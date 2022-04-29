@@ -104,52 +104,59 @@ type GithubProfile {
 
 ## HTTP Cache-Control header
 
-You can change the Cache-Control header of your response regardless of [@cache](../api-reference/directives.md#cache),
-by adding the [@cacheControl](../api-reference/directives.md#cachecontrol) directive to a field. The final header settings
-are calculated based on these rules:
+You can change the [`Cache-Control` header](https://developer.mozilla.org/de/docs/Web/HTTP/Headers/Cache-Control) of your response
+regardless of [@cache](../api-reference/directives.md#cache)
+by adding the [@cacheControl](../api-reference/directives.md#cachecontrol) directive to a field.
 
-- The response's maxAge equals the lowest maxAge among all fields. If that value is 0, the entire result is not cached.
-- The response's scope is PRIVATE if any field's scope is PRIVATE.
+The final header settings are calculated based on these rules:
+
+- `max-age` equals the lowest `maxAge` among all fields. If that value is 0, `no-cache` is used instead
+- visibility is `public` unless the scope of a queried field is `PRIVATE`
 
 For more details check [Apollo](https://www.apollographql.com/docs/apollo-server/performance/caching/#calculating-cache-behavior).
 
-Now let's see some examples, consider this as your schema:
+Given the following example schema:
+
 ```graphql
 type User {
     tasks: [Task!]! @hasMany @cacheControl(maxAge: 50, scope: PUBLIC)
 }
 
-type Team {
+type Company {
     users: [User!]! @hasMany @cacheControl(maxAge: 25, scope: PUBLIC)
 }
 
 type Task {
-    id: Int @cacheControl(maxAge: 10, scope: PUBLIC)
-    ToDo: String @cacheControl
+    id: ID @cacheControl(maxAge: 10, scope: PUBLIC)
+    description: String @cacheControl
 }
 
 type Query {
-    user: User @first @cacheControl(maxAge: 5, scope: PRIVATE)
-    team: Team @first
+    me: User! @auth @cacheControl(maxAge: 5, scope: PRIVATE)
+    company: Company!
 }
 ```
 
 The Cache-Control headers for some queries will be: 
 
-```graphql 
+```graphql
 # Cache-Control header: no-cache, PRIVATE
-query user {    # 5, PRIVATE
-    tasks {     # 50, PUBLIC
-        id      # 10, PUBLIC
-        ToDo    # no-cache, PUBLIC
+{        
+    me { # 5, PRIVATE
+        tasks { # 50, PUBLIC
+            id # 10, PUBLIC
+            description # no-cache, PUBLIC
+        }
     }
 }
 
-# Cache-Control header: max-age=10, public
-query team {
-    users {         # 25, PUBLIC
-        tasks  {    # 50, PUBLIC
-            id      # 10, PUBLIC
+# Cache-Control header: no-cache, public
+{
+    company {
+        users { # 25, PUBLIC
+            tasks { # 50, PUBLIC
+                id # 10, PUBLIC
+            }
         }
     }
 }

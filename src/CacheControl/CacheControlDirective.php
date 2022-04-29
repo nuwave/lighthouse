@@ -23,19 +23,19 @@ class CacheControlDirective extends BaseDirective implements FieldMiddleware
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Set the HTTP Cache-Control headers of the response.
+Influences the HTTP `Cache-Control` headers of the response.
 """
 directive @cacheControl(
   """
-  The maximum amount of time the field's cached value is valid, in seconds. 
-  The default value is 0(no-cache).
+  The maximum amount of time the field's cached value is valid, in seconds.
+  0 means the field is not cacheable.
   """
-  maxAge: Int = 0
+  maxAge: Int! = 0
 
   """
-  If PRIVATE, the field's value is specific to a single user. 
+  Is the value specific to a single user?
   """
-  scope: CacheControlScope = PUBLIC  
+  scope: CacheControlScope! = PUBLIC
 ) on FIELD_DEFINITION | OBJECT | INTERFACE | UNION
 
 """
@@ -43,12 +43,12 @@ Options for the `scope` argument of `@cacheControl`.
 """
 enum CacheControlScope {
     """
-    The HTTP Cache-Control header set to public.
+    The value is the same for each user.
     """
     PUBLIC
 
     """
-    The HTTP Cache-Control header set to private.
+    The value is specific to a single user.
     """
     PRIVATE
 }
@@ -57,11 +57,12 @@ GRAPHQL;
 
     public function handleField(FieldValue $fieldValue, Closure $next)
     {
-        $maxAge = $this->directiveArgValue('maxAge') ?? 0;
-        $scope = $this->directiveArgValue('scope') ?? 'PUBLIC';
-
-        $this->cacheControl->addToMaxAgeList($maxAge);
-        $this->cacheControl->addToScopeList($scope);
+        $this->cacheControl->addToMaxAgeList(
+            $this->directiveArgValue('maxAge') ?? 0
+        );
+        $this->cacheControl->addToScopeList(
+            $this->directiveArgValue('scope') ?? 'PUBLIC'
+        );
 
         return $next($fieldValue);
     }
