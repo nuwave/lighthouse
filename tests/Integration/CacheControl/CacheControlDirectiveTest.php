@@ -16,8 +16,7 @@ final class CacheControlDirectiveTest extends DBTestCase
             'name' => 'foobar',
         ]);
 
-        $this->schema /** @lang GraphQL */
-            = '
+        $this->schema /** @lang GraphQL */ = '
         type User {
             id: ID!
             name: String
@@ -47,8 +46,7 @@ final class CacheControlDirectiveTest extends DBTestCase
             'name' => 'foobar',
         ]);
 
-        $this->schema /** @lang GraphQL */
-            = "
+        $this->schema /** @lang GraphQL */ = "
         type User {
             id: ID!
             name: String $directive
@@ -86,8 +84,7 @@ final class CacheControlDirectiveTest extends DBTestCase
      */
     public function testUseDirectiveNested(string $query, string $expectedHeaderString): void
     {
-        $this->schema /** @lang GraphQL */
-            = '
+        $this->schema /** @lang GraphQL */ = '
         type User {
             tasks: [Task!]! @hasMany @cacheControl(maxAge: 50, scope: PUBLIC)
         }
