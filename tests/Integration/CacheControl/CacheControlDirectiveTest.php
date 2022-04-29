@@ -90,12 +90,12 @@ final class CacheControlDirectiveTest extends DBTestCase
             = '
         type User {
             tasks: [Task!]! @hasMany @cacheControl(maxAge: 50, scope: PUBLIC)
-        } 
-        
+        }
+
         type Team {
             users: [User!]! @hasMany @cacheControl(maxAge: 25, scope: PUBLIC)
         }
-         
+
         type Task {
             id: Int @cacheControl(maxAge: 10, scope: PUBLIC)
             foo: String @cacheControl
@@ -103,7 +103,7 @@ final class CacheControlDirectiveTest extends DBTestCase
 
         type Query {
             user: User @first @cacheControl(maxAge: 5, scope: PRIVATE)
-            team: Team @first 
+            team: Team @first
         }
         ';
 
@@ -129,10 +129,10 @@ final class CacheControlDirectiveTest extends DBTestCase
     {
         return [
             [/** @lang GraphQL */ '
-                {   
+                {
                     user {
                         tasks {
-                            id 
+                            id
                             foo
                         }
                     }
@@ -140,17 +140,17 @@ final class CacheControlDirectiveTest extends DBTestCase
             ', 'no-cache, private',
             ],
             [/** @lang GraphQL */ '
-                {   
+                {
                     user {
                         tasks {
-                            id 
+                            id
                         }
                     }
                 }
             ', 'max-age=5, private',
             ],
             [/** @lang GraphQL */ '
-                {   
+                {
                     team {
                         users {
                             tasks  {
@@ -159,10 +159,10 @@ final class CacheControlDirectiveTest extends DBTestCase
                         }
                     }
                 }
-            ', 'max-age=10, public',
+            ', 'no-cache, public',
             ],
             [/** @lang GraphQL */ '
-                {   
+                {
                     team {
                         users {
                             tasks  {
