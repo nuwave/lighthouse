@@ -20,6 +20,7 @@ class StartExecution
      * @var \GraphQL\Type\Schema;
      */
     public $schema;
+
     /**
      * The client given parsed query string.
      *

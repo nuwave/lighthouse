@@ -8,9 +8,9 @@ use GraphQL\Language\Visitor;
 use GraphQL\Type\Definition\ListOfType;
 use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\ScalarType;
-use GraphQL\Utils\AST;
 use GraphQL\Utils\TypeInfo;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\Events\EndRequest;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
@@ -35,32 +35,36 @@ class CacheControlServiceProvider extends ServiceProvider
         $dispatcher->listen(
             StartExecution::class,
             function (StartExecution $StartExecution) use ($cacheControl) {
-                $schema = $StartExecution->schema;
-                $typeInfo = new TypeInfo($schema);
-                $valueNode = $StartExecution->query->definitions;
-                Visitor::visit($valueNode, Visitor::visitWithTypeInfo($typeInfo, [
-                    NodeKind::FIELD => function (FieldNode $node) use ($schema, $typeInfo, $cacheControl): void {
+                $typeInfo = new TypeInfo($StartExecution->schema);
+                Visitor::visit($StartExecution->query, Visitor::visitWithTypeInfo($typeInfo, [
+                    NodeKind::FIELD => function (FieldNode $node) use ($typeInfo, $cacheControl): void {
                         $field = $typeInfo->getFieldDef();
                         // @phpstan-ignore-next-line can be null, remove ignore with graphql-php 15
                         if (null === $field) {
                             return;
                         }
 
-                        $nodeType = AST::typeFromAST($schema, $field->astNode->type);
+                        $nodeType = $field->getType();
                         if ($nodeType instanceof (NonNull::class) || $nodeType instanceof (ListOfType::class)) {
                             do {
                                 $nodeType = $nodeType->getOfType();
                             } while ($nodeType instanceof (NonNull::class) || $nodeType instanceof (ListOfType::class));
                         }
 
-                        if (!$nodeType instanceof (ScalarType::class)) {
+                        if (! $nodeType instanceof (ScalarType::class)) {
                             $maxAge = 0;
                         }
 
-                        $cacheControlDirective = collect($field->astNode->directives)->where('name.value', 'cacheControl')->first();
-                        if (!is_null($cacheControlDirective) && key_exists('arguments', $cacheControlDirective->toArray())) {
-                            $maxAge = collect($cacheControlDirective->arguments)->where('name.value', 'maxAge')->pluck('value.value')->first() ?? 0;
-                            $scope = collect($cacheControlDirective->arguments)->where('name.value', 'scope')->pluck('value.value')->first() ?? 'PUBLIC';
+                        $cacheControlDirective = new Collection($field->astNode->directives);
+                        $cacheControlDirective = $cacheControlDirective->where('name.value', 'cacheControl')->first();
+                        if (! is_null($cacheControlDirective) && key_exists('arguments', $cacheControlDirective->toArray())) {
+                            $arguments = new Collection($cacheControlDirective->arguments);
+                            $maxAge
+                                = $arguments->where('name.value', 'maxAge')->pluck('value.value')->first()
+                                ?? 0;
+                            $scope
+                                = $arguments->where('name.value', 'scope')->pluck('value.value')->first()
+                                ?? 'PUBLIC';
                         }
 
                         if (isset($maxAge)) {

@@ -33,8 +33,9 @@ class CacheControl
      *
      * @return array<string, bool|int>
      */
-    public function makeHeaderOptions(): array {
-        $maxAge = !empty($this->maxAgeList)
+    public function makeHeaderOptions(): array
+    {
+        $maxAge = ! empty($this->maxAgeList)
             ? min($this->maxAgeList)
             : 0;
         if (0 === $maxAge) {
