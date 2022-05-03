@@ -33,24 +33,17 @@ class CacheControl
      *
      * @return array<string, bool|int>
      */
-    public function makeHeaderOptions(): array
-    {
-        // Early return if @cacheControl not used.
-        if (empty($this->scopeList) && empty($this->maxAgeList)) {
-            $headerOptions['no_cache'] = true;
-            $headerOptions['private'] = true;
-
-            return $headerOptions;
-        }
-
-        $maxAge = min($this->maxAgeList);
+    public function makeHeaderOptions(): array {
+        $maxAge = !empty($this->maxAgeList)
+            ? min($this->maxAgeList)
+            : 0;
         if (0 === $maxAge) {
             $headerOptions['no_cache'] = true;
         } else {
             $headerOptions['max_age'] = $maxAge;
         }
 
-        if (in_array('PRIVATE', $this->scopeList)) {
+        if (empty($this->scopeList) || in_array('PRIVATE', $this->scopeList)) {
             $headerOptions['private'] = true;
         } else {
             $headerOptions['public'] = true;

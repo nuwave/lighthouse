@@ -2,12 +2,9 @@
 
 namespace Nuwave\Lighthouse\CacheControl;
 
-use Closure;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
-class CacheControlDirective extends BaseDirective implements FieldMiddleware
+class CacheControlDirective extends BaseDirective
 {
     /**
      * @var \Nuwave\Lighthouse\CacheControl\CacheControl
@@ -53,17 +50,5 @@ enum CacheControlScope {
     PRIVATE
 }
 GRAPHQL;
-    }
-
-    public function handleField(FieldValue $fieldValue, Closure $next)
-    {
-        $this->cacheControl->addToMaxAgeList(
-            $this->directiveArgValue('maxAge') ?? 0
-        );
-        $this->cacheControl->addToScopeList(
-            $this->directiveArgValue('scope') ?? 'PUBLIC'
-        );
-
-        return $next($fieldValue);
     }
 }

@@ -3,6 +3,7 @@
 namespace Tests\Integration\CacheControl;
 
 use Tests\DBTestCase;
+use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\Team;
 use Tests\Utils\Models\User;
@@ -53,7 +54,7 @@ final class CacheControlDirectiveTest extends DBTestCase
         }
 
         type Query {
-            user: User @mock
+            user: User @mock @cacheControl(maxAge:50)
         }
         ";
 
@@ -87,6 +88,12 @@ final class CacheControlDirectiveTest extends DBTestCase
         $this->schema /** @lang GraphQL */ = '
         type User {
             tasks: [Task!]! @hasMany @cacheControl(maxAge: 50, scope: PUBLIC)
+            posts: [Post!]! @hasMany
+        }
+        
+        type Post {
+            id: Int @cacheControl(maxAge: 10, scope: PUBLIC)
+            foo: String @cacheControl(scope: PRIVATE)
         }
 
         type Team {
@@ -96,11 +103,13 @@ final class CacheControlDirectiveTest extends DBTestCase
         type Task {
             id: Int @cacheControl(maxAge: 10, scope: PUBLIC)
             foo: String @cacheControl
+            bar: String
         }
 
         type Query {
             user: User @first @cacheControl(maxAge: 5, scope: PRIVATE)
             team: Team @first
+            teamWithCache: Team @first @cacheControl(maxAge: 20)
         }
         ';
 
@@ -109,6 +118,9 @@ final class CacheControlDirectiveTest extends DBTestCase
 
         $tasks = factory(Task::class, 3)->make();
         $user->tasks()->saveMany($tasks);
+
+        $posts = factory(Post::class, 3)->make();
+        $user->posts()->saveMany($posts);
 
         $team = factory(Team::class)->create();
         assert($team instanceof Team);
@@ -169,6 +181,43 @@ final class CacheControlDirectiveTest extends DBTestCase
                     }
                 }
             ', 'no-cache, public',
+            ],
+            [/** @lang GraphQL */ '
+                {
+                    teamWithCache {
+                        users {
+                            tasks  {
+                                bar
+                            }
+                        }
+                    }
+                }
+            ', 'max-age=20, public',
+            ],
+            [/** @lang GraphQL */ '
+                {
+                    teamWithCache {
+                        users {
+                            posts  {
+                                id
+                            }
+                        }
+                    }
+                }
+            ', 'no-cache, public',
+            ],
+            [/** @lang GraphQL */ '
+                {
+                    teamWithCache {
+                        users {
+                            posts  {
+                                id
+                                foo
+                            }
+                        }
+                    }
+                }
+            ', 'no-cache, private',
             ],
         ];
     }
