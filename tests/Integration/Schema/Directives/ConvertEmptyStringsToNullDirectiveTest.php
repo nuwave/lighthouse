@@ -6,7 +6,7 @@ use Tests\TestCase;
 
 final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
 {
-    public function testArgument(): void
+    public function testOnArgument(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -29,7 +29,7 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
         ]);
     }
 
-    public function testMatrix(): void
+    public function testOnArgumentWithMatrix(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -52,7 +52,7 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
         ]);
     }
 
-    public function testFieldInputs(): void
+    public function testOnField(): void
     {
         $this->mockResolver(static function ($root, array $args): array {
             return $args;
@@ -60,12 +60,6 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
 
         $this->schema .= /** @lang GraphQL */ '
         type Foo {
-            foo: String
-            bar: [String]!
-            baz: Int!
-        }
-
-        input FooInput {
             foo: String
             bar: [String]!
             baz: Int!
@@ -103,7 +97,7 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
         ]);
     }
 
-    public function testDoesNotConvertNonNullableArguments(): void
+    public function testDoesNotConvertNonNullableArgumentsWhenUsedOnField(): void
     {
         $this->mockResolver(static function ($root, array $args): array {
             return $args;
@@ -144,6 +138,29 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
                     'bar' => [''],
                     'baz' => [[['']]],
                 ],
+            ],
+        ]);
+    }
+
+    public function testConvertsNonNullableArgumentsWhenUsedOnArgument(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(bar: String! @convertEmptyStringsToNull): String @mock
+        }
+        ';
+
+        $this->mockResolver(function ($_, array $args): ?string {
+            return $args['bar'];
+        });
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo(bar: "")
+        }
+        ')->assertJson([
+            'data' => [
+                'foo' => null,
             ],
         ]);
     }
