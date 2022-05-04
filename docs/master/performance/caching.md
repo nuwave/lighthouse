@@ -155,6 +155,7 @@ The Cache-Control headers for some queries will be:
 # Cache-Control header: no-cache, public
 {
   company {
+    # no-cache, public
     users {
       # 25, PUBLIC
       tasks {
