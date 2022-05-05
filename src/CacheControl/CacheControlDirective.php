@@ -6,16 +6,6 @@ use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 
 class CacheControlDirective extends BaseDirective
 {
-    /**
-     * @var \Nuwave\Lighthouse\CacheControl\CacheControl
-     */
-    protected $cacheControl;
-
-    public function __construct(CacheControl $cacheControl)
-    {
-        $this->cacheControl = $cacheControl;
-    }
-
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
