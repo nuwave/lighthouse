@@ -772,8 +772,10 @@ type Mutation {
   createPost(input: CreatePostInput!): Post! @convertEmptyStringsToNull
 }
 ```
+
 Non-nullable arguments will *not* be converted when this directive is used on a field,
 but will be converted when it is used directly on the argument.
+
 ```graphql
 type Mutation {
   createPost(
