@@ -5,7 +5,9 @@ namespace Nuwave\Lighthouse\CacheControl;
 use GraphQL\Language\AST\FieldNode;
 use GraphQL\Language\AST\NodeKind;
 use GraphQL\Language\Visitor;
+use GraphQL\Type\Definition\CompositeType;
 use GraphQL\Type\Definition\ScalarType;
+use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\WrappingType;
 use GraphQL\Utils\TypeInfo;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -14,6 +16,7 @@ use Nuwave\Lighthouse\Events\EndRequest;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Schema\RootType;
 
 class CacheControlServiceProvider extends ServiceProvider
 {
@@ -47,6 +50,12 @@ class CacheControlServiceProvider extends ServiceProvider
                         // TODO use getInnermostType() in graphql-php 15
                         while ($nodeType instanceof WrappingType) {
                             $nodeType = $nodeType->getWrappedType();
+                        }
+
+                        $parent = $typeInfo->getParentType();
+                        assert($parent instanceof CompositeType && $parent instanceof Type);
+                        if (RootType::isRootType($parent->name)) {
+                            $maxAge = 0;
                         }
 
                         if (! $nodeType instanceof ScalarType) {
