@@ -55,17 +55,11 @@ class CacheControlServiceProvider extends ServiceProvider
                             $maxAge = 0;
                         }
 
-                        if (isset($field->astNode->directives)) {
-                            $cacheControlDirective = new Collection($field->astNode->directives);
-                            $cacheControlDirective = $cacheControlDirective->where('name.value', 'cacheControl')->first();
-                            if (! is_null($cacheControlDirective) && key_exists('arguments', $cacheControlDirective->toArray())) {
-                                $arguments = new Collection($cacheControlDirective->arguments);
-                                $maxAge
-                                    = $arguments->where('name.value', 'maxAge')->pluck('value.value')->first()
-                                    ?? 0;
-                                $scope
-                                    = $arguments->where('name.value', 'scope')->pluck('value.value')->first()
-                                    ?? 'PUBLIC';
+                        if (isset($field->astNode)) {
+                            $cacheControlDirective = ASTHelper::directiveDefinition('cacheControl', $field->astNode);
+                            if ($cacheControlDirective !== null) {
+                                $maxAge = ASTHelper::directiveArgValue($cacheControlDirective, 'maxAge') ?? 0;
+                                $scope = ASTHelper::directiveArgValue($cacheControlDirective, 'scope') ?? 'PUBLIC';
                             }
                         }
 
