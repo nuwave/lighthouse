@@ -29,27 +29,24 @@ class CacheControl
     }
 
     /**
-     * Create an array of options to fulfil HTTP Cache-Control header.
-     *
-     * @return array<string, bool|int>
+     * Calculate max-age for HTTP Cache-Control.
      */
-    public function makeHeaderOptions(): array
+    public function calculateMaxAge(): int
     {
-        $maxAge = ! empty($this->maxAgeList)
+        return ! empty($this->maxAgeList)
             ? min($this->maxAgeList)
             : 0;
-        if (0 === $maxAge) {
-            $headerOptions['no_cache'] = true;
-        } else {
-            $headerOptions['max_age'] = $maxAge;
-        }
+    }
 
+    /**
+     * Calculate scope for HTTP Cache-Control.
+     */
+    public function calculateScope(): string
+    {
         if (empty($this->scopeList) || in_array('PRIVATE', $this->scopeList)) {
-            $headerOptions['private'] = true;
-        } else {
-            $headerOptions['public'] = true;
+            return 'private';
         }
 
-        return $headerOptions;
+        return 'public';
     }
 }

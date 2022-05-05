@@ -83,7 +83,14 @@ class CacheControlServiceProvider extends ServiceProvider
         $dispatcher->listen(
             EndRequest::class,
             function (EndRequest $request) use ($cacheControl): void {
-                $request->response->setCache($cacheControl->makeHeaderOptions());
+                $maxAge = $cacheControl->calculateMaxAge();
+                if (0 != $maxAge) {
+                    $request->response->setMaxAge($maxAge);
+                } else {
+                    $request->response->headers->addCacheControlDirective('no-cache');
+                }
+                $request->response->headers->addCacheControlDirective($cacheControl->calculateScope());
+
                 $this->app->forgetInstance(CacheControl::class);
             }
         );
