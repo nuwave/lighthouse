@@ -34,9 +34,9 @@ class CacheControlServiceProvider extends ServiceProvider
 
         $dispatcher->listen(
             StartExecution::class,
-            function (StartExecution $StartExecution) use ($cacheControl) {
-                $typeInfo = new TypeInfo($StartExecution->schema);
-                Visitor::visit($StartExecution->query, Visitor::visitWithTypeInfo($typeInfo, [
+            function (StartExecution $startExecution) use ($cacheControl) {
+                $typeInfo = new TypeInfo($startExecution->schema);
+                Visitor::visit($startExecution->query, Visitor::visitWithTypeInfo($typeInfo, [
                     NodeKind::FIELD => function (FieldNode $node) use ($typeInfo, $cacheControl): void {
                         $field = $typeInfo->getFieldDef();
                         // @phpstan-ignore-next-line can be null, remove ignore with graphql-php 15
