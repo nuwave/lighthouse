@@ -62,6 +62,34 @@ final class CacheControlDirectiveTest extends DBTestCase
         ')->assertHeader('Cache-Control', 'max-age=5, private');
     }
 
+    public function testRootScalar(): void
+    {
+        $this->mockResolver([
+            'id' => 1,
+        ]);
+        $this->mockResolver(42, 'value');
+
+        $this->schema /** @lang GraphQL */ = '
+        type User {
+            id: ID!
+        }
+
+        type Query {
+            me: User @mock @cacheControl(maxAge: 5)
+            value: Int! @mock(key: "value")
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            me {
+                id
+            }
+            value
+        }
+        ')->assertHeader('Cache-Control', 'no-cache, private');
+    }
+
     public function testInheritanceWithNonScalar(): void
     {
         $this->mockResolver([
