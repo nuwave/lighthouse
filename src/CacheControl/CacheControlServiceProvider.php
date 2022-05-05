@@ -5,9 +5,8 @@ namespace Nuwave\Lighthouse\CacheControl;
 use GraphQL\Language\AST\FieldNode;
 use GraphQL\Language\AST\NodeKind;
 use GraphQL\Language\Visitor;
-use GraphQL\Type\Definition\ListOfType;
-use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\ScalarType;
+use GraphQL\Type\Definition\WrappingType;
 use GraphQL\Utils\TypeInfo;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\ServiceProvider;
@@ -45,10 +44,9 @@ class CacheControlServiceProvider extends ServiceProvider
                         }
 
                         $nodeType = $field->getType();
-                        if ($nodeType instanceof NonNull || $nodeType instanceof ListOfType) {
-                            do {
-                                $nodeType = $nodeType->getOfType();
-                            } while ($nodeType instanceof NonNull || $nodeType instanceof ListOfType);
+                        // TODO use getInnermostType() in graphql-php 15
+                        while ($nodeType instanceof WrappingType) {
+                            $nodeType = $nodeType->getWrappedType();
                         }
 
                         if (! $nodeType instanceof ScalarType) {
@@ -80,11 +78,13 @@ class CacheControlServiceProvider extends ServiceProvider
                 $maxAge = $cacheControl->calculateMaxAge();
                 $response = $request->response;
                 $headers = $response->headers;
+
                 if ($maxAge > 0) {
                     $response->setMaxAge($maxAge);
                 } else {
                     $headers->addCacheControlDirective('no-cache');
                 }
+
                 $headers->addCacheControlDirective($cacheControl->calculateScope());
 
                 $this->app->forgetInstance(CacheControl::class);
