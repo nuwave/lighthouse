@@ -45,13 +45,13 @@ class CacheControlServiceProvider extends ServiceProvider
                         }
 
                         $nodeType = $field->getType();
-                        if ($nodeType instanceof (NonNull::class) || $nodeType instanceof (ListOfType::class)) {
+                        if ($nodeType instanceof NonNull || $nodeType instanceof ListOfType) {
                             do {
                                 $nodeType = $nodeType->getOfType();
-                            } while ($nodeType instanceof (NonNull::class) || $nodeType instanceof (ListOfType::class));
+                            } while ($nodeType instanceof NonNull || $nodeType instanceof ListOfType);
                         }
 
-                        if (! $nodeType instanceof (ScalarType::class)) {
+                        if (! $nodeType instanceof ScalarType) {
                             $maxAge = 0;
                         }
 
