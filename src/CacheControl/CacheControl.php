@@ -33,9 +33,9 @@ class CacheControl
      */
     public function calculateMaxAge(): int
     {
-        return ! empty($this->maxAgeList)
-            ? min($this->maxAgeList)
-            : 0;
+        return empty($this->maxAgeList)
+            ? 0
+            : min($this->maxAgeList);
     }
 
     /**
