@@ -10,11 +10,11 @@ use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Utils\TypeInfo;
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\Events\EndRequest;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Events\StartExecution;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 
 class CacheControlServiceProvider extends ServiceProvider
 {
@@ -56,8 +56,8 @@ class CacheControlServiceProvider extends ServiceProvider
                         }
 
                         if (isset($field->astNode)) {
-                            $cacheControlDirective = ASTHelper::directiveDefinition('cacheControl', $field->astNode);
-                            if ($cacheControlDirective !== null) {
+                            $cacheControlDirective = ASTHelper::directiveDefinition($field->astNode, 'cacheControl');
+                            if (null !== $cacheControlDirective) {
                                 $maxAge = ASTHelper::directiveArgValue($cacheControlDirective, 'maxAge') ?? 0;
                                 $scope = ASTHelper::directiveArgValue($cacheControlDirective, 'scope') ?? 'PUBLIC';
                             }
@@ -78,12 +78,14 @@ class CacheControlServiceProvider extends ServiceProvider
             EndRequest::class,
             function (EndRequest $request) use ($cacheControl): void {
                 $maxAge = $cacheControl->calculateMaxAge();
+                $response = $request->response;
+                $headers = $response->headers;
                 if ($maxAge > 0) {
-                    $request->response->setMaxAge($maxAge);
+                    $response->setMaxAge($maxAge);
                 } else {
-                    $request->response->headers->addCacheControlDirective('no-cache');
+                    $headers->addCacheControlDirective('no-cache');
                 }
-                $request->response->headers->addCacheControlDirective($cacheControl->calculateScope());
+                $headers->addCacheControlDirective($cacheControl->calculateScope());
 
                 $this->app->forgetInstance(CacheControl::class);
             }
