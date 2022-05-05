@@ -142,10 +142,8 @@ The Cache-Control headers for some queries will be:
 ```graphql
 # Cache-Control header: no-cache, PRIVATE
 {
-  me {
-    # 5, PRIVATE
-    tasks {
-      # 50, PUBLIC
+  me { # 5, PRIVATE
+    tasks { # 50, PUBLIC
       id # 10, PUBLIC
       description # no-cache, PUBLIC
     }
