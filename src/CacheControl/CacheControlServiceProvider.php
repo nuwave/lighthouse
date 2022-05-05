@@ -78,7 +78,7 @@ class CacheControlServiceProvider extends ServiceProvider
             EndRequest::class,
             function (EndRequest $request) use ($cacheControl): void {
                 $maxAge = $cacheControl->calculateMaxAge();
-                if (0 != $maxAge) {
+                if ($maxAge > 0) {
                     $request->response->setMaxAge($maxAge);
                 } else {
                     $request->response->headers->addCacheControlDirective('no-cache');
