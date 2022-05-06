@@ -23,8 +23,7 @@ final class UploadDirectiveTest extends TestCase
 
         Storage::fake('uploadDisk');
 
-        $this->schema = /** @lang GraphQL */
-            '
+        $this->schema = /** @lang GraphQL */ '
         scalar Upload @scalar(class: "Nuwave\\\\Lighthouse\\\\Schema\\\\Types\\\\Scalars\\\\Upload")
     
         type Mutation {
