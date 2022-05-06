@@ -4,8 +4,10 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Exception;
 use Illuminate\Http\UploadedFile;
+use InvalidArgumentException;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
+use Symfony\Component\HttpFoundation\File\Exception\CannotWriteFileException;
 
 class UploadDirective extends BaseDirective implements ArgDirective, ArgTransformerDirective
 {
@@ -41,7 +43,7 @@ GRAPHQL;
         }
 
         if (!($argumentValue instanceof UploadedFile)) {
-            throw new Exception("Expected UploadedFile from `{$this->name()}`");
+            throw new InvalidArgumentException("Expected UploadedFile from `{$this->nodeName()}`");
         }
 
         $filename = $argumentValue->hashName();
@@ -53,7 +55,7 @@ GRAPHQL;
         );
 
         if ($filepathInStorage === false) {
-            throw new Exception("Unable to upload `{$this->name()}` file to `{$this->pathArgValue()}` via disk `{$this->diskArgValue()}`");
+            throw new CannotWriteFileException("Unable to upload `{$this->name()}` file to `{$this->pathArgValue()}` via disk `{$this->diskArgValue()}`");
         }
 
         return $filepathInStorage;
@@ -66,6 +68,6 @@ GRAPHQL;
 
     public function pathArgValue(): string
     {
-        return $this->directiveArgValue('path', '');
+        return $this->directiveArgValue('path', '/');
     }
 }

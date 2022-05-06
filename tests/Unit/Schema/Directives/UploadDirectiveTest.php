@@ -3,9 +3,12 @@
 namespace Tests\Unit\Schema\Directives;
 
 use Exception;
+use Illuminate\Http\Testing\File;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use InvalidArgumentException;
 use Mockery;
+use Symfony\Component\HttpFoundation\File\Exception\CannotWriteFileException;
 use Tests\TestCase;
 
 final class UploadDirectiveTest extends TestCase
@@ -226,7 +229,7 @@ final class UploadDirectiveTest extends TestCase
 
     public function testThrowsAnExceptionIfStoringFails(): void
     {
-        $this->expectExceptionMessage("Unable to upload `upload` file to `/` via disk `uploadDisk`");
+        $this->expectExceptionObject(new CannotWriteFileException("Unable to upload `upload` file to `/` via disk `uploadDisk`"));
 
         config()->offsetSet('filesystems.default', 'uploadDisk');
 
@@ -245,7 +248,7 @@ final class UploadDirectiveTest extends TestCase
         }
         ' . self::PLACEHOLDER_QUERY;
 
-        $file = Mockery::mock(UploadedFile::class);
+        $file = Mockery::mock(File::class);
 
         $file->shouldReceive('hashName')
             ->andReturn('testFileName.pdf');
@@ -277,7 +280,7 @@ final class UploadDirectiveTest extends TestCase
 
     public function testThrowsAnExceptionIfAttributeIsNotUploadedFile(): void
     {
-        $this->expectException(Exception::class);
+        $this->expectExceptionObject(new InvalidArgumentException("Expected UploadedFile from `baz`"));
 
         $this->schema = /** @lang GraphQL */
             '
