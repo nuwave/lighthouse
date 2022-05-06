@@ -25,7 +25,7 @@ class CacheControlServiceProvider extends ServiceProvider
         $this->app->singleton(CacheControl::class);
     }
 
-    public function boot(Dispatcher $dispatcher, CacheControl $cacheControl): void
+    public function boot(Dispatcher $dispatcher): void
     {
         $dispatcher->listen(
             RegisterDirectiveNamespaces::class,
@@ -36,7 +36,8 @@ class CacheControlServiceProvider extends ServiceProvider
 
         $dispatcher->listen(
             StartExecution::class,
-            function (StartExecution $startExecution) use ($cacheControl) {
+            function (StartExecution $startExecution) {
+                $cacheControl = $this->app->make(CacheControl::class);
                 $typeInfo = new TypeInfo($startExecution->schema);
                 Visitor::visit($startExecution->query, Visitor::visitWithTypeInfo($typeInfo, [
                     NodeKind::FIELD => function (FieldNode $node) use ($typeInfo, $cacheControl): void {
@@ -83,7 +84,9 @@ class CacheControlServiceProvider extends ServiceProvider
 
         $dispatcher->listen(
             EndRequest::class,
-            function (EndRequest $request) use ($cacheControl): void {
+            function (EndRequest $request): void {
+                $cacheControl = $this->app->make(CacheControl::class);
+
                 $maxAge = $cacheControl->calculateMaxAge();
                 $response = $request->response;
                 $headers = $response->headers;
