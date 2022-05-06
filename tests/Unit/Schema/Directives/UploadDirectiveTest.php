@@ -38,10 +38,10 @@ final class UploadDirectiveTest extends TestCase
         $this->multipartGraphQL(
             [
                 'query' => /** @lang GraphQL */ '
-                mutation ($file: Upload!) {
-                    file: upload(file: $file)
-                }
-            ',
+                    mutation ($file: Upload!) {
+                        file: upload(file: $file)
+                    }
+                ',
                 'variables' => [
                     'file' => null,
                 ],
