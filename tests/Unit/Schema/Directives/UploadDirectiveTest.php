@@ -17,8 +17,7 @@ final class UploadDirectiveTest extends TestCase
         $filePath = null;
 
         $this->mockResolver(static function ($root, array $args) use (&$filePath): ?string {
-            $filePath = $args['file'];
-            return $args['file'];
+            return $filePath = $args['file'];
         });
 
         Storage::fake('uploadDisk');
