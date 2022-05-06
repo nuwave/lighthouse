@@ -80,14 +80,28 @@ final class CacheControlDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ '
+        dump($this->graphQL(/** @lang GraphQL */ '
+        {
+            value
+        }
+        ')->headers->get('Cache-Control'));
+
+        dump($this->graphQL(/** @lang GraphQL */ '
+        {
+            me {
+                id
+            }
+        }
+        ')->headers->get('Cache-Control'));
+
+        dump($this->graphQL(/** @lang GraphQL */ '
         {
             me {
                 id
             }
             value
         }
-        ')->assertHeader('Cache-Control', 'no-cache, private');
+        ')->headers->get('Cache-Control'));
     }
 
     public function testInheritanceWithNonScalar(): void
