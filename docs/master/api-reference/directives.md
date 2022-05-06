@@ -781,6 +781,18 @@ directive @count(
   Apply scopes to the underlying query.
   """
   scopes: [String!]
+
+  """
+  The field to count.
+  counts only a specific field
+  """
+  field: String
+
+  """
+  distinct count.
+  exclude duplicated rows
+  """
+  distinct: Boolean
 ) on FIELD_DEFINITION
 ```
 
