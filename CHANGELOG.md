@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+
+- Restored `Laravel\Scout\Builder` as a valid option for the `@paginate` directive https://github.com/nuwave/lighthouse/pull/2183
+
 ## v5.57.0
 
 ### Added
