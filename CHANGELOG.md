@@ -13,7 +13,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
-- Provide additional information about detected usages of deprecated elements
+- Provide additional information about detected usages of deprecated elements https://github.com/nuwave/lighthouse/pull/2141
 
 ## v5.48.2
 
