@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.49.0
+
+### Added
+
+- Provide additional information about detected usages of deprecated elements https://github.com/nuwave/lighthouse/pull/2141
+
 ## v5.48.2
 
 ### Fixed
