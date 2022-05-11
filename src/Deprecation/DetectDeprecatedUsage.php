@@ -14,12 +14,12 @@ use GraphQL\Validator\ValidationContext;
 /**
  * @experimental not enabled by default, not guaranteed to be stable
  *
- * @phpstan-type DeprecationHandler callable(array<string, DeprecatedUsage>): void
+ * @phpstan-type DeprecationHandler callable(array<string, \Nuwave\Lighthouse\Deprecation\DeprecatedUsage>): void
  */
 class DetectDeprecatedUsage extends ValidationRule
 {
     /**
-     * @var array<string, true>
+     * @var array<string, \Nuwave\Lighthouse\Deprecation\DeprecatedUsage>
      */
     protected $deprecations = [];
 
