@@ -49,7 +49,6 @@ final class DeprecationTest extends TestCase
         $this->assertSame(Directive::DEFAULT_DEPRECATION_REASON, $deprecatedUsage->reason);
     }
 
-
     public function testDetectsDeprecatedFieldWithReason(): void
     {
         $this->schema = /** @lang GraphQL */ '

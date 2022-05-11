@@ -55,7 +55,7 @@ class DetectDeprecatedUsage extends ValidationRule
                 }
 
                 $deprecationReason = $field->deprecationReason;
-                if ($deprecationReason !== null) {
+                if (null !== $deprecationReason) {
                     $parent = $context->getParentType();
                     if (null === $parent) {
                         return;
@@ -76,7 +76,7 @@ class DetectDeprecatedUsage extends ValidationRule
                 }
 
                 $deprecationReason = $value->deprecationReason;
-                if ($deprecationReason !== null) {
+                if (null !== $deprecationReason) {
                     $this->registerDeprecation("{$enum->name}.{$value->name}", $deprecationReason);
                 }
             },
@@ -94,6 +94,6 @@ class DetectDeprecatedUsage extends ValidationRule
             $this->deprecations[$element] = new DeprecatedUsage($reason);
         }
 
-        $this->deprecations[$element]->count++;
+        ++$this->deprecations[$element]->count;
     }
 }
