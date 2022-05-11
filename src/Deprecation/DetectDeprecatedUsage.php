@@ -14,7 +14,7 @@ use GraphQL\Validator\ValidationContext;
 /**
  * @experimental not enabled by default, not guaranteed to be stable
  *
- * @phpstan-type DeprecationHandler callable(array<string, true>): void
+ * @phpstan-type DeprecationHandler callable(array<string, DeprecatedUsage>): void
  */
 class DetectDeprecatedUsage extends ValidationRule
 {
@@ -54,13 +54,14 @@ class DetectDeprecatedUsage extends ValidationRule
                     return;
                 }
 
-                if ($field->isDeprecated()) {
+                $deprecationReason = $field->deprecationReason;
+                if ($deprecationReason !== null) {
                     $parent = $context->getParentType();
                     if (null === $parent) {
                         return;
                     }
 
-                    $this->deprecations["{$parent->name}.{$field->name}"] = true;
+                    $this->registerDeprecation("{$parent->name}.{$field->name}", $deprecationReason);
                 }
             },
             NodeKind::ENUM => function (EnumValueNode $node) use ($context): void {
@@ -74,8 +75,9 @@ class DetectDeprecatedUsage extends ValidationRule
                     return;
                 }
 
-                if ($value->isDeprecated()) {
-                    $this->deprecations["{$enum->name}.{$value->name}"] = true;
+                $deprecationReason = $value->deprecationReason;
+                if ($deprecationReason !== null) {
+                    $this->registerDeprecation("{$enum->name}.{$value->name}", $deprecationReason);
                 }
             },
             NodeKind::OPERATION_DEFINITION => [
@@ -84,5 +86,14 @@ class DetectDeprecatedUsage extends ValidationRule
                 },
             ],
         ];
+    }
+
+    protected function registerDeprecation(string $element, string $reason)
+    {
+        if (! isset($this->deprecations[$element])) {
+            $this->deprecations[$element] = new DeprecatedUsage($reason);
+        }
+
+        $this->deprecations[$element]->count++;
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Deprecation;
 
+use GraphQL\Type\Definition\Directive;
+use Nuwave\Lighthouse\Deprecation\DeprecatedUsage;
 use Nuwave\Lighthouse\Deprecation\DetectDeprecatedUsage;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
@@ -9,7 +11,7 @@ use Tests\Utils\Queries\Foo;
 final class DeprecationTest extends TestCase
 {
     /**
-     * @var array<string, true>
+     * @var array<string, DeprecatedUsage>
      */
     protected $deprecations;
 
@@ -21,7 +23,7 @@ final class DeprecationTest extends TestCase
             $this->deprecations = $deprecations;
         });
 
-        // TODO remove rule once we have graphql-php 15
+        // TODO remove rule in tearDown once we have graphql-php 15
     }
 
     public function testDetectsDeprecatedFields(): void
@@ -42,7 +44,58 @@ final class DeprecationTest extends TestCase
             ],
         ]);
 
-        $this->assertSame(['Query.foo' => true], $this->deprecations);
+        $deprecatedUsage = $this->deprecations['Query.foo'];
+        $this->assertSame(1, $deprecatedUsage->count);
+        $this->assertSame(Directive::DEFAULT_DEPRECATION_REASON, $deprecatedUsage->reason);
+    }
+
+
+    public function testDetectsDeprecatedFieldWithReason(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo: Int @deprecated(reason: "bar")
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo
+        }
+        ')->assertExactJson([
+            'data' => [
+                'foo' => Foo::THE_ANSWER,
+            ],
+        ]);
+
+        $deprecatedUsage = $this->deprecations['Query.foo'];
+        $this->assertSame(1, $deprecatedUsage->count);
+        $this->assertSame('bar', $deprecatedUsage->reason);
+    }
+
+    public function testDetectsDeprecatedFieldsMultipleTimes(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo: Int @deprecated
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo
+            bar: foo
+        }
+        ')->assertExactJson([
+            'data' => [
+                'foo' => Foo::THE_ANSWER,
+                'bar' => Foo::THE_ANSWER,
+            ],
+        ]);
+
+        $deprecatedUsage = $this->deprecations['Query.foo'];
+        $this->assertSame(2, $deprecatedUsage->count);
+        $this->assertSame(Directive::DEFAULT_DEPRECATION_REASON, $deprecatedUsage->reason);
     }
 
     public function testDetectsDeprecatedEnumValueUsage(): void
@@ -68,7 +121,9 @@ final class DeprecationTest extends TestCase
             ],
         ]);
 
-        $this->assertSame(['Foo.B' => true], $this->deprecations);
+        $deprecatedUsage = $this->deprecations['Foo.B'];
+        $this->assertSame(1, $deprecatedUsage->count);
+        $this->assertSame(Directive::DEFAULT_DEPRECATION_REASON, $deprecatedUsage->reason);
     }
 
     public function testDetectsDeprecatedEnumValueUsageInVariables(): void
@@ -97,9 +152,6 @@ final class DeprecationTest extends TestCase
         ]);
 
         $this->markTestIncomplete('Not implemented yet');
-
-        // @phpstan-ignore-next-line unreachable
-        $this->assertSame(['Foo.B' => true], $this->deprecations);
     }
 
     public function testDetectsDeprecatedEnumValueUsageInResults(): void
@@ -128,8 +180,5 @@ final class DeprecationTest extends TestCase
         ]);
 
         $this->markTestIncomplete('Not implemented yet');
-
-        // @phpstan-ignore-next-line unreachable
-        $this->assertSame(['Foo.B' => true], $this->deprecations);
     }
 }
