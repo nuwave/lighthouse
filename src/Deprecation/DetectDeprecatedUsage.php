@@ -88,7 +88,7 @@ class DetectDeprecatedUsage extends ValidationRule
         ];
     }
 
-    protected function registerDeprecation(string $element, string $reason)
+    protected function registerDeprecation(string $element, string $reason): void
     {
         if (! isset($this->deprecations[$element])) {
             $this->deprecations[$element] = new DeprecatedUsage($reason);
