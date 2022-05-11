@@ -736,14 +736,14 @@ type Mutation {
 }
 ```
 
-Non-nullable arguments will *not* be converted when this directive is used on a field,
+Non-nullable arguments will _not_ be converted when this directive is used on a field,
 but will be converted when it is used directly on the argument.
 
 ```graphql
 type Mutation {
   createPost(
-      willBeConvertedBecauseExplicitlyMarked: String! @convertEmptyStringsToNull
-      willNotBeConvertedToMaintainInvariants: String!
+    willBeConvertedBecauseExplicitlyMarked: String! @convertEmptyStringsToNull
+    willNotBeConvertedToMaintainInvariants: String!
   ): Post! @convertEmptyStringsToNull
 }
 ```
