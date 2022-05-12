@@ -5,48 +5,43 @@ namespace Nuwave\Lighthouse\CacheControl;
 class CacheControl
 {
     /**
-     * List of maxAges.
+     * Maximum age.
      *
-     * @var array<int, int>
+     * @var int|null
      */
-    protected $maxAgeList = [];
+    public $maxAge = null;
 
     /**
-     * List of scopes.
+     * Is the result public?
      *
-     * @var array<int, string>
+     * @var bool
      */
-    protected $scopeList = [];
+    protected $public = true;
 
-    public function addToMaxAgeList(int $maxAge): void
+    public function addMaxAge(int $maxAge): void
     {
-        $this->maxAgeList[] = $maxAge;
+        $this->maxAge = isset($this->maxAge)
+            ? min($maxAge, $this->maxAge)
+            : $maxAge;
     }
 
-    public function addToScopeList(string $scope): void
+    public function setPrivate(): void
     {
-        $this->scopeList[] = $scope;
+        $this->public = false;
     }
 
     /**
      * Calculate max-age for HTTP Cache-Control.
      */
-    public function calculateMaxAge(): int
+    public function maxAge(): int
     {
-        return empty($this->maxAgeList)
-            ? 0
-            : min($this->maxAgeList);
+        return $this->maxAge ?? 0;
     }
 
-    /**
-     * Calculate scope for HTTP Cache-Control.
-     */
-    public function calculateScope(): string
+    public function scope(): string
     {
-        if (empty($this->scopeList) || in_array('PRIVATE', $this->scopeList)) {
-            return 'private';
-        }
-
-        return 'public';
+        return $this->public
+            ? 'public'
+            : 'private';
     }
 }

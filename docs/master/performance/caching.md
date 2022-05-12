@@ -104,8 +104,15 @@ type GithubProfile {
 
 ## HTTP Cache-Control header
 
-To activate this feature, edit your application `config/app` file and add it to the providers:
-`Nuwave\Lighthouse\CacheControl\CacheControlServiceProvider::class`
+**Experimental: not enabled by default, not guaranteed to be stable.**
+
+Add the service provider to your `config/app.php`:
+
+```php
+'providers' => [
+    \Nuwave\Lighthouse\CacheControl\CacheControlServiceProvider::class,
+],
+```
 
 You can change the [`Cache-Control` header](https://developer.mozilla.org/de/docs/Web/HTTP/Headers/Cache-Control) of your response
 regardless of [@cache](../api-reference/directives.md#cache)
@@ -116,10 +123,9 @@ The final header settings are calculated based on these rules:
 - `max-age` equals the lowest `maxAge` among all fields. If that value is 0, `no-cache` is used instead
 - visibility is `public` unless the scope of a queried field is `PRIVATE`
 
-There are defaults for the root fields and non-scalar types:
-- for non-scalar types `max-age` is 0
-- for root fields `max-age` is 0 and `scope` is `private`
-
+The following defaults apply:
+- non-scalar fields `maxAge` is 0
+- root fields `maxAge` is 0 and `scope` is `PRIVATE`
 
 For more details check [Apollo](https://www.apollographql.com/docs/apollo-server/performance/caching/#calculating-cache-behavior).
 
@@ -141,26 +147,46 @@ type Task {
 
 type Query {
   me: User! @auth @cacheControl(maxAge: 5, scope: PRIVATE)
-  company: Company!
+  companies: [Company!]!
+  publicCompanies: [Company!]! @cacheControl(maxAge: 15)
 }
 ```
 
 The Cache-Control headers for some queries will be:
 
 ```graphql
-# Cache-Control header: no-cache, PRIVATE
+# Cache-Control header: max-age: 5, PRIVATE
 {
   me { # 5, PRIVATE
     tasks { # 50, PUBLIC
       id # 10, PUBLIC
-      description # no-cache, PUBLIC
+    }
+  }
+}
+
+# Cache-Control header: no-cache, PRIVATE
+{
+  me { # 5, PRIVATE
+    tasks { # 50, PUBLIC
+      description # 0, PUBLIC
     }
   }
 }
 
 # Cache-Control header: no-cache, private
 {
-  company { # no-cache, private
+  companies { # no-cache, private
+    users { # 25, PUBLIC
+      tasks { # 50, PUBLIC
+        id # 10, PUBLIC
+      }
+    }
+  }
+}
+
+# Cache-Control header: maxAge: 10, private
+{
+  publicCompanies { # 15, PUBLIC
     users { # 25, PUBLIC
       tasks { # 50, PUBLIC
         id # 10, PUBLIC

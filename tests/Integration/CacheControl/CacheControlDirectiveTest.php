@@ -62,46 +62,50 @@ final class CacheControlDirectiveTest extends DBTestCase
         ')->assertHeader('Cache-Control', 'max-age=5, private');
     }
 
-    public function testRootScalar(): void
+    /**
+     * @dataProvider rootScalarDataProvider
+     */
+    public function testRootScalar(string $query, string $expectedHeaderString): void
     {
-        $this->mockResolver([
-            'id' => 1,
-        ]);
-        $this->mockResolver(42, 'value');
+        $this->mockResolver(1);
 
         $this->schema /** @lang GraphQL */ = '
-        type User {
-            id: ID!
-        }
-
         type Query {
-            me: User @mock @cacheControl(maxAge: 5)
-            value: Int! @mock(key: "value")
+            default: ID @mock
+            withDirective: ID @mock @cacheControl(maxAge: 5)
         }
         ';
 
-        dump($this->graphQL(/** @lang GraphQL */ '
-        {
-            value
-        }
-        ')->headers->get('Cache-Control'));
+        $this->graphQL($query)
+            ->assertHeader('Cache-Control', $expectedHeaderString);
+    }
 
-        dump($this->graphQL(/** @lang GraphQL */ '
-        {
-            me {
-                id
-            }
-        }
-        ')->headers->get('Cache-Control'));
-
-        dump($this->graphQL(/** @lang GraphQL */ '
-        {
-            me {
-                id
-            }
-            value
-        }
-        ')->headers->get('Cache-Control'));
+    /**
+     * @return array<int, array{string, string}>
+     */
+    public function rootScalarDataProvider(): array
+    {
+        return [
+            [/** @lang GraphQL */ '
+                {
+                    default
+                }
+            ', 'no-cache, private',
+            ],
+            [/** @lang GraphQL */ '
+                {
+                    withDirective
+                }
+            ', 'max-age=5, public',
+            ],
+            [/** @lang GraphQL */ '
+                {
+                    default
+                    withDirective
+                }
+            ', 'no-cache, private',
+            ],
+        ];
     }
 
     public function testInheritanceWithNonScalar(): void
@@ -169,10 +173,11 @@ final class CacheControlDirectiveTest extends DBTestCase
     public function argumentsDataProvider(): array
     {
         return [
-            'noArguments' => ['@cacheControl', 'max-age=50, public'],
+            'noArguments' => ['@cacheControl', 'no-cache, public'],
             'onlyMaxAge' => ['@cacheControl(maxAge: 10)', 'max-age=10, public'],
-            'onlyScope' => ['@cacheControl(scope: PRIVATE)', 'max-age=50, private'],
-            'allSet' => ['@cacheControl(maxAge:10, scope: PRIVATE)', 'max-age=10, private'],
+            'onlyScope' => ['@cacheControl(scope: PRIVATE)', 'no-cache, private'],
+            'inheritMaxAge' => ['@cacheControl(inheritMaxAge: true)', 'max-age=50, public'],
+            'maxAgePrivate' => ['@cacheControl(maxAge:10, scope: PRIVATE)', 'max-age=10, private'],
         ];
     }
 
@@ -183,28 +188,28 @@ final class CacheControlDirectiveTest extends DBTestCase
     {
         $this->schema /** @lang GraphQL */ = '
         type User {
-            tasks: [Task!]! @hasMany @cacheControl(maxAge: 50, scope: PUBLIC)
+            tasks: [Task!]! @hasMany @cacheControl(maxAge: 50)
             posts: [Post!]! @hasMany
         }
 
         type Post {
-            id: Int @cacheControl(maxAge: 10, scope: PUBLIC)
-            foo: String @cacheControl(scope: PRIVATE)
+            id: Int @cacheControl(maxAge: 10)
+            foo: String @cacheControl(scope: PRIVATE, inheritMaxAge: true)
         }
 
         type Team {
-            users: [User!]! @hasMany @cacheControl(maxAge: 25, scope: PUBLIC)
+            users: [User!]! @hasMany @cacheControl(maxAge: 25)
         }
 
         type Task {
-            id: Int @cacheControl(maxAge: 10, scope: PUBLIC)
-            foo: String @cacheControl
+            id: Int @cacheControl(maxAge: 10)
+            foo: String @cacheControl(inheritMaxAge: true)
             bar: String
         }
 
         type Query {
             user: User @first @cacheControl(maxAge: 5, scope: PRIVATE)
-            team: Team @first @cacheControl(scope: PUBLIC)
+            team: Team @first @cacheControl
             teamWithCache: Team @first @cacheControl(maxAge: 20)
         }
         ';
@@ -224,7 +229,8 @@ final class CacheControlDirectiveTest extends DBTestCase
         $users = factory(User::class, 3)->make();
         $team->users()->saveMany($users);
 
-        $this->graphQL($query)->assertHeader('Cache-Control', $expectedHeaderString);
+        $this->graphQL($query)
+            ->assertHeader('Cache-Control', $expectedHeaderString);
     }
 
     /**
@@ -288,7 +294,7 @@ final class CacheControlDirectiveTest extends DBTestCase
                         }
                     }
                 }
-            ', 'max-age=20, private',
+            ', 'max-age=20, public',
             ],
             [/** @lang GraphQL */ '
                 {
@@ -300,7 +306,7 @@ final class CacheControlDirectiveTest extends DBTestCase
                         }
                     }
                 }
-            ', 'no-cache, private',
+            ', 'no-cache, public',
             ],
             [/** @lang GraphQL */ '
                 {

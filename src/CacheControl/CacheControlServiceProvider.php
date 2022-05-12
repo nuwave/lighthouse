@@ -38,50 +38,50 @@ class CacheControlServiceProvider extends ServiceProvider
             StartExecution::class,
             function (StartExecution $startExecution) {
                 $cacheControl = $this->app->make(CacheControl::class);
+                assert($cacheControl instanceof CacheControl);
+
                 $typeInfo = new TypeInfo($startExecution->schema);
+
                 Visitor::visit($startExecution->query, Visitor::visitWithTypeInfo($typeInfo, [
                     NodeKind::FIELD => function (FieldNode $node) use ($typeInfo, $cacheControl): void {
-                        $defaultMaxAge = null;
-                        $defaultScope = 'PUBLIC';
                         $field = $typeInfo->getFieldDef();
                         // @phpstan-ignore-next-line can be null, remove ignore with graphql-php 15
                         if (null === $field) {
                             return;
                         }
 
-                        $nodeType = $field->getType();
-                        // TODO use getInnermostType() in graphql-php 15
-                        while ($nodeType instanceof WrappingType) {
-                            $nodeType = $nodeType->getWrappedType();
-                        }
+                        $cacheControlDirective = isset($field->astNode)
+                            ? ASTHelper::directiveDefinition($field->astNode, 'cacheControl')
+                            : null;
 
-                        $parent = $typeInfo->getParentType();
-                        assert($parent instanceof CompositeType && $parent instanceof Type);
-                        if (RootType::isRootType($parent->name)) {
-                            $defaultMaxAge = 0;
-                            $defaultScope = 'PRIVATE';
-                        }
-
-                        if (! $nodeType instanceof ScalarType) {
-                            $defaultMaxAge = 0;
-                        }
-
-                        if (isset($field->astNode)) {
-                            $cacheControlDirective = ASTHelper::directiveDefinition($field->astNode, 'cacheControl');
-                            if (null !== $cacheControlDirective) {
-                                $maxAge = ASTHelper::directiveArgValue($cacheControlDirective, 'maxAge') ?? $defaultMaxAge;
-                                $scope = ASTHelper::directiveArgValue($cacheControlDirective, 'scope') ?? $defaultScope;
-                            } elseif (RootType::isRootType($parent->name) || ! $nodeType instanceof ScalarType) {
-                                $maxAge = $defaultMaxAge;
-                                $scope = $defaultScope;
+                        if (null !== $cacheControlDirective) {
+                            if (! ASTHelper::directiveArgValue($cacheControlDirective, 'inheritMaxAge')) {
+                                $cacheControl->addMaxAge(
+                                    ASTHelper::directiveArgValue($cacheControlDirective, 'maxAge') ?? 0
+                                );
                             }
-                        }
 
-                        if (isset($maxAge)) {
-                            $cacheControl->addToMaxAgeList($maxAge);
-                        }
-                        if (isset($scope)) {
-                            $cacheControl->addToScopeList($scope);
+                            if (ASTHelper::directiveArgValue($cacheControlDirective, 'scope') === 'PRIVATE') {
+                                $cacheControl->setPrivate();
+                            }
+                        } else {
+                            $parent = $typeInfo->getParentType();
+                            assert($parent instanceof CompositeType && $parent instanceof Type);
+
+                            if (RootType::isRootType($parent->name)) {
+                                $cacheControl->addMaxAge(0);
+                                $cacheControl->setPrivate();
+                            } else {
+                                $nodeType = $field->getType();
+                                // TODO use getInnermostType() in graphql-php 15
+                                while ($nodeType instanceof WrappingType) {
+                                    $nodeType = $nodeType->getWrappedType();
+                                }
+
+                                if (! $nodeType instanceof ScalarType) {
+                                    $cacheControl->addMaxAge(0);
+                                }
+                            }
                         }
                     },
                 ]));
@@ -92,8 +92,9 @@ class CacheControlServiceProvider extends ServiceProvider
             EndRequest::class,
             function (EndRequest $request): void {
                 $cacheControl = $this->app->make(CacheControl::class);
+                assert($cacheControl instanceof CacheControl);
 
-                $maxAge = $cacheControl->calculateMaxAge();
+                $maxAge = $cacheControl->maxAge();
                 $response = $request->response;
                 $headers = $response->headers;
 
@@ -103,7 +104,7 @@ class CacheControlServiceProvider extends ServiceProvider
                     $headers->addCacheControlDirective('no-cache');
                 }
 
-                $headers->addCacheControlDirective($cacheControl->calculateScope());
+                $headers->addCacheControlDirective($cacheControl->scope());
 
                 $this->app->forgetInstance(CacheControl::class);
             }
