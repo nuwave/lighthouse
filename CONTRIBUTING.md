@@ -82,6 +82,37 @@ Set the environment variable `XDEBUG_REMOTE_HOST` to the IP of your host machine
 seen from the Docker container. This may differ based on your setup: When running
 Docker for Desktop, it is usually `10.0.2.2`, when running from a VM it is something else.
 
+### Test Data Setup
+
+Use relations over direct access to foreign keys.
+
+```php
+$user = factory(User::class)->create();
+
+// Right
+$post = factory(Post::class)->make();
+$user->post()->save();
+
+// Wrong
+$user = factory(Post::class)->create([
+    'user_id' => $post->id,
+]);
+```
+
+Use properties over arrays to fill fields.
+
+```php
+// Right
+$user = new User();
+$user->name = 'Sepp';
+$user->save();
+
+// Wrong
+$user = User::create([
+    'name' => 'Sepp',
+]);
+```
+
 ## Documentation
 
 ### External
@@ -305,37 +336,6 @@ You can use the following two case-sensitive regexes to search for violations:
 ```regexp
 @(var|param|return|throws).*\|[A-Z]
 @(var|param|return|throws)\s*[A-Z]
-```
-
-### Test Data Setup
-
-Use relations over direct access to foreign keys.
-
-```php
-$user = factory(User::class)->create();
-
-// Right
-$post = factory(Post::class)->make();
-$user->post()->save();
-
-// Wrong
-$user = factory(Post::class)->create([
-    'user_id' => $post->id,
-]);
-```
-
-Use properties over arrays to fill fields.
-
-```php
-// Right
-$user = new User();
-$user->name = 'Sepp';
-$user->save();
-
-// Wrong
-$user = User::create([
-    'name' => 'Sepp',
-]);
 ```
 
 ## Benchmarks
