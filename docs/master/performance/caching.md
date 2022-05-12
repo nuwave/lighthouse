@@ -103,7 +103,9 @@ type GithubProfile {
 ```
 
 ## HTTP Cache-Control header
-The service must be activated by adding it to the composer
+
+To activate this feature, edit your application `config/app` file and add it to the providers:
+`Nuwave\Lighthouse\CacheControl\CacheControlServiceProvider::class`
 
 You can change the [`Cache-Control` header](https://developer.mozilla.org/de/docs/Web/HTTP/Headers/Cache-Control) of your response
 regardless of [@cache](../api-reference/directives.md#cache)
