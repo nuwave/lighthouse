@@ -41,6 +41,8 @@ class CacheControlServiceProvider extends ServiceProvider
                 $typeInfo = new TypeInfo($startExecution->schema);
                 Visitor::visit($startExecution->query, Visitor::visitWithTypeInfo($typeInfo, [
                     NodeKind::FIELD => function (FieldNode $node) use ($typeInfo, $cacheControl): void {
+                        $defaultMaxAge = null;
+                        $defaultScope = 'PUBLIC';
                         $field = $typeInfo->getFieldDef();
                         // @phpstan-ignore-next-line can be null, remove ignore with graphql-php 15
                         if (null === $field) {
@@ -56,18 +58,22 @@ class CacheControlServiceProvider extends ServiceProvider
                         $parent = $typeInfo->getParentType();
                         assert($parent instanceof CompositeType && $parent instanceof Type);
                         if (RootType::isRootType($parent->name)) {
-                            $maxAge = 0;
+                            $defaultMaxAge = 0;
+                            $defaultScope = 'PRIVATE';
                         }
 
                         if (! $nodeType instanceof ScalarType) {
-                            $maxAge = 0;
+                            $defaultMaxAge = 0;
                         }
 
                         if (isset($field->astNode)) {
                             $cacheControlDirective = ASTHelper::directiveDefinition($field->astNode, 'cacheControl');
                             if (null !== $cacheControlDirective) {
-                                $maxAge = ASTHelper::directiveArgValue($cacheControlDirective, 'maxAge') ?? 0;
-                                $scope = ASTHelper::directiveArgValue($cacheControlDirective, 'scope') ?? 'PUBLIC';
+                                $maxAge = ASTHelper::directiveArgValue($cacheControlDirective, 'maxAge') ?? $defaultMaxAge;
+                                $scope = ASTHelper::directiveArgValue($cacheControlDirective, 'scope') ?? $defaultScope;
+                            } elseif (RootType::isRootType($parent->name) || ! $nodeType instanceof ScalarType) {
+                                $maxAge = $defaultMaxAge;
+                                $scope = $defaultScope;
                             }
                         }
 

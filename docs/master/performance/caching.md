@@ -103,6 +103,7 @@ type GithubProfile {
 ```
 
 ## HTTP Cache-Control header
+The service must be activated by adding it to the composer
 
 You can change the [`Cache-Control` header](https://developer.mozilla.org/de/docs/Web/HTTP/Headers/Cache-Control) of your response
 regardless of [@cache](../api-reference/directives.md#cache)
@@ -112,6 +113,11 @@ The final header settings are calculated based on these rules:
 
 - `max-age` equals the lowest `maxAge` among all fields. If that value is 0, `no-cache` is used instead
 - visibility is `public` unless the scope of a queried field is `PRIVATE`
+
+There are defaults for the root fields and non-scalar types:
+- for non-scalar types `max-age` is 0
+- for root fields `max-age` is 0 and `scope` is `private`
+
 
 For more details check [Apollo](https://www.apollographql.com/docs/apollo-server/performance/caching/#calculating-cache-behavior).
 
@@ -150,9 +156,9 @@ The Cache-Control headers for some queries will be:
   }
 }
 
-# Cache-Control header: no-cache, public
+# Cache-Control header: no-cache, private
 {
-  company { # no-cache, public
+  company { # no-cache, private
     users { # 25, PUBLIC
       tasks { # 50, PUBLIC
         id # 10, PUBLIC

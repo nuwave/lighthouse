@@ -150,7 +150,7 @@ final class CacheControlDirectiveTest extends DBTestCase
         }
 
         type Query {
-            user: User @mock @cacheControl(maxAge:50)
+            user: User @mock @cacheControl(maxAge:50 scope: PUBLIC )
         }
         ";
 
@@ -169,9 +169,9 @@ final class CacheControlDirectiveTest extends DBTestCase
     public function argumentsDataProvider(): array
     {
         return [
-            'noArguments' => ['@cacheControl', 'no-cache, public'],
+            'noArguments' => ['@cacheControl', 'max-age=50, public'],
             'onlyMaxAge' => ['@cacheControl(maxAge: 10)', 'max-age=10, public'],
-            'onlyScope' => ['@cacheControl(scope: PRIVATE)', 'no-cache, private'],
+            'onlyScope' => ['@cacheControl(scope: PRIVATE)', 'max-age=50, private'],
             'allSet' => ['@cacheControl(maxAge:10, scope: PRIVATE)', 'max-age=10, private'],
         ];
     }
@@ -204,7 +204,7 @@ final class CacheControlDirectiveTest extends DBTestCase
 
         type Query {
             user: User @first @cacheControl(maxAge: 5, scope: PRIVATE)
-            team: Team @first
+            team: Team @first @cacheControl(scope: PUBLIC)
             teamWithCache: Team @first @cacheControl(maxAge: 20)
         }
         ';
@@ -242,7 +242,7 @@ final class CacheControlDirectiveTest extends DBTestCase
                         }
                     }
                 }
-            ', 'no-cache, private',
+            ', 'max-age=5, private',
             ],
             [/** @lang GraphQL */ '
                 {
@@ -288,7 +288,7 @@ final class CacheControlDirectiveTest extends DBTestCase
                         }
                     }
                 }
-            ', 'max-age=20, public',
+            ', 'max-age=20, private',
             ],
             [/** @lang GraphQL */ '
                 {
@@ -300,7 +300,7 @@ final class CacheControlDirectiveTest extends DBTestCase
                         }
                     }
                 }
-            ', 'no-cache, public',
+            ', 'no-cache, private',
             ],
             [/** @lang GraphQL */ '
                 {

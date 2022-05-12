@@ -99,7 +99,7 @@
             "providers": [
                 "Nuwave\\Lighthouse\\LighthouseServiceProvider",
                 "Nuwave\\Lighthouse\\Auth\\AuthServiceProvider",
-                "Nuwave\\Lighthouse\\CacheControl\\CacheControlServiceProvider",
+                
                 "Nuwave\\Lighthouse\\GlobalId\\GlobalIdServiceProvider",
                 "Nuwave\\Lighthouse\\OrderBy\\OrderByServiceProvider",
                 "Nuwave\\Lighthouse\\Pagination\\PaginationServiceProvider",
