@@ -428,7 +428,7 @@ final class CountDirectiveDBTest extends DBTestCase
             tasks: Int @count(model: "Task", field: "difficulty")
         }
         ';
-        factory(Task::class, 3)->create(['difficulty' => 1]);
+        factory(Task::class, 3)->create();
 
         $this->graphQL(/** @lang GraphQL */ '
         {
