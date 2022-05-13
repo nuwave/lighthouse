@@ -68,9 +68,9 @@ GRAPHQL;
                     $query->distinct();
                 }
 
-                $field = $this->directiveArgValue('field');
-                if ($field) {
-                    return $query->count($field);
+                $columns = $this->directiveArgValue('columns');
+                if ($columns) {
+                    return $query->count(...$columns);
                 }
 
                 return $query->count();
