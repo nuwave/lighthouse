@@ -30,9 +30,6 @@ class CacheControl
         $this->public = false;
     }
 
-    /**
-     * Calculate max-age for HTTP Cache-Control.
-     */
     public function maxAge(): int
     {
         return $this->maxAge ?? 0;

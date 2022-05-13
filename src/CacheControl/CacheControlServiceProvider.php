@@ -61,7 +61,7 @@ class CacheControlServiceProvider extends ServiceProvider
                                 );
                             }
 
-                            if (ASTHelper::directiveArgValue($cacheControlDirective, 'scope') === 'PRIVATE') {
+                            if ('PRIVATE' === ASTHelper::directiveArgValue($cacheControlDirective, 'scope')) {
                                 $cacheControl->setPrivate();
                             }
                         } else {

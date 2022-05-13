@@ -6,7 +6,7 @@ use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 
 class CacheControlDirective extends BaseDirective
 {
-    const NAME = 'cacheControl';
+    public const NAME = 'cacheControl';
 
     public static function definition(): string
     {

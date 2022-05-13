@@ -154,7 +154,7 @@ final class CacheControlDirectiveTest extends DBTestCase
         }
 
         type Query {
-            user: User @mock @cacheControl(maxAge:50 scope: PUBLIC )
+            user: User @mock @cacheControl(maxAge:50)
         }
         ";
 
@@ -177,6 +177,7 @@ final class CacheControlDirectiveTest extends DBTestCase
             'onlyMaxAge' => ['@cacheControl(maxAge: 10)', 'max-age=10, public'],
             'onlyScope' => ['@cacheControl(scope: PRIVATE)', 'no-cache, private'],
             'inheritMaxAge' => ['@cacheControl(inheritMaxAge: true)', 'max-age=50, public'],
+            'inheritMaxAgeDenyMaxAge' => ['@cacheControl(maxAge: 0, inheritMaxAge: true)', 'max-age=50, public'],
             'maxAgePrivate' => ['@cacheControl(maxAge:10, scope: PRIVATE)', 'max-age=10, private'],
         ];
     }

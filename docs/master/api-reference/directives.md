@@ -530,6 +530,7 @@ directive @cacheControl(
   """
   The maximum amount of time the field's cached value is valid, in seconds.
   0 means the field is not cacheable.
+  Mutually exclusive with `inheritMaxAge = true`.
   """
   maxAge: Int! = 0
 
@@ -537,6 +538,12 @@ directive @cacheControl(
   Is the value specific to a single user?
   """
   scope: CacheControlScope! = PUBLIC
+    
+  """
+  Should the field inherit the `maxAge` of its parent field instead of using the default `maxAge`?
+  Mutually exclusive with `maxAge`.
+  """
+  inheritMaxAge: Boolean! = false
 ) on FIELD_DEFINITION | OBJECT | INTERFACE | UNION
 
 """

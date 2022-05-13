@@ -126,6 +126,7 @@ The final header settings are calculated based on these rules:
 The following defaults apply:
 - non-scalar fields `maxAge` is 0
 - root fields `maxAge` is 0 and `scope` is `PRIVATE`
+- the directive default is prior to the field default
 
 For more details check [Apollo](https://www.apollographql.com/docs/apollo-server/performance/caching/#calculating-cache-behavior).
 
@@ -142,6 +143,7 @@ type Company {
 
 type Task {
   id: ID @cacheControl(maxAge: 10, scope: PUBLIC)
+  name: String @cacheControl(maxAge: 0, inheritMaxAge: true)
   description: String @cacheControl
 }
 
@@ -190,6 +192,17 @@ The Cache-Control headers for some queries will be:
     users { # 25, PUBLIC
       tasks { # 50, PUBLIC
         id # 10, PUBLIC
+      }
+    }
+  }
+}
+
+# Cache-Control header: maxAge: 15, public
+{
+  publicCompanies { # 15, PUBLIC
+    users { # 25, PUBLIC
+      tasks { # 50, PUBLIC
+        name # 50, PUBLIC
       }
     }
   }
