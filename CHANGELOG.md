@@ -11,7 +11,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
-- Add `distinct` and `field` args to `@count` directive https://github.com/nuwave/lighthouse/pull/2138
+- Add `columns` and `distinct` args to `@count` directive https://github.com/nuwave/lighthouse/pull/2138
 
 ## v5.49.0
 
