@@ -41,10 +41,10 @@ directive @count(
   scopes: [String!]
 
   """
-  The field to count.
-  counts only a specific field
+  Count only rows where the given columns are non-null.
+  `*` counts every row.
   """
-  field: String
+  columns: [String!]! = ["*"]
 
   """
   Should exclude duplicated rows?
