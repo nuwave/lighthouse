@@ -47,10 +47,9 @@ directive @count(
   field: String
 
   """
-  distinct count.
-  exclude duplicated rows
+  Should exclude duplicated rows?
   """
-  distinct: Boolean
+  distinct: Boolean! = false
 ) on FIELD_DEFINITION
 GRAPHQL;
     }
