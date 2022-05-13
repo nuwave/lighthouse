@@ -783,16 +783,15 @@ directive @count(
   scopes: [String!]
 
   """
-  The field to count.
-  counts only a specific field
+  Count only rows where the given columns are non-null.
+  `*` counts every row.
   """
-  field: String
+  columns: [String!]! = ["*"]
 
   """
-  distinct count.
-  exclude duplicated rows
+  Should exclude duplicated rows?
   """
-  distinct: Boolean
+  distinct: Boolean! = false
 ) on FIELD_DEFINITION
 ```
 
