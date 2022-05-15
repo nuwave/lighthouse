@@ -40,6 +40,7 @@ class PaginatedModelsLoader implements ModelsLoader
 
     public function load(EloquentCollection $parents): void
     {
+
         CountModelsLoader::loadCount($parents, [$this->relation => $this->decorateBuilder]);
 
         $relatedModels = $this->loadRelatedModels($parents);
@@ -72,11 +73,17 @@ class PaginatedModelsLoader implements ModelsLoader
                     $shouldSelect = new ReflectionMethod(get_class($relation), 'shouldSelect');
                     $shouldSelect->setAccessible(true);
                     $select = $shouldSelect->invoke($relation, ['*']);
-
+                    $relationSelected=$relation->getBaseQuery();
+                    $selectedArray=[];
+                    foreach($select as $column){
+                        if(!in_array($column,$relationSelected->columns)){
+                            $selectedArray[]=$column;
+                        }
+                    }
                     // @phpstan-ignore-next-line Builder mixin is not understood
-                    $relation->addSelect($select);
+                    $relation->addSelect($selectedArray);
 
-                    
+
                 }
 
                 $relation->initRelation([$model], $this->relation);
