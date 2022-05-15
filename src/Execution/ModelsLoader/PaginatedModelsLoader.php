@@ -75,9 +75,13 @@ class PaginatedModelsLoader implements ModelsLoader
                     $select = $shouldSelect->invoke($relation, ['*']);
                     $relationSelected=$relation->getBaseQuery();
                     $selectedArray=[];
-                    foreach($select as $column){
-                        if(!in_array($column,$relationSelected->columns)){
-                            $selectedArray[]=$column;
+                    if($relationSelected->columns==null){
+                        $selectedArray=$select;
+                    } else {
+                        foreach($select as $column){
+                            if(!in_array($column,$relationSelected->columns)){
+                                $selectedArray[]=$column;
+                            }
                         }
                     }
                     // @phpstan-ignore-next-line Builder mixin is not understood
