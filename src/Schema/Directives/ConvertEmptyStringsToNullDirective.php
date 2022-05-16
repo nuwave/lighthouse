@@ -62,7 +62,7 @@ GRAPHQL;
             if (
                 null !== $namedType
                 && ScalarType::STRING === $namedType->name
-                && !$namedType->nonNull
+                && ! $namedType->nonNull
             ) {
                 $argument->value = $this->sanitize($argument->value);
             }
