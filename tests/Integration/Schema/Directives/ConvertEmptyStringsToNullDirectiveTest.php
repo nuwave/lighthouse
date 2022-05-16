@@ -22,7 +22,7 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
         {
             foo(bar: "")
         }
-        ')->assertJson([
+        ')->assertExactJson([
             'data' => [
                 'foo' => null,
             ],
@@ -45,7 +45,7 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
         {
             foo(bar: [[["", null, "baz"]]])
         }
-        ')->assertJson([
+        ')->assertExactJson([
             'data' => [
                 'foo' => [[[null, null, 'baz']]],
             ],
@@ -69,7 +69,8 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
             foo(
                 foo: String
                 bar: [String]!
-                baz: Int!
+                baz: [[[String]]]!
+                qux: Int!
             ): Foo! @convertEmptyStringsToNull @mock
         }
         ';
@@ -79,6 +80,7 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
             foo(
                 foo: ""
                 bar: [""]
+                baz: [[[""]]]
                 baz: 3
             ) {
                 foo
@@ -86,12 +88,13 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
                 baz
             }
         }
-        ')->assertJson([
+        ')->assertExactJson([
             'data' => [
                 'foo' => [
                     'foo' => null,
                     'bar' => [null],
-                    'baz' => 3,
+                    'baz' => [[[null]]],
+                    'qux' => 3,
                 ],
             ],
         ]);
@@ -131,7 +134,7 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
                 baz
             }
         }
-        ')->assertJson([
+        ')->assertExactJson([
             'data' => [
                 'foo' => [
                     'foo' => '',
@@ -158,7 +161,7 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
         {
             foo(bar: "")
         }
-        ')->assertJson([
+        ')->assertExactJson([
             'data' => [
                 'foo' => null,
             ],

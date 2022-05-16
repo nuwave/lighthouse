@@ -59,11 +59,13 @@ GRAPHQL;
     {
         foreach ($argumentSet->arguments as $argument) {
             $namedType = $argument->namedType();
-            if (null !== $namedType && ScalarType::STRING === $namedType->name) {
-                continue;
+            if (
+                null !== $namedType
+                && ScalarType::STRING === $namedType->name
+                && !$namedType->nonNull
+            ) {
+                $argument->value = $this->sanitize($argument->value);
             }
-
-            $argument->value = $this->sanitize($argument->value);
         }
 
         return $argumentSet;
