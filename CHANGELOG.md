@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Add `@cacheControl` directive https://github.com/nuwave/lighthouse/pull/2136
+
 ## v5.49.0
 
 ### Added
