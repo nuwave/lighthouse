@@ -421,14 +421,36 @@ final class CountDirectiveDBTest extends DBTestCase
         ]);
     }
 
-    public function testCountModelWithSingleColumn(): void
+    public function testCountModelWithDistinct(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            tasks: Int @count(model: "Task", distinct: true)
+        }
+        ';
+        factory(Task::class, 2)->create();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            tasks
+        }
+        ')->assertExactJson([
+            'data' => [
+                'tasks' => 2,
+            ],
+        ]);
+    }
+
+    public function testCountModelWithColumns(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
             tasks: Int @count(model: "Task", columns: ["difficulty"])
         }
         ';
-        factory(Task::class, 3)->create();
+        $task = factory(Task::class)->make();
+        $task->difficulty = null;
+        $task->save();
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -436,32 +458,12 @@ final class CountDirectiveDBTest extends DBTestCase
         }
         ')->assertExactJson([
             'data' => [
-                'tasks' => 3,
+                'tasks' => 0,
             ],
         ]);
     }
 
-    public function testCountModelWithMultipleColumns(): void
-    {
-        $this->schema = /** @lang GraphQL */ '
-        type Query {
-            tasks: Int @count(model: "Task", columns: ["id", "difficulty"])
-        }
-        ';
-        factory(Task::class, 3)->create();
-
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            tasks
-        }
-        ')->assertExactJson([
-            'data' => [
-                'tasks' => 3,
-            ],
-        ]);
-    }
-
-    public function testCountModelWithFieldAndDistinct(): void
+    public function testCountModelWithColumnsAndDistinct(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
