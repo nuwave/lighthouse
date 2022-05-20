@@ -420,4 +420,69 @@ final class CountDirectiveDBTest extends DBTestCase
             ],
         ]);
     }
+
+    public function testCountModelWithDistinct(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            tasks: Int @count(model: "Task", distinct: true)
+        }
+        ';
+        factory(Task::class, 2)->create();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            tasks
+        }
+        ')->assertExactJson([
+            'data' => [
+                'tasks' => 2,
+            ],
+        ]);
+    }
+
+    public function testCountModelWithColumns(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            tasks: Int @count(model: "Task", columns: ["difficulty"])
+        }
+        ';
+        $task = factory(Task::class)->make();
+        $task->difficulty = null;
+        $task->save();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            tasks
+        }
+        ')->assertExactJson([
+            'data' => [
+                'tasks' => 0,
+            ],
+        ]);
+    }
+
+    public function testCountModelWithColumnsAndDistinct(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            tasks: Int @count(model: "Task", distinct: true, columns: ["difficulty"])
+        }
+        ';
+        foreach (factory(Task::class, 3)->make() as $task) {
+            $task->difficulty = 1;
+            $task->save();
+        }
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            tasks
+        }
+        ')->assertExactJson([
+            'data' => [
+                'tasks' => 1,
+            ],
+        ]);
+    }
 }
