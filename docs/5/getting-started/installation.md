@@ -78,7 +78,7 @@ To make use of the amazing tooling around GraphQL, we recommend
 installing [GraphQL Playground](https://github.com/mll-lab/laravel-graphql-playground).
 
 ```bash
-composer require mll-lab/laravel-graphql-playground
+composer require --dev mll-lab/laravel-graphql-playground
 ```
 
 After installation, visit `/graphql-playground` to try it.
