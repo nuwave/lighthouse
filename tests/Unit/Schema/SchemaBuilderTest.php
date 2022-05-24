@@ -121,7 +121,7 @@ final class SchemaBuilderTest extends TestCase
         $this->assertSame('bar attribute of Foo', $bar->description);
 
         $baz = $bar->getArg('baz');
-        assert($baz instanceof Argument\);
+        assert($baz instanceof Argument);
         $this->assertSame('arg', $baz->description);
         $this->assertTrue($baz->defaultValueExists());
         $this->assertFalse($baz->defaultValue);
@@ -229,7 +229,7 @@ final class SchemaBuilderTest extends TestCase
         $barArg = $queryType
             ->getField('foo')
             ->getArg('bar');
-        assert($barArg instanceof Argument\);
+        assert($barArg instanceof Argument);
         $this->assertSame('internal', $barArg->defaultValue);
     }
 }
