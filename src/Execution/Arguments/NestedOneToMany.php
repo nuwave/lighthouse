@@ -74,7 +74,7 @@ class NestedOneToMany implements ArgResolver
             $children = $relation
                 ->make()
                 ->whereIn(
-                    $relation->getLocalKeyName(),
+                    $relation->make()->getKeyName(),
                     $args->arguments['connect']->value
                 )
                 ->get();
@@ -88,7 +88,7 @@ class NestedOneToMany implements ArgResolver
             $children = $relation
                 ->make()
                 ->whereIn(
-                    $relation->getLocalKeyName(),
+                    $relation->make()->getKeyName(),
                     $args->arguments['disconnect']->value
                 )
                 ->get();
