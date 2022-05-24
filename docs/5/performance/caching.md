@@ -124,6 +124,7 @@ The final header settings are calculated based on these rules:
 - visibility is `public` unless the scope of a queried field is `PRIVATE`
 
 The following defaults apply:
+
 - non-scalar fields `maxAge` is 0
 - root fields `maxAge` is 0 and `scope` is `PRIVATE`
 - the directive default is prior to the field default
@@ -159,8 +160,10 @@ The Cache-Control headers for some queries will be:
 ```graphql
 # Cache-Control header: max-age: 5, PRIVATE
 {
-  me { # 5, PRIVATE
-    tasks { # 50, PUBLIC
+  me {
+    # 5, PRIVATE
+    tasks {
+      # 50, PUBLIC
       id # 10, PUBLIC
     }
   }
@@ -168,8 +171,10 @@ The Cache-Control headers for some queries will be:
 
 # Cache-Control header: no-cache, PRIVATE
 {
-  me { # 5, PRIVATE
-    tasks { # 50, PUBLIC
+  me {
+    # 5, PRIVATE
+    tasks {
+      # 50, PUBLIC
       description # 0, PUBLIC
     }
   }
@@ -177,9 +182,12 @@ The Cache-Control headers for some queries will be:
 
 # Cache-Control header: no-cache, private
 {
-  companies { # no-cache, private
-    users { # 25, PUBLIC
-      tasks { # 50, PUBLIC
+  companies {
+    # no-cache, private
+    users {
+      # 25, PUBLIC
+      tasks {
+        # 50, PUBLIC
         id # 10, PUBLIC
       }
     }
@@ -188,9 +196,12 @@ The Cache-Control headers for some queries will be:
 
 # Cache-Control header: maxAge: 10, private
 {
-  publicCompanies { # 15, PUBLIC
-    users { # 25, PUBLIC
-      tasks { # 50, PUBLIC
+  publicCompanies {
+    # 15, PUBLIC
+    users {
+      # 25, PUBLIC
+      tasks {
+        # 50, PUBLIC
         id # 10, PUBLIC
       }
     }
@@ -199,9 +210,12 @@ The Cache-Control headers for some queries will be:
 
 # Cache-Control header: maxAge: 15, public
 {
-  publicCompanies { # 15, PUBLIC
-    users { # 25, PUBLIC
-      tasks { # 50, PUBLIC
+  publicCompanies {
+    # 15, PUBLIC
+    users {
+      # 25, PUBLIC
+      tasks {
+        # 50, PUBLIC
         name # 50, PUBLIC
       }
     }
