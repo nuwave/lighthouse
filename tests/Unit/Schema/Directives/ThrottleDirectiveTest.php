@@ -7,7 +7,7 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
 
-class ThrottleDirectiveTest extends TestCase
+final class ThrottleDirectiveTest extends TestCase
 {
     public function testNamedLimiter(): void
     {

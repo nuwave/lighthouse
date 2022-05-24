@@ -8,7 +8,7 @@ use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Tests\TestCase;
 
-class ASTHelperTest extends TestCase
+final class ASTHelperTest extends TestCase
 {
     public function testThrowsWhenMergingUniqueNodeListWithCollision(): void
     {

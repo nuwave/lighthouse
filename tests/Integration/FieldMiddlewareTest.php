@@ -5,7 +5,7 @@ namespace Tests\Integration;
 use Nuwave\Lighthouse\Exceptions\AuthenticationException;
 use Tests\TestCase;
 
-class FieldMiddlewareTest extends TestCase
+final class FieldMiddlewareTest extends TestCase
 {
     public function testTransformsArgsBeforeCustomFieldMiddleware(): void
     {

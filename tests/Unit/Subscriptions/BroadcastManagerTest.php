@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
 use Tests\TestsSubscriptions;
 
-class BroadcastManagerTest extends TestCase
+final class BroadcastManagerTest extends TestCase
 {
     use TestsSubscriptions;
 

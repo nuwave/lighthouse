@@ -33,6 +33,7 @@ GRAPHQL;
 
             $validationFactory = app(ValidationFactory::class);
             assert($validationFactory instanceof ValidationFactory);
+
             $validator = $validationFactory->make(
                 $args,
                 $rulesGatherer->rules,

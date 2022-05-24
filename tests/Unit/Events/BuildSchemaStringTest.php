@@ -6,7 +6,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Nuwave\Lighthouse\Events\BuildSchemaString;
 use Tests\TestCase;
 
-class BuildSchemaStringTest extends TestCase
+final class BuildSchemaStringTest extends TestCase
 {
     public function testInjectsSourceSchemaIntoEvent(): void
     {

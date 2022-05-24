@@ -9,7 +9,7 @@ use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Tests\TestCase;
 use Tests\TestsSubscriptions;
 
-class CacheStorageManagerTest extends TestCase
+final class CacheStorageManagerTest extends TestCase
 {
     use TestsSubscriptions;
 

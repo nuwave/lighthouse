@@ -4,7 +4,7 @@ namespace Tests\Utils\Resolvers;
 
 use Illuminate\Support\Arr;
 
-class Foo
+final class Foo
 {
     public function __invoke(): string
     {

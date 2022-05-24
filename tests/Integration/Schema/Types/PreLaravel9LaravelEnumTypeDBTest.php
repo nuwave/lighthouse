@@ -12,7 +12,7 @@ use Tests\Utils\Models\PreLaravel9WithEnum;
 /**
  * TODO remove when requiring Laravel 9+.
  */
-class PreLaravel9LaravelEnumTypeDBTest extends DBTestCase
+final class PreLaravel9LaravelEnumTypeDBTest extends DBTestCase
 {
     /**
      * @var \Nuwave\Lighthouse\Schema\TypeRegistry

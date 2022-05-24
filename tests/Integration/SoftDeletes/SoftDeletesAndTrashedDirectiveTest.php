@@ -7,7 +7,7 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
+final class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
 {
     public function testWithAllDirective(): void
     {

@@ -11,6 +11,7 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Redis\RedisServiceProvider;
 use Laravel\Scout\ScoutServiceProvider as LaravelScoutServiceProvider;
 use Nuwave\Lighthouse\Auth\AuthServiceProvider as LighthouseAuthServiceProvider;
+use Nuwave\Lighthouse\CacheControl\CacheControlServiceProvider;
 use Nuwave\Lighthouse\GlobalId\GlobalIdServiceProvider;
 use Nuwave\Lighthouse\LighthouseServiceProvider;
 use Nuwave\Lighthouse\OrderBy\OrderByServiceProvider;
@@ -72,6 +73,7 @@ GRAPHQL;
             // Lighthouse's own
             LighthouseServiceProvider::class,
             LighthouseAuthServiceProvider::class,
+            CacheControlServiceProvider::class,
             GlobalIdServiceProvider::class,
             LighthouseScoutServiceProvider::class,
             OrderByServiceProvider::class,
@@ -207,8 +209,8 @@ GRAPHQL;
     {
         $this->schema = $schema;
 
-        /** @var \Nuwave\Lighthouse\Schema\SchemaBuilder $schemaBuilder */
         $schemaBuilder = $this->app->make(SchemaBuilder::class);
+        assert($schemaBuilder instanceof SchemaBuilder);
 
         return $schemaBuilder->schema();
     }

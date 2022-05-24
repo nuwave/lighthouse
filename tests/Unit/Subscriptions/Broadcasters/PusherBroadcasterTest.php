@@ -9,7 +9,7 @@ use Psr\Log\LoggerInterface;
 use Tests\TestCase;
 use Tests\TestsSubscriptions;
 
-class PusherBroadcasterTest extends TestCase
+final class PusherBroadcasterTest extends TestCase
 {
     use TestsSubscriptions;
 

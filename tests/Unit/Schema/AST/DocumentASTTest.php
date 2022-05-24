@@ -13,7 +13,7 @@ use Nuwave\Lighthouse\Schema\RootType;
 use Tests\TestCase;
 use Tests\Utils\Models\User;
 
-class DocumentASTTest extends TestCase
+final class DocumentASTTest extends TestCase
 {
     public function testParsesSimpleSchema(): void
     {

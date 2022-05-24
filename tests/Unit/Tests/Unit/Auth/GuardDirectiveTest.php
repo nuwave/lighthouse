@@ -6,7 +6,7 @@ use Nuwave\Lighthouse\Exceptions\AuthenticationException;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
 
-class GuardDirectiveTest extends TestCase
+final class GuardDirectiveTest extends TestCase
 {
     public function testGuardDefault(): void
     {

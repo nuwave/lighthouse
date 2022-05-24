@@ -8,7 +8,7 @@ use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
 use Tests\Utils\Rules\FooBarRule;
 
-class RulesDirectiveTest extends TestCase
+final class RulesDirectiveTest extends TestCase
 {
     protected function getEnvironmentSetUp($app): void
     {

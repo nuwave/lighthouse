@@ -11,7 +11,7 @@ use Tests\TestCase;
 use Tests\TestsSubscriptions;
 use Tests\Utils\Subscriptions\DummySubscriber;
 
-class RedisStorageManagerTest extends TestCase
+final class RedisStorageManagerTest extends TestCase
 {
     use TestsSubscriptions;
 

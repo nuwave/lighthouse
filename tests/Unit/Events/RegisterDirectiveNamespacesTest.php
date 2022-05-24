@@ -8,7 +8,7 @@ use Tests\Integration\Events\FieldDirective as TestFieldDirective;
 use Tests\TestCase;
 use Tests\Utils\Directives\FooDirective;
 
-class RegisterDirectiveNamespacesTest extends TestCase
+final class RegisterDirectiveNamespacesTest extends TestCase
 {
     /**
      * @var \Nuwave\Lighthouse\Schema\DirectiveLocator

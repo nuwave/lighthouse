@@ -24,7 +24,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property-read \Tests\Utils\Models\Post|\Tests\Utils\Models\Task $content
  * @property-read \Tests\Utils\Models\User $user
  */
-class Activity extends Model
+final class Activity extends Model
 {
     public function content(): MorphTo
     {

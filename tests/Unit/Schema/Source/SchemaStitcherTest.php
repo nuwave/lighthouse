@@ -6,7 +6,7 @@ use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
 use Tests\TestCase;
 
-class SchemaStitcherTest extends TestCase
+final class SchemaStitcherTest extends TestCase
 {
     public const SCHEMA_PATH = __DIR__ . '/schema/';
     public const ROOT_SCHEMA_FILENAME = 'root-schema';
@@ -16,8 +16,8 @@ class SchemaStitcherTest extends TestCase
     {
         parent::setUp();
 
-        // @phpstan-ignore-next-line using the Safe variant crashes PHPStan
-        exec('mkdir --parents ' . self::SCHEMA_PATH);
+        // @phpstan-ignore-next-line using the Safe variant crashes PHPStan (uses the short `-p` because `--parent` is not available on macOS)
+        exec('mkdir -p ' . self::SCHEMA_PATH);
     }
 
     protected function tearDown(): void

@@ -12,7 +12,7 @@ use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class MorphManyDirectiveTest extends DBTestCase
+final class MorphManyDirectiveTest extends DBTestCase
 {
     use WithFaker;
 

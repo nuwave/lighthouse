@@ -6,7 +6,7 @@ use GraphQL\Type\Definition\Directive;
 use Illuminate\Support\Arr;
 use Tests\TestCase;
 
-class DeprecatedDirectiveTest extends TestCase
+final class DeprecatedDirectiveTest extends TestCase
 {
     public function testRemoveDeprecatedFieldsFromIntrospection(): void
     {

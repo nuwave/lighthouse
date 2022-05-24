@@ -7,7 +7,7 @@ use GraphQL\Type\Definition\InputObjectType;
 use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\TestCase;
 
-class OrderByDirectiveTest extends TestCase
+final class OrderByDirectiveTest extends TestCase
 {
     public function testGeneratesInputWithFullyQualifiedName(): void
     {

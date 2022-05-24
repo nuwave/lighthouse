@@ -10,7 +10,7 @@ use Nuwave\Lighthouse\Schema\Directives\FieldDirective;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\TestCase;
 
-class IdeHelperCommandTest extends TestCase
+final class IdeHelperCommandTest extends TestCase
 {
     protected function getEnvironmentSetUp($app): void
     {

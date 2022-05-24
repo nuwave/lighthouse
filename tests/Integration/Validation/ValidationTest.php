@@ -13,7 +13,7 @@ use Tests\Utils\Validators\FooClosureValidator;
 /**
  * Covers fundamentals of the validation process.
  */
-class ValidationTest extends TestCase
+final class ValidationTest extends TestCase
 {
     protected function getEnvironmentSetUp($app): void
     {

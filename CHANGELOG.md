@@ -28,6 +28,64 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove support for Laravel 5, 6, 7
 - Remove `Serializable` implementation
 
+## v5.51.0
+
+### Added
+
+- Add `columns` and `distinct` args to `@count` directive https://github.com/nuwave/lighthouse/pull/2138
+
+## v5.50.0
+
+### Added
+
+- Add `@cacheControl` directive https://github.com/nuwave/lighthouse/pull/2136
+
+## v5.49.0
+
+### Added
+
+- Provide additional information about detected usages of deprecated elements https://github.com/nuwave/lighthouse/pull/2141
+
+## v5.48.2
+
+### Fixed
+
+- Allow `@cacheKey` on field definition https://github.com/nuwave/lighthouse/pull/2131
+
+## v5.48.1
+
+### Fixed
+
+- Omit non-nullable arguments in `@convertEmptyStringsToNull` https://github.com/nuwave/lighthouse/pull/2130
+
+## v5.48.0
+
+### Changed
+
+- Generate classes as `final` through artisan commands https://github.com/nuwave/lighthouse/pull/2127
+
+## v5.47.1
+
+### Fixed
+
+- `RelationDirective`/`batchload_relations` will consider `null` and default connection name the same connection https://github.com/nuwave/lighthouse/pull/2125
+
+## v5.47.0
+
+### Added
+
+- Add `@convertEmptyStringsToNull` directive https://github.com/nuwave/lighthouse/pull/2123
+
+### Fixed
+
+- Allow returning `Relation` from custom builder on `@all` and `@paginate` directive https://github.com/nuwave/lighthouse/pull/2120
+
+## v5.46.2
+
+### Fixed
+
+- Respect non-default primary key in nested one-to-many relations https://github.com/nuwave/lighthouse/pull/2119
+
 ## v5.46.1
 
 ### Fixed

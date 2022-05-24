@@ -7,7 +7,7 @@ use GraphQL\Validator\Rules\QueryComplexity;
 use GraphQL\Validator\Rules\QueryDepth;
 use Tests\TestCase;
 
-class SecurityTest extends TestCase
+final class SecurityTest extends TestCase
 {
     public function testSetMaxComplexityThroughConfig(): void
     {

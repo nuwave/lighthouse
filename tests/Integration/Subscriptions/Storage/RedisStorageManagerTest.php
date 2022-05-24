@@ -9,7 +9,7 @@ use Tests\TestCase;
 use Tests\TestsRedis;
 use Tests\TestsSubscriptions;
 
-class RedisStorageManagerTest extends TestCase
+final class RedisStorageManagerTest extends TestCase
 {
     use TestsRedis;
     use TestsSubscriptions;

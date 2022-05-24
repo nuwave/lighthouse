@@ -23,7 +23,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read \Tests\Utils\Models\User $user
  * @property-read \Tests\Utils\Models\Post $post
  */
-class Comment extends Model
+final class Comment extends Model
 {
     public function user(): BelongsTo
     {

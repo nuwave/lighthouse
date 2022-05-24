@@ -7,7 +7,7 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Role;
 use Tests\Utils\Models\User;
 
-class BelongsToManyTest extends DBTestCase
+final class BelongsToManyTest extends DBTestCase
 {
     protected $schema = /** @lang GraphQL */ '
     type Role {

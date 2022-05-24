@@ -2,7 +2,7 @@
 
 namespace Tests\Utils\Queries;
 
-class FooBar
+final class FooBar
 {
     public const INVOKE_RESULT = 'foobaz';
     public const CUSTOM_RESOLVE_RESULT = 'barbaz';

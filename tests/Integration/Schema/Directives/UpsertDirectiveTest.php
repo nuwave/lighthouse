@@ -8,7 +8,7 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class UpsertDirectiveTest extends DBTestCase
+final class UpsertDirectiveTest extends DBTestCase
 {
     public function testNestedArgResolver(): void
     {

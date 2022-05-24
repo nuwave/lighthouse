@@ -5,7 +5,7 @@ namespace Tests\Utils\Validators\Query;
 use Illuminate\Validation\Rule;
 use Nuwave\Lighthouse\Validation\Validator;
 
-class MacroUserValidator extends Validator
+final class MacroUserValidator extends Validator
 {
     public function rules(): array
     {

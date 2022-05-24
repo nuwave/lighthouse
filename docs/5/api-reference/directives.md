@@ -520,13 +520,57 @@ directive @cache(
 
 You can find usage examples of this directive in [the caching docs](../performance/caching.md).
 
+## @cacheControl
+
+```graphql
+"""
+Influences the HTTP `Cache-Control` headers of the response.
+"""
+directive @cacheControl(
+  """
+  The maximum amount of time the field's cached value is valid, in seconds.
+  0 means the field is not cacheable.
+  Mutually exclusive with `inheritMaxAge = true`.
+  """
+  maxAge: Int! = 0
+
+  """
+  Is the value specific to a single user?
+  """
+  scope: CacheControlScope! = PUBLIC
+    
+  """
+  Should the field inherit the `maxAge` of its parent field instead of using the default `maxAge`?
+  Mutually exclusive with `maxAge`.
+  """
+  inheritMaxAge: Boolean! = false
+) on FIELD_DEFINITION | OBJECT | INTERFACE | UNION
+
+"""
+Options for the `scope` argument of `@cacheControl`.
+"""
+enum CacheControlScope {
+  """
+  The value is the same for each user.
+  """
+  PUBLIC
+
+  """
+  The value is specific to a single user.
+  """
+  PRIVATE
+}
+```
+
+Find usage examples of this directive in [the caching docs](../performance/caching.md#http-cache-control-header).
+
 ## @cacheKey
 
 ```graphql
 """
 Specify the field to use as a key when creating a cache.
 """
-directive @cacheKey on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+directive @cacheKey on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 ```
 
 You can find usage examples of this directive in [the caching docs](../performance/caching.md#cache-key).
@@ -711,6 +755,53 @@ class ComplexityAnalyzer {
     }
 ```
 
+## @convertEmptyStringsToNull
+
+```graphql
+"""
+Replaces `""` with `null`.
+"""
+directive @convertEmptyStringsToNull on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+```
+
+Use this when there is no meaningful distinction between an empty string and null.
+
+```graphql
+type Mutation {
+  createPost(title: String @convertEmptyStringsToNull): Post!
+}
+```
+
+Usage on a field applies the conversion recursively to all inputs.
+
+```graphql
+type Mutation {
+  createPost(input: CreatePostInput!): Post! @convertEmptyStringsToNull
+}
+```
+
+Non-nullable arguments will _not_ be converted when this directive is used on a field,
+but will be converted when it is used directly on the argument.
+
+```graphql
+type Mutation {
+  createPost(
+    willBeConvertedBecauseExplicitlyMarked: String! @convertEmptyStringsToNull
+    willNotBeConvertedToMaintainInvariants: String!
+  ): Post! @convertEmptyStringsToNull
+}
+```
+
+If you want this for all your fields, consider adding this directive to your
+global field middleware in `lighthouse.php`:
+
+```php
+    'field_middleware' => [
+        \Nuwave\Lighthouse\Schema\Directives\ConvertEmptyStringsToNullDirective::class,
+        ...
+    ],
+```
+
 ## @count
 
 ```graphql
@@ -734,6 +825,17 @@ directive @count(
   Apply scopes to the underlying query.
   """
   scopes: [String!]
+
+  """
+  Count only rows where the given columns are non-null.
+  `*` counts every row.
+  """
+  columns: [String!]! = ["*"]
+
+  """
+  Should exclude duplicated rows?
+  """
+  distinct: Boolean! = false
 ) on FIELD_DEFINITION
 ```
 

@@ -7,7 +7,7 @@ use Nuwave\Lighthouse\Console\PrintSchemaCommand;
 use Nuwave\Lighthouse\Federation\FederationServiceProvider;
 use Tests\TestCase;
 
-class PrintFederationSchemaCommandTest extends TestCase
+final class PrintFederationSchemaCommandTest extends TestCase
 {
     protected const SCHEMA_TYPE /** @lang GraphQL */
         = <<<'GRAPHQL'

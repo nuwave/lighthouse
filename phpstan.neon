@@ -76,5 +76,8 @@ parameters:
   # Unavailable in thecodingmachine/safe:2
   - '#Function (sort|substr|ksort) is unsafe to use\. It can return FALSE instead of throwing an exception\.#'
 
+  # Lumen type hints are just wrong
+  - '#Parameter \#1 \$content of function response expects string, .* given\.#'
+
   # Seems like a bug in PHPStan
   - '#Parameter \#2 \$type of method Nuwave\\Lighthouse\\Schema\\TypeRegistry::.+Lazy\(\) expects callable\(\): GraphQL\\Type\\Definition\\Type&GraphQL\\Type\\Definition\\NamedType, Closure\(\): GraphQL\\Type\\Definition\\ObjectType given\.#'

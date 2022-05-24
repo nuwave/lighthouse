@@ -10,7 +10,7 @@ use Tests\Utils\Models\Tag;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class MorphToManyDirectiveTest extends DBTestCase
+final class MorphToManyDirectiveTest extends DBTestCase
 {
     use WithFaker;
 
