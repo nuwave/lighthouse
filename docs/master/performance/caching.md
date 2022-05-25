@@ -160,35 +160,38 @@ The Cache-Control headers for some queries will be:
 ```graphql
 # Cache-Control header: max-age: 5, PRIVATE
 {
+  # 5, PRIVATE
   me {
-    # 5, PRIVATE
+    # 50, PUBLIC
     tasks {
-      # 50, PUBLIC
-      id # 10, PUBLIC
+      # 10, PUBLIC
+      id
     }
   }
 }
 
 # Cache-Control header: no-cache, PRIVATE
 {
+  # 5, PRIVATE
   me {
-    # 5, PRIVATE
+    # 50, PUBLIC
     tasks {
-      # 50, PUBLIC
-      description # 0, PUBLIC
+      # 0, PUBLIC
+      description
     }
   }
 }
 
 # Cache-Control header: no-cache, private
 {
+  # no-cache, private
   companies {
-    # no-cache, private
+    # 25, PUBLIC
     users {
-      # 25, PUBLIC
+      # 50, PUBLIC
       tasks {
-        # 50, PUBLIC
-        id # 10, PUBLIC
+        # 10, PUBLIC
+        id
       }
     }
   }
@@ -196,13 +199,14 @@ The Cache-Control headers for some queries will be:
 
 # Cache-Control header: maxAge: 10, private
 {
+  # 15, PUBLIC
   publicCompanies {
-    # 15, PUBLIC
+    # 25, PUBLIC
     users {
-      # 25, PUBLIC
+      # 50, PUBLIC
       tasks {
-        # 50, PUBLIC
-        id # 10, PUBLIC
+        # 10, PUBLIC
+        id
       }
     }
   }
@@ -210,13 +214,14 @@ The Cache-Control headers for some queries will be:
 
 # Cache-Control header: maxAge: 15, public
 {
+  # 15, PUBLIC
   publicCompanies {
-    # 15, PUBLIC
+    # 25, PUBLIC
     users {
-      # 25, PUBLIC
+      # 50, PUBLIC
       tasks {
         # 50, PUBLIC
-        name # 50, PUBLIC
+        name
       }
     }
   }
