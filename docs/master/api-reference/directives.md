@@ -538,7 +538,7 @@ directive @cacheControl(
   Is the value specific to a single user?
   """
   scope: CacheControlScope! = PUBLIC
-    
+
   """
   Should the field inherit the `maxAge` of its parent field instead of using the default `maxAge`?
   Mutually exclusive with `maxAge`.
