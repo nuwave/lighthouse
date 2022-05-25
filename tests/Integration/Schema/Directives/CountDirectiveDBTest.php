@@ -420,4 +420,62 @@ final class CountDirectiveDBTest extends DBTestCase
             ],
         ]);
     }
+
+    public function testCountModelWithColumns(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            tasks: Int @count(model: "Task", columns: ["difficulty"])
+        }
+        ';
+
+        $notNull = factory(Task::class)->make();
+        assert($notNull instanceof Task);
+        $notNull->difficulty = null;
+        $notNull->save();
+
+        $notNull = factory(Task::class)->make();
+        assert($notNull instanceof Task);
+        $notNull->difficulty = 2;
+        $notNull->save();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            tasks
+        }
+        ')->assertExactJson([
+            'data' => [
+                'tasks' => 1,
+            ],
+        ]);
+    }
+
+    public function testCountModelWithColumnsAndDistinct(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            tasks: Int @count(model: "Task", distinct: true, columns: ["difficulty"])
+        }
+        ';
+        foreach (factory(Task::class, 2)->make() as $task) {
+            assert($task instanceof Task);
+            $task->difficulty = 1;
+            $task->save();
+        }
+
+        $other = factory(Task::class)->make();
+        assert($other instanceof Task);
+        $other->difficulty = 2;
+        $other->save();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            tasks
+        }
+        ')->assertExactJson([
+            'data' => [
+                'tasks' => 2,
+            ],
+        ]);
+    }
 }
