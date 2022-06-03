@@ -137,7 +137,7 @@ final class MorphToManyDirectiveTest extends DBTestCase
                                 'node' => [
                                     'id' => $tag->id,
                                     'name' => $tag->name,
-                                ]
+                                ],
                             ];
                         })->toArray(),
                     ],
