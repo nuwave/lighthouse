@@ -48,10 +48,6 @@ class TypeValue
         return $this->typeDefinition;
     }
 
-    /**
-     * @throws DefinitionException
-     * @throws \Exception
-     */
     public function cacheKey(): ?string
     {
         if (! isset($this->cacheKey)) {
