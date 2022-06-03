@@ -73,9 +73,9 @@ class TypeValue
                 if (ASTHelper::hasDirective($field, CacheKeyDirective::NAME)) {
                     $renameDirectiveNode = ASTHelper::directiveDefinition($field, 'rename');
 
-                    return $renameDirectiveNode
-                        ? $this->cacheKey = ASTHelper::directiveArgValue($renameDirectiveNode, 'attribute')
-                        : $this->cacheKey = $field->name->value;
+                    return $this->cacheKey = $renameDirectiveNode
+                        ? ASTHelper::directiveArgValue($renameDirectiveNode, 'attribute')
+                        : $field->name->value;
                 }
             }
 
@@ -88,7 +88,11 @@ class TypeValue
                     && $fieldType->type instanceof NamedTypeNode
                     && 'ID' === $fieldType->type->name->value
                 ) {
-                    return $this->cacheKey = $field->name->value;
+                    $renameDirectiveNode = ASTHelper::directiveDefinition($field, 'rename');
+
+                    return $this->cacheKey = $renameDirectiveNode
+                        ? ASTHelper::directiveArgValue($renameDirectiveNode, 'attribute')
+                        : $field->name->value;
                 }
             }
 
