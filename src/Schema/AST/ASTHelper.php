@@ -413,7 +413,7 @@ class ASTHelper
         return null;
     }
 
-    public static function getFieldName(FieldDefinitionNode $field): string
+    public static function internalFieldName(FieldDefinitionNode $field): string
     {
         $renameDirectiveNode = static::directiveDefinition($field, 'rename');
 
