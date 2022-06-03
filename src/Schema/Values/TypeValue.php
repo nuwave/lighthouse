@@ -71,11 +71,7 @@ class TypeValue
             // First priority: Look for a field with the @cacheKey directive
             foreach ($fieldDefinitions as $field) {
                 if (ASTHelper::hasDirective($field, CacheKeyDirective::NAME)) {
-                    $renameDirectiveNode = ASTHelper::directiveDefinition($field, 'rename');
-
-                    return $this->cacheKey = $renameDirectiveNode
-                        ? ASTHelper::directiveArgValue($renameDirectiveNode, 'attribute')
-                        : $field->name->value;
+                    return ASTHelper::getFieldName($field);
                 }
             }
 
@@ -88,11 +84,7 @@ class TypeValue
                     && $fieldType->type instanceof NamedTypeNode
                     && 'ID' === $fieldType->type->name->value
                 ) {
-                    $renameDirectiveNode = ASTHelper::directiveDefinition($field, 'rename');
-
-                    return $this->cacheKey = $renameDirectiveNode
-                        ? ASTHelper::directiveArgValue($renameDirectiveNode, 'attribute')
-                        : $field->name->value;
+                    return ASTHelper::getFieldName($field);
                 }
             }
 

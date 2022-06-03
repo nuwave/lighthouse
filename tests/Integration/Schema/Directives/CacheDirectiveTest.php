@@ -156,6 +156,41 @@ final class CacheDirectiveTest extends DBTestCase
         $this->assertSame('foobar', $this->cache->get('lighthouse:User:foo@bar.com:name'));
     }
 
+    public function testIDCacheKeyWithRenameDirective(): void
+    {
+        $this->mockResolver([
+            'id_' => 1,
+            'name' => 'foobar',
+        ]);
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID! @rename(attribute: "id_")
+            name: String @cache
+        }
+
+        type Query {
+            user: User @mock
+        }
+        ';
+
+        $response = $this->graphQL(/** @lang GraphQL */ '
+        {
+            user {
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'name' => 'foobar',
+                ],
+            ],
+        ]);
+
+        $this->assertSame('foobar', $this->cache->get('lighthouse:User:1:name'));
+    }
+
     public function testStoreResolverResultInPrivateCache(): void
     {
         $user = factory(User::class)->create();
