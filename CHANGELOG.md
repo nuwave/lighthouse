@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+
+- Consider `@rename` when picking the value of a key in `@cache` https://github.com/nuwave/lighthouse/pull/2155
+
 ## v5.51.0
 
 ### Added
