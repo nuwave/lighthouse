@@ -48,6 +48,10 @@ class TypeValue
         return $this->typeDefinition;
     }
 
+    /**
+     * @throws DefinitionException
+     * @throws \Exception
+     */
     public function cacheKey(): ?string
     {
         if (! isset($this->cacheKey)) {
@@ -71,7 +75,11 @@ class TypeValue
             // First priority: Look for a field with the @cacheKey directive
             foreach ($fieldDefinitions as $field) {
                 if (ASTHelper::hasDirective($field, CacheKeyDirective::NAME)) {
-                    return $this->cacheKey = $field->name->value;
+                    $renameDirectiveNode = ASTHelper::directiveDefinition($field, 'rename');
+
+                    return $renameDirectiveNode
+                        ? $this->cacheKey = ASTHelper::directiveArgValue($renameDirectiveNode, 'attribute')
+                        : $this->cacheKey = $field->name->value;
                 }
             }
 
