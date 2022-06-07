@@ -9,6 +9,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.52.1
+
 ### Fixed
 
 - Show proper validation error when referencing standard types in `union` https://github.com/nuwave/lighthouse/pull/2157
