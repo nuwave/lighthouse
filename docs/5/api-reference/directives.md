@@ -2049,20 +2049,20 @@ directive @morphToMany(
 Options for the `type` argument of `@morphToMany`.
 """
 enum MorphToManyType {
-    """
-    Offset-based pagination, similar to the Laravel default.
-    """
-    PAGINATOR
+  """
+  Offset-based pagination, similar to the Laravel default.
+  """
+  PAGINATOR
 
-    """
-    Offset-based pagination like the Laravel "Simple Pagination", which does not count the total number of records.
-    """
-    SIMPLE
+  """
+  Offset-based pagination like the Laravel "Simple Pagination", which does not count the total number of records.
+  """
+  SIMPLE
 
-    """
-    Cursor-based pagination, compatible with the Relay specification.
-    """
-    CONNECTION
+  """
+  Cursor-based pagination, compatible with the Relay specification.
+  """
+  CONNECTION
 }
 ```
 
