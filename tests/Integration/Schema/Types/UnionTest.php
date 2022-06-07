@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Types;
 
+use GraphQL\Error\InvariantViolation;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\DBTestCase;
@@ -84,6 +85,20 @@ GRAPHQL;
                 ],
             ],
         ]);
+    }
+
+    public function testRejectsUnionWithString(): void
+    {
+        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ <<<GRAPHQL
+        union Stuff = String
+
+GRAPHQL
+        );
+
+        $this->expectExceptionObject(new InvariantViolation(
+            'Union type Stuff can only include Object types, it cannot include String.'
+        ));
+        $schema->assertValid();
     }
 
     public function testThrowsOnAmbiguousSchemaMapping(): void
