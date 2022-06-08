@@ -97,7 +97,7 @@ final class ThrottleDirectiveTest extends TestCase
         {
             foo
         }
-        ')->assertGraphQLErrorMessage(RateLimitException::buildErrorMessage('foo'));
+        ')->assertGraphQLErrorMessage(RateLimitException::buildErrorMessage('Query.foo'));
     }
 
     public function testInlineLimiter(): void
@@ -122,44 +122,6 @@ final class ThrottleDirectiveTest extends TestCase
         {
             foo
         }
-        ')->assertGraphQLErrorMessage(RateLimitException::buildErrorMessage('foo'));
-    }
-
-    public function testExceptionMessageForNestedField(): void
-    {
-        $this->mockResolver([
-            'bar' => Foo::THE_ANSWER,
-        ]);
-
-        $this->schema = /** @lang GraphQL */ '
-        type Foo {
-            bar: Int @throttle(maxAttempts: 1)
-        }
-        type Query {
-            foo: Foo @mock
-        }
-        ';
-
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            foo {
-                bar
-            }
-        }
-        ')->assertJson([
-            'data' => [
-                'foo' => [
-                    'bar' => Foo::THE_ANSWER,
-                ],
-            ],
-        ]);
-
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            foo {
-                bar
-            }
-        }
-        ')->assertGraphQLErrorMessage(RateLimitException::buildErrorMessage('foo.bar'));
+        ')->assertGraphQLErrorMessage(RateLimitException::buildErrorMessage('Query.foo'));
     }
 }

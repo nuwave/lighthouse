@@ -10,12 +10,11 @@ use RuntimeException;
  */
 class RateLimitException extends RuntimeException implements ClientAware
 {
-    public const MESSAGE = 'Rate limit for %s exceeded. Try again later.';
     public const CATEGORY = 'rate-limit';
 
-    public function __construct(string $queryPath)
+    public function __construct(string $fieldName)
     {
-        parent::__construct(self::buildErrorMessage($queryPath));
+        parent::__construct(self::buildErrorMessage($fieldName));
     }
 
     public function isClientSafe(): bool
@@ -28,8 +27,8 @@ class RateLimitException extends RuntimeException implements ClientAware
         return self::CATEGORY;
     }
 
-    public static function buildErrorMessage(string $queryPath): string
+    public static function buildErrorMessage(string $fieldName): string
     {
-        return sprintf(self::MESSAGE, $queryPath);
+        return "Rate limit for $fieldName exceeded. Try again later.";
     }
 }
