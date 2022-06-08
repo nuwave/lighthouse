@@ -11,7 +11,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Changed
 
-- Include the path of the query that produced a RateLimitException in its message https://github.com/nuwave/lighthouse/pull/2149
+- Include field that produced a `RateLimitException` in its message https://github.com/nuwave/lighthouse/pull/2149
 
 ## v5.51.0
 
