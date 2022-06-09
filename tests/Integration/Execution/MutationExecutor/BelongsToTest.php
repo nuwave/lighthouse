@@ -507,8 +507,9 @@ GRAPHQL
      */
     public function testUpdateAndDisconnectBelongsTo(string $action): void
     {
-        /** @var \Tests\Utils\Models\Task $task */
         $task = factory(Task::class)->create();
+        assert($task instanceof Task);
+
         $task->user()->create();
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
@@ -543,19 +544,20 @@ GRAPHQL
             'Must not delete the second model.'
         );
 
-        /** @var \Tests\Utils\Models\Task $task */
         $task = Task::findOrFail(1);
+        assert($task instanceof Task);
         $this->assertNull($task->user, 'Must disconnect the parent relationship.');
     }
 
     public function testCreateUsingUpsertAndDisconnectBelongsTo(): void
     {
-        /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
-        /** @var \Tests\Utils\Models\Task $task */
+        assert($user instanceof User);
+
         $task = $user->tasks()->save(
             factory(Task::class)->make()
         );
+        assert($task instanceof Task);
 
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -600,12 +602,13 @@ GRAPHQL
      */
     public function testUpdateAndDeleteBelongsTo(string $action): void
     {
-        /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
-        /** @var \Tests\Utils\Models\Task $task */
+        assert($user instanceof User);
+
         $task = $user->tasks()->save(
             factory(Task::class)->make()
         );
+        assert($task instanceof Task);
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
@@ -692,12 +695,13 @@ GRAPHQL
      */
     public function testDoesNotDeleteOrDisconnectOnFalsyValues(string $action): void
     {
-        /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
-        /** @var \Tests\Utils\Models\Task $task */
+        assert($user instanceof User);
+
         $task = $user->tasks()->save(
             factory(Task::class)->make()
         );
+        assert($task instanceof Task);
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
