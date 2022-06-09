@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Changed
+
+- Include field that produced a `RateLimitException` in its message https://github.com/nuwave/lighthouse/pull/2149
+
 ## v5.52.1
 
 ### Fixed
