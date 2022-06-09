@@ -114,7 +114,7 @@ GRAPHQL;
                     $limit['key'],
                     $limit['maxAttempts'],
                     $limit['decayMinutes'],
-                    "$resolveInfo->parentType.$resolveInfo->fieldName"
+                    "{$resolveInfo->parentType}.{$resolveInfo->fieldName}"
                 );
             }
 
