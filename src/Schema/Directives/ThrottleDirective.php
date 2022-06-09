@@ -142,12 +142,12 @@ GRAPHQL;
     }
 
     /**
-     * Checks throttling limit.
+     * Checks throttling limit and records this attempt.
      */
-    protected function handleLimit(string $key, int $maxAttempts, float $decayMinutes, string $fieldName): void
+    protected function handleLimit(string $key, int $maxAttempts, float $decayMinutes, string $fieldReference): void
     {
         if ($this->limiter->tooManyAttempts($key, $maxAttempts)) {
-            throw new RateLimitException($fieldName);
+            throw new RateLimitException($fieldReference);
         }
 
         $this->limiter->hit($key, (int) ($decayMinutes * 60));
