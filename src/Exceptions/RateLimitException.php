@@ -12,9 +12,9 @@ class RateLimitException extends RuntimeException implements ClientAware
 {
     public const CATEGORY = 'rate-limit';
 
-    public function __construct(string $fieldName)
+    public function __construct(string $fieldReference)
     {
-        parent::__construct(self::buildErrorMessage($fieldName));
+        parent::__construct("Rate limit for {$fieldReference} exceeded. Try again later.");
     }
 
     public function isClientSafe(): bool
@@ -25,10 +25,5 @@ class RateLimitException extends RuntimeException implements ClientAware
     public function getCategory(): string
     {
         return self::CATEGORY;
-    }
-
-    public static function buildErrorMessage(string $fieldName): string
-    {
-        return "Rate limit for $fieldName exceeded. Try again later.";
     }
 }
