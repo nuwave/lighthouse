@@ -13,6 +13,36 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Restored `Laravel\Scout\Builder` as a valid option for the `@paginate` directive https://github.com/nuwave/lighthouse/pull/2139
 
+## v5.52.1
+
+### Fixed
+
+- Show proper validation error when referencing standard types in `union` https://github.com/nuwave/lighthouse/pull/2157
+
+## v5.52.0
+
+### Added
+
+- Allow pagination types for `@morphToMany` https://github.com/nuwave/lighthouse/pull/2154
+
+## v5.51.1
+
+### Fixed
+
+- Consider `@rename` when picking the value of a key in `@cache` https://github.com/nuwave/lighthouse/pull/2155
+
+## v5.51.0
+
+### Added
+
+- Add `columns` and `distinct` args to `@count` directive https://github.com/nuwave/lighthouse/pull/2138
+
+## v5.50.0
+
+### Added
+
+- Add `@cacheControl` directive https://github.com/nuwave/lighthouse/pull/2136
+
 ## v5.49.0
 
 ### Added

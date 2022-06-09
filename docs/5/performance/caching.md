@@ -101,3 +101,129 @@ type GithubProfile {
   repos: [Repository] @cache
 }
 ```
+
+## HTTP Cache-Control header
+
+**Experimental: not enabled by default, not guaranteed to be stable.**
+
+Add the service provider to your `config/app.php`:
+
+```php
+'providers' => [
+    \Nuwave\Lighthouse\CacheControl\CacheControlServiceProvider::class,
+],
+```
+
+You can change the [`Cache-Control` header](https://developer.mozilla.org/de/docs/Web/HTTP/Headers/Cache-Control) of your response
+regardless of [@cache](../api-reference/directives.md#cache)
+by adding the [@cacheControl](../api-reference/directives.md#cachecontrol) directive to a field.
+
+The final header settings are calculated based on these rules:
+
+- `max-age` equals the lowest `maxAge` among all fields. If that value is 0, `no-cache` is used instead
+- visibility is `public` unless the scope of a queried field is `PRIVATE`
+
+The following defaults apply:
+
+- non-scalar fields `maxAge` is 0
+- root fields `maxAge` is 0 and `scope` is `PRIVATE`
+- the directive default is prior to the field default
+
+For more details check [Apollo](https://www.apollographql.com/docs/apollo-server/performance/caching/#calculating-cache-behavior).
+
+Given the following example schema:
+
+```graphql
+type User {
+  tasks: [Task!]! @hasMany @cacheControl(maxAge: 50, scope: PUBLIC)
+}
+
+type Company {
+  users: [User!]! @hasMany @cacheControl(maxAge: 25, scope: PUBLIC)
+}
+
+type Task {
+  id: ID @cacheControl(maxAge: 10, scope: PUBLIC)
+  name: String @cacheControl(maxAge: 0, inheritMaxAge: true)
+  description: String @cacheControl
+}
+
+type Query {
+  me: User! @auth @cacheControl(maxAge: 5, scope: PRIVATE)
+  companies: [Company!]!
+  publicCompanies: [Company!]! @cacheControl(maxAge: 15)
+}
+```
+
+The Cache-Control headers for some queries will be:
+
+```graphql
+# Cache-Control header: max-age: 5, PRIVATE
+{
+  # 5, PRIVATE
+  me {
+    # 50, PUBLIC
+    tasks {
+      # 10, PUBLIC
+      id
+    }
+  }
+}
+
+# Cache-Control header: no-cache, PRIVATE
+{
+  # 5, PRIVATE
+  me {
+    # 50, PUBLIC
+    tasks {
+      # 0, PUBLIC
+      description
+    }
+  }
+}
+
+# Cache-Control header: no-cache, private
+{
+  # no-cache, private
+  companies {
+    # 25, PUBLIC
+    users {
+      # 50, PUBLIC
+      tasks {
+        # 10, PUBLIC
+        id
+      }
+    }
+  }
+}
+
+# Cache-Control header: maxAge: 10, private
+{
+  # 15, PUBLIC
+  publicCompanies {
+    # 25, PUBLIC
+    users {
+      # 50, PUBLIC
+      tasks {
+        # 10, PUBLIC
+        id
+      }
+    }
+  }
+}
+
+# Cache-Control header: maxAge: 15, public
+{
+  # 15, PUBLIC
+  publicCompanies {
+    # 25, PUBLIC
+    users {
+      # 50, PUBLIC
+      tasks {
+        # 50, PUBLIC
+        name
+      }
+    }
+  }
+}
+```

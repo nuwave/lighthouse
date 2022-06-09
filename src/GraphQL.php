@@ -254,7 +254,7 @@ class GraphQL
         $schema = $this->schemaBuilder->schema();
 
         $this->eventDispatcher->dispatch(
-            new StartExecution($query, $variables, $operationName, $context)
+            new StartExecution($schema, $query, $variables, $operationName, $context)
         );
 
         $result = GraphQLBase::executeQuery(

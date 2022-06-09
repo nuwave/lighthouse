@@ -71,7 +71,7 @@ class TypeValue
             // First priority: Look for a field with the @cacheKey directive
             foreach ($fieldDefinitions as $field) {
                 if (ASTHelper::hasDirective($field, CacheKeyDirective::NAME)) {
-                    return $this->cacheKey = $field->name->value;
+                    return $this->cacheKey = ASTHelper::internalFieldName($field);
                 }
             }
 
@@ -84,7 +84,7 @@ class TypeValue
                     && $fieldType->type instanceof NamedTypeNode
                     && 'ID' === $fieldType->type->name->value
                 ) {
-                    return $this->cacheKey = $field->name->value;
+                    return $this->cacheKey = ASTHelper::internalFieldName($field);
                 }
             }
 
