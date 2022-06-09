@@ -58,9 +58,17 @@ directive @can(
   Query for specific model instances to check the policy against, using arguments
   with directives that add constraints to the query builder, such as `@eq`.
 
-  Mutually exclusive with `find`.
+  Mutually exclusive with `find` and `resolved`.
   """
-  query: Boolean = false
+  query: Boolean! = false
+
+  """
+  Check the policy against the model instances returned by the field resolver.
+  Only use this if the field does not mutate data, it is run before checking.
+
+  Mutually exclusive with `find` and `resolved`.
+  """
+  resolved: Boolean! = false
 
   """
   Apply scopes to the underlying query.
@@ -76,7 +84,7 @@ directive @can(
   """
   Pass along the client given input data as arguments to `Gate::check`.
   """
-  injectArgs: Boolean = false
+  injectArgs: Boolean! = false
 
   """
   Statically defined arguments that are passed to `Gate::check`.
@@ -92,7 +100,7 @@ directive @can(
 
   You may pass the string in dot notation to use nested inputs.
 
-  Mutually exclusive with `search`.
+  Mutually exclusive with `search` and `resolved`.
   """
   find: String
 ) repeatable on FIELD_DEFINITION
@@ -111,10 +119,21 @@ GRAPHQL;
     {
         $previousResolver = $fieldValue->getResolver();
         $ability = $this->directiveArgValue('ability');
+        $resolved = $this->directiveArgValue('resolved');
 
-        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($ability, $previousResolver) {
+        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver, $ability, $resolved) {
             $gate = $this->gate->forUser($context->user());
             $checkArguments = $this->buildCheckArguments($args);
+
+            if ($resolved) {
+                $modelOrModels = $previousResolver($root, $args, $context, $resolveInfo);
+
+                Utils::applyEach(function (Model $model) use ($gate, $ability, $checkArguments): void {
+                    $this->authorize($gate, $ability, $model, $checkArguments);
+                }, $modelOrModels);
+
+                return $modelOrModels;
+            }
 
             foreach ($this->modelsToCheck($resolveInfo->argumentSet, $args) as $model) {
                 $this->authorize($gate, $ability, $model, $checkArguments);

@@ -140,6 +140,43 @@ final class CanDirectiveTest extends TestCase
         ]);
     }
 
+    public function testChecksAgainstResolvedModels(): void
+    {
+        $user = new User();
+        $user->name = UserPolicy::ADMIN;
+        $this->be($user);
+
+        $this->mockResolver(function (): User {
+            return $this->resolveUser();
+        });
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            user: User!
+                @can(ability: "view", resolved: true)
+                @mock
+        }
+
+        type User {
+            name: String
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            user {
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'name' => 'foo',
+                ],
+            ],
+        ]);
+    }
+
     public function testAcceptsGuestUser(): void
     {
         if (AppVersion::below(5.7)) {
