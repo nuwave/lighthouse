@@ -17,7 +17,7 @@ class StartExecution
     /**
      * The parsed schema.
      *
-     * @var \GraphQL\Type\Schema;
+     * @var \GraphQL\Type\Schema
      */
     public $schema;
 
