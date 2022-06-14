@@ -11,7 +11,7 @@ class CacheServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->bind(CacheKeyAndTags::class, GenerateCacheKeyAndTags::class);
+        $this->app->bind(CacheKeyAndTags::class, CacheKeyAndTagsGenerator::class);
     }
 
     public function boot(Dispatcher $dispatcher): void

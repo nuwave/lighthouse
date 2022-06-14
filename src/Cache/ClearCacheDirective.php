@@ -20,7 +20,7 @@ class ClearCacheDirective extends BaseDirective implements FieldMiddleware
     protected $cacheRepository;
 
     /**
-     * @var Nuwave\Lighthouse\Support\Contracts\CacheKeyAndTags
+     * @var \Nuwave\Lighthouse\Support\Contracts\CacheKeyAndTags
      */
     protected $cacheKeyAndTags;
 

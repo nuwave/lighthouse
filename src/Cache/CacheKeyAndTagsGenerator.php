@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\Cache;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Nuwave\Lighthouse\Support\Contracts\CacheKeyAndTags;
 
-class GenerateCacheKeyAndTags implements CacheKeyAndTags
+class CacheKeyAndTagsGenerator implements CacheKeyAndTags
 {
     public const PREFIX = 'lighthouse';
     public const SEPARATOR = ':';
@@ -42,26 +42,6 @@ class GenerateCacheKeyAndTags implements CacheKeyAndTags
         }
 
         return implode(self::SEPARATOR, $parts);
-    }
-
-    /**
-     * @param  int|string|null  $id
-     *
-     * @return array{string, string}
-     */
-    public function tags(string $parentName, $id, string $fieldName): array
-    {
-        return [
-            self::parentTag(
-                $parentName,
-                $id
-            ),
-            self::fieldTag(
-                $parentName,
-                $id,
-                $fieldName
-            ),
-        ];
     }
 
     /**

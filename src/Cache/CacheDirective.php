@@ -21,7 +21,7 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
     protected $cacheRepository;
 
     /**
-     * @var Nuwave\Lighthouse\Support\Contracts\CacheKeyAndTags
+     * @var \Nuwave\Lighthouse\Support\Contracts\CacheKeyAndTags
      */
     protected $cacheKeyAndTags;
 
@@ -75,7 +75,7 @@ GRAPHQL;
 
                 /** @var \Illuminate\Cache\TaggedCache|\Illuminate\Contracts\Cache\Repository $cache */
                 $cache = $shouldUseTags
-                    ? $this->cacheRepository->tags($this->cacheKeyAndTags->tags($parentName, $rootID, $fieldName))
+                    ? $this->cacheRepository->tags([$this->cacheKeyAndTags->parentTag($parentName, $rootID), $this->cacheKeyAndTags->fieldTag($parentName, $rootID, $fieldName)])
                     : $this->cacheRepository;
 
                 $cacheKey = $this->cacheKeyAndTags->key(
