@@ -102,6 +102,18 @@ type GithubProfile {
 }
 ```
 
+## Implementing your own cache key generator
+
+In one of your application service providers, bind the [`Nuwave\Lighthouse\Cache\CacheKeyAndTags.php`](https://github.com/nuwave/lighthouse/blob/master/src/Cache/CacheKeyAndTags.php)
+interface to your cache key generator class:
+
+```php
+$this->app->bind(CacheKeyAndTags::class, YourOwnCacheKeyGenerator::class);
+```
+
+You can extend [`Nuwave\Lighthouse\Cache\CacheKeyAndTagsGenerator.php`](https://github.com/nuwave/lighthouse/blob/master/src/Cache/CacheKeyAndTagsGenerator.php)
+to override certain methods, or implement the interface from scratch.
+
 ## HTTP Cache-Control header
 
 **Experimental: not enabled by default, not guaranteed to be stable.**
