@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Integration\Schema\Directives;
+namespace Tests\Integration\Cache;
 
 use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\TestCase;

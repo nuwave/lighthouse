@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Support\Contracts;
+namespace Nuwave\Lighthouse\Cache;
 
 use Illuminate\Contracts\Auth\Authenticatable;
 

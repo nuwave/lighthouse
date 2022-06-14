@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Cache;
 
 use Illuminate\Contracts\Auth\Authenticatable;
-use Nuwave\Lighthouse\Support\Contracts\CacheKeyAndTags;
 
 class CacheKeyAndTagsGenerator implements CacheKeyAndTags
 {

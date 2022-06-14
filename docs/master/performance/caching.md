@@ -104,7 +104,7 @@ type GithubProfile {
 
 ## Implementing your own cache key generator
 
-In one of your application service providers, bind the [`Nuwave\Lighthouse\Support\Contracts\CacheKeyAndTags.php`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/CacheKeyAndTags.php)
+In one of your application service providers, bind the [`Nuwave\Lighthouse\Cache\CacheKeyAndTags.php`](https://github.com/nuwave/lighthouse/blob/master/src/Cache/CacheKeyAndTags.php)
 interface to your cache key generator class:
 
 ```php

@@ -5,7 +5,6 @@ namespace Nuwave\Lighthouse\Cache;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
-use Nuwave\Lighthouse\Support\Contracts\CacheKeyAndTags;
 
 class CacheServiceProvider extends ServiceProvider
 {

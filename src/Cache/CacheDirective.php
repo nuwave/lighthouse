@@ -9,7 +9,6 @@ use Illuminate\Support\Carbon;
 use Nuwave\Lighthouse\Execution\Resolved;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\CacheKeyAndTags;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
@@ -21,7 +20,7 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
     protected $cacheRepository;
 
     /**
-     * @var \Nuwave\Lighthouse\Support\Contracts\CacheKeyAndTags
+     * @var \Nuwave\Lighthouse\Cache\CacheKeyAndTags
      */
     protected $cacheKeyAndTags;
 
@@ -76,9 +75,9 @@ GRAPHQL;
                 /** @var \Illuminate\Cache\TaggedCache|\Illuminate\Contracts\Cache\Repository $cache */
                 $cache = $shouldUseTags
                     ? $this->cacheRepository->tags([
-                          $this->cacheKeyAndTags->parentTag($parentName, $rootID),
-                          $this->cacheKeyAndTags->fieldTag($parentName, $rootID, $fieldName),
-                      ])
+                        $this->cacheKeyAndTags->parentTag($parentName, $rootID),
+                        $this->cacheKeyAndTags->fieldTag($parentName, $rootID, $fieldName),
+                    ])
                     : $this->cacheRepository;
 
                 $cacheKey = $this->cacheKeyAndTags->key(
