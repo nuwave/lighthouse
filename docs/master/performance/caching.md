@@ -109,8 +109,6 @@ interface to your cache key generator class:
 
 ```php
 $this->app->bind(CacheKeyAndTags::class, YourOwnCacheKeyGenerator::class);
-```
-You can extend lighthouse [`Nuwave\Lighthouse\Cache\CacheKeyAndTagsGenerator.php`](https://github.com/nuwave/lighthouse/blob/master/src/Cache/CacheKeyAndTagsGenerator.php) class and override the methods or implement the interface.
 
 ## HTTP Cache-Control header
 
