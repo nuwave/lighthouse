@@ -104,7 +104,8 @@ type GithubProfile {
 
 ## Implementing your own cache key generator
 
-In laravel `AppServiceProvider.php`, bind the [`Nuwave\Lighthouse\Support\Contracts\CacheKeyAndTags.php`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/CacheKeyAndTags.php) interface to your cache key generator class:
+In one of your application service providers, bind the [`Nuwave\Lighthouse\Support\Contracts\CacheKeyAndTags.php`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/CacheKeyAndTags.php)
+interface to your cache key generator class:
 
 ```php
 $this->app->bind(CacheKeyAndTags::class, YourOwnCacheKeyGenerator::class);
