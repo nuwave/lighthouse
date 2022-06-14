@@ -1,13 +1,14 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Directives;
+namespace Nuwave\Lighthouse\Cache;
 
 use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Support\Arr;
-use Nuwave\Lighthouse\Schema\Values\CacheKeyAndTags;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\CacheKeyAndTags;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
@@ -18,9 +19,15 @@ class ClearCacheDirective extends BaseDirective implements FieldMiddleware
      */
     protected $cacheRepository;
 
-    public function __construct(CacheRepository $cacheRepository)
+    /**
+     * @var Nuwave\Lighthouse\Support\Contracts\CacheKeyAndTags
+     */
+    protected $cacheKeyAndTags;
+
+    public function __construct(CacheRepository $cacheRepository, CacheKeyAndTags $cacheKeyAndTags)
     {
         $this->cacheRepository = $cacheRepository;
+        $this->cacheKeyAndTags = $cacheKeyAndTags;
     }
 
     public static function definition(): string
@@ -83,8 +90,8 @@ GRAPHQL;
 
                 foreach ((array) $idOrIds as $id) {
                     $tag = is_string($field)
-                        ? CacheKeyAndTags::fieldTag($type, $id, $field)
-                        : CacheKeyAndTags::parentTag($type, $id);
+                        ? $this->cacheKeyAndTags->fieldTag($type, $id, $field)
+                        : $this->cacheKeyAndTags->parentTag($type, $id);
 
                     $this->cacheRepository->tags([$tag])->flush();
                 }

@@ -1,10 +1,11 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Values;
+namespace Nuwave\Lighthouse\Cache;
 
 use Illuminate\Contracts\Auth\Authenticatable;
+use Nuwave\Lighthouse\Support\Contracts\CacheKeyAndTags;
 
-class CacheKeyAndTags
+class GenerateCacheKeyAndTags implements CacheKeyAndTags
 {
     public const PREFIX = 'lighthouse';
     public const SEPARATOR = ':';
@@ -13,7 +14,7 @@ class CacheKeyAndTags
      * @param  int|string|null  $id
      * @param  array<string, mixed>  $args
      */
-    public static function key(
+    public function key(
         ?Authenticatable $user,
         bool $isPrivate,
         string $parentName,
@@ -48,7 +49,7 @@ class CacheKeyAndTags
      *
      * @return array{string, string}
      */
-    public static function tags(string $parentName, $id, string $fieldName): array
+    public function tags(string $parentName, $id, string $fieldName): array
     {
         return [
             self::parentTag(
@@ -66,7 +67,7 @@ class CacheKeyAndTags
     /**
      * @param  int|string|null $id
      */
-    public static function parentTag(string $parentName, $id): string
+    public function parentTag(string $parentName, $id): string
     {
         return implode(self::SEPARATOR, [
             self::PREFIX,
@@ -78,7 +79,7 @@ class CacheKeyAndTags
     /**
      * @param  int|string|null $id
      */
-    public static function fieldTag(string $parentName, $id, string $fieldName): string
+    public function fieldTag(string $parentName, $id, string $fieldName): string
     {
         return implode(self::SEPARATOR, [
             self::PREFIX,
