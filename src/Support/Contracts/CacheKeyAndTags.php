@@ -9,8 +9,8 @@ interface CacheKeyAndTags
     /**
      * Generate the cache key.
      *
-     * @param int|string|null      $id
-     * @param array<string, mixed> $args
+     * @param  int|string|null $id
+     * @param  array<string, mixed> $args
      */
     public function key(?Authenticatable $user, bool $isPrivate, string $parentName, $id, string $fieldName, array $args): string;
 

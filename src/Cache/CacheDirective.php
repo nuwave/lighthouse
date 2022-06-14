@@ -75,7 +75,10 @@ GRAPHQL;
 
                 /** @var \Illuminate\Cache\TaggedCache|\Illuminate\Contracts\Cache\Repository $cache */
                 $cache = $shouldUseTags
-                    ? $this->cacheRepository->tags([$this->cacheKeyAndTags->parentTag($parentName, $rootID), $this->cacheKeyAndTags->fieldTag($parentName, $rootID, $fieldName)])
+                    ? $this->cacheRepository->tags([
+                          $this->cacheKeyAndTags->parentTag($parentName, $rootID),
+                          $this->cacheKeyAndTags->fieldTag($parentName, $rootID, $fieldName),
+                      ])
                     : $this->cacheRepository;
 
                 $cacheKey = $this->cacheKeyAndTags->key(
