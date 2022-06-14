@@ -17,14 +17,14 @@ interface CacheKeyAndTags
     /**
      * Generate a tag for the parent.
      *
-     * @param int|string|null $id
+     * @param  int|string|null $id
      */
     public function parentTag(string $parentName, $id): string;
 
     /**
      * Generate a tag for the field.
      *
-     * @param int|string|null $id
+     * @param  int|string|null $id
      */
     public function fieldTag(string $parentName, $id, string $fieldName): string;
 }
