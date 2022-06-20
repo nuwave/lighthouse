@@ -41,7 +41,6 @@ class ConnectionField
     /**
      * Resolve edges for connection.
      *
-     * @param  \Illuminate\Pagination\AbstractPaginator  $paginator
      * @param  array<string, mixed>  $args
      */
     public function edgeResolver(AbstractPaginator $paginator, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Collection

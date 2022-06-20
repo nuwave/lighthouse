@@ -32,8 +32,6 @@ class PaginatorField
     /**
      * Resolve data for connection.
      *
-     * @param  \Illuminate\Pagination\AbstractPaginator  $root
-     *
      * @return \Illuminate\Support\Collection<mixed>
      */
     public function dataResolver(AbstractPaginator $root): Collection
