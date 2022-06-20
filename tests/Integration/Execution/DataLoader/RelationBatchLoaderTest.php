@@ -3,7 +3,6 @@
 namespace Tests\Integration\Execution\DataLoader;
 
 use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Support\Facades\DB;
 use Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Tests\DBTestCase;
@@ -103,26 +102,21 @@ final class RelationBatchLoaderTest extends DBTestCase
 
         config(['lighthouse.batchload_relations' => $batchloadRelations]);
 
-        $queryCount = 0;
-        DB::listen(function () use (&$queryCount): void {
-            ++$queryCount;
-        });
-
-        $this
-            ->graphQL(/** @lang GraphQL */ '
-            {
-                users {
-                    tasks {
-                        id
+        $this->assertQueryCountMatches($expectedQueryCount, function () use ($userCount, $tasksPerUser): void {
+            $this
+                ->graphQL(/** @lang GraphQL */ '
+                {
+                    users {
+                        tasks {
+                            id
+                        }
                     }
                 }
-            }
-            ')
-            ->assertJsonCount($userCount, 'data.users')
-            ->assertJsonCount($tasksPerUser, 'data.users.0.tasks')
-            ->assertJsonCount($tasksPerUser, 'data.users.1.tasks');
-
-        $this->assertSame($expectedQueryCount, $queryCount);
+                ')
+                ->assertJsonCount($userCount, 'data.users')
+                ->assertJsonCount($tasksPerUser, 'data.users.0.tasks')
+                ->assertJsonCount($tasksPerUser, 'data.users.1.tasks');
+        });
     }
 
     public function testDoesNotBatchloadRelationsWithDifferentDatabaseConnections(): void
@@ -151,26 +145,21 @@ final class RelationBatchLoaderTest extends DBTestCase
                 );
             });
 
-        $queryCount = 0;
-        DB::listen(function () use (&$queryCount): void {
-            ++$queryCount;
-        });
-
-        $this
-            ->graphQL(/** @lang GraphQL */ '
-            {
-                users {
-                    alternateConnections {
-                        id
+        $this->assertQueryCountMatches(3, function () use ($userCount, $alternateConnectionsPerUser): void {
+            $this
+                ->graphQL(/** @lang GraphQL */ '
+                {
+                    users {
+                        alternateConnections {
+                            id
+                        }
                     }
                 }
-            }
-            ')
-            ->assertJsonCount($userCount, 'data.users')
-            ->assertJsonCount($alternateConnectionsPerUser, 'data.users.0.alternateConnections')
-            ->assertJsonCount($alternateConnectionsPerUser, 'data.users.1.alternateConnections');
-
-        $this->assertSame(3, $queryCount);
+                ')
+                ->assertJsonCount($userCount, 'data.users')
+                ->assertJsonCount($alternateConnectionsPerUser, 'data.users.0.alternateConnections')
+                ->assertJsonCount($alternateConnectionsPerUser, 'data.users.1.alternateConnections');
+        });
     }
 
     public function testDoesNotBatchloadRelationsWithNullDatabaseConnections(): void
@@ -179,7 +168,7 @@ final class RelationBatchLoaderTest extends DBTestCase
         type NullConnection {
             users: [User!]! @hasMany
         }
-        
+
         type User {
             id: ID
         }
@@ -201,26 +190,21 @@ final class RelationBatchLoaderTest extends DBTestCase
 
         config(['lighthouse.batchload_relations' => true]);
 
-        $queryCount = 0;
-        DB::listen(function () use (&$queryCount): void {
-            ++$queryCount;
-        });
-
-        $this
-            ->graphQL(/** @lang GraphQL */ '
-            {
-                nullConnections {
-                    users {
-                        id
+        $this->assertQueryCountMatches(2, function () use ($nullConnectionsCount, $usersPerNullConnection): void {
+            $this
+                ->graphQL(/** @lang GraphQL */ '
+                {
+                    nullConnections {
+                        users {
+                            id
+                        }
                     }
                 }
-            }
-            ')
-            ->assertJsonCount($nullConnectionsCount, 'data.nullConnections')
-            ->assertJsonCount($usersPerNullConnection, 'data.nullConnections.0.users')
-            ->assertJsonCount($usersPerNullConnection, 'data.nullConnections.1.users');
-
-        $this->assertSame(2, $queryCount);
+                ')
+                ->assertJsonCount($nullConnectionsCount, 'data.nullConnections')
+                ->assertJsonCount($usersPerNullConnection, 'data.nullConnections.0.users')
+                ->assertJsonCount($usersPerNullConnection, 'data.nullConnections.1.users');
+        });
     }
 
     /**
@@ -253,46 +237,40 @@ final class RelationBatchLoaderTest extends DBTestCase
 
         factory(User::class, 2)->create();
 
-        $queryCount = 0;
-        DB::listen(function () use (&$queryCount): void {
-            ++$queryCount;
+        $this->assertQueryCountMatches(2, function (): void {
+            $this->graphQL(/** @lang GraphQL */ '
+            {
+                users {
+                    tasks {
+                        id
+                    }
+                }
+            }
+            ');
         });
 
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            users {
-                tasks {
-                    id
+        $this->assertQueryCountMatches(2, function (): void {
+            $this->graphQL(/** @lang GraphQL */ '
+            {
+                users {
+                    name
                 }
             }
-        }
-        ');
-        $this->assertSame(2, $queryCount);
+            ');
+        });
 
-        $queryCount = 0;
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            users {
-                name
-            }
-        }
-        ');
-        // @phpstan-ignore-next-line $queryCount is modified
-        $this->assertSame(2, $queryCount);
-
-        $queryCount = 0;
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            users {
-                name
-                tasks {
-                    id
+        $this->assertQueryCountMatches(2, function (): void {
+            $this->graphQL(/** @lang GraphQL */ '
+            {
+                users {
+                    name
+                    tasks {
+                        id
+                    }
                 }
             }
-        }
-        ');
-        // @phpstan-ignore-next-line $queryCount is modified
-        $this->assertSame(2, $queryCount);
+            ');
+        });
     }
 
     public function testSplitsEagerLoadsByScopes(): void
@@ -314,22 +292,18 @@ final class RelationBatchLoaderTest extends DBTestCase
 
         factory(User::class, 2)->create();
 
-        $queryCount = 0;
-        DB::listen(function () use (&$queryCount): void {
-            ++$queryCount;
-        });
-
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            users {
-                name
-                tasks {
-                    id
+        $this->assertQueryCountMatches(3, function (): void {
+            $this->graphQL(/** @lang GraphQL */ '
+            {
+                users {
+                    name
+                    tasks {
+                        id
+                    }
                 }
             }
-        }
-        ');
-        $this->assertSame(3, $queryCount);
+            ');
+        });
     }
 
     public function testSplitsEagerLoadsWithArguments(): void
@@ -351,22 +325,18 @@ final class RelationBatchLoaderTest extends DBTestCase
 
         factory(User::class, 2)->create();
 
-        $queryCount = 0;
-        DB::listen(function () use (&$queryCount): void {
-            ++$queryCount;
-        });
-
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            users {
-                name
-                tasks(name: "Prevents combination of eager loads") {
-                    id
+        $this->assertQueryCountMatches(3, function (): void {
+            $this->graphQL(/** @lang GraphQL */ '
+            {
+                users {
+                    name
+                    tasks(name: "Prevents combination of eager loads") {
+                        id
+                    }
                 }
             }
-        }
-        ');
-        $this->assertSame(3, $queryCount);
+            ');
+        });
     }
 
     public function testResolveFieldsByCustomBatchLoader(): void
@@ -549,24 +519,21 @@ final class RelationBatchLoaderTest extends DBTestCase
         }
         ';
 
-        /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
+        assert($user instanceof User);
 
-        /** @var \Tests\Utils\Models\Task $task */
         $task = factory(Task::class)->make();
+        assert($task instanceof Task);
         $task->user()->associate($user);
         $task->save();
 
-        /** @var \Tests\Utils\Models\Post $post */
         $post = factory(Post::class)->make();
+        assert($post instanceof Post);
         $post->task()->associate($task);
         $post->user()->associate($user);
         $post->save();
 
-        $queries = 0;
-        DB::listen(static function () use (&$queries): void {
-            ++$queries;
-        });
+        $this->countQueries($queryCount);
 
         $this
             ->graphQL(/** @lang GraphQL */ '
@@ -599,6 +566,6 @@ final class RelationBatchLoaderTest extends DBTestCase
         // TODO optimize this
         $this->markTestIncomplete('The intermediary relation of dot notation is not batched with equivalent relations of fields.');
         // @phpstan-ignore-next-line Of course this terminates...
-        $this->assertSame(3, $queries);
+        $this->assertSame(3, $queryCount);
     }
 }

@@ -29,17 +29,15 @@ class PaginationType
             case 'paginator':
                 $this->type = self::PAGINATOR;
                 break;
+            case 'simple':
+                $this->type = self::SIMPLE;
+                break;
             case 'connection':
             case 'relay':
                 $this->type = self::CONNECTION;
                 break;
-            case 'simple':
-                $this->type = self::SIMPLE;
-                break;
             default:
-                throw new DefinitionException(
-                    "Found invalid pagination type: {$paginationType}"
-                );
+                throw new DefinitionException("Found invalid pagination type: {$paginationType}");
         }
     }
 
@@ -48,20 +46,21 @@ class PaginationType
         return self::PAGINATOR === $this->type;
     }
 
-    public function isConnection(): bool
-    {
-        return self::CONNECTION === $this->type;
-    }
-
     public function isSimple(): bool
     {
         return self::SIMPLE === $this->type;
+    }
+
+    public function isConnection(): bool
+    {
+        return self::CONNECTION === $this->type;
     }
 
     public function infoFieldName(): string
     {
         switch ($this->type) {
             case self::PAGINATOR:
+            case self::SIMPLE:
                 return 'paginatorInfo';
             case self::CONNECTION:
                 return 'pageInfo';

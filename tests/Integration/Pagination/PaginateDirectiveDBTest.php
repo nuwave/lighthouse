@@ -4,7 +4,6 @@ namespace Tests\Integration\Pagination;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Tests\AssertsQueryCounts;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Comment;
 use Tests\Utils\Models\Post;
@@ -12,14 +11,11 @@ use Tests\Utils\Models\User;
 
 final class PaginateDirectiveDBTest extends DBTestCase
 {
-    use AssertsQueryCounts;
-
     public function testPaginate(): void
     {
         factory(User::class, 3)->create();
 
-        $this->schema /** @lang GraphQL */
-            = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
         }
@@ -60,16 +56,15 @@ final class PaginateDirectiveDBTest extends DBTestCase
     {
         factory(User::class, 2)->create();
 
-        $this->schema /** @lang GraphQL */
-            = '
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type User {
             id: ID!
         }
 
         type Query {
-            users: [User!]! @paginate(builder: "' . $this->qualifyTestResolver('builder') . '")
+            users: [User!]! @paginate(builder: "{$this->qualifyTestResolver('builder')}")
         }
-        ';
+GRAPHQL;
 
         // The custom builder is supposed to change the sort order
         $this->graphQL(/** @lang GraphQL */ '
@@ -101,21 +96,20 @@ final class PaginateDirectiveDBTest extends DBTestCase
         $posts = factory(Post::class, 2)->create();
         $user->posts()->saveMany($posts);
 
-        $this->schema /** @lang GraphQL */
-            = '
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type Post {
             id: ID!
         }
 
         type User {
             id: ID!
-            posts: [Post!]! @paginate(builder: "' . $this->qualifyTestResolver('builderForRelation') . '")
+            posts: [Post!]! @paginate(builder: "{$this->qualifyTestResolver('builderForRelation')}")
         }
 
         type Query {
             user(id: ID! @eq): User @find
         }
-        ';
+GRAPHQL;
 
         // The custom builder is supposed to change the sort order
         $this->graphQL(/** @lang GraphQL */ "
@@ -148,17 +142,17 @@ final class PaginateDirectiveDBTest extends DBTestCase
 
     public function testPaginateWithScopes(): void
     {
-        $namedUser = factory(User::class)->create([
-            'name' => 'A named user',
-        ]);
+        $namedUser = factory(User::class)->make();
         assert($namedUser instanceof User);
+        $namedUser->name = 'A named user';
+        $namedUser->save();
 
-        factory(User::class)->create([
-            'name' => null,
-        ]);
+        $unnamedUser = factory(User::class)->make();
+        assert($unnamedUser instanceof User);
+        $unnamedUser->name = null;
+        $unnamedUser->save();
 
-        $this->schema /** @lang GraphQL */
-            = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: String!
         }
@@ -212,15 +206,27 @@ final class PaginateDirectiveDBTest extends DBTestCase
     public function testCreateQueryPaginatorsWithDifferentPages(): void
     {
         $users = factory(User::class, 3)->create();
-        $posts = factory(Post::class, 3)->create([
-            'user_id' => $users->first()->id,
-        ]);
-        factory(Comment::class, 3)->create([
-            'post_id' => $posts->first()->id,
-        ]);
 
-        $this->schema /** @lang GraphQL */
-            = '
+        $firstUser = $users->first();
+        assert($firstUser instanceof User);
+
+        $posts = factory(Post::class, 3)->make();
+        foreach ($posts as $post) {
+            assert($post instanceof Post);
+            $post->user()->associate($firstUser);
+            $post->save();
+        }
+
+        $firstPost = $posts->first();
+        assert($firstPost instanceof Post);
+
+        foreach (factory(Comment::class, 3)->make() as $comment) {
+            assert($comment instanceof Comment);
+            $comment->post()->associate($firstPost);
+            $comment->save();
+        }
+
+        $this->schema = /** @lang GraphQL */ '
         type User {
             posts: [Post!]! @paginate
         }
@@ -299,8 +305,7 @@ final class PaginateDirectiveDBTest extends DBTestCase
     {
         factory(User::class, 3)->create();
 
-        $this->schema /** @lang GraphQL */
-            = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
         }
@@ -336,8 +341,7 @@ final class PaginateDirectiveDBTest extends DBTestCase
 
     public function testQueriesConnectionWithNoData(): void
     {
-        $this->schema /** @lang GraphQL */
-            = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
         }
@@ -387,8 +391,7 @@ final class PaginateDirectiveDBTest extends DBTestCase
 
     public function testQueriesPaginationWithNoData(): void
     {
-        $this->schema /** @lang GraphQL */
-            = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
         }
@@ -437,9 +440,9 @@ final class PaginateDirectiveDBTest extends DBTestCase
     public function testQueriesPaginationWithoutPaginatorInfo(): void
     {
         $user = factory(User::class)->create();
+        assert($user instanceof User);
 
-        $this->schema /** @lang GraphQL */
-            = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
         }
@@ -449,7 +452,7 @@ final class PaginateDirectiveDBTest extends DBTestCase
         }
         ';
 
-        $this->assertQueryCountMatches(1, function () use ($user) {
+        $this->assertQueryCountMatches(1, function () use ($user): void {
             $this->graphQL(/** @lang GraphQL */ '
             {
                 users(first: 1) {
@@ -475,9 +478,9 @@ final class PaginateDirectiveDBTest extends DBTestCase
     public function testQueriesConnectionWithoutPageInfo(): void
     {
         $user = factory(User::class)->create();
+        assert($user instanceof User);
 
-        $this->schema /** @lang GraphQL */
-            = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
         }
@@ -487,7 +490,7 @@ final class PaginateDirectiveDBTest extends DBTestCase
         }
         ';
 
-        $this->assertQueryCountMatches(1, function () use ($user) {
+        $this->assertQueryCountMatches(1, function () use ($user): void {
             $this->graphQL(/** @lang GraphQL */ '
             {
                 users(first: 1) {
@@ -518,8 +521,7 @@ final class PaginateDirectiveDBTest extends DBTestCase
     {
         factory(User::class, 2)->create();
 
-        $this->schema /** @lang GraphQL */
-            .= '
+        $this->schema .= /** @lang GraphQL */ '
         type User {
             id: ID!
         }
@@ -544,8 +546,7 @@ final class PaginateDirectiveDBTest extends DBTestCase
     {
         factory(User::class, 3)->create();
 
-        $this->schema /** @lang GraphQL */
-            = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
         }
@@ -586,8 +587,7 @@ final class PaginateDirectiveDBTest extends DBTestCase
         $defaultCount = 2;
         config(['lighthouse.pagination.default_count' => $defaultCount]);
 
-        $this->schema /** @lang GraphQL */
-            = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
             name: String!
@@ -614,8 +614,7 @@ final class PaginateDirectiveDBTest extends DBTestCase
         config(['lighthouse.pagination.default_count' => 10]);
         factory(User::class, 3)->create();
 
-        $this->schema /** @lang GraphQL */
-            = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
             name: String!
@@ -628,7 +627,7 @@ final class PaginateDirectiveDBTest extends DBTestCase
         ';
 
         // "paginate" fires 2 queries: One for data, one for counting.
-        $this->assertQueryCountMatches(2, function () {
+        $this->assertQueryCountMatches(2, function (): void {
             $this->graphQL(/** @lang GraphQL */ '
             {
                 usersPaginated {
@@ -644,7 +643,7 @@ final class PaginateDirectiveDBTest extends DBTestCase
         });
 
         // "simplePaginate" only fires one query for the data.
-        $this->assertQueryCountMatches(1, function () {
+        $this->assertQueryCountMatches(1, function (): void {
             $this->graphQL(/** @lang GraphQL */ '
             {
                 usersSimplePaginated {
@@ -662,8 +661,7 @@ final class PaginateDirectiveDBTest extends DBTestCase
         config(['lighthouse.pagination.default_count' => 10]);
         factory(User::class, 3)->create();
 
-        $this->schema /** @lang GraphQL */
-            = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
             name: String!

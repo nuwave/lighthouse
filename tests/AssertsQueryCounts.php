@@ -6,13 +6,21 @@ use Closure;
 use Illuminate\Support\Facades\DB;
 
 /**
- * This trait was taken from a package that has less Laravel version support than we require.
+ * This trait was taken from a package that supports fewer Laravel versions than us.
  *
  * @see https://github.com/mattiasgeniar/phpunit-query-count-assertions
+ * @mixin \PHPUnit\Framework\TestCase
  */
 trait AssertsQueryCounts
 {
-    public function assertNoQueriesExecuted(Closure $closure = null): void
+    protected function countQueries(?int &$count): void
+    {
+        DB::listen(function () use (&$count): void {
+            ++$count;
+        });
+    }
+
+    protected function assertNoQueriesExecuted(Closure $closure = null): void
     {
         if ($closure) {
             self::trackQueries();
@@ -27,7 +35,7 @@ trait AssertsQueryCounts
         }
     }
 
-    public function assertQueryCountMatches(int $count, Closure $closure = null): void
+    protected function assertQueryCountMatches(int $count, Closure $closure = null): void
     {
         if ($closure) {
             self::trackQueries();
@@ -42,7 +50,7 @@ trait AssertsQueryCounts
         }
     }
 
-    public function assertQueryCountLessThan(int $count, Closure $closure = null): void
+    protected function assertQueryCountLessThan(int $count, Closure $closure = null): void
     {
         if ($closure) {
             self::trackQueries();
@@ -57,7 +65,7 @@ trait AssertsQueryCounts
         }
     }
 
-    public function assertQueryCountGreaterThan(int $count, Closure $closure = null): void
+    protected function assertQueryCountGreaterThan(int $count, Closure $closure = null): void
     {
         if ($closure) {
             self::trackQueries();
@@ -72,18 +80,18 @@ trait AssertsQueryCounts
         }
     }
 
-    public static function trackQueries(): void
+    protected static function trackQueries(): void
     {
         DB::enableQueryLog();
     }
 
     /** @return array<array{query: string, bindings: array<int, mixed>, time: ?float}> */
-    public static function getQueriesExecuted(): array
+    protected static function getQueriesExecuted(): array
     {
         return DB::getQueryLog();
     }
 
-    public static function getQueryCount(): int
+    protected static function getQueryCount(): int
     {
         return count(self::getQueriesExecuted());
     }
