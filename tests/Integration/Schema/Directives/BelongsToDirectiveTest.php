@@ -15,8 +15,8 @@ final class BelongsToDirectiveTest extends DBTestCase
     {
         $company = factory(Company::class)->create();
 
-        /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->make();
+        assert($user instanceof User);
         $user->company()->associate($company);
         $user->save();
 
@@ -59,8 +59,8 @@ final class BelongsToDirectiveTest extends DBTestCase
     {
         $company = factory(Company::class)->create();
 
-        /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->make();
+        assert($user instanceof User);
         $user->company()->associate($company);
         $user->save();
 
@@ -104,8 +104,8 @@ final class BelongsToDirectiveTest extends DBTestCase
         $company = factory(Company::class)->create();
         $team = factory(Team::class)->create();
 
-        /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->make();
+        assert($user instanceof User);
         $user->company()->associate($company);
         $user->team()->associate($team);
         $user->save();
@@ -319,6 +319,8 @@ final class BelongsToDirectiveTest extends DBTestCase
         $user->company()->associate($company);
         $user->save();
 
+        $user->unsetRelations();
+
         $this->be($user);
 
         $this->schema = /** @lang GraphQL */ '
@@ -335,7 +337,7 @@ final class BelongsToDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->assertQueryCountMatches(2, function () use ($company): void {
+        $this->assertNoQueriesExecuted(function () use ($company): void {
             $this->graphQL(/** @lang GraphQL */ '
             {
                 user {

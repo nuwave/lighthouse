@@ -145,21 +145,23 @@ final class RelationBatchLoaderTest extends DBTestCase
                 );
             });
 
-        $this->assertQueryCountMatches(3, function () use ($userCount, $alternateConnectionsPerUser): void {
-            $this
-                ->graphQL(/** @lang GraphQL */ '
-                {
-                    users {
-                        alternateConnections {
-                            id
-                        }
+        $this->countQueries($queryCount);
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                users {
+                    alternateConnections {
+                        id
                     }
                 }
-                ')
-                ->assertJsonCount($userCount, 'data.users')
-                ->assertJsonCount($alternateConnectionsPerUser, 'data.users.0.alternateConnections')
-                ->assertJsonCount($alternateConnectionsPerUser, 'data.users.1.alternateConnections');
-        });
+            }
+            ')
+            ->assertJsonCount($userCount, 'data.users')
+            ->assertJsonCount($alternateConnectionsPerUser, 'data.users.0.alternateConnections')
+            ->assertJsonCount($alternateConnectionsPerUser, 'data.users.1.alternateConnections');
+
+        $this->assertSame(3, $queryCount);
     }
 
     public function testDoesNotBatchloadRelationsWithNullDatabaseConnections(): void
