@@ -319,7 +319,7 @@ final class BelongsToDirectiveTest extends DBTestCase
         $user->company()->associate($company);
         $user->save();
 
-        $user->unsetRelations();
+        $user->setRelations([]);
 
         $this->be($user);
 

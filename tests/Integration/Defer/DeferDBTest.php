@@ -29,7 +29,7 @@ final class DeferDBTest extends DBTestCase
         $user->company()->associate($company);
         $user->save();
 
-        $user->unsetRelations();
+        $user->setRelations([]);
 
         $this->mockResolver($user);
 
@@ -87,7 +87,7 @@ final class DeferDBTest extends DBTestCase
 
         $user = $users[0];
         assert($user instanceof User);
-        $user->unsetRelations();
+        $user->setRelations([]);
 
         $this->mockResolver($user);
 
