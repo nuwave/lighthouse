@@ -3,7 +3,6 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Activity;
@@ -94,34 +93,29 @@ final class CountDirectiveDBTest extends DBTestCase
                 ]);
             });
 
-        $queries = 0;
-        DB::listen(function () use (&$queries): void {
-            ++$queries;
-        });
-
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            users {
-                tasks_count
+        $this->assertQueryCountMatches(2, function (): void {
+            $this->graphQL(/** @lang GraphQL */ '
+            {
+                users {
+                    tasks_count
+                }
             }
-        }
-        ')->assertExactJson([
-            'data' => [
-                'users' => [
-                    [
-                        'tasks_count' => 3,
-                    ],
-                    [
-                        'tasks_count' => 2,
-                    ],
-                    [
-                        'tasks_count' => 1,
+            ')->assertExactJson([
+                'data' => [
+                    'users' => [
+                        [
+                            'tasks_count' => 3,
+                        ],
+                        [
+                            'tasks_count' => 2,
+                        ],
+                        [
+                            'tasks_count' => 1,
+                        ],
                     ],
                 ],
-            ],
-        ]);
-
-        $this->assertEquals(2, $queries);
+            ]);
+        });
     }
 
     public function testCountRelationThatIsNotSuffixedWithCount(): void

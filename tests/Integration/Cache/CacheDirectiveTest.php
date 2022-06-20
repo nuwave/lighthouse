@@ -322,6 +322,9 @@ final class CacheDirectiveTest extends DBTestCase
         $this->graphQL(/** @lang GraphQL */ '
         {
             users(first: 5) {
+                paginatorInfo {
+                    total
+                }
                 data {
                     id
                     name

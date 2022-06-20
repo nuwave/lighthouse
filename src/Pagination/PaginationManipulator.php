@@ -65,17 +65,18 @@ class PaginationManipulator
         ?ObjectTypeDefinitionNode $edgeType = null
     ): void {
         if ($paginationType->isConnection()) {
-            $this->registerConnection($fieldDefinition, $parentType, $defaultCount, $maxCount, $edgeType);
+            $this->registerConnection($fieldDefinition, $parentType, $paginationType, $defaultCount, $maxCount, $edgeType);
         } elseif ($paginationType->isSimple()) {
-            $this->registerSimplePaginator($fieldDefinition, $parentType, $defaultCount, $maxCount);
+            $this->registerSimplePaginator($fieldDefinition, $parentType, $paginationType, $defaultCount, $maxCount);
         } else {
-            $this->registerPaginator($fieldDefinition, $parentType, $defaultCount, $maxCount);
+            $this->registerPaginator($fieldDefinition, $parentType, $paginationType, $defaultCount, $maxCount);
         }
     }
 
     protected function registerConnection(
         FieldDefinitionNode &$fieldDefinition,
         ObjectTypeDefinitionNode &$parentType,
+        PaginationType $paginationType,
         ?int $defaultCount = null,
         ?int $maxCount = null,
         ?ObjectTypeDefinitionNode $edgeType = null
@@ -96,7 +97,7 @@ class PaginationManipulator
             "A paginated list of {$fieldTypeName} edges."
             type {$connectionTypeName} {
                 "Pagination information about the list of edges."
-                pageInfo: PageInfo! @field(resolver: "{$connectionFieldName}@pageInfoResolver")
+                {$paginationType->infoFieldName()}: PageInfo! @field(resolver: "{$connectionFieldName}@pageInfoResolver")
 
                 "A list of {$fieldTypeName} edges."
                 edges: [{$connectionEdgeName}!]! @field(resolver: "{$connectionFieldName}@edgeResolver")
@@ -162,6 +163,7 @@ GRAPHQL
     protected function registerPaginator(
         FieldDefinitionNode &$fieldDefinition,
         ObjectTypeDefinitionNode &$parentType,
+        PaginationType $paginationType,
         ?int $defaultCount = null,
         ?int $maxCount = null
     ): void {
@@ -173,7 +175,7 @@ GRAPHQL
             "A paginated list of {$fieldTypeName} items."
             type {$paginatorTypeName} {
                 "Pagination information about the list of items."
-                paginatorInfo: PaginatorInfo! @field(resolver: "{$paginatorFieldClassName}@paginatorInfoResolver")
+                {$paginationType->infoFieldName()}: PaginatorInfo! @field(resolver: "{$paginatorFieldClassName}@paginatorInfoResolver")
 
                 "A list of {$fieldTypeName} items."
                 data: [{$fieldTypeName}!]! @field(resolver: "{$paginatorFieldClassName}@dataResolver")
@@ -198,6 +200,7 @@ GRAPHQL
     protected function registerSimplePaginator(
         FieldDefinitionNode &$fieldDefinition,
         ObjectTypeDefinitionNode &$parentType,
+        PaginationType $paginationType,
         ?int $defaultCount = null,
         ?int $maxCount = null
     ): void {
@@ -209,7 +212,7 @@ GRAPHQL
             "A paginated list of {$fieldTypeName} items."
             type {$paginatorTypeName} {
                 "Pagination information about the list of items."
-                paginatorInfo: SimplePaginatorInfo! @field(resolver: "{$paginatorFieldClassName}@paginatorInfoResolver")
+                {$paginationType->infoFieldName()}: SimplePaginatorInfo! @field(resolver: "{$paginatorFieldClassName}@paginatorInfoResolver")
 
                 "A list of {$fieldTypeName} items."
                 data: [{$fieldTypeName}!]! @field(resolver: "{$paginatorFieldClassName}@dataResolver")

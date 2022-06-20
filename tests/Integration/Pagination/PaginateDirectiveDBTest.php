@@ -4,7 +4,6 @@ namespace Tests\Integration\Pagination;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Support\Facades\DB;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Comment;
 use Tests\Utils\Models\Post;
@@ -57,15 +56,15 @@ final class PaginateDirectiveDBTest extends DBTestCase
     {
         factory(User::class, 2)->create();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type User {
             id: ID!
         }
 
         type Query {
-            users: [User!]! @paginate(builder: "' . $this->qualifyTestResolver('builder') . '")
+            users: [User!]! @paginate(builder: "{$this->qualifyTestResolver('builder')}")
         }
-        ';
+GRAPHQL;
 
         // The custom builder is supposed to change the sort order
         $this->graphQL(/** @lang GraphQL */ '
@@ -97,20 +96,20 @@ final class PaginateDirectiveDBTest extends DBTestCase
         $posts = factory(Post::class, 2)->create();
         $user->posts()->saveMany($posts);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type Post {
             id: ID!
         }
 
         type User {
             id: ID!
-            posts: [Post!]! @paginate(builder: "' . $this->qualifyTestResolver('builderForRelation') . '")
+            posts: [Post!]! @paginate(builder: "{$this->qualifyTestResolver('builderForRelation')}")
         }
 
         type Query {
             user(id: ID! @eq): User @find
         }
-        ';
+GRAPHQL;
 
         // The custom builder is supposed to change the sort order
         $this->graphQL(/** @lang GraphQL */ "
@@ -143,14 +142,15 @@ final class PaginateDirectiveDBTest extends DBTestCase
 
     public function testPaginateWithScopes(): void
     {
-        $namedUser = factory(User::class)->create([
-            'name' => 'A named user',
-        ]);
+        $namedUser = factory(User::class)->make();
         assert($namedUser instanceof User);
+        $namedUser->name = 'A named user';
+        $namedUser->save();
 
-        factory(User::class)->create([
-            'name' => null,
-        ]);
+        $unnamedUser = factory(User::class)->make();
+        assert($unnamedUser instanceof User);
+        $unnamedUser->name = null;
+        $unnamedUser->save();
 
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -206,12 +206,25 @@ final class PaginateDirectiveDBTest extends DBTestCase
     public function testCreateQueryPaginatorsWithDifferentPages(): void
     {
         $users = factory(User::class, 3)->create();
-        $posts = factory(Post::class, 3)->create([
-            'user_id' => $users->first()->id,
-        ]);
-        factory(Comment::class, 3)->create([
-            'post_id' => $posts->first()->id,
-        ]);
+
+        $firstUser = $users->first();
+        assert($firstUser instanceof User);
+
+        $posts = factory(Post::class, 3)->make();
+        foreach ($posts as $post) {
+            assert($post instanceof Post);
+            $post->user()->associate($firstUser);
+            $post->save();
+        }
+
+        $firstPost = $posts->first();
+        assert($firstPost instanceof Post);
+
+        foreach (factory(Comment::class, 3)->make() as $comment) {
+            assert($comment instanceof Comment);
+            $comment->post()->associate($firstPost);
+            $comment->save();
+        }
 
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -424,6 +437,86 @@ final class PaginateDirectiveDBTest extends DBTestCase
         ])->assertJsonCount(0, 'data.users.data');
     }
 
+    public function testQueriesPaginationWithoutPaginatorInfo(): void
+    {
+        $user = factory(User::class)->create();
+        assert($user instanceof User);
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID!
+        }
+
+        type Query {
+            users: [User!]! @paginate
+        }
+        ';
+
+        $this->assertQueryCountMatches(1, function () use ($user): void {
+            $this->graphQL(/** @lang GraphQL */ '
+            {
+                users(first: 1) {
+                    data {
+                        id
+                    }
+                }
+            }
+            ')->assertJson([
+                'data' => [
+                    'users' => [
+                        'data' => [
+                            [
+                                'id' => $user->id,
+                            ],
+                        ],
+                    ],
+                ],
+            ])->assertJsonCount(1, 'data.users.data');
+        });
+    }
+
+    public function testQueriesConnectionWithoutPageInfo(): void
+    {
+        $user = factory(User::class)->create();
+        assert($user instanceof User);
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID!
+        }
+
+        type Query {
+            users: [User!]! @paginate(type: CONNECTION)
+        }
+        ';
+
+        $this->assertQueryCountMatches(1, function () use ($user): void {
+            $this->graphQL(/** @lang GraphQL */ '
+            {
+                users(first: 1) {
+                    edges {
+                        node {
+                            id
+                        }
+                    }
+                }
+            }
+            ')->assertJson([
+                'data' => [
+                    'users' => [
+                        'edges' => [
+                            [
+                                'node' => [
+                                    'id' => $user->id,
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ])->assertJsonCount(1, 'data.users.edges');
+        });
+    }
+
     public function testPaginatesWhenDefinedInTypeExtension(): void
     {
         factory(User::class, 2)->create();
@@ -521,7 +614,6 @@ final class PaginateDirectiveDBTest extends DBTestCase
         config(['lighthouse.pagination.default_count' => 10]);
         factory(User::class, 3)->create();
 
-        DB::enableQueryLog();
         $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
@@ -534,31 +626,34 @@ final class PaginateDirectiveDBTest extends DBTestCase
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            usersPaginated {
-                data {
-                    id
-                }
-            }
-        }
-        ')->assertJsonCount(3, 'data.usersPaginated.data');
         // "paginate" fires 2 queries: One for data, one for counting.
-        $this->assertCount(2, DB::getQueryLog());
-        DB::flushQueryLog();
-
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            usersSimplePaginated {
-                data {
-                    id
+        $this->assertQueryCountMatches(2, function (): void {
+            $this->graphQL(/** @lang GraphQL */ '
+            {
+                usersPaginated {
+                    paginatorInfo {
+                        total
+                    }
+                    data {
+                        id
+                    }
                 }
             }
-        }
-        ')->assertJsonCount(3, 'data.usersSimplePaginated.data');
-        // "simplePaginate" only fires one query.
-        $this->assertCount(1, DB::getQueryLog());
-        DB::disableQueryLog();
+            ')->assertJsonCount(3, 'data.usersPaginated.data');
+        });
+
+        // "simplePaginate" only fires one query for the data.
+        $this->assertQueryCountMatches(1, function (): void {
+            $this->graphQL(/** @lang GraphQL */ '
+            {
+                usersSimplePaginated {
+                    data {
+                        id
+                    }
+                }
+            }
+            ')->assertJsonCount(3, 'data.usersSimplePaginated.data');
+        });
     }
 
     public function testGetSimplePaginationAttributes(): void
