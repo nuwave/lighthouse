@@ -57,4 +57,13 @@ class PaginationType
     {
         return self::SIMPLE === $this->type;
     }
+
+    public function getInfoFieldName(): string
+    {
+        if ($this->isConnection()) {
+            return 'pageInfo';
+        }
+
+        return 'paginatorInfo';
+    }
 }

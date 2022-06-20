@@ -143,12 +143,8 @@ GRAPHQL;
             return $type;
         }
 
-        $pageInfoFieldName = $type->isPaginator()
-            ? 'paginatorInfo'
-            : 'pageInfo';
-
         // If the page info is not requested we can optimize by using a simple paginator that doesn't query total counts
-        if (! isset($resolveInfo->getFieldSelection()[$pageInfoFieldName])) {
+        if (! isset($resolveInfo->getFieldSelection()[$type->getInfoFieldName()])) {
             return new PaginationType(PaginationType::SIMPLE);
         }
 
