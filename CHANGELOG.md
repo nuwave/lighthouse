@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Changed
+
+- `@paginate` directive will use a simple pagination strategy when the paginator info is not requested https://github.com/nuwave/lighthouse/pull/2170
+
 ## v5.54.0
 
 ### Changed
