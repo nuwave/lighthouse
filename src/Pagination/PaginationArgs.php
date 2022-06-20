@@ -100,7 +100,7 @@ class PaginationArgs
             : 'paginate';
 
         if ($builder instanceof ScoutBuilder) {
-            // Fallback to `paginate` when `simplePaginate` is not available, it was introduced in v8.6.0
+            // TODO remove fallback when requiring Laravel 8.6.0+
             if ($this->type->isSimple() && ! method_exists($builder, 'simplePaginate')) {
                 $methodName = 'paginate';
             }
