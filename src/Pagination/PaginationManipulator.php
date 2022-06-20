@@ -97,7 +97,7 @@ class PaginationManipulator
             "A paginated list of {$fieldTypeName} edges."
             type {$connectionTypeName} {
                 "Pagination information about the list of edges."
-                {$paginationType->getInfoFieldName()}: PageInfo! @field(resolver: "{$connectionFieldName}@pageInfoResolver")
+                {$paginationType->infoFieldName()}: PageInfo! @field(resolver: "{$connectionFieldName}@pageInfoResolver")
 
                 "A list of {$fieldTypeName} edges."
                 edges: [{$connectionEdgeName}!]! @field(resolver: "{$connectionFieldName}@edgeResolver")
@@ -175,7 +175,7 @@ GRAPHQL
             "A paginated list of {$fieldTypeName} items."
             type {$paginatorTypeName} {
                 "Pagination information about the list of items."
-                {$paginationType->getInfoFieldName()}: PaginatorInfo! @field(resolver: "{$paginatorFieldClassName}@paginatorInfoResolver")
+                {$paginationType->infoFieldName()}: PaginatorInfo! @field(resolver: "{$paginatorFieldClassName}@paginatorInfoResolver")
 
                 "A list of {$fieldTypeName} items."
                 data: [{$fieldTypeName}!]! @field(resolver: "{$paginatorFieldClassName}@dataResolver")
@@ -212,7 +212,7 @@ GRAPHQL
             "A paginated list of {$fieldTypeName} items."
             type {$paginatorTypeName} {
                 "Pagination information about the list of items."
-                {$paginationType->getInfoFieldName()}: SimplePaginatorInfo! @field(resolver: "{$paginatorFieldClassName}@paginatorInfoResolver")
+                {$paginationType->infoFieldName()}: SimplePaginatorInfo! @field(resolver: "{$paginatorFieldClassName}@paginatorInfoResolver")
 
                 "A list of {$fieldTypeName} items."
                 data: [{$fieldTypeName}!]! @field(resolver: "{$paginatorFieldClassName}@dataResolver")

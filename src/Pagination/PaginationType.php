@@ -58,12 +58,15 @@ class PaginationType
         return self::SIMPLE === $this->type;
     }
 
-    public function getInfoFieldName(): string
+    public function infoFieldName(): string
     {
-        if ($this->isConnection()) {
-            return 'pageInfo';
+        switch ($this->type) {
+            case self::PAGINATOR:
+                return 'paginatorInfo';
+            case self::CONNECTION:
+                return 'pageInfo';
+            default:
+                throw new \Exception("infoFieldName is not implemented for pagination type: {$this->type}.");
         }
-
-        return 'paginatorInfo';
     }
 }
