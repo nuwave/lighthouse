@@ -126,18 +126,33 @@ GRAPHQL;
                     $this->directiveArgValue('scopes') ?? []
                 );
 
-            return PaginationArgs::extractArgs($args, $this->paginationType(), $this->paginateMaxCount())
+            return PaginationArgs::extractArgs($args, $this->paginationType($resolveInfo), $this->paginateMaxCount())
                 ->applyToBuilder($query);
         });
 
         return $fieldValue;
     }
 
-    protected function paginationType(): PaginationType
+    protected function paginationType(?ResolveInfo $resolveInfo = null): PaginationType
     {
-        return new PaginationType(
+        $type = new PaginationType(
             $this->directiveArgValue('type') ?? PaginationType::PAGINATOR
         );
+
+        if (null === $resolveInfo || $type->isSimple()) {
+            return $type;
+        }
+
+        $pageInfoFieldName = $type->isPaginator()
+            ? 'paginatorInfo'
+            : 'pageInfo';
+
+        // If the page info is not requested we can optimize by using a simple paginator that doesn't query total counts
+        if (! isset($resolveInfo->getFieldSelection()[$pageInfoFieldName])) {
+            return new PaginationType(PaginationType::SIMPLE);
+        }
+
+        return $type;
     }
 
     protected function defaultCount(): ?int

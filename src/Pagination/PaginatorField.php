@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Pagination;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Collection;
 
 class PaginatorField
@@ -31,11 +32,11 @@ class PaginatorField
     /**
      * Resolve data for connection.
      *
-     * @param  \Illuminate\Pagination\LengthAwarePaginator<mixed>  $root
+     * @param  \Illuminate\Pagination\AbstractPaginator  $root
      *
      * @return \Illuminate\Support\Collection<mixed>
      */
-    public function dataResolver(LengthAwarePaginator $root): Collection
+    public function dataResolver(AbstractPaginator $root): Collection
     {
         // @phpstan-ignore-next-line static refers to the wrong class because it is a proxied method call
         return $root->values();

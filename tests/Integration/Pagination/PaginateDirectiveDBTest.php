@@ -424,6 +424,96 @@ final class PaginateDirectiveDBTest extends DBTestCase
         ])->assertJsonCount(0, 'data.users.data');
     }
 
+    public function testQueriesPaginationWithoutPaginatorInfo(): void
+    {
+        $user = factory(User::class)->create();
+
+        $this->schema /** @lang GraphQL */
+            = '
+        type User {
+            id: ID!
+        }
+
+        type Query {
+            users: [User!]! @paginate
+        }
+        ';
+
+        DB::enableQueryLog();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users(first: 1) {
+                data {
+                    id
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'users' => [
+                    'data' => [
+                        [
+                            'id' => $user->id,
+                        ],
+                    ],
+                ],
+            ],
+        ])->assertJsonCount(1, 'data.users.data');
+
+        DB::disableQueryLog();
+
+        $this->assertCount(1, DB::getQueryLog());
+        DB::flushQueryLog();
+    }
+
+    public function testQueriesConnectionWithoutPageInfo(): void
+    {
+        $user = factory(User::class)->create();
+
+        $this->schema /** @lang GraphQL */
+            = '
+        type User {
+            id: ID!
+        }
+
+        type Query {
+            users: [User!]! @paginate(type: CONNECTION)
+        }
+        ';
+
+        DB::enableQueryLog();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users(first: 1) {
+                edges {
+                    node {
+                        id
+                    }
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'users' => [
+                    'edges' => [
+                        [
+                            'node' => [
+                                'id' => $user->id,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ])->assertJsonCount(1, 'data.users.edges');
+
+        DB::disableQueryLog();
+
+        $this->assertCount(1, DB::getQueryLog());
+        DB::flushQueryLog();
+    }
+
     public function testPaginatesWhenDefinedInTypeExtension(): void
     {
         factory(User::class, 2)->create();
@@ -537,6 +627,9 @@ final class PaginateDirectiveDBTest extends DBTestCase
         $this->graphQL(/** @lang GraphQL */ '
         {
             usersPaginated {
+                paginatorInfo {
+                    total
+                }
                 data {
                     id
                 }
