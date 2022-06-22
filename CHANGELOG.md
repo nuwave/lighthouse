@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.55.1
+
+### Fixed
+
+- Always register `TestingServiceProvider` in order to ensure macros are recognized by Larastan
+
 ## v5.55.0
 
 ### Changed
