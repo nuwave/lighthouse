@@ -9,6 +9,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+- Pass the path array to the `key` method of `CacheKeyAndTags` class https://github.com/nuwave/lighthouse/pull/2176
+
 ## v5.55.1
 
 ### Fixed
