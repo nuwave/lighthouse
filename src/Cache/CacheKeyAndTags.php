@@ -13,7 +13,7 @@ interface CacheKeyAndTags
      * @param  array<string, mixed> $args
      * @param  array<int, string> $path
      */
-    public function key(?Authenticatable $user, bool $isPrivate, string $parentName, $id, string $fieldName, array $args, array $path): string;
+    public function key(?Authenticatable $user, bool $isPrivate, array $args, ResolveInfo $resolveInfo): string;
 
     /**
      * Generate a tag for the parent.
