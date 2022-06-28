@@ -49,8 +49,10 @@ class CacheKeyAndTagsGenerator implements CacheKeyAndTags
     /**
      * @param  int|string|null $id
      */
-    public function parentTag(string $parentName, $id): string
+    public function parentTag($id, ResolveInfo $resolveInfo, ?string $parentName = null): string
     {
+        $parentName = $parentName ?? $resolveInfo->parentType->name;
+
         return implode(self::SEPARATOR, [
             self::PREFIX,
             $parentName,
@@ -61,8 +63,11 @@ class CacheKeyAndTagsGenerator implements CacheKeyAndTags
     /**
      * @param  int|string|null $id
      */
-    public function fieldTag(string $parentName, $id, string $fieldName): string
+    public function fieldTag($id, ResolveInfo $resolveInfo, ?string $parentName = null, ?string $fieldName = null): string
     {
+        $parentName = $parentName ?? $resolveInfo->parentType->name;
+        $fieldName = $fieldName ?? $resolveInfo->fieldName;
+
         return implode(self::SEPARATOR, [
             self::PREFIX,
             $parentName,

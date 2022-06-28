@@ -89,8 +89,8 @@ GRAPHQL;
 
                 foreach ((array) $idOrIds as $id) {
                     $tag = is_string($field)
-                        ? $this->cacheKeyAndTags->fieldTag($type, $id, $field)
-                        : $this->cacheKeyAndTags->parentTag($type, $id);
+                        ? $this->cacheKeyAndTags->fieldTag($id, $resolveInfo, $type, $field)
+                        : $this->cacheKeyAndTags->parentTag($id, $resolveInfo, $type);
 
                     $this->cacheRepository->tags([$tag])->flush();
                 }

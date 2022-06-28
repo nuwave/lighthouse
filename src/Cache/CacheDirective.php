@@ -66,17 +66,15 @@ GRAPHQL;
 
         $fieldValue->setResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($rootCacheKey, $shouldUseTags, $resolver, $maxAge, $isPrivate) {
-                $parentName = $resolveInfo->parentType->name;
                 $rootID = null !== $root && null !== $rootCacheKey
                     ? data_get($root, $rootCacheKey)
                     : null;
-                $fieldName = $resolveInfo->fieldName;
 
                 /** @var \Illuminate\Cache\TaggedCache|\Illuminate\Contracts\Cache\Repository $cache */
                 $cache = $shouldUseTags
                     ? $this->cacheRepository->tags([
-                        $this->cacheKeyAndTags->parentTag($parentName, $rootID),
-                        $this->cacheKeyAndTags->fieldTag($parentName, $rootID, $fieldName),
+                        $this->cacheKeyAndTags->parentTag($rootID, $resolveInfo),
+                        $this->cacheKeyAndTags->fieldTag($rootID, $resolveInfo),
                     ])
                     : $this->cacheRepository;
 
