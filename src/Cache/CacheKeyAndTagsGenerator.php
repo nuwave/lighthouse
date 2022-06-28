@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Cache;
 
+use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Auth\Authenticatable;
 
 class CacheKeyAndTagsGenerator implements CacheKeyAndTags
@@ -10,19 +11,19 @@ class CacheKeyAndTagsGenerator implements CacheKeyAndTags
     public const SEPARATOR = ':';
 
     /**
-     * @param  int|string|null  $id
-     * @param  array<string, mixed>  $args
-     * @param  array<int, string> $path
+     * @param  int|string|null $id
+     * @param  array<string, mixed> $args
      */
     public function key(
         ?Authenticatable $user,
         bool $isPrivate,
-        string $parentName,
         $id,
-        string $fieldName,
         array $args,
-        array $path
+        ResolveInfo $resolveInfo
     ): string {
+        $parentName = $resolveInfo->parentType->name;
+        $fieldName = $resolveInfo->fieldName;
+
         $parts = [self::PREFIX];
 
         if ($isPrivate && null !== $user) {
