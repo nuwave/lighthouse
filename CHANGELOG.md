@@ -9,7 +9,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
-- Change `CacheKeyAndTags` methods signature https://github.com/nuwave/lighthouse/pull/2176
+- Change `CacheKeyAndTags` interface signature class https://github.com/nuwave/lighthouse/pull/2176
 
 ## v5.55.1
 

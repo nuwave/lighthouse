@@ -20,12 +20,12 @@ interface CacheKeyAndTags
      *
      * @param  int|string|null $id
      */
-    public function parentTag($id, ResolveInfo $resolveInfo, ?string $parentName = null): string;
+    public function parentTag(string $parentName, $id): string;
 
     /**
      * Generate a tag for the field.
      *
      * @param  int|string|null $id
      */
-    public function fieldTag($id, ResolveInfo $resolveInfo, ?string $parentName = null, ?string $fieldName = null): string;
+    public function fieldTag(string $parentName, $id, string $fieldName): string;
 }
