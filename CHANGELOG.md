@@ -9,7 +9,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
-- Change `CacheKeyAndTags` interface signature class https://github.com/nuwave/lighthouse/pull/2176
+- Pass the path array to the `key` method of `CacheKeyAndTags` class https://github.com/nuwave/lighthouse/pull/2176
 
 ## v5.55.1
 

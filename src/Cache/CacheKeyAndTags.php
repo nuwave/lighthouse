@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Cache;
 
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Auth\Authenticatable;
 
 interface CacheKeyAndTags
@@ -12,8 +11,9 @@ interface CacheKeyAndTags
      *
      * @param  int|string|null $id
      * @param  array<string, mixed> $args
+     * @param  array<int, string> $path
      */
-    public function key(?Authenticatable $user, bool $isPrivate, $id, array $args, ResolveInfo $resolveInfo): string;
+    public function key(?Authenticatable $user, bool $isPrivate, array $args, ResolveInfo $resolveInfo): string;
 
     /**
      * Generate a tag for the parent.

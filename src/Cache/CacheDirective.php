@@ -71,6 +71,7 @@ GRAPHQL;
                     ? data_get($root, $rootCacheKey)
                     : null;
                 $fieldName = $resolveInfo->fieldName;
+                $path = $resolveInfo->path;
 
                 /** @var \Illuminate\Cache\TaggedCache|\Illuminate\Contracts\Cache\Repository $cache */
                 $cache = $shouldUseTags
@@ -83,9 +84,11 @@ GRAPHQL;
                 $cacheKey = $this->cacheKeyAndTags->key(
                     $context->user(),
                     $isPrivate,
+                    $parentName,
                     $rootID,
+                    $fieldName,
                     $args,
-                    $resolveInfo
+                    $path
                 );
 
                 // We found a matching value in the cache, so we can just return early
