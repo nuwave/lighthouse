@@ -21,6 +21,9 @@ class CacheKeyAndTagsGenerator implements CacheKeyAndTags
         array $args,
         ResolveInfo $resolveInfo
     ): string {
+        $parentName = $resolveInfo->parentType->name;
+        $fieldName = $resolveInfo->fieldName;
+
         $parts = [self::PREFIX];
 
         if ($isPrivate && null !== $user) {
@@ -28,9 +31,9 @@ class CacheKeyAndTagsGenerator implements CacheKeyAndTags
             $parts[] = $user->getAuthIdentifier();
         }
 
-        $parts[] = $resolveInfo->parentType->name;
+        $parts[] = $parentName;
         $parts[] = $id;
-        $parts[] = $resolveInfo->fieldName;
+        $parts[] = $fieldName;
 
         ksort($args);
         foreach ($args as $key => $value) {
@@ -48,9 +51,11 @@ class CacheKeyAndTagsGenerator implements CacheKeyAndTags
      */
     public function parentTag($id, ResolveInfo $resolveInfo, ?string $parentName = null): string
     {
+        $parentName = $parentName ?? $resolveInfo->parentType->name;
+
         return implode(self::SEPARATOR, [
             self::PREFIX,
-            $parentName ?? $resolveInfo->parentType->name,
+            $parentName,
             $id,
         ]);
     }
@@ -60,11 +65,14 @@ class CacheKeyAndTagsGenerator implements CacheKeyAndTags
      */
     public function fieldTag($id, ResolveInfo $resolveInfo, ?string $parentName = null, ?string $fieldName = null): string
     {
+        $parentName = $parentName ?? $resolveInfo->parentType->name;
+        $fieldName = $fieldName ?? $resolveInfo->fieldName;
+
         return implode(self::SEPARATOR, [
             self::PREFIX,
-            $parentName ?? $resolveInfo->parentType->name,
+            $parentName,
             $id,
-            $fieldName ?? $resolveInfo->fieldName,
+            $fieldName,
         ]);
     }
 }
