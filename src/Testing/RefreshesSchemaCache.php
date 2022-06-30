@@ -2,6 +2,8 @@
 
 namespace Nuwave\Lighthouse\Testing;
 
+use Safe\Exceptions\FilesystemException;
+
 /**
  * Refreshes the schema cache once before any tests are run.
  *
@@ -32,16 +34,18 @@ trait RefreshesSchemaCache
             // We utilize the filesystem as shared mutable state to coordinate between processes,
             // since the tests might be run in parallel, and we want to ensure the schema cache
             // is refreshed exactly once before all tests.
-            touch(self::$lockFilePath);
-            $lockFile = fopen(self::$lockFilePath, 'r');
+            \Safe\touch(self::$lockFilePath);
+            $lockFile = \Safe\fopen(self::$lockFilePath, 'r');
 
             // Attempt to get an exclusive lock - first process wins
-            if (flock($lockFile, LOCK_EX | LOCK_NB)) {
+            try {
+                \Safe\flock($lockFile, LOCK_EX | LOCK_NB);
+
                 // Since we are the single process that has an exclusive lock, we have to write the cache
                 $this->artisan('lighthouse:cache');
-            } else {
+            } catch (FilesystemException $e) {
                 // If no exclusive lock is available, block until the first process is done and wrote the cache
-                flock($lockFile, LOCK_SH);
+                \Safe\flock($lockFile, LOCK_SH);
             }
 
             self::$schemaCacheWasRefreshed = true;

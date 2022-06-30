@@ -6,6 +6,7 @@ use GraphQL\Type\Introspection;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Arr;
+use Illuminate\Testing\TestResponse;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 use Nuwave\Lighthouse\Support\Http\Responses\MemoryStream;
 use PHPUnit\Framework\Assert;
@@ -24,7 +25,7 @@ trait MakesGraphQLRequestsLumen
      * On the first call to introspect() this property is set to
      * cache the result, as introspection is quite expensive.
      *
-     * @var \Illuminate\Http\Response|null
+     * @var \Illuminate\Testing\TestResponse|null
      */
     protected $introspectionResult;
 
@@ -163,9 +164,13 @@ trait MakesGraphQLRequestsLumen
     protected function introspectByName(string $path, string $name): ?array
     {
         $this->introspect();
+        assert($this->introspectionResult instanceof TestResponse);
+
+        $content = $this->introspectionResult->getContent();
+        assert(is_string($content));
 
         $results = data_get(
-            json_decode($this->introspectionResult->getContent(), true),
+            \Safe\json_decode($content, true),
             $path
         );
 
@@ -210,10 +215,12 @@ trait MakesGraphQLRequestsLumen
 
         $response = $this->graphQL($query, $variables, $extraParams, $headers);
 
+        // @phpstan-ignore-next-line can be true
         if (! $response->response instanceof StreamedResponse) {
             Assert::fail('Expected the response to be a streamed response but got a regular response.');
         }
 
+        // @phpstan-ignore-next-line not always unreachable
         $response->response->send();
 
         return $this->deferStream->chunks;
@@ -227,14 +234,17 @@ trait MakesGraphQLRequestsLumen
         $this->deferStream = new MemoryStream();
 
         Container::getInstance()->singleton(CanStreamResponse::class, function (): MemoryStream {
+            assert($this->deferStream instanceof MemoryStream);
+
             return $this->deferStream;
         });
     }
 
     protected function rethrowGraphQLErrors(): void
     {
-        /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = app(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
+
         $config->set('lighthouse.error_handlers', [RethrowingErrorHandler::class]);
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Auth;
+namespace Auth;
 
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Tests\TestCase;

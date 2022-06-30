@@ -27,6 +27,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove support for PHP 7.2, 7.3
 - Remove support for Laravel 5, 6, 7
 - Remove `Serializable` implementation
+- Remove trait `ClearsSchemaCache`
 
 ## v5.55.1
 

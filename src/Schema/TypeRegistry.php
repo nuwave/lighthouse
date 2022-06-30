@@ -123,7 +123,7 @@ class TypeRegistry
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException if the type is not found or invalid
      *
-     * @return \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType)
+     * @return \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType
      */
     public function get(string $name): Type
     {
@@ -155,17 +155,12 @@ class TypeRegistry
             return $this->types[$name] = $this->lazyTypes[$name]();
         }
 
-        return null;
-    }
-
         $standardTypes = Type::getStandardTypes();
         if (isset($standardTypes[$name])) {
-            $this->types[$name] = $standardTypes[$name];
-
-            return true;
+            return $this->types[$name] = $standardTypes[$name];
         }
 
-        return false;
+        return null;
     }
 
     /**
@@ -420,6 +415,7 @@ class TypeRegistry
             },
             'astNode' => $objectDefinition,
         ]);
+    }
 
     /**
      * Returns a closure that lazy loads the fields for a constructed type.
