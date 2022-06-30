@@ -174,10 +174,12 @@ use Nuwave\Lighthouse\Schema\Types\LaravelEnumType;
 
 final class Color extends Enum
 {
-    public const WHITE = 0;
+    public const BLACK = 0;
 
-    /** @deprecated too dark */
-    public const BLACK = 1;
+    public const WHITE = 1;
+
+    /** @deprecated too colorful */
+    public const YELLOW = 2;
 }
 
 // Register through TypeRegistry::register()
@@ -188,8 +190,9 @@ The generated enum will be named after the class and have values equivalent to t
 
 ```graphql
 enum Color {
+  BLACK
   WHITE
-  BLACK @deprecated(reason: "too dark")
+  YELLOW @deprecated(reason: "too colorful")
 }
 ```
 

@@ -158,6 +158,16 @@ class TypeRegistry
         return null;
     }
 
+        $standardTypes = Type::getStandardTypes();
+        if (isset($standardTypes[$name])) {
+            $this->types[$name] = $standardTypes[$name];
+
+            return true;
+        }
+
+        return false;
+    }
+
     /**
      * Is a type with the given name present?
      */
@@ -410,7 +420,6 @@ class TypeRegistry
             },
             'astNode' => $objectDefinition,
         ]);
-    }
 
     /**
      * Returns a closure that lazy loads the fields for a constructed type.
@@ -440,12 +449,17 @@ class TypeRegistry
 
     protected function resolveInputObjectType(InputObjectTypeDefinitionNode $inputDefinition): InputObjectType
     {
+        /**
+         * @return array<string, array<string, mixed>>
+         */
+        $fields = function () use ($inputDefinition): array {
+            return $this->argumentFactory->toTypeMap($inputDefinition->fields);
+        };
+
         return new InputObjectType([
             'name' => $inputDefinition->name->value,
             'description' => $inputDefinition->description->value ?? null,
-            'fields' => function () use ($inputDefinition): array {
-                return $this->argumentFactory->toTypeMap($inputDefinition->fields);
-            },
+            'fields' => $fields,
             'astNode' => $inputDefinition,
         ]);
     }

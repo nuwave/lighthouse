@@ -130,9 +130,8 @@ class LighthouseServiceProvider extends ServiceProvider
 
         $this->commands(self::COMMANDS);
 
-        if ($this->app->runningUnitTests()) {
-            $this->app->register(TestingServiceProvider::class);
-        }
+        // Always registered in order to ensure macros are recognized by Larastan
+        $this->app->register(TestingServiceProvider::class);
     }
 
     public function boot(ConfigRepository $configRepository): void

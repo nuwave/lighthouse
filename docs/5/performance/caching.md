@@ -102,6 +102,18 @@ type GithubProfile {
 }
 ```
 
+## Implementing your own cache key generator
+
+In one of your application service providers, bind the [`Nuwave\Lighthouse\Cache\CacheKeyAndTags.php`](https://github.com/nuwave/lighthouse/blob/master/src/Cache/CacheKeyAndTags.php)
+interface to your cache key generator class:
+
+```php
+$this->app->bind(CacheKeyAndTags::class, YourOwnCacheKeyGenerator::class);
+```
+
+You can extend [`Nuwave\Lighthouse\Cache\CacheKeyAndTagsGenerator.php`](https://github.com/nuwave/lighthouse/blob/master/src/Cache/CacheKeyAndTagsGenerator.php)
+to override certain methods, or implement the interface from scratch.
+
 ## HTTP Cache-Control header
 
 **Experimental: not enabled by default, not guaranteed to be stable.**
@@ -160,35 +172,41 @@ The Cache-Control headers for some queries will be:
 ```graphql
 # Cache-Control header: max-age: 5, PRIVATE
 {
-  me {
+  
     # 5, PRIVATE
-    tasks {
+    me {
       # 50, PUBLIC
-      id # 10, PUBLIC
+      tasks {
+      # 10, PUBLIC
+      id
     }
   }
 }
 
 # Cache-Control header: no-cache, PRIVATE
 {
-  me {
+  
     # 5, PRIVATE
-    tasks {
+    me {
       # 50, PUBLIC
-      description # 0, PUBLIC
+      tasks {
+      # 0, PUBLIC
+      description
     }
   }
 }
 
 # Cache-Control header: no-cache, private
 {
-  companies {
+  
     # no-cache, private
-    users {
+    companies {
       # 25, PUBLIC
-      tasks {
+      users {
         # 50, PUBLIC
-        id # 10, PUBLIC
+        tasks {
+        # 10, PUBLIC
+        id
       }
     }
   }
@@ -196,13 +214,15 @@ The Cache-Control headers for some queries will be:
 
 # Cache-Control header: maxAge: 10, private
 {
-  publicCompanies {
+  
     # 15, PUBLIC
-    users {
+    publicCompanies {
       # 25, PUBLIC
-      tasks {
+      users {
         # 50, PUBLIC
-        id # 10, PUBLIC
+        tasks {
+        # 10, PUBLIC
+        id
       }
     }
   }
@@ -210,13 +230,15 @@ The Cache-Control headers for some queries will be:
 
 # Cache-Control header: maxAge: 15, public
 {
-  publicCompanies {
+  
     # 15, PUBLIC
-    users {
+    publicCompanies {
       # 25, PUBLIC
-      tasks {
+      users {
         # 50, PUBLIC
-        name # 50, PUBLIC
+        tasks {
+        # 50, PUBLIC
+        name
       }
     }
   }

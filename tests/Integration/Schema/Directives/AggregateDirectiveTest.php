@@ -2,7 +2,6 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use Illuminate\Support\Facades\DB;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
@@ -109,34 +108,29 @@ final class AggregateDirectiveTest extends DBTestCase
                 $task->save();
             });
 
-        $queries = 0;
-        DB::listen(static function () use (&$queries): void {
-            ++$queries;
-        });
-
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            users {
-                workload
+        $this->assertQueryCountMatches(2, function (): void {
+            $this->graphQL(/** @lang GraphQL */ '
+            {
+                users {
+                    workload
+                }
             }
-        }
-        ')->assertExactJson([
-            'data' => [
-                'users' => [
-                    [
-                        'workload' => 0,
-                    ],
-                    [
-                        'workload' => 1,
-                    ],
-                    [
-                        'workload' => 2,
+            ')->assertExactJson([
+                'data' => [
+                    'users' => [
+                        [
+                            'workload' => 0,
+                        ],
+                        [
+                            'workload' => 1,
+                        ],
+                        [
+                            'workload' => 2,
+                        ],
                     ],
                 ],
-            ],
-        ]);
-
-        $this->assertSame(2, $queries);
+            ]);
+        });
     }
 
     public function testSumRelationWithScopes(): void
