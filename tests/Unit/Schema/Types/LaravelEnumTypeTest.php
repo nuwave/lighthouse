@@ -34,6 +34,13 @@ final class LaravelEnumTypeTest extends TestCase
         $this->assertSame($customName, $enumType->name);
     }
 
+    public function testEnumDescription(): void
+    {
+        $enumType = new LaravelEnumType(LocalizedUserType::class);
+
+        $this->assertSame('Localized user type', $enumType->config['description']);
+    }
+
     public function testCustomDescription(): void
     {
         $enumType = new LaravelEnumType(LocalizedUserType::class);
@@ -49,6 +56,7 @@ final class LaravelEnumTypeTest extends TestCase
         $enumType = new LaravelEnumType(PartiallyDeprecated::class);
 
         $this->assertSame(/** @lang GraphQL */ <<<GRAPHQL
+"""Partially deprecated"""
 enum PartiallyDeprecated {
   """Not"""
   NOT

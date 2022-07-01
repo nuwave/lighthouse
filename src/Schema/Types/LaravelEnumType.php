@@ -46,6 +46,7 @@ class LaravelEnumType extends EnumType
 
         parent::__construct([
             'name' => $name ?? class_basename($enumClass),
+            'description' => $this->enumDescription($enumClass),
             'values' => array_map(
                 /**
                  * @return array<string, mixed> Used to construct a \GraphQL\Type\Definition\EnumValueDefinition
@@ -104,6 +105,16 @@ class LaravelEnumType extends EnumType
         }
 
         return null;
+    }
+
+    /**
+     * @param  class-string<\BenSampo\Enum\Enum>  $enumClass
+     */
+    protected function enumDescription(string $enumClass): ?string
+    {
+        return method_exists($enumClass, 'getClassDescription')
+            ? $enumClass::getClassDescription()
+            : null;
     }
 
     /**
