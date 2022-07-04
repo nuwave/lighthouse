@@ -117,7 +117,7 @@ Use the [@hasManyThrough](../api-reference/directives.md#hasmanythrough) directi
 
 ```graphql
 type Project {
-    deployments: [Deployment!]! @hasManyThrough
+  deployments: [Deployment!]! @hasManyThrough
 }
 ```
 
