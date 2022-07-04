@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Implement `@hasManyThrough` directive https://github.com/nuwave/lighthouse/pull/2178
+
 ## v5.55.1
 
 ### Fixed
