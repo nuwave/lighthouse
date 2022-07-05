@@ -120,7 +120,7 @@ GRAPHQL;
                 $query = $this->getModelClass()::query();
             }
 
-            if (!$query instanceof ScoutBuilder) {
+            if (! $query instanceof ScoutBuilder) {
                 $query = $resolveInfo
                     ->argumentSet
                     ->enhanceBuilder(
