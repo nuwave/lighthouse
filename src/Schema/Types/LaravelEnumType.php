@@ -115,6 +115,7 @@ class LaravelEnumType extends EnumType
     protected function enumDescription(string $enumClass): ?string
     {
         return method_exists($enumClass, 'getClassDescription')
+            // @phpstan-ignore-next-line proven to exist by the line above
             ? $enumClass::getClassDescription()
             : null;
     }

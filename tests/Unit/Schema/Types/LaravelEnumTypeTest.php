@@ -61,6 +61,7 @@ final class LaravelEnumTypeTest extends TestCase
         $enumType = new LaravelEnumType(PartiallyDeprecated::class);
 
         // TODO remove check when requiring bensampo/laravel-enum:6
+        // @phpstan-ignore-next-line depends on the required version
         if (method_exists(LocalizedUserType::class, 'getClassDescription')) {
             $this->assertSame(/** @lang GraphQL */ <<<GRAPHQL
 """Partially deprecated"""
@@ -74,7 +75,8 @@ enum PartiallyDeprecated {
   """Deprecated with reason"""
   DEPRECATED_WITH_REASON @deprecated(reason: "some reason")
 }
-GRAPHQL,
+GRAPHQL
+                ,
                 SchemaPrinter::printType($enumType));
         } else {
             $this->assertSame(/** @lang GraphQL */ <<<GRAPHQL
@@ -88,7 +90,8 @@ enum PartiallyDeprecated {
   """Deprecated with reason"""
   DEPRECATED_WITH_REASON @deprecated(reason: "some reason")
 }
-GRAPHQL,
+GRAPHQL
+                ,
                 SchemaPrinter::printType($enumType));
         }
 
