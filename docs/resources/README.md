@@ -6,6 +6,7 @@
 - [daniel-de-wit/lighthouse-sanctum](https://github.com/daniel-de-wit/lighthouse-sanctum)
 - [thekonz/lighthouse-redis-broadcaster](https://github.com/thekonz/lighthouse-redis-broadcaster)
 - [brightalley/lighthouse-apollo](https://github.com/brightalley/lighthouse-apollo)
+- [roboroads/lighthouse-settings](https://github.com/Roboroads/lighthouse-settings)
 
 ## Tutorials
 
