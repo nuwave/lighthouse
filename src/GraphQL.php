@@ -113,7 +113,7 @@ class GraphQL
             new StartOperationOrOperations($operationOrOperations)
         );
 
-        $resultOrResults = LighthouseUtils::applyEach(
+        $resultOrResults = LighthouseUtils::mapEach(
             /**
              * @return array<string, mixed>
              */

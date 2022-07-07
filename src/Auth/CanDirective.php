@@ -8,6 +8,8 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -15,6 +17,7 @@ use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
+use Nuwave\Lighthouse\Execution\Resolved;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -126,13 +129,20 @@ GRAPHQL;
             $checkArguments = $this->buildCheckArguments($args);
 
             if ($resolved) {
-                $modelOrModels = $previousResolver($root, $args, $context, $resolveInfo);
+                return Resolved::handle(
+                    $previousResolver($root, $args, $context, $resolveInfo),
+                    function ($modelLike) use ($gate, $ability, $checkArguments) {
+                        $modelOrModels = $modelLike instanceof Paginator
+                            ? $modelLike->items()
+                            : $modelLike;
 
-                Utils::applyEach(function (Model $model) use ($gate, $ability, $checkArguments): void {
-                    $this->authorize($gate, $ability, $model, $checkArguments);
-                }, $modelOrModels);
+                        Utils::applyEach(function (Model $model) use ($gate, $ability, $checkArguments): void {
+                            $this->authorize($gate, $ability, $model, $checkArguments);
+                        }, $modelOrModels);
 
-                return $modelOrModels;
+                        return $modelLike;
+                    }
+                );
             }
 
             foreach ($this->modelsToCheck($resolveInfo->argumentSet, $args) as $model) {

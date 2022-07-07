@@ -46,7 +46,7 @@ abstract class ArgTraversalDirective extends BaseDirective implements FieldMiddl
                 Utils::instanceofMatcher(ArgDirective::class)
             );
 
-            $argument->value = Utils::applyEach(
+            $argument->value = Utils::mapEach(
                 function ($value) use ($directivesForArgument) {
                     if ($value instanceof ArgumentSet) {
                         $value = $this->transform($value, $directivesForArgument);
