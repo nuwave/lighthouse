@@ -110,6 +110,7 @@ class Utils
             foreach ($valueOrValues as $value) {
                 $callback($value);
             }
+
             return;
         }
 

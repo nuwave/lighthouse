@@ -494,7 +494,6 @@ final class CanDirectiveDBTest extends DBTestCase
         ]);
     }
 
-
     public function testChecksAgainstRelation(): void
     {
         $user = new User();
