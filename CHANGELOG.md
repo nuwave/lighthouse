@@ -9,6 +9,36 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.56.0
+
+### Added
+
+- Implement `@hasManyThrough` directive https://github.com/nuwave/lighthouse/pull/2178
+
+## v5.55.1
+
+### Fixed
+
+- Always register `TestingServiceProvider` in order to ensure macros are recognized by Larastan https://github.com/nuwave/lighthouse/pull/2171
+
+## v5.55.0
+
+### Changed
+
+- `@paginate` directive will use a simple pagination strategy when the paginator info is not requested https://github.com/nuwave/lighthouse/pull/2170
+
+## v5.54.0
+
+### Changed
+
+- Cache related code moves to the cache namespace, add new contract `CacheKeyAndTags` https://github.com/nuwave/lighthouse/pull/2162
+
+## v5.53.0
+
+### Changed
+
+- Include field that produced a `RateLimitException` in its message https://github.com/nuwave/lighthouse/pull/2149
+
 ## v5.52.1
 
 ### Fixed

@@ -113,7 +113,8 @@ GRAPHQL;
                 $this->handleLimit(
                     $limit['key'],
                     $limit['maxAttempts'],
-                    $limit['decayMinutes']
+                    $limit['decayMinutes'],
+                    "{$resolveInfo->parentType}.{$resolveInfo->fieldName}"
                 );
             }
 
@@ -141,12 +142,12 @@ GRAPHQL;
     }
 
     /**
-     * Checks throttling limit.
+     * Checks throttling limit and records this attempt.
      */
-    protected function handleLimit(string $key, int $maxAttempts, float $decayMinutes): void
+    protected function handleLimit(string $key, int $maxAttempts, float $decayMinutes, string $fieldReference): void
     {
         if ($this->limiter->tooManyAttempts($key, $maxAttempts)) {
-            throw new RateLimitException();
+            throw new RateLimitException($fieldReference);
         }
 
         $this->limiter->hit($key, (int) ($decayMinutes * 60));

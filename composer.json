@@ -99,6 +99,7 @@
             "providers": [
                 "Nuwave\\Lighthouse\\LighthouseServiceProvider",
                 "Nuwave\\Lighthouse\\Auth\\AuthServiceProvider",
+                "Nuwave\\Lighthouse\\Cache\\CacheServiceProvider",
                 "Nuwave\\Lighthouse\\GlobalId\\GlobalIdServiceProvider",
                 "Nuwave\\Lighthouse\\OrderBy\\OrderByServiceProvider",
                 "Nuwave\\Lighthouse\\Pagination\\PaginationServiceProvider",
@@ -107,12 +108,5 @@
                 "Nuwave\\Lighthouse\\Validation\\ValidationServiceProvider"
             ]
         }
-    },
-    "scripts": {
-        "rector": "rector process -v src/ tests/",
-        "stan": "phpstan analyse --memory-limit 2048M",
-        "test": "phpunit --colors=always",
-        "test:integration": "phpunit --colors=always --testsuite Integration",
-        "test:unit": "phpunit --colors=always --testsuite Unit"
     }
 }

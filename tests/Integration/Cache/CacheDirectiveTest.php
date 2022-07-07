@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Integration\Schema\Directives;
+namespace Tests\Integration\Cache;
 
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -322,6 +322,9 @@ final class CacheDirectiveTest extends DBTestCase
         $this->graphQL(/** @lang GraphQL */ '
         {
             users(first: 5) {
+                paginatorInfo {
+                    total
+                }
                 data {
                     id
                     name

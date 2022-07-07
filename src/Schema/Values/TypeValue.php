@@ -6,9 +6,9 @@ use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
+use Nuwave\Lighthouse\Cache\CacheKeyDirective;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
-use Nuwave\Lighthouse\Schema\Directives\CacheKeyDirective;
 use Nuwave\Lighthouse\Schema\RootType;
 
 class TypeValue
