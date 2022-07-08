@@ -57,25 +57,12 @@ directive @can(
   ability: String!
 
   """
-  Query for specific model instances to check the policy against, using arguments
-  with directives that add constraints to the query builder, such as `@eq`.
-
-  Mutually exclusive with `find` and `resolved`.
-  """
-  query: Boolean! = false
-
-  """
   Check the policy against the model instances returned by the field resolver.
   Only use this if the field does not mutate data, it is run before checking.
 
-  Mutually exclusive with `find` and `resolved`.
+  Mutually exclusive with `query` and `find`.
   """
   resolved: Boolean! = false
-
-  """
-  Apply scopes to the underlying query.
-  """
-  scopes: [String!]
 
   """
   Specify the class name of the model to use.
@@ -97,12 +84,25 @@ directive @can(
   args: CanArgs
 
   """
+  Query for specific model instances to check the policy against, using arguments
+  with directives that add constraints to the query builder, such as `@eq`.
+
+  Mutually exclusive with `resolved` and `find`.
+  """
+  query: Boolean! = false
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+
+  """
   If your policy checks against specific model instances, specify
   the name of the field argument that contains its primary key(s).
 
   You may pass the string in dot notation to use nested inputs.
 
-  Mutually exclusive with `search` and `resolved`.
+  Mutually exclusive with `resolved` and `query`.
   """
   find: String
 ) repeatable on FIELD_DEFINITION
@@ -175,7 +175,7 @@ GRAPHQL;
         if ($find = $this->directiveArgValue('find')) {
             $findValue = Arr::get($args, $find);
             if (null === $findValue) {
-                throw new Error(self::missingKeyToFindModel($find));
+                throw self::missingKeyToFindModel($find);
             }
 
             $queryBuilder = $this->getModelClass()::query();
@@ -221,9 +221,9 @@ GRAPHQL;
         return [$this->getModelClass()];
     }
 
-    public static function missingKeyToFindModel(string $find): string
+    public static function missingKeyToFindModel(string $find): Error
     {
-        return "Got no key to find a model at the expected input path: ${find}.";
+        return new Error("Got no key to find a model at the expected input path: ${find}.");
     }
 
     /**
@@ -253,9 +253,7 @@ GRAPHQL;
                 $ability
             );
         } elseif (! $gate->check($ability, $arguments)) {
-            throw new AuthorizationException(
-                "You are not authorized to access {$this->nodeName()}"
-            );
+            throw new AuthorizationException("You are not authorized to access {$this->nodeName()}");
         }
     }
 
@@ -284,13 +282,19 @@ GRAPHQL;
 
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType)
     {
-        if ($this->directiveHasArgument('find') && $this->directiveHasArgument('query')) {
-            throw new DefinitionException(self::findAndQueryAreMutuallyExclusive());
+        $mutuallyExclusive = [
+            $this->directiveHasArgument('resolve'),
+            $this->directiveHasArgument('query'),
+            $this->directiveHasArgument('find'),
+        ];
+
+        if (count(array_filter($mutuallyExclusive)) > 1) {
+            throw self::multipleMutuallyExclusiveArguments();
         }
     }
 
-    public static function findAndQueryAreMutuallyExclusive(): string
+    public static function multipleMutuallyExclusiveArguments(): DefinitionException
     {
-        return 'The arguments `find` and `query` are mutually exclusive in the `@can` directive.';
+        return new DefinitionException('The arguments `resolve`, `query` and `find` are mutually exclusive in the `@can` directive.');
     }
 }

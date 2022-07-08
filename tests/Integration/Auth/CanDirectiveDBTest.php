@@ -115,7 +115,7 @@ final class CanDirectiveDBTest extends DBTestCase
                 name
             }
         }
-        ')->assertGraphQLErrorMessage(CanDirective::missingKeyToFindModel('some.path'));
+        ')->assertGraphQLError(CanDirective::missingKeyToFindModel('some.path'));
     }
 
     public function testFindUsingNestedInputWithDotNotation(): void
@@ -197,7 +197,7 @@ final class CanDirectiveDBTest extends DBTestCase
         }
         ', [
             'foo' => $post->id,
-        ])->assertGraphQLErrorCategory(AuthorizationException::CATEGORY);
+        ])->assertGraphQLError(new AuthorizationException('This action is unauthorized.'));
     }
 
     public function testHandleMultipleModels(): void
