@@ -19,30 +19,30 @@ final class PaginateDirectiveTest extends TestCase
         $schemaString = SchemaPrinter::doPrint($schema);
 
         $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
-"""Information about pagination using a Relay style cursor connection."""
+"Information about pagination using a Relay style cursor connection."
 type PageInfo {
-  """When paginating forwards, are there more items?"""
+  "When paginating forwards, are there more items?"
   hasNextPage: Boolean!
 
-  """When paginating backwards, are there more items?"""
+  "When paginating backwards, are there more items?"
   hasPreviousPage: Boolean!
 
-  """The cursor to continue paginating backwards."""
+  "The cursor to continue paginating backwards."
   startCursor: String
 
-  """The cursor to continue paginating forwards."""
+  "The cursor to continue paginating forwards."
   endCursor: String
 
-  """Total number of nodes in the paginated connection."""
+  "Total number of nodes in the paginated connection."
   total: Int!
 
-  """Number of nodes in the current page."""
+  "Number of nodes in the current page."
   count: Int!
 
-  """Index of the current page."""
+  "Index of the current page."
   currentPage: Int!
 
-  """Index of the last available page."""
+  "Index of the last available page."
   lastPage: Int!
 }
 GRAPHQL
@@ -51,30 +51,30 @@ GRAPHQL
         );
 
         $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
-"""Information about pagination using a fully featured paginator."""
+"Information about pagination using a fully featured paginator."
 type PaginatorInfo {
-  """Number of items in the current page."""
+  "Number of items in the current page."
   count: Int!
 
-  """Index of the current page."""
+  "Index of the current page."
   currentPage: Int!
 
-  """Index of the first item in the current page."""
+  "Index of the first item in the current page."
   firstItem: Int
 
-  """Are there more pages after this one?"""
+  "Are there more pages after this one?"
   hasMorePages: Boolean!
 
-  """Index of the last item in the current page."""
+  "Index of the last item in the current page."
   lastItem: Int
 
-  """Index of the last available page."""
+  "Index of the last available page."
   lastPage: Int!
 
-  """Number of items per page."""
+  "Number of items per page."
   perPage: Int!
 
-  """Number of total available items."""
+  "Number of total available items."
   total: Int!
 }
 GRAPHQL
@@ -83,24 +83,24 @@ GRAPHQL
         );
 
         $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
-"""Information about pagination using a simple paginator."""
+"Information about pagination using a simple paginator."
 type SimplePaginatorInfo {
-  """Number of items in the current page."""
+  "Number of items in the current page."
   count: Int!
 
-  """Index of the current page."""
+  "Index of the current page."
   currentPage: Int!
 
-  """Index of the first item in the current page."""
+  "Index of the first item in the current page."
   firstItem: Int
 
-  """Index of the last item in the current page."""
+  "Index of the last item in the current page."
   lastItem: Int
 
-  """Number of items per page."""
+  "Number of items per page."
   perPage: Int!
 
-  """Are there more pages after this one?"""
+  "Are there more pages after this one?"
   hasMorePages: Boolean!
 }
 GRAPHQL
@@ -133,10 +133,10 @@ GRAPHQL
         $this->assertStringContainsString(/** @lang GraphQL */ <<<GRAPHQL
 type Query {
   users(
-    """Limits number of fetched items."""
+    "Limits number of fetched items."
     first: Int!
 
-    """The offset from which items are returned."""
+    "The offset from which items are returned."
     page: Int
   ): UserPaginator{$nonNull}
 }
@@ -146,12 +146,12 @@ GRAPHQL
         );
 
         $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
-"""A paginated list of User items."""
+"A paginated list of User items."
 type UserPaginator {
-  """Pagination information about the list of items."""
+  "Pagination information about the list of items."
   paginatorInfo: PaginatorInfo!
 
-  """A list of User items."""
+  "A list of User items."
   data: [User!]!
 }
 GRAPHQL
@@ -184,10 +184,10 @@ GRAPHQL
         $this->assertStringContainsString(/** @lang GraphQL */ <<<GRAPHQL
 type Query {
   users(
-    """Limits number of fetched items."""
+    "Limits number of fetched items."
     first: Int!
 
-    """The offset from which items are returned."""
+    "The offset from which items are returned."
     page: Int
   ): UserSimplePaginator{$nonNull}
 }
@@ -197,12 +197,12 @@ GRAPHQL
         );
 
         $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
-"""A paginated list of User items."""
+"A paginated list of User items."
 type UserSimplePaginator {
-  """Pagination information about the list of items."""
+  "Pagination information about the list of items."
   paginatorInfo: SimplePaginatorInfo!
 
-  """A list of User items."""
+  "A list of User items."
   data: [User!]!
 }
 GRAPHQL
@@ -235,10 +235,10 @@ GRAPHQL
         $this->assertStringContainsString(/** @lang GraphQL */ <<<GRAPHQL
 type Query {
   users(
-    """Limits number of fetched items."""
+    "Limits number of fetched items."
     first: Int!
 
-    """A cursor after which elements are returned."""
+    "A cursor after which elements are returned."
     after: String
   ): UserConnection{$nonNull}
 }
@@ -248,12 +248,12 @@ GRAPHQL
         );
 
         $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
-"""A paginated list of User edges."""
+"A paginated list of User edges."
 type UserConnection {
-  """Pagination information about the list of edges."""
+  "Pagination information about the list of edges."
   pageInfo: PageInfo!
 
-  """A list of User edges."""
+  "A list of User edges."
   edges: [UserEdge!]!
 }
 GRAPHQL
@@ -262,12 +262,12 @@ GRAPHQL
         );
 
         $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
-"""An edge that contains a node of type User and a cursor."""
+"An edge that contains a node of type User and a cursor."
 type UserEdge {
-  """The User node."""
+  "The User node."
   node: User!
 
-  """A unique cursor that can be used for pagination."""
+  "A unique cursor that can be used for pagination."
   cursor: String!
 }
 GRAPHQL

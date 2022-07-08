@@ -50,13 +50,13 @@ final class LaravelEnumTypeTest extends TestCase
 
         $this->assertSame(/** @lang GraphQL */ <<<GRAPHQL
 enum PartiallyDeprecated {
-  """Not"""
+  "Not"
   NOT
 
-  """Deprecated"""
+  "Deprecated"
   DEPRECATED @deprecated
 
-  """Deprecated with reason"""
+  "Deprecated with reason"
   DEPRECATED_WITH_REASON @deprecated(reason: "some reason")
 }
 GRAPHQL
