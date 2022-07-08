@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Testing;
 
-use Laravel\Lumen\Testing\Concerns\MakesHttpRequests;
+use Illuminate\Foundation\Testing\Concerns\MakesHttpRequests;
 use Nuwave\Lighthouse\Testing\ClearsSchemaCache;
 use Nuwave\Lighthouse\Testing\MakesGraphQLRequests;
 use Nuwave\Lighthouse\Testing\MocksResolvers;
