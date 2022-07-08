@@ -24,17 +24,13 @@ trait MakesGraphQLRequestsLumen
      *
      * On the first call to introspect() this property is set to
      * cache the result, as introspection is quite expensive.
-     *
-     * @var \Illuminate\Testing\TestResponse|null
      */
-    protected $introspectionResult;
+    protected TestResponse $introspectionResult;
 
     /**
      * Used to test deferred queries.
-     *
-     * @var \Nuwave\Lighthouse\Support\Http\Responses\MemoryStream|null
      */
-    protected $deferStream;
+    protected MemoryStream $deferStream;
 
     /**
      * Execute a query as if it was sent as a request to the server.

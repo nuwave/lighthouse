@@ -87,7 +87,8 @@
     "config": {
         "allow-plugins": {
             "composer/package-versions-deprecated": true,
-            "ergebnis/composer-normalize": true
+            "ergebnis/composer-normalize": true,
+            "kylekatarnls/update-helper": true
         },
         "sort-packages": true
     },

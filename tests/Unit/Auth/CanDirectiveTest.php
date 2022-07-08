@@ -127,6 +127,43 @@ final class CanDirectiveTest extends TestCase
         ]);
     }
 
+    public function testChecksAgainstResolvedModels(): void
+    {
+        $user = new User();
+        $user->name = UserPolicy::ADMIN;
+        $this->be($user);
+
+        $this->mockResolver(function (): User {
+            return $this->resolveUser();
+        });
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            user: User!
+                @can(ability: "view", resolved: true)
+                @mock
+        }
+
+        type User {
+            name: String
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            user {
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'name' => 'foo',
+                ],
+            ],
+        ]);
+    }
+
     public function testAcceptsGuestUser(): void
     {
         $this->mockResolver(function (): User {
@@ -294,15 +331,17 @@ final class CanDirectiveTest extends TestCase
         ]);
     }
 
-    public function testFindAndQueryAreMutuallyExclusive(): void
+    /**
+     * @dataProvider multipleMutuallyExclusiveArguments
+     */
+    public function testMultipleMutuallyExclusiveArgument(string $arguments): void
     {
-        $this->expectException(DefinitionException::class);
-        $this->expectExceptionMessage(CanDirective::findAndQueryAreMutuallyExclusive());
+        $this->expectExceptionObject(CanDirective::multipleMutuallyExclusiveArguments());
 
-        $this->buildSchema(/** @lang GraphQL */ '
+        $this->buildSchema(/** @lang GraphQL */ <<<GRAPHQL
         type Query {
             user(id: ID! @eq): User
-                @can(ability: "view", find: "id", query: true)
+                @can(ability: "view", {$arguments})
                 @first
         }
 
@@ -310,7 +349,20 @@ final class CanDirectiveTest extends TestCase
             id: ID!
             name: String!
         }
-        ');
+
+GRAPHQL
+        );
+    }
+
+    /**
+     * @return iterable<array{string}>
+     */
+    public function multipleMutuallyExclusiveArguments(): iterable
+    {
+        yield ['resolve: "id", query: true'];
+        yield ['query: true, find: "id"'];
+        yield ['find: "id", resolve: true'];
+        yield ['resolve: "id", query: true, find: "id"'];
     }
 
     public function resolveUser(): User
