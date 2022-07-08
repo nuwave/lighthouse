@@ -29,10 +29,11 @@ GRAPHQL;
     public function handleBuilder($builder, $value): object
     {
         if (! $builder instanceof EloquentBuilder) {
-            throw new Exception('Can not get model from builder of class: ' . get_class($builder));
+            $notEloquentBuilder = get_class($builder);
+            throw new Exception("Can not get model from builder of class: {$notEloquentBuilder}");
         }
-        $model = $builder->getModel();
 
+        $model = $builder->getModel();
         $this->assertModelUsesSoftDeletes($model);
 
         if (null === $value) {
@@ -58,7 +59,6 @@ GRAPHQL;
     public function handleScoutBuilder(ScoutBuilder $builder, $value): ScoutBuilder
     {
         $model = $builder->model;
-
         $this->assertModelUsesSoftDeletes($model);
 
         if (null === $value) {

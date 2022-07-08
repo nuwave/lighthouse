@@ -19,8 +19,7 @@ Head over their [Error Handling docs](https://webonyx.github.io/graphql-php/erro
 The interface [`\Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions`](https://github.com/nuwave/lighthouse/blob/master/src/Exceptions/RendersErrorsExtensions.php)
 may be extended to add more information than just an error message to the rendered error output.
 
-Let's say you want to have a custom exception type that contains information about
-the reason the exception was thrown.
+This custom exception contains information about the reason the exception was thrown:
 
 ```php
 <?php
@@ -46,9 +45,6 @@ class CustomException extends Exception implements RendersErrorsExtensions
 
     /**
      * Returns true when exception message is safe to be displayed to a client.
-     *
-     * @api
-     * @return bool
      */
     public function isClientSafe(): bool
     {
