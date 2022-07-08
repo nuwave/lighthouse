@@ -591,17 +591,12 @@ directive @can(
   ability: String!
 
   """
-  Query for specific model instances to check the policy against, using arguments
-  with directives that add constraints to the query builder, such as `@eq`.
+  Check the policy against the model instances returned by the field resolver.
+  Only use this if the field does not mutate data, it is run before checking.
 
-  Mutually exclusive with `find`.
+  Mutually exclusive with `query` and `find`.
   """
-  query: Boolean = false
-
-  """
-  Apply scopes to the underlying query.
-  """
-  scopes: [String!]
+  resolved: Boolean! = false
 
   """
   Specify the class name of the model to use.
@@ -612,7 +607,7 @@ directive @can(
   """
   Pass along the client given input data as arguments to `Gate::check`.
   """
-  injectArgs: Boolean = false
+  injectArgs: Boolean! = false
 
   """
   Statically defined arguments that are passed to `Gate::check`.
@@ -623,12 +618,25 @@ directive @can(
   args: CanArgs
 
   """
+  Query for specific model instances to check the policy against, using arguments
+  with directives that add constraints to the query builder, such as `@eq`.
+
+  Mutually exclusive with `resolved` and `find`.
+  """
+  query: Boolean! = false
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+
+  """
   If your policy checks against specific model instances, specify
   the name of the field argument that contains its primary key(s).
 
   You may pass the string in dot notation to use nested inputs.
 
-  Mutually exclusive with `search`.
+  Mutually exclusive with `resolved` and `query`.
   """
   find: String
 ) repeatable on FIELD_DEFINITION
@@ -649,12 +657,12 @@ type Mutation {
 }
 ```
 
-Query for specific model instances to check the policy against with the `query` argument:
+Check the policy against the resolved model instances with the `resolved` argument:
 
 ```graphql
 type Query {
   fetchUserByEmail(email: String! @eq): User
-    @can(ability: "view", query: true)
+    @can(ability: "view", resolved: true)
     @find
 }
 ```

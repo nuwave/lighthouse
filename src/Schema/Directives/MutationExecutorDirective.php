@@ -77,7 +77,7 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
     {
         $update = new ResolveNested($this->makeExecutionFunction($parentRelation));
 
-        return Utils::applyEach(
+        return Utils::mapEach(
             static function (ArgumentSet $argumentSet) use ($update, $model) {
                 return $update($model->newInstance(), $argumentSet);
             },
