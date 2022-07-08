@@ -11,7 +11,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Fixed
 
-- Fix static analysis error in testing traits
+- Fix static analysis error in testing traits https://github.com/nuwave/lighthouse/pull/2180
 
 ## v5.56.0
 
