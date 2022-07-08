@@ -36,7 +36,8 @@ final class LazyLoadDirectiveTest extends DBTestCase
         /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
 
-        $user->tasks()->saveMany(factory(Task::class, 3)->make());
+        $tasks = factory(Task::class, 3)->make();
+        $user->tasks()->saveMany($tasks);
 
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -47,7 +48,7 @@ final class LazyLoadDirectiveTest extends DBTestCase
 
         type Task {
             id: ID!
-            user: User!
+            userLoaded: Boolean! @method
         }
 
         type Query {
@@ -58,15 +59,29 @@ final class LazyLoadDirectiveTest extends DBTestCase
         $this->graphQL(/** @lang GraphQL */ '
         {
             user {
-                tasks(first: 3) {
+                tasks(first: 1) {
                     edges {
                         node {
-                            id
+                            userLoaded
                         }
                     }
                 }
             }
         }
-        ');
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'tasks' => [
+                        'edges' => [
+                            [
+                                'node' => [
+                                    'userLoaded' => true,
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
     }
 }

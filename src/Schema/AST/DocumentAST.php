@@ -5,12 +5,12 @@ namespace Nuwave\Lighthouse\Schema\AST;
 use Exception;
 use GraphQL\Error\SyntaxError;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
-use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionNode;
 use GraphQL\Language\Parser;
+use GraphQL\Utils\AST;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
@@ -25,6 +25,14 @@ use Serializable;
  * Explicitly implementing Serializable provides performance gains by:
  * - stripping unnecessary data
  * - leveraging lazy instantiation of schema types
+ *
+ * @phpstan-type ClassNameToObjectTypeName array<class-string, list<string>>
+ *
+ * @phpstan-type SerializableDocumentAST array{
+ *     types: array<int, array<string, mixed>>,
+ *     directives: array<int, array<string, mixed>>,
+ *     classNameToObjectTypeName: ClassNameToObjectTypeName,
+ * }
  */
 class DocumentAST implements Serializable, Arrayable
 {
@@ -67,7 +75,7 @@ class DocumentAST implements Serializable, Arrayable
      *
      * @see \Nuwave\Lighthouse\Schema\TypeRegistry::typeResolverFallback()
      *
-     * @var array<class-string, list<string>>
+     * @var ClassNameToObjectTypeName
      */
     public $classNameToObjectTypeNames = [];
 
@@ -175,19 +183,15 @@ class DocumentAST implements Serializable, Arrayable
      * We exclude the type extensions stored in $typeExtensions,
      * as they are merged with the actual types at this point.
      *
-     * @return array<string, mixed>
+     * @return SerializableDocumentAST
      */
     public function toArray(): array
     {
-        $nodeToArray = function (Node $node): array {
-            return $node->toArray(true);
-        };
-
         return [
             // @phpstan-ignore-next-line Before serialization, those are arrays
-            self::TYPES => array_map($nodeToArray, $this->types),
+            self::TYPES => array_map([AST::class, 'toArray'], $this->types),
             // @phpstan-ignore-next-line Before serialization, those are arrays
-            self::DIRECTIVES => array_map($nodeToArray, $this->directives),
+            self::DIRECTIVES => array_map([AST::class, 'toArray'], $this->directives),
             self::CLASS_NAME_TO_OBJECT_TYPE_NAME => $this->classNameToObjectTypeNames,
         ];
     }
@@ -195,7 +199,7 @@ class DocumentAST implements Serializable, Arrayable
     /**
      * Instantiate from a serialized array.
      *
-     * @param  array<string, mixed>  $ast
+     * @param  SerializableDocumentAST  $ast
      */
     public static function fromArray(array $ast): DocumentAST
     {
@@ -206,7 +210,7 @@ class DocumentAST implements Serializable, Arrayable
     }
 
     /**
-     * @return array<string, mixed>
+     * @return SerializableDocumentAST
      */
     public function __serialize(): array
     {
@@ -222,7 +226,7 @@ class DocumentAST implements Serializable, Arrayable
     }
 
     /**
-     * @param  array<string, mixed>  $data
+     * @param  SerializableDocumentAST  $data
      */
     public function __unserialize(array $data): void
     {
@@ -238,7 +242,7 @@ class DocumentAST implements Serializable, Arrayable
     }
 
     /**
-     * @param  array<string, mixed>  $ast
+     * @param  SerializableDocumentAST  $ast
      */
     protected function hydrateFromArray(array $ast): void
     {
@@ -250,9 +254,10 @@ class DocumentAST implements Serializable, Arrayable
 
         // Utilize the NodeList for lazy unserialization for performance gains.
         // Until they are accessed by name, they are kept in their array form.
-        // @phpstan-ignore-next-line TODO fixed in https://github.com/webonyx/graphql-php/pull/777
+
+        // @phpstan-ignore-next-line Since we start from the array form, the generic type does not match
         $this->types = new NodeList($types);
-        // @phpstan-ignore-next-line TODO fixed in https://github.com/webonyx/graphql-php/pull/777
+        // @phpstan-ignore-next-line Since we start from the array form, the generic type does not match
         $this->directives = new NodeList($directives);
     }
 }
