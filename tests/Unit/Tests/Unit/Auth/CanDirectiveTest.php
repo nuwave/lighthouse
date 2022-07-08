@@ -367,7 +367,7 @@ final class CanDirectiveTest extends TestCase
         }
 
 GRAPHQL
-);
+        );
     }
 
     /**
