@@ -96,7 +96,10 @@ the resolved model instances.
 
 ```graphql
 type Query {
-  post(id: ID! @eq): Post @can(ability: "view", resolved: true) @find @softDeletes
+  post(id: ID! @eq): Post
+    @can(ability: "view", resolved: true)
+    @find
+    @softDeletes
 }
 ```
 
