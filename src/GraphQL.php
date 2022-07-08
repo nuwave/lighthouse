@@ -370,7 +370,7 @@ class GraphQL
      *   callable(\GraphQL\Error\Error $error): ?array<string, mixed>
      * ): array<string, mixed>
      */
-    protected function errorsHandler(): \Closure
+    protected function errorsHandler(): callable
     {
         if (! isset($this->errorsHandler)) {
             $this->errorsHandler = function (array $errors, callable $formatter): array {

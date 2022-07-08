@@ -185,8 +185,9 @@ final class SchemaBuilderTest extends TestCase
 
         $objectType = $schema->getType('Foo');
         assert($objectType instanceof ObjectType);
+        $fields = $objectType->getFields();
 
-        $this->assertArrayHasKey('baz', $objectType->config['fields']());
+        $this->assertArrayHasKey('baz', $fields);
     }
 
     public function testExtendTypes(): void
