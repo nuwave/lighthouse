@@ -197,7 +197,7 @@ final class CanDirectiveDBTest extends DBTestCase
         }
         ', [
             'foo' => $post->id,
-        ])->assertGraphQLError(new AuthorizationException('This action is unauthorized.'));
+        ])->assertGraphQLErrorCategory(AuthorizationException::CATEGORY);
     }
 
     public function testHandleMultipleModels(): void
