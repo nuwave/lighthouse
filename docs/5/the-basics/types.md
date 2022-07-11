@@ -170,6 +170,7 @@ you can use `Nuwave\Lighthouse\Schema\Types\LaravelEnumType` to construct an enu
 
 ```php
 use BenSampo\Enum\Enum;
+use Nuwave\Lighthouse\Schema\Types\LaravelEnumType;
 
 final class Color extends Enum
 {
