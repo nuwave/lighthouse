@@ -11,7 +11,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Changed
 
-- Add description generation to `LaravelEnumType` based on `BenSampo\Enum\Enum::getClassDescription()` [2177](https://github.com/nuwave/lighthouse/pull/2177)
+- Add description generation to `LaravelEnumType` based on `BenSampo\Enum\Enum::getClassDescription()` https://github.com/nuwave/lighthouse/pull/2177
 
 ## v5.57.0
 
