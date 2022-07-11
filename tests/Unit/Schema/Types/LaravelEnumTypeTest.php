@@ -43,7 +43,7 @@ final class LaravelEnumTypeTest extends TestCase
         if (method_exists(LocalizedUserType::class, 'getClassDescription')) {
             $this->assertSame('Localized user type', $enumType->config['description']);
         } else {
-            $this->assertSame(null, $enumType->config['description']);
+            $this->assertNull($enumType->config['description']);
         }
     }
 
