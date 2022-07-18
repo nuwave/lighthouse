@@ -42,9 +42,11 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
         $this->transactionalMutations = $transactionalMutations;
     }
 
-    public static function couldNotModify(Model $user): string
+    public static function couldNotModify(Model $model): Error
     {
-        return 'Could not modify model ' . get_class($user) . ' with ID ' . $user->getKey() . '.';
+        $modelClass = get_class($model);
+
+        return new Error("Could not modify model {$modelClass} with ID {$model->getKey()}.");
     }
 
     public function resolveField(FieldValue $fieldValue): FieldValue
@@ -64,10 +66,6 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
                 $idOrIds
             );
 
-            if (null === $modelOrModels) {
-                return null;
-            }
-
             $modifyModelExistence = function (Model $model): void {
                 $success = $this->transactionalMutations->execute(
                     function () use ($model): bool {
@@ -77,11 +75,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
                 );
 
                 if (! $success) {
-                    $this->errorPool->record(
-                        new Error(
-                            self::couldNotModify($model)
-                        )
-                    );
+                    $this->errorPool->record(self::couldNotModify($model));
                 }
             };
 
@@ -109,15 +103,12 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
      */
     protected function idArgument()
     {
-        /** @var \GraphQL\Language\AST\FieldDefinitionNode $fieldNode */
         $fieldNode = $this->definitionNode;
+        assert($fieldNode instanceof FieldDefinitionNode);
 
         return $fieldNode->arguments[0]->type;
     }
 
-    /**
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
-     */
     public function manipulateFieldDefinition(
         DocumentAST &$documentAST,
         FieldDefinitionNode &$fieldDefinition,
@@ -146,7 +137,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
     {
         // At this point we know the type is at least wrapped in a NonNull type, so we go one deeper
         if ($this->idArgument()->type instanceof ListTypeNode) {
-            /** @var array<string> $idOrIds */
+            assert(is_array($idOrIds));
             return array_map(
                 function (string $id): string {
                     return $this->globalId->decodeID($id);
@@ -154,7 +145,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
                 $idOrIds
             );
         } else {
-            /** @var string $idOrIds */
+            assert(is_string($idOrIds));
             return $this->globalId->decodeID($idOrIds);
         }
     }

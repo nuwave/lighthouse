@@ -43,7 +43,7 @@ class CountModelsLoader implements ModelsLoader
          *
          * @see \Illuminate\Database\Eloquent\Concerns\QueriesRelationships::withCount()
          */
-        $countAttributeName = Str::snake("${relationName}_count");
+        $countAttributeName = Str::snake("{$relationName}_count");
 
         /**
          * We just assert this is an int and let PHP run into a type error if not.
