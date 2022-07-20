@@ -201,7 +201,7 @@ final class MorphToTest extends DBTestCase
         $image->url = 'bar';
         $image->save();
 
-        $field = "${action}Image";
+        $field = "{$action}Image";
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
             {$field}(input: {
@@ -242,7 +242,7 @@ GRAPHQL
         $image->url = 'bar';
         $image->save();
 
-        $field = "${action}Image";
+        $field = "{$action}Image";
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
             {$field}(input: {

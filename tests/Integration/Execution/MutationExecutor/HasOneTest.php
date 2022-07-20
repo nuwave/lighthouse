@@ -270,7 +270,7 @@ GRAPHQL
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            ${action}Task(input: {
+            {$action}Task(input: {
                 id: 1
                 name: "foo"
                 post: {
@@ -290,7 +290,7 @@ GRAPHQL
 GRAPHQL
         )->assertJson([
             'data' => [
-                "${action}Task" => [
+                "{$action}Task" => [
                     'id' => '1',
                     'name' => 'foo',
                     'post' => [
@@ -316,7 +316,7 @@ GRAPHQL
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            ${action}Task(input: {
+            {$action}Task(input: {
                 id: 1
                 name: "foo"
                 post: {
@@ -337,7 +337,7 @@ GRAPHQL
 GRAPHQL
         )->assertJson([
             'data' => [
-                "${action}Task" => [
+                "{$action}Task" => [
                     'id' => '1',
                     'name' => 'foo',
                     'post' => [
@@ -363,7 +363,7 @@ GRAPHQL
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            ${action}Task(input: {
+            {$action}Task(input: {
                 id: 1
                 name: "foo"
                 post: {
@@ -384,7 +384,7 @@ GRAPHQL
 GRAPHQL
         )->assertJson([
             'data' => [
-                "${action}Task" => [
+                "{$action}Task" => [
                     'id' => '1',
                     'name' => 'foo',
                     'post' => [
@@ -410,7 +410,7 @@ GRAPHQL
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            ${action}Task(input: {
+            {$action}Task(input: {
                 id: 1
                 name: "foo"
                 post: {
@@ -429,7 +429,7 @@ GRAPHQL
 GRAPHQL
         )->assertJson([
             'data' => [
-                "${action}Task" => [
+                "{$action}Task" => [
                     'id' => '1',
                     'name' => 'foo',
                     'post' => null,
