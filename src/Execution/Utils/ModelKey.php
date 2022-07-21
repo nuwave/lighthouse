@@ -17,7 +17,7 @@ class ModelKey
             array_merge(
                 [get_class($model)],
                 // Might be one or more keys
-                (array) ($model->getKey())
+                (array) $model->getKey()
             )
         );
     }

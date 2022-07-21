@@ -223,7 +223,7 @@ GRAPHQL;
 
     public static function missingKeyToFindModel(string $find): Error
     {
-        return new Error("Got no key to find a model at the expected input path: ${find}.");
+        return new Error("Got no key to find a model at the expected input path: {$find}.");
     }
 
     /**
