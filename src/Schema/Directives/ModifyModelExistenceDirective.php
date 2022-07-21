@@ -138,6 +138,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
         // At this point we know the type is at least wrapped in a NonNull type, so we go one deeper
         if ($this->idArgument()->type instanceof ListTypeNode) {
             assert(is_array($idOrIds));
+
             return array_map(
                 function (string $id): string {
                     return $this->globalId->decodeID($id);
@@ -146,6 +147,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
             );
         } else {
             assert(is_string($idOrIds));
+
             return $this->globalId->decodeID($idOrIds);
         }
     }
