@@ -135,7 +135,7 @@ GRAPHQL;
                             ? $modelLike->items()
                             : $modelLike;
 
-                        Utils::applyEach(function (Model $model) use ($gate, $ability, $checkArguments): void {
+                        Utils::applyEach(function (?Model $model) use ($gate, $ability, $checkArguments): void {
                             $this->authorize($gate, $ability, $model, $checkArguments);
                         }, $modelOrModels);
 
