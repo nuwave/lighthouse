@@ -543,4 +543,42 @@ final class CanDirectiveDBTest extends DBTestCase
             ],
         ]);
     }
+
+    public function testChecksAgainstMissingResolvedModelWithFind(): void
+    {
+        $user = new User();
+        $user->name = UserPolicy::ADMIN;
+        $this->be($user);
+
+        $user = factory(User::class)->create();
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            user(id: ID @eq): User
+                @can(ability: "view", resolved: true)
+                @find
+        }
+
+        type User {
+            name: String!
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            user(id: "not-present") {
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => null,
+            ],
+            'errors' => [
+                [
+                    'message' => 'This action is unauthorized.',
+                ],
+            ],
+        ]);
+    }
 }
