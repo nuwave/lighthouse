@@ -577,12 +577,9 @@ final class CanDirectiveDBTest extends DBTestCase
             ],
             'errors' => [
                 [
-                    // NOTE: The error message differs because
-                    // CanDirective::authorize has differing implementations
-                    // depending on Laravel version. If laravel<6.0 support is
-                    // removed, so can this ternary statement.
                     'message' => AppVersion::atLeast(6.0)
                         ? 'This action is unauthorized.'
+                        // TODO remove with Laravel < 6 support
                         : 'You are not authorized to access user',
                 ],
             ],
