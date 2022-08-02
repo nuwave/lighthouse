@@ -149,5 +149,7 @@ class ScoutEnhancer
             ->first(Utils::instanceofMatcher(SearchDirective::class));
 
         $searchDirective->search($scoutBuilder);
+
+        return $scoutBuilder;
     }
 }

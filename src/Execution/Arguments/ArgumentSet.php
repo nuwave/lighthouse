@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
 use Closure;
+use Laravel\Scout\Builder as ScoutBuilder;
 use Nuwave\Lighthouse\Scout\ScoutEnhancer;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective;
@@ -68,20 +69,20 @@ class ArgumentSet
     /**
      * Apply ArgBuilderDirectives and scopes to the builder.
      *
-     * @template TBuilder of \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation
+     * @template TBuilder of \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation|ScoutBuilder
      *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation  $builder
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation|ScoutBuilder  $builder
      * @phpstan-param  TBuilder  $builder
      *
      * @param  array<string>  $scopes
      *
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation|\Laravel\Scout\Builder
-     * @phpstan-return TBuilder|\Laravel\Scout\Builder
+     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation|ScoutBuilder
+     * @phpstan-return TBuilder|ScoutBuilder
      */
     public function enhanceBuilder(object $builder, array $scopes, Closure $directiveFilter = null): object
     {
         $scoutEnhancer = new ScoutEnhancer($this, $builder);
-        if ($scoutEnhancer->hasSearchArguments()) {
+        if ($scoutEnhancer->hasSearchArguments() || $builder instanceof ScoutBuilder) {
             return $scoutEnhancer->enhanceBuilder();
         }
 

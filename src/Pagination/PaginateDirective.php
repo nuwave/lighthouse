@@ -120,14 +120,12 @@ GRAPHQL;
                 $query = $this->getModelClass()::query();
             }
 
-            if (! $query instanceof ScoutBuilder) {
-                $query = $resolveInfo
-                    ->argumentSet
-                    ->enhanceBuilder(
-                        $query,
-                        $this->directiveArgValue('scopes') ?? []
-                    );
-            }
+            $query = $resolveInfo
+                ->argumentSet
+                ->enhanceBuilder(
+                    $query,
+                    $this->directiveArgValue('scopes') ?? []
+                );
 
             return PaginationArgs::extractArgs($args, $this->optimalPaginationType($resolveInfo), $this->paginateMaxCount())
                 ->applyToBuilder($query);
