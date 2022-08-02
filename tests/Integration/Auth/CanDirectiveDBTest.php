@@ -4,6 +4,7 @@ namespace Tests\Integration\Auth;
 
 use Nuwave\Lighthouse\Auth\CanDirective;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
+use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Company;
 use Tests\Utils\Models\Post;
@@ -539,6 +540,50 @@ final class CanDirectiveDBTest extends DBTestCase
                             'name' => $user->name,
                         ],
                     ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testChecksAgainstMissingResolvedModelWithFind(): void
+    {
+        $user = new User();
+        $user->name = UserPolicy::ADMIN;
+        $this->be($user);
+
+        $user = factory(User::class)->create();
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            user(id: ID @eq): User
+                @can(ability: "view", resolved: true)
+                @find
+        }
+
+        type User {
+            name: String!
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            user(id: "not-present") {
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => null,
+            ],
+            'errors' => [
+                [
+                    // NOTE: The error message differs because
+                    // CanDirective::authorize has differing implementations
+                    // depending on Laravel version. If laravel<6.0 support is
+                    // removed, so can this ternary statement.
+                    'message' => AppVersion::atLeast(6.0)
+                        ? 'This action is unauthorized.'
+                        : 'You are not authorized to access user',
                 ],
             ],
         ]);
