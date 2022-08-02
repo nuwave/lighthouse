@@ -135,7 +135,7 @@ GRAPHQL;
                             ? $modelLike->items()
                             : $modelLike;
 
-                        Utils::applyEach(function (Model $model) use ($gate, $ability, $checkArguments): void {
+                        Utils::applyEach(function (?Model $model) use ($gate, $ability, $checkArguments): void {
                             $this->authorize($gate, $ability, $model, $checkArguments);
                         }, $modelOrModels);
 
@@ -228,7 +228,7 @@ GRAPHQL;
 
     /**
      * @param  string|array<string>  $ability
-     * @param  string|\Illuminate\Database\Eloquent\Model  $model
+     * @param  string|null|\Illuminate\Database\Eloquent\Model  $model
      * @param  array<int, mixed>  $arguments
      *
      * @throws \Nuwave\Lighthouse\Exceptions\AuthorizationException
