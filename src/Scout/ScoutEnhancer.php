@@ -18,7 +18,7 @@ class ScoutEnhancer
     protected $argumentSet;
 
     /**
-     * @var \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation|ScoutBuilder
+     * @var \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation|\Laravel\Scout\Builder
      */
     protected $builder;
 
@@ -44,7 +44,7 @@ class ScoutEnhancer
     protected $argumentsWithScoutBuilderDirectives = [];
 
     /**
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation|ScoutBuilder  $builder
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation|\Laravel\Scout\Builder  $builder
      */
     public function __construct(ArgumentSet $argumentSet, object $builder)
     {
