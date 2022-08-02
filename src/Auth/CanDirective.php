@@ -228,7 +228,7 @@ GRAPHQL;
 
     /**
      * @param  string|array<string>  $ability
-     * @param  string|null|\Illuminate\Database\Eloquent\Model  $model
+     * @param  string|\Illuminate\Database\Eloquent\Model|null  $model
      * @param  array<int, mixed>  $arguments
      *
      * @throws \Nuwave\Lighthouse\Exceptions\AuthorizationException
