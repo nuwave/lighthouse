@@ -5,6 +5,7 @@ namespace Tests\Integration\Pagination;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Laravel\Scout\Builder as ScoutBuilder;
 use Mockery;
 use Tests\DBTestCase;
 use Tests\TestsScoutEngine;
@@ -15,6 +16,8 @@ use Tests\Utils\Models\User;
 final class PaginateDirectiveDBTest extends DBTestCase
 {
     use TestsScoutEngine;
+
+    public const LIMIT_FROM_CUSTOM_SCOUT_BUILDER = 123;
 
     public function testPaginate(): void
     {
@@ -149,104 +152,27 @@ GRAPHQL;
     {
         $this->setUpScoutEngine();
 
-        /** @var \Tests\Utils\Models\Post $postA */
-        $postA = factory(Post::class)->create([
-            'title' => 'great title',
-        ]);
-        /** @var \Tests\Utils\Models\Post $postB */
-        $postB = factory(Post::class)->create([
-            'title' => 'Really great title',
-        ]);
-        factory(Post::class)->create([
-            'title' => 'bad title',
-        ]);
+        $post = factory(Post::class)->create();
+        assert($post instanceof Post);
 
         $this->engine->shouldReceive('map')
-            ->andReturn(
-                new EloquentCollection([$postA, $postB])
-            )
+            ->withArgs(function (ScoutBuilder $builder) use ($post): bool {
+                return $builder->wheres === ['id' => "$post->id"]
+                    && self::LIMIT_FROM_CUSTOM_SCOUT_BUILDER === $builder->limit;
+            })
+            ->andReturn(new EloquentCollection([$post]))
             ->once();
+
+        $first = 42;
+        $page = 69;
 
         $this->engine->shouldReceive('paginate')
             ->with(
-                Mockery::any(),
-                Mockery::any(),
-                Mockery::not('page')
+                Mockery::type(ScoutBuilder::class),
+                $first,
+                $page
             )
-            ->andReturn(new EloquentCollection([$postA, $postB]))
-            ->once();
-
-        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
-        type Post {
-            id: ID!
-        }
-
-        type Query {
-            posts: [Post!]! @paginate(builder: "{$this->qualifyTestResolver('builderForScoutBuilder')}")
-        }
-GRAPHQL;
-
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            posts(first: 10) {
-                data {
-                    id
-                }
-            }
-        }
-        ')->assertJson([
-            'data' => [
-                'posts' => [
-                    'data' => [
-                        [
-                            'id' => '1',
-                        ],
-                        [
-                            'id' => '2',
-                        ],
-                    ],
-                ],
-            ],
-        ]);
-    }
-
-    public function testSpecifyCustomBuilderForScoutBuilderWithScoutDirective(): void
-    {
-        $this->setUpScoutEngine();
-
-        /** @var \Mockery\MockInterface&\Laravel\Scout\Builder $builder */
-        $builder = Mockery::mock(Post::search())->makePartial();
-        app()->bind(\Laravel\Scout\Builder::class, function () use ($builder) {
-            return $builder;
-        });
-
-        /** @var \Tests\Utils\Models\Post $postA */
-        $postA = factory(Post::class)->create([
-            'title' => 'great title',
-            'task_id' => 1,
-        ]);
-        factory(Post::class)->create([
-            'title' => 'Really great title',
-            'task_id' => 2,
-        ]);
-        factory(Post::class)->create([
-            'title' => 'bad title',
-            'task_id' => 3,
-        ]);
-
-        $this->engine->shouldReceive('map')
-            ->andReturn(
-                new EloquentCollection([$postA])
-            )
-            ->once();
-
-        $this->engine->shouldReceive('paginate')
-            ->with(
-                Mockery::any(),
-                Mockery::any(),
-                Mockery::not('page')
-            )
-            ->andReturn(new EloquentCollection([$postA]))
+            ->andReturn(new EloquentCollection([$post]))
             ->once();
 
         $this->schema = /** @lang GraphQL */ <<<GRAPHQL
@@ -256,38 +182,34 @@ GRAPHQL;
 
         type Query {
             posts(
-                task: ID! @eq(key: "task_id")
-            ): [Post!]!
-                @paginate(builder: "{$this->qualifyTestResolver('builderForScoutBuilder')}")
+                id: ID! @eq
+            ): [Post!]! @paginate(builder: "{$this->qualifyTestResolver('builderForScoutBuilder')}")
         }
 GRAPHQL;
 
         $this->graphQL(/** @lang GraphQL */ '
-        {
-            posts(first: 10, task: "1") {
+        query ($first: Int!, $page: Int!, $id: ID!) {
+            posts(first: $first, page: $page, id: $id) {
                 data {
                     id
                 }
             }
         }
-        ')->assertJson([
+        ', [
+            'first' => $first,
+            'page' => $page,
+            'id' => $post->id,
+        ])->assertJson([
             'data' => [
                 'posts' => [
                     'data' => [
                         [
-                            'id' => '1',
+                            'id' => "$post->id",
                         ],
                     ],
                 ],
             ],
         ]);
-
-        // Ensure `@eq` directive has been applied on scout builder instance
-        $builder->shouldHaveReceived('where')
-            ->with(
-                'task_id',
-                '1'
-            );
     }
 
     public function testPaginateWithScopes(): void
@@ -353,9 +275,10 @@ GRAPHQL;
         return $parent->posts()->orderBy('id', 'DESC');
     }
 
-    public function builderForScoutBuilder(): \Laravel\Scout\Builder
+    public function builderForScoutBuilder(): ScoutBuilder
     {
-        return Post::search('great title');
+        return Post::search('great title')
+            ->take(self::LIMIT_FROM_CUSTOM_SCOUT_BUILDER);
     }
 
     public function testCreateQueryPaginatorsWithDifferentPages(): void
