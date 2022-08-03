@@ -215,8 +215,7 @@ GRAPHQL;
         $this->setUpScoutEngine();
 
         /** @var \Mockery\MockInterface&\Laravel\Scout\Builder $builder */
-        $builder = $this->partialMock(\Laravel\Scout\Builder::class);
-        $builder->model = new Post();
+        $builder = Mockery::mock(Post::search())->makePartial();
         app()->bind(\Laravel\Scout\Builder::class, function () use ($builder) {
             return $builder;
         });
@@ -265,7 +264,7 @@ GRAPHQL;
 
         $this->graphQL(/** @lang GraphQL */ '
         {
-            posts(first: 10, task: 1) {
+            posts(first: 10, task: "1") {
                 data {
                     id
                 }

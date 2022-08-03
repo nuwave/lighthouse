@@ -5,6 +5,7 @@ namespace Tests\Integration\Schema\Directives;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Mockery;
 use Tests\DBTestCase;
 use Tests\TestsScoutEngine;
 use Tests\Utils\Models\Post;
@@ -310,8 +311,7 @@ GRAPHQL;
         $this->setUpScoutEngine();
 
         /** @var \Mockery\MockInterface&\Laravel\Scout\Builder $builder */
-        $builder = $this->partialMock(\Laravel\Scout\Builder::class);
-        $builder->model = new Post();
+        $builder = Mockery::mock(Post::search())->makePartial();
         app()->bind(\Laravel\Scout\Builder::class, function () use ($builder) {
             return $builder;
         });
@@ -351,7 +351,7 @@ GRAPHQL;
 
         $this->graphQL(/** @lang GraphQL */ '
         {
-            posts(task: 1) {
+            posts(task: "1") {
                 id
             }
         }
