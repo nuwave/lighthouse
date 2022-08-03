@@ -11,7 +11,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Fixed
 
-- Restore `Laravel\Scout\Builder` as a valid option for the `@paginate` directive https://github.com/nuwave/lighthouse/pull/2183
+- Allow combination of `@search` with option `builder` in `@all` and `@paginate` https://github.com/nuwave/lighthouse/pull/2183
 
 ## v5.57.1
 
