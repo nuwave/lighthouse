@@ -66,13 +66,15 @@ class ScoutEnhancer
 
     public function enhanceBuilder(): ScoutBuilder
     {
-        $scoutBuilder = $this->builder instanceof ScoutBuilder ? $this->builder : $this->enhanceEloquentBuilder();
+        $scoutBuilder = $this->builder instanceof ScoutBuilder
+            ? $this->builder
+            : $this->enhanceEloquentBuilder();
 
         foreach ($this->argumentsWithScoutBuilderDirectives as $argument) {
-            /** @var \Nuwave\Lighthouse\Scout\ScoutBuilderDirective $scoutBuilderDirective */
             $scoutBuilderDirective = $argument
                 ->directives
                 ->first(Utils::instanceofMatcher(ScoutBuilderDirective::class));
+            assert($scoutBuilderDirective instanceof ScoutBuilderDirective);
 
             $scoutBuilderDirective->handleScoutBuilder($scoutBuilder, $argument->toPlain());
         }
@@ -130,7 +132,7 @@ class ScoutEnhancer
         }
 
         if (! $this->builder instanceof EloquentBuilder) {
-            throw new ScoutException('Can only get Model from \Illuminate\Database\Eloquent\Builder, got: ' . get_class($this->builder));
+            throw new ScoutException('Can only get Model from ' . EloquentBuilder::class . ', got: ' . get_class($this->builder));
         }
         $model = $this->builder->getModel();
 
@@ -144,14 +146,10 @@ class ScoutEnhancer
          */
         $scoutBuilder = $model::search($searchArgument->toPlain());
 
-        /**
-         * We know this argument has this directive, because that is how we found it.
-         *
-         * @var \Nuwave\Lighthouse\Scout\SearchDirective $searchDirective
-         */
         $searchDirective = $searchArgument
             ->directives
             ->first(Utils::instanceofMatcher(SearchDirective::class));
+        assert($searchDirective instanceof SearchDirective);
 
         $searchDirective->search($scoutBuilder);
 
