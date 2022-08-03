@@ -3,14 +3,19 @@
 namespace Tests\Integration\Pagination;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Mockery;
 use Tests\DBTestCase;
+use Tests\TestsScoutEngine;
 use Tests\Utils\Models\Comment;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
 
 final class PaginateDirectiveDBTest extends DBTestCase
 {
+    use TestsScoutEngine;
+
     public function testPaginate(): void
     {
         factory(User::class, 3)->create();
@@ -140,6 +145,152 @@ GRAPHQL;
         ]);
     }
 
+    public function testSpecifyCustomBuilderForScoutBuilder(): void
+    {
+        $this->setUpScoutEngine();
+
+        /** @var \Tests\Utils\Models\Post $postA */
+        $postA = factory(Post::class)->create([
+            'title' => 'great title',
+        ]);
+        /** @var \Tests\Utils\Models\Post $postB */
+        $postB = factory(Post::class)->create([
+            'title' => 'Really great title',
+        ]);
+        factory(Post::class)->create([
+            'title' => 'bad title',
+        ]);
+
+        $this->engine->shouldReceive('map')
+            ->andReturn(
+                new EloquentCollection([$postA, $postB])
+            )
+            ->once();
+
+        $this->engine->shouldReceive('paginate')
+            ->with(
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::not('page')
+            )
+            ->andReturn(new EloquentCollection([$postA, $postB]))
+            ->once();
+
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        type Post {
+            id: ID!
+        }
+
+        type Query {
+            posts: [Post!]! @paginate(builder: "{$this->qualifyTestResolver('builderForScoutBuilder')}")
+        }
+GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ "
+        {
+            posts(first: 10) {
+                data {
+                    id
+                }
+            }
+        }
+        ")->assertJson([
+            'data' => [
+                'posts' => [
+                    'data' => [
+                        [
+                            'id' => '1',
+                        ],
+                        [
+                            'id' => '2',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testSpecifyCustomBuilderForScoutBuilderWithScoutDirective(): void
+    {
+        $this->setUpScoutEngine();
+
+        /** @var \Mockery\MockInterface&\Laravel\Scout\Builder $builder */
+        $builder = $this->partialMock(\Laravel\Scout\Builder::class);
+        $builder->model = new Post();
+        app()->bind(\Laravel\Scout\Builder::class, function () use ($builder) {
+            return $builder;
+        });
+
+        /** @var \Tests\Utils\Models\Post $postA */
+        $postA = factory(Post::class)->create([
+            'title' => 'great title',
+            'task_id' => 1,
+        ]);
+        factory(Post::class)->create([
+            'title' => 'Really great title',
+            'task_id' => 2,
+        ]);
+        factory(Post::class)->create([
+            'title' => 'bad title',
+            'task_id' => 3,
+        ]);
+
+        $this->engine->shouldReceive('map')
+            ->andReturn(
+                new EloquentCollection([$postA])
+            )
+            ->once();
+
+        $this->engine->shouldReceive('paginate')
+            ->with(
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::not('page')
+            )
+            ->andReturn(new EloquentCollection([$postA]))
+            ->once();
+
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        type Post {
+            id: ID!
+        }
+
+        type Query {
+            posts(
+                task: ID! @eq(key: "task_id")
+            ): [Post!]!
+                @paginate(builder: "{$this->qualifyTestResolver('builderForScoutBuilder')}")
+        }
+GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ "
+        {
+            posts(first: 10, task: 1) {
+                data {
+                    id
+                }
+            }
+        }
+        ")->assertJson([
+            'data' => [
+                'posts' => [
+                    'data' => [
+                        [
+                            'id' => '1',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        // Ensure `@eq` directive has been applied on scout builder instance
+        $builder->shouldHaveReceived('where')
+            ->with(
+                "task_id",
+                "1"
+            );
+    }
+
     public function testPaginateWithScopes(): void
     {
         $namedUser = factory(User::class)->make();
@@ -201,6 +352,11 @@ GRAPHQL;
     public function builderForRelation(User $parent): Relation
     {
         return $parent->posts()->orderBy('id', 'DESC');
+    }
+
+    public function builderForScoutBuilder(): \Laravel\Scout\Builder
+    {
+        return Post::search('great title');
     }
 
     public function testCreateQueryPaginatorsWithDifferentPages(): void
