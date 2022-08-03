@@ -15,7 +15,7 @@ final class SearchDirectiveTest extends DBTestCase
 {
     use TestsScoutEngine;
 
-    function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
         $this->setUpScoutEngine();

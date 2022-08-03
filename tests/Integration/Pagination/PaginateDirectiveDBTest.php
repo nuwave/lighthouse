@@ -186,7 +186,7 @@ GRAPHQL;
         }
 GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ "
+        $this->graphQL(/** @lang GraphQL */ '
         {
             posts(first: 10) {
                 data {
@@ -194,7 +194,7 @@ GRAPHQL;
                 }
             }
         }
-        ")->assertJson([
+        ')->assertJson([
             'data' => [
                 'posts' => [
                     'data' => [
@@ -263,7 +263,7 @@ GRAPHQL;
         }
 GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ "
+        $this->graphQL(/** @lang GraphQL */ '
         {
             posts(first: 10, task: 1) {
                 data {
@@ -271,7 +271,7 @@ GRAPHQL;
                 }
             }
         }
-        ")->assertJson([
+        ')->assertJson([
             'data' => [
                 'posts' => [
                     'data' => [
@@ -286,8 +286,8 @@ GRAPHQL;
         // Ensure `@eq` directive has been applied on scout builder instance
         $builder->shouldHaveReceived('where')
             ->with(
-                "task_id",
-                "1"
+                'task_id',
+                '1'
             );
     }
 

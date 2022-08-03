@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
 use Closure;
-use Laravel\Scout\Builder as ScoutBuilder;
 use Nuwave\Lighthouse\Scout\ScoutEnhancer;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective;

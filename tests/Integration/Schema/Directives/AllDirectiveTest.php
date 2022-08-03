@@ -285,13 +285,13 @@ final class AllDirectiveTest extends DBTestCase
         }
 GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ "
+        $this->graphQL(/** @lang GraphQL */ '
         {
             posts {
                 id
             }
         }
-        ")->assertJson([
+        ')->assertJson([
             'data' => [
                 'posts' => [
                     [
@@ -349,13 +349,13 @@ GRAPHQL;
         }
 GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ "
+        $this->graphQL(/** @lang GraphQL */ '
         {
             posts(task: 1) {
                 id
             }
         }
-        ")->assertJson([
+        ')->assertJson([
             'data' => [
                 'posts' => [
                     [
@@ -368,8 +368,8 @@ GRAPHQL;
         // Ensure `@eq` directive has been applied on scout builder instance
         $builder->shouldHaveReceived('where')
             ->with(
-                "task_id",
-                "1"
+                'task_id',
+                '1'
             );
     }
 
