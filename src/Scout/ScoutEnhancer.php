@@ -59,6 +59,11 @@ class ScoutEnhancer
         return count($this->searchArguments) > 0;
     }
 
+    public function canEnhanceBuilder(): bool
+    {
+        return $this->hasSearchArguments() || $this->builder instanceof ScoutBuilder;
+    }
+
     public function enhanceBuilder(): ScoutBuilder
     {
         $scoutBuilder = $this->builder instanceof ScoutBuilder ? $this->builder : $this->enhanceEloquentBuilder();

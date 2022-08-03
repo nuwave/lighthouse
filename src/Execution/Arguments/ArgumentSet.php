@@ -82,7 +82,7 @@ class ArgumentSet
     public function enhanceBuilder(object $builder, array $scopes, Closure $directiveFilter = null): object
     {
         $scoutEnhancer = new ScoutEnhancer($this, $builder);
-        if ($scoutEnhancer->hasSearchArguments() || $builder instanceof ScoutBuilder) {
+        if ($scoutEnhancer->canEnhanceBuilder()) {
             return $scoutEnhancer->enhanceBuilder();
         }
 
