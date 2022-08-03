@@ -3,13 +3,18 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Mockery;
 use Tests\DBTestCase;
+use Tests\TestsScoutEngine;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
 
 final class AllDirectiveTest extends DBTestCase
 {
+    use TestsScoutEngine;
+
     public function testGetAllModelsAsRootField(): void
     {
         $count = 2;
@@ -249,6 +254,125 @@ final class AllDirectiveTest extends DBTestCase
         ]);
     }
 
+    public function testSpecifyCustomBuilderForScoutBuilder(): void
+    {
+        $this->setUpScoutEngine();
+
+        /** @var \Tests\Utils\Models\Post $postA */
+        $postA = factory(Post::class)->create([
+            'title' => 'great title',
+        ]);
+        /** @var \Tests\Utils\Models\Post $postB */
+        $postB = factory(Post::class)->create([
+            'title' => 'Really great title',
+        ]);
+        factory(Post::class)->create([
+            'title' => 'bad title',
+        ]);
+
+        $this->engine->shouldReceive('map')
+            ->andReturn(
+                new EloquentCollection([$postA, $postB])
+            )
+            ->once();
+
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        type Post {
+            id: ID!
+        }
+
+        type Query {
+            posts: [Post!]! @all(builder: "{$this->qualifyTestResolver('builderForScoutBuilder')}")
+        }
+GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            posts {
+                id
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'posts' => [
+                    [
+                        'id' => '1',
+                    ],
+                    [
+                        'id' => '2',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testSpecifyCustomBuilderForScoutBuilderWithScoutDirective(): void
+    {
+        $this->setUpScoutEngine();
+
+        /** @var \Mockery\MockInterface&\Laravel\Scout\Builder $builder */
+        $builder = Mockery::mock(Post::search())->makePartial();
+        app()->bind(\Laravel\Scout\Builder::class, function () use ($builder) {
+            return $builder;
+        });
+
+        /** @var \Tests\Utils\Models\Post $postA */
+        $postA = factory(Post::class)->create([
+            'title' => 'great title',
+            'task_id' => 1,
+        ]);
+        factory(Post::class)->create([
+            'title' => 'Really great title',
+            'task_id' => 2,
+        ]);
+        factory(Post::class)->create([
+            'title' => 'bad title',
+            'task_id' => 3,
+        ]);
+
+        $this->engine->shouldReceive('map')
+            ->andReturn(
+                new EloquentCollection([$postA])
+            )
+            ->once();
+
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        type Post {
+            id: ID!
+        }
+
+        type Query {
+            posts(
+                task: ID! @eq(key: "task_id")
+            ): [Post!]!
+                @all(builder: "{$this->qualifyTestResolver('builderForScoutBuilder')}")
+        }
+GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            posts(task: "1") {
+                id
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'posts' => [
+                    [
+                        'id' => '1',
+                    ],
+                ],
+            ],
+        ]);
+
+        // Ensure `@eq` directive has been applied on scout builder instance
+        $builder->shouldHaveReceived('where')
+            ->with(
+                'task_id',
+                '1'
+            );
+    }
+
     public function builder(): Builder
     {
         return User::orderBy('id', 'DESC');
@@ -257,5 +381,10 @@ final class AllDirectiveTest extends DBTestCase
     public function builderForRelation(User $parent): Relation
     {
         return $parent->posts()->orderBy('id', 'DESC');
+    }
+
+    public function builderForScoutBuilder(): \Laravel\Scout\Builder
+    {
+        return Post::search('great title');
     }
 }
