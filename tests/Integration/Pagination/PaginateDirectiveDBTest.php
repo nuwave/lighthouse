@@ -610,12 +610,10 @@ GRAPHQL;
         }
         ';
 
-        $cursor = Cursor::encode(2);
-
-        $this->assertQueryCountMatches(2, function () use ($users, $cursor): void {
-            $this->graphQL(/** @lang GraphQL */ "
-            {
-                users(first: 2, after: \"{$cursor}\") {
+        $this->assertQueryCountMatches(2, function () use ($users): void {
+            $this->graphQL(/** @lang GraphQL */ '
+            query ($after: String!) {
+                users(first: 2, after: $after) {
                     pageInfo {
                       hasNextPage
                       hasPreviousPage
@@ -633,7 +631,9 @@ GRAPHQL;
                     }
                 }
             }
-            ")->assertJson([
+            ', [
+                'after' => Cursor::encode(2),
+            ])->assertJson([
                 'data' => [
                     'users' => [
                         'pageInfo' => [
@@ -676,9 +676,9 @@ GRAPHQL;
         $cursor = Cursor::encode(2);
 
         $this->assertQueryCountMatches(1, function () use ($users, $cursor): void {
-            $this->graphQL(/** @lang GraphQL */ "
-            {
-                users(first: 2, after: \"{$cursor}\") {
+            $this->graphQL(/** @lang GraphQL */ '
+            query ($after: String!) {
+                users(first: 2, after: $after) {
                     edges {
                         node {
                             id
@@ -686,7 +686,9 @@ GRAPHQL;
                     }
                 }
             }
-            ")->assertJson([
+            ', [
+                'after' => Cursor::encode(2),
+            ])->assertJson([
                 'data' => [
                     'users' => [
                         'edges' => [
