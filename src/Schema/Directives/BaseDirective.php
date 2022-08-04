@@ -114,9 +114,9 @@ abstract class BaseDirective implements Directive
     /**
      * Get the value of an argument on the directive.
      *
-     * @param  mixed|null  $default
+     * @param  mixed  $default Use this over `??` to preserve explicit `null`
      *
-     * @return mixed|null
+     * @return mixed The argument value or the default
      */
     protected function directiveArgValue(string $name, $default = null)
     {
