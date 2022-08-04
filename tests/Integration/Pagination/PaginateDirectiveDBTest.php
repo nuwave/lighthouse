@@ -3,14 +3,23 @@
 namespace Tests\Integration\Pagination;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Laravel\Scout\Builder as ScoutBuilder;
+use Mockery;
+use Nuwave\Lighthouse\Pagination\Cursor;
 use Tests\DBTestCase;
+use Tests\TestsScoutEngine;
 use Tests\Utils\Models\Comment;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
 
 final class PaginateDirectiveDBTest extends DBTestCase
 {
+    use TestsScoutEngine;
+
+    public const LIMIT_FROM_CUSTOM_SCOUT_BUILDER = 123;
+
     public function testPaginate(): void
     {
         factory(User::class, 3)->create();
@@ -140,6 +149,70 @@ GRAPHQL;
         ]);
     }
 
+    public function testSpecifyCustomBuilderForScoutBuilder(): void
+    {
+        $this->setUpScoutEngine();
+
+        $post = factory(Post::class)->create();
+        assert($post instanceof Post);
+
+        $this->engine->shouldReceive('map')
+            ->withArgs(function (ScoutBuilder $builder) use ($post): bool {
+                return $builder->wheres === ['id' => "$post->id"]
+                    && self::LIMIT_FROM_CUSTOM_SCOUT_BUILDER === $builder->limit;
+            })
+            ->andReturn(new EloquentCollection([$post]))
+            ->once();
+
+        $first = 42;
+        $page = 69;
+
+        $this->engine->shouldReceive('paginate')
+            ->with(
+                Mockery::type(ScoutBuilder::class),
+                $first,
+                $page
+            )
+            ->andReturn(new EloquentCollection([$post]))
+            ->once();
+
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        type Post {
+            id: ID!
+        }
+
+        type Query {
+            posts(
+                id: ID! @eq
+            ): [Post!]! @paginate(builder: "{$this->qualifyTestResolver('builderForScoutBuilder')}")
+        }
+GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($first: Int!, $page: Int!, $id: ID!) {
+            posts(first: $first, page: $page, id: $id) {
+                data {
+                    id
+                }
+            }
+        }
+        ', [
+            'first' => $first,
+            'page' => $page,
+            'id' => $post->id,
+        ])->assertJson([
+            'data' => [
+                'posts' => [
+                    'data' => [
+                        [
+                            'id' => "$post->id",
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
     public function testPaginateWithScopes(): void
     {
         $namedUser = factory(User::class)->make();
@@ -201,6 +274,12 @@ GRAPHQL;
     public function builderForRelation(User $parent): Relation
     {
         return $parent->posts()->orderBy('id', 'DESC');
+    }
+
+    public function builderForScoutBuilder(): ScoutBuilder
+    {
+        return Post::search('great title')
+            ->take(self::LIMIT_FROM_CUSTOM_SCOUT_BUILDER);
     }
 
     public function testCreateQueryPaginatorsWithDifferentPages(): void
@@ -508,6 +587,114 @@ GRAPHQL;
                             [
                                 'node' => [
                                     'id' => $user->id,
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ])->assertJsonCount(1, 'data.users.edges');
+        });
+    }
+
+    public function testQueriesConnectionPageOffset(): void
+    {
+        $users = factory(User::class, 3)->create();
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID!
+        }
+
+        type Query {
+            users: [User!]! @paginate(type: CONNECTION)
+        }
+        ';
+
+        $this->assertQueryCountMatches(2, function () use ($users): void {
+            $this->graphQL(/** @lang GraphQL */ '
+            query ($after: String!) {
+                users(first: 2, after: $after) {
+                    pageInfo {
+                      hasNextPage
+                      hasPreviousPage
+                      startCursor
+                      endCursor
+                      total
+                      count
+                      currentPage
+                      lastPage
+                    }
+                    edges {
+                        node {
+                            id
+                        }
+                    }
+                }
+            }
+            ', [
+                'after' => Cursor::encode(2),
+            ])->assertJson([
+                'data' => [
+                    'users' => [
+                        'pageInfo' => [
+                            'hasNextPage' => false,
+                            'hasPreviousPage' => true,
+                            'startCursor' => 'Mw==',
+                            'endCursor' => 'Mw==',
+                            'total' => 3,
+                            'count' => 1,
+                            'currentPage' => 2,
+                            'lastPage' => 2,
+                        ],
+                        'edges' => [
+                            [
+                                'node' => [
+                                    'id' => $users[2]->id,
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ])->assertJsonCount(1, 'data.users.edges');
+        });
+    }
+
+    public function testQueriesConnectionPageOffsetWithoutPageInfo(): void
+    {
+        $users = factory(User::class, 3)->create();
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID!
+        }
+
+        type Query {
+            users: [User!]! @paginate(type: CONNECTION)
+        }
+        ';
+
+        $cursor = Cursor::encode(2);
+
+        $this->assertQueryCountMatches(1, function () use ($users): void {
+            $this->graphQL(/** @lang GraphQL */ '
+            query ($after: String!) {
+                users(first: 2, after: $after) {
+                    edges {
+                        node {
+                            id
+                        }
+                    }
+                }
+            }
+            ', [
+                'after' => Cursor::encode(2),
+            ])->assertJson([
+                'data' => [
+                    'users' => [
+                        'edges' => [
+                            [
+                                'node' => [
+                                    'id' => $users[2]->id,
                                 ],
                             ],
                         ],

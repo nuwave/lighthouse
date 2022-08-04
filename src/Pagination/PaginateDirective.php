@@ -9,6 +9,7 @@ use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Laravel\Scout\Builder as ScoutBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -112,7 +113,7 @@ GRAPHQL;
 
                 $query = $builderResolver($root, $args, $context, $resolveInfo);
                 assert(
-                    $query instanceof QueryBuilder || $query instanceof EloquentBuilder || $query instanceof Relation,
+                    $query instanceof QueryBuilder || $query instanceof EloquentBuilder || $query instanceof ScoutBuilder || $query instanceof Relation,
                     "The method referenced by the builder argument of the @{$this->name()} directive on {$this->nodeName()} must return a Builder or Relation."
                 );
             } else {
@@ -126,8 +127,11 @@ GRAPHQL;
                     $this->directiveArgValue('scopes') ?? []
                 );
 
-            return PaginationArgs::extractArgs($args, $this->optimalPaginationType($resolveInfo), $this->paginateMaxCount())
-                ->applyToBuilder($query);
+            $paginationArgs = PaginationArgs::extractArgs($args, $this->paginationType(), $this->paginateMaxCount());
+
+            $paginationArgs->type = $this->optimalPaginationType($resolveInfo);
+
+            return $paginationArgs->applyToBuilder($query);
         });
 
         return $fieldValue;
