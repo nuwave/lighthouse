@@ -343,7 +343,6 @@ final class MorphManyDirectiveTest extends DBTestCase
             }
             ")
             ->assertGraphQLErrorFree();
-
     }
 
     public function testHandlesPaginationWithCountZero(): void
