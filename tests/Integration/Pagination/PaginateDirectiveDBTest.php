@@ -675,7 +675,7 @@ GRAPHQL;
 
         $cursor = Cursor::encode(2);
 
-        $this->assertQueryCountMatches(1, function () use ($users, $cursor): void {
+        $this->assertQueryCountMatches(1, function () use ($users): void {
             $this->graphQL(/** @lang GraphQL */ '
             query ($after: String!) {
                 users(first: 2, after: $after) {
