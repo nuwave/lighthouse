@@ -181,14 +181,12 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
 
     protected function paginationMaxCount(): ?int
     {
-        return $this->directiveArgValue('maxCount')
-            ?? $this->lighthouseConfig['pagination']['max_count'];
+        return $this->directiveArgValue('maxCount', $this->lighthouseConfig['pagination']['max_count']);
     }
 
     protected function paginationDefaultCount(): ?int
     {
-        return $this->directiveArgValue('defaultCount')
-            ?? $this->lighthouseConfig['pagination']['default_count'];
+        return $this->directiveArgValue('defaultCount', $this->lighthouseConfig['pagination']['default_count']);
     }
 
     protected function isSameConnection(Relation $relation): bool

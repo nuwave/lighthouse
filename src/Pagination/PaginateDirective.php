@@ -164,13 +164,11 @@ GRAPHQL;
 
     protected function defaultCount(): ?int
     {
-        return $this->directiveArgValue('defaultCount')
-            ?? config('lighthouse.pagination.default_count');
+        return $this->directiveArgValue('defaultCount', config('lighthouse.pagination.default_count'));
     }
 
     protected function paginateMaxCount(): ?int
     {
-        return $this->directiveArgValue('maxCount')
-            ?? config('lighthouse.pagination.max_count');
+        return $this->directiveArgValue('maxCount', config('lighthouse.pagination.max_count'));
     }
 }

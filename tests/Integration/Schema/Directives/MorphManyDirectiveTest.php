@@ -306,6 +306,46 @@ final class MorphManyDirectiveTest extends DBTestCase
         );
     }
 
+    public function testPaginatorTypeIsUnlimitedByMaxCountFromDirective(): void
+    {
+        config(['lighthouse.pagination.max_count' => 1]);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Post {
+            id: ID!
+            title: String!
+            images: [Image!] @morphMany(type: PAGINATOR, maxCount: null)
+        }
+
+        type Image {
+            id: ID!
+        }
+
+        type Query {
+            post (
+                id: ID! @eq
+            ): Post @find
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ "
+            {
+                post(id: {$this->post->id}) {
+                    id
+                    title
+                    images(first: 10) {
+                        data {
+                            id
+                        }
+                    }
+                }
+            }
+            ")
+            ->assertGraphQLErrorFree();
+
+    }
+
     public function testHandlesPaginationWithCountZero(): void
     {
         $this->schema = /** @lang GraphQL */ '
