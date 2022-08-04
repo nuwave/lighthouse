@@ -486,35 +486,6 @@ GRAPHQL
         );
     }
 
-    public function testIsUnlimitedByMaxCountFromDirective(): void
-    {
-        config(['lighthouse.pagination.max_count' => 5]);
-
-        $this->schema = /** @lang GraphQL */ '
-        type User {
-            id: ID!
-            name: String!
-        }
-
-        type Query {
-            users: [User!]! @paginate(maxCount: null)
-        }
-        ';
-
-        $this
-            ->graphQL(/** @lang GraphQL */ '
-            {
-                users(first: 10) {
-                    data {
-                        id
-                        name
-                    }
-                }
-            }
-            ')
-            ->assertGraphQLErrorFree();
-    }
-
     public function testIsLimitedToMaxCountFromConfig(): void
     {
         config(['lighthouse.pagination.max_count' => 5]);
