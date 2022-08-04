@@ -127,8 +127,11 @@ GRAPHQL;
                     $this->directiveArgValue('scopes') ?? []
                 );
 
-            return PaginationArgs::extractArgs($args, $this->optimalPaginationType($resolveInfo), $this->paginateMaxCount())
-                ->applyToBuilder($query);
+            $paginationArgs = PaginationArgs::extractArgs($args, $this->paginationType(), $this->paginateMaxCount());
+
+            $paginationArgs->type = $this->optimalPaginationType($resolveInfo);
+
+            return $paginationArgs->applyToBuilder($query);
         });
 
         return $fieldValue;
