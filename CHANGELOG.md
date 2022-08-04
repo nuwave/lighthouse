@@ -11,7 +11,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Changed
 
-- Setting explicitly `maxCount: null` or `defaultCount: null` in schema now behaves same as in configuration `lighthouse.pagination`
+- Respect explicit `maxCount: null` or `defaultCount: null` in pagination directives over config `lighthouse.pagination`
 
 ## v5.57.3
 
