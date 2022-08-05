@@ -148,8 +148,7 @@ abstract class BaseDirective implements Directive
      */
     protected function getModelClass(string $argumentName = 'model'): string
     {
-        $model = $this->directiveArgValue($argumentName)
-            ?? ASTHelper::modelName($this->definitionNode);
+        $model = $this->directiveArgValue($argumentName, ASTHelper::modelName($this->definitionNode));
 
         if (! $model) {
             throw new DefinitionException(

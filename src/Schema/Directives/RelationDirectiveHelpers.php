@@ -18,14 +18,12 @@ trait RelationDirectiveHelpers
      */
     protected function scopes(): array
     {
-        return $this->directiveArgValue('scopes')
-            ?? [];
+        return $this->directiveArgValue('scopes', []);
     }
 
     protected function relation(): string
     {
-        return $this->directiveArgValue('relation')
-            ?? $this->nodeName();
+        return $this->directiveArgValue('relation', $this->nodeName());
     }
 
     /**

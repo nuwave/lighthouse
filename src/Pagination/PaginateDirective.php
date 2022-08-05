@@ -126,7 +126,7 @@ GRAPHQL;
                 ->argumentSet
                 ->enhanceBuilder(
                     $query,
-                    $this->directiveArgValue('scopes') ?? []
+                    $this->directiveArgValue('scopes', [])
                 );
 
             $paginationArgs = PaginationArgs::extractArgs($args, $this->paginationType(), $this->paginateMaxCount());
@@ -160,7 +160,7 @@ GRAPHQL;
     protected function paginationType(): PaginationType
     {
         return new PaginationType(
-            $this->directiveArgValue('type') ?? PaginationType::PAGINATOR
+            $this->directiveArgValue('type', PaginationType::PAGINATOR)
         );
     }
 
