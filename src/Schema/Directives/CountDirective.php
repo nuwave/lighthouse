@@ -64,7 +64,7 @@ GRAPHQL;
 
                 $this->makeBuilderDecorator($resolveInfo)($query);
 
-                if ($this->directiveArgValue('distinct') ?? false) {
+                if ($this->directiveArgValue('distinct')) {
                     $query->distinct();
                 }
 

@@ -167,7 +167,7 @@ GRAPHQL;
             return $argumentSet
                 ->enhanceBuilder(
                     $this->getModelClass()::query(),
-                    $this->directiveArgValue('scopes') ?? []
+                    $this->directiveArgValue('scopes', [])
                 )
                 ->get();
         }
@@ -201,7 +201,7 @@ GRAPHQL;
             try {
                 $enhancedBuilder = $argumentSet->enhanceBuilder(
                     $queryBuilder,
-                    $this->directiveArgValue('scopes') ?? [],
+                    $this->directiveArgValue('scopes', []),
                     Utils::instanceofMatcher(TrashedDirective::class)
                 );
                 assert($enhancedBuilder instanceof Builder);

@@ -114,9 +114,9 @@ abstract class BaseDirective implements Directive
     /**
      * Get the value of an argument on the directive.
      *
-     * @param  mixed|null  $default
+     * @param  mixed  $default Use this over `??` to preserve explicit `null`
      *
-     * @return mixed|null
+     * @return mixed The argument value or the default
      */
     protected function directiveArgValue(string $name, $default = null)
     {
@@ -148,8 +148,7 @@ abstract class BaseDirective implements Directive
      */
     protected function getModelClass(string $argumentName = 'model'): string
     {
-        $model = $this->directiveArgValue($argumentName)
-            ?? ASTHelper::modelName($this->definitionNode);
+        $model = $this->directiveArgValue($argumentName, ASTHelper::modelName($this->definitionNode));
 
         if (! $model) {
             throw new DefinitionException(

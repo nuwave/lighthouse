@@ -48,7 +48,6 @@ trait GeneratesColumnsEnum
         ObjectTypeDefinitionNode &$parentType
     ): string {
         $columnsEnum = $this->directiveArgValue('columnsEnum');
-
         if (! is_null($columnsEnum)) {
             return $columnsEnum;
         }

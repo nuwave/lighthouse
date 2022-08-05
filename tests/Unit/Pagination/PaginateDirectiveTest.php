@@ -554,6 +554,34 @@ GRAPHQL
         );
     }
 
+    public function testCountExplicitlyRequiredFromDirective(): void
+    {
+        config(['lighthouse.pagination.default_count' => 2]);
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID!
+            name: String!
+        }
+
+        type Query {
+            users: [User!] @paginate(defaultCount: null)
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                users {
+                    data {
+                        id
+                    }
+                }
+            }
+            ')
+            ->assertGraphQLErrorMessage('Field "users" argument "first" of type "Int!" is required but not provided.');
+    }
+
     /**
      * @dataProvider nonNullPaginationResults
      */

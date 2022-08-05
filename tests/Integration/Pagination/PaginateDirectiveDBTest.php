@@ -796,6 +796,35 @@ GRAPHQL;
         ')->assertJsonCount($defaultCount, 'data.users.data');
     }
 
+    public function testIsUnlimitedByMaxCountFromDirective(): void
+    {
+        config(['lighthouse.pagination.max_count' => 5]);
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID!
+            name: String!
+        }
+
+        type Query {
+            users: [User!]! @paginate(maxCount: null)
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                users(first: 10) {
+                    data {
+                        id
+                        name
+                    }
+                }
+            }
+            ')
+            ->assertGraphQLErrorFree();
+    }
+
     public function testQueriesSimplePagination(): void
     {
         config(['lighthouse.pagination.default_count' => 10]);

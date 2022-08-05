@@ -60,7 +60,7 @@ GRAPHQL;
                 ->argumentSet
                 ->enhanceBuilder(
                     $query,
-                    $this->directiveArgValue('scopes') ?? []
+                    $this->directiveArgValue('scopes', [])
                 )
                 ->get();
         });

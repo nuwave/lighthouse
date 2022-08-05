@@ -54,9 +54,11 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
      */
     public function __invoke($parent, $args)
     {
-        $relationName = $this->directiveArgValue('relation')
+        $relationName = $this->directiveArgValue(
+            'relation',
             // Use the name of the argument if no explicit relation name is given
-            ?? $this->nodeName();
+            $this->nodeName()
+        );
 
         $relation = $parent->{$relationName}();
         assert($relation instanceof Relation);
