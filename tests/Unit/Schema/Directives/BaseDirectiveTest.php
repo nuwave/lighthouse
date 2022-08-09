@@ -65,6 +65,18 @@ final class BaseDirectiveTest extends TestCase
         );
     }
 
+    public function testBuiltInTypeTolerated(): void
+    {
+        $directive = $this->constructFieldDirective('foo: String @dummy(model: "Team")');
+
+        $directive->getModelClass();
+
+        $this->assertSame(
+            Team::class,
+            $directive->getModelClass()
+        );
+    }
+
     public function testThrowsIfTheClassIsNotInTheSchema(): void
     {
         $directive = $this->constructFieldDirective('foo: UnknownType @dummy');
