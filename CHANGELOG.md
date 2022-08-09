@@ -13,7 +13,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Fixed
 
-- Fix directive option `model` on schema elements using built-in types
+- Fix directive option `model` on schema elements using built-in types https://github.com/nuwave/lighthouse/pull/2196
 
 ## v5.57.4
 
