@@ -198,7 +198,7 @@ final class BaseDirectiveTest extends TestCase
             }
 
             /**
-             * Allow to call protected methods from the test.
+             * Allows calling protected methods from the test.
              *
              * @param  array<mixed>  $args
              *
