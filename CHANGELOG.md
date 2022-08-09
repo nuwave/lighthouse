@@ -19,7 +19,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Fixed
 
-- Respect explicit `maxCount: null` or `defaultCount: null` in pagination directives over config `lighthouse.pagination`
+- Respect explicit `maxCount: null` or `defaultCount: null` in pagination directives over config `lighthouse.pagination` https://github.com/nuwave/lighthouse/pull/2193
 
 ## v5.57.3
 
