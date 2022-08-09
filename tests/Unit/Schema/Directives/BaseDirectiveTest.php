@@ -77,8 +77,6 @@ final class BaseDirectiveTest extends TestCase
     {
         $directive = $this->constructFieldDirective('foo: String @dummy(model: "Team")');
 
-        $directive->getModelClass();
-
         $this->assertSame(
             Team::class,
             $directive->getModelClass()
