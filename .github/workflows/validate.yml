@@ -16,7 +16,7 @@ env:
 
 jobs:
   static-analysis:
-    name: ${{ matrix.actions.name }} on PHP ${{ matrix.php-version }} with Laravel ${{ matrix.laravel-version }}
+    name: PHPStan on PHP ${{ matrix.php-version }} with Laravel ${{ matrix.laravel-version }}
     runs-on: ubuntu-latest
 
     strategy:
