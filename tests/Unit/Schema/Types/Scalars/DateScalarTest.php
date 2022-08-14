@@ -2,9 +2,6 @@
 
 namespace Tests\Unit\Schema\Types\Scalars;
 
-use Carbon\Carbon;
-use Carbon\Carbon;
-use Carbon\Carbon;
 use Carbon\Carbon as CarbonCarbon;
 use Carbon\CarbonImmutable as CarbonCarbonImmutable;
 use GraphQL\Error\Error;
@@ -82,7 +79,7 @@ abstract class DateScalarTest extends TestCase
      */
     public function testParsesValueString(string $date): void
     {
-        if (! method_exists(Carbon::class, 'createFromIsoFormat')) {
+        if (! method_exists(CarbonCarbon::class, 'createFromIsoFormat')) {
             $this->markTestSkipped('createFromIsoFormat is not in older Carbon versions');
         }
 
@@ -97,7 +94,7 @@ abstract class DateScalarTest extends TestCase
      */
     public function testParsesLiteral(string $date): void
     {
-        if (! method_exists(Carbon::class, 'createFromIsoFormat')) {
+        if (! method_exists(CarbonCarbon::class, 'createFromIsoFormat')) {
             $this->markTestSkipped('createFromIsoFormat is not in older Carbon versions');
         }
 
@@ -120,7 +117,7 @@ abstract class DateScalarTest extends TestCase
 
     public function testSerializesCarbonInstance(): void
     {
-        if (! method_exists(Carbon::class, 'toJSON')) {
+        if (! method_exists(CarbonCarbon::class, 'toJSON')) {
             $this->markTestSkipped('toJSON is not in older Carbon versions');
         }
 
@@ -136,7 +133,7 @@ abstract class DateScalarTest extends TestCase
      */
     public function testCanonicalizesValidDateString(string $date, string $canonical): void
     {
-        if (! method_exists(Carbon::class, 'createFromIsoFormat')) {
+        if (! method_exists(CarbonCarbon::class, 'createFromIsoFormat')) {
             $this->markTestSkipped('createFromIsoFormat is not in older Carbon versions');
         }
 
