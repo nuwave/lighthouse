@@ -13,7 +13,7 @@ use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\RootType;
 use Tests\TestCase;
 
-class ArgumentSetFactoryTest extends TestCase
+final class ArgumentSetFactoryTest extends TestCase
 {
     public function testSimpleField(): void
     {

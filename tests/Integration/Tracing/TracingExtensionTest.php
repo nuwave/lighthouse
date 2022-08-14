@@ -5,7 +5,7 @@ namespace Tests\Integration\Tracing;
 use Nuwave\Lighthouse\Tracing\TracingServiceProvider;
 use Tests\TestCase;
 
-class TracingExtensionTest extends TestCase
+final class TracingExtensionTest extends TestCase
 {
     protected $schema = /** @lang GraphQL */ '
     type Query {

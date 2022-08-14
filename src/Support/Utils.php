@@ -84,19 +84,55 @@ class Utils
     }
 
     /**
-     * Apply a callback to a value or each value in an array.
+     * Map a value or each value in an array.
      *
      * @param  mixed|array<mixed>  $valueOrValues
      *
      * @return mixed|array<mixed>
      */
-    public static function applyEach(Closure $callback, $valueOrValues)
+    public static function mapEach(Closure $callback, $valueOrValues)
     {
         if (is_array($valueOrValues)) {
             return array_map($callback, $valueOrValues);
         }
 
         return $callback($valueOrValues);
+    }
+
+    /**
+     * Map a value or each value in an array.
+     *
+     * @param  mixed|array<mixed>  $valueOrValues
+     *
+     * @return mixed|array<mixed>
+     */
+    public static function mapEachRecursive(Closure $callback, $valueOrValues)
+    {
+        if (is_array($valueOrValues)) {
+            return array_map(function ($value) use ($callback) {
+                return static::mapEachRecursive($callback, $value);
+            }, $valueOrValues);
+        }
+
+        return $callback($valueOrValues);
+    }
+
+    /**
+     * Apply a callback to a value or each value in an iterable.
+     *
+     * @param  mixed|iterable<mixed>  $valueOrValues
+     */
+    public static function applyEach(Closure $callback, $valueOrValues): void
+    {
+        if (is_iterable($valueOrValues)) {
+            foreach ($valueOrValues as $value) {
+                $callback($value);
+            }
+
+            return;
+        }
+
+        $callback($valueOrValues);
     }
 
     /**

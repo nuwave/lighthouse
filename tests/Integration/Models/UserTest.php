@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
-class UserTest extends DBTestCase
+final class UserTest extends DBTestCase
 {
     public function testInsertRecordsIntoTestDB(): void
     {

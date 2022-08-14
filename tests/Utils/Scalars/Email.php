@@ -7,7 +7,7 @@ use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Utils\Utils;
 
-class Email extends ScalarType
+final class Email extends ScalarType
 {
     /**
      * @var string

@@ -12,7 +12,7 @@ use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class MorphManyDirectiveTest extends DBTestCase
+final class MorphManyDirectiveTest extends DBTestCase
 {
     use WithFaker;
 
@@ -304,6 +304,45 @@ class MorphManyDirectiveTest extends DBTestCase
             PaginationArgs::requestedTooManyItems(2, 10),
             $result->json('errors.0.message')
         );
+    }
+
+    public function testPaginatorTypeIsUnlimitedByMaxCountFromDirective(): void
+    {
+        config(['lighthouse.pagination.max_count' => 1]);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Post {
+            id: ID!
+            title: String!
+            images: [Image!] @morphMany(type: PAGINATOR, maxCount: null)
+        }
+
+        type Image {
+            id: ID!
+        }
+
+        type Query {
+            post (
+                id: ID! @eq
+            ): Post @find
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ "
+            {
+                post(id: {$this->post->id}) {
+                    id
+                    title
+                    images(first: 10) {
+                        data {
+                            id
+                        }
+                    }
+                }
+            }
+            ")
+            ->assertGraphQLErrorFree();
     }
 
     public function testHandlesPaginationWithCountZero(): void

@@ -6,9 +6,9 @@ use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
+use Nuwave\Lighthouse\Cache\CacheKeyDirective;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
-use Nuwave\Lighthouse\Schema\Directives\CacheKeyDirective;
 use Nuwave\Lighthouse\Schema\RootType;
 
 class TypeValue
@@ -71,7 +71,7 @@ class TypeValue
             // First priority: Look for a field with the @cacheKey directive
             foreach ($fieldDefinitions as $field) {
                 if (ASTHelper::hasDirective($field, CacheKeyDirective::NAME)) {
-                    return $this->cacheKey = $field->name->value;
+                    return $this->cacheKey = ASTHelper::internalFieldName($field);
                 }
             }
 
@@ -84,13 +84,11 @@ class TypeValue
                     && $fieldType->type instanceof NamedTypeNode
                     && 'ID' === $fieldType->type->name->value
                 ) {
-                    return $this->cacheKey = $field->name->value;
+                    return $this->cacheKey = ASTHelper::internalFieldName($field);
                 }
             }
 
-            throw new DefinitionException(
-                "No @cacheKey or ID field defined on {$typeName}"
-            );
+            throw new DefinitionException("No @cacheKey or ID field defined on {$typeName}");
         }
 
         return $this->cacheKey;

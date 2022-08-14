@@ -4,7 +4,7 @@ namespace Tests\Integration;
 
 use Tests\TestCase;
 
-class MultipleRequestsTest extends TestCase
+final class MultipleRequestsTest extends TestCase
 {
     public function testFireMultipleRequestsInOneTest(): void
     {

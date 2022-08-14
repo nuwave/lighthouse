@@ -7,7 +7,7 @@ use GraphQL\Validator\Rules\QueryComplexity;
 use GraphQL\Validator\Rules\QueryDepth;
 use Tests\TestCase;
 
-class SecurityTest extends TestCase
+final class SecurityTest extends TestCase
 {
     public function testSetMaxComplexityThroughConfig(): void
     {
@@ -46,30 +46,27 @@ class SecurityTest extends TestCase
 
     public function testDisableIntrospectionThroughConfig(): void
     {
-        config(['lighthouse.security.disable_introspection' => true]);
+        config(['lighthouse.security.disable_introspection' => DisableIntrospection::ENABLED]);
 
         $this->assertIntrospectionIsDisabled();
     }
 
     protected function assertMaxQueryComplexityIs1(): void
     {
-        $result = $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 name
             }
         }
-        ');
-
-        $this->assertSame(
-            QueryComplexity::maxQueryComplexityErrorMessage(1, 2),
-            $result->json('errors.0.message')
+        ')->assertGraphQLErrorMessage(
+            QueryComplexity::maxQueryComplexityErrorMessage(1, 2)
         );
     }
 
     protected function assertMaxQueryDepthIs1(): void
     {
-        $result = $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ '
         {
             user {
                 user {
@@ -79,17 +76,14 @@ class SecurityTest extends TestCase
                 }
             }
         }
-        ');
-
-        $this->assertSame(
-            QueryDepth::maxQueryDepthErrorMessage(1, 2),
-            $result->json('errors.0.message')
+        ')->assertGraphQLErrorMessage(
+            QueryDepth::maxQueryDepthErrorMessage(1, 2)
         );
     }
 
     protected function assertIntrospectionIsDisabled(): void
     {
-        $result = $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ '
         {
             __schema {
                 queryType {
@@ -97,11 +91,8 @@ class SecurityTest extends TestCase
                 }
             }
         }
-        ');
-
-        $this->assertSame(
-            DisableIntrospection::introspectionDisabledMessage(),
-            $result->json('errors.0.message')
+        ')->assertGraphQLErrorMessage(
+            DisableIntrospection::introspectionDisabledMessage()
         );
     }
 }

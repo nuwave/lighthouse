@@ -1,11 +1,11 @@
 <?php
 
-namespace Tests\Integration\Schema\Directives;
+namespace Tests\Integration\Cache;
 
 use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\TestCase;
 
-class ClearCacheDirectiveTest extends TestCase
+final class ClearCacheDirectiveTest extends TestCase
 {
     /**
      * @var \Illuminate\Contracts\Cache\Repository

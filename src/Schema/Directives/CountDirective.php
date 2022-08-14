@@ -39,6 +39,17 @@ directive @count(
   Apply scopes to the underlying query.
   """
   scopes: [String!]
+
+  """
+  Count only rows where the given columns are non-null.
+  `*` counts every row.
+  """
+  columns: [String!]! = ["*"]
+
+  """
+  Should exclude duplicated rows?
+  """
+  distinct: Boolean! = false
 ) on FIELD_DEFINITION
 GRAPHQL;
     }
@@ -47,40 +58,45 @@ GRAPHQL;
     {
         $modelArg = $this->directiveArgValue('model');
         if (is_string($modelArg)) {
-            $fieldValue->setResolver(
-                function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg): int {
-                    $query = $this
-                        ->namespaceModelClass($modelArg)::query();
+            $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg): int {
+                $query = $this
+                    ->namespaceModelClass($modelArg)::query();
 
-                    $this->makeBuilderDecorator($resolveInfo)($query);
+                $this->makeBuilderDecorator($resolveInfo)($query);
 
-                    return $query->count();
+                if ($this->directiveArgValue('distinct')) {
+                    $query->distinct();
                 }
-            );
+
+                $columns = $this->directiveArgValue('columns');
+                if ($columns) {
+                    return $query->count(...$columns);
+                }
+
+                return $query->count();
+            });
 
             return $fieldValue;
         }
 
         $relation = $this->directiveArgValue('relation');
         if (is_string($relation)) {
-            $fieldValue->setResolver(
-                function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
-                    /** @var \Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader $relationBatchLoader */
-                    $relationBatchLoader = BatchLoaderRegistry::instance(
-                        array_merge(
-                            $this->qualifyPath($args, $resolveInfo),
-                            ['count']
-                        ),
-                        function () use ($resolveInfo): RelationBatchLoader {
-                            return new RelationBatchLoader(
-                                new CountModelsLoader($this->relation(), $this->makeBuilderDecorator($resolveInfo))
-                            );
-                        }
-                    );
+            $fieldValue->setResolver(function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
+                /** @var \Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader $relationBatchLoader */
+                $relationBatchLoader = BatchLoaderRegistry::instance(
+                    array_merge(
+                        $this->qualifyPath($args, $resolveInfo),
+                        ['count']
+                    ),
+                    function () use ($resolveInfo): RelationBatchLoader {
+                        return new RelationBatchLoader(
+                            new CountModelsLoader($this->relation(), $this->makeBuilderDecorator($resolveInfo))
+                        );
+                    }
+                );
 
-                    return $relationBatchLoader->load($parent);
-                }
-            );
+                return $relationBatchLoader->load($parent);
+            });
 
             return $fieldValue;
         }

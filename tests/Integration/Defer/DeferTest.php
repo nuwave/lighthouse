@@ -9,7 +9,7 @@ use Nuwave\Lighthouse\Defer\DeferrableDirective;
 use Nuwave\Lighthouse\Defer\DeferServiceProvider;
 use Tests\TestCase;
 
-class DeferTest extends TestCase
+final class DeferTest extends TestCase
 {
     public function setUp(): void
     {

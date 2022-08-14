@@ -4,7 +4,7 @@ namespace Tests\Unit\Schema\Directives;
 
 use Tests\TestCase;
 
-class SpreadDirectiveTest extends TestCase
+final class SpreadDirectiveTest extends TestCase
 {
     public function testNestedSpread(): void
     {

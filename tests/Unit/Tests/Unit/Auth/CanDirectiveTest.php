@@ -4,13 +4,12 @@ namespace Tests\Unit\Auth;
 
 use Nuwave\Lighthouse\Auth\CanDirective;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\TestCase;
 use Tests\Utils\Models\User;
 use Tests\Utils\Policies\UserPolicy;
 
-class CanDirectiveTest extends TestCase
+final class CanDirectiveTest extends TestCase
 {
     public function testThrowsIfNotAuthorized(): void
     {
@@ -117,6 +116,43 @@ class CanDirectiveTest extends TestCase
         type Query {
             user: User!
                 @can(ability: "adminOnly")
+                @mock
+        }
+
+        type User {
+            name: String
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            user {
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'name' => 'foo',
+                ],
+            ],
+        ]);
+    }
+
+    public function testChecksAgainstResolvedModels(): void
+    {
+        $user = new User();
+        $user->name = UserPolicy::ADMIN;
+        $this->be($user);
+
+        $this->mockResolver(function (): User {
+            return $this->resolveUser();
+        });
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            user: User!
+                @can(ability: "view", resolved: true)
                 @mock
         }
 
@@ -311,15 +347,17 @@ class CanDirectiveTest extends TestCase
         ]);
     }
 
-    public function testFindAndQueryAreMutuallyExclusive(): void
+    /**
+     * @dataProvider multipleMutuallyExclusiveArguments
+     */
+    public function testMultipleMutuallyExclusiveArgument(string $arguments): void
     {
-        $this->expectException(DefinitionException::class);
-        $this->expectExceptionMessage(CanDirective::findAndQueryAreMutuallyExclusive());
+        $this->expectExceptionObject(CanDirective::multipleMutuallyExclusiveArguments());
 
-        $this->buildSchema(/** @lang GraphQL */ '
+        $this->buildSchema(/** @lang GraphQL */ <<<GRAPHQL
         type Query {
             user(id: ID! @eq): User
-                @can(ability: "view", find: "id", query: true)
+                @can(ability: "view", {$arguments})
                 @first
         }
 
@@ -327,7 +365,20 @@ class CanDirectiveTest extends TestCase
             id: ID!
             name: String!
         }
-        ');
+
+GRAPHQL
+        );
+    }
+
+    /**
+     * @return iterable<array{string}>
+     */
+    public function multipleMutuallyExclusiveArguments(): iterable
+    {
+        yield ['resolve: "id", query: true'];
+        yield ['query: true, find: "id"'];
+        yield ['find: "id", resolve: true'];
+        yield ['resolve: "id", query: true, find: "id"'];
     }
 
     public function resolveUser(): User

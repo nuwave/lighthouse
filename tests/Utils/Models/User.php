@@ -45,7 +45,7 @@ use Tests\Integration\Execution\DataLoader\RelationBatchLoaderTest;
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Task> $tasks
  * @property-read \Tests\Utils\Models\Team|null $team
  */
-class User extends Authenticatable
+final class User extends Authenticatable
 {
     /**
      * Ensure that this is functionally equivalent to leaving this as null.
@@ -98,6 +98,11 @@ class User extends Authenticatable
     public function team(): BelongsTo
     {
         return $this->belongsTo(Team::class);
+    }
+
+    public function customPrimaryKeys(): HasMany
+    {
+        return $this->hasMany(CustomPrimaryKey::class, 'user_id');
     }
 
     public function scopeCompanyName(Builder $query, array $args): Builder

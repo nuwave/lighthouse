@@ -8,7 +8,7 @@ use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Nuwave\Lighthouse\Execution\AuthorizationErrorHandler;
 use Tests\TestCase;
 
-class AuthorizationErrorHandlerTest extends TestCase
+final class AuthorizationErrorHandlerTest extends TestCase
 {
     public function testWrapsLaravelAuthorizationException(): void
     {

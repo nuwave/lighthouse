@@ -181,6 +181,13 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 class StartExecution
 {
     /**
+     * The parsed schema.
+     *
+     * @var \GraphQL\Type\Schema;
+     */
+    public $schema;
+
+    /**
      * The client given parsed query string.
      *
      * @var \GraphQL\Language\AST\DocumentNode
@@ -218,8 +225,9 @@ class StartExecution
     /**
      * @param array<string, mixed>|null $variables
      */
-    public function __construct(DocumentNode $query, ?array $variables, ?string $operationName, GraphQLContext $context)
+    public function __construct(Schema $schema, DocumentNode $query, ?array $variables, ?string $operationName, GraphQLContext $context)
     {
+        $this->schema = $schema;
         $this->query = $query;
         $this->variables = $variables;
         $this->operationName = $operationName;

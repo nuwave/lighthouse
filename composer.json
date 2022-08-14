@@ -43,7 +43,7 @@
         "webonyx/graphql-php": "^14.7"
     },
     "require-dev": {
-        "bensampo/laravel-enum": "^1.28.3 || ^2 || ^3 || ^4 || ^5",
+        "bensampo/laravel-enum": "^1.28.3 || ^2 || ^3 || ^4 || ^5 || ^6",
         "ergebnis/composer-normalize": "^2.2.2",
         "laravel/framework": "5.6.* || 5.7.* || 5.8.* || ^6 || ^7 || ^8 || ^9",
         "laravel/legacy-factories": "^1",
@@ -87,7 +87,8 @@
     "config": {
         "allow-plugins": {
             "composer/package-versions-deprecated": true,
-            "ergebnis/composer-normalize": true
+            "ergebnis/composer-normalize": true,
+            "kylekatarnls/update-helper": true
         },
         "sort-packages": true
     },
@@ -99,6 +100,7 @@
             "providers": [
                 "Nuwave\\Lighthouse\\LighthouseServiceProvider",
                 "Nuwave\\Lighthouse\\Auth\\AuthServiceProvider",
+                "Nuwave\\Lighthouse\\Cache\\CacheServiceProvider",
                 "Nuwave\\Lighthouse\\GlobalId\\GlobalIdServiceProvider",
                 "Nuwave\\Lighthouse\\OrderBy\\OrderByServiceProvider",
                 "Nuwave\\Lighthouse\\Pagination\\PaginationServiceProvider",
@@ -107,12 +109,5 @@
                 "Nuwave\\Lighthouse\\Validation\\ValidationServiceProvider"
             ]
         }
-    },
-    "scripts": {
-        "rector": "rector process -v src/ tests/",
-        "stan": "phpstan analyse --memory-limit 2048M",
-        "test": "phpunit --colors=always",
-        "test:integration": "phpunit --colors=always --testsuite Integration",
-        "test:unit": "phpunit --colors=always --testsuite Unit"
     }
 }

@@ -130,6 +130,7 @@ Currently, the following directives use the defined filters for resolving the qu
 - [@find](../api-reference/directives.md#find)
 - [@first](../api-reference/directives.md#first)
 - [@hasMany](../api-reference/directives.md#hasmany)
+- [@hasManyThrough](../api-reference/directives.md#hasmanythrough)
 - [@hasOne](../api-reference/directives.md#hasone)
 - [@belongsTo](../api-reference/directives.md#belongsto)
 - [@belongsToMany](../api-reference/directives.md#belongstomany)

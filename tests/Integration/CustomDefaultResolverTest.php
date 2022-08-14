@@ -5,7 +5,7 @@ namespace Tests\Integration;
 use GraphQL\Executor\Executor;
 use Tests\TestCase;
 
-class CustomDefaultResolverTest extends TestCase
+final class CustomDefaultResolverTest extends TestCase
 {
     public const CUSTOM_RESOLVER_RESULT = 123;
 

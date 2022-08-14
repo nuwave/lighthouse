@@ -5,7 +5,7 @@ namespace Tests\Unit\Schema\Directives;
 use Tests\TestCase;
 use Tests\Utils\QueriesSecondary\Foo;
 
-class NamespaceDirectiveTest extends TestCase
+final class NamespaceDirectiveTest extends TestCase
 {
     public function testSetNamespaceOnField(): void
     {

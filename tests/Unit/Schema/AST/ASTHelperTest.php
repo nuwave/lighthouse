@@ -3,12 +3,15 @@
 namespace Tests\Unit\Schema\AST;
 
 use GraphQL\Language\AST\DirectiveDefinitionNode;
+use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use GraphQL\Language\Parser;
+use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Tests\TestCase;
 
-class ASTHelperTest extends TestCase
+final class ASTHelperTest extends TestCase
 {
     public function testThrowsWhenMergingUniqueNodeListWithCollision(): void
     {
@@ -25,8 +28,7 @@ class ASTHelperTest extends TestCase
         ');
 
         $this->expectException(DefinitionException::class);
-
-        $objectType1->fields = ASTHelper::mergeUniqueNodeList(
+        ASTHelper::mergeUniqueNodeList(
             $objectType1->fields,
             $objectType2->fields
         );
@@ -56,9 +58,9 @@ class ASTHelperTest extends TestCase
 
         $this->assertCount(3, $objectType1->fields);
 
-        /** @var \GraphQL\Language\AST\FieldDefinitionNode $firstNameField */
         $firstNameField = ASTHelper::firstByName($objectType1->fields, 'first_name');
 
+        assert($firstNameField instanceof FieldDefinitionNode);
         $this->assertCount(1, $firstNameField->directives);
     }
 
@@ -190,7 +192,6 @@ GRAPHQL
     public function testThrowsOnSyntaxError(): void
     {
         $this->expectException(DefinitionException::class);
-
         ASTHelper::extractDirectiveDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
 invalid GraphQL
 GRAPHQL
@@ -200,7 +201,6 @@ GRAPHQL
     public function testThrowsIfMissingDirectiveDefinitions(): void
     {
         $this->expectException(DefinitionException::class);
-
         ASTHelper::extractDirectiveDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
 scalar Foo
 GRAPHQL
@@ -210,11 +210,20 @@ GRAPHQL
     public function testThrowsOnMultipleDirectiveDefinitions(): void
     {
         $this->expectException(DefinitionException::class);
-
         ASTHelper::extractDirectiveDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
 directive @foo on OBJECT
 directive @bar on OBJECT
 GRAPHQL
         );
+    }
+
+    public function testUnderlyingTypeKnowsStandardTypes(): void
+    {
+        $type = ASTHelper::underlyingType(
+            Parser::fieldDefinition('foo: ID')
+        );
+
+        $this->assertInstanceOf(ScalarTypeDefinitionNode::class, $type);
+        $this->assertSame(Type::ID, $type->name->value);
     }
 }

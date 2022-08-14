@@ -9,7 +9,7 @@ use Tests\DBTestCase;
 use Tests\TestsSubscriptions;
 use Tests\Utils\Models\User;
 
-class SerializerTest extends DBTestCase
+final class SerializerTest extends DBTestCase
 {
     use TestsSubscriptions;
 

@@ -6,7 +6,7 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Image;
 use Tests\Utils\Models\Task;
 
-class MorphOneTest extends DBTestCase
+final class MorphOneTest extends DBTestCase
 {
     protected $schema = /** @lang GraphQL */ '
     type Task {
@@ -229,7 +229,7 @@ GRAPHQL
 
         $this->graphQL(/** @lang GraphQL */ "
         mutation {
-            ${action}Task(input: {
+            {$action}Task(input: {
                 id: 1
                 name: \"foo\"
                 image: {
@@ -247,7 +247,7 @@ GRAPHQL
         }
         ")->assertJson([
             'data' => [
-                "${action}Task" => [
+                "{$action}Task" => [
                     'id' => '1',
                     'name' => 'foo',
                     'image' => [
@@ -267,7 +267,7 @@ GRAPHQL
 
         $this->graphQL(/** @lang GraphQL */ "
         mutation {
-            ${action}Task(input: {
+            {$action}Task(input: {
                 id: 1
                 name: \"foo\"
                 image: {
@@ -286,7 +286,7 @@ GRAPHQL
         }
         ")->assertJson([
             'data' => [
-                "${action}Task" => [
+                "{$action}Task" => [
                     'id' => '1',
                     'name' => 'foo',
                     'image' => [
@@ -311,7 +311,7 @@ GRAPHQL
 
         $this->graphQL(/** @lang GraphQL */ "
         mutation {
-            ${action}Task(input: {
+            {$action}Task(input: {
                 id: 1
                 name: \"foo\"
                 image: {
@@ -330,7 +330,7 @@ GRAPHQL
         }
         ")->assertJson([
             'data' => [
-                "${action}Task" => [
+                "{$action}Task" => [
                     'id' => '1',
                     'name' => 'foo',
                     'image' => [
@@ -355,7 +355,7 @@ GRAPHQL
 
         $this->graphQL("
         mutation {
-            ${action}Task(input: {
+            {$action}Task(input: {
                 id: 1
                 name: \"foo\"
                 image: {
@@ -371,7 +371,7 @@ GRAPHQL
         }
         ")->assertJson([
             'data' => [
-                "${action}Task" => [
+                "{$action}Task" => [
                     'id' => '1',
                     'name' => 'foo',
                     'image' => null,

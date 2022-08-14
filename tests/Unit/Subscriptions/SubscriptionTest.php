@@ -15,7 +15,7 @@ use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
 use Tests\TestCase;
 use Tests\TestsSubscriptions;
 
-class SubscriptionTest extends TestCase
+final class SubscriptionTest extends TestCase
 {
     use TestsSubscriptions;
 
@@ -32,7 +32,7 @@ class SubscriptionTest extends TestCase
         $subscriptionField = 'onPostCreated';
         $this->schema .= /** @lang GraphQL */ "
         type Subscription {
-            ${subscriptionField}: ID
+            {$subscriptionField}: ID
         }
         ";
 

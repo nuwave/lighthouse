@@ -82,6 +82,37 @@ Set the environment variable `XDEBUG_REMOTE_HOST` to the IP of your host machine
 seen from the Docker container. This may differ based on your setup: When running
 Docker for Desktop, it is usually `10.0.2.2`, when running from a VM it is something else.
 
+### Test Data Setup
+
+Use relations over direct access to foreign keys.
+
+```php
+$user = factory(User::class)->create();
+
+// Right
+$post = factory(Post::class)->make();
+$user->post()->save();
+
+// Wrong
+$user = factory(Post::class)->create([
+    'user_id' => $post->id,
+]);
+```
+
+Use properties over arrays to fill fields.
+
+```php
+// Right
+$user = new User();
+$user->name = 'Sepp';
+$user->save();
+
+// Wrong
+$user = User::create([
+    'name' => 'Sepp',
+]);
+```
+
 ## Documentation
 
 ### External
@@ -113,10 +144,17 @@ Then, add a short description of your change and close it off with a link to you
 
 ## Code guidelines
 
-### `protected` over `private`
+### Extensibility
 
-Always use class member visibility `protected` over `private`. We cannot foresee every
-possible use case in advance, extending the code should remain possible. 
+We cannot foresee every possible use case in advance, extending the code should remain possible.
+
+#### `protected` over `private`
+
+Always use class member visibility `protected` over `private`.
+
+#### `final` classes
+
+Prefer `final` classes in [tests](tests), but never use them in [src](src).
 
 ### Laravel feature usage
 
@@ -235,7 +273,7 @@ function bar(){
 
 ## Code style
 
-We format the code automatically with [php-cs-fixer](https://github.com/friendsofphp/php-cs-fixer)
+We format the code automatically with [php-cs-fixer](https://github.com/friendsofphp/php-cs-fixer).
 
     make fix
 
@@ -298,37 +336,6 @@ You can use the following two case-sensitive regexes to search for violations:
 ```regexp
 @(var|param|return|throws).*\|[A-Z]
 @(var|param|return|throws)\s*[A-Z]
-```
-
-### Test Data Setup
-
-Use relations over direct access to foreign keys.
-
-```php
-$user = factory(User::class)->create();
-
-// Right
-$post = factory(Post::class)->make();
-$user->post()->save();
-
-// Wrong
-$user = factory(Post::class)->create([
-    'user_id' => $post->id,
-]);
-```
-
-Use properties over arrays to fill fields.
-
-```php
-// Right
-$user = new User();
-$user->name = 'Sepp';
-$user->save();
-
-// Wrong
-$user = User::create([
-    'name' => 'Sepp',
-]);
 ```
 
 ## Benchmarks

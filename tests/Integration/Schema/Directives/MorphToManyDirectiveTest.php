@@ -10,7 +10,7 @@ use Tests\Utils\Models\Tag;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class MorphToManyDirectiveTest extends DBTestCase
+final class MorphToManyDirectiveTest extends DBTestCase
 {
     use WithFaker;
 
@@ -84,6 +84,63 @@ class MorphToManyDirectiveTest extends DBTestCase
                             'name' => $tag->name,
                         ];
                     })->toArray(),
+                ],
+            ],
+        ]);
+    }
+
+    public function testResolveMorphToManyRelationshipWithRelayConnection(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Tag {
+            id: ID!
+            name: String!
+        }
+
+        type Post {
+            id: ID!
+            tags: [Tag!]! @morphToMany(relation: "tags", type: CONNECTION)
+        }
+
+        type Query {
+            post (
+                id: ID! @eq
+            ): Post @find
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($id: ID!) {
+            post(id: $id) {
+                id
+                tags(first: 7) {
+                    edges {
+                        node {
+                            id
+                            ...on Tag {
+                                name
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        ', [
+            'id' => $this->post->id,
+        ])->assertJson([
+            'data' => [
+                'post' => [
+                    'id' => $this->post->id,
+                    'tags' => [
+                        'edges' => $this->postTags->map(function (Tag $tag) {
+                            return [
+                                'node' => [
+                                    'id' => $tag->id,
+                                    'name' => $tag->name,
+                                ],
+                            ];
+                        })->toArray(),
+                    ],
                 ],
             ],
         ]);
