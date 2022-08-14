@@ -13,6 +13,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Bump Laravel minor version requirements to ensure everything actually works
 
+## v5.58.1
+
+### Fixed
+
+- Allow pagination amount to be 0 https://github.com/nuwave/lighthouse/pull/2105
+
 ## v5.58.0
 
 ### Added
