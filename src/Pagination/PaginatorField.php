@@ -2,7 +2,7 @@
 
 namespace Nuwave\Lighthouse\Pagination;
 
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\AbstractPaginator;
 
 class PaginatorField
 {
@@ -11,7 +11,7 @@ class PaginatorField
      *
      * @return array<string, mixed>
      */
-    public function paginatorInfoResolver(LengthAwarePaginator $root): array
+    public function paginatorInfoResolver(AbstractPaginator $root): array
     {
         return [
             'count' => $root->count(),
@@ -30,7 +30,7 @@ class PaginatorField
      *
      * @return array<mixed>
      */
-    public function dataResolver(LengthAwarePaginator $root): array
+    public function dataResolver(AbstractPaginator $root): array
     {
         return $root->items();
     }
