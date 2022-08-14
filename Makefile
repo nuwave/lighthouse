@@ -10,7 +10,7 @@ setup: build vendor ## Setup the local environment
 
 .PHONY: build
 build: ## Build the local Docker containers
-	docker-compose build --build-arg USER_ID=$(shell id -u) --build-arg GROUP_ID=$(shell id -g)
+	docker-compose build --pull --build-arg USER_ID=$(shell id -u) --build-arg GROUP_ID=$(shell id -g)
 
 .PHONY: up
 up: ## Bring up the docker-compose stack

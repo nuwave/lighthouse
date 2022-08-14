@@ -137,4 +137,15 @@ GRAPHQL
         // @phpstan-ignore-next-line intentionally wrong
         new LaravelEnumType($notBenSampoEnumEnum);
     }
+
+    public function testEnumMustHaveKey(): void
+    {
+        $enumType = new LaravelEnumType(AOrB::class);
+
+        $aWithoutKey = AOrB::A();
+        $aWithoutKey->key = null;
+
+        $this->expectExceptionObject(LaravelEnumType::enumMustHaveKey($aWithoutKey));
+        $enumType->serialize($aWithoutKey);
+    }
 }

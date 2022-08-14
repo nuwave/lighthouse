@@ -504,6 +504,45 @@ final class HasManyDirectiveTest extends DBTestCase
             ->assertGraphQLErrorMessage(PaginationArgs::requestedTooManyItems(3, 5));
     }
 
+    public function testPaginatorTypeIsUnlimitedByMaxCountFromDirective(): void
+    {
+        config(['lighthouse.pagination.max_count' => 1]);
+
+        $user = factory(User::class)->create();
+        assert($user instanceof User);
+
+        $tasks = factory(Task::class, 3)->make();
+        $user->tasks()->saveMany($tasks);
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            tasks: [Task!]! @hasMany(type: PAGINATOR, maxCount: null)
+        }
+
+        type Task {
+            id: Int!
+        }
+
+        type Query {
+            user: User @first
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                user {
+                    tasks(first: 5) {
+                        data {
+                            id
+                        }
+                    }
+                }
+            }
+            ')
+            ->assertGraphQLErrorFree();
+    }
+
     public function testHandlesPaginationWithCountZero(): void
     {
         $user = factory(User::class)->create();

@@ -76,9 +76,19 @@ class LaravelEnumType extends EnumType
         return new InvalidArgumentException("Class {$enumClass} must extend {$baseClass}.");
     }
 
+    public static function enumMustHaveKey(Enum $value): InvalidArgumentException
+    {
+        $class = get_class($value);
+
+        return new InvalidArgumentException("Enum of class {$class} must have key.");
+    }
+
     protected function deprecationReason(Enum $enum): ?string
     {
-        $constant = $this->reflection->getReflectionConstant($enum->key);
+        $key = $enum->key;
+        assert(is_string($key));
+
+        $constant = $this->reflection->getReflectionConstant($key);
         assert($constant instanceof ReflectionClassConstant, 'Enum keys are derived from the constant names');
 
         $docComment = $constant->getDocComment();
@@ -129,6 +139,11 @@ class LaravelEnumType extends EnumType
             $value = $this->enumClass::fromValue($value);
         }
 
-        return $value->key;
+        $key = $value->key;
+        if (! $key) {
+            throw static::enumMustHaveKey($value);
+        }
+
+        return $key;
     }
 }

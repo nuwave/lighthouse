@@ -135,7 +135,7 @@ GRAPHQL;
                             ? $modelLike->items()
                             : $modelLike;
 
-                        Utils::applyEach(function (Model $model) use ($gate, $ability, $checkArguments): void {
+                        Utils::applyEach(function (?Model $model) use ($gate, $ability, $checkArguments): void {
                             $this->authorize($gate, $ability, $model, $checkArguments);
                         }, $modelOrModels);
 
@@ -167,7 +167,7 @@ GRAPHQL;
             return $argumentSet
                 ->enhanceBuilder(
                     $this->getModelClass()::query(),
-                    $this->directiveArgValue('scopes') ?? []
+                    $this->directiveArgValue('scopes', [])
                 )
                 ->get();
         }
@@ -201,7 +201,7 @@ GRAPHQL;
             try {
                 $enhancedBuilder = $argumentSet->enhanceBuilder(
                     $queryBuilder,
-                    $this->directiveArgValue('scopes') ?? [],
+                    $this->directiveArgValue('scopes', []),
                     Utils::instanceofMatcher(TrashedDirective::class)
                 );
                 assert($enhancedBuilder instanceof Builder);
@@ -223,12 +223,12 @@ GRAPHQL;
 
     public static function missingKeyToFindModel(string $find): Error
     {
-        return new Error("Got no key to find a model at the expected input path: ${find}.");
+        return new Error("Got no key to find a model at the expected input path: {$find}.");
     }
 
     /**
      * @param  string|array<string>  $ability
-     * @param  string|\Illuminate\Database\Eloquent\Model  $model
+     * @param  string|\Illuminate\Database\Eloquent\Model|null  $model
      * @param  array<int, mixed>  $arguments
      *
      * @throws \Nuwave\Lighthouse\Exceptions\AuthorizationException
