@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Changed
+
+- Bump Laravel minor version requirements to ensure everything actually works
+
 ## v5.58.0
 
 ### Added
