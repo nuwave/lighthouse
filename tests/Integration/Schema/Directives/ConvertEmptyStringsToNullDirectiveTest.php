@@ -62,7 +62,8 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
         type Foo {
             foo: String
             bar: [String]!
-            baz: Int!
+            baz: [[[String]]]!
+            qux: Int!
         }
 
         type Query {
@@ -81,11 +82,12 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
                 foo: ""
                 bar: [""]
                 baz: [[[""]]]
-                baz: 3
+                qux: 3
             ) {
                 foo
                 bar
                 baz
+                qux
             }
         }
         ')->assertExactJson([
