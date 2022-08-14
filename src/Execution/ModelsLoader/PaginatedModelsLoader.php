@@ -198,7 +198,7 @@ class PaginatedModelsLoader implements ModelsLoader
         foreach ($parents as $model) {
             $total = CountModelsLoader::extractCount($model, $this->relation);
 
-            $paginator = $first === 0
+            $paginator = 0 === $first
                 ? new ZeroPageLengthAwarePaginator($total, $page)
                 : new LengthAwarePaginator($model->getRelation($this->relation), $total, $first, $page);
 

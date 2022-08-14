@@ -78,7 +78,8 @@ enum PartiallyDeprecated {
 }
 GRAPHQL
                 ,
-                SchemaPrinter::printType($enumType));
+                SchemaPrinter::printType($enumType)
+            );
         } else {
             $this->assertSame(/** @lang GraphQL */ <<<GRAPHQL
 enum PartiallyDeprecated {
@@ -93,9 +94,9 @@ enum PartiallyDeprecated {
 }
 GRAPHQL
                 ,
-                SchemaPrinter::printType($enumType));
+                SchemaPrinter::printType($enumType)
+            );
         }
-
     }
 
     public function testReceivesEnumInstanceInternally(): void
