@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Schema\Types\Scalars;
 
+use Carbon\Carbon;
+use Carbon\Carbon;
 use Carbon\Carbon as CarbonCarbon;
 use Carbon\CarbonImmutable as CarbonCarbonImmutable;
 use GraphQL\Error\Error;
@@ -109,6 +111,10 @@ abstract class DateScalarTest extends TestCase
 
     public function testSerializesCarbonInstance(): void
     {
+        if (! method_exists(Carbon::class, 'toJSON')) {
+            $this->markTestSkipped('toJSON is not in older Carbon versions');
+        }
+
         $now = IlluminateCarbon::now();
         $result = $this->scalarInstance()->serialize($now);
 
@@ -121,6 +127,10 @@ abstract class DateScalarTest extends TestCase
      */
     public function testCanonicalizesValidDateString(string $date, string $canonical): void
     {
+        if (! method_exists(Carbon::class, 'createFromIsoFormat')) {
+            $this->markTestSkipped('createFromIsoFormat is not in older Carbon versions');
+        }
+
         $result = $this->scalarInstance()->serialize($date);
 
         $this->assertSame($canonical, $result);

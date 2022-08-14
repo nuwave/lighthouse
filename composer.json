@@ -39,7 +39,6 @@
         "illuminate/support": "~5.6.34 || ~5.7 || ~5.8.33 || ^6.20.44 || ^7 || ^8 || ^9",
         "illuminate/validation": "~5.6.34 || ~5.7 || ~5.8.33 || ^6.20.44 || ^7 || ^8 || ^9",
         "laragraph/utils": "^1",
-        "nesbot/carbon": "^1.37 || ^2.61",
         "thecodingmachine/safe": "^1 || ^2",
         "webonyx/graphql-php": "^14.7"
     },
