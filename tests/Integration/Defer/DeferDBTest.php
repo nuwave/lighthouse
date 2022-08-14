@@ -4,7 +4,6 @@ namespace Tests\Integration\Defer;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
-use Illuminate\Support\Facades\DB;
 use Nuwave\Lighthouse\Defer\DeferServiceProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Company;
@@ -23,9 +22,14 @@ final class DeferDBTest extends DBTestCase
     public function testDeferBelongsToFields(): void
     {
         $company = factory(Company::class)->create();
-        $user = factory(User::class)->create([
-            'company_id' => $company->getKey(),
-        ]);
+        assert($company instanceof Company);
+
+        $user = factory(User::class)->make();
+        assert($user instanceof User);
+        $user->company()->associate($company);
+        $user->save();
+
+        $user->setRelations([]);
 
         $this->mockResolver($user);
 
@@ -44,10 +48,7 @@ final class DeferDBTest extends DBTestCase
         }
         ';
 
-        $queries = 0;
-        DB::listen(function () use (&$queries): void {
-            ++$queries;
-        });
+        $this->countQueries($queryCount);
 
         $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
         {
@@ -60,7 +61,7 @@ final class DeferDBTest extends DBTestCase
         }
         ');
 
-        $this->assertSame(1, $queries);
+        $this->assertSame(1, $queryCount);
         $this->assertCount(2, $chunks);
 
         $deferredUser = $chunks[0];
@@ -75,10 +76,18 @@ final class DeferDBTest extends DBTestCase
     public function testDeferNestedRelationshipFields(): void
     {
         $company = factory(Company::class)->create();
-        $users = factory(User::class, 5)->create([
-            'company_id' => $company->getKey(),
-        ]);
+        assert($company instanceof Company);
+
+        $users = factory(User::class, 5)->make();
+        foreach ($users as $user) {
+            assert($user instanceof User);
+            $user->company()->associate($company);
+            $user->save();
+        }
+
         $user = $users[0];
+        assert($user instanceof User);
+        $user->setRelations([]);
 
         $this->mockResolver($user);
 
@@ -98,10 +107,7 @@ final class DeferDBTest extends DBTestCase
         }
         ';
 
-        $queries = 0;
-        DB::listen(function () use (&$queries): void {
-            ++$queries;
-        });
+        $this->countQueries($queryCount);
 
         $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
         {
@@ -117,7 +123,7 @@ final class DeferDBTest extends DBTestCase
         }
         ');
 
-        $this->assertSame(2, $queries);
+        $this->assertSame(2, $queryCount);
         $this->assertCount(3, $chunks);
 
         $deferredUser = $chunks[0];
@@ -172,10 +178,7 @@ final class DeferDBTest extends DBTestCase
         }
         ';
 
-        $queries = 0;
-        DB::listen(function () use (&$queries): void {
-            ++$queries;
-        });
+        $this->countQueries($queryCount);
 
         $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
         {
@@ -191,7 +194,7 @@ final class DeferDBTest extends DBTestCase
         }
         ');
 
-        $this->assertSame(2, $queries);
+        $this->assertSame(2, $queryCount);
         $this->assertCount(3, $chunks);
 
         $deferredCompanies = $chunks[0];

@@ -52,7 +52,7 @@ SIGNATURE;
 
         if ($this->option('write')) {
             $storage->put($filename, $schemaString);
-            $this->info('Wrote schema to the default file storage (usually storage/app) as "' . $filename . '".');
+            $this->info("Wrote schema to the default file storage (usually storage/app) as {$filename}.");
         } else {
             $this->info($schemaString);
         }

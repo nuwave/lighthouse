@@ -27,7 +27,7 @@ GRAPHQL;
 
     public function sanitize($argumentValue)
     {
-        return Utils::applyEach(
+        return Utils::mapEach(
             function ($value) {
                 return $value instanceof ArgumentSet
                     ? $this->transformArgumentSet($value)

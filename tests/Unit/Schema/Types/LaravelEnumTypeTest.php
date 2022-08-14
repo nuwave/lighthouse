@@ -37,8 +37,11 @@ final class LaravelEnumTypeTest extends TestCase
     public function testCustomDescription(): void
     {
         $enumType = new LaravelEnumType(LocalizedUserType::class);
+        $values = $enumType->config['values'];
 
-        $this->assertSame('Localize Moderator', $enumType->config['values']['Moderator']['description']);
+        $this->assertIsArray($values);
+        $this->assertArrayHasKey('Moderator', $values);
+        $this->assertSame('Localize Moderator', $values['Moderator']['description']);
     }
 
     public function testDeprecated(): void
@@ -100,5 +103,16 @@ GRAPHQL
         $this->expectExceptionObject(LaravelEnumType::classMustExtendBenSampoEnumEnum($notBenSampoEnumEnum));
         // @phpstan-ignore-next-line intentionally wrong
         new LaravelEnumType($notBenSampoEnumEnum);
+    }
+
+    public function testEnumMustHaveKey(): void
+    {
+        $enumType = new LaravelEnumType(AOrB::class);
+
+        $aWithoutKey = AOrB::A();
+        $aWithoutKey->key = null;
+
+        $this->expectExceptionObject(LaravelEnumType::enumMustHaveKey($aWithoutKey));
+        $enumType->serialize($aWithoutKey);
     }
 }

@@ -150,6 +150,13 @@ class TypeRegistry
             return true;
         }
 
+        $standardTypes = Type::getStandardTypes();
+        if (isset($standardTypes[$name])) {
+            $this->types[$name] = $standardTypes[$name];
+
+            return true;
+        }
+
         return false;
     }
 
@@ -373,19 +380,16 @@ class TypeRegistry
             'name' => $objectDefinition->name->value,
             'description' => $objectDefinition->description->value ?? null,
             'fields' => $this->makeFieldsLoader($objectDefinition),
-            'interfaces'
-/**
- * @return list<\GraphQL\Type\Definition\Type>
- */ => function () use ($objectDefinition): array {
-    $interfaces = [];
+            'interfaces' => function () use ($objectDefinition): array {
+                $interfaces = [];
 
-    // Might be a NodeList, so we can not use array_map()
-    foreach ($objectDefinition->interfaces as $interface) {
-        $interfaces[] = $this->get($interface->name->value);
-    }
+                foreach ($objectDefinition->interfaces as $interface) {
+                    $interfaces[] = $this->get($interface->name->value);
+                }
 
-    return $interfaces;
-},
+                /** @var list<\GraphQL\Type\Definition\InterfaceType> $interfaces */
+                return $interfaces;
+            },
             'astNode' => $objectDefinition,
         ]);
     }
@@ -399,38 +403,36 @@ class TypeRegistry
      */
     protected function makeFieldsLoader($typeDefinition): Closure
     {
-        return
-            /**
-             * @return array<string, Closure(): array<string, mixed>>
-             */
-            function () use ($typeDefinition): array {
-                $fieldFactory = $this->fieldFactory();
-                $typeValue = new TypeValue($typeDefinition);
-                $fields = [];
+        return function () use ($typeDefinition): array {
+            $fieldFactory = $this->fieldFactory();
+            $typeValue = new TypeValue($typeDefinition);
+            $fields = [];
 
-                foreach ($typeDefinition->fields as $fieldDefinition) {
-                    $fields[$fieldDefinition->name->value] = static function () use ($fieldFactory, $typeValue, $fieldDefinition): array {
-                        return $fieldFactory->handle(
-                            new FieldValue($typeValue, $fieldDefinition)
-                        );
-                    };
-                }
+            foreach ($typeDefinition->fields as $fieldDefinition) {
+                $fields[$fieldDefinition->name->value] = static function () use ($fieldFactory, $typeValue, $fieldDefinition): array {
+                    return $fieldFactory->handle(
+                        new FieldValue($typeValue, $fieldDefinition)
+                    );
+                };
+            }
 
-                return $fields;
-            };
+            return $fields;
+        };
     }
 
     protected function resolveInputObjectType(InputObjectTypeDefinitionNode $inputDefinition): InputObjectType
     {
+        /**
+         * @return array<string, array<string, mixed>>
+         */
+        $fields = function () use ($inputDefinition): array {
+            return $this->argumentFactory->toTypeMap($inputDefinition->fields);
+        };
+
         return new InputObjectType([
             'name' => $inputDefinition->name->value,
             'description' => $inputDefinition->description->value ?? null,
-            'fields'
-/**
- * @return array<string, array<string, mixed>>
- */ => function () use ($inputDefinition): array {
-    return $this->argumentFactory->toTypeMap($inputDefinition->fields);
-},
+            'fields' => $fields,
             'astNode' => $inputDefinition,
         ]);
     }
@@ -564,18 +566,16 @@ class TypeRegistry
         return new UnionType([
             'name' => $nodeName,
             'description' => $unionDefinition->description->value ?? null,
-            'types'
-/**
- * @return list<\GraphQL\Type\Definition\Type>
- */ => function () use ($unionDefinition): array {
-    $types = [];
+            'types' => function () use ($unionDefinition): array {
+                $types = [];
 
-    foreach ($unionDefinition->types as $type) {
-        $types[] = $this->get($type->name->value);
-    }
+                foreach ($unionDefinition->types as $type) {
+                    $types[] = $this->get($type->name->value);
+                }
 
-    return $types;
-},
+                /** @var list<\GraphQL\Type\Definition\ObjectType> $types */
+                return $types;
+            },
             'resolveType' => $typeResolver,
             'astNode' => $unionDefinition,
         ]);

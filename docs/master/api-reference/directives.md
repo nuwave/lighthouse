@@ -249,12 +249,14 @@ directive @belongsToMany(
   """
   Allow clients to query paginated lists without specifying the amount of items.
   Overrules the `pagination.default_count` setting from `lighthouse.php`.
+  Setting this to `null` means clients have to explicitly ask for the count.
   """
   defaultCount: Int
 
   """
   Limit the maximum amount of items that clients can request from paginated lists.
   Overrules the `pagination.max_count` setting from `lighthouse.php`.
+  Setting this to `null` means the count is unrestricted.
   """
   maxCount: Int
 
@@ -520,6 +522,50 @@ directive @cache(
 
 You can find usage examples of this directive in [the caching docs](../performance/caching.md).
 
+## @cacheControl
+
+```graphql
+"""
+Influences the HTTP `Cache-Control` headers of the response.
+"""
+directive @cacheControl(
+  """
+  The maximum amount of time the field's cached value is valid, in seconds.
+  0 means the field is not cacheable.
+  Mutually exclusive with `inheritMaxAge = true`.
+  """
+  maxAge: Int! = 0
+
+  """
+  Is the value specific to a single user?
+  """
+  scope: CacheControlScope! = PUBLIC
+
+  """
+  Should the field inherit the `maxAge` of its parent field instead of using the default `maxAge`?
+  Mutually exclusive with `maxAge`.
+  """
+  inheritMaxAge: Boolean! = false
+) on FIELD_DEFINITION | OBJECT | INTERFACE | UNION
+
+"""
+Options for the `scope` argument of `@cacheControl`.
+"""
+enum CacheControlScope {
+  """
+  The value is the same for each user.
+  """
+  PUBLIC
+
+  """
+  The value is specific to a single user.
+  """
+  PRIVATE
+}
+```
+
+Find usage examples of this directive in [the caching docs](../performance/caching.md#http-cache-control-header).
+
 ## @cacheKey
 
 ```graphql
@@ -547,17 +593,12 @@ directive @can(
   ability: String!
 
   """
-  Query for specific model instances to check the policy against, using arguments
-  with directives that add constraints to the query builder, such as `@eq`.
+  Check the policy against the model instances returned by the field resolver.
+  Only use this if the field does not mutate data, it is run before checking.
 
-  Mutually exclusive with `find`.
+  Mutually exclusive with `query` and `find`.
   """
-  query: Boolean = false
-
-  """
-  Apply scopes to the underlying query.
-  """
-  scopes: [String!]
+  resolved: Boolean! = false
 
   """
   Specify the class name of the model to use.
@@ -568,7 +609,7 @@ directive @can(
   """
   Pass along the client given input data as arguments to `Gate::check`.
   """
-  injectArgs: Boolean = false
+  injectArgs: Boolean! = false
 
   """
   Statically defined arguments that are passed to `Gate::check`.
@@ -579,12 +620,25 @@ directive @can(
   args: CanArgs
 
   """
+  Query for specific model instances to check the policy against, using arguments
+  with directives that add constraints to the query builder, such as `@eq`.
+
+  Mutually exclusive with `resolved` and `find`.
+  """
+  query: Boolean! = false
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+
+  """
   If your policy checks against specific model instances, specify
   the name of the field argument that contains its primary key(s).
 
   You may pass the string in dot notation to use nested inputs.
 
-  Mutually exclusive with `search`.
+  Mutually exclusive with `resolved` and `query`.
   """
   find: String
 ) repeatable on FIELD_DEFINITION
@@ -605,12 +659,12 @@ type Mutation {
 }
 ```
 
-Query for specific model instances to check the policy against with the `query` argument:
+Check the policy against the resolved model instances with the `resolved` argument:
 
 ```graphql
 type Query {
   fetchUserByEmail(email: String! @eq): User
-    @can(ability: "view", query: true)
+    @can(ability: "view", resolved: true)
     @find
 }
 ```
@@ -781,6 +835,17 @@ directive @count(
   Apply scopes to the underlying query.
   """
   scopes: [String!]
+
+  """
+  Count only rows where the given columns are non-null.
+  `*` counts every row.
+  """
+  columns: [String!]! = ["*"]
+
+  """
+  Should exclude duplicated rows?
+  """
+  distinct: Boolean! = false
 ) on FIELD_DEFINITION
 ```
 
@@ -1433,12 +1498,14 @@ directive @hasMany(
   """
   Allow clients to query paginated lists without specifying the amount of items.
   Overrules the `pagination.default_count` setting from `lighthouse.php`.
+  Setting this to `null` means clients have to explicitly ask for the count.
   """
   defaultCount: Int
 
   """
   Limit the maximum amount of items that clients can request from paginated lists.
   Overrules the `pagination.max_count` setting from `lighthouse.php`.
+  Setting this to `null` means the count is unrestricted.
   """
   maxCount: Int
 
@@ -1495,6 +1562,75 @@ type User {
   posts: [Post!]! @hasMany(relation: "articles")
 }
 ```
+
+## @hasManyThrough
+
+```graphql
+"""
+Corresponds to [the Eloquent relationship HasManyThrough](https://laravel.com/docs/eloquent-relationships#has-many-through).
+"""
+directive @hasManyThrough(
+  """
+  Specify the relationship method name in the model class,
+  if it is named different from the field in the schema.
+  """
+  relation: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+
+  """
+  Allows to resolve the relation as a paginated list.
+  Allowed values: `paginator`, `connection`.
+  """
+  type: HasManyThroughType
+
+  """
+  Allow clients to query paginated lists without specifying the amount of items.
+  Overrules the `pagination.default_count` setting from `lighthouse.php`.
+  Setting this to `null` means clients have to explicitly ask for the count.
+  """
+  defaultCount: Int
+
+  """
+  Limit the maximum amount of items that clients can request from paginated lists.
+  Overrules the `pagination.max_count` setting from `lighthouse.php`.
+  Setting this to `null` means the count is unrestricted.
+  """
+  maxCount: Int
+
+  """
+  Specify a custom type that implements the Edge interface
+  to extend edge object.
+  Only applies when using Relay style "connection" pagination.
+  """
+  edgeType: String
+) on FIELD_DEFINITION
+
+"""
+Options for the `type` argument of `@hasManyThrough`.
+"""
+enum HasManyThroughType {
+  """
+  Offset-based pagination, similar to the Laravel default.
+  """
+  PAGINATOR
+
+  """
+  Offset-based pagination like the Laravel "Simple Pagination", which does not count the total number of records.
+  """
+  SIMPLE
+
+  """
+  Cursor-based pagination, compatible with the Relay specification.
+  """
+  CONNECTION
+}
+```
+
+Usage is the same as [@hasMany](#hasmany).
 
 ## @hasOne
 
@@ -1837,12 +1973,14 @@ directive @morphMany(
   """
   Allow clients to query paginated lists without specifying the amount of items.
   Overrules the `pagination.default_count` setting from `lighthouse.php`.
+  Setting this to `null` means clients have to explicitly ask for the count.
   """
   defaultCount: Int
 
   """
   Limit the maximum amount of items that clients can request from paginated lists.
   Overrules the `pagination.max_count` setting from `lighthouse.php`.
+  Setting this to `null` means the count is unrestricted.
   """
   maxCount: Int
 
@@ -1945,6 +2083,72 @@ type Image {
 }
 
 union Imageable = Post | User
+```
+
+## @morphToMany
+
+```graphql
+"""
+Corresponds to [Eloquent's ManyToMany-Polymorphic-Relationship](https://laravel.com/docs/eloquent-relationships#many-to-many-polymorphic-relations).
+"""
+directive @morphToMany(
+  """
+  Specify the relationship method name in the model class,
+  if it is named different from the field in the schema.
+  """
+  relation: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+
+  """
+  Allows to resolve the relation as a paginated list.
+  """
+  type: MorphToManyType
+
+  """
+  Allow clients to query paginated lists without specifying the amount of items.
+  Overrules the `pagination.default_count` setting from `lighthouse.php`.
+  Setting this to `null` means clients have to explicitly ask for the count.
+  """
+  defaultCount: Int
+
+  """
+  Limit the maximum amount of items that clients can request from paginated lists.
+  Overrules the `pagination.max_count` setting from `lighthouse.php`.
+  Setting this to `null` means the count is unrestricted.
+  """
+  maxCount: Int
+
+  """
+  Specify a custom type that implements the Edge interface
+  to extend edge object.
+  Only applies when using Relay style "connection" pagination.
+  """
+  edgeType: String
+) on FIELD_DEFINITION
+
+"""
+Options for the `type` argument of `@morphToMany`.
+"""
+enum MorphToManyType {
+  """
+  Offset-based pagination, similar to the Laravel default.
+  """
+  PAGINATOR
+
+  """
+  Offset-based pagination like the Laravel "Simple Pagination", which does not count the total number of records.
+  """
+  SIMPLE
+
+  """
+  Cursor-based pagination, compatible with the Relay specification.
+  """
+  CONNECTION
+}
 ```
 
 ## @namespace
@@ -2236,12 +2440,14 @@ directive @paginate(
   """
   Allow clients to query paginated lists without specifying the amount of items.
   Overrules the `pagination.default_count` setting from `lighthouse.php`.
+  Setting this to `null` means clients have to explicitly ask for the count.
   """
   defaultCount: Int
 
   """
   Limit the maximum amount of items that clients can request from paginated lists.
   Overrules the `pagination.max_count` setting from `lighthouse.php`.
+  Setting this to `null` means the count is unrestricted.
   """
   maxCount: Int
 ) on FIELD_DEFINITION

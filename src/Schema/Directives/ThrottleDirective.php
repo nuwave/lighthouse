@@ -101,8 +101,8 @@ GRAPHQL;
         } else {
             $limits[] = [
                 'key' => sha1($this->directiveArgValue('prefix') . $this->request->ip()),
-                'maxAttempts' => $this->directiveArgValue('maxAttempts') ?? 60,
-                'decayMinutes' => $this->directiveArgValue('decayMinutes') ?? 1.0,
+                'maxAttempts' => $this->directiveArgValue('maxAttempts', 60),
+                'decayMinutes' => $this->directiveArgValue('decayMinutes', 1.0),
             ];
         }
 
@@ -113,7 +113,8 @@ GRAPHQL;
                 $this->handleLimit(
                     $limit['key'],
                     $limit['maxAttempts'],
-                    $limit['decayMinutes']
+                    $limit['decayMinutes'],
+                    "{$resolveInfo->parentType}.{$resolveInfo->fieldName}"
                 );
             }
 
@@ -134,19 +135,19 @@ GRAPHQL;
             // @phpstan-ignore-next-line won't be executed on Laravel < 8
             $limiter = $this->limiter->limiter($name);
             // @phpstan-ignore-next-line $limiter may be null although it's not specified in limiter() PHPDoc
-            if (is_null($limiter)) {
+            if (null === $limiter) {
                 throw new DefinitionException("Named limiter {$name} is not found.");
             }
         }
     }
 
     /**
-     * Checks throttling limit.
+     * Checks throttling limit and records this attempt.
      */
-    protected function handleLimit(string $key, int $maxAttempts, float $decayMinutes): void
+    protected function handleLimit(string $key, int $maxAttempts, float $decayMinutes, string $fieldReference): void
     {
         if ($this->limiter->tooManyAttempts($key, $maxAttempts)) {
-            throw new RateLimitException();
+            throw new RateLimitException($fieldReference);
         }
 
         $this->limiter->hit($key, (int) ($decayMinutes * 60));

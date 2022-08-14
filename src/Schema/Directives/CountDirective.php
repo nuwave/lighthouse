@@ -39,6 +39,17 @@ directive @count(
   Apply scopes to the underlying query.
   """
   scopes: [String!]
+
+  """
+  Count only rows where the given columns are non-null.
+  `*` counts every row.
+  """
+  columns: [String!]! = ["*"]
+
+  """
+  Should exclude duplicated rows?
+  """
+  distinct: Boolean! = false
 ) on FIELD_DEFINITION
 GRAPHQL;
     }
@@ -52,6 +63,15 @@ GRAPHQL;
                     ->namespaceModelClass($modelArg)::query();
 
                 $this->makeBuilderDecorator($resolveInfo)($query);
+
+                if ($this->directiveArgValue('distinct')) {
+                    $query->distinct();
+                }
+
+                $columns = $this->directiveArgValue('columns');
+                if ($columns) {
+                    return $query->count(...$columns);
+                }
 
                 return $query->count();
             });

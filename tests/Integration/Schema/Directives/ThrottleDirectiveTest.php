@@ -97,7 +97,9 @@ final class ThrottleDirectiveTest extends TestCase
         {
             foo
         }
-        ')->assertGraphQLErrorMessage(RateLimitException::MESSAGE);
+        ')->assertGraphQLError(
+            new RateLimitException('Query.foo')
+        );
     }
 
     public function testInlineLimiter(): void
@@ -122,6 +124,8 @@ final class ThrottleDirectiveTest extends TestCase
         {
             foo
         }
-        ')->assertGraphQLErrorMessage(RateLimitException::MESSAGE);
+        ')->assertGraphQLError(
+            new RateLimitException('Query.foo')
+        );
     }
 }

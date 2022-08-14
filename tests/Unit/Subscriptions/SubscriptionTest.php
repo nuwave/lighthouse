@@ -32,7 +32,7 @@ final class SubscriptionTest extends TestCase
         $subscriptionField = 'onPostCreated';
         $this->schema .= /** @lang GraphQL */ "
         type Subscription {
-            ${subscriptionField}: ID
+            {$subscriptionField}: ID
         }
         ";
 
