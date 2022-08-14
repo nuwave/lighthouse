@@ -3,6 +3,8 @@
 namespace Tests\Unit\Schema\Types\Scalars;
 
 use Carbon\Carbon;
+use Carbon\Carbon;
+use Carbon\Carbon;
 use Carbon\Carbon as CarbonCarbon;
 use Carbon\CarbonImmutable as CarbonCarbonImmutable;
 use GraphQL\Error\Error;
@@ -80,6 +82,10 @@ abstract class DateScalarTest extends TestCase
      */
     public function testParsesValueString(string $date): void
     {
+        if (! method_exists(Carbon::class, 'createFromIsoFormat')) {
+            $this->markTestSkipped('createFromIsoFormat is not in older Carbon versions');
+        }
+
         $this->assertInstanceOf(
             IlluminateCarbon::class,
             $this->scalarInstance()->parseValue($date)
@@ -91,6 +97,10 @@ abstract class DateScalarTest extends TestCase
      */
     public function testParsesLiteral(string $date): void
     {
+        if (! method_exists(Carbon::class, 'createFromIsoFormat')) {
+            $this->markTestSkipped('createFromIsoFormat is not in older Carbon versions');
+        }
+
         $dateLiteral = new StringValueNode(
             ['value' => $date]
         );
