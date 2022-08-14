@@ -3,7 +3,6 @@
 namespace Tests\Unit\Schema\Types\Scalars;
 
 use Carbon\Carbon;
-use Carbon\Carbon;
 use Carbon\Carbon as CarbonCarbon;
 use Carbon\CarbonImmutable as CarbonCarbonImmutable;
 use GraphQL\Error\Error;
