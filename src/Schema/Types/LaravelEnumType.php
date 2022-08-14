@@ -118,7 +118,7 @@ class LaravelEnumType extends EnumType
     }
 
     /**
-     * TODO remove check and inline when requiring bensampo/laravel-enum:6
+     * TODO remove check and inline when requiring bensampo/laravel-enum:6.
      *
      * @param  class-string<\BenSampo\Enum\Enum>  $enumClass
      */
