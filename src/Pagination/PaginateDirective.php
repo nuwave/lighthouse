@@ -9,6 +9,7 @@ use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Laravel\Scout\Builder as ScoutBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -50,12 +51,14 @@ directive @paginate(
   """
   Allow clients to query paginated lists without specifying the amount of items.
   Overrules the `pagination.default_count` setting from `lighthouse.php`.
+  Setting this to `null` means clients have to explicitly ask for the count.
   """
   defaultCount: Int
 
   """
   Limit the maximum amount of items that clients can request from paginated lists.
   Overrules the `pagination.max_count` setting from `lighthouse.php`.
+  Setting this to `null` means the count is unrestricted.
   """
   maxCount: Int
 ) on FIELD_DEFINITION
@@ -112,7 +115,7 @@ GRAPHQL;
 
                 $query = $builderResolver($root, $args, $context, $resolveInfo);
                 assert(
-                    $query instanceof QueryBuilder || $query instanceof EloquentBuilder || $query instanceof Relation,
+                    $query instanceof QueryBuilder || $query instanceof EloquentBuilder || $query instanceof ScoutBuilder || $query instanceof Relation,
                     "The method referenced by the builder argument of the @{$this->name()} directive on {$this->nodeName()} must return a Builder or Relation."
                 );
             } else {
@@ -123,11 +126,14 @@ GRAPHQL;
                 ->argumentSet
                 ->enhanceBuilder(
                     $query,
-                    $this->directiveArgValue('scopes') ?? []
+                    $this->directiveArgValue('scopes', [])
                 );
 
-            return PaginationArgs::extractArgs($args, $this->optimalPaginationType($resolveInfo), $this->paginateMaxCount())
-                ->applyToBuilder($query);
+            $paginationArgs = PaginationArgs::extractArgs($args, $this->paginationType(), $this->paginateMaxCount());
+
+            $paginationArgs->type = $this->optimalPaginationType($resolveInfo);
+
+            return $paginationArgs->applyToBuilder($query);
         });
 
         return $fieldValue;
@@ -154,19 +160,17 @@ GRAPHQL;
     protected function paginationType(): PaginationType
     {
         return new PaginationType(
-            $this->directiveArgValue('type') ?? PaginationType::PAGINATOR
+            $this->directiveArgValue('type', PaginationType::PAGINATOR)
         );
     }
 
     protected function defaultCount(): ?int
     {
-        return $this->directiveArgValue('defaultCount')
-            ?? config('lighthouse.pagination.default_count');
+        return $this->directiveArgValue('defaultCount', config('lighthouse.pagination.default_count'));
     }
 
     protected function paginateMaxCount(): ?int
     {
-        return $this->directiveArgValue('maxCount')
-            ?? config('lighthouse.pagination.max_count');
+        return $this->directiveArgValue('maxCount', config('lighthouse.pagination.max_count'));
     }
 }

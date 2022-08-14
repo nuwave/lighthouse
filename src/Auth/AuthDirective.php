@@ -39,8 +39,7 @@ GRAPHQL;
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
         $fieldValue->setResolver(function (): ?Authenticatable {
-            $guard = $this->directiveArgValue('guard')
-                ?? AuthServiceProvider::guard();
+            $guard = $this->directiveArgValue('guard', AuthServiceProvider::guard());
             assert(is_string($guard) || is_null($guard));
 
             // @phpstan-ignore-next-line phpstan does not know about App\User, which implements Authenticatable

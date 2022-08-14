@@ -3,13 +3,20 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Laravel\Scout\Builder as ScoutBuilder;
 use Tests\DBTestCase;
+use Tests\TestsScoutEngine;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
 
 final class AllDirectiveTest extends DBTestCase
 {
+    use TestsScoutEngine;
+
+    public const LIMIT_FROM_CUSTOM_SCOUT_BUILDER = 321;
+
     public function testGetAllModelsAsRootField(): void
     {
         $count = 2;
@@ -249,6 +256,52 @@ final class AllDirectiveTest extends DBTestCase
         ]);
     }
 
+    public function testSpecifyCustomBuilderForScoutBuilder(): void
+    {
+        $this->setUpScoutEngine();
+
+        $post = factory(Post::class)->create();
+        assert($post instanceof Post);
+
+        $this->engine->shouldReceive('map')
+            ->withArgs(function (ScoutBuilder $builder) use ($post): bool {
+                return $builder->wheres === ['id' => "$post->id"]
+                    && self::LIMIT_FROM_CUSTOM_SCOUT_BUILDER === $builder->limit;
+            })
+            ->andReturn(new EloquentCollection([$post]))
+            ->once();
+
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        type Post {
+            id: ID!
+        }
+
+        type Query {
+            posts(
+                id: ID! @eq
+            ): [Post!]! @all(builder: "{$this->qualifyTestResolver('builderForScoutBuilder')}")
+        }
+GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($id: ID!) {
+            posts(id: $id) {
+                id
+            }
+        }
+        ', [
+            'id' => $post->id,
+        ])->assertJson([
+            'data' => [
+                'posts' => [
+                    [
+                        'id' => "$post->id",
+                    ],
+                ],
+            ],
+        ]);
+    }
+
     public function builder(): Builder
     {
         return User::orderBy('id', 'DESC');
@@ -257,5 +310,11 @@ final class AllDirectiveTest extends DBTestCase
     public function builderForRelation(User $parent): Relation
     {
         return $parent->posts()->orderBy('id', 'DESC');
+    }
+
+    public function builderForScoutBuilder(): ScoutBuilder
+    {
+        return Post::search('great title')
+            ->take(self::LIMIT_FROM_CUSTOM_SCOUT_BUILDER);
     }
 }
