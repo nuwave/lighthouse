@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+
+- Allow pagination amount to be 0 https://github.com/nuwave/lighthouse/pull/2105
+
 ## v5.58.0
 
 ### Added
