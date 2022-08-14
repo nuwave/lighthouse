@@ -190,17 +190,11 @@ The generated enum will be named after the class and have values equivalent to t
 
 ```graphql
 enum Color {
-  """
-  Black
-  """
+  """Black"""
   BLACK
-  """
-  White
-  """
+  """White"""
   WHITE
-  """
-  Yellow
-  """
+  """Yellow"""
   YELLOW @deprecated(reason: "too colorful")
 }
 ```
@@ -239,21 +233,13 @@ $userType = new LaravelEnumType(Color::class);
 The generated enum will be as such:
 
 ```graphql
-"""
-Available theme Colors
-"""
+"""Available theme Colors"""
 enum Color {
-  """
-  Black theme
-  """
+  """Black theme"""
   BLACK
-  """
-  White theme
-  """
+  """White theme"""
   WHITE
-  """
-  Yellow
-  """
+  """Yellow"""
   YELLOW @deprecated(reason: "too colorful")
 }
 ```
