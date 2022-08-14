@@ -9,12 +9,6 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
-## v5.58.0
-
-### Added
-
-- Allow `bensampo/laravel-enum` version 6
-
 ## v5.57.5
 
 ### Fixed
