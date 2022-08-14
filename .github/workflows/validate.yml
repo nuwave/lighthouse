@@ -50,11 +50,6 @@ jobs:
             laravel-version: ^6
           - php-version: 8.1
             laravel-version: ^7
-        actions:
-          - name: Psalm
-            run: "vendor/bin/psalm"
-          - name: PHPStan
-            run: "vendor/bin/phpstan"
 
     steps:
       - uses: actions/checkout@v2
@@ -81,7 +76,7 @@ jobs:
 
       - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
 
-      - run: ${{ matrix.actions.run }}
+      - run: vendor/bin/phpstan
 
   tests:
     name: PHPUnit on PHP ${{ matrix.php-version }} with Laravel ${{ matrix.laravel-version }} and ${{ matrix.composer.name }} dependencies
