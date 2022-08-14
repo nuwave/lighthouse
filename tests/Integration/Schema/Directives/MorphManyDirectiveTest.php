@@ -336,6 +336,12 @@ class MorphManyDirectiveTest extends DBTestCase
                         }
                         paginatorInfo {
                             count
+                            currentPage
+                            firstItem
+                            hasMorePages
+                            lastItem
+                            lastPage
+                            perPage
                         }
                     }
                 }
@@ -350,6 +356,12 @@ class MorphManyDirectiveTest extends DBTestCase
                             'data' => [],
                             'paginatorInfo' => [
                                 'count' => 0,
+                                'currentPage' => 1,
+                                'firstItem' => null,
+                                'hasMorePages' => false,
+                                'lastItem' => null,
+                                'lastPage' => 0,
+                                'perPage' => 0,
                             ],
                         ],
                     ],

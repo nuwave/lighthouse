@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
+use Nuwave\Lighthouse\Pagination\ZeroPageLengthAwarePaginator;
 use ReflectionClass;
 use ReflectionMethod;
 
@@ -85,12 +86,8 @@ class PaginatedModelsLoader implements ModelsLoader
 
         // Merge all the relation queries into a single query with UNION ALL.
 
-        /**
-         * Non-null because only non-empty lists of parents are passed into this loader.
-         *
-         * @var \Illuminate\Database\Eloquent\Relations\Relation $firstRelation
-         */
         $firstRelation = $relations->shift();
+        assert($firstRelation instanceof Relation, 'Non-null because only non-empty lists of parents are passed into this loader.');
 
         // Use ->getQuery() to respect model scopes, such as soft deletes
         $mergedRelationQuery = $relations->reduce(
@@ -121,11 +118,11 @@ class PaginatedModelsLoader implements ModelsLoader
      */
     protected function newModelQuery(EloquentCollection $parents): EloquentBuilder
     {
-        /** @var \Illuminate\Database\Eloquent\Model $anyModelInstance */
         $anyModelInstance = $parents->first();
+        assert($anyModelInstance instanceof Model);
 
-        /** @var \Illuminate\Database\Eloquent\Builder $newModelQuery */
         $newModelQuery = $anyModelInstance->newModelQuery();
+        assert($newModelQuery instanceof EloquentBuilder);
 
         return $newModelQuery;
     }
@@ -156,11 +153,11 @@ class PaginatedModelsLoader implements ModelsLoader
      */
     protected function loadDefaultWith(EloquentCollection $models): void
     {
-        /** @var \Illuminate\Database\Eloquent\Model|null $model */
         $model = $models->first();
         if (null === $model) {
             return;
         }
+        assert($model instanceof Model);
 
         $reflection = new ReflectionClass($model);
         $withProperty = $reflection->getProperty('with');
@@ -195,16 +192,17 @@ class PaginatedModelsLoader implements ModelsLoader
 
     protected function convertRelationToPaginator(EloquentCollection $parents): void
     {
+        $first = $this->paginationArgs->first;
+        $page = $this->paginationArgs->page;
+
         foreach ($parents as $model) {
-            $model->setRelation(
-                $this->relation,
-                new LengthAwarePaginator(
-                    $model->getRelation($this->relation),
-                    CountModelsLoader::extractCount($model, $this->relation),
-                    $this->paginationArgs->first,
-                    $this->paginationArgs->page
-                )
-            );
+            $total = CountModelsLoader::extractCount($model, $this->relation);
+
+            $paginator = $first === 0
+                ? new ZeroPageLengthAwarePaginator($total, $page)
+                : new LengthAwarePaginator($model->getRelation($this->relation), $total, $first, $page);
+
+            $model->setRelation($this->relation, $paginator);
         }
     }
 }
