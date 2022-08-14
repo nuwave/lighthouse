@@ -15,10 +15,10 @@ class ParseException extends Exception implements ClientAware
 
         $source = $error->getSource();
         $positions = $error->getPositions();
-        if ($source instanceof Source && count($positions) > 0) {
+        if ($source instanceof Source && [] !== $positions) {
             $position = $positions[0];
 
-            $message .= ', near: ' . \Safe\substr($source->body, max(0, $position - 50), 100);
+            $message .= ', near: ' . substr($source->body, max(0, $position - 50), 100);
         }
 
         parent::__construct($message);

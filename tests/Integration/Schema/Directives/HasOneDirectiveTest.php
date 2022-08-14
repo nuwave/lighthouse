@@ -6,7 +6,7 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 
-class HasOneDirectiveTest extends DBTestCase
+final class HasOneDirectiveTest extends DBTestCase
 {
     public function testQueryHasOneRelationship(): void
     {
@@ -19,11 +19,11 @@ class HasOneDirectiveTest extends DBTestCase
         type Post {
             id: Int
         }
-        
+
         type Task {
             post: Post @hasOne
         }
-        
+
         type Query {
             tasks: [Task!]! @all
         }

@@ -4,17 +4,17 @@ namespace Tests\Unit\Schema\Directives;
 
 use Tests\TestCase;
 
-class HashDirectiveTest extends TestCase
+final class HashDirectiveTest extends TestCase
 {
     public function testHashAnArgument(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            foo(bar: String @hash): Foo @mock
+            foo(bar: String! @hash): Foo @mock
         }
 
         type Foo {
-            bar: String
+            bar: String!
         }
         ';
 
@@ -40,19 +40,19 @@ class HashDirectiveTest extends TestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            user(input: UserInput): User @mock
+            user(input: UserInput!): User @mock
         }
 
         type User {
-            password: String!
-            alt_passwords: [String]
-            friends: [User]
+            password: String
+            alt_passwords: [String!]
+            friends: [User!]
         }
 
         input UserInput {
             password: String @hash
-            alt_passwords: [String] @hash
-            friends: [UserInput]
+            alt_passwords: [String!] @hash
+            friends: [UserInput!]
         }
         ';
 
@@ -117,5 +117,40 @@ class HashDirectiveTest extends TestCase
         $friendPasswordFour = $result->json('data.user.friends.2.friends.0.password');
         $this->assertNotSame('friend_password_4', $friendPasswordFour);
         $this->assertTrue(password_verify('friend_password_4', $friendPasswordFour));
+    }
+
+    public function testHashWithRename(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            user(input: UserInput!): User @mock
+        }
+
+        type User {
+            password_renamed: String!
+        }
+
+        input UserInput {
+            password: String! @hash @rename(attribute: "password_renamed")
+        }
+        ';
+
+        $this->mockResolver(function ($root, array $args) {
+            return $args['input'];
+        });
+
+        $result = $this->graphQL(/** @lang GraphQL */ '
+        {
+            user(input: {
+                password: "password"
+            }) {
+                password_renamed
+            }
+        }
+        ');
+
+        $password = $result->json('data.user.password_renamed');
+        $this->assertNotSame('password', $password);
+        $this->assertTrue(password_verify('password', $password));
     }
 }

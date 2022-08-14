@@ -7,7 +7,7 @@ use Illuminate\Routing\Route;
 use Nuwave\Lighthouse\LighthouseServiceProvider;
 use Orchestra\Testbench\TestCase;
 
-class RouteRegistrationTest extends TestCase
+final class RouteRegistrationTest extends TestCase
 {
     /**
      * Get package providers.

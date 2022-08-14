@@ -11,7 +11,7 @@ use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Nuwave\Lighthouse\Pagination\PaginationType;
 use Tests\TestCase;
 
-class PaginateDirectiveTest extends TestCase
+final class PaginateDirectiveTest extends TestCase
 {
     public function testIncludesPaginationInfoObjectsInSchema(): void
     {
@@ -99,6 +99,9 @@ type SimplePaginatorInfo {
 
   """Number of items per page."""
   perPage: Int!
+
+  """Are there more pages after this one?"""
+  hasMorePages: Boolean!
 }
 GRAPHQL
             ,
@@ -551,6 +554,34 @@ GRAPHQL
         );
     }
 
+    public function testCountExplicitlyRequiredFromDirective(): void
+    {
+        config(['lighthouse.pagination.default_count' => 2]);
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID!
+            name: String!
+        }
+
+        type Query {
+            users: [User!] @paginate(defaultCount: null)
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                users {
+                    data {
+                        id
+                    }
+                }
+            }
+            ')
+            ->assertGraphQLErrorMessage('Field "users" argument "first" of type "Int!" is required but not provided.');
+    }
+
     /**
      * @dataProvider nonNullPaginationResults
      */
@@ -648,5 +679,32 @@ GRAPHQL
         $ast = $userPaginator->astNode;
 
         $this->assertCount(1, $ast->directives);
+    }
+
+    public function testDisallowFirstNull(): void
+    {
+        // TODO reenable in v6
+        $this->markTestSkipped('Will be fixed in v6');
+
+        // @phpstan-ignore-next-line unreachable
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID!
+        }
+
+        type Query {
+            users: [User!]! @paginate(defaultCount: 2)
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users(first: null) {
+                data {
+                    id
+                }
+            }
+        }
+        ')->dump();
     }
 }

@@ -31,8 +31,7 @@ GRAPHQL;
      */
     public function handleBuilder($builder, $value): object
     {
-        $scope = $this->directiveArgValue('name')
-            ?? $this->nodeName();
+        $scope = $this->directiveArgValue('name', $this->nodeName());
 
         try {
             return $builder->{$scope}($value);

@@ -85,44 +85,42 @@ GRAPHQL;
     {
         $modelArg = $this->directiveArgValue('model');
         if (is_string($modelArg)) {
-            return $fieldValue->setResolver(
-                function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg) {
-                    /** @var Builder $query */
-                    $query = $this
-                        ->namespaceModelClass($modelArg)::query();
+            $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg) {
+                /** @var Builder $query */
+                $query = $this
+                    ->namespaceModelClass($modelArg)::query();
 
-                    $this->makeBuilderDecorator($resolveInfo)($query);
+                $this->makeBuilderDecorator($resolveInfo)($query);
 
-                    return $query->{$this->function()}($this->column());
-                }
-            );
+                return $query->{$this->function()}($this->column());
+            });
+
+            return $fieldValue;
         }
 
         $relation = $this->directiveArgValue('relation');
         if (is_string($relation)) {
-            $fieldValue->setResolver(
-                function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
-                    /** @var \Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader $relationBatchLoader */
-                    $relationBatchLoader = BatchLoaderRegistry::instance(
-                        array_merge(
-                            $this->qualifyPath($args, $resolveInfo),
-                            [$this->function(), $this->column()]
-                        ),
-                        function () use ($resolveInfo): RelationBatchLoader {
-                            return new RelationBatchLoader(
-                                new AggregateModelsLoader(
-                                    $this->relation(),
-                                    $this->column(),
-                                    $this->function(),
-                                    $this->makeBuilderDecorator($resolveInfo)
-                                )
-                            );
-                        }
-                    );
+            $fieldValue->setResolver(function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
+                /** @var \Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader $relationBatchLoader */
+                $relationBatchLoader = BatchLoaderRegistry::instance(
+                    array_merge(
+                        $this->qualifyPath($args, $resolveInfo),
+                        [$this->function(), $this->column()]
+                    ),
+                    function () use ($resolveInfo): RelationBatchLoader {
+                        return new RelationBatchLoader(
+                            new AggregateModelsLoader(
+                                $this->relation(),
+                                $this->column(),
+                                $this->function(),
+                                $this->makeBuilderDecorator($resolveInfo)
+                            )
+                        );
+                    }
+                );
 
-                    return $relationBatchLoader->load($parent);
-                }
-            );
+                return $relationBatchLoader->load($parent);
+            });
 
             return $fieldValue;
         }

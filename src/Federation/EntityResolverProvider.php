@@ -7,6 +7,7 @@ use GraphQL\Error\Error;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\SelectionSetNode;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
@@ -18,6 +19,10 @@ use Nuwave\Lighthouse\Schema\Directives\ModelDirective;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Support\Utils;
 
+/**
+ * @phpstan-type SingleEntityResolverFn \Closure(array<string, mixed>): mixed
+ * @phpstan-type EntityResolver SingleEntityResolverFn|BatchedEntityResolver
+ */
 class EntityResolverProvider
 {
     /**
@@ -36,6 +41,11 @@ class EntityResolverProvider
     protected $configRepository;
 
     /**
+     * @var \Illuminate\Contracts\Container\Container
+     */
+    protected $container;
+
+    /**
      * Maps from __typename to definitions.
      *
      * @var array<string, \GraphQL\Language\AST\ObjectTypeDefinitionNode>
@@ -45,15 +55,20 @@ class EntityResolverProvider
     /**
      * Maps from __typename to resolver.
      *
-     * @var array<string, \Closure(array<string, mixed>): mixed>
+     * @var array<string, SingleEntityResolverFn|BatchedEntityResolver>
      */
     protected $resolvers;
 
-    public function __construct(SchemaBuilder $schemaBuilder, DirectiveLocator $directiveLocator, ConfigRepository $configRepository)
-    {
+    public function __construct(
+        SchemaBuilder $schemaBuilder,
+        DirectiveLocator $directiveLocator,
+        ConfigRepository $configRepository,
+        Container $container
+    ) {
         $this->schema = $schemaBuilder->schema();
         $this->directiveLocator = $directiveLocator;
         $this->configRepository = $configRepository;
+        $this->container = $container;
     }
 
     public static function missingResolver(string $typename): string
@@ -67,9 +82,9 @@ class EntityResolverProvider
     }
 
     /**
-     * @return \Closure(array<string, mixed> $representations): mixed
+     * @return EntityResolver
      */
-    public function resolver(string $typename): Closure
+    public function resolver(string $typename): callable
     {
         if (isset($this->resolvers[$typename])) {
             return $this->resolvers[$typename];
@@ -123,7 +138,10 @@ class EntityResolverProvider
         return $definition;
     }
 
-    protected function resolverFromClass(string $typename): ?Closure
+    /**
+     * @return EntityResolver|null
+     */
+    protected function resolverFromClass(string $typename): ?callable
     {
         $resolverClass = Utils::namespaceClassname(
             $typename,
@@ -135,9 +153,16 @@ class EntityResolverProvider
             return null;
         }
 
+        if (is_a($resolverClass, BatchedEntityResolver::class, true)) {
+            return $this->container->make($resolverClass);
+        }
+
         return Utils::constructResolver($resolverClass, '__invoke');
     }
 
+    /**
+     * @return SingleEntityResolverFn|null
+     */
     protected function resolverFromModel(string $typeName): ?Closure
     {
         $definition = $this->typeDefinition($typeName);

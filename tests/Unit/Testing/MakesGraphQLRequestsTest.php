@@ -7,7 +7,7 @@ use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Http\Request;
 use Tests\TestCase;
 
-class MakesGraphQLRequestsTest extends TestCase
+final class MakesGraphQLRequestsTest extends TestCase
 {
     protected function getEnvironmentSetUp($app): void
     {

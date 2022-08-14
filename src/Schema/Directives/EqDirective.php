@@ -46,7 +46,7 @@ GRAPHQL;
     public function handleBuilder($builder, $value): object
     {
         return $builder->where(
-            $this->directiveArgValue('key') ?? $this->nodeName(),
+            $this->directiveArgValue('key', $this->nodeName()),
             $value
         );
     }
@@ -54,7 +54,7 @@ GRAPHQL;
     public function handleScoutBuilder(ScoutBuilder $builder, $value): ScoutBuilder
     {
         return $builder->where(
-            $this->directiveArgValue('key') ?? $this->nodeName(),
+            $this->directiveArgValue('key', $this->nodeName()),
             $value
         );
     }

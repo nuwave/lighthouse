@@ -22,7 +22,7 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Post> $posts
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Task> $tasks
  */
-class Tag extends Model
+final class Tag extends Model
 {
     public function posts(): MorphToMany
     {

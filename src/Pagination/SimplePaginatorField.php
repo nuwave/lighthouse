@@ -22,6 +22,7 @@ class SimplePaginatorField
             'firstItem' => $root->firstItem(),
             'lastItem' => $root->lastItem(),
             'perPage' => $root->perPage(),
+            'hasMorePages' => $root->hasMorePages(),
         ];
     }
 

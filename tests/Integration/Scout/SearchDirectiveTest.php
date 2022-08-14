@@ -4,42 +4,21 @@ namespace Tests\Integration\Scout;
 
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Laravel\Scout\Builder as ScoutBuilder;
-use Laravel\Scout\EngineManager;
-use Laravel\Scout\Engines\NullEngine;
 use Mockery;
-use Mockery\MockInterface;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Scout\ScoutException;
 use Tests\DBTestCase;
+use Tests\TestsScoutEngine;
 use Tests\Utils\Models\Post;
 
-class SearchDirectiveTest extends DBTestCase
+final class SearchDirectiveTest extends DBTestCase
 {
-    /**
-     * @var \Mockery\MockInterface&\Laravel\Scout\EngineManager
-     */
-    protected $engineManager;
-
-    /**
-     * @var \Mockery\MockInterface&\Laravel\Scout\Engines\NullEngine
-     */
-    protected $engine;
+    use TestsScoutEngine;
 
     public function setUp(): void
     {
         parent::setUp();
-
-        $this->engineManager = Mockery::mock(EngineManager::class);
-        $this->engine = Mockery::mock(NullEngine::class)
-            ->makePartial();
-
-        $this->app->singleton(EngineManager::class, function (): MockInterface {
-            return $this->engineManager;
-        });
-
-        $this->engineManager
-            ->shouldReceive('engine')
-            ->andReturn($this->engine);
+        $this->setUpScoutEngine();
     }
 
     public function testSearch(): void

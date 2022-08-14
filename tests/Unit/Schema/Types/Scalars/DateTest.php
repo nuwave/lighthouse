@@ -5,7 +5,7 @@ namespace Tests\Unit\Schema\Types\Scalars;
 use Nuwave\Lighthouse\Schema\Types\Scalars\Date;
 use Nuwave\Lighthouse\Schema\Types\Scalars\DateScalar;
 
-class DateTest extends DateScalarTest
+final class DateTest extends DateScalarTest
 {
     protected function scalarInstance(): DateScalar
     {

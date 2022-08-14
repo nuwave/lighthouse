@@ -61,8 +61,7 @@ We welcome contributions of any kind, see how in [`CONTRIBUTING.md`](CONTRIBUTIN
 ## Security Vulnerabilities
 
 If you discover a security vulnerability within Lighthouse,
-please email Benedikt Franke via [benedikt@franke.tech](mailto:benedikt@franke.tech)
-or visit https://tidelift.com/security.
+please email Benedikt Franke via [benedikt@franke.tech](mailto:benedikt@franke.tech).
 
 ## Sponsors
 

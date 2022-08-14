@@ -3,13 +3,15 @@
 namespace Tests\Integration;
 
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
+use Illuminate\Filesystem\Filesystem;
+use Nuwave\Lighthouse\Exceptions\InvalidSchemaCacheContentsException;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Tests\TestCase;
 use Tests\TestsSchemaCache;
 use Tests\TestsSerialization;
 use Tests\Utils\Models\Comment;
 
-class SchemaCachingTest extends TestCase
+final class SchemaCachingTest extends TestCase
 {
     use TestsSerialization;
     use TestsSchemaCache;
@@ -74,6 +76,25 @@ class SchemaCachingTest extends TestCase
                 ],
             ],
         ]);
+    }
+
+    public function testInvalidSchemaCacheContents(): void
+    {
+        $config = app(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
+        $config->set('lighthouse.cache.version', 2);
+
+        $filesystem = app(Filesystem::class);
+        assert($filesystem instanceof Filesystem);
+        $path = $config->get('lighthouse.cache.path');
+        $filesystem->put($path, '');
+
+        $this->expectExceptionObject(new InvalidSchemaCacheContentsException($path, 1));
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo
+        }
+        ');
     }
 
     protected function cacheSchema(): void

@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
 use Closure;
-use Nuwave\Lighthouse\Schema\Directives\RenameDirective;
 use Nuwave\Lighthouse\Scout\ScoutEnhancer;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective;
@@ -59,7 +58,7 @@ class ArgumentSet
     {
         $argument = $this->arguments[$key] ?? null;
 
-        if (null === $argument) {
+        if (! $argument instanceof Argument) {
             return false;
         }
 
@@ -67,62 +66,22 @@ class ArgumentSet
     }
 
     /**
-     * Apply the @rename directive and return a new, modified instance.
-     *
-     * @noRector \Rector\DeadCode\Rector\ClassMethod\RemoveDeadRecursiveClassMethodRector
-     */
-    public function rename(): self
-    {
-        $argumentSet = new self();
-        $argumentSet->directives = $this->directives;
-
-        foreach ($this->arguments as $name => $argument) {
-            // Recursively apply the renaming to nested inputs.
-            // We look for further ArgumentSet instances, they
-            // might be contained within an array.
-            $argument->value = Utils::applyEach(
-                function ($value) {
-                    if ($value instanceof self) {
-                        return $value->rename();
-                    }
-
-                    return $value;
-                },
-                $argument->value
-            );
-
-            /** @var \Nuwave\Lighthouse\Schema\Directives\RenameDirective|null $renameDirective */
-            $renameDirective = $argument->directives->first(function ($directive) {
-                return $directive instanceof RenameDirective;
-            });
-
-            if (null !== $renameDirective) {
-                $argumentSet->arguments[$renameDirective->attributeArgValue()] = $argument;
-            } else {
-                $argumentSet->arguments[$name] = $argument;
-            }
-        }
-
-        return $argumentSet;
-    }
-
-    /**
      * Apply ArgBuilderDirectives and scopes to the builder.
      *
-     * @template TBuilder of \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
+     * @template TBuilder of \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation|\Laravel\Scout\Builder
      *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation|\Laravel\Scout\Builder  $builder
      * @phpstan-param  TBuilder  $builder
      *
      * @param  array<string>  $scopes
      *
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Laravel\Scout\Builder
-     * @phpstan-return TBuilder|\Laravel\Scout\Builder
+     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation|\Laravel\Scout\Builder
+     * @phpstan-return TBuilder
      */
     public function enhanceBuilder(object $builder, array $scopes, Closure $directiveFilter = null): object
     {
         $scoutEnhancer = new ScoutEnhancer($this, $builder);
-        if ($scoutEnhancer->hasSearchArguments()) {
+        if ($scoutEnhancer->canEnhanceBuilder()) {
             return $scoutEnhancer->enhanceBuilder();
         }
 

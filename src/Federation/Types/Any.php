@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Federation\Types;
 use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Utils\AST;
+use GraphQL\Utils\Utils;
 use Nuwave\Lighthouse\Federation\EntityResolverProvider;
 
 /**
@@ -12,13 +13,26 @@ use Nuwave\Lighthouse\Federation\EntityResolverProvider;
  */
 class Any extends ScalarType
 {
-    public const MESSAGE = 'Expected an input with a field `__typename` and matching fields, got: ';
-
     public $name = '_Any';
 
     public $description = /** @lang Markdown */ <<<'DESCRIPTION'
 Representation of entities from external services for the root `_entities` field.
 DESCRIPTION;
+
+    public static function isNotArray(): string
+    {
+        return 'Expected an input with a field `__typename` and matching fields.';
+    }
+
+    public static function typenameIsNotString(): string
+    {
+        return 'Expected an input where field `__typename` is a string.';
+    }
+
+    public static function typenameIsInvalidName(Error $isValidNameError): string
+    {
+        return "Invalid __typename: {$isValidNameError->getMessage()}";
+    }
 
     public function serialize($value)
     {
@@ -33,12 +47,17 @@ DESCRIPTION;
         // We do as much validation as possible here, before entering resolvers
 
         if (! is_array($value)) {
-            throw new Error(self::MESSAGE . \Safe\json_encode($value));
+            throw new Error(self::isNotArray());
         }
 
         $typename = $value['__typename'] ?? null;
         if (! is_string($typename)) {
-            throw new Error(self::MESSAGE . \Safe\json_encode($value));
+            throw new Error(self::typenameIsNotString());
+        }
+
+        $isValidNameError = Utils::isValidNameError($typename);
+        if ($isValidNameError instanceof Error) {
+            throw new Error(self::typenameIsInvalidName($isValidNameError));
         }
 
         /** @var \Nuwave\Lighthouse\Federation\EntityResolverProvider $entityResolverProvider */

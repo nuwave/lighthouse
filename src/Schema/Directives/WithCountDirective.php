@@ -53,7 +53,7 @@ GRAPHQL;
     /**
      * @return CountModelsLoader
      */
-    protected function relationLoader(ResolveInfo $resolveInfo): ModelsLoader
+    protected function modelsLoader(ResolveInfo $resolveInfo): ModelsLoader
     {
         return new CountModelsLoader(
             $this->relation(),

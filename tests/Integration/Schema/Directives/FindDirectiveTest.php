@@ -6,7 +6,7 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Company;
 use Tests\Utils\Models\User;
 
-class FindDirectiveTest extends DBTestCase
+final class FindDirectiveTest extends DBTestCase
 {
     public function testReturnsSingleUser(): void
     {

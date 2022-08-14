@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Schema\Factories;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
-use GraphQL\Type\Definition\Type;
 use Illuminate\Pipeline\Pipeline;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
@@ -86,19 +85,17 @@ class FieldFactory
             ->through(array_merge($fieldMiddleware, $globalFieldMiddleware))
             ->via('handleField')
             // TODO replace when we cut support for Laravel 5.6
-            //->thenReturn()
+            // ->thenReturn()
             ->then(static function (FieldValue $fieldValue): FieldValue {
                 return $fieldValue;
             })
             ->getResolver();
 
-        $fieldValue->setResolver(
-            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolverWithMiddleware) {
-                $resolveInfo->argumentSet = $this->argumentSetFactory->fromResolveInfo($args, $resolveInfo);
+        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolverWithMiddleware) {
+            $resolveInfo->argumentSet = $this->argumentSetFactory->fromResolveInfo($args, $resolveInfo);
 
-                return $resolverWithMiddleware($root, $args, $context, $resolveInfo);
-            }
-        );
+            return $resolverWithMiddleware($root, $args, $context, $resolveInfo);
+        });
 
         // To see what is allowed here, look at the validation rules in
         // GraphQL\Type\Definition\FieldDefinition::getDefinition()
@@ -117,7 +114,7 @@ class FieldFactory
     }
 
     /**
-     * @return \Closure(): Type
+     * @return \Closure(): (\GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\OutputType)
      */
     protected function type(FieldDefinitionNode $fieldDefinition): \Closure
     {

@@ -12,7 +12,7 @@ use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class MorphManyDirectiveTest extends DBTestCase
+final class MorphManyDirectiveTest extends DBTestCase
 {
     use WithFaker;
 
@@ -52,28 +52,26 @@ class MorphManyDirectiveTest extends DBTestCase
         $this->task = factory(Task::class)->create([
             'user_id' => $this->user->id,
         ]);
-        $this->taskImages = Collection::times(10)
-            ->map(function (): Image {
-                $image = $this->task
-                    ->images()
-                    ->save(
-                        factory(Image::class)->create()
-                    );
+        $this->taskImages = Collection::times(10, function (): Image {
+            $image = $this->task
+                ->images()
+                ->save(
+                    factory(Image::class)->create()
+                );
 
-                if (false === $image) {
-                    throw new Exception('Failed to save Image');
-                }
+            if (false === $image) {
+                throw new Exception('Failed to save Image');
+            }
 
-                return $image;
-            });
+            return $image;
+        });
 
         $this->post = factory(Post::class)->create([
             'user_id' => $this->user->id,
         ]);
         $this->postImages = Collection::times(
-            $this->faker()->numberBetween(1, 10)
-        )
-            ->map(function () {
+            $this->faker()->numberBetween(1, 10),
+            function () {
                 $image = $this->post
                     ->images()
                     ->save(
@@ -85,7 +83,8 @@ class MorphManyDirectiveTest extends DBTestCase
                 }
 
                 return $image;
-            });
+            }
+        );
     }
 
     public function testQueryMorphManyRelationship(): void
@@ -305,6 +304,45 @@ class MorphManyDirectiveTest extends DBTestCase
             PaginationArgs::requestedTooManyItems(2, 10),
             $result->json('errors.0.message')
         );
+    }
+
+    public function testPaginatorTypeIsUnlimitedByMaxCountFromDirective(): void
+    {
+        config(['lighthouse.pagination.max_count' => 1]);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Post {
+            id: ID!
+            title: String!
+            images: [Image!] @morphMany(type: PAGINATOR, maxCount: null)
+        }
+
+        type Image {
+            id: ID!
+        }
+
+        type Query {
+            post (
+                id: ID! @eq
+            ): Post @find
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ "
+            {
+                post(id: {$this->post->id}) {
+                    id
+                    title
+                    images(first: 10) {
+                        data {
+                            id
+                        }
+                    }
+                }
+            }
+            ")
+            ->assertGraphQLErrorFree();
     }
 
     public function testHandlesPaginationWithCountZero(): void

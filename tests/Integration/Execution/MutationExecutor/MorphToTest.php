@@ -6,7 +6,7 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Image;
 use Tests\Utils\Models\Task;
 
-class MorphToTest extends DBTestCase
+final class MorphToTest extends DBTestCase
 {
     protected $schema = /** @lang GraphQL */ '
     type Task {
@@ -201,7 +201,7 @@ class MorphToTest extends DBTestCase
         $image->url = 'bar';
         $image->save();
 
-        $field = "${action}Image";
+        $field = "{$action}Image";
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
             {$field}(input: {
@@ -242,7 +242,7 @@ GRAPHQL
         $image->url = 'bar';
         $image->save();
 
-        $field = "${action}Image";
+        $field = "{$action}Image";
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
             {$field}(input: {

@@ -80,6 +80,20 @@ namespace Illuminate\Testing {
         }
 
         /**
+         * Assert the response contains an error with the given debug message.
+         *
+         * Requires the config `lighthouse.debug` to include the option \GraphQL\Error\DebugFlag::INCLUDE_DEBUG_MESSAGE.
+         *
+         * @param  string  $message  the expected debug message
+         *
+         * @return $this
+         */
+        public function assertGraphQLDebugMessage(string $message): self
+        {
+            return $this;
+        }
+
+        /**
          * Assert the response contains no errors.
          *
          * @return $this

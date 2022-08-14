@@ -29,11 +29,11 @@ GRAPHQL;
     {
         $attribute = $this->attributeArgValue();
 
-        return $fieldValue->setResolver(
-            function ($rootValue) use ($attribute) {
-                return data_get($rootValue, $attribute);
-            }
-        );
+        $fieldValue->setResolver(function ($rootValue) use ($attribute) {
+            return data_get($rootValue, $attribute);
+        });
+
+        return $fieldValue;
     }
 
     /**

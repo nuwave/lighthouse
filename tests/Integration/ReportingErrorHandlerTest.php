@@ -6,7 +6,7 @@ use GraphQL\Error\Error;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Tests\TestCase;
 
-class ReportingErrorHandlerTest extends TestCase
+final class ReportingErrorHandlerTest extends TestCase
 {
     protected $schema = /** @lang GraphQL */ '
     type Query {

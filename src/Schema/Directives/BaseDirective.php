@@ -114,9 +114,9 @@ abstract class BaseDirective implements Directive
     /**
      * Get the value of an argument on the directive.
      *
-     * @param  mixed|null  $default
+     * @param  mixed  $default Use this over `??` to preserve explicit `null`
      *
-     * @return mixed|null
+     * @return mixed The argument value or the default
      */
     protected function directiveArgValue(string $name, $default = null)
     {
@@ -148,13 +148,10 @@ abstract class BaseDirective implements Directive
      */
     protected function getModelClass(string $argumentName = 'model'): string
     {
-        $model = $this->directiveArgValue($argumentName)
-            ?? ASTHelper::modelName($this->definitionNode);
+        $model = $this->directiveArgValue($argumentName, ASTHelper::modelName($this->definitionNode));
 
         if (! $model) {
-            throw new DefinitionException(
-                "Could not determine a model name for the '@{$this->name()}' directive on '{$this->nodeName()}."
-            );
+            throw new DefinitionException("Could not determine a model name for the '@{$this->name()}' directive on '{$this->nodeName()}.");
         }
 
         return $this->namespaceModelClass($model);
@@ -209,8 +206,10 @@ abstract class BaseDirective implements Directive
      * Split a single method argument into its parts.
      *
      * A method argument is expected to contain a class and a method name, separated by an @ symbol.
-     * e.g. "App\My\Class@methodName"
-     * This validates that exactly two parts are given and are not empty.
+     *
+     * @example "App\My\Class@methodName"
+     *
+     * This validates that exactly two non-empty parts are given, not that the method exists.
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      *
@@ -247,11 +246,6 @@ abstract class BaseDirective implements Directive
      */
     protected function namespaceModelClass(string $modelClassCandidate): string
     {
-        /**
-         * The callback ensures this holds true.
-         *
-         * @var class-string<\Illuminate\Database\Eloquent\Model> $modelClass
-         */
         $modelClass = $this->namespaceClassName(
             $modelClassCandidate,
             (array) config('lighthouse.namespaces.models'),
@@ -259,6 +253,7 @@ abstract class BaseDirective implements Directive
                 return is_subclass_of($classCandidate, Model::class);
             }
         );
+        assert(is_subclass_of($modelClass, Model::class));
 
         return $modelClass;
     }

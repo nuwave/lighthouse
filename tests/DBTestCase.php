@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\DB;
 
 abstract class DBTestCase extends TestCase
 {
+    use AssertsQueryCounts;
+
     public const DEFAULT_CONNECTION = 'mysql';
     public const ALTERNATE_CONNECTION = 'alternate';
 

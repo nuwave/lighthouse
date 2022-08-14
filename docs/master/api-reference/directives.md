@@ -249,12 +249,14 @@ directive @belongsToMany(
   """
   Allow clients to query paginated lists without specifying the amount of items.
   Overrules the `pagination.default_count` setting from `lighthouse.php`.
+  Setting this to `null` means clients have to explicitly ask for the count.
   """
   defaultCount: Int
 
   """
   Limit the maximum amount of items that clients can request from paginated lists.
   Overrules the `pagination.max_count` setting from `lighthouse.php`.
+  Setting this to `null` means the count is unrestricted.
   """
   maxCount: Int
 
@@ -287,7 +289,9 @@ enum BelongsToManyType {
 }
 ```
 
-It assumes both the field and the relationship method to have the same name.
+### Basic Usage
+
+The field and the relationship method are assumed to have the same name.
 
 ```graphql
 type User {
@@ -296,10 +300,6 @@ type User {
 ```
 
 ```php
-<?php
-
-namespace App\Models;
-
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
@@ -312,6 +312,8 @@ class User extends Model
 }
 ```
 
+### Rename Relation
+
 The directive accepts an optional `relation` argument if your relationship method
 has a different name than the field.
 
@@ -321,22 +323,79 @@ type User {
 }
 ```
 
-When using the `type` argument with pagination style `CONNECTION`, you may create your own
-[Edge type](https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types) which
-may have fields that resolve from the model [pivot](https://laravel.com/docs/eloquent-relationships#many-to-many)
-data. You may also add a custom field resolver for fields you want to resolve yourself.
+### Retrieving Intermediate Table Columns
 
-You may either specify the edge using the `edgetype` argument, or it will automatically
-look for a {type}Edge type to be defined. In this case it would be `RoleEdge`.
+You may want to allow accessing data that describes the relation between the models
+and is stored in the intermediate table - see [retrieving intermediate table columns in Laravel](https://laravel.com/docs/eloquent-relationships#retrieving-intermediate-table-columns).
+
+Just like in Laravel, you can access the `pivot` attribute on the models (or its alias).
+Even though this attribute is always present when querying the model through the relation,
+it may not be present when reaching the node through another path in the schema, so it is
+recommended to define the field as nullable (no `!`).
+
+The following example assumes the intermediate table between `User` and `Role` defines
+a column `meta`.
+
+```php
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+
+class User extends Model
+{
+    public function roles(): BelongsToMany
+    {
+        return $this->belongsToMany(Role::class)
+            ->withPivot('meta');
+    }
+}
+
+class Role extends Model
+{
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class)
+            ->withPivot('meta');
+    }
+}
+```
 
 ```graphql
 type User {
-  roles: [Role!]! @belongsToMany(type: CONNECTION, edgeType: "CustomRoleEdge")
+  id: ID!
+  roles: [Role!]! @belongsToMany
+  pivot: RoleUserPivot
 }
 
-type CustomRoleEdge implements Edge {
+type Role {
+  id: ID!
+  users: [Users!]! @belongsToMany
+  pivot: RoleUserPivot
+}
+
+type RoleUserPivot {
+  meta: String
+}
+```
+
+When using the `type` argument with pagination style `CONNECTION`, you may create your own [edge type](https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types)
+that contains the attributes of the intermediate table.
+
+The custom edge type must contain at least the following two fields:
+
+- `cursor: String!`
+- `node: <RelatedModel>!` (in this case `node: Role!`)
+
+It is expected to be named `<RelatedModel>Edge` (in this case `RoleEdge`).
+Assuming the intermediate table defines a column `meta`, the definition could look like this:
+
+```graphql
+type User {
+  roles: [Role!]! @belongsToMany(type: CONNECTION)
+}
+
+type RoleEdge {
+  node: Role!
   cursor: String!
-  node: Node
   meta: String
 }
 ```
@@ -463,13 +522,57 @@ directive @cache(
 
 You can find usage examples of this directive in [the caching docs](../performance/caching.md).
 
+## @cacheControl
+
+```graphql
+"""
+Influences the HTTP `Cache-Control` headers of the response.
+"""
+directive @cacheControl(
+  """
+  The maximum amount of time the field's cached value is valid, in seconds.
+  0 means the field is not cacheable.
+  Mutually exclusive with `inheritMaxAge = true`.
+  """
+  maxAge: Int! = 0
+
+  """
+  Is the value specific to a single user?
+  """
+  scope: CacheControlScope! = PUBLIC
+
+  """
+  Should the field inherit the `maxAge` of its parent field instead of using the default `maxAge`?
+  Mutually exclusive with `maxAge`.
+  """
+  inheritMaxAge: Boolean! = false
+) on FIELD_DEFINITION | OBJECT | INTERFACE | UNION
+
+"""
+Options for the `scope` argument of `@cacheControl`.
+"""
+enum CacheControlScope {
+  """
+  The value is the same for each user.
+  """
+  PUBLIC
+
+  """
+  The value is specific to a single user.
+  """
+  PRIVATE
+}
+```
+
+Find usage examples of this directive in [the caching docs](../performance/caching.md#http-cache-control-header).
+
 ## @cacheKey
 
 ```graphql
 """
 Specify the field to use as a key when creating a cache.
 """
-directive @cacheKey on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+directive @cacheKey on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 ```
 
 You can find usage examples of this directive in [the caching docs](../performance/caching.md#cache-key).
@@ -490,17 +593,12 @@ directive @can(
   ability: String!
 
   """
-  Query for specific model instances to check the policy against, using arguments
-  with directives that add constraints to the query builder, such as `@eq`.
+  Check the policy against the model instances returned by the field resolver.
+  Only use this if the field does not mutate data, it is run before checking.
 
-  Mutually exclusive with `find`.
+  Mutually exclusive with `query` and `find`.
   """
-  query: Boolean = false
-
-  """
-  Apply scopes to the underlying query.
-  """
-  scopes: [String!]
+  resolved: Boolean! = false
 
   """
   Specify the class name of the model to use.
@@ -511,15 +609,28 @@ directive @can(
   """
   Pass along the client given input data as arguments to `Gate::check`.
   """
-  injectArgs: Boolean = false
+  injectArgs: Boolean! = false
 
   """
   Statically defined arguments that are passed to `Gate::check`.
 
-  You may pass pass arbitrary GraphQL literals,
+  You may pass arbitrary GraphQL literals,
   e.g.: [1, 2, 3] or { foo: "bar" }
   """
   args: CanArgs
+
+  """
+  Query for specific model instances to check the policy against, using arguments
+  with directives that add constraints to the query builder, such as `@eq`.
+
+  Mutually exclusive with `resolved` and `find`.
+  """
+  query: Boolean! = false
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
 
   """
   If your policy checks against specific model instances, specify
@@ -527,7 +638,7 @@ directive @can(
 
   You may pass the string in dot notation to use nested inputs.
 
-  Mutually exclusive with `search`.
+  Mutually exclusive with `resolved` and `query`.
   """
   find: String
 ) repeatable on FIELD_DEFINITION
@@ -548,12 +659,12 @@ type Mutation {
 }
 ```
 
-Query for specific model instances to check the policy against with the `query` argument:
+Check the policy against the resolved model instances with the `resolved` argument:
 
 ```graphql
 type Query {
   fetchUserByEmail(email: String! @eq): User
-    @can(ability: "view", query: true)
+    @can(ability: "view", resolved: true)
     @find
 }
 ```
@@ -575,7 +686,7 @@ directive @clearCache(
   """
   Source of the parent ID to clear.
   """
-  idSource: ClearCacheId
+  idSource: ClearCacheIdSource
 
   """
   Name of the field to clear.
@@ -654,6 +765,53 @@ class ComplexityAnalyzer {
     }
 ```
 
+## @convertEmptyStringsToNull
+
+```graphql
+"""
+Replaces `""` with `null`.
+"""
+directive @convertEmptyStringsToNull on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+```
+
+Use this when there is no meaningful distinction between an empty string and null.
+
+```graphql
+type Mutation {
+  createPost(title: String @convertEmptyStringsToNull): Post!
+}
+```
+
+Usage on a field applies the conversion recursively to all inputs.
+
+```graphql
+type Mutation {
+  createPost(input: CreatePostInput!): Post! @convertEmptyStringsToNull
+}
+```
+
+Non-nullable arguments will _not_ be converted when this directive is used on a field,
+but will be converted when it is used directly on the argument.
+
+```graphql
+type Mutation {
+  createPost(
+    willBeConvertedBecauseExplicitlyMarked: String! @convertEmptyStringsToNull
+    willNotBeConvertedToMaintainInvariants: String!
+  ): Post! @convertEmptyStringsToNull
+}
+```
+
+If you want this for all your fields, consider adding this directive to your
+global field middleware in `lighthouse.php`:
+
+```php
+    'field_middleware' => [
+        \Nuwave\Lighthouse\Schema\Directives\ConvertEmptyStringsToNullDirective::class,
+        ...
+    ],
+```
+
 ## @count
 
 ```graphql
@@ -677,6 +835,17 @@ directive @count(
   Apply scopes to the underlying query.
   """
   scopes: [String!]
+
+  """
+  Count only rows where the given columns are non-null.
+  `*` counts every row.
+  """
+  columns: [String!]! = ["*"]
+
+  """
+  Should exclude duplicated rows?
+  """
+  distinct: Boolean! = false
 ) on FIELD_DEFINITION
 ```
 
@@ -850,21 +1019,47 @@ Marks an element of a GraphQL schema as no longer supported.
 directive @deprecated(
   """
   Explains why this element was deprecated, usually also including a
-  suggestion for how to access supported similar data. Formatted
-  in [Markdown](https://daringfireball.net/projects/markdown).
+  suggestion for how to access supported similar data.
+  Formatted in [Markdown](https://commonmark.org).
   """
   reason: String = "No longer supported"
-) on FIELD_DEFINITION
+) on FIELD_DEFINITION | ENUM_VALUE
 ```
 
-You can mark fields as deprecated by adding the [@deprecated](#deprecated) directive and providing a
-`reason`. Deprecated fields are not included in introspection queries unless
-requested and they can still be queried by clients.
+You can mark fields as deprecated by adding the [@deprecated](#deprecated) directive.
+It is recommended to provide a `reason` for the deprecation, as well as a suggestion on
+how to move forward.
 
 ```graphql
 type Query {
-  users: [User] @deprecated(reason: "Use the `allUsers` field")
-  allUsers: [User]
+  allUsers: [User!]! @deprecated(reason: "Use `users`")
+  users: [User!]!
+}
+```
+
+Deprecated elements are not included in introspection queries by default,
+but they can still be queried by clients.
+
+## @drop
+
+```graphql
+"""
+Ignore the user given value, don't pass it to the resolver.
+"""
+directive @drop on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
+
+This is useful when you want to deprecate a field, but avoid breaking changes
+for clients that still pass the value.
+
+```graphql
+type User {
+  email: String!
+  foo: String @deprecated
+}
+
+type Mutation {
+  createUser(email: String!, foo: String @drop): User @create
 }
 ```
 
@@ -1303,12 +1498,14 @@ directive @hasMany(
   """
   Allow clients to query paginated lists without specifying the amount of items.
   Overrules the `pagination.default_count` setting from `lighthouse.php`.
+  Setting this to `null` means clients have to explicitly ask for the count.
   """
   defaultCount: Int
 
   """
   Limit the maximum amount of items that clients can request from paginated lists.
   Overrules the `pagination.max_count` setting from `lighthouse.php`.
+  Setting this to `null` means the count is unrestricted.
   """
   maxCount: Int
 
@@ -1365,6 +1562,75 @@ type User {
   posts: [Post!]! @hasMany(relation: "articles")
 }
 ```
+
+## @hasManyThrough
+
+```graphql
+"""
+Corresponds to [the Eloquent relationship HasManyThrough](https://laravel.com/docs/eloquent-relationships#has-many-through).
+"""
+directive @hasManyThrough(
+  """
+  Specify the relationship method name in the model class,
+  if it is named different from the field in the schema.
+  """
+  relation: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+
+  """
+  Allows to resolve the relation as a paginated list.
+  Allowed values: `paginator`, `connection`.
+  """
+  type: HasManyThroughType
+
+  """
+  Allow clients to query paginated lists without specifying the amount of items.
+  Overrules the `pagination.default_count` setting from `lighthouse.php`.
+  Setting this to `null` means clients have to explicitly ask for the count.
+  """
+  defaultCount: Int
+
+  """
+  Limit the maximum amount of items that clients can request from paginated lists.
+  Overrules the `pagination.max_count` setting from `lighthouse.php`.
+  Setting this to `null` means the count is unrestricted.
+  """
+  maxCount: Int
+
+  """
+  Specify a custom type that implements the Edge interface
+  to extend edge object.
+  Only applies when using Relay style "connection" pagination.
+  """
+  edgeType: String
+) on FIELD_DEFINITION
+
+"""
+Options for the `type` argument of `@hasManyThrough`.
+"""
+enum HasManyThroughType {
+  """
+  Offset-based pagination, similar to the Laravel default.
+  """
+  PAGINATOR
+
+  """
+  Offset-based pagination like the Laravel "Simple Pagination", which does not count the total number of records.
+  """
+  SIMPLE
+
+  """
+  Cursor-based pagination, compatible with the Relay specification.
+  """
+  CONNECTION
+}
+```
+
+Usage is the same as [@hasMany](#hasmany).
 
 ## @hasOne
 
@@ -1707,12 +1973,14 @@ directive @morphMany(
   """
   Allow clients to query paginated lists without specifying the amount of items.
   Overrules the `pagination.default_count` setting from `lighthouse.php`.
+  Setting this to `null` means clients have to explicitly ask for the count.
   """
   defaultCount: Int
 
   """
   Limit the maximum amount of items that clients can request from paginated lists.
   Overrules the `pagination.max_count` setting from `lighthouse.php`.
+  Setting this to `null` means the count is unrestricted.
   """
   maxCount: Int
 
@@ -1815,6 +2083,72 @@ type Image {
 }
 
 union Imageable = Post | User
+```
+
+## @morphToMany
+
+```graphql
+"""
+Corresponds to [Eloquent's ManyToMany-Polymorphic-Relationship](https://laravel.com/docs/eloquent-relationships#many-to-many-polymorphic-relations).
+"""
+directive @morphToMany(
+  """
+  Specify the relationship method name in the model class,
+  if it is named different from the field in the schema.
+  """
+  relation: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+
+  """
+  Allows to resolve the relation as a paginated list.
+  """
+  type: MorphToManyType
+
+  """
+  Allow clients to query paginated lists without specifying the amount of items.
+  Overrules the `pagination.default_count` setting from `lighthouse.php`.
+  Setting this to `null` means clients have to explicitly ask for the count.
+  """
+  defaultCount: Int
+
+  """
+  Limit the maximum amount of items that clients can request from paginated lists.
+  Overrules the `pagination.max_count` setting from `lighthouse.php`.
+  Setting this to `null` means the count is unrestricted.
+  """
+  maxCount: Int
+
+  """
+  Specify a custom type that implements the Edge interface
+  to extend edge object.
+  Only applies when using Relay style "connection" pagination.
+  """
+  edgeType: String
+) on FIELD_DEFINITION
+
+"""
+Options for the `type` argument of `@morphToMany`.
+"""
+enum MorphToManyType {
+  """
+  Offset-based pagination, similar to the Laravel default.
+  """
+  PAGINATOR
+
+  """
+  Offset-based pagination like the Laravel "Simple Pagination", which does not count the total number of records.
+  """
+  SIMPLE
+
+  """
+  Cursor-based pagination, compatible with the Relay specification.
+  """
+  CONNECTION
+}
 ```
 
 ## @namespace
@@ -2106,12 +2440,14 @@ directive @paginate(
   """
   Allow clients to query paginated lists without specifying the amount of items.
   Overrules the `pagination.default_count` setting from `lighthouse.php`.
+  Setting this to `null` means clients have to explicitly ask for the count.
   """
   defaultCount: Int
 
   """
   Limit the maximum amount of items that clients can request from paginated lists.
   Overrules the `pagination.max_count` setting from `lighthouse.php`.
+  Setting this to `null` means the count is unrestricted.
   """
   maxCount: Int
 ) on FIELD_DEFINITION
@@ -2273,7 +2609,7 @@ hold information about the total number of items.
 If you wish to use the `simplePaginate` method, set the `type` to `SIMPLE`.
 
 > Please note that the `SIMPLE` paginator does not have the attributes
-> `hasMorePages`, `lastPage` and `total`.
+> `lastPage` and `total`.
 >
 > If you need those fields, you should use the default `PAGINATOR`.
 
@@ -2321,6 +2657,9 @@ type SimplePaginatorInfo {
 
   "Number of items per page."
   perPage: Int!
+
+  "Are there more pages after this one?"
+  hasMorePages: Boolean!
 }
 ```
 

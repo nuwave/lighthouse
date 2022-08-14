@@ -5,7 +5,7 @@ namespace Tests\Integration\Schema\Directives;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
-class InjectDirectiveTest extends DBTestCase
+final class InjectDirectiveTest extends DBTestCase
 {
     public function testCreateFromInputObjectWithDeepInjection(): void
     {
@@ -18,15 +18,15 @@ class InjectDirectiveTest extends DBTestCase
             name: String!
             user: User @belongsTo
         }
-        
+
         type User {
             id: ID
         }
-        
+
         type Mutation {
             createTask(input: CreateTaskInput! @spread): Task @create @inject(context: "user.id", name: "user_id")
         }
-        
+
         input CreateTaskInput {
             name: String
         }

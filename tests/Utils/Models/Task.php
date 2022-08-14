@@ -5,6 +5,7 @@ namespace Tests\Utils\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
@@ -37,9 +38,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Tag> $tags
  * @property-read \Tests\Utils\Models\User|null $user
  */
-class Task extends Model
+final class Task extends Model
 {
     use SoftDeletes;
+
+    public const CLEANING = 'cleaning';
 
     protected static function boot(): void
     {
@@ -47,7 +50,7 @@ class Task extends Model
 
         // This is used to test that this scope works in all kinds of queries
         static::addGlobalScope('no_cleaning', function (Builder $builder): void {
-            $builder->where('name', '!=', 'cleaning');
+            $builder->where('name', '!=', self::CLEANING);
         });
     }
 
@@ -69,6 +72,11 @@ class Task extends Model
     public function post(): HasOne
     {
         return $this->hasOne(Post::class);
+    }
+
+    public function postComments(): HasManyThrough
+    {
+        return $this->hasManyThrough(Comment::class, Post::class);
     }
 
     public function tags(): MorphToMany
@@ -102,5 +110,10 @@ class Task extends Model
         return $query->whereHas('tags', function (Builder $query) use ($tags) {
             $query->whereIn('name', $tags);
         });
+    }
+
+    public function userLoaded(): bool
+    {
+        return $this->relationLoaded('user');
     }
 }

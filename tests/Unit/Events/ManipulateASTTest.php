@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Event;
 use Nuwave\Lighthouse\Events\ManipulateAST;
 use Tests\TestCase;
 
-class ManipulateASTTest extends TestCase
+final class ManipulateASTTest extends TestCase
 {
     public function testManipulateTheAST(): void
     {

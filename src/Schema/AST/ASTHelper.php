@@ -53,7 +53,10 @@ class ASTHelper
             ->all();
 
         $remainingDefinitions = (new Collection($original))
-            ->reject(function ($definition) use ($newNames, $overwriteDuplicates): bool {
+            ->reject(function (Node $definition) use ($newNames, $overwriteDuplicates): bool {
+                // TODO remove with next graphql-php version
+                assert(property_exists($definition, 'name'));
+
                 $oldName = $definition->name->value;
                 $collisionOccurred = in_array($oldName, $newNames);
 
@@ -379,15 +382,19 @@ class ASTHelper
     {
         $typeName = static::getUnderlyingTypeName($field);
 
-        /** @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder $astBuilder */
+        $standardTypes = Type::getStandardTypes();
+        if (isset($standardTypes[$typeName])) {
+            return Parser::scalarTypeDefinition("scalar {$typeName}");
+        }
+
         $astBuilder = app(ASTBuilder::class);
+        assert($astBuilder instanceof ASTBuilder);
+
         $documentAST = $astBuilder->documentAST();
 
         $type = $documentAST->types[$typeName] ?? null;
         if (null === $type) {
-            throw new DefinitionException(
-                "Type '$typeName' on '{$field->name->value}' can not be found in the schema.'"
-            );
+            throw new DefinitionException("Type '$typeName' on '{$field->name->value}' can not be found in the schema.'");
         }
 
         return $type;
@@ -408,5 +415,14 @@ class ASTHelper
         }
 
         return null;
+    }
+
+    public static function internalFieldName(FieldDefinitionNode $field): string
+    {
+        $renameDirectiveNode = static::directiveDefinition($field, 'rename');
+
+        return $renameDirectiveNode
+            ? static::directiveArgValue($renameDirectiveNode, 'attribute')
+            : $field->name->value;
     }
 }

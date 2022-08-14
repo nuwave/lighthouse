@@ -10,7 +10,7 @@ use Tests\Utils\Models\Employee;
 use Tests\Utils\Models\Team;
 use Tests\Utils\Models\User;
 
-class MorphOneFromUnionTest extends DBTestCase
+final class MorphOneFromUnionTest extends DBTestCase
 {
     public function testResolveMorphOneRelationshipOnInterface(): void
     {

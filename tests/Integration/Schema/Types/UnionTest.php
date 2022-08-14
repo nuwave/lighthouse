@@ -2,14 +2,14 @@
 
 namespace Tests\Integration\Schema\Types;
 
-use Illuminate\Support\Collection;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use GraphQL\Error\InvariantViolation;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
 
-class UnionTest extends DBTestCase
+final class UnionTest extends DBTestCase
 {
     /**
      * @dataProvider withAndWithoutCustomTypeResolver
@@ -87,6 +87,20 @@ GRAPHQL;
         ]);
     }
 
+    public function testRejectsUnionWithString(): void
+    {
+        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ <<<GRAPHQL
+        union Stuff = String
+
+GRAPHQL
+        );
+
+        $this->expectExceptionObject(new InvariantViolation(
+            'Union type Stuff can only include Object types, it cannot include String.'
+        ));
+        $schema->assertValid();
+    }
+
     public function testThrowsOnAmbiguousSchemaMapping(): void
     {
         // This creates a user with it
@@ -112,9 +126,7 @@ GRAPHQL;
 GRAPHQL;
 
         $this->expectExceptionObject(
-            new DefinitionException(
-                TypeRegistry::unresolvableAbstractTypeMapping(User::class, ['Foo', 'Post'])
-            )
+            TypeRegistry::unresolvableAbstractTypeMapping(User::class, ['Foo', 'Post'])
         );
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -155,9 +167,7 @@ GRAPHQL;
 GRAPHQL;
 
         $this->expectExceptionObject(
-            new DefinitionException(
-                TypeRegistry::unresolvableAbstractTypeMapping(User::class, [])
-            )
+            TypeRegistry::unresolvableAbstractTypeMapping(User::class, [])
         );
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -171,14 +181,16 @@ GRAPHQL;
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\User|\Tests\Utils\Models\Post>
      */
-    public function fetchResults(): Collection
+    public function fetchResults(): EloquentCollection
     {
-        $users = User::all();
-        $posts = Post::all();
+        /** @var \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\User|\Tests\Utils\Models\Post> $results */
+        $results = new EloquentCollection();
 
-        return $users->concat($posts);
+        return $results
+            ->concat(User::all())
+            ->concat(Post::all());
     }
 
     /**

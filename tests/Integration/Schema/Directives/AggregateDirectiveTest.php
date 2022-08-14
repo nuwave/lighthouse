@@ -2,14 +2,13 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use Illuminate\Support\Facades\DB;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class AggregateDirectiveTest extends DBTestCase
+final class AggregateDirectiveTest extends DBTestCase
 {
     public function setUp(): void
     {
@@ -119,34 +118,29 @@ class AggregateDirectiveTest extends DBTestCase
                 $task->save();
             });
 
-        $queries = 0;
-        DB::listen(static function () use (&$queries): void {
-            ++$queries;
-        });
-
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            users {
-                workload
+        $this->assertQueryCountMatches(2, function (): void {
+            $this->graphQL(/** @lang GraphQL */ '
+            {
+                users {
+                    workload
+                }
             }
-        }
-        ')->assertExactJson([
-            'data' => [
-                'users' => [
-                    [
-                        'workload' => 0,
-                    ],
-                    [
-                        'workload' => 1,
-                    ],
-                    [
-                        'workload' => 2,
+            ')->assertExactJson([
+                'data' => [
+                    'users' => [
+                        [
+                            'workload' => 0,
+                        ],
+                        [
+                            'workload' => 1,
+                        ],
+                        [
+                            'workload' => 2,
+                        ],
                     ],
                 ],
-            ],
-        ]);
-
-        $this->assertSame(2, $queries);
+            ]);
+        });
     }
 
     public function testSumRelationWithScopes(): void
@@ -184,5 +178,67 @@ class AggregateDirectiveTest extends DBTestCase
                 ],
             ],
         ]);
+    }
+
+    public function testMultipleAggregatesOnSameRelationWithAliases(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            difficulty(
+                minimum: Int @where(key: "difficulty", operator: ">=")
+                maximum: Int @where(key: "difficulty", operator: "<=")
+            ): Int! @aggregate(relation: "tasks", function: SUM, column: "difficulty")
+        }
+
+        type Query {
+            users: [User!]! @all
+        }
+        ';
+
+        /** @var \Tests\Utils\Models\User $user1 */
+        $user1 = factory(User::class)->create();
+
+        $low1 = factory(Task::class)->make();
+        $low1->difficulty = 42;
+        $user1->tasks()->save($low1);
+
+        $high1 = factory(Task::class)->make();
+        $high1->difficulty = 9001;
+        $user1->tasks()->save($high1);
+
+        /** @var \Tests\Utils\Models\User $user2 */
+        $user2 = factory(User::class)->create();
+
+        $low2 = factory(Task::class)->make();
+        $low2->difficulty = 69;
+        $user2->tasks()->save($low2);
+
+        $high2 = factory(Task::class)->make();
+        $high2->difficulty = 9002;
+        $user2->tasks()->save($high2);
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            query {
+                users {
+                    lowDifficulty: difficulty(maximum: 9000)
+                    highDifficulty: difficulty(minimum: 9000)
+                }
+            }
+            ')
+            ->assertExactJson([
+                'data' => [
+                    'users' => [
+                        [
+                            'lowDifficulty' => 42,
+                            'highDifficulty' => 9001,
+                        ],
+                        [
+                            'lowDifficulty' => 69,
+                            'highDifficulty' => 9002,
+                        ],
+                    ],
+                ],
+            ]);
     }
 }

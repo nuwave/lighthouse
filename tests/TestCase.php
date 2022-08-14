@@ -11,6 +11,8 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Redis\RedisServiceProvider;
 use Laravel\Scout\ScoutServiceProvider as LaravelScoutServiceProvider;
 use Nuwave\Lighthouse\Auth\AuthServiceProvider as LighthouseAuthServiceProvider;
+use Nuwave\Lighthouse\Cache\CacheServiceProvider;
+use Nuwave\Lighthouse\CacheControl\CacheControlServiceProvider;
 use Nuwave\Lighthouse\GlobalId\GlobalIdServiceProvider;
 use Nuwave\Lighthouse\LighthouseServiceProvider;
 use Nuwave\Lighthouse\OrderBy\OrderByServiceProvider;
@@ -73,6 +75,8 @@ GRAPHQL;
             // Lighthouse's own
             LighthouseServiceProvider::class,
             LighthouseAuthServiceProvider::class,
+            CacheServiceProvider::class,
+            CacheControlServiceProvider::class,
             GlobalIdServiceProvider::class,
             LighthouseScoutServiceProvider::class,
             OrderByServiceProvider::class,
@@ -145,6 +149,13 @@ GRAPHQL;
             'broadcaster' => 'log',
         ]);
 
+        $config->set('broadcasting.connections.pusher', [
+            'driver' => 'pusher',
+            'key' => 'foo',
+            'secret' => 'bar',
+            'app_id' => 'baz',
+        ]);
+
         $config->set('database.redis.default', [
             'url' => env('LIGHTHOUSE_TEST_REDIS_URL'),
             'host' => env('LIGHTHOUSE_TEST_REDIS_HOST', 'redis'),
@@ -205,8 +216,8 @@ GRAPHQL;
     {
         $this->schema = $schema;
 
-        /** @var \Nuwave\Lighthouse\Schema\SchemaBuilder $schemaBuilder */
         $schemaBuilder = $this->app->make(SchemaBuilder::class);
+        assert($schemaBuilder instanceof SchemaBuilder);
 
         return $schemaBuilder->schema();
     }

@@ -27,32 +27,29 @@ GRAPHQL;
     {
         $resolver = $fieldValue->getResolver();
 
-        return $next(
-            $fieldValue->setResolver(
-                function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
-                    $argumentSet = $resolveInfo->argumentSet;
-                    $rulesGatherer = new RulesGatherer($argumentSet);
+        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
+            $argumentSet = $resolveInfo->argumentSet;
+            $rulesGatherer = new RulesGatherer($argumentSet);
 
-                    /**
-                     * @var \Illuminate\Contracts\Validation\Factory $validationFactory
-                     */
-                    $validationFactory = app(ValidationFactory::class);
-                    $validator = $validationFactory->make(
-                        $args,
-                        $rulesGatherer->rules,
-                        $rulesGatherer->messages,
-                        $rulesGatherer->attributes
-                    );
+            $validationFactory = app(ValidationFactory::class);
+            assert($validationFactory instanceof ValidationFactory);
 
-                    if ($validator->fails()) {
-                        $path = implode('.', $resolveInfo->path);
+            $validator = $validationFactory->make(
+                $args,
+                $rulesGatherer->rules,
+                $rulesGatherer->messages,
+                $rulesGatherer->attributes
+            );
 
-                        throw new ValidationException("Validation failed for the field [$path].", $validator);
-                    }
+            if ($validator->fails()) {
+                $path = implode('.', $resolveInfo->path);
 
-                    return $resolver($root, $args, $context, $resolveInfo);
-                }
-            )
-        );
+                throw new ValidationException("Validation failed for the field [$path].", $validator);
+            }
+
+            return $resolver($root, $args, $context, $resolveInfo);
+        });
+
+        return $next($fieldValue);
     }
 }

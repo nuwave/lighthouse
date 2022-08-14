@@ -8,7 +8,7 @@ use Nuwave\Lighthouse\Exceptions\FederationException;
 use Nuwave\Lighthouse\Federation\FederationServiceProvider;
 use Tests\TestCase;
 
-class SchemaBuilderTest extends TestCase
+final class SchemaBuilderTest extends TestCase
 {
     protected function getPackageProviders($app): array
     {

@@ -12,13 +12,16 @@ use Tests\DBTestCase;
 use Tests\Integration\Execution\DataLoader\RelationBatchLoaderTest;
 
 /**
- * Primary key.
+ * Account of a person who utilizes this application.
+ *
+ * Primary key
  *
  * @property int $id
  *
  * Attributes
  * @property string|null $name
  * @property string|null $email
+ * @property \Illuminate\Support\Carbon|null $email_verified_at
  * @property string|null $password
  * @property string|null $remember_token
  *
@@ -42,7 +45,7 @@ use Tests\Integration\Execution\DataLoader\RelationBatchLoaderTest;
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Task> $tasks
  * @property-read \Tests\Utils\Models\Team|null $team
  */
-class User extends Authenticatable
+final class User extends Authenticatable
 {
     /**
      * Ensure that this is functionally equivalent to leaving this as null.
@@ -50,6 +53,10 @@ class User extends Authenticatable
      * @see RelationBatchLoaderTest::testDoesNotBatchloadRelationsWithDifferentDatabaseConnections()
      */
     protected $connection = DBTestCase::DEFAULT_CONNECTION;
+
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
 
     public function alternateConnections(): HasMany
     {
@@ -75,7 +82,7 @@ class User extends Authenticatable
     {
         return $this
             ->belongsToMany(Role::class)
-            ->withPivot(['meta']);
+            ->withPivot('meta');
     }
 
     public function rolesPivot(): HasMany
@@ -91,6 +98,11 @@ class User extends Authenticatable
     public function team(): BelongsTo
     {
         return $this->belongsTo(Team::class);
+    }
+
+    public function customPrimaryKeys(): HasMany
+    {
+        return $this->hasMany(CustomPrimaryKey::class, 'user_id');
     }
 
     public function scopeCompanyName(Builder $query, array $args): Builder
@@ -148,5 +160,10 @@ class User extends Authenticatable
     {
         return $this->postsTaskLoaded()
             && $this->postsCommentsLoaded();
+    }
+
+    public function nonRelationPrimitive(): string
+    {
+        return 'foo';
     }
 }

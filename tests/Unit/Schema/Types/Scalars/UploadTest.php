@@ -8,7 +8,7 @@ use Illuminate\Http\UploadedFile;
 use Nuwave\Lighthouse\Schema\Types\Scalars\Upload;
 use Tests\TestCase;
 
-class UploadTest extends TestCase
+final class UploadTest extends TestCase
 {
     public function testThrowsIfSerializing(): void
     {

@@ -1,10 +1,10 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Values;
+namespace Nuwave\Lighthouse\Cache;
 
 use Illuminate\Contracts\Auth\Authenticatable;
 
-class CacheKeyAndTags
+class CacheKeyAndTagsGenerator implements CacheKeyAndTags
 {
     public const PREFIX = 'lighthouse';
     public const SEPARATOR = ':';
@@ -13,7 +13,7 @@ class CacheKeyAndTags
      * @param  int|string|null  $id
      * @param  array<string, mixed>  $args
      */
-    public static function key(
+    public function key(
         ?Authenticatable $user,
         bool $isPrivate,
         string $parentName,
@@ -32,7 +32,7 @@ class CacheKeyAndTags
         $parts[] = $id;
         $parts[] = $fieldName;
 
-        \Safe\ksort($args);
+        ksort($args);
         foreach ($args as $key => $value) {
             $parts[] = $key;
             $parts[] = is_array($value)
@@ -44,29 +44,9 @@ class CacheKeyAndTags
     }
 
     /**
-     * @param  int|string|null  $id
-     *
-     * @return array{string, string}
-     */
-    public static function tags(string $parentName, $id, string $fieldName): array
-    {
-        return [
-            self::parentTag(
-                $parentName,
-                $id
-            ),
-            self::fieldTag(
-                $parentName,
-                $id,
-                $fieldName
-            ),
-        ];
-    }
-
-    /**
      * @param  int|string|null $id
      */
-    public static function parentTag(string $parentName, $id): string
+    public function parentTag(string $parentName, $id): string
     {
         return implode(self::SEPARATOR, [
             self::PREFIX,
@@ -78,7 +58,7 @@ class CacheKeyAndTags
     /**
      * @param  int|string|null $id
      */
-    public static function fieldTag(string $parentName, $id, string $fieldName): string
+    public function fieldTag(string $parentName, $id, string $fieldName): string
     {
         return implode(self::SEPARATOR, [
             self::PREFIX,

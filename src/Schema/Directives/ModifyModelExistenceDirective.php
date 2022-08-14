@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\ErrorPool;
+use Nuwave\Lighthouse\Execution\TransactionalMutations;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
@@ -29,60 +30,67 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
      */
     protected $errorPool;
 
-    public function __construct(GlobalId $globalId, ErrorPool $errorPool)
+    /**
+     * @var \Nuwave\Lighthouse\Execution\TransactionalMutations
+     */
+    protected $transactionalMutations;
+
+    public function __construct(GlobalId $globalId, ErrorPool $errorPool, TransactionalMutations $transactionalMutations)
     {
         $this->globalId = $globalId;
         $this->errorPool = $errorPool;
+        $this->transactionalMutations = $transactionalMutations;
     }
 
-    public static function couldNotModify(Model $user): string
+    public static function couldNotModify(Model $model): Error
     {
-        return 'Could not modify model ' . get_class($user) . ' with ID ' . $user->getKey() . '.';
+        $modelClass = get_class($model);
+
+        return new Error("Could not modify model {$modelClass} with ID {$model->getKey()}.");
     }
 
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
-        return $fieldValue->setResolver(
-            function ($root, array $args) {
-                /** @var string|int|array<string>|array<int> $idOrIds */
-                $idOrIds = reset($args);
+        $fieldValue->setResolver(function ($root, array $args) {
+            /** @var string|int|array<string>|array<int> $idOrIds */
+            $idOrIds = reset($args);
 
-                // TODO remove in v6
-                if ($this->directiveArgValue('globalId') ?? false) {
-                    // @phpstan-ignore-next-line We know that global ids must be strings
-                    $idOrIds = $this->decodeIdOrIds($idOrIds);
-                }
+            // TODO remove in v6
+            if ($this->directiveArgValue('globalId')) {
+                // @phpstan-ignore-next-line We know that global ids must be strings
+                $idOrIds = $this->decodeIdOrIds($idOrIds);
+            }
 
-                $modelOrModels = $this->find(
-                    $this->getModelClass(),
-                    $idOrIds
+            $modelOrModels = $this->find(
+                $this->getModelClass(),
+                $idOrIds
+            );
+
+            $modifyModelExistence = function (Model $model): void {
+                $success = $this->transactionalMutations->execute(
+                    function () use ($model): bool {
+                        return $this->modifyExistence($model);
+                    },
+                    $model->getConnectionName()
                 );
 
-                if (null === $modelOrModels) {
-                    return null;
+                if (! $success) {
+                    $this->errorPool->record(self::couldNotModify($model));
                 }
+            };
 
-                $modifyModelExistence = function (Model $model): void {
-                    if (! $this->modifyExistence($model)) {
-                        $this->errorPool->record(
-                            new Error(
-                                self::couldNotModify($model)
-                            )
-                        );
-                    }
-                };
-
-                if ($modelOrModels instanceof Model) {
-                    $modifyModelExistence($modelOrModels);
-                } elseif ($modelOrModels instanceof Collection) {
-                    foreach ($modelOrModels as $model) {
-                        $modifyModelExistence($model);
-                    }
+            if ($modelOrModels instanceof Model) {
+                $modifyModelExistence($modelOrModels);
+            } elseif ($modelOrModels instanceof Collection) {
+                foreach ($modelOrModels as $model) {
+                    $modifyModelExistence($model);
                 }
-
-                return $modelOrModels;
             }
-        );
+
+            return $modelOrModels;
+        });
+
+        return $fieldValue;
     }
 
     /**
@@ -95,15 +103,12 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
      */
     protected function idArgument()
     {
-        /** @var \GraphQL\Language\AST\FieldDefinitionNode $fieldNode */
         $fieldNode = $this->definitionNode;
+        assert($fieldNode instanceof FieldDefinitionNode);
 
         return $fieldNode->arguments[0]->type;
     }
 
-    /**
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
-     */
     public function manipulateFieldDefinition(
         DocumentAST &$documentAST,
         FieldDefinitionNode &$fieldDefinition,
@@ -132,7 +137,8 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
     {
         // At this point we know the type is at least wrapped in a NonNull type, so we go one deeper
         if ($this->idArgument()->type instanceof ListTypeNode) {
-            /** @var array<string> $idOrIds */
+            assert(is_array($idOrIds));
+
             return array_map(
                 function (string $id): string {
                     return $this->globalId->decodeID($id);
@@ -140,7 +146,8 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
                 $idOrIds
             );
         } else {
-            /** @var string $idOrIds */
+            assert(is_string($idOrIds));
+
             return $this->globalId->decodeID($idOrIds);
         }
     }

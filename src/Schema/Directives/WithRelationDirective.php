@@ -17,21 +17,19 @@ abstract class WithRelationDirective extends BaseDirective implements FieldMiddl
 {
     use RelationDirectiveHelpers;
 
-    abstract protected function relationLoader(ResolveInfo $resolveInfo): ModelsLoader;
+    abstract protected function modelsLoader(ResolveInfo $resolveInfo): ModelsLoader;
 
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         $previousResolver = $fieldValue->getResolver();
 
-        $fieldValue->setResolver(
-            function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
-                return $this
-                    ->loadRelation($parent, $args, $resolveInfo)
-                    ->then(static function () use ($previousResolver, $parent, $args, $context, $resolveInfo) {
-                        return $previousResolver($parent, $args, $context, $resolveInfo);
-                    });
-            }
-        );
+        $fieldValue->setResolver(function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
+            return $this
+                ->loadRelation($parent, $args, $resolveInfo)
+                ->then(static function () use ($previousResolver, $parent, $args, $context, $resolveInfo) {
+                    return $previousResolver($parent, $args, $context, $resolveInfo);
+                });
+        });
 
         return $next($fieldValue);
     }
@@ -45,7 +43,7 @@ abstract class WithRelationDirective extends BaseDirective implements FieldMiddl
         $relationBatchLoader = BatchLoaderRegistry::instance(
             $this->qualifyPath($args, $resolveInfo),
             function () use ($resolveInfo): RelationBatchLoader {
-                return new RelationBatchLoader($this->relationLoader($resolveInfo));
+                return new RelationBatchLoader($this->modelsLoader($resolveInfo));
             }
         );
 

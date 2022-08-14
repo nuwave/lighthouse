@@ -9,7 +9,7 @@ use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 use Tests\Utils\Policies\UserPolicy;
 
-class RestoreDirectiveTest extends DBTestCase
+final class RestoreDirectiveTest extends DBTestCase
 {
     public function testRestoresTaskAndReturnsIt(): void
     {

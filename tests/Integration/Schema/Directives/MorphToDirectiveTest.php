@@ -8,49 +8,27 @@ use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class MorphToDirectiveTest extends DBTestCase
+final class MorphToDirectiveTest extends DBTestCase
 {
-    /**
-     * The authenticated user.
-     *
-     * @var \Tests\Utils\Models\User
-     */
-    protected $user;
-
-    /**
-     * User's task.
-     *
-     * @var \Tests\Utils\Models\Task
-     */
-    protected $task;
-
-    /**
-     * Task's image.
-     *
-     * @var \Tests\Utils\Models\Image
-     */
-    protected $image;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->user = factory(User::class)->create();
-        $this->task = factory(Task::class)->create([
-            'user_id' => $this->user->id,
-        ]);
-        $this->image = $this->task->images()
-            ->save(
-                factory(Image::class)->create()
-            );
-    }
-
     public function testResolveMorphToRelationship(): void
     {
+        $user = factory(User::class)->create();
+        assert($user instanceof User);
+
+        $task = factory(Task::class)->make();
+        assert($task instanceof Task);
+        $task->user()->associate($user);
+        $task->save();
+
+        $image = factory(Image::class)->make();
+        assert($image instanceof Image);
+        $image->imageable()->associate($task);
+        $image->save();
+
         $this->schema = /** @lang GraphQL */ '
         type Image {
             id: ID!
-            imageable: Task! @morphTo(relation: "imageable")
+            imageable: Task! @morphTo
         }
 
         type Task {
@@ -76,14 +54,14 @@ class MorphToDirectiveTest extends DBTestCase
             }
         }
         ', [
-            'id' => $this->image->id,
+            'id' => $image->id,
         ])->assertJson([
             'data' => [
                 'image' => [
-                    'id' => $this->image->id,
+                    'id' => $image->id,
                     'imageable' => [
-                        'id' => $this->task->id,
-                        'name' => $this->task->name,
+                        'id' => $task->id,
+                        'name' => $task->name,
                     ],
                 ],
             ],
@@ -92,6 +70,19 @@ class MorphToDirectiveTest extends DBTestCase
 
     public function testResolveMorphToWithCustomName(): void
     {
+        $user = factory(User::class)->create();
+        assert($user instanceof User);
+
+        $task = factory(Task::class)->make();
+        assert($task instanceof Task);
+        $task->user()->associate($user);
+        $task->save();
+
+        $image = factory(Image::class)->make();
+        assert($image instanceof Image);
+        $image->imageable()->associate($task);
+        $image->save();
+
         $this->schema = /** @lang GraphQL */ '
         type Image {
             id: ID!
@@ -121,14 +112,14 @@ class MorphToDirectiveTest extends DBTestCase
             }
         }
         ', [
-            'id' => $this->image->id,
+            'id' => $image->id,
         ])->assertJson([
             'data' => [
                 'image' => [
-                    'id' => $this->image->id,
+                    'id' => $image->id,
                     'customImageable' => [
-                        'id' => $this->task->id,
-                        'name' => $this->task->name,
+                        'id' => $task->id,
+                        'name' => $task->name,
                     ],
                 ],
             ],
@@ -137,14 +128,28 @@ class MorphToDirectiveTest extends DBTestCase
 
     public function testResolveMorphToUsingInterfaces(): void
     {
-        /** @var \Tests\Utils\Models\Post $post */
-        $post = factory(Post::class)->create([
-            'user_id' => $this->user->id,
-        ]);
-        /** @var \Tests\Utils\Models\Image $postImage */
-        $postImage = $post->images()->save(
-            factory(Image::class)->create()
-        );
+        $user = factory(User::class)->create();
+        assert($user instanceof User);
+
+        $task = factory(Task::class)->make();
+        assert($task instanceof Task);
+        $task->user()->associate($user);
+        $task->save();
+
+        $image = factory(Image::class)->make();
+        assert($image instanceof Image);
+        $image->imageable()->associate($task);
+        $image->save();
+
+        $post = factory(Post::class)->make();
+        assert($post instanceof Post);
+        $post->user()->associate($user->id);
+        $post->save();
+
+        $postImage = factory(Image::class)->make();
+        assert($postImage instanceof Image);
+        $postImage->imageable()->associate($post);
+        $postImage->save();
 
         $this->schema = /** @lang GraphQL */ '
         interface Imageable {
@@ -203,15 +208,15 @@ class MorphToDirectiveTest extends DBTestCase
             }
         }
         ', [
-            'taskImage' => $this->image->id,
+            'taskImage' => $image->id,
             'postImage' => $postImage->id,
         ])->assertJson([
             'data' => [
                 'taskImage' => [
-                    'id' => $this->image->id,
+                    'id' => $image->id,
                     'imageable' => [
-                        'id' => $this->task->id,
-                        'name' => $this->task->name,
+                        'id' => $task->id,
+                        'name' => $task->name,
                     ],
                 ],
                 'postImage' => [

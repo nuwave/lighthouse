@@ -100,9 +100,7 @@ GRAPHQL;
                 case 'ARRAY':
                     return $this->globalId->decode($argumentValue);
                 default:
-                    throw new DefinitionException(
-                        "The decode argument of the @globalId directive can only be TYPE, ARRAY or ID, got {$decode}"
-                    );
+                    throw new DefinitionException("The decode argument of the @{$this->name()} directive can only be TYPE, ARRAY or ID, got {$decode}.");
             }
         }
 
