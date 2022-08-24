@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.58.2
+
+### Fixed
+
+- Clean duplicate `@param` in `field_full.stub` https://github.com/nuwave/lighthouse/pull/2198
+
 ## v5.58.1
 
 ### Fixed
