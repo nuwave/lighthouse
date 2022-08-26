@@ -68,7 +68,7 @@
         "bensampo/laravel-enum": "Convenient enum definitions that can easily be registered in your Schema",
         "laravel/scout": "Required for the @search directive",
         "mll-lab/graphql-php-scalars": "Useful scalar types, required for @whereConditions",
-        "mll-lab/laravel-graphql-playground": "GraphQL IDE for better development workflow - integrated with Laravel",
+        "mll-lab/laravel-graphiql": "A graphical interactive in-browser GraphQL IDE - integrated with Laravel",
         "pusher/pusher-php-server": "Required when using the Pusher Subscriptions driver"
     },
     "minimum-stability": "dev",
