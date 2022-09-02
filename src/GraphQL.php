@@ -223,7 +223,7 @@ class GraphQL
         $store = $cacheFactory->store($cacheConfig['store']);
 
         return $store->remember(
-            'lighthouse:query:' . hash('sha256', $query),
+            $cacheConfig['query_cache_key_prefix'] . hash('sha256', $query),
             $cacheConfig['ttl'],
             static function () use ($query): DocumentNode {
                 return Parser::parse($query);
@@ -338,7 +338,7 @@ class GraphQL
         $cacheFactory = app(CacheFactory::class);
         $store = $cacheFactory->store($cacheConfig['store']);
 
-        $document = $store->get('lighthouse:query:' . $sha256hash);
+        $document = $store->get($cacheConfig['query_cache_key_prefix'] . $sha256hash);
         if (null === $document) {
             // https://github.com/apollographql/apollo-server/blob/37a5c862261806817a1d71852c4e1d9cdb59eab2/packages/apollo-server-errors/src/index.ts#L230-L239
             throw new Error(

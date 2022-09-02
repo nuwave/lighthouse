@@ -146,6 +146,11 @@ return [
          */
         'store' => env('LIGHTHOUSE_QUERY_CACHE_STORE', null),
 
+        /**
+         * Use a cache key prefix to generate new cache with every deployment.
+         */
+        'query_cache_key_prefix' => env('LIGHTHOUSE_QUERY_CACHE_KEY_PREFIX', 'lighthouse:query:'),
+
         /*
          * Duration in seconds (minutes for Laravel pre-5.8) the query should remain cached, null means forever.
          */
