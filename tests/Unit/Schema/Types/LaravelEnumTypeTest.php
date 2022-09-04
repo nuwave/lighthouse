@@ -66,7 +66,7 @@ final class LaravelEnumTypeTest extends TestCase
         // @phpstan-ignore-next-line depends on the required version
         if (method_exists(LocalizedUserType::class, 'getClassDescription')) {
             $this->assertSame(/** @lang GraphQL */ <<<GRAPHQL
-"""Partially deprecated"""
+"Partially deprecated"
 enum PartiallyDeprecated {
   "Not"
   NOT
@@ -84,13 +84,13 @@ GRAPHQL
         } else {
             $this->assertSame(/** @lang GraphQL */ <<<GRAPHQL
 enum PartiallyDeprecated {
-  """Not"""
+  "Not"
   NOT
 
-  """Deprecated"""
+  "Deprecated"
   DEPRECATED @deprecated
 
-  """Deprecated with reason"""
+  "Deprecated with reason"
   DEPRECATED_WITH_REASON @deprecated(reason: "some reason")
 }
 GRAPHQL
