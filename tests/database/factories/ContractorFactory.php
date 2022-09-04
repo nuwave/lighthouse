@@ -7,6 +7,6 @@ use Tests\Utils\Models\Contractor;
 
 $factory->define(Contractor::class, function (Faker $faker): array {
     return [
-        'position' => $faker->jobTitle,
+        'position' => $faker->word,
     ];
 });

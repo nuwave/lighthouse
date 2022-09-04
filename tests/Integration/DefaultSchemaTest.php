@@ -45,7 +45,7 @@ final class DefaultSchemaTest extends DBTestCase
 
     public function testFindRequiresExactlyOneArgument(): void
     {
-        if (AppVersion::below(8.0)) {
+        if (AppVersion::below(8.59)) {
             $this->markTestSkipped('Missing validation rule prohibits');
         }
 

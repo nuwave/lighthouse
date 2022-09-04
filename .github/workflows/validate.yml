@@ -9,18 +9,18 @@ env:
   REQUIRED_PHP_EXTENSIONS: mbstring, mysqli, pdo_mysql, redis
   LIGHTHOUSE_TEST_DB_USER: root
   LIGHTHOUSE_TEST_DB_PASSWORD: root
-  LIGHTHOUSE_TEST_DB_HOST: localhost
-  LIGHTHOUSE_TEST_DB_UNIX_SOCKET: /var/run/mysqld/mysqld.sock
+  LIGHTHOUSE_TEST_DB_HOST: 127.0.0.1
   LIGHTHOUSE_TEST_REDIS_HOST: 127.0.0.1
-
-# Using ubuntu-18.04 because it has MySQL 5.7.
-# TODO switch to MySQL 8 https://github.com/nuwave/lighthouse/issues/1784
+  LIGHTHOUSE_TEST_DB_PORT: 33060
+  LIGHTHOUSE_TEST_REDIS_PORT: 63790
 
 jobs:
   static-analysis:
-    runs-on: ubuntu-18.04
+    name: PHPStan on PHP ${{ matrix.php-version }} with Laravel ${{ matrix.laravel-version }}
+    runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
         php-version:
           - 7.4
@@ -43,7 +43,7 @@ jobs:
           php-version: ${{ matrix.php-version }}
 
       - name: "Cache composer dependencies"
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}
@@ -61,9 +61,11 @@ jobs:
       - run: vendor/bin/phpstan
 
   tests:
-    runs-on: ubuntu-18.04
+    name: PHPUnit on PHP ${{ matrix.php-version }} with Laravel ${{ matrix.laravel-version }} and ${{ matrix.composer.name }} dependencies
+    runs-on: ${{ matrix.os }}
 
     strategy:
+      fail-fast: false
       matrix:
         php-version:
           - 7.4
@@ -72,16 +74,35 @@ jobs:
         laravel-version:
           - ^8
           - ^9
+        os:
+          - ubuntu-latest
+        composer:
+          - name: lowest
+            arg: "--prefer-lowest --prefer-stable"
+          - name: highest
+            # No args added as highest is default
+            arg: ""
         exclude:
           - php-version: 7.4
             laravel-version: ^9
 
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: test
+        ports:
+          - 33060:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+      redis:
+        image: redis:6
+        ports:
+          - 63790:6379
+        options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
     steps:
       - uses: actions/checkout@v2
-
-      - uses: supercharge/redis-github-action@1.1.0
-        with:
-          redis-version: 6
 
       - uses: shivammathur/setup-php@v2
         with:
@@ -89,11 +110,10 @@ jobs:
           php-version: ${{ matrix.php-version }}
 
       - name: "Cache composer dependencies"
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
-          key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}
-          restore-keys: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-
+          key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-os-${{ matrix.os }}-composer-${{ matrix.composer.name }}
 
       - name: "Remove conflicting dependencies that are not needed here"
         run: composer remove --dev nunomaduro/larastan phpstan/phpstan-mockery phpbench/phpbench rector/rector --no-update
@@ -104,14 +124,12 @@ jobs:
 
       - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
 
-      - run: |
-          sudo systemctl start mysql.service
-          mysql --user=root --password=root --execute='CREATE DATABASE test;'
+      - run: composer update ${{ matrix.composer.arg }}
 
       - run: vendor/bin/phpunit --colors=always --verbose
 
   coverage:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
@@ -120,12 +138,23 @@ jobs:
         laravel-version:
           - ^8
 
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: test
+        ports:
+          - 33060:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+      redis:
+        image: redis:6
+        ports:
+          - 63790:6379
+        options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
     steps:
       - uses: actions/checkout@v2
-
-      - uses: supercharge/redis-github-action@1.1.0
-        with:
-          redis-version: 6
 
       - uses: shivammathur/setup-php@v2
         with:
@@ -134,19 +163,14 @@ jobs:
           php-version: ${{ matrix.php-version }}
 
       - name: "Cache composer dependencies"
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}
-          restore-keys: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-
 
       - run: composer remove --dev phpbench/phpbench rector/rector --no-update
 
       - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
-
-      - run: |
-          sudo systemctl start mysql.service
-          mysql --user=root --password=root --execute='CREATE DATABASE test;'
 
       - run: vendor/bin/phpunit --coverage-clover=coverage.xml
 
@@ -154,7 +178,7 @@ jobs:
         uses: codecov/codecov-action@v2
 
   benchmarks:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
@@ -172,11 +196,10 @@ jobs:
           php-version: ${{ matrix.php-version }}
 
       - name: "Cache composer dependencies"
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}
-          restore-keys: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-
 
       - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
 
