@@ -53,7 +53,7 @@
         "mll-lab/php-cs-fixer-config": "^4.4.1",
         "mockery/mockery": "^1.5",
         "nunomaduro/larastan": "^0.7 || ^1 || ^2",
-        "orchestra/testbench": "^6 || ^7.7",
+        "orchestra/testbench": "^6.25 || ^7.7",
         "phpbench/phpbench": "^1.2.6",
         "phpstan/phpstan": "~0.12 || ^1.8.4",
         "phpstan/phpstan-mockery": "~0.12 || ^1.1",
