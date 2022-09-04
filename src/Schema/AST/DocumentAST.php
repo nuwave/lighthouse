@@ -26,7 +26,6 @@ use Nuwave\Lighthouse\Support\Utils;
  * - leveraging lazy instantiation of schema types
  *
  * @phpstan-type ClassNameToObjectTypeName array<class-string, list<string>>
- *
  * @phpstan-type SerializableDocumentAST array{
  *     types: array<int, array<string, mixed>>,
  *     directives: array<int, array<string, mixed>>,
