@@ -66,22 +66,18 @@ To improve your editing experience, you can generate a definition file
 php artisan lighthouse:ide-helper
 ```
 
-We recommend the following plugins:
-
-| IDE      | Plugin                                               |
-| -------- | ---------------------------------------------------- |
-| PhpStorm | https://plugins.jetbrains.com/plugin/8097-js-graphql |
+For Phpstorm, we recommend [the GraphQL plugin](https://plugins.jetbrains.com/plugin/8097-graphql).
 
 ## Install GraphQL DevTools
 
 To make use of the amazing tooling around GraphQL, we recommend
-installing [GraphQL Playground](https://github.com/mll-lab/laravel-graphql-playground).
+installing [GraphiQL](https://github.com/mll-lab/laravel-graphiql).
 
 ```bash
-composer require mll-lab/laravel-graphql-playground
+composer require mll-lab/laravel-graphiql
 ```
 
-After installation, visit `/graphql-playground` to try it.
+After installation, visit `/graphiql` to try it.
 
 You can use any GraphQL client with Lighthouse, make sure to point it to the URL defined in
 the config. By default, the endpoint lives at `/graphql`.

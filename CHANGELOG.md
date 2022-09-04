@@ -29,6 +29,30 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove `Serializable` implementation
 - Remove trait `ClearsSchemaCache`
 
+## v5.58.2
+
+### Fixed
+
+- Clean duplicate `@param` in `field_full.stub` https://github.com/nuwave/lighthouse/pull/2198
+
+## v5.58.1
+
+### Fixed
+
+- Allow pagination amount to be 0 https://github.com/nuwave/lighthouse/pull/2105
+
+## v5.58.0
+
+### Added
+
+- Add description generation to `LaravelEnumType` based on `BenSampo\Enum\Enum::getClassDescription()` https://github.com/nuwave/lighthouse/pull/2177
+
+## v5.57.6
+
+### Fixed
+
+- Fix `@convertEmptyStringsToNull` on fields and matrices https://github.com/nuwave/lighthouse/pull/2142
+
 ## v5.57.5
 
 ### Fixed

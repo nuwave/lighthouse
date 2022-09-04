@@ -543,7 +543,7 @@ final class HasManyDirectiveTest extends DBTestCase
             ->assertGraphQLErrorFree();
     }
 
-    public function testHandlesPaginationWithCountZero(): void
+    public function testRejectsPaginationWithNegativeCount(): void
     {
         $user = factory(User::class)->create();
         assert($user instanceof User);
@@ -571,7 +571,7 @@ final class HasManyDirectiveTest extends DBTestCase
             {
                 user {
                     id
-                    tasks(first: 0) {
+                    tasks(first: -1) {
                         data {
                             id
                         }
@@ -579,7 +579,7 @@ final class HasManyDirectiveTest extends DBTestCase
                 }
             }
             ')
-            ->assertGraphQLErrorMessage(PaginationArgs::requestedZeroOrLessItems(0));
+            ->assertGraphQLErrorMessage(PaginationArgs::requestedLessThanZeroItems(-1));
     }
 
     public function testRelayTypeIsLimitedByMaxCountFromDirective(): void

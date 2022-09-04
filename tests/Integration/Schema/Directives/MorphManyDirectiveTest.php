@@ -373,13 +373,39 @@ final class MorphManyDirectiveTest extends DBTestCase
                         data {
                             id
                         }
+                        paginatorInfo {
+                            count
+                            currentPage
+                            firstItem
+                            hasMorePages
+                            lastItem
+                            lastPage
+                            perPage
+                        }
                     }
                 }
             }
             ', [
                 'id' => $this->post->id,
             ])
-            ->assertGraphQLErrorMessage(PaginationArgs::requestedZeroOrLessItems(0));
+            ->assertExactJson([
+                'data' => [
+                    'post' => [
+                        'images' => [
+                            'data' => [],
+                            'paginatorInfo' => [
+                                'count' => 0,
+                                'currentPage' => 1,
+                                'firstItem' => null,
+                                'hasMorePages' => false,
+                                'lastItem' => null,
+                                'lastPage' => 0,
+                                'perPage' => 0,
+                            ],
+                        ],
+                    ],
+                ],
+            ]);
     }
 
     public function testQueryMorphManyPaginatorWithADefaultCount(): void
