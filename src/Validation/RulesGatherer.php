@@ -87,10 +87,7 @@ class RulesGatherer
         foreach ($directives as $directive) {
             if ($directive instanceof ArgumentSetValidation) {
                 if (Utils::classUsesTrait($directive, HasArgumentValue::class)) {
-                    /**
-                     * @var \Nuwave\Lighthouse\Support\Contracts\Directive&\Nuwave\Lighthouse\Support\Contracts\ArgumentSetValidation&\Nuwave\Lighthouse\Support\Traits\HasArgumentValue $directive
-                     */
-                    // @phpstan-ignore-next-line using trait in typehint
+                    assert(method_exists($directive, 'setArgumentValue'));
                     $directive->setArgumentValue($argumentSet);
                 }
 
@@ -109,10 +106,7 @@ class RulesGatherer
         foreach ($directives as $directive) {
             if ($directive instanceof ArgumentValidation) {
                 if (Utils::classUsesTrait($directive, HasArgumentValue::class)) {
-                    /**
-                     * @var \Nuwave\Lighthouse\Support\Contracts\Directive&\Nuwave\Lighthouse\Support\Contracts\ArgumentValidation&\Nuwave\Lighthouse\Support\Traits\HasArgumentValue $directive
-                     */
-                    // @phpstan-ignore-next-line using trait in typehint
+                    assert(method_exists($directive, 'setArgumentValue'));
                     $directive->setArgumentValue($value);
                 }
 
