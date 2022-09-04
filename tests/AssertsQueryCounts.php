@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
  * This trait was taken from a package that supports fewer Laravel versions than us.
  *
  * @see https://github.com/mattiasgeniar/phpunit-query-count-assertions
+ *
  * @mixin \PHPUnit\Framework\TestCase
  */
 trait AssertsQueryCounts

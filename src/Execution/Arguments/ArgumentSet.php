@@ -71,11 +71,13 @@ class ArgumentSet
      * @template TBuilder of \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation|\Laravel\Scout\Builder
      *
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation|\Laravel\Scout\Builder  $builder
+     *
      * @phpstan-param  TBuilder  $builder
      *
      * @param  array<string>  $scopes
      *
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation|\Laravel\Scout\Builder
+     *
      * @phpstan-return TBuilder
      */
     public function enhanceBuilder(object $builder, array $scopes, Closure $directiveFilter = null): object
