@@ -48,7 +48,7 @@ class EnsureXHR
             throw new BadRequestHttpException('Content-Type header must be set');
         }
 
-        if (Str::startsWith($contentType, self::FORM_CONTENT_TYPES)) {
+        if (Str::startsWith($contentType, static::FORM_CONTENT_TYPES)) {
             throw new BadRequestHttpException("Content-Type $contentType is forbidden");
         }
 
