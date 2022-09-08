@@ -9,7 +9,9 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
-- Allow configuring the `disable_introspection setting` via the `.env` file https://github.com/nuwave/lighthouse/pull/2205
+### Added
+
+- Allow configuring `security.disable_introspection` through the env variable `LIGHTHOUSE_SECURITY_DISABLE_INTROSPECTION` https://github.com/nuwave/lighthouse/pull/2205
 
 ## v5.58.2
 
