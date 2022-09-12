@@ -29,6 +29,10 @@ directive @upload(
   The path where the file should be stored.
   """
   path: String! = "/"
+  """
+  If the visibility should be public, defaults to false (private).
+  """
+  public: Boolean! = false
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 GRAPHQL;
     }
@@ -51,7 +55,12 @@ GRAPHQL;
         $filepathInStorage = $argumentValue->storeAs(
             $this->pathArgValue(),
             $filename,
-            $this->diskArgValue()
+            [
+                'disk' => $this->diskArgValue(),
+                'visibility' => $this->publicArgValue()
+                    ? 'public'
+                    : 'private'
+            ]
         );
 
         if ($filepathInStorage === false) {
@@ -69,5 +78,10 @@ GRAPHQL;
     public function pathArgValue(): string
     {
         return $this->directiveArgValue('path') ?? '/';
+    }
+
+    public function publicArgValue(): string
+    {
+        return $this->directiveArgValue('public', false);
     }
 }

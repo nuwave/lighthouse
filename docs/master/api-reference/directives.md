@@ -3138,6 +3138,10 @@ directive @upload(
   The path where the file should be stored, defaults to `/`.
   """
   path: String
+  """
+  If the visibility should be public, defaults to false (private).
+  """
+  public: Boolean! = false
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
@@ -3151,7 +3155,7 @@ type User {
 
 type Mutation {
   createUser(
-    avatar: Upload @upload(disk:"public", path:"images/avatars")
+    avatar: Upload @upload(disk:"public", path:"images/avatars", public: true)
   ): User @create
 }
 ```
