@@ -56,8 +56,6 @@ final class UploadDirectiveTest extends TestCase
                 'file' => $filePath,
             ],
         ]);
-
-        Storage::disk('uploadDisk')->assertExists($file->hashName());
     }
 
     public function testUploadArgumentWithDiskParameter(): void
@@ -102,8 +100,6 @@ final class UploadDirectiveTest extends TestCase
                 'file' => $filePath,
             ],
         ]);
-
-        Storage::disk('uploadDisk')->assertExists($file->hashName());
     }
 
     public function testUploadArgumentWithPathParameter(): void
@@ -149,8 +145,6 @@ final class UploadDirectiveTest extends TestCase
                 'file' => $filePath,
             ],
         ]);
-
-        Storage::disk('uploadDisk')->assertExists("/test/{$file->hashName()}");
     }
 
     public function testUploadArgumentWhereValueIsNull(): void
