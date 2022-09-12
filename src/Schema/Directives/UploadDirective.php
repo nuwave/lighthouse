@@ -55,7 +55,7 @@ GRAPHQL;
         );
 
         if ($filepathInStorage === false) {
-            throw new CannotWriteFileException("Unable to upload `{$this->name()}` file to `{$this->pathArgValue()}` via disk `{$this->diskArgValue()}`");
+            throw new CannotWriteFileException("Unable to upload `{$this->nodeName()}` file to `{$this->pathArgValue()}` via disk `{$this->diskArgValue()}`");
         }
 
         return $filepathInStorage;
@@ -68,6 +68,6 @@ GRAPHQL;
 
     public function pathArgValue(): string
     {
-        return $this->directiveArgValue('path', '/');
+        return $this->directiveArgValue('path') ?? '/';
     }
 }

@@ -25,7 +25,8 @@ final class UploadDirectiveTest extends TestCase
 
         Storage::fake('uploadDisk');
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */
+            '
         scalar Upload @scalar(class: "Nuwave\\\\Lighthouse\\\\Schema\\\\Types\\\\Scalars\\\\Upload")
     
         type Mutation {
@@ -194,8 +195,6 @@ final class UploadDirectiveTest extends TestCase
 
     public function testThrowsAnExceptionIfDiskIsMissing(): void
     {
-        $this->expectException(Exception::class);
-
         config()->offsetSet('filesystems.default', 'uploadDisk');
 
         $this->schema = /** @lang GraphQL */
@@ -210,6 +209,8 @@ final class UploadDirectiveTest extends TestCase
         ' . self::PLACEHOLDER_QUERY;
 
         $file = UploadedFile::fake()->create('test.pdf', 500);
+
+        $this->expectException(Exception::class);
 
         $this->multipartGraphQL(
             [
@@ -229,8 +230,6 @@ final class UploadDirectiveTest extends TestCase
 
     public function testThrowsAnExceptionIfStoringFails(): void
     {
-        $this->expectExceptionObject(new CannotWriteFileException("Unable to upload `upload` file to `/` via disk `uploadDisk`"));
-
         config()->offsetSet('filesystems.default', 'uploadDisk');
 
         $filePath = null;
@@ -256,6 +255,8 @@ final class UploadDirectiveTest extends TestCase
         $file->shouldReceive('storeAs')
             ->andReturn(false);
 
+        $this->expectExceptionObject(new CannotWriteFileException("Unable to upload `file` file to `/` via disk `uploadDisk`"));
+
         $this->multipartGraphQL(
             [
                 'query' => /** @lang GraphQL */ '
@@ -269,19 +270,11 @@ final class UploadDirectiveTest extends TestCase
             ],
             ['0' => ['variables.file']],
             ['0' => $file]
-        )->assertJson([
-            'data' => [
-                'file' => $filePath,
-            ],
-        ]);
-
-        Storage::disk('uploadDisk')->assertExists($file->hashName());
+        );
     }
 
     public function testThrowsAnExceptionIfAttributeIsNotUploadedFile(): void
     {
-        $this->expectExceptionObject(new InvalidArgumentException("Expected UploadedFile from `baz`"));
-
         $this->schema = /** @lang GraphQL */
             '
         type Query {
@@ -290,6 +283,8 @@ final class UploadDirectiveTest extends TestCase
             ): Boolean
         }
         ';
+
+        $this->expectExceptionObject(new InvalidArgumentException("Expected UploadedFile from `baz`"));
 
         $this->graphQL(/** @lang GraphQL */ '
         {
