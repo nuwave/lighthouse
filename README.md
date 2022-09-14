@@ -35,9 +35,6 @@ The site includes the latest docs for each major version of Lighthouse.
 You can find docs for specific versions by looking at the contents of [/docs/master](/docs/master)
 at that point in the git history: `https://github.com/nuwave/lighthouse/tree/<SPECIFIC-TAG>/docs/master`.
 
-A chinese translation is available at [lighthouse-php.cn](http://lighthouse-php.cn) and is maintained
-over at https://github.com/haxibiao/lighthouse.
-
 ## Get involved
 
 - Have a question? [Use the laravel-lighthouse tag on Stack Overflow](https://stackoverflow.com/questions/tagged/laravel-lighthouse)
