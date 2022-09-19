@@ -3373,6 +3373,48 @@ type Mutation {
 
 This directive can also be used as a [nested arg resolver](../concepts/arg-resolvers.md).
 
+## @upload
+
+```graphql
+"""
+Uploads given file to storage, removes the argument and sets
+the returned path to the attribute key provided.
+
+This does not change the schema from a client perspective.
+"""
+directive @upload(
+    """
+    The storage disk to be used, defaults to config value `filesystems.default`.
+    """
+    disk: String
+
+    """
+    The path where the file should be stored.
+    """
+    path: String! = "/"
+
+    """
+    Should the visibility be public?
+    """
+    public: Boolean! = false
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
+
+This is useful when you want pass in a file as an argument but have it upload and resolve to a filepath.
+For example, you want to pass in a user avatar, have that file uploaded and the resulting filepath stored as a row in a database table.
+
+```graphql
+type Mutation {
+  createUser(
+    avatar: Upload @upload(disk: "public", path: "images/avatars", public: true)
+  ): User @create
+}
+
+type User {
+  avatar: String!
+}
+```
+
 ## @upsert
 
 ```graphql
