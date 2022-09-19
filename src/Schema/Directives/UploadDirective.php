@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Exception;
 use Illuminate\Http\UploadedFile;
 use InvalidArgumentException;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
@@ -15,7 +14,7 @@ class UploadDirective extends BaseDirective implements ArgDirective, ArgTransfor
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Uploads given file to storage, removes the argument and sets 
+Uploads given file to storage, removes the argument and sets
 the returned path to the attribute key provided.
 
 This does not change the schema from a client perspective.
@@ -25,21 +24,20 @@ directive @upload(
   The storage disk to be used, defaults to config value `filesystems.default`.
   """
   disk: String
+
   """
   The path where the file should be stored.
   """
   path: String! = "/"
+
   """
-  If the visibility should be public, defaults to false (private).
+  Should the visibility be public?
   """
   public: Boolean! = false
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 GRAPHQL;
     }
 
-    /**
-     * @throws Exception
-     */
     public function transform($argumentValue): ?string
     {
         if ($argumentValue === null) {
@@ -47,7 +45,8 @@ GRAPHQL;
         }
 
         if (!($argumentValue instanceof UploadedFile)) {
-            throw new InvalidArgumentException("Expected UploadedFile from `{$this->nodeName()}`");
+            $uploadedFileClass = UploadedFile::class;
+            throw new InvalidArgumentException("Expected argument `{$this->nodeName()}` to be instanceof {$uploadedFileClass}.");
         }
 
         $filename = $argumentValue->hashName();
@@ -64,7 +63,7 @@ GRAPHQL;
         );
 
         if ($filepathInStorage === false) {
-            throw new CannotWriteFileException("Unable to upload `{$this->nodeName()}` file to `{$this->pathArgValue()}` via disk `{$this->diskArgValue()}`");
+            throw new CannotWriteFileException("Unable to upload `{$this->nodeName()}` file to `{$this->pathArgValue()}` via disk `{$this->diskArgValue()}`.");
         }
 
         return $filepathInStorage;
@@ -72,15 +71,16 @@ GRAPHQL;
 
     public function diskArgValue(): string
     {
-        return $this->directiveArgValue('disk') ?? config('filesystems.default');
+        return $this->directiveArgValue('disk')
+            ?? config('filesystems.default');
     }
 
     public function pathArgValue(): string
     {
-        return $this->directiveArgValue('path') ?? '/';
+        return $this->directiveArgValue('path', '/');
     }
 
-    public function publicArgValue(): string
+    public function publicArgValue(): bool
     {
         return $this->directiveArgValue('public', false);
     }

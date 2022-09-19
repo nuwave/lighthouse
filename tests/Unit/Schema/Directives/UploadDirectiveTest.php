@@ -15,20 +15,18 @@ final class UploadDirectiveTest extends TestCase
 {
     public function testUploadArgumentWithDefaultParameters(): void
     {
-        config()->offsetSet('filesystems.default', 'uploadDisk');
+        config(['filesystems.default' => 'uploadDisk']);
 
         $filePath = null;
-
         $this->mockResolver(static function ($root, array $args) use (&$filePath): ?string {
             return $filePath = $args['file'];
         });
 
         Storage::fake('uploadDisk');
 
-        $this->schema = /** @lang GraphQL */
-            '
+        $this->schema = /** @lang GraphQL */'
         scalar Upload @scalar(class: "Nuwave\\\\Lighthouse\\\\Schema\\\\Types\\\\Scalars\\\\Upload")
-    
+
         type Mutation {
             upload(
             file: Upload! @upload
@@ -65,16 +63,13 @@ final class UploadDirectiveTest extends TestCase
         Storage::fake('uploadDisk');
 
         $filePath = null;
-
         $this->mockResolver(static function ($root, array $args) use (&$filePath): ?string {
-            $filePath = $args['file'];
-            return $args['file'];
+            return $filePath = $args['file'];
         });
 
-        $this->schema = /** @lang GraphQL */
-            '
+        $this->schema = /** @lang GraphQL */'
         scalar Upload @scalar(class: "Nuwave\\\\Lighthouse\\\\Schema\\\\Types\\\\Scalars\\\\Upload")
-    
+
         type Mutation {
             upload(
             file: Upload! @upload(disk:"uploadDisk")
@@ -106,20 +101,17 @@ final class UploadDirectiveTest extends TestCase
 
     public function testUploadArgumentWithPathParameter(): void
     {
-        config()->offsetSet('filesystems.default', 'uploadDisk');
+        config(['filesystems.default' => 'uploadDisk']);
         Storage::fake('uploadDisk');
 
         $filePath = null;
-
         $this->mockResolver(static function ($root, array $args) use (&$filePath): ?string {
-            $filePath = $args['file'];
-            return $args['file'];
+            return $filePath = $args['file'];
         });
 
-        $this->schema = /** @lang GraphQL */
-            '
+        $this->schema = /** @lang GraphQL */ '
         scalar Upload @scalar(class: "Nuwave\\\\Lighthouse\\\\Schema\\\\Types\\\\Scalars\\\\Upload")
-    
+
         type Mutation {
             upload(
             file: Upload! @upload(path:"test")
@@ -151,20 +143,17 @@ final class UploadDirectiveTest extends TestCase
 
     public function testUploadArgumentWithPublicParameter(): void
     {
-        config()->offsetSet('filesystems.default', 'uploadDisk');
+        config(['filesystems.default' => 'uploadDisk']);
         Storage::fake('uploadDisk');
 
         $filePath = null;
-
         $this->mockResolver(static function ($root, array $args) use (&$filePath): ?string {
-            $filePath = $args['file'];
-            return $args['file'];
+            return $filePath = $args['file'];
         });
 
-        $this->schema = /** @lang GraphQL */
-            '
+        $this->schema = /** @lang GraphQL */ '
         scalar Upload @scalar(class: "Nuwave\\\\Lighthouse\\\\Schema\\\\Types\\\\Scalars\\\\Upload")
-    
+
         type Mutation {
             upload(
             file: Upload! @upload(public: true disk:"uploadDisk")
@@ -199,16 +188,13 @@ final class UploadDirectiveTest extends TestCase
     public function testUploadArgumentWhereValueIsNull(): void
     {
         $filePath = null;
-
         $this->mockResolver(static function ($root, array $args) use (&$filePath): ?string {
-            $filePath = $args['file'];
-            return $args['file'];
+            return $filePath = $args['file'];
         });
 
-        $this->schema = /** @lang GraphQL */
-            '
+        $this->schema = /** @lang GraphQL */ '
         scalar Upload @scalar(class: "Nuwave\\\\Lighthouse\\\\Schema\\\\Types\\\\Scalars\\\\Upload")
-    
+
         type Mutation {
             upload(
             file: Upload @upload
@@ -238,12 +224,11 @@ final class UploadDirectiveTest extends TestCase
 
     public function testThrowsAnExceptionIfDiskIsMissing(): void
     {
-        config()->offsetSet('filesystems.default', 'uploadDisk');
+        config(['filesystems.default' => 'uploadDisk']);
 
-        $this->schema = /** @lang GraphQL */
-            '
+        $this->schema = /** @lang GraphQL */ '
         scalar Upload @scalar(class: "Nuwave\\\\Lighthouse\\\\Schema\\\\Types\\\\Scalars\\\\Upload")
-    
+
         type Mutation {
             upload(
             file: Upload! @upload(disk:"uploadDisk")
@@ -273,16 +258,12 @@ final class UploadDirectiveTest extends TestCase
 
     public function testThrowsAnExceptionIfStoringFails(): void
     {
-        config()->offsetSet('filesystems.default', 'uploadDisk');
-
-        $filePath = null;
-
+        config(['filesystems.default' => 'uploadDisk']);
         Storage::fake('uploadDisk');
 
-        $this->schema = /** @lang GraphQL */
-            '
+        $this->schema = /** @lang GraphQL */ '
         scalar Upload @scalar(class: "Nuwave\\\\Lighthouse\\\\Schema\\\\Types\\\\Scalars\\\\Upload")
-    
+
         type Mutation {
             upload(
             file: Upload! @upload(path:"/")
@@ -298,7 +279,7 @@ final class UploadDirectiveTest extends TestCase
         $file->shouldReceive('storeAs')
             ->andReturn(false);
 
-        $this->expectExceptionObject(new CannotWriteFileException("Unable to upload `file` file to `/` via disk `uploadDisk`"));
+        $this->expectExceptionObject(new CannotWriteFileException("Unable to upload `file` file to `/` via disk `uploadDisk`."));
 
         $this->multipartGraphQL(
             [
@@ -318,8 +299,7 @@ final class UploadDirectiveTest extends TestCase
 
     public function testThrowsAnExceptionIfAttributeIsNotUploadedFile(): void
     {
-        $this->schema = /** @lang GraphQL */
-            '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             foo(
                 baz: String @upload
@@ -327,8 +307,7 @@ final class UploadDirectiveTest extends TestCase
         }
         ';
 
-        $this->expectExceptionObject(new InvalidArgumentException("Expected UploadedFile from `baz`"));
-
+        $this->expectExceptionObject(new InvalidArgumentException("Expected argument `baz` to be instanceof Illuminate\\Http\\UploadedFile."));
         $this->graphQL(/** @lang GraphQL */ '
         {
             foo(baz: "something")
