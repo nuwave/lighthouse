@@ -6,7 +6,7 @@ use GraphQL\Type\Definition\UnionType;
 use Nuwave\Lighthouse\Federation\FederationServiceProvider;
 use Tests\TestCase;
 
-class FederationSchemaTest extends TestCase
+final class FederationSchemaTest extends TestCase
 {
     protected function getPackageProviders($app): array
     {

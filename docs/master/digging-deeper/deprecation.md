@@ -20,8 +20,8 @@ use Nuwave\Lighthouse\Deprecation\DetectDeprecatedUsage;
 
 DetectDeprecatedUsage::handle(function (array $deprecations): void {
     app()->terminating(function () use ($deprecations) {
-        foreach ($deprecations as $element => $_) {
-            someMethodToReportDeprecations("Deprecated GraphQL element used: {$element}.");
+        foreach ($deprecations as $element => $deprecatedUsage) {
+            someMethodToReportDeprecations("Deprecated GraphQL element {$element} used {$deprecatedUsage->count} times. {$deprecatedUsage->reason}");
         }
     });
 });

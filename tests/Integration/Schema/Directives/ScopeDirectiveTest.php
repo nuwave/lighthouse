@@ -7,7 +7,7 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Tag;
 use Tests\Utils\Models\Task;
 
-class ScopeDirectiveTest extends DBTestCase
+final class ScopeDirectiveTest extends DBTestCase
 {
     public function testExplicitName(): void
     {

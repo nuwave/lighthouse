@@ -24,14 +24,14 @@ trait MakesGraphQLRequests
      * On the first call to introspect() this property is set to
      * cache the result, as introspection is quite expensive.
      *
-     * @var \Illuminate\Testing\TestResponse|null
+     * @var \Illuminate\Testing\TestResponse
      */
     protected $introspectionResult;
 
     /**
      * Used to test deferred queries.
      *
-     * @var \Nuwave\Lighthouse\Support\Http\Responses\MemoryStream|null
+     * @var \Nuwave\Lighthouse\Support\Http\Responses\MemoryStream
      */
     protected $deferStream;
 
@@ -89,8 +89,8 @@ trait MakesGraphQLRequests
      * https://github.com/jaydenseric/graphql-multipart-request-spec
      *
      * @param  array<string, mixed>|array<int, array<string, mixed>>  $operations
-     * @param  array<int|string, array<int, string>>  $map
-     * @param  array<int|string, \Illuminate\Http\Testing\File>|array<int|string, array>  $files
+     * @param  array<array<int, string>>  $map
+     * @param  array<\Illuminate\Http\Testing\File>|array<array<mixed>>  $files
      * @param  array<string, string>  $headers  Will be merged with Content-Type: multipart/form-data
      *
      * @return \Illuminate\Testing\TestResponse
@@ -102,8 +102,8 @@ trait MakesGraphQLRequests
         array $headers = []
     ) {
         $parameters = [
-            'operations' => json_encode($operations),
-            'map' => json_encode($map),
+            'operations' => \Safe\json_encode($operations),
+            'map' => \Safe\json_encode($map),
         ];
 
         return $this->call(
@@ -128,11 +128,11 @@ trait MakesGraphQLRequests
      */
     protected function introspect()
     {
-        if (null !== $this->introspectionResult) {
-            return $this->introspectionResult;
+        if (! isset($this->introspectionResult)) {
+            return $this->introspectionResult = $this->graphQL(Introspection::getIntrospectionQuery());
         }
 
-        return $this->introspectionResult = $this->graphQL(Introspection::getIntrospectionQuery());
+        return $this->introspectionResult;
     }
 
     /**
@@ -203,13 +203,15 @@ trait MakesGraphQLRequests
         array $extraParams = [],
         array $headers = []
     ): array {
-        if (null === $this->deferStream) {
+        if (! isset($this->deferStream)) {
             $this->setUpDeferStream();
         }
 
         $response = $this->graphQL($query, $variables, $extraParams, $headers);
 
-        if (! $response->baseResponse instanceof StreamedResponse) {
+        /** @var StreamedResponse|mixed $response */
+        $response = $response->baseResponse;
+        if (! $response instanceof StreamedResponse) {
             Assert::fail('Expected the response to be a streamed response but got a regular response.');
         }
 

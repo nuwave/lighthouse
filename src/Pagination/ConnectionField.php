@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Pagination;
 
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
@@ -40,10 +41,9 @@ class ConnectionField
     /**
      * Resolve edges for connection.
      *
-     * @param  \Illuminate\Pagination\LengthAwarePaginator<mixed>  $paginator
      * @param  array<string, mixed>  $args
      */
-    public function edgeResolver(LengthAwarePaginator $paginator, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Collection
+    public function edgeResolver(AbstractPaginator $paginator, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Collection
     {
         // We know those types because we manipulated them during PaginationManipulator
         /** @var \GraphQL\Type\Definition\NonNull $nonNullList */

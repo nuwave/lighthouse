@@ -6,7 +6,7 @@ use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\TestCase;
 use Tests\Utils\Queries\FooBar;
 
-class FieldDirectiveTest extends TestCase
+final class FieldDirectiveTest extends TestCase
 {
     public function testAssignsResolverFromCombinedDefinition(): void
     {

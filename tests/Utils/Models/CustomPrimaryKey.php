@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * Relations
  * @property-read \Tests\Utils\Models\User|null $user
  */
-class CustomPrimaryKey extends Model
+final class CustomPrimaryKey extends Model
 {
     protected $primaryKey = 'custom_primary_key_id';
 

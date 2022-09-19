@@ -19,8 +19,8 @@ gives clients the power to ask for exactly what they need and nothing more,
 makes it easier to evolve APIs over time, and enables powerful developer tools.
 
 <div align="center">
-  <img src="./playground.png">  
-  <small>GraphQL Playground</small>
+  <img src="https://raw.githubusercontent.com/graphql/graphiql/main/packages/graphiql/resources/graphiql.png" alt="Screenshot of GraphiQL with Doc Explorer Open">  
+  <small>GraphiQL</small>
 </div>
 
 GraphQL has been released only as a [_specification_](https://facebook.github.io/graphql).
@@ -73,7 +73,7 @@ In this tutorial we will create a GraphQL API for a simple Blog from scratch wit
 
 - Laravel
 - Lighthouse
-- GraphQL Playground
+- GraphiQL
 
 ::: tip
 You can download the source code for this tutorial at [https://github.com/nuwave/lighthouse-tutorial](https://github.com/nuwave/lighthouse-tutorial)
@@ -113,12 +113,12 @@ Publish the default schema to `graphql/schema.graphql`:
 
     php artisan vendor:publish --tag=lighthouse-schema
 
-We will use [GraphQL Playground](https://github.com/prisma-labs/graphql-playground)
+We will use [GraphiQL](https://github.com/graphql/graphiql/tree/main/packages/graphiql)
 to interactively run GraphQL queries:
 
-    composer require mll-lab/laravel-graphql-playground
+    composer require mll-lab/laravel-graphiql
 
-To make sure everything is working, access `/graphql-playground` and try this query:
+To make sure everything is working, access `/graphiql` and try this query:
 
 ```graphql
 {
@@ -364,7 +364,7 @@ Just like in Eloquent, we express the relationship between our types using the
 Insert some fake data into your database,
 you can use [Laravel seeders](https://laravel.com/docs/seeding) for that.
 
-Visit `/graphql-playground` and try the following query:
+Visit `/graphiql` and try the following query:
 
 ```graphql
 {

@@ -25,7 +25,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read \Tests\Utils\Models\Location $parent
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Location> $children
  */
-class Location extends Model
+final class Location extends Model
 {
     /** @var array<string, string> */
     protected $casts = [

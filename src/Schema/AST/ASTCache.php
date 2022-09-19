@@ -19,6 +19,8 @@ use Nuwave\Lighthouse\Exceptions\UnknownCacheVersionException;
  *   ttl: int|null,
  *   path: string|null,
  * }
+ *
+ * @phpstan-import-type SerializableDocumentAST from DocumentAST
  */
 class ASTCache
 {
@@ -123,6 +125,7 @@ class ASTCache
             if (! is_array($ast)) {
                 throw new InvalidSchemaCacheContentsException($this->path, $ast);
             }
+            /** @var SerializableDocumentAST $ast */
 
             return DocumentAST::fromArray($ast);
         }

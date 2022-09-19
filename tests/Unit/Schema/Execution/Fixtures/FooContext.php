@@ -6,14 +6,14 @@ use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class FooContext implements GraphQLContext
+final class FooContext implements GraphQLContext
 {
     public const FROM_FOO_CONTEXT = 'custom.context';
 
     /**
      * @var \Illuminate\Http\Request
      */
-    protected $request;
+    private $request;
 
     public function __construct(Request $request)
     {

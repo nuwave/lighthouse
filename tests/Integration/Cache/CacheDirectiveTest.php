@@ -1,16 +1,17 @@
 <?php
 
-namespace Tests\Integration\Schema\Directives;
+namespace Tests\Integration\Cache;
 
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Nuwave\Lighthouse\Schema\Validator as SchemaValidator;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
 
-class CacheDirectiveTest extends DBTestCase
+final class CacheDirectiveTest extends DBTestCase
 {
     /**
      * @var \Illuminate\Contracts\Cache\Repository
@@ -59,6 +60,28 @@ class CacheDirectiveTest extends DBTestCase
         $this->assertSame('foobar', $this->cache->get('lighthouse:User:1:name'));
     }
 
+    public function testCacheKeyIsValidOnFieldDefinition(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+            type User {
+                id: ID!
+                name: String @cache
+                email: String @cacheKey
+            }
+
+            type Query {
+                user: User @first
+            }
+        ';
+
+        $schemaValidator = $this->app->make(SchemaValidator::class);
+        assert($schemaValidator instanceof SchemaValidator);
+
+        $schemaValidator->validate();
+
+        $this->expectNotToPerformAssertions();
+    }
+
     public function testPlaceCacheKeyOnAnyField(): void
     {
         $this->mockResolver([
@@ -94,6 +117,78 @@ class CacheDirectiveTest extends DBTestCase
         ]);
 
         $this->assertSame('foobar', $this->cache->get('lighthouse:User:foo@bar.com:name'));
+    }
+
+    public function testCacheKeyWithRenameDirective(): void
+    {
+        $this->mockResolver([
+            'id' => 1,
+            'name' => 'foobar',
+            'email_name' => 'foo@bar.com',
+        ]);
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID!
+            name: String @cache
+            emailName: String @cacheKey @rename(attribute: "email_name")
+        }
+
+        type Query {
+            user: User @mock
+        }
+        ';
+
+        $response = $this->graphQL(/** @lang GraphQL */ '
+        {
+            user {
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'name' => 'foobar',
+                ],
+            ],
+        ]);
+
+        $this->assertSame('foobar', $this->cache->get('lighthouse:User:foo@bar.com:name'));
+    }
+
+    public function testIDCacheKeyWithRenameDirective(): void
+    {
+        $this->mockResolver([
+            'id_' => 1,
+            'name' => 'foobar',
+        ]);
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID! @rename(attribute: "id_")
+            name: String @cache
+        }
+
+        type Query {
+            user: User @mock
+        }
+        ';
+
+        $response = $this->graphQL(/** @lang GraphQL */ '
+        {
+            user {
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'name' => 'foobar',
+                ],
+            ],
+        ]);
+
+        $this->assertSame('foobar', $this->cache->get('lighthouse:User:1:name'));
     }
 
     public function testStoreResolverResultInPrivateCache(): void
@@ -227,6 +322,9 @@ class CacheDirectiveTest extends DBTestCase
         $this->graphQL(/** @lang GraphQL */ '
         {
             users(first: 5) {
+                paginatorInfo {
+                    total
+                }
                 data {
                     id
                     name

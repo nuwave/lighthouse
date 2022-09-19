@@ -554,10 +554,35 @@ GRAPHQL
         );
     }
 
-    /**
-     * @dataProvider nonNullPaginationResults
-     */
-    public function testThrowsWhenPaginationWithCountZeroIsRequested(bool $nonNullPaginationResults): void
+    public function testCountExplicitlyRequiredFromDirective(): void
+    {
+        config(['lighthouse.pagination.default_count' => 2]);
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID!
+            name: String!
+        }
+
+        type Query {
+            users: [User!] @paginate(defaultCount: null)
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                users {
+                    data {
+                        id
+                    }
+                }
+            }
+            ')
+            ->assertGraphQLErrorMessage('Field "users" argument "first" of type "Int!" is required but not provided.');
+    }
+
+    public function testThrowsWhenPaginationWithNegativeCountIsRequested(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -570,25 +595,17 @@ GRAPHQL
         }
         ';
 
-        $result = $this
+        $this
             ->graphQL(/** @lang GraphQL */ '
             {
-                users(first: 0) {
+                users(first: -1) {
                     data {
                         id
                     }
                 }
             }
             ')
-            ->assertGraphQLErrorMessage(PaginationArgs::requestedZeroOrLessItems(0));
-
-        if (! $nonNullPaginationResults) {
-            $result->assertJson([
-                'data' => [
-                    'users' => null,
-                ],
-            ]);
-        }
+            ->assertGraphQLErrorMessage(PaginationArgs::requestedLessThanZeroItems(-1));
     }
 
     /**

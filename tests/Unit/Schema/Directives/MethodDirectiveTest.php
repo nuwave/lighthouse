@@ -6,7 +6,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Tests\TestCase;
 use Tests\Unit\Schema\Directives\Fixtures\Foo;
 
-class MethodDirectiveTest extends TestCase
+final class MethodDirectiveTest extends TestCase
 {
     protected $schema = /** @lang GraphQL */ '
     type Query {

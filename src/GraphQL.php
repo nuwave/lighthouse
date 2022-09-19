@@ -113,7 +113,7 @@ class GraphQL
             new StartOperationOrOperations($operationOrOperations)
         );
 
-        $resultOrResults = LighthouseUtils::applyEach(
+        $resultOrResults = LighthouseUtils::mapEach(
             /**
              * @return array<string, mixed>
              */
@@ -254,7 +254,7 @@ class GraphQL
         $schema = $this->schemaBuilder->schema();
 
         $this->eventDispatcher->dispatch(
-            new StartExecution($query, $variables, $operationName, $context)
+            new StartExecution($schema, $query, $variables, $operationName, $context)
         );
 
         $result = GraphQLBase::executeQuery(
@@ -370,7 +370,7 @@ class GraphQL
      *   callable(\GraphQL\Error\Error $error): ?array<string, mixed>
      * ): array<string, mixed>
      */
-    protected function errorsHandler(): \Closure
+    protected function errorsHandler(): callable
     {
         if (! isset($this->errorsHandler)) {
             $this->errorsHandler = function (array $errors, callable $formatter): array {

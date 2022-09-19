@@ -11,7 +11,7 @@ use Tests\TestsSchemaCache;
 use Tests\TestsSerialization;
 use Tests\Utils\Models\Comment;
 
-class SchemaCachingTest extends TestCase
+final class SchemaCachingTest extends TestCase
 {
     use TestsSerialization;
     use TestsSchemaCache;

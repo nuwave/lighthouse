@@ -4,7 +4,7 @@ use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
 
-class AutomaticPersistedQueriesTest extends TestCase
+final class AutomaticPersistedQueriesTest extends TestCase
 {
     public function testEnabled(): void
     {

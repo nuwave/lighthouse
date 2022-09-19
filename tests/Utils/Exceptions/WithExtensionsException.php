@@ -5,7 +5,7 @@ namespace Tests\Utils\Exceptions;
 use GraphQL\Error\ClientAware;
 use Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions;
 
-class WithExtensionsException extends \Exception implements ClientAware, RendersErrorsExtensions
+final class WithExtensionsException extends \Exception implements ClientAware, RendersErrorsExtensions
 {
     /**
      * @var array<string, mixed>

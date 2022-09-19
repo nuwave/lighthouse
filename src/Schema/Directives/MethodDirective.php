@@ -32,8 +32,7 @@ GRAPHQL;
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
         $fieldValue->setResolver(function ($root, array $args) {
-            $method = $this->directiveArgValue('name')
-                ?? $this->nodeName();
+            $method = $this->directiveArgValue('name', $this->nodeName());
             assert(is_string($method));
 
             $orderedArgs = [];

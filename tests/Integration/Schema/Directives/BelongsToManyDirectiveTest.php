@@ -8,7 +8,7 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Role;
 use Tests\Utils\Models\User;
 
-class BelongsToManyDirectiveTest extends DBTestCase
+final class BelongsToManyDirectiveTest extends DBTestCase
 {
     public function testQueryBelongsToManyRelationship(): void
     {

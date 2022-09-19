@@ -2,7 +2,6 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use Illuminate\Support\Facades\DB;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Company;
 use Tests\Utils\Models\Post;
@@ -10,14 +9,14 @@ use Tests\Utils\Models\Product;
 use Tests\Utils\Models\Team;
 use Tests\Utils\Models\User;
 
-class BelongsToDirectiveTest extends DBTestCase
+final class BelongsToDirectiveTest extends DBTestCase
 {
     public function testResolveBelongsToRelationship(): void
     {
         $company = factory(Company::class)->create();
 
-        /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->make();
+        assert($user instanceof User);
         $user->company()->associate($company);
         $user->save();
 
@@ -60,8 +59,8 @@ class BelongsToDirectiveTest extends DBTestCase
     {
         $company = factory(Company::class)->create();
 
-        /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->make();
+        assert($user instanceof User);
         $user->company()->associate($company);
         $user->save();
 
@@ -105,8 +104,8 @@ class BelongsToDirectiveTest extends DBTestCase
         $company = factory(Company::class)->create();
         $team = factory(Team::class)->create();
 
-        /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->make();
+        assert($user instanceof User);
         $user->company()->associate($company);
         $user->team()->associate($team);
         $user->save();
@@ -313,11 +312,14 @@ class BelongsToDirectiveTest extends DBTestCase
         config(['lighthouse.shortcut_foreign_key_selection' => true]);
 
         $company = factory(Company::class)->create();
+        assert($company instanceof Company);
 
-        /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->make();
+        assert($user instanceof User);
         $user->company()->associate($company);
         $user->save();
+
+        $user->setRelations([]);
 
         $this->be($user);
 
@@ -335,30 +337,25 @@ class BelongsToDirectiveTest extends DBTestCase
         }
         ';
 
-        $queries = 0;
-        DB::listen(function () use (&$queries): void {
-            ++$queries;
-        });
-
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            user {
-                company {
-                    id
+        $this->assertNoQueriesExecuted(function () use ($company): void {
+            $this->graphQL(/** @lang GraphQL */ '
+            {
+                user {
+                    company {
+                        id
+                    }
                 }
             }
-        }
-        ')->assertJson([
-            'data' => [
-                'user' => [
-                    'company' => [
-                        'id' => $company->id,
+            ')->assertJson([
+                'data' => [
+                    'user' => [
+                        'company' => [
+                            'id' => $company->id,
+                        ],
                     ],
                 ],
-            ],
-        ]);
-
-        self::assertSame(0, $queries);
+            ]);
+        });
     }
 
     public function testDoesNotShortcutForeignKeyIfQueryHasConditions(): void
@@ -366,9 +363,10 @@ class BelongsToDirectiveTest extends DBTestCase
         config(['lighthouse.shortcut_foreign_key_selection' => true]);
 
         $company = factory(Company::class)->create();
+        assert($company instanceof Company);
 
-        /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->make();
+        assert($user instanceof User);
         $user->company()->associate($company);
         $user->save();
 
@@ -388,29 +386,24 @@ class BelongsToDirectiveTest extends DBTestCase
         }
         ';
 
-        $queries = 0;
-        DB::listen(function () use (&$queries): void {
-            ++$queries;
-        });
-
-        $this->graphQL(/** @lang GraphQL */ '
-        query ($name: String) {
-            user {
-                company(name: $name) {
-                    id
+        $this->assertQueryCountMatches(1, function () use ($company): void {
+            $this->graphQL(/** @lang GraphQL */ '
+            query ($name: String) {
+                user {
+                    company(name: $name) {
+                        id
+                    }
                 }
             }
-        }
-        ', [
-            'name' => $company->name . ' no match',
-        ])->assertJson([
-            'data' => [
-                'user' => [
-                    'company' => null,
+            ', [
+                'name' => "{$company->name} no match",
+            ])->assertJson([
+                'data' => [
+                    'user' => [
+                        'company' => null,
+                    ],
                 ],
-            ],
-        ]);
-
-        self::assertSame(1, $queries);
+            ]);
+        });
     }
 }

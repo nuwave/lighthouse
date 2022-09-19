@@ -2,11 +2,11 @@
 
 namespace Tests\Unit\Schema\Directives;
 
-use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Arr;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\DBTestCase;
 
-class HasManyDirectiveTest extends DBTestCase
+final class HasManyDirectiveTest extends DBTestCase
 {
     public function testUsesEdgeTypeForRelayConnections(): void
     {
@@ -57,9 +57,9 @@ class HasManyDirectiveTest extends DBTestCase
 
     public function testThrowsErrorWithUnknownTypeArg(): void
     {
-        $this->expectExceptionMessage('Found invalid pagination type: foo');
+        $this->expectExceptionObject(new DefinitionException('Found invalid pagination type: foo'));
 
-        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
+        $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
         type User {
             tasks(first: Int! after: Int): [Task!]! @hasMany(type: "foo")
         }
@@ -68,11 +68,5 @@ class HasManyDirectiveTest extends DBTestCase
             foo: String
         }
         ');
-
-        $type = $schema->getType('User');
-
-        $this->assertInstanceOf(Type::class, $type);
-        /** @var \GraphQL\Type\Definition\Type $type */
-        $type->config['fields']();
     }
 }

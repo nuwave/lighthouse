@@ -13,7 +13,7 @@ use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use ReflectionProperty;
 use Tests\TestCase;
 
-class DirectiveLocatorTest extends TestCase
+final class DirectiveLocatorTest extends TestCase
 {
     /**
      * @var \Nuwave\Lighthouse\Schema\DirectiveLocator

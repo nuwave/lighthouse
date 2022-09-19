@@ -193,7 +193,9 @@ return [
     'security' => [
         'max_query_complexity' => \GraphQL\Validator\Rules\QueryComplexity::DISABLED,
         'max_query_depth' => \GraphQL\Validator\Rules\QueryDepth::DISABLED,
-        'disable_introspection' => \GraphQL\Validator\Rules\DisableIntrospection::DISABLED,
+        'disable_introspection' => (bool) env('LIGHTHOUSE_SECURITY_DISABLE_INTROSPECTION', false)
+            ? \GraphQL\Validator\Rules\DisableIntrospection::ENABLED
+            : \GraphQL\Validator\Rules\DisableIntrospection::DISABLED,
     ],
 
     /*
@@ -282,6 +284,7 @@ return [
 
     'field_middleware' => [
         \Nuwave\Lighthouse\Schema\Directives\TrimDirective::class,
+        \Nuwave\Lighthouse\Schema\Directives\ConvertEmptyStringsToNullDirective::class,
         \Nuwave\Lighthouse\Schema\Directives\SanitizeDirective::class,
         \Nuwave\Lighthouse\Validation\ValidateDirective::class,
         \Nuwave\Lighthouse\Schema\Directives\TransformArgsDirective::class,

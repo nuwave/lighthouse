@@ -5,7 +5,7 @@ namespace Tests\Utils\Policies;
 use Illuminate\Auth\Access\Response;
 use Tests\Utils\Models\User;
 
-class UserPolicy
+final class UserPolicy
 {
     public const SUPER_ADMIN = 'super admin';
     public const ADMIN = 'admin';

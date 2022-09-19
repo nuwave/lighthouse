@@ -78,3 +78,6 @@ parameters:
 
   # Unavailable in thecodingmachine/safe:2
   - '#Function (sort|substr|ksort) is unsafe to use\. It can return FALSE instead of throwing an exception\.#'
+
+  # Lumen type hints are just wrong
+  - '#Parameter \#1 \$content of function response expects string, .* given\.#'

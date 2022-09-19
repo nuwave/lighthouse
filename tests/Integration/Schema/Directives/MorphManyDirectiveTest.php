@@ -12,7 +12,7 @@ use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class MorphManyDirectiveTest extends DBTestCase
+final class MorphManyDirectiveTest extends DBTestCase
 {
     use WithFaker;
 
@@ -306,6 +306,45 @@ class MorphManyDirectiveTest extends DBTestCase
         );
     }
 
+    public function testPaginatorTypeIsUnlimitedByMaxCountFromDirective(): void
+    {
+        config(['lighthouse.pagination.max_count' => 1]);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Post {
+            id: ID!
+            title: String!
+            images: [Image!] @morphMany(type: PAGINATOR, maxCount: null)
+        }
+
+        type Image {
+            id: ID!
+        }
+
+        type Query {
+            post (
+                id: ID! @eq
+            ): Post @find
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ "
+            {
+                post(id: {$this->post->id}) {
+                    id
+                    title
+                    images(first: 10) {
+                        data {
+                            id
+                        }
+                    }
+                }
+            }
+            ")
+            ->assertGraphQLErrorFree();
+    }
+
     public function testHandlesPaginationWithCountZero(): void
     {
         $this->schema = /** @lang GraphQL */ '
@@ -334,13 +373,39 @@ class MorphManyDirectiveTest extends DBTestCase
                         data {
                             id
                         }
+                        paginatorInfo {
+                            count
+                            currentPage
+                            firstItem
+                            hasMorePages
+                            lastItem
+                            lastPage
+                            perPage
+                        }
                     }
                 }
             }
             ', [
                 'id' => $this->post->id,
             ])
-            ->assertGraphQLErrorMessage(PaginationArgs::requestedZeroOrLessItems(0));
+            ->assertExactJson([
+                'data' => [
+                    'post' => [
+                        'images' => [
+                            'data' => [],
+                            'paginatorInfo' => [
+                                'count' => 0,
+                                'currentPage' => 1,
+                                'firstItem' => null,
+                                'hasMorePages' => false,
+                                'lastItem' => null,
+                                'lastPage' => 0,
+                                'perPage' => 0,
+                            ],
+                        ],
+                    ],
+                ],
+            ]);
     }
 
     public function testQueryMorphManyPaginatorWithADefaultCount(): void

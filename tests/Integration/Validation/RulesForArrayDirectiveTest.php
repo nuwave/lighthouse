@@ -4,7 +4,7 @@ namespace Tests\Integration\Validation;
 
 use Tests\TestCase;
 
-class RulesForArrayDirectiveTest extends TestCase
+final class RulesForArrayDirectiveTest extends TestCase
 {
     public function testValidatesListSize(): void
     {

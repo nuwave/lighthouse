@@ -53,7 +53,7 @@ GRAPHQL;
 
         foreach ($original->arguments as $name => $argument) {
             // Recurse down first, as that resolves the more deeply nested spreads first
-            $argument->value = Utils::applyEach(
+            $argument->value = Utils::mapEach(
                 function ($value) {
                     if ($value instanceof ArgumentSet) {
                         return $this->spread($value);

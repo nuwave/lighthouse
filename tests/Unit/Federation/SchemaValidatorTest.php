@@ -9,7 +9,7 @@ use Nuwave\Lighthouse\Federation\FederationServiceProvider;
 use Nuwave\Lighthouse\Federation\SchemaValidator;
 use Tests\TestCase;
 
-class SchemaValidatorTest extends TestCase
+final class SchemaValidatorTest extends TestCase
 {
     protected function getPackageProviders($app): array
     {

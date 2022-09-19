@@ -5,7 +5,7 @@ namespace Tests;
 use Exception;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 
-class PreLaravel7ExceptionHandler implements ExceptionHandler
+final class PreLaravel7ExceptionHandler implements ExceptionHandler
 {
     public function report(Exception $e)
     {

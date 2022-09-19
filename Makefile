@@ -10,7 +10,7 @@ setup: build vendor ## Setup the local environment
 
 .PHONY: build
 build: ## Build the local Docker containers
-	docker-compose build --build-arg USER_ID=$(shell id -u) --build-arg GROUP_ID=$(shell id -g)
+	docker-compose build --pull --build-arg USER_ID=$(shell id -u) --build-arg GROUP_ID=$(shell id -g)
 
 .PHONY: up
 up: ## Bring up the docker-compose stack
@@ -26,7 +26,7 @@ stan: up ## Runs static analysis
 
 .PHONY: test
 test: up ## Runs tests with PHPUnit
-	docker-compose exec php composer test
+	docker-compose exec php vendor/bin/phpunit
 
 .PHONY: bench
 bench: up ## Run benchmarks
@@ -34,7 +34,7 @@ bench: up ## Run benchmarks
 
 .PHONY: rector
 rector: up ## Automatic code fixes with Rector
-	docker-compose exec php composer rector
+	docker-compose exec php rector process -v src/ tests/
 
 vendor: up composer.json ## Install composer dependencies
 	docker-compose exec php composer update

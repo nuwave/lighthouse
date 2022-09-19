@@ -5,12 +5,12 @@ namespace Tests\Utils\Unions;
 use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 
-class CustomStuff
+final class CustomStuff
 {
     /**
      * @var \Nuwave\Lighthouse\Schema\TypeRegistry
      */
-    protected $typeRegistry;
+    private $typeRegistry;
 
     public function __construct(TypeRegistry $typeRegistry)
     {

@@ -12,7 +12,7 @@ use Tests\TestCase;
 use Tests\TestsSchemaCache;
 use Tests\TestsSerialization;
 
-class CacheCommandTest extends TestCase
+final class CacheCommandTest extends TestCase
 {
     use TestsSerialization;
     use TestsSchemaCache;

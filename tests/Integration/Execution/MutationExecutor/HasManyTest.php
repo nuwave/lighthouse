@@ -8,7 +8,7 @@ use Tests\Utils\Models\Role;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class HasManyTest extends DBTestCase
+final class HasManyTest extends DBTestCase
 {
     protected $schema = /** @lang GraphQL */ '
     type Task {
@@ -331,7 +331,7 @@ class HasManyTest extends DBTestCase
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            ${action}User(input: {
+            {$action}User(input: {
                 id: 1
                 name: "foo"
                 tasks: {
@@ -351,7 +351,7 @@ class HasManyTest extends DBTestCase
 GRAPHQL
         )->assertJson([
             'data' => [
-                "${action}User" => [
+                "{$action}User" => [
                     'id' => '1',
                     'name' => 'foo',
                     'tasks' => [
@@ -380,7 +380,7 @@ GRAPHQL
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            ${action}User(input: {
+            {$action}User(input: {
                 id: 1
                 name: "foo"
                 tasks: {
@@ -401,7 +401,7 @@ GRAPHQL
 GRAPHQL
         )->assertJson([
             'data' => [
-                "${action}User" => [
+                "{$action}User" => [
                     'id' => "$user->id",
                     'name' => 'foo',
                     'tasks' => [
@@ -430,7 +430,7 @@ GRAPHQL
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            ${action}User(input: {
+            {$action}User(input: {
                 id: 1
                 name: "foo"
                 tasks: {
@@ -451,7 +451,7 @@ GRAPHQL
 GRAPHQL
         )->assertJson([
             'data' => [
-                "${action}User" => [
+                "{$action}User" => [
                     'id' => "$user->id",
                     'name' => 'foo',
                     'tasks' => [
@@ -480,7 +480,7 @@ GRAPHQL
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            ${action}User(input: {
+            {$action}User(input: {
                 id: 1
                 name: "foo"
                 tasks: {
@@ -498,7 +498,7 @@ GRAPHQL
 GRAPHQL
         )->assertJson([
             'data' => [
-                "${action}User" => [
+                "{$action}User" => [
                     'id' => "$user->id",
                     'name' => 'foo',
                     'tasks' => [],
@@ -522,7 +522,7 @@ GRAPHQL
 
         $this->graphQL(/** @lang GraphQL */ "
             mutation (\$input: {$actionInputName}UserInput!) {
-                ${action}User(input: \$input) {
+                {$action}User(input: \$input) {
                     id
                     name
                     tasks {
@@ -546,7 +546,7 @@ GRAPHQL
             ]
         )->assertJson([
             'data' => [
-                "${action}User" => [
+                "{$action}User" => [
                     'id' => "$user->id",
                     'name' => 'foo',
                     'tasks' => [
@@ -585,7 +585,7 @@ GRAPHQL
 
         $this->graphQL(/** @lang GraphQL */ "
             mutation (\$input: {$actionInputName}UserInput!) {
-                ${action}User(input: \$input) {
+                {$action}User(input: \$input) {
                     id
                     name
                     tasks {
@@ -606,7 +606,7 @@ GRAPHQL
             ],
         ])->assertJson([
             'data' => [
-                "${action}User" => [
+                "{$action}User" => [
                     'id' => "$user->id",
                     'name' => 'foo',
                     'tasks' => [
@@ -771,7 +771,7 @@ GRAPHQL
             name: String
             customPrimaryKeys: UpdateCustomPrimaryKeyHasMany
         }
-    
+
         input UpdateCustomPrimaryKeyHasMany {
             connect: [ID!]
             disconnect: [ID!]

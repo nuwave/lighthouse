@@ -12,7 +12,7 @@ use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
 
-class ThrottleDirectiveTest extends TestCase
+final class ThrottleDirectiveTest extends TestCase
 {
     public function testWrongLimiterName(): void
     {
@@ -97,7 +97,9 @@ class ThrottleDirectiveTest extends TestCase
         {
             foo
         }
-        ')->assertGraphQLErrorMessage(RateLimitException::MESSAGE);
+        ')->assertGraphQLError(
+            new RateLimitException('Query.foo')
+        );
     }
 
     public function testInlineLimiter(): void
@@ -122,6 +124,8 @@ class ThrottleDirectiveTest extends TestCase
         {
             foo
         }
-        ')->assertGraphQLErrorMessage(RateLimitException::MESSAGE);
+        ')->assertGraphQLError(
+            new RateLimitException('Query.foo')
+        );
     }
 }

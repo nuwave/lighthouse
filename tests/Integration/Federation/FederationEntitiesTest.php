@@ -9,7 +9,7 @@ use Nuwave\Lighthouse\Federation\FederationServiceProvider;
 use Nuwave\Lighthouse\Federation\Types\Any;
 use Tests\TestCase;
 
-class FederationEntitiesTest extends TestCase
+final class FederationEntitiesTest extends TestCase
 {
     protected function getPackageProviders($app): array
     {

@@ -7,7 +7,7 @@ use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
-class CustomFieldMiddlewareDirective extends BaseDirective implements FieldMiddleware
+final class CustomFieldMiddlewareDirective extends BaseDirective implements FieldMiddleware
 {
     public static function definition(): string
     {

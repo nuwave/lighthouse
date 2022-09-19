@@ -10,7 +10,7 @@ use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\RootType;
 use Tests\TestCase;
 
-class ASTBuilderTest extends TestCase
+final class ASTBuilderTest extends TestCase
 {
     /**
      * @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder

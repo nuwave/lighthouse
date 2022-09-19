@@ -21,7 +21,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\User> $users
  * @property-read \Tests\Utils\Models\ACL|null $acl
  */
-class Role extends Model
+final class Role extends Model
 {
     public $timestamps = false;
 

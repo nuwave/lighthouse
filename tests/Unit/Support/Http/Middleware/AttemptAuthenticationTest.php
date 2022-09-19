@@ -9,7 +9,7 @@ use PHPUnit\Framework\Constraint\Callback;
 use Tests\TestCase;
 use Tests\Utils\Models\User;
 
-class AttemptAuthenticationTest extends TestCase
+final class AttemptAuthenticationTest extends TestCase
 {
     /** @var \Tests\Utils\Models\User|null */
     public $user;

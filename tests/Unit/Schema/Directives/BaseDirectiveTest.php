@@ -21,7 +21,7 @@ use Tests\Utils\ModelsSecondary\OnlyHere;
  * are commonly used in directives. As users may also extend it to create
  * custom directives, its behaviour should be stable and well-defined.
  */
-class BaseDirectiveTest extends TestCase
+final class BaseDirectiveTest extends TestCase
 {
     public function testGetsModelClassFromDirective(): void
     {
@@ -71,6 +71,16 @@ class BaseDirectiveTest extends TestCase
 
         $this->expectException(DefinitionException::class);
         $directive->getModelClass();
+    }
+
+    public function testBuiltInTypeTolerated(): void
+    {
+        $directive = $this->constructFieldDirective('foo: String @dummy(model: "Team")');
+
+        $this->assertSame(
+            Team::class,
+            $directive->getModelClass()
+        );
     }
 
     public function testThrowsIfTheClassIsNotAModel(): void
@@ -188,7 +198,7 @@ class BaseDirectiveTest extends TestCase
             }
 
             /**
-             * Allow to call protected methods from the test.
+             * Allows calling protected methods from the test.
              *
              * @param  array<mixed>  $args
              *
