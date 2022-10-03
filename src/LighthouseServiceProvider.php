@@ -53,7 +53,6 @@ use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules;
 use Nuwave\Lighthouse\Support\Http\Responses\ResponseStream;
-use Nuwave\Lighthouse\Testing\TestingServiceProvider;
 
 class LighthouseServiceProvider extends ServiceProvider
 {
@@ -129,9 +128,6 @@ class LighthouseServiceProvider extends ServiceProvider
         });
 
         $this->commands(self::COMMANDS);
-
-        // Always registered in order to ensure macros are recognized by Larastan
-        $this->app->register(TestingServiceProvider::class);
     }
 
     public function boot(ConfigRepository $configRepository): void

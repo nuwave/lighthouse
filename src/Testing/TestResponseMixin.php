@@ -4,19 +4,18 @@ namespace Nuwave\Lighthouse\Testing;
 
 use Closure;
 use GraphQL\Error\ClientAware;
+use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\Assert;
 use Throwable;
 
 /**
- * TODO add stronger type hints once support for Illuminate\Foundation\Testing\TestResponse is no longer needed.
- *
  * @mixin \Illuminate\Testing\TestResponse
  */
 class TestResponseMixin
 {
     public function assertGraphQLValidationError(): Closure
     {
-        return function (string $key, ?string $message) {
+        return function (string $key, ?string $message): TestResponse {
             $validation = TestResponseUtils::extractValidationErrors($this);
             Assert::assertNotNull($validation, 'Expected the query to return an error with extensions.validation.');
 
@@ -38,7 +37,7 @@ class TestResponseMixin
 
     public function assertGraphQLValidationKeys(): Closure
     {
-        return function (array $keys) {
+        return function (array $keys): TestResponse {
             $validation = TestResponseUtils::extractValidationErrors($this);
             Assert::assertNotNull($validation, 'Expected the query to return an error with extensions.validation.');
 
@@ -54,7 +53,7 @@ class TestResponseMixin
 
     public function assertGraphQLValidationPasses(): Closure
     {
-        return function () {
+        return function (): TestResponse {
             $validation = TestResponseUtils::extractValidationErrors($this);
             Assert::assertNull($validation, 'Expected the query to have no validation errors.');
 
@@ -64,7 +63,7 @@ class TestResponseMixin
 
     public function assertGraphQLError(): Closure
     {
-        return function (Throwable $error) {
+        return function (Throwable $error): TestResponse {
             $message = $error->getMessage();
 
             return $error instanceof ClientAware && $error->isClientSafe()
@@ -75,7 +74,7 @@ class TestResponseMixin
 
     public function assertGraphQLErrorMessage(): Closure
     {
-        return function (string $message) {
+        return function (string $message): TestResponse {
             $messages = $this->json('errors.*.message');
 
             Assert::assertIsArray($messages, 'Expected the GraphQL response to contain errors, got none.');
@@ -91,7 +90,7 @@ class TestResponseMixin
 
     public function assertGraphQLDebugMessage(): Closure
     {
-        return function (string $message) {
+        return function (string $message): TestResponse {
             $messages = $this->json('errors.*.extensions.debugMessage');
 
             Assert::assertIsArray($messages, 'Expected the GraphQL response to contain errors, got none.');
@@ -107,7 +106,7 @@ class TestResponseMixin
 
     public function assertGraphQLErrorFree(): Closure
     {
-        return function () {
+        return function (): TestResponse {
             $errors = $this->json('errors');
             Assert::assertNull(
                 $errors,

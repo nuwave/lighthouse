@@ -106,6 +106,7 @@
                 "Nuwave\\Lighthouse\\Pagination\\PaginationServiceProvider",
                 "Nuwave\\Lighthouse\\Scout\\ScoutServiceProvider",
                 "Nuwave\\Lighthouse\\SoftDeletes\\SoftDeletesServiceProvider",
+                "Nuwave\\Lighthouse\\Testing\\TestingServiceProvider",
                 "Nuwave\\Lighthouse\\Validation\\ValidationServiceProvider"
             ]
         }
