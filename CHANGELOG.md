@@ -29,6 +29,24 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove `Serializable` implementation
 - Remove trait `ClearsSchemaCache`
 
+## v5.61.0
+
+### Added
+
+- Add `@upload` directive https://github.com/nuwave/lighthouse/pull/2121
+
+## v5.60.0
+
+### Added
+
+- Allow configuring `security.disable_introspection` through the env variable `LIGHTHOUSE_SECURITY_DISABLE_INTROSPECTION` https://github.com/nuwave/lighthouse/pull/2205
+
+## v5.59.0
+
+### Added
+
+- Open `EnsureXHR` middleware for extension https://github.com/nuwave/lighthouse/pull/2202
+
 ## v5.58.2
 
 ### Fixed
