@@ -40,11 +40,11 @@ GRAPHQL;
 
     public function transform($argumentValue): ?string
     {
-        if ($argumentValue === null) {
+        if (null === $argumentValue) {
             return null;
         }
 
-        if (!($argumentValue instanceof UploadedFile)) {
+        if (! ($argumentValue instanceof UploadedFile)) {
             $uploadedFileClass = UploadedFile::class;
             throw new InvalidArgumentException("Expected argument `{$this->nodeName()}` to be instanceof {$uploadedFileClass}.");
         }
@@ -58,11 +58,11 @@ GRAPHQL;
                 'disk' => $this->diskArgValue(),
                 'visibility' => $this->publicArgValue()
                     ? 'public'
-                    : 'private'
+                    : 'private',
             ]
         );
 
-        if ($filepathInStorage === false) {
+        if (false === $filepathInStorage) {
             throw new CannotWriteFileException("Unable to upload `{$this->nodeName()}` file to `{$this->pathArgValue()}` via disk `{$this->diskArgValue()}`.");
         }
 
