@@ -3383,20 +3383,20 @@ the returned path to the attribute key provided.
 This does not change the schema from a client perspective.
 """
 directive @upload(
-    """
-    The storage disk to be used, defaults to config value `filesystems.default`.
-    """
-    disk: String
+  """
+  The storage disk to be used, defaults to config value `filesystems.default`.
+  """
+  disk: String
 
-    """
-    The path where the file should be stored.
-    """
-    path: String! = "/"
+  """
+  The path where the file should be stored.
+  """
+  path: String! = "/"
 
-    """
-    Should the visibility be public?
-    """
-    public: Boolean! = false
+  """
+  Should the visibility be public?
+  """
+  public: Boolean! = false
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
