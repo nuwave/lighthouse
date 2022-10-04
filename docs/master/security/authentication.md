@@ -173,7 +173,7 @@ class Login
     public function __invoke($_, array $args): User
     {
         // Plain Laravel: Auth::guard()
-        // Laravel Sanctum: Auth::guard(config('sanctum.guard', 'web'))
+        // Laravel Sanctum: Auth::guard(Arr::first(config('sanctum.guard')))
         $guard = ?;
 
         if( ! $guard->attempt($args)) {
