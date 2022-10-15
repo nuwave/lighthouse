@@ -40,10 +40,12 @@ class EnsureXHR
         }
 
         $contentType = $request->header('content-type', '');
+        // @phpstan-ignore-next-line wrongly assumes $contentType to always be string
         if (is_array($contentType)) {
             $contentType = $contentType[0];
         }
 
+        // @phpstan-ignore-next-line wrongly assumes $contentType to always be string
         if (null === $contentType || '' === $contentType) {
             throw new BadRequestHttpException('Content-Type header must be set');
         }
