@@ -59,10 +59,6 @@ GRAPHQL;
     }
 
     /**
-     * Get package providers.
-     *
-     * @param  \Illuminate\Foundation\Application  $app
-     *
      * @return array<class-string<\Illuminate\Support\ServiceProvider>>
      */
     protected function getPackageProviders($app): array
@@ -87,11 +83,6 @@ GRAPHQL;
         ];
     }
 
-    /**
-     * Define environment setup.
-     *
-     * @param  \Illuminate\Foundation\Application  $app
-     */
     protected function getEnvironmentSetUp($app): void
     {
         /** @var \Illuminate\Contracts\Config\Repository $config */
@@ -186,8 +177,6 @@ GRAPHQL;
      *
      * This makes debugging the tests much simpler as Exceptions
      * are fully dumped to the console when making requests.
-     *
-     * @param  \Illuminate\Foundation\Application  $app
      */
     protected function resolveApplicationExceptionHandler($app): void
     {
@@ -199,7 +188,7 @@ GRAPHQL;
     /**
      * Build an executable schema from a SDL string, adding on a default Query type.
      */
-    protected function buildSchemaWithPlaceholderQuery(string $schema = ''): Schema
+    protected function buildSchemaWithPlaceholderQuery(string $schema): Schema
     {
         return $this->buildSchema(
             $schema . self::PLACEHOLDER_QUERY
@@ -222,14 +211,11 @@ GRAPHQL;
     /**
      * Get a fully qualified reference to a method that is defined on the test class.
      */
-    protected function qualifyTestResolver(string $method = 'resolve'): string
+    protected function qualifyTestResolver(string $method): string
     {
         return addslashes(static::class) . '@' . $method;
     }
 
-    /**
-     * Construct a command tester.
-     */
     protected function commandTester(Command $command): CommandTester
     {
         $command->setLaravel($this->app);
