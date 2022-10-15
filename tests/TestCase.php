@@ -22,6 +22,7 @@ use Nuwave\Lighthouse\Scout\ScoutServiceProvider as LighthouseScoutServiceProvid
 use Nuwave\Lighthouse\SoftDeletes\SoftDeletesServiceProvider;
 use Nuwave\Lighthouse\Testing\MakesGraphQLRequests;
 use Nuwave\Lighthouse\Testing\MocksResolvers;
+use Nuwave\Lighthouse\Testing\TestingServiceProvider;
 use Nuwave\Lighthouse\Testing\UsesTestSchema;
 use Nuwave\Lighthouse\Validation\ValidationServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
@@ -81,6 +82,7 @@ GRAPHQL;
             OrderByServiceProvider::class,
             PaginationServiceProvider::class,
             SoftDeletesServiceProvider::class,
+            TestingServiceProvider::class,
             ValidationServiceProvider::class,
         ];
     }
