@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.62.0
+
+### Changed
+
+- Extract uploaded file name calculation to method in `@upload` directive https://github.com/nuwave/lighthouse/pull/2215
+
 ## v5.61.0
 
 ### Added

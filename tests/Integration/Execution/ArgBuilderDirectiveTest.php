@@ -209,7 +209,7 @@ final class ArgBuilderDirectiveTest extends DBTestCase
         ', [
             'between' => [
                 now()->subDay()->startOfDay()->format('Y-m-d H:i:s'),
-                now()->subDay()->endOfDay()->format('Y-m-d H:i:s')
+                now()->subDay()->endOfDay()->format('Y-m-d H:i:s'),
             ],
         ])->assertJsonCount(1, 'data.users');
     }
@@ -282,7 +282,7 @@ final class ArgBuilderDirectiveTest extends DBTestCase
             'between' => [
                 now()->subDay()->startOfDay()->format('Y-m-d H:i:s'),
                 now()->subDay()->endOfDay()->format('Y-m-d H:i:s'),
-            ]
+            ],
         ])->assertJsonCount(2, 'data.users');
     }
 
@@ -312,7 +312,7 @@ final class ArgBuilderDirectiveTest extends DBTestCase
             }
         }
         ', [
-            'created_at' => $oneYearAgo->format('Y')
+            'created_at' => $oneYearAgo->format('Y'),
         ])->assertJsonCount(1, 'data.users');
     }
 
