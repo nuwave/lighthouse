@@ -165,10 +165,6 @@ class Utils
 
     /**
      * Return valid uppercased GraphQL columns enum name for a given column name.
-     *
-     * @param  string  $columnName
-     * 
-     * @return string
      */
     public static function columnNameToGraphQLName(string $columnName): string
     {

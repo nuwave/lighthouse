@@ -1868,4 +1868,3 @@ You can find and compare releases at the [GitHub release page](https://github.co
 We just started maintaining a changelog starting from v3.
 
 If someone wants to make one for previous versions, pull requests are welcome.
-

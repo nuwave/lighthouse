@@ -7,14 +7,7 @@ use Nuwave\Lighthouse\Support\Utils;
 
 final class UtilsTest extends TestCase
 {
-    /**
-     * A basic unit test example.
-     *
-     * @return void
-     * @group utils
-     */
-
-    public function testUsualColumnNameGeneratorHelper(): void
+    public function testColumnNameToGraphQLName(): void
     {
         $this->assertSame(
             'COLUMN_NAME',
@@ -25,17 +18,7 @@ final class UtilsTest extends TestCase
             'COLUMN_NAME',
             Utils::columnNameToGraphQLName('columnName')
         );
-    }
 
-    /**
-     * A basic unit test example.
-     *
-     * @return void
-     * @group utils
-     */
-
-    public function testUnusualColumnNameGeneratorHelper(): void
-    {
         $this->assertSame(
             'SOME_NESTED_COLUMN_NAME',
             Utils::columnNameToGraphQLName('some.nested.column_name')
