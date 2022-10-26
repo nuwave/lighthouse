@@ -9,7 +9,15 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
-- Fixed GraphQL enum names generation from column names containing symbols 
+### Fixed
+
+- Fix GraphQL enum names generation from column names containing symbols https://github.com/nuwave/lighthouse/pull/2219
+
+## v5.63.0
+
+### Added
+
+- Allow easily overwriting enum description generation from `bensampo/laravel-enum` https://github.com/nuwave/lighthouse/pull/2218
 
 ## v5.62.0
 
