@@ -3,9 +3,10 @@
 namespace Nuwave\Lighthouse\Support;
 
 use Closure;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use ReflectionClass;
 use ReflectionException;
+use Illuminate\Support\Str;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
 class Utils
 {
@@ -160,5 +161,26 @@ class Utils
         return function ($object) use ($classLike): bool {
             return $object instanceof $classLike;
         };
+    }
+
+    /**
+     * Return valid uppercased GraphQL columns enum name for a given column name.
+     *
+     * @param  string  $columnName
+     * 
+     * @return string
+     */
+    public static function columnNameToGraphQLName(string $columnName): string
+    {
+        // preserve separator on specific characters like $ for MariaDB and . for MongoDB
+        $separatedColumnName = str_replace(str_split('\$\.'), '_', Str::snake($columnName));
+
+        // valid graphql name can only start with a letter or underscore
+        // https://spec.graphql.org/draft/#sec-Names
+        $prepend = preg_match('/^[a-zA-Z_]/', $separatedColumnName) ? '' : '_';
+
+        return strtoupper(
+            $prepend . Str::slug($separatedColumnName, "_")
+        );
     }
 }

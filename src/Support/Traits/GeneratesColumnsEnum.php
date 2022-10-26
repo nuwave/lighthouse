@@ -2,15 +2,16 @@
 
 namespace Nuwave\Lighthouse\Support\Traits;
 
-use GraphQL\Language\AST\EnumTypeDefinitionNode;
+use Illuminate\Support\Str;
+use GraphQL\Language\Parser;
+use Nuwave\Lighthouse\Support\Utils;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use GraphQL\Language\AST\EnumTypeDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use GraphQL\Language\Parser;
-use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Schema\AST\ASTHelper;
-use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 
 /**
  * Directives may want to constrain database columns to an enum.
@@ -83,9 +84,7 @@ trait GeneratesColumnsEnum
         $enumValues = array_map(
             function (string $columnName): string {
                 return
-                    strtoupper(
-                        Str::snake($columnName)
-                    )
+                    Utils::columnNameToGraphQLName($columnName)
                     . ' @enum(value: "' . $columnName . '")';
             },
             $allowedColumns
