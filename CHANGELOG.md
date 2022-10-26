@@ -13,7 +13,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
-- Allow easily overwriting enum description generation from `bensampo/laravel-enum`
+- Allow easily overwriting enum description generation from `bensampo/laravel-enum` https://github.com/nuwave/lighthouse/pull/2218
 
 ## v5.62.0
 
