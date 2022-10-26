@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.63.0
+
+### Added
+
+- Allow easily overwriting enum description generation from `bensampo/laravel-enum`
+
 ## v5.62.0
 
 ### Changed
