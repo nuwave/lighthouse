@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Support\Traits;
 
-use Illuminate\Support\Str;
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Support\Utils;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
