@@ -34,6 +34,6 @@ class ModelNotFoundTest extends DBTestCase
         '
         )
             ->assertGraphQLErrorMessage( 'No query results for model [Tests\Utils\Models\Post] -1')
-            ->assertGraphQLErrorCategory('graphql');
+            ->assertGraphQLErrorCategory('not_found');
     }
 }

@@ -20,7 +20,7 @@ class ModelNotFoundErrorHandler implements ErrorHandler
         $previous = $error->getPrevious();
 
         if ($previous instanceof ModelNotFoundException) {
-            return $next(new Error($previous->getMessage()));
+            return $next(new Error($previous->getMessage(), null, null, [], null, null, ['category' => 'not_found']));
         }
 
         return $next($error);
