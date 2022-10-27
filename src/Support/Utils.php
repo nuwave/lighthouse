@@ -7,6 +7,7 @@ use ReflectionClass;
 use ReflectionException;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use function Safe\preg_match;
 
 class Utils
 {
