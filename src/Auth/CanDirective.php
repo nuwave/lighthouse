@@ -11,7 +11,6 @@ use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
@@ -198,18 +197,14 @@ GRAPHQL;
                 $queryBuilder->onlyTrashed();
             }
 
-            try {
-                $enhancedBuilder = $argumentSet->enhanceBuilder(
-                    $queryBuilder,
-                    $this->directiveArgValue('scopes', []),
-                    Utils::instanceofMatcher(TrashedDirective::class)
-                );
-                assert($enhancedBuilder instanceof Builder);
+            $enhancedBuilder = $argumentSet->enhanceBuilder(
+                $queryBuilder,
+                $this->directiveArgValue('scopes', []),
+                Utils::instanceofMatcher(TrashedDirective::class)
+            );
+            assert($enhancedBuilder instanceof Builder);
 
-                $modelOrModels = $enhancedBuilder->findOrFail($findValue);
-            } catch (ModelNotFoundException $exception) {
-                throw new Error($exception->getMessage());
-            }
+            $modelOrModels = $enhancedBuilder->findOrFail($findValue);
 
             if ($modelOrModels instanceof Model) {
                 $modelOrModels = [$modelOrModels];
