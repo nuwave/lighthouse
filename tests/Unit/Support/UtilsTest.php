@@ -1,42 +1,33 @@
 <?php
 
-namespace Tests\Unit\Support\Http\Middleware;
+namespace Tests\Unit\Support;
 
-use Tests\TestCase;
 use Nuwave\Lighthouse\Support\Utils;
+use Tests\TestCase;
 
 final class UtilsTest extends TestCase
 {
-    public function testColumnNameToGraphQLName(): void
+    /**
+     * @dataProvider nameToEnumValueName
+     */
+    public function testToEnumValueName(string $name, string $enumValueName): void
     {
         $this->assertSame(
-            'COLUMN_NAME',
-            Utils::columnNameToGraphQLName('column_name')
+            $enumValueName,
+            Utils::toEnumValueName($name)
         );
+    }
 
-        $this->assertSame(
-            'COLUMN_NAME',
-            Utils::columnNameToGraphQLName('columnName')
-        );
-
-        $this->assertSame(
-            'SOME_NESTED_COLUMN_NAME',
-            Utils::columnNameToGraphQLName('some.nested.column_name')
-        );
-
-        $this->assertSame(
-            'COLUMN_NAME',
-            Utils::columnNameToGraphQLName('$columnName')
-        );
-
-        $this->assertSame(
-            '_123_COLUMN_NAME',
-            Utils::columnNameToGraphQLName('123_column_name')
-        );
-
-        $this->assertSame(
-            '_123_COLUMN_NAME',
-            Utils::columnNameToGraphQLName('123Column$Name')
-        );
+    /**
+     * @return iterable<array{string, string}>
+     */
+    public function nameToEnumValueName(): iterable
+    {
+        yield ['column_name', 'COLUMN_NAME'];
+        yield ['columnName', 'COLUMN_NAME'];
+        yield ['some.nested.column_name', 'SOME_NESTED_COLUMN_NAME'];
+        yield ['$columnName', 'COLUMN_NAME'];
+        yield ['123_column_name', '_123_COLUMN_NAME'];
+        yield ['123Column$Name', '_123_COLUMN_NAME'];
     }
 }

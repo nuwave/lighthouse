@@ -3,11 +3,13 @@
 namespace Nuwave\Lighthouse\Support;
 
 use Closure;
-use ReflectionClass;
-use ReflectionException;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use ReflectionClass;
+use ReflectionException;
+
 use function Safe\preg_match;
+use function Safe\preg_replace;
 
 class Utils
 {
@@ -52,7 +54,7 @@ class Utils
     public static function constructResolver(string $className, string $methodName): Closure
     {
         if (! method_exists($className, $methodName)) {
-            throw new DefinitionException("Method '{$methodName}' does not exist on class '{$className}'");
+            throw new DefinitionException("Method '{$methodName}' does not exist on class '{$className}'.");
         }
 
         return Closure::fromCallable(
@@ -165,19 +167,32 @@ class Utils
     }
 
     /**
-     * Return valid uppercased GraphQL columns enum name for a given column name.
+     * Convert the given name to an UPPER_CASE name for an enum value.
+     *
+     * Ensures compliance with https://spec.graphql.org/draft/#sec-Names.
+     *
+     * @see \Illuminate\Support\Str::slug().
      */
-    public static function columnNameToGraphQLName(string $columnName): string
+    public static function toEnumValueName(string $name): string
     {
-        // preserve separator on specific characters like $ for MariaDB and . for MongoDB
-        $separatedColumnName = str_replace(str_split('\$\.'), '_', Str::snake($columnName));
+        // Remove UTF-8 special characters
+        $name = Str::ascii($name);
+        // Preserve words separated by camelCase
+        $name = Str::snake($name);
+        // ALL_CAPS
+        $name = strtoupper($name);
+        // Preserve separator on specific characters like $ for MariaDB and . for MongoDB
+        $name = preg_replace('/[$.]/', '_', $name);
+        // Remove all characters that are not the separator, letters, numbers, or whitespace
+        $name = preg_replace('![^_\pL\pN\s]+!u', '', $name);
+        // Replace all separator characters and whitespace by a single separator
+        $name = preg_replace('![_\s]+!u', '_', $name);
+        // Remove leading or trailing separators
+        $name = trim($name, '_');
 
-        // valid graphql name can only start with a letter or underscore
-        // https://spec.graphql.org/draft/#sec-Names
-        $prepend = preg_match('/^[a-zA-Z_]/', $separatedColumnName) ? '' : '_';
-
-        return strtoupper(
-            $prepend . Str::slug($separatedColumnName, "_")
-        );
+        // GraphQL names can only start with a letter or underscore
+        return preg_match('/^[a-zA-Z_]/', $name)
+            ? $name
+            : "_{$name}";
     }
 }
