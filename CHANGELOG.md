@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+
+- Fix GraphQL enum names generation from column names containing symbols https://github.com/nuwave/lighthouse/pull/2219
+
 ## v5.63.0
 
 ### Added
