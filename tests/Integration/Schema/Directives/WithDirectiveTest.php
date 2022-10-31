@@ -11,7 +11,7 @@ use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-final class CWithDirectiveTest extends DBTestCase
+final class WithDirectiveTest extends DBTestCase
 {
     public function testEagerLoadsRelation(): void
     {
