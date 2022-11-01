@@ -39,21 +39,23 @@ class EnsureXHR
             return $next($request);
         }
 
-        if ($request->header('X-Requested-With', '') !== 'XMLHttpRequest') {
-            $contentType = $request->header('content-type', '');
-            // @phpstan-ignore-next-line wrongly assumes $contentType to always be string
-            if (is_array($contentType)) {
-                $contentType = $contentType[0];
-            }
+        if ($request->header('X-Requested-With', '') === 'XMLHttpRequest') {
+            return $next($request);
+        }
 
-            // @phpstan-ignore-next-line wrongly assumes $contentType to always be string
-            if (null === $contentType || '' === $contentType) {
-                throw new BadRequestHttpException('Content-Type header must be set');
-            }
+        $contentType = $request->header('content-type', '');
+        // @phpstan-ignore-next-line wrongly assumes $contentType to always be string
+        if (is_array($contentType)) {
+            $contentType = $contentType[0];
+        }
 
-            if (Str::startsWith($contentType, static::FORM_CONTENT_TYPES)) {
-                throw new BadRequestHttpException("Content-Type $contentType is forbidden");
-            }
+        // @phpstan-ignore-next-line wrongly assumes $contentType to always be string
+        if (null === $contentType || '' === $contentType) {
+            throw new BadRequestHttpException('Content-Type header must be set');
+        }
+
+        if (Str::startsWith($contentType, static::FORM_CONTENT_TYPES)) {
+            throw new BadRequestHttpException("Content-Type $contentType is forbidden");
         }
 
         return $next($request);
