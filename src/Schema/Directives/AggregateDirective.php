@@ -3,7 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry;
@@ -86,7 +86,7 @@ GRAPHQL;
         $modelArg = $this->directiveArgValue('model');
         if (is_string($modelArg)) {
             $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg) {
-                /** @var Builder $query */
+                /** @var EloquentBuilder $query */
                 $query = $this
                     ->namespaceModelClass($modelArg)::query();
 

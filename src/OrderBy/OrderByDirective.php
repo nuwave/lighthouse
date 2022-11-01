@@ -6,7 +6,7 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
@@ -117,7 +117,7 @@ GRAPHQL;
             $column = Arr::pull($orderByClause, 'column');
 
             if (null === $column) {
-                if (! $builder instanceof Builder) {
+                if (! $builder instanceof EloquentBuilder) {
                     throw new DefinitionException('Can not order by relations on non-Eloquent builders, got: ' . get_class($builder));
                 }
 

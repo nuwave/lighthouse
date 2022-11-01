@@ -7,7 +7,7 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\SelectionSetNode;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Container\Container;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
@@ -200,7 +200,7 @@ class EntityResolverProvider
      * @param  \Illuminate\Support\Collection<\GraphQL\Language\AST\SelectionSetNode>  $keyFieldsSelections
      * @param  array<string, mixed>  $representation
      */
-    protected function constrainKeys(Builder $builder, Collection $keyFieldsSelections, array $representation): void
+    protected function constrainKeys(EloquentBuilder $builder, Collection $keyFieldsSelections, array $representation): void
     {
         $this->applySatisfiedSelection(
             $builder,
@@ -247,7 +247,7 @@ class EntityResolverProvider
     /**
      * @param  array<string, mixed>  $representation
      */
-    protected function applySatisfiedSelection(Builder $builder, SelectionSetNode $keyFields, array $representation): void
+    protected function applySatisfiedSelection(EloquentBuilder $builder, SelectionSetNode $keyFields, array $representation): void
     {
         /**
          * Fragments or spreads are not allowed in key fields.

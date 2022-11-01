@@ -2,7 +2,7 @@
 
 namespace Tests\Integration\Pagination;
 
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Laravel\Scout\Builder as ScoutBuilder;
@@ -265,7 +265,7 @@ GRAPHQL;
         ]);
     }
 
-    public function builder(): Builder
+    public function builder(): EloquentBuilder
     {
         return User::orderBy('id', 'DESC');
     }

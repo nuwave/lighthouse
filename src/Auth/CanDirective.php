@@ -8,7 +8,7 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Pagination\Paginator;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Arr;
@@ -203,7 +203,7 @@ GRAPHQL;
                     $this->directiveArgValue('scopes', []),
                     Utils::instanceofMatcher(TrashedDirective::class)
                 );
-                assert($enhancedBuilder instanceof Builder);
+                assert($enhancedBuilder instanceof EloquentBuilder);
 
                 $modelOrModels = $enhancedBuilder->findOrFail($findValue);
             } catch (ModelNotFoundException $exception) {
