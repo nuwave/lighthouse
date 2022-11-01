@@ -24,7 +24,10 @@ class AppVersion
 
     protected static function version(): string
     {
-        return Container::getInstance()->version();
+        /** @var \Illuminate\Foundation\Application|\Laravel\Lumen\Application $container */
+        $container = Container::getInstance();
+
+        return $container->version();
     }
 
     protected static function versionNumber(): float

@@ -25,9 +25,10 @@ class ResolverProvider implements ProvidesResolver
                 $this->throwMissingResolver($fieldValue);
             }
 
-            return \Closure::fromCallable(
-                [Container::getInstance()->make($resolverClass), '__invoke']
-            );
+            $resolver = Container::getInstance()->make($resolverClass);
+            assert(is_object($resolver));
+
+            return \Closure::fromCallable([$resolver, '__invoke']);
         }
 
         return \Closure::fromCallable(
@@ -51,6 +52,7 @@ class ResolverProvider implements ProvidesResolver
 
     /**
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
+     * @return never
      */
     protected function throwMissingResolver(FieldValue $fieldValue): void
     {
@@ -73,3 +75,4 @@ MESSAGE
         );
     }
 }
+

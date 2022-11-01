@@ -56,9 +56,10 @@ class Utils
             throw new DefinitionException("Method '{$methodName}' does not exist on class '{$className}'.");
         }
 
-        return \Closure::fromCallable(
-            [Container::getInstance()->make($className), $methodName]
-        );
+        $resolver = Container::getInstance()->make($className);
+        assert(is_object($resolver));
+
+        return \Closure::fromCallable([$resolver, $methodName]);
     }
 
     /**

@@ -502,9 +502,10 @@ class TypeRegistry
         );
 
         if ($className) {
-            return \Closure::fromCallable(
-                [Container::getInstance()->make($className), '__invoke']
-            );
+            $typeResolver = Container::getInstance()->make($className);
+            assert(is_object($typeResolver));
+
+            return \Closure::fromCallable([$typeResolver, '__invoke']);
         }
 
         return null;
