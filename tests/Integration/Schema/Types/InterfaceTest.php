@@ -3,6 +3,7 @@
 namespace Tests\Integration\Schema\Types;
 
 use GraphQL\Type\Definition\Type;
+use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
@@ -307,7 +308,7 @@ GRAPHQL;
 
     public function resolveType(): Type
     {
-        $typeRegistry = $this->app->make(TypeRegistry::class);
+        $typeRegistry = Container::getInstance()->make(TypeRegistry::class);
         assert($typeRegistry instanceof TypeRegistry);
 
         return $typeRegistry->get('Guy');
