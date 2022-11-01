@@ -4,6 +4,7 @@ namespace Tests\Integration;
 
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Routing\Route;
+use Illuminate\Routing\Router;
 use Nuwave\Lighthouse\LighthouseServiceProvider;
 use Orchestra\Testbench\TestCase;
 
@@ -34,14 +35,14 @@ final class RouteRegistrationTest extends TestCase
 
     public function testRegisterRouteWithCustomConfig(): void
     {
-        /** @var \Illuminate\Routing\Router $router */
-        $router = app('router');
+        $router = $this->app->make(Router::class);
+        assert($router instanceof Router);
+
         $routes = $router->getRoutes();
 
         $graphqlRoute = $routes->getByName('graphql');
+        assert($graphqlRoute instanceof Route);
 
-        $this->assertInstanceOf(Route::class, $graphqlRoute);
-        /** @var \Illuminate\Routing\Route $graphqlRoute */
         $this->assertEquals(
             ['GET', 'POST', 'HEAD'],
             $graphqlRoute->methods()

@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Auth;
 
-use Closure;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionNode;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -53,7 +52,7 @@ directive @guard(
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
     {
         $previousResolver = $fieldValue->getResolver();
 

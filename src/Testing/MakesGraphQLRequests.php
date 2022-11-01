@@ -181,7 +181,7 @@ trait MakesGraphQLRequests
      */
     protected function graphQLEndpointUrl(): string
     {
-        $config = app(ConfigRepository::class);
+        $config = Container::getInstance()->make(ConfigRepository::class);
         assert($config instanceof ConfigRepository);
 
         return route($config->get('lighthouse.route.name'));
@@ -234,8 +234,9 @@ trait MakesGraphQLRequests
 
     protected function rethrowGraphQLErrors(): void
     {
-        $config = app(ConfigRepository::class);
+        $config = Container::getInstance()->make(ConfigRepository::class);
         assert($config instanceof ConfigRepository);
+
         $config->set('lighthouse.error_handlers', [RethrowingErrorHandler::class]);
     }
 }

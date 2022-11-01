@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Schema;
 
-use Closure;
 use GraphQL\Language\Parser;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\EnumValueDefinition;
@@ -26,9 +25,11 @@ final class TypeRegistryTest extends TestCase
     {
         parent::setUp();
 
-        $this->typeRegistry = app(TypeRegistry::class);
+        $this->typeRegistry = $this->app->make(TypeRegistry::class);
 
-        $astBuilder = app(ASTBuilder::class);
+        $astBuilder = $this->app->make(ASTBuilder::class);
+        assert($astBuilder instanceof ASTBuilder);
+
         $this->typeRegistry->setDocumentAST($astBuilder->documentAST());
     }
 
@@ -159,7 +160,7 @@ final class TypeRegistryTest extends TestCase
 
         $this->assertInstanceOf(UnionType::class, $unionType);
         $this->assertSame('Foo', $unionType->name);
-        $this->assertInstanceOf(Closure::class, $unionType->config['resolveType'] ?? null);
+        $this->assertInstanceOf(\Closure::class, $unionType->config['resolveType'] ?? null);
     }
 
     public function testTransformObjectTypes(): void
@@ -316,8 +317,10 @@ final class TypeRegistryTest extends TestCase
         }
         " . self::PLACEHOLDER_QUERY;
 
-        app()->forgetInstance(ASTBuilder::class);
-        $astBuilder = app(ASTBuilder::class);
+        $this->app->forgetInstance(ASTBuilder::class);
+        $astBuilder = $this->app->make(ASTBuilder::class);
+        assert($astBuilder instanceof ASTBuilder);
+
         $this->typeRegistry->setDocumentAST($astBuilder->documentAST());
 
         $lazyTypeName = 'Bar';
@@ -354,8 +357,10 @@ final class TypeRegistryTest extends TestCase
         }
         " . self::PLACEHOLDER_QUERY;
 
-        app()->forgetInstance(ASTBuilder::class);
-        $astBuilder = app(ASTBuilder::class);
+        $this->app->forgetInstance(ASTBuilder::class);
+        $astBuilder = $this->app->make(ASTBuilder::class);
+        assert($astBuilder instanceof ASTBuilder);
+
         $this->typeRegistry->setDocumentAST($astBuilder->documentAST());
 
         $lazyTypeName = 'Bar';

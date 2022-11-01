@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Support\Http\Middleware;
 
-use Closure;
 use Illuminate\Http\Request;
 use Psr\Log\LoggerInterface;
 
@@ -26,7 +25,7 @@ class LogGraphQLQueries
     /**
      * @return mixed Any kind of response
      */
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, \Closure $next)
     {
         $this->logger->info(
             self::MESSAGE,

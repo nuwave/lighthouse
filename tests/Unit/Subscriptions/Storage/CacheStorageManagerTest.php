@@ -22,7 +22,7 @@ final class CacheStorageManagerTest extends TestCase
     {
         parent::setUp();
 
-        $this->storage = app(CacheStorageManager::class);
+        $this->storage = $this->app->make(CacheStorageManager::class);
     }
 
     /**

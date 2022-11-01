@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Execution\ModelsLoader;
 
-use Closure;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
@@ -12,8 +11,6 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Nuwave\Lighthouse\Pagination\ZeroPageLengthAwarePaginator;
-use ReflectionClass;
-use ReflectionMethod;
 
 class PaginatedModelsLoader implements ModelsLoader
 {
@@ -32,7 +29,7 @@ class PaginatedModelsLoader implements ModelsLoader
      */
     protected $paginationArgs;
 
-    public function __construct(string $relation, Closure $decorateBuilder, PaginationArgs $paginationArgs)
+    public function __construct(string $relation, \Closure $decorateBuilder, PaginationArgs $paginationArgs)
     {
         $this->relation = $relation;
         $this->decorateBuilder = $decorateBuilder;
@@ -70,7 +67,7 @@ class PaginatedModelsLoader implements ModelsLoader
                 ($this->decorateBuilder)($relation, $model);
 
                 if ($relation instanceof BelongsToMany || $relation instanceof HasManyThrough) {
-                    $shouldSelect = new ReflectionMethod(get_class($relation), 'shouldSelect');
+                    $shouldSelect = new \ReflectionMethod(get_class($relation), 'shouldSelect');
                     $shouldSelect->setAccessible(true);
                     $select = $shouldSelect->invoke($relation, ['*']);
 
@@ -138,7 +135,7 @@ class PaginatedModelsLoader implements ModelsLoader
          * @see BelongsToMany::hydratePivotRelation()
          */
         if ($relation instanceof BelongsToMany) {
-            $hydrationMethod = new ReflectionMethod($relation, 'hydratePivotRelation');
+            $hydrationMethod = new \ReflectionMethod($relation, 'hydratePivotRelation');
             $hydrationMethod->setAccessible(true);
             $hydrationMethod->invoke($relation, $relatedModels->all());
         }
@@ -159,7 +156,7 @@ class PaginatedModelsLoader implements ModelsLoader
         }
         assert($model instanceof Model);
 
-        $reflection = new ReflectionClass($model);
+        $reflection = new \ReflectionClass($model);
         $withProperty = $reflection->getProperty('with');
         $withProperty->setAccessible(true);
 

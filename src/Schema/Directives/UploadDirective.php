@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Illuminate\Http\UploadedFile;
-use InvalidArgumentException;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
 use Symfony\Component\HttpFoundation\File\Exception\CannotWriteFileException;
@@ -46,7 +45,7 @@ GRAPHQL;
 
         if (! ($argumentValue instanceof UploadedFile)) {
             $uploadedFileClass = UploadedFile::class;
-            throw new InvalidArgumentException("Expected argument `{$this->nodeName()}` to be instanceof {$uploadedFileClass}.");
+            throw new \InvalidArgumentException("Expected argument `{$this->nodeName()}` to be instanceof {$uploadedFileClass}.");
         }
 
         $filename = $this->getFilename($argumentValue);

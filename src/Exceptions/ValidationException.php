@@ -2,11 +2,10 @@
 
 namespace Nuwave\Lighthouse\Exceptions;
 
-use Exception;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Validation\ValidationException as LaravelValidationException;
 
-class ValidationException extends Exception implements RendersErrorsExtensions
+class ValidationException extends \Exception implements RendersErrorsExtensions
 {
     public const CATEGORY = 'validation';
 

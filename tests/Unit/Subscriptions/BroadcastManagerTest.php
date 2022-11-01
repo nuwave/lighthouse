@@ -26,7 +26,7 @@ final class BroadcastManagerTest extends TestCase
     {
         parent::setUp();
 
-        $this->broadcastManager = app(BroadcastManager::class);
+        $this->broadcastManager = $this->app->make(BroadcastManager::class);
     }
 
     public function testResolveDrivers(): void

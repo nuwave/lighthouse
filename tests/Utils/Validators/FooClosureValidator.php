@@ -2,7 +2,6 @@
 
 namespace Tests\Utils\Validators;
 
-use Closure;
 use Nuwave\Lighthouse\Validation\Validator;
 
 final class FooClosureValidator extends Validator
@@ -16,7 +15,7 @@ final class FooClosureValidator extends Validator
     {
         return [
             'foo' => [
-                static function (string $attribute, $value, Closure $fail): void {
+                static function (string $attribute, $value, \Closure $fail): void {
                     if ('foo' !== $value) {
                         $fail(self::notFoo($attribute));
                     }

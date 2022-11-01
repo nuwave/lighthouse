@@ -5,7 +5,6 @@ namespace Nuwave\Lighthouse\Subscriptions;
 use Illuminate\Auth\GuardHelpers;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Guard;
-use RuntimeException;
 
 class SubscriptionGuard implements Guard
 {
@@ -35,6 +34,6 @@ class SubscriptionGuard implements Guard
      */
     public function validate(array $credentials = []): bool
     {
-        throw new RuntimeException('The Lighthouse subscription guard cannot be used for credential based authentication.');
+        throw new \RuntimeException('The Lighthouse subscription guard cannot be used for credential based authentication.');
     }
 }

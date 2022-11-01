@@ -21,7 +21,7 @@ final class DirectiveFactoryTest extends TestCase
     {
         parent::setUp();
 
-        $typeRegistry = app(TypeRegistry::class);
+        $typeRegistry = $this->app->make(TypeRegistry::class);
         $this->directiveFactory = new DirectiveFactory(
             new FallbackTypeNodeConverter($typeRegistry)
         );

@@ -2,10 +2,8 @@
 
 namespace Nuwave\Lighthouse\Testing;
 
-use Closure;
 use GraphQL\Error\ClientAware;
 use PHPUnit\Framework\Assert;
-use Throwable;
 
 /**
  * TODO add stronger type hints once support for Illuminate\Foundation\Testing\TestResponse is no longer needed.
@@ -14,7 +12,7 @@ use Throwable;
  */
 class TestResponseMixin
 {
-    public function assertGraphQLValidationError(): Closure
+    public function assertGraphQLValidationError(): \Closure
     {
         return function (string $key, ?string $message) {
             $validation = TestResponseUtils::extractValidationErrors($this);
@@ -36,7 +34,7 @@ class TestResponseMixin
         };
     }
 
-    public function assertGraphQLValidationKeys(): Closure
+    public function assertGraphQLValidationKeys(): \Closure
     {
         return function (array $keys) {
             $validation = TestResponseUtils::extractValidationErrors($this);
@@ -52,7 +50,7 @@ class TestResponseMixin
         };
     }
 
-    public function assertGraphQLValidationPasses(): Closure
+    public function assertGraphQLValidationPasses(): \Closure
     {
         return function () {
             $validation = TestResponseUtils::extractValidationErrors($this);
@@ -62,9 +60,9 @@ class TestResponseMixin
         };
     }
 
-    public function assertGraphQLError(): Closure
+    public function assertGraphQLError(): \Closure
     {
-        return function (Throwable $error) {
+        return function (\Throwable $error) {
             $message = $error->getMessage();
 
             return $error instanceof ClientAware && $error->isClientSafe()
@@ -73,7 +71,7 @@ class TestResponseMixin
         };
     }
 
-    public function assertGraphQLErrorMessage(): Closure
+    public function assertGraphQLErrorMessage(): \Closure
     {
         return function (string $message) {
             $messages = $this->json('errors.*.message');
@@ -89,7 +87,7 @@ class TestResponseMixin
         };
     }
 
-    public function assertGraphQLDebugMessage(): Closure
+    public function assertGraphQLDebugMessage(): \Closure
     {
         return function (string $message) {
             $messages = $this->json('errors.*.debugMessage');
@@ -105,7 +103,7 @@ class TestResponseMixin
         };
     }
 
-    public function assertGraphQLErrorFree(): Closure
+    public function assertGraphQLErrorFree(): \Closure
     {
         return function () {
             $errors = $this->json('errors');
@@ -118,7 +116,7 @@ class TestResponseMixin
         };
     }
 
-    public function assertGraphQLErrorCategory(): Closure
+    public function assertGraphQLErrorCategory(): \Closure
     {
         return function (string $category) {
             $this->assertJson([

@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Testing;
 
+use Illuminate\Container\Container;
 use PHPUnit\Framework\MockObject\Builder\InvocationMocker;
 
 /**
@@ -48,8 +49,9 @@ trait MocksResolvers
      */
     protected function registerMockResolver(callable $mock, string $key): void
     {
-        /** @var \Nuwave\Lighthouse\Testing\MockResolverService $mockResolverService */
-        $mockResolverService = app(MockResolverService::class);
+        $mockResolverService = Container::getInstance()->make(MockResolverService::class);
+        assert($mockResolverService instanceof MockResolverService);
+
         $mockResolverService->register($mock, $key);
     }
 }

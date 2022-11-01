@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Types\Scalars;
 
-use Exception;
 use GraphQL\Error\Error;
 use GraphQL\Error\InvariantViolation;
 use GraphQL\Language\AST\StringValueNode;
@@ -97,7 +96,7 @@ abstract class DateScalar extends ScalarType
             }
 
             return $this->parse($value);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new $exceptionClass(
                 Utils::printSafeJson($e->getMessage())
             );

@@ -2,7 +2,6 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use Exception;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
@@ -60,7 +59,7 @@ final class MorphManyDirectiveTest extends DBTestCase
                 );
 
             if (false === $image) {
-                throw new Exception('Failed to save Image');
+                throw new \Exception('Failed to save Image');
             }
 
             return $image;
@@ -79,7 +78,7 @@ final class MorphManyDirectiveTest extends DBTestCase
                     );
 
                 if (false === $image) {
-                    throw new Exception('Failed to save Image');
+                    throw new \Exception('Failed to save Image');
                 }
 
                 return $image;

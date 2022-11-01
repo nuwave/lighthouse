@@ -18,6 +18,7 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\UnionType;
+use Illuminate\Container\Container;
 use Illuminate\Pipeline\Pipeline;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
@@ -401,7 +402,7 @@ class TypeRegistry
      *
      * @return \Closure(): array<string, Closure(): array<string, mixed>>
      */
-    protected function makeFieldsLoader($typeDefinition): Closure
+    protected function makeFieldsLoader($typeDefinition): \Closure
     {
         return function () use ($typeDefinition): array {
             $fieldFactory = $this->fieldFactory();
@@ -490,7 +491,7 @@ class TypeRegistry
     /**
      * @param  array<string>  $namespaces
      */
-    protected function typeResolverFromClass(string $nodeName, array $namespaces): ?Closure
+    protected function typeResolverFromClass(string $nodeName, array $namespaces): ?\Closure
     {
         $className = Utils::namespaceClassname(
             $nodeName,
@@ -501,10 +502,10 @@ class TypeRegistry
         );
 
         if ($className) {
-            return Closure::fromCallable(
-                // @phpstan-ignore-next-line this works
-                [app($className), '__invoke']
-            );
+            $typeResolver = Container::getInstance()->make($className);
+            assert(is_object($typeResolver));
+
+            return \Closure::fromCallable([$typeResolver, '__invoke']);
         }
 
         return null;
@@ -515,9 +516,9 @@ class TypeRegistry
      *
      * @param  list<string>  $possibleTypes
      *
-     * @return Closure(mixed): Type
+     * @return \Closure(mixed): Type
      */
-    protected function typeResolverFallback(array $possibleTypes): Closure
+    protected function typeResolverFallback(array $possibleTypes): \Closure
     {
         return function ($root) use ($possibleTypes): Type {
             $explicitTypename = data_get($root, '__typename');
@@ -584,7 +585,7 @@ class TypeRegistry
     protected function fieldFactory(): FieldFactory
     {
         if (! isset($this->fieldFactory)) {
-            $this->fieldFactory = app(FieldFactory::class);
+            $this->fieldFactory = Container::getInstance()->make(FieldFactory::class);
         }
 
         return $this->fieldFactory;

@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\WhereConditions;
 
-use Exception;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Support\Str;
 
@@ -65,7 +64,7 @@ GRAPHQL;
         }
 
         if (! $builder instanceof EloquentBuilder) {
-            throw new Exception('Can not get model from builder of class: ' . get_class($builder));
+            throw new \Exception('Can not get model from builder of class: ' . get_class($builder));
         }
 
         $this->handle(

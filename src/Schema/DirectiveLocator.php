@@ -2,10 +2,10 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
-use Exception;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\Node;
 use HaydenPierce\ClassFinder\ClassFinder;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -140,7 +140,7 @@ class DirectiveLocator
     {
         $directiveClass = $this->resolve($directiveName);
 
-        return app($directiveClass);
+        return Container::getInstance()->make($directiveClass);
     }
 
     /**
@@ -211,7 +211,7 @@ class DirectiveLocator
     public function associated(Node $node): Collection
     {
         if (! property_exists($node, 'directives')) {
-            throw new Exception('Expected Node class with property `directives`, got: ' . get_class($node));
+            throw new \Exception('Expected Node class with property `directives`, got: ' . get_class($node));
         }
 
         return (new Collection($node->directives))
@@ -280,7 +280,7 @@ class DirectiveLocator
                 ->implode(', ');
 
             if (! property_exists($node, 'name')) {
-                throw new Exception('Expected Node class with property `name`, got: ' . get_class($node));
+                throw new \Exception('Expected Node class with property `name`, got: ' . get_class($node));
             }
 
             throw new DirectiveException(

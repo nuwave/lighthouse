@@ -8,7 +8,9 @@ use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\Parser;
+use Illuminate\Container\Container;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -64,12 +66,13 @@ GRAPHQL;
     protected function validator(): Validator
     {
         if (null === $this->validator) {
-            /** @var \Nuwave\Lighthouse\Validation\Validator $validator */
-            $validator = app(
+            $validator = Container::getInstance()->make(
                 // We precomputed and validated the full class name at schema build time
                 $this->directiveArgValue('class')
             );
-            // @phpstan-ignore-next-line Since this directive can only be defined on a field or input, this must be ArgumentSet
+            assert($validator instanceof Validator);
+
+            assert($this->argumentValue instanceof ArgumentSet, 'this directive can only be defined on a field or input');
             $validator->setArgs($this->argumentValue);
 
             return $this->validator = $validator;

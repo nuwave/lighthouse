@@ -3,6 +3,9 @@
 namespace Nuwave\Lighthouse\Schema\Factories;
 
 use GraphQL\Language\AST\InputValueDefinitionNode;
+use GraphQL\Type\Definition\InputType;
+use GraphQL\Type\Definition\Type;
+use Illuminate\Container\Container;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter;
 
@@ -38,10 +41,11 @@ class ArgumentFactory
      */
     public function convert(InputValueDefinitionNode $definitionNode): array
     {
-        /** @var \Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter $definitionNodeConverter */
-        $definitionNodeConverter = app(ExecutableTypeNodeConverter::class);
-        /** @var \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\InputType $type */
+        $definitionNodeConverter = Container::getInstance()->make(ExecutableTypeNodeConverter::class);
+        assert($definitionNodeConverter instanceof ExecutableTypeNodeConverter);
+
         $type = $definitionNodeConverter->convert($definitionNode->type);
+        assert($type instanceof Type && $type instanceof InputType);
 
         $config = [
             'name' => $definitionNode->name->value,

@@ -10,7 +10,6 @@ use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use Nuwave\Lighthouse\Support\DriverManager;
 use Psr\Log\LoggerInterface;
 use Pusher\Pusher;
-use RuntimeException;
 
 /**
  * @method void broadcast(\Nuwave\Lighthouse\Subscriptions\Subscriber $subscriber, array $data)
@@ -46,7 +45,7 @@ class BroadcastManager extends DriverManager
         $driverConfig = config("broadcasting.connections.{$connection}");
 
         if (empty($driverConfig) || 'pusher' !== $driverConfig['driver']) {
-            throw new RuntimeException("Could not initialize Pusher broadcast driver for connection: {$connection}.");
+            throw new \RuntimeException("Could not initialize Pusher broadcast driver for connection: {$connection}.");
         }
 
         $pusher = new Pusher(

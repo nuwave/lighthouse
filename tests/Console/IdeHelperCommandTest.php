@@ -32,7 +32,8 @@ final class IdeHelperCommandTest extends TestCase
      */
     public function testGeneratesIdeHelperFiles(): void
     {
-        $typeRegistry = app(TypeRegistry::class);
+        $typeRegistry = $this->app->make(TypeRegistry::class);
+        assert($typeRegistry instanceof TypeRegistry);
         $programmaticType = new EnumType([
             'name' => 'Foo',
             'values' => [

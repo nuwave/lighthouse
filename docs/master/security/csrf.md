@@ -17,10 +17,12 @@ middleware. Just add it as the first middleware for the Lighthouse route in `con
 ```
 
 It forbids:
+
 - `GET` requests
 - `POST` requests that can be created using HTML forms
 
 It allows:
+
 - other request methods
 - `POST` requests with the header `X-Requested-With: XMLHttpRequest`
 - `POST` requests with a `Content-Type` that can not be set from HTML forms

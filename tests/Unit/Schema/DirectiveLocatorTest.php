@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Schema;
 
-use Closure;
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
@@ -10,7 +9,6 @@ use Nuwave\Lighthouse\Schema\Directives\FieldDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-use ReflectionProperty;
 use Tests\TestCase;
 
 final class DirectiveLocatorTest extends TestCase
@@ -47,7 +45,7 @@ final class DirectiveLocatorTest extends TestCase
             ->associated($fieldDefinition)
             ->first();
 
-        $definitionNode = new ReflectionProperty($fieldDirective, 'definitionNode');
+        $definitionNode = new \ReflectionProperty($fieldDirective, 'definitionNode');
         $definitionNode->setAccessible(true);
 
         $this->assertSame(
@@ -68,7 +66,7 @@ final class DirectiveLocatorTest extends TestCase
                 return /** @lang GraphQL */ 'foo';
             }
 
-            public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+            public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
             {
                 return $fieldValue;
             }

@@ -74,7 +74,7 @@ abstract class BaseDirective implements Directive
     /**
      * Get a Closure that is defined through an argument on the directive.
      */
-    public function getResolverFromArgument(string $argumentName): Closure
+    public function getResolverFromArgument(string $argumentName): \Closure
     {
         [$className, $methodName] = $this->getMethodArgumentParts($argumentName);
 

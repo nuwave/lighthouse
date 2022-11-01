@@ -21,7 +21,7 @@ final class LifecycleEventsTest extends TestCase
 {
     public function testDispatchesProperLifecycleEvents(): void
     {
-        $eventsDispatcher = app(EventsDispatcher::class);
+        $eventsDispatcher = $this->app->make(EventsDispatcher::class);
         assert($eventsDispatcher instanceof EventsDispatcher);
 
         /** @var array<int, object> $events */

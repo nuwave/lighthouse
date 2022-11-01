@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
-use Exception;
 use GraphQL\Error\SyntaxError;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\NodeList;
@@ -33,7 +32,7 @@ use Serializable;
  *     classNameToObjectTypeName: ClassNameToObjectTypeName,
  * }
  */
-class DocumentAST implements Serializable, Arrayable
+class DocumentAST implements \Serializable, Arrayable
 {
     public const TYPES = 'types';
     public const DIRECTIVES = 'directives';
@@ -139,7 +138,7 @@ class DocumentAST implements Serializable, Arrayable
             } elseif ($definition instanceof DirectiveDefinitionNode) {
                 $instance->directives[$definition->name->value] = $definition;
             } else {
-                throw new Exception('Unknown definition type: ' . get_class($definition));
+                throw new \Exception('Unknown definition type: ' . get_class($definition));
             }
         }
 

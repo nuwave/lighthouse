@@ -4,7 +4,6 @@ namespace Tests\Integration\Scout;
 
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Laravel\Scout\Builder as ScoutBuilder;
-use Mockery;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Scout\ScoutException;
 use Tests\DBTestCase;
@@ -385,9 +384,9 @@ final class SearchDirectiveTest extends DBTestCase
 
         $this->engine->shouldReceive('paginate')
             ->with(
-                Mockery::any(),
-                Mockery::any(),
-                Mockery::not('page')
+                \Mockery::any(),
+                \Mockery::any(),
+                \Mockery::not('page')
             )
             ->andReturn(new EloquentCollection([$postA, $postB]))
             ->once();

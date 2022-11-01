@@ -7,7 +7,7 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ListTypeNode;
 use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\ErrorPool;
@@ -81,7 +81,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
 
             if ($modelOrModels instanceof Model) {
                 $modifyModelExistence($modelOrModels);
-            } elseif ($modelOrModels instanceof Collection) {
+            } elseif ($modelOrModels instanceof EloquentCollection) {
                 foreach ($modelOrModels as $model) {
                     $modifyModelExistence($model);
                 }

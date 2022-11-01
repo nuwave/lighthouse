@@ -13,6 +13,7 @@ use GraphQL\Server\Helper as GraphQLHelper;
 use GraphQL\Server\OperationParams;
 use GraphQL\Server\RequestError;
 use GraphQL\Type\Schema;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
@@ -218,8 +219,9 @@ class GraphQL
             return Parser::parse($query);
         }
 
-        /** @var \Illuminate\Contracts\Cache\Factory $cacheFactory */
-        $cacheFactory = app(CacheFactory::class);
+        $cacheFactory = Container::getInstance()->make(CacheFactory::class);
+        assert($cacheFactory instanceof CacheFactory);
+
         $store = $cacheFactory->store($cacheConfig['store']);
 
         return $store->remember(
@@ -334,8 +336,9 @@ class GraphQL
             );
         }
 
-        /** @var \Illuminate\Contracts\Cache\Factory $cacheFactory */
-        $cacheFactory = app(CacheFactory::class);
+        $cacheFactory = Container::getInstance()->make(CacheFactory::class);
+        assert($cacheFactory instanceof CacheFactory);
+
         $store = $cacheFactory->store($cacheConfig['store']);
 
         $document = $store->get('lighthouse:query:' . $sha256hash);
@@ -378,7 +381,7 @@ class GraphQL
                 // This allows the user to register multiple handlers and pipe the errors through.
                 $handlers = [];
                 foreach ($this->configRepository->get('lighthouse.error_handlers', []) as $handlerClass) {
-                    $handlers[] = app($handlerClass);
+                    $handlers[] = Container::getInstance()->make($handlerClass);
                 }
 
                 return (new Collection($errors))
