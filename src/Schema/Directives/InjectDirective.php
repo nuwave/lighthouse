@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -38,7 +37,7 @@ GRAPHQL;
     /**
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
     {
         $contextAttributeName = $this->directiveArgValue('context');
         if (! $contextAttributeName) {

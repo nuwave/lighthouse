@@ -5,8 +5,6 @@ namespace Nuwave\Lighthouse\Schema\Types;
 use BenSampo\Enum\Enum;
 use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\EnumType;
-use InvalidArgumentException;
-use ReflectionClassConstant;
 
 /**
  * A convenience wrapper for registering enums programmatically.
@@ -64,23 +62,23 @@ class LaravelEnumType extends EnumType
         ]);
     }
 
-    public static function classDoesNotExist(string $enumClass): InvalidArgumentException
+    public static function classDoesNotExist(string $enumClass): \InvalidArgumentException
     {
-        return new InvalidArgumentException("Class {$enumClass} does not exist.");
+        return new \InvalidArgumentException("Class {$enumClass} does not exist.");
     }
 
-    public static function classMustExtendBenSampoEnumEnum(string $enumClass): InvalidArgumentException
+    public static function classMustExtendBenSampoEnumEnum(string $enumClass): \InvalidArgumentException
     {
         $baseClass = Enum::class;
 
-        return new InvalidArgumentException("Class {$enumClass} must extend {$baseClass}.");
+        return new \InvalidArgumentException("Class {$enumClass} must extend {$baseClass}.");
     }
 
-    public static function enumMustHaveKey(Enum $value): InvalidArgumentException
+    public static function enumMustHaveKey(Enum $value): \InvalidArgumentException
     {
         $class = get_class($value);
 
-        return new InvalidArgumentException("Enum of class {$class} must have key.");
+        return new \InvalidArgumentException("Enum of class {$class} must have key.");
     }
 
     protected function deprecationReason(Enum $enum): ?string
@@ -89,7 +87,7 @@ class LaravelEnumType extends EnumType
         assert(is_string($key));
 
         $constant = $this->reflection->getReflectionConstant($key);
-        assert($constant instanceof ReflectionClassConstant, 'Enum keys are derived from the constant names');
+        assert($constant instanceof \ReflectionClassConstant, 'Enum keys are derived from the constant names');
 
         $docComment = $constant->getDocComment();
         if (false === $docComment) {

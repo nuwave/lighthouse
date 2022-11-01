@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Auth;
 
-use Closure;
 use GraphQL\Error\Error;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
@@ -117,7 +116,7 @@ GRAPHQL;
     /**
      * Ensure the user is authorized to access this field.
      */
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
     {
         $previousResolver = $fieldValue->getResolver();
         $ability = $this->directiveArgValue('ability');

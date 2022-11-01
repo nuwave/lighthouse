@@ -6,8 +6,6 @@ use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use ReflectionClass;
-use ReflectionException;
 
 use function Safe\preg_match;
 use function Safe\preg_replace;
@@ -52,13 +50,13 @@ class Utils
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
-    public static function constructResolver(string $className, string $methodName): Closure
+    public static function constructResolver(string $className, string $methodName): \Closure
     {
         if (! method_exists($className, $methodName)) {
             throw new DefinitionException("Method '{$methodName}' does not exist on class '{$className}'.");
         }
 
-        return Closure::fromCallable(
+        return \Closure::fromCallable(
             [Container::getInstance()->make($className), $methodName]
         );
     }
@@ -77,12 +75,12 @@ class Utils
     public static function accessProtected($object, string $memberName, $default = null)
     {
         try {
-            $reflection = new ReflectionClass($object);
+            $reflection = new \ReflectionClass($object);
             $property = $reflection->getProperty($memberName);
             $property->setAccessible(true);
 
             return $property->getValue($object);
-        } catch (ReflectionException $ex) {
+        } catch (\ReflectionException $ex) {
             return $default;
         }
     }
@@ -94,7 +92,7 @@ class Utils
      *
      * @return mixed|array<mixed>
      */
-    public static function mapEach(Closure $callback, $valueOrValues)
+    public static function mapEach(\Closure $callback, $valueOrValues)
     {
         if (is_array($valueOrValues)) {
             return array_map($callback, $valueOrValues);
@@ -110,7 +108,7 @@ class Utils
      *
      * @return mixed|array<mixed>
      */
-    public static function mapEachRecursive(Closure $callback, $valueOrValues)
+    public static function mapEachRecursive(\Closure $callback, $valueOrValues)
     {
         if (is_array($valueOrValues)) {
             return array_map(function ($value) use ($callback) {
@@ -126,7 +124,7 @@ class Utils
      *
      * @param  mixed|iterable<mixed>  $valueOrValues
      */
-    public static function applyEach(Closure $callback, $valueOrValues): void
+    public static function applyEach(\Closure $callback, $valueOrValues): void
     {
         if (is_iterable($valueOrValues)) {
             foreach ($valueOrValues as $value) {
@@ -157,9 +155,9 @@ class Utils
      *
      * @param  class-string  $classLike
      *
-     * @return Closure(mixed): bool
+     * @return \Closure(mixed): bool
      */
-    public static function instanceofMatcher(string $classLike): Closure
+    public static function instanceofMatcher(string $classLike): \Closure
     {
         return function ($object) use ($classLike): bool {
             return $object instanceof $classLike;

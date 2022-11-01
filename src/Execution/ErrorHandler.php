@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Execution;
 
-use Closure;
 use GraphQL\Error\Error;
 
 /**
@@ -19,5 +18,5 @@ interface ErrorHandler
      *
      * @return array<string, mixed>|null
      */
-    public function __invoke(?Error $error, Closure $next): ?array;
+    public function __invoke(?Error $error, \Closure $next): ?array;
 }

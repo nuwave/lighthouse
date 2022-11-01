@@ -402,7 +402,7 @@ class TypeRegistry
      *
      * @return \Closure(): array<string, Closure(): array<string, mixed>>
      */
-    protected function makeFieldsLoader($typeDefinition): Closure
+    protected function makeFieldsLoader($typeDefinition): \Closure
     {
         return function () use ($typeDefinition): array {
             $fieldFactory = $this->fieldFactory();
@@ -491,7 +491,7 @@ class TypeRegistry
     /**
      * @param  array<string>  $namespaces
      */
-    protected function typeResolverFromClass(string $nodeName, array $namespaces): ?Closure
+    protected function typeResolverFromClass(string $nodeName, array $namespaces): ?\Closure
     {
         $className = Utils::namespaceClassname(
             $nodeName,
@@ -502,7 +502,7 @@ class TypeRegistry
         );
 
         if ($className) {
-            return Closure::fromCallable(
+            return \Closure::fromCallable(
                 [Container::getInstance()->make($className), '__invoke']
             );
         }
@@ -515,9 +515,9 @@ class TypeRegistry
      *
      * @param  list<string>  $possibleTypes
      *
-     * @return Closure(mixed): Type
+     * @return \Closure(mixed): Type
      */
-    protected function typeResolverFallback(array $possibleTypes): Closure
+    protected function typeResolverFallback(array $possibleTypes): \Closure
     {
         return function ($root) use ($possibleTypes): Type {
             $explicitTypename = data_get($root, '__typename');

@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
-use Closure;
 use GraphQL\Executor\Executor;
 use Illuminate\Container\Container;
 use Illuminate\Support\Str;
@@ -18,7 +17,7 @@ class ResolverProvider implements ProvidesResolver
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
-    public function provideResolver(FieldValue $fieldValue): Closure
+    public function provideResolver(FieldValue $fieldValue): \Closure
     {
         if (RootType::isRootType($fieldValue->getParentName())) {
             $resolverClass = $this->findResolverClass($fieldValue, '__invoke');
@@ -26,12 +25,12 @@ class ResolverProvider implements ProvidesResolver
                 $this->throwMissingResolver($fieldValue);
             }
 
-            return Closure::fromCallable(
+            return \Closure::fromCallable(
                 [Container::getInstance()->make($resolverClass), '__invoke']
             );
         }
 
-        return Closure::fromCallable(
+        return \Closure::fromCallable(
             Executor::getDefaultFieldResolver()
         );
     }

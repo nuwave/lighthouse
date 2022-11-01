@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Execution;
 
-use Closure;
 use GraphQL\Error\Error;
 use Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions;
 
@@ -13,7 +12,7 @@ use Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions;
  */
 class ExtensionErrorHandler implements ErrorHandler
 {
-    public function __invoke(?Error $error, Closure $next): ?array
+    public function __invoke(?Error $error, \Closure $next): ?array
     {
         if (null === $error) {
             return $next(null);

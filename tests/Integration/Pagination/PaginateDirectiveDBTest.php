@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Laravel\Scout\Builder as ScoutBuilder;
-use Mockery;
 use Nuwave\Lighthouse\Pagination\Cursor;
 use Tests\DBTestCase;
 use Tests\TestsScoutEngine;
@@ -169,7 +168,7 @@ GRAPHQL;
 
         $this->engine->shouldReceive('paginate')
             ->with(
-                Mockery::type(ScoutBuilder::class),
+                \Mockery::type(ScoutBuilder::class),
                 $first,
                 $page
             )

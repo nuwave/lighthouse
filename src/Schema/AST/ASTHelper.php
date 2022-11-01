@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
-use Exception;
 use GraphQL\Error\SyntaxError;
 use GraphQL\Executor\Values;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
@@ -184,7 +183,7 @@ class ASTHelper
     public static function directiveDefinition(Node $definitionNode, string $name): ?DirectiveNode
     {
         if (! property_exists($definitionNode, 'directives')) {
-            throw new Exception('Expected Node class with property `directives`, got: ' . get_class($definitionNode));
+            throw new \Exception('Expected Node class with property `directives`, got: ' . get_class($definitionNode));
         }
         /** @var \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\DirectiveNode> $directives */
         $directives = $definitionNode->directives;
@@ -213,7 +212,7 @@ class ASTHelper
     {
         foreach ($nodes as $node) {
             if (! property_exists($node, 'name')) {
-                throw new Exception('Expected a Node with a name property, got: ' . get_class($node));
+                throw new \Exception('Expected a Node with a name property, got: ' . get_class($node));
             }
 
             if ($node->name->value === $name) {

@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Closure;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Database\Eloquent\Collection;
@@ -31,7 +30,7 @@ directive @lazyLoad(
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
     {
         $relations = $this->directiveArgValue('relations');
 

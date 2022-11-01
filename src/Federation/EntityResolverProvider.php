@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Federation;
 
-use Closure;
 use GraphQL\Error\Error;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\SelectionSetNode;
@@ -163,7 +162,7 @@ class EntityResolverProvider
     /**
      * @return SingleEntityResolverFn|null
      */
-    protected function resolverFromModel(string $typeName): ?Closure
+    protected function resolverFromModel(string $typeName): ?\Closure
     {
         $definition = $this->typeDefinition($typeName);
 

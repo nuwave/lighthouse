@@ -3,7 +3,6 @@
 namespace Tests\Unit\Subscriptions;
 
 use Illuminate\Http\Request;
-use InvalidArgumentException;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\Utils\Subscription;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
@@ -93,7 +92,7 @@ final class SubscriptionTest extends TestCase
         }
         ';
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
 
         Subscription::broadcast('unknownField', []);
     }

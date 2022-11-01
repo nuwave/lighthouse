@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
-use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
@@ -111,7 +110,7 @@ class ASTCache
     /**
      * @param \Closure(): DocumentAST $build
      */
-    public function fromCacheOrBuild(Closure $build): DocumentAST
+    public function fromCacheOrBuild(\Closure $build): DocumentAST
     {
         if (1 === $this->version) {
             return $this->store()->remember(

@@ -2,7 +2,6 @@
 
 namespace Tests\Utils\Directives;
 
-use Closure;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
@@ -16,7 +15,7 @@ directive @customFieldMiddleware on FIELD_DEFINITION
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next)
+    public function handleField(FieldValue $fieldValue, \Closure $next)
     {
         $fieldValue->setResolver(static function ($root, array $args): array {
             return $args;

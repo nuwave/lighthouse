@@ -10,9 +10,8 @@ use Illuminate\Container\Container;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-use Serializable;
 
-class Subscriber implements Serializable
+class Subscriber implements \Serializable
 {
     /**
      * A unique key for the subscriber's channel.

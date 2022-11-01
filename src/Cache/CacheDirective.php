@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Cache;
 
-use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Support\Carbon;
@@ -53,7 +52,7 @@ directive @cache(
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
     {
         // Ensure we run this after other field middleware
         $fieldValue = $next($fieldValue);

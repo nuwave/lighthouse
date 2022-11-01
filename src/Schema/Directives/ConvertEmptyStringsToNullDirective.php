@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\ScalarType;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
@@ -37,7 +36,7 @@ GRAPHQL;
         );
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
     {
         $resolver = $fieldValue->getResolver();
 

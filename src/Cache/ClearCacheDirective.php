@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Cache;
 
-use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Support\Arr;
@@ -71,7 +70,7 @@ input ClearCacheIdSource {
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
     {
         $fieldValue->resultHandler(
             function ($result, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {

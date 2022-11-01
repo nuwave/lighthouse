@@ -2,7 +2,6 @@
 
 namespace Tests;
 
-use Closure;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -21,7 +20,7 @@ trait AssertsQueryCounts
         });
     }
 
-    protected function assertNoQueriesExecuted(Closure $closure = null): void
+    protected function assertNoQueriesExecuted(\Closure $closure = null): void
     {
         if ($closure) {
             self::trackQueries();
@@ -36,7 +35,7 @@ trait AssertsQueryCounts
         }
     }
 
-    protected function assertQueryCountMatches(int $count, Closure $closure = null): void
+    protected function assertQueryCountMatches(int $count, \Closure $closure = null): void
     {
         if ($closure) {
             self::trackQueries();
@@ -51,7 +50,7 @@ trait AssertsQueryCounts
         }
     }
 
-    protected function assertQueryCountLessThan(int $count, Closure $closure = null): void
+    protected function assertQueryCountLessThan(int $count, \Closure $closure = null): void
     {
         if ($closure) {
             self::trackQueries();
@@ -66,7 +65,7 @@ trait AssertsQueryCounts
         }
     }
 
-    protected function assertQueryCountGreaterThan(int $count, Closure $closure = null): void
+    protected function assertQueryCountGreaterThan(int $count, \Closure $closure = null): void
     {
         if ($closure) {
             self::trackQueries();

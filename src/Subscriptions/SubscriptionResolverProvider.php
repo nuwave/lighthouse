@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
-use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Container\Container;
 use Illuminate\Support\Str;
@@ -36,7 +35,7 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
      *
      * @return \Closure(mixed, array<string, mixed>, \Nuwave\Lighthouse\Support\Contracts\GraphQLContext, \GraphQL\Type\Definition\ResolveInfo): mixed
      */
-    public function provideSubscriptionResolver(FieldValue $fieldValue): Closure
+    public function provideSubscriptionResolver(FieldValue $fieldValue): \Closure
     {
         $fieldName = $fieldValue->getFieldName();
 

@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Validation;
 
-use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
@@ -24,7 +23,7 @@ directive @validate on FIELD_DEFINITION
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
     {
         $resolver = $fieldValue->getResolver();
 

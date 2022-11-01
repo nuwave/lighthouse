@@ -4,7 +4,6 @@ namespace Tests\Console;
 
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Utils\SchemaPrinter;
-use Illuminate\Container\Container;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Nuwave\Lighthouse\Console\IdeHelperCommand;
 use Nuwave\Lighthouse\Schema\Directives\FieldDirective;

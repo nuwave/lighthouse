@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\GlobalId;
 
-use Closure;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\Parser;
@@ -57,7 +56,7 @@ directive @node(
 GRAPHQL;
     }
 
-    public function handleNode(TypeValue $value, Closure $next): Type
+    public function handleNode(TypeValue $value, \Closure $next): Type
     {
         if ($this->directiveHasArgument('resolver')) {
             $resolver = $this->getResolverFromArgument('resolver');

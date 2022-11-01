@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -23,7 +22,7 @@ directive @dropArgs on FIELD_DEFINITION
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next)
+    public function handleField(FieldValue $fieldValue, \Closure $next)
     {
         $resolver = $fieldValue->getResolver();
 

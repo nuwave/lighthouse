@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
-use Closure;
 use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
@@ -107,7 +106,7 @@ class NestedOneToMany implements ArgResolver
      */
     protected static function getKeyName(HasOneOrMany $relation): string
     {
-        $getKeyName = Closure::bind(
+        $getKeyName = \Closure::bind(
             function () {
                 // @phpstan-ignore-next-line This is a dirty hack
                 return $this->make()->getKeyName();

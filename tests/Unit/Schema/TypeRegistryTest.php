@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Schema;
 
-use Closure;
 use GraphQL\Language\Parser;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\EnumValueDefinition;
@@ -11,7 +10,6 @@ use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Type\Definition\UnionType;
-use Illuminate\Container\Container;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\TestCase;
@@ -162,7 +160,7 @@ final class TypeRegistryTest extends TestCase
 
         $this->assertInstanceOf(UnionType::class, $unionType);
         $this->assertSame('Foo', $unionType->name);
-        $this->assertInstanceOf(Closure::class, $unionType->config['resolveType'] ?? null);
+        $this->assertInstanceOf(\Closure::class, $unionType->config['resolveType'] ?? null);
     }
 
     public function testTransformObjectTypes(): void

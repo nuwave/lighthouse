@@ -3,12 +3,10 @@
 namespace Nuwave\Lighthouse\Execution\Utils;
 
 use Illuminate\Container\Container;
-use InvalidArgumentException;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionExceptionHandler;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry;
-use Throwable;
 
 class Subscription
 {
@@ -30,7 +28,7 @@ class Subscription
         assert($registry instanceof SubscriptionRegistry);
 
         if (! $registry->has($subscriptionField)) {
-            throw new InvalidArgumentException("No subscription field registered for {$subscriptionField}");
+            throw new \InvalidArgumentException("No subscription field registered for {$subscriptionField}");
         }
 
         $broadcaster = Container::getInstance()->make(BroadcastsSubscriptions::class);
@@ -49,7 +47,7 @@ class Subscription
             } else {
                 $broadcaster->broadcast($subscription, $subscriptionField, $root);
             }
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             $exceptionHandler = Container::getInstance()->make(SubscriptionExceptionHandler::class);
             assert($exceptionHandler instanceof SubscriptionExceptionHandler);
 

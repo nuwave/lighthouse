@@ -2,10 +2,9 @@
 
 namespace Nuwave\Lighthouse\Exceptions;
 
-use Exception;
 use GraphQL\Utils\Utils;
 
-class InvalidSchemaCacheContentsException extends Exception
+class InvalidSchemaCacheContentsException extends \Exception
 {
     /**
      * @param  mixed  $value the non-array result of `require $path`

@@ -2,7 +2,6 @@
 
 namespace Tests;
 
-use Illuminate\Container\Container;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Filesystem\Filesystem;
 

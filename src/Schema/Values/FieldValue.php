@@ -199,7 +199,7 @@ class FieldValue
      *
      * @deprecated will be removed in v6
      */
-    public function getComplexity(): ?Closure
+    public function getComplexity(): ?\Closure
     {
         return $this->complexity;
     }
@@ -209,7 +209,7 @@ class FieldValue
      *
      * @deprecated will be removed in v6
      */
-    public function setComplexity(Closure $complexity): self
+    public function setComplexity(\Closure $complexity): self
     {
         $this->complexity = $complexity;
 

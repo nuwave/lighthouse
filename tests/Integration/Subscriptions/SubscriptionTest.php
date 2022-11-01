@@ -235,7 +235,7 @@ GRAPHQL;
         ');
 
         $broadcastManager = $this->app->make(BroadcastManager::class);
-        assert($broadcastManager instanceof  BroadcastManager);
+        assert($broadcastManager instanceof BroadcastManager);
 
         $log = $broadcastManager->driver();
         assert($log instanceof LogBroadcaster);

@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Support\Contracts;
 
-use Closure;
 use Nuwave\Lighthouse\Schema\Values\TypeValue;
 
 interface TypeMiddleware extends Directive
@@ -12,5 +11,5 @@ interface TypeMiddleware extends Directive
      *
      * @return \GraphQL\Type\Definition\Type
      */
-    public function handleNode(TypeValue $value, Closure $next);
+    public function handleNode(TypeValue $value, \Closure $next);
 }
