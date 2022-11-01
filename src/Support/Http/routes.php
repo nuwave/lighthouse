@@ -1,12 +1,19 @@
 <?php
 
+use Illuminate\Container\Container;
+use Nuwave\Lighthouse\Support\Http\Controllers\GraphQLController;
+
 if ($routeConfig = config('lighthouse.route')) {
-    /** @var \Illuminate\Contracts\Routing\Registrar|\Laravel\Lumen\Routing\Router $router */
-    $router = app('router');
+    /**
+     * Not using assert() as only one of those classes will actually be installed.
+     *
+     * @var \Illuminate\Contracts\Routing\Registrar|\Laravel\Lumen\Routing\Router $router
+     */
+    $router = Container::getInstance()->make('router');
 
     $actions = [
         'as' => $routeConfig['name'] ?? 'graphql',
-        'uses' => \Nuwave\Lighthouse\Support\Http\Controllers\GraphQLController::class,
+        'uses' => GraphQLController::class,
     ];
 
     if (isset($routeConfig['middleware'])) {

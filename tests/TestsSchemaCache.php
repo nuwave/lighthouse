@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Filesystem\Filesystem;
 
@@ -9,8 +10,9 @@ trait TestsSchemaCache
 {
     protected function setUpSchemaCache(): void
     {
-        /** @var \Illuminate\Contracts\Config\Repository $config */
-        $config = app(ConfigRepository::class);
+        $config = $this->app->make(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
+
         $config->set('lighthouse.cache.enable', true);
         $config->set('lighthouse.cache.path', $this->schemaCachePath());
     }
@@ -22,8 +24,9 @@ trait TestsSchemaCache
 
     protected function tearDownSchemaCache(): void
     {
-        /** @var \Illuminate\Filesystem\Filesystem $filesystem */
-        $filesystem = app(Filesystem::class);
+        $filesystem = $this->app->make(Filesystem::class);
+        assert($filesystem instanceof Filesystem);
+
         $filesystem->delete($this->schemaCachePath());
     }
 

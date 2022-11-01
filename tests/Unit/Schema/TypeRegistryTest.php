@@ -11,6 +11,7 @@ use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Type\Definition\UnionType;
+use Illuminate\Container\Container;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\TestCase;
@@ -26,9 +27,11 @@ final class TypeRegistryTest extends TestCase
     {
         parent::setUp();
 
-        $this->typeRegistry = app(TypeRegistry::class);
+        $this->typeRegistry = $this->app->make(TypeRegistry::class);
 
-        $astBuilder = app(ASTBuilder::class);
+        $astBuilder = $this->app->make(ASTBuilder::class);
+        assert($astBuilder instanceof ASTBuilder);
+
         $this->typeRegistry->setDocumentAST($astBuilder->documentAST());
     }
 
@@ -316,8 +319,10 @@ final class TypeRegistryTest extends TestCase
         }
         " . self::PLACEHOLDER_QUERY;
 
-        app()->forgetInstance(ASTBuilder::class);
-        $astBuilder = app(ASTBuilder::class);
+        $this->app->forgetInstance(ASTBuilder::class);
+        $astBuilder = $this->app->make(ASTBuilder::class);
+        assert($astBuilder instanceof ASTBuilder);
+
         $this->typeRegistry->setDocumentAST($astBuilder->documentAST());
 
         $lazyTypeName = 'Bar';
@@ -354,8 +359,10 @@ final class TypeRegistryTest extends TestCase
         }
         " . self::PLACEHOLDER_QUERY;
 
-        app()->forgetInstance(ASTBuilder::class);
-        $astBuilder = app(ASTBuilder::class);
+        $this->app->forgetInstance(ASTBuilder::class);
+        $astBuilder = $this->app->make(ASTBuilder::class);
+        assert($astBuilder instanceof ASTBuilder);
+
         $this->typeRegistry->setDocumentAST($astBuilder->documentAST());
 
         $lazyTypeName = 'Bar';

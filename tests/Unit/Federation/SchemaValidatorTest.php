@@ -40,8 +40,8 @@ final class SchemaValidatorTest extends TestCase
         }
         ');
 
-        /** @var \Nuwave\Lighthouse\Federation\SchemaValidator $validator */
-        $validator = app(SchemaValidator::class);
+        $validator = $this->app->make(SchemaValidator::class);
+        assert($validator instanceof SchemaValidator);
 
         $validator->handle(new ValidateSchema($schema));
         $this->assertTrue(true);
@@ -55,8 +55,8 @@ final class SchemaValidatorTest extends TestCase
         }
         ');
 
-        /** @var \Nuwave\Lighthouse\Federation\SchemaValidator $validator */
-        $validator = app(SchemaValidator::class);
+        $validator = $this->app->make(SchemaValidator::class);
+        assert($validator instanceof SchemaValidator);
 
         $this->expectException(FederationException::class);
         $validator->handle(new ValidateSchema($schema));
@@ -70,8 +70,8 @@ final class SchemaValidatorTest extends TestCase
         }
         ');
 
-        /** @var \Nuwave\Lighthouse\Federation\SchemaValidator $validator */
-        $validator = app(SchemaValidator::class);
+        $validator = $this->app->make(SchemaValidator::class);
+        assert($validator instanceof SchemaValidator);
 
         $this->expectException(FederationException::class);
         $validator->handle(new ValidateSchema($schema));
@@ -90,8 +90,8 @@ final class SchemaValidatorTest extends TestCase
         }
         ');
 
-        /** @var \Nuwave\Lighthouse\Federation\SchemaValidator $validator */
-        $validator = app(SchemaValidator::class);
+        $validator = $this->app->make(SchemaValidator::class);
+        assert($validator instanceof SchemaValidator);
 
         $validator->handle(new ValidateSchema($schema));
         $this->assertTrue(true);
@@ -110,8 +110,8 @@ final class SchemaValidatorTest extends TestCase
         }
         ');
 
-        /** @var \Nuwave\Lighthouse\Federation\SchemaValidator $validator */
-        $validator = app(SchemaValidator::class);
+        $validator = $this->app->make(SchemaValidator::class);
+        assert($validator instanceof SchemaValidator);
 
         $this->expectException(FederationException::class);
         $validator->handle(new ValidateSchema($schema));

@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\WhereConditions;
 
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\Events\ManipulateAST;
@@ -69,8 +70,8 @@ class WhereConditionsServiceProvider extends ServiceProvider
     {
         $hasRelationInputName = $name . self::DEFAULT_WHERE_RELATION_CONDITIONS;
 
-        /** @var \Nuwave\Lighthouse\WhereConditions\Operator $operator */
-        $operator = app(Operator::class);
+        $operator = Container::getInstance()->make(Operator::class);
+        assert($operator instanceof Operator);
 
         $operatorName = Parser::enumTypeDefinition(
             $operator->enumDefinition()
@@ -109,8 +110,8 @@ GRAPHQL
         $hasRelationInputName = $name . self::DEFAULT_WHERE_RELATION_CONDITIONS;
         $defaultHasAmount = self::DEFAULT_HAS_AMOUNT;
 
-        /** @var \Nuwave\Lighthouse\WhereConditions\Operator $operator */
-        $operator = app(Operator::class);
+        $operator = Container::getInstance()->make(Operator::class);
+        assert($operator instanceof Operator);
 
         $operatorName = Parser::enumTypeDefinition(
             $operator->enumDefinition()

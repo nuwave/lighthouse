@@ -387,7 +387,7 @@ class ASTHelper
             return Parser::scalarTypeDefinition("scalar {$typeName}");
         }
 
-        $astBuilder = app(ASTBuilder::class);
+        $astBuilder = Container::getInstance()->make(ASTBuilder::class);
         assert($astBuilder instanceof ASTBuilder);
 
         $documentAST = $astBuilder->documentAST();

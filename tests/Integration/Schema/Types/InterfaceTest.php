@@ -307,7 +307,10 @@ GRAPHQL;
 
     public function resolveType(): Type
     {
-        return app(TypeRegistry::class)->get('Guy');
+        $typeRegistry = $this->app->make(TypeRegistry::class);
+        assert($typeRegistry instanceof TypeRegistry);
+
+        return $typeRegistry->get('Guy');
     }
 
     /**

@@ -199,6 +199,9 @@ GRAPHQL;
 
     public function resolveType(): Type
     {
-        return app(TypeRegistry::class)->get('Admin');
+        $typeRegistry = $this->app->make(TypeRegistry::class);
+        assert($typeRegistry instanceof TypeRegistry);
+
+        return $typeRegistry->get('Admin');
     }
 }

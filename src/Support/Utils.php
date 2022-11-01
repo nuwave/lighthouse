@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Support;
 
 use Closure;
+use Illuminate\Container\Container;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use ReflectionClass;
@@ -58,8 +59,7 @@ class Utils
         }
 
         return Closure::fromCallable(
-            // @phpstan-ignore-next-line this works
-            [app($className), $methodName]
+            [Container::getInstance()->make($className), $methodName]
         );
     }
 

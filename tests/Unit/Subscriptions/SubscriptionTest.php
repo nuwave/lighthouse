@@ -55,7 +55,8 @@ final class SubscriptionTest extends TestCase
 
     public function testBroadcastProgrammaticallyRegisteredSubscription(): void
     {
-        $subscriptionRegistry = app(SubscriptionRegistry::class);
+        $subscriptionRegistry = $this->app->make(SubscriptionRegistry::class);
+        assert($subscriptionRegistry instanceof SubscriptionRegistry);
 
         $subscription = new class() extends GraphQLSubscription {
             public function authorize(Subscriber $subscriber, Request $request): bool

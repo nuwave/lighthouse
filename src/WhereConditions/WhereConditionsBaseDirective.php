@@ -6,6 +6,7 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
+use Illuminate\Container\Container;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -25,7 +26,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
     {
         $handler = $this->directiveHasArgument('handler')
             ? $this->getResolverFromArgument('handler')
-            : app(WhereConditionsHandler::class);
+            : Container::getInstance()->make(WhereConditionsHandler::class);
 
         $handler($builder, $value);
     }

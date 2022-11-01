@@ -6,6 +6,7 @@ use Exception;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\Node;
 use HaydenPierce\ClassFinder\ClassFinder;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -140,7 +141,7 @@ class DirectiveLocator
     {
         $directiveClass = $this->resolve($directiveName);
 
-        return app($directiveClass);
+        return Container::getInstance()->make($directiveClass);
     }
 
     /**

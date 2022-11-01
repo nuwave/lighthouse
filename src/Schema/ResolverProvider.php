@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Schema;
 
 use Closure;
 use GraphQL\Executor\Executor;
+use Illuminate\Container\Container;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -26,8 +27,7 @@ class ResolverProvider implements ProvidesResolver
             }
 
             return Closure::fromCallable(
-                // @phpstan-ignore-next-line this works
-                [app($resolverClass), '__invoke']
+                [Container::getInstance()->make($resolverClass), '__invoke']
             );
         }
 

@@ -4,6 +4,7 @@ namespace Tests\Console;
 
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Utils\SchemaPrinter;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Nuwave\Lighthouse\Console\IdeHelperCommand;
 use Nuwave\Lighthouse\Schema\Directives\FieldDirective;
@@ -32,7 +33,8 @@ final class IdeHelperCommandTest extends TestCase
      */
     public function testGeneratesIdeHelperFiles(): void
     {
-        $typeRegistry = app(TypeRegistry::class);
+        $typeRegistry = $this->app->make(TypeRegistry::class);
+        assert($typeRegistry instanceof TypeRegistry);
         $programmaticType = new EnumType([
             'name' => 'Foo',
             'values' => [

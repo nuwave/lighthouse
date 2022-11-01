@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Execution\Utils;
 
+use Illuminate\Container\Container;
 use InvalidArgumentException;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
@@ -20,19 +21,20 @@ class Subscription
     {
         // Ensure we have a schema and registered subscription fields
         // in the event we are calling this method in code.
-        /** @var \Nuwave\Lighthouse\Schema\SchemaBuilder $schemaBuilder */
-        $schemaBuilder = app(SchemaBuilder::class);
+        $schemaBuilder = Container::getInstance()->make(SchemaBuilder::class);
+        assert($schemaBuilder instanceof SchemaBuilder);
+
         $schemaBuilder->schema();
 
-        /** @var \Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry $registry */
-        $registry = app(SubscriptionRegistry::class);
+        $registry = Container::getInstance()->make(SubscriptionRegistry::class);
+        assert($registry instanceof SubscriptionRegistry);
 
         if (! $registry->has($subscriptionField)) {
             throw new InvalidArgumentException("No subscription field registered for {$subscriptionField}");
         }
 
-        /** @var \Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions $broadcaster */
-        $broadcaster = app(BroadcastsSubscriptions::class);
+        $broadcaster = Container::getInstance()->make(BroadcastsSubscriptions::class);
+        assert($broadcaster instanceof BroadcastsSubscriptions);
 
         // Default to the configuration setting if not specified
         if (null === $shouldQueue) {
@@ -48,8 +50,9 @@ class Subscription
                 $broadcaster->broadcast($subscription, $subscriptionField, $root);
             }
         } catch (Throwable $e) {
-            /** @var \Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionExceptionHandler $exceptionHandler */
-            $exceptionHandler = app(SubscriptionExceptionHandler::class);
+            $exceptionHandler = Container::getInstance()->make(SubscriptionExceptionHandler::class);
+            assert($exceptionHandler instanceof SubscriptionExceptionHandler);
+
             $exceptionHandler->handleBroadcastError($e);
         }
     }

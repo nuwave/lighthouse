@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Support;
 
+use Illuminate\Container\Container;
 use Illuminate\Support\Str;
 
 class AppVersion
@@ -23,7 +24,7 @@ class AppVersion
 
     protected static function version(): string
     {
-        return app()->version();
+        return Container::getInstance()->version();
     }
 
     protected static function versionNumber(): float

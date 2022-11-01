@@ -18,6 +18,7 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\UnionType;
+use Illuminate\Container\Container;
 use Illuminate\Pipeline\Pipeline;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
@@ -502,8 +503,7 @@ class TypeRegistry
 
         if ($className) {
             return Closure::fromCallable(
-                // @phpstan-ignore-next-line this works
-                [app($className), '__invoke']
+                [Container::getInstance()->make($className), '__invoke']
             );
         }
 
@@ -584,7 +584,7 @@ class TypeRegistry
     protected function fieldFactory(): FieldFactory
     {
         if (! isset($this->fieldFactory)) {
-            $this->fieldFactory = app(FieldFactory::class);
+            $this->fieldFactory = Container::getInstance()->make(FieldFactory::class);
         }
 
         return $this->fieldFactory;
