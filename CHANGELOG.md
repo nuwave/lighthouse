@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.64.0
+
+### Changed
+
+- Allow requests with header `X-Requested-With: XMLHttpRequest` in `EnsureXHR` middleware https://github.com/nuwave/lighthouse/pull/2221
+
 ## v5.63.1
 
 ### Fixed
