@@ -104,6 +104,39 @@ final class EnsureXHRTest extends TestCase
         );
     }
 
+    public function testAllowXRequestedWithHeader(): void
+    {
+        $middleware = new EnsureXHR();
+
+        $request = new Request();
+        $request->setMethod('POST');
+        $request->headers->set('X-Requested-With', 'XMLHttpRequest');
+
+        $response = new Response();
+
+        $result = $middleware->handle(
+            $request,
+            static function () use ($response): Response { return $response; }
+        );
+
+        $this->assertSame($response, $result);
+    }
+
+    public function testForbidInvalidXRequestedWithHeader(): void
+    {
+        $middleware = new EnsureXHR();
+
+        $request = new Request();
+        $request->setMethod('POST');
+        $request->headers->set('X-Requested-With', 'InvalidValue');
+
+        $this->expectException(BadRequestHttpException::class);
+        $middleware->handle(
+            $request,
+            static function (): void {}
+        );
+    }
+
     public function testAllowXHR(): void
     {
         $middleware = new EnsureXHR();

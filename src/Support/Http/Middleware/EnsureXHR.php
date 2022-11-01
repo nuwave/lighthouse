@@ -39,6 +39,10 @@ class EnsureXHR
             return $next($request);
         }
 
+        if ($request->header('X-Requested-With', '') === 'XMLHttpRequest') {
+            return $next($request);
+        }
+
         $contentType = $request->header('content-type', '');
         // @phpstan-ignore-next-line wrongly assumes $contentType to always be string
         if (is_array($contentType)) {
