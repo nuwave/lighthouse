@@ -189,8 +189,26 @@ class DirectiveLocator
         $baseName = basename(str_replace('\\', '/', $className));
 
         return lcfirst(
-            Str::before($baseName, 'Directive')
+            self::beforeLast($baseName, 'Directive')
         );
+    }
+
+    /**
+     * TODO use Str::beforeLast with Laravel 6+.
+     */
+    protected static function beforeLast(string $subject, string $search): string
+    {
+        if ('' === $search) {
+            return $subject;
+        }
+
+        $pos = mb_strrpos($subject, $search);
+
+        if (false === $pos) {
+            return $subject;
+        }
+
+        return Str::substr($subject, 0, $pos);
     }
 
     /**

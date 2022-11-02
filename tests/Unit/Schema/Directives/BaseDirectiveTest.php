@@ -39,16 +39,6 @@ final class BaseDirectiveTest extends TestCase
         );
     }
 
-    public function testGetsNameFromDirective(): void
-    {
-        $directive = $this->constructFieldDirective('foo: ID @dummy');
-
-        $this->assertSame(
-            'dummy',
-            $directive->name()
-        );
-    }
-
     public function testDefaultsToFieldTypeForTheModelClass(): void
     {
         $this->schema .= /** @lang GraphQL */ '

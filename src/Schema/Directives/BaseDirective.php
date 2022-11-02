@@ -18,6 +18,7 @@ use GraphQL\Utils\AST;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Utils;
 
@@ -26,9 +27,11 @@ abstract class BaseDirective implements Directive
     /**
      * The AST node of the directive.
      *
+     * May not be set if the directive is added programmatically.
+     *
      * @var \GraphQL\Language\AST\DirectiveNode
      */
-    protected $directiveNode;
+    public $directiveNode;
 
     /**
      * The node the directive is defined on.
@@ -39,7 +42,7 @@ abstract class BaseDirective implements Directive
      *
      * @var ScalarTypeDefinitionNode|ObjectTypeDefinitionNode|FieldDefinitionNode|InputValueDefinitionNode|InterfaceTypeDefinitionNode|UnionTypeDefinitionNode|EnumTypeDefinitionNode|EnumValueDefinitionNode|InputObjectTypeDefinitionNode
      */
-    protected $definitionNode;
+    public $definitionNode;
 
     /**
      * Cached directive arguments.
@@ -55,7 +58,7 @@ abstract class BaseDirective implements Directive
      */
     public function name(): string
     {
-        return $this->directiveNode->name->value;
+        return DirectiveLocator::directiveName(static::class);
     }
 
     /**
@@ -89,6 +92,12 @@ abstract class BaseDirective implements Directive
     protected function loadArgValues(): void
     {
         $this->directiveArgs = [];
+
+        // If the directive was added programmatically, it has no arguments
+        if (! isset($this->directiveNode)) {
+            return;
+        }
+
         foreach ($this->directiveNode->arguments as $node) {
             if (array_key_exists($node->name->value, $this->directiveArgs)) {
                 throw new DefinitionException("Directive {$this->directiveNode->name->value} has two arguments with the same name {$node->name->value}");
