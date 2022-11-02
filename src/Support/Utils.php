@@ -194,4 +194,26 @@ class Utils
             ? $name
             : "_{$name}";
     }
+
+    /**
+     * Get the portion of a string before the last occurrence of a given value.
+     *
+     * @param  string  $subject
+     * @param  string  $search
+     * @return string
+     */
+    public static function beforeLast($subject, $search)
+    {
+        if ($search === '') {
+            return $subject;
+        }
+
+        $pos = mb_strrpos($subject, $search);
+
+        if ($pos === false) {
+            return $subject;
+        }
+
+        return Str::substr($subject, 0, $pos);
+    }
 }

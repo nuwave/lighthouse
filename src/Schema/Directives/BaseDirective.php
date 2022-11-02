@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Utils;
 
@@ -58,9 +59,7 @@ abstract class BaseDirective implements Directive
      */
     public function name(): string
     {
-        return Str::camel(
-            Str::beforeLast(static::class, 'Directive')
-        );
+        return DirectiveLocator::directiveName(static::class);
     }
 
     /**
