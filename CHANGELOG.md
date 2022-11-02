@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+
+- Handle unset properties in `field_middleware` directives
+
 ## v5.64.0
 
 ### Changed
