@@ -200,17 +200,18 @@ class Utils
      *
      * @param  string  $subject
      * @param  string  $search
+     *
      * @return string
      */
     public static function beforeLast($subject, $search)
     {
-        if ($search === '') {
+        if ('' === $search) {
             return $subject;
         }
 
         $pos = mb_strrpos($subject, $search);
 
-        if ($pos === false) {
+        if (false === $pos) {
             return $subject;
         }
 

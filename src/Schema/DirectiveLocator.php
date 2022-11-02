@@ -198,13 +198,13 @@ class DirectiveLocator
      */
     protected static function beforeLast(string $subject, string $search): string
     {
-        if ($search === '') {
+        if ('' === $search) {
             return $subject;
         }
 
         $pos = mb_strrpos($subject, $search);
 
-        if ($pos === false) {
+        if (false === $pos) {
             return $subject;
         }
 
