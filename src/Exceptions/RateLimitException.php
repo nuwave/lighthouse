@@ -3,12 +3,11 @@
 namespace Nuwave\Lighthouse\Exceptions;
 
 use GraphQL\Error\ClientAware;
-use RuntimeException;
 
 /**
  * Thrown when the user has reached the rate limit for a field.
  */
-class RateLimitException extends RuntimeException implements ClientAware
+class RateLimitException extends \RuntimeException implements ClientAware
 {
     public function __construct(string $fieldReference)
     {

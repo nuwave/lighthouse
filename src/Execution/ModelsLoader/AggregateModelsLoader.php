@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Execution\ModelsLoader;
 
-use Closure;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -29,7 +28,7 @@ class AggregateModelsLoader implements ModelsLoader
      */
     protected $decorateBuilder;
 
-    public function __construct(string $relation, string $column, string $function, Closure $decorateBuilder)
+    public function __construct(string $relation, string $column, string $function, \Closure $decorateBuilder)
     {
         $this->relation = $relation;
         $this->column = $column;

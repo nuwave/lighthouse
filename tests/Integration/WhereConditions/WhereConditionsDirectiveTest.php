@@ -2,7 +2,7 @@
 
 namespace Tests\Integration\WhereConditions;
 
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Nuwave\Lighthouse\WhereConditions\SQLOperator;
 use Nuwave\Lighthouse\WhereConditions\WhereConditionsHandler;
 use Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider;
@@ -974,7 +974,7 @@ GRAPHQL;
     /**
      * @param array<string, mixed> $conditions
      */
-    public function handler(Builder $builder, array $conditions): void
+    public function handler(EloquentBuilder $builder, array $conditions): void
     {
         $value = $conditions['value'];
         $builder->where($conditions['column'], $value . $value);

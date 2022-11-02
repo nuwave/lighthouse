@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use BadMethodCallException;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
@@ -36,7 +35,7 @@ GRAPHQL;
         try {
             return $builder->{$scope}($value);
             // @phpstan-ignore-next-line PHPStan thinks this exception does not occur - but it does. Magic.
-        } catch (BadMethodCallException $exception) {
+        } catch (\BadMethodCallException $exception) {
             throw new DefinitionException(
                 $exception->getMessage() . " in @{$this->name()} directive on {$this->nodeName()} argument.",
                 $exception->getCode(),

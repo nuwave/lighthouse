@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Defer;
 
-use Closure;
 use GraphQL\Error\Error;
 use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\TypeNode;
@@ -42,7 +41,7 @@ GRAPHQL;
         $this->defer = $defer;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
     {
         $previousResolver = $fieldValue->getResolver();
         $fieldType = $fieldValue->getField()->type;

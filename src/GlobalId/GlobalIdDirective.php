@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\GlobalId;
 
-use Closure;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -62,7 +61,7 @@ enum GlobalIdDecode {
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
     {
         $type = $fieldValue->getParentName();
 

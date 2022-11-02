@@ -3,7 +3,7 @@
 namespace Tests\Integration\Defer;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Defer\DeferServiceProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Company;
@@ -234,7 +234,7 @@ final class DeferDBTest extends DBTestCase
 
         $this->assertCount(6, $deferredCompanies);
 
-        (new BaseCollection($deferredCompanies))->each(function (array $item) use ($companies): void {
+        (new Collection($deferredCompanies))->each(function (array $item) use ($companies): void {
             $item = $item['data'];
             $this->assertArrayHasKey('name', $item);
 

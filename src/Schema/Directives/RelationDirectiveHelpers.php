@@ -2,9 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
 trait RelationDirectiveHelpers
@@ -29,13 +28,13 @@ trait RelationDirectiveHelpers
     /**
      * @return \Closure(\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation): void
      */
-    protected function makeBuilderDecorator(ResolveInfo $resolveInfo): Closure
+    protected function makeBuilderDecorator(ResolveInfo $resolveInfo): \Closure
     {
         return function (object $builder) use ($resolveInfo): void {
             if ($builder instanceof Relation) {
                 $builder = $builder->getQuery();
             }
-            assert($builder instanceof Builder);
+            assert($builder instanceof EloquentBuilder);
 
             $resolveInfo->argumentSet->enhanceBuilder(
                 $builder,

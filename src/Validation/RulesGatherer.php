@@ -15,7 +15,6 @@ use Nuwave\Lighthouse\Support\Contracts\ArgumentValidation;
 use Nuwave\Lighthouse\Support\Contracts\WithReferenceRule;
 use Nuwave\Lighthouse\Support\Traits\HasArgumentValue;
 use Nuwave\Lighthouse\Support\Utils;
-use Throwable;
 
 class RulesGatherer
 {
@@ -295,7 +294,7 @@ class RulesGatherer
             ])) {
                 try {
                     Carbon::parse($args[0]);
-                } catch (Throwable $argumentIsNotADate) {
+                } catch (\Throwable $argumentIsNotADate) {
                     $args[0] = implode('.', array_merge($argumentPath, [$args[0]]));
                 }
             }

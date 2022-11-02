@@ -2,12 +2,11 @@
 
 namespace Nuwave\Lighthouse\Exceptions;
 
-use Exception;
 use GraphQL\Error\ClientAware;
 use GraphQL\Error\SyntaxError;
 use GraphQL\Language\Source;
 
-class ParseException extends Exception implements ClientAware
+class ParseException extends \Exception implements ClientAware
 {
     public function __construct(SyntaxError $error)
     {

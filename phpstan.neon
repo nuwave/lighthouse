@@ -38,8 +38,10 @@ parameters:
   reportUnmatchedIgnoredErrors: false
 
   ignoreErrors:
+  # PHPStan does not get it
+  - '#Parameter \#1 \$callback of static method Closure::fromCallable\(\) expects callable\(\): mixed, array{object, .*} given\.#'
+
   # Some parts of Laravel are just really magical
-  - '#Parameter \#1 \$callable of static method Closure::fromCallable\(\) expects callable\(\): mixed, array\(\*NEVER\*, .*\) given\.#'
   - '#Parameter \#1 \$response of static method Nuwave\\Lighthouse\\Testing\\TestResponseUtils::extractValidationErrors\(\) expects Illuminate\\Testing\\TestResponse, \$this\(Nuwave\\Lighthouse\\Testing\\TestResponseMixin\) given\.#'
   - path: tests/database/factories/*
     message: '#Variable \$factory might not be defined#'

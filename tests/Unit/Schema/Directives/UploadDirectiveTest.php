@@ -2,12 +2,9 @@
 
 namespace Tests\Unit\Schema\Directives;
 
-use Exception;
 use Illuminate\Http\Testing\File;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use InvalidArgumentException;
-use Mockery;
 use Symfony\Component\HttpFoundation\File\Exception\CannotWriteFileException;
 use Tests\TestCase;
 
@@ -238,7 +235,7 @@ final class UploadDirectiveTest extends TestCase
 
         $file = UploadedFile::fake()->create('test.pdf', 500);
 
-        $this->expectException(Exception::class);
+        $this->expectException(\Exception::class);
 
         $this->multipartGraphQL(
             [
@@ -271,7 +268,7 @@ final class UploadDirectiveTest extends TestCase
         }
         ' . self::PLACEHOLDER_QUERY;
 
-        $file = Mockery::mock(File::class);
+        $file = \Mockery::mock(File::class);
 
         $file->shouldReceive('hashName')
             ->andReturn('testFileName.pdf');
@@ -307,7 +304,7 @@ final class UploadDirectiveTest extends TestCase
         }
         ';
 
-        $this->expectExceptionObject(new InvalidArgumentException('Expected argument `baz` to be instanceof Illuminate\\Http\\UploadedFile.'));
+        $this->expectExceptionObject(new \InvalidArgumentException('Expected argument `baz` to be instanceof Illuminate\\Http\\UploadedFile.'));
         $this->graphQL(/** @lang GraphQL */ '
         {
             foo(baz: "something")

@@ -2,7 +2,7 @@
 
 namespace Tests\Utils\Models;
 
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -105,14 +105,14 @@ final class User extends Authenticatable
         return $this->hasMany(CustomPrimaryKey::class, 'user_id');
     }
 
-    public function scopeCompanyName(Builder $query, array $args): Builder
+    public function scopeCompanyName(EloquentBuilder $query, array $args): EloquentBuilder
     {
-        return $query->whereHas('company', function (Builder $q) use ($args): void {
+        return $query->whereHas('company', function (EloquentBuilder $q) use ($args): void {
             $q->where('name', $args['company']);
         });
     }
 
-    public function scopeNamed(Builder $query): Builder
+    public function scopeNamed(EloquentBuilder $query): EloquentBuilder
     {
         return $query->whereNotNull('name');
     }

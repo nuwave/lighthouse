@@ -2,7 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\ModifyModelExistenceDirective;
 use Tests\DBTestCase;
@@ -74,7 +74,7 @@ final class DeleteDirectiveTest extends DBTestCase
     public function testDeletesMultipleUsersAndReturnsThem(): void
     {
         $users = factory(User::class, 2)->create();
-        assert($users instanceof Collection);
+        assert($users instanceof EloquentCollection);
 
         $this->schema .= /** @lang GraphQL */ '
         type User {

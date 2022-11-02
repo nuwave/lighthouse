@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\SoftDeletes;
 
-use Exception;
 use GraphQL\Error\Error;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
@@ -29,7 +28,7 @@ GRAPHQL;
     {
         if (! $builder instanceof EloquentBuilder) {
             $notEloquentBuilder = get_class($builder);
-            throw new Exception("Can not get model from builder of class: {$notEloquentBuilder}");
+            throw new \Exception("Can not get model from builder of class: {$notEloquentBuilder}");
         }
 
         $model = $builder->getModel();

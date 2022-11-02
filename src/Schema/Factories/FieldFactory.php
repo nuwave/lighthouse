@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Factories;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Container\Container;
 use Illuminate\Pipeline\Pipeline;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
@@ -121,8 +122,8 @@ class FieldFactory
     protected function type(FieldDefinitionNode $fieldDefinition): \Closure
     {
         return static function () use ($fieldDefinition) {
-            /** @var \Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter $typeNodeConverter */
-            $typeNodeConverter = app(ExecutableTypeNodeConverter::class);
+            $typeNodeConverter = Container::getInstance()->make(ExecutableTypeNodeConverter::class);
+            assert($typeNodeConverter instanceof ExecutableTypeNodeConverter);
 
             return $typeNodeConverter->convert($fieldDefinition->type);
         };
@@ -152,13 +153,13 @@ class FieldFactory
     public static function defaultResolver(FieldValue $fieldValue): callable
     {
         if (RootType::SUBSCRIPTION === $fieldValue->getParentName()) {
-            /** @var \Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver $providesSubscriptionResolver */
-            $providesSubscriptionResolver = app(ProvidesSubscriptionResolver::class);
+            $providesSubscriptionResolver = Container::getInstance()->make(ProvidesSubscriptionResolver::class);
+            assert($providesSubscriptionResolver instanceof ProvidesSubscriptionResolver);
 
             return $providesSubscriptionResolver->provideSubscriptionResolver($fieldValue);
         }
-        /** @var \Nuwave\Lighthouse\Support\Contracts\ProvidesResolver $providesResolver */
-        $providesResolver = app(ProvidesResolver::class);
+        $providesResolver = Container::getInstance()->make(ProvidesResolver::class);
+        assert($providesResolver instanceof ProvidesResolver);
 
         return $providesResolver->provideResolver($fieldValue);
     }

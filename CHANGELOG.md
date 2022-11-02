@@ -29,6 +29,30 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove `Serializable` implementation
 - Remove trait `ClearsSchemaCache`
 
+## v5.64.0
+
+### Changed
+
+- Allow requests with header `X-Requested-With: XMLHttpRequest` in `EnsureXHR` middleware https://github.com/nuwave/lighthouse/pull/2221
+
+## v5.63.1
+
+### Fixed
+
+- Fix GraphQL enum names generation from column names containing symbols https://github.com/nuwave/lighthouse/pull/2219
+
+## v5.63.0
+
+### Added
+
+- Allow easily overwriting enum description generation from `bensampo/laravel-enum` https://github.com/nuwave/lighthouse/pull/2218
+
+## v5.62.0
+
+### Changed
+
+- Extract uploaded file name calculation to method in `@upload` directive https://github.com/nuwave/lighthouse/pull/2215
+
 ## v5.61.0
 
 ### Added

@@ -4,7 +4,6 @@ namespace Tests;
 
 use Laravel\Scout\EngineManager;
 use Laravel\Scout\Engines\NullEngine;
-use Mockery;
 use Mockery\MockInterface;
 
 trait TestsScoutEngine
@@ -21,12 +20,12 @@ trait TestsScoutEngine
 
     public function setUpScoutEngine(): void
     {
-        $this->engineManager = Mockery::mock(EngineManager::class);
+        $this->engineManager = \Mockery::mock(EngineManager::class);
         $this->app->singleton(EngineManager::class, function (): MockInterface {
             return $this->engineManager;
         });
 
-        $this->engine = Mockery::mock(NullEngine::class)
+        $this->engine = \Mockery::mock(NullEngine::class)
             ->makePartial();
 
         $this->engineManager

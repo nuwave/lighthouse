@@ -165,13 +165,10 @@ Not every application has them enabled - Lumen does not use Facades by default.
 
 Prefer direct usage of Illuminate classes instead of helpers.
 
-```php
-// Correct usage
-use \Illuminate\Support\Arr;
-Arr::get($foo, 'bar');
-
-// Wrong usage
-array_get($foo, 'bar');
+```diff
+-array_get($foo, 'bar');
++use \Illuminate\Support\Arr;
++Arr::get($foo, 'bar');
 ```
 
 A notable exception is the `response()` helper - using DI for injecting a

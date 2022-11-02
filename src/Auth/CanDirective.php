@@ -2,14 +2,13 @@
 
 namespace Nuwave\Lighthouse\Auth;
 
-use Closure;
 use GraphQL\Error\Error;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Pagination\Paginator;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Arr;
@@ -116,7 +115,7 @@ GRAPHQL;
     /**
      * Ensure the user is authorized to access this field.
      */
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
     {
         $previousResolver = $fieldValue->getResolver();
         $ability = $this->directiveArgValue('ability');
@@ -203,7 +202,7 @@ GRAPHQL;
                     $this->directiveArgValue('scopes', []),
                     Utils::instanceofMatcher(TrashedDirective::class)
                 );
-                assert($enhancedBuilder instanceof Builder);
+                assert($enhancedBuilder instanceof EloquentBuilder);
 
                 $modelOrModels = $enhancedBuilder->findOrFail($findValue);
             } catch (ModelNotFoundException $exception) {

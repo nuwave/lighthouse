@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
-use Exception;
 use GraphQL\Error\SyntaxError;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\NodeList;
@@ -138,7 +137,7 @@ class DocumentAST implements Arrayable
             } elseif ($definition instanceof DirectiveDefinitionNode) {
                 $instance->directives[$definition->name->value] = $definition;
             } else {
-                throw new Exception('Unknown definition type: ' . get_class($definition));
+                throw new \Exception('Unknown definition type: ' . get_class($definition));
             }
         }
 

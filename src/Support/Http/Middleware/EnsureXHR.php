@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Support\Http\Middleware;
 
-use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -27,7 +26,7 @@ class EnsureXHR
     /**
      * @return \Symfony\Component\HttpFoundation\Response|\Illuminate\Http\JsonResponse
      */
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, \Closure $next)
     {
         $method = $request->getRealMethod();
 
@@ -36,6 +35,10 @@ class EnsureXHR
         }
 
         if ('POST' !== $method) {
+            return $next($request);
+        }
+
+        if ('XMLHttpRequest' === $request->header('X-Requested-With', '')) {
             return $next($request);
         }
 

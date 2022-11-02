@@ -6,6 +6,7 @@ use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Utils\AST;
 use GraphQL\Utils\Utils;
+use Illuminate\Container\Container;
 use Nuwave\Lighthouse\Federation\EntityResolverProvider;
 
 /**
@@ -60,8 +61,8 @@ DESCRIPTION;
             throw new Error(self::typenameIsInvalidName($isValidNameError));
         }
 
-        /** @var \Nuwave\Lighthouse\Federation\EntityResolverProvider $entityResolverProvider */
-        $entityResolverProvider = app(EntityResolverProvider::class);
+        $entityResolverProvider = Container::getInstance()->make(EntityResolverProvider::class);
+        assert($entityResolverProvider instanceof EntityResolverProvider);
 
         // Representations must contain at least the fields defined in the fieldset of a @key directive on the base type.
         $definition = $entityResolverProvider->typeDefinition($typename);

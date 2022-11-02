@@ -18,7 +18,7 @@ final class NodeDirectiveDBTest extends DBTestCase
     {
         parent::setUp();
 
-        $this->globalIdResolver = app(GlobalId::class);
+        $this->globalIdResolver = $this->app->make(GlobalId::class);
     }
 
     /**

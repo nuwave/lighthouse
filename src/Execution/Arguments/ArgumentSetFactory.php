@@ -7,7 +7,6 @@ use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Type\Definition\ResolveInfo;
-use InvalidArgumentException;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
 
@@ -71,7 +70,7 @@ class ArgumentSetFactory
         } elseif ($definition instanceof InputObjectTypeDefinitionNode) {
             $argDefinitions = $definition->fields;
         } else {
-            throw new InvalidArgumentException('Got unexpected node of type ' . get_class($definition));
+            throw new \InvalidArgumentException('Got unexpected node of type ' . get_class($definition));
         }
 
         $argumentDefinitionMap = $this->makeDefinitionMap($argDefinitions);

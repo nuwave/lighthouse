@@ -2,9 +2,7 @@
 
 namespace Nuwave\Lighthouse\Exceptions;
 
-use Exception;
-
-class UnknownCacheVersionException extends Exception
+class UnknownCacheVersionException extends \Exception
 {
     /**
      * @param  mixed  $version  Should be int, but could be something else
