@@ -7,6 +7,7 @@ use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Pipeline\Pipeline;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
@@ -15,11 +16,13 @@ use Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ComplexityResolverDirective;
+use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
+use PhpParser\Node\Scalar\MagicConst\Dir;
 
 class FieldFactory
 {
@@ -81,23 +84,24 @@ class FieldFactory
 
         // Middleware resolve in reversed order
 
-        $globalFieldMiddleware = array_reverse(
-            $this->config->get('lighthouse.field_middleware')
-        );
-        foreach ($globalFieldMiddleware as $fieldMiddleware) {
-            if ($fieldMiddleware instanceof BaseDirective) {
-                $fieldMiddleware->definitionNode = $fieldDefinitionNode;
-            }
-        }
+        $globalFieldMiddleware = (new Collection($this->config->get('lighthouse.field_middleware')))
+            ->reverse()
+            ->map(function (string $middlewareDirective): Directive {
+                return Container::getInstance()->make($middlewareDirective);
+            })
+            ->each(function (Directive $directive) use ($fieldDefinitionNode): void {
+                if ($directive instanceof BaseDirective) {
+                    $directive->definitionNode = $fieldDefinitionNode;
+                }
+            });
 
         $fieldMiddleware = $this->directiveLocator
             ->associatedOfType($fieldDefinitionNode, FieldMiddleware::class)
-            ->reverse()
-            ->all();
+            ->reverse();
 
         $resolverWithMiddleware = $this->pipeline
             ->send($fieldValue)
-            ->through(array_merge($fieldMiddleware, $globalFieldMiddleware))
+            ->through(array_merge($fieldMiddleware->all(), $globalFieldMiddleware->all()))
             ->via('handleField')
             // TODO replace when we cut support for Laravel 5.6
             // ->thenReturn()
