@@ -21,7 +21,7 @@ GRAPHQL;
         $fieldValue->setResolver(function (): bool {
             return $this->definitionNode instanceof FieldDefinitionNode
                 // Must not crash
-                && $this->directiveArgValue('random') === null;
+                && null === $this->directiveArgValue('random');
         });
 
         return $next($fieldValue);
