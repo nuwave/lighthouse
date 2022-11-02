@@ -49,10 +49,10 @@ class FieldFactory
     protected $argumentSetFactory;
 
     public function __construct(
-        Pipeline           $pipeline,
-        ConfigRepository   $config,
-        DirectiveLocator   $directiveLocator,
-        ArgumentFactory    $argumentFactory,
+        Pipeline $pipeline,
+        ConfigRepository $config,
+        DirectiveLocator $directiveLocator,
+        ArgumentFactory $argumentFactory,
         ArgumentSetFactory $argumentSetFactory
     ) {
         $this->pipeline = $pipeline;
