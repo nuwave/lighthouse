@@ -56,6 +56,7 @@ class FieldFactory
         ArgumentSetFactory $argumentSetFactory
     ) {
         $this->pipeline = $pipeline;
+        $this->config = $config;
         $this->directiveLocator = $directiveLocator;
         $this->argumentFactory = $argumentFactory;
         $this->argumentSetFactory = $argumentSetFactory;
