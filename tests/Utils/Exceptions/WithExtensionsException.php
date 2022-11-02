@@ -2,14 +2,13 @@
 
 namespace Tests\Utils\Exceptions;
 
-use Exception;
 use GraphQL\Error\ClientAware;
 use GraphQL\Error\ProvidesExtensions;
 
 /**
  * @phpstan-type ExtensionsContent array<string, mixed>
  */
-final class WithExtensionsException extends Exception implements ClientAware, ProvidesExtensions
+final class WithExtensionsException extends \Exception implements ClientAware, ProvidesExtensions
 {
     /**
      * @var ExtensionsContent
