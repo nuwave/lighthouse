@@ -36,6 +36,8 @@ class MyCustomDirectiveTest extends TestCase
 }
 ```
 
+> `UsesTestSchema` does not work with `RefreshesSchemaCache`, choose one.
+
 ## Mock resolvers
 
 When testing custom functionality through a dummy schema, you still need to have
