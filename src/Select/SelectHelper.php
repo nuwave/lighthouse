@@ -23,6 +23,7 @@ class SelectHelper
      * @param mixed[] $fieldSelection
      *
      * @return string[]
+     * @reference https://github.com/nuwave/lighthouse/pull/1626
      */
     public static function getSelectColumns(Node $definitionNode, array $fieldSelection, string $modelName): array
     {
