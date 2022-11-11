@@ -9,10 +9,12 @@ use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Support\Arr;
 use Laravel\Scout\Builder as ScoutBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Select\SelectHelper;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -128,6 +130,24 @@ GRAPHQL;
                     $query,
                     $this->directiveArgValue('scopes', [])
                 );
+
+            if (($query instanceof QueryBuilder || $query instanceof EloquentBuilder) && ! $this->directiveHasArgument('builder')) {
+                $fieldSelection = $resolveInfo->getFieldSelection(4);
+
+                if (Arr::has($fieldSelection, 'data') || Arr::has($fieldSelection, 'edges')) {
+                    $fieldSelection = array_keys(Arr::has($fieldSelection, 'data') ? $fieldSelection['data'] : $fieldSelection['edges']['node']);
+
+                    $selectColumns = SelectHelper::getSelectColumns(
+                        $this->definitionNode,
+                        $fieldSelection,
+                        $this->getModelClass()
+                    );
+
+                    if (! empty($selectColumns)) {
+                        $query = $query->select($selectColumns);
+                    }
+                }
+            }
 
             $paginationArgs = PaginationArgs::extractArgs($args, $this->paginationType(), $this->paginateMaxCount());
 

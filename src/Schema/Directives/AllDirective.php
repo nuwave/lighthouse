@@ -9,6 +9,7 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Collection;
 use Laravel\Scout\Builder as ScoutBuilder;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Select\SelectHelper;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
@@ -56,13 +57,30 @@ GRAPHQL;
                 $query = $this->getModelClass()::query();
             }
 
-            return $resolveInfo
+            $builder = $resolveInfo
                 ->argumentSet
                 ->enhanceBuilder(
                     $query,
                     $this->directiveArgValue('scopes', [])
-                )
-                ->get();
+                );
+
+            if (($builder instanceof QueryBuilder || $builder instanceof EloquentBuilder) && ! $this->directiveHasArgument('builder')) {
+                $fieldSelection = array_keys($resolveInfo->getFieldSelection(1));
+
+                $selectColumns = SelectHelper::getSelectColumns(
+                    $this->definitionNode,
+                    $fieldSelection,
+                    $this->getModelClass()
+                );
+
+                if (empty($selectColumns)) {
+                    return $builder->get();
+                }
+
+                $builder = $builder->select($selectColumns);
+            }
+
+            return $builder->get();
         });
 
         return $fieldValue;
