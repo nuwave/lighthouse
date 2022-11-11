@@ -3,6 +3,7 @@
 namespace Tests;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 /**
  * This trait was taken from a package that supports fewer Laravel versions than us.
@@ -15,7 +16,12 @@ trait AssertsQueryCounts
 {
     protected function countQueries(?int &$count): void
     {
-        DB::listen(function () use (&$count): void {
+        DB::listen(function ($query) use (&$count): void {
+            // ignore fetch column list.
+            if (Str::contains($query->sql, ['select column_name'])) {
+                return;
+            }
+
             ++$count;
         });
     }

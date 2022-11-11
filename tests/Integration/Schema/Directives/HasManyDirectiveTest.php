@@ -168,7 +168,7 @@ final class HasManyDirectiveTest extends DBTestCase
         $lastTask = $tasks2->last();
         assert($lastTask instanceof Task);
 
-        $this
+        $response = $this
             ->graphQL(/** @lang GraphQL */ '
             query ($firstId: ID!, $lastId: ID!) {
                 users {
@@ -183,29 +183,20 @@ final class HasManyDirectiveTest extends DBTestCase
             ', [
                 'firstId' => $firstTask->id,
                 'lastId' => $lastTask->id,
-            ])
-            ->assertExactJson([
-                'data' => [
-                    'users' => [
-                        [
-                            'firstTasks' => [
-                                [
-                                    'id' => $firstTask->id,
-                                ],
-                            ],
-                            'lastTasks' => [],
-                        ],
-                        [
-                            'firstTasks' => [],
-                            'lastTasks' => [
-                                [
-                                    'id' => $lastTask->id,
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
             ]);
+
+        $response->assertJsonCount(2, 'data.users');
+
+        $firstTaskData = empty($response->json('data.users.0.firstTasks'))
+            ? $response->json('data.users.1.firstTasks.0')
+            : $response->json('data.users.0.firstTasks.0');
+
+        $lastTaskData = empty($response->json('data.users.0.lastTasks'))
+            ? $response->json('data.users.1.lastTasks.0')
+            : $response->json('data.users.0.lastTasks.0');
+
+        $this->assertEquals($firstTask->id, $firstTaskData['id']);
+        $this->assertEquals($lastTask->id, $lastTaskData['id']);
     }
 
     public function testQueryPaginatedHasManyWithConditionInDifferentAliases(): void
@@ -244,7 +235,7 @@ final class HasManyDirectiveTest extends DBTestCase
         $lastTask = $tasks2->last();
         assert($lastTask instanceof Task);
 
-        $this
+        $response = $this
             ->graphQL(/** @lang GraphQL */ '
             query ($firstId: ID!, $lastId: ID!) {
                 users {
@@ -263,37 +254,20 @@ final class HasManyDirectiveTest extends DBTestCase
             ', [
                 'firstId' => $firstTask->id,
                 'lastId' => $lastTask->id,
-            ])
-            ->assertExactJson([
-                'data' => [
-                    'users' => [
-                        [
-                            'firstTasks' => [
-                                'data' => [
-                                    [
-                                        'id' => $firstTask->id,
-                                    ],
-                                ],
-                            ],
-                            'lastTasks' => [
-                                'data' => [],
-                            ],
-                        ],
-                        [
-                            'firstTasks' => [
-                                'data' => [],
-                            ],
-                            'lastTasks' => [
-                                'data' => [
-                                    [
-                                        'id' => $lastTask->id,
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
             ]);
+
+        $response->assertJsonCount(2, 'data.users');
+
+        $firstTaskData = empty($response->json('data.users.0.firstTasks.data'))
+            ? $response->json('data.users.1.firstTasks.data.0')
+            : $response->json('data.users.0.firstTasks.data.0');
+
+        $lastTaskData = empty($response->json('data.users.0.lastTasks.data'))
+            ? $response->json('data.users.1.lastTasks.data.0')
+            : $response->json('data.users.0.lastTasks.data.0');
+
+        $this->assertEquals($firstTask->id, $firstTaskData['id']);
+        $this->assertEquals($lastTask->id, $lastTaskData['id']);
     }
 
     public function testCallsScopeWithResolverArgs(): void

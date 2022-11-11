@@ -16,6 +16,8 @@ class SelectHelper
 
     public const DirectivesRequiringForeignKey = ['belongsTo', 'belongsToMany', 'morphTo'];
 
+    public const DirectivesIgnore = ['morphTo'];
+
     /**
      * Given a field definition node, resolve info, and a model name, return the SQL columns that should be selected.
      * Accounts for relationships and the rename and select directives.
@@ -62,7 +64,7 @@ class SelectHelper
             $fieldDefinition = ASTHelper::firstByName($fieldDefinitions, $field);
 
             if ($fieldDefinition) {
-                $directivesRequiringKeys = array_merge(self::DirectivesRequiringLocalKey, self::DirectivesRequiringForeignKey);
+                $directivesRequiringKeys = array_merge(self::DirectivesRequiringLocalKey, self::DirectivesRequiringForeignKey, self::DirectivesIgnore);
 
                 foreach ($directivesRequiringKeys as $directiveType) {
                     if (ASTHelper::hasDirective($fieldDefinition, $directiveType)) {
@@ -86,6 +88,10 @@ class SelectHelper
                                     array_push($selectColumns, $model->{$relationName}()->getForeignKeyName());
                                 }
                             }
+                        }
+
+                        if (in_array($directiveType, self::DirectivesIgnore)) {
+                            return [];
                         }
 
                         continue 2;
@@ -116,7 +122,6 @@ class SelectHelper
         }
 
         // for unit test query log check
-
         try {
             $allColumns = Schema::getColumnListing($model->getTable());
         } catch (\Exception $e) {

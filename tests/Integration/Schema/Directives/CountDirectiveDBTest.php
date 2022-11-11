@@ -94,27 +94,24 @@ final class CountDirectiveDBTest extends DBTestCase
             });
 
         $this->assertQueryCountMatches(2, function (): void {
-            $this->graphQL(/** @lang GraphQL */ '
+            $response = $this->graphQL(/** @lang GraphQL */ '
             {
                 users {
                     tasks_count
                 }
             }
-            ')->assertExactJson([
-                'data' => [
-                    'users' => [
-                        [
-                            'tasks_count' => 3,
-                        ],
-                        [
-                            'tasks_count' => 2,
-                        ],
-                        [
-                            'tasks_count' => 1,
-                        ],
-                    ],
-                ],
-            ]);
+            ');
+
+
+            $response->assertJsonCount(3, 'data.users');
+
+            $users = $response->json('data.users');
+
+            $counts = collect($users)->pluck('tasks_count')->all();
+
+            sort($counts);
+
+            $this->assertEquals([1, 2, 3], $counts);
         });
     }
 

@@ -173,7 +173,7 @@ final class LimitDirectiveTest extends DBTestCase
         $this->assertInstanceOf(Task::class, $task);
         $this->assertSame(3, $task->id);
 
-        $this
+        $response = $this
             ->graphQL(/** @lang GraphQL */ '
             {
                 user {
@@ -183,28 +183,19 @@ final class LimitDirectiveTest extends DBTestCase
                     }
                 }
             }
-            ')
-            ->assertJson([
-                'data' => [
-                    'user' => [
-                        [
-                            'id' => 1,
-                            'tasks' => [
-                                [
-                                    'id' => 1,
-                                ],
-                            ],
-                        ],
-                        [
-                            'id' => 2,
-                            'tasks' => [
-                                [
-                                    'id' => 3,
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-            ]);
+            ');
+
+        $response->assertJsonCount(2, 'data.user');
+
+        $user1Tasks = intval($response->json('data.user.0.id')) === 1
+            ? $response->json('data.user.0.tasks.0')
+            : $response->json('data.user.1.tasks.0');
+
+        $user2Tasks = intval($response->json('data.user.0.id')) === 2
+            ? $response->json('data.user.0.tasks.0')
+            : $response->json('data.user.1.tasks.0');
+
+        $this->assertEquals(1, $user1Tasks['id']);
+        $this->assertEquals(3, $user2Tasks['id']);
     }
 }
