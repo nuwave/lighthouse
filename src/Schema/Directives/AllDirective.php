@@ -64,20 +64,22 @@ GRAPHQL;
                     $this->directiveArgValue('scopes', [])
                 );
 
-            if (($builder instanceof QueryBuilder || $builder instanceof EloquentBuilder) && ! $this->directiveHasArgument('builder')) {
-                $fieldSelection = array_keys($resolveInfo->getFieldSelection(1));
+            if (config('lighthouse.optimized_selects')) {
+                if (($builder instanceof QueryBuilder || $builder instanceof EloquentBuilder) && !$this->directiveHasArgument('builder')) {
+                    $fieldSelection = array_keys($resolveInfo->getFieldSelection(1));
 
-                $selectColumns = SelectHelper::getSelectColumns(
-                    $this->definitionNode,
-                    $fieldSelection,
-                    $this->getModelClass()
-                );
+                    $selectColumns = SelectHelper::getSelectColumns(
+                        $this->definitionNode,
+                        $fieldSelection,
+                        $this->getModelClass()
+                    );
 
-                if (empty($selectColumns)) {
-                    return $builder->get();
+                    if (empty($selectColumns)) {
+                        return $builder->get();
+                    }
+
+                    $builder = $builder->select($selectColumns);
                 }
-
-                $builder = $builder->select($selectColumns);
             }
 
             return $builder->get();
