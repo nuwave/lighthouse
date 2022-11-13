@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Select;
+namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 
