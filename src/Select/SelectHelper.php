@@ -16,7 +16,7 @@ class SelectHelper
 
     public const DirectivesRequiringForeignKey = ['belongsTo', 'belongsToMany', 'morphTo'];
 
-    public const DirectivesIgnore = ['morphTo'];
+    public const DirectivesIgnore = ['morphTo', 'morphMany'];
 
     /**
      * Given a field definition node, resolve info, and a model name, return the SQL columns that should be selected.
