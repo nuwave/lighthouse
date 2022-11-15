@@ -41,9 +41,11 @@ class SelectHelper
         }
 
         // ignore relation closure, e.g. RelationOrderByClause
-        foreach (array_keys($documentAST->types) as $type) {
-            if (Str::contains($type, ['RelationOrderByClause'], true)) {
-                return [];
+        if (is_array($documentAST->types)) {
+            foreach (array_keys($documentAST->types) as $type) {
+                if (Str::contains($type, ['RelationOrderByClause'], true)) {
+                    return [];
+                }
             }
         }
 
