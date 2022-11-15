@@ -46,7 +46,7 @@ GRAPHQL;
                 );
 
             if (config('lighthouse.optimized_selects')) {
-                if (($builder instanceof QueryBuilder || $builder instanceof EloquentBuilder) && ! $this->directiveHasArgument('model')) {
+                if ($builder instanceof QueryBuilder || $builder instanceof EloquentBuilder) {
                     $fieldSelection = array_keys($resolveInfo->getFieldSelection(1));
 
                     $selectColumns = SelectHelper::getSelectColumns(

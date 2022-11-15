@@ -170,7 +170,7 @@ final class FindDirectiveTest extends DBTestCase
         type User {
             id: ID!
             name: String!
-            companyName: String!
+            companyName: String! @select(columns: ["company_id"])
         }
 
         type Query {

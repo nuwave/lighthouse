@@ -5,18 +5,19 @@ namespace Nuwave\Lighthouse\Select;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 
 class SelectHelper
 {
-    public const DirectivesRequiringLocalKey = ['hasOne', 'hasMany', 'count'];
+    public const DirectivesRequiringLocalKey = ['hasOne', 'hasMany', 'count', 'morphOne', 'morphMany'];
 
-    public const DirectivesRequiringForeignKey = ['belongsTo', 'belongsToMany', 'morphTo'];
+    public const DirectivesRequiringForeignKey = ['belongsTo'];
 
-    public const DirectivesIgnore = ['morphTo', 'morphMany'];
+    public const DirectivesReturn = ['morphTo', 'morphToMany'];
+
+    public const DirectivesIgnore = ['aggregate', 'withCount', 'belongsToMany'];
 
     /**
      * Given a field definition node, resolve info, and a model name, return the SQL columns that should be selected.
@@ -29,8 +30,6 @@ class SelectHelper
      */
     public static function getSelectColumns(Node $definitionNode, array $fieldSelection, string $modelName): array
     {
-        DB::disableQueryLog();
-
         $returnTypeName = ASTHelper::getUnderlyingTypeName($definitionNode);
 
         /** @var \Nuwave\Lighthouse\Schema\AST\DocumentAST $documentAST */
@@ -66,11 +65,15 @@ class SelectHelper
             $fieldDefinition = ASTHelper::firstByName($fieldDefinitions, $field);
 
             if ($fieldDefinition) {
-                $directivesRequiringKeys = array_merge(self::DirectivesRequiringLocalKey, self::DirectivesRequiringForeignKey, self::DirectivesIgnore);
+                $directivesRequiringKeys = array_merge(self::DirectivesRequiringLocalKey, self::DirectivesRequiringForeignKey, self::DirectivesReturn, self::DirectivesIgnore);
 
                 foreach ($directivesRequiringKeys as $directiveType) {
                     if (ASTHelper::hasDirective($fieldDefinition, $directiveType)) {
                         $directive = ASTHelper::directiveDefinition($fieldDefinition, $directiveType);
+
+                        if (in_array($directiveType, self::DirectivesReturn)) {
+                            return [];
+                        }
 
                         if (in_array($directiveType, self::DirectivesRequiringLocalKey)) {
                             $relationName = ASTHelper::directiveArgValue($directive, 'relation', $field);
@@ -84,16 +87,8 @@ class SelectHelper
                             $relationName = ASTHelper::directiveArgValue($directive, 'relation', $field);
 
                             if (method_exists($model, $relationName)) {
-                                if ($directiveType === 'belongsToMany') {
-                                    array_push($selectColumns, $model->{$relationName}()->getForeignPivotKeyName());
-                                } else {
-                                    array_push($selectColumns, $model->{$relationName}()->getForeignKeyName());
-                                }
+                                array_push($selectColumns, $model->{$relationName}()->getForeignKeyName());
                             }
-                        }
-
-                        if (in_array($directiveType, self::DirectivesIgnore)) {
-                            return [];
                         }
 
                         continue 2;
@@ -123,18 +118,10 @@ class SelectHelper
             }
         }
 
-        // for unit test query log check
-        try {
-            $allColumns = Schema::getColumnListing($model->getTable());
-        } catch (\Exception $e) {
-            // connection refuse
-            $allColumns = [];
-        }
+        $selectColumns = array_filter($selectColumns, function($column) use ($model) {
+            return !$model->hasGetMutator($column) && !method_exists($model, $column);
+        });
 
-        DB::enableQueryLog();
-
-        return !empty($allColumns)
-            ? array_intersect($allColumns, array_unique($selectColumns))
-            : array_unique($selectColumns);
+        return array_unique($selectColumns);
     }
 }

@@ -17,11 +17,6 @@ trait AssertsQueryCounts
     protected function countQueries(?int &$count): void
     {
         DB::listen(function ($query) use (&$count): void {
-            // ignore fetch column list.
-            if (Str::contains($query->sql, ['select column_name'])) {
-                return;
-            }
-
             ++$count;
         });
     }
