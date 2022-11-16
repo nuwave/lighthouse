@@ -6,6 +6,7 @@ use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Collection;
 use Laravel\Scout\Builder as ScoutBuilder;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -78,7 +79,23 @@ GRAPHQL;
                         return $builder->get();
                     }
 
-                    $builder = $builder->select($selectColumns);
+                    $query = $builder->getQuery();
+
+                    if ($query->columns !== null) {
+                        $bindings = $query->getRawBindings();
+
+                        $expressions = array_filter($query->columns, function ($column) {
+                            return $column instanceof Expression;
+                        });
+
+                        $builder = $builder->select(array_unique(array_merge($selectColumns, $expressions)));
+
+                        foreach ($bindings as $type => $binding) {
+                            $builder = $builder->addBinding($binding, $type);
+                        }
+                    } else {
+                        $builder = $builder->select($selectColumns);
+                    }
                 }
             }
 

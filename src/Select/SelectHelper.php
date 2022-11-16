@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Select;
 
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\UnionTypeDefinitionNode;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
@@ -37,15 +36,6 @@ class SelectHelper
 
         if (Str::contains($returnTypeName, ['SimplePaginator', 'Paginator'], true)) {
             $returnTypeName = Str::replace(['SimplePaginator', 'Paginator'], '', $returnTypeName);
-        }
-
-        // ignore relation closure, e.g. RelationOrderByClause
-        if (is_array($documentAST->types)) {
-            foreach (array_keys($documentAST->types) as $type) {
-                if (Str::contains($type, ['RelationOrderByClause'], true)) {
-                    return [];
-                }
-            }
         }
 
         $type = $documentAST->types[$returnTypeName];
