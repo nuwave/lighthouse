@@ -2,11 +2,15 @@
 
 namespace Nuwave\Lighthouse\Select;
 
+use GraphQL\Language\AST\DirectiveNode;
+use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\UnionTypeDefinitionNode;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 
 class SelectHelper
 {
@@ -20,18 +24,19 @@ class SelectHelper
 
     /**
      * Given a field definition node, resolve info, and a model name, return the SQL columns that should be selected.
-     * Accounts for relationships and the rename and select directives.
+     * Accounts for relationships and to rename and select directives.
      *
      * @param mixed[] $fieldSelection
      *
      * @return string[]
+     *
      * @reference https://github.com/nuwave/lighthouse/pull/1626
      */
     public static function getSelectColumns(Node $definitionNode, array $fieldSelection, string $modelName): array
     {
         $returnTypeName = ASTHelper::getUnderlyingTypeName($definitionNode);
 
-        /** @var \Nuwave\Lighthouse\Schema\AST\DocumentAST $documentAST */
+        /** @var DocumentAST $documentAST */
         $documentAST = app(ASTBuilder::class)->documentAST();
 
         if (Str::contains($returnTypeName, ['SimplePaginator', 'Paginator'], true)) {
@@ -44,9 +49,10 @@ class SelectHelper
             $type = $documentAST->types[ASTHelper::getUnderlyingTypeName($type->types[0])];
         }
 
-        /** @var iterable<\GraphQL\Language\AST\FieldDefinitionNode> $fieldDefinitions */
+        /** @var iterable<FieldDefinitionNode> $fieldDefinitions */
         $fieldDefinitions = $type->fields;
 
+        /** @var Model $model */
         $model = new $modelName();
 
         $selectColumns = [];
@@ -59,6 +65,7 @@ class SelectHelper
 
                 foreach ($directivesRequiringKeys as $directiveType) {
                     if (ASTHelper::hasDirective($fieldDefinition, $directiveType)) {
+                        /** @var DirectiveNode $directive */
                         $directive = ASTHelper::directiveDefinition($fieldDefinition, $directiveType);
 
                         if (in_array($directiveType, self::DirectivesReturn)) {
@@ -108,8 +115,8 @@ class SelectHelper
             }
         }
 
-        $selectColumns = array_filter($selectColumns, function($column) use ($model) {
-            return !$model->hasGetMutator($column) && !method_exists($model, $column);
+        $selectColumns = array_filter($selectColumns, function ($column) use ($model) {
+            return ! $model->hasGetMutator($column) && ! method_exists($model, $column);
         });
 
         return array_unique($selectColumns);

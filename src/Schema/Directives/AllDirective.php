@@ -66,7 +66,7 @@ GRAPHQL;
                 );
 
             if (config('lighthouse.optimized_selects')) {
-                if (($builder instanceof QueryBuilder || $builder instanceof EloquentBuilder) && !$this->directiveHasArgument('builder')) {
+                if (($builder instanceof QueryBuilder || $builder instanceof EloquentBuilder) && ! $this->directiveHasArgument('builder')) {
                     $fieldSelection = array_keys($resolveInfo->getFieldSelection(1));
 
                     $selectColumns = SelectHelper::getSelectColumns(
@@ -81,7 +81,7 @@ GRAPHQL;
 
                     $query = $builder->getQuery();
 
-                    if ($query->columns !== null) {
+                    if (null !== $query->columns) {
                         $bindings = $query->getRawBindings();
 
                         $expressions = array_filter($query->columns, function ($column) {

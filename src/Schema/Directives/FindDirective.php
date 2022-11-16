@@ -55,7 +55,7 @@ GRAPHQL;
                         $this->getModelClass()
                     );
 
-                    if (!empty($selectColumns)) {
+                    if (! empty($selectColumns)) {
                         $builder = $builder->select($selectColumns);
                     }
                 }

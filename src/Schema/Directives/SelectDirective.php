@@ -2,8 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-
 class SelectDirective extends BaseDirective
 {
     public static function definition(): string
