@@ -478,7 +478,7 @@ GRAPHQL
             ])->assertJson([
                 'data' => [
                     "{$action}Task" => [
-                        'id' => "$task->id",
+                        'id' => "{$task->id}",
                         'name' => $newTaskName,
                         'images' => [
                             [
@@ -530,7 +530,7 @@ GRAPHQL
             ])->assertJson([
                 'data' => [
                     "{$action}Task" => [
-                        'id' => "$task->id",
+                        'id' => "{$task->id}",
                         'name' => $newTaskName,
                         'images' => [],
                     ],
@@ -581,7 +581,7 @@ GRAPHQL
             ])->assertJson([
                 'data' => [
                     "{$action}Task" => [
-                        'id' => "$task->id",
+                        'id' => "{$task->id}",
                         'images' => [],
                     ],
                 ],

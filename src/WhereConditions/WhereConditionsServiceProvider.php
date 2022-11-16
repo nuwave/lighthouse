@@ -81,25 +81,25 @@ class WhereConditionsServiceProvider extends ServiceProvider
         $operatorDefault = $operator->default();
 
         return Parser::inputObjectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
-            "$description"
-            input $name {
+            "{$description}"
+            input {$name} {
                 "The column that is used for the condition."
-                column: $columnType
+                column: {$columnType}
 
                 "The operator that is used for the condition."
-                operator: $operatorName = $operatorDefault
+                operator: {$operatorName} = {$operatorDefault}
 
                 "The value that is used for the condition."
                 value: Mixed
 
                 "A set of conditions that requires all conditions to match."
-                AND: [$name!]
+                AND: [{$name}!]
 
                 "A set of conditions that requires at least one condition to match."
-                OR: [$name!]
+                OR: [{$name}!]
 
                 "Check whether a relation exists. Extra conditions or a minimum amount can be applied."
-                HAS: $hasRelationInputName
+                HAS: {$hasRelationInputName}
             }
 GRAPHQL
         );
@@ -121,19 +121,19 @@ GRAPHQL
         $operatorDefault = $operator->defaultHasOperator();
 
         return Parser::inputObjectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
-            "$description"
-            input $hasRelationInputName {
+            "{$description}"
+            input {$hasRelationInputName} {
                 "The relation that is checked."
                 relation: String!
 
                 "The comparison operator to test against the amount."
-                operator: $operatorName = $operatorDefault
+                operator: {$operatorName} = {$operatorDefault}
 
                 "The amount to test."
-                amount: Int = $defaultHasAmount
+                amount: Int = {$defaultHasAmount}
 
                 "Additional condition logic."
-                condition: $name
+                condition: {$name}
             }
 GRAPHQL
         );

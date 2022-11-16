@@ -50,7 +50,7 @@ final class ScopeDirectiveTest extends DBTestCase
             'data' => [
                 'tasks' => [
                     [
-                        'id' => "$taskWithTag->id",
+                        'id' => "{$taskWithTag->id}",
                     ],
                 ],
             ],
@@ -90,7 +90,7 @@ final class ScopeDirectiveTest extends DBTestCase
             'data' => [
                 'tasks' => [
                     [
-                        'id' => "$taskWithTag->id",
+                        'id' => "{$taskWithTag->id}",
                     ],
                 ],
             ],

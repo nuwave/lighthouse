@@ -2,6 +2,9 @@
 
 namespace Nuwave\Lighthouse\Pagination;
 
+use GraphQL\Type\Definition\InterfaceType;
+use GraphQL\Type\Definition\NonNull;
+use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\AbstractPaginator;
@@ -32,7 +35,7 @@ class ConnectionField
                 ? Cursor::encode($lastItem)
                 : null,
             'total' => $paginator->total(),
-            'count' => $paginator->count(),
+            'count' => count($paginator->items()),
             'currentPage' => $paginator->currentPage(),
             'lastPage' => $paginator->lastPage(),
         ];
@@ -46,10 +49,11 @@ class ConnectionField
     public function edgeResolver(AbstractPaginator $paginator, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Collection
     {
         // We know those types because we manipulated them during PaginationManipulator
-        /** @var \GraphQL\Type\Definition\NonNull $nonNullList */
         $nonNullList = $resolveInfo->returnType;
-        /** @var \GraphQL\Type\Definition\ObjectType|\GraphQL\Type\Definition\InterfaceType $objectLikeType */
-        $objectLikeType = $nonNullList->getWrappedType(true);
+        assert($nonNullList instanceof NonNull);
+
+        $objectLikeType = $nonNullList->getInnermostType();
+        assert($objectLikeType instanceof ObjectType || $objectLikeType instanceof InterfaceType);
 
         $returnTypeFields = $objectLikeType->getFields();
 

@@ -14,11 +14,6 @@ final class IntrospectionTest extends TestCase
      */
     protected $typeRegistry;
 
-    /**
-     * @var \Illuminate\Testing\TestResponse|null
-     */
-    protected $introspectionResult;
-
     public function setUp(): void
     {
         parent::setUp();

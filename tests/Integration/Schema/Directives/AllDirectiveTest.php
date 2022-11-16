@@ -265,7 +265,7 @@ final class AllDirectiveTest extends DBTestCase
 
         $this->engine->shouldReceive('map')
             ->withArgs(function (ScoutBuilder $builder) use ($post): bool {
-                return $builder->wheres === ['id' => "$post->id"]
+                return $builder->wheres === ['id' => "{$post->id}"]
                     && self::LIMIT_FROM_CUSTOM_SCOUT_BUILDER === $builder->limit;
             })
             ->andReturn(new EloquentCollection([$post]))
@@ -295,7 +295,7 @@ GRAPHQL;
             'data' => [
                 'posts' => [
                     [
-                        'id' => "$post->id",
+                        'id' => "{$post->id}",
                     ],
                 ],
             ],

@@ -16,8 +16,8 @@ final class IdeHelperCommandTest extends TestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = $app->make(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
 
         $config->set('lighthouse.namespaces.directives', [
             // Contains an overwritten UnionDirective
@@ -34,6 +34,7 @@ final class IdeHelperCommandTest extends TestCase
     {
         $typeRegistry = $this->app->make(TypeRegistry::class);
         assert($typeRegistry instanceof TypeRegistry);
+
         $programmaticType = new EnumType([
             'name' => 'Foo',
             'values' => [

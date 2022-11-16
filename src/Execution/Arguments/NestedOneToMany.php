@@ -24,8 +24,8 @@ class NestedOneToMany implements ArgResolver
      */
     public function __invoke($parent, $args): void
     {
-        /** @var \Illuminate\Database\Eloquent\Relations\HasMany|\Illuminate\Database\Eloquent\Relations\MorphMany $relation */
         $relation = $parent->{$this->relationName}();
+        assert($relation instanceof HasMany || $relation instanceof MorphMany);
 
         static::createUpdateUpsert($args, $relation);
         static::connectDisconnect($args, $relation);
@@ -93,8 +93,8 @@ class NestedOneToMany implements ArgResolver
                 )
                 ->get();
 
-            /** @var \Illuminate\Database\Eloquent\Model $child */
             foreach ($children as $child) {
+                assert($child instanceof Model);
                 $child->setAttribute($relation->getForeignKeyName(), null);
                 $child->save();
             }

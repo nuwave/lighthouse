@@ -402,7 +402,7 @@ GRAPHQL
         )->assertJson([
             'data' => [
                 "{$action}User" => [
-                    'id' => "$user->id",
+                    'id' => "{$user->id}",
                     'name' => 'foo',
                     'tasks' => [
                         [
@@ -452,7 +452,7 @@ GRAPHQL
         )->assertJson([
             'data' => [
                 "{$action}User" => [
-                    'id' => "$user->id",
+                    'id' => "{$user->id}",
                     'name' => 'foo',
                     'tasks' => [
                         [
@@ -499,7 +499,7 @@ GRAPHQL
         )->assertJson([
             'data' => [
                 "{$action}User" => [
-                    'id' => "$user->id",
+                    'id' => "{$user->id}",
                     'name' => 'foo',
                     'tasks' => [],
                 ],
@@ -547,15 +547,15 @@ GRAPHQL
         )->assertJson([
             'data' => [
                 "{$action}User" => [
-                    'id' => "$user->id",
+                    'id' => "{$user->id}",
                     'name' => 'foo',
                     'tasks' => [
                         [
-                            'id' => "$task1->id",
+                            'id' => "{$task1->id}",
                             'name' => $task1->name,
                         ],
                         [
-                            'id' => "$task2->id",
+                            'id' => "{$task2->id}",
                             'name' => $task2->name,
                         ],
                     ],
@@ -607,11 +607,11 @@ GRAPHQL
         ])->assertJson([
             'data' => [
                 "{$action}User" => [
-                    'id' => "$user->id",
+                    'id' => "{$user->id}",
                     'name' => 'foo',
                     'tasks' => [
                         [
-                            'id' => "$taskKeep->id",
+                            'id' => "{$taskKeep->id}",
                             'name' => $taskKeep->name,
                         ],
                     ],

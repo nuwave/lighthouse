@@ -15,7 +15,7 @@ final class LimitDirectiveTest extends DBTestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        $this->useSerializingArrayStore($app);
+        $this->useSerializingArrayStore();
     }
 
     public function testLimitsResults(): void

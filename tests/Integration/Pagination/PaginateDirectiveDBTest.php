@@ -157,7 +157,7 @@ GRAPHQL;
 
         $this->engine->shouldReceive('map')
             ->withArgs(function (ScoutBuilder $builder) use ($post): bool {
-                return $builder->wheres === ['id' => "$post->id"]
+                return $builder->wheres === ['id' => "{$post->id}"]
                     && self::LIMIT_FROM_CUSTOM_SCOUT_BUILDER === $builder->limit;
             })
             ->andReturn(new EloquentCollection([$post]))
@@ -204,7 +204,7 @@ GRAPHQL;
                 'posts' => [
                     'data' => [
                         [
-                            'id' => "$post->id",
+                            'id' => "{$post->id}",
                         ],
                     ],
                 ],
@@ -257,7 +257,7 @@ GRAPHQL;
                     ],
                     'data' => [
                         [
-                            'id' => "$namedUser->id",
+                            'id' => "{$namedUser->id}",
                         ],
                     ],
                 ],

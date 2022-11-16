@@ -21,7 +21,7 @@ final class SchemaCachingTest extends TestCase
         parent::setUp();
 
         $this->setUpSchemaCache();
-        $this->useSerializingArrayStore($this->app);
+        $this->useSerializingArrayStore();
     }
 
     protected function tearDown(): void

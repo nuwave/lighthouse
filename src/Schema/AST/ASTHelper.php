@@ -129,7 +129,7 @@ class ASTHelper
         }
 
         throw new DefinitionException(
-            "The node '$node->kind' does not have a type associated with it."
+            "The node '{$node->kind}' does not have a type associated with it."
         );
     }
 
@@ -393,7 +393,7 @@ class ASTHelper
 
         $type = $documentAST->types[$typeName] ?? null;
         if (null === $type) {
-            throw new DefinitionException("Type '$typeName' on '{$field->name->value}' can not be found in the schema.'");
+            throw new DefinitionException("Type '{$typeName}' on '{$field->name->value}' can not be found in the schema.'");
         }
 
         return $type;
