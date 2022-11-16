@@ -3,7 +3,6 @@
 namespace Tests\Integration\Schema\Directives;
 
 use GraphQL\Type\Definition\Type;
-use Illuminate\Container\Container;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
