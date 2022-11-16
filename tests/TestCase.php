@@ -36,6 +36,13 @@ abstract class TestCase extends BaseTestCase
     use UsesTestSchema;
 
     /**
+     * Set when not in setUp.
+     *
+     * @var \Illuminate\Foundation\Application
+     */
+    protected $app;
+
+    /**
      * A dummy query type definition that is added to tests by default.
      */
     public const PLACEHOLDER_QUERY = /** @lang GraphQL */ <<<'GRAPHQL'
