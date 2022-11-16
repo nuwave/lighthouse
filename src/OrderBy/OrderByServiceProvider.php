@@ -85,10 +85,10 @@ class OrderByServiceProvider extends ServiceProvider
     public static function createOrderByClauseInput(string $name, string $description, string $columnType): InputObjectTypeDefinitionNode
     {
         return Parser::inputObjectTypeDefinition(/* @lang GraphQL */ <<<GRAPHQL
-            "$description"
-            input $name {
+            "{$description}"
+            input {$name} {
                 "The column that is used for ordering."
-                column: $columnType!
+                column: {$columnType}!
 
                 "The direction that is used for ordering."
                 order: SortOrder!
@@ -105,8 +105,8 @@ GRAPHQL
     public static function createRelationAggregateFunctionInput(string $name, string $description): InputObjectTypeDefinitionNode
     {
         return Parser::inputObjectTypeDefinition(/* @lang GraphQL */ <<<GRAPHQL
-            "$description"
-            input $name {
+            "{$description}"
+            input {$name} {
                 "Always COUNT."
                 aggregate: OrderByRelationAggregateFunction!
             }
@@ -117,13 +117,13 @@ GRAPHQL
     public static function createRelationAggregateFunctionForColumnInput(string $name, string $description, string $columnType): InputObjectTypeDefinitionNode
     {
         return Parser::inputObjectTypeDefinition(/* @lang GraphQL */ <<<GRAPHQL
-            "$description"
-            input $name {
+            "{$description}"
+            input {$name} {
                 "The aggregate function to apply to the column."
                 aggregate: OrderByRelationWithColumnAggregateFunction!
 
                 "Name of the column to use."
-                column: $columnType
+                column: {$columnType}
             }
 GRAPHQL
         );

@@ -964,7 +964,7 @@ GRAPHQL;
             'data' => [
                 'users' => [
                     [
-                        'id' => "$user2->id",
+                        'id' => "{$user2->id}",
                     ],
                 ],
             ],

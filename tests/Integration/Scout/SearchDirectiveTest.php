@@ -416,10 +416,10 @@ final class SearchDirectiveTest extends DBTestCase
                 'posts' => [
                     'data' => [
                         [
-                            'id' => "$postA->id",
+                            'id' => "{$postA->id}",
                         ],
                         [
-                            'id' => "$postB->id",
+                            'id' => "{$postB->id}",
                         ],
                     ],
                 ],

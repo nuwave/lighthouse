@@ -217,7 +217,7 @@ GRAPHQL;
                 "Order by clause for {$parentType->name->value}.{$parentField->name->value}.{$argDefinition->name->value}."
                 input {$qualifiedRelationOrderByName} {
                     "The column that is used for ordering."
-                    column: $allowedColumnsTypeName {$this->mutuallyExclusiveRule($relationNames)}
+                    column: {$allowedColumnsTypeName} {$this->mutuallyExclusiveRule($relationNames)}
 
                     "The direction that is used for ordering."
                     order: SortOrder!

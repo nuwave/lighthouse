@@ -54,7 +54,7 @@ class EnsureXHR
         }
 
         if (Str::startsWith($contentType, static::FORM_CONTENT_TYPES)) {
-            throw new BadRequestHttpException("Content-Type $contentType is forbidden");
+            throw new BadRequestHttpException("Content-Type {$contentType} is forbidden");
         }
 
         return $next($request);
