@@ -5,14 +5,18 @@ namespace Nuwave\Lighthouse\Schema\Factories;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Pipeline\Pipeline;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ComplexityResolverDirective;
+use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -28,6 +32,16 @@ use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 class FieldFactory
 {
     /**
+     * @var \Illuminate\Pipeline\Pipeline
+     */
+    protected $pipeline;
+
+    /**
+     * @var \Illuminate\Contracts\Config\Repository
+     */
+    protected $config;
+
+    /**
      * @var \Nuwave\Lighthouse\Schema\DirectiveLocator
      */
     protected $directiveLocator;
@@ -38,24 +52,21 @@ class FieldFactory
     protected $argumentFactory;
 
     /**
-     * @var \Illuminate\Pipeline\Pipeline
-     */
-    protected $pipeline;
-
-    /**
      * @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory
      */
     protected $argumentSetFactory;
 
     public function __construct(
+        Pipeline $pipeline,
+        ConfigRepository $config,
         DirectiveLocator $directiveLocator,
         ArgumentFactory $argumentFactory,
-        Pipeline $pipeline,
         ArgumentSetFactory $argumentSetFactory
     ) {
+        $this->pipeline = $pipeline;
+        $this->config = $config;
         $this->directiveLocator = $directiveLocator;
         $this->argumentFactory = $argumentFactory;
-        $this->pipeline = $pipeline;
         $this->argumentSetFactory = $argumentSetFactory;
     }
 
@@ -78,18 +89,24 @@ class FieldFactory
 
         // Middleware resolve in reversed order
 
-        $globalFieldMiddleware = array_reverse(
-            config('lighthouse.field_middleware')
-        );
+        $globalFieldMiddleware = (new Collection($this->config->get('lighthouse.field_middleware')))
+            ->reverse()
+            ->map(function (string $middlewareDirective): Directive {
+                return Container::getInstance()->make($middlewareDirective);
+            })
+            ->each(function (Directive $directive) use ($fieldDefinitionNode): void {
+                if ($directive instanceof BaseDirective) {
+                    $directive->definitionNode = $fieldDefinitionNode;
+                }
+            });
 
         $fieldMiddleware = $this->directiveLocator
             ->associatedOfType($fieldDefinitionNode, FieldMiddleware::class)
-            ->reverse()
-            ->all();
+            ->reverse();
 
         $resolverWithMiddleware = $this->pipeline
             ->send($fieldValue)
-            ->through(array_merge($fieldMiddleware, $globalFieldMiddleware))
+            ->through(array_merge($fieldMiddleware->all(), $globalFieldMiddleware->all()))
             ->via('handleField')
             ->thenReturn()
             ->getResolver();
@@ -134,7 +151,6 @@ class FieldFactory
      */
     protected function complexity(FieldValue $fieldValue): ?callable
     {
-        /** @var \Nuwave\Lighthouse\Support\Contracts\ComplexityResolverDirective|null $complexityDirective */
         $complexityDirective = $this->directiveLocator->exclusiveOfType(
             $fieldValue->getField(),
             ComplexityResolverDirective::class
@@ -143,6 +159,7 @@ class FieldFactory
         if (null === $complexityDirective) {
             return null;
         }
+        assert($complexityDirective instanceof ComplexityResolverDirective);
 
         return $complexityDirective->complexityResolver($fieldValue);
     }

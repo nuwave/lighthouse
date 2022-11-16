@@ -29,6 +29,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove `Serializable` implementation
 - Remove trait `ClearsSchemaCache`
 
+## v5.64.1
+
+### Fixed
+
+- Handle unset properties in `field_middleware` directives https://github.com/nuwave/lighthouse/pull/2224
+
 ## v5.64.0
 
 ### Changed
