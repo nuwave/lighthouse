@@ -32,7 +32,7 @@ class ConnectionField
                 ? Cursor::encode($lastItem)
                 : null,
             'total' => $paginator->total(),
-            'count' => $paginator->count(),
+            'count' => count($paginator->items()),
             'currentPage' => $paginator->currentPage(),
             'lastPage' => $paginator->lastPage(),
         ];

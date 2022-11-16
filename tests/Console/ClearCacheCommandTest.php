@@ -3,6 +3,7 @@
 namespace Tests\Console;
 
 use Illuminate\Cache\Repository as CacheRepository;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Filesystem\Filesystem;
 use Nuwave\Lighthouse\Console\ClearCacheCommand;
@@ -41,8 +42,9 @@ final class ClearCacheCommandTest extends TestCase
 
         $key = $this->config->get('lighthouse.cache.key');
 
-        /** @var \Illuminate\Cache\Repository $cache */
-        $cache = $this->app->make(CacheRepository::class);
+        $cache = Container::getInstance()->make(CacheRepository::class);
+        assert($cache instanceof CacheRepository);
+
         $cache->put($key, 'foo', 60);
         $this->assertTrue($cache->has($key));
 
@@ -54,8 +56,8 @@ final class ClearCacheCommandTest extends TestCase
     {
         $this->config->set('lighthouse.cache.version', 2);
 
-        /** @var \Illuminate\Filesystem\Filesystem $filesystem */
-        $filesystem = $this->app->make(Filesystem::class);
+        $filesystem = Container::getInstance()->make(Filesystem::class);
+        assert($filesystem instanceof Filesystem);
 
         $path = $this->schemaCachePath();
         $filesystem->put($path, 'foo');
