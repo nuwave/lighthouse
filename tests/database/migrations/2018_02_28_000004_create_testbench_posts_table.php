@@ -20,12 +20,6 @@ final class CreateTestbenchPostsTable extends Migration
             $table->timestamps();
             $table->softDeletes();
         });
-
-        Schema::table('posts', function (Blueprint $table): void {
-            $table->foreign('parent_id')
-                ->references('id')
-                ->on('posts');
-        });
     }
 
     public function down(): void

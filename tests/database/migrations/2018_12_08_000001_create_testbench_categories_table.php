@@ -15,8 +15,6 @@ final class CreateTestbenchCategoriesTable extends Migration
             $table->unsignedInteger('parent_id')->nullable();
 
             $table->timestamps();
-
-            $table->foreign('parent_id')->references('category_id')->on('categories');
         });
     }
 
