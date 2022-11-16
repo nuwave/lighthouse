@@ -52,7 +52,7 @@ class ConnectionField
         $nonNullList = $resolveInfo->returnType;
         assert($nonNullList instanceof NonNull);
 
-        $objectLikeType = $nonNullList->getInnermostType();
+        $objectLikeType = $nonNullList->getWrappedType(true);
         assert($objectLikeType instanceof ObjectType || $objectLikeType instanceof InterfaceType);
 
         $returnTypeFields = $objectLikeType->getFields();
