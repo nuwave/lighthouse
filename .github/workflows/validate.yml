@@ -52,7 +52,7 @@ jobs:
             laravel-version: ^7
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - uses: shivammathur/setup-php@v2
         with:
@@ -61,7 +61,7 @@ jobs:
           php-version: ${{ matrix.php-version }}
 
       - name: "Cache composer dependencies"
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         with:
           path: ~/.composer/cache
           key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}
@@ -132,7 +132,7 @@ jobs:
             laravel-version: ^7
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - uses: supercharge/redis-github-action@1.1.0
         with:
@@ -144,7 +144,7 @@ jobs:
           php-version: ${{ matrix.php-version }}
 
       - name: "Cache composer dependencies"
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         with:
           path: ~/.composer/cache
           key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}
@@ -180,7 +180,7 @@ jobs:
           - ^8
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - uses: supercharge/redis-github-action@1.1.0
         with:
@@ -193,7 +193,7 @@ jobs:
           php-version: ${{ matrix.php-version }}
 
       - name: "Cache composer dependencies"
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         with:
           path: ~/.composer/cache
           key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}
@@ -227,7 +227,7 @@ jobs:
           - ^8
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - uses: shivammathur/setup-php@v2
         with:
@@ -235,7 +235,7 @@ jobs:
           php-version: ${{ matrix.php-version }}
 
       - name: "Cache composer dependencies"
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         with:
           path: ~/.composer/cache
           key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}

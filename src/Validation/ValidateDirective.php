@@ -44,7 +44,7 @@ GRAPHQL;
             if ($validator->fails()) {
                 $path = implode('.', $resolveInfo->path);
 
-                throw new ValidationException("Validation failed for the field [$path].", $validator);
+                throw new ValidationException("Validation failed for the field [{$path}].", $validator);
             }
 
             return $resolver($root, $args, $context, $resolveInfo);

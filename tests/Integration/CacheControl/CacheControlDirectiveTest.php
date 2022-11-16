@@ -150,7 +150,7 @@ final class CacheControlDirectiveTest extends DBTestCase
         $this->schema /** @lang GraphQL */ = "
         type User {
             id: ID!
-            name: String $directive
+            name: String {$directive}
         }
 
         type Query {

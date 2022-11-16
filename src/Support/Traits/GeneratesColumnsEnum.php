@@ -95,7 +95,7 @@ GRAPHQL;
 
         return Parser::enumTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
 "Allowed column names for {$parentType->name->value}.{$parentField->name->value}.{$argDefinition->name->value}."
-enum $allowedColumnsEnumName {
+enum {$allowedColumnsEnumName} {
     {$enumValuesString}
 }
 GRAPHQL

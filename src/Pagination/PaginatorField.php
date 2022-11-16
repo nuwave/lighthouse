@@ -12,17 +12,17 @@ class PaginatorField
      *
      * @return array<string, mixed>
      */
-    public function paginatorInfoResolver(LengthAwarePaginator $root): array
+    public function paginatorInfoResolver(LengthAwarePaginator $paginator): array
     {
         return [
-            'count' => $root->count(),
-            'currentPage' => $root->currentPage(),
-            'firstItem' => $root->firstItem(),
-            'hasMorePages' => $root->hasMorePages(),
-            'lastItem' => $root->lastItem(),
-            'lastPage' => $root->lastPage(),
-            'perPage' => $root->perPage(),
-            'total' => $root->total(),
+            'count' => count($paginator->items()),
+            'currentPage' => $paginator->currentPage(),
+            'firstItem' => $paginator->firstItem(),
+            'hasMorePages' => $paginator->hasMorePages(),
+            'lastItem' => $paginator->lastItem(),
+            'lastPage' => $paginator->lastPage(),
+            'perPage' => $paginator->perPage(),
+            'total' => $paginator->total(),
         ];
     }
 
@@ -31,8 +31,8 @@ class PaginatorField
      *
      * @return array<mixed>
      */
-    public function dataResolver(AbstractPaginator $root): array
+    public function dataResolver(AbstractPaginator $paginator): array
     {
-        return $root->items();
+        return $paginator->items();
     }
 }
