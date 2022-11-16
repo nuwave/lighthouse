@@ -42,7 +42,7 @@ final class ClearCacheCommandTest extends TestCase
 
         $key = $this->config->get('lighthouse.cache.key');
 
-        $cache = Container::getInstance()->make(CacheRepository::class);
+        $cache = $this->app->make(CacheRepository::class);
         assert($cache instanceof CacheRepository);
 
         $cache->put($key, 'foo', 60);
@@ -56,7 +56,7 @@ final class ClearCacheCommandTest extends TestCase
     {
         $this->config->set('lighthouse.cache.version', 2);
 
-        $filesystem = Container::getInstance()->make(Filesystem::class);
+        $filesystem = $this->app->make(Filesystem::class);
         assert($filesystem instanceof Filesystem);
 
         $path = $this->schemaCachePath();

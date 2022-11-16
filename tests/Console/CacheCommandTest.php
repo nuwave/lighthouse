@@ -27,7 +27,7 @@ final class CacheCommandTest extends TestCase
     {
         parent::setUp();
 
-        $this->config = Container::getInstance()->make(ConfigRepository::class);
+        $this->config = $this->app->make(ConfigRepository::class);
 
         $this->setUpSchemaCache();
         $this->useSerializingArrayStore();
@@ -48,7 +48,7 @@ final class CacheCommandTest extends TestCase
 
         $key = $this->config->get('lighthouse.cache.key');
 
-        $cache = Container::getInstance()->make(CacheRepository::class);
+        $cache = $this->app->make(CacheRepository::class);
         assert($cache instanceof CacheRepository);
         $this->assertFalse($cache->has($key));
 
@@ -62,7 +62,7 @@ final class CacheCommandTest extends TestCase
     {
         $this->config->set('lighthouse.cache.version', 2);
 
-        $filesystem = Container::getInstance()->make(Filesystem::class);
+        $filesystem = $this->app->make(Filesystem::class);
         assert($filesystem instanceof Filesystem);
 
         $path = $this->schemaCachePath();
