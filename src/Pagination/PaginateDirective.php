@@ -45,6 +45,13 @@ directive @paginate(
   builder: String
 
   """
+  Reference a function to customize the resolving the paginator by returning a LengthAwarePaginator instance from it.
+  Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
+  """
+  resolver: String
+
+  """
   Apply scopes to the underlying query.
   """
   scopes: [String!]
@@ -90,7 +97,9 @@ GRAPHQL;
     {
         $paginationManipulator = new PaginationManipulator($documentAST);
 
-        if ($this->directiveHasArgument('builder')) {
+        if ($this->directiveHasArgument('resolver')) {
+            $this->getResolverFromArgument('resolver');
+        } elseif ($this->directiveHasArgument('builder')) {
             // This is done only for validation
             $this->getResolverFromArgument('builder');
         } else {
@@ -111,15 +120,23 @@ GRAPHQL;
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
         $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Paginator {
+            if ($this->directiveHasArgument('resolver')) {
+                $builderResolver = $this->getResolverFromArgument('resolver');
+
+                $query = $builderResolver($root, $args, $context, $resolveInfo);
+
+                assert(
+                    $query instanceof LengthAwarePaginator,
+                    "The method referenced by the resolver argument of the @{$this->name()} directive on {$this->nodeName()} must return a LengthAwarePaginator."
+                );
+
+                return $query;
+            }
+
             if ($this->directiveHasArgument('builder')) {
                 $builderResolver = $this->getResolverFromArgument('builder');
 
-
                 $query = $builderResolver($root, $args, $context, $resolveInfo);
-                if ($query instanceof LengthAwarePaginator) {
-                    // Bypass if builder returns the paginator data itself
-                    return $query;
-                }
 
                 assert(
                     $query instanceof QueryBuilder || $query instanceof EloquentBuilder || $query instanceof ScoutBuilder || $query instanceof Relation,

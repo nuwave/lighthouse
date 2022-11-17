@@ -708,15 +708,15 @@ GRAPHQL
             [
                 'id' => 2,
             ],
-        ], 10, 15);
+        ], 2, 15);
     }
 
-    public function testBypassPaginatorBuilders(): void
+    public function testPaginatorResolver(): void
     {
         $builder = addslashes(static::class).'@returnPaginatedDataInsteadOfBuilder';
         $this->schema = $this->buildSchema(/* @lang GraphQL */ "
             type Query {
-                users: [User] @paginate(builder: \"{$builder}\")
+                users: [User] @paginate(resolver: \"{$builder}\")
             }
 
             type User {
@@ -742,5 +742,17 @@ GRAPHQL
                 ],
             ],
         ]);
+    }
+
+    public function testThrowsIfResolverIsNotPresent(): void
+    {
+        $this->expectException(DefinitionException::class);
+        $this->expectExceptionMessage('Failed to find class NonexistingClass in namespaces [] for directive @paginate.');
+
+        $this->buildSchema(/** @lang GraphQL */ '
+        type Query {
+            users: [Query!] @paginate(resolver: "NonexistingClass@notFound")
+        }
+        ');
     }
 }

@@ -2433,6 +2433,13 @@ directive @paginate(
   builder: String
 
   """
+  Reference a function to customize the resolving the paginator by returning a LengthAwarePaginator instance from it.
+  Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
+  """
+  resolver: String
+
+  """
   Apply scopes to the underlying query.
   """
   scopes: [String!]
@@ -2757,6 +2764,39 @@ class Blog
             ->groupBy(...);
     }
 }
+```
+
+### Custom resolver
+
+You can provide your own function to return paginated data instead of using eloquent.
+
+```graphql
+type Query {
+  posts: [Post!]!
+    @paginate(resolver: "App\\Resolver\\Posts@userPosts")
+}
+```
+
+A custom resolver function may look like the following.
+
+```php
+namespace App\Resolver;
+
+use Illuminate\Pagination\LengthAwarePaginator;
+
+class Posts {
+    public function userPosts($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Builder
+    {
+        //...apply your logic
+        return new LengthAwarePaginator([
+            [
+                "ID" => 1,
+            ],
+            [
+                "ID" => 2,
+            ],
+        ], 2, 15);
+    }
 ```
 
 ## @rename
