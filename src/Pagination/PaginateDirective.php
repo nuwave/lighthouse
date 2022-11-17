@@ -45,7 +45,8 @@ directive @paginate(
   builder: String
 
   """
-  Reference a function to customize the resolving the paginator by returning a LengthAwarePaginator instance from it.
+  Reference a function to customize the resolving the paginator by returning directly a LengthAwarePaginator instance.
+  This is mutually exclusive with builder and model and other options such as scopes will have no impact when it is used.
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
   If you pass only a class name, the method name defaults to `__invoke`.
   """

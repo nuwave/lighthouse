@@ -2770,6 +2770,8 @@ class Blog
 
 You can provide your own function to return paginated data instead of using eloquent.
 
+This is mutually exclusive with builder and model and other options such as scopes will have no impact when it is used.
+
 ```graphql
 type Query {
   posts: [Post!]!
