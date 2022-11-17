@@ -11,6 +11,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## v5.64.1
 
+### Added
+
+- Support for returning LenghtAwarePaginator directly from @paginator directive's builder 
+
 ### Fixed
 
 - Handle unset properties in `field_middleware` directives https://github.com/nuwave/lighthouse/pull/2224
