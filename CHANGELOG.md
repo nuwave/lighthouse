@@ -13,7 +13,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
-- Support for returning LenghtAwarePaginator directly from @paginator directive's resolver https://github.com/nuwave/lighthouse/pull/2232
+- Support for returning LengthAwarePaginator directly from @paginator directive's resolver https://github.com/nuwave/lighthouse/pull/2232
 
 ### Fixed
 
