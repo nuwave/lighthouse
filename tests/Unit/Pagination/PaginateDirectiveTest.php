@@ -6,6 +6,7 @@ use GraphQL\Type\Definition\FieldArgument;
 use GraphQL\Type\Definition\FieldDefinition;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Utils\SchemaPrinter;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Nuwave\Lighthouse\Pagination\PaginationType;
@@ -695,5 +696,51 @@ GRAPHQL
             }
         }
         ')->dump();
+    }
+
+
+    public function returnPaginatedDataInsteadOfBuilder(): LengthAwarePaginator
+    {
+        return new LengthAwarePaginator([
+            [
+                'id' => 1,
+            ],
+            [
+                'id' => 2,
+            ],
+        ], 10, 15);
+    }
+
+    public function testBypassPaginatorBuilders(): void
+    {
+        $builder = addslashes(static::class).'@returnPaginatedDataInsteadOfBuilder';
+        $this->schema = $this->buildSchema(/* @lang GraphQL */ "
+            type Query {
+                users: [User] @paginate(builder: \"{$builder}\")
+            }
+
+            type User {
+                id: ID
+            }
+            ");
+
+        $this->graphQL(/* @lang GraphQL */ '
+        {
+            users(first: 0) {
+                data {
+                    id
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'users' => [
+                    'data' => [
+                        ['id' => 1],
+                        ['id' => 2],
+                    ],
+                ],
+            ],
+        ]);
     }
 }
