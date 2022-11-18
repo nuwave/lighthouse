@@ -9,8 +9,8 @@ use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Laravel\Scout\Builder as ScoutBuilder;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -98,9 +98,19 @@ GRAPHQL;
     {
         $paginationManipulator = new PaginationManipulator($documentAST);
 
-        if ($this->directiveHasArgument('resolver')) {
+        $directiveHasBuilderArgument = $this->directiveHasArgument('builder');
+        $directiveHasResolverArgument = $this->directiveHasArgument('resolver');
+        $directiveHasModelArgument = $this->directiveHasArgument('model');
+
+        if($directiveHasResolverArgument && ($directiveHasModelArgument || $directiveHasBuilderArgument)){
+            throw new DefinitionException(
+                "Argument 'resolver' is mutually exclusive with 'builder' and 'model'."
+            );
+        }
+
+        if ($directiveHasResolverArgument) {
             $this->getResolverFromArgument('resolver');
-        } elseif ($this->directiveHasArgument('builder')) {
+        } elseif ($directiveHasBuilderArgument) {
             // This is done only for validation
             $this->getResolverFromArgument('builder');
         } else {
@@ -127,8 +137,8 @@ GRAPHQL;
                 $query = $builderResolver($root, $args, $context, $resolveInfo);
 
                 assert(
-                    $query instanceof LengthAwarePaginator,
-                    "The method referenced by the resolver argument of the @{$this->name()} directive on {$this->nodeName()} must return a LengthAwarePaginator."
+                    $query instanceof Paginator,
+                    "The method referenced by the resolver argument of the @{$this->name()} directive on {$this->nodeName()} must return a Paginator."
                 );
 
                 return $query;

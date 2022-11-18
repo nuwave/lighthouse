@@ -755,4 +755,38 @@ GRAPHQL
         }
         ');
     }
+
+    public function testThrowsIfResolverIsPresentWithBuilder(): void
+    {
+        $builder = addslashes(static::class).'@returnPaginatedDataInsteadOfBuilder';
+        $this->expectException(DefinitionException::class);
+        $this->expectExceptionMessage("Argument 'resolver' is mutually exclusive with 'builder' and 'model'.");
+
+        $this->buildSchema(/* @lang GraphQL */ "
+            type Query {
+                users: [User] @paginate(resolver: \"{$builder}\" builder: \"{$builder}\")
+            }
+
+            type User {
+                id: ID
+            }
+            ");
+    }
+
+    public function testThrowsIfResolverIsPresentWithModel(): void
+    {
+        $builder = addslashes(static::class).'@returnPaginatedDataInsteadOfBuilder';
+        $this->expectException(DefinitionException::class);
+        $this->expectExceptionMessage("Argument 'resolver' is mutually exclusive with 'builder' and 'model'.");
+
+        $this->buildSchema(/* @lang GraphQL */ "
+            type Query {
+                users: [User] @paginate(resolver: \"{$builder}\" builder: \"{$builder}\")
+            }
+
+            type User {
+                id: ID
+            }
+            ");
+    }
 }
