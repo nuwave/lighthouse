@@ -132,16 +132,14 @@ GRAPHQL;
     {
         $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Paginator {
             if ($this->directiveHasArgument('resolver')) {
-                $resolverResolver = $this->getResolverFromArgument('resolver');
-
-                $query = $resolverResolver($root, $args, $context, $resolveInfo);
+                $paginator = $this->getResolverFromArgument('resolver')($root, $args, $context, $resolveInfo);
 
                 assert(
-                    $query instanceof Paginator,
+                    $paginator instanceof Paginator,
                     "The method referenced by the resolver argument of the @{$this->name()} directive on {$this->nodeName()} must return a Paginator."
                 );
 
-                return $query;
+                return $paginator;
             }
 
             if ($this->directiveHasArgument('builder')) {
