@@ -2793,10 +2793,12 @@ class Posts {
         //...apply your logic
         return new LengthAwarePaginator([
             [
-                "ID" => 1,
+                'id' => 1,
+                'title' => 'Flying teacup found in solar orbit',
             ],
             [
-                "ID" => 2,
+                'id' => 2,
+                'title' => 'What actually is the difference between cookies and biscuits?',
             ],
         ], 2, 15);
     }
