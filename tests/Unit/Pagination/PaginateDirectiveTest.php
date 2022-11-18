@@ -750,7 +750,7 @@ GRAPHQL
 
         $this->buildSchema(/** @lang GraphQL */ '
         type Query {
-            users: [Query!] @paginate(resolver: "NonexistingClass@notFound")
+            users: [Query!]! @paginate(resolver: "NonexistingClass@notFound")
         }
         ');
     }
