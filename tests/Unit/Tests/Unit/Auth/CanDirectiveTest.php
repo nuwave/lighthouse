@@ -4,6 +4,7 @@ namespace Tests\Unit\Auth;
 
 use Nuwave\Lighthouse\Auth\CanDirective;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\TestCase;
 use Tests\Utils\Models\User;
@@ -352,7 +353,7 @@ final class CanDirectiveTest extends TestCase
      */
     public function testMultipleMutuallyExclusiveArgument(string $arguments): void
     {
-        $this->expectExceptionObject(CanDirective::multipleMutuallyExclusiveArguments());
+        $this->expectExceptionObject(new DefinitionException('foo'));
 
         $this->buildSchema(/** @lang GraphQL */ <<<GRAPHQL
         type Query {

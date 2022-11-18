@@ -281,19 +281,6 @@ GRAPHQL;
 
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType)
     {
-        $mutuallyExclusive = [
-            $this->directiveHasArgument('resolve'),
-            $this->directiveHasArgument('query'),
-            $this->directiveHasArgument('find'),
-        ];
-
-        if (count(array_filter($mutuallyExclusive)) > 1) {
-            throw self::multipleMutuallyExclusiveArguments();
-        }
-    }
-
-    public static function multipleMutuallyExclusiveArguments(): DefinitionException
-    {
-        return new DefinitionException('The arguments `resolve`, `query` and `find` are mutually exclusive in the `@can` directive.');
+        $this->validateMutuallyExclusiveArguments(['resolve', 'query', 'find']);
     }
 }
