@@ -714,7 +714,7 @@ GRAPHQL
     public function testPaginatorResolver(): void
     {
         $builder = addslashes(static::class).'@returnPaginatedDataInsteadOfBuilder';
-        $this->schema = $this->buildSchema(/* @lang GraphQL */ "
+        $this->buildSchema(/* @lang GraphQL */ "
             type Query {
                 users: [User] @paginate(resolver: \"{$builder}\")
             }
