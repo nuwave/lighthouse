@@ -102,7 +102,7 @@ GRAPHQL;
         $directiveHasResolverArgument = $this->directiveHasArgument('resolver');
         $directiveHasModelArgument = $this->directiveHasArgument('model');
 
-        if($directiveHasResolverArgument && ($directiveHasModelArgument || $directiveHasBuilderArgument)){
+        if ($directiveHasResolverArgument && ($directiveHasModelArgument || $directiveHasBuilderArgument)) {
             throw new DefinitionException(
                 "Argument 'resolver' is mutually exclusive with 'builder' and 'model'."
             );

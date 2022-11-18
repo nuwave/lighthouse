@@ -698,7 +698,6 @@ GRAPHQL
         ')->dump();
     }
 
-
     public function returnPaginatedDataInsteadOfBuilder(): LengthAwarePaginator
     {
         return new LengthAwarePaginator([
@@ -713,7 +712,7 @@ GRAPHQL
 
     public function testPaginatorResolver(): void
     {
-        $builder = addslashes(static::class).'@returnPaginatedDataInsteadOfBuilder';
+        $builder = addslashes(static::class) . '@returnPaginatedDataInsteadOfBuilder';
         $this->buildSchema(/* @lang GraphQL */ "
             type Query {
                 users: [User] @paginate(resolver: \"{$builder}\")
@@ -758,7 +757,7 @@ GRAPHQL
 
     public function testThrowsIfResolverIsPresentWithBuilder(): void
     {
-        $callable = addslashes(static::class).'@returnPaginatedDataInsteadOfBuilder';
+        $callable = addslashes(static::class) . '@returnPaginatedDataInsteadOfBuilder';
         $this->expectException(DefinitionException::class);
         $this->expectExceptionMessage("Argument 'resolver' is mutually exclusive with 'builder' and 'model'.");
 
@@ -775,7 +774,7 @@ GRAPHQL
 
     public function testThrowsIfResolverIsPresentWithModel(): void
     {
-        $callable = addslashes(static::class).'@returnPaginatedDataInsteadOfBuilder';
+        $callable = addslashes(static::class) . '@returnPaginatedDataInsteadOfBuilder';
         $this->expectException(DefinitionException::class);
         $this->expectExceptionMessage("Argument 'resolver' is mutually exclusive with 'builder' and 'model'.");
 
