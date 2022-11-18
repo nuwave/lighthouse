@@ -105,7 +105,7 @@ in a single PR.
 After you finished your work on `docs/master/`, copy the updated docs
 into the directory of the current major version by running:
 
-    yarn release
+    make release
 
 When releasing a new major version, update the version number in the `release` target in [Makefile](../Makefile).
 
