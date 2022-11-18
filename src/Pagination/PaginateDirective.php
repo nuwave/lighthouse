@@ -46,7 +46,7 @@ directive @paginate(
 
   """
   Reference a function that resolves the field by directly returning data in a `LengthAwarePaginator` instance.
-  Mutually exclusive with `builder` and `model`. Not compatible with  `scopes` and builder arguments such as `@eq`.
+  Mutually exclusive with `builder` and `model`. Not compatible with `scopes` and builder arguments such as `@eq`.
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
   If you pass only a class name, the method name defaults to `__invoke`.
   """
