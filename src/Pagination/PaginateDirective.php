@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\Pagination;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
@@ -130,13 +130,13 @@ GRAPHQL;
 
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
-        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Paginator {
+        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): LengthAwarePaginator {
             if ($this->directiveHasArgument('resolver')) {
                 $paginator = $this->getResolverFromArgument('resolver')($root, $args, $context, $resolveInfo);
 
                 assert(
-                    $paginator instanceof Paginator,
-                    "The method referenced by the resolver argument of the @{$this->name()} directive on {$this->nodeName()} must return a Paginator."
+                    $paginator instanceof LengthAwarePaginator,
+                    "The method referenced by the resolver argument of the @{$this->name()} directive on {$this->nodeName()} must return a LengthAwarePaginator."
                 );
 
                 return $paginator;
