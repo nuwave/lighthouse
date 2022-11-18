@@ -279,7 +279,7 @@ abstract class BaseDirective implements Directive
         if (count($given) > 1) {
             $namesString = implode(', ', $names);
             $givenString = implode(', ', $given);
-            throw new DefinitionException("The arguments [$namesString] for @{$this->name()} are mutually exclusive, found [$givenString] on {$this->nodeName()}.");
+            throw new DefinitionException("The arguments [{$namesString}] for @{$this->name()} are mutually exclusive, found [{$givenString}] on {$this->nodeName()}.");
         }
     }
 }
