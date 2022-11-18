@@ -132,9 +132,9 @@ GRAPHQL;
     {
         $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Paginator {
             if ($this->directiveHasArgument('resolver')) {
-                $builderResolver = $this->getResolverFromArgument('resolver');
+                $resolverResolver = $this->getResolverFromArgument('resolver');
 
-                $query = $builderResolver($root, $args, $context, $resolveInfo);
+                $query = $resolverResolver($root, $args, $context, $resolveInfo);
 
                 assert(
                     $query instanceof Paginator,

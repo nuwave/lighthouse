@@ -758,13 +758,13 @@ GRAPHQL
 
     public function testThrowsIfResolverIsPresentWithBuilder(): void
     {
-        $builder = addslashes(static::class).'@returnPaginatedDataInsteadOfBuilder';
+        $callable = addslashes(static::class).'@returnPaginatedDataInsteadOfBuilder';
         $this->expectException(DefinitionException::class);
         $this->expectExceptionMessage("Argument 'resolver' is mutually exclusive with 'builder' and 'model'.");
 
         $this->buildSchema(/* @lang GraphQL */ "
             type Query {
-                users: [User] @paginate(resolver: \"{$builder}\" builder: \"{$builder}\")
+                users: [User] @paginate(resolver: \"{$callable}\" builder: \"{$callable}\")
             }
 
             type User {
@@ -775,13 +775,13 @@ GRAPHQL
 
     public function testThrowsIfResolverIsPresentWithModel(): void
     {
-        $builder = addslashes(static::class).'@returnPaginatedDataInsteadOfBuilder';
+        $callable = addslashes(static::class).'@returnPaginatedDataInsteadOfBuilder';
         $this->expectException(DefinitionException::class);
         $this->expectExceptionMessage("Argument 'resolver' is mutually exclusive with 'builder' and 'model'.");
 
         $this->buildSchema(/* @lang GraphQL */ "
             type Query {
-                users: [User] @paginate(resolver: \"{$builder}\" builder: \"{$builder}\")
+                users: [User] @paginate(resolver: \"{$callable}\" builder: \"{$callable}\")
             }
 
             type User {
