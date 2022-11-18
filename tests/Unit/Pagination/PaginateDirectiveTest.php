@@ -714,14 +714,14 @@ GRAPHQL
     {
         $builder = addslashes(static::class) . '@returnPaginatedDataInsteadOfBuilder';
         $this->buildSchema(/* @lang GraphQL */ "
-            type Query {
-                users: [User] @paginate(resolver: \"{$builder}\")
-            }
+        type Query {
+            users: [User] @paginate(resolver: \"{$builder}\")
+        }
 
-            type User {
-                id: ID
-            }
-            ");
+        type User {
+            id: ID
+        }
+        ");
 
         $this->graphQL(/* @lang GraphQL */ '
         {
