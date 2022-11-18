@@ -2433,7 +2433,8 @@ directive @paginate(
   builder: String
 
   """
-  Reference a function to customize the resolving the paginator by returning a LengthAwarePaginator instance from it.
+  Reference a function that resolves the field by directly returning data in a `LengthAwarePaginator` instance.
+  Mutually exclusive with `builder` and `model`. Not compatible with `scopes` and builder arguments such as `@eq`.
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
   If you pass only a class name, the method name defaults to `__invoke`.
   """
@@ -2768,9 +2769,9 @@ class Blog
 
 ### Custom resolver
 
-You can provide your own function to return paginated data instead of using eloquent.
+You can provide your own function that resolves the field by directly returning data in a `LengthAwarePaginator` instance.
 
-This is mutually exclusive with builder and model and other options such as scopes will have no impact when it is used.
+This is mutually exclusive with `builder` and `model`. Not compatible with `scopes` and builder arguments such as `@eq`.
 
 ```graphql
 type Query {
