@@ -153,11 +153,8 @@ class ArgumentSet
     {
         $argumentSet->directives
             ->filter(Utils::instanceofMatcher(FieldBuilderDirective::class))
-            ->each(static function (FieldBuilderDirective $fieldBuilderDirective) use (&$builder, $argumentSet): void {
-                // @phpstan-ignore-next-line
-                $fieldBuilderDirective->argsForHandleFieldBuilder = $argumentSet->toArray();
-                // @phpstan-ignore-next-line
-                $builder = $fieldBuilderDirective->handleFieldBuilder($builder, $argumentSet->toArray());
+            ->each(static function (FieldBuilderDirective $fieldBuilderDirective) use (&$builder): void {
+                $builder = $fieldBuilderDirective->handleFieldBuilder($builder);
             });
     }
 
