@@ -39,8 +39,8 @@ class SelectHelper
         /** @var DocumentAST $documentAST */
         $documentAST = app(ASTBuilder::class)->documentAST();
 
-        if (Str::contains($returnTypeName, ['SimplePaginator', 'Paginator'], true)) {
-            $returnTypeName = Str::replace(['SimplePaginator', 'Paginator'], '', $returnTypeName);
+        if (Str::contains($returnTypeName, ['SimplePaginator', 'Paginator'])) {
+            $returnTypeName = str_replace(['SimplePaginator', 'Paginator'], '', $returnTypeName);
         }
 
         $type = $documentAST->types[$returnTypeName];
