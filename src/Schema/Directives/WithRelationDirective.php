@@ -17,9 +17,8 @@ abstract class WithRelationDirective extends BaseDirective implements FieldMiddl
     use RelationDirectiveHelpers;
 
     /**
-     * @param  mixed  $parent
+     * @param  mixed  $parent the parent node
      * @param  array<string, mixed>  $args
-     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
      */
     abstract protected function modelsLoader($parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ModelsLoader;
 

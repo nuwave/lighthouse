@@ -14,7 +14,6 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Execution\Resolved;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -143,7 +142,7 @@ GRAPHQL;
                 );
             }
 
-            foreach ($this->modelsToCheck($resolveInfo->argumentSet, $root, $args, $context, $resolveInfo) as $model) {
+            foreach ($this->modelsToCheck($root, $args, $context, $resolveInfo) as $model) {
                 $this->authorize($gate, $ability, $model, $checkArguments);
             }
 
@@ -161,10 +160,10 @@ GRAPHQL;
      *
      * @return iterable<\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>>
      */
-    protected function modelsToCheck(ArgumentSet $argumentSet, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): iterable
+    protected function modelsToCheck($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): iterable
     {
         if ($this->directiveArgValue('query')) {
-            return $argumentSet
+            return $resolveInfo->argumentSet
                 ->enhanceBuilder(
                     $this->getModelClass()::query(),
                     $this->directiveArgValue('scopes', []),
@@ -184,7 +183,7 @@ GRAPHQL;
 
             $queryBuilder = $this->getModelClass()::query();
 
-            $directivesContainsForceDelete = $argumentSet->directives->contains(
+            $directivesContainsForceDelete = $resolveInfo->argumentSet->directives->contains(
                 Utils::instanceofMatcher(ForceDeleteDirective::class)
             );
             if ($directivesContainsForceDelete) {
@@ -193,7 +192,7 @@ GRAPHQL;
                 $queryBuilder->withTrashed();
             }
 
-            $directivesContainsRestore = $argumentSet->directives->contains(
+            $directivesContainsRestore = $resolveInfo->argumentSet->directives->contains(
                 Utils::instanceofMatcher(RestoreDirective::class)
             );
             if ($directivesContainsRestore) {
@@ -203,7 +202,7 @@ GRAPHQL;
             }
 
             try {
-                $enhancedBuilder = $argumentSet->enhanceBuilder(
+                $enhancedBuilder = $resolveInfo->argumentSet->enhanceBuilder(
                     $queryBuilder,
                     $this->directiveArgValue('scopes', []),
                     $root,

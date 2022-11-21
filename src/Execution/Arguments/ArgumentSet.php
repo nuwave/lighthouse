@@ -90,7 +90,7 @@ class ArgumentSet
         }
 
         self::applyArgBuilderDirectives($this, $builder, $directiveFilter);
-        self::applyFieldBuilderDirectives($this, $builder, $root, $args, $context, $resolveInfo);
+        self::applyFieldBuilderDirectives($resolveInfo, $builder, $root, $args, $context);
 
         foreach ($scopes as $scope) {
             $builder->{$scope}($this->toArray());
@@ -153,9 +153,9 @@ class ArgumentSet
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
      * @param  array<string, mixed>  $args
      */
-    protected static function applyFieldBuilderDirectives(self $argumentSet, object &$builder, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): void
+    protected static function applyFieldBuilderDirectives(ResolveInfo $resolveInfo, object &$builder, $root, array $args, GraphQLContext $context): void
     {
-        $argumentSet->directives
+        $resolveInfo->argumentSet->directives
             ->filter(Utils::instanceofMatcher(FieldBuilderDirective::class))
             ->each(static function (FieldBuilderDirective $fieldBuilderDirective) use ($root, $args, $context, $resolveInfo, &$builder): void {
                 $builder = $fieldBuilderDirective->handleFieldBuilder($builder, $root, $args, $context, $resolveInfo);
