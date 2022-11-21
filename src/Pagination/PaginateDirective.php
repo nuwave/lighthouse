@@ -5,12 +5,11 @@ namespace Nuwave\Lighthouse\Pagination;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Pagination\AbstractPaginator;
 use Laravel\Scout\Builder as ScoutBuilder;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -96,21 +95,13 @@ GRAPHQL;
 
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType): void
     {
+        $this->validateMutuallyExclusiveArguments(['builder', 'resolver', 'model']);
+
         $paginationManipulator = new PaginationManipulator($documentAST);
 
-        $directiveHasBuilderArgument = $this->directiveHasArgument('builder');
-        $directiveHasResolverArgument = $this->directiveHasArgument('resolver');
-        $directiveHasModelArgument = $this->directiveHasArgument('model');
-
-        if ($directiveHasResolverArgument && ($directiveHasModelArgument || $directiveHasBuilderArgument)) {
-            throw new DefinitionException(
-                "Argument 'resolver' is mutually exclusive with 'builder' and 'model'."
-            );
-        }
-
-        if ($directiveHasResolverArgument) {
+        if ($this->directiveHasArgument('resolver')) {
             $this->getResolverFromArgument('resolver');
-        } elseif ($directiveHasBuilderArgument) {
+        } elseif ($this->directiveHasArgument('builder')) {
             // This is done only for validation
             $this->getResolverFromArgument('builder');
         } else {
@@ -130,13 +121,13 @@ GRAPHQL;
 
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
-        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): LengthAwarePaginator {
+        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): AbstractPaginator {
             if ($this->directiveHasArgument('resolver')) {
                 $paginator = $this->getResolverFromArgument('resolver')($root, $args, $context, $resolveInfo);
 
                 assert(
-                    $paginator instanceof LengthAwarePaginator,
-                    "The method referenced by the resolver argument of the @{$this->name()} directive on {$this->nodeName()} must return a LengthAwarePaginator."
+                    $paginator instanceof AbstractPaginator,
+                    "The method referenced by the resolver argument of the @{$this->name()} directive on {$this->nodeName()} must return a AbstractPaginator."
                 );
 
                 return $paginator;

@@ -58,11 +58,20 @@ GRAPHQL;
         if ($this->directiveHasArgument('value')) {
             return $resolver(
                 $builder,
-                $this->directiveArgValue('value')
+                $this->directiveArgValue('value'),
+                // @phpstan-ignore-next-line
+                $this->argsForHandleFieldBuilder
             );
         }
 
-        return $resolver($builder);
+        $resolverReflectedParameters = (new \ReflectionFunction($resolver))->getParameters();
+        $possibleDefaultValueFromReflection = 0;
+        if (count($resolverReflectedParameters) >= 2) {
+            $possibleDefaultValueFromReflection = $resolverReflectedParameters[1]->getDefaultValue();
+        }
+
+        // @phpstan-ignore-next-line
+        return $resolver($builder, $possibleDefaultValueFromReflection, $this->argsForHandleFieldBuilder);
     }
 
     protected function resolver(): \Closure
