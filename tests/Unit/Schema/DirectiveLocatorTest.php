@@ -9,6 +9,7 @@ use Nuwave\Lighthouse\Schema\Directives\FieldDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Support\Utils;
 use Tests\TestCase;
 
 final class DirectiveLocatorTest extends TestCase
@@ -39,18 +40,15 @@ final class DirectiveLocatorTest extends TestCase
             foo: String @field
         ');
 
-        /** @var \Nuwave\Lighthouse\Schema\Directives\FieldDirective $fieldDirective */
         $fieldDirective = $this
             ->directiveLocator
             ->associated($fieldDefinition)
             ->first();
-
-        $definitionNode = new \ReflectionProperty($fieldDirective, 'definitionNode');
-        $definitionNode->setAccessible(true);
+        assert($fieldDirective instanceof FieldDirective);
 
         $this->assertSame(
             $fieldDefinition,
-            $definitionNode->getValue($fieldDirective)
+            Utils::accessProtected($fieldDirective, 'definitionNode')
         );
     }
 
