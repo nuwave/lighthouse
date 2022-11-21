@@ -11,7 +11,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
-- Support returning `LengthAwarePaginator` from option `resolver` in `@paginator` directive https://github.com/nuwave/lighthouse/pull/2232
+- Support returning data in a `Paginator` from option `resolver` in `@paginator` directive https://github.com/nuwave/lighthouse/pull/2232
 
 ## v5.65.0
 
