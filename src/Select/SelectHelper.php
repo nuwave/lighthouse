@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Support\AppVersion;
 
 class SelectHelper
 {
@@ -76,7 +77,11 @@ class SelectHelper
                             $relationName = ASTHelper::directiveArgValue($directive, 'relation', $field);
 
                             if (method_exists($model, $relationName)) {
-                                array_push($selectColumns, $model->{$relationName}()->getLocalKeyName());
+                                if (AppVersion::below(5.8)) {
+                                    array_push($selectColumns, $model->{$relationName}()->getLocalKey());
+                                } else {
+                                    array_push($selectColumns, $model->{$relationName}()->getLocalKeyName());
+                                }
                             }
                         }
 
@@ -84,7 +89,11 @@ class SelectHelper
                             $relationName = ASTHelper::directiveArgValue($directive, 'relation', $field);
 
                             if (method_exists($model, $relationName)) {
-                                array_push($selectColumns, $model->{$relationName}()->getForeignKeyName());
+                                if (AppVersion::below(5.8)) {
+                                    array_push($selectColumns, $model->{$relationName}()->getForeignKey());
+                                } else {
+                                    array_push($selectColumns, $model->{$relationName}()->getForeignKeyName());
+                                }
                             }
                         }
 
