@@ -2769,25 +2769,32 @@ class Blog
 
 ### Custom resolver
 
-You can provide your own function that resolves the field by directly returning data in a `LengthAwarePaginator` instance.
+You can provide your own function that resolves the field by directly returning data in a `\Illuminate\Contracts\Pagination\Paginator` instance.
 
 This is mutually exclusive with `builder` and `model`. Not compatible with `scopes` and builder arguments such as `@eq`.
 
 ```graphql
 type Query {
-  posts: [Post!]! @paginate(resolver: "App\\Resolver\\Posts@userPosts")
+  posts: [Post!]! @paginate(resolver: "App\\GraphQL\\Queries\\Posts")
 }
 ```
 
-A custom resolver function may look like the following.
+A custom resolver function may look like the following:
 
 ```php
-namespace App\Resolver;
+namespace App\GraphQL\Queries;
 
 use Illuminate\Pagination\LengthAwarePaginator;
 
-class Posts {
-    public function userPosts($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Builder
+final class Posts
+{
+    /**
+     * @param  null  $root Always null, since this field has no parent.
+     * @param  array{}  $args The field arguments passed by the client.
+     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context Shared between all fields.
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo Metadata for advanced query resolution.
+     */
+    public function __invoke($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): LengthAwarePaginator
     {
         //...apply your logic
         return new LengthAwarePaginator([
@@ -2801,6 +2808,7 @@ class Posts {
             ],
         ], 2, 15);
     }
+}
 ```
 
 ## @rename
