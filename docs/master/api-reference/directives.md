@@ -2433,7 +2433,7 @@ directive @paginate(
   builder: String
 
   """
-  Reference a function that resolves the field by directly returning data in a `LengthAwarePaginator` instance.
+  Reference a function that resolves the field by directly returning data in a Paginator instance.
   Mutually exclusive with `builder` and `model`. Not compatible with `scopes` and builder arguments such as `@eq`.
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
   If you pass only a class name, the method name defaults to `__invoke`.
@@ -2775,8 +2775,7 @@ This is mutually exclusive with `builder` and `model`. Not compatible with `scop
 
 ```graphql
 type Query {
-  posts: [Post!]!
-    @paginate(resolver: "App\\Resolver\\Posts@userPosts")
+  posts: [Post!]! @paginate(resolver: "App\\Resolver\\Posts@userPosts")
 }
 ```
 
