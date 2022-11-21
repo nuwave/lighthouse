@@ -79,6 +79,11 @@ class SelectHelper
                             if (method_exists($model, $relationName)) {
                                 if (AppVersion::below(5.7)) {
                                     $relation = new \ReflectionClass($model->{$relationName}());
+
+                                    while ($relation->getShortName() !== 'HasOneOrMany') {
+                                        $relation = $relation->getParentClass();
+                                    }
+
                                     $localKey = $relation->getProperty('localKey');
                                     $localKey->setAccessible(true);
                                     array_push($selectColumns, $localKey->getValue($relation));
