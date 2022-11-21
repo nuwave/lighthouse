@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Execution\Resolved;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -142,7 +142,7 @@ GRAPHQL;
                 );
             }
 
-            foreach ($this->modelsToCheck($root, $args, $context, $resolveInfo) as $model) {
+            foreach ($this->modelsToCheck($resolveInfo->argumentSet, $args) as $model) {
                 $this->authorize($gate, $ability, $model, $checkArguments);
             }
 
@@ -154,23 +154,18 @@ GRAPHQL;
 
     /**
      * @param  array<string, mixed>  $args
-     * @param  array<string, mixed> $args
      *
      * @throws \GraphQL\Error\Error
      *
      * @return iterable<\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>>
      */
-    protected function modelsToCheck($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): iterable
+    protected function modelsToCheck(ArgumentSet $argumentSet, array $args): iterable
     {
         if ($this->directiveArgValue('query')) {
-            return $resolveInfo->argumentSet
+            return $argumentSet
                 ->enhanceBuilder(
                     $this->getModelClass()::query(),
-                    $this->directiveArgValue('scopes', []),
-                    $root,
-                    $args,
-                    $context,
-                    $resolveInfo
+                    $this->directiveArgValue('scopes', [])
                 )
                 ->get();
         }
@@ -183,7 +178,7 @@ GRAPHQL;
 
             $queryBuilder = $this->getModelClass()::query();
 
-            $directivesContainsForceDelete = $resolveInfo->argumentSet->directives->contains(
+            $directivesContainsForceDelete = $argumentSet->directives->contains(
                 Utils::instanceofMatcher(ForceDeleteDirective::class)
             );
             if ($directivesContainsForceDelete) {
@@ -192,7 +187,7 @@ GRAPHQL;
                 $queryBuilder->withTrashed();
             }
 
-            $directivesContainsRestore = $resolveInfo->argumentSet->directives->contains(
+            $directivesContainsRestore = $argumentSet->directives->contains(
                 Utils::instanceofMatcher(RestoreDirective::class)
             );
             if ($directivesContainsRestore) {
@@ -202,13 +197,9 @@ GRAPHQL;
             }
 
             try {
-                $enhancedBuilder = $resolveInfo->argumentSet->enhanceBuilder(
+                $enhancedBuilder = $argumentSet->enhanceBuilder(
                     $queryBuilder,
                     $this->directiveArgValue('scopes', []),
-                    $root,
-                    $args,
-                    $context,
-                    $resolveInfo,
                     Utils::instanceofMatcher(TrashedDirective::class)
                 );
                 assert($enhancedBuilder instanceof EloquentBuilder);
@@ -289,19 +280,6 @@ GRAPHQL;
 
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType)
     {
-        $mutuallyExclusive = [
-            $this->directiveHasArgument('resolve'),
-            $this->directiveHasArgument('query'),
-            $this->directiveHasArgument('find'),
-        ];
-
-        if (count(array_filter($mutuallyExclusive)) > 1) {
-            throw self::multipleMutuallyExclusiveArguments();
-        }
-    }
-
-    public static function multipleMutuallyExclusiveArguments(): DefinitionException
-    {
-        return new DefinitionException('The arguments `resolve`, `query` and `find` are mutually exclusive in the `@can` directive.');
+        $this->validateMutuallyExclusiveArguments(['resolve', 'query', 'find']);
     }
 }

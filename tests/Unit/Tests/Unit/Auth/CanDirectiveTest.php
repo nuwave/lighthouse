@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Auth;
 
-use Nuwave\Lighthouse\Auth\CanDirective;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\TestCase;
@@ -345,40 +344,6 @@ final class CanDirectiveTest extends TestCase
                 ],
             ],
         ]);
-    }
-
-    /**
-     * @dataProvider multipleMutuallyExclusiveArguments
-     */
-    public function testMultipleMutuallyExclusiveArgument(string $arguments): void
-    {
-        $this->expectExceptionObject(CanDirective::multipleMutuallyExclusiveArguments());
-
-        $this->buildSchema(/** @lang GraphQL */ <<<GRAPHQL
-        type Query {
-            user(id: ID! @eq): User
-                @can(ability: "view", {$arguments})
-                @first
-        }
-
-        type User {
-            id: ID!
-            name: String!
-        }
-
-GRAPHQL
-        );
-    }
-
-    /**
-     * @return iterable<array{string}>
-     */
-    public function multipleMutuallyExclusiveArguments(): iterable
-    {
-        yield ['resolve: "id", query: true'];
-        yield ['query: true, find: "id"'];
-        yield ['find: "id", resolve: true'];
-        yield ['resolve: "id", query: true, find: "id"'];
     }
 
     public function resolveUser(): User
