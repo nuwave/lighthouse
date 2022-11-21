@@ -187,11 +187,11 @@ final class LimitDirectiveTest extends DBTestCase
 
         $response->assertJsonCount(2, 'data.user');
 
-        $user1Tasks = intval($response->json('data.user.0.id')) === 1
+        $user1Tasks = 1 === intval($response->json('data.user.0.id'))
             ? $response->json('data.user.0.tasks.0')
             : $response->json('data.user.1.tasks.0');
 
-        $user2Tasks = intval($response->json('data.user.0.id')) === 2
+        $user2Tasks = 2 === intval($response->json('data.user.0.id'))
             ? $response->json('data.user.0.tasks.0')
             : $response->json('data.user.1.tasks.0');
 

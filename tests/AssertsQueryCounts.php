@@ -3,7 +3,6 @@
 namespace Tests;
 
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 /**
  * This trait was taken from a package that supports fewer Laravel versions than us.

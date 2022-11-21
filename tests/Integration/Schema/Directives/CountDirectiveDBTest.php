@@ -102,7 +102,6 @@ final class CountDirectiveDBTest extends DBTestCase
             }
             ');
 
-
             $response->assertJsonCount(3, 'data.users');
 
             $users = $response->json('data.users');
