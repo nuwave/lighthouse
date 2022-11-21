@@ -5,10 +5,10 @@ namespace Nuwave\Lighthouse\Pagination;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
-use Illuminate\Pagination\AbstractPaginator;
 use Laravel\Scout\Builder as ScoutBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -95,11 +95,12 @@ GRAPHQL;
 
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType): void
     {
-        $this->validateMutuallyExclusiveArguments(['builder', 'resolver', 'model']);
+        $this->validateMutuallyExclusiveArguments(['model', 'builder', 'resolver']);
 
         $paginationManipulator = new PaginationManipulator($documentAST);
 
         if ($this->directiveHasArgument('resolver')) {
+            // This is done only for validation
             $this->getResolverFromArgument('resolver');
         } elseif ($this->directiveHasArgument('builder')) {
             // This is done only for validation
@@ -121,13 +122,13 @@ GRAPHQL;
 
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
-        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): AbstractPaginator {
+        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Paginator {
             if ($this->directiveHasArgument('resolver')) {
                 $paginator = $this->getResolverFromArgument('resolver')($root, $args, $context, $resolveInfo);
 
                 assert(
-                    $paginator instanceof AbstractPaginator,
-                    "The method referenced by the resolver argument of the @{$this->name()} directive on {$this->nodeName()} must return a AbstractPaginator."
+                    $paginator instanceof Paginator,
+                    "The method referenced by the resolver argument of the @{$this->name()} directive on {$this->nodeName()} must return a Paginator."
                 );
 
                 return $paginator;

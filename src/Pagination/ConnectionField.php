@@ -7,7 +7,7 @@ use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Pagination\AbstractPaginator;
+use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
@@ -46,7 +46,7 @@ class ConnectionField
      *
      * @param  array<string, mixed>  $args
      */
-    public function edgeResolver(AbstractPaginator $paginator, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Collection
+    public function edgeResolver(Paginator $paginator, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Collection
     {
         // We know those types because we manipulated them during PaginationManipulator
         $nonNullList = $resolveInfo->returnType;
@@ -60,12 +60,7 @@ class ConnectionField
         /** @var int|null $firstItem Laravel type-hints are inaccurate here */
         $firstItem = $paginator->firstItem();
 
-        /**
-         * The return type `static` refers to the wrong class because it is a proxied method call.
-         *
-         * @var \Illuminate\Support\Collection<mixed> $values
-         */
-        $values = $paginator->values();
+        $values = new Collection(array_values($paginator->items()));
 
         return $values->map(function ($item, int $index) use ($returnTypeFields, $firstItem): array {
             $data = [];

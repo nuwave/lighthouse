@@ -754,38 +754,4 @@ GRAPHQL
         }
         ');
     }
-
-    public function testThrowsIfResolverIsPresentWithBuilder(): void
-    {
-        $callable = addslashes(static::class) . '@returnPaginatedDataInsteadOfBuilder';
-        $this->expectException(DefinitionException::class);
-        $this->expectExceptionMessage('The arguments [builder, resolver, model] for @paginate are mutually exclusive, found [builder, resolver] on users.');
-
-        $this->buildSchema(/* @lang GraphQL */ "
-            type Query {
-                users: [User] @paginate(resolver: \"{$callable}\" builder: \"{$callable}\")
-            }
-
-            type User {
-                id: ID
-            }
-            ");
-    }
-
-    public function testThrowsIfResolverIsPresentWithModel(): void
-    {
-        $callable = addslashes(static::class) . '@returnPaginatedDataInsteadOfBuilder';
-        $this->expectException(DefinitionException::class);
-        $this->expectExceptionMessage('The arguments [builder, resolver, model] for @paginate are mutually exclusive, found [resolver, model] on users.');
-
-        $this->buildSchema(/* @lang GraphQL */ "
-            type Query {
-                users: [User] @paginate(resolver: \"{$callable}\" model: \"{$callable}\")
-            }
-
-            type User {
-                id: ID
-            }
-            ");
-    }
 }
