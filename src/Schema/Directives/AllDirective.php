@@ -79,7 +79,7 @@ GRAPHQL;
                         return $builder->get();
                     }
 
-                    $query = $builder->getQuery();
+                    $query = $builder instanceof EloquentBuilder ? $builder->getQuery() : $builder;
 
                     if (null !== $query->columns) {
                         $bindings = $query->getRawBindings();

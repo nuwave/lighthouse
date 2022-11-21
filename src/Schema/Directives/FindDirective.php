@@ -46,18 +46,16 @@ GRAPHQL;
                 );
 
             if (config('lighthouse.optimized_selects')) {
-                if ($builder instanceof QueryBuilder || $builder instanceof EloquentBuilder) {
-                    $fieldSelection = array_keys($resolveInfo->getFieldSelection(1));
+                $fieldSelection = array_keys($resolveInfo->getFieldSelection(1));
 
-                    $selectColumns = SelectHelper::getSelectColumns(
-                        $this->definitionNode,
-                        $fieldSelection,
-                        $this->getModelClass()
-                    );
+                $selectColumns = SelectHelper::getSelectColumns(
+                    $this->definitionNode,
+                    $fieldSelection,
+                    $this->getModelClass()
+                );
 
-                    if (! empty($selectColumns)) {
-                        $builder = $builder->select($selectColumns);
-                    }
+                if (! empty($selectColumns)) {
+                    $builder = $builder->select($selectColumns);
                 }
             }
 
