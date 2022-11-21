@@ -80,7 +80,7 @@ class SelectHelper
                                 if (AppVersion::below(5.7)) {
                                     $relation = new \ReflectionClass($model->{$relationName}());
 
-                                    while ($relation->getShortName() !== 'HasOneOrMany') {
+                                    while ('HasOneOrMany' !== $relation->getShortName()) {
                                         $relation = $relation->getParentClass();
                                     }
 
