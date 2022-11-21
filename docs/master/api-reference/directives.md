@@ -2433,6 +2433,14 @@ directive @paginate(
   builder: String
 
   """
+  Reference a function that resolves the field by directly returning data in a Paginator instance.
+  Mutually exclusive with `builder` and `model`. Not compatible with `scopes` and builder arguments such as `@eq`.
+  Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
+  """
+  resolver: String
+
+  """
   Apply scopes to the underlying query.
   """
   scopes: [String!]
@@ -2755,6 +2763,50 @@ class Blog
         return DB::table('posts')
             ->leftJoinSub(...)
             ->groupBy(...);
+    }
+}
+```
+
+### Custom resolver
+
+You can provide your own function that resolves the field by directly returning data in a `\Illuminate\Contracts\Pagination\Paginator` instance.
+
+This is mutually exclusive with `builder` and `model`. Not compatible with `scopes` and builder arguments such as `@eq`.
+
+```graphql
+type Query {
+  posts: [Post!]! @paginate(resolver: "App\\GraphQL\\Queries\\Posts")
+}
+```
+
+A custom resolver function may look like the following:
+
+```php
+namespace App\GraphQL\Queries;
+
+use Illuminate\Pagination\LengthAwarePaginator;
+
+final class Posts
+{
+    /**
+     * @param  null  $root Always null, since this field has no parent.
+     * @param  array{}  $args The field arguments passed by the client.
+     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context Shared between all fields.
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo Metadata for advanced query resolution.
+     */
+    public function __invoke($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): LengthAwarePaginator
+    {
+        //...apply your logic
+        return new LengthAwarePaginator([
+            [
+                'id' => 1,
+                'title' => 'Flying teacup found in solar orbit',
+            ],
+            [
+                'id' => 2,
+                'title' => 'What actually is the difference between cookies and biscuits?',
+            ],
+        ], 2, 15);
     }
 }
 ```
