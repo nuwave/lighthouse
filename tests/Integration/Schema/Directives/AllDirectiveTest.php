@@ -302,7 +302,7 @@ GRAPHQL;
         ]);
     }
 
-    public function testGetAllOptimizeSelected(): void
+    public function testGetAllOptimizedSelect(): void
     {
         factory(Post::class, 2)->create([
             // Do not create those, as they would create more users

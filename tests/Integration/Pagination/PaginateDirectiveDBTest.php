@@ -265,7 +265,7 @@ GRAPHQL;
         ]);
     }
 
-    public function testPaginateOptimizedSelected(): void
+    public function testPaginateOptimizedSelect(): void
     {
         factory(User::class, 2)->create();
 

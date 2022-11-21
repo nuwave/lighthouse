@@ -197,7 +197,7 @@ final class FindDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testReturnsOptimizeSelected(): void
+    public function testReturnsOptimizedSelect(): void
     {
         $company = factory(Company::class)->create();
         $user = factory(User::class)->create([
