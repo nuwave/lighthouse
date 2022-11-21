@@ -37,6 +37,8 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
         FieldDefinitionNode &$parentField,
         ObjectTypeDefinitionNode &$parentType
     ): void {
+        $this->validateMutuallyExclusiveArguments(['columns', 'columnsEnum']);
+
         if ($this->hasAllowedColumns()) {
             $restrictedWhereConditionsName = ASTHelper::qualifiedArgType($argDefinition, $parentField, $parentType) . $this->generatedInputSuffix();
             $argDefinition->type = Parser::namedType($restrictedWhereConditionsName);

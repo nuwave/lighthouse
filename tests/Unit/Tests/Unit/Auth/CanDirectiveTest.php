@@ -347,40 +347,6 @@ final class CanDirectiveTest extends TestCase
         ]);
     }
 
-    /**
-     * @dataProvider multipleMutuallyExclusiveArguments
-     */
-    public function testMultipleMutuallyExclusiveArgument(string $arguments): void
-    {
-        $this->expectExceptionObject(new DefinitionException('foo'));
-
-        $this->buildSchema(/** @lang GraphQL */ <<<GRAPHQL
-        type Query {
-            user(id: ID! @eq): User
-                @can(ability: "view", {$arguments})
-                @first
-        }
-
-        type User {
-            id: ID!
-            name: String!
-        }
-
-GRAPHQL
-        );
-    }
-
-    /**
-     * @return iterable<array{string}>
-     */
-    public function multipleMutuallyExclusiveArguments(): iterable
-    {
-        yield ['resolve: "id", query: true'];
-        yield ['query: true, find: "id"'];
-        yield ['find: "id", resolve: true'];
-        yield ['resolve: "id", query: true, find: "id"'];
-    }
-
     public function resolveUser(): User
     {
         $user = new User();
