@@ -20,8 +20,8 @@ class LumenMiddlewareAdapter implements MiddlewareAdapter
     public function getMiddleware(): array
     {
         // TODO remove once Lumen gains public access to the middleware/routeMiddleware
-        $globalMiddleware = Utils::accessProtected($this->app, 'middleware', []);
-        $routeMiddleware = Utils::accessProtected($this->app, 'routeMiddleware', []);
+        $globalMiddleware = Utils::accessProtected($this->app, 'middleware');
+        $routeMiddleware = Utils::accessProtected($this->app, 'routeMiddleware');
 
         return array_merge($globalMiddleware, $routeMiddleware);
     }
