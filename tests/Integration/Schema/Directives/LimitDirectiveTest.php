@@ -104,7 +104,7 @@ final class LimitDirectiveTest extends DBTestCase
         }
 
         type Query {
-            users: [User!]! @all
+            users: [User!]! @all @orderBy(column: "id")
         }
         ';
 
@@ -148,7 +148,7 @@ final class LimitDirectiveTest extends DBTestCase
         }
 
         type Query {
-            user: [User!]! @all
+            user: [User!]! @all @orderBy(column: "id")
         }
         ';
 
@@ -173,7 +173,7 @@ final class LimitDirectiveTest extends DBTestCase
         $this->assertInstanceOf(Task::class, $task);
         $this->assertSame(3, $task->id);
 
-        $response = $this
+        $this
             ->graphQL(/** @lang GraphQL */ '
             {
                 user {
@@ -183,19 +183,28 @@ final class LimitDirectiveTest extends DBTestCase
                     }
                 }
             }
-            ');
-
-        $response->assertJsonCount(2, 'data.user');
-
-        $user1Tasks = 1 === intval($response->json('data.user.0.id'))
-            ? $response->json('data.user.0.tasks.0')
-            : $response->json('data.user.1.tasks.0');
-
-        $user2Tasks = 2 === intval($response->json('data.user.0.id'))
-            ? $response->json('data.user.0.tasks.0')
-            : $response->json('data.user.1.tasks.0');
-
-        $this->assertEquals(1, $user1Tasks['id']);
-        $this->assertEquals(3, $user2Tasks['id']);
+            ')
+            ->assertJson([
+                'data' => [
+                    'user' => [
+                        [
+                            'id' => 1,
+                            'tasks' => [
+                                [
+                                    'id' => 1,
+                                ],
+                            ],
+                        ],
+                        [
+                            'id' => 2,
+                            'tasks' => [
+                                [
+                                    'id' => 3,
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]);
     }
 }

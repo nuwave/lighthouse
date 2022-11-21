@@ -30,14 +30,14 @@ final class WhereConditionsDirectiveTest extends DBTestCase
     }
 
     type Query {
-        posts(where: _ @whereConditions): [Post!]! @all
-        users(where: _ @whereConditions): [User!]! @all
+        posts(where: _ @whereConditions): [Post!]! @all @orderBy(column: "id")
+        users(where: _ @whereConditions): [User!]! @all @orderBy(column: "id")
         whitelistedColumns(
             where: _ @whereConditions(columns: ["id", "camelCase"])
-        ): [User!]! @all
+        ): [User!]! @all @orderBy(column: "id")
         enumColumns(
             where: _ @whereConditions(columnsEnum: "UserColumn")
-        ): [User!]! @all
+        ): [User!]! @all @orderBy(column: "id")
     }
 
     enum UserColumn {
@@ -95,7 +95,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
     {
         factory(User::class, 5)->create();
 
-        $response = $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users(
                 where: {
@@ -107,17 +107,18 @@ final class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ');
-
-        $response->assertJsonCount(2, 'data.users');
-
-        $users = $response->json('data.users');
-
-        $ids = collect($users)->pluck('id')->all();
-
-        sort($ids);
-
-        $this->assertEquals(['2', '5'], $ids);
+        ')->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => '2',
+                    ],
+                    [
+                        'id' => '5',
+                    ],
+                ],
+            ],
+        ]);
     }
 
     public function testOperatorIsNull(): void
@@ -186,7 +187,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
     {
         factory(User::class, 5)->create();
 
-        $response = $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users(
                 where: {
@@ -198,17 +199,18 @@ final class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ');
-
-        $response->assertJsonCount(2, 'data.users');
-
-        $users = $response->json('data.users');
-
-        $ids = collect($users)->pluck('id')->all();
-
-        sort($ids);
-
-        $this->assertEquals(['1', '5'], $ids);
+        ')->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => '1',
+                    ],
+                    [
+                        'id' => '5',
+                    ],
+                ],
+            ],
+        ]);
     }
 
     public function testAddsNestedAnd(): void
@@ -243,7 +245,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
     {
         factory(User::class, 5)->create();
 
-        $response = $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users(
                 where: {
@@ -271,24 +273,28 @@ final class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ');
-
-        $response->assertJsonCount(3, 'data.users');
-
-        $users = $response->json('data.users');
-
-        $ids = collect($users)->pluck('id')->all();
-
-        sort($ids);
-
-        $this->assertEquals(['1', '3', '5'], $ids);
+        ')->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => '1',
+                    ],
+                    [
+                        'id' => '3',
+                    ],
+                    [
+                        'id' => '5',
+                    ],
+                ],
+            ],
+        ]);
     }
 
     public function testAddsNestedAndOr(): void
     {
         factory(User::class, 5)->create();
 
-        $response = $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users(
                 where: {
@@ -317,17 +323,18 @@ final class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ');
-
-        $response->assertJsonCount(2, 'data.users');
-
-        $users = $response->json('data.users');
-
-        $ids = collect($users)->pluck('id')->all();
-
-        sort($ids);
-
-        $this->assertEquals(['2', '3'], $ids);
+        ')->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => '2',
+                    ],
+                    [
+                        'id' => '3',
+                    ],
+                ],
+            ],
+        ]);
     }
 
     public function testHasMixed(): void
@@ -432,7 +439,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
         $commentTwo->comment = 'none';
         $commentTwo->save();
 
-        $response = $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ '
         {
             users(
                 where: {
@@ -444,17 +451,18 @@ final class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ');
-
-        $response->assertJsonCount(2, 'data.users');
-
-        $users = $response->json('data.users');
-
-        $ids = collect($users)->pluck('id')->all();
-
-        sort($ids);
-
-        $this->assertEquals(['2', '4'], $ids);
+        ')->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => '2',
+                    ],
+                    [
+                        'id' => '4',
+                    ],
+                ],
+            ],
+        ]);
     }
 
     public function testHasAmount(): void
