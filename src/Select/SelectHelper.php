@@ -12,6 +12,7 @@ use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Support\AppVersion;
+use ReflectionClass;
 
 class SelectHelper
 {
@@ -77,8 +78,11 @@ class SelectHelper
                             $relationName = ASTHelper::directiveArgValue($directive, 'relation', $field);
 
                             if (method_exists($model, $relationName)) {
-                                if (AppVersion::below(5.8)) {
-                                    array_push($selectColumns, $model->{$relationName}()->getLocalKey());
+                                if (AppVersion::below(5.7)) {
+                                    $relation = new ReflectionClass($model->{$relationName}());
+                                    $localKey = $relation->getProperty('localKey');
+                                    $localKey->setAccessible(true);
+                                    array_push($selectColumns, $localKey->getValue($relation));
                                 } else {
                                     array_push($selectColumns, $model->{$relationName}()->getLocalKeyName());
                                 }
