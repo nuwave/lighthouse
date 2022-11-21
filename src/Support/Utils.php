@@ -83,7 +83,7 @@ class Utils
      *
      * @param  mixed  $object  object with protected method
      * @param  string  $methodName  name of object's protected method
-     * @param  mixed  ...$args  zero or more parameters to be passed to the method
+     * @param  array<mixed>  ...$args  zero or more parameters to be passed to the method
      *
      * @return mixed result of calling the method
      */
