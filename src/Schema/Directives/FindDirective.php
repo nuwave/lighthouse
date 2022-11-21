@@ -4,9 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Query\Builder as QueryBuilder;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Select\SelectHelper;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
