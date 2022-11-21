@@ -90,7 +90,7 @@ GRAPHQL;
                 $query = $this
                     ->namespaceModelClass($modelArg)::query();
 
-                $this->makeBuilderDecorator($resolveInfo)($query);
+                $this->makeBuilderDecorator($root, $args, $context, $resolveInfo)($query);
 
                 return $query->{$this->function()}($this->column());
             });
@@ -107,13 +107,13 @@ GRAPHQL;
                         $this->qualifyPath($args, $resolveInfo),
                         [$this->function(), $this->column()]
                     ),
-                    function () use ($resolveInfo): RelationBatchLoader {
+                    function () use ($parent, $args, $context, $resolveInfo): RelationBatchLoader {
                         return new RelationBatchLoader(
                             new AggregateModelsLoader(
                                 $this->relation(),
                                 $this->column(),
                                 $this->function(),
-                                $this->makeBuilderDecorator($resolveInfo)
+                                $this->makeBuilderDecorator($parent, $args, $context, $resolveInfo)
                             )
                         );
                     }

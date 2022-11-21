@@ -2,9 +2,11 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
+use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Scout\ScoutEnhancer;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Utils;
 
 class ArgumentSet
@@ -74,12 +76,13 @@ class ArgumentSet
      * @phpstan-param  TBuilder  $builder
      *
      * @param  array<string>  $scopes
+     * @param  array<string, mixed> $args
      *
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation|\Laravel\Scout\Builder
      *
      * @phpstan-return TBuilder
      */
-    public function enhanceBuilder(object $builder, array $scopes, \Closure $directiveFilter = null): object
+    public function enhanceBuilder(object $builder, array $scopes, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo, \Closure $directiveFilter = null): object
     {
         $scoutEnhancer = new ScoutEnhancer($this, $builder);
         if ($scoutEnhancer->canEnhanceBuilder()) {
@@ -87,7 +90,7 @@ class ArgumentSet
         }
 
         self::applyArgBuilderDirectives($this, $builder, $directiveFilter);
-        self::applyFieldBuilderDirectives($this, $builder);
+        self::applyFieldBuilderDirectives($this, $builder, $root, $args, $context, $resolveInfo);
 
         foreach ($scopes as $scope) {
             $builder->{$scope}($this->toArray());
@@ -148,13 +151,14 @@ class ArgumentSet
      * but we must special case that in some way anyhow, as only eq filters can be added on top of search.
      *
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
+     * @param  array<string, mixed>  $args
      */
-    protected static function applyFieldBuilderDirectives(self $argumentSet, object &$builder): void
+    protected static function applyFieldBuilderDirectives(self $argumentSet, object &$builder, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): void
     {
         $argumentSet->directives
             ->filter(Utils::instanceofMatcher(FieldBuilderDirective::class))
-            ->each(static function (FieldBuilderDirective $fieldBuilderDirective) use (&$builder): void {
-                $builder = $fieldBuilderDirective->handleFieldBuilder($builder);
+            ->each(static function (FieldBuilderDirective $fieldBuilderDirective) use ($root, $args, $context, $resolveInfo, &$builder): void {
+                $builder = $fieldBuilderDirective->handleFieldBuilder($builder, $root, $args, $context, $resolveInfo);
             });
     }
 

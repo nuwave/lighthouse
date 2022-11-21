@@ -126,7 +126,11 @@ GRAPHQL;
                 ->argumentSet
                 ->enhanceBuilder(
                     $query,
-                    $this->directiveArgValue('scopes', [])
+                    $this->directiveArgValue('scopes', []),
+                    $root,
+                    $args,
+                    $context,
+                    $resolveInfo
                 );
 
             $paginationArgs = PaginationArgs::extractArgs($args, $this->paginationType(), $this->paginateMaxCount());

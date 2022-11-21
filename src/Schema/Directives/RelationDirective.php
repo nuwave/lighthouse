@@ -51,7 +51,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
         $fieldValue->setResolver(function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
             $relationName = $this->relation();
 
-            $decorateBuilder = $this->makeBuilderDecorator($resolveInfo);
+            $decorateBuilder = $this->makeBuilderDecorator($parent, $args, $context, $resolveInfo);
             $paginationArgs = $this->paginationArgs($args);
 
             $relation = $parent->{$relationName}();

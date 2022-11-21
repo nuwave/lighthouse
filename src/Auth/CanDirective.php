@@ -143,7 +143,7 @@ GRAPHQL;
                 );
             }
 
-            foreach ($this->modelsToCheck($resolveInfo->argumentSet, $args) as $model) {
+            foreach ($this->modelsToCheck($resolveInfo->argumentSet, $root, $args, $context, $resolveInfo) as $model) {
                 $this->authorize($gate, $ability, $model, $checkArguments);
             }
 
@@ -155,18 +155,23 @@ GRAPHQL;
 
     /**
      * @param  array<string, mixed>  $args
+     * @param  array<string, mixed> $args
      *
      * @throws \GraphQL\Error\Error
      *
      * @return iterable<\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>>
      */
-    protected function modelsToCheck(ArgumentSet $argumentSet, array $args): iterable
+    protected function modelsToCheck(ArgumentSet $argumentSet, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): iterable
     {
         if ($this->directiveArgValue('query')) {
             return $argumentSet
                 ->enhanceBuilder(
                     $this->getModelClass()::query(),
-                    $this->directiveArgValue('scopes', [])
+                    $this->directiveArgValue('scopes', []),
+                    $root,
+                    $args,
+                    $context,
+                    $resolveInfo
                 )
                 ->get();
         }
@@ -201,6 +206,10 @@ GRAPHQL;
                 $enhancedBuilder = $argumentSet->enhanceBuilder(
                     $queryBuilder,
                     $this->directiveArgValue('scopes', []),
+                    $root,
+                    $args,
+                    $context,
+                    $resolveInfo,
                     Utils::instanceofMatcher(TrashedDirective::class)
                 );
                 assert($enhancedBuilder instanceof EloquentBuilder);

@@ -11,6 +11,7 @@ use Nuwave\Lighthouse\Execution\ModelsLoader\ModelsLoader;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class WithCountDirective extends WithRelationDirective implements FieldManipulator
 {
@@ -51,13 +52,15 @@ GRAPHQL;
     }
 
     /**
+     * @param  array<string, mixed>  $args
+     *
      * @return CountModelsLoader
      */
-    protected function modelsLoader(ResolveInfo $resolveInfo): ModelsLoader
+    protected function modelsLoader($parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ModelsLoader
     {
         return new CountModelsLoader(
             $this->relation(),
-            $this->makeBuilderDecorator($resolveInfo)
+            $this->makeBuilderDecorator($parent, $args, $context, $resolveInfo)
         );
     }
 }

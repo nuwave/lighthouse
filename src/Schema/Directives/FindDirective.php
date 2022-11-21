@@ -39,7 +39,11 @@ GRAPHQL;
                 ->argumentSet
                 ->enhanceBuilder(
                     $this->getModelClass()::query(),
-                    $this->directiveArgValue('scopes', [])
+                    $this->directiveArgValue('scopes', []),
+                    $root,
+                    $args,
+                    $context,
+                    $resolveInfo
                 )
                 ->get();
 
