@@ -15,7 +15,7 @@ trait AssertsQueryCounts
 {
     protected function countQueries(?int &$count): void
     {
-        DB::listen(function ($query) use (&$count): void {
+        DB::listen(function () use (&$count): void {
             ++$count;
         });
     }
