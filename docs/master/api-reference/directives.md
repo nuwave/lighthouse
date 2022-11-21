@@ -41,25 +41,25 @@ directive @aggregate(
 Options for the `function` argument of `@aggregate`.
 """
 enum AggregateFunction {
-    """
-    Return the average value.
-    """
-    AVG
+  """
+  Return the average value.
+  """
+  AVG
 
-    """
-    Return the sum.
-    """
-    SUM
+  """
+  Return the sum.
+  """
+  SUM
 
-    """
-    Return the minimum.
-    """
-    MIN
+  """
+  Return the minimum.
+  """
+  MIN
 
-    """
-    Return the maximum.
-    """
-    MAX
+  """
+  Return the maximum.
+  """
+  MAX
 }
 ```
 
@@ -2250,22 +2250,22 @@ When used without any arguments, Lighthouse will attempt
 to resolve the type through a model with the same name.
 """
 directive @node(
-    """
-    Reference to a function that receives the decoded `id` and returns a result.
-    Consists of two parts: a class name and a method name, seperated by an `@` symbol.
-    If you pass only a class name, the method name defaults to `__invoke`.
+  """
+  Reference to a function that receives the decoded `id` and returns a result.
+  Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
 
-    Mutually exclusive with `model`.
-    """
-    resolver: String
+  Mutually exclusive with `model`.
+  """
+  resolver: String
 
-    """
-    Specify the class name of the model to use.
-    This is only needed when the default model detection does not work.
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model detection does not work.
 
-    Mutually exclusive with `resolver`.
-    """
-    model: String
+  Mutually exclusive with `resolver`.
+  """
+  model: String
 ) on OBJECT
 ```
 
@@ -2331,78 +2331,78 @@ type Query {
 Sort a result list by one or more given columns.
 """
 directive @orderBy(
-    """
-    Restrict the allowed column names to a well-defined list.
-    This improves introspection capabilities and security.
-    Mutually exclusive with `columnsEnum`.
-    Only used when the directive is added on an argument.
-    """
-    columns: [String!]
+  """
+  Restrict the allowed column names to a well-defined list.
+  This improves introspection capabilities and security.
+  Mutually exclusive with `columnsEnum`.
+  Only used when the directive is added on an argument.
+  """
+  columns: [String!]
 
-    """
-    Use an existing enumeration type to restrict the allowed columns to a predefined list.
-    This allows you to re-use the same enum for multiple fields.
-    Mutually exclusive with `columns`.
-    Only used when the directive is added on an argument.
-    """
-    columnsEnum: String
+  """
+  Use an existing enumeration type to restrict the allowed columns to a predefined list.
+  This allows you to re-use the same enum for multiple fields.
+  Mutually exclusive with `columns`.
+  Only used when the directive is added on an argument.
+  """
+  columnsEnum: String
 
-    """
-    Allow clients to sort by aggregates on relations.
-    Only used when the directive is added on an argument.
-    """
-    relations: [OrderByRelation!]
+  """
+  Allow clients to sort by aggregates on relations.
+  Only used when the directive is added on an argument.
+  """
+  relations: [OrderByRelation!]
 
-    """
-    The database column for which the order by clause will be applied on.
-    Only used when the directive is added on a field.
-    """
-    column: String
+  """
+  The database column for which the order by clause will be applied on.
+  Only used when the directive is added on a field.
+  """
+  column: String
 
-    """
-    The direction of the order by clause.
-    Only used when the directive is added on a field.
-    """
-    direction: OrderByDirection = ASC
+  """
+  The direction of the order by clause.
+  Only used when the directive is added on a field.
+  """
+  direction: OrderByDirection = ASC
 ) on ARGUMENT_DEFINITION | FIELD_DEFINITION
 
 """
 Options for the `direction` argument on `@orderBy`.
 """
 enum OrderByDirection {
-    """
-    Sort in ascending order.
-    """
-    ASC
+  """
+  Sort in ascending order.
+  """
+  ASC
 
-    """
-    Sort in descending order.
-    """
-    DESC
+  """
+  Sort in descending order.
+  """
+  DESC
 }
 
 """
 Options for the `relations` argument on `@orderBy`.
 """
 input OrderByRelation {
-    """
-    Name of the relation.
-    """
-    relation: String!
+  """
+  Name of the relation.
+  """
+  relation: String!
 
-    """
-    Restrict the allowed column names to a well-defined list.
-    This improves introspection capabilities and security.
-    Mutually exclusive with `columnsEnum`.
-    """
-    columns: [String!]
+  """
+  Restrict the allowed column names to a well-defined list.
+  This improves introspection capabilities and security.
+  Mutually exclusive with `columnsEnum`.
+  """
+  columns: [String!]
 
-    """
-    Use an existing enumeration type to restrict the allowed columns to a predefined list.
-    This allows you to re-use the same enum for multiple fields.
-    Mutually exclusive with `columns`.
-    """
-    columnsEnum: String
+  """
+  Use an existing enumeration type to restrict the allowed columns to a predefined list.
+  This allows you to re-use the same enum for multiple fields.
+  Mutually exclusive with `columns`.
+  """
+  columnsEnum: String
 }
 ```
 
