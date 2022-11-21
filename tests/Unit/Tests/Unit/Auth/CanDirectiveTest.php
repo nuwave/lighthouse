@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Auth;
 
+use Nuwave\Lighthouse\Auth\CanDirective;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\TestCase;
@@ -352,5 +353,15 @@ final class CanDirectiveTest extends TestCase
         $user->name = 'foo';
 
         return $user;
+    }
+
+    public function testThrowsIfResolvedIsUsedOnMutation(): void
+    {
+        $this->expectExceptionObject(CanDirective::resolvedIsUnsafeInMutations('foo'));
+        $this->buildSchema(/** @lang GraphQL */ '
+        type Mutation {
+            foo: ID @can(resolved: true)
+        }
+        ');
     }
 }
