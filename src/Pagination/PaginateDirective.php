@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Pagination\AbstractPaginator;
 use Laravel\Scout\Builder as ScoutBuilder;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -96,21 +95,13 @@ GRAPHQL;
 
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType): void
     {
+        $this->validateMutuallyExclusiveArguments(['builder', 'resolver', 'model']);
+
         $paginationManipulator = new PaginationManipulator($documentAST);
 
-        $directiveHasBuilderArgument = $this->directiveHasArgument('builder');
-        $directiveHasResolverArgument = $this->directiveHasArgument('resolver');
-        $directiveHasModelArgument = $this->directiveHasArgument('model');
-
-        if ($directiveHasResolverArgument && ($directiveHasModelArgument || $directiveHasBuilderArgument)) {
-            throw new DefinitionException(
-                "Argument 'resolver' is mutually exclusive with 'builder' and 'model'."
-            );
-        }
-
-        if ($directiveHasResolverArgument) {
+        if ($this->directiveHasArgument('resolver')) {
             $this->getResolverFromArgument('resolver');
-        } elseif ($directiveHasBuilderArgument) {
+        } elseif ($this->directiveHasArgument('builder')) {
             // This is done only for validation
             $this->getResolverFromArgument('builder');
         } else {

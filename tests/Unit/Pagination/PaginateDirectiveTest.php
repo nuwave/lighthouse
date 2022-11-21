@@ -759,7 +759,7 @@ GRAPHQL
     {
         $callable = addslashes(static::class) . '@returnPaginatedDataInsteadOfBuilder';
         $this->expectException(DefinitionException::class);
-        $this->expectExceptionMessage("Argument 'resolver' is mutually exclusive with 'builder' and 'model'.");
+        $this->expectExceptionMessage('The arguments [builder, resolver, model] for @paginate are mutually exclusive, found [builder, resolver] on users.');
 
         $this->buildSchema(/* @lang GraphQL */ "
             type Query {
@@ -776,11 +776,11 @@ GRAPHQL
     {
         $callable = addslashes(static::class) . '@returnPaginatedDataInsteadOfBuilder';
         $this->expectException(DefinitionException::class);
-        $this->expectExceptionMessage("Argument 'resolver' is mutually exclusive with 'builder' and 'model'.");
+        $this->expectExceptionMessage('The arguments [builder, resolver, model] for @paginate are mutually exclusive, found [resolver, model] on users.');
 
         $this->buildSchema(/* @lang GraphQL */ "
             type Query {
-                users: [User] @paginate(resolver: \"{$callable}\" builder: \"{$callable}\")
+                users: [User] @paginate(resolver: \"{$callable}\" model: \"{$callable}\")
             }
 
             type User {
