@@ -12,7 +12,6 @@ use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Support\AppVersion;
-use ReflectionClass;
 
 class SelectHelper
 {
@@ -79,7 +78,7 @@ class SelectHelper
 
                             if (method_exists($model, $relationName)) {
                                 if (AppVersion::below(5.7)) {
-                                    $relation = new ReflectionClass($model->{$relationName}());
+                                    $relation = new \ReflectionClass($model->{$relationName}());
                                     $localKey = $relation->getProperty('localKey');
                                     $localKey->setAccessible(true);
                                     array_push($selectColumns, $localKey->getValue($relation));
