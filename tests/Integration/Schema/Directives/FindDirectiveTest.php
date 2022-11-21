@@ -196,4 +196,48 @@ final class FindDirectiveTest extends DBTestCase
             ],
         ]);
     }
+
+    public function testReturnsOptimizeSelected(): void
+    {
+        $company = factory(Company::class)->create();
+        $user = factory(User::class)->create([
+            'company_id' => $company->id,
+        ]);
+
+        $this->schema = '
+        type User {
+            id: ID!
+            companyName: String! @select(columns: ["company_id"])
+        }
+
+        type Query {
+            user(id: ID @eq): User @find(model: "User")
+        }
+        ';
+
+        self::trackQueries();
+
+        $this->graphQL("
+        {
+            user(id: {$user->id}) {
+                id
+                companyName
+            }
+        }
+        ")->assertJson([
+            'data' => [
+                'user' => [
+                    'id' => (string) $user->id,
+                    'companyName' => $company->name,
+                ],
+            ],
+        ]);
+
+        $queries = self::getQueriesExecuted();
+
+        $this->assertStringContainsString(
+            'select `id`, `company_id` from `users`',
+            $queries[0]['query']
+        );
+    }
 }
