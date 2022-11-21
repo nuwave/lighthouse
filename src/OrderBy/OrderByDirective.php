@@ -34,15 +34,15 @@ directive @orderBy(
     """
     Restrict the allowed column names to a well-defined list.
     This improves introspection capabilities and security.
-    Mutually exclusive with the `columnsEnum` argument.
+    Mutually exclusive with `columnsEnum`.
     Only used when the directive is added on an argument.
     """
     columns: [String!]
 
     """
     Use an existing enumeration type to restrict the allowed columns to a predefined list.
-    This allowes you to re-use the same enum for multiple fields.
-    Mutually exclusive with the `columns` argument.
+    This allows you to re-use the same enum for multiple fields.
+    Mutually exclusive with `columns`.
     Only used when the directive is added on an argument.
     """
     columnsEnum: String
@@ -86,21 +86,21 @@ Options for the `relations` argument on `@orderBy`.
 """
 input OrderByRelation {
     """
-    TODO: description
+    Name of the relation.
     """
     relation: String!
 
     """
     Restrict the allowed column names to a well-defined list.
     This improves introspection capabilities and security.
-    Mutually exclusive with the `columnsEnum` argument.
+    Mutually exclusive with `columnsEnum`.
     """
     columns: [String!]
 
     """
     Use an existing enumeration type to restrict the allowed columns to a predefined list.
-    This allowes you to re-use the same enum for multiple fields.
-    Mutually exclusive with the `columns` argument.
+    This allows you to re-use the same enum for multiple fields.
+    Mutually exclusive with `columns`.
     """
     columnsEnum: String
 }
@@ -153,6 +153,8 @@ GRAPHQL;
         FieldDefinitionNode &$parentField,
         ObjectTypeDefinitionNode &$parentType
     ): void {
+        $this->validateMutuallyExclusiveArguments(['columns', 'columnsEnum']);
+
         if (! $this->hasAllowedColumns() && ! $this->directiveHasArgument('relations')) {
             $argDefinition->type = Parser::typeReference('[' . OrderByServiceProvider::DEFAULT_ORDER_BY_CLAUSE . '!]');
 

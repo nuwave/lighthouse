@@ -9,7 +9,7 @@ a minimalistic [Vue](https://vuejs.org) powered static site generator.
 docs/
 ├── .vuepress/            # https://vuepress.vuejs.org/guide/directory-structure.html
 │
-├── master/
+├── master/               # Docs for the current version
 │   ├── guides/
 │   │   └── auth.md       # https://mysite.com/master/guides/auth.html
 │   ├── the-basics/
@@ -17,14 +17,13 @@ docs/
 │   │
 │   └── sidebar.js        # versioned sidebar for this version
 │
-├── 2/
+├── 2/                    # Archived docs for the latest 2.x version, same for other old versions
 │   └── ...               # same structure as "docs/master/"
 |
-├── 3/
+├── [x]/                  # Docs for the current stable version, usually a copy of "docs/master/"
 │   └── ...               # same structure as "docs/master/"
 │
-├── pages/
-│   └── ...               # Not versioned, it remains the same for all docs versions
+├── pages/                # Pages independent from the version
 │
 ├── package.json          # vuepress dependencies
 └── INDEX.md              # the beautiful home page
@@ -76,8 +75,8 @@ See [configuration](../getting-started/configuration.md) for more info.
 
 ## Versioning
 
-Each subfolder in `docs/` will represent a documentation version,
-except `docs/pages/` that will remain the same for all docs versions.
+The numbered directories (2, 3, ...) in `docs/` correspond to major releases of Lighthouse,
+`docs/pages/` remains the same for all versions.
 
 This ensures that the docs are always in sync with the released version of Lighthouse.
 Version specific changes are handled by keeping the docs for each version separate.
@@ -87,6 +86,11 @@ Version specific changes are handled by keeping the docs for each version separa
 | `docs/master/guides/installation.md` | `https://mysite.com/master/guides/installation.html` |
 | `docs/2/guides/installation.md`      | `https://mysite.com/2/guides/installation.html`      |
 | `docs/pages/users.md`                | `https://mysite.com/pages/users.html`                |
+
+### Documenting new features
+
+Add documentation for new features to `docs/master/`.
+See [Tagging a new version](#tagging-a-new-version) for how they are released.
 
 ### Updating existing versions
 
@@ -98,12 +102,12 @@ in a single PR.
 
 ### Tagging a new version
 
-After you finished your work on `docs/master`, copy the updated docs
+After you finished your work on `docs/master/`, copy the updated docs
 into the directory of the current major version by running:
 
-    yarn release
+    make release
 
-When releasing a new major version, update the `release` script in `package.json` first.
+When releasing a new major version, update the version number in the `release` target in [Makefile](../Makefile).
 
 ## Deployment
 

@@ -13,7 +13,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Execution\Resolved;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
@@ -281,19 +280,6 @@ GRAPHQL;
 
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType)
     {
-        $mutuallyExclusive = [
-            $this->directiveHasArgument('resolve'),
-            $this->directiveHasArgument('query'),
-            $this->directiveHasArgument('find'),
-        ];
-
-        if (count(array_filter($mutuallyExclusive)) > 1) {
-            throw self::multipleMutuallyExclusiveArguments();
-        }
-    }
-
-    public static function multipleMutuallyExclusiveArguments(): DefinitionException
-    {
-        return new DefinitionException('The arguments `resolve`, `query` and `find` are mutually exclusive in the `@can` directive.');
+        $this->validateMutuallyExclusiveArguments(['resolve', 'query', 'find']);
     }
 }

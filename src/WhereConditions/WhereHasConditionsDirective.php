@@ -27,14 +27,14 @@ directive @whereHasConditions(
     """
     Restrict the allowed column names to a well-defined list.
     This improves introspection capabilities and security.
-    Mutually exclusive with the `columnsEnum` argument.
+    Mutually exclusive with `columnsEnum`.
     """
     columns: [String!]
 
     """
     Use an existing enumeration type to restrict the allowed columns to a predefined list.
-    This allowes you to re-use the same enum for multiple fields.
-    Mutually exclusive with the `columns` argument.
+    This allows you to re-use the same enum for multiple fields.
+    Mutually exclusive with `columns`.
     """
     columnsEnum: String
 

@@ -13,6 +13,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Support returning `LengthAwarePaginator` from option `resolver` in `@paginator` directive https://github.com/nuwave/lighthouse/pull/2232
 
+## v5.65.0
+
+### Added
+
+- Validate only one of any mutually exclusive directive arguments is defined https://github.com/nuwave/lighthouse/pull/2233
+
 ## v5.64.1
 
 ### Fixed

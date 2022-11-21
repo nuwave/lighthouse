@@ -21,13 +21,13 @@ directive @aggregate(
 
   """
   The relationship with the column to aggregate.
-  Mutually exclusive with the `model` argument.
+  Mutually exclusive with `model`.
   """
   relation: String
 
   """
   The model with the column to aggregate.
-  Mutually exclusive with the `relation` argument.
+  Mutually exclusive with `relation`.
   """
   model: String
 
@@ -821,13 +821,13 @@ Returns the count of a given relationship or model.
 directive @count(
   """
   The relationship to count.
-  Mutually exclusive with the `model` argument.
+  Mutually exclusive with `model`.
   """
   relation: String
 
   """
   The model to count.
-  Mutually exclusive with the `relation` argument.
+  Mutually exclusive with `relation`.
   """
   model: String
 
@@ -2255,7 +2255,7 @@ directive @node(
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
   If you pass only a class name, the method name defaults to `__invoke`.
 
-  Mutually exclusive with the `model` argument.
+  Mutually exclusive with `model`.
   """
   resolver: String
 
@@ -2263,7 +2263,7 @@ directive @node(
   Specify the class name of the model to use.
   This is only needed when the default model detection does not work.
 
-  Mutually exclusive with the `model` argument.
+  Mutually exclusive with `resolver`.
   """
   model: String
 ) on OBJECT
@@ -2334,15 +2334,15 @@ directive @orderBy(
   """
   Restrict the allowed column names to a well-defined list.
   This improves introspection capabilities and security.
-  Mutually exclusive with the `columnsEnum` argument.
+  Mutually exclusive with `columnsEnum`.
   Only used when the directive is added on an argument.
   """
   columns: [String!]
 
   """
   Use an existing enumeration type to restrict the allowed columns to a predefined list.
-  This allowes you to re-use the same enum for multiple fields.
-  Mutually exclusive with the `columns` argument.
+  This allows you to re-use the same enum for multiple fields.
+  Mutually exclusive with `columns`.
   Only used when the directive is added on an argument.
   """
   columnsEnum: String
@@ -2386,21 +2386,21 @@ Options for the `relations` argument on `@orderBy`.
 """
 input OrderByRelation {
   """
-  TODO: description
+  Name of the relation.
   """
   relation: String!
 
   """
   Restrict the allowed column names to a well-defined list.
   This improves introspection capabilities and security.
-  Mutually exclusive with the `columnsEnum` argument.
+  Mutually exclusive with `columnsEnum`.
   """
   columns: [String!]
 
   """
   Use an existing enumeration type to restrict the allowed columns to a predefined list.
-  This allowes you to re-use the same enum for multiple fields.
-  Mutually exclusive with the `columns` argument.
+  This allows you to re-use the same enum for multiple fields.
+  Mutually exclusive with `columns`.
   """
   columnsEnum: String
 }
