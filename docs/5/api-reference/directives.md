@@ -21,13 +21,13 @@ directive @aggregate(
 
   """
   The relationship with the column to aggregate.
-  Mutually exclusive with the `model` argument.
+  Mutually exclusive with `model`.
   """
   relation: String
 
   """
   The model with the column to aggregate.
-  Mutually exclusive with the `relation` argument.
+  Mutually exclusive with `relation`.
   """
   model: String
 
@@ -821,13 +821,13 @@ Returns the count of a given relationship or model.
 directive @count(
   """
   The relationship to count.
-  Mutually exclusive with the `model` argument.
+  Mutually exclusive with `model`.
   """
   relation: String
 
   """
   The model to count.
-  Mutually exclusive with the `relation` argument.
+  Mutually exclusive with `relation`.
   """
   model: String
 
@@ -2255,7 +2255,7 @@ directive @node(
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
   If you pass only a class name, the method name defaults to `__invoke`.
 
-  Mutually exclusive with the `model` argument.
+  Mutually exclusive with `model`.
   """
   resolver: String
 
@@ -2263,7 +2263,7 @@ directive @node(
   Specify the class name of the model to use.
   This is only needed when the default model detection does not work.
 
-  Mutually exclusive with the `model` argument.
+  Mutually exclusive with `resolver`.
   """
   model: String
 ) on OBJECT
@@ -2334,15 +2334,15 @@ directive @orderBy(
   """
   Restrict the allowed column names to a well-defined list.
   This improves introspection capabilities and security.
-  Mutually exclusive with the `columnsEnum` argument.
+  Mutually exclusive with `columnsEnum`.
   Only used when the directive is added on an argument.
   """
   columns: [String!]
 
   """
   Use an existing enumeration type to restrict the allowed columns to a predefined list.
-  This allowes you to re-use the same enum for multiple fields.
-  Mutually exclusive with the `columns` argument.
+  This allows you to re-use the same enum for multiple fields.
+  Mutually exclusive with `columns`.
   Only used when the directive is added on an argument.
   """
   columnsEnum: String
@@ -2386,21 +2386,21 @@ Options for the `relations` argument on `@orderBy`.
 """
 input OrderByRelation {
   """
-  TODO: description
+  Name of the relation.
   """
   relation: String!
 
   """
   Restrict the allowed column names to a well-defined list.
   This improves introspection capabilities and security.
-  Mutually exclusive with the `columnsEnum` argument.
+  Mutually exclusive with `columnsEnum`.
   """
   columns: [String!]
 
   """
   Use an existing enumeration type to restrict the allowed columns to a predefined list.
-  This allowes you to re-use the same enum for multiple fields.
-  Mutually exclusive with the `columns` argument.
+  This allows you to re-use the same enum for multiple fields.
+  Mutually exclusive with `columns`.
   """
   columnsEnum: String
 }
@@ -2431,6 +2431,14 @@ directive @paginate(
   This replaces the use of a model.
   """
   builder: String
+
+  """
+  Reference a function that resolves the field by directly returning data in a Paginator instance.
+  Mutually exclusive with `builder` and `model`. Not compatible with `scopes` and builder arguments such as `@eq`.
+  Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
+  """
+  resolver: String
 
   """
   Apply scopes to the underlying query.
@@ -2755,6 +2763,50 @@ class Blog
         return DB::table('posts')
             ->leftJoinSub(...)
             ->groupBy(...);
+    }
+}
+```
+
+### Custom resolver
+
+You can provide your own function that resolves the field by directly returning data in a `\Illuminate\Contracts\Pagination\Paginator` instance.
+
+This is mutually exclusive with `builder` and `model`. Not compatible with `scopes` and builder arguments such as `@eq`.
+
+```graphql
+type Query {
+  posts: [Post!]! @paginate(resolver: "App\\GraphQL\\Queries\\Posts")
+}
+```
+
+A custom resolver function may look like the following:
+
+```php
+namespace App\GraphQL\Queries;
+
+use Illuminate\Pagination\LengthAwarePaginator;
+
+final class Posts
+{
+    /**
+     * @param  null  $root Always null, since this field has no parent.
+     * @param  array{}  $args The field arguments passed by the client.
+     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context Shared between all fields.
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo Metadata for advanced query resolution.
+     */
+    public function __invoke($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): LengthAwarePaginator
+    {
+        //...apply your logic
+        return new LengthAwarePaginator([
+            [
+                'id' => 1,
+                'title' => 'Flying teacup found in solar orbit',
+            ],
+            [
+                'id' => 2,
+                'title' => 'What actually is the difference between cookies and biscuits?',
+            ],
+        ], 2, 15);
     }
 }
 ```
