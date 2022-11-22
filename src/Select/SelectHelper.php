@@ -6,6 +6,7 @@ use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\UnionTypeDefinitionNode;
+use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
@@ -52,7 +53,11 @@ class SelectHelper
     {
         $returnTypeName = ASTHelper::getUnderlyingTypeName($definitionNode);
 
-        $documentAST = app(ASTBuilder::class)->documentAST();
+        $astBuilder = Container::getInstance()->make(ASTBuilder::class);
+
+        assert($astBuilder instanceof ASTBuilder);
+
+        $documentAST = $astBuilder->documentAST();
 
         assert($documentAST instanceof DocumentAST);
 
