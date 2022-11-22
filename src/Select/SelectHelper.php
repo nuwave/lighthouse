@@ -5,7 +5,6 @@ namespace Nuwave\Lighthouse\Select;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
-use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -66,10 +65,6 @@ class SelectHelper
         }
 
         $type = $documentAST->types[$returnTypeName];
-
-        if ($type instanceof UnionTypeDefinitionNode) {
-            $type = $documentAST->types[ASTHelper::getUnderlyingTypeName($type->types[0])];
-        }
 
         $fieldDefinitions = $type->fields;
 
