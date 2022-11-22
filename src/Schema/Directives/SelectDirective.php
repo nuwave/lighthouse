@@ -12,9 +12,9 @@ Specify the SQL column dependencies of this field.
 """
 directive @select(
   """
-  SQL columns names to pass to the Eloquent query builder
+  SQL column names to include in the `SELECT` part of the query.
   """
-  columns: [String!]
+  columns: [String!]!
 ) on FIELD_DEFINITION
 GRAPHQL;
     }

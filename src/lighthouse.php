@@ -360,9 +360,8 @@ return [
     | Optimized Selects
     |--------------------------------------------------------------------------
     |
-    | If set to true, Eloquent will only select the columns necessary to resolve
-    | a query. You must use the select directive to resolve advanced field dependencies
-    | on other columns.
+    | If set to true, Eloquent will only select the columns necessary to resolve a query.
+    | Use the @select directive to specify column dependencies of compound fields.
     |
     */
 
