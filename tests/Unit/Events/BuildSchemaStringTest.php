@@ -68,12 +68,12 @@ final class BuildSchemaStringTest extends TestCase
         ]);
     }
 
-    public function resolveSayHello(): string
+    public static function resolveSayHello(): string
     {
         return 'hello';
     }
 
-    public function resolveFoo(): string
+    public static function resolveFoo(): string
     {
         return 'foo';
     }

@@ -347,7 +347,7 @@ final class CanDirectiveTest extends TestCase
         ]);
     }
 
-    public function resolveUser(): User
+    public static function resolveUser(): User
     {
         $user = new User();
         $user->name = 'foo';

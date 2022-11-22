@@ -296,7 +296,7 @@ GRAPHQL;
     /**
      * @return \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\User|\Tests\Utils\Models\Team>
      */
-    public function fetchResults(): EloquentCollection
+    public static function fetchResults(): EloquentCollection
     {
         /** @var \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\User|\Tests\Utils\Models\Team> $results */
         $results = new EloquentCollection();
@@ -306,7 +306,7 @@ GRAPHQL;
             ->concat(Team::all());
     }
 
-    public function resolveType(): Type
+    public static function resolveType(): Type
     {
         $typeRegistry = Container::getInstance()->make(TypeRegistry::class);
         assert($typeRegistry instanceof TypeRegistry);
@@ -317,7 +317,7 @@ GRAPHQL;
     /**
      * @return array<string, string>
      */
-    public function fetchGuy(): array
+    public static function fetchGuy(): array
     {
         return [
             'name' => 'bar',
