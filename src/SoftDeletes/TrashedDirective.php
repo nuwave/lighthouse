@@ -2,13 +2,12 @@
 
 namespace Nuwave\Lighthouse\SoftDeletes;
 
-use GraphQL\Exception\InvalidArgument;
+use GraphQL\Error\Error;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Builder as ScoutBuilder;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Scout\ScoutBuilderDirective;
-use Nuwave\Lighthouse\Scout\ScoutException;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
 class TrashedDirective extends BaseDirective implements ArgBuilderDirective, ScoutBuilderDirective
@@ -51,7 +50,7 @@ GRAPHQL;
                 // @phpstan-ignore-next-line because it involves mixins
                 return $builder->withoutTrashed();
             default:
-                throw new InvalidArgument('Unexpected value for Trashed filter: ' . $value);
+                throw new Error("Unexpected value for Trashed filter: {$value}");
         }
     }
 
@@ -70,7 +69,7 @@ GRAPHQL;
             case 'only':
                 return $builder->onlyTrashed();
             default:
-                throw new ScoutException('Unexpected value for Trashed filter: ' . $value);
+                throw new Error("Unexpected value for Trashed filter: {$value}");
         }
     }
 

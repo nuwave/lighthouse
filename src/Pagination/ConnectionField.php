@@ -14,8 +14,6 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 class ConnectionField
 {
     /**
-     * Resolve page info for connection.
-     *
      * @return array<string, mixed>
      */
     public function pageInfoResolver(LengthAwarePaginator $paginator): array
@@ -42,9 +40,9 @@ class ConnectionField
     }
 
     /**
-     * Resolve edges for connection.
-     *
      * @param  array<string, mixed>  $args
+     *
+     * @return Collection<array<string, mixed>>
      */
     public function edgeResolver(Paginator $paginator, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Collection
     {

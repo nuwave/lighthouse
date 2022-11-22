@@ -212,7 +212,7 @@ final class RelationBatchLoaderTest extends DBTestCase
     /**
      * @return array<array<bool|int>>
      */
-    public function batchloadRelationsSetting(): array
+    public static function batchloadRelationsSetting(): array
     {
         return [
             [true, 2],

@@ -974,7 +974,7 @@ GRAPHQL;
     /**
      * @param array<string, mixed> $conditions
      */
-    public function handler(EloquentBuilder $builder, array $conditions): void
+    public static function handler(EloquentBuilder $builder, array $conditions): void
     {
         $value = $conditions['value'];
         $builder->where($conditions['column'], $value . $value);
