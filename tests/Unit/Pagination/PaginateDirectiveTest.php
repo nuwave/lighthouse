@@ -6,6 +6,7 @@ use GraphQL\Type\Definition\Argument;
 use GraphQL\Type\Definition\FieldDefinition;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Utils\SchemaPrinter;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Nuwave\Lighthouse\Pagination\PaginationType;
@@ -695,5 +696,61 @@ GRAPHQL
             }
         }
         ')->dump();
+    }
+
+    public function returnPaginatedDataInsteadOfBuilder(): LengthAwarePaginator
+    {
+        return new LengthAwarePaginator([
+            [
+                'id' => 1,
+            ],
+            [
+                'id' => 2,
+            ],
+        ], 2, 15);
+    }
+
+    public function testPaginatorResolver(): void
+    {
+        $this->buildSchema(/* @lang GraphQL */ "
+        type Query {
+            users: [User] @paginate(resolver: \"{$this->qualifyTestResolver('returnPaginatedDataInsteadOfBuilder')}\")
+        }
+
+        type User {
+            id: ID
+        }
+        ");
+
+        $this->graphQL(/* @lang GraphQL */ '
+        {
+            users(first: 0) {
+                data {
+                    id
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'users' => [
+                    'data' => [
+                        ['id' => 1],
+                        ['id' => 2],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testThrowsIfResolverIsNotPresent(): void
+    {
+        $this->expectException(DefinitionException::class);
+        $this->expectExceptionMessage('Failed to find class NonexistingClass in namespaces [] for directive @paginate.');
+
+        $this->buildSchema(/** @lang GraphQL */ '
+        type Query {
+            users: [Query!]! @paginate(resolver: "NonexistingClass@notFound")
+        }
+        ');
     }
 }

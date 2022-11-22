@@ -18,6 +18,7 @@ use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Execution\Resolved;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\SoftDeletes\ForceDeleteDirective;
 use Nuwave\Lighthouse\SoftDeletes\RestoreDirective;
@@ -274,19 +275,15 @@ GRAPHQL;
 
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType)
     {
-        $mutuallyExclusive = [
-            $this->directiveHasArgument('resolve'),
-            $this->directiveHasArgument('query'),
-            $this->directiveHasArgument('find'),
-        ];
+        $this->validateMutuallyExclusiveArguments(['resolved', 'query', 'find']);
 
-        if (count(array_filter($mutuallyExclusive)) > 1) {
-            throw self::multipleMutuallyExclusiveArguments();
+        if ($this->directiveHasArgument('resolved') && RootType::MUTATION === $parentType->name->value) {
+            throw self::resolvedIsUnsafeInMutations($fieldDefinition->name->value);
         }
     }
 
-    public static function multipleMutuallyExclusiveArguments(): DefinitionException
+    public static function resolvedIsUnsafeInMutations(string $fieldName): DefinitionException
     {
-        return new DefinitionException('The arguments `resolve`, `query` and `find` are mutually exclusive in the `@can` directive.');
+        return new DefinitionException("Do not use @can with `resolved` on mutation {$fieldName}, it is unsafe as the resolver will run before checking permissions. Use `query` or `find`.");
     }
 }

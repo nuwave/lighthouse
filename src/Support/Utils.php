@@ -65,25 +65,34 @@ class Utils
     /**
      * Get the value of a protected member variable of an object.
      *
-     * Returns a default value in case of error.
-     *
      * @param  mixed  $object  object with protected member
      * @param  string  $memberName  name of object's protected member
-     * @param  mixed|null  $default  default value to return in case of access error
      *
      * @return mixed value of object's protected member
      */
-    public static function accessProtected($object, string $memberName, $default = null)
+    public static function accessProtected($object, string $memberName)
     {
-        try {
-            $reflection = new \ReflectionClass($object);
-            $property = $reflection->getProperty($memberName);
-            $property->setAccessible(true);
+        $property = new \ReflectionProperty($object, $memberName);
+        $property->setAccessible(true);
 
-            return $property->getValue($object);
-        } catch (\ReflectionException $ex) {
-            return $default;
-        }
+        return $property->getValue($object);
+    }
+
+    /**
+     * Call a protected method of an object.
+     *
+     * @param  mixed  $object  object with protected method
+     * @param  string  $methodName  name of object's protected method
+     * @param  array<mixed>  ...$args  zero or more parameters to be passed to the method
+     *
+     * @return mixed result of calling the method
+     */
+    public static function callProtected($object, string $methodName, array ...$args)
+    {
+        $property = new \ReflectionMethod($object, $methodName);
+        $property->setAccessible(true);
+
+        return $property->invoke($object, ...$args);
     }
 
     /**
