@@ -41,7 +41,7 @@ class DirectiveFactory
                 ];
             }
 
-            $arguments[] = new FieldArgument($argumentConfig);
+            $arguments[] = $argumentConfig;
         }
 
         $locations = [];
