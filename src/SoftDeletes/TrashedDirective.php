@@ -50,7 +50,7 @@ GRAPHQL;
                 // @phpstan-ignore-next-line because it involves mixins
                 return $builder->withoutTrashed();
             default:
-                throw new Error('Unexpected value for Trashed filter: ' . $value);
+                throw new Error("Unexpected value for Trashed filter: {$value}");
         }
     }
 
@@ -69,7 +69,7 @@ GRAPHQL;
             case 'only':
                 return $builder->onlyTrashed();
             default:
-                throw new Error('Unexpected value for Trashed filter: ' . $value);
+                throw new Error("Unexpected value for Trashed filter: {$value}");
         }
     }
 
