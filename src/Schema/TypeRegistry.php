@@ -163,6 +163,8 @@ class TypeRegistry
 
     /**
      * Register an executable GraphQL type.
+     *
+     * @param  \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType  $type
      */
     public function register(Type $type): self
     {
@@ -178,6 +180,8 @@ class TypeRegistry
 
     /**
      * Register an executable GraphQL type lazily.
+     *
+     * @param callable(): \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType $type
      */
     public function registerLazy(string $name, callable $type): self
     {
@@ -192,6 +196,8 @@ class TypeRegistry
 
     /**
      * Register a type, overwriting if it exists already.
+     *
+     * @param  \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType  $type
      */
     public function overwrite(Type $type): self
     {
@@ -202,6 +208,8 @@ class TypeRegistry
 
     /**
      * Register a type lazily, overwriting if it exists already.
+     *
+     * @param callable(): \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType $type
      */
     public function overwriteLazy(string $name, callable $type): self
     {
@@ -216,7 +224,7 @@ class TypeRegistry
     /**
      * Return all possible types that are registered.
      *
-     * @return array<string, \GraphQL\Type\Definition\Type>
+     * @return array<string, \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType>
      */
     public function possibleTypes(): array
     {
@@ -246,7 +254,7 @@ class TypeRegistry
      * This does not return all possible types, only those that
      * are programmatically registered or already resolved.
      *
-     * @return array<string, \GraphQL\Type\Definition\Type>
+     * @return array<string, \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType>
      */
     public function resolvedTypes(): array
     {
@@ -257,6 +265,8 @@ class TypeRegistry
      * Transform a definition node to an executable type.
      *
      * @param  \GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node  $definition
+     *
+     * @return \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType
      */
     public function handle(TypeDefinitionNode $definition): Type
     {
@@ -287,6 +297,8 @@ class TypeRegistry
      *
      * @throws \GraphQL\Error\InvariantViolation
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
+     *
+     * @return \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType
      */
     protected function resolveType(TypeDefinitionNode $typeDefinition): Type
     {

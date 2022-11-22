@@ -30,19 +30,19 @@ class DirectiveFactory
             /** @var \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\InputType $argumentType */
             $argumentType = $this->typeNodeConverter->convert($argument->type);
 
-            $fieldArgumentConfig = [
+            $argumentConfig = [
                 'name' => $argument->name->value,
                 'description' => $argument->description->value ?? null,
                 'type' => $argumentType,
             ];
 
             if ($defaultValue = $argument->defaultValue) {
-                $fieldArgumentConfig += [
+                $argumentConfig += [
                     'defaultValue' => ASTHelper::defaultValueForArgument($defaultValue, $argumentType),
                 ];
             }
 
-            $arguments[] = new FieldArgument($fieldArgumentConfig);
+            $arguments[] = new FieldArgument($argumentConfig);
         }
 
         $locations = [];

@@ -274,7 +274,7 @@ final class RulesDirectiveTest extends TestCase
     /**
      * @return array<array<int, string>>
      */
-    public function invalidApplyArguments(): array
+    public static function invalidApplyArguments(): array
     {
         return [
             [/** @lang GraphQL */ '123'],
@@ -300,7 +300,7 @@ final class RulesDirectiveTest extends TestCase
     /**
      * @return array<array<int, string>>
      */
-    public function invalidMessageArguments(): array
+    public static function invalidMessageArguments(): array
     {
         return [
             [/** @lang GraphQL */ '"foo"'],

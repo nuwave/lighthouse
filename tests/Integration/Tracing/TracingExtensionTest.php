@@ -89,7 +89,7 @@ final class TracingExtensionTest extends TestCase
         $this->assertCount(1, $result->json('1.extensions.tracing.execution.resolvers'));
     }
 
-    public function resolve(): string
+    public static function resolve(): string
     {
         // Just enough to consistently change the resulting timestamp
         usleep(1000);

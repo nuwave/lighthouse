@@ -34,7 +34,7 @@ trait TestsSchemaCache
      *
      * @return array<int, array{int}>
      */
-    public function cacheVersions(): array
+    public static function cacheVersions(): array
     {
         return [
             [1],

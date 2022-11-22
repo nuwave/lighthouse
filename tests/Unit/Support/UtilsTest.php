@@ -21,7 +21,7 @@ final class UtilsTest extends TestCase
     /**
      * @return iterable<array{string, string}>
      */
-    public function nameToEnumValueName(): iterable
+    public static function nameToEnumValueName(): iterable
     {
         yield ['column_name', 'COLUMN_NAME'];
         yield ['columnName', 'COLUMN_NAME'];
