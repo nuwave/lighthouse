@@ -3,6 +3,7 @@
 namespace Tests\Integration\Schema\Directives;
 
 use GraphQL\Type\Definition\Type;
+use Illuminate\Container\Container;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
@@ -197,9 +198,9 @@ GRAPHQL;
         ]);
     }
 
-    public function resolveType(): Type
+    public static function resolveType(): Type
     {
-        $typeRegistry = $this->app->make(TypeRegistry::class);
+        $typeRegistry = Container::getInstance()->make(TypeRegistry::class);
         assert($typeRegistry instanceof TypeRegistry);
 
         return $typeRegistry->get('Admin');

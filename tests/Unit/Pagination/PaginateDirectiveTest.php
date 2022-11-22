@@ -612,7 +612,7 @@ GRAPHQL
     /**
      * @return array<int, array{bool}>
      */
-    public function nonNullPaginationResults(): array
+    public static function nonNullPaginationResults(): array
     {
         return [
             [true],
@@ -698,7 +698,7 @@ GRAPHQL
         ')->dump();
     }
 
-    public function returnPaginatedDataInsteadOfBuilder(): LengthAwarePaginator
+    public static function returnPaginatedDataInsteadOfBuilder(): LengthAwarePaginator
     {
         return new LengthAwarePaginator([
             [

@@ -41,6 +41,7 @@ class ConnectionField
 
     /**
      * @param  array<string, mixed>  $args
+     *
      * @return Collection<array<string, mixed>>
      */
     public function edgeResolver(Paginator $paginator, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Collection

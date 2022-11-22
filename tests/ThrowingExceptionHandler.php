@@ -4,7 +4,7 @@ namespace Tests;
 
 use Illuminate\Contracts\Debug\ExceptionHandler;
 
-class ThrowingExceptionHandler implements ExceptionHandler
+final class ThrowingExceptionHandler implements ExceptionHandler
 {
     public function report(\Throwable $e)
     {

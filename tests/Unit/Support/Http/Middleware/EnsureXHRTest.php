@@ -79,7 +79,7 @@ final class EnsureXHRTest extends TestCase
     /**
      * @return array{array{string}}
      */
-    public function formContentTypes(): array
+    public static function formContentTypes(): array
     {
         return [
             ['application/x-www-form-urlencoded'],
