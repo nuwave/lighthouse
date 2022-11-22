@@ -200,9 +200,14 @@ final class FindDirectiveTest extends DBTestCase
     public function testReturnsOptimizedSelect(): void
     {
         $company = factory(Company::class)->create();
-        $user = factory(User::class)->create([
-            'company_id' => $company->id,
-        ]);
+
+        $user = factory(User::class)->make();
+
+        assert($user instanceof User);
+
+        $user->company()->associate($company);
+
+        $user->save();
 
         $this->schema = '
         type User {
