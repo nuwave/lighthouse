@@ -9,6 +9,33 @@ Compare your `lighthouse.php` against the latest [default configuration](src/lig
 
 ## v5 to v6
 
+### New signature for `handleFieldBuilder` on `FieldBuilderDirective` interface
+
+Lighthouse previously, did not pass any data about the resolved node to `handleFieldBuilder` but now it does, this change gives you more control over the field builder.
+
+```diff
+<?php
+
+namespace Nuwave\Lighthouse\Support\Contracts;
+
++ use GraphQL\Type\Definition\ResolveInfo;
+
+interface FieldBuilderDirective extends Directive
+{
+    /**
+     * Add additional constraints to the builder.
+     *
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder  the builder used to resolve the field
++     * @param  array<string, mixed>  $args
++     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
+     *
+     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder the modified builder
+     */
+-    public function handleFieldBuilder(object $builder): object;
++    public function handleFieldBuilder(object $builder, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): object;
+}
+```
+
 ### `messages` on `@rules` and `@rulesForArray`
 
 Lighthouse previously allowed passing a map with arbitrary keys as the `messages`
