@@ -155,7 +155,6 @@ GRAPHQL;
 
     /**
      * @param  array<string, mixed>  $args
-     * @param  array<string, mixed> $args
      *
      * @throws \GraphQL\Error\Error
      *
@@ -184,7 +183,8 @@ GRAPHQL;
 
             $queryBuilder = $this->getModelClass()::query();
 
-            $directivesContainsForceDelete = $resolveInfo->argumentSet->directives->contains(
+            $argumentSetDirectives = $resolveInfo->argumentSet->directives;
+            $directivesContainsForceDelete = $argumentSetDirectives->contains(
                 Utils::instanceofMatcher(ForceDeleteDirective::class)
             );
             if ($directivesContainsForceDelete) {
@@ -193,7 +193,7 @@ GRAPHQL;
                 $queryBuilder->withTrashed();
             }
 
-            $directivesContainsRestore = $resolveInfo->argumentSet->directives->contains(
+            $directivesContainsRestore = $argumentSetDirectives->contains(
                 Utils::instanceofMatcher(RestoreDirective::class)
             );
             if ($directivesContainsRestore) {
