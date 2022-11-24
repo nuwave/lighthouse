@@ -2,17 +2,21 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry;
 use Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader;
 use Nuwave\Lighthouse\Execution\ModelsLoader\CountModelsLoader;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class CountDirective extends BaseDirective implements FieldResolver
+class CountDirective extends BaseDirective implements FieldResolver, FieldManipulator
 {
     use RelationDirectiveHelpers;
 
@@ -25,13 +29,13 @@ Returns the count of a given relationship or model.
 directive @count(
   """
   The relationship to count.
-  Mutually exclusive with the `model` argument.
+  Mutually exclusive with `model`.
   """
   relation: String
 
   """
   The model to count.
-  Mutually exclusive with the `relation` argument.
+  Mutually exclusive with `relation`.
   """
   model: String
 
@@ -104,5 +108,10 @@ GRAPHQL;
         throw new DefinitionException(
             "A `model` or `relation` argument must be assigned to the '{$this->name()}' directive on '{$this->nodeName()}'."
         );
+    }
+
+    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType)
+    {
+        $this->validateMutuallyExclusiveArguments(['model', 'relation']);
     }
 }

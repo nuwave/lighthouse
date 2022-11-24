@@ -266,4 +266,20 @@ abstract class BaseDirective implements Directive
 
         return $modelClass;
     }
+
+    /**
+     * Validate at most one of the given mutually exclusive arguments is used.
+     *
+     * @param array<string> $names
+     */
+    protected function validateMutuallyExclusiveArguments(array $names): void
+    {
+        $given = array_filter($names, [$this, 'directiveHasArgument']);
+
+        if (count($given) > 1) {
+            $namesString = implode(', ', $names);
+            $givenString = implode(', ', $given);
+            throw new DefinitionException("The arguments [{$namesString}] for @{$this->name()} are mutually exclusive, found [{$givenString}] on {$this->nodeName()}.");
+        }
+    }
 }

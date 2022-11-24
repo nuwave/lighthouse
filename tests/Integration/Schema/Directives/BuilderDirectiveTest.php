@@ -151,7 +151,7 @@ final class BuilderDirectiveTest extends DBTestCase
      *
      * @return \Illuminate\Database\Query\Builder|Builder
      */
-    public function limit(object $builder, ?int $value): object
+    public static function limit(object $builder, int $value = 2): object
     {
         return $builder->limit($value ?: 2);
     }

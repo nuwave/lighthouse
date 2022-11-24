@@ -183,7 +183,7 @@ GRAPHQL;
     /**
      * @return \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\User|\Tests\Utils\Models\Post>
      */
-    public function fetchResults(): EloquentCollection
+    public static function fetchResults(): EloquentCollection
     {
         /** @var \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\User|\Tests\Utils\Models\Post> $results */
         $results = new EloquentCollection();

@@ -44,6 +44,14 @@ directive @paginate(
   builder: String
 
   """
+  Reference a function that resolves the field by directly returning data in a Paginator instance.
+  Mutually exclusive with `builder` and `model`. Not compatible with `scopes` and builder arguments such as `@eq`.
+  Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
+  """
+  resolver: String
+
+  """
   Apply scopes to the underlying query.
   """
   scopes: [String!]
@@ -87,9 +95,14 @@ GRAPHQL;
 
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType): void
     {
+        $this->validateMutuallyExclusiveArguments(['model', 'builder', 'resolver']);
+
         $paginationManipulator = new PaginationManipulator($documentAST);
 
-        if ($this->directiveHasArgument('builder')) {
+        if ($this->directiveHasArgument('resolver')) {
+            // This is done only for validation
+            $this->getResolverFromArgument('resolver');
+        } elseif ($this->directiveHasArgument('builder')) {
             // This is done only for validation
             $this->getResolverFromArgument('builder');
         } else {
@@ -110,10 +123,22 @@ GRAPHQL;
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
         $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Paginator {
+            if ($this->directiveHasArgument('resolver')) {
+                $paginator = $this->getResolverFromArgument('resolver')($root, $args, $context, $resolveInfo);
+
+                assert(
+                    $paginator instanceof Paginator,
+                    "The method referenced by the resolver argument of the @{$this->name()} directive on {$this->nodeName()} must return a Paginator."
+                );
+
+                return $paginator;
+            }
+
             if ($this->directiveHasArgument('builder')) {
                 $builderResolver = $this->getResolverFromArgument('builder');
 
                 $query = $builderResolver($root, $args, $context, $resolveInfo);
+
                 assert(
                     $query instanceof QueryBuilder || $query instanceof EloquentBuilder || $query instanceof ScoutBuilder || $query instanceof Relation,
                     "The method referenced by the builder argument of the @{$this->name()} directive on {$this->nodeName()} must return a Builder or Relation."

@@ -9,6 +9,24 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.67.0
+
+### Added
+
+- Throw on unsafe usage of `@can` directive argument `resolved` on mutations https://github.com/nuwave/lighthouse/pull/2238
+
+## v5.66.0
+
+### Added
+
+- Support returning data in a `Paginator` from option `resolver` in `@paginator` directive https://github.com/nuwave/lighthouse/pull/2232
+
+## v5.65.0
+
+### Added
+
+- Validate only one of any mutually exclusive directive arguments is defined https://github.com/nuwave/lighthouse/pull/2233
+
 ## v5.64.1
 
 ### Fixed
