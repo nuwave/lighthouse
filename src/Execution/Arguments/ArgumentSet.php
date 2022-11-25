@@ -153,7 +153,7 @@ class ArgumentSet
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
      * @param  array<string, mixed>  $args
      */
-    protected static function applyFieldBuilderDirectives(ResolveInfo $resolveInfo, object &$builder, $root, array $args, GraphQLContext $context): void
+    protected static function applyFieldBuilderDirectives(object &$builder, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): void
     {
         $resolveInfo->argumentSet->directives
             ->filter(Utils::instanceofMatcher(FieldBuilderDirective::class))
