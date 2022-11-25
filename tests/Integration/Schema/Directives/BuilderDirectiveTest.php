@@ -148,7 +148,6 @@ final class BuilderDirectiveTest extends DBTestCase
 
     /**
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @param  int|null  $value
      *
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */

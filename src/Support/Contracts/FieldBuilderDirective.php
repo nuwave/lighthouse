@@ -10,8 +10,7 @@ interface FieldBuilderDirective extends Directive
      * Add additional constraints to the builder.
      *
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder  the builder used to resolve the field
-     * @param  array<string, mixed>  $args
-     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
+     * @param  array<string, mixed>  $args  the arguments that were passed into the field
      *
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder the modified builder
      */
