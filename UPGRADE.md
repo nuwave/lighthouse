@@ -9,28 +9,6 @@ Compare your `lighthouse.php` against the latest [default configuration](src/lig
 
 ## v5 to v6
 
-### New signature for `handleFieldBuilder` on `FieldBuilderDirective` interface
-
-Lighthouse now passes the typical 4 resolver arguments to `handleFieldBuilder`.
-
-```diff
-+ use GraphQL\Type\Definition\ResolveInfo;
-
-interface FieldBuilderDirective extends Directive
-{
-    /**
-     * Add additional constraints to the builder.
-     *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder  the builder used to resolve the field
-+     * @param  array<string, mixed>  $args  the arguments that were passed into the field
-     *
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder the modified builder
-     */
--    public function handleFieldBuilder(object $builder): object;
-+    public function handleFieldBuilder(object $builder, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): object;
-}
-```
-
 ### `messages` on `@rules` and `@rulesForArray`
 
 Lighthouse previously allowed passing a map with arbitrary keys as the `messages`
@@ -125,7 +103,7 @@ This change will increase the complexity of queries on fields using `@complexity
 a custom complexity resolver. If you configured `security.max_query_complexity`, complex
 queries that previously passed might now fail.
 
-### Passing of BenSampo\Enum\Enum instances to ArgBuilderDirective::handleBuilder()
+### Passing of `BenSampo\Enum\Enum` instances to `ArgBuilderDirective::handleBuilder()`
 
 Previous to `v6`, Lighthouse would extract the internal `$value` from instances of
 `BenSampo\Enum\Enum` before passing it to `ArgBuilderDirective::handleBuilder()`
@@ -156,10 +134,26 @@ the new behaviour before upgrading by setting `unbox_bensampo_enum_enum_instance
 public function scopeByType(Builder $builder, AOrB $aOrB): Builder
 ```
 
-### Replace Nuwave\Lighthouse\GraphQL::executeQuery() usage
+### Adopt `FieldBuilderDirective::handleFieldBuilder()` signature
+
+Lighthouse now passes the typical 4 resolver arguments to `FieldBuilderDirective::handleFieldBuilder()`.
+Custom directives the implement `FieldBuilderDirective` now have to accept those extra arguments.
+
+```diff
++ use GraphQL\Type\Definition\ResolveInfo;
++ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+
+final class MyDirective extends BaseDirective implements FieldBuilderDirective
+{
+-    public function handleFieldBuilder(object $builder): object;
++    public function handleFieldBuilder(object $builder, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): object;
+}
+```
+
+### Replace `Nuwave\Lighthouse\GraphQL::executeQuery()` usage
 
 Use `parseAndExecuteQuery()` for executing a string query or `executeParsedQuery()` for 
-executing already parsed `DocumentNode`.
+executing an already parsed `DocumentNode` instance.
 
 ### Use `RefreshesSchemaCache` over `ClearsSchemaCache`
 
