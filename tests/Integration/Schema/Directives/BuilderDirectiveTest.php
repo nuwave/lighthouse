@@ -153,6 +153,6 @@ final class BuilderDirectiveTest extends DBTestCase
      */
     public static function limit(object $builder, ?int $value): object
     {
-        return $builder->limit($value ?: 2);
+        return $builder->limit($value ?? 2);
     }
 }
