@@ -90,7 +90,7 @@ class ArgumentSet
         }
 
         self::applyArgBuilderDirectives($this, $builder, $directiveFilter);
-        self::applyFieldBuilderDirectives($resolveInfo, $builder, $root, $args, $context);
+        self::applyFieldBuilderDirectives($builder, $root, $args, $context, $resolveInfo);
 
         foreach ($scopes as $scope) {
             $builder->{$scope}($this->toArray());
