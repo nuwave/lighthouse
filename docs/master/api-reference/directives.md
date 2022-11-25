@@ -486,13 +486,17 @@ type Query {
 
 ```php
 use Illuminate\Database\Eloquent\Builder;
+use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class MyClass
 {
-    public function minimumHighscore(Builder $builder, int $minimumHighscore): Builder
+    public function minimumHighscore(Builder $builder, ?int $minimumHighscore, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Builder
     {
-        return $builder->whereHas('game', static function (Builder $builder) use ($minimumHighscore): void {
-            $builder->where('score', '>', $minimumHighscore);
+        return $builder->when($minimumHighscore !== null, static function(Builder $builder) use ($minimumHighscore): void {
+            $builder->whereHas('game', static function (Builder $builder) use ($minimumHighscore): void {
+                $builder->where('score', '>', $minimumHighscore);
+            });
         });
     }
 }
