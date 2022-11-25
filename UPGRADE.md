@@ -11,7 +11,7 @@ Compare your `lighthouse.php` against the latest [default configuration](src/lig
 
 ### New signature for `handleFieldBuilder` on `FieldBuilderDirective` interface
 
-Lighthouse previously, did not pass any data about the resolved node to `handleFieldBuilder` but now it does, this change gives you more control over the field builder.
+Lighthouse now passes the typical 4 resolver arguments to `handleFieldBuilder`.
 
 ```diff
 + use GraphQL\Type\Definition\ResolveInfo;

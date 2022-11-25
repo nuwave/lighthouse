@@ -11,7 +11,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Changed
 
-- New signature for `handleFieldBuilder` on `FieldBuilderDirective` interface
+- Pass resolver arguments to `FieldBuilderDirective::handleFieldBuilder()`
 
 ```diff
 + use GraphQL\Type\Definition\ResolveInfo;
