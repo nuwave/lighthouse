@@ -678,21 +678,21 @@ You can find usage examples of this directive in [the authorization docs](../sec
 Clear a resolver cache by tags.
 """
 directive @clearCache(
-  """
-  Name of the parent type of the field to clear.
-  """
-  type: String!
+    """
+    Name of the parent type of the field to clear.
+    """
+    type: String!
 
-  """
-  Source of the parent ID to clear.
-  """
-  idSource: ClearCacheIdSource
+    """
+    Source of the parent ID to clear.
+    """
+    idSource: ClearCacheIdSource
 
-  """
-  Name of the field to clear.
-  """
-  field: String
-) on FIELD_DEFINITION
+    """
+    Name of the field to clear.
+    """
+    field: String
+) repeatable on FIELD_DEFINITION
 
 """
 Options for the `id` argument on `@clearCache`.
@@ -700,15 +700,15 @@ Options for the `id` argument on `@clearCache`.
 Exactly one of the fields must be given.
 """
 input ClearCacheIdSource {
-  """
-  Path of an argument the client passes to the field `@clearCache` is applied to.
-  """
-  argument: String
+    """
+    Path of an argument the client passes to the field `@clearCache` is applied to.
+    """
+    argument: String
 
-  """
-  Path of a field in the result returned from the field `@clearCache` is applied to.
-  """
-  field: String
+    """
+    Path of a field in the result returned from the field `@clearCache` is applied to.
+    """
+    field: String
 }
 ```
 

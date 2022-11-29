@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+
+- Mark `@clearCache` directive `repeatable`
+
 ## v5.67.0
 
 ### Added
