@@ -11,7 +11,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Fixed
 
-- Mark `@clearCache` directive `repeatable`
+- Mark `@clearCache` directive `repeatable` https://github.com/nuwave/lighthouse/pull/2243
 
 ## v5.67.0
 
