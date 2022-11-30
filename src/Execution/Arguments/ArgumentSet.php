@@ -76,7 +76,7 @@ class ArgumentSet
      * @phpstan-param  TBuilder  $builder
      *
      * @param  array<string>  $scopes
-     * @param  array<string, mixed> $args
+     * @param  array<string, mixed>  $args
      *
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation|\Laravel\Scout\Builder
      *
