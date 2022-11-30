@@ -471,9 +471,11 @@ scalar BuilderValue
 You must point to a `method` which will receive the builder instance
 and can apply additional constraints to the query.
 
-When used on an argument, the value is supplied as the second parameter to the method.
-When used on a field, the value argument inside the directive is applied as the second
-parameter to the method.
+When used on an argument, the method is only called when the argument is specified (may be `null`),
+and its value is passed as the second parameter.
+
+When used on a field, the method is always called, and if the `value` argument is defined,
+it is passed as the second parameter.
 
 ```graphql
 type Query {
@@ -489,15 +491,15 @@ use Illuminate\Database\Eloquent\Builder;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class MyClass
+final class MyClass
 {
-    public function minimumHighscore(Builder $builder, ?int $minimumHighscore, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Builder
+    /**
+     * @param  array<string, mixed>  $args
+     */
+    public function minimumHighscore(Builder $builder, ?int $minimumHighscore, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Builder
     {
-        return $builder->when($minimumHighscore !== null, static function(Builder $builder) use ($minimumHighscore): void {
-            $builder->whereHas('game', static function (Builder $builder) use ($minimumHighscore): void {
-                $builder->where('score', '>', $minimumHighscore);
-            });
-        });
+        if (! $minimumHighscore) return $builder;
+        return $builder->whereHas('game', static fn (Builder $builder): Builder => $builder->where('score', '>', $minimumHighscore));
     }
 }
 ```
