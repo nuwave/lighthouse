@@ -692,7 +692,7 @@ directive @clearCache(
   Name of the field to clear.
   """
   field: String
-) on FIELD_DEFINITION
+) repeatable on FIELD_DEFINITION
 
 """
 Options for the `id` argument on `@clearCache`.
