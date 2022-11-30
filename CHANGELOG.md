@@ -11,7 +11,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Changed
 
-- Pass resolver arguments to `FieldBuilderDirective::handleFieldBuilder()`
+- Pass resolver arguments to `FieldBuilderDirective::handleFieldBuilder()` https://github.com/nuwave/lighthouse/pull/2234
 
 ### Fixed
 
