@@ -13,6 +13,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Pass resolver arguments to `FieldBuilderDirective::handleFieldBuilder()`
 
+### Fixed
+
+- Mark `@clearCache` directive `repeatable` https://github.com/nuwave/lighthouse/pull/2243
+
 ## v5.67.0
 
 ### Added
