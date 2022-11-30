@@ -38,17 +38,19 @@ final class BuilderDirectiveTest extends DBTestCase
     public function testCallsCustomBuilderMethodOnFieldCheckWithArgs(): void
     {
         $mock = \Mockery::mock($this);
-        app()->instance(__CLASS__, $mock);
-        $mock->shouldReceive('limit')->once()->withArgs(function (Builder $builder, $value, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
-            $this->assertIsNumeric($value);
-            $this->assertEquals(1, $value);
-            $this->assertEquals([
-                'arg1' => 'Hello',
-                'arg2' => 'World',
-            ], $args);
+        $this->app->instance(__CLASS__, $mock);
+        $mock->shouldReceive('limit')
+            ->once()
+            ->withArgs(function (Builder $builder, $value, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
+                $this->assertSame(1, $value);
+                $this->assertSame([
+                    'arg1' => 'Hello',
+                    'arg2' => 'World',
+                ], $args);
 
-            return true;
-        })->andReturn(User::query());
+                return true;
+            })
+            ->andReturn(User::query());
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
