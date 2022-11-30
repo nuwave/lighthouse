@@ -2,7 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
-use Composer\Autoload\ClassMapGenerator;
+use Composer\ClassMapGenerator\ClassMapGenerator;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\Node;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
@@ -91,9 +91,11 @@ class DirectiveLocator
         $directives = [];
 
         foreach ($this->namespaces() as $directiveNamespace) {
-            $classesInNamespace = ClassMapGenerator::createMap('?', null, $directiveNamespace);
+            $generator = new ClassMapGenerator();
+            $generator->scanPaths(base_path(), null, 'psr-4', $directiveNamespace);
+            $classesInNamespace = $generator->getClassMap()->getMap();
 
-            foreach ($classesInNamespace as $class) {
+            foreach ($classesInNamespace as $class => $_) {
                 $reflection = new \ReflectionClass($class);
                 if (! $reflection->isInstantiable()) {
                     continue;
