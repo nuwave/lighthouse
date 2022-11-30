@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+
+- Mark `@clearCache` directive `repeatable` https://github.com/nuwave/lighthouse/pull/2243
+
 ## v5.67.0
 
 ### Added
