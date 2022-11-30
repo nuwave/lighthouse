@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Auth;
 
-use Closure;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionNode;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -53,23 +52,20 @@ directive @guard(
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
     {
         $previousResolver = $fieldValue->getResolver();
 
-        $fieldValue->setResolver(
-            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
-                // TODO remove cast in v6
-                $with = (array) (
-                    $this->directiveArgValue('with')
-                    ?? [AuthServiceProvider::guard()]
-                );
+        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
+            // TODO remove cast in v6
+            $with = (array)
+                $this->directiveArgValue('with', AuthServiceProvider::guard())
+            ;
 
-                $this->authenticate($with);
+            $this->authenticate($with);
 
-                return $previousResolver($root, $args, $context, $resolveInfo);
-            }
-        );
+            return $previousResolver($root, $args, $context, $resolveInfo);
+        });
 
         return $next($fieldValue);
     }

@@ -35,9 +35,6 @@ The site includes the latest docs for each major version of Lighthouse.
 You can find docs for specific versions by looking at the contents of [/docs/master](/docs/master)
 at that point in the git history: `https://github.com/nuwave/lighthouse/tree/<SPECIFIC-TAG>/docs/master`.
 
-A chinese translation is available at [lighthouse-php.cn](http://lighthouse-php.cn) and is maintained
-over at https://github.com/haxibiao/lighthouse.
-
 ## Get involved
 
 - Have a question? [Use the laravel-lighthouse tag on Stack Overflow](https://stackoverflow.com/questions/tagged/laravel-lighthouse)
@@ -61,8 +58,7 @@ We welcome contributions of any kind, see how in [`CONTRIBUTING.md`](CONTRIBUTIN
 ## Security Vulnerabilities
 
 If you discover a security vulnerability within Lighthouse,
-please email Benedikt Franke via [benedikt@franke.tech](mailto:benedikt@franke.tech)
-or visit https://tidelift.com/security.
+please email Benedikt Franke via [benedikt@franke.tech](mailto:benedikt@franke.tech).
 
 ## Sponsors
 

@@ -4,9 +4,7 @@ namespace Nuwave\Lighthouse\Support;
 
 use Closure;
 use Illuminate\Container\Container as Application;
-use InvalidArgumentException;
 use Nuwave\Lighthouse\Exceptions\InvalidDriverException;
-use ReflectionClass;
 
 /**
  * NOTE: Implementation pulled from \Illuminate\Cache\CacheManager. Purpose is
@@ -95,7 +93,7 @@ abstract class DriverManager
     /**
      * Register a custom driver creator Closure.
      */
-    public function extend(string $driver, Closure $callback): self
+    public function extend(string $driver, \Closure $callback): self
     {
         $this->customCreators[$driver] = $callback;
 
@@ -123,7 +121,7 @@ abstract class DriverManager
             return $this->validateDriver($this->{$driverMethod}($config));
         }
 
-        throw new InvalidArgumentException("Driver [{$config['driver']}] is not supported.");
+        throw new \InvalidArgumentException("Driver [{$config['driver']}] is not supported.");
     }
 
     /**
@@ -151,7 +149,7 @@ abstract class DriverManager
     {
         $interface = $this->interface();
 
-        if (! (new ReflectionClass($driver))->implementsInterface($interface)) {
+        if (! (new \ReflectionClass($driver))->implementsInterface($interface)) {
             throw new InvalidDriverException(get_class($driver) . " does not implement {$interface}");
         }
 

@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
@@ -16,24 +15,22 @@ use Nuwave\Lighthouse\Support\Utils;
 
 abstract class ArgTraversalDirective extends BaseDirective implements FieldMiddleware
 {
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
     {
         $resolver = $fieldValue->getResolver();
 
-        return $next(
-            $fieldValue->setResolver(
-                function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
-                    $resolveInfo->argumentSet = $this->transformRecursively($resolveInfo->argumentSet);
+        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
+            $resolveInfo->argumentSet = $this->transformRecursively($resolveInfo->argumentSet);
 
-                    return $resolver(
-                        $root,
-                        $resolveInfo->argumentSet->toArray(),
-                        $context,
-                        $resolveInfo
-                    );
-                }
-            )
-        );
+            return $resolver(
+                $root,
+                $resolveInfo->argumentSet->toArray(),
+                $context,
+                $resolveInfo
+            );
+        });
+
+        return $next($fieldValue);
     }
 
     public function transformRecursively(ArgumentSet $argumentSet): ArgumentSet
@@ -48,7 +45,7 @@ abstract class ArgTraversalDirective extends BaseDirective implements FieldMiddl
                 Utils::instanceofMatcher(ArgDirective::class)
             );
 
-            $argument->value = Utils::applyEach(
+            $argument->value = Utils::mapEach(
                 function ($value) use ($directivesForArgument) {
                     if ($value instanceof ArgumentSet) {
                         $value = $this->transform($value, $directivesForArgument);

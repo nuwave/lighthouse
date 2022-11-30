@@ -174,10 +174,12 @@ use Nuwave\Lighthouse\Schema\Types\LaravelEnumType;
 
 final class Color extends Enum
 {
-    public const WHITE = 0;
+    public const BLACK = 0;
 
-    /** @deprecated too dark */
-    public const BLACK = 1;
+    public const WHITE = 1;
+
+    /** @deprecated too colorful */
+    public const YELLOW = 2;
 }
 
 // Register through TypeRegistry::register()
@@ -188,8 +190,18 @@ The generated enum will be named after the class and have values equivalent to t
 
 ```graphql
 enum Color {
+  """
+  Black
+  """
+  BLACK
+  """
+  White
+  """
   WHITE
-  BLACK @deprecated(reason: "too dark")
+  """
+  Yellow
+  """
+  YELLOW @deprecated(reason: "too colorful")
 }
 ```
 
@@ -198,6 +210,52 @@ You may overwrite the name if the default does not fit, or you have a name confl
 ```php
 // API uses british english
 new LaravelEnumType(Color::class, 'Colour');
+```
+
+You may customize Enum and value descriptions:
+
+```php
+use BenSampo\Enum\Enum;
+use BenSampo\Enum\Attributes\Description;
+use Nuwave\Lighthouse\Schema\Types\LaravelEnumType;
+
+#[Description('Available theme colors')]
+final class Color extends Enum
+{
+    #[Description('Black theme')]
+    public const BLACK = 0;
+
+    #[Description('White theme')]
+    public const WHITE = 1;
+
+    /** @deprecated too colorful */
+    public const YELLOW = 2;
+}
+
+// Register through TypeRegistry::register()
+$userType = new LaravelEnumType(Color::class);
+```
+
+The generated enum will be as such:
+
+```graphql
+"""
+Available theme Colors
+"""
+enum Color {
+  """
+  Black theme
+  """
+  BLACK
+  """
+  White theme
+  """
+  WHITE
+  """
+  Yellow
+  """
+  YELLOW @deprecated(reason: "too colorful")
+}
 ```
 
 ## Input

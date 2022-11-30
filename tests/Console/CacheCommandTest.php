@@ -12,7 +12,7 @@ use Tests\TestCase;
 use Tests\TestsSchemaCache;
 use Tests\TestsSerialization;
 
-class CacheCommandTest extends TestCase
+final class CacheCommandTest extends TestCase
 {
     use TestsSerialization;
     use TestsSchemaCache;
@@ -29,7 +29,7 @@ class CacheCommandTest extends TestCase
         $this->config = $this->app->make(ConfigRepository::class);
 
         $this->setUpSchemaCache();
-        $this->useSerializingArrayStore($this->app);
+        $this->useSerializingArrayStore();
     }
 
     protected function tearDown(): void
@@ -47,8 +47,8 @@ class CacheCommandTest extends TestCase
 
         $key = $this->config->get('lighthouse.cache.key');
 
-        /** @var \Illuminate\Contracts\Cache\Repository $cache */
         $cache = $this->app->make(CacheRepository::class);
+        assert($cache instanceof CacheRepository);
         $this->assertFalse($cache->has($key));
 
         $this->commandTester(new CacheCommand())->execute([]);
@@ -61,8 +61,9 @@ class CacheCommandTest extends TestCase
     {
         $this->config->set('lighthouse.cache.version', 2);
 
-        /** @var \Illuminate\Filesystem\Filesystem $filesystem */
         $filesystem = $this->app->make(Filesystem::class);
+        assert($filesystem instanceof Filesystem);
+
         $path = $this->schemaCachePath();
         $this->assertFalse($filesystem->exists($path));
 

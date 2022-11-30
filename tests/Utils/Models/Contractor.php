@@ -22,7 +22,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
  * @property-read \Tests\Utils\Models\User $user
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Color> $colors
  */
-class Contractor extends Model
+final class Contractor extends Model
 {
     public function user(): MorphOne
     {

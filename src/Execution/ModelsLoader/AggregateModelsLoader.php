@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Execution\ModelsLoader;
 
-use Closure;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -29,7 +28,7 @@ class AggregateModelsLoader implements ModelsLoader
      */
     protected $decorateBuilder;
 
-    public function __construct(string $relation, string $column, string $function, Closure $decorateBuilder)
+    public function __construct(string $relation, string $column, string $function, \Closure $decorateBuilder)
     {
         $this->relation = $relation;
         $this->column = $column;
@@ -51,7 +50,7 @@ class AggregateModelsLoader implements ModelsLoader
          * @see \Illuminate\Database\Eloquent\Concerns\QueriesRelationships::withAggregate()
          */
         $attribute = Str::snake(
-            \Safe\preg_replace('/[^[:alnum:][:space:]_]/u', '', "$this->relation $this->function $this->column")
+            \Safe\preg_replace('/[^[:alnum:][:space:]_]/u', '', "{$this->relation} {$this->function} {$this->column}")
         );
 
         return $model->getAttribute($attribute);

@@ -19,6 +19,9 @@ class ExecutableTypeNodeConverter extends TypeNodeConverter
         $this->typeRegistry = $typeRegistry;
     }
 
+    /**
+     * @param \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NullableType $type
+     */
     protected function nonNull($type): NonNull
     {
         return Type::nonNull($type);

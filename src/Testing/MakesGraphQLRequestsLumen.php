@@ -24,21 +24,21 @@ trait MakesGraphQLRequestsLumen
      * On the first call to introspect() this property is set to
      * cache the result, as introspection is quite expensive.
      *
-     * @var \Illuminate\Http\Response|null
+     * @var \Illuminate\Http\Response
      */
     protected $introspectionResult;
 
     /**
      * Used to test deferred queries.
      *
-     * @var \Nuwave\Lighthouse\Support\Http\Responses\MemoryStream|null
+     * @var \Nuwave\Lighthouse\Support\Http\Responses\MemoryStream
      */
     protected $deferStream;
 
     /**
-     * Execute a query as if it was sent as a request to the server.
+     * Execute a GraphQL operation as if it was sent as a request to the server.
      *
-     * @param  string  $query  The GraphQL query to send
+     * @param  string  $query  The GraphQL operation to send
      * @param  array<string, mixed>  $variables  The variables to include in the query
      * @param  array<string, mixed>  $extraParams  Extra parameters to add to the JSON payload
      * @param  array<string, mixed>  $headers  HTTP headers to pass to the POST request
@@ -62,7 +62,7 @@ trait MakesGraphQLRequestsLumen
     }
 
     /**
-     * Execute a POST to the GraphQL endpoint.
+     * Send a POST request to the GraphQL endpoint.
      *
      * Use this over graphQL() when you need more control or want to
      * test how your server behaves on incorrect inputs.
@@ -82,7 +82,7 @@ trait MakesGraphQLRequestsLumen
     }
 
     /**
-     * Send a multipart form request to GraphQL.
+     * Send a multipart form request to the GraphQL endpoint.
      *
      * This is used for file uploads conforming to the specification:
      * https://github.com/jaydenseric/graphql-multipart-request-spec
@@ -123,7 +123,9 @@ trait MakesGraphQLRequestsLumen
     }
 
     /**
-     * Execute the introspection query on the GraphQL server.
+     * Send the introspection query to the GraphQL server.
+     *
+     * Returns the cached first result on repeated calls.
      */
     protected function introspect(): self
     {
@@ -163,9 +165,13 @@ trait MakesGraphQLRequestsLumen
     protected function introspectByName(string $path, string $name): ?array
     {
         $this->introspect();
+        assert($this->introspectionResult instanceof TestResponse);
+
+        $content = $this->introspectionResult->getContent();
+        assert(is_string($content));
 
         $results = data_get(
-            json_decode($this->introspectionResult->getContent(), true),
+            \Safe\json_decode($content, true),
             $path
         );
 
@@ -182,8 +188,8 @@ trait MakesGraphQLRequestsLumen
      */
     protected function graphQLEndpointUrl(): string
     {
-        /** @var \Illuminate\Contracts\Config\Repository $config */
-        $config = app(ConfigRepository::class);
+        $config = Container::getInstance()->make(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
 
         return route($config->get('lighthouse.route.name'));
     }
@@ -210,10 +216,12 @@ trait MakesGraphQLRequestsLumen
 
         $response = $this->graphQL($query, $variables, $extraParams, $headers);
 
+        // @phpstan-ignore-next-line can be true
         if (! $response->response instanceof StreamedResponse) {
             Assert::fail('Expected the response to be a streamed response but got a regular response.');
         }
 
+        // @phpstan-ignore-next-line not always unreachable
         $response->response->send();
 
         return $this->deferStream->chunks;
@@ -231,10 +239,14 @@ trait MakesGraphQLRequestsLumen
         });
     }
 
+    /**
+     * Configure an error handler that rethrows all errors passed to it.
+     */
     protected function rethrowGraphQLErrors(): void
     {
-        /** @var \Illuminate\Contracts\Config\Repository $config */
-        $config = app(ConfigRepository::class);
+        $config = Container::getInstance()->make(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
+
         $config->set('lighthouse.error_handlers', [RethrowingErrorHandler::class]);
     }
 }

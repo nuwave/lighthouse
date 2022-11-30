@@ -7,7 +7,7 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
 
-class FieldBuilderDirectiveTest extends DBTestCase
+final class FieldBuilderDirectiveTest extends DBTestCase
 {
     protected $schema = /** @lang GraphQL */ '
     type Post {

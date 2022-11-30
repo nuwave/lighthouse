@@ -3,12 +3,13 @@
 namespace Tests\Integration\Schema\Directives;
 
 use GraphQL\Type\Definition\Type;
+use Illuminate\Container\Container;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class UpsertDirectiveTest extends DBTestCase
+final class UpsertDirectiveTest extends DBTestCase
 {
     public function testNestedArgResolver(): void
     {
@@ -197,8 +198,11 @@ GRAPHQL;
         ]);
     }
 
-    public function resolveType(): Type
+    public static function resolveType(): Type
     {
-        return app(TypeRegistry::class)->get('Admin');
+        $typeRegistry = Container::getInstance()->make(TypeRegistry::class);
+        assert($typeRegistry instanceof TypeRegistry);
+
+        return $typeRegistry->get('Admin');
     }
 }

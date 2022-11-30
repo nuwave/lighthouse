@@ -4,8 +4,9 @@ namespace Tests\Integration;
 
 use Nuwave\Lighthouse\Exceptions\AuthenticationException;
 use Tests\TestCase;
+use Tests\Utils\Directives\GlobalFieldMiddlewareDirective;
 
-class FieldMiddlewareTest extends TestCase
+final class FieldMiddlewareTest extends TestCase
 {
     public function testTransformsArgsBeforeCustomFieldMiddleware(): void
     {
@@ -56,5 +57,28 @@ class FieldMiddlewareTest extends TestCase
             }
         }
         ')->assertGraphQLErrorCategory(AuthenticationException::CATEGORY);
+    }
+
+    public function testHydratesGlobalFieldMiddleware(): void
+    {
+        config(['lighthouse.field_middleware' => [
+            GlobalFieldMiddlewareDirective::class,
+        ]]);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo: Boolean
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo
+        }
+        ')->assertExactJson([
+            'data' => [
+                'foo' => true,
+            ],
+        ]);
     }
 }

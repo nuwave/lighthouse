@@ -127,7 +127,7 @@ class WhereConditionsHandler
 
     public static function invalidColumnName(string $column): string
     {
-        return "Column names may contain only alphanumerics or underscores, and may not begin with a digit, got: $column";
+        return "Column names may contain only alphanumerics or underscores, and may not begin with a digit, got: {$column}";
     }
 
     /**

@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
-use Exception;
 use GraphQL\Error\SyntaxError;
 use GraphQL\Executor\Values;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
@@ -53,7 +52,10 @@ class ASTHelper
             ->all();
 
         $remainingDefinitions = (new Collection($original))
-            ->reject(function ($definition) use ($newNames, $overwriteDuplicates): bool {
+            ->reject(function (Node $definition) use ($newNames, $overwriteDuplicates): bool {
+                // TODO remove with next graphql-php version
+                assert(property_exists($definition, 'name'));
+
                 $oldName = $definition->name->value;
                 $collisionOccurred = in_array($oldName, $newNames);
 
@@ -127,7 +129,7 @@ class ASTHelper
         }
 
         throw new DefinitionException(
-            "The node '$node->kind' does not have a type associated with it."
+            "The node '{$node->kind}' does not have a type associated with it."
         );
     }
 
@@ -181,7 +183,7 @@ class ASTHelper
     public static function directiveDefinition(Node $definitionNode, string $name): ?DirectiveNode
     {
         if (! property_exists($definitionNode, 'directives')) {
-            throw new Exception('Expected Node class with property `directives`, got: ' . get_class($definitionNode));
+            throw new \Exception('Expected Node class with property `directives`, got: ' . get_class($definitionNode));
         }
         /** @var \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\DirectiveNode> $directives */
         $directives = $definitionNode->directives;
@@ -210,7 +212,7 @@ class ASTHelper
     {
         foreach ($nodes as $node) {
             if (! property_exists($node, 'name')) {
-                throw new Exception('Expected a Node with a name property, got: ' . get_class($node));
+                throw new \Exception('Expected a Node with a name property, got: ' . get_class($node));
             }
 
             if ($node->name->value === $name) {
@@ -379,15 +381,19 @@ class ASTHelper
     {
         $typeName = static::getUnderlyingTypeName($field);
 
-        /** @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder $astBuilder */
-        $astBuilder = app(ASTBuilder::class);
+        $standardTypes = Type::getStandardTypes();
+        if (isset($standardTypes[$typeName])) {
+            return Parser::scalarTypeDefinition("scalar {$typeName}");
+        }
+
+        $astBuilder = Container::getInstance()->make(ASTBuilder::class);
+        assert($astBuilder instanceof ASTBuilder);
+
         $documentAST = $astBuilder->documentAST();
 
         $type = $documentAST->types[$typeName] ?? null;
         if (null === $type) {
-            throw new DefinitionException(
-                "Type '$typeName' on '{$field->name->value}' can not be found in the schema.'"
-            );
+            throw new DefinitionException("Type '{$typeName}' on '{$field->name->value}' can not be found in the schema.'");
         }
 
         return $type;
@@ -408,5 +414,14 @@ class ASTHelper
         }
 
         return null;
+    }
+
+    public static function internalFieldName(FieldDefinitionNode $field): string
+    {
+        $renameDirectiveNode = static::directiveDefinition($field, 'rename');
+
+        return $renameDirectiveNode
+            ? static::directiveArgValue($renameDirectiveNode, 'attribute')
+            : $field->name->value;
     }
 }

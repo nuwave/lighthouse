@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Execution\ModelsLoader;
 
-use Closure;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
@@ -20,7 +19,7 @@ class CountModelsLoader implements ModelsLoader
      */
     protected $decorateBuilder;
 
-    public function __construct(string $relation, Closure $decorateBuilder)
+    public function __construct(string $relation, \Closure $decorateBuilder)
     {
         $this->relation = $relation;
         $this->decorateBuilder = $decorateBuilder;
@@ -43,7 +42,7 @@ class CountModelsLoader implements ModelsLoader
          *
          * @see \Illuminate\Database\Eloquent\Concerns\QueriesRelationships::withCount()
          */
-        $countAttributeName = Str::snake("${relationName}_count");
+        $countAttributeName = Str::snake("{$relationName}_count");
 
         /**
          * We just assert this is an int and let PHP run into a type error if not.
@@ -65,29 +64,35 @@ class CountModelsLoader implements ModelsLoader
      */
     public static function loadCount(EloquentCollection $parents, array $relations): void
     {
-        if ($parents->isEmpty()) {
+        $firstParent = $parents->first();
+        if (! $firstParent) {
             return;
         }
 
-        $models = $parents->first()->newModelQuery()
+        $models = $firstParent->newModelQuery()
             ->whereKey($parents->modelKeys())
-            ->select($parents->first()->getKeyName())
+            ->select($firstParent->getKeyName())
             ->withCount($relations)
             ->get()
-            ->keyBy($parents->first()->getKeyName());
+            ->keyBy($firstParent->getKeyName());
 
+        $firstModel = $models->first();
+        assert($firstModel instanceof Model);
         $attributes = Arr::except(
-            array_keys($models->first()->getAttributes()),
-            $models->first()->getKeyName()
+            array_keys($firstModel->getAttributes()),
+            $firstModel->getKeyName()
         );
 
-        foreach ($parents as $model) {
-            $extraAttributes = Arr::only($models->get($model->getKey())->getAttributes(), $attributes);
+        foreach ($parents as $parent) {
+            $model = $models->get($parent->getKey());
+            assert($model instanceof Model);
 
-            $model->forceFill($extraAttributes);
+            $extraAttributes = Arr::only($model->getAttributes(), $attributes);
+
+            $parent->forceFill($extraAttributes);
 
             foreach ($attributes as $attribute) {
-                $model->syncOriginalAttribute($attribute);
+                $parent->syncOriginalAttribute($attribute);
             }
         }
     }

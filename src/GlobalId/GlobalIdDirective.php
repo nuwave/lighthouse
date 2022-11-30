@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\GlobalId;
 
-use Closure;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -62,7 +61,7 @@ enum GlobalIdDecode {
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
     {
         $type = $fieldValue->getParentName();
 
@@ -100,9 +99,7 @@ GRAPHQL;
                 case 'ARRAY':
                     return $this->globalId->decode($argumentValue);
                 default:
-                    throw new DefinitionException(
-                        "The decode argument of the @globalId directive can only be TYPE, ARRAY or ID, got {$decode}"
-                    );
+                    throw new DefinitionException("The decode argument of the @{$this->name()} directive can only be TYPE, ARRAY or ID, got {$decode}.");
             }
         }
 

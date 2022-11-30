@@ -8,7 +8,7 @@ use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
 use Tests\Utils\Rules\FooBarRule;
 
-class RulesDirectiveTest extends TestCase
+final class RulesDirectiveTest extends TestCase
 {
     protected function getEnvironmentSetUp($app): void
     {
@@ -274,7 +274,7 @@ class RulesDirectiveTest extends TestCase
     /**
      * @return array<array<int, string>>
      */
-    public function invalidApplyArguments(): array
+    public static function invalidApplyArguments(): array
     {
         return [
             [/** @lang GraphQL */ '123'],
@@ -300,7 +300,7 @@ class RulesDirectiveTest extends TestCase
     /**
      * @return array<array<int, string>>
      */
-    public function invalidMessageArguments(): array
+    public static function invalidMessageArguments(): array
     {
         return [
             [/** @lang GraphQL */ '"foo"'],

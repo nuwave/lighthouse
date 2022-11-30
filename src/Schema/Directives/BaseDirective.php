@@ -18,6 +18,7 @@ use GraphQL\Utils\AST;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Utils;
 
@@ -26,9 +27,11 @@ abstract class BaseDirective implements Directive
     /**
      * The AST node of the directive.
      *
+     * May not be set if the directive is added programmatically.
+     *
      * @var \GraphQL\Language\AST\DirectiveNode
      */
-    protected $directiveNode;
+    public $directiveNode;
 
     /**
      * The node the directive is defined on.
@@ -39,7 +42,7 @@ abstract class BaseDirective implements Directive
      *
      * @var ScalarTypeDefinitionNode|ObjectTypeDefinitionNode|FieldDefinitionNode|InputValueDefinitionNode|InterfaceTypeDefinitionNode|UnionTypeDefinitionNode|EnumTypeDefinitionNode|EnumValueDefinitionNode|InputObjectTypeDefinitionNode
      */
-    protected $definitionNode;
+    public $definitionNode;
 
     /**
      * Cached directive arguments.
@@ -55,7 +58,7 @@ abstract class BaseDirective implements Directive
      */
     public function name(): string
     {
-        return $this->directiveNode->name->value;
+        return DirectiveLocator::directiveName(static::class);
     }
 
     /**
@@ -74,7 +77,7 @@ abstract class BaseDirective implements Directive
     /**
      * Get a Closure that is defined through an argument on the directive.
      */
-    public function getResolverFromArgument(string $argumentName): Closure
+    public function getResolverFromArgument(string $argumentName): \Closure
     {
         [$className, $methodName] = $this->getMethodArgumentParts($argumentName);
 
@@ -89,6 +92,12 @@ abstract class BaseDirective implements Directive
     protected function loadArgValues(): void
     {
         $this->directiveArgs = [];
+
+        // If the directive was added programmatically, it has no arguments
+        if (! isset($this->directiveNode)) {
+            return;
+        }
+
         foreach ($this->directiveNode->arguments as $node) {
             if (array_key_exists($node->name->value, $this->directiveArgs)) {
                 throw new DefinitionException("Directive {$this->directiveNode->name->value} has two arguments with the same name {$node->name->value}");
@@ -114,9 +123,9 @@ abstract class BaseDirective implements Directive
     /**
      * Get the value of an argument on the directive.
      *
-     * @param  mixed|null  $default
+     * @param  mixed  $default Use this over `??` to preserve explicit `null`
      *
-     * @return mixed|null
+     * @return mixed The argument value or the default
      */
     protected function directiveArgValue(string $name, $default = null)
     {
@@ -148,13 +157,10 @@ abstract class BaseDirective implements Directive
      */
     protected function getModelClass(string $argumentName = 'model'): string
     {
-        $model = $this->directiveArgValue($argumentName)
-            ?? ASTHelper::modelName($this->definitionNode);
+        $model = $this->directiveArgValue($argumentName, ASTHelper::modelName($this->definitionNode));
 
         if (! $model) {
-            throw new DefinitionException(
-                "Could not determine a model name for the '@{$this->name()}' directive on '{$this->nodeName()}."
-            );
+            throw new DefinitionException("Could not determine a model name for the '@{$this->name()}' directive on '{$this->nodeName()}.");
         }
 
         return $this->namespaceModelClass($model);
@@ -209,8 +215,10 @@ abstract class BaseDirective implements Directive
      * Split a single method argument into its parts.
      *
      * A method argument is expected to contain a class and a method name, separated by an @ symbol.
-     * e.g. "App\My\Class@methodName"
-     * This validates that exactly two parts are given and are not empty.
+     *
+     * @example "App\My\Class@methodName"
+     *
+     * This validates that exactly two non-empty parts are given, not that the method exists.
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      *
@@ -247,11 +255,6 @@ abstract class BaseDirective implements Directive
      */
     protected function namespaceModelClass(string $modelClassCandidate): string
     {
-        /**
-         * The callback ensures this holds true.
-         *
-         * @var class-string<\Illuminate\Database\Eloquent\Model> $modelClass
-         */
         $modelClass = $this->namespaceClassName(
             $modelClassCandidate,
             (array) config('lighthouse.namespaces.models'),
@@ -259,7 +262,24 @@ abstract class BaseDirective implements Directive
                 return is_subclass_of($classCandidate, Model::class);
             }
         );
+        assert(is_subclass_of($modelClass, Model::class));
 
         return $modelClass;
+    }
+
+    /**
+     * Validate at most one of the given mutually exclusive arguments is used.
+     *
+     * @param array<string> $names
+     */
+    protected function validateMutuallyExclusiveArguments(array $names): void
+    {
+        $given = array_filter($names, [$this, 'directiveHasArgument']);
+
+        if (count($given) > 1) {
+            $namesString = implode(', ', $names);
+            $givenString = implode(', ', $given);
+            throw new DefinitionException("The arguments [{$namesString}] for @{$this->name()} are mutually exclusive, found [{$givenString}] on {$this->nodeName()}.");
+        }
     }
 }

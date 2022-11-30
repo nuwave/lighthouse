@@ -13,6 +13,7 @@ use GraphQL\Server\Helper as GraphQLHelper;
 use GraphQL\Server\OperationParams;
 use GraphQL\Server\RequestError;
 use GraphQL\Type\Schema;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
@@ -113,7 +114,7 @@ class GraphQL
             new StartOperationOrOperations($operationOrOperations)
         );
 
-        $resultOrResults = LighthouseUtils::applyEach(
+        $resultOrResults = LighthouseUtils::mapEach(
             /**
              * @return array<string, mixed>
              */
@@ -218,8 +219,9 @@ class GraphQL
             return Parser::parse($query);
         }
 
-        /** @var \Illuminate\Contracts\Cache\Factory $cacheFactory */
-        $cacheFactory = app(CacheFactory::class);
+        $cacheFactory = Container::getInstance()->make(CacheFactory::class);
+        assert($cacheFactory instanceof CacheFactory);
+
         $store = $cacheFactory->store($cacheConfig['store']);
 
         return $store->remember(
@@ -254,7 +256,7 @@ class GraphQL
         $schema = $this->schemaBuilder->schema();
 
         $this->eventDispatcher->dispatch(
-            new StartExecution($query, $variables, $operationName, $context)
+            new StartExecution($schema, $query, $variables, $operationName, $context)
         );
 
         $result = GraphQLBase::executeQuery(
@@ -334,8 +336,9 @@ class GraphQL
             );
         }
 
-        /** @var \Illuminate\Contracts\Cache\Factory $cacheFactory */
-        $cacheFactory = app(CacheFactory::class);
+        $cacheFactory = Container::getInstance()->make(CacheFactory::class);
+        assert($cacheFactory instanceof CacheFactory);
+
         $store = $cacheFactory->store($cacheConfig['store']);
 
         $document = $store->get('lighthouse:query:' . $sha256hash);
@@ -370,7 +373,7 @@ class GraphQL
      *   callable(\GraphQL\Error\Error $error): ?array<string, mixed>
      * ): array<string, mixed>
      */
-    protected function errorsHandler(): \Closure
+    protected function errorsHandler(): callable
     {
         if (! isset($this->errorsHandler)) {
             $this->errorsHandler = function (array $errors, callable $formatter): array {
@@ -378,7 +381,7 @@ class GraphQL
                 // This allows the user to register multiple handlers and pipe the errors through.
                 $handlers = [];
                 foreach ($this->configRepository->get('lighthouse.error_handlers', []) as $handlerClass) {
-                    $handlers[] = app($handlerClass);
+                    $handlers[] = Container::getInstance()->make($handlerClass);
                 }
 
                 return (new Collection($errors))

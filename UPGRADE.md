@@ -85,6 +85,14 @@ The setting `non_null_pagination_results` was removed and now always behaves as 
 This is generally more convenient for clients, but will
 cause validation errors to bubble further up in the result.
 
+### Nullability of pagination `first`
+
+Previously, the pagination argument `first` was either marked as non-nullable,
+or non-nullable with a default value.
+
+Now, it will always be marked as non-nullable, regardless if it has a default or not.
+This prevents clients from passing an invalid explicit `null`.
+
 ### Include field cost in `@complexity` calculation
 
 Previous to `v6`, the default query complexity calculation of fields with `@complexity`
@@ -130,6 +138,30 @@ public function scopeByType(Builder $builder, AOrB $aOrB): Builder
 
 Use `parseAndExecuteQuery()` for executing a string query or `executeParsedQuery()` for 
 executing already parsed `DocumentNode`.
+
+### Use `RefreshesSchemaCache` over `ClearsSchemaCache`
+
+The `ClearsSchemaCache` testing trait was prone to race conditions when running tests in parallel.
+
+```diff
+-use Nuwave\Lighthouse\Testing\ClearsSchemaCache;
++use Nuwave\Lighthouse\Testing\RefreshesSchemaCache;
+use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+
+abstract class TestCase extends BaseTestCase
+{
+    use CreatesApplication;
+-   use ClearsSchemaCache;
++   use RefreshesSchemaCache;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+-       $this->bootClearsSchemaCache();
++       $this->bootRefreshesSchemaCache();
+     }
+}
+```
 
 ## v4 to v5
 

@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Auth;
 
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective;
 
@@ -41,12 +42,15 @@ GRAPHQL;
 
     public function handleFieldBuilder(object $builder): object
     {
+        assert($builder instanceof EloquentBuilder);
+
         // @phpstan-ignore-next-line Mixins are magic
         return $builder->whereHas(
             $this->directiveArgValue('relation'),
-            function ($query): void {
-                $guard = $this->directiveArgValue('guard')
-                    ?? AuthServiceProvider::guard();
+            function (object $query): void {
+                assert($query instanceof EloquentBuilder);
+
+                $guard = $this->directiveArgValue('guard', AuthServiceProvider::guard());
 
                 $userId = $this
                     ->authFactory

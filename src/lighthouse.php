@@ -41,8 +41,8 @@ return [
         /*
          * The `prefix` and `domain` configuration options are optional.
          */
-        //'prefix' => '',
-        //'domain' => '',
+        // 'prefix' => '',
+        // 'domain' => '',
     ],
 
     /*
@@ -147,13 +147,13 @@ return [
         'store' => env('LIGHTHOUSE_QUERY_CACHE_STORE', null),
 
         /*
-         * Duration in seconds the query should remain cached, null means forever.
+         * Duration in seconds (minutes for Laravel pre-5.8) the query should remain cached, null means forever.
          */
         'ttl' => env(
             'LIGHTHOUSE_QUERY_CACHE_TTL',
             \Nuwave\Lighthouse\Support\AppVersion::atLeast(5.8)
-                ? null
-                : 365 * 24 * 60 // For Laravel < 5.8 the exact value must be specified and it is counted in minutes
+                ? 24 * 60 * 60 // 1 day in seconds
+                : 24 * 60 // 1 day in minutes
         ),
     ],
 
@@ -193,7 +193,9 @@ return [
     'security' => [
         'max_query_complexity' => \GraphQL\Validator\Rules\QueryComplexity::DISABLED,
         'max_query_depth' => \GraphQL\Validator\Rules\QueryDepth::DISABLED,
-        'disable_introspection' => \GraphQL\Validator\Rules\DisableIntrospection::DISABLED,
+        'disable_introspection' => (bool) env('LIGHTHOUSE_SECURITY_DISABLE_INTROSPECTION', false)
+            ? \GraphQL\Validator\Rules\DisableIntrospection::ENABLED
+            : \GraphQL\Validator\Rules\DisableIntrospection::DISABLED,
     ],
 
     /*
@@ -282,11 +284,13 @@ return [
 
     'field_middleware' => [
         \Nuwave\Lighthouse\Schema\Directives\TrimDirective::class,
+        \Nuwave\Lighthouse\Schema\Directives\ConvertEmptyStringsToNullDirective::class,
         \Nuwave\Lighthouse\Schema\Directives\SanitizeDirective::class,
         \Nuwave\Lighthouse\Validation\ValidateDirective::class,
         \Nuwave\Lighthouse\Schema\Directives\TransformArgsDirective::class,
         \Nuwave\Lighthouse\Schema\Directives\SpreadDirective::class,
         \Nuwave\Lighthouse\Schema\Directives\RenameArgsDirective::class,
+        \Nuwave\Lighthouse\Schema\Directives\DropArgsDirective::class,
     ],
 
     /*

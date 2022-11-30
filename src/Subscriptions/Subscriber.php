@@ -6,12 +6,12 @@ use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\AST\NodeList;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Utils\AST;
+use Illuminate\Container\Container;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-use Serializable;
 
-class Subscriber implements Serializable
+class Subscriber implements \Serializable
 {
     /**
      * A unique key for the subscriber's channel.
@@ -186,6 +186,6 @@ class Subscriber implements Serializable
 
     protected function contextSerializer(): ContextSerializer
     {
-        return app(ContextSerializer::class);
+        return Container::getInstance()->make(ContextSerializer::class);
     }
 }

@@ -39,21 +39,20 @@ SIGNATURE;
 
                 return;
             }
+
             $filename = self::GRAPHQL_FEDERATION_FILENAME;
             $schemaString = FederationPrinter::print($schema);
+        } elseif ($this->option('json')) {
+            $filename = self::JSON_FILENAME;
+            $schemaString = $this->toJson($schema);
         } else {
-            if ($this->option('json')) {
-                $filename = self::JSON_FILENAME;
-                $schemaString = $this->toJson($schema);
-            } else {
-                $filename = self::GRAPHQL_FILENAME;
-                $schemaString = SchemaPrinter::doPrint($schema);
-            }
+            $filename = self::GRAPHQL_FILENAME;
+            $schemaString = SchemaPrinter::doPrint($schema);
         }
 
         if ($this->option('write')) {
             $storage->put($filename, $schemaString);
-            $this->info('Wrote schema to the default file storage (usually storage/app) as "' . $filename . '".');
+            $this->info("Wrote schema to the default file storage (usually storage/app) as {$filename}.");
         } else {
             $this->info($schemaString);
         }

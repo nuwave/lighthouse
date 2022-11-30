@@ -2,16 +2,17 @@
 
 namespace Tests\Unit\Events;
 
-use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Nuwave\Lighthouse\Events\BuildSchemaString;
 use Tests\TestCase;
 
-class BuildSchemaStringTest extends TestCase
+final class BuildSchemaStringTest extends TestCase
 {
     public function testInjectsSourceSchemaIntoEvent(): void
     {
-        /** @var \Illuminate\Contracts\Events\Dispatcher $dispatcher */
-        $dispatcher = app(Dispatcher::class);
+        $dispatcher = $this->app->make(EventDispatcher::class);
+        assert($dispatcher instanceof EventDispatcher);
+
         $dispatcher->listen(
             BuildSchemaString::class,
             function (BuildSchemaString $buildSchemaString): void {
@@ -24,8 +25,9 @@ class BuildSchemaStringTest extends TestCase
 
     public function testAddAdditionalSchemaThroughEvent(): void
     {
-        /** @var \Illuminate\Contracts\Events\Dispatcher $dispatcher */
-        $dispatcher = app(Dispatcher::class);
+        $dispatcher = $this->app->make(EventDispatcher::class);
+        assert($dispatcher instanceof EventDispatcher);
+
         $dispatcher->listen(
             BuildSchemaString::class,
             function (): string {
@@ -66,12 +68,12 @@ class BuildSchemaStringTest extends TestCase
         ]);
     }
 
-    public function resolveSayHello(): string
+    public static function resolveSayHello(): string
     {
         return 'hello';
     }
 
-    public function resolveFoo(): string
+    public static function resolveFoo(): string
     {
         return 'foo';
     }

@@ -1,13 +1,12 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Directives;
+namespace Nuwave\Lighthouse\Cache;
 
-use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Support\Carbon;
 use Nuwave\Lighthouse\Execution\Resolved;
-use Nuwave\Lighthouse\Schema\Values\CacheKeyAndTags;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -19,9 +18,15 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
      */
     protected $cacheRepository;
 
-    public function __construct(CacheRepository $cacheRepository)
+    /**
+     * @var \Nuwave\Lighthouse\Cache\CacheKeyAndTags
+     */
+    protected $cacheKeyAndTags;
+
+    public function __construct(CacheRepository $cacheRepository, CacheKeyAndTags $cacheKeyAndTags)
     {
         $this->cacheRepository = $cacheRepository;
+        $this->cacheKeyAndTags = $cacheKeyAndTags;
     }
 
     public static function definition(): string
@@ -47,7 +52,7 @@ directive @cache(
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
     {
         // Ensure we run this after other field middleware
         $fieldValue = $next($fieldValue);
@@ -68,10 +73,13 @@ GRAPHQL;
 
                 /** @var \Illuminate\Cache\TaggedCache|\Illuminate\Contracts\Cache\Repository $cache */
                 $cache = $shouldUseTags
-                    ? $this->cacheRepository->tags(CacheKeyAndTags::tags($parentName, $rootID, $fieldName))
+                    ? $this->cacheRepository->tags([
+                        $this->cacheKeyAndTags->parentTag($parentName, $rootID),
+                        $this->cacheKeyAndTags->fieldTag($parentName, $rootID, $fieldName),
+                    ])
                     : $this->cacheRepository;
 
-                $cacheKey = CacheKeyAndTags::key(
+                $cacheKey = $this->cacheKeyAndTags->key(
                     $context->user(),
                     $isPrivate,
                     $parentName,

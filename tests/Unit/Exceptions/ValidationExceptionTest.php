@@ -6,7 +6,7 @@ use Illuminate\Validation\ValidationException as LaravelValidationException;
 use Nuwave\Lighthouse\Exceptions\ValidationException;
 use Tests\TestCase;
 
-class ValidationExceptionTest extends TestCase
+final class ValidationExceptionTest extends TestCase
 {
     public function testWithMessages(): void
     {

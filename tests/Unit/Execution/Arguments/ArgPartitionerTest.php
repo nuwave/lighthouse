@@ -12,7 +12,7 @@ use Tests\Unit\Execution\Arguments\Fixtures\Nested;
 use Tests\Utils\Models\User;
 use Tests\Utils\Models\WithoutRelationClassImport;
 
-class ArgPartitionerTest extends TestCase
+final class ArgPartitionerTest extends TestCase
 {
     public function testPartitionArgsWithArgResolvers(): void
     {

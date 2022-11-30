@@ -2,11 +2,10 @@
 
 namespace Tests\Integration;
 
-use Exception;
 use Tests\TestCase;
 use Tests\Utils\NullErrorHandler;
 
-class ErrorHandlersTest extends TestCase
+final class ErrorHandlersTest extends TestCase
 {
     public function testErrorHandlerReturningNull(): void
     {
@@ -15,7 +14,7 @@ class ErrorHandlersTest extends TestCase
         ]]);
 
         $this->mockResolver(static function (): void {
-            throw new Exception();
+            throw new \Exception();
         });
 
         $this->schema = /** @lang GraphQL */ '

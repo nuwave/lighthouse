@@ -2,8 +2,6 @@
 
 namespace Nuwave\Lighthouse;
 
-use Closure;
-use Exception;
 use GraphQL\Error\ClientAware;
 use GraphQL\Error\Error;
 use GraphQL\Executor\ExecutionResult;
@@ -100,9 +98,9 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->app->bind(ProvidesResolver::class, ResolverProvider::class);
         $this->app->bind(ProvidesSubscriptionResolver::class, static function (): ProvidesSubscriptionResolver {
             return new class() implements ProvidesSubscriptionResolver {
-                public function provideSubscriptionResolver(FieldValue $fieldValue): Closure
+                public function provideSubscriptionResolver(FieldValue $fieldValue): \Closure
                 {
-                    throw new Exception(
+                    throw new \Exception(
                         'Add the SubscriptionServiceProvider to your config/app.php to enable subscriptions.'
                     );
                 }
@@ -123,18 +121,15 @@ class LighthouseServiceProvider extends ServiceProvider
                 return new LumenMiddlewareAdapter();
             }
 
-            throw new Exception(
+            throw new \Exception(
                 'Could not correctly determine Laravel framework flavor, got ' . get_class($app) . '.'
             );
         });
 
-        if ($this->app->runningInConsole()) {
-            $this->commands(self::COMMANDS);
-        }
+        $this->commands(self::COMMANDS);
 
-        if ($this->app->runningUnitTests()) {
-            $this->app->register(TestingServiceProvider::class);
-        }
+        // Always registered in order to ensure macros are recognized by Larastan
+        $this->app->register(TestingServiceProvider::class);
     }
 
     public function boot(ConfigRepository $configRepository): void

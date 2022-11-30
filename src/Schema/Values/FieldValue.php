@@ -8,11 +8,15 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
+use Illuminate\Container\Container;
 use Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter;
 use Nuwave\Lighthouse\Schema\Factories\FieldFactory;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
+/**
+ * @phpstan-type Resolver callable(mixed, array<string, mixed>, GraphQLContext, ResolveInfo): mixed
+ */
 class FieldValue
 {
     /**
@@ -41,7 +45,7 @@ class FieldValue
      *
      * Lazily initialized through setResolver().
      *
-     * @var callable
+     * @var Resolver
      */
     protected $resolver;
 
@@ -85,6 +89,8 @@ class FieldValue
 
     /**
      * Get field resolver.
+     *
+     * @return Resolver
      */
     public function getResolver(): callable
     {
@@ -93,6 +99,8 @@ class FieldValue
 
     /**
      * Overwrite the current/default resolver.
+     *
+     * @param  Resolver  $resolver
      */
     public function setResolver(callable $resolver): self
     {
@@ -125,7 +133,7 @@ class FieldValue
      *     return $result;
      * }
      *
-     * @param callable(mixed $result, array<string, mixed> $args, GraphQLContext $context, ResolveInfo $resolveInfo): mixed $handle
+     * @param Resolver $handle
      */
     public function resultHandler(callable $handle): void
     {
@@ -191,7 +199,7 @@ class FieldValue
      *
      * @deprecated will be removed in v6
      */
-    public function getComplexity(): ?Closure
+    public function getComplexity(): ?\Closure
     {
         return $this->complexity;
     }
@@ -201,7 +209,7 @@ class FieldValue
      *
      * @deprecated will be removed in v6
      */
-    public function setComplexity(Closure $complexity): self
+    public function setComplexity(\Closure $complexity): self
     {
         $this->complexity = $complexity;
 
@@ -216,8 +224,9 @@ class FieldValue
     public function getReturnType(): Type
     {
         if (null === $this->returnType) {
-            /** @var \Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter $typeNodeConverter */
-            $typeNodeConverter = app(ExecutableTypeNodeConverter::class);
+            $typeNodeConverter = Container::getInstance()->make(ExecutableTypeNodeConverter::class);
+            assert($typeNodeConverter instanceof ExecutableTypeNodeConverter);
+
             $this->returnType = $typeNodeConverter->convert($this->field->type);
         }
 

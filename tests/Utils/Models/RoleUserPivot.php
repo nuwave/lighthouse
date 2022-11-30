@@ -21,7 +21,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read \Tests\Utils\Models\Role $role
  * @property-read \Tests\Utils\Models\User $user
  */
-class RoleUserPivot extends Model
+final class RoleUserPivot extends Model
 {
     public $table = 'role_user';
 

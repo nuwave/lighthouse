@@ -9,7 +9,7 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class OrderByDirectiveDBTest extends DBTestCase
+final class OrderByDirectiveDBTest extends DBTestCase
 {
     protected $schema = /** @lang GraphQL */ '
     type Query {

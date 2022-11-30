@@ -6,6 +6,9 @@ namespace Nuwave\Lighthouse\Testing;
  * Clears the schema cache once before any tests are run.
  *
  * @mixin \Illuminate\Foundation\Testing\Concerns\InteractsWithConsole
+ *
+ * @deprecated not safe with parallel testing
+ * @see \Nuwave\Lighthouse\Testing\RefreshesSchemaCache
  */
 trait ClearsSchemaCache
 {

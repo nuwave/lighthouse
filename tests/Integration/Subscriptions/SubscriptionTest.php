@@ -4,6 +4,7 @@ namespace Tests\Integration\Subscriptions;
 
 use Illuminate\Auth\SessionGuard;
 use Illuminate\Support\Arr;
+use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
 use Nuwave\Lighthouse\Subscriptions\Storage\CacheStorageManager;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
@@ -14,7 +15,7 @@ use Tests\Utils\Models\User;
 /**
  * TODO extends TestCase when depending on Laravel 5.8+.
  */
-class SubscriptionTest extends DBTestCase
+final class SubscriptionTest extends DBTestCase
 {
     use TestsSubscriptions;
 
@@ -52,7 +53,11 @@ GRAPHQL;
     public function testSendsSubscriptionChannelInResponse(): void
     {
         $response = $this->subscribe();
-        $subscriber = app(CacheStorageManager::class)->subscribersByTopic('ON_POST_CREATED')->first();
+
+        $cache = $this->app->make(CacheStorageManager::class);
+        assert($cache instanceof CacheStorageManager);
+
+        $subscriber = $cache->subscribersByTopic('ON_POST_CREATED')->first();
 
         $this->assertInstanceOf(Subscriber::class, $subscriber);
         $response->assertExactJson(
@@ -83,7 +88,10 @@ GRAPHQL;
             ],
         ]);
 
-        $subscribers = app(CacheStorageManager::class)->subscribersByTopic('ON_POST_CREATED');
+        $cache = $this->app->make(CacheStorageManager::class);
+        assert($cache instanceof CacheStorageManager);
+
+        $subscribers = $cache->subscribersByTopic('ON_POST_CREATED');
         $this->assertCount(2, $subscribers);
 
         $response->assertExactJson([
@@ -103,8 +111,12 @@ GRAPHQL;
         }
         ');
 
-        /** @var \Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster $log */
-        $log = app(BroadcastManager::class)->driver();
+        $broadcastManager = $this->app->make(BroadcastManager::class);
+        assert($broadcastManager instanceof BroadcastManager);
+
+        $log = $broadcastManager->driver();
+        assert($log instanceof LogBroadcaster);
+
         $broadcasts = $log->broadcasts();
 
         $this->assertNotNull($broadcasts);
@@ -222,8 +234,12 @@ GRAPHQL;
         }
         ');
 
-        /** @var \Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster $log */
-        $log = app(BroadcastManager::class)->driver();
+        $broadcastManager = $this->app->make(BroadcastManager::class);
+        assert($broadcastManager instanceof BroadcastManager);
+
+        $log = $broadcastManager->driver();
+        assert($log instanceof LogBroadcaster);
+
         $broadcasts = $log->broadcasts();
 
         $this->assertIsArray($broadcasts);

@@ -17,9 +17,9 @@ parameters:
   - src
   - tests
   checkOctaneCompatibility: true
+  # TODO reenable once we require Laravel 9+
+  checkGenericClassInNonGenericObjectType: false
   excludePaths:
-  - tests/database/migrations/*
-
   # Indirectly refers to \App\User (maybe through larastan?)
   - tests/Utils/Models/User.php
 
@@ -31,12 +31,20 @@ parameters:
   - tests/Laravel7ExceptionHandler.php
   - tests/PreLaravel7ExceptionHandler.php
 
+  # Breaking changes in bensampo/laravel-enum
+  - tests/Integration/Schema/Types/LaravelEnumTypeDBTest.php
+  - tests/Integration/Schema/Types/PreLaravel9LaravelEnumTypeDBTest.php
+  - tests/Utils/Models/WithEnum.php
+  - tests/Utils/Models/PreLaravel9WithEnum.php
+
   # As long as we support multiple Laravel versions at once, there will be some dead spots
   reportUnmatchedIgnoredErrors: false
 
   ignoreErrors:
+  # PHPStan does not get it
+  - '#Parameter \#1 \$callback of static method Closure::fromCallable\(\) expects callable\(\): mixed, array{object, .*} given\.#'
+
   # Some parts of Laravel are just really magical
-  - '#Parameter \#1 \$callable of static method Closure::fromCallable\(\) expects callable\(\): mixed, array\(\*NEVER\*, .*\) given\.#'
   - path: tests/database/factories/*
     message: '#Variable \$factory might not be defined#'
   - '#Function factory invoked with 2 parameters, 0 required\.#'
@@ -70,3 +78,6 @@ parameters:
 
   # Unavailable in thecodingmachine/safe:2
   - '#Function (sort|substr|ksort) is unsafe to use\. It can return FALSE instead of throwing an exception\.#'
+
+  # Lumen type hints are just wrong
+  - '#Parameter \#1 \$content of function response expects string, .* given\.#'

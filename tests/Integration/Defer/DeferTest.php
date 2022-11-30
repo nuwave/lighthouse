@@ -9,7 +9,7 @@ use Nuwave\Lighthouse\Defer\DeferrableDirective;
 use Nuwave\Lighthouse\Defer\DeferServiceProvider;
 use Tests\TestCase;
 
-class DeferTest extends TestCase
+final class DeferTest extends TestCase
 {
     public function setUp(): void
     {
@@ -368,8 +368,9 @@ class DeferTest extends TestCase
         }
         ';
 
-        /** @var \Nuwave\Lighthouse\Defer\Defer $defer */
-        $defer = app(Defer::class);
+        $defer = $this->app->make(Defer::class);
+        assert($defer instanceof Defer);
+
         // Set max execution time to now so we immediately resolve deferred fields
         $defer->setMaxExecutionTime(microtime(true));
 
@@ -424,8 +425,9 @@ class DeferTest extends TestCase
         }
         ';
 
-        /** @var \Nuwave\Lighthouse\Defer\Defer $defer */
-        $defer = app(Defer::class);
+        $defer = $this->app->make(Defer::class);
+        assert($defer instanceof Defer);
+
         $defer->setMaxNestedFields(1);
 
         $chunks = $this->streamGraphQL(/** @lang GraphQL */ '

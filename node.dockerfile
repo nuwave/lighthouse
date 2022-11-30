@@ -1,4 +1,4 @@
-FROM node:14-slim
+FROM node:18-slim
 
 ARG USER_ID
 ARG GROUP_ID

@@ -2,8 +2,10 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
-use Closure;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
@@ -25,8 +27,8 @@ class NestedOneToMany implements ArgResolver
      */
     public function __invoke($parent, $args): void
     {
-        /** @var \Illuminate\Database\Eloquent\Relations\HasMany|\Illuminate\Database\Eloquent\Relations\MorphMany $relation */
         $relation = $parent->{$this->relationName}();
+        assert($relation instanceof HasMany || $relation instanceof MorphMany);
 
         static::createUpdateUpsert($args, $relation);
         static::connectDisconnect($args, $relation);
@@ -75,7 +77,7 @@ class NestedOneToMany implements ArgResolver
             $children = $relation
                 ->make()
                 ->whereIn(
-                    self::getLocalKeyName($relation),
+                    self::getKeyName($relation),
                     $args->arguments['connect']->value
                 )
                 ->get();
@@ -89,13 +91,13 @@ class NestedOneToMany implements ArgResolver
             $children = $relation
                 ->make()
                 ->whereIn(
-                    self::getLocalKeyName($relation),
+                    self::getKeyName($relation),
                     $args->arguments['disconnect']->value
                 )
                 ->get();
 
-            /** @var \Illuminate\Database\Eloquent\Model $child */
             foreach ($children as $child) {
+                assert($child instanceof Model);
                 $child->setAttribute($relation->getForeignKeyName(), null);
                 $child->save();
             }
@@ -105,17 +107,17 @@ class NestedOneToMany implements ArgResolver
     /**
      * TODO remove this horrible hack when we no longer support Laravel 5.6.
      */
-    protected static function getLocalKeyName(HasOneOrMany $relation): string
+    protected static function getKeyName(HasOneOrMany $relation): string
     {
-        $getLocalKeyName = Closure::bind(
+        $getKeyName = \Closure::bind(
             function () {
                 // @phpstan-ignore-next-line This is a dirty hack
-                return $this->localKey;
+                return $this->make()->getKeyName();
             },
             $relation,
             get_class($relation)
         );
 
-        return $getLocalKeyName();
+        return $getKeyName();
     }
 }

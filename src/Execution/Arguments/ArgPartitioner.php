@@ -12,8 +12,6 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 use Nuwave\Lighthouse\Support\Utils;
-use ReflectionClass;
-use ReflectionNamedType;
 
 class ArgPartitioner
 {
@@ -70,7 +68,7 @@ class ArgPartitioner
         Model $model,
         string $relationClass
     ): array {
-        $modelReflection = new ReflectionClass($model);
+        $modelReflection = new \ReflectionClass($model);
 
         [$relations, $remaining] = static::partition(
             $argumentSet,
@@ -93,7 +91,7 @@ class ArgPartitioner
     /**
      * Attach a nested argument resolver to an argument.
      */
-    protected static function attachNestedArgResolver(string $name, Argument &$argument, ?ReflectionClass $model): void
+    protected static function attachNestedArgResolver(string $name, Argument &$argument, ?\ReflectionClass $model): void
     {
         $resolverDirective = $argument->directives->first(
             Utils::instanceofMatcher(ArgResolver::class)
@@ -133,8 +131,6 @@ class ArgPartitioner
                 || $isRelation(MorphToMany::class)
             ) {
                 $argument->resolver = new ResolveNested(new NestedManyToMany($name));
-
-                return;
             }
         }
     }
@@ -176,7 +172,7 @@ class ArgPartitioner
      * Does a method on the model return a relation of the given class?
      */
     public static function methodReturnsRelation(
-        ReflectionClass $modelReflection,
+        \ReflectionClass $modelReflection,
         string $name,
         string $relationClass
     ): bool {
@@ -187,11 +183,7 @@ class ArgPartitioner
         $relationMethodCandidate = $modelReflection->getMethod($name);
 
         $returnType = $relationMethodCandidate->getReturnType();
-        if (null === $returnType) {
-            return false;
-        }
-
-        if (! $returnType instanceof ReflectionNamedType) {
+        if (! $returnType instanceof \ReflectionNamedType) {
             return false;
         }
 

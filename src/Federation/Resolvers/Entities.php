@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Federation\Resolvers;
 
 use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Federation\BatchedEntityResolver;
 use Nuwave\Lighthouse\Federation\EntityResolverProvider;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
@@ -32,11 +33,25 @@ class Entities
     {
         $results = [];
 
+        /** @var array<string, array<int, array<string, mixed>>> $groupedRepresentations */
+        $groupedRepresentations = [];
         foreach ($args['representations'] as $representation) {
-            $typename = $representation['__typename'];
-            $resolver = $this->entityResolverProvider->resolver($typename);
+            $groupedRepresentations[$representation['__typename']][] = $representation;
+        }
 
-            $results[] = $resolver($representation);
+        foreach ($groupedRepresentations as $typename => $representations) {
+            assert(is_string($typename), 'Never numeric due to GraphQL\Utils::isValidNameError()');
+
+            $resolver = $this->entityResolverProvider->resolver($typename);
+            if ($resolver instanceof BatchedEntityResolver) {
+                foreach ($resolver($representations) as $result) {
+                    $results[] = $result;
+                }
+            } else {
+                foreach ($representations as $representation) {
+                    $results[] = $resolver($representation);
+                }
+            }
         }
 
         return $results;

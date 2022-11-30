@@ -2,7 +2,7 @@
 
 namespace Tests\Integration\WhereConditions;
 
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Nuwave\Lighthouse\WhereConditions\SQLOperator;
 use Nuwave\Lighthouse\WhereConditions\WhereConditionsHandler;
 use Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider;
@@ -13,7 +13,7 @@ use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class WhereConditionsDirectiveTest extends DBTestCase
+final class WhereConditionsDirectiveTest extends DBTestCase
 {
     protected $schema = /** @lang GraphQL */ '
     type User {
@@ -725,38 +725,6 @@ class WhereConditionsDirectiveTest extends DBTestCase
         ')->assertGraphQLErrorMessage(WhereConditionsHandler::invalidColumnName("Robert'); DROP TABLE Students;--"));
     }
 
-    public function testQueriesEmptyStrings(): void
-    {
-        factory(User::class, 3)->create();
-
-        $userNamedEmptyString = factory(User::class)->create([
-            'name' => '',
-        ]);
-
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            users(
-                where: {
-                    column: "name"
-                    value: ""
-                }
-            ) {
-                id
-                name
-            }
-        }
-        ')->assertJson([
-            'data' => [
-                'users' => [
-                    [
-                        'id' => $userNamedEmptyString->id,
-                        'name' => $userNamedEmptyString->name,
-                    ],
-                ],
-            ],
-        ]);
-    }
-
     public function testQueryForNull(): void
     {
         factory(User::class, 3)->create();
@@ -962,7 +930,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
         type User {
             id: ID!
         }
-    
+
         type Query {
             users(where: _ @whereConditions(
                 columns: ["name"],
@@ -996,7 +964,7 @@ GRAPHQL;
             'data' => [
                 'users' => [
                     [
-                        'id' => "$user2->id",
+                        'id' => "{$user2->id}",
                     ],
                 ],
             ],
@@ -1006,7 +974,7 @@ GRAPHQL;
     /**
      * @param array<string, mixed> $conditions
      */
-    public function handler(Builder $builder, array $conditions): void
+    public static function handler(EloquentBuilder $builder, array $conditions): void
     {
         $value = $conditions['value'];
         $builder->where($conditions['column'], $value . $value);

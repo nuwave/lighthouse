@@ -4,7 +4,7 @@ namespace Tests\Utils\Directives;
 
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 
-class FooDirective extends BaseDirective
+final class FooDirective extends BaseDirective
 {
     public static function definition(): string
     {

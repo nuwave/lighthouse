@@ -5,7 +5,7 @@ namespace Tests\Integration\Schema\Directives;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
-class BuilderDirectiveTest extends DBTestCase
+final class BuilderDirectiveTest extends DBTestCase
 {
     public function testCallsCustomBuilderMethod(): void
     {
@@ -83,7 +83,7 @@ class BuilderDirectiveTest extends DBTestCase
      *
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
-    public function limit(object $builder, int $value = 2): object
+    public static function limit(object $builder, int $value = 2): object
     {
         return $builder->limit($value);
     }

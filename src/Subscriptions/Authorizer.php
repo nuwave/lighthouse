@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions;
@@ -66,7 +65,7 @@ class Authorizer implements AuthorizesSubscriptions
             }
 
             return true;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->exceptionHandler->handleAuthError($e);
 
             return false;

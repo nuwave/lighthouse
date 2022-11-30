@@ -4,10 +4,11 @@ namespace Tests\Unit\Support\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Support\Http\Middleware\EnsureXHR;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Tests\TestCase;
 
-class EnsureXHRTest extends TestCase
+final class EnsureXHRTest extends TestCase
 {
     public function testForbidGet(): void
     {
@@ -47,12 +48,14 @@ class EnsureXHRTest extends TestCase
         $request = new Request();
         $request->setMethod('PUT');
 
+        $response = new Response();
+
         $result = $middleware->handle(
             $request,
-            static function (): bool { return true; }
+            static function () use ($response): Response { return $response; }
         );
 
-        $this->assertTrue($result);
+        $this->assertSame($response, $result);
     }
 
     /**
@@ -76,7 +79,7 @@ class EnsureXHRTest extends TestCase
     /**
      * @return array{array{string}}
      */
-    public function formContentTypes(): array
+    public static function formContentTypes(): array
     {
         return [
             ['application/x-www-form-urlencoded'],
@@ -101,6 +104,39 @@ class EnsureXHRTest extends TestCase
         );
     }
 
+    public function testAllowXRequestedWithHeader(): void
+    {
+        $middleware = new EnsureXHR();
+
+        $request = new Request();
+        $request->setMethod('POST');
+        $request->headers->set('X-Requested-With', 'XMLHttpRequest');
+
+        $response = new Response();
+
+        $result = $middleware->handle(
+            $request,
+            static function () use ($response): Response { return $response; }
+        );
+
+        $this->assertSame($response, $result);
+    }
+
+    public function testForbidInvalidXRequestedWithHeader(): void
+    {
+        $middleware = new EnsureXHR();
+
+        $request = new Request();
+        $request->setMethod('POST');
+        $request->headers->set('X-Requested-With', 'InvalidValue');
+
+        $this->expectException(BadRequestHttpException::class);
+        $middleware->handle(
+            $request,
+            static function (): void {}
+        );
+    }
+
     public function testAllowXHR(): void
     {
         $middleware = new EnsureXHR();
@@ -109,11 +145,13 @@ class EnsureXHRTest extends TestCase
         $request->setMethod('POST');
         $request->headers->set('content-type', 'application/json');
 
+        $response = new Response();
+
         $result = $middleware->handle(
             $request,
-            static function (): bool { return true; }
+            static function () use ($response): Response { return $response; }
         );
 
-        $this->assertTrue($result);
+        $this->assertSame($response, $result);
     }
 }

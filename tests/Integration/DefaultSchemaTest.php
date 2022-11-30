@@ -10,7 +10,7 @@ use Nuwave\Lighthouse\Validation\ValidationServiceProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
-class DefaultSchemaTest extends DBTestCase
+final class DefaultSchemaTest extends DBTestCase
 {
     public function setUp(): void
     {

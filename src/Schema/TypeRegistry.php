@@ -18,6 +18,7 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\UnionType;
+use Illuminate\Container\Container;
 use Illuminate\Pipeline\Pipeline;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
@@ -71,6 +72,13 @@ class TypeRegistry
      */
     protected $types = [];
 
+    /**
+     * Map from type names to lazily resolved types.
+     *
+     * @var array<string, callable(): \GraphQL\Type\Definition\Type>
+     */
+    protected $lazyTypes = [];
+
     public function __construct(
         Pipeline $pipeline,
         DirectiveLocator $directiveLocator,
@@ -81,14 +89,24 @@ class TypeRegistry
         $this->argumentFactory = $argumentFactory;
     }
 
+    public static function failedToLoadType(string $name): DefinitionException
+    {
+        return new DefinitionException("Failed to load type: {$name}. Make sure the type is present in your schema definition.");
+    }
+
+    public static function triedToRegisterPresentType(string $name): DefinitionException
+    {
+        return new DefinitionException("Tried to register a type that is already present in the schema: {$name}. Use overwrite() to ignore existing types.");
+    }
+
     /**
      * @param  array<string>  $possibleTypes
      */
-    public static function unresolvableAbstractTypeMapping(string $fqcn, array $possibleTypes): string
+    public static function unresolvableAbstractTypeMapping(string $fqcn, array $possibleTypes): DefinitionException
     {
         $ambiguousMapping = implode(', ', $possibleTypes);
 
-        return "Expected to map {$fqcn} to a single possible type, got: [{$ambiguousMapping}].";
+        return new DefinitionException("Expected to map {$fqcn} to a single possible type, got: [{$ambiguousMapping}].");
     }
 
     public function setDocumentAST(DocumentAST $documentAST): self
@@ -106,14 +124,7 @@ class TypeRegistry
     public function get(string $name): Type
     {
         if (! $this->has($name)) {
-            throw new DefinitionException(
-                <<<EOL
-Lighthouse failed while trying to load a type: $name
-
-Make sure the type is present in your schema definition.
-
-EOL
-            );
+            throw self::failedToLoadType($name);
         }
 
         return $this->types[$name];
@@ -124,8 +135,30 @@ EOL
      */
     public function has(string $name): bool
     {
-        return isset($this->types[$name])
-            || $this->fromAST($name) instanceof Type;
+        if (isset($this->types[$name])) {
+            return true;
+        }
+
+        if (isset($this->documentAST->types[$name])) {
+            $this->types[$name] = $this->handle($this->documentAST->types[$name]);
+
+            return true;
+        }
+
+        if (isset($this->lazyTypes[$name])) {
+            $this->types[$name] = $this->lazyTypes[$name]();
+
+            return true;
+        }
+
+        $standardTypes = Type::getStandardTypes();
+        if (isset($standardTypes[$name])) {
+            $this->types[$name] = $standardTypes[$name];
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -135,10 +168,24 @@ EOL
     {
         $name = $type->name;
         if ($this->has($name)) {
-            throw new DefinitionException("Tried to register a type that is already present in the schema: {$name}. Use overwrite() to ignore existing types.");
+            throw self::triedToRegisterPresentType($name);
         }
 
         $this->types[$name] = $type;
+
+        return $this;
+    }
+
+    /**
+     * Register an executable GraphQL type lazily.
+     */
+    public function registerLazy(string $name, callable $type): self
+    {
+        if ($this->has($name)) {
+            throw self::triedToRegisterPresentType($name);
+        }
+
+        $this->lazyTypes[$name] = $type;
 
         return $this;
     }
@@ -154,16 +201,16 @@ EOL
     }
 
     /**
-     * Attempt to make a type of the given name from the AST.
+     * Register a type lazily, overwriting if it exists already.
      */
-    protected function fromAST(string $name): ?Type
+    public function overwriteLazy(string $name, callable $type): self
     {
-        $typeDefinition = $this->documentAST->types[$name] ?? null;
-        if (null === $typeDefinition) {
-            return null;
-        }
+        // The lazy type might have been resolved already
+        unset($this->types[$name]);
 
-        return $this->types[$name] = $this->handle($typeDefinition);
+        $this->lazyTypes[$name] = $type;
+
+        return $this;
     }
 
     /**
@@ -175,12 +222,18 @@ EOL
     {
         // Make sure all the types from the AST are eagerly converted
         // to find orphaned types, such as an object type that is only
-        // ever used through its association to an interface
+        // ever used through its association to an interface.
         foreach ($this->documentAST->types as $typeDefinition) {
             $name = $typeDefinition->name->value;
 
             if (! isset($this->types[$name])) {
                 $this->types[$name] = $this->handle($typeDefinition);
+            }
+        }
+
+        foreach ($this->lazyTypes as $name => $lazyType) {
+            if (! isset($this->types[$name])) {
+                $this->types[$name] = $lazyType();
             }
         }
 
@@ -328,19 +381,16 @@ EOL
             'name' => $objectDefinition->name->value,
             'description' => $objectDefinition->description->value ?? null,
             'fields' => $this->makeFieldsLoader($objectDefinition),
-            'interfaces'
-/**
- * @return list<\GraphQL\Type\Definition\Type>
- */ => function () use ($objectDefinition): array {
-    $interfaces = [];
+            'interfaces' => function () use ($objectDefinition): array {
+                $interfaces = [];
 
-    // Might be a NodeList, so we can not use array_map()
-    foreach ($objectDefinition->interfaces as $interface) {
-        $interfaces[] = $this->get($interface->name->value);
-    }
+                foreach ($objectDefinition->interfaces as $interface) {
+                    $interfaces[] = $this->get($interface->name->value);
+                }
 
-    return $interfaces;
-},
+                /** @var list<\GraphQL\Type\Definition\InterfaceType> $interfaces */
+                return $interfaces;
+            },
             'astNode' => $objectDefinition,
         ]);
     }
@@ -352,40 +402,38 @@ EOL
      *
      * @return \Closure(): array<string, Closure(): array<string, mixed>>
      */
-    protected function makeFieldsLoader($typeDefinition): Closure
+    protected function makeFieldsLoader($typeDefinition): \Closure
     {
-        return
-            /**
-             * @return array<string, Closure(): array<string, mixed>>
-             */
-            function () use ($typeDefinition): array {
-                $fieldFactory = $this->fieldFactory();
-                $typeValue = new TypeValue($typeDefinition);
-                $fields = [];
+        return function () use ($typeDefinition): array {
+            $fieldFactory = $this->fieldFactory();
+            $typeValue = new TypeValue($typeDefinition);
+            $fields = [];
 
-                foreach ($typeDefinition->fields as $fieldDefinition) {
-                    $fields[$fieldDefinition->name->value] = static function () use ($fieldFactory, $typeValue, $fieldDefinition): array {
-                        return $fieldFactory->handle(
-                            new FieldValue($typeValue, $fieldDefinition)
-                        );
-                    };
-                }
+            foreach ($typeDefinition->fields as $fieldDefinition) {
+                $fields[$fieldDefinition->name->value] = static function () use ($fieldFactory, $typeValue, $fieldDefinition): array {
+                    return $fieldFactory->handle(
+                        new FieldValue($typeValue, $fieldDefinition)
+                    );
+                };
+            }
 
-                return $fields;
-            };
+            return $fields;
+        };
     }
 
     protected function resolveInputObjectType(InputObjectTypeDefinitionNode $inputDefinition): InputObjectType
     {
+        /**
+         * @return array<string, array<string, mixed>>
+         */
+        $fields = function () use ($inputDefinition): array {
+            return $this->argumentFactory->toTypeMap($inputDefinition->fields);
+        };
+
         return new InputObjectType([
             'name' => $inputDefinition->name->value,
             'description' => $inputDefinition->description->value ?? null,
-            'fields'
-/**
- * @return array<string, array<string, mixed>>
- */ => function () use ($inputDefinition): array {
-    return $this->argumentFactory->toTypeMap($inputDefinition->fields);
-},
+            'fields' => $fields,
             'astNode' => $inputDefinition,
         ]);
     }
@@ -443,7 +491,7 @@ EOL
     /**
      * @param  array<string>  $namespaces
      */
-    protected function typeResolverFromClass(string $nodeName, array $namespaces): ?Closure
+    protected function typeResolverFromClass(string $nodeName, array $namespaces): ?\Closure
     {
         $className = Utils::namespaceClassname(
             $nodeName,
@@ -454,10 +502,10 @@ EOL
         );
 
         if ($className) {
-            return Closure::fromCallable(
-                // @phpstan-ignore-next-line this works
-                [app($className), '__invoke']
-            );
+            $typeResolver = Container::getInstance()->make($className);
+            assert(is_object($typeResolver));
+
+            return \Closure::fromCallable([$typeResolver, '__invoke']);
         }
 
         return null;
@@ -468,9 +516,9 @@ EOL
      *
      * @param  list<string>  $possibleTypes
      *
-     * @return Closure(mixed): Type
+     * @return \Closure(mixed): Type
      */
-    protected function typeResolverFallback(array $possibleTypes): Closure
+    protected function typeResolverFallback(array $possibleTypes): \Closure
     {
         return function ($root) use ($possibleTypes): Type {
             $explicitTypename = data_get($root, '__typename');
@@ -485,9 +533,7 @@ EOL
                     $actuallyPossibleTypes = array_intersect($possibleTypes, $explicitSchemaMapping);
 
                     if (1 !== count($actuallyPossibleTypes)) {
-                        throw new DefinitionException(
-                            self::unresolvableAbstractTypeMapping($fqcn, $actuallyPossibleTypes)
-                        );
+                        throw self::unresolvableAbstractTypeMapping($fqcn, $actuallyPossibleTypes);
                     }
 
                     return $this->get(end($actuallyPossibleTypes));
@@ -509,11 +555,10 @@ EOL
 
             $typeResolver = $unionDirective->getResolverFromArgument('resolveType');
         } else {
-            $typeResolver
-                = $this->typeResolverFromClass(
-                    $nodeName,
-                    (array) config('lighthouse.namespaces.unions')
-                )
+            $typeResolver = $this->typeResolverFromClass(
+                $nodeName,
+                (array) config('lighthouse.namespaces.unions')
+            )
                 ?: $this->typeResolverFallback(
                     $this->possibleUnionTypes($unionDefinition)
                 );
@@ -522,18 +567,16 @@ EOL
         return new UnionType([
             'name' => $nodeName,
             'description' => $unionDefinition->description->value ?? null,
-            'types'
-/**
- * @return list<\GraphQL\Type\Definition\Type>
- */ => function () use ($unionDefinition): array {
-    $types = [];
+            'types' => function () use ($unionDefinition): array {
+                $types = [];
 
-    foreach ($unionDefinition->types as $type) {
-        $types[] = $this->get($type->name->value);
-    }
+                foreach ($unionDefinition->types as $type) {
+                    $types[] = $this->get($type->name->value);
+                }
 
-    return $types;
-},
+                /** @var list<\GraphQL\Type\Definition\ObjectType> $types */
+                return $types;
+            },
             'resolveType' => $typeResolver,
             'astNode' => $unionDefinition,
         ]);
@@ -542,7 +585,7 @@ EOL
     protected function fieldFactory(): FieldFactory
     {
         if (! isset($this->fieldFactory)) {
-            $this->fieldFactory = app(FieldFactory::class);
+            $this->fieldFactory = Container::getInstance()->make(FieldFactory::class);
         }
 
         return $this->fieldFactory;
@@ -554,7 +597,6 @@ EOL
     protected function possibleUnionTypes(UnionTypeDefinitionNode $unionDefinition): array
     {
         $types = [];
-
         foreach ($unionDefinition->types as $type) {
             $types[] = $type->name->value;
         }

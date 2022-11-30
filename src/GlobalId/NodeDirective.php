@@ -2,7 +2,7 @@
 
 namespace Nuwave\Lighthouse\GlobalId;
 
-use Closure;
+use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\Parser;
@@ -42,7 +42,7 @@ directive @node(
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
   If you pass only a class name, the method name defaults to `__invoke`.
 
-  Mutually exclusive with the `model` argument.
+  Mutually exclusive with `model`.
   """
   resolver: String
 
@@ -50,14 +50,14 @@ directive @node(
   Specify the class name of the model to use.
   This is only needed when the default model detection does not work.
 
-  Mutually exclusive with the `model` argument.
+  Mutually exclusive with `resolver`.
   """
   model: String
 ) on OBJECT
 GRAPHQL;
     }
 
-    public function handleNode(TypeValue $value, Closure $next): Type
+    public function handleNode(TypeValue $value, \Closure $next): Type
     {
         if ($this->directiveHasArgument('resolver')) {
             $resolver = $this->getResolverFromArgument('resolver');
@@ -85,14 +85,16 @@ GRAPHQL;
      */
     public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition): void
     {
+        $this->validateMutuallyExclusiveArguments(['model', 'resolver']);
+
         if (! $typeDefinition instanceof ObjectTypeDefinitionNode) {
             throw new DefinitionException(
                 "The {$this->name()} directive must only be used on object type definitions, not on {$typeDefinition->kind} {$typeDefinition->name->value}."
             );
         }
 
-        /** @var \GraphQL\Language\AST\NamedTypeNode $namedTypeNode */
         $namedTypeNode = Parser::parseType(GlobalIdServiceProvider::NODE, ['noLocation' => true]);
+        assert($namedTypeNode instanceof NamedTypeNode);
         $typeDefinition->interfaces[] = $namedTypeNode;
 
         $globalIdFieldName = config('lighthouse.global_id_field');

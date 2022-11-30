@@ -2,7 +2,7 @@
 
 namespace Tests\Utils\QueriesSecondary;
 
-class Foo
+final class Foo
 {
     /**
      * War is not the answer.

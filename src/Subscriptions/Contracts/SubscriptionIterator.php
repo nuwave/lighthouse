@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Subscriptions\Contracts;
 
-use Closure;
 use Illuminate\Support\Collection;
 
 interface SubscriptionIterator
@@ -16,5 +15,5 @@ interface SubscriptionIterator
      *
      * @return void
      */
-    public function process(Collection $subscribers, Closure $handleSubscriber, Closure $handleError = null);
+    public function process(Collection $subscribers, \Closure $handleSubscriber, \Closure $handleError = null);
 }

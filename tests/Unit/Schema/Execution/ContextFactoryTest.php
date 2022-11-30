@@ -8,7 +8,7 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Tests\TestCase;
 use Tests\Unit\Schema\Execution\Fixtures\FooContext;
 
-class ContextFactoryTest extends TestCase
+final class ContextFactoryTest extends TestCase
 {
     protected function getEnvironmentSetUp($app): void
     {

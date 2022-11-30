@@ -10,7 +10,7 @@ use Nuwave\Lighthouse\Schema\FallbackTypeNodeConverter;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\TestCase;
 
-class DirectiveFactoryTest extends TestCase
+final class DirectiveFactoryTest extends TestCase
 {
     /**
      * @var \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory
@@ -21,7 +21,7 @@ class DirectiveFactoryTest extends TestCase
     {
         parent::setUp();
 
-        $typeRegistry = app(TypeRegistry::class);
+        $typeRegistry = $this->app->make(TypeRegistry::class);
         $this->directiveFactory = new DirectiveFactory(
             new FallbackTypeNodeConverter($typeRegistry)
         );
@@ -51,6 +51,6 @@ class DirectiveFactoryTest extends TestCase
         $arg = $executable->args[0];
         $this->assertSame('baz', $arg->name);
         $this->assertSame("baz\ndescription", $arg->description);
-        $this->assertSame(Type::INT, $arg->getType()->name);
+        $this->assertSame(Type::int(), $arg->getType());
     }
 }

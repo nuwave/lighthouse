@@ -8,7 +8,7 @@ use Orchestra\Testbench\Exceptions\Handler as OrchestraHandler;
 use Tests\TestCase;
 use Tests\Utils\Exceptions\WithExtensionsException;
 
-class GlobalErrorRendererTest extends TestCase
+final class GlobalErrorRendererTest extends TestCase
 {
     public const MESSAGE = 'foo';
     public const EXTENSIONS_CONTENT = ['bar' => 'baz'];

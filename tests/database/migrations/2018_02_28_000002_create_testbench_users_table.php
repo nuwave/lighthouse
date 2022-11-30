@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTestbenchUsersTable extends Migration
+final class CreateTestbenchUsersTable extends Migration
 {
     public function up(): void
     {

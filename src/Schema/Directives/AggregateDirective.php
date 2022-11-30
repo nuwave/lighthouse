@@ -2,18 +2,22 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry;
 use Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader;
 use Nuwave\Lighthouse\Execution\ModelsLoader\AggregateModelsLoader;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class AggregateDirective extends BaseDirective implements FieldResolver
+class AggregateDirective extends BaseDirective implements FieldResolver, FieldManipulator
 {
     use RelationDirectiveHelpers;
 
@@ -38,13 +42,13 @@ directive @aggregate(
 
   """
   The relationship with the column to aggregate.
-  Mutually exclusive with the `model` argument.
+  Mutually exclusive with `model`.
   """
   relation: String
 
   """
   The model with the column to aggregate.
-  Mutually exclusive with the `relation` argument.
+  Mutually exclusive with `relation`.
   """
   model: String
 
@@ -85,44 +89,42 @@ GRAPHQL;
     {
         $modelArg = $this->directiveArgValue('model');
         if (is_string($modelArg)) {
-            return $fieldValue->setResolver(
-                function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg) {
-                    /** @var Builder $query */
-                    $query = $this
-                        ->namespaceModelClass($modelArg)::query();
+            $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg) {
+                /** @var EloquentBuilder $query */
+                $query = $this
+                    ->namespaceModelClass($modelArg)::query();
 
-                    $this->makeBuilderDecorator($resolveInfo)($query);
+                $this->makeBuilderDecorator($resolveInfo)($query);
 
-                    return $query->{$this->function()}($this->column());
-                }
-            );
+                return $query->{$this->function()}($this->column());
+            });
+
+            return $fieldValue;
         }
 
         $relation = $this->directiveArgValue('relation');
         if (is_string($relation)) {
-            $fieldValue->setResolver(
-                function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
-                    /** @var \Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader $relationBatchLoader */
-                    $relationBatchLoader = BatchLoaderRegistry::instance(
-                        array_merge(
-                            $this->qualifyPath($args, $resolveInfo),
-                            [$this->function(), $this->column()]
-                        ),
-                        function () use ($resolveInfo): RelationBatchLoader {
-                            return new RelationBatchLoader(
-                                new AggregateModelsLoader(
-                                    $this->relation(),
-                                    $this->column(),
-                                    $this->function(),
-                                    $this->makeBuilderDecorator($resolveInfo)
-                                )
-                            );
-                        }
-                    );
+            $fieldValue->setResolver(function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
+                /** @var \Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader $relationBatchLoader */
+                $relationBatchLoader = BatchLoaderRegistry::instance(
+                    array_merge(
+                        $this->qualifyPath($args, $resolveInfo),
+                        [$this->function(), $this->column()]
+                    ),
+                    function () use ($resolveInfo): RelationBatchLoader {
+                        return new RelationBatchLoader(
+                            new AggregateModelsLoader(
+                                $this->relation(),
+                                $this->column(),
+                                $this->function(),
+                                $this->makeBuilderDecorator($resolveInfo)
+                            )
+                        );
+                    }
+                );
 
-                    return $relationBatchLoader->load($parent);
-                }
-            );
+                return $relationBatchLoader->load($parent);
+            });
 
             return $fieldValue;
         }
@@ -142,5 +144,10 @@ GRAPHQL;
     protected function column(): string
     {
         return $this->directiveArgValue('column');
+    }
+
+    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType)
+    {
+        $this->validateMutuallyExclusiveArguments(['model', 'relation']);
     }
 }

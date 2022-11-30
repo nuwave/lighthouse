@@ -2,9 +2,10 @@
 
 namespace Tests\Utils\Models;
 
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
@@ -37,7 +38,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Tag> $tags
  * @property-read \Tests\Utils\Models\User|null $user
  */
-class Task extends Model
+final class Task extends Model
 {
     use SoftDeletes;
 
@@ -48,7 +49,7 @@ class Task extends Model
         parent::boot();
 
         // This is used to test that this scope works in all kinds of queries
-        static::addGlobalScope('no_cleaning', function (Builder $builder): void {
+        static::addGlobalScope('no_cleaning', function (EloquentBuilder $builder): void {
             $builder->where('name', '!=', self::CLEANING);
         });
     }
@@ -73,6 +74,11 @@ class Task extends Model
         return $this->hasOne(Post::class);
     }
 
+    public function postComments(): HasManyThrough
+    {
+        return $this->hasManyThrough(Comment::class, Post::class);
+    }
+
     public function tags(): MorphToMany
     {
         return $this->morphToMany(Tag::class, 'taggable');
@@ -83,7 +89,7 @@ class Task extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function scopeCompleted(Builder $query): Builder
+    public function scopeCompleted(EloquentBuilder $query): EloquentBuilder
     {
         return $query->whereNotNull('completed_at');
     }
@@ -91,7 +97,7 @@ class Task extends Model
     /**
      * @param  array<string, int>  $args
      */
-    public function scopeFoo(Builder $query, array $args): Builder
+    public function scopeFoo(EloquentBuilder $query, array $args): EloquentBuilder
     {
         return $query->limit($args['foo']);
     }
@@ -99,10 +105,15 @@ class Task extends Model
     /**
      * @param  iterable<string>  $tags
      */
-    public function scopeWhereTags(Builder $query, iterable $tags): Builder
+    public function scopeWhereTags(EloquentBuilder $query, iterable $tags): EloquentBuilder
     {
-        return $query->whereHas('tags', function (Builder $query) use ($tags) {
+        return $query->whereHas('tags', function (EloquentBuilder $query) use ($tags) {
             $query->whereIn('name', $tags);
         });
+    }
+
+    public function userLoaded(): bool
+    {
+        return $this->relationLoaded('user');
     }
 }

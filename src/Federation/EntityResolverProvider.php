@@ -2,12 +2,12 @@
 
 namespace Nuwave\Lighthouse\Federation;
 
-use Closure;
 use GraphQL\Error\Error;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\SelectionSetNode;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Contracts\Container\Container;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
@@ -18,6 +18,10 @@ use Nuwave\Lighthouse\Schema\Directives\ModelDirective;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Support\Utils;
 
+/**
+ * @phpstan-type SingleEntityResolverFn \Closure(array<string, mixed>): mixed
+ * @phpstan-type EntityResolver SingleEntityResolverFn|BatchedEntityResolver
+ */
 class EntityResolverProvider
 {
     /**
@@ -36,6 +40,11 @@ class EntityResolverProvider
     protected $configRepository;
 
     /**
+     * @var \Illuminate\Contracts\Container\Container
+     */
+    protected $container;
+
+    /**
      * Maps from __typename to definitions.
      *
      * @var array<string, \GraphQL\Language\AST\ObjectTypeDefinitionNode>
@@ -45,15 +54,20 @@ class EntityResolverProvider
     /**
      * Maps from __typename to resolver.
      *
-     * @var array<string, \Closure(array<string, mixed>): mixed>
+     * @var array<string, SingleEntityResolverFn|BatchedEntityResolver>
      */
     protected $resolvers;
 
-    public function __construct(SchemaBuilder $schemaBuilder, DirectiveLocator $directiveLocator, ConfigRepository $configRepository)
-    {
+    public function __construct(
+        SchemaBuilder $schemaBuilder,
+        DirectiveLocator $directiveLocator,
+        ConfigRepository $configRepository,
+        Container $container
+    ) {
         $this->schema = $schemaBuilder->schema();
         $this->directiveLocator = $directiveLocator;
         $this->configRepository = $configRepository;
+        $this->container = $container;
     }
 
     public static function missingResolver(string $typename): string
@@ -67,9 +81,9 @@ class EntityResolverProvider
     }
 
     /**
-     * @return \Closure(array<string, mixed> $representations): mixed
+     * @return EntityResolver
      */
-    public function resolver(string $typename): Closure
+    public function resolver(string $typename): callable
     {
         if (isset($this->resolvers[$typename])) {
             return $this->resolvers[$typename];
@@ -123,7 +137,10 @@ class EntityResolverProvider
         return $definition;
     }
 
-    protected function resolverFromClass(string $typename): ?Closure
+    /**
+     * @return EntityResolver|null
+     */
+    protected function resolverFromClass(string $typename): ?callable
     {
         $resolverClass = Utils::namespaceClassname(
             $typename,
@@ -135,10 +152,17 @@ class EntityResolverProvider
             return null;
         }
 
+        if (is_a($resolverClass, BatchedEntityResolver::class, true)) {
+            return $this->container->make($resolverClass);
+        }
+
         return Utils::constructResolver($resolverClass, '__invoke');
     }
 
-    protected function resolverFromModel(string $typeName): ?Closure
+    /**
+     * @return SingleEntityResolverFn|null
+     */
+    protected function resolverFromModel(string $typeName): ?\Closure
     {
         $definition = $this->typeDefinition($typeName);
 
@@ -176,7 +200,7 @@ class EntityResolverProvider
      * @param  \Illuminate\Support\Collection<\GraphQL\Language\AST\SelectionSetNode>  $keyFieldsSelections
      * @param  array<string, mixed>  $representation
      */
-    protected function constrainKeys(Builder $builder, Collection $keyFieldsSelections, array $representation): void
+    protected function constrainKeys(EloquentBuilder $builder, Collection $keyFieldsSelections, array $representation): void
     {
         $this->applySatisfiedSelection(
             $builder,
@@ -223,7 +247,7 @@ class EntityResolverProvider
     /**
      * @param  array<string, mixed>  $representation
      */
-    protected function applySatisfiedSelection(Builder $builder, SelectionSetNode $keyFields, array $representation): void
+    protected function applySatisfiedSelection(EloquentBuilder $builder, SelectionSetNode $keyFields, array $representation): void
     {
         /**
          * Fragments or spreads are not allowed in key fields.

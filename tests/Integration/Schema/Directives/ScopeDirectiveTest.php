@@ -7,7 +7,7 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Tag;
 use Tests\Utils\Models\Task;
 
-class ScopeDirectiveTest extends DBTestCase
+final class ScopeDirectiveTest extends DBTestCase
 {
     public function testExplicitName(): void
     {
@@ -50,7 +50,7 @@ class ScopeDirectiveTest extends DBTestCase
             'data' => [
                 'tasks' => [
                     [
-                        'id' => "$taskWithTag->id",
+                        'id' => "{$taskWithTag->id}",
                     ],
                 ],
             ],
@@ -90,7 +90,7 @@ class ScopeDirectiveTest extends DBTestCase
             'data' => [
                 'tasks' => [
                     [
-                        'id' => "$taskWithTag->id",
+                        'id' => "{$taskWithTag->id}",
                     ],
                 ],
             ],
