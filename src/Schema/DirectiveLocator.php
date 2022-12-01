@@ -90,10 +90,19 @@ class DirectiveLocator
     {
         $directives = [];
 
+        $basePath = base_path();
+        dump($basePath);
+
         foreach ($this->namespaces() as $directiveNamespace) {
+            dump($directiveNamespace);
             $generator = new ClassMapGenerator();
-            $generator->scanPaths(base_path(), null, 'psr-4', $directiveNamespace);
+            dump('generator');
+            // TODO any of those hang indefinitely
+//            $generator->scanPaths($basePath, null, 'psr-4', '');
+            $generator->scanPaths($basePath);
+            dump('scanPaths');
             $classesInNamespace = $generator->getClassMap()->getMap();
+            dump($classesInNamespace);
 
             foreach ($classesInNamespace as $class => $_) {
                 $reflection = new \ReflectionClass($class);
