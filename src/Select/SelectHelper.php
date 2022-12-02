@@ -22,8 +22,6 @@ class SelectHelper
 
     public const DIRECTIVES_RETURN = ['morphTo', 'morphToMany'];
 
-    public const DIRECTIVES_IGNORE = ['aggregate', 'withCount', 'belongsToMany'];
-
     public const DIRECTIVES = [
         'aggregate',
         'belongsTo',
@@ -70,7 +68,6 @@ class SelectHelper
 
         assert($fieldDefinitions instanceof NodeList);
 
-        /** @var Model $model */
         $model = new $modelName();
 
         assert($model instanceof Model);
@@ -82,9 +79,8 @@ class SelectHelper
 
             if ($fieldDefinition) {
                 foreach (self::DIRECTIVES as $directiveType) {
-                    if (ASTHelper::hasDirective($fieldDefinition, $directiveType)) {
-                        /** @var DirectiveNode $directive */
-                        $directive = ASTHelper::directiveDefinition($fieldDefinition, $directiveType);
+                    if ($directive = ASTHelper::directiveDefinition($fieldDefinition, $directiveType)) {
+                        assert($directive instanceof DirectiveNode);
 
                         if (in_array($directiveType, self::DIRECTIVES_RETURN)) {
                             return [];
