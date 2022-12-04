@@ -9,9 +9,11 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.68.0
+
 ### Added
 
-- Interfaces can implement other Interfaces.
+- Allow interfaces to implement interfaces https://github.com/nuwave/lighthouse/pull/2248
 
 ### Fixed
 
