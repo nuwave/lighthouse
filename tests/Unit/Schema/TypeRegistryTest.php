@@ -109,8 +109,11 @@ final class TypeRegistryTest extends TestCase
 
     public function testTransformInterfaces(): void
     {
+        $bar = new InterfaceType(['name' => 'Bar']);
+        $this->typeRegistry->overwrite($bar);
+
         $interfaceNode = Parser::interfaceTypeDefinition(/** @lang GraphQL */ '
-        interface Foo {
+        interface Foo implements Bar {
             bar: String
         }
         ');
@@ -120,6 +123,7 @@ final class TypeRegistryTest extends TestCase
         $this->assertInstanceOf(InterfaceType::class, $interfaceType);
         $this->assertSame('Foo', $interfaceType->name);
         $this->assertArrayHasKey('bar', $interfaceType->getFields());
+        $this->assertContains($bar, $interfaceType->getInterfaces());
     }
 
     public function testResolvesInterfaceThoughNamespace(): void

@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Interfaces can implement other Interfaces.
+
 ### Fixed
 
 - Mark `@clearCache` directive `repeatable` https://github.com/nuwave/lighthouse/pull/2243
