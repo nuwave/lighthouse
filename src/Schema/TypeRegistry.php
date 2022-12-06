@@ -486,6 +486,16 @@ class TypeRegistry
             'fields' => $this->makeFieldsLoader($interfaceDefinition),
             'resolveType' => $typeResolver,
             'astNode' => $interfaceDefinition,
+            'interfaces' => function () use ($interfaceDefinition): array {
+                $interfaces = [];
+
+                foreach ($interfaceDefinition->interfaces as $interface) {
+                    $interfaces[] = $this->get($interface->name->value);
+                }
+
+                /** @var list<\GraphQL\Type\Definition\InterfaceType> $interfaces */
+                return $interfaces;
+            },
         ]);
     }
 

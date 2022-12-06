@@ -29,6 +29,16 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove `Serializable` implementation
 - Remove trait `ClearsSchemaCache`
 
+## v5.68.0
+
+### Added
+
+- Allow interfaces to implement interfaces https://github.com/nuwave/lighthouse/pull/2248
+
+### Fixed
+
+- Mark `@clearCache` directive `repeatable` https://github.com/nuwave/lighthouse/pull/2243
+
 ## v5.67.0
 
 ### Added

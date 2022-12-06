@@ -33,9 +33,9 @@ trait MakesGraphQLRequests
     protected MemoryStream $deferStream;
 
     /**
-     * Execute a query as if it was sent as a request to the server.
+     * Execute a GraphQL operation as if it was sent as a request to the server.
      *
-     * @param  string  $query  The GraphQL query to send
+     * @param  string  $query  The GraphQL operation to send
      * @param  array<string, mixed>  $variables  The variables to include in the query
      * @param  array<string, mixed>  $extraParams  Extra parameters to add to the JSON payload
      * @param  array<string, mixed>  $headers  HTTP headers to pass to the POST request
@@ -58,7 +58,7 @@ trait MakesGraphQLRequests
     }
 
     /**
-     * Execute a POST to the GraphQL endpoint.
+     * Send a POST request to the GraphQL endpoint.
      *
      * Use this over graphQL() when you need more control or want to
      * test how your server behaves on incorrect inputs.
@@ -76,7 +76,7 @@ trait MakesGraphQLRequests
     }
 
     /**
-     * Send a multipart form request to GraphQL.
+     * Send a multipart form request to the GraphQL endpoint.
      *
      * This is used for file uploads conforming to the specification:
      * https://github.com/jaydenseric/graphql-multipart-request-spec
@@ -113,7 +113,9 @@ trait MakesGraphQLRequests
     }
 
     /**
-     * Execute the introspection query on the GraphQL server.
+     * Send the introspection query to the GraphQL server.
+     *
+     * Returns the cached first result on repeated calls.
      */
     protected function introspect(): TestResponse
     {
@@ -209,6 +211,9 @@ trait MakesGraphQLRequests
         });
     }
 
+    /**
+     * Configure an error handler that rethrows all errors passed to it.
+     */
     protected function rethrowGraphQLErrors(): void
     {
         $config = Container::getInstance()->make(ConfigRepository::class);
