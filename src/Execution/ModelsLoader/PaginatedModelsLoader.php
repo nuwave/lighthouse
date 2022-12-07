@@ -96,7 +96,10 @@ class PaginatedModelsLoader implements ModelsLoader
             $firstRelation->getQuery()
         );
 
-        return $mergedRelationQuery->get();
+        $relatedModels = $mergedRelationQuery->get();
+        assert($relatedModels instanceof EloquentCollection);
+
+        return $relatedModels->unique();
     }
 
     /**

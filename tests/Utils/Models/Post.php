@@ -36,6 +36,7 @@ use Laravel\Scout\Searchable;
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Post> $children
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Tag> $tags
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Image> $images
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\RoleUserPivot> $roles
  */
 final class Post extends Model
 {
@@ -85,5 +86,10 @@ final class Post extends Model
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class, 'category_post', 'category_id', 'post_id');
+    }
+
+    public function roles(): HasMany
+    {
+        return $this->hasMany(RoleUserPivot::class, 'user_id', 'user_id');
     }
 }
