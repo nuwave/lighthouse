@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.68.1
+
+### Fixed
+
+- Avoid duplicated data in relation directives with paginator with non-unique foreign keys https://github.com/nuwave/lighthouse/pull/2252
+
 ## v5.68.0
 
 ### Added
