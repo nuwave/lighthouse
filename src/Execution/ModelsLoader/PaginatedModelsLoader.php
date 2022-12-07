@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Nuwave\Lighthouse\Pagination\ZeroPageLengthAwarePaginator;
 use Nuwave\Lighthouse\Support\Utils;
@@ -96,7 +97,10 @@ class PaginatedModelsLoader implements ModelsLoader
             $firstRelation->getQuery()
         );
 
-        return $mergedRelationQuery->get();
+        /* @var \Illuminate\Database\Eloquent\Collection $relationCollection */
+        $relationCollection = $mergedRelationQuery->get();
+
+        return $relationCollection->unique();
     }
 
     /**
