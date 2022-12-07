@@ -97,7 +97,7 @@ class PaginatedModelsLoader implements ModelsLoader
         );
 
         $relatedModels = $mergedRelationQuery->get();
-        assert($relatedModels instenceof EloquentCollection);
+        assert($relatedModels instanceof EloquentCollection);
 
         return $relatedModels->unique();
     }
