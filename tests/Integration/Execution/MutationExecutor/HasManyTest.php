@@ -374,8 +374,8 @@ GRAPHQL
         $user = factory(User::class)->create();
 
         $user->tasks()
-            ->save(
-                factory(Task::class)->create()
+            ->saveMany(
+                factory(Task::class, 2)->create()
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
@@ -384,10 +384,16 @@ GRAPHQL
                 id: 1
                 name: "foo"
                 tasks: {
-                    update: [{
-                        id: 1
-                        name: "bar"
-                    }]
+                    update: [
+                        {
+                            id: 1
+                            name: "foo"
+                        }
+                        {
+                            id: 2
+                            name: "bar"
+                        }
+                    ]
                 }
             }) {
                 id
@@ -407,6 +413,10 @@ GRAPHQL
                     'tasks' => [
                         [
                             'id' => '1',
+                            'name' => 'foo',
+                        ],
+                        [
+                            'id' => '2',
                             'name' => 'bar',
                         ],
                     ],
@@ -434,10 +444,16 @@ GRAPHQL
                 id: 1
                 name: "foo"
                 tasks: {
-                    upsert: [{
-                        id: 1
-                        name: "bar"
-                    }]
+                    upsert: [
+                        {
+                            id: 1
+                            name: "foo"
+                        },
+                        {
+                            id: 2
+                            name: "bar"
+                        },
+                    ]
                 }
             }) {
                 id
@@ -457,6 +473,10 @@ GRAPHQL
                     'tasks' => [
                         [
                             'id' => '1',
+                            'name' => 'foo',
+                        ],
+                        [
+                            'id' => '2',
                             'name' => 'bar',
                         ],
                     ],
