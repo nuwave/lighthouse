@@ -23,7 +23,7 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Query multiple model entries as a paginated list.
+Query multiple entries as a paginated list.
 """
 directive @paginate(
   """
@@ -34,18 +34,22 @@ directive @paginate(
   """
   Specify the class name of the model to use.
   This is only needed when the default model detection does not work.
+  Mutually exclusive with `builder` and `resolver`.
   """
   model: String
 
   """
   Point to a function that provides a Query Builder instance.
-  This replaces the use of a model.
+  Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
+  Mutually exclusive with `model` and `resolver`.
   """
   builder: String
 
   """
   Reference a function that resolves the field by directly returning data in a Paginator instance.
-  Mutually exclusive with `builder` and `model`. Not compatible with `scopes` and builder arguments such as `@eq`.
+  Mutually exclusive with `builder` and `model`.
+  Not compatible with `scopes` and builder arguments such as `@eq`.
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
   If you pass only a class name, the method name defaults to `__invoke`.
   """
@@ -75,20 +79,20 @@ directive @paginate(
 Options for the `type` argument of `@paginate`.
 """
 enum PaginateType {
-    """
-    Offset-based pagination, similar to the Laravel default.
-    """
-    PAGINATOR
+  """
+  Offset-based pagination, similar to the Laravel default.
+  """
+  PAGINATOR
 
-    """
-    Offset-based pagination like the Laravel "Simple Pagination", which does not count the total number of records.
-    """
-    SIMPLE
+  """
+  Offset-based pagination like the Laravel "Simple Pagination", which does not count the total number of records.
+  """
+  SIMPLE
 
-    """
-    Cursor-based pagination, compatible with the Relay specification.
-    """
-    CONNECTION
+  """
+  Cursor-based pagination, compatible with the Relay specification.
+  """
+  CONNECTION
 }
 GRAPHQL;
     }
