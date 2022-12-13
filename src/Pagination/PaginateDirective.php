@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Pagination;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -12,6 +11,7 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
 use Laravel\Scout\Builder as ScoutBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Schema\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
@@ -148,7 +148,6 @@ GRAPHQL;
             }
 
             $query = $resolveInfo
-                ->argumentSet
                 ->enhanceBuilder(
                     $query,
                     $this->directiveArgValue('scopes', [])

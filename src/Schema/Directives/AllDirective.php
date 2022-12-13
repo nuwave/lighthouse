@@ -2,12 +2,12 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Collection;
 use Laravel\Scout\Builder as ScoutBuilder;
+use Nuwave\Lighthouse\Schema\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -57,7 +57,6 @@ GRAPHQL;
             }
 
             return $resolveInfo
-                ->argumentSet
                 ->enhanceBuilder(
                     $query,
                     $this->directiveArgValue('scopes', [])

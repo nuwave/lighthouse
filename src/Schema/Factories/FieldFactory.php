@@ -3,7 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Factories;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Type\Definition\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo as BaseResolveInfo;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Pipeline\Pipeline;
@@ -13,6 +13,7 @@ use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter;
+use Nuwave\Lighthouse\Schema\ResolveInfo;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ComplexityResolverDirective;
@@ -109,10 +110,22 @@ class FieldFactory
             })
             ->getResolver();
 
-        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolverWithMiddleware) {
-            $resolveInfo->argumentSet = $this->argumentSetFactory->fromResolveInfo($args, $resolveInfo);
+        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, BaseResolveInfo $resolveInfo) use ($resolverWithMiddleware) {
+            $argumentSet = $this->argumentSetFactory->fromResolveInfo($args, $resolveInfo);
+            $wrappedResolveInfo = new ResolveInfo(
+                $resolveInfo->fieldDefinition,
+                $resolveInfo->fieldNodes,
+                $resolveInfo->parentType,
+                $resolveInfo->path,
+                $resolveInfo->schema,
+                $resolveInfo->fragments,
+                $resolveInfo->rootValue,
+                $resolveInfo->operation,
+                $resolveInfo->variableValues,
+                $argumentSet
+            );
 
-            return $resolverWithMiddleware($root, $args, $context, $resolveInfo);
+            return $resolverWithMiddleware($root, $args, $context, $wrappedResolveInfo);
         });
 
         // To see what is allowed here, look at the validation rules in

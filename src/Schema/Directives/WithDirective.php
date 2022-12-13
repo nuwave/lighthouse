@@ -4,11 +4,11 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\ModelsLoader\ModelsLoader;
 use Nuwave\Lighthouse\Execution\ModelsLoader\SimpleModelsLoader;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\ResolveInfo;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 

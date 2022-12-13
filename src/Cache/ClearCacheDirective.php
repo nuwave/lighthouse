@@ -2,10 +2,10 @@
 
 namespace Nuwave\Lighthouse\Cache;
 
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Schema\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;

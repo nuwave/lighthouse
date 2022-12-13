@@ -2,11 +2,11 @@
 
 namespace Nuwave\Lighthouse\Validation;
 
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Nuwave\Lighthouse\Exceptions\ValidationException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Schema\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
