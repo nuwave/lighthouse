@@ -13,7 +13,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
-- Add argument `builder` to directive `@aggregate`
+- Add argument `builder` to directive `@aggregate` https://github.com/nuwave/lighthouse/pull/2255
 
 ## v5.68.1
 
