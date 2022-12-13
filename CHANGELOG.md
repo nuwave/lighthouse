@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.69.0
+
+### Added
+
+- Add argument `builder` to directive `@aggregate` https://github.com/nuwave/lighthouse/pull/2255
+
 ## v5.68.1
 
 ### Fixed
