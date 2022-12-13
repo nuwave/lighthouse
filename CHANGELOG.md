@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.69.1
+
+### Fixed
+
+- Create a new `ResolveInfo` class to extend with `$argumentSet` in response to PHP 8.2 deprecating dynamic properties
+
 ## v5.69.0
 
 ### Added
