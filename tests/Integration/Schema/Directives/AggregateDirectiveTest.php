@@ -253,8 +253,8 @@ final class AggregateDirectiveTest extends DBTestCase
         $this->schema = /** @lang GraphQL */ "
         type Query {
             sum(
-                difficulty: Int @eq
-                exclude: ID
+                difficulty: Int! @eq
+                exclude: ID!
             ): Int! @aggregate(builder: \"{$this->qualifyTestResolver('builder')}\", function: SUM, column: \"difficulty\")
         }
         ";
@@ -282,7 +282,7 @@ final class AggregateDirectiveTest extends DBTestCase
         $task4->save();
 
         $this->graphQL(/** @lang GraphQL */ '
-        query ($difficulty: Int, $exclude: ID) {
+        query ($difficulty: Int!, $exclude: ID!) {
             sum(difficulty: $difficulty, exclude: $exclude)
         }
         ', [
@@ -295,6 +295,9 @@ final class AggregateDirectiveTest extends DBTestCase
         ]);
     }
 
+    /**
+     * @param array{difficulty: int, exclude: int} $args
+     */
     public function builder($root, array $args): Builder
     {
         return DB::table('tasks')
