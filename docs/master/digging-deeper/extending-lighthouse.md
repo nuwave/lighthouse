@@ -9,15 +9,32 @@ Lighthouse offers a unified way of hooking into the complete execution lifecycle
 through [Laravel's event system](https://laravel.com/docs/events).
 You may use any Service Provider to register listeners.
 
-You can find a complete list of all dispatched events [in the events API reference](../api-reference/events.md).
+A complete list of all dispatched events is available [in the events API reference](../api-reference/events.md).
 
 ## Adding Directives
 
-You can add your custom directives to Lighthouse by listening for the
-[`RegisterDirectiveNamespaces`](../api-reference/events.md#registerdirectivenamespaces) event.
+Add your custom directives to Lighthouse by listening for the [`RegisterDirectiveNamespaces`](../api-reference/events.md#registerdirectivenamespaces) event.
 
-Check out [the test suite](https://github.com/nuwave/lighthouse/tree/master/tests/Integration/Events/RegisterDirectiveNamespacesTest.php)
-for an example of how this works.
+```php
+namespace SomeVendor\SomePackage;
+
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Support\ServiceProvider;
+use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
+
+class SomePackageServiceProvider extends ServiceProvider
+{
+    public function boot(Dispatcher $dispatcher): void
+    {
+        $dispatcher->listen(
+            RegisterDirectiveNamespaces::class,
+            function (RegisterDirectiveNamespaces $registerDirectiveNamespaces): string {
+                // May also return an iterable with multiple strings if needed
+                return 'SomeVendor\SomePackage\Directives';
+            }
+        );
+    }
+```
 
 ## Changing the default resolver
 
