@@ -13,11 +13,29 @@ You can find a complete list of all dispatched events [in the events API referen
 
 ## Adding Directives
 
-You can add your custom directives to Lighthouse by listening for the
-[`RegisterDirectiveNamespaces`](../api-reference/events.md#registerdirectivenamespaces) event.
+You can add your custom directives to Lighthouse by listening for the [`RegisterDirectiveNamespaces`](../api-reference/events.md#registerdirectivenamespaces) event.
 
-Check out [the test suite](https://github.com/nuwave/lighthouse/tree/master/tests/Integration/Events/RegisterDirectiveNamespacesTest.php)
-for an example of how this works.
+```php
+<?php
+
+namespace SomePackage\Providers;
+
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Support\ServiceProvider;
+use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
+
+class SomePackageServiceProvider extends ServiceProvider
+{
+    public function boot(Dispatcher $dispatcher): void
+    {
+        $dispatcher->listen(
+            RegisterDirectiveNamespaces::class,
+            function (RegisterDirectiveNamespaces $registerDirectiveNamespaces): string {
+                return 'Custom\Namespace\Directives';
+            }
+        );
+    }
+```
 
 ## Changing the default resolver
 
