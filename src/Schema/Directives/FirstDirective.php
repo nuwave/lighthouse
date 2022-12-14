@@ -34,10 +34,12 @@ GRAPHQL;
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
         $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ?Model {
-            return $resolveInfo->enhanceBuilder(
-                $this->getModelClass()::query(),
-                $this->directiveArgValue('scopes', [])
-            )->first();
+            return $resolveInfo
+                ->enhanceBuilder(
+                    $this->getModelClass()::query(),
+                    $this->directiveArgValue('scopes', [])
+                )
+                ->first();
         });
 
         return $fieldValue;

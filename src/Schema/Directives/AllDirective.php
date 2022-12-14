@@ -63,10 +63,12 @@ GRAPHQL;
                 $query = $this->getModelClass()::query();
             }
 
-            return $resolveInfo->enhanceBuilder(
-                $query,
-                $this->directiveArgValue('scopes', [])
-            )->get();
+            return $resolveInfo
+                ->enhanceBuilder(
+                    $query,
+                    $this->directiveArgValue('scopes', [])
+                )
+                ->get();
         });
 
         return $fieldValue;

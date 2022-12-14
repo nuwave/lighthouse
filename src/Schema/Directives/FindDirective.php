@@ -35,10 +35,12 @@ GRAPHQL;
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
         $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ?Model {
-            $results = $resolveInfo->enhanceBuilder(
-                $this->getModelClass()::query(),
-                $this->directiveArgValue('scopes', [])
-            )->get();
+            $results = $resolveInfo
+                ->enhanceBuilder(
+                    $this->getModelClass()::query(),
+                    $this->directiveArgValue('scopes', [])
+                )
+                ->get();
 
             if ($results->count() > 1) {
                 throw new Error('The query returned more than one result.');
