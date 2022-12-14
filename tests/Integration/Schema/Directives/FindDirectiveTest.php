@@ -202,11 +202,8 @@ final class FindDirectiveTest extends DBTestCase
         $company = factory(Company::class)->create();
 
         $user = factory(User::class)->make();
-
         assert($user instanceof User);
-
         $user->company()->associate($company);
-
         $user->save();
 
         $this->schema = '

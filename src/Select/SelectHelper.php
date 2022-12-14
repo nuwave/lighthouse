@@ -51,11 +51,9 @@ class SelectHelper
         $returnTypeName = ASTHelper::getUnderlyingTypeName($definitionNode);
 
         $astBuilder = Container::getInstance()->make(ASTBuilder::class);
-
         assert($astBuilder instanceof ASTBuilder);
 
         $documentAST = $astBuilder->documentAST();
-
         assert($documentAST instanceof DocumentAST);
 
         if (Str::contains($returnTypeName, ['SimplePaginator', 'Paginator'])) {
@@ -65,11 +63,9 @@ class SelectHelper
         $type = $documentAST->types[$returnTypeName];
 
         $fieldDefinitions = $type->fields;
-
         assert($fieldDefinitions instanceof NodeList);
 
         $model = new $modelName();
-
         assert($model instanceof Model);
 
         $selectColumns = [];
