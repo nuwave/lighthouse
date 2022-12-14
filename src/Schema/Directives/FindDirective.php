@@ -4,7 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Error\Error;
 use Illuminate\Database\Eloquent\Model;
-use Nuwave\Lighthouse\Schema\ResolveInfo;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -35,12 +35,10 @@ GRAPHQL;
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
         $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ?Model {
-            $results = $resolveInfo
-                ->enhanceBuilder(
-                    $this->getModelClass()::query(),
-                    $this->directiveArgValue('scopes', [])
-                )
-                ->get();
+            $results = $resolveInfo->enhanceBuilder(
+                $this->getModelClass()::query(),
+                $this->directiveArgValue('scopes', [])
+            )->get();
 
             if ($results->count() > 1) {
                 throw new Error('The query returned more than one result.');

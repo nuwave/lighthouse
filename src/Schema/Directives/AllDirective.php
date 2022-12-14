@@ -9,8 +9,8 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Collection;
 use Laravel\Scout\Builder as ScoutBuilder;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
@@ -63,12 +63,10 @@ GRAPHQL;
                 $query = $this->getModelClass()::query();
             }
 
-            return $resolveInfo
-                ->enhanceBuilder(
-                    $query,
-                    $this->directiveArgValue('scopes', [])
-                )
-                ->get();
+            return $resolveInfo->enhanceBuilder(
+                $query,
+                $this->directiveArgValue('scopes', [])
+            )->get();
         });
 
         return $fieldValue;

@@ -9,9 +9,9 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Laravel\Scout\Builder as ScoutBuilder;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Schema\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
@@ -151,11 +151,10 @@ GRAPHQL;
                 $query = $this->getModelClass()::query();
             }
 
-            $query = $resolveInfo
-                ->enhanceBuilder(
-                    $query,
-                    $this->directiveArgValue('scopes', [])
-                );
+            $query = $resolveInfo->enhanceBuilder(
+                $query,
+                $this->directiveArgValue('scopes', [])
+            );
 
             $paginationArgs = PaginationArgs::extractArgs($args, $this->paginationType(), $this->paginateMaxCount());
 

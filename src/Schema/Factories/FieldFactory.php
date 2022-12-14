@@ -9,11 +9,11 @@ use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter;
-use Nuwave\Lighthouse\Schema\ResolveInfo;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ComplexityResolverDirective;
@@ -111,7 +111,6 @@ class FieldFactory
             ->getResolver();
 
         $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, BaseResolveInfo $resolveInfo) use ($resolverWithMiddleware) {
-            $argumentSet = $this->argumentSetFactory->fromResolveInfo($args, $resolveInfo);
             $wrappedResolveInfo = new ResolveInfo(
                 $resolveInfo->fieldDefinition,
                 $resolveInfo->fieldNodes,
@@ -122,7 +121,7 @@ class FieldFactory
                 $resolveInfo->rootValue,
                 $resolveInfo->operation,
                 $resolveInfo->variableValues,
-                $argumentSet
+                $this->argumentSetFactory->fromResolveInfo($args, $resolveInfo)
             );
 
             return $resolverWithMiddleware($root, $args, $context, $wrappedResolveInfo);

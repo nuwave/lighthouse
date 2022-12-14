@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
-use Nuwave\Lighthouse\Schema\ResolveInfo;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 
 trait RelationDirectiveHelpers
 {

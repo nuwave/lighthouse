@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema;
+namespace Nuwave\Lighthouse\Execution;
 
 use GraphQL\Language\AST\OperationDefinitionNode;
 use GraphQL\Type\Definition\FieldDefinition;

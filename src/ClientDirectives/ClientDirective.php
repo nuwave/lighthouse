@@ -6,8 +6,7 @@ use GraphQL\Executor\Values;
 use GraphQL\Type\Definition\Directive;
 use Illuminate\Container\Container;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\GraphQL;
-use Nuwave\Lighthouse\Schema\ResolveInfo;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 
 /**

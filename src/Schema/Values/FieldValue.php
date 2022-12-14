@@ -2,15 +2,14 @@
 
 namespace Nuwave\Lighthouse\Schema\Values;
 
-use Closure;
 use GraphQL\Deferred;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Container\Container;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter;
 use Nuwave\Lighthouse\Schema\Factories\FieldFactory;
-use Nuwave\Lighthouse\Schema\ResolveInfo;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
