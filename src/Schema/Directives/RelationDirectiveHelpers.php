@@ -2,10 +2,10 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 
 trait RelationDirectiveHelpers
 {
@@ -37,7 +37,7 @@ trait RelationDirectiveHelpers
             }
             assert($builder instanceof QueryBuilder || $builder instanceof EloquentBuilder);
 
-            $resolveInfo->argumentSet->enhanceBuilder(
+            $resolveInfo->enhanceBuilder(
                 $builder,
                 $this->scopes()
             );
