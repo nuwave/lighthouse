@@ -62,6 +62,9 @@ directive @whereConditions(
 ) on ARGUMENT_DEFINITION
 ```
 
+> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
+> Built-in field resolver directives that query the database do this, such as [@all](../api-reference/directives.md#all) or [@hasMany](../api-reference/directives.md#hasmany).
+
 You can apply this directive on any field that performs an Eloquent query:
 
 ```graphql
