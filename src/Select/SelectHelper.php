@@ -7,6 +7,9 @@ use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
 use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
@@ -20,7 +23,7 @@ class SelectHelper
 
     public const DIRECTIVES_REQUIRING_FOREIGN_KEY = ['belongsTo'];
 
-    public const DIRECTIVES_RETURN = ['morphTo', 'morphToMany'];
+    public const DIRECTIVES_REQUIRING_MORPH_KEY = ['morphTo'];
 
     public const DIRECTIVES = [
         'aggregate',
@@ -78,33 +81,16 @@ class SelectHelper
                     if ($directive = ASTHelper::directiveDefinition($fieldDefinition, $directiveType)) {
                         assert($directive instanceof DirectiveNode);
 
-                        if (in_array($directiveType, self::DIRECTIVES_RETURN)) {
-                            return [];
-                        }
-
-                        if (in_array($directiveType, self::DIRECTIVES_REQUIRING_LOCAL_KEY)) {
-                            $relationName = ASTHelper::directiveArgValue($directive, 'relation', $field);
-
-                            if (method_exists($model, $relationName)) {
-                                $relation = $model->{$relationName}();
-
-                                $localKey = AppVersion::below(5.7)
-                                    ? Utils::accessProtected($relation, 'localKey')
-                                    : $relation->getLocalKeyName();
-
-                                $selectColumns[] = $localKey;
-                            }
-                        }
-
-                        if (in_array($directiveType, self::DIRECTIVES_REQUIRING_FOREIGN_KEY)) {
-                            $relationName = ASTHelper::directiveArgValue($directive, 'relation', $field);
-
-                            if (method_exists($model, $relationName)) {
-                                $foreignKey = AppVersion::below(5.8)
-                                    ? $model->{$relationName}()->getForeignKey()
-                                    : $model->{$relationName}()->getForeignKeyName();
-
-                                $selectColumns[] = $foreignKey;
+                        $relationName = ASTHelper::directiveArgValue($directive, 'relation', $field);
+                        if (method_exists($model, $relationName)) {
+                            $relation = $model->{$relationName}();
+                            if (in_array($directiveType, self::DIRECTIVES_REQUIRING_LOCAL_KEY)) {
+                                $selectColumns[] = self::getLocalKey($relation);
+                            } elseif (in_array($directiveType, self::DIRECTIVES_REQUIRING_FOREIGN_KEY)) {
+                                $selectColumns[] = self::getForeignKey($relation);
+                            } elseif (in_array($directiveType, self::DIRECTIVES_REQUIRING_MORPH_KEY)) {
+                                $selectColumns[] = self::getForeignKey($relation);
+                                $selectColumns[] = $relation->getMorphType();
                             }
                         }
 
@@ -120,6 +106,16 @@ class SelectHelper
                     // append renamed attribute to selection
                     $renamedAttribute = ASTHelper::directiveArgValue($directive, 'attribute');
                     $selectColumns[] = $renamedAttribute;
+                } elseif ($model->isRelation($field) || $model->relationLoaded($field)) {
+                    $relation = $model->{$field}();
+                    if ($relation instanceof MorphTo) {
+                        $selectColumns[] = self::getForeignKey($relation);
+                        $selectColumns[] = $relation->getMorphType();
+                    } elseif ($relation instanceof BelongsTo) {
+                        $selectColumns[] = self::getForeignKey($relation);
+                    } elseif ($relation instanceof HasOneOrMany) {
+                        $selectColumns[] = self::getLocalKey($relation);
+                    }
                 } else {
                     // fallback to selecting the field name
                     $selectColumns[] = $field;
@@ -127,11 +123,26 @@ class SelectHelper
             }
         }
 
-        /** @var array<int, string> $selectColumns */
-        $selectColumns = array_filter($selectColumns, function ($column) use ($model): bool {
-            return ! $model->hasGetMutator($column) && ! method_exists($model, $column);
-        });
-
         return array_unique($selectColumns);
+    }
+
+    /**
+     * Get the local key.
+     */
+    protected static function getLocalKey(HasOneOrMany $relation): string
+    {
+        return AppVersion::below(5.7)
+            ? Utils::accessProtected($relation, 'localKey')
+            : $relation->getLocalKeyName();
+    }
+
+    /**
+     * Get the foreign key.
+     */
+    protected static function getForeignKey(BelongsTo $relation): string
+    {
+        return AppVersion::below(5.8)
+            ? $relation->getForeignKey() // @phpstan-ignore-line only be executed on Laravel < 5.8
+            : $relation->getForeignKeyName();
     }
 }
