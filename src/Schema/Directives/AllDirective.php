@@ -90,9 +90,7 @@ GRAPHQL;
 
                         $builder = $builder->select(array_unique(array_merge($selectColumns, $expressions)));
 
-                        foreach ($bindings as $type => $binding) {
-                            $builder = $builder->addBinding($binding, $type);
-                        }
+                        $builder = $builder->addBinding($bindings['select'], 'select');
                     } else {
                         $builder = $builder->select($selectColumns);
                     }
