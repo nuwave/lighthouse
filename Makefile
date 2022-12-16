@@ -1,3 +1,6 @@
+dcphp=$$(echo "docker-compose exec php")
+dcnode=$$(echo "docker-compose exec node")
+
 .PHONY: it
 it: vendor fix stan test ## Run useful checks before commits
 
@@ -18,36 +21,36 @@ up: ## Bring up the docker-compose stack
 
 .PHONY: fix
 fix: up ## Fix code style
-	docker-compose exec php vendor/bin/php-cs-fixer fix
+	${dcphp} vendor/bin/php-cs-fixer fix
 
 .PHONY: stan
 stan: up ## Runs static analysis
-	docker-compose exec php vendor/bin/phpstan
+	${dcphp} vendor/bin/phpstan
 
 .PHONY: test
 test: up ## Runs tests with PHPUnit
-	docker-compose exec php vendor/bin/phpunit
+	${dcphp} vendor/bin/phpunit
 
 .PHONY: bench
 bench: up ## Run benchmarks
-	docker-compose exec php vendor/bin/phpbench run --report=aggregate
+	${dcphp} vendor/bin/phpbench run --report=aggregate
 
 .PHONY: rector
 rector: up ## Automatic code fixes with Rector
-	docker-compose exec php rector process -v src/ tests/
+	${dcphp} rector process -v src/ tests/
 
 vendor: up composer.json ## Install composer dependencies
-	docker-compose exec php composer update
-	docker-compose exec php composer validate --strict
-	docker-compose exec php composer normalize
+	${dcphp} composer update
+	${dcphp} composer validate --strict
+	${dcphp} composer normalize
 
 .PHONY: php
 php: up ## Open an interactive shell into the PHP container
-	docker-compose exec php bash
+	${dcphp} bash
 
 .PHONY: node
 node: up ## Open an interactive shell into the Node container
-	docker-compose exec node bash
+	${dcnode} bash
 
 .PHONY: release
 release: ## Prepare the docs for a new release
@@ -55,4 +58,4 @@ release: ## Prepare the docs for a new release
 
 .PHONY: docs
 docs: up ## Render the docs in a development server
-	docker-compose exec node yarn run start
+	${dcnode} yarn run start

@@ -198,7 +198,7 @@ GRAPHQL;
         ]);
     }
 
-    public function resolveType(): Type
+    public static function resolveType(): Type
     {
         $typeRegistry = Container::getInstance()->make(TypeRegistry::class);
         assert($typeRegistry instanceof TypeRegistry);

@@ -9,6 +9,46 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.69.1
+
+### Fixed
+
+- Wrap base `ResolveInfo` class and extend it with `public ArgumentSet $argumentSet` in response to PHP 8.2 deprecating dynamic properties
+
+## v5.69.0
+
+### Added
+
+- Add argument `builder` to directive `@aggregate` https://github.com/nuwave/lighthouse/pull/2255
+
+## v5.68.1
+
+### Fixed
+
+- Avoid duplicated data in relation directives with paginator with non-unique foreign keys https://github.com/nuwave/lighthouse/pull/2252
+
+## v5.68.0
+
+### Added
+
+- Allow interfaces to implement interfaces https://github.com/nuwave/lighthouse/pull/2248
+
+### Fixed
+
+- Mark `@clearCache` directive `repeatable` https://github.com/nuwave/lighthouse/pull/2243
+
+## v5.67.0
+
+### Added
+
+- Throw on unsafe usage of `@can` directive argument `resolved` on mutations https://github.com/nuwave/lighthouse/pull/2238
+
+## v5.66.0
+
+### Added
+
+- Support returning data in a `Paginator` from option `resolver` in `@paginator` directive https://github.com/nuwave/lighthouse/pull/2232
+
 ## v5.65.0
 
 ### Added

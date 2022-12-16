@@ -5,7 +5,6 @@ namespace Nuwave\Lighthouse\Auth;
 use GraphQL\Error\Error;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
@@ -13,10 +12,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Execution\Resolved;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\SoftDeletes\ForceDeleteDirective;
 use Nuwave\Lighthouse\SoftDeletes\RestoreDirective;
@@ -280,6 +282,15 @@ GRAPHQL;
 
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType)
     {
-        $this->validateMutuallyExclusiveArguments(['resolve', 'query', 'find']);
+        $this->validateMutuallyExclusiveArguments(['resolved', 'query', 'find']);
+
+        if ($this->directiveHasArgument('resolved') && RootType::MUTATION === $parentType->name->value) {
+            throw self::resolvedIsUnsafeInMutations($fieldDefinition->name->value);
+        }
+    }
+
+    public static function resolvedIsUnsafeInMutations(string $fieldName): DefinitionException
+    {
+        return new DefinitionException("Do not use @can with `resolved` on mutation {$fieldName}, it is unsafe as the resolver will run before checking permissions. Use `query` or `find`.");
     }
 }

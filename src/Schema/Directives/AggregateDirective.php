@@ -7,6 +7,7 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry;
 use Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader;
@@ -42,15 +43,23 @@ directive @aggregate(
 
   """
   The relationship with the column to aggregate.
-  Mutually exclusive with `model`.
+  Mutually exclusive with `model` and `builder`.
   """
   relation: String
 
   """
   The model with the column to aggregate.
-  Mutually exclusive with `relation`.
+  Mutually exclusive with `relation` and `builder`.
   """
   model: String
+
+  """
+  Point to a function that provides a Query Builder instance.
+  Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
+  Mutually exclusive with `relation` and `model`.
+  """
+  builder: String
 
   """
   Apply scopes to the underlying query.
@@ -62,50 +71,34 @@ directive @aggregate(
 Options for the `function` argument of `@aggregate`.
 """
 enum AggregateFunction {
-    """
-    Return the average value.
-    """
-    AVG
+  """
+  Return the average value.
+  """
+  AVG
 
-    """
-    Return the sum.
-    """
-    SUM
+  """
+  Return the sum.
+  """
+  SUM
 
-    """
-    Return the minimum.
-    """
-    MIN
+  """
+  Return the minimum.
+  """
+  MIN
 
-    """
-    Return the maximum.
-    """
-    MAX
+  """
+  Return the maximum.
+  """
+  MAX
 }
 GRAPHQL;
     }
 
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
-        $modelArg = $this->directiveArgValue('model');
-        if (is_string($modelArg)) {
-            $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg) {
-                /** @var EloquentBuilder $query */
-                $query = $this
-                    ->namespaceModelClass($modelArg)::query();
-
-                $this->makeBuilderDecorator($resolveInfo)($query);
-
-                return $query->{$this->function()}($this->column());
-            });
-
-            return $fieldValue;
-        }
-
         $relation = $this->directiveArgValue('relation');
         if (is_string($relation)) {
             $fieldValue->setResolver(function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
-                /** @var \Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader $relationBatchLoader */
                 $relationBatchLoader = BatchLoaderRegistry::instance(
                     array_merge(
                         $this->qualifyPath($args, $resolveInfo),
@@ -122,6 +115,7 @@ GRAPHQL;
                         );
                     }
                 );
+                assert($relationBatchLoader instanceof RelationBatchLoader);
 
                 return $relationBatchLoader->load($parent);
             });
@@ -129,9 +123,40 @@ GRAPHQL;
             return $fieldValue;
         }
 
-        throw new DefinitionException(
-            "A `model` or `relation` argument must be assigned to the '{$this->name()}' directive on '{$this->nodeName()}'."
-        );
+        $modelArg = $this->directiveArgValue('model');
+        if (is_string($modelArg)) {
+            $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg) {
+                $query = $this->namespaceModelClass($modelArg)::query();
+                assert($query instanceof EloquentBuilder);
+
+                $this->makeBuilderDecorator($resolveInfo)($query);
+
+                return $query->{$this->function()}($this->column());
+            });
+
+            return $fieldValue;
+        }
+
+        if ($this->directiveHasArgument('builder')) {
+            $builderResolver = $this->getResolverFromArgument('builder');
+
+            $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($builderResolver) {
+                $query = $builderResolver($root, $args, $context, $resolveInfo);
+
+                assert(
+                    $query instanceof QueryBuilder || $query instanceof EloquentBuilder,
+                    "The method referenced by the builder argument of the @{$this->name()} directive on {$this->nodeName()} must return a Builder."
+                );
+
+                $this->makeBuilderDecorator($resolveInfo)($query);
+
+                return $query->{$this->function()}($this->column());
+            });
+
+            return $fieldValue;
+        }
+
+        throw new DefinitionException("One of the arguments `model`, `relation` or `builder` must be assigned to the '{$this->name()}' directive on '{$this->nodeName()}'.");
     }
 
     protected function function(): string
@@ -148,6 +173,6 @@ GRAPHQL;
 
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType)
     {
-        $this->validateMutuallyExclusiveArguments(['model', 'relation']);
+        $this->validateMutuallyExclusiveArguments(['relation', 'model', 'builder']);
     }
 }

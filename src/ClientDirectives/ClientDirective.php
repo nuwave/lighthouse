@@ -4,10 +4,9 @@ namespace Nuwave\Lighthouse\ClientDirectives;
 
 use GraphQL\Executor\Values;
 use GraphQL\Type\Definition\Directive;
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Container\Container;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\GraphQL;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 
 /**

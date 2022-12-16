@@ -259,7 +259,7 @@ final class MorphManyTest extends DBTestCase
     /**
      * @return array<array<string, string>>
      */
-    public function existingModelMutations(): array
+    public static function existingModelMutations(): array
     {
         return [
             ['Update action' => 'update'],

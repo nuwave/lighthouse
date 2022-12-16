@@ -304,17 +304,17 @@ GRAPHQL;
         );
     }
 
-    public function builder(): EloquentBuilder
+    public static function builder(): EloquentBuilder
     {
         return User::orderBy('id', 'DESC');
     }
 
-    public function builderForRelation(User $parent): Relation
+    public static function builderForRelation(User $parent): Relation
     {
         return $parent->posts()->orderBy('id', 'DESC');
     }
 
-    public function builderForScoutBuilder(): ScoutBuilder
+    public static function builderForScoutBuilder(): ScoutBuilder
     {
         return Post::search('great title')
             ->take(self::LIMIT_FROM_CUSTOM_SCOUT_BUILDER);

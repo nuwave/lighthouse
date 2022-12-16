@@ -157,7 +157,7 @@ GRAPHQL;
         ')->assertGraphQLErrorMessage(QueryComplexity::maxQueryComplexityErrorMessage($max, Foo::THE_ANSWER));
     }
 
-    public function complexity(): int
+    public static function complexity(): int
     {
         return self::CUSTOM_COMPLEXITY;
     }

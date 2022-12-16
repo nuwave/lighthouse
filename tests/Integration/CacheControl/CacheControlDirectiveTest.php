@@ -83,7 +83,7 @@ final class CacheControlDirectiveTest extends DBTestCase
     /**
      * @return array<int, array{string, string}>
      */
-    public function rootScalarDataProvider(): array
+    public static function rootScalarDataProvider(): array
     {
         return [
             [/** @lang GraphQL */ '
@@ -170,7 +170,7 @@ final class CacheControlDirectiveTest extends DBTestCase
     /**
      * @return array<string, array{string, string}>
      */
-    public function argumentsDataProvider(): array
+    public static function argumentsDataProvider(): array
     {
         return [
             'noArguments' => ['@cacheControl', 'no-cache, public'],
@@ -237,7 +237,7 @@ final class CacheControlDirectiveTest extends DBTestCase
     /**
      * @return array<int, array{string, string}>
      */
-    public function nestedQueryDataProvider(): array
+    public static function nestedQueryDataProvider(): array
     {
         return [
             [/** @lang GraphQL */ '

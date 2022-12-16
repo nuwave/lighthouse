@@ -64,7 +64,7 @@ abstract class DateScalarTest extends TestCase
      *
      * @return array<array<mixed>>
      */
-    public function invalidDateValues(): array
+    public static function invalidDateValues(): array
     {
         return [
             [1],

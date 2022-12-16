@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Nuwave\Lighthouse\Pagination\ZeroPageLengthAwarePaginator;
+use Nuwave\Lighthouse\Support\Utils;
 
 class PaginatedModelsLoader implements ModelsLoader
 {
@@ -67,9 +68,7 @@ class PaginatedModelsLoader implements ModelsLoader
                 ($this->decorateBuilder)($relation, $model);
 
                 if ($relation instanceof BelongsToMany || $relation instanceof HasManyThrough) {
-                    $shouldSelect = new \ReflectionMethod(get_class($relation), 'shouldSelect');
-                    $shouldSelect->setAccessible(true);
-                    $select = $shouldSelect->invoke($relation, ['*']);
+                    $select = Utils::callProtected($relation, 'shouldSelect', ['*']);
 
                     // @phpstan-ignore-next-line Builder mixin is not understood
                     $relation->addSelect($select);
@@ -97,7 +96,10 @@ class PaginatedModelsLoader implements ModelsLoader
             $firstRelation->getQuery()
         );
 
-        return $mergedRelationQuery->get();
+        $relatedModels = $mergedRelationQuery->get();
+        assert($relatedModels instanceof EloquentCollection);
+
+        return $relatedModels->unique();
     }
 
     /**
@@ -135,9 +137,7 @@ class PaginatedModelsLoader implements ModelsLoader
          * @see BelongsToMany::hydratePivotRelation()
          */
         if ($relation instanceof BelongsToMany) {
-            $hydrationMethod = new \ReflectionMethod($relation, 'hydratePivotRelation');
-            $hydrationMethod->setAccessible(true);
-            $hydrationMethod->invoke($relation, $relatedModels->all());
+            Utils::callProtected($relation, 'hydratePivotRelation', $relatedModels->all());
         }
     }
 
@@ -156,13 +156,9 @@ class PaginatedModelsLoader implements ModelsLoader
         }
         assert($model instanceof Model);
 
-        $reflection = new \ReflectionClass($model);
-        $withProperty = $reflection->getProperty('with');
-        $withProperty->setAccessible(true);
-
         /** @var array<int, string> $unloadedWiths */
         $unloadedWiths = array_filter(
-            $withProperty->getValue($model),
+            Utils::accessProtected($model, 'with'),
             static function (string $relation) use ($model): bool {
                 return ! $model->relationLoaded($relation);
             }

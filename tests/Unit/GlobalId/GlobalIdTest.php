@@ -54,7 +54,7 @@ final class GlobalIdTest extends TestCase
     /**
      * @return array<int, array{0: string}>
      */
-    public function provideInvalidGlobalIds(): array
+    public static function provideInvalidGlobalIds(): array
     {
         return [
             ['foo'],
