@@ -52,8 +52,18 @@ GRAPHQL;
                     $this->getModelClass()
                 );
 
-                if (! empty($selectColumns)) {
-                    $builder = $builder->select($selectColumns);
+                $builder = $builder->select($selectColumns);
+
+                $model = $builder->getModel();
+
+                /** @var string|string[] $keyName */
+                $keyName = $model->getKeyName();
+                if (is_string($keyName)) {
+                    $keyName = [$keyName];
+                }
+
+                foreach ($keyName as $name) {
+                    $builder->orderBy($name);
                 }
             }
 

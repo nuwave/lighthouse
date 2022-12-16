@@ -89,6 +89,8 @@ class SelectHelper
                             } elseif (in_array($directiveType, self::DIRECTIVES_REQUIRING_MORPH_KEY)) {
                                 $selectColumns[] = self::getForeignKey($relation);
                                 $selectColumns[] = $relation->getMorphType();
+                            } else {
+                                $selectColumns[] = $model->getKeyName();
                             }
                         }
 

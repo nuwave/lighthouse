@@ -69,15 +69,13 @@ GRAPHQL;
                 if ($builder instanceof EloquentBuilder) {
                     $fieldSelection = array_keys($resolveInfo->getFieldSelection(1));
 
+                    $model = $builder->getModel();
+
                     $selectColumns = SelectHelper::getSelectColumns(
                         $this->definitionNode,
                         $fieldSelection,
-                        get_class($builder->getModel())
+                        get_class($model)
                     );
-
-                    if (empty($selectColumns)) {
-                        return $builder->get();
-                    }
 
                     $query = $builder->getQuery();
 
@@ -93,6 +91,16 @@ GRAPHQL;
                         $builder = $builder->addBinding($bindings['select'], 'select');
                     } else {
                         $builder = $builder->select($selectColumns);
+                    }
+
+                    /** @var string|string[] $keyName */
+                    $keyName = $model->getKeyName();
+                    if (is_string($keyName)) {
+                        $keyName = [$keyName];
+                    }
+
+                    foreach ($keyName as $name) {
+                        $query->orderBy($name);
                     }
                 }
             }

@@ -30,14 +30,14 @@ final class WhereConditionsDirectiveTest extends DBTestCase
     }
 
     type Query {
-        posts(where: _ @whereConditions): [Post!]! @all @orderBy(column: "id")
-        users(where: _ @whereConditions): [User!]! @all @orderBy(column: "id")
+        posts(where: _ @whereConditions): [Post!]! @all
+        users(where: _ @whereConditions): [User!]! @all
         whitelistedColumns(
             where: _ @whereConditions(columns: ["id", "camelCase"])
-        ): [User!]! @all @orderBy(column: "id")
+        ): [User!]! @all
         enumColumns(
             where: _ @whereConditions(columnsEnum: "UserColumn")
-        ): [User!]! @all @orderBy(column: "id")
+        ): [User!]! @all
     }
 
     enum UserColumn {

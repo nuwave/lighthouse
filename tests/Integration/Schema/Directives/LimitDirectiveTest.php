@@ -104,7 +104,7 @@ final class LimitDirectiveTest extends DBTestCase
         }
 
         type Query {
-            users: [User!]! @all @orderBy(column: "id")
+            users: [User!]! @all
         }
         ';
 
@@ -148,7 +148,7 @@ final class LimitDirectiveTest extends DBTestCase
         }
 
         type Query {
-            user: [User!]! @all @orderBy(column: "id")
+            user: [User!]! @all
         }
         ';
 

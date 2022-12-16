@@ -146,7 +146,7 @@ final class HasManyDirectiveTest extends DBTestCase
         }
 
         type Query {
-            users: [User!]! @all @orderBy(column: "id")
+            users: [User!]! @all
         }
         ';
 
@@ -222,7 +222,7 @@ final class HasManyDirectiveTest extends DBTestCase
         }
 
         type Query {
-            users: [User!]! @all @orderBy(column: "id")
+            users: [User!]! @all
         }
         ';
 
