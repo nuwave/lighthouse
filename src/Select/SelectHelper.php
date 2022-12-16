@@ -72,9 +72,18 @@ class SelectHelper
         $selectColumns = [];
 
         foreach ($fieldSelection as $field) {
+            $foundSelect = false;
             $fieldDefinition = ASTHelper::firstByName($fieldDefinitions, $field);
 
             if ($fieldDefinition) {
+                // the priority of select directive is highest
+                if ($directive = ASTHelper::directiveDefinition($fieldDefinition, 'select')) {
+                    // append selected columns in select directive to selection
+                    $selectFields = ASTHelper::directiveArgValue($directive, 'columns', []);
+                    $selectColumns = array_merge($selectColumns, $selectFields);
+                    $foundSelect = true;
+                }
+
                 foreach (self::DIRECTIVES as $directiveType) {
                     if ($directive = ASTHelper::directiveDefinition($fieldDefinition, $directiveType)) {
                         assert($directive instanceof DirectiveNode);
@@ -98,10 +107,8 @@ class SelectHelper
                     }
                 }
 
-                if ($directive = ASTHelper::directiveDefinition($fieldDefinition, 'select')) {
-                    // append selected columns in select directive to selection
-                    $selectFields = ASTHelper::directiveArgValue($directive, 'columns', []);
-                    $selectColumns = array_merge($selectColumns, $selectFields);
+                if ($foundSelect) {
+                    continue;
                 } elseif ($directive = ASTHelper::directiveDefinition($fieldDefinition, 'rename')) {
                     // append renamed attribute to selection
                     $renamedAttribute = ASTHelper::directiveArgValue($directive, 'attribute');

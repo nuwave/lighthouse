@@ -302,7 +302,9 @@ final class HasManyDirectiveTest extends DBTestCase
         $this->schema /** @lang GraphQL */
             = '
         type Post {
-            roles: [RoleUser!]! @hasMany(relation: "roles", type: PAGINATOR, defaultCount: 10)
+            roles: [RoleUser!]!
+                @hasMany(relation: "roles", type: PAGINATOR, defaultCount: 10)
+                @select(columns: ["id"])
         }
 
         type RoleUser {
@@ -334,6 +336,7 @@ final class HasManyDirectiveTest extends DBTestCase
         }
         $this->assertCount(3, $user->roles);
 
+        self::trackQueries();
         $this
             ->graphQL(/** @lang GraphQL */ '
             query {
