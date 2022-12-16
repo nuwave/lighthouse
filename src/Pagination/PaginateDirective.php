@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Pagination;
 
+use GraphQL\Error\Error;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -150,6 +151,10 @@ GRAPHQL;
                             $fieldSelection,
                             get_class($model)
                         );
+
+                        if (empty($selectColumns)) {
+                            throw new Error('The select column is empty.');
+                        }
 
                         $query = $query->select($selectColumns);
 

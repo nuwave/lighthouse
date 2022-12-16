@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -76,6 +77,10 @@ GRAPHQL;
                         $fieldSelection,
                         get_class($model)
                     );
+
+                    if (empty($selectColumns)) {
+                        throw new Error('The select column is empty.');
+                    }
 
                     $query = $builder->getQuery();
 

@@ -52,6 +52,10 @@ GRAPHQL;
                     $this->getModelClass()
                 );
 
+                if (empty($selectColumns)) {
+                    throw new Error('The select column is empty.');
+                }
+
                 $builder = $builder->select($selectColumns);
 
                 $model = $builder->getModel();
