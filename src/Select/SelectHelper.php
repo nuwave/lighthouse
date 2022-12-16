@@ -106,7 +106,7 @@ class SelectHelper
                     // append renamed attribute to selection
                     $renamedAttribute = ASTHelper::directiveArgValue($directive, 'attribute');
                     $selectColumns[] = $renamedAttribute;
-                } elseif (self::isRelation($model, $field)) {
+                } elseif (method_exists($model, $field)) {
                     $relation = $model->{$field}();
                     if ($relation instanceof MorphTo) {
                         $selectColumns[] = self::getForeignKey($relation);
@@ -144,19 +144,5 @@ class SelectHelper
         return AppVersion::below(5.8)
             ? $relation->getForeignKey() // @phpstan-ignore-line only be executed on Laravel < 5.8
             : $relation->getForeignKeyName();
-    }
-
-    protected static function isRelation(Model $model, string $field): bool
-    {
-        if (AppVersion::below(7.0)) {
-            return method_exists($model, $field) || $model->relationLoaded($field);
-        }
-        if (AppVersion::below(8.0)) {
-            return method_exists($model, $field)
-                    || (Utils::accessProtected($model, 'relationResolvers')[get_class($model)][$field] ?? false)
-                    || $model->relationLoaded($field);
-        }
-
-        return $model->isRelation($field) || $model->relationLoaded($field);
     }
 }
