@@ -336,7 +336,6 @@ final class HasManyDirectiveTest extends DBTestCase
         }
         $this->assertCount(3, $user->roles);
 
-        self::trackQueries();
         $this
             ->graphQL(/** @lang GraphQL */ '
             query {
