@@ -109,7 +109,8 @@ class SelectHelper
 
                 if ($foundSelect) {
                     continue;
-                } elseif ($directive = ASTHelper::directiveDefinition($fieldDefinition, 'rename')) {
+                }
+                if ($directive = ASTHelper::directiveDefinition($fieldDefinition, 'rename')) {
                     // append renamed attribute to selection
                     $renamedAttribute = ASTHelper::directiveArgValue($directive, 'attribute');
                     $selectColumns[] = $renamedAttribute;
