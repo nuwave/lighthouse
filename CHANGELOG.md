@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+
+- Do not cache schema when running tests https://github.com/nuwave/lighthouse/pull/2259
+
 ## v5.69.1
 
 ### Fixed
