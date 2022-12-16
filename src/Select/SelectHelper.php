@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Support\Str;
+use Nuwave\Lighthouse\Pagination\PaginationManipulator;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
@@ -51,17 +51,15 @@ class SelectHelper
      */
     public static function getSelectColumns(Node $definitionNode, array $fieldSelection, string $modelName): array
     {
-        $returnTypeName = ASTHelper::getUnderlyingTypeName($definitionNode);
+        if (! ($returnTypeName = PaginationManipulator::getReturnTypeName($definitionNode))) {
+            $returnTypeName = ASTHelper::getUnderlyingTypeName($definitionNode);
+        }
 
         $astBuilder = Container::getInstance()->make(ASTBuilder::class);
         assert($astBuilder instanceof ASTBuilder);
 
         $documentAST = $astBuilder->documentAST();
         assert($documentAST instanceof DocumentAST);
-
-        if (Str::contains($returnTypeName, ['SimplePaginator', 'Paginator'])) {
-            $returnTypeName = str_replace(['SimplePaginator', 'Paginator'], '', $returnTypeName);
-        }
 
         $type = $documentAST->types[$returnTypeName];
 

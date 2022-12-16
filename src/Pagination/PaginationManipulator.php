@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Pagination;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\NamedTypeNode;
+use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\TypeNode;
@@ -14,6 +15,8 @@ use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\ModelDirective;
+
+use function Safe\preg_replace;
 
 class PaginationManipulator
 {
@@ -272,5 +275,15 @@ GRAPHQL
         );
 
         return $typeNode;
+    }
+
+    public static function getReturnTypeName(Node $fieldDefinition): ?string
+    {
+        if (! ASTHelper::directiveDefinition($fieldDefinition, 'paginate')) {
+            return null;
+        }
+        $fieldTypeName = ASTHelper::getUnderlyingTypeName($fieldDefinition);
+
+        return preg_replace('/(Connection|SimplePaginator|Paginator)$/', '', $fieldTypeName);
     }
 }

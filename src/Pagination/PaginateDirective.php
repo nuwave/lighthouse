@@ -143,14 +143,24 @@ GRAPHQL;
                         /** @var array<int, string> $fieldSelection */
                         $fieldSelection = array_keys($data);
 
+                        $model = $query->getModel();
+
                         $selectColumns = SelectHelper::getSelectColumns(
                             $this->definitionNode,
                             $fieldSelection,
-                            get_class($query->getModel())
+                            get_class($model)
                         );
 
-                        if (! empty($selectColumns)) {
-                            $query = $query->select($selectColumns);
+                        $query = $query->select($selectColumns);
+
+                        /** @var string|string[] $keyName */
+                        $keyName = $model->getKeyName();
+                        if (is_string($keyName)) {
+                            $keyName = [$keyName];
+                        }
+
+                        foreach ($keyName as $name) {
+                            $query->orderBy($name);
                         }
                     }
                 }
