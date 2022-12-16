@@ -176,6 +176,8 @@ GRAPHQL;
         $config->set('lighthouse.cache.enable', false);
 
         $config->set('lighthouse.unbox_bensampo_enum_enum_instances', true);
+
+        $config->set('lighthouse.optimized_selects', true);
     }
 
     /**
