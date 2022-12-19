@@ -114,8 +114,10 @@ class SelectHelper
                     // append renamed attribute to selection
                     $renamedAttribute = ASTHelper::directiveArgValue($directive, 'attribute');
                     $selectColumns[] = $renamedAttribute;
-                } elseif (method_exists($model, $field)) {
-                    $relation = $model->{$field}();
+                } elseif (($directive = ASTHelper::directiveDefinition($fieldDefinition, 'method')) || method_exists($model, $field)) {
+                    $relation = null !== $directive
+                        ? $model->{ASTHelper::directiveArgValue($directive, 'name')}()
+                        : $model->{$field}();
                     if ($relation instanceof MorphTo) {
                         $selectColumns[] = self::getForeignKey($relation);
                         $selectColumns[] = $relation->getMorphType();
@@ -123,6 +125,8 @@ class SelectHelper
                         $selectColumns[] = self::getForeignKey($relation);
                     } elseif ($relation instanceof HasOneOrMany) {
                         $selectColumns[] = self::getLocalKey($relation);
+                    } else {
+                        $selectColumns[] = $model->getKeyName();
                     }
                 } else {
                     // fallback to selecting the field name
