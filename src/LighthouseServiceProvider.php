@@ -152,7 +152,8 @@ class LighthouseServiceProvider extends ServiceProvider
         ) {
             $exceptionHandler->renderable(
                 function (ClientAware $error) {
-                    /** @var \GraphQL\Error\ClientAware&\Throwable $error Only throwables can end up in here */
+                    assert($error instanceof \Throwable);
+
                     if (! $error instanceof Error) {
                         $error = new Error(
                             $error->getMessage(),
@@ -165,8 +166,9 @@ class LighthouseServiceProvider extends ServiceProvider
                         );
                     }
 
-                    /** @var \Nuwave\Lighthouse\GraphQL $graphQL */
                     $graphQL = $this->app->make(GraphQL::class);
+                    assert($graphQL instanceof GraphQL);
+
                     $executionResult = new ExecutionResult(null, [$error]);
 
                     return new JsonResponse($graphQL->serializable($executionResult));

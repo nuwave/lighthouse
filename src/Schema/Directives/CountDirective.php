@@ -86,7 +86,6 @@ GRAPHQL;
         $relation = $this->directiveArgValue('relation');
         if (is_string($relation)) {
             $fieldValue->setResolver(function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
-                /** @var \Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader $relationBatchLoader */
                 $relationBatchLoader = BatchLoaderRegistry::instance(
                     array_merge(
                         $this->qualifyPath($args, $resolveInfo),
@@ -98,6 +97,7 @@ GRAPHQL;
                         );
                     }
                 );
+                assert($relationBatchLoader instanceof RelationBatchLoader);
 
                 return $relationBatchLoader->load($parent);
             });

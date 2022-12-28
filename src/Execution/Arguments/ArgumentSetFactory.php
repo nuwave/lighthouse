@@ -7,6 +7,7 @@ use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
 
@@ -44,12 +45,10 @@ class ArgumentSetFactory
      */
     public function fromResolveInfo(array $args, ResolveInfo $resolveInfo): ArgumentSet
     {
-        /**
-         * TODO handle programmatic types without an AST gracefully.
-         *
-         * @var \GraphQL\Language\AST\FieldDefinitionNode $definition
-         */
         $definition = $resolveInfo->fieldDefinition->astNode;
+        if (! $definition) {
+            throw new DefinitionException('Can not handle programmatic object types due to missing AST.');
+        }
 
         return $this->wrapArgs($definition, $args);
     }

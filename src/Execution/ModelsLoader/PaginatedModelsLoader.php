@@ -156,7 +156,6 @@ class PaginatedModelsLoader implements ModelsLoader
         }
         assert($model instanceof Model);
 
-        /** @var array<int, string> $unloadedWiths */
         $unloadedWiths = array_filter(
             Utils::accessProtected($model, 'with'),
             static function (string $relation) use ($model): bool {
