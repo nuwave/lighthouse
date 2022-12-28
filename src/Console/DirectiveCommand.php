@@ -197,6 +197,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
             null,
             true
         );
+        // @phpstan-ignore-next-line TODO remove with newer PHPStan
         assert(is_array($implementedInterfaces), 'Because we set $multiple = true');
 
         foreach ($implementedInterfaces as $interface) {
@@ -216,6 +217,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
             null,
             true
         );
+        // @phpstan-ignore-next-line TODO remove with newer PHPStan
         assert(is_array($usedLocations), 'Because we set $multiple = true');
 
         foreach ($usedLocations as $location) {
