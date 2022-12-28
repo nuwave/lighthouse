@@ -38,13 +38,13 @@ abstract class WithRelationDirective extends BaseDirective implements FieldMiddl
      */
     protected function loadRelation(Model $parent, array $args, ResolveInfo $resolveInfo): Deferred
     {
-        /** @var \Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader $relationBatchLoader */
         $relationBatchLoader = BatchLoaderRegistry::instance(
             $this->qualifyPath($args, $resolveInfo),
             function () use ($resolveInfo): RelationBatchLoader {
                 return new RelationBatchLoader($this->modelsLoader($resolveInfo));
             }
         );
+        assert($relationBatchLoader instanceof RelationBatchLoader);
 
         return $relationBatchLoader->load($parent);
     }

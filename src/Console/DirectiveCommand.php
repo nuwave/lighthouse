@@ -190,7 +190,6 @@ class DirectiveCommand extends LighthouseGeneratorCommand
      */
     protected function askForInterfaces(array $availableInterfaces): void
     {
-        /** @var array<class-string> $implementedInterfaces Because we set $multiple = true */
         $implementedInterfaces = $this->choice(
             'Which interfaces should the directive implement?',
             $availableInterfaces,
@@ -198,6 +197,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
             null,
             true
         );
+        assert(is_array($implementedInterfaces), 'Because we set $multiple = true');
 
         foreach ($implementedInterfaces as $interface) {
             $this->implementInterface($interface);
@@ -209,7 +209,6 @@ class DirectiveCommand extends LighthouseGeneratorCommand
      */
     public function askForLocations(array $availableLocations): void
     {
-        /** @var array<string> $usedLocations Because we set $multiple = true */
         $usedLocations = $this->choice(
             'In which schema locations can the directive be used?',
             $availableLocations,
@@ -217,6 +216,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
             null,
             true
         );
+        assert(is_array($usedLocations), 'Because we set $multiple = true');
 
         foreach ($usedLocations as $location) {
             $this->addLocation($location);

@@ -54,8 +54,9 @@ class FederationPrinter
             unset($types[$type]);
         }
 
-        /** @var \GraphQL\Type\Definition\ObjectType $originalQueryType */
         $originalQueryType = Arr::pull($types, RootType::QUERY);
+        assert($originalQueryType instanceof ObjectType);
+
         $queryFieldsWithoutFederation = array_filter(
             $originalQueryType->getFields(),
             static function (FieldDefinition $field): bool {
@@ -85,8 +86,9 @@ class FederationPrinter
         ));
 
         $printDirectives = static function ($definition): string {
-            /** @var Type|EnumValueDefinition|FieldArgument|FieldDefinition|InputObjectField $definition */
             $astNode = $definition->astNode;
+            assert($definition instanceof Type || $definition instanceof EnumValueDefinition || $definition instanceof FieldArgument || $definition instanceof FieldDefinition || $definition instanceof InputObjectField);
+
             if (null === $astNode) {
                 return '';
             }

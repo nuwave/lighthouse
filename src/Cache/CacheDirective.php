@@ -71,7 +71,6 @@ GRAPHQL;
                     : null;
                 $fieldName = $resolveInfo->fieldName;
 
-                /** @var \Illuminate\Cache\TaggedCache|\Illuminate\Contracts\Cache\Repository $cache */
                 $cache = $shouldUseTags
                     ? $this->cacheRepository->tags([
                         $this->cacheKeyAndTags->parentTag($parentName, $rootID),

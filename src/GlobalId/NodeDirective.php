@@ -63,10 +63,10 @@ GRAPHQL;
             $resolver = $this->getResolverFromArgument('resolver');
         } else {
             $resolver = function ($id): ?Model {
-                /** @var \Illuminate\Database\Eloquent\Model|null $model */
-                $model = $this->getModelClass()::find($id);
+                // TODO use union type
+                assert(is_int($id) || is_string($id));
 
-                return $model;
+                return $this->getModelClass()::find($id);
             };
         }
 

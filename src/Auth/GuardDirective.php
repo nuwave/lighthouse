@@ -58,10 +58,7 @@ GRAPHQL;
 
         $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
             // TODO remove cast in v6
-            $with = (array)
-                $this->directiveArgValue('with', AuthServiceProvider::guard())
-            ;
-
+            $with = (array) $this->directiveArgValue('with', AuthServiceProvider::guard());
             $this->authenticate($with);
 
             return $previousResolver($root, $args, $context, $resolveInfo);
