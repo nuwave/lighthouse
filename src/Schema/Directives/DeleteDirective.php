@@ -88,6 +88,7 @@ GRAPHQL;
             // Deleting when `false` is given seems wrong.
             if ($idOrIds) {
                 if ($relationIsBelongsToLike) {
+                    /** @var \Illuminate\Database\Eloquent\Relations\BelongsTo $relation TODO remove with newer PHPStan */
                     $relation->dissociate();
                     $relation->getParent()->save();
                 }

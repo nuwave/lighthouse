@@ -152,6 +152,7 @@ class SubscriptionRegistry
                     ->all();
             })
             ->collapse()
+            // @phpstan-ignore-next-line TODO remove with newer PHPStan
             ->map(function (string $subscriptionField): GraphQLSubscription {
                 if ($this->has($subscriptionField)) {
                     return $this->subscription($subscriptionField);
