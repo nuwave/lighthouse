@@ -29,6 +29,18 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove `Serializable` implementation
 - Remove trait `ClearsSchemaCache`
 
+## v5.69.1
+
+### Fixed
+
+- Wrap base `ResolveInfo` class and extend it with `public ArgumentSet $argumentSet` in response to PHP 8.2 deprecating dynamic properties
+
+## v5.69.0
+
+### Added
+
+- Add argument `builder` to directive `@aggregate` https://github.com/nuwave/lighthouse/pull/2255
+
 ## v5.68.1
 
 ### Fixed

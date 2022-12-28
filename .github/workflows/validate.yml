@@ -26,6 +26,7 @@ jobs:
           - 7.4
           - 8.0
           - 8.1
+          - 8.2
         laravel-version:
           - ^8
           - ^9
@@ -71,6 +72,7 @@ jobs:
           - 7.4
           - 8.0
           - 8.1
+          - 8.2
         laravel-version:
           - ^8
           - ^9
@@ -134,7 +136,7 @@ jobs:
     strategy:
       matrix:
         php-version:
-          - 8.0
+          - 8.1
         laravel-version:
           - ^8
 
@@ -183,7 +185,7 @@ jobs:
     strategy:
       matrix:
         php-version:
-          - 8.0
+          - 8.1
         laravel-version:
           - ^8
 

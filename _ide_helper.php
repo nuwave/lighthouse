@@ -87,12 +87,3 @@ namespace Illuminate\Testing {
         }
     }
 }
-
-namespace GraphQL\Type\Definition {
-    /**
-     * @property \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet $argumentSet We monkey patch this onto here to pass it down the resolver chain.
-     */
-    class ResolveInfo
-    {
-    }
-}

@@ -3,8 +3,8 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Error\Error;
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Model;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -36,7 +36,6 @@ GRAPHQL;
     {
         $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ?Model {
             $results = $resolveInfo
-                ->argumentSet
                 ->enhanceBuilder(
                     $this->getModelClass()::query(),
                     $this->directiveArgValue('scopes', [])
