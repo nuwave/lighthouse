@@ -40,7 +40,7 @@
         "illuminate/validation": "^8.13 || ^9",
         "laragraph/utils": "dev-graphql-php-15",
         "thecodingmachine/safe": "^1 || ^2",
-        "webonyx/graphql-php": "dev-master"
+        "webonyx/graphql-php": "^15"
     },
     "require-dev": {
         "algolia/algoliasearch-client-php": "^3 || ^4",
