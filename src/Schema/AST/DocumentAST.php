@@ -99,7 +99,7 @@ class DocumentAST implements Arrayable
 
         foreach ($documentNode->definitions as $definition) {
             if ($definition instanceof TypeDefinitionNode) {
-                $name = $definition->name->value;
+                $name = $definition->getName()->value;
 
                 // Store the types in an associative array for quick lookup
                 $instance->types[$name] = $definition;
@@ -133,7 +133,7 @@ class DocumentAST implements Arrayable
                 }
             } elseif ($definition instanceof TypeExtensionNode) {
                 // Multiple type extensions for the same name can exist
-                $instance->typeExtensions[$definition->name->value][] = $definition;
+                $instance->typeExtensions[$definition->getName()->value][] = $definition;
             } elseif ($definition instanceof DirectiveDefinitionNode) {
                 $instance->directives[$definition->name->value] = $definition;
             } else {
@@ -155,7 +155,7 @@ class DocumentAST implements Arrayable
      */
     public function setTypeDefinition(TypeDefinitionNode $type): self
     {
-        $this->types[$type->name->value] = $type;
+        $this->types[$type->getName()->value] = $type;
 
         return $this;
     }

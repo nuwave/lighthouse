@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Cache;
 
+use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\TestCase;
 
@@ -21,7 +22,7 @@ final class ClearCacheDirectiveTest extends TestCase
         }
         config(['lighthouse.cache.tags' => true]);
 
-        $this->cache = $this->app->make('cache');
+        $this->cache = $this->app->make(CacheRepository::class);
     }
 
     public function testClearCacheForEntireType(): void

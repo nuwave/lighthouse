@@ -37,7 +37,7 @@ class TypeValue
      */
     public function getTypeDefinitionName(): string
     {
-        return $this->getTypeDefinition()->name->value;
+        return $this->getTypeDefinition()->getName()->value;
     }
 
     /**

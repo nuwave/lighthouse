@@ -243,7 +243,7 @@ class TypeRegistry
         // to find orphaned types, such as an object type that is only
         // ever used through its association to an interface.
         foreach ($this->documentAST->types as $typeDefinition) {
-            $name = $typeDefinition->name->value;
+            $name = $typeDefinition->getName()->value;
 
             if (! isset($this->types[$name])) {
                 $this->types[$name] = $this->handle($typeDefinition);
@@ -327,9 +327,7 @@ class TypeRegistry
             case UnionTypeDefinitionNode::class:
                 return $this->resolveUnionType($typeDefinition);
             default:
-                throw new InvariantViolation(
-                    "Unknown type for definition [{$typeDefinition->name->value}]"
-                );
+                throw new InvariantViolation("Unknown type for definition {$typeDefinition->getName()->value}.");
         }
     }
 

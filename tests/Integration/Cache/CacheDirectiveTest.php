@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Cache;
 
+use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -22,7 +23,7 @@ final class CacheDirectiveTest extends DBTestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        $this->cache = $app->make('cache');
+        $this->cache = $app->make(CacheRepository::class);
     }
 
     public function testStoreResolverResultInCache(): void
