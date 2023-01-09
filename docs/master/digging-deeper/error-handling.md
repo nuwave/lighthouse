@@ -143,15 +143,13 @@ Add them to your `lighthouse.php` config file, for example:
 An error handler class must implement [`\Nuwave\Lighthouse\Execution\ErrorHandler`](https://github.com/nuwave/lighthouse/blob/master/src/Execution/ErrorHandler.php)
 
 ```php
-<?php
-
 namespace App\GraphQL;
 
 use Closure;
 use GraphQL\Error\Error;
 use Nuwave\Lighthouse\Execution\ErrorHandler;
 
-class ExtensionErrorHandler implements ErrorHandler
+final class ExtensionErrorHandler implements ErrorHandler
 {
     public function __invoke(?Error $error, Closure $next): ?array
     {

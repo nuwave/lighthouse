@@ -32,9 +32,7 @@ final class PusherBroadcasterTest extends TestCase
         $subscriber = $this->createMock(Subscriber::class);
         $subscriber->channel = 'test-123';
 
-        $broadcastManager = $this->app->make(BroadcastManager::class);
-        $pusherBroadcaster = $broadcastManager->driver('pusher');
-        $pusherBroadcaster->broadcast($subscriber, 'foo');
+        $this->broadcast($subscriber);
     }
 
     public function testPusherNeverUsesLoggerInterface(): void
@@ -55,8 +53,17 @@ final class PusherBroadcasterTest extends TestCase
         $subscriber = $this->createMock(Subscriber::class);
         $subscriber->channel = 'test-123';
 
+        $this->broadcast($subscriber);
+    }
+
+    private function broadcast(Subscriber $subscriber): void
+    {
         $broadcastManager = $this->app->make(BroadcastManager::class);
+        assert($broadcastManager instanceof BroadcastManager);
+
         $pusherBroadcaster = $broadcastManager->driver('pusher');
+        assert($pusherBroadcaster instanceof PusherBroadcaster);
+
         $pusherBroadcaster->broadcast($subscriber, 'foo');
     }
 }
