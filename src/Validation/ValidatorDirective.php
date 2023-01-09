@@ -66,10 +66,11 @@ GRAPHQL;
     protected function validator(): Validator
     {
         if (null === $this->validator) {
-            $validator = Container::getInstance()->make(
-                // We precomputed and validated the full class name at schema build time
-                $this->directiveArgValue('class')
-            );
+            // We precomputed and validated the full class name at schema build time
+            $validatorClass = $this->directiveArgValue('class');
+
+            $validator = Container::getInstance()->make($validatorClass);
+            /** @var \Nuwave\Lighthouse\Validation\Validator $validator PHPStan thinks it is *NEVER* with Laravel 9 */
             assert($validator instanceof Validator);
 
             assert($this->argumentValue instanceof ArgumentSet, 'this directive can only be defined on a field or input');
