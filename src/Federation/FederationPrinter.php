@@ -9,7 +9,6 @@ use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\EnumValueDefinition;
 use GraphQL\Type\Definition\FieldDefinition;
 use GraphQL\Type\Definition\InputObjectField;
-use GraphQL\Type\Definition\NamedType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Schema;
@@ -53,8 +52,9 @@ class FederationPrinter
             unset($types[$type]);
         }
 
-        /** @var \GraphQL\Type\Definition\ObjectType $originalQueryType */
         $originalQueryType = Arr::pull($types, RootType::QUERY);
+        assert($originalQueryType instanceof ObjectType);
+
         $queryFieldsWithoutFederation = array_filter(
             $originalQueryType->getFields(),
             static function (FieldDefinition $field): bool {
@@ -84,7 +84,8 @@ class FederationPrinter
         ));
 
         $printDirectives = static function ($definition): string {
-            /** @var (Type&NamedType)|EnumValueDefinition|Argument|FieldDefinition|InputObjectField $definition */
+            assert($definition instanceof Type || $definition instanceof EnumValueDefinition || $definition instanceof Argument || $definition instanceof FieldDefinition || $definition instanceof InputObjectField);
+
             $astNode = $definition->astNode;
 
             if ($astNode instanceof ObjectTypeDefinitionNode) {

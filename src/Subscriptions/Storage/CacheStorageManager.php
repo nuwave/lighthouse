@@ -60,15 +60,12 @@ class CacheStorageManager implements StoresSubscriptions
 
     public function subscribersByTopic(string $topic): Collection
     {
-        /** @var \Illuminate\Support\Collection<\Nuwave\Lighthouse\Subscriptions\Subscriber> $subscribers */
-        $subscribers = $this
+        return $this
             ->retrieveTopic(self::topicKey($topic))
             ->map(function (string $channel): ?Subscriber {
                 return $this->subscriberByChannel($channel);
             })
             ->filter();
-
-        return $subscribers;
     }
 
     public function storeSubscriber(Subscriber $subscriber, string $topic): void

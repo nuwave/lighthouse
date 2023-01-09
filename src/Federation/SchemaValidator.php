@@ -46,7 +46,6 @@ class SchemaValidator
         if (null !== $ast) {
             $directives = $this->directiveLocator->associated($ast);
 
-            /** @var \Nuwave\Lighthouse\Support\Contracts\Directive $directive */
             foreach ($directives as $directive) {
                 if ($directive instanceof KeyDirective) {
                     $this->validateKeySelectionSet($directive->fields(), $type, $ast);

@@ -30,8 +30,9 @@ class SubscriptionServiceProvider extends ServiceProvider
         $this->app->singleton(BroadcastManager::class);
         $this->app->singleton(SubscriptionRegistry::class);
         $this->app->singleton(StoresSubscriptions::class, static function (Container $app): StoresSubscriptions {
-            /** @var \Illuminate\Contracts\Config\Repository $configRepository */
             $configRepository = $app->make(ConfigRepository::class);
+            assert($configRepository instanceof ConfigRepository);
+
             switch ($configRepository->get('lighthouse.subscriptions.storage')) {
                 case 'redis':
                     return $app->make(RedisStorageManager::class);
@@ -91,8 +92,8 @@ class SubscriptionServiceProvider extends ServiceProvider
 
         if ($routesMethod = $configRepository->get("lighthouse.subscriptions.broadcasters.{$broadcaster}.routes")) {
             [$routesProviderClass, $method] = Str::parseCallback($routesMethod, 'pusher');
-            /** @var class-string $routesProviderClass */
-            /** @var string $method */
+            assert(is_string($routesProviderClass) && class_exists($routesProviderClass));
+            assert(is_string($method));
             $routesProvider = $this->app->make($routesProviderClass);
             $router = $this->app->make('router');
 

@@ -35,8 +35,8 @@ class WhereConditionsServiceProvider extends ServiceProvider
         $dispatcher->listen(
             ManipulateAST::class,
             function (ManipulateAST $manipulateAST): void {
-                /** @var \Nuwave\Lighthouse\WhereConditions\Operator $operator */
                 $operator = $this->app->make(Operator::class);
+                assert($operator instanceof Operator);
 
                 $manipulateAST->documentAST
                     ->setTypeDefinition(

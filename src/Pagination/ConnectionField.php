@@ -20,6 +20,7 @@ class ConnectionField
     {
         /** @var int|null $firstItem Laravel type-hints are inaccurate here */
         $firstItem = $paginator->firstItem();
+
         /** @var int|null $lastItem Laravel type-hints are inaccurate here */
         $lastItem = $paginator->lastItem();
 

@@ -372,7 +372,6 @@ class TypeRegistry
 
         $namespacesToTry = (array) config('lighthouse.namespaces.scalars');
 
-        /** @var class-string<\GraphQL\Type\Definition\ScalarType>|null $className */
         $className = Utils::namespaceClassname(
             $className,
             $namespacesToTry,
@@ -380,6 +379,7 @@ class TypeRegistry
                 return is_subclass_of($className, ScalarType::class);
             }
         );
+        assert(is_null($className) || is_subclass_of($className, ScalarType::class));
 
         if (! $className) {
             $scalarClass = ScalarType::class;

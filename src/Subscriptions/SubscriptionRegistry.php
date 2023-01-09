@@ -143,7 +143,7 @@ class SubscriptionRegistry
                 return 'subscription' === $node->operation;
             })
             // @phpstan-ignore-next-line type of $node was narrowed by the preceding filter
-            ->flatMap(function (OperationDefinitionNode $node): array {
+            ->map(function (OperationDefinitionNode $node): array {
                 return (new Collection($node->selectionSet->selections))
                     // @phpstan-ignore-next-line subscriptions must only have a single field
                     ->map(function (FieldNode $field): string {
@@ -151,6 +151,8 @@ class SubscriptionRegistry
                     })
                     ->all();
             })
+            ->collapse()
+            // @phpstan-ignore-next-line TODO remove with newer PHPStan
             ->map(function (string $subscriptionField): GraphQLSubscription {
                 if ($this->has($subscriptionField)) {
                     return $this->subscription($subscriptionField);

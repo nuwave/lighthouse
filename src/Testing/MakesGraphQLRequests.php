@@ -188,13 +188,13 @@ trait MakesGraphQLRequests
 
         $response = $this->graphQL($query, $variables, $extraParams, $headers);
 
-        /** @var StreamedResponse|mixed $response */
-        $response = $response->baseResponse;
-        if (! $response instanceof StreamedResponse) {
+        /** @var mixed $baseResponse Laravel type hint is wrong */
+        $baseResponse = $response->baseResponse;
+        if (! $baseResponse instanceof StreamedResponse) {
             Assert::fail('Expected the response to be a streamed response but got a regular response.');
         }
 
-        $response->send();
+        $baseResponse->send();
 
         return $this->deferStream->chunks;
     }

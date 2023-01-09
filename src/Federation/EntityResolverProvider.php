@@ -3,10 +3,12 @@
 namespace Nuwave\Lighthouse\Federation;
 
 use GraphQL\Error\Error;
+use GraphQL\Language\AST\FieldNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\SelectionSetNode;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
@@ -178,8 +180,9 @@ class EntityResolverProvider
         $keyFieldsSelections = $this->keyFieldsSelections($definition);
 
         return function (array $representation) use ($keyFieldsSelections, $modelClass): ?Model {
-            /** @var \Illuminate\Database\Eloquent\Builder $builder */
             $builder = $modelClass::query();
+            assert($builder instanceof Builder);
+
             $this->constrainKeys($builder, $keyFieldsSelections, $representation);
 
             $results = $builder->get();
@@ -209,14 +212,10 @@ class EntityResolverProvider
      */
     protected function satisfiesKeyFields(SelectionSetNode $keyFields, array $representation): bool
     {
-        /**
-         * Fragments or spreads are not allowed in key fields.
-         *
-         * @see \Nuwave\Lighthouse\Federation\SchemaValidator
-         *
-         * @var \GraphQL\Language\AST\FieldNode $field
-         */
         foreach ($keyFields->selections as $field) {
+            /** @see \Nuwave\Lighthouse\Federation\SchemaValidator */
+            assert($field instanceof FieldNode, 'Fragments or spreads are not allowed in key fields');
+
             $fieldName = $field->name->value;
             $value = $representation[$fieldName] ?? null;
             if (null === $value) {
@@ -244,12 +243,10 @@ class EntityResolverProvider
      */
     protected function applySatisfiedSelection(EloquentBuilder $builder, SelectionSetNode $keyFields, array $representation): void
     {
-        /**
-         * Fragments or spreads are not allowed in key fields.
-         *
-         * @var \GraphQL\Language\AST\FieldNode $field
-         */
         foreach ($keyFields->selections as $field) {
+            /** @see \Nuwave\Lighthouse\Federation\SchemaValidator */
+            assert($field instanceof FieldNode, 'Fragments or spreads are not allowed in key fields');
+
             $fieldName = $field->name->value;
             $value = $representation[$fieldName];
 

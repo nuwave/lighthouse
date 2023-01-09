@@ -4,6 +4,8 @@ namespace Nuwave\Lighthouse\Schema\Factories;
 
 use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Type\Definition\Directive;
+use GraphQL\Type\Definition\InputType;
+use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\TypeNodeConverter;
 
@@ -26,8 +28,8 @@ class DirectiveFactory
     {
         $arguments = [];
         foreach ($directive->arguments as $argument) {
-            /** @var \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\InputType $argumentType */
             $argumentType = $this->typeNodeConverter->convert($argument->type);
+            assert($argumentType instanceof Type && $argumentType instanceof InputType);
 
             $argumentConfig = [
                 'name' => $argument->name->value,

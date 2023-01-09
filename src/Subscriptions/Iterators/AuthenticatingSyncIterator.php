@@ -44,8 +44,8 @@ class AuthenticatingSyncIterator implements SubscriptionIterator
         // Set our subscription guard as the default guard for the application
         $this->authFactory->shouldUse(SubscriptionGuard::GUARD_NAME);
 
-        /** @var \Nuwave\Lighthouse\Subscriptions\SubscriptionGuard $guard */
         $guard = $this->authFactory->guard(SubscriptionGuard::GUARD_NAME);
+        assert($guard instanceof SubscriptionGuard);
 
         try {
             $subscribers->each(static function (Subscriber $item) use ($handleSubscriber, $handleError, $guard): void {

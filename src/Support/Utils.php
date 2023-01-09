@@ -26,7 +26,8 @@ class Utils
     public static function namespaceClassname(string $classCandidate, array $namespacesToTry, callable $determineMatch): ?string
     {
         if ($determineMatch($classCandidate)) {
-            /** @var class-string $classCandidate */
+            assert(class_exists($classCandidate));
+
             return $classCandidate;
         }
 
@@ -34,7 +35,8 @@ class Utils
             $className = $namespace . '\\' . $classCandidate;
 
             if ($determineMatch($className)) {
-                /** @var class-string $className */
+                assert(class_exists($className));
+
                 return $className;
             }
         }
