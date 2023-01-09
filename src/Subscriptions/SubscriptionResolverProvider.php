@@ -62,8 +62,10 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
                 "Failed to find class {$className} extends {$subscriptionClass} in namespaces [{$consideredNamespaces}] for the subscription field {$fieldName}"
             );
         }
+        assert(is_subclass_of($className, GraphQLSubscription::class));
 
         $subscription = Container::getInstance()->make($className);
+        /** @var \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription $subscription PHPStan thinks it is *NEVER* with Laravel 9 */
         assert($subscription instanceof GraphQLSubscription);
 
         // Subscriptions can only be placed on a single field on the root

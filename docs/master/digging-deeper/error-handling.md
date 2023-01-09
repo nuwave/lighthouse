@@ -22,19 +22,15 @@ may be implemented to add more information than just an error message to the ren
 This custom exception contains information about the reason the exception was thrown:
 
 ```php
-<?php
-
 namespace App\Exceptions;
 
 use Exception;
 use GraphQL\Error\ClientAware;
 use GraphQL\Error\ProvidesExtensions;
 
-class CustomException extends Exception implements ClientAware, ProvidesExtensions
+final class CustomException extends Exception implements ClientAware, ProvidesExtensions
 {
-    /**
-     * @var @string
-     */
+    /** @var @string */
     protected $reason;
 
     public function __construct(string $message, string $reason)
@@ -130,15 +126,13 @@ Add them to your `lighthouse.php` config file, for example:
 An error handler class must implement [`\Nuwave\Lighthouse\Execution\ErrorHandler`](https://github.com/nuwave/lighthouse/blob/master/src/Execution/ErrorHandler.php)
 
 ```php
-<?php
-
 namespace App\GraphQL;
 
 use Closure;
 use GraphQL\Error\Error;
 use Nuwave\Lighthouse\Execution\ErrorHandler;
 
-class CountErrorHandler implements ErrorHandler
+final class CountErrorHandler implements ErrorHandler
 {
     public function __invoke(?Error $error, Closure $next): ?array
     {

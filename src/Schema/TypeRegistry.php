@@ -535,6 +535,7 @@ class TypeRegistry
         if ($className) {
             $typeResolver = Container::getInstance()->make($className);
             assert(is_object($typeResolver));
+            /** @var object $typeResolver PHPStan thinks it is *NEVER* with Laravel 9 */
 
             return \Closure::fromCallable([$typeResolver, '__invoke']);
         }

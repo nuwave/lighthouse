@@ -60,6 +60,7 @@ class Utils
 
         $resolver = Container::getInstance()->make($className);
         assert(is_object($resolver));
+        /** @var object $resolver PHPStan thinks it is *NEVER* with Laravel 9 */
 
         return \Closure::fromCallable([$resolver, $methodName]);
     }
