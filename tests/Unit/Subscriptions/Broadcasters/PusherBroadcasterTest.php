@@ -3,6 +3,7 @@
 namespace Tests\Unit\Subscriptions\Broadcasters;
 
 use Illuminate\Config\Repository as ConfigRepository;
+use Nuwave\Lighthouse\Subscriptions\Broadcasters\PusherBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Psr\Log\LoggerInterface;
