@@ -4,7 +4,6 @@ namespace Tests\Integration\OrderBy;
 
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\InputObjectType;
-use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\TestCase;
 
 final class OrderByDirectiveTest extends TestCase

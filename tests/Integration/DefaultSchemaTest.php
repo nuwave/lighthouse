@@ -5,7 +5,6 @@ namespace Tests\Integration;
 use Nuwave\Lighthouse\Console\ValidateSchemaCommand;
 use Nuwave\Lighthouse\LighthouseServiceProvider;
 use Nuwave\Lighthouse\Pagination\PaginationServiceProvider;
-use Nuwave\Lighthouse\Support\AppVersion;
 use Nuwave\Lighthouse\Validation\ValidationServiceProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
