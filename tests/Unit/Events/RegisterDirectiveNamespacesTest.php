@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Events;
 
+use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Tests\Integration\Events\FieldDirective as TestFieldDirective;
@@ -17,7 +18,10 @@ final class RegisterDirectiveNamespacesTest extends TestCase
 
     protected function getEnvironmentSetUp($app): void
     {
-        $app->make('events')->listen(
+        $dispatcher = $app->make(EventsDispatcher::class);
+        assert($dispatcher instanceof EventsDispatcher);
+
+        $dispatcher->listen(
             RegisterDirectiveNamespaces::class,
             function (): array {
                 return [

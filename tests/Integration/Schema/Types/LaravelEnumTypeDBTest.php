@@ -22,9 +22,9 @@ final class LaravelEnumTypeDBTest extends DBTestCase
 
         if (AppVersion::below(9.0)) {
             $this->markTestSkipped('Uses Laravel 9 style enums');
-        } else {
-            $this->typeRegistry = $this->app->make(TypeRegistry::class);
         }
+
+        $this->typeRegistry = $this->app->make(TypeRegistry::class);
     }
 
     public function testUseLaravelEnumType(): void

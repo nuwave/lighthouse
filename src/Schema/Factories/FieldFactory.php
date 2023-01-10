@@ -186,8 +186,10 @@ class FieldFactory
             $providesSubscriptionResolver = Container::getInstance()->make(ProvidesSubscriptionResolver::class);
             assert($providesSubscriptionResolver instanceof ProvidesSubscriptionResolver);
 
+            // @phpstan-ignore-next-line Call to method provideSubscriptionResolver() on an unknown class Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver@anonymous
             return $providesSubscriptionResolver->provideSubscriptionResolver($fieldValue);
         }
+
         $providesResolver = Container::getInstance()->make(ProvidesResolver::class);
         assert($providesResolver instanceof ProvidesResolver);
 

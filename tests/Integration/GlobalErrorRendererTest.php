@@ -2,6 +2,7 @@
 
 namespace Tests\Integration;
 
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Orchestra\Testbench\Exceptions\Handler as OrchestraHandler;
 use Tests\TestCase;
@@ -16,8 +17,8 @@ final class GlobalErrorRendererTest extends TestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        /** @var \Illuminate\Contracts\Config\Repository $config */
-        $config = $app->make('config');
+        $config = $app->make(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
 
         $config->set('lighthouse.route.middleware', [
             function () {
