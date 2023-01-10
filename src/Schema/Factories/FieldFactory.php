@@ -112,7 +112,7 @@ class FieldFactory
             ->thenReturn()
             ->getResolver();
 
-        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, BaseResolveInfo $resolveInfo) use ($resolverWithMiddleware) {
+        $resolver = function ($root, array $args, GraphQLContext $context, BaseResolveInfo $resolveInfo) use ($resolverWithMiddleware) {
             $wrappedResolveInfo = new ResolveInfo(
                 $resolveInfo->fieldDefinition,
                 $resolveInfo->fieldNodes,
@@ -127,7 +127,8 @@ class FieldFactory
             );
 
             return $resolverWithMiddleware($root, $args, $context, $wrappedResolveInfo);
-        });
+        };
+        $fieldValue->setResolver($resolver);
 
         // To see what is allowed here, look at the validation rules in
         // GraphQL\Type\Definition\FieldDefinition::getDefinition()
@@ -137,7 +138,7 @@ class FieldFactory
             'args' => $this->argumentFactory->toTypeMap(
                 $fieldValue->getField()->arguments
             ),
-            'resolve' => $fieldValue->getResolver(),
+            'resolve' => $resolver,
             'description' => $fieldDefinitionNode->description->value ?? null,
             'complexity' => $this->complexity($fieldValue),
             'deprecationReason' => ASTHelper::deprecationReason($fieldDefinitionNode),
