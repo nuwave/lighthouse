@@ -68,8 +68,8 @@ class TypeRegistry
     /**
      * Map from type names to resolved types.
      *
-     * May contain `null` if the type is known to not exist, this allows
-     * short-circuiting repeated lookups for the same type.
+     * May contain `null` if a type was previously looked up and determined to not exist.
+     * This allows short-circuiting repeated lookups for the same type.
      *
      * @var array<string, (\GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType)|null>
      */
