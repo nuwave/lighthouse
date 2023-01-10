@@ -3,6 +3,8 @@
 namespace Tests\Integration\Subscriptions;
 
 use Illuminate\Auth\SessionGuard;
+use Illuminate\Contracts\Auth\Factory as AuthFactory;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
@@ -163,8 +165,9 @@ GRAPHQL;
 
     public function testWithoutExcludeEmpty(): void
     {
-        /** @var \Illuminate\Contracts\Config\Repository $config */
-        $config = $this->app->make('config');
+        $config = $this->app->make(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
+
         $config->set('lighthouse.subscriptions.exclude_empty', false);
         $config->set('lighthouse.subscriptions.version', 2);
 
@@ -191,8 +194,9 @@ GRAPHQL;
 
     public function testWithExcludeEmpty(): void
     {
-        /** @var \Illuminate\Contracts\Config\Repository $config */
-        $config = $this->app->make('config');
+        $config = $this->app->make(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
+
         $config->set('lighthouse.subscriptions.exclude_empty', true);
         $config->set('lighthouse.subscriptions.version', 2);
 
@@ -222,8 +226,11 @@ GRAPHQL;
             }
         ');
 
-        /** @var SessionGuard $sessionGuard */
-        $sessionGuard = $this->app->make('auth')->guard();
+        $authFactory = $this->app->make(AuthFactory::class);
+        assert($authFactory instanceof AuthFactory);
+
+        $sessionGuard = $authFactory->guard();
+        assert($sessionGuard instanceof SessionGuard);
         $sessionGuard->logout();
 
         $this->graphQL(/** @lang GraphQL */ '

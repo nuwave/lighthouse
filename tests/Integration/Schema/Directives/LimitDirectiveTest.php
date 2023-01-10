@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Tests\DBTestCase;
 use Tests\TestsSerialization;
 use Tests\Utils\Models\Task;
@@ -164,9 +165,10 @@ final class LimitDirectiveTest extends DBTestCase
             }
             ');
 
-        $cache = $this->app->make('cache');
-        $data = $cache->get('lighthouse:User:2:tasks:limit:1');
+        $cache = $this->app->make(CacheRepository::class);
+        assert($cache instanceof CacheRepository);
 
+        $data = $cache->get('lighthouse:User:2:tasks:limit:1');
         $this->assertIsArray($data);
 
         $task = $data[0];
