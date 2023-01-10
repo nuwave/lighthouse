@@ -83,10 +83,6 @@ final class OrderByDirectiveTest extends TestCase
 
     public function testValidatesOnlyColumnOrOneRelationIsUsed(): void
     {
-        if (AppVersion::below(8.0)) {
-            $this->markTestSkipped('prohibits rule is not available');
-        }
-
         $this->schema = /** @lang GraphQL */ '
         type Query {
             foo(

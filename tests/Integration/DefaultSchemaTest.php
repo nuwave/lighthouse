@@ -45,10 +45,6 @@ final class DefaultSchemaTest extends DBTestCase
 
     public function testFindRequiresExactlyOneArgument(): void
     {
-        if (AppVersion::below(8.59)) {
-            $this->markTestSkipped('Missing validation rule prohibits');
-        }
-
         $this
             ->graphQL(/** @lang GraphQL */ '
             {
@@ -74,10 +70,6 @@ final class DefaultSchemaTest extends DBTestCase
 
     public function testFindById(): void
     {
-        if (AppVersion::below(8.0)) {
-            $this->markTestSkipped('Missing validation rule prohibits');
-        }
-
         factory(User::class)->create();
         $user = factory(User::class)->create();
 

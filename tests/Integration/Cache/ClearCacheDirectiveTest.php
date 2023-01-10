@@ -3,7 +3,6 @@
 namespace Tests\Integration\Cache;
 
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
-use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\TestCase;
 
 final class ClearCacheDirectiveTest extends TestCase
@@ -17,9 +16,6 @@ final class ClearCacheDirectiveTest extends TestCase
     {
         parent::setUp();
 
-        if (AppVersion::below(7.0)) {
-            self::markTestSkipped('Flushing tags does not work the same in older Laravel versions');
-        }
         config(['lighthouse.cache.tags' => true]);
 
         $this->cache = $this->app->make(CacheRepository::class);
