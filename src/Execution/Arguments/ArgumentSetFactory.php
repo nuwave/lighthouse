@@ -92,7 +92,7 @@ class ArgumentSetFactory
      *
      * @return array<string, \GraphQL\Language\AST\InputValueDefinitionNode>
      */
-    protected function makeDefinitionMap($argumentDefinitions): array
+    protected function makeDefinitionMap(iterable $argumentDefinitions): array
     {
         $argumentDefinitionMap = [];
 

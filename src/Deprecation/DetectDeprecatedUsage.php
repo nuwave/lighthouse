@@ -61,7 +61,7 @@ class DetectDeprecatedUsage extends ValidationRule
                         return;
                     }
 
-                    $this->registerDeprecation("{$parent->name}.{$field->name}", $deprecationReason);
+                    $this->registerDeprecation("{$parent->name()}.{$field->name}", $deprecationReason);
                 }
             },
             NodeKind::ENUM => function (EnumValueNode $node) use ($context): void {

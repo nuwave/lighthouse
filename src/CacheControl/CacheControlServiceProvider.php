@@ -66,7 +66,7 @@ class CacheControlServiceProvider extends ServiceProvider
                             $parent = $typeInfo->getParentType();
                             assert($parent instanceof NamedType);
 
-                            if (RootType::isRootType($parent->name)) {
+                            if (RootType::isRootType($parent->name())) {
                                 $cacheControl->addMaxAge(0);
                                 $cacheControl->setPrivate();
                             } else {

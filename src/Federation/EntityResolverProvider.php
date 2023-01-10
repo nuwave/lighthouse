@@ -120,7 +120,7 @@ class EntityResolverProvider
             throw new Error(self::unknownTypename($typename));
         }
 
-        $definition = $type->astNode;
+        $definition = $type->astNode();
         if (null === $definition) {
             throw new FederationException("Must provide AST definition for type `{$typename}`.");
         }

@@ -179,7 +179,7 @@ class TypeRegistry
      */
     public function register(Type $type): self
     {
-        $name = $type->name;
+        $name = $type->name();
         if ($this->has($name)) {
             throw self::triedToRegisterPresentType($name);
         }
@@ -212,7 +212,7 @@ class TypeRegistry
      */
     public function overwrite(Type $type): self
     {
-        $this->types[$type->name] = $type;
+        $this->types[$type->name()] = $type;
 
         return $this;
     }
