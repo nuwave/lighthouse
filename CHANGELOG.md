@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Allow configuring regular expression constraints for the registered route with `lighthouse.route.where`
+
 ## v5.69.1
 
 ### Fixed
