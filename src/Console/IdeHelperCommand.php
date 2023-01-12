@@ -6,14 +6,12 @@ use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\Parser;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Utils\SchemaPrinter;
-use HaydenPierce\ClassFinder\ClassFinder;
 use Illuminate\Console\Command;
 use Nuwave\Lighthouse\Schema\AST\ASTCache;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
-use Nuwave\Lighthouse\Support\Contracts\Directive;
 
 class IdeHelperCommand extends Command
 {
@@ -56,11 +54,7 @@ scalar _
 
 GRAPHQL;
 
-        $directiveClasses = $this->scanForDirectives(
-            $directiveLocator->namespaces()
-        );
-
-        foreach ($directiveClasses as $directiveClass) {
+        foreach ($directiveLocator->classes() as $directiveClass) {
             $definition = $this->define($directiveClass);
 
             $schema .= /** @lang GraphQL */ <<<GRAPHQL
@@ -75,44 +69,6 @@ GRAPHQL;
         \Safe\file_put_contents($filePath, self::GENERATED_NOTICE . $schema);
 
         $this->info("Wrote schema directive definitions to {$filePath}.");
-    }
-
-    /**
-     * Scan the given namespaces for directive classes.
-     *
-     * @param  array<string>  $directiveNamespaces
-     *
-     * @return array<string, class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>>
-     */
-    protected function scanForDirectives(array $directiveNamespaces): array
-    {
-        $directives = [];
-
-        foreach ($directiveNamespaces as $directiveNamespace) {
-            /** @var array<class-string> $classesInNamespace */
-            $classesInNamespace = ClassFinder::getClassesInNamespace($directiveNamespace);
-
-            foreach ($classesInNamespace as $class) {
-                $reflection = new \ReflectionClass($class);
-                if (! $reflection->isInstantiable()) {
-                    continue;
-                }
-
-                if (! is_a($class, Directive::class, true)) {
-                    continue;
-                }
-                $name = DirectiveLocator::directiveName($class);
-
-                // The directive was already found, so we do not add it twice
-                if (isset($directives[$name])) {
-                    continue;
-                }
-
-                $directives[$name] = $class;
-            }
-        }
-
-        return $directives;
     }
 
     /**

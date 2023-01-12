@@ -2,9 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
+use Composer\ClassMapGenerator\ClassMapGenerator;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\Node;
-use HaydenPierce\ClassFinder\ClassFinder;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Support\Collection;
@@ -90,11 +90,21 @@ class DirectiveLocator
     {
         $directives = [];
 
-        foreach ($this->namespaces() as $directiveNamespace) {
-            /** @var array<class-string> $classesInNamespace */
-            $classesInNamespace = ClassFinder::getClassesInNamespace($directiveNamespace);
+        $basePath = base_path();
+        dump($basePath);
 
-            foreach ($classesInNamespace as $class) {
+        foreach ($this->namespaces() as $directiveNamespace) {
+            dump($directiveNamespace);
+            $generator = new ClassMapGenerator();
+            dump('generator');
+            // TODO any of those hang indefinitely
+//            $generator->scanPaths($basePath, null, 'psr-4', '');
+            $generator->scanPaths($basePath);
+            dump('scanPaths');
+            $classesInNamespace = $generator->getClassMap()->getMap();
+            dump($classesInNamespace);
+
+            foreach ($classesInNamespace as $class => $_) {
                 $reflection = new \ReflectionClass($class);
                 if (! $reflection->isInstantiable()) {
                     continue;
