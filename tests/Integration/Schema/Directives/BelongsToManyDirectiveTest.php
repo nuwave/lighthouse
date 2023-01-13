@@ -199,6 +199,51 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         ])->assertJsonCount(2, 'data.user.roles.edges');
     }
 
+    public function testQueryBelongsToManyRelayConnectionWithDuplicates(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            roles: [Role!]! @belongsToMany(type: CONNECTION)
+        }
+
+        type Role {
+            id: ID!
+        }
+
+        type Query {
+            users: [User]! @all
+        }
+        ';
+
+        $roles = factory(Role::class, 2)->create();
+
+        $user = factory(User::class)->create();
+        $user->roles()->attach($roles);
+
+        $user2 = factory(User::class)->create();
+        $user2->roles()->attach($roles);
+
+        $this->be($user);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users {
+                roles(first: 2) {
+                    pageInfo {
+                        hasNextPage
+                    }
+                    edges {
+                        node {
+                            id
+                        }
+                    }
+                }
+            }
+        }
+        ')->assertJsonCount(2, 'data.users.0.roles.edges')
+            ->assertJsonCount(2, 'data.users.1.roles.edges');
+    }
+
     public function testQueryBelongsToManyRelayConnectionWithCustomEdgeUsingDirective(): void
     {
         $this->schema = /** @lang GraphQL */ '
