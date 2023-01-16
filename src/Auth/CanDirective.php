@@ -124,19 +124,18 @@ GRAPHQL;
         $resolved = $this->directiveArgValue('resolved');
 
         $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver, $ability, $resolved) {
-            $gate = $this->gate->forUser($context->user());
             $checkArguments = $this->buildCheckArguments($args);
 
             if ($resolved) {
                 return Resolved::handle(
                     $previousResolver($root, $args, $context, $resolveInfo),
-                    function ($modelLike) use ($gate, $ability, $checkArguments) {
+                    function ($modelLike) use ($ability, $checkArguments) {
                         $modelOrModels = $modelLike instanceof Paginator
                             ? $modelLike->items()
                             : $modelLike;
 
-                        Utils::applyEach(function (?Model $model) use ($gate, $ability, $checkArguments): void {
-                            $this->authorize($gate, $ability, $model, $checkArguments);
+                        Utils::applyEach(function (?Model $model) use ($ability, $checkArguments): void {
+                            $this->authorize($ability, $model, $checkArguments);
                         }, $modelOrModels);
 
                         return $modelLike;
@@ -145,7 +144,7 @@ GRAPHQL;
             }
 
             foreach ($this->modelsToCheck($resolveInfo->argumentSet, $args) as $model) {
-                $this->authorize($gate, $ability, $model, $checkArguments);
+                $this->authorize($ability, $model, $checkArguments);
             }
 
             return $previousResolver($root, $args, $context, $resolveInfo);
@@ -233,7 +232,7 @@ GRAPHQL;
      *
      * @throws \Nuwave\Lighthouse\Exceptions\AuthorizationException
      */
-    protected function authorize(Gate $gate, $ability, $model, array $arguments): void
+    protected function authorize($ability, $model, array $arguments): void
     {
         // The signature of the second argument `$arguments` of `Gate::check`
         // should be [modelClassName, additionalArg, additionalArg...]
@@ -243,8 +242,8 @@ GRAPHQL;
         // TODO remove with Laravel < 6 support
         if (AppVersion::atLeast(6.0)) {
             Utils::applyEach(
-                function ($ability) use ($gate, $arguments) {
-                    $response = $gate->inspect($ability, $arguments);
+                function ($ability) use ($arguments) {
+                    $response = $this->gate->inspect($ability, $arguments);
 
                     if ($response->denied()) {
                         throw new AuthorizationException($response->message(), $response->code());
@@ -252,7 +251,7 @@ GRAPHQL;
                 },
                 $ability
             );
-        } elseif (! $gate->check($ability, $arguments)) {
+        } elseif (! $this->gate->check($ability, $arguments)) {
             throw new AuthorizationException("You are not authorized to access {$this->nodeName()}");
         }
     }
