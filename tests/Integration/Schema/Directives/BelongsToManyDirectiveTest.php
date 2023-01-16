@@ -5,6 +5,8 @@ namespace Tests\Integration\Schema\Directives;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\DBTestCase;
+use Tests\Utils\Models\Category;
+use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Role;
 use Tests\Utils\Models\User;
 
@@ -147,6 +149,69 @@ final class BelongsToManyDirectiveTest extends DBTestCase
             ])
             ->assertJsonCount(2, 'data.user.rolesPaginated.data')
             ->assertJsonCount(3, 'data.user.rolesSimplePaginated.data');
+    }
+
+    public function testQueryPaginatedBelongsToDataMayBeRepeated(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            posts: [Post!]! @hasMany(type: SIMPLE)
+        }
+
+        type Post {
+            id: ID!
+            categories: [Category!]! @belongsToMany(type: SIMPLE)
+        }
+
+        type Category {
+            id: ID! @rename(attribute: "category_id")
+        }
+
+        type Query {
+            user: User! @auth
+        }
+        ';
+
+        $user = factory(User::class)->create();
+        $this->be($user);
+
+        $posts = factory(Post::class, 3)->make()
+            ->map(fn ($post) => $user->posts()->save($post));
+
+        $categories = factory(Category::class, 3)->create();
+        $posts->each(fn ($role) => $role->categories()->attach($categories));
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            user {
+                posts(first: 3) {
+                    data {
+                        id
+                        categories(first: 3) {
+                            data {
+                                id
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'posts' => [
+                        'data' => $posts->map(fn ($post) => [
+                            'id' => (string)$post->id,
+                            'categories' => [
+                                'data' => $categories->map(fn ($category) => [
+                                    'id' => (string)$category->category_id,
+                                ])->toArray(),
+                            ],
+                        ])->toArray(),
+                    ],
+                ],
+            ],
+        ]);
     }
 
     public function testQueryBelongsToManyRelayConnection(): void
