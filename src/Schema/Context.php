@@ -16,17 +16,9 @@ class Context implements GraphQLContext
      */
     public $request;
 
-    /**
-     * An instance of the currently authenticated user.
-     *
-     * @var \Illuminate\Contracts\Auth\Authenticatable|null
-     */
-    public $user;
-
     public function __construct(Request $request)
     {
         $this->request = $request;
-        $this->user = $request->user(AuthServiceProvider::guard());
     }
 
     /**
@@ -36,7 +28,7 @@ class Context implements GraphQLContext
      */
     public function user(): ?Authenticatable
     {
-        return $this->user;
+        return $this->request->user(AuthServiceProvider::guard());
     }
 
     public function request(): Request

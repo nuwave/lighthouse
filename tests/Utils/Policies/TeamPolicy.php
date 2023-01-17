@@ -7,8 +7,8 @@ use Tests\Utils\Models\Team;
 
 final class TeamPolicy
 {
-    public function onlyTeams($user): bool
+    public function onlyTeams(?Team $user): bool
     {
-        return $user instanceof Team;
+        return $user !== null;
     }
 }

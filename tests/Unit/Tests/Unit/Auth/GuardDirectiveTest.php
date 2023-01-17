@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Auth;
 
+use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Nuwave\Lighthouse\Exceptions\AuthenticationException;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Tests\TestCase;
@@ -139,6 +140,7 @@ final class GuardDirectiveTest extends TestCase
     {
         /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = $this->app->make(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
 
         $config->set('auth.providers', array_merge($config->get('auth.providers'), [
             'teams' => [
@@ -158,7 +160,10 @@ final class GuardDirectiveTest extends TestCase
         $team->id = 1;
         $team->name = 'Test';
 
-        $this->app['auth']->guard('team')->setUser($team);
+        /** @var \Illuminate\Contracts\Auth\Factory */
+        $auth = $this->app->make('auth');
+        assert($auth instanceof AuthFactory);
+        $auth->guard('team')->setUser($team);
 
         $this->mockResolver($team);
 
