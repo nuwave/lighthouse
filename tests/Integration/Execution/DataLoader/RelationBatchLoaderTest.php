@@ -573,11 +573,10 @@ final class RelationBatchLoaderTest extends DBTestCase
         $this->assertSame(3, $queryCount);
     }
 
-    public function testBatchLoaderFailsWithExpiredCacheEntry(): void {
-        $this->expectNotToPerformAssertions();
-
-        $this->schema = /** @lang GraphQL */
-            '
+    public function testBatchLoaderFailsWithExpiredCacheEntry(): void
+    {
+        $this->schema /** @lang GraphQL */
+            = '
         type Query {
             posts: [Post] @all @cache(maxAge: 20)
         }
@@ -626,7 +625,7 @@ final class RelationBatchLoaderTest extends DBTestCase
         }
 
         try {
-            $this
+            $firstRequest = $this
                 ->graphQL(/** @lang GraphQL */ '
             query {
                 posts {
@@ -645,7 +644,7 @@ final class RelationBatchLoaderTest extends DBTestCase
         Cache::forget('lighthouse:Post:5:comments');
 
         try {
-            $this
+            $secondRequest = $this
                 ->graphQL(/** @lang GraphQL */ '
             query {
                 posts {
@@ -660,5 +659,6 @@ final class RelationBatchLoaderTest extends DBTestCase
         } catch (\Exception $exception) {
             $this->fail();
         }
+        $this->assertSame($firstRequest->content(), $secondRequest->content());
     }
 }
