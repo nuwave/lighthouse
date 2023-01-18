@@ -12,8 +12,8 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property int $id
  *
  * Timestamps
- * @property \lluminate\Support\Carbon $created_at
- * @property \lluminate\Support\Carbon $updated_at
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property \Illuminate\Support\Carbon $updated_at
  *
  * Foreign keys
  * @property int $activity_id
