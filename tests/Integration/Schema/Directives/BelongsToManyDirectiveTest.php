@@ -436,7 +436,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
                             'roles' => $roleIDs,
                         ];
                     })
-                    ->all()
+                    ->all(),
             ],
         ]);
     }
