@@ -27,6 +27,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
+        assert($user instanceof User);
         $this->be($user);
 
         $rolesCount = 2;
@@ -61,6 +62,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
+        assert($user instanceof User);
         $this->be($user);
 
         $rolesCount = 2;
@@ -96,6 +98,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
+        assert($user instanceof User);
         $this->be($user);
 
         $rolesCount = 4;
@@ -166,6 +169,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
+        assert($user instanceof User);
         $this->be($user);
 
         $roles = factory(Role::class, 3)->create();
@@ -222,14 +226,12 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
+        assert($user instanceof User);
         $this->be($user);
 
         $roles = factory(Role::class, 3)->create();
-        $meta = 'new';
-        $user->roles()->attach(
-            $roles,
-            ['meta' => $meta]
-        );
+        $meta = ['meta' => 'new'];
+        $user->roles()->attach($roles, $meta);
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -249,9 +251,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
                 'user' => [
                     'roles' => [
                         'edges' => [
-                            [
-                                'meta' => $meta,
-                            ],
+                            $meta,
                         ],
                     ],
                 ],
@@ -281,15 +281,13 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
+        assert($user instanceof User);
         $this->be($user);
 
         $rolesCount = 2;
         $roles = factory(Role::class, $rolesCount)->create();
-        $meta = 'new';
-        $user->roles()->attach(
-            $roles,
-            ['meta' => $meta]
-        );
+        $meta = ['meta' => 'new'];
+        $user->roles()->attach($roles, $meta);
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -307,9 +305,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
                 'user' => [
                     'roles' => [
                         [
-                            'pivot' => [
-                                'meta' => $meta,
-                            ],
+                            'pivot' => $meta,
                         ],
                     ],
                 ],
@@ -356,14 +352,12 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
+        assert($user instanceof User);
         $this->be($user);
 
         $roles = factory(Role::class, 3)->create();
-        $meta = 'new';
-        $user->roles()->attach(
-            $roles,
-            ['meta' => $meta]
-        );
+        $meta = ['meta' => 'new'];
+        $user->roles()->attach($roles, $meta);
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -383,9 +377,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
                 'user' => [
                     'roles' => [
                         'edges' => [
-                            [
-                                'meta' => $meta,
-                            ],
+                            $meta,
                         ],
                     ],
                 ],
@@ -417,6 +409,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
+        assert($user instanceof User);
         $this->be($user);
 
         $roles = factory(Role::class, 3)->create();
