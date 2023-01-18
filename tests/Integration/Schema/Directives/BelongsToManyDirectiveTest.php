@@ -433,7 +433,9 @@ final class BelongsToManyDirectiveTest extends DBTestCase
                     ->map(function (User $user) use ($roleIDs): array {
                         return [
                             'id' => (string) $user->id,
-                            'roles' => $roleIDs,
+                            'roles' => [
+                                'data' => $roleIDs
+                            ],
                         ];
                     })
                     ->all(),
