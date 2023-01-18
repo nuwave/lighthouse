@@ -434,7 +434,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
                         return [
                             'id' => (string) $user->id,
                             'roles' => [
-                                'data' => $roleIDs
+                                'data' => $roleIDs,
                             ],
                         ];
                     })
