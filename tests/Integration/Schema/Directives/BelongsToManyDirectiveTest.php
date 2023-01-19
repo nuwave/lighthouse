@@ -385,6 +385,64 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         ])->assertJsonCount(2, 'data.user.roles.edges');
     }
 
+    public function testQueryPaginatedBelongsToManyWithDuplicates(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            users: [User]! @all
+        }
+
+        type User {
+            id: ID!
+            roles: [Role!]! @belongsToMany(type: SIMPLE)
+        }
+
+        type Role {
+            id: ID!
+        }
+        ';
+
+        $roles = factory(Role::class, 2)->create();
+
+        $users = factory(User::class, 2)->create();
+        foreach ($users as $user) {
+            assert($user instanceof User);
+            $user->roles()->attach($roles);
+        }
+
+        $roleIDs = $roles
+            ->map(function (Role $role): array {
+                return ['id' => (string) $role->id];
+            })
+            ->all();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users {
+                id
+                roles(first: 2) {
+                    data {
+                        id
+                    }
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'users' => $users
+                    ->map(function (User $user) use ($roleIDs): array {
+                        return [
+                            'id' => (string) $user->id,
+                            'roles' => [
+                                'data' => $roleIDs,
+                            ],
+                        ];
+                    })
+                    ->all(),
+            ],
+        ]);
+    }
+
     public function testQueryBelongsToManyNestedRelationships(): void
     {
         $this->schema = /** @lang GraphQL */ '
