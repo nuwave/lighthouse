@@ -4,6 +4,7 @@ namespace Tests\Integration\Execution\DataLoader;
 
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Facades\Cache;
+use Nuwave\Lighthouse\Cache\CacheKeyAndTagsGenerator;
 use Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Tests\DBTestCase;
@@ -577,12 +578,12 @@ final class RelationBatchLoaderTest extends DBTestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            posts: [Post] @all @cache(maxAge: 20)
+            posts: [Post!]! @all @cache(maxAge: 20)
         }
 
         type Post {
             id: ID!
-            comments: [Comment] @hasMany @cache(maxAge: 20)
+            comments: [Comment!]! @hasMany @cache(maxAge: 20)
         }
 
         type Comment {
@@ -635,7 +636,9 @@ final class RelationBatchLoaderTest extends DBTestCase
         }
         ');
 
-        Cache::forget('lighthouse:Post:5:comments');
+        Cache::forget(
+            (new CacheKeyAndTagsGenerator)->key(null, false, 'Post', $post2->id, 'comments', [])
+        );
 
         $secondRequest = $this->graphQL(/** @lang GraphQL */ '
         query {
