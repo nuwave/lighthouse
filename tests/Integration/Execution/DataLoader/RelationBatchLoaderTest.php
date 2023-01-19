@@ -629,7 +629,7 @@ final class RelationBatchLoaderTest extends DBTestCase
 
         dump('First request');
         DB::listen(function (QueryExecuted $query): void {
-            dump($query);
+            dump($query->sql);
         });
 
         $firstRequest = $this->graphQL(/** @lang GraphQL */ '
