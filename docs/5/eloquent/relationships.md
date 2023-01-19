@@ -5,8 +5,6 @@ Just like in Laravel, you can define [Eloquent Relationships](https://laravel.co
 Suppose you have defined the following model:
 
 ```php
-<?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -136,8 +134,6 @@ type Post {
 This would work for the following model:
 
 ```php
-<?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
