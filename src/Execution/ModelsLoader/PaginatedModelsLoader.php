@@ -99,7 +99,14 @@ class PaginatedModelsLoader implements ModelsLoader
         $relatedModels = $mergedRelationQuery->get();
         assert($relatedModels instanceof EloquentCollection);
 
-        return $relatedModels->unique();
+        return $relatedModels->unique(function ($item) {
+            $finalKey = '';
+            collect(array_keys($item->getAttributes()))->each(function ($keyName) use ($item, &$finalKey) {
+                $finalKey = $finalKey . $item[$keyName];
+            });
+
+            return $finalKey;
+        });
     }
 
     /**
