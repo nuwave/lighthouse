@@ -596,69 +596,62 @@ final class RelationBatchLoaderTest extends DBTestCase
         }
         ';
 
-        $user_1 = factory(User::class)->create();
-        assert($user_1 instanceof User);
+        $user1 = factory(User::class)->create();
+        assert($user1 instanceof User);
 
-        $post_1 = factory(Post::class)->create();
-        assert($post_1 instanceof Post);
+        $post1 = factory(Post::class)->create();
+        assert($post1 instanceof Post);
 
-        $comments_1 = factory(Comment::class, 3)->make();
-        foreach ($comments_1 as $comment) {
+        $comments1 = factory(Comment::class, 3)->make();
+        foreach ($comments1 as $comment) {
             assert($comment instanceof Comment);
-            $comment->user()->associate($user_1);
-            $comment->post()->associate($post_1);
+            $comment->user()->associate($user1);
+            $comment->post()->associate($post1);
             $comment->save();
         }
 
-        $user_2 = factory(User::class)->create();
-        assert($user_2 instanceof User);
+        $user2 = factory(User::class)->create();
+        assert($user2 instanceof User);
 
-        $post_2 = factory(Post::class)->create();
-        assert($post_2 instanceof Post);
+        $post2 = factory(Post::class)->create();
+        assert($post2 instanceof Post);
 
-        $comments_2 = factory(Comment::class, 3)->make();
-        foreach ($comments_2 as $comment) {
+        $comments2 = factory(Comment::class, 3)->make();
+        foreach ($comments2 as $comment) {
             assert($comment instanceof Comment);
-            $comment->user()->associate($user_2);
-            $comment->post()->associate($post_2);
+            $comment->user()->associate($user2);
+            $comment->post()->associate($post2);
             $comment->save();
         }
 
-        try {
-            $firstRequest = $this
-                ->graphQL(/** @lang GraphQL */ '
-            query {
-                posts {
-                    comments {
-                        user {
-                            id
-                        }
+        $firstRequest = $this
+            ->graphQL(/** @lang GraphQL */ '
+        query {
+            posts {
+                comments {
+                    user {
+                        id
                     }
                 }
             }
-            ');
-        } catch (\Exception $exception) {
-            $this->fail();
         }
+        ');
 
         Cache::forget('lighthouse:Post:5:comments');
 
-        try {
-            $secondRequest = $this
-                ->graphQL(/** @lang GraphQL */ '
-            query {
-                posts {
-                    comments {
-                        user {
-                            id
-                        }
+        $secondRequest = $this
+            ->graphQL(/** @lang GraphQL */ '
+        query {
+            posts {
+                comments {
+                    user {
+                        id
                     }
                 }
             }
-            ');
-        } catch (\Exception $exception) {
-            $this->fail();
         }
+        ');
+
         $this->assertSame($firstRequest->content(), $secondRequest->content());
     }
 }
