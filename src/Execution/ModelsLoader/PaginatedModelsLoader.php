@@ -99,7 +99,11 @@ class PaginatedModelsLoader implements ModelsLoader
         $relatedModels = $mergedRelationQuery->get();
         assert($relatedModels instanceof EloquentCollection);
 
-        return $relatedModels->unique();
+        return $relatedModels->unique(function (Model $relatedModel): string {
+            // Compare all attributes because there might not be a unique primary key
+            // or there could be differing pivot attributes.
+            return $relatedModel->toJson();
+        });
     }
 
     /**
