@@ -3,7 +3,10 @@
 namespace Tests\Integration\Execution\DataLoader;
 
 use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Cache\CacheKeyAndTagsGenerator;
 use Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -624,6 +627,11 @@ final class RelationBatchLoaderTest extends DBTestCase
             $comment->save();
         }
 
+        dump('First request');
+        DB::listen(function (QueryExecuted $query): void {
+            dump($query);
+        });
+
         $firstRequest = $this->graphQL(/** @lang GraphQL */ '
         query {
             posts {
@@ -640,6 +648,7 @@ final class RelationBatchLoaderTest extends DBTestCase
             (new CacheKeyAndTagsGenerator)->key(null, false, 'Post', $post2->id, 'comments', [])
         );
 
+        dump('Second request');
         $secondRequest = $this->graphQL(/** @lang GraphQL */ '
         query {
             posts {
@@ -652,6 +661,6 @@ final class RelationBatchLoaderTest extends DBTestCase
         }
         ');
 
-        $this->assertSame($firstRequest->content(), $secondRequest->content());
+        $this->assertSame($firstRequest->json(), $secondRequest->json());
     }
 }
