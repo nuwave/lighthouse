@@ -575,8 +575,7 @@ final class RelationBatchLoaderTest extends DBTestCase
 
     public function testBatchLoaderFailsWithExpiredCacheEntry(): void
     {
-        $this->schema /** @lang GraphQL */
-            = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             posts: [Post] @all @cache(maxAge: 20)
         }
@@ -624,8 +623,7 @@ final class RelationBatchLoaderTest extends DBTestCase
             $comment->save();
         }
 
-        $firstRequest = $this
-            ->graphQL(/** @lang GraphQL */ '
+        $firstRequest = $this->graphQL(/** @lang GraphQL */ '
         query {
             posts {
                 comments {
@@ -639,8 +637,7 @@ final class RelationBatchLoaderTest extends DBTestCase
 
         Cache::forget('lighthouse:Post:5:comments');
 
-        $secondRequest = $this
-            ->graphQL(/** @lang GraphQL */ '
+        $secondRequest = $this->graphQL(/** @lang GraphQL */ '
         query {
             posts {
                 comments {
