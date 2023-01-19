@@ -22,8 +22,6 @@ That will create a class called `UpperCaseDirective` that extends the
 abstract class `\Nuwave\Lighthouse\Schema\Directives\BaseDirective`.
 
 ```php
-<?php
-
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 
 class UpperCaseDirective extends BaseDirective
@@ -61,8 +59,6 @@ Just like [Laravel Middleware](https://laravel.com/docs/middleware),
 we can wrap around it by using the `FieldMiddleware` directive.
 
 ```php
-<?php
-
 namespace App\GraphQL\Directives;
 
 use Closure;

@@ -46,8 +46,6 @@ a way to resolve fields. Lighthouse provides a simple way to mock resolvers in a
 Add the `MocksResolvers` trait to your test class:
 
 ```php
-<?php
-
 namespace Tests;
 
 use Nuwave\Lighthouse\Testing\MocksResolvers;

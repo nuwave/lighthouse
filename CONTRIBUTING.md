@@ -208,8 +208,6 @@ differentiate between cases where you return the original object instance and
 other cases where you instantiate a new class.
 
 ```php
-<?php
-
 class Foo
 {
     /**
@@ -310,8 +308,6 @@ When used in the actual source code, classes must always be imported at the top.
 Class references in PHPDoc must use the full namespace.
 
 ```php
-<?php
-
 use Illuminate\Database\Eloquent\Model;
 
 class Foo

@@ -64,8 +64,6 @@ implementation of the interface `Nuwave\Lighthouse\Support\Contracts\GraphQLCont
 The following example is just a starting point of what you can do:
 
 ```php
-<?php
-
 namespace Nuwave\Lighthouse\Schema;
 
 use Illuminate\Http\Request;
@@ -114,8 +112,6 @@ You need a factory that creates an instance of `\Nuwave\Lighthouse\Support\Contr
 This factory class needs to implement `\Nuwave\Lighthouse\Support\Contracts\CreatesContext`.
 
 ```php
-<?php
-
 namespace App\GraphQL;
 
 use Illuminate\Http\Request;

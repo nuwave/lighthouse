@@ -209,8 +209,6 @@ type Post {
 ```
 
 ```php
-<?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -1785,8 +1783,6 @@ The function receives the value of the parent field as its single argument and m
 return an Object Type. You can get the appropriate Object Type from Lighthouse's type registry.
 
 ```php
-<?php
-
 namespace App\GraphQL\Interfaces;
 
 use GraphQL\Type\Definition\Type;
@@ -2814,8 +2810,6 @@ Your method receives the typical resolver arguments and has to return an instanc
 > make sure to return an Eloquent builder, e.g. `Post::query()`.
 
 ```php
-<?php
-
 namespace App\Models;
 
 use Illuminate\Support\Facades\DB;
@@ -3407,8 +3401,6 @@ The function receives the value of the parent field as its single argument and m
 resolve an Object Type from Lighthouse's `TypeRegistry`.
 
 ```php
-<?php
-
 namespace App\GraphQL\Unions;
 
 use GraphQL\Type\Definition\Type;

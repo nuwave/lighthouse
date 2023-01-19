@@ -22,8 +22,6 @@ All subscription field classes **must** implement the abstract class
 `authorize` and `filter`.
 
 ```php
-<?php
-
 namespace App\GraphQL\Subscriptions;
 
 use App\User;
