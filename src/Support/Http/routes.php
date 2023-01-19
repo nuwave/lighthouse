@@ -1,36 +1,46 @@
 <?php
 
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Nuwave\Lighthouse\Support\Http\Controllers\GraphQLController;
 
-if ($routeConfig = config('lighthouse.route')) {
+$container = Container::getInstance();
+
+$config = $container->make(ConfigRepository::class);
+assert($config instanceof ConfigRepository);
+
+if ($routeConfig = $config->get('lighthouse.route')) {
     /**
      * Not using assert() as only one of those classes will actually be installed.
      *
      * @var \Illuminate\Contracts\Routing\Registrar|\Laravel\Lumen\Routing\Router $router
      */
-    $router = Container::getInstance()->make('router');
+    $router = $container->make('router');
 
-    $actions = [
+    $action = [
         'as' => $routeConfig['name'] ?? 'graphql',
         'uses' => GraphQLController::class,
     ];
 
     if (isset($routeConfig['middleware'])) {
-        $actions['middleware'] = $routeConfig['middleware'];
+        $action['middleware'] = $routeConfig['middleware'];
     }
 
     if (isset($routeConfig['prefix'])) {
-        $actions['prefix'] = $routeConfig['prefix'];
+        $action['prefix'] = $routeConfig['prefix'];
     }
 
     if (isset($routeConfig['domain'])) {
-        $actions['domain'] = $routeConfig['domain'];
+        $action['domain'] = $routeConfig['domain'];
+    }
+
+    if (isset($routeConfig['where'])) {
+        $action['where'] = $routeConfig['where'];
     }
 
     $router->addRoute(
         ['GET', 'POST'],
         $routeConfig['uri'] ?? 'graphql',
-        $actions
+        $action
     );
 }

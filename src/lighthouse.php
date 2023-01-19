@@ -39,10 +39,11 @@ return [
         ],
 
         /*
-         * The `prefix` and `domain` configuration options are optional.
+         * The `prefix`, `domain` and `where` configuration options are optional.
          */
         // 'prefix' => '',
         // 'domain' => '',
+        // 'where' => [],
     ],
 
     /*

@@ -18,8 +18,6 @@ You may use it to handle incoming values before reaching the final resolver
 as well as the outgoing result of resolving the field.
 
 ```php
-<?php
-
 namespace App\GraphQL\Directives;
 
 use Closure;

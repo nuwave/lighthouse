@@ -299,8 +299,7 @@ final class HasManyDirectiveTest extends DBTestCase
 
     public function testQueryPaginatedHasManyWithNonUniqueForeignKey(): void
     {
-        $this->schema /** @lang GraphQL */
-            = '
+        $this->schema = /** @lang GraphQL */ '
         type Post {
             roles: [RoleUser!]! @hasMany(relation: "roles", type: PAGINATOR, defaultCount: 10)
         }
