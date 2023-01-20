@@ -67,8 +67,6 @@ Now you can just throw that Exception somewhere in your code, for example your r
 and it will display additional error output.
 
 ```php
-<?php
-
 namespace App\GraphQL\Queries;
 
 use App\Exceptions\CustomException;

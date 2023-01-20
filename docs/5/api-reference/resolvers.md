@@ -5,8 +5,6 @@
 Resolvers are always called with the same 4 arguments:
 
 ```php
-<?php
-
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 

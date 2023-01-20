@@ -34,8 +34,6 @@ see the [Laravel docs for File Uploads](https://laravel.com/docs/filesystem#file
 The field from the previous example can be implemented like this:
 
 ```php
-<?php
-
 namespace App\GraphQL\Mutations;
 
 class Upload

@@ -22,8 +22,6 @@ may be extended to add more information than just an error message to the render
 This custom exception contains information about the reason the exception was thrown:
 
 ```php
-<?php
-
 namespace App\Exceptions;
 
 use Exception;
@@ -84,8 +82,6 @@ Now you can just throw that Exception somewhere in your code, for example your r
 and it will display additional error output.
 
 ```php
-<?php
-
 namespace App\GraphQL\Queries;
 
 use App\Exceptions\CustomException;
@@ -143,15 +139,13 @@ Add them to your `lighthouse.php` config file, for example:
 An error handler class must implement [`\Nuwave\Lighthouse\Execution\ErrorHandler`](https://github.com/nuwave/lighthouse/blob/master/src/Execution/ErrorHandler.php)
 
 ```php
-<?php
-
 namespace App\GraphQL;
 
 use Closure;
 use GraphQL\Error\Error;
 use Nuwave\Lighthouse\Execution\ErrorHandler;
 
-class ExtensionErrorHandler implements ErrorHandler
+final class ExtensionErrorHandler implements ErrorHandler
 {
     public function __invoke(?Error $error, Closure $next): ?array
     {

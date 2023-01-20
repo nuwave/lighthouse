@@ -21,11 +21,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $name
  * @property int|null $difficulty
  * @property string|null $guard
- * @property \lluminate\Support\Carbon $completed_at
+ * @property \Illuminate\Support\Carbon $completed_at
  *
  * Timestamps
- * @property \lluminate\Support\Carbon $created_at
- * @property \lluminate\Support\Carbon $updated_at
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property \Illuminate\Support\Carbon $updated_at
  *
  * Foreign keys
  * @property int|null $user_id
