@@ -21,7 +21,7 @@ final class ASTBuilderTest extends TestCase
     {
         parent::setUp();
 
-        $this->astBuilder = app(ASTBuilder::class);
+        $this->astBuilder = $this->app->make(ASTBuilder::class);
     }
 
     public function testMergeTypeExtensionFields(): void

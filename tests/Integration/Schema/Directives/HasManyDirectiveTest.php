@@ -5,6 +5,7 @@ namespace Tests\Integration\Schema\Directives;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
+use Tests\Utils\Models\Role;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 use Tests\Utils\Policies\UserPolicy;
@@ -296,6 +297,106 @@ final class HasManyDirectiveTest extends DBTestCase
             ]);
     }
 
+    public function testQueryPaginatedHasManyWithNonUniqueForeignKey(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Post {
+            roles: [RoleUser!]! @hasMany(relation: "roles", type: PAGINATOR, defaultCount: 10)
+        }
+
+        type RoleUser {
+            id: Int!
+            user_id: Int!
+            role_id: Int!
+        }
+
+        type Query {
+            posts: [Post!]! @all
+        }
+        ';
+
+        $user = factory(User::class)->create();
+        assert($user instanceof User);
+
+        $posts = factory(Post::class, 2)->make();
+        foreach ($posts as $post) {
+            assert($post instanceof Post);
+            $post->user()->associate($user);
+            $post->save();
+        }
+        $this->assertCount(2, $user->posts);
+
+        $roles = factory(Role::class, 3)->make();
+        foreach ($roles as $role) {
+            assert($role instanceof Role);
+            $user->roles()->save($role);
+        }
+        $this->assertCount(3, $user->roles);
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            query {
+                posts {
+                    roles {
+                        data {
+                            id
+                            user_id
+                            role_id
+                        }
+                    }
+                }
+            }
+            ')
+            ->assertExactJson([
+                'data' => [
+                    'posts' => [
+                        [
+                            'roles' => [
+                                'data' => [
+                                    [
+                                        'id' => 1,
+                                        'user_id' => $user->id,
+                                        'role_id' => $roles[0]->id,
+                                    ],
+                                    [
+                                        'id' => 2,
+                                        'user_id' => $user->id,
+                                        'role_id' => $roles[1]->id,
+                                    ],
+                                    [
+                                        'id' => 3,
+                                        'user_id' => $user->id,
+                                        'role_id' => $roles[2]->id,
+                                    ],
+                                ],
+                            ],
+                        ],
+                        [
+                            'roles' => [
+                                'data' => [
+                                    [
+                                        'id' => 1,
+                                        'user_id' => $user->id,
+                                        'role_id' => $roles[0]->id,
+                                    ],
+                                    [
+                                        'id' => 2,
+                                        'user_id' => $user->id,
+                                        'role_id' => $roles[1]->id,
+                                    ],
+                                    [
+                                        'id' => 3,
+                                        'user_id' => $user->id,
+                                        'role_id' => $roles[2]->id,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]);
+    }
+
     public function testCallsScopeWithResolverArgs(): void
     {
         $this->schema = /** @lang GraphQL */ '
@@ -504,7 +605,46 @@ final class HasManyDirectiveTest extends DBTestCase
             ->assertGraphQLErrorMessage(PaginationArgs::requestedTooManyItems(3, 5));
     }
 
-    public function testHandlesPaginationWithCountZero(): void
+    public function testPaginatorTypeIsUnlimitedByMaxCountFromDirective(): void
+    {
+        config(['lighthouse.pagination.max_count' => 1]);
+
+        $user = factory(User::class)->create();
+        assert($user instanceof User);
+
+        $tasks = factory(Task::class, 3)->make();
+        $user->tasks()->saveMany($tasks);
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            tasks: [Task!]! @hasMany(type: PAGINATOR, maxCount: null)
+        }
+
+        type Task {
+            id: Int!
+        }
+
+        type Query {
+            user: User @first
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                user {
+                    tasks(first: 5) {
+                        data {
+                            id
+                        }
+                    }
+                }
+            }
+            ')
+            ->assertGraphQLErrorFree();
+    }
+
+    public function testRejectsPaginationWithNegativeCount(): void
     {
         $user = factory(User::class)->create();
         assert($user instanceof User);
@@ -532,7 +672,7 @@ final class HasManyDirectiveTest extends DBTestCase
             {
                 user {
                     id
-                    tasks(first: 0) {
+                    tasks(first: -1) {
                         data {
                             id
                         }
@@ -540,7 +680,7 @@ final class HasManyDirectiveTest extends DBTestCase
                 }
             }
             ')
-            ->assertGraphQLErrorMessage(PaginationArgs::requestedZeroOrLessItems(0));
+            ->assertGraphQLErrorMessage(PaginationArgs::requestedLessThanZeroItems(-1));
     }
 
     public function testRelayTypeIsLimitedByMaxCountFromDirective(): void
@@ -1182,7 +1322,7 @@ final class HasManyDirectiveTest extends DBTestCase
     /**
      * @return array<int, array{0: bool}>
      */
-    public function batchloadRelations(): array
+    public static function batchloadRelations(): array
     {
         return [
             [true],

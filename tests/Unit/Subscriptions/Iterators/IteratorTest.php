@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Subscriptions\Iterators;
 
-use Exception;
 use GraphQL\Language\AST\NameNode;
 use GraphQL\Language\AST\OperationDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -35,7 +34,7 @@ abstract class IteratorTest extends TestCase
 
     public function assertPassesExceptionToHandler(SubscriptionIterator $iterator): void
     {
-        $exceptionToThrow = new Exception('test_exception');
+        $exceptionToThrow = new \Exception('test_exception');
 
         /** @var \Exception|null $exceptionThrown */
         $exceptionThrown = null;
@@ -45,7 +44,7 @@ abstract class IteratorTest extends TestCase
             static function () use ($exceptionToThrow): void {
                 throw $exceptionToThrow;
             },
-            static function (Exception $e) use (&$exceptionThrown): void {
+            static function (\Exception $e) use (&$exceptionThrown): void {
                 $exceptionThrown = $e;
             }
         );
@@ -66,7 +65,7 @@ abstract class IteratorTest extends TestCase
     public function generateSubscriber(): Subscriber
     {
         $resolveInfo = $this->createMock(ResolveInfo::class);
-
+        $resolveInfo->fieldName = 'foo';
         $resolveInfo->operation = new OperationDefinitionNode([
             'name' => new NameNode([
                 'value' => 'lighthouse',

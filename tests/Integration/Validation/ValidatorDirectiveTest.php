@@ -207,8 +207,9 @@ final class ValidatorDirectiveTest extends TestCase
         }
         ';
 
-        /** @var \Nuwave\Lighthouse\Support\Contracts\GlobalId $encoder */
-        $encoder = app(GlobalId::class);
+        $encoder = $this->app->make(GlobalId::class);
+        assert($encoder instanceof GlobalId);
+
         $globalId = $encoder->encode('asdf', '123');
 
         $this

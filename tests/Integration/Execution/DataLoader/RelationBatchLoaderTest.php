@@ -3,11 +3,14 @@
 namespace Tests\Integration\Execution\DataLoader;
 
 use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Support\Facades\Cache;
+use Nuwave\Lighthouse\Cache\CacheKeyAndTagsGenerator;
 use Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Tests\DBTestCase;
 use Tests\Utils\BatchLoaders\UserLoader;
 use Tests\Utils\Models\AlternateConnection;
+use Tests\Utils\Models\Comment;
 use Tests\Utils\Models\NullConnection;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
@@ -212,7 +215,7 @@ final class RelationBatchLoaderTest extends DBTestCase
     /**
      * @return array<array<bool|int>>
      */
-    public function batchloadRelationsSetting(): array
+    public static function batchloadRelationsSetting(): array
     {
         return [
             [true, 2],
@@ -569,5 +572,86 @@ final class RelationBatchLoaderTest extends DBTestCase
         $this->markTestIncomplete('The intermediary relation of dot notation is not batched with equivalent relations of fields.');
         // @phpstan-ignore-next-line Of course this terminates...
         $this->assertSame(3, $queryCount);
+    }
+
+    public function testBatchLoaderWithExpiredCacheEntry(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            posts: [Post!]! @all @cache(maxAge: 20)
+        }
+
+        type Post {
+            id: ID!
+            comments: [Comment!]! @hasMany @cache(maxAge: 20)
+        }
+
+        type Comment {
+            id: ID!
+            user: User! @belongsTo
+        }
+
+        type User {
+            id: ID!
+        }
+        ';
+
+        $user1 = factory(User::class)->create();
+        assert($user1 instanceof User);
+
+        $post1 = factory(Post::class)->create();
+        assert($post1 instanceof Post);
+
+        $comments1 = factory(Comment::class, 3)->make();
+        foreach ($comments1 as $comment) {
+            assert($comment instanceof Comment);
+            $comment->user()->associate($user1);
+            $comment->post()->associate($post1);
+            $comment->save();
+        }
+
+        $user2 = factory(User::class)->create();
+        assert($user2 instanceof User);
+
+        $post2 = factory(Post::class)->create();
+        assert($post2 instanceof Post);
+
+        $comments2 = factory(Comment::class, 3)->make();
+        foreach ($comments2 as $comment) {
+            assert($comment instanceof Comment);
+            $comment->user()->associate($user2);
+            $comment->post()->associate($post2);
+            $comment->save();
+        }
+
+        $firstRequest = $this->graphQL(/** @lang GraphQL */ '
+        query {
+            posts {
+                comments {
+                    user {
+                        id
+                    }
+                }
+            }
+        }
+        ');
+
+        Cache::forget(
+            (new CacheKeyAndTagsGenerator)->key(null, false, 'Post', $post2->id, 'comments', [])
+        );
+
+        $secondRequest = $this->graphQL(/** @lang GraphQL */ '
+        query {
+            posts {
+                comments {
+                    user {
+                        id
+                    }
+                }
+            }
+        }
+        ');
+
+        $this->assertSame($firstRequest->json(), $secondRequest->json());
     }
 }

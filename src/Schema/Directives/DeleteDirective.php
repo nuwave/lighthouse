@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
@@ -66,11 +67,13 @@ GRAPHQL;
      */
     public function __invoke($parent, $idOrIds): void
     {
-        $relationName = $this->directiveArgValue('relation')
+        $relationName = $this->directiveArgValue(
+            'relation',
             // Use the name of the argument if no explicit relation name is given
-            ?? $this->nodeName();
-        /** @var \Illuminate\Database\Eloquent\Relations\Relation $relation */
+            $this->nodeName()
+        );
         $relation = $parent->{$relationName}();
+        assert($relation instanceof Relation);
 
         // Those types of relations may only have one related model attached to
         // it, so we don't need to use an ID to know which model to delete.
@@ -79,13 +82,13 @@ GRAPHQL;
         $relationIsBelongsToLike = $relation instanceof BelongsTo;
 
         if ($relationIsHasOneLike || $relationIsBelongsToLike) {
-            /** @var \Illuminate\Database\Eloquent\Relations\HasOne|\Illuminate\Database\Eloquent\Relations\MorphOne|\Illuminate\Database\Eloquent\Relations\BelongsTo $relation */
+            assert($relation instanceof HasOne || $relation instanceof MorphOne || $relation instanceof BelongsTo);
             // Only delete if the given value is truthy, since
             // the client might use a variable and always pass the argument.
             // Deleting when `false` is given seems wrong.
             if ($idOrIds) {
                 if ($relationIsBelongsToLike) {
-                    /** @var \Illuminate\Database\Eloquent\Relations\BelongsTo $relation */
+                    /** @var \Illuminate\Database\Eloquent\Relations\BelongsTo $relation TODO remove with newer PHPStan */
                     $relation->dissociate();
                     $relation->getParent()->save();
                 }
@@ -94,9 +97,9 @@ GRAPHQL;
                 $relation->delete();
             }
         } else {
-            /** @var \Illuminate\Database\Eloquent\Model $related */
             // @phpstan-ignore-next-line Relation&Builder mixin not recognized
             $related = $relation->make();
+            assert($related instanceof Model);
             $related::destroy($idOrIds);
         }
     }

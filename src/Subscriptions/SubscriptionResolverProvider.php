@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
-use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Container\Container;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
@@ -35,7 +35,7 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
      *
      * @return \Closure(mixed, array<string, mixed>, \Nuwave\Lighthouse\Support\Contracts\GraphQLContext, \GraphQL\Type\Definition\ResolveInfo): mixed
      */
-    public function provideSubscriptionResolver(FieldValue $fieldValue): Closure
+    public function provideSubscriptionResolver(FieldValue $fieldValue): \Closure
     {
         $fieldName = $fieldValue->getFieldName();
 
@@ -62,9 +62,11 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
                 "Failed to find class {$className} extends {$subscriptionClass} in namespaces [{$consideredNamespaces}] for the subscription field {$fieldName}"
             );
         }
+        assert(is_subclass_of($className, GraphQLSubscription::class));
 
-        /** @var \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription $subscription */
-        $subscription = app($className);
+        $subscription = Container::getInstance()->make($className);
+        /** @var \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription $subscription PHPStan thinks it is *NEVER* with Laravel 9 */
+        assert($subscription instanceof GraphQLSubscription);
 
         // Subscriptions can only be placed on a single field on the root
         // query, so there is no need to consider the field path

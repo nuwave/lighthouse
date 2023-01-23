@@ -117,8 +117,7 @@ final class AutomaticPersistedQueriesTest extends TestCase
         $config->set('lighthouse.query_cache.enable', false);
         $config->set('lighthouse.persisted_queries', true);
 
-        $query /** @lang GraphQL */
-            = '
+        $query = /** @lang GraphQL */ '
         {
             foo
         }

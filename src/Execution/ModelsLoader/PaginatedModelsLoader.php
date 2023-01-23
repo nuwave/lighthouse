@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Execution\ModelsLoader;
 
-use Closure;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
@@ -11,8 +10,8 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
-use ReflectionClass;
-use ReflectionMethod;
+use Nuwave\Lighthouse\Pagination\ZeroPageLengthAwarePaginator;
+use Nuwave\Lighthouse\Support\Utils;
 
 class PaginatedModelsLoader implements ModelsLoader
 {
@@ -31,7 +30,7 @@ class PaginatedModelsLoader implements ModelsLoader
      */
     protected $paginationArgs;
 
-    public function __construct(string $relation, Closure $decorateBuilder, PaginationArgs $paginationArgs)
+    public function __construct(string $relation, \Closure $decorateBuilder, PaginationArgs $paginationArgs)
     {
         $this->relation = $relation;
         $this->decorateBuilder = $decorateBuilder;
@@ -69,9 +68,7 @@ class PaginatedModelsLoader implements ModelsLoader
                 ($this->decorateBuilder)($relation, $model);
 
                 if ($relation instanceof BelongsToMany || $relation instanceof HasManyThrough) {
-                    $shouldSelect = new ReflectionMethod(get_class($relation), 'shouldSelect');
-                    $shouldSelect->setAccessible(true);
-                    $select = $shouldSelect->invoke($relation, ['*']);
+                    $select = Utils::callProtected($relation, 'shouldSelect', ['*']);
 
                     // @phpstan-ignore-next-line Builder mixin is not understood
                     $relation->addSelect($select);
@@ -85,12 +82,8 @@ class PaginatedModelsLoader implements ModelsLoader
 
         // Merge all the relation queries into a single query with UNION ALL.
 
-        /**
-         * Non-null because only non-empty lists of parents are passed into this loader.
-         *
-         * @var \Illuminate\Database\Eloquent\Relations\Relation $firstRelation
-         */
         $firstRelation = $relations->shift();
+        assert($firstRelation instanceof Relation, 'Non-null because only non-empty lists of parents are passed into this loader.');
 
         // Use ->getQuery() to respect model scopes, such as soft deletes
         $mergedRelationQuery = $relations->reduce(
@@ -103,7 +96,14 @@ class PaginatedModelsLoader implements ModelsLoader
             $firstRelation->getQuery()
         );
 
-        return $mergedRelationQuery->get();
+        $relatedModels = $mergedRelationQuery->get();
+        assert($relatedModels instanceof EloquentCollection);
+
+        return $relatedModels->unique(function (Model $relatedModel): string {
+            // Compare all attributes because there might not be a unique primary key
+            // or there could be differing pivot attributes.
+            return $relatedModel->toJson();
+        });
     }
 
     /**
@@ -121,11 +121,11 @@ class PaginatedModelsLoader implements ModelsLoader
      */
     protected function newModelQuery(EloquentCollection $parents): EloquentBuilder
     {
-        /** @var \Illuminate\Database\Eloquent\Model $anyModelInstance */
         $anyModelInstance = $parents->first();
+        assert($anyModelInstance instanceof Model);
 
-        /** @var \Illuminate\Database\Eloquent\Builder $newModelQuery */
         $newModelQuery = $anyModelInstance->newModelQuery();
+        assert($newModelQuery instanceof EloquentBuilder);
 
         return $newModelQuery;
     }
@@ -141,9 +141,7 @@ class PaginatedModelsLoader implements ModelsLoader
          * @see BelongsToMany::hydratePivotRelation()
          */
         if ($relation instanceof BelongsToMany) {
-            $hydrationMethod = new ReflectionMethod($relation, 'hydratePivotRelation');
-            $hydrationMethod->setAccessible(true);
-            $hydrationMethod->invoke($relation, $relatedModels->all());
+            Utils::callProtected($relation, 'hydratePivotRelation', $relatedModels->all());
         }
     }
 
@@ -156,19 +154,14 @@ class PaginatedModelsLoader implements ModelsLoader
      */
     protected function loadDefaultWith(EloquentCollection $models): void
     {
-        /** @var \Illuminate\Database\Eloquent\Model|null $model */
         $model = $models->first();
         if (null === $model) {
             return;
         }
+        assert($model instanceof Model);
 
-        $reflection = new ReflectionClass($model);
-        $withProperty = $reflection->getProperty('with');
-        $withProperty->setAccessible(true);
-
-        /** @var array<int, string> $unloadedWiths */
         $unloadedWiths = array_filter(
-            $withProperty->getValue($model),
+            Utils::accessProtected($model, 'with'),
             static function (string $relation) use ($model): bool {
                 return ! $model->relationLoaded($relation);
             }
@@ -195,16 +188,17 @@ class PaginatedModelsLoader implements ModelsLoader
 
     protected function convertRelationToPaginator(EloquentCollection $parents): void
     {
+        $first = $this->paginationArgs->first;
+        $page = $this->paginationArgs->page;
+
         foreach ($parents as $model) {
-            $model->setRelation(
-                $this->relation,
-                new LengthAwarePaginator(
-                    $model->getRelation($this->relation),
-                    CountModelsLoader::extractCount($model, $this->relation),
-                    $this->paginationArgs->first,
-                    $this->paginationArgs->page
-                )
-            );
+            $total = CountModelsLoader::extractCount($model, $this->relation);
+
+            $paginator = 0 === $first
+                ? new ZeroPageLengthAwarePaginator($total, $page)
+                : new LengthAwarePaginator($model->getRelation($this->relation), $total, $first, $page);
+
+            $model->setRelation($this->relation, $paginator);
         }
     }
 }

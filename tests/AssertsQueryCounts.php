@@ -2,13 +2,13 @@
 
 namespace Tests;
 
-use Closure;
 use Illuminate\Support\Facades\DB;
 
 /**
  * This trait was taken from a package that supports fewer Laravel versions than us.
  *
  * @see https://github.com/mattiasgeniar/phpunit-query-count-assertions
+ *
  * @mixin \PHPUnit\Framework\TestCase
  */
 trait AssertsQueryCounts
@@ -20,7 +20,7 @@ trait AssertsQueryCounts
         });
     }
 
-    protected function assertNoQueriesExecuted(Closure $closure = null): void
+    protected function assertNoQueriesExecuted(\Closure $closure = null): void
     {
         if ($closure) {
             self::trackQueries();
@@ -35,7 +35,7 @@ trait AssertsQueryCounts
         }
     }
 
-    protected function assertQueryCountMatches(int $count, Closure $closure = null): void
+    protected function assertQueryCountMatches(int $count, \Closure $closure = null): void
     {
         if ($closure) {
             self::trackQueries();
@@ -50,7 +50,7 @@ trait AssertsQueryCounts
         }
     }
 
-    protected function assertQueryCountLessThan(int $count, Closure $closure = null): void
+    protected function assertQueryCountLessThan(int $count, \Closure $closure = null): void
     {
         if ($closure) {
             self::trackQueries();
@@ -65,7 +65,7 @@ trait AssertsQueryCounts
         }
     }
 
-    protected function assertQueryCountGreaterThan(int $count, Closure $closure = null): void
+    protected function assertQueryCountGreaterThan(int $count, \Closure $closure = null): void
     {
         if ($closure) {
             self::trackQueries();

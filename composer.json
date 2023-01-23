@@ -43,7 +43,8 @@
         "webonyx/graphql-php": "^14.7"
     },
     "require-dev": {
-        "bensampo/laravel-enum": "^1.28.3 || ^2 || ^3 || ^4 || ^5",
+        "algolia/algoliasearch-client-php": "^3 || ^4",
+        "bensampo/laravel-enum": "^1.28.3 || ^2 || ^3 || ^4 || ^5 || ^6",
         "ergebnis/composer-normalize": "^2.2.2",
         "laravel/framework": "5.6.* || 5.7.* || 5.8.* || ^6 || ^7 || ^8 || ^9",
         "laravel/legacy-factories": "^1",
@@ -68,7 +69,7 @@
         "bensampo/laravel-enum": "Convenient enum definitions that can easily be registered in your Schema",
         "laravel/scout": "Required for the @search directive",
         "mll-lab/graphql-php-scalars": "Useful scalar types, required for @whereConditions",
-        "mll-lab/laravel-graphql-playground": "GraphQL IDE for better development workflow - integrated with Laravel",
+        "mll-lab/laravel-graphiql": "A graphical interactive in-browser GraphQL IDE - integrated with Laravel",
         "pusher/pusher-php-server": "Required when using the Pusher Subscriptions driver"
     },
     "minimum-stability": "dev",
@@ -87,7 +88,8 @@
     "config": {
         "allow-plugins": {
             "composer/package-versions-deprecated": true,
-            "ergebnis/composer-normalize": true
+            "ergebnis/composer-normalize": true,
+            "kylekatarnls/update-helper": true
         },
         "sort-packages": true
     },
@@ -108,5 +110,10 @@
                 "Nuwave\\Lighthouse\\Validation\\ValidationServiceProvider"
             ]
         }
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "[ -f vendor/bin/testbench ] && vendor/bin/testbench package:discover || true"
+        ]
     }
 }

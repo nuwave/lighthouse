@@ -2,12 +2,12 @@
 
 namespace Nuwave\Lighthouse\Schema\Values;
 
-use Closure;
 use GraphQL\Deferred;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\StringValueNode;
-use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
+use Illuminate\Container\Container;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter;
 use Nuwave\Lighthouse\Schema\Factories\FieldFactory;
 use Nuwave\Lighthouse\Schema\RootType;
@@ -198,7 +198,7 @@ class FieldValue
      *
      * @deprecated will be removed in v6
      */
-    public function getComplexity(): ?Closure
+    public function getComplexity(): ?\Closure
     {
         return $this->complexity;
     }
@@ -208,7 +208,7 @@ class FieldValue
      *
      * @deprecated will be removed in v6
      */
-    public function setComplexity(Closure $complexity): self
+    public function setComplexity(\Closure $complexity): self
     {
         $this->complexity = $complexity;
 
@@ -223,8 +223,9 @@ class FieldValue
     public function getReturnType(): Type
     {
         if (null === $this->returnType) {
-            /** @var \Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter $typeNodeConverter */
-            $typeNodeConverter = app(ExecutableTypeNodeConverter::class);
+            $typeNodeConverter = Container::getInstance()->make(ExecutableTypeNodeConverter::class);
+            assert($typeNodeConverter instanceof ExecutableTypeNodeConverter);
+
             $this->returnType = $typeNodeConverter->convert($this->field->type);
         }
 

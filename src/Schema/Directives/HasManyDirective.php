@@ -33,12 +33,14 @@ directive @hasMany(
   """
   Allow clients to query paginated lists without specifying the amount of items.
   Overrules the `pagination.default_count` setting from `lighthouse.php`.
+  Setting this to `null` means clients have to explicitly ask for the count.
   """
   defaultCount: Int
 
   """
   Limit the maximum amount of items that clients can request from paginated lists.
   Overrules the `pagination.max_count` setting from `lighthouse.php`.
+  Setting this to `null` means the count is unrestricted.
   """
   maxCount: Int
 

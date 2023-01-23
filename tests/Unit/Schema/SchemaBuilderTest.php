@@ -16,7 +16,7 @@ final class SchemaBuilderTest extends TestCase
 {
     public function testGeneratesValidSchema(): void
     {
-        $this->buildSchemaWithPlaceholderQuery()
+        $this->buildSchemaWithPlaceholderQuery('')
             ->assertValid();
 
         $this->expectNotToPerformAssertions();
@@ -163,7 +163,7 @@ final class SchemaBuilderTest extends TestCase
 
     public function testResolveQueries(): void
     {
-        $schema = $this->buildSchemaWithPlaceholderQuery();
+        $schema = $this->buildSchemaWithPlaceholderQuery('');
 
         $queryObjectType = $schema->getType(RootType::QUERY);
         assert($queryObjectType instanceof ObjectType);
@@ -185,8 +185,9 @@ final class SchemaBuilderTest extends TestCase
 
         $objectType = $schema->getType('Foo');
         assert($objectType instanceof ObjectType);
+        $fields = $objectType->getFields();
 
-        $this->assertArrayHasKey('baz', $objectType->config['fields']());
+        $this->assertArrayHasKey('baz', $fields);
     }
 
     public function testExtendTypes(): void

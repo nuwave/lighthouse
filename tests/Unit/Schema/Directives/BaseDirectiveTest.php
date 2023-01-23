@@ -39,16 +39,6 @@ final class BaseDirectiveTest extends TestCase
         );
     }
 
-    public function testGetsNameFromDirective(): void
-    {
-        $directive = $this->constructFieldDirective('foo: ID @dummy');
-
-        $this->assertSame(
-            'dummy',
-            $directive->name()
-        );
-    }
-
     public function testDefaultsToFieldTypeForTheModelClass(): void
     {
         $this->schema .= /** @lang GraphQL */ '
@@ -71,6 +61,16 @@ final class BaseDirectiveTest extends TestCase
 
         $this->expectException(DefinitionException::class);
         $directive->getModelClass();
+    }
+
+    public function testBuiltInTypeTolerated(): void
+    {
+        $directive = $this->constructFieldDirective('foo: String @dummy(model: "Team")');
+
+        $this->assertSame(
+            Team::class,
+            $directive->getModelClass()
+        );
     }
 
     public function testThrowsIfTheClassIsNotAModel(): void
@@ -153,7 +153,7 @@ final class BaseDirectiveTest extends TestCase
 
     public function testGetsArgumentFromDirective(): void
     {
-        $directive = $this->constructFieldDirective('foo: ID @dummy(argName:"argValue", argName2:"argValue2")');
+        $directive = $this->constructFieldDirective('foo: ID @dummy(argName: "argValue", argName2: "argValue2")');
 
         $this->assertSame(
             'argValue',
@@ -170,11 +170,22 @@ final class BaseDirectiveTest extends TestCase
 
     public function testTwoArgumentsWithSameName(): void
     {
-        $directive = $this->constructFieldDirective('foo: ID @dummy(argName:"argValue", argName:"argValue2")');
+        $directive = $this->constructFieldDirective('foo: ID @dummy(argName: "argValue", argName: "argValue2")');
 
         $this->expectException(DefinitionException::class);
         // @phpstan-ignore-next-line protected method is called via wrapper below
         $directive->directiveArgValue('argName');
+    }
+
+    public function testMutuallyExclusive(): void
+    {
+        $directive = $this->constructFieldDirective('foo: ID @dummy(bar: 1, baz: 2)');
+
+        $this->expectExceptionObject(
+            new DefinitionException('The arguments [bar, baz, qux] for @base are mutually exclusive, found [bar, baz] on foo.')
+        );
+        // @phpstan-ignore-next-line protected method is called via wrapper below
+        $directive->validateMutuallyExclusiveArguments(['bar', 'baz', 'qux']);
     }
 
     protected function constructFieldDirective(string $definition): BaseDirective
@@ -184,11 +195,11 @@ final class BaseDirectiveTest extends TestCase
         $directive = new class() extends BaseDirective {
             public static function definition(): string
             {
-                return /** @lang GraphQL */ 'directive @baseTest on FIELD_DEFINITION';
+                return /** @lang GraphQL */ 'directive @base on FIELD_DEFINITION';
             }
 
             /**
-             * Allow to call protected methods from the test.
+             * Allows calling protected methods from the test.
              *
              * @param  array<mixed>  $args
              *

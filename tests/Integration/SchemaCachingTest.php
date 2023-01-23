@@ -21,7 +21,7 @@ final class SchemaCachingTest extends TestCase
         parent::setUp();
 
         $this->setUpSchemaCache();
-        $this->useSerializingArrayStore($this->app);
+        $this->useSerializingArrayStore();
     }
 
     protected function tearDown(): void
@@ -36,8 +36,9 @@ final class SchemaCachingTest extends TestCase
      */
     public function testSchemaCachingWithUnionType(int $cacheVersion): void
     {
-        /** @var \Illuminate\Contracts\Config\Repository $config */
-        $config = app(ConfigRepository::class);
+        $config = $this->app->make(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
+
         $config->set('lighthouse.cache.version', $cacheVersion);
 
         $this->schema = /** @lang GraphQL */ '
@@ -80,12 +81,14 @@ final class SchemaCachingTest extends TestCase
 
     public function testInvalidSchemaCacheContents(): void
     {
-        $config = app(ConfigRepository::class);
+        $config = $this->app->make(ConfigRepository::class);
         assert($config instanceof ConfigRepository);
+
         $config->set('lighthouse.cache.version', 2);
 
-        $filesystem = app(Filesystem::class);
+        $filesystem = $this->app->make(Filesystem::class);
         assert($filesystem instanceof Filesystem);
+
         $path = $config->get('lighthouse.cache.path');
         $filesystem->put($path, '');
 

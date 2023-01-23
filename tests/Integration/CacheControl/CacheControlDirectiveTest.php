@@ -17,7 +17,7 @@ final class CacheControlDirectiveTest extends DBTestCase
             'name' => 'foobar',
         ]);
 
-        $this->schema /** @lang GraphQL */ = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
             name: String
@@ -43,7 +43,7 @@ final class CacheControlDirectiveTest extends DBTestCase
             'id' => 1,
         ]);
 
-        $this->schema /** @lang GraphQL */ = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
         }
@@ -69,7 +69,7 @@ final class CacheControlDirectiveTest extends DBTestCase
     {
         $this->mockResolver(1);
 
-        $this->schema /** @lang GraphQL */ = '
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             default: ID @mock
             withDirective: ID @mock @cacheControl(maxAge: 5)
@@ -83,7 +83,7 @@ final class CacheControlDirectiveTest extends DBTestCase
     /**
      * @return array<int, array{string, string}>
      */
-    public function rootScalarDataProvider(): array
+    public static function rootScalarDataProvider(): array
     {
         return [
             [/** @lang GraphQL */ '
@@ -115,7 +115,7 @@ final class CacheControlDirectiveTest extends DBTestCase
             'self' => null,
         ]);
 
-        $this->schema /** @lang GraphQL */ = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
             child: User
@@ -147,10 +147,10 @@ final class CacheControlDirectiveTest extends DBTestCase
             'name' => 'foobar',
         ]);
 
-        $this->schema /** @lang GraphQL */ = "
+        $this->schema = /** @lang GraphQL */ "
         type User {
             id: ID!
-            name: String $directive
+            name: String {$directive}
         }
 
         type Query {
@@ -170,7 +170,7 @@ final class CacheControlDirectiveTest extends DBTestCase
     /**
      * @return array<string, array{string, string}>
      */
-    public function argumentsDataProvider(): array
+    public static function argumentsDataProvider(): array
     {
         return [
             'noArguments' => ['@cacheControl', 'no-cache, public'],
@@ -187,7 +187,7 @@ final class CacheControlDirectiveTest extends DBTestCase
      */
     public function testUseDirectiveNested(string $query, string $expectedHeaderString): void
     {
-        $this->schema /** @lang GraphQL */ = '
+        $this->schema = /** @lang GraphQL */ '
         type User {
             tasks: [Task!]! @hasMany @cacheControl(maxAge: 50)
             posts: [Post!]! @hasMany
@@ -237,7 +237,7 @@ final class CacheControlDirectiveTest extends DBTestCase
     /**
      * @return array<int, array{string, string}>
      */
-    public function nestedQueryDataProvider(): array
+    public static function nestedQueryDataProvider(): array
     {
         return [
             [/** @lang GraphQL */ '

@@ -2,10 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Closure;
-use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\ScalarType;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgSanitizerDirective;
@@ -27,7 +26,7 @@ GRAPHQL;
 
     public function sanitize($argumentValue)
     {
-        return Utils::applyEach(
+        return Utils::mapEachRecursive(
             function ($value) {
                 return $value instanceof ArgumentSet
                     ? $this->transformArgumentSet($value)
@@ -37,7 +36,7 @@ GRAPHQL;
         );
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
     {
         $resolver = $fieldValue->getResolver();
 
@@ -59,11 +58,13 @@ GRAPHQL;
     {
         foreach ($argumentSet->arguments as $argument) {
             $namedType = $argument->namedType();
-            if (null !== $namedType && ScalarType::STRING === $namedType->name) {
-                continue;
+            if (
+                null !== $namedType
+                && ScalarType::STRING === $namedType->name
+                && ! $namedType->nonNull
+            ) {
+                $argument->value = $this->sanitize($argument->value);
             }
-
-            $argument->value = $this->sanitize($argument->value);
         }
 
         return $argumentSet;

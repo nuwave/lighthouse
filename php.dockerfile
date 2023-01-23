@@ -1,4 +1,4 @@
-FROM php:8-cli
+FROM php:8.1-cli
 
 WORKDIR /workdir
 
@@ -30,7 +30,7 @@ ARG GROUP_ID
 
 RUN if [ ${USER_ID:-0} -ne 0 ] && [ ${GROUP_ID:-0} -ne 0 ]; then \
     groupadd --force --gid ${GROUP_ID} ${USER} &&\
-    useradd --no-log-init --uid ${USER_ID} --gid ${GROUP_ID} ${USER} \
+    useradd --no-log-init  --create-home --uid ${USER_ID} --gid ${GROUP_ID} ${USER} \
 ;fi
 
 USER ${USER}

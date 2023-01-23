@@ -4,7 +4,6 @@ namespace Tests\Unit\Subscriptions\Iterators;
 
 use Illuminate\Auth\AuthManager;
 use Illuminate\Contracts\Auth\Authenticatable;
-use Mockery;
 use Mockery\MockInterface;
 use Nuwave\Lighthouse\Subscriptions\Iterators\AuthenticatingSyncIterator;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
@@ -35,7 +34,7 @@ final class AuthenticatingSyncIteratorTest extends IteratorTest
                 return $subscriber;
             });
 
-        $guard = Mockery::mock(SubscriptionGuard::class, static function (MockInterface $mock) use ($subscribers) {
+        $guard = \Mockery::mock(SubscriptionGuard::class, static function (MockInterface $mock) use ($subscribers) {
             $subscribers->each(static function (Subscriber $subscriber) use ($mock) {
                 $user = $subscriber->context->user();
 

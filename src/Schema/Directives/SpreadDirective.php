@@ -2,9 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Closure;
-use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -23,7 +22,7 @@ directive @spread on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next)
+    public function handleField(FieldValue $fieldValue, \Closure $next)
     {
         $resolver = $fieldValue->getResolver();
 
@@ -53,7 +52,7 @@ GRAPHQL;
 
         foreach ($original->arguments as $name => $argument) {
             // Recurse down first, as that resolves the more deeply nested spreads first
-            $argument->value = Utils::applyEach(
+            $argument->value = Utils::mapEach(
                 function ($value) {
                     if ($value instanceof ArgumentSet) {
                         return $this->spread($value);

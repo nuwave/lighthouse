@@ -2,10 +2,10 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
-use Exception;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\Node;
 use HaydenPierce\ClassFinder\ClassFinder;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -140,7 +140,7 @@ class DirectiveLocator
     {
         $directiveClass = $this->resolve($directiveName);
 
-        return app($directiveClass);
+        return Container::getInstance()->make($directiveClass);
     }
 
     /**
@@ -162,7 +162,7 @@ class DirectiveLocator
 
             if (class_exists($directiveClass)) {
                 if (! is_a($directiveClass, Directive::class, true)) {
-                    throw new DirectiveException("Class $directiveClass must implement the interface " . Directive::class);
+                    throw new DirectiveException("Class {$directiveClass} must implement the interface " . Directive::class);
                 }
                 $this->resolvedClassnames[$directiveName] = $directiveClass;
 
@@ -189,8 +189,26 @@ class DirectiveLocator
         $baseName = basename(str_replace('\\', '/', $className));
 
         return lcfirst(
-            Str::before($baseName, 'Directive')
+            self::beforeLast($baseName, 'Directive')
         );
+    }
+
+    /**
+     * TODO use Str::beforeLast with Laravel 6+.
+     */
+    protected static function beforeLast(string $subject, string $search): string
+    {
+        if ('' === $search) {
+            return $subject;
+        }
+
+        $pos = mb_strrpos($subject, $search);
+
+        if (false === $pos) {
+            return $subject;
+        }
+
+        return Str::substr($subject, 0, $pos);
     }
 
     /**
@@ -211,7 +229,7 @@ class DirectiveLocator
     public function associated(Node $node): Collection
     {
         if (! property_exists($node, 'directives')) {
-            throw new Exception('Expected Node class with property `directives`, got: ' . get_class($node));
+            throw new \Exception('Expected Node class with property `directives`, got: ' . get_class($node));
         }
 
         return (new Collection($node->directives))
@@ -280,7 +298,7 @@ class DirectiveLocator
                 ->implode(', ');
 
             if (! property_exists($node, 'name')) {
-                throw new Exception('Expected Node class with property `name`, got: ' . get_class($node));
+                throw new \Exception('Expected Node class with property `name`, got: ' . get_class($node));
             }
 
             throw new DirectiveException(

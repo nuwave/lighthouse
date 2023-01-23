@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Federation;
 
+use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Events\ManipulateAST;
@@ -51,8 +52,8 @@ class ASTManipulator
                 continue;
             }
 
-            /** @var \GraphQL\Language\AST\DirectiveNode $directive */
             foreach ($type->directives as $directive) {
+                assert($directive instanceof DirectiveNode);
                 if ('key' === $directive->name->value) {
                     $entities[] = $type->name->value;
                     break;
@@ -80,8 +81,8 @@ class ASTManipulator
             $documentAST->types[RootType::QUERY] = Parser::objectTypeDefinition(/** @lang GraphQL */ 'type Query');
         }
 
-        /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
         $queryType = $documentAST->types[RootType::QUERY];
+        assert($queryType instanceof ObjectTypeDefinitionNode);
 
         $queryType->fields[] = Parser::fieldDefinition(/** @lang GraphQL */ '
         _entities(

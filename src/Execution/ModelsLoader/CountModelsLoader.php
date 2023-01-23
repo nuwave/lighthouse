@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Execution\ModelsLoader;
 
-use Closure;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
@@ -20,7 +19,7 @@ class CountModelsLoader implements ModelsLoader
      */
     protected $decorateBuilder;
 
-    public function __construct(string $relation, Closure $decorateBuilder)
+    public function __construct(string $relation, \Closure $decorateBuilder)
     {
         $this->relation = $relation;
         $this->decorateBuilder = $decorateBuilder;
@@ -43,14 +42,10 @@ class CountModelsLoader implements ModelsLoader
          *
          * @see \Illuminate\Database\Eloquent\Concerns\QueriesRelationships::withCount()
          */
-        $countAttributeName = Str::snake("${relationName}_count");
+        $countAttributeName = Str::snake("{$relationName}_count");
 
-        /**
-         * We just assert this is an int and let PHP run into a type error if not.
-         *
-         * @var int $count
-         */
         $count = $model->getAttribute($countAttributeName);
+        assert(is_int($count), 'avoid runtime check in production since the return type validates this anyway');
 
         return $count;
     }

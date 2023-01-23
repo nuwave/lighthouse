@@ -10,7 +10,7 @@ final class DummyClass
     /**
      * Return a value for the field.
      *
-     * @param  @param  null  $root Always null, since this field has no parent.
+     * @param  null  $root Always null, since this field has no parent.
      * @param  array{}  $args The field arguments passed by the client.
      * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context Shared between all fields.
      * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo Metadata for advanced query resolution.

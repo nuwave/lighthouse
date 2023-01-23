@@ -79,7 +79,7 @@ final class EnsureXHRTest extends TestCase
     /**
      * @return array{array{string}}
      */
-    public function formContentTypes(): array
+    public static function formContentTypes(): array
     {
         return [
             ['application/x-www-form-urlencoded'],
@@ -96,6 +96,39 @@ final class EnsureXHRTest extends TestCase
 
         $request = new Request();
         $request->setMethod('POST');
+
+        $this->expectException(BadRequestHttpException::class);
+        $middleware->handle(
+            $request,
+            static function (): void {}
+        );
+    }
+
+    public function testAllowXRequestedWithHeader(): void
+    {
+        $middleware = new EnsureXHR();
+
+        $request = new Request();
+        $request->setMethod('POST');
+        $request->headers->set('X-Requested-With', 'XMLHttpRequest');
+
+        $response = new Response();
+
+        $result = $middleware->handle(
+            $request,
+            static function () use ($response): Response { return $response; }
+        );
+
+        $this->assertSame($response, $result);
+    }
+
+    public function testForbidInvalidXRequestedWithHeader(): void
+    {
+        $middleware = new EnsureXHR();
+
+        $request = new Request();
+        $request->setMethod('POST');
+        $request->headers->set('X-Requested-With', 'InvalidValue');
 
         $this->expectException(BadRequestHttpException::class);
         $middleware->handle(

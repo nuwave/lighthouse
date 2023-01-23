@@ -20,8 +20,8 @@ final class SubscriberTest extends TestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        $this->useSerializingArrayStore($app);
-        $this->fakeContextSerializer($app);
+        $this->useSerializingArrayStore();
+        $this->fakeContextSerializer();
     }
 
     public function testSerializable(): void

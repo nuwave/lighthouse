@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Schema;
 
-use Closure;
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\ResolverProvider;
@@ -30,7 +29,7 @@ final class ResolverProviderTest extends TestCase
         $fieldValue = $this->constructFieldValue('nonExisting: Int', 'NonRoot');
 
         $this->assertInstanceOf(
-            Closure::class,
+            \Closure::class,
             $this->resolverProvider->provideResolver($fieldValue)
         );
     }
@@ -40,7 +39,7 @@ final class ResolverProviderTest extends TestCase
         $fieldValue = $this->constructFieldValue('foo: Int');
 
         $this->assertInstanceOf(
-            Closure::class,
+            \Closure::class,
             $this->resolverProvider->provideResolver($fieldValue)
         );
     }
@@ -50,7 +49,7 @@ final class ResolverProviderTest extends TestCase
         $fieldValue = $this->constructFieldValue('baz: Int');
 
         $this->assertInstanceOf(
-            Closure::class,
+            \Closure::class,
             $this->resolverProvider->provideResolver($fieldValue)
         );
     }

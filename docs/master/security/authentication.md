@@ -66,8 +66,8 @@ to `sanctum` and register Sanctum's `EnsureFrontendRequestsAreStateful` as the f
 Note that Sanctum requires you to send an CSRF token as [header](https://laravel.com/docs/csrf#csrf-x-csrf-token)
 with all GraphQL requests, regardless of whether the user is authenticated or not.
 
-When using [laravel-graphql-playground](https://github.com/mll-lab/laravel-graphql-playground), follow the [instructions
-to add a CSRF token](https://github.com/mll-lab/laravel-graphql-playground#configure-session-authentication).
+When using [mll-lab/laravel-graphiql](https://github.com/mll-lab/laravel-graphiql), follow the [instructions
+to add a CSRF token](https://github.com/mll-lab/laravel-graphiql#configure-session-authentication).
 
 ## Guard selected fields
 
@@ -173,7 +173,7 @@ class Login
     public function __invoke($_, array $args): User
     {
         // Plain Laravel: Auth::guard()
-        // Laravel Sanctum: Auth::guard(config('sanctum.guard', 'web'))
+        // Laravel Sanctum: Auth::guard(Arr::first(config('sanctum.guard')))
         $guard = ?;
 
         if( ! $guard->attempt($args)) {

@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
-use Closure;
 use Nuwave\Lighthouse\Scout\ScoutEnhancer;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective;
@@ -68,20 +67,24 @@ class ArgumentSet
     /**
      * Apply ArgBuilderDirectives and scopes to the builder.
      *
-     * @template TBuilder of \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation
+     * @template TBuilder of \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation|\Laravel\Scout\Builder
      *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation  $builder
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation|\Laravel\Scout\Builder  $builder
+     *
      * @phpstan-param  TBuilder  $builder
      *
      * @param  array<string>  $scopes
      *
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation|\Laravel\Scout\Builder
-     * @phpstan-return TBuilder|\Laravel\Scout\Builder
+     *
+     * @phpstan-return TBuilder
+     *
+     * @deprecated will be moved to \Nuwave\Lighthouse\Execution\ResolveInfo
      */
-    public function enhanceBuilder(object $builder, array $scopes, Closure $directiveFilter = null): object
+    public function enhanceBuilder(object $builder, array $scopes, \Closure $directiveFilter = null): object
     {
         $scoutEnhancer = new ScoutEnhancer($this, $builder);
-        if ($scoutEnhancer->hasSearchArguments()) {
+        if ($scoutEnhancer->canEnhanceBuilder()) {
             return $scoutEnhancer->enhanceBuilder();
         }
 
@@ -104,7 +107,7 @@ class ArgumentSet
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
      * @param  (\Closure(\Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective): bool)|null  $directiveFilter
      */
-    protected static function applyArgBuilderDirectives(self $argumentSet, object &$builder, Closure $directiveFilter = null): void
+    protected static function applyArgBuilderDirectives(self $argumentSet, object &$builder, \Closure $directiveFilter = null): void
     {
         $unboxBenSampoEnumEnumInstances = config('lighthouse.unbox_bensampo_enum_enum_instances');
 

@@ -65,8 +65,8 @@ GRAPHQL;
 
             $schema .= /** @lang GraphQL */ <<<GRAPHQL
 
-# Directive class: $directiveClass
-$definition
+# Directive class: {$directiveClass}
+{$definition}
 
 GRAPHQL;
         }
@@ -74,7 +74,7 @@ GRAPHQL;
         $filePath = static::schemaDirectivesPath();
         \Safe\file_put_contents($filePath, self::GENERATED_NOTICE . $schema);
 
-        $this->info("Wrote schema directive definitions to $filePath.");
+        $this->info("Wrote schema directive definitions to {$filePath}.");
     }
 
     /**
@@ -176,7 +176,7 @@ GRAPHQL;
 
         \Safe\file_put_contents($filePath, self::GENERATED_NOTICE . $schema . "\n");
 
-        $this->info("Wrote definitions for programmatically registered types to $filePath.");
+        $this->info("Wrote definitions for programmatically registered types to {$filePath}.");
     }
 
     public static function programmaticTypesPath(): string
@@ -191,7 +191,7 @@ GRAPHQL;
 
         \Safe\file_put_contents($filePath, $this->withGeneratedNotice($contents));
 
-        $this->info("Wrote PHP definitions to $filePath.");
+        $this->info("Wrote PHP definitions to {$filePath}.");
     }
 
     public static function phpIdeHelperPath(): string

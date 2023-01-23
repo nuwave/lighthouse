@@ -2,7 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
-use Closure;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
@@ -19,6 +19,8 @@ use Nuwave\Lighthouse\Exceptions\UnknownCacheVersionException;
  *   ttl: int|null,
  *   path: string|null,
  * }
+ *
+ * @phpstan-import-type SerializableDocumentAST from DocumentAST
  */
 class ASTCache
 {
@@ -108,7 +110,7 @@ class ASTCache
     /**
      * @param \Closure(): DocumentAST $build
      */
-    public function fromCacheOrBuild(Closure $build): DocumentAST
+    public function fromCacheOrBuild(\Closure $build): DocumentAST
     {
         if (1 === $this->version) {
             return $this->store()->remember(
@@ -123,6 +125,7 @@ class ASTCache
             if (! is_array($ast)) {
                 throw new InvalidSchemaCacheContentsException($this->path, $ast);
             }
+            /** @var SerializableDocumentAST $ast */
 
             return DocumentAST::fromArray($ast);
         }
@@ -135,14 +138,14 @@ class ASTCache
 
     protected function store(): CacheRepository
     {
-        /** @var \Illuminate\Contracts\Cache\Factory $cacheFactory */
-        $cacheFactory = app(CacheFactory::class);
+        $cacheFactory = Container::getInstance()->make(CacheFactory::class);
+        assert($cacheFactory instanceof CacheFactory);
 
         return $cacheFactory->store($this->store);
     }
 
     protected function filesystem(): Filesystem
     {
-        return app(Filesystem::class);
+        return Container::getInstance()->make(Filesystem::class);
     }
 }

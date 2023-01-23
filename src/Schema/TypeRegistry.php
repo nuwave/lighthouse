@@ -18,6 +18,7 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\UnionType;
+use Illuminate\Container\Container;
 use Illuminate\Pipeline\Pipeline;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
@@ -350,7 +351,6 @@ class TypeRegistry
 
         $namespacesToTry = (array) config('lighthouse.namespaces.scalars');
 
-        /** @var class-string<\GraphQL\Type\Definition\ScalarType>|null $className */
         $className = Utils::namespaceClassname(
             $className,
             $namespacesToTry,
@@ -358,6 +358,7 @@ class TypeRegistry
                 return is_subclass_of($className, ScalarType::class);
             }
         );
+        assert(is_null($className) || is_subclass_of($className, ScalarType::class));
 
         if (! $className) {
             $scalarClass = ScalarType::class;
@@ -376,25 +377,20 @@ class TypeRegistry
 
     protected function resolveObjectType(ObjectTypeDefinitionNode $objectDefinition): ObjectType
     {
-        /**
-         * @return list<\GraphQL\Type\Definition\Type>
-         */
-        $interfaces = function () use ($objectDefinition): array {
-            $interfaces = [];
-
-            // Might be a NodeList, so we can not use array_map()
-            foreach ($objectDefinition->interfaces as $interface) {
-                $interfaces[] = $this->get($interface->name->value);
-            }
-
-            return $interfaces;
-        };
-
         return new ObjectType([
             'name' => $objectDefinition->name->value,
             'description' => $objectDefinition->description->value ?? null,
             'fields' => $this->makeFieldsLoader($objectDefinition),
-            'interfaces' => $interfaces,
+            'interfaces' => function () use ($objectDefinition): array {
+                $interfaces = [];
+
+                foreach ($objectDefinition->interfaces as $interface) {
+                    $interfaces[] = $this->get($interface->name->value);
+                }
+
+                /** @var list<\GraphQL\Type\Definition\InterfaceType> $interfaces */
+                return $interfaces;
+            },
             'astNode' => $objectDefinition,
         ]);
     }
@@ -406,27 +402,23 @@ class TypeRegistry
      *
      * @return \Closure(): array<string, Closure(): array<string, mixed>>
      */
-    protected function makeFieldsLoader($typeDefinition): Closure
+    protected function makeFieldsLoader($typeDefinition): \Closure
     {
-        return
-            /**
-             * @return array<string, Closure(): array<string, mixed>>
-             */
-            function () use ($typeDefinition): array {
-                $fieldFactory = $this->fieldFactory();
-                $typeValue = new TypeValue($typeDefinition);
-                $fields = [];
+        return function () use ($typeDefinition): array {
+            $fieldFactory = $this->fieldFactory();
+            $typeValue = new TypeValue($typeDefinition);
+            $fields = [];
 
-                foreach ($typeDefinition->fields as $fieldDefinition) {
-                    $fields[$fieldDefinition->name->value] = static function () use ($fieldFactory, $typeValue, $fieldDefinition): array {
-                        return $fieldFactory->handle(
-                            new FieldValue($typeValue, $fieldDefinition)
-                        );
-                    };
-                }
+            foreach ($typeDefinition->fields as $fieldDefinition) {
+                $fields[$fieldDefinition->name->value] = static function () use ($fieldFactory, $typeValue, $fieldDefinition): array {
+                    return $fieldFactory->handle(
+                        new FieldValue($typeValue, $fieldDefinition)
+                    );
+                };
+            }
 
-                return $fields;
-            };
+            return $fields;
+        };
     }
 
     protected function resolveInputObjectType(InputObjectTypeDefinitionNode $inputDefinition): InputObjectType
@@ -471,6 +463,16 @@ class TypeRegistry
             'fields' => $this->makeFieldsLoader($interfaceDefinition),
             'resolveType' => $typeResolver,
             'astNode' => $interfaceDefinition,
+            'interfaces' => function () use ($interfaceDefinition): array {
+                $interfaces = [];
+
+                foreach ($interfaceDefinition->interfaces as $interface) {
+                    $interfaces[] = $this->get($interface->name->value);
+                }
+
+                /** @var list<\GraphQL\Type\Definition\InterfaceType> $interfaces */
+                return $interfaces;
+            },
         ]);
     }
 
@@ -499,7 +501,7 @@ class TypeRegistry
     /**
      * @param  array<string>  $namespaces
      */
-    protected function typeResolverFromClass(string $nodeName, array $namespaces): ?Closure
+    protected function typeResolverFromClass(string $nodeName, array $namespaces): ?\Closure
     {
         $className = Utils::namespaceClassname(
             $nodeName,
@@ -510,10 +512,11 @@ class TypeRegistry
         );
 
         if ($className) {
-            return Closure::fromCallable(
-                // @phpstan-ignore-next-line this works
-                [app($className), '__invoke']
-            );
+            $typeResolver = Container::getInstance()->make($className);
+            assert(is_object($typeResolver));
+            /** @var object $typeResolver PHPStan thinks it is *NEVER* with Laravel 9 */
+
+            return \Closure::fromCallable([$typeResolver, '__invoke']);
         }
 
         return null;
@@ -524,9 +527,9 @@ class TypeRegistry
      *
      * @param  list<string>  $possibleTypes
      *
-     * @return Closure(mixed): Type
+     * @return \Closure(mixed): Type
      */
-    protected function typeResolverFallback(array $possibleTypes): Closure
+    protected function typeResolverFallback(array $possibleTypes): \Closure
     {
         return function ($root) use ($possibleTypes): Type {
             $explicitTypename = data_get($root, '__typename');
@@ -572,23 +575,19 @@ class TypeRegistry
                 );
         }
 
-        /**
-         * @return list<\GraphQL\Type\Definition\Type>
-         */
-        $types = function () use ($unionDefinition): array {
-            $types = [];
-
-            foreach ($unionDefinition->types as $type) {
-                $types[] = $this->get($type->name->value);
-            }
-
-            return $types;
-        };
-
         return new UnionType([
             'name' => $nodeName,
             'description' => $unionDefinition->description->value ?? null,
-            'types' => $types,
+            'types' => function () use ($unionDefinition): array {
+                $types = [];
+
+                foreach ($unionDefinition->types as $type) {
+                    $types[] = $this->get($type->name->value);
+                }
+
+                /** @var list<\GraphQL\Type\Definition\ObjectType> $types */
+                return $types;
+            },
             'resolveType' => $typeResolver,
             'astNode' => $unionDefinition,
         ]);
@@ -597,7 +596,7 @@ class TypeRegistry
     protected function fieldFactory(): FieldFactory
     {
         if (! isset($this->fieldFactory)) {
-            $this->fieldFactory = app(FieldFactory::class);
+            $this->fieldFactory = Container::getInstance()->make(FieldFactory::class);
         }
 
         return $this->fieldFactory;

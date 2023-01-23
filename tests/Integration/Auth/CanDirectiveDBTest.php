@@ -4,7 +4,9 @@ namespace Tests\Integration\Auth;
 
 use Nuwave\Lighthouse\Auth\CanDirective;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
+use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\DBTestCase;
+use Tests\Utils\Models\Company;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
@@ -18,8 +20,8 @@ final class CanDirectiveDBTest extends DBTestCase
         $admin->name = UserPolicy::ADMIN;
         $this->be($admin);
 
-        /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
+        assert($user instanceof User);
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -114,13 +116,13 @@ final class CanDirectiveDBTest extends DBTestCase
                 name
             }
         }
-        ')->assertGraphQLErrorMessage(CanDirective::missingKeyToFindModel('some.path'));
+        ')->assertGraphQLError(CanDirective::missingKeyToFindModel('some.path'));
     }
 
     public function testFindUsingNestedInputWithDotNotation(): void
     {
-        /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
+        assert($user instanceof User);
         $this->be($user);
 
         $this->schema = /** @lang GraphQL */ '
@@ -164,11 +166,11 @@ final class CanDirectiveDBTest extends DBTestCase
         $admin->name = UserPolicy::ADMIN;
         $this->be($admin);
 
-        /** @var \Tests\Utils\Models\User $author */
         $author = factory(User::class)->create();
+        assert($author instanceof User);
 
-        /** @var \Tests\Utils\Models\Post $post */
         $post = factory(Post::class)->make();
+        assert($post instanceof Post);
         $post->user()->associate($author);
         $post->save();
 
@@ -205,13 +207,13 @@ final class CanDirectiveDBTest extends DBTestCase
         $admin->name = UserPolicy::ADMIN;
         $this->be($admin);
 
-        /** @var \Tests\Utils\Models\Post $postA */
         $postA = factory(Post::class)->make();
+        assert($postA instanceof Post);
         $postA->user()->associate($admin);
         $postA->save();
 
-        /** @var \Tests\Utils\Models\Post $postB */
         $postB = factory(Post::class)->make();
+        assert($postB instanceof Post);
         $postB->user()->associate($admin);
         $postB->save();
 
@@ -255,8 +257,8 @@ final class CanDirectiveDBTest extends DBTestCase
         $admin->name = UserPolicy::ADMIN;
         $this->be($admin);
 
-        /** @var \Tests\Utils\Models\Task $task */
         $task = factory(Task::class)->create();
+        assert($task instanceof Task);
         $task->delete();
 
         $this->schema = /** @lang GraphQL */ '
@@ -295,8 +297,8 @@ final class CanDirectiveDBTest extends DBTestCase
         $admin->name = UserPolicy::ADMIN;
         $this->be($admin);
 
-        /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
+        assert($user instanceof User);
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -368,13 +370,13 @@ final class CanDirectiveDBTest extends DBTestCase
         $admin->name = UserPolicy::ADMIN;
         $this->be($admin);
 
-        /** @var \Tests\Utils\Models\Post $postA */
         $postA = factory(Post::class)->make();
+        assert($postA instanceof Post);
         $postA->user()->associate($admin);
         $postA->save();
 
-        /** @var \Tests\Utils\Models\Post $postB */
         $postB = factory(Post::class)->make();
+        assert($postB instanceof Post);
         $postB->user()->associate($admin);
         $postB->save();
 
@@ -418,8 +420,8 @@ final class CanDirectiveDBTest extends DBTestCase
         $admin->name = UserPolicy::ADMIN;
         $this->be($admin);
 
-        /** @var \Tests\Utils\Models\Task $task */
         $task = factory(Task::class)->create();
+        assert($task instanceof Task);
         $task->delete();
 
         $this->schema = /** @lang GraphQL */ '
@@ -447,6 +449,138 @@ final class CanDirectiveDBTest extends DBTestCase
             'data' => [
                 'task' => [
                     'name' => $task->name,
+                ],
+            ],
+        ]);
+    }
+
+    public function testChecksAgainstResolvedModelsFromPaginator(): void
+    {
+        $user = new User();
+        $user->name = UserPolicy::ADMIN;
+        $this->be($user);
+
+        $user = factory(User::class)->create();
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            users: [User!]!
+                @can(ability: "view", resolved: true)
+                @paginate
+        }
+
+        type User {
+            name: String
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users(first: 2) {
+                data {
+                    name
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'users' => [
+                    'data' => [
+                        [
+                            'name' => $user->name,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testChecksAgainstRelation(): void
+    {
+        $user = new User();
+        $user->name = UserPolicy::ADMIN;
+        $this->be($user);
+
+        $company = factory(Company::class)->create();
+
+        $user = factory(User::class)->make();
+        assert($user instanceof User);
+        $user->company()->associate($company);
+        $user->save();
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            company: Company @first
+        }
+
+        type Company {
+            users: [User!]!
+                @can(ability: "view", resolved: true)
+                @hasMany
+        }
+
+        type User {
+            name: String
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            company {
+                users {
+                    name
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'company' => [
+                    'users' => [
+                        [
+                            'name' => $user->name,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testChecksAgainstMissingResolvedModelWithFind(): void
+    {
+        $user = new User();
+        $user->name = UserPolicy::ADMIN;
+        $this->be($user);
+
+        $user = factory(User::class)->create();
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            user(id: ID @eq): User
+                @can(ability: "view", resolved: true)
+                @find
+        }
+
+        type User {
+            name: String!
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            user(id: "not-present") {
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => null,
+            ],
+            'errors' => [
+                [
+                    'message' => AppVersion::atLeast(6.0)
+                        ? 'This action is unauthorized.'
+                        // TODO remove with Laravel < 6 support
+                        : 'You are not authorized to access user',
                 ],
             ],
         ]);

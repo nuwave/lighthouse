@@ -4,11 +4,12 @@ namespace Nuwave\Lighthouse\Pagination;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Laravel\Scout\Builder as ScoutBuilder;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -22,7 +23,7 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Query multiple model entries as a paginated list.
+Query multiple entries as a paginated list.
 """
 directive @paginate(
   """
@@ -33,14 +34,26 @@ directive @paginate(
   """
   Specify the class name of the model to use.
   This is only needed when the default model detection does not work.
+  Mutually exclusive with `builder` and `resolver`.
   """
   model: String
 
   """
   Point to a function that provides a Query Builder instance.
-  This replaces the use of a model.
+  Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
+  Mutually exclusive with `model` and `resolver`.
   """
   builder: String
+
+  """
+  Reference a function that resolves the field by directly returning data in a Paginator instance.
+  Mutually exclusive with `builder` and `model`.
+  Not compatible with `scopes` and builder arguments such as `@eq`.
+  Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
+  """
+  resolver: String
 
   """
   Apply scopes to the underlying query.
@@ -50,12 +63,14 @@ directive @paginate(
   """
   Allow clients to query paginated lists without specifying the amount of items.
   Overrules the `pagination.default_count` setting from `lighthouse.php`.
+  Setting this to `null` means clients have to explicitly ask for the count.
   """
   defaultCount: Int
 
   """
   Limit the maximum amount of items that clients can request from paginated lists.
   Overrules the `pagination.max_count` setting from `lighthouse.php`.
+  Setting this to `null` means the count is unrestricted.
   """
   maxCount: Int
 ) on FIELD_DEFINITION
@@ -64,29 +79,34 @@ directive @paginate(
 Options for the `type` argument of `@paginate`.
 """
 enum PaginateType {
-    """
-    Offset-based pagination, similar to the Laravel default.
-    """
-    PAGINATOR
+  """
+  Offset-based pagination, similar to the Laravel default.
+  """
+  PAGINATOR
 
-    """
-    Offset-based pagination like the Laravel "Simple Pagination", which does not count the total number of records.
-    """
-    SIMPLE
+  """
+  Offset-based pagination like the Laravel "Simple Pagination", which does not count the total number of records.
+  """
+  SIMPLE
 
-    """
-    Cursor-based pagination, compatible with the Relay specification.
-    """
-    CONNECTION
+  """
+  Cursor-based pagination, compatible with the Relay specification.
+  """
+  CONNECTION
 }
 GRAPHQL;
     }
 
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType): void
     {
+        $this->validateMutuallyExclusiveArguments(['model', 'builder', 'resolver']);
+
         $paginationManipulator = new PaginationManipulator($documentAST);
 
-        if ($this->directiveHasArgument('builder')) {
+        if ($this->directiveHasArgument('resolver')) {
+            // This is done only for validation
+            $this->getResolverFromArgument('resolver');
+        } elseif ($this->directiveHasArgument('builder')) {
             // This is done only for validation
             $this->getResolverFromArgument('builder');
         } else {
@@ -107,27 +127,40 @@ GRAPHQL;
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
         $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Paginator {
+            if ($this->directiveHasArgument('resolver')) {
+                $paginator = $this->getResolverFromArgument('resolver')($root, $args, $context, $resolveInfo);
+
+                assert(
+                    $paginator instanceof Paginator,
+                    "The method referenced by the resolver argument of the @{$this->name()} directive on {$this->nodeName()} must return a Paginator."
+                );
+
+                return $paginator;
+            }
+
             if ($this->directiveHasArgument('builder')) {
                 $builderResolver = $this->getResolverFromArgument('builder');
 
                 $query = $builderResolver($root, $args, $context, $resolveInfo);
+
                 assert(
-                    $query instanceof QueryBuilder || $query instanceof EloquentBuilder || $query instanceof Relation,
+                    $query instanceof QueryBuilder || $query instanceof EloquentBuilder || $query instanceof ScoutBuilder || $query instanceof Relation,
                     "The method referenced by the builder argument of the @{$this->name()} directive on {$this->nodeName()} must return a Builder or Relation."
                 );
             } else {
                 $query = $this->getModelClass()::query();
             }
 
-            $query = $resolveInfo
-                ->argumentSet
-                ->enhanceBuilder(
-                    $query,
-                    $this->directiveArgValue('scopes') ?? []
-                );
+            $query = $resolveInfo->enhanceBuilder(
+                $query,
+                $this->directiveArgValue('scopes', [])
+            );
 
-            return PaginationArgs::extractArgs($args, $this->optimalPaginationType($resolveInfo), $this->paginateMaxCount())
-                ->applyToBuilder($query);
+            $paginationArgs = PaginationArgs::extractArgs($args, $this->paginationType(), $this->paginateMaxCount());
+
+            $paginationArgs->type = $this->optimalPaginationType($resolveInfo);
+
+            return $paginationArgs->applyToBuilder($query);
         });
 
         return $fieldValue;
@@ -154,19 +187,17 @@ GRAPHQL;
     protected function paginationType(): PaginationType
     {
         return new PaginationType(
-            $this->directiveArgValue('type') ?? PaginationType::PAGINATOR
+            $this->directiveArgValue('type', PaginationType::PAGINATOR)
         );
     }
 
     protected function defaultCount(): ?int
     {
-        return $this->directiveArgValue('defaultCount')
-            ?? config('lighthouse.pagination.default_count');
+        return $this->directiveArgValue('defaultCount', config('lighthouse.pagination.default_count'));
     }
 
     protected function paginateMaxCount(): ?int
     {
-        return $this->directiveArgValue('maxCount')
-            ?? config('lighthouse.pagination.max_count');
+        return $this->directiveArgValue('maxCount', config('lighthouse.pagination.max_count'));
     }
 }

@@ -34,8 +34,6 @@ see the [Laravel docs for File Uploads](https://laravel.com/docs/filesystem#file
 The field from the previous example can be implemented like this:
 
 ```php
-<?php
-
 namespace App\GraphQL\Mutations;
 
 class Upload
@@ -62,6 +60,9 @@ class Upload
 In order to upload a file, you must send a `multipart/form-data` request.
 Use any of the [available client implementations](https://github.com/jaydenseric/graphql-multipart-request-spec#client)
 or look at the [specification examples](https://github.com/jaydenseric/graphql-multipart-request-spec#multipart-form-field-structure) to roll your own.
+
+> If you are using [the EnsureXHR middleware to protect against CSRF](../security/csrf.md),
+> add the header `X-Requested-With: XMLHttpRequest` to your request.
 
 To test the example above, prepare a file you can upload.
 

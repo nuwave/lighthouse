@@ -2,10 +2,9 @@
 
 namespace Nuwave\Lighthouse\Cache;
 
-use Closure;
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Support\Arr;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
@@ -50,7 +49,7 @@ directive @clearCache(
   Name of the field to clear.
   """
   field: String
-) on FIELD_DEFINITION
+) repeatable on FIELD_DEFINITION
 
 """
 Options for the `id` argument on `@clearCache`.
@@ -71,7 +70,7 @@ input ClearCacheIdSource {
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
     {
         $fieldValue->resultHandler(
             function ($result, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {

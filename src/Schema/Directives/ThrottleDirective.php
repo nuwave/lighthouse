@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Closure;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -69,7 +68,7 @@ directive @throttle(
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
     {
         /** @var array<int, array{key: string, maxAttempts: int, decayMinutes: float}> $limits */
         $limits = [];
@@ -101,8 +100,8 @@ GRAPHQL;
         } else {
             $limits[] = [
                 'key' => sha1($this->directiveArgValue('prefix') . $this->request->ip()),
-                'maxAttempts' => $this->directiveArgValue('maxAttempts') ?? 60,
-                'decayMinutes' => $this->directiveArgValue('decayMinutes') ?? 1.0,
+                'maxAttempts' => $this->directiveArgValue('maxAttempts', 60),
+                'decayMinutes' => $this->directiveArgValue('decayMinutes', 1.0),
             ];
         }
 
@@ -135,7 +134,7 @@ GRAPHQL;
             // @phpstan-ignore-next-line won't be executed on Laravel < 8
             $limiter = $this->limiter->limiter($name);
             // @phpstan-ignore-next-line $limiter may be null although it's not specified in limiter() PHPDoc
-            if (is_null($limiter)) {
+            if (null === $limiter) {
                 throw new DefinitionException("Named limiter {$name} is not found.");
             }
         }

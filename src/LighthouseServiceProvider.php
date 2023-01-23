@@ -2,8 +2,6 @@
 
 namespace Nuwave\Lighthouse;
 
-use Closure;
-use Exception;
 use GraphQL\Error\ClientAware;
 use GraphQL\Error\Error;
 use GraphQL\Executor\ExecutionResult;
@@ -100,9 +98,9 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->app->bind(ProvidesResolver::class, ResolverProvider::class);
         $this->app->bind(ProvidesSubscriptionResolver::class, static function (): ProvidesSubscriptionResolver {
             return new class() implements ProvidesSubscriptionResolver {
-                public function provideSubscriptionResolver(FieldValue $fieldValue): Closure
+                public function provideSubscriptionResolver(FieldValue $fieldValue): \Closure
                 {
-                    throw new Exception(
+                    throw new \Exception(
                         'Add the SubscriptionServiceProvider to your config/app.php to enable subscriptions.'
                     );
                 }
@@ -123,7 +121,7 @@ class LighthouseServiceProvider extends ServiceProvider
                 return new LumenMiddlewareAdapter();
             }
 
-            throw new Exception(
+            throw new \Exception(
                 'Could not correctly determine Laravel framework flavor, got ' . get_class($app) . '.'
             );
         });
@@ -154,7 +152,8 @@ class LighthouseServiceProvider extends ServiceProvider
         ) {
             $exceptionHandler->renderable(
                 function (ClientAware $error) {
-                    /** @var \GraphQL\Error\ClientAware&\Throwable $error Only throwables can end up in here */
+                    assert($error instanceof \Throwable);
+
                     if (! $error instanceof Error) {
                         $error = new Error(
                             $error->getMessage(),
@@ -167,8 +166,9 @@ class LighthouseServiceProvider extends ServiceProvider
                         );
                     }
 
-                    /** @var \Nuwave\Lighthouse\GraphQL $graphQL */
                     $graphQL = $this->app->make(GraphQL::class);
+                    assert($graphQL instanceof GraphQL);
+
                     $executionResult = new ExecutionResult(null, [$error]);
 
                     return new JsonResponse($graphQL->serializable($executionResult));

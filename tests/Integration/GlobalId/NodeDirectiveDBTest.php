@@ -12,19 +12,19 @@ final class NodeDirectiveDBTest extends DBTestCase
     /**
      * @var \Nuwave\Lighthouse\Support\Contracts\GlobalId
      */
-    protected $globalIdResolver;
+    private $globalIdResolver;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->globalIdResolver = app(GlobalId::class);
+        $this->globalIdResolver = $this->app->make(GlobalId::class);
     }
 
     /**
      * @var array<int, array<string, mixed>>
      */
-    protected $testTuples = [
+    private const TEST_TUPLES = [
         1 => [
             'id' => 1,
             'name' => 'foobar',
@@ -43,8 +43,8 @@ final class NodeDirectiveDBTest extends DBTestCase
         }
         ';
 
-        $firstGlobalId = $this->globalIdResolver->encode('User', $this->testTuples[1]['id']);
-        $secondGlobalId = $this->globalIdResolver->encode('User', $this->testTuples[2]['id']);
+        $firstGlobalId = $this->globalIdResolver->encode('User', self::TEST_TUPLES[1]['id']);
+        $secondGlobalId = $this->globalIdResolver->encode('User', self::TEST_TUPLES[2]['id']);
 
         $this->graphQL(/** @lang GraphQL */ "
         {
@@ -65,11 +65,11 @@ final class NodeDirectiveDBTest extends DBTestCase
             'data' => [
                 'first' => [
                     'id' => $firstGlobalId,
-                    'name' => $this->testTuples[1]['name'],
+                    'name' => self::TEST_TUPLES[1]['name'],
                 ],
                 'second' => [
                     'id' => $secondGlobalId,
-                    'name' => $this->testTuples[2]['name'],
+                    'name' => self::TEST_TUPLES[2]['name'],
                 ],
             ],
         ]);
@@ -86,7 +86,7 @@ final class NodeDirectiveDBTest extends DBTestCase
         }
         ';
 
-        $globalId = $this->globalIdResolver->encode('User', $this->testTuples[1]['id']);
+        $globalId = $this->globalIdResolver->encode('User', self::TEST_TUPLES[1]['id']);
 
         $this->graphQL(/** @lang GraphQL */ "
         {
@@ -101,7 +101,7 @@ final class NodeDirectiveDBTest extends DBTestCase
             'data' => [
                 'node' => [
                     'id' => $globalId,
-                    'name' => $this->testTuples[1]['name'],
+                    'name' => self::TEST_TUPLES[1]['name'],
                 ],
             ],
         ]);
@@ -115,7 +115,7 @@ final class NodeDirectiveDBTest extends DBTestCase
         }
         ';
 
-        $globalId = $this->globalIdResolver->encode('WrongClass', $this->testTuples[1]['id']);
+        $globalId = $this->globalIdResolver->encode('WrongClass', self::TEST_TUPLES[1]['id']);
         $this->graphQL(/** @lang GraphQL */ "
         {
             node: node(id: \"{$globalId}\") {
@@ -146,7 +146,7 @@ final class NodeDirectiveDBTest extends DBTestCase
         }
         ';
 
-        $globalId = $this->globalIdResolver->encode('User2', $this->testTuples[1]['id']);
+        $globalId = $this->globalIdResolver->encode('User2', self::TEST_TUPLES[1]['id']);
         $this->graphQL(/** @lang GraphQL */ "
         {
             node: node(id: \"{$globalId}\") {
@@ -168,9 +168,9 @@ final class NodeDirectiveDBTest extends DBTestCase
     /**
      * @return array<mixed>
      */
-    public function resolveNode(int $id): array
+    public static function resolveNode(int $id): array
     {
-        return $this->testTuples[$id];
+        return self::TEST_TUPLES[$id];
     }
 
     /**
@@ -211,7 +211,7 @@ final class NodeDirectiveDBTest extends DBTestCase
     /**
      * @return array<array<string>>
      */
-    public function modelNodeDirectiveStyles(): array
+    public static function modelNodeDirectiveStyles(): array
     {
         return [
             ['@node'],

@@ -21,7 +21,7 @@ final class DirectiveFactoryTest extends TestCase
     {
         parent::setUp();
 
-        $typeRegistry = app(TypeRegistry::class);
+        $typeRegistry = $this->app->make(TypeRegistry::class);
         $this->directiveFactory = new DirectiveFactory(
             new FallbackTypeNodeConverter($typeRegistry)
         );
@@ -51,6 +51,6 @@ final class DirectiveFactoryTest extends TestCase
         $arg = $executable->args[0];
         $this->assertSame('baz', $arg->name);
         $this->assertSame("baz\ndescription", $arg->description);
-        $this->assertSame(Type::INT, $arg->getType()->name);
+        $this->assertSame(Type::int(), $arg->getType());
     }
 }

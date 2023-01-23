@@ -9,7 +9,187 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
-- Change `key` method signature of `CacheKeyAndTags` class https://github.com/nuwave/lighthouse/pull/2176
+## v5.70.2
+
+### Fixed
+
+- Fix batch loading relations of parents that were partially cached https://github.com/nuwave/lighthouse/issues/2269
+
+## v5.70.1
+
+### Fixed
+
+- Fix batch loading a paginated BelongsToMany relation with duplicates https://github.com/nuwave/lighthouse/pull/2277
+
+## v5.70.0
+
+### Added
+
+- Allow configuring regular expression constraints for the registered route with `lighthouse.route.where`
+
+## v5.69.1
+
+### Fixed
+
+- Wrap base `ResolveInfo` class and extend it with `public ArgumentSet $argumentSet` in response to PHP 8.2 deprecating dynamic properties
+
+## v5.69.0
+
+### Added
+
+- Add argument `builder` to directive `@aggregate` https://github.com/nuwave/lighthouse/pull/2255
+
+## v5.68.1
+
+### Fixed
+
+- Avoid duplicated data in relation directives with paginator with non-unique foreign keys https://github.com/nuwave/lighthouse/pull/2252
+
+## v5.68.0
+
+### Added
+
+- Allow interfaces to implement interfaces https://github.com/nuwave/lighthouse/pull/2248
+
+### Fixed
+
+- Mark `@clearCache` directive `repeatable` https://github.com/nuwave/lighthouse/pull/2243
+
+## v5.67.0
+
+### Added
+
+- Throw on unsafe usage of `@can` directive argument `resolved` on mutations https://github.com/nuwave/lighthouse/pull/2238
+
+## v5.66.0
+
+### Added
+
+- Support returning data in a `Paginator` from option `resolver` in `@paginator` directive https://github.com/nuwave/lighthouse/pull/2232
+
+## v5.65.0
+
+### Added
+
+- Validate only one of any mutually exclusive directive arguments is defined https://github.com/nuwave/lighthouse/pull/2233
+
+## v5.64.1
+
+### Fixed
+
+- Handle unset properties in `field_middleware` directives https://github.com/nuwave/lighthouse/pull/2224
+
+## v5.64.0
+
+### Changed
+
+- Allow requests with header `X-Requested-With: XMLHttpRequest` in `EnsureXHR` middleware https://github.com/nuwave/lighthouse/pull/2221
+
+## v5.63.1
+
+### Fixed
+
+- Fix GraphQL enum names generation from column names containing symbols https://github.com/nuwave/lighthouse/pull/2219
+
+## v5.63.0
+
+### Added
+
+- Allow easily overwriting enum description generation from `bensampo/laravel-enum` https://github.com/nuwave/lighthouse/pull/2218
+
+## v5.62.0
+
+### Changed
+
+- Extract uploaded file name calculation to method in `@upload` directive https://github.com/nuwave/lighthouse/pull/2215
+
+## v5.61.0
+
+### Added
+
+- Add `@upload` directive https://github.com/nuwave/lighthouse/pull/2121
+
+## v5.60.0
+
+### Added
+
+- Allow configuring `security.disable_introspection` through the env variable `LIGHTHOUSE_SECURITY_DISABLE_INTROSPECTION` https://github.com/nuwave/lighthouse/pull/2205
+
+## v5.59.0
+
+### Added
+
+- Open `EnsureXHR` middleware for extension https://github.com/nuwave/lighthouse/pull/2202
+
+## v5.58.2
+
+### Fixed
+
+- Clean duplicate `@param` in `field_full.stub` https://github.com/nuwave/lighthouse/pull/2198
+
+## v5.58.1
+
+### Fixed
+
+- Allow pagination amount to be 0 https://github.com/nuwave/lighthouse/pull/2105
+
+## v5.58.0
+
+### Added
+
+- Add description generation to `LaravelEnumType` based on `BenSampo\Enum\Enum::getClassDescription()` https://github.com/nuwave/lighthouse/pull/2177
+
+## v5.57.6
+
+### Fixed
+
+- Fix `@convertEmptyStringsToNull` on fields and matrices https://github.com/nuwave/lighthouse/pull/2142
+
+## v5.57.5
+
+### Fixed
+
+- Fix directive option `model` on schema elements using built-in types https://github.com/nuwave/lighthouse/pull/2196
+
+## v5.57.4
+
+### Fixed
+
+- Respect explicit `maxCount: null` or `defaultCount: null` in pagination directives over config `lighthouse.pagination` https://github.com/nuwave/lighthouse/pull/2193
+
+## v5.57.3
+
+### Fixed
+
+- Fix cursor pagination always returning the first page when no fields from the `pageInfo` are requested https://github.com/nuwave/lighthouse/pull/2190
+
+## v5.57.2
+
+### Fixed
+
+- Allow returning `Laravel\Scout\Builder` from custom `builder` in `@all` and `@paginate` https://github.com/nuwave/lighthouse/pull/2183
+
+## v5.57.1
+
+### Fixed
+
+- Handle missing models in `@can` with option `resolved` https://github.com/nuwave/lighthouse/pull/2187
+
+## v5.57.0
+
+### Added
+
+- Allow checking policies against resolved models in `@can` https://github.com/nuwave/lighthouse/pull/2159
+
+### Fixed
+
+- Fix static analysis error in testing traits https://github.com/nuwave/lighthouse/pull/2180
+
+## v5.56.0
+
+### Added
+
+- Implement `@hasManyThrough` directive https://github.com/nuwave/lighthouse/pull/2178
 
 ## v5.55.1
 

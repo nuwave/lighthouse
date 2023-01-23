@@ -6,7 +6,6 @@ use GraphQL\Utils\SchemaPrinter;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\Types\LaravelEnumType;
 use PHPUnit\Framework\Constraint\Callback;
-use stdClass;
 use Tests\TestCase;
 use Tests\Utils\LaravelEnums\AOrB;
 use Tests\Utils\LaravelEnums\LocalizedUserType;
@@ -34,18 +33,38 @@ final class LaravelEnumTypeTest extends TestCase
         $this->assertSame($customName, $enumType->name);
     }
 
-    public function testCustomDescription(): void
+    public function testEnumDescription(): void
     {
         $enumType = new LaravelEnumType(LocalizedUserType::class);
 
-        $this->assertSame('Localize Moderator', $enumType->config['values']['Moderator']['description']);
+        // TODO remove check when requiring bensampo/laravel-enum:6
+        // @phpstan-ignore-next-line depends on the required version
+        if (method_exists(LocalizedUserType::class, 'getClassDescription')) {
+            $this->assertSame('Localized user type', $enumType->config['description']);
+        } else {
+            $this->assertNull($enumType->config['description']);
+        }
+    }
+
+    public function testCustomDescription(): void
+    {
+        $enumType = new LaravelEnumType(LocalizedUserType::class);
+        $values = $enumType->config['values'];
+
+        $this->assertIsArray($values);
+        $this->assertArrayHasKey('Moderator', $values);
+        $this->assertSame('Localize Moderator', $values['Moderator']['description']);
     }
 
     public function testDeprecated(): void
     {
         $enumType = new LaravelEnumType(PartiallyDeprecated::class);
 
-        $this->assertSame(/** @lang GraphQL */ <<<GRAPHQL
+        // TODO remove check when requiring bensampo/laravel-enum:6
+        // @phpstan-ignore-next-line depends on the required version
+        if (method_exists(LocalizedUserType::class, 'getClassDescription')) {
+            $this->assertSame(/** @lang GraphQL */ <<<GRAPHQL
+"""Partially deprecated"""
 enum PartiallyDeprecated {
   """Not"""
   NOT
@@ -57,9 +76,26 @@ enum PartiallyDeprecated {
   DEPRECATED_WITH_REASON @deprecated(reason: "some reason")
 }
 GRAPHQL
-            ,
-            SchemaPrinter::printType($enumType)
-        );
+                ,
+                SchemaPrinter::printType($enumType)
+            );
+        } else {
+            $this->assertSame(/** @lang GraphQL */ <<<GRAPHQL
+enum PartiallyDeprecated {
+  """Not"""
+  NOT
+
+  """Deprecated"""
+  DEPRECATED @deprecated
+
+  """Deprecated with reason"""
+  DEPRECATED_WITH_REASON @deprecated(reason: "some reason")
+}
+GRAPHQL
+                ,
+                SchemaPrinter::printType($enumType)
+            );
+        }
     }
 
     public function testReceivesEnumInstanceInternally(): void
@@ -96,9 +132,20 @@ GRAPHQL
 
     public function testClassMustExtendBenSampoEnumEnum(): void
     {
-        $notBenSampoEnumEnum = stdClass::class;
+        $notBenSampoEnumEnum = \stdClass::class;
         $this->expectExceptionObject(LaravelEnumType::classMustExtendBenSampoEnumEnum($notBenSampoEnumEnum));
         // @phpstan-ignore-next-line intentionally wrong
         new LaravelEnumType($notBenSampoEnumEnum);
+    }
+
+    public function testEnumMustHaveKey(): void
+    {
+        $enumType = new LaravelEnumType(AOrB::class);
+
+        $aWithoutKey = AOrB::A();
+        $aWithoutKey->key = null;
+
+        $this->expectExceptionObject(LaravelEnumType::enumMustHaveKey($aWithoutKey));
+        $enumType->serialize($aWithoutKey);
     }
 }

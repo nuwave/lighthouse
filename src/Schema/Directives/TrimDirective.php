@@ -2,9 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Closure;
-use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgSanitizerDirective;
@@ -33,7 +32,7 @@ GRAPHQL;
      */
     public function sanitize($argumentValue)
     {
-        return Utils::applyEach(
+        return Utils::mapEach(
             function ($value) {
                 return $value instanceof ArgumentSet
                     ? $this->transformArgumentSet($value)
@@ -43,7 +42,7 @@ GRAPHQL;
         );
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
     {
         $resolver = $fieldValue->getResolver();
 

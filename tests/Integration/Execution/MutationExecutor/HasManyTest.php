@@ -314,7 +314,7 @@ final class HasManyTest extends DBTestCase
     /**
      * @return array<array<string, string>>
      */
-    public function existingModelMutations(): array
+    public static function existingModelMutations(): array
     {
         return [
             ['Update action' => 'update'],
@@ -331,7 +331,7 @@ final class HasManyTest extends DBTestCase
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            ${action}User(input: {
+            {$action}User(input: {
                 id: 1
                 name: "foo"
                 tasks: {
@@ -351,7 +351,7 @@ final class HasManyTest extends DBTestCase
 GRAPHQL
         )->assertJson([
             'data' => [
-                "${action}User" => [
+                "{$action}User" => [
                     'id' => '1',
                     'name' => 'foo',
                     'tasks' => [
@@ -380,7 +380,7 @@ GRAPHQL
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            ${action}User(input: {
+            {$action}User(input: {
                 id: 1
                 name: "foo"
                 tasks: {
@@ -401,8 +401,8 @@ GRAPHQL
 GRAPHQL
         )->assertJson([
             'data' => [
-                "${action}User" => [
-                    'id' => "$user->id",
+                "{$action}User" => [
+                    'id' => "{$user->id}",
                     'name' => 'foo',
                     'tasks' => [
                         [
@@ -430,7 +430,7 @@ GRAPHQL
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            ${action}User(input: {
+            {$action}User(input: {
                 id: 1
                 name: "foo"
                 tasks: {
@@ -451,8 +451,8 @@ GRAPHQL
 GRAPHQL
         )->assertJson([
             'data' => [
-                "${action}User" => [
-                    'id' => "$user->id",
+                "{$action}User" => [
+                    'id' => "{$user->id}",
                     'name' => 'foo',
                     'tasks' => [
                         [
@@ -480,7 +480,7 @@ GRAPHQL
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            ${action}User(input: {
+            {$action}User(input: {
                 id: 1
                 name: "foo"
                 tasks: {
@@ -498,8 +498,8 @@ GRAPHQL
 GRAPHQL
         )->assertJson([
             'data' => [
-                "${action}User" => [
-                    'id' => "$user->id",
+                "{$action}User" => [
+                    'id' => "{$user->id}",
                     'name' => 'foo',
                     'tasks' => [],
                 ],
@@ -522,7 +522,7 @@ GRAPHQL
 
         $this->graphQL(/** @lang GraphQL */ "
             mutation (\$input: {$actionInputName}UserInput!) {
-                ${action}User(input: \$input) {
+                {$action}User(input: \$input) {
                     id
                     name
                     tasks {
@@ -546,16 +546,16 @@ GRAPHQL
             ]
         )->assertJson([
             'data' => [
-                "${action}User" => [
-                    'id' => "$user->id",
+                "{$action}User" => [
+                    'id' => "{$user->id}",
                     'name' => 'foo',
                     'tasks' => [
                         [
-                            'id' => "$task1->id",
+                            'id' => "{$task1->id}",
                             'name' => $task1->name,
                         ],
                         [
-                            'id' => "$task2->id",
+                            'id' => "{$task2->id}",
                             'name' => $task2->name,
                         ],
                     ],
@@ -585,7 +585,7 @@ GRAPHQL
 
         $this->graphQL(/** @lang GraphQL */ "
             mutation (\$input: {$actionInputName}UserInput!) {
-                ${action}User(input: \$input) {
+                {$action}User(input: \$input) {
                     id
                     name
                     tasks {
@@ -606,12 +606,12 @@ GRAPHQL
             ],
         ])->assertJson([
             'data' => [
-                "${action}User" => [
-                    'id' => "$user->id",
+                "{$action}User" => [
+                    'id' => "{$user->id}",
                     'name' => 'foo',
                     'tasks' => [
                         [
-                            'id' => "$taskKeep->id",
+                            'id' => "{$taskKeep->id}",
                             'name' => $taskKeep->name,
                         ],
                     ],

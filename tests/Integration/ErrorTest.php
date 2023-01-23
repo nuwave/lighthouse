@@ -2,7 +2,6 @@
 
 namespace Tests\Integration;
 
-use Exception;
 use GraphQL\Error\DebugFlag;
 use GraphQL\Error\Error;
 use GraphQL\Error\FormattedError;
@@ -106,7 +105,7 @@ final class ErrorTest extends TestCase
         $config->set('lighthouse.debug', DebugFlag::INCLUDE_DEBUG_MESSAGE);
 
         $this->mockResolver()
-            ->willThrowException(new Exception('foo'));
+            ->willThrowException(new \Exception('foo'));
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -125,7 +124,7 @@ final class ErrorTest extends TestCase
 
         $config->set('lighthouse.debug', DebugFlag::RETHROW_INTERNAL_EXCEPTIONS);
 
-        $this->expectException(Exception::class);
+        $this->expectException(\Exception::class);
         $this->graphQL(/** @lang GraphQL */ '
         {
             foo
@@ -166,7 +165,7 @@ final class ErrorTest extends TestCase
         $message = 'foo';
 
         $this->mockResolver()
-            ->willThrowException(new Exception($message));
+            ->willThrowException(new \Exception($message));
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -215,7 +214,7 @@ final class ErrorTest extends TestCase
         assert($config instanceof ConfigRepository);
         $config->set('lighthouse.debug', DebugFlag::INCLUDE_DEBUG_MESSAGE);
 
-        $exception = new Exception('foo');
+        $exception = new \Exception('foo');
 
         $this->mockResolver()
             ->willThrowException($exception);

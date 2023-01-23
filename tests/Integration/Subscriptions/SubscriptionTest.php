@@ -3,7 +3,10 @@
 namespace Tests\Integration\Subscriptions;
 
 use Illuminate\Auth\SessionGuard;
+use Illuminate\Contracts\Auth\Factory as AuthFactory;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Arr;
+use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
 use Nuwave\Lighthouse\Subscriptions\Storage\CacheStorageManager;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
@@ -52,7 +55,11 @@ GRAPHQL;
     public function testSendsSubscriptionChannelInResponse(): void
     {
         $response = $this->subscribe();
-        $subscriber = app(CacheStorageManager::class)->subscribersByTopic('ON_POST_CREATED')->first();
+
+        $cache = $this->app->make(CacheStorageManager::class);
+        assert($cache instanceof CacheStorageManager);
+
+        $subscriber = $cache->subscribersByTopic('ON_POST_CREATED')->first();
 
         $this->assertInstanceOf(Subscriber::class, $subscriber);
         $response->assertExactJson(
@@ -83,7 +90,10 @@ GRAPHQL;
             ],
         ]);
 
-        $subscribers = app(CacheStorageManager::class)->subscribersByTopic('ON_POST_CREATED');
+        $cache = $this->app->make(CacheStorageManager::class);
+        assert($cache instanceof CacheStorageManager);
+
+        $subscribers = $cache->subscribersByTopic('ON_POST_CREATED');
         $this->assertCount(2, $subscribers);
 
         $response->assertExactJson([
@@ -103,8 +113,12 @@ GRAPHQL;
         }
         ');
 
-        /** @var \Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster $log */
-        $log = app(BroadcastManager::class)->driver();
+        $broadcastManager = $this->app->make(BroadcastManager::class);
+        assert($broadcastManager instanceof BroadcastManager);
+
+        $log = $broadcastManager->driver();
+        assert($log instanceof LogBroadcaster);
+
         $broadcasts = $log->broadcasts();
 
         $this->assertNotNull($broadcasts);
@@ -151,8 +165,9 @@ GRAPHQL;
 
     public function testWithoutExcludeEmpty(): void
     {
-        /** @var \Illuminate\Contracts\Config\Repository $config */
-        $config = $this->app->make('config');
+        $config = $this->app->make(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
+
         $config->set('lighthouse.subscriptions.exclude_empty', false);
         $config->set('lighthouse.subscriptions.version', 2);
 
@@ -179,8 +194,9 @@ GRAPHQL;
 
     public function testWithExcludeEmpty(): void
     {
-        /** @var \Illuminate\Contracts\Config\Repository $config */
-        $config = $this->app->make('config');
+        $config = $this->app->make(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
+
         $config->set('lighthouse.subscriptions.exclude_empty', true);
         $config->set('lighthouse.subscriptions.version', 2);
 
@@ -210,8 +226,11 @@ GRAPHQL;
             }
         ');
 
-        /** @var SessionGuard $sessionGuard */
-        $sessionGuard = $this->app->make('auth')->guard();
+        $authFactory = $this->app->make(AuthFactory::class);
+        assert($authFactory instanceof AuthFactory);
+
+        $sessionGuard = $authFactory->guard();
+        assert($sessionGuard instanceof SessionGuard);
         $sessionGuard->logout();
 
         $this->graphQL(/** @lang GraphQL */ '
@@ -222,8 +241,12 @@ GRAPHQL;
         }
         ');
 
-        /** @var \Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster $log */
-        $log = app(BroadcastManager::class)->driver();
+        $broadcastManager = $this->app->make(BroadcastManager::class);
+        assert($broadcastManager instanceof BroadcastManager);
+
+        $log = $broadcastManager->driver();
+        assert($log instanceof LogBroadcaster);
+
         $broadcasts = $log->broadcasts();
 
         $this->assertIsArray($broadcasts);

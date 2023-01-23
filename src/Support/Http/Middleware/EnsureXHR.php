@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Support\Http\Middleware;
 
-use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -27,7 +26,7 @@ class EnsureXHR
     /**
      * @return \Symfony\Component\HttpFoundation\Response|\Illuminate\Http\JsonResponse
      */
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, \Closure $next)
     {
         $method = $request->getRealMethod();
 
@@ -39,17 +38,23 @@ class EnsureXHR
             return $next($request);
         }
 
+        if ('XMLHttpRequest' === $request->header('X-Requested-With', '')) {
+            return $next($request);
+        }
+
         $contentType = $request->header('content-type', '');
+        // @phpstan-ignore-next-line wrongly assumes $contentType to always be string
         if (is_array($contentType)) {
             $contentType = $contentType[0];
         }
 
+        // @phpstan-ignore-next-line wrongly assumes $contentType to always be string
         if (null === $contentType || '' === $contentType) {
             throw new BadRequestHttpException('Content-Type header must be set');
         }
 
-        if (Str::startsWith($contentType, self::FORM_CONTENT_TYPES)) {
-            throw new BadRequestHttpException("Content-Type $contentType is forbidden");
+        if (Str::startsWith($contentType, static::FORM_CONTENT_TYPES)) {
+            throw new BadRequestHttpException("Content-Type {$contentType} is forbidden");
         }
 
         return $next($request);

@@ -165,13 +165,10 @@ Not every application has them enabled - Lumen does not use Facades by default.
 
 Prefer direct usage of Illuminate classes instead of helpers.
 
-```php
-// Correct usage
-use \Illuminate\Support\Arr;
-Arr::get($foo, 'bar');
-
-// Wrong usage
-array_get($foo, 'bar');
+```diff
+-array_get($foo, 'bar');
++use \Illuminate\Support\Arr;
++Arr::get($foo, 'bar');
 ```
 
 A notable exception is the `response()` helper - using DI for injecting a
@@ -211,8 +208,6 @@ differentiate between cases where you return the original object instance and
 other cases where you instantiate a new class.
 
 ```php
-<?php
-
 class Foo
 {
     /**
@@ -273,7 +268,7 @@ function bar(){
 
 ## Code style
 
-We format the code automatically with [php-cs-fixer](https://github.com/friendsofphp/php-cs-fixer)
+We format the code automatically with [php-cs-fixer](https://github.com/friendsofphp/php-cs-fixer).
 
     make fix
 
@@ -313,8 +308,6 @@ When used in the actual source code, classes must always be imported at the top.
 Class references in PHPDoc must use the full namespace.
 
 ```php
-<?php
-
 use Illuminate\Database\Eloquent\Model;
 
 class Foo

@@ -180,7 +180,7 @@ final class MorphToTest extends DBTestCase
     /**
      * @return array<array<string, string>>
      */
-    public function existingModelMutations(): array
+    public static function existingModelMutations(): array
     {
         return [
             ['Update action' => 'update'],
@@ -201,7 +201,7 @@ final class MorphToTest extends DBTestCase
         $image->url = 'bar';
         $image->save();
 
-        $field = "${action}Image";
+        $field = "{$action}Image";
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
             {$field}(input: {
@@ -242,7 +242,7 @@ GRAPHQL
         $image->url = 'bar';
         $image->save();
 
-        $field = "${action}Image";
+        $field = "{$action}Image";
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
             {$field}(input: {

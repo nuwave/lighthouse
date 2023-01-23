@@ -2,8 +2,6 @@
 
 namespace Nuwave\Lighthouse\Subscriptions\Iterators;
 
-use Closure;
-use Exception;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Collection;
@@ -32,7 +30,7 @@ class AuthenticatingSyncIterator implements SubscriptionIterator
         $this->authFactory = $authFactory;
     }
 
-    public function process(Collection $subscribers, Closure $handleSubscriber, Closure $handleError = null): void
+    public function process(Collection $subscribers, \Closure $handleSubscriber, \Closure $handleError = null): void
     {
         // Store the previous default guard name so we can restore it after we're done
         $previousGuardName = $this->configRepository->get('auth.defaults.guard');
@@ -46,8 +44,8 @@ class AuthenticatingSyncIterator implements SubscriptionIterator
         // Set our subscription guard as the default guard for the application
         $this->authFactory->shouldUse(SubscriptionGuard::GUARD_NAME);
 
-        /** @var \Nuwave\Lighthouse\Subscriptions\SubscriptionGuard $guard */
         $guard = $this->authFactory->guard(SubscriptionGuard::GUARD_NAME);
+        assert($guard instanceof SubscriptionGuard);
 
         try {
             $subscribers->each(static function (Subscriber $item) use ($handleSubscriber, $handleError, $guard): void {
@@ -59,7 +57,7 @@ class AuthenticatingSyncIterator implements SubscriptionIterator
 
                 try {
                     $handleSubscriber($item);
-                } catch (Exception $e) {
+                } catch (\Exception $e) {
                     if (null === $handleError) {
                         throw $e;
                     }

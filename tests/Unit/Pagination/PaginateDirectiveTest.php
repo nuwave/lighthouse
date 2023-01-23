@@ -6,6 +6,7 @@ use GraphQL\Type\Definition\FieldArgument;
 use GraphQL\Type\Definition\FieldDefinition;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Utils\SchemaPrinter;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Nuwave\Lighthouse\Pagination\PaginationType;
@@ -15,7 +16,7 @@ final class PaginateDirectiveTest extends TestCase
 {
     public function testIncludesPaginationInfoObjectsInSchema(): void
     {
-        $schema = $this->buildSchemaWithPlaceholderQuery();
+        $schema = $this->buildSchemaWithPlaceholderQuery('');
         $schemaString = SchemaPrinter::doPrint($schema);
 
         $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
@@ -554,10 +555,35 @@ GRAPHQL
         );
     }
 
-    /**
-     * @dataProvider nonNullPaginationResults
-     */
-    public function testThrowsWhenPaginationWithCountZeroIsRequested(bool $nonNullPaginationResults): void
+    public function testCountExplicitlyRequiredFromDirective(): void
+    {
+        config(['lighthouse.pagination.default_count' => 2]);
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID!
+            name: String!
+        }
+
+        type Query {
+            users: [User!] @paginate(defaultCount: null)
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                users {
+                    data {
+                        id
+                    }
+                }
+            }
+            ')
+            ->assertGraphQLErrorMessage('Field "users" argument "first" of type "Int!" is required but not provided.');
+    }
+
+    public function testThrowsWhenPaginationWithNegativeCountIsRequested(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -570,25 +596,17 @@ GRAPHQL
         }
         ';
 
-        $result = $this
+        $this
             ->graphQL(/** @lang GraphQL */ '
             {
-                users(first: 0) {
+                users(first: -1) {
                     data {
                         id
                     }
                 }
             }
             ')
-            ->assertGraphQLErrorMessage(PaginationArgs::requestedZeroOrLessItems(0));
-
-        if (! $nonNullPaginationResults) {
-            $result->assertJson([
-                'data' => [
-                    'users' => null,
-                ],
-            ]);
-        }
+            ->assertGraphQLErrorMessage(PaginationArgs::requestedLessThanZeroItems(-1));
     }
 
     /**
@@ -678,5 +696,61 @@ GRAPHQL
             }
         }
         ')->dump();
+    }
+
+    public function returnPaginatedDataInsteadOfBuilder(): LengthAwarePaginator
+    {
+        return new LengthAwarePaginator([
+            [
+                'id' => 1,
+            ],
+            [
+                'id' => 2,
+            ],
+        ], 2, 15);
+    }
+
+    public function testPaginatorResolver(): void
+    {
+        $this->buildSchema(/* @lang GraphQL */ "
+        type Query {
+            users: [User] @paginate(resolver: \"{$this->qualifyTestResolver('returnPaginatedDataInsteadOfBuilder')}\")
+        }
+
+        type User {
+            id: ID
+        }
+        ");
+
+        $this->graphQL(/* @lang GraphQL */ '
+        {
+            users(first: 0) {
+                data {
+                    id
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'users' => [
+                    'data' => [
+                        ['id' => 1],
+                        ['id' => 2],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testThrowsIfResolverIsNotPresent(): void
+    {
+        $this->expectException(DefinitionException::class);
+        $this->expectExceptionMessage('Failed to find class NonexistingClass in namespaces [] for directive @paginate.');
+
+        $this->buildSchema(/** @lang GraphQL */ '
+        type Query {
+            users: [Query!]! @paginate(resolver: "NonexistingClass@notFound")
+        }
+        ');
     }
 }

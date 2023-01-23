@@ -59,8 +59,8 @@ final class MakesGraphQLRequestsTest extends TestCase
     {
         /** @var \Illuminate\Http\Request|null $request */
         $request = null;
-        $this->mockResolver(static function () use (&$request): void {
-            $request = app(Request::class);
+        $this->mockResolver(function () use (&$request): void {
+            $request = $this->app->make(Request::class);
         });
 
         $this->schema = /** @lang GraphQL */ '

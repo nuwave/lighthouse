@@ -2,13 +2,14 @@
 
 namespace Nuwave\Lighthouse\Federation;
 
-use Closure;
 use GraphQL\Error\Error;
+use GraphQL\Language\AST\FieldNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\SelectionSetNode;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
@@ -163,7 +164,7 @@ class EntityResolverProvider
     /**
      * @return SingleEntityResolverFn|null
      */
-    protected function resolverFromModel(string $typeName): ?Closure
+    protected function resolverFromModel(string $typeName): ?\Closure
     {
         $definition = $this->typeDefinition($typeName);
 
@@ -184,8 +185,9 @@ class EntityResolverProvider
         $keyFieldsSelections = $this->keyFieldsSelections($definition);
 
         return function (array $representation) use ($keyFieldsSelections, $modelClass): ?Model {
-            /** @var \Illuminate\Database\Eloquent\Builder $builder */
             $builder = $modelClass::query();
+            assert($builder instanceof Builder);
+
             $this->constrainKeys($builder, $keyFieldsSelections, $representation);
 
             $results = $builder->get();
@@ -201,7 +203,7 @@ class EntityResolverProvider
      * @param  \Illuminate\Support\Collection<\GraphQL\Language\AST\SelectionSetNode>  $keyFieldsSelections
      * @param  array<string, mixed>  $representation
      */
-    protected function constrainKeys(Builder $builder, Collection $keyFieldsSelections, array $representation): void
+    protected function constrainKeys(EloquentBuilder $builder, Collection $keyFieldsSelections, array $representation): void
     {
         $this->applySatisfiedSelection(
             $builder,
@@ -215,14 +217,10 @@ class EntityResolverProvider
      */
     protected function satisfiesKeyFields(SelectionSetNode $keyFields, array $representation): bool
     {
-        /**
-         * Fragments or spreads are not allowed in key fields.
-         *
-         * @see \Nuwave\Lighthouse\Federation\SchemaValidator
-         *
-         * @var \GraphQL\Language\AST\FieldNode $field
-         */
         foreach ($keyFields->selections as $field) {
+            /** @see \Nuwave\Lighthouse\Federation\SchemaValidator */
+            assert($field instanceof FieldNode, 'Fragments or spreads are not allowed in key fields');
+
             $fieldName = $field->name->value;
             $value = $representation[$fieldName] ?? null;
             if (null === $value) {
@@ -248,14 +246,12 @@ class EntityResolverProvider
     /**
      * @param  array<string, mixed>  $representation
      */
-    protected function applySatisfiedSelection(Builder $builder, SelectionSetNode $keyFields, array $representation): void
+    protected function applySatisfiedSelection(EloquentBuilder $builder, SelectionSetNode $keyFields, array $representation): void
     {
-        /**
-         * Fragments or spreads are not allowed in key fields.
-         *
-         * @var \GraphQL\Language\AST\FieldNode $field
-         */
         foreach ($keyFields->selections as $field) {
+            /** @see \Nuwave\Lighthouse\Federation\SchemaValidator */
+            assert($field instanceof FieldNode, 'Fragments or spreads are not allowed in key fields');
+
             $fieldName = $field->name->value;
             $value = $representation[$fieldName];
 

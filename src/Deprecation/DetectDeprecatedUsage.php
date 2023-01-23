@@ -7,6 +7,7 @@ use GraphQL\Language\AST\FieldNode;
 use GraphQL\Language\AST\NodeKind;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\EnumValueDefinition;
+use GraphQL\Type\Definition\NamedType;
 use GraphQL\Validator\DocumentValidator;
 use GraphQL\Validator\Rules\ValidationRule;
 use GraphQL\Validator\ValidationContext;
@@ -57,7 +58,7 @@ class DetectDeprecatedUsage extends ValidationRule
                 $deprecationReason = $field->deprecationReason;
                 if (null !== $deprecationReason) {
                     $parent = $context->getParentType();
-                    if (null === $parent) {
+                    if (! $parent instanceof NamedType) {
                         return;
                     }
 

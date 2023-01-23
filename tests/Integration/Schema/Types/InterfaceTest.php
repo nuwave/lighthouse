@@ -3,6 +3,7 @@
 namespace Tests\Integration\Schema\Types;
 
 use GraphQL\Type\Definition\Type;
+use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
@@ -295,7 +296,7 @@ GRAPHQL;
     /**
      * @return \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\User|\Tests\Utils\Models\Team>
      */
-    public function fetchResults(): EloquentCollection
+    public static function fetchResults(): EloquentCollection
     {
         /** @var \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\User|\Tests\Utils\Models\Team> $results */
         $results = new EloquentCollection();
@@ -305,15 +306,18 @@ GRAPHQL;
             ->concat(Team::all());
     }
 
-    public function resolveType(): Type
+    public static function resolveType(): Type
     {
-        return app(TypeRegistry::class)->get('Guy');
+        $typeRegistry = Container::getInstance()->make(TypeRegistry::class);
+        assert($typeRegistry instanceof TypeRegistry);
+
+        return $typeRegistry->get('Guy');
     }
 
     /**
      * @return array<string, string>
      */
-    public function fetchGuy(): array
+    public static function fetchGuy(): array
     {
         return [
             'name' => 'bar',

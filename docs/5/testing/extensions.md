@@ -36,6 +36,8 @@ class MyCustomDirectiveTest extends TestCase
 }
 ```
 
+> `UsesTestSchema` does not work with `RefreshesSchemaCache`, choose one.
+
 ## Mock resolvers
 
 When testing custom functionality through a dummy schema, you still need to have
@@ -44,8 +46,6 @@ a way to resolve fields. Lighthouse provides a simple way to mock resolvers in a
 Add the `MocksResolvers` trait to your test class:
 
 ```php
-<?php
-
 namespace Tests;
 
 use Nuwave\Lighthouse\Testing\MocksResolvers;

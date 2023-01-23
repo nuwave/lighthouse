@@ -134,8 +134,6 @@ to the database and return that instance to Lighthouse.
 A simplified, generic implementation of an appropriate field resolver would look something like this:
 
 ```php
-<?php
-
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Illuminate\Database\Eloquent\Model;
@@ -174,8 +172,6 @@ and create and attach a related `Note` model.
 We can extend our previous implementation of [@create](../api-reference/directives.md#create) by allowing it to be used as an `ArgResolver`:
 
 ```php
-<?php
-
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
