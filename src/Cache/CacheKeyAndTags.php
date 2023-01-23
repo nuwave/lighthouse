@@ -11,7 +11,7 @@ interface CacheKeyAndTags
      *
      * @param  int|string|null $id
      * @param  array<string, mixed> $args
-     * @param  array<int, string> $path
+     * @param  array<int, string|int> $path
      */
     public function key(?Authenticatable $user, bool $isPrivate, string $parentName, $id, string $fieldName, array $args, array $path): string;
 
