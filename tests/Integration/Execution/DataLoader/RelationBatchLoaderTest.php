@@ -577,7 +577,7 @@ final class RelationBatchLoaderTest extends DBTestCase
         $this->assertSame(3, $queryCount);
     }
 
-    public function testBatchLoaderFailsWithExpiredCacheEntry(): void
+    public function testBatchLoaderWithExpiredCacheEntry(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
