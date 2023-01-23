@@ -24,7 +24,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove error extension field `category`
 - Remove interface `Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions`
 - Remove `Nuwave\Lighthouse\Execution\ExtensionErrorHandler`
-- Remove support for PHP 7.2, 7.3
+- Remove support for PHP 7.2, 7.3, 7.4
 - Remove support for Laravel 5, 6, 7
 - Remove `Serializable` implementation
 - Remove trait `ClearsSchemaCache`
