@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.70.2
+
+### Fixed
+
+- Fix batch loading relations of parents that were partially cached https://github.com/nuwave/lighthouse/issues/2269
+
 ## v5.70.1
 
 ### Fixed
