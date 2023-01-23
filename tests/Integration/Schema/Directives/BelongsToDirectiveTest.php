@@ -179,6 +179,10 @@ final class BelongsToDirectiveTest extends DBTestCase
         }
         ';
 
+        $products = $products
+                        ->sortBy(function ($product) {return $product->barcode; })
+                        ->values();
+
         $this->graphQL(/** @lang GraphQL */ '
         {
             products(first: 2) {

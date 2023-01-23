@@ -265,6 +265,45 @@ GRAPHQL;
         ]);
     }
 
+    public function testPaginateOptimizedSelect(): void
+    {
+        factory(User::class, 2)->create();
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID!
+        }
+
+        type Query {
+            users: [User!]! @paginate
+        }
+        ';
+
+        self::trackQueries();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users(first: 1) {
+                paginatorInfo {
+                    count
+                    total
+                    currentPage
+                }
+                data {
+                    id
+                }
+            }
+        }
+        ')->assertJsonCount(1, 'data.users.data');
+
+        $queries = self::getQueriesExecuted();
+
+        $this->assertStringContainsString(
+            'select `id` from `users`',
+            $queries[1]['query']
+        );
+    }
+
     public static function builder(): EloquentBuilder
     {
         return User::orderBy('id', 'DESC');

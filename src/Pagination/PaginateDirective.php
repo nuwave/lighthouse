@@ -2,17 +2,20 @@
 
 namespace Nuwave\Lighthouse\Pagination;
 
+use GraphQL\Error\Error;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Support\Arr;
 use Laravel\Scout\Builder as ScoutBuilder;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Select\SelectHelper;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -155,6 +158,45 @@ GRAPHQL;
                 $query,
                 $this->directiveArgValue('scopes', [])
             );
+
+            if (config('lighthouse.optimized_selects')) {
+                if ($query instanceof EloquentBuilder) {
+                    $fieldSelection = $resolveInfo->getFieldSelection(2);
+
+                    if (($hasData = Arr::has($fieldSelection, 'data')) || Arr::has($fieldSelection, 'edges')) {
+                        $data = $hasData
+                            ? $fieldSelection['data']
+                            : $fieldSelection['edges']['node'];
+
+                        /** @var array<int, string> $fieldSelection */
+                        $fieldSelection = array_keys($data);
+
+                        $model = $query->getModel();
+
+                        $selectColumns = SelectHelper::getSelectColumns(
+                            $this->definitionNode,
+                            $fieldSelection,
+                            get_class($model)
+                        );
+
+                        if (empty($selectColumns)) {
+                            throw new Error('The select column is empty.');
+                        }
+
+                        $query = $query->select($selectColumns);
+
+                        /** @var string|string[] $keyName */
+                        $keyName = $model->getKeyName();
+                        if (is_string($keyName)) {
+                            $keyName = [$keyName];
+                        }
+
+                        foreach ($keyName as $name) {
+                            $query->orderBy($name);
+                        }
+                    }
+                }
+            }
 
             $paginationArgs = PaginationArgs::extractArgs($args, $this->paginationType(), $this->paginateMaxCount());
 

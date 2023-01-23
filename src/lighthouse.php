@@ -357,6 +357,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Optimized Selects
+    |--------------------------------------------------------------------------
+    |
+    | If set to true, Eloquent will only select the columns necessary to resolve a query.
+    | Use the @select directive to specify column dependencies of compound fields.
+    |
+    */
+
+    'optimized_selects' => false,
+
+    /*
+    |--------------------------------------------------------------------------
     | Shortcut Foreign Key Selection
     |--------------------------------------------------------------------------
     |

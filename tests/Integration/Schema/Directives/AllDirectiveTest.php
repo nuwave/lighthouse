@@ -302,6 +302,52 @@ GRAPHQL;
         ]);
     }
 
+    public function testGetAllOptimizedSelect(): void
+    {
+        factory(Post::class, 2)->create([
+            // Do not create those, as they would create more users
+            'task_id' => 1,
+        ]);
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            posts: [Post!]! @all
+        }
+
+        type Post {
+            id: ID!
+        }
+
+        type Query {
+            users: [User!]! @all
+        }
+        ';
+
+        self::trackQueries();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users {
+                posts {
+                    id
+                }
+            }
+        }
+        ');
+
+        $queries = self::getQueriesExecuted();
+
+        $this->assertStringContainsString(
+            'select `id` from `posts`',
+            $queries[1]['query']
+        );
+
+        $this->assertStringContainsString(
+            'select `id` from `posts`',
+            $queries[2]['query']
+        );
+    }
+
     public static function builder(): EloquentBuilder
     {
         return User::orderBy('id', 'DESC');

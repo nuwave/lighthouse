@@ -2,16 +2,19 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use GraphQL\Error\Error;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Collection;
 use Laravel\Scout\Builder as ScoutBuilder;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Select\SelectHelper;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -63,12 +66,57 @@ GRAPHQL;
                 $query = $this->getModelClass()::query();
             }
 
-            return $resolveInfo
+            $builder = $resolveInfo
                 ->enhanceBuilder(
                     $query,
                     $this->directiveArgValue('scopes', [])
-                )
-                ->get();
+                );
+
+            if (config('lighthouse.optimized_selects')) {
+                if ($builder instanceof EloquentBuilder) {
+                    $fieldSelection = array_keys($resolveInfo->getFieldSelection(1));
+
+                    $model = $builder->getModel();
+
+                    $selectColumns = SelectHelper::getSelectColumns(
+                        $this->definitionNode,
+                        $fieldSelection,
+                        get_class($model)
+                    );
+
+                    if (empty($selectColumns)) {
+                        throw new Error('The select column is empty.');
+                    }
+
+                    $query = $builder->getQuery();
+
+                    if (null !== $query->columns) {
+                        $bindings = $query->getRawBindings();
+
+                        $expressions = array_filter($query->columns, function ($column) {
+                            return $column instanceof Expression;
+                        });
+
+                        $builder = $builder->select(array_unique(array_merge($selectColumns, $expressions)));
+
+                        $builder = $builder->addBinding($bindings['select'], 'select');
+                    } else {
+                        $builder = $builder->select($selectColumns);
+                    }
+
+                    /** @var string|string[] $keyName */
+                    $keyName = $model->getKeyName();
+                    if (is_string($keyName)) {
+                        $keyName = [$keyName];
+                    }
+
+                    foreach ($keyName as $name) {
+                        $query->orderBy($name);
+                    }
+                }
+            }
+
+            return $builder->get();
         });
 
         return $fieldValue;

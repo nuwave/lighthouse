@@ -6,6 +6,7 @@ use GraphQL\Error\Error;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Select\SelectHelper;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
@@ -35,12 +36,41 @@ GRAPHQL;
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
         $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ?Model {
-            $results = $resolveInfo
+            $builder = $resolveInfo
                 ->enhanceBuilder(
                     $this->getModelClass()::query(),
                     $this->directiveArgValue('scopes', [])
-                )
-                ->get();
+                );
+
+            if (config('lighthouse.optimized_selects')) {
+                $fieldSelection = array_keys($resolveInfo->getFieldSelection(1));
+
+                $selectColumns = SelectHelper::getSelectColumns(
+                    $this->definitionNode,
+                    $fieldSelection,
+                    $this->getModelClass()
+                );
+
+                if (empty($selectColumns)) {
+                    throw new Error('The select column is empty.');
+                }
+
+                $builder = $builder->select($selectColumns);
+
+                $model = $builder->getModel();
+
+                /** @var string|string[] $keyName */
+                $keyName = $model->getKeyName();
+                if (is_string($keyName)) {
+                    $keyName = [$keyName];
+                }
+
+                foreach ($keyName as $name) {
+                    $builder->orderBy($name);
+                }
+            }
+
+            $results = $builder->get();
 
             if ($results->count() > 1) {
                 throw new Error('The query returned more than one result.');

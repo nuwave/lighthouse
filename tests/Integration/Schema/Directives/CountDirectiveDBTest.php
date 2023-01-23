@@ -78,7 +78,7 @@ final class CountDirectiveDBTest extends DBTestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            users: [User!] @all
+            users: [User!] @all @orderBy(column: "id")
         }
 
         type User {
