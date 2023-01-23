@@ -16,7 +16,6 @@ use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Exceptions\ParseException;
 use Nuwave\Lighthouse\Schema\Directives\ModelDirective;
 use Nuwave\Lighthouse\Support\Utils;
-use Serializable;
 
 /**
  * Represents the AST of the entire GraphQL schema document.
@@ -32,7 +31,7 @@ use Serializable;
  *     classNameToObjectTypeName: ClassNameToObjectTypeName,
  * }
  */
-class DocumentAST implements \Serializable, Arrayable
+class DocumentAST implements Arrayable
 {
     public const TYPES = 'types';
     public const DIRECTIVES = 'directives';
@@ -100,7 +99,7 @@ class DocumentAST implements \Serializable, Arrayable
 
         foreach ($documentNode->definitions as $definition) {
             if ($definition instanceof TypeDefinitionNode) {
-                $name = $definition->name->value;
+                $name = $definition->getName()->value;
 
                 // Store the types in an associative array for quick lookup
                 $instance->types[$name] = $definition;
@@ -134,7 +133,7 @@ class DocumentAST implements \Serializable, Arrayable
                 }
             } elseif ($definition instanceof TypeExtensionNode) {
                 // Multiple type extensions for the same name can exist
-                $instance->typeExtensions[$definition->name->value][] = $definition;
+                $instance->typeExtensions[$definition->getName()->value][] = $definition;
             } elseif ($definition instanceof DirectiveDefinitionNode) {
                 $instance->directives[$definition->name->value] = $definition;
             } else {
@@ -156,7 +155,7 @@ class DocumentAST implements \Serializable, Arrayable
      */
     public function setTypeDefinition(TypeDefinitionNode $type): self
     {
-        $this->types[$type->name->value] = $type;
+        $this->types[$type->getName()->value] = $type;
 
         return $this;
     }
@@ -216,27 +215,11 @@ class DocumentAST implements \Serializable, Arrayable
     }
 
     /**
-     * @deprecated TODO remove in v6
-     */
-    public function serialize(): string
-    {
-        return serialize($this->__serialize());
-    }
-
-    /**
      * @param  SerializableDocumentAST  $data
      */
     public function __unserialize(array $data): void
     {
         $this->hydrateFromArray($data);
-    }
-
-    /**
-     * @deprecated TODO remove in v6
-     */
-    public function unserialize($data): void
-    {
-        $this->__unserialize(unserialize($data));
     }
 
     /**

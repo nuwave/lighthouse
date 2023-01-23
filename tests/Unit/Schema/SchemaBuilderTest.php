@@ -2,9 +2,9 @@
 
 namespace Tests\Unit\Schema;
 
+use GraphQL\Type\Definition\Argument;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\EnumValueDefinition;
-use GraphQL\Type\Definition\FieldArgument;
 use GraphQL\Type\Definition\FieldDefinition;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
@@ -121,7 +121,7 @@ final class SchemaBuilderTest extends TestCase
         $this->assertSame('bar attribute of Foo', $bar->description);
 
         $baz = $bar->getArg('baz');
-        assert($baz instanceof FieldArgument);
+        assert($baz instanceof Argument);
         $this->assertSame('arg', $baz->description);
         $this->assertTrue($baz->defaultValueExists());
         $this->assertFalse($baz->defaultValue);
@@ -229,7 +229,7 @@ final class SchemaBuilderTest extends TestCase
         $barArg = $queryType
             ->getField('foo')
             ->getArg('bar');
-        assert($barArg instanceof FieldArgument);
+        assert($barArg instanceof Argument);
         $this->assertSame('internal', $barArg->defaultValue);
     }
 }

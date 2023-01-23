@@ -3,7 +3,6 @@
 namespace Tests\Unit\Testing;
 
 use Laravel\Lumen\Testing\Concerns\MakesHttpRequests;
-use Nuwave\Lighthouse\Testing\ClearsSchemaCache;
 use Nuwave\Lighthouse\Testing\MakesGraphQLRequestsLumen;
 use Nuwave\Lighthouse\Testing\MocksResolvers;
 use Nuwave\Lighthouse\Testing\RefreshesSchemaCache;
@@ -15,7 +14,6 @@ use Orchestra\Testbench\TestCase;
  */
 final class TestingTraitDummyLumen extends TestCase
 {
-    use ClearsSchemaCache;
     use MakesGraphQLRequestsLumen;
     use MakesHttpRequests;
     use MocksResolvers;

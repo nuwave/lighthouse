@@ -5,9 +5,8 @@ namespace Nuwave\Lighthouse\CacheControl;
 use GraphQL\Language\AST\FieldNode;
 use GraphQL\Language\AST\NodeKind;
 use GraphQL\Language\Visitor;
-use GraphQL\Type\Definition\CompositeType;
+use GraphQL\Type\Definition\NamedType;
 use GraphQL\Type\Definition\ScalarType;
-use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\WrappingType;
 use GraphQL\Utils\TypeInfo;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -45,7 +44,6 @@ class CacheControlServiceProvider extends ServiceProvider
                 Visitor::visit($startExecution->query, Visitor::visitWithTypeInfo($typeInfo, [
                     NodeKind::FIELD => function (FieldNode $_) use ($typeInfo, $cacheControl): void {
                         $field = $typeInfo->getFieldDef();
-                        // @phpstan-ignore-next-line can be null, remove ignore with graphql-php 15
                         if (null === $field) {
                             return;
                         }
@@ -66,16 +64,15 @@ class CacheControlServiceProvider extends ServiceProvider
                             }
                         } else {
                             $parent = $typeInfo->getParentType();
-                            assert($parent instanceof CompositeType && $parent instanceof Type);
+                            assert($parent instanceof NamedType);
 
-                            if (RootType::isRootType($parent->name)) {
+                            if (RootType::isRootType($parent->name())) {
                                 $cacheControl->addMaxAge(0);
                                 $cacheControl->setPrivate();
                             } else {
                                 $nodeType = $field->getType();
-                                // TODO use getInnermostType() in graphql-php 15
-                                while ($nodeType instanceof WrappingType) {
-                                    $nodeType = $nodeType->getWrappedType();
+                                if ($nodeType instanceof WrappingType) {
+                                    $nodeType = $nodeType->getInnermostType();
                                 }
 
                                 if (! $nodeType instanceof ScalarType) {

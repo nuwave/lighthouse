@@ -4,13 +4,17 @@ namespace Nuwave\Lighthouse\Federation;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Type\Definition\Argument;
 use GraphQL\Type\Definition\Directive;
+use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\EnumValueDefinition;
-use GraphQL\Type\Definition\FieldArgument;
 use GraphQL\Type\Definition\FieldDefinition;
 use GraphQL\Type\Definition\InputObjectField;
+use GraphQL\Type\Definition\InputObjectType;
+use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\Type;
+use GraphQL\Type\Definition\ScalarType;
+use GraphQL\Type\Definition\UnionType;
 use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
 use Illuminate\Support\Arr;
@@ -84,12 +88,20 @@ class FederationPrinter
         ));
 
         $printDirectives = static function ($definition): string {
-            $astNode = $definition->astNode;
-            assert($definition instanceof Type || $definition instanceof EnumValueDefinition || $definition instanceof FieldArgument || $definition instanceof FieldDefinition || $definition instanceof InputObjectField);
+            assert(
+                $definition instanceof EnumType
+                || $definition instanceof InputObjectType
+                || $definition instanceof InterfaceType
+                || $definition instanceof ObjectType
+                || $definition instanceof ScalarType
+                || $definition instanceof UnionType
+                || $definition instanceof EnumValueDefinition
+                || $definition instanceof Argument
+                || $definition instanceof FieldDefinition
+                || $definition instanceof InputObjectField
+            );
 
-            if (null === $astNode) {
-                return '';
-            }
+            $astNode = $definition->astNode;
 
             if ($astNode instanceof ObjectTypeDefinitionNode) {
                 $federationDirectives = [];

@@ -3,7 +3,6 @@
 namespace Tests\Unit\Testing;
 
 use Illuminate\Foundation\Testing\Concerns\MakesHttpRequests;
-use Nuwave\Lighthouse\Testing\ClearsSchemaCache;
 use Nuwave\Lighthouse\Testing\MakesGraphQLRequests;
 use Nuwave\Lighthouse\Testing\MocksResolvers;
 use Nuwave\Lighthouse\Testing\RefreshesSchemaCache;
@@ -15,7 +14,6 @@ use Orchestra\Testbench\TestCase;
  */
 final class TestingTraitDummy extends TestCase
 {
-    use ClearsSchemaCache;
     use MakesGraphQLRequests;
     use MakesHttpRequests;
     use MocksResolvers;

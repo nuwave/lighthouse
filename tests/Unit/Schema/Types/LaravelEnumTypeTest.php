@@ -36,13 +36,14 @@ final class LaravelEnumTypeTest extends TestCase
     public function testEnumDescription(): void
     {
         $enumType = new LaravelEnumType(LocalizedUserType::class);
+        $description = $enumType->description;
 
         // TODO remove check when requiring bensampo/laravel-enum:6
         // @phpstan-ignore-next-line depends on the required version
         if (method_exists(LocalizedUserType::class, 'getClassDescription')) {
-            $this->assertSame('Localized user type', $enumType->config['description']);
+            $this->assertSame('Localized user type', $description);
         } else {
-            $this->assertNull($enumType->config['description']);
+            $this->assertNull($description);
         }
     }
 
@@ -64,15 +65,15 @@ final class LaravelEnumTypeTest extends TestCase
         // @phpstan-ignore-next-line depends on the required version
         if (method_exists(LocalizedUserType::class, 'getClassDescription')) {
             $this->assertSame(/** @lang GraphQL */ <<<GRAPHQL
-"""Partially deprecated"""
+"Partially deprecated"
 enum PartiallyDeprecated {
-  """Not"""
+  "Not"
   NOT
 
-  """Deprecated"""
+  "Deprecated"
   DEPRECATED @deprecated
 
-  """Deprecated with reason"""
+  "Deprecated with reason"
   DEPRECATED_WITH_REASON @deprecated(reason: "some reason")
 }
 GRAPHQL
@@ -82,13 +83,13 @@ GRAPHQL
         } else {
             $this->assertSame(/** @lang GraphQL */ <<<GRAPHQL
 enum PartiallyDeprecated {
-  """Not"""
+  "Not"
   NOT
 
-  """Deprecated"""
+  "Deprecated"
   DEPRECATED @deprecated
 
-  """Deprecated with reason"""
+  "Deprecated with reason"
   DEPRECATED_WITH_REASON @deprecated(reason: "some reason")
 }
 GRAPHQL

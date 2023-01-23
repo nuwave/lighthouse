@@ -26,11 +26,6 @@ parameters:
   # Intentionally wrong
   - tests/Utils/Models/WithoutRelationClassImport.php
 
-  # Compatibility fix because Laravel moved the TestResponse class
-  - tests/TestCase.php
-  - tests/Laravel7ExceptionHandler.php
-  - tests/PreLaravel7ExceptionHandler.php
-
   # Breaking changes in bensampo/laravel-enum
   - tests/Integration/Schema/Types/LaravelEnumTypeDBTest.php
   - tests/Integration/Schema/Types/PreLaravel9LaravelEnumTypeDBTest.php
@@ -45,10 +40,21 @@ parameters:
   - '#Parameter \#1 \$callback of static method Closure::fromCallable\(\) expects callable\(\): mixed, array{object, .*} given\.#'
 
   # Some parts of Laravel are just really magical
+  - '#Parameter \#1 \$response of static method Nuwave\\Lighthouse\\Testing\\TestResponseUtils::extractValidationErrors\(\) expects Illuminate\\Testing\\TestResponse, \$this\(Nuwave\\Lighthouse\\Testing\\TestResponseMixin\) given\.#'
   - path: tests/database/factories/*
     message: '#Variable \$factory might not be defined#'
   - '#Function factory invoked with 2 parameters, 0 required\.#'
   - '#Function factory invoked with 1 parameter, 0 required\.#'
+
+  # Mixins are magical
+  - path: src/Testing/TestResponseMixin.php
+    message: '#Method Nuwave\\Lighthouse\\Testing\\TestResponseMixin::assertGraphQLErrorMessage\(\) invoked with 1 parameter, 0 required\.#'
+  - path: src/Testing/TestResponseMixin.php
+    message: '#Method Nuwave\\Lighthouse\\Testing\\TestResponseMixin::assertGraphQLDebugMessage\(\) invoked with 1 parameter, 0 required\.#'
+  - path: src/Testing/TestResponseMixin.php
+    message: '#Anonymous function should return Illuminate\\Testing\\TestResponse but returns .*#'
+  - path: tests/*
+    message: '#Call to an undefined method Illuminate\\Testing\\TestResponse::.*#'
 
   # This test cheats and uses reflection to make assertions
   - path: tests/Unit/Schema/Directives/BaseDirectiveTest.php
@@ -59,9 +65,6 @@ parameters:
 
   # This is a library, so it should be extendable
   - '#Unsafe usage of new static.*#'
-
-  # Compatibility fix because Laravel moved the TestResponse class
-  - '#.*TestResponse.*#'
 
   # This really has no type in root resolvers
   - '#Method .* has parameter \$root with no type specified\.#'
@@ -81,3 +84,6 @@ parameters:
 
   # Lumen type hints are just wrong
   - '#Parameter \#1 \$content of function response expects string, .* given\.#'
+
+  # Seems like a bug in PHPStan
+  - '#Parameter \#2 \$type of method Nuwave\\Lighthouse\\Schema\\TypeRegistry::.+Lazy\(\) expects callable\(\): GraphQL\\Type\\Definition\\Type&GraphQL\\Type\\Definition\\NamedType, Closure\(\): GraphQL\\Type\\Definition\\ObjectType given\.#'

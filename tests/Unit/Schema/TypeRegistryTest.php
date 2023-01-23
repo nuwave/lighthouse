@@ -215,6 +215,11 @@ final class TypeRegistryTest extends TestCase
         $this->typeRegistry->get($nonExistingTypeName);
     }
 
+    public function testSearchReturnsNullWhenMissingType(): void
+    {
+        $this->assertNull($this->typeRegistry->search('ThisTypeDoesNotExist'));
+    }
+
     public function testDeterminesIfHasType(): void
     {
         $name = 'Foo';
@@ -260,19 +265,6 @@ final class TypeRegistryTest extends TestCase
             TypeRegistry::triedToRegisterPresentType($name)
         );
         $this->typeRegistry->registerLazy($name, $makeType);
-    }
-
-    public function testOverwrite(): void
-    {
-        $name = 'Foo';
-
-        $foo = new ObjectType(['name' => $name]);
-        $this->typeRegistry->register($foo);
-
-        $foo2 = new ObjectType(['name' => $name]);
-        $this->typeRegistry->overwrite($foo2);
-
-        $this->assertSame($foo2, $this->typeRegistry->get($name));
     }
 
     public function testOverwriteLazy(): void

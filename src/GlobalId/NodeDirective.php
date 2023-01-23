@@ -89,7 +89,7 @@ GRAPHQL;
 
         if (! $typeDefinition instanceof ObjectTypeDefinitionNode) {
             throw new DefinitionException(
-                "The {$this->name()} directive must only be used on object type definitions, not on {$typeDefinition->kind} {$typeDefinition->name->value}."
+                "The {$this->name()} directive must only be used on object type definitions, not on {$typeDefinition->kind} {$typeDefinition->getName()->value}."
             );
         }
 

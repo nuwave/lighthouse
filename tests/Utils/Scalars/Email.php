@@ -9,15 +9,9 @@ use GraphQL\Utils\Utils;
 
 final class Email extends ScalarType
 {
-    /**
-     * @var string
-     */
-    public $name = 'Email';
+    public string $name = 'Email';
 
-    /**
-     * @var string
-     */
-    public $description = 'Email address.';
+    public ?string $description = 'Email address.';
 
     public function serialize($value)
     {

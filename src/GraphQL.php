@@ -35,6 +35,8 @@ use Nuwave\Lighthouse\Support\Utils as LighthouseUtils;
 
 /**
  * The main entrypoint to GraphQL execution.
+ *
+ * @phpstan-import-type ErrorsHandler from \GraphQL\Executor\ExecutionResult
  */
 class GraphQL
 {
@@ -76,10 +78,7 @@ class GraphQL
     /**
      * Lazily initialized.
      *
-     * @var \Closure(
-     *   array<\GraphQL\Error\Error> $errors,
-     *   callable(\GraphQL\Error\Error $error): ?array<string, mixed>
-     * ): array<string, mixed>
+     * @var ErrorsHandler
      */
     protected $errorsHandler;
 
@@ -368,15 +367,13 @@ class GraphQL
     }
 
     /**
-     * @return \Closure(
-     *   array<\GraphQL\Error\Error> $errors,
-     *   callable(\GraphQL\Error\Error $error): ?array<string, mixed>
-     * ): array<string, mixed>
+     * @return ErrorsHandler
      */
     protected function errorsHandler(): callable
     {
         if (! isset($this->errorsHandler)) {
-            $this->errorsHandler = function (array $errors, callable $formatter): array {
+            // @phpstan-ignore-next-line callable is not recognized correctly and can not be type-hinted to match
+            return $this->errorsHandler = function (array $errors, callable $formatter): array {
                 // User defined error handlers, implementing \Nuwave\Lighthouse\Execution\ErrorHandler
                 // This allows the user to register multiple handlers and pipe the errors through.
                 $handlers = [];
@@ -389,13 +386,11 @@ class GraphQL
                         return $this->pipeline
                             ->send($error)
                             ->through($handlers)
-                            ->then(function (?Error $error) use ($formatter): ?array {
-                                if (null === $error) {
-                                    return null;
-                                }
-
-                                return $formatter($error);
-                            });
+                            ->then(
+                                fn (?Error $error): ?array => null === $error
+                                ? null
+                                : $formatter($error)
+                            );
                     })
                     ->filter()
                     ->all();

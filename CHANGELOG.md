@@ -9,6 +9,26 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+
+- Return proper error for unknown types in variable definitions
+
+### Added
+
+- Add method `TypeRegistry::search()` that maybe finds a type with a given name
+
+### Removed
+
+- Remove mixin `TestResponse::assertGraphQLErrorCategory()`
+- Remove class `Nuwave\Lighthouse\Exceptions\GenericException`
+- Remove error extension field `category`
+- Remove interface `Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions`
+- Remove `Nuwave\Lighthouse\Execution\ExtensionErrorHandler`
+- Remove support for PHP 7.2, 7.3, 7.4
+- Remove support for Laravel 5, 6, 7
+- Remove `Serializable` implementation
+- Remove trait `ClearsSchemaCache`
+
 ## v5.70.2
 
 ### Fixed

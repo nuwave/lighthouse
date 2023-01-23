@@ -14,7 +14,7 @@ use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 /**
- * @phpstan-type Resolver callable(mixed, array<string, mixed>, GraphQLContext, ResolveInfo): mixed
+ * @phpstan-type Resolver callable(mixed, array<string, mixed>, \Nuwave\Lighthouse\Support\Contracts\GraphQLContext, \Nuwave\Lighthouse\Execution\ResolveInfo): mixed
  */
 class FieldValue
 {
