@@ -6,6 +6,7 @@ use GraphQL\Type\Introspection;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Arr;
+use Illuminate\Testing\TestResponse;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 use Nuwave\Lighthouse\Support\Http\Responses\MemoryStream;
 use PHPUnit\Framework\Assert;
@@ -23,17 +24,13 @@ trait MakesGraphQLRequestsLumen
      *
      * On the first call to introspect() this property is set to
      * cache the result, as introspection is quite expensive.
-     *
-     * @var \Illuminate\Http\Response
      */
-    protected $introspectionResult;
+    protected TestResponse $introspectionResult;
 
     /**
      * Used to test deferred queries.
-     *
-     * @var \Nuwave\Lighthouse\Support\Http\Responses\MemoryStream
      */
-    protected $deferStream;
+    protected MemoryStream $deferStream;
 
     /**
      * Execute a GraphQL operation as if it was sent as a request to the server.

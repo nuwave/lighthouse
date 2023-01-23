@@ -4,19 +4,9 @@ namespace Tests\Unit\Schema\Types\Scalars;
 
 use Nuwave\Lighthouse\Schema\Types\Scalars\DateScalar;
 use Nuwave\Lighthouse\Schema\Types\Scalars\DateTimeUtc;
-use Nuwave\Lighthouse\Support\AppVersion;
 
 final class DateTimeUtcTest extends DateScalarTest
 {
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        if (AppVersion::below(5.8)) {
-            $this->markTestSkipped('This only works with Illuminate\Support\Carbon::createFromIsoFormat().');
-        }
-    }
-
     protected function scalarInstance(): DateScalar
     {
         return new DateTimeUtc();

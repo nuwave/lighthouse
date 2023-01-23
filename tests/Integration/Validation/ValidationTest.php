@@ -7,7 +7,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator as ValidatorFactory;
 use Illuminate\Validation\Validator;
 use Nuwave\Lighthouse\Exceptions\ValidationException;
-use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\TestCase;
 use Tests\Utils\Validators\FooClosureValidator;
 
@@ -71,8 +70,7 @@ final class ValidationTest extends TestCase
                     [
                         'message' => 'Validation failed for the field [foo].',
                         'extensions' => [
-                            'category' => ValidationException::CATEGORY,
-                            ValidationException::CATEGORY => [
+                            ValidationException::KEY => [
                                 'bar' => [
                                     'The bar field is required.',
                                 ],
@@ -134,7 +132,7 @@ final class ValidationTest extends TestCase
                         'path' => ['foo'],
                         'message' => 'Validation failed for the field [foo.baz].',
                         'extensions' => [
-                            ValidationException::CATEGORY => [
+                            ValidationException::KEY => [
                                 'required' => [
                                     'The required field is required.',
                                 ],
@@ -339,17 +337,13 @@ final class ValidationTest extends TestCase
             ')
             ->assertGraphQLValidationError('bar', 'The bar must be at least 2 characters.');
 
-        $message = AppVersion::atLeast(8.32)
-            ? 'The bar must not be greater than 3 characters.'
-            : 'The bar may not be greater than 3 characters.';
-
         $this
             ->graphQL(/** @lang GraphQL */ '
             {
                 foo(bar: "fasdf")
             }
             ')
-            ->assertGraphQLValidationError('bar', $message);
+            ->assertGraphQLValidationError('bar', 'The bar must not be greater than 3 characters.');
     }
 
     public function testSingleFieldReferencesAreQualified(): void

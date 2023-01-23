@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class Subscriber implements \Serializable
+class Subscriber
 {
     /**
      * A unique key for the subscriber's channel.
@@ -121,14 +121,6 @@ class Subscriber implements \Serializable
     }
 
     /**
-     * @deprecated TODO remove in v6
-     */
-    public function serialize(): string
-    {
-        return \Safe\json_encode($this->__serialize());
-    }
-
-    /**
      * @param  array<string, mixed>  $data
      */
     public function __unserialize(array $data): void
@@ -148,14 +140,6 @@ class Subscriber implements \Serializable
         $this->context = $this->contextSerializer()->unserialize(
             $data['context']
         );
-    }
-
-    /**
-     * @deprecated TODO remove in v6
-     */
-    public function unserialize($subscription): void
-    {
-        $this->__unserialize(\Safe\json_decode($subscription, true));
     }
 
     /**

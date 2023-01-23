@@ -14,9 +14,9 @@ use Nuwave\Lighthouse\Federation\EntityResolverProvider;
  */
 class Any extends ScalarType
 {
-    public $name = '_Any';
+    public string $name = '_Any';
 
-    public $description = /** @lang Markdown */ <<<'DESCRIPTION'
+    public ?string $description = /** @lang Markdown */ <<<'DESCRIPTION'
 Representation of entities from external services for the root `_entities` field.
 DESCRIPTION;
 

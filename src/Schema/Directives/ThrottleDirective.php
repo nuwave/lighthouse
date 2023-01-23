@@ -14,7 +14,6 @@ use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Exceptions\RateLimitException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\AppVersion;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -127,11 +126,6 @@ GRAPHQL;
     {
         $name = $this->directiveArgValue('name');
         if (null !== $name) {
-            if (AppVersion::below(8.0)) {
-                throw new DefinitionException('Named limiter requires Laravel 8.x or later');
-            }
-
-            // @phpstan-ignore-next-line won't be executed on Laravel < 8
             $limiter = $this->limiter->limiter($name);
             // @phpstan-ignore-next-line $limiter may be null although it's not specified in limiter() PHPDoc
             if (null === $limiter) {

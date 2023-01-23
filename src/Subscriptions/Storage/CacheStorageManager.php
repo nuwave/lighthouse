@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Subscriptions\Storage;
 
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
@@ -78,8 +77,7 @@ class CacheStorageManager implements StoresSubscriptions
         if (null === $this->ttl) {
             $this->cache->forever($channelKey, $subscriber);
         } else {
-            // TODO: Change to just pass the ttl directly when support for Laravel <=5.7 is dropped
-            $this->cache->put($channelKey, $subscriber, Carbon::now()->addSeconds($this->ttl));
+            $this->cache->put($channelKey, $subscriber, $this->ttl);
         }
     }
 
@@ -104,8 +102,7 @@ class CacheStorageManager implements StoresSubscriptions
         if (null === $this->ttl) {
             $this->cache->forever($key, $topic);
         } else {
-            // TODO: Change to just pass the ttl directly when support for Laravel <=5.7 is dropped
-            $this->cache->put($key, $topic, Carbon::now()->addSeconds($this->ttl));
+            $this->cache->put($key, $topic, $this->ttl);
         }
     }
 

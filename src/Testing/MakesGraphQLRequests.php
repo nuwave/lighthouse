@@ -6,6 +6,7 @@ use GraphQL\Type\Introspection;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Arr;
+use Illuminate\Testing\TestResponse;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 use Nuwave\Lighthouse\Support\Http\Responses\MemoryStream;
 use PHPUnit\Framework\Assert;
@@ -23,17 +24,13 @@ trait MakesGraphQLRequests
      *
      * On the first call to introspect() this property is set to
      * cache the result, as introspection is quite expensive.
-     *
-     * @var \Illuminate\Testing\TestResponse
      */
-    protected $introspectionResult;
+    protected TestResponse $introspectionResult;
 
     /**
      * Used to test deferred queries.
-     *
-     * @var \Nuwave\Lighthouse\Support\Http\Responses\MemoryStream
      */
-    protected $deferStream;
+    protected MemoryStream $deferStream;
 
     /**
      * Execute a GraphQL operation as if it was sent as a request to the server.
@@ -42,15 +39,13 @@ trait MakesGraphQLRequests
      * @param  array<string, mixed>  $variables  The variables to include in the query
      * @param  array<string, mixed>  $extraParams  Extra parameters to add to the JSON payload
      * @param  array<string, mixed>  $headers  HTTP headers to pass to the POST request
-     *
-     * @return \Illuminate\Testing\TestResponse
      */
     protected function graphQL(
         string $query,
         array $variables = [],
         array $extraParams = [],
         array $headers = []
-    ) {
+    ): TestResponse {
         $params = ['query' => $query];
 
         if ([] !== $variables) {
@@ -70,10 +65,8 @@ trait MakesGraphQLRequests
      *
      * @param  array<mixed, mixed>  $data  JSON-serializable payload
      * @param  array<string, string>  $headers  HTTP headers to pass to the POST request
-     *
-     * @return \Illuminate\Testing\TestResponse
      */
-    protected function postGraphQL(array $data, array $headers = [])
+    protected function postGraphQL(array $data, array $headers = []): TestResponse
     {
         return $this->postJson(
             $this->graphQLEndpointUrl(),
@@ -92,15 +85,13 @@ trait MakesGraphQLRequests
      * @param  array<array<int, string>>  $map
      * @param  array<\Illuminate\Http\Testing\File>|array<array<mixed>>  $files
      * @param  array<string, string>  $headers  Will be merged with Content-Type: multipart/form-data
-     *
-     * @return \Illuminate\Testing\TestResponse
      */
     protected function multipartGraphQL(
         array $operations,
         array $map,
         array $files,
         array $headers = []
-    ) {
+    ): TestResponse {
         $parameters = [
             'operations' => \Safe\json_encode($operations),
             'map' => \Safe\json_encode($map),
@@ -125,16 +116,10 @@ trait MakesGraphQLRequests
      * Send the introspection query to the GraphQL server.
      *
      * Returns the cached first result on repeated calls.
-     *
-     * @return \Illuminate\Testing\TestResponse
      */
-    protected function introspect()
+    protected function introspect(): TestResponse
     {
-        if (! isset($this->introspectionResult)) {
-            return $this->introspectionResult = $this->graphQL(Introspection::getIntrospectionQuery());
-        }
-
-        return $this->introspectionResult;
+        return $this->introspectionResult ??= $this->graphQL(Introspection::getIntrospectionQuery());
     }
 
     /**
@@ -164,17 +149,9 @@ trait MakesGraphQLRequests
      */
     protected function introspectByName(string $path, string $name): ?array
     {
-        if (null === $this->introspectionResult) {
-            $this->introspect();
-        }
-
-        $results = $this->introspectionResult->json($path);
-
         return Arr::first(
-            $results,
-            static function (array $result) use ($name): bool {
-                return $result['name'] === $name;
-            }
+            $this->introspect()->json($path),
+            static fn (array $result): bool => $result['name'] === $name
         );
     }
 

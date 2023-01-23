@@ -55,7 +55,7 @@ class ASTHelper
 
         $remainingDefinitions = (new Collection($original))
             ->reject(function (Node $definition) use ($newNames, $overwriteDuplicates): bool {
-                // TODO remove with next graphql-php version
+                // @phpstan-ignore-next-line https://github.com/phpstan/phpstan/issues/8474
                 assert(property_exists($definition, 'name'));
 
                 $oldName = $definition->name->value;
@@ -183,6 +183,7 @@ class ASTHelper
      */
     public static function directiveDefinition(Node $definitionNode, string $name): ?DirectiveNode
     {
+        // @phpstan-ignore-next-line https://github.com/phpstan/phpstan/issues/8474
         if (! property_exists($definitionNode, 'directives')) {
             throw new \Exception('Expected Node class with property `directives`, got: ' . get_class($definitionNode));
         }
@@ -209,9 +210,10 @@ class ASTHelper
      *
      * @return TNode|null
      */
-    public static function firstByName($nodes, string $name): ?Node
+    public static function firstByName(iterable $nodes, string $name): ?Node
     {
         foreach ($nodes as $node) {
+            // @phpstan-ignore-next-line https://github.com/phpstan/phpstan/issues/8474
             if (! property_exists($node, 'name')) {
                 throw new \Exception('Expected a Node with a name property, got: ' . get_class($node));
             }

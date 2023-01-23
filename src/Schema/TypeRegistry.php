@@ -68,14 +68,17 @@ class TypeRegistry
     /**
      * Map from type names to resolved types.
      *
-     * @var array<string, \GraphQL\Type\Definition\Type>
+     * May contain `null` if a type was previously looked up and determined to not exist.
+     * This allows short-circuiting repeated lookups for the same type.
+     *
+     * @var array<string, (\GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType)|null>
      */
     protected $types = [];
 
     /**
      * Map from type names to lazily resolved types.
      *
-     * @var array<string, callable(): \GraphQL\Type\Definition\Type>
+     * @var array<string, callable(): \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType>
      */
     protected $lazyTypes = [];
 
@@ -119,15 +122,46 @@ class TypeRegistry
     /**
      * Get the given GraphQL type by name.
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException if the type is not found or invalid
+     *
+     * @return \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType
      */
     public function get(string $name): Type
     {
-        if (! $this->has($name)) {
+        $type = $this->search($name);
+
+        if (null === $type) {
             throw self::failedToLoadType($name);
         }
 
-        return $this->types[$name];
+        return $type;
+    }
+
+    /**
+     * Search the given GraphQL type by name.
+     *
+     * @return (\GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType)|null
+     */
+    public function search(string $name): ?Type
+    {
+        if (isset($this->types[$name])) {
+            return $this->types[$name];
+        }
+
+        if (isset($this->documentAST->types[$name])) {
+            return $this->types[$name] = $this->handle($this->documentAST->types[$name]);
+        }
+
+        if (isset($this->lazyTypes[$name])) {
+            return $this->types[$name] = $this->lazyTypes[$name]();
+        }
+
+        $standardTypes = Type::getStandardTypes();
+        if (isset($standardTypes[$name])) {
+            return $this->types[$name] = $standardTypes[$name];
+        }
+
+        return null;
     }
 
     /**
@@ -135,38 +169,17 @@ class TypeRegistry
      */
     public function has(string $name): bool
     {
-        if (isset($this->types[$name])) {
-            return true;
-        }
-
-        if (isset($this->documentAST->types[$name])) {
-            $this->types[$name] = $this->handle($this->documentAST->types[$name]);
-
-            return true;
-        }
-
-        if (isset($this->lazyTypes[$name])) {
-            $this->types[$name] = $this->lazyTypes[$name]();
-
-            return true;
-        }
-
-        $standardTypes = Type::getStandardTypes();
-        if (isset($standardTypes[$name])) {
-            $this->types[$name] = $standardTypes[$name];
-
-            return true;
-        }
-
-        return false;
+        return $this->search($name) instanceof Type;
     }
 
     /**
      * Register an executable GraphQL type.
+     *
+     * @param  \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType  $type
      */
     public function register(Type $type): self
     {
-        $name = $type->name;
+        $name = $type->name();
         if ($this->has($name)) {
             throw self::triedToRegisterPresentType($name);
         }
@@ -178,6 +191,8 @@ class TypeRegistry
 
     /**
      * Register an executable GraphQL type lazily.
+     *
+     * @param callable(): \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType $type
      */
     public function registerLazy(string $name, callable $type): self
     {
@@ -192,16 +207,20 @@ class TypeRegistry
 
     /**
      * Register a type, overwriting if it exists already.
+     *
+     * @param  \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType  $type
      */
     public function overwrite(Type $type): self
     {
-        $this->types[$type->name] = $type;
+        $this->types[$type->name()] = $type;
 
         return $this;
     }
 
     /**
      * Register a type lazily, overwriting if it exists already.
+     *
+     * @param callable(): \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType $type
      */
     public function overwriteLazy(string $name, callable $type): self
     {
@@ -216,7 +235,7 @@ class TypeRegistry
     /**
      * Return all possible types that are registered.
      *
-     * @return array<string, \GraphQL\Type\Definition\Type>
+     * @return array<string, \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType>
      */
     public function possibleTypes(): array
     {
@@ -224,7 +243,7 @@ class TypeRegistry
         // to find orphaned types, such as an object type that is only
         // ever used through its association to an interface.
         foreach ($this->documentAST->types as $typeDefinition) {
-            $name = $typeDefinition->name->value;
+            $name = $typeDefinition->getName()->value;
 
             if (! isset($this->types[$name])) {
                 $this->types[$name] = $this->handle($typeDefinition);
@@ -237,7 +256,7 @@ class TypeRegistry
             }
         }
 
-        return $this->types;
+        return array_filter($this->types);
     }
 
     /**
@@ -246,17 +265,19 @@ class TypeRegistry
      * This does not return all possible types, only those that
      * are programmatically registered or already resolved.
      *
-     * @return array<string, \GraphQL\Type\Definition\Type>
+     * @return array<string, \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType>
      */
     public function resolvedTypes(): array
     {
-        return $this->types;
+        return array_filter($this->types);
     }
 
     /**
      * Transform a definition node to an executable type.
      *
      * @param  \GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node  $definition
+     *
+     * @return \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType
      */
     public function handle(TypeDefinitionNode $definition): Type
     {
@@ -287,6 +308,8 @@ class TypeRegistry
      *
      * @throws \GraphQL\Error\InvariantViolation
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
+     *
+     * @return \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType
      */
     protected function resolveType(TypeDefinitionNode $typeDefinition): Type
     {
@@ -304,9 +327,7 @@ class TypeRegistry
             case UnionTypeDefinitionNode::class:
                 return $this->resolveUnionType($typeDefinition);
             default:
-                throw new InvariantViolation(
-                    "Unknown type for definition [{$typeDefinition->name->value}]"
-                );
+                throw new InvariantViolation("Unknown type for definition {$typeDefinition->getName()->value}.");
         }
     }
 

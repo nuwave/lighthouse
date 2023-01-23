@@ -24,7 +24,7 @@ class ResolveInfo extends BaseResolveInfo
         Schema $schema,
         array $fragments,
         $rootValue,
-        ?OperationDefinitionNode $operation,
+        OperationDefinitionNode $operation,
         array $variableValues,
         ArgumentSet $argumentSet
     ) {
