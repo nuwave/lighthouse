@@ -54,10 +54,11 @@ class ResolveInfo extends BaseResolveInfo
         return $this->argumentSet->enhanceBuilder(
             $builder,
             $scopes,
-            $directiveFilter,
+            $root,
             $args,
             $context,
-            $resolveInfo
+            $resolveInfo,
+            $directiveFilter
         );
     }
 }
