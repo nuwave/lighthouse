@@ -27,6 +27,13 @@ class ExecutableTypeNodeConverter extends TypeNodeConverter
         return Type::nonNull($type);
     }
 
+    /**
+     * @template T of \GraphQL\Type\Definition\Type
+     *
+     * @param T|callable():T $type
+     *
+     * @return \GraphQL\Type\Definition\ListOfType<T>
+     */
     protected function listOf($type): ListOfType
     {
         return Type::listOf($type);

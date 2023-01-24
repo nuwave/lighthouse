@@ -29,7 +29,6 @@ class UpdateModel implements ArgResolver
      */
     public function __invoke($model, $args)
     {
-        /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument|null $id */
         $id = Arr::pull($args->arguments, 'id')
             ?? Arr::pull($args->arguments, $model->getKeyName())
             ?? null;
@@ -37,6 +36,7 @@ class UpdateModel implements ArgResolver
         if (null === $id) {
             throw new Error(self::MISSING_PRIMARY_KEY_FOR_UPDATE);
         }
+        assert($id instanceof Argument);
 
         $model = $model->newQuery()->findOrFail($id->value);
 

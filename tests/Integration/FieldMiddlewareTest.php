@@ -56,7 +56,7 @@ final class FieldMiddlewareTest extends TestCase
                 name
             }
         }
-        ')->assertGraphQLErrorCategory(AuthenticationException::CATEGORY);
+        ')->assertGraphQLErrorMessage(AuthenticationException::MESSAGE);
     }
 
     public function testHydratesGlobalFieldMiddleware(): void

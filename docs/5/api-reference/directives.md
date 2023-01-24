@@ -21,15 +21,23 @@ directive @aggregate(
 
   """
   The relationship with the column to aggregate.
-  Mutually exclusive with `model`.
+  Mutually exclusive with `model` and `builder`.
   """
   relation: String
 
   """
   The model with the column to aggregate.
-  Mutually exclusive with `relation`.
+  Mutually exclusive with `relation` and `builder`.
   """
   model: String
+
+  """
+  Point to a function that provides a Query Builder instance.
+  Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
+  Mutually exclusive with `relation` and `model`.
+  """
+  builder: String
 
   """
   Apply scopes to the underlying query.
@@ -106,12 +114,15 @@ directive @all(
   """
   Specify the class name of the model to use.
   This is only needed when the default model detection does not work.
+  Mutually exclusive with `builder`.
   """
   model: String
 
   """
   Point to a function that provides a Query Builder instance.
-  This replaces the use of a model.
+  Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
+  Mutually exclusive with `model`.
   """
   builder: String
 
@@ -198,8 +209,6 @@ type Post {
 ```
 
 ```php
-<?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -470,6 +479,9 @@ scalar BuilderValue
 
 You must point to a `method` which will receive the builder instance
 and can apply additional constraints to the query.
+
+> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
+> Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 When used on an argument, the value is supplied as the second parameter to the method.
 When used on a field, the value argument inside the directive is applied as the second
@@ -1281,6 +1293,9 @@ Any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-In
 scalar EqValue
 ```
 
+> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
+> Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
+
 ```graphql
 type User {
   posts(category: String @eq): [Post!]! @hasMany
@@ -1682,6 +1697,9 @@ directive @in(
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
+> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
+> Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
+
 ```graphql
 type Query {
   posts(includeIds: [Int!] @in(key: "id")): [Post!]! @paginate
@@ -1765,8 +1783,6 @@ The function receives the value of the parent field as its single argument and m
 return an Object Type. You can get the appropriate Object Type from Lighthouse's type registry.
 
 ```php
-<?php
-
 namespace App\GraphQL\Interfaces;
 
 use GraphQL\Type\Definition\Type;
@@ -1825,6 +1841,40 @@ type Post {
   comments: [Comment!]! @hasMany @lazyLoad(relations: ["replies"])
 }
 ```
+
+## @like
+
+```graphql
+"""
+Add a `LIKE` conditional to a database query.
+"""
+directive @like(
+  """
+  Specify the database column to compare.
+  Required if the directive is:
+  - used on an argument and the database column has a different name
+  - used on a field
+  """
+  key: String
+
+  """
+  Fixate the positions of wildcards (`%`, `_`) in the LIKE comparison around the
+  placeholder `{}`, e.g. `%{}`, `__{}` or `%{}%`.
+  If specified, wildcard characters in the client-given input are escaped.
+  If not specified, the client can pass wildcards unescaped.
+  """
+  template: String
+
+  """
+  Provide a value to compare against.
+  Only used when the directive is added on a field.
+  """
+  value: String
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+```
+
+> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
+> Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 ## @limit
 
@@ -2199,6 +2249,9 @@ directive @neq(
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
+> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
+> Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
+
 ```graphql
 type User {
   posts(excludeCategory: String @neq(key: "category")): [Post!]! @hasMany
@@ -2318,6 +2371,9 @@ directive @notIn(
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
+> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
+> Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
+
 ```graphql
 type Query {
   posts(excludeIds: [Int!] @notIn(key: "id")): [Post!]! @paginate
@@ -2406,13 +2462,16 @@ input OrderByRelation {
 }
 ```
 
+> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
+> Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
+
 See [ordering](../digging-deeper/ordering.md).
 
 ## @paginate
 
 ```graphql
 """
-Query multiple model entries as a paginated list.
+Query multiple entries as a paginated list.
 """
 directive @paginate(
   """
@@ -2423,18 +2482,22 @@ directive @paginate(
   """
   Specify the class name of the model to use.
   This is only needed when the default model detection does not work.
+  Mutually exclusive with `builder` and `resolver`.
   """
   model: String
 
   """
   Point to a function that provides a Query Builder instance.
-  This replaces the use of a model.
+  Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
+  Mutually exclusive with `model` and `resolver`.
   """
   builder: String
 
   """
   Reference a function that resolves the field by directly returning data in a Paginator instance.
-  Mutually exclusive with `builder` and `model`. Not compatible with `scopes` and builder arguments such as `@eq`.
+  Mutually exclusive with `builder` and `model`.
+  Not compatible with `scopes` and builder arguments such as `@eq`.
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
   If you pass only a class name, the method name defaults to `__invoke`.
   """
@@ -2747,8 +2810,6 @@ Your method receives the typical resolver arguments and has to return an instanc
 > make sure to return an Eloquent builder, e.g. `Post::query()`.
 
 ```php
-<?php
-
 namespace App\Models;
 
 use Illuminate\Support\Facades\DB;
@@ -3028,7 +3089,8 @@ directive @scope(
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-You may use this in combination with field directives such as [@all](#all).
+> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
+> Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 ```graphql
 type Query {
@@ -3249,6 +3311,9 @@ Allows to filter if trashed elements should be fetched.
 directive @trashed on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
+> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
+> Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
+
 The most convenient way to use this directive is through [@softDeletes](#softdeletes).
 
 If you want to add it manually, make sure the argument is of the
@@ -3336,8 +3401,6 @@ The function receives the value of the parent field as its single argument and m
 resolve an Object Type from Lighthouse's `TypeRegistry`.
 
 ```php
-<?php
-
 namespace App\GraphQL\Unions;
 
 use GraphQL\Type\Definition\Type;
@@ -3555,6 +3618,9 @@ directive @where(
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
+> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
+> Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
+
 You can specify simple operators:
 
 ```graphql
@@ -3591,6 +3657,9 @@ directive @whereAuth(
 ) on FIELD_DEFINITION
 ```
 
+> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
+> Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
+
 The following query returns all posts that belong to the currently authenticated user.  
 Behind the scenes it is using a `whereHas` query.
 
@@ -3617,6 +3686,9 @@ directive @whereBetween(
   key: String
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
+
+> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
+> Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 This example defines an `input` to filter that a value is between two dates.
 
@@ -3657,7 +3729,8 @@ directive @whereJsonContains(
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-Use in combination with other Eloquent directives such as [@all](#all)
+> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
+> Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 ```graphql
 type Query {
@@ -3690,6 +3763,9 @@ directive @whereNotBetween(
   key: String
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
+
+> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
+> Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 ```graphql
 type Query {

@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Subscriptions;
 
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\AST\NodeList;
+use GraphQL\Language\AST\OperationDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Utils\AST;
 use Illuminate\Container\Container;
@@ -11,7 +12,7 @@ use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class Subscriber implements \Serializable
+class Subscriber
 {
     /**
      * A unique key for the subscriber's channel.
@@ -90,12 +91,8 @@ class Subscriber implements \Serializable
         $this->variables = $resolveInfo->variableValues;
         $this->context = $context;
 
-        /**
-         * Must be here, since webonyx/graphql-php validated the subscription.
-         *
-         * @var \GraphQL\Language\AST\OperationDefinitionNode $operation
-         */
         $operation = $resolveInfo->operation;
+        assert($operation instanceof OperationDefinitionNode, 'Must be here, since webonyx/graphql-php validated the subscription.');
 
         $this->query = new DocumentNode([
             'definitions' => new NodeList(array_merge(
@@ -124,14 +121,6 @@ class Subscriber implements \Serializable
     }
 
     /**
-     * @deprecated TODO remove in v6
-     */
-    public function serialize(): string
-    {
-        return \Safe\json_encode($this->__serialize());
-    }
-
-    /**
      * @param  array<string, mixed>  $data
      */
     public function __unserialize(array $data): void
@@ -139,14 +128,11 @@ class Subscriber implements \Serializable
         $this->channel = $data['channel'];
         $this->topic = $data['topic'];
 
-        /**
-         * We know the type since it is set during construction and serialized.
-         *
-         * @var \GraphQL\Language\AST\DocumentNode $documentNode
-         */
         $documentNode = AST::fromArray(
             unserialize($data['query'])
         );
+        assert($documentNode instanceof DocumentNode, 'We know the type since it is set during construction and serialized.');
+
         $this->query = $documentNode;
         $this->fieldName = $data['field_name'];
         $this->args = $data['args'];
@@ -154,14 +140,6 @@ class Subscriber implements \Serializable
         $this->context = $this->contextSerializer()->unserialize(
             $data['context']
         );
-    }
-
-    /**
-     * @deprecated TODO remove in v6
-     */
-    public function unserialize($subscription): void
-    {
-        $this->__unserialize(\Safe\json_decode($subscription, true));
     }
 
     /**

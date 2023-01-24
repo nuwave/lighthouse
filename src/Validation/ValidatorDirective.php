@@ -66,10 +66,11 @@ GRAPHQL;
     protected function validator(): Validator
     {
         if (null === $this->validator) {
-            $validator = Container::getInstance()->make(
-                // We precomputed and validated the full class name at schema build time
-                $this->directiveArgValue('class')
-            );
+            // We precomputed and validated the full class name at schema build time
+            $validatorClass = $this->directiveArgValue('class');
+
+            $validator = Container::getInstance()->make($validatorClass);
+            /** @var \Nuwave\Lighthouse\Validation\Validator $validator PHPStan thinks it is *NEVER* with Laravel 9 */
             assert($validator instanceof Validator);
 
             assert($this->argumentValue instanceof ArgumentSet, 'this directive can only be defined on a field or input');
@@ -84,9 +85,7 @@ GRAPHQL;
     public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition)
     {
         if (! $typeDefinition instanceof InputObjectTypeDefinitionNode) {
-            throw new DefinitionException(
-                "Can not use @validator on non input type {$typeDefinition->name->value}."
-            );
+            throw new DefinitionException("Can not use @validator on non input type {$typeDefinition->getName()->value}.");
         }
 
         $this->setFullClassnameOnDirective(
@@ -140,9 +139,6 @@ GRAPHQL;
      */
     protected function namespaceValidatorClass(string $classCandidate): string
     {
-        /**
-         * @var class-string<\Nuwave\Lighthouse\Validation\Validator> $validatorClassName We know this because of the callback
-         */
         $validatorClassName = $this->namespaceClassName(
             $classCandidate,
             (array) config('lighthouse.namespaces.validators'),
@@ -150,6 +146,7 @@ GRAPHQL;
                 return is_subclass_of($classCandidate, Validator::class);
             }
         );
+        assert(is_subclass_of($validatorClassName, Validator::class));
 
         return $validatorClassName;
     }

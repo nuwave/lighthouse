@@ -4,9 +4,9 @@ namespace Nuwave\Lighthouse\Auth;
 
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionNode;
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Nuwave\Lighthouse\Exceptions\AuthenticationException;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -58,10 +58,7 @@ GRAPHQL;
 
         $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
             // TODO remove cast in v6
-            $with = (array)
-                $this->directiveArgValue('with', AuthServiceProvider::guard())
-            ;
-
+            $with = (array) $this->directiveArgValue('with', AuthServiceProvider::guard());
             $this->authenticate($with);
 
             return $previousResolver($root, $args, $context, $resolveInfo);

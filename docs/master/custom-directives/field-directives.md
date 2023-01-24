@@ -18,8 +18,6 @@ You may use it to handle incoming values before reaching the final resolver
 as well as the outgoing result of resolving the field.
 
 ```php
-<?php
-
 namespace App\GraphQL\Directives;
 
 use Closure;
@@ -77,7 +75,7 @@ type Query {
 A [`\Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/FieldBuilderDirective.php)
 directive allows modifying the database query that Lighthouse creates for a field.
 
-> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->argumentSet->enhanceBuilder()`.
+> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](../api-reference/directives.md#all) or [@hasMany](../api-reference/directives.md#hasmany).
 
 The following directives use the defined filter for resolving the query:

@@ -5,7 +5,6 @@ namespace Nuwave\Lighthouse\Auth;
 use GraphQL\Error\Error;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
@@ -16,6 +15,7 @@ use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Execution\Resolved;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\RootType;
@@ -23,7 +23,6 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\SoftDeletes\ForceDeleteDirective;
 use Nuwave\Lighthouse\SoftDeletes\RestoreDirective;
 use Nuwave\Lighthouse\SoftDeletes\TrashedDirective;
-use Nuwave\Lighthouse\Support\AppVersion;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -248,22 +247,16 @@ GRAPHQL;
         // should be [modelClassName, additionalArg, additionalArg...]
         array_unshift($arguments, $model);
 
-        // Gate responses were introduced in Laravel 6
-        // TODO remove with Laravel < 6 support
-        if (AppVersion::atLeast(6.0)) {
-            Utils::applyEach(
-                function ($ability) use ($gate, $arguments) {
-                    $response = $gate->inspect($ability, $arguments);
+        Utils::applyEach(
+            function ($ability) use ($gate, $arguments) {
+                $response = $gate->inspect($ability, $arguments);
 
-                    if ($response->denied()) {
-                        throw new AuthorizationException($response->message(), $response->code());
-                    }
-                },
-                $ability
-            );
-        } elseif (! $gate->check($ability, $arguments)) {
-            throw new AuthorizationException("You are not authorized to access {$this->nodeName()}");
-        }
+                if ($response->denied()) {
+                    throw new AuthorizationException($response->message(), $response->code());
+                }
+            },
+            $ability
+        );
     }
 
     /**

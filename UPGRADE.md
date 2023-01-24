@@ -155,6 +155,28 @@ final class MyDirective extends BaseDirective implements FieldBuilderDirective
 Use `parseAndExecuteQuery()` for executing a string query or `executeParsedQuery()` for 
 executing an already parsed `DocumentNode` instance.
 
+### Removed error extension field `category`
+
+See https://github.com/webonyx/graphql-php/blob/master/UPGRADE.md#breaking-removed-error-extension-field-category
+
+### Use native interface for errors with extensions
+
+Use `GraphQL\Error\ProvidesExtensions::getExtensions()` over `Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions::extensionsContent()`
+to return extra information from exceptions:
+
+```diff
+use Exception;
+-use Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions;
++use GraphQL\Error\ClientAware;
++use GraphQL\Error\ProvidesExtensions;
+
+-class CustomException extends Exception implements RendersErrorsExtensions
++class CustomException extends Exception implements ClientAware, ProvidesExtensions
+{
+-   public function extensionsContent(): array
++   public function getExtensions(): array
+```
+
 ### Use `RefreshesSchemaCache` over `ClearsSchemaCache`
 
 The `ClearsSchemaCache` testing trait was prone to race conditions when running tests in parallel.

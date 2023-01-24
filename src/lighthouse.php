@@ -39,10 +39,11 @@ return [
         ],
 
         /*
-         * The `prefix` and `domain` configuration options are optional.
+         * The `prefix`, `domain` and `where` configuration options are optional.
          */
         // 'prefix' => '',
         // 'domain' => '',
+        // 'where' => [],
     ],
 
     /*
@@ -267,7 +268,6 @@ return [
         \Nuwave\Lighthouse\Execution\AuthenticationErrorHandler::class,
         \Nuwave\Lighthouse\Execution\AuthorizationErrorHandler::class,
         \Nuwave\Lighthouse\Execution\ValidationErrorHandler::class,
-        \Nuwave\Lighthouse\Execution\ExtensionErrorHandler::class,
         \Nuwave\Lighthouse\Execution\ReportingErrorHandler::class,
     ],
 

@@ -14,7 +14,7 @@ final class ValidationExceptionTest extends TestCase
         $message = 'The email or password does not match';
         $exception = ValidationException::withMessages([$rule => $message]);
 
-        $validation = $exception->extensionsContent()[ValidationException::CATEGORY];
+        $validation = $exception->getExtensions()[ValidationException::KEY];
         $this->assertSame([$message], $validation[$rule]);
     }
 
@@ -25,7 +25,7 @@ final class ValidationExceptionTest extends TestCase
         $laravelException = LaravelValidationException::withMessages([$rule => $message]);
         $exception = ValidationException::fromLaravel($laravelException);
 
-        $validation = $exception->extensionsContent()[ValidationException::CATEGORY];
+        $validation = $exception->getExtensions()[ValidationException::KEY];
         $this->assertSame([$message], $validation[$rule]);
     }
 }

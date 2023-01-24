@@ -3,12 +3,13 @@
 namespace Nuwave\Lighthouse\Schema\Factories;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Type\Definition\ResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo as BaseResolveInfo;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -23,6 +24,12 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 
+/**
+ * @phpstan-import-type FieldResolver from \GraphQL\Executor\Executor as FieldResolverFn
+ * @phpstan-import-type FieldDefinitionConfig from \GraphQL\Type\Definition\FieldDefinition
+ * @phpstan-import-type FieldType from \GraphQL\Type\Definition\FieldDefinition
+ * @phpstan-import-type ComplexityFn from \GraphQL\Type\Definition\FieldDefinition
+ */
 class FieldFactory
 {
     /**
@@ -67,7 +74,7 @@ class FieldFactory
     /**
      * Convert a FieldValue to an executable FieldDefinition.
      *
-     * @return array<string, mixed> Configuration array for @see \GraphQL\Type\Definition\FieldDefinition
+     * @return FieldDefinitionConfig
      */
     public function handle(FieldValue $fieldValue): array
     {
@@ -102,18 +109,26 @@ class FieldFactory
             ->send($fieldValue)
             ->through(array_merge($fieldMiddleware->all(), $globalFieldMiddleware->all()))
             ->via('handleField')
-            // TODO replace when we cut support for Laravel 5.6
-            // ->thenReturn()
-            ->then(static function (FieldValue $fieldValue): FieldValue {
-                return $fieldValue;
-            })
+            ->thenReturn()
             ->getResolver();
 
-        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolverWithMiddleware) {
-            $resolveInfo->argumentSet = $this->argumentSetFactory->fromResolveInfo($args, $resolveInfo);
+        $resolver = function ($root, array $args, GraphQLContext $context, BaseResolveInfo $resolveInfo) use ($resolverWithMiddleware) {
+            $wrappedResolveInfo = new ResolveInfo(
+                $resolveInfo->fieldDefinition,
+                $resolveInfo->fieldNodes,
+                $resolveInfo->parentType,
+                $resolveInfo->path,
+                $resolveInfo->schema,
+                $resolveInfo->fragments,
+                $resolveInfo->rootValue,
+                $resolveInfo->operation,
+                $resolveInfo->variableValues,
+                $this->argumentSetFactory->fromResolveInfo($args, $resolveInfo)
+            );
 
-            return $resolverWithMiddleware($root, $args, $context, $resolveInfo);
-        });
+            return $resolverWithMiddleware($root, $args, $context, $wrappedResolveInfo);
+        };
+        $fieldValue->setResolver($resolver);
 
         // To see what is allowed here, look at the validation rules in
         // GraphQL\Type\Definition\FieldDefinition::getDefinition()
@@ -123,7 +138,7 @@ class FieldFactory
             'args' => $this->argumentFactory->toTypeMap(
                 $fieldValue->getField()->arguments
             ),
-            'resolve' => $fieldValue->getResolver(),
+            'resolve' => $resolver,
             'description' => $fieldDefinitionNode->description->value ?? null,
             'complexity' => $this->complexity($fieldValue),
             'deprecationReason' => ASTHelper::deprecationReason($fieldDefinitionNode),
@@ -144,6 +159,9 @@ class FieldFactory
         };
     }
 
+    /**
+     * @return ComplexityFn|null
+     */
     protected function complexity(FieldValue $fieldValue): ?callable
     {
         $complexityDirective = $this->directiveLocator->exclusiveOfType(
@@ -159,14 +177,19 @@ class FieldFactory
         return $complexityDirective->complexityResolver($fieldValue);
     }
 
+    /**
+     * @return FieldResolverFn
+     */
     public static function defaultResolver(FieldValue $fieldValue): callable
     {
         if (RootType::SUBSCRIPTION === $fieldValue->getParentName()) {
             $providesSubscriptionResolver = Container::getInstance()->make(ProvidesSubscriptionResolver::class);
             assert($providesSubscriptionResolver instanceof ProvidesSubscriptionResolver);
 
+            // @phpstan-ignore-next-line Call to method provideSubscriptionResolver() on an unknown class Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver@anonymous
             return $providesSubscriptionResolver->provideSubscriptionResolver($fieldValue);
         }
+
         $providesResolver = Container::getInstance()->make(ProvidesResolver::class);
         assert($providesResolver instanceof ProvidesResolver);
 

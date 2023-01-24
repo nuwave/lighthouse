@@ -5,6 +5,7 @@ namespace Tests\Integration\Schema\Directives;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
+use Tests\Utils\Models\Role;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 use Tests\Utils\Policies\UserPolicy;
@@ -287,6 +288,106 @@ final class HasManyDirectiveTest extends DBTestCase
                                 'data' => [
                                     [
                                         'id' => $lastTask->id,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]);
+    }
+
+    public function testQueryPaginatedHasManyWithNonUniqueForeignKey(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Post {
+            roles: [RoleUser!]! @hasMany(relation: "roles", type: PAGINATOR, defaultCount: 10)
+        }
+
+        type RoleUser {
+            id: Int!
+            user_id: Int!
+            role_id: Int!
+        }
+
+        type Query {
+            posts: [Post!]! @all
+        }
+        ';
+
+        $user = factory(User::class)->create();
+        assert($user instanceof User);
+
+        $posts = factory(Post::class, 2)->make();
+        foreach ($posts as $post) {
+            assert($post instanceof Post);
+            $post->user()->associate($user);
+            $post->save();
+        }
+        $this->assertCount(2, $user->posts);
+
+        $roles = factory(Role::class, 3)->make();
+        foreach ($roles as $role) {
+            assert($role instanceof Role);
+            $user->roles()->save($role);
+        }
+        $this->assertCount(3, $user->roles);
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            query {
+                posts {
+                    roles {
+                        data {
+                            id
+                            user_id
+                            role_id
+                        }
+                    }
+                }
+            }
+            ')
+            ->assertExactJson([
+                'data' => [
+                    'posts' => [
+                        [
+                            'roles' => [
+                                'data' => [
+                                    [
+                                        'id' => 1,
+                                        'user_id' => $user->id,
+                                        'role_id' => $roles[0]->id,
+                                    ],
+                                    [
+                                        'id' => 2,
+                                        'user_id' => $user->id,
+                                        'role_id' => $roles[1]->id,
+                                    ],
+                                    [
+                                        'id' => 3,
+                                        'user_id' => $user->id,
+                                        'role_id' => $roles[2]->id,
+                                    ],
+                                ],
+                            ],
+                        ],
+                        [
+                            'roles' => [
+                                'data' => [
+                                    [
+                                        'id' => 1,
+                                        'user_id' => $user->id,
+                                        'role_id' => $roles[0]->id,
+                                    ],
+                                    [
+                                        'id' => 2,
+                                        'user_id' => $user->id,
+                                        'role_id' => $roles[1]->id,
+                                    ],
+                                    [
+                                        'id' => 3,
+                                        'user_id' => $user->id,
+                                        'role_id' => $roles[2]->id,
                                     ],
                                 ],
                             ],

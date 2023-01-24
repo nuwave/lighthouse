@@ -2,6 +2,8 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Illuminate\Contracts\Cache\Repository as CacheRepository;
+use Nuwave\Lighthouse\Cache\CacheKeyAndTagsGenerator;
 use Tests\DBTestCase;
 use Tests\TestsSerialization;
 use Tests\Utils\Models\Task;
@@ -128,10 +130,11 @@ final class LimitDirectiveTest extends DBTestCase
 
     public function testLimitsWithCache(): void
     {
-        $users = factory(User::class, 2)->create();
+        $user1 = factory(User::class)->create();
+        $user2 = factory(User::class)->create();
 
-        /** @var \Tests\Utils\Models\User $user */
-        foreach ($users as $user) {
+        foreach ([$user1, $user2] as $user) {
+            assert($user instanceof User);
             $user->tasks()->saveMany(
                 factory(Task::class, 2)->make()
             );
@@ -164,9 +167,12 @@ final class LimitDirectiveTest extends DBTestCase
             }
             ');
 
-        $cache = $this->app->make('cache');
-        $data = $cache->get('lighthouse:User:2:tasks:limit:1');
+        $cache = $this->app->make(CacheRepository::class);
+        assert($cache instanceof CacheRepository);
 
+        $data = $cache->get(
+            (new CacheKeyAndTagsGenerator())->key(null, false, 'User', $user2->id, 'tasks', ['limit' => 1])
+        );
         $this->assertIsArray($data);
 
         $task = $data[0];

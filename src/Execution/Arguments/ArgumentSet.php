@@ -81,6 +81,8 @@ class ArgumentSet
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation|\Laravel\Scout\Builder
      *
      * @phpstan-return TBuilder
+     *
+     * @deprecated will be moved to \Nuwave\Lighthouse\Execution\ResolveInfo
      */
     public function enhanceBuilder(object $builder, array $scopes, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo, \Closure $directiveFilter = null): object
     {

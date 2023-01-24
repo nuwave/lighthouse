@@ -20,6 +20,7 @@ class ConnectionField
     {
         /** @var int|null $firstItem Laravel type-hints are inaccurate here */
         $firstItem = $paginator->firstItem();
+
         /** @var int|null $lastItem Laravel type-hints are inaccurate here */
         $lastItem = $paginator->lastItem();
 
@@ -50,7 +51,7 @@ class ConnectionField
         $nonNullList = $resolveInfo->returnType;
         assert($nonNullList instanceof NonNull);
 
-        $objectLikeType = $nonNullList->getWrappedType(true);
+        $objectLikeType = $nonNullList->getInnermostType();
         assert($objectLikeType instanceof ObjectType || $objectLikeType instanceof InterfaceType);
 
         $returnTypeFields = $objectLikeType->getFields();

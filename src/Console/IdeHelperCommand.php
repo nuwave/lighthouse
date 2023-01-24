@@ -146,7 +146,7 @@ GRAPHQL;
         $sourceTypes = [];
         foreach ($sourceSchema->definitions as $definition) {
             if ($definition instanceof TypeDefinitionNode) {
-                $sourceTypes[$definition->name->value] = true;
+                $sourceTypes[$definition->getName()->value] = true;
             }
         }
 

@@ -4,7 +4,6 @@ namespace Tests\Unit\Auth;
 
 use Nuwave\Lighthouse\Auth\CanDirective;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
-use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\TestCase;
 use Tests\Utils\Models\User;
 use Tests\Utils\Policies\UserPolicy;
@@ -33,16 +32,11 @@ final class CanDirectiveTest extends TestCase
                 name
             }
         }
-        ')->assertGraphQLErrorCategory(AuthorizationException::CATEGORY);
+        ')->assertGraphQLErrorMessage(AuthorizationException::MESSAGE);
     }
 
     public function testThrowsWithCustomMessageIfNotAuthorized(): void
     {
-        // TODO remove with Laravel < 6 support
-        if (AppVersion::below(6.0)) {
-            $this->markTestSkipped('Version less than 6.0 do not support gate responses.');
-        }
-
         $this->be(new User());
 
         $this->schema = /** @lang GraphQL */ '
@@ -65,17 +59,11 @@ final class CanDirectiveTest extends TestCase
                 }
             }
             ')
-            ->assertGraphQLErrorCategory(AuthorizationException::CATEGORY)
             ->assertGraphQLErrorMessage(UserPolicy::SUPER_ADMINS_ONLY_MESSAGE);
     }
 
     public function testThrowsFirstWithCustomMessageIfNotAuthorized(): void
     {
-        // TODO remove with Laravel < 6 support
-        if (AppVersion::below(6.0)) {
-            $this->markTestSkipped('Version less than 6.0 do not support gate responses.');
-        }
-
         $this->be(new User());
 
         $this->schema = /** @lang GraphQL */ '
@@ -98,7 +86,6 @@ final class CanDirectiveTest extends TestCase
                 }
             }
             ')
-            ->assertGraphQLErrorCategory(AuthorizationException::CATEGORY)
             ->assertGraphQLErrorMessage(UserPolicy::SUPER_ADMINS_ONLY_MESSAGE);
     }
 
@@ -178,10 +165,6 @@ final class CanDirectiveTest extends TestCase
 
     public function testAcceptsGuestUser(): void
     {
-        if (AppVersion::below(5.7)) {
-            $this->markTestSkipped('Version less than 5.7 do not support guest user.');
-        }
-
         $this->mockResolver(function (): User {
             return $this->resolveUser();
         });
@@ -270,7 +253,7 @@ final class CanDirectiveTest extends TestCase
                 name
             }
         }
-        ')->assertGraphQLErrorCategory(AuthorizationException::CATEGORY);
+        ')->assertGraphQLErrorMessage(AuthorizationException::MESSAGE);
     }
 
     public function testInjectArgsPassesClientArgumentToPolicy(): void

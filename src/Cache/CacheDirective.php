@@ -2,10 +2,11 @@
 
 namespace Nuwave\Lighthouse\Cache;
 
-use GraphQL\Type\Definition\ResolveInfo;
+use GraphQL\Deferred;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Support\Carbon;
 use Nuwave\Lighthouse\Execution\Resolved;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
@@ -71,7 +72,6 @@ GRAPHQL;
                     : null;
                 $fieldName = $resolveInfo->fieldName;
 
-                /** @var \Illuminate\Cache\TaggedCache|\Illuminate\Contracts\Cache\Repository $cache */
                 $cache = $shouldUseTags
                     ? $this->cacheRepository->tags([
                         $this->cacheKeyAndTags->parentTag($parentName, $rootID),
@@ -88,14 +88,16 @@ GRAPHQL;
                     $args
                 );
 
-                // We found a matching value in the cache, so we can just return early
-                // without actually running the query
+                // We found a matching value in the cache, so we can just return early without actually running the query.
                 $value = $cache->get($cacheKey);
                 if (null !== $value) {
-                    return $value;
+                    // Deferring the result will allow nested deferred resolves to be bundled together, see https://github.com/nuwave/lighthouse/pull/2270#discussion_r1072414584.
+                    return new Deferred(function () use ($value) {
+                        return $value;
+                    });
                 }
 
-                // In Laravel cache, null is considered a non-existent value, see https://laravel.com/docs/8.x/cache#checking-for-item-existence:
+                // In Laravel cache, null is considered a non-existent value, see https://laravel.com/docs/9.x/cache#checking-for-item-existence:
                 // > The `has` method [...] will also return false if the item exists but its value is null.
                 //
                 // If caching `null` value becomes something worthwhile, one possible way to achieve it is to
@@ -116,7 +118,7 @@ GRAPHQL;
                 //
                 // Such a change would introduce some potential BC, if for instance cached value was already containing
                 // an object with a `rawValue` key prior the implementation change. A possible workaround is to choose a
-                // less collision-probable key instead of `rawValue` (eg. "com.lighthouse-php:rawValue" ?)
+                // less collision-probable key instead of `rawValue` (e.g. "lighthouse:rawValue").
 
                 $resolved = $resolver($root, $args, $context, $resolveInfo);
 

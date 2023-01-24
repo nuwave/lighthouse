@@ -96,7 +96,14 @@ class PaginatedModelsLoader implements ModelsLoader
             $firstRelation->getQuery()
         );
 
-        return $mergedRelationQuery->get();
+        $relatedModels = $mergedRelationQuery->get();
+        assert($relatedModels instanceof EloquentCollection);
+
+        return $relatedModels->unique(function (Model $relatedModel): string {
+            // Compare all attributes because there might not be a unique primary key
+            // or there could be differing pivot attributes.
+            return $relatedModel->toJson();
+        });
     }
 
     /**
@@ -153,7 +160,6 @@ class PaginatedModelsLoader implements ModelsLoader
         }
         assert($model instanceof Model);
 
-        /** @var array<int, string> $unloadedWiths */
         $unloadedWiths = array_filter(
             Utils::accessProtected($model, 'with'),
             static function (string $relation) use ($model): bool {

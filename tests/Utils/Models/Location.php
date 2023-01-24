@@ -15,8 +15,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property array<string, mixed> $extra
  *
  * Timestamps
- * @property \lluminate\Support\Carbon $created_at
- * @property \lluminate\Support\Carbon $updated_at
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property \Illuminate\Support\Carbon $updated_at
  *
  * Foreign keys
  * @property int|null $parent_id

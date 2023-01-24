@@ -14,7 +14,6 @@ use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Support\AppVersion;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
@@ -273,10 +272,6 @@ GRAPHQL;
      */
     protected function mutuallyExclusiveRule(array $otherOptions): string
     {
-        if (AppVersion::below(8.0)) {
-            return '';
-        }
-
         $optionsString = implode(',', $otherOptions);
 
         return "@rules(apply: [\"prohibits:{$optionsString}\"])";

@@ -15,6 +15,74 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Fixed
 
+- Return proper error for unknown types in variable definitions
+
+### Added
+
+- Add method `TypeRegistry::search()` that maybe finds a type with a given name
+
+### Removed
+
+- Remove mixin `TestResponse::assertGraphQLErrorCategory()`
+- Remove class `Nuwave\Lighthouse\Exceptions\GenericException`
+- Remove error extension field `category`
+- Remove interface `Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions`
+- Remove `Nuwave\Lighthouse\Execution\ExtensionErrorHandler`
+- Remove support for PHP 7.2, 7.3, 7.4
+- Remove support for Laravel 5, 6, 7
+- Remove `Serializable` implementation
+- Remove trait `ClearsSchemaCache`
+
+## v5.70.3
+
+### Fixed
+
+- Allow `\Illuminate\Http\UploadedFile` in test helper `multipartGraphQL()` argument `array $files`
+
+## v5.70.2
+
+### Fixed
+
+- Fix batch loading relations of parents that were partially cached https://github.com/nuwave/lighthouse/issues/2269
+
+## v5.70.1
+
+### Fixed
+
+- Fix batch loading a paginated BelongsToMany relation with duplicates https://github.com/nuwave/lighthouse/pull/2277
+
+## v5.70.0
+
+### Added
+
+- Allow configuring regular expression constraints for the registered route with `lighthouse.route.where`
+
+## v5.69.1
+
+### Fixed
+
+- Wrap base `ResolveInfo` class and extend it with `public ArgumentSet $argumentSet` in response to PHP 8.2 deprecating dynamic properties
+
+## v5.69.0
+
+### Added
+
+- Add argument `builder` to directive `@aggregate` https://github.com/nuwave/lighthouse/pull/2255
+
+## v5.68.1
+
+### Fixed
+
+- Avoid duplicated data in relation directives with paginator with non-unique foreign keys https://github.com/nuwave/lighthouse/pull/2252
+
+## v5.68.0
+
+### Added
+
+- Allow interfaces to implement interfaces https://github.com/nuwave/lighthouse/pull/2248
+
+### Fixed
+
 - Mark `@clearCache` directive `repeatable` https://github.com/nuwave/lighthouse/pull/2243
 
 ## v5.67.0

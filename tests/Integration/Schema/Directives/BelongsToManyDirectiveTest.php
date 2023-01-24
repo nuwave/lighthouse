@@ -27,6 +27,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
+        assert($user instanceof User);
         $this->be($user);
 
         $rolesCount = 2;
@@ -61,6 +62,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
+        assert($user instanceof User);
         $this->be($user);
 
         $rolesCount = 2;
@@ -96,6 +98,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
+        assert($user instanceof User);
         $this->be($user);
 
         $rolesCount = 4;
@@ -166,6 +169,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
+        assert($user instanceof User);
         $this->be($user);
 
         $roles = factory(Role::class, 3)->create();
@@ -222,14 +226,12 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
+        assert($user instanceof User);
         $this->be($user);
 
         $roles = factory(Role::class, 3)->create();
-        $meta = 'new';
-        $user->roles()->attach(
-            $roles,
-            ['meta' => $meta]
-        );
+        $meta = ['meta' => 'new'];
+        $user->roles()->attach($roles, $meta);
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -249,9 +251,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
                 'user' => [
                     'roles' => [
                         'edges' => [
-                            [
-                                'meta' => $meta,
-                            ],
+                            $meta,
                         ],
                     ],
                 ],
@@ -281,15 +281,13 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
+        assert($user instanceof User);
         $this->be($user);
 
         $rolesCount = 2;
         $roles = factory(Role::class, $rolesCount)->create();
-        $meta = 'new';
-        $user->roles()->attach(
-            $roles,
-            ['meta' => $meta]
-        );
+        $meta = ['meta' => 'new'];
+        $user->roles()->attach($roles, $meta);
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -307,9 +305,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
                 'user' => [
                     'roles' => [
                         [
-                            'pivot' => [
-                                'meta' => $meta,
-                            ],
+                            'pivot' => $meta,
                         ],
                     ],
                 ],
@@ -356,14 +352,12 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
+        assert($user instanceof User);
         $this->be($user);
 
         $roles = factory(Role::class, 3)->create();
-        $meta = 'new';
-        $user->roles()->attach(
-            $roles,
-            ['meta' => $meta]
-        );
+        $meta = ['meta' => 'new'];
+        $user->roles()->attach($roles, $meta);
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -383,14 +377,70 @@ final class BelongsToManyDirectiveTest extends DBTestCase
                 'user' => [
                     'roles' => [
                         'edges' => [
-                            [
-                                'meta' => $meta,
-                            ],
+                            $meta,
                         ],
                     ],
                 ],
             ],
         ])->assertJsonCount(2, 'data.user.roles.edges');
+    }
+
+    public function testQueryPaginatedBelongsToManyWithDuplicates(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            users: [User]! @all
+        }
+
+        type User {
+            id: ID!
+            roles: [Role!]! @belongsToMany(type: SIMPLE)
+        }
+
+        type Role {
+            id: ID!
+        }
+        ';
+
+        $roles = factory(Role::class, 2)->create();
+
+        $users = factory(User::class, 2)->create();
+        foreach ($users as $user) {
+            assert($user instanceof User);
+            $user->roles()->attach($roles);
+        }
+
+        $roleIDs = $roles
+            ->map(function (Role $role): array {
+                return ['id' => (string) $role->id];
+            })
+            ->all();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users {
+                id
+                roles(first: 2) {
+                    data {
+                        id
+                    }
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'users' => $users
+                    ->map(function (User $user) use ($roleIDs): array {
+                        return [
+                            'id' => (string) $user->id,
+                            'roles' => [
+                                'data' => $roleIDs,
+                            ],
+                        ];
+                    })
+                    ->all(),
+            ],
+        ]);
     }
 
     public function testQueryBelongsToManyNestedRelationships(): void
@@ -417,6 +467,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
+        assert($user instanceof User);
         $this->be($user);
 
         $roles = factory(Role::class, 3)->create();

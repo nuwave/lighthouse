@@ -3,11 +3,11 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Deferred;
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry;
 use Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader;
 use Nuwave\Lighthouse\Execution\ModelsLoader\ModelsLoader;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -42,13 +42,13 @@ abstract class WithRelationDirective extends BaseDirective implements FieldMiddl
      */
     protected function loadRelation(Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Deferred
     {
-        /** @var \Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader $relationBatchLoader */
         $relationBatchLoader = BatchLoaderRegistry::instance(
             $this->qualifyPath($args, $resolveInfo),
             function () use ($parent, $args, $context, $resolveInfo): RelationBatchLoader {
                 return new RelationBatchLoader($this->modelsLoader($parent, $args, $context, $resolveInfo));
             }
         );
+        assert($relationBatchLoader instanceof RelationBatchLoader);
 
         return $relationBatchLoader->load($parent);
     }

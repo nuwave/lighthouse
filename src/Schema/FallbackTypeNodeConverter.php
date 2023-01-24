@@ -25,6 +25,13 @@ class FallbackTypeNodeConverter extends TypeNodeConverter
         return Type::nonNull($type);
     }
 
+    /**
+     * @param T|callable():T $type
+     *
+     * @return ListOfType<T>
+     *
+     * @template T of Type
+     */
     protected function listOf($type): ListOfType
     {
         return Type::listOf($type);
