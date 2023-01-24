@@ -99,7 +99,6 @@ GRAPHQL;
         $modelArg = $this->directiveArgValue('model');
         if (is_string($modelArg)) {
             $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg) {
-                /** @var EloquentBuilder $query */
                 $query = $this->namespaceModelClass($modelArg)::query();
                 assert($query instanceof EloquentBuilder);
 
