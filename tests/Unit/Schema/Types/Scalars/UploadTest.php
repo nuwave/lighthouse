@@ -35,8 +35,7 @@ final class UploadTest extends TestCase
 
     public function testParsesValidFiles(): void
     {
-        $value = UploadedFile::fake()
-            ->create('my-file.jpg', 500);
+        $value = UploadedFile::fake()->create('my-file.jpg', 500);
         $parsedValue = (new Upload())->parseValue($value);
 
         $this->assertEquals($value, $parsedValue);
