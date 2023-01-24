@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit bootstrap="vendor/autoload.php"
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
          colors="true"
          verbose="true"
 >
@@ -17,19 +19,19 @@
         </testsuite>
     </testsuites>
 
-    <filter>
-        <whitelist>
+    <coverage>
+        <include>
             <directory suffix=".php">src</directory>
-        </whitelist>
-    </filter>
+        </include>
+    </coverage>
 
     <php>
         <env name="LIGHTHOUSE_TEST_DB_DATABASE" value="test"/>
-        <env name="LIGHTHOUSE_TEST_DB_HOST" value="127.0.0.1"/>
+        <env name="LIGHTHOUSE_TEST_DB_HOST" value="mysql"/>
         <env name="LIGHTHOUSE_TEST_DB_PORT" value="3306"/>
         <env name="LIGHTHOUSE_TEST_DB_USERNAME" value="root"/>
-        <env name="LIGHTHOUSE_TEST_DB_PASSWORD" value="root"/>
-        <env name="LIGHTHOUSE_TEST_REDIS_HOST" value="127.0.0.1"/>
+        <env name="LIGHTHOUSE_TEST_DB_PASSWORD" value=""/>
+        <env name="LIGHTHOUSE_TEST_REDIS_HOST" value="redis"/>
         <env name="LIGHTHOUSE_TEST_REDIS_PASSWORD" value="null"/>
         <env name="LIGHTHOUSE_TEST_REDIS_PORT" value="6379"/>
         <env name="LIGHTHOUSE_TEST_REDIS_DB" value="0"/>

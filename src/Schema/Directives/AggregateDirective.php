@@ -101,6 +101,7 @@ GRAPHQL;
             $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg) {
                 /** @var EloquentBuilder $query */
                 $query = $this->namespaceModelClass($modelArg)::query();
+                assert($query instanceof EloquentBuilder);
 
                 $this->makeBuilderDecorator($root, $args, $context, $resolveInfo)($query);
 
