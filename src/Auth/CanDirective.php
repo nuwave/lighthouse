@@ -162,7 +162,7 @@ GRAPHQL;
     protected function modelsToCheck($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): iterable
     {
         if ($this->directiveArgValue('query')) {
-            return $resolveInfo->argumentSet
+            return $resolveInfo
                 ->enhanceBuilder(
                     $this->getModelClass()::query(),
                     $this->directiveArgValue('scopes', []),
