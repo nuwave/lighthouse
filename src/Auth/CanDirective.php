@@ -202,7 +202,7 @@ GRAPHQL;
             }
 
             try {
-                $enhancedBuilder = $resolveInfo->argumentSet->enhanceBuilder(
+                $enhancedBuilder = $resolveInfo->enhanceBuilder(
                     $queryBuilder,
                     $this->directiveArgValue('scopes', []),
                     $root,
