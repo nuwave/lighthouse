@@ -483,9 +483,10 @@ and can apply additional constraints to the query.
 > This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
-When used on an argument, the value is supplied as the second parameter to the method.
-When used on a field, the value argument inside the directive is applied as the second
-parameter to the method.
+When used on an argument, the method is only called when the argument is specified (may be `null`),
+and its value is passed as the second parameter.
+When used on a field, the method is always called, and if the `value` argument is defined,
+it is passed as the second parameter.
 
 ```graphql
 type Query {
@@ -498,14 +499,18 @@ type Query {
 
 ```php
 use Illuminate\Database\Eloquent\Builder;
+use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class MyClass
+final class MyClass
 {
-    public function minimumHighscore(Builder $builder, int $minimumHighscore): Builder
+    /**
+     * @param  array<string, mixed>  $args
+     */
+    public function minimumHighscore(Builder $builder, ?int $minimumHighscore, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Builder
     {
-        return $builder->whereHas('game', static function (Builder $builder) use ($minimumHighscore): void {
-            $builder->where('score', '>', $minimumHighscore);
-        });
+        if (! $minimumHighscore) return $builder;
+        return $builder->whereHas('game', static fn (Builder $builder): Builder => $builder->where('score', '>', $minimumHighscore));
     }
 }
 ```

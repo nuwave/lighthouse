@@ -2,6 +2,9 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Database\Eloquent\Builder;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
@@ -30,6 +33,73 @@ final class BuilderDirectiveTest extends DBTestCase
             }
         }
         ')->assertJsonCount(1, 'data.users');
+    }
+
+    public function testCallsCustomBuilderMethodOnFieldCheckWithArgs(): void
+    {
+        $mock = \Mockery::mock($this);
+        $this->app->instance(__CLASS__, $mock);
+        $mock->shouldReceive('limit')
+            ->once()
+            ->withArgs(function (Builder $builder, $value, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
+                $this->assertSame(1, $value);
+                $this->assertSame([
+                    'arg1' => 'Hello',
+                    'arg2' => 'World',
+                ], $args);
+
+                return true;
+            })
+            ->andReturn(User::query());
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            users(arg1 : String, arg2 : String): [User!]! @all @builder(method: "' . $this->qualifyTestResolver('limit') . '" value: 1)
+        }
+
+        type User {
+            id: ID
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users(arg1: "Hello", arg2: "World") {
+                id
+            }
+        }
+        ');
+    }
+
+    public function testCallsCustomBuilderMethodOnFieldCheckWithoutArgs(): void
+    {
+        $mock = \Mockery::mock($this);
+        app()->instance(__CLASS__, $mock);
+        $mock->shouldReceive('limit')->once()->withArgs(function (Builder $builder, $value, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
+            $this->assertIsNumeric($value);
+            $this->assertEquals(1, $value);
+            $this->assertEquals([], $args);
+
+            return true;
+        })->andReturn(User::query());
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            users(arg1 : String, arg2 : String): [User!]! @all @builder(method: "' . $this->qualifyTestResolver('limit') . '" value: 1)
+        }
+
+        type User {
+            id: ID
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users {
+                id
+            }
+        }
+        ');
     }
 
     public function testCallsCustomBuilderMethodOnFieldWithValue(): void
@@ -83,8 +153,8 @@ final class BuilderDirectiveTest extends DBTestCase
      *
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
-    public static function limit(object $builder, int $value = 2): object
+    public static function limit(object $builder, ?int $value): object
     {
-        return $builder->limit($value);
+        return $builder->limit($value ?? 2);
     }
 }
