@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v5.70.3
+
+### Fixed
+
+- Allow `\Illuminate\Http\UploadedFile` in test helper `multipartGraphQL()` argument `array $files`
+
 ## v5.70.2
 
 ### Fixed

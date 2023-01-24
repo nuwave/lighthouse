@@ -90,7 +90,7 @@ trait MakesGraphQLRequests
      *
      * @param  array<string, mixed>|array<int, array<string, mixed>>  $operations
      * @param  array<array<int, string>>  $map
-     * @param  array<\Illuminate\Http\Testing\File>|array<array<mixed>>  $files
+     * @param  array<\Illuminate\Http\UploadedFile>|array<array<mixed>>  $files
      * @param  array<string, string>  $headers  Will be merged with Content-Type: multipart/form-data
      *
      * @return \Illuminate\Testing\TestResponse
