@@ -3,7 +3,7 @@ on:
   pull_request:
   push:
     branches:
-      - master
+      - 5.x
 
 env:
   REQUIRED_PHP_EXTENSIONS: mbstring, mysqli, pdo_mysql, redis
