@@ -4,9 +4,9 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 trait RelationDirectiveHelpers
 {

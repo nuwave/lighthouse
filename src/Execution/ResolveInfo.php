@@ -8,6 +8,7 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo as BaseResolveInfo;
 use GraphQL\Type\Schema;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class ResolveInfo extends BaseResolveInfo
 {
@@ -42,13 +43,21 @@ class ResolveInfo extends BaseResolveInfo
      * @phpstan-param  TBuilder  $builder
      *
      * @param  array<string>  $scopes
+     * @param  array<string, mixed>  $args
      *
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation|\Laravel\Scout\Builder
      *
      * @phpstan-return TBuilder
      */
-    public function enhanceBuilder(object $builder, array $scopes, \Closure $directiveFilter = null): object
+    public function enhanceBuilder(object $builder, array $scopes, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo, \Closure $directiveFilter = null): object
     {
-        return $this->argumentSet->enhanceBuilder($builder, $scopes, $directiveFilter);
+        return $this->argumentSet->enhanceBuilder(
+            $builder,
+            $scopes,
+            $directiveFilter,
+            $args,
+            $context,
+            $resolveInfo
+        );
     }
 }

@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder as QueryBuilder;
@@ -12,6 +11,7 @@ use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry;
 use Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader;
 use Nuwave\Lighthouse\Execution\ModelsLoader\AggregateModelsLoader;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
@@ -144,7 +144,7 @@ GRAPHQL;
                 $query = $this->namespaceModelClass($modelArg)::query();
                 assert($query instanceof EloquentBuilder);
 
-                $this->makeBuilderDecorator($resolveInfo)($query);
+                $this->makeBuilderDecorator($root, $args, $context, $resolveInfo)($query);
 
                 return $query->{$this->function()}($this->column());
             });
@@ -163,7 +163,7 @@ GRAPHQL;
                     "The method referenced by the builder argument of the @{$this->name()} directive on {$this->nodeName()} must return a Builder."
                 );
 
-                $this->makeBuilderDecorator($resolveInfo)($query);
+                $this->makeBuilderDecorator($root, $args, $context, $resolveInfo)($query);
 
                 return $query->{$this->function()}($this->column());
             });
