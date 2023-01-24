@@ -151,16 +151,14 @@ GRAPHQL;
                 $query = $this->getModelClass()::query();
             }
 
-            $query = $resolveInfo
-                ->argumentSet
-                ->enhanceBuilder(
-                    $query,
-                    $this->directiveArgValue('scopes', []),
-                    $root,
-                    $args,
-                    $context,
-                    $resolveInfo
-                );
+            $query = $resolveInfo->enhanceBuilder(
+                $query,
+                $this->directiveArgValue('scopes', []),
+                $root,
+                $args,
+                $context,
+                $resolveInfo
+            );
 
             $paginationArgs = PaginationArgs::extractArgs($args, $this->paginationType(), $this->paginateMaxCount());
 

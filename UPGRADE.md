@@ -150,6 +150,21 @@ final class MyDirective extends BaseDirective implements FieldBuilderDirective
 }
 ```
 
+### Use `ResolveInfo::enhanceBuilder()`
+
+`ArgumentSet::enhanceBuilder()` was removed.
+You must now call `ResolveInfo::enhanceBuilder()` and pass the resolver arguments.
+
+```diff
+use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+
+// Some resolver function or directive middleware
+function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
+-   $resolveInfo->argumentSet->enhanceBuilder($builder, $scopes, $directiveFilter);
++   $resolveInfo->enhanceBuilder($builder, $scopes, $root, $args, $context, $resolveInfo, $directiveFilter);
+```
+
 ### Replace `Nuwave\Lighthouse\GraphQL::executeQuery()` usage
 
 Use `parseAndExecuteQuery()` for executing a string query or `executeParsedQuery()` for 
