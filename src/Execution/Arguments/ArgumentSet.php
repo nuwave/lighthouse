@@ -159,7 +159,7 @@ class ArgumentSet
     {
         $resolveInfo->argumentSet->directives
             ->filter(Utils::instanceofMatcher(FieldBuilderDirective::class))
-            ->each(static function (FieldBuilderDirective $fieldBuilderDirective) use ($root, $args, $context, $resolveInfo, &$builder): void {
+            ->each(static function (FieldBuilderDirective $fieldBuilderDirective) use (&$builder, $root, $args, $context, $resolveInfo): void {
                 $builder = $fieldBuilderDirective->handleFieldBuilder($builder, $root, $args, $context, $resolveInfo);
             });
     }
