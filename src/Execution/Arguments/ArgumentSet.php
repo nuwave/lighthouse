@@ -62,8 +62,6 @@ class ArgumentSet
     /**
      * Add a value at the dot-separated path.
      *
-     * Works just like @see \Illuminate\Support\Arr::add().
-     *
      * @param  mixed  $value  any value to inject
      */
     public function addValue(string $path, $value): self
@@ -71,8 +69,28 @@ class ArgumentSet
         $argumentSet = $this;
         $keys = explode('.', $path);
 
+        self::setArgumentsValue($keys, $value, $argumentSet);
+
+        return $this;
+    }
+
+    /**
+     * @param  array<string>  $keys
+     * @param  mixed  $value any value to inject
+     * @param  ArgumentSet  $argumentSet
+     */
+    private function setArgumentsValue(array $keys, $value, ArgumentSet $argumentSet): void
+    {
         while (count($keys) > 1) {
             $key = array_shift($keys);
+
+            if ($key === '*') {
+                foreach ($argumentSet as $argument) {
+                    self::setArgumentsValue($keys, $value, $argument);
+                }
+
+                return;
+            }
 
             // If the key doesn't exist at this depth, we will just create an empty ArgumentSet
             // to hold the next value, allowing us to create the ArgumentSet to hold a final
@@ -89,8 +107,6 @@ class ArgumentSet
         $argument = new Argument();
         $argument->value = $value;
         $argumentSet->arguments[array_shift($keys)] = $argument;
-
-        return $this;
     }
 
     /**
