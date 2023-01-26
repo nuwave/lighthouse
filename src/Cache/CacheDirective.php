@@ -71,6 +71,7 @@ GRAPHQL;
                     ? data_get($root, $rootCacheKey)
                     : null;
                 $fieldName = $resolveInfo->fieldName;
+                $path = $resolveInfo->path;
 
                 $cache = $shouldUseTags
                     ? $this->cacheRepository->tags([
@@ -85,7 +86,8 @@ GRAPHQL;
                     $parentName,
                     $rootID,
                     $fieldName,
-                    $args
+                    $args,
+                    $path
                 );
 
                 // We found a matching value in the cache, so we can just return early without actually running the query.

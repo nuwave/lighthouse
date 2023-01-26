@@ -9,6 +9,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+- Change `CacheKeyAndTags` interface signature class https://github.com/nuwave/lighthouse/pull/2176
+
 ### Changed
 
 - Pass resolver arguments to `FieldBuilderDirective::handleFieldBuilder()` https://github.com/nuwave/lighthouse/pull/2234
