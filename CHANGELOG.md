@@ -9,6 +9,11 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Changed
+
+- Pass resolver arguments to `FieldBuilderDirective::handleFieldBuilder()` https://github.com/nuwave/lighthouse/pull/2234
+- Expected resolver arguments in `ResolveInfo::enhanceBuilder()`
+
 ### Fixed
 
 - Return proper error for unknown types in variable definitions
@@ -28,6 +33,14 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove support for Laravel 5, 6, 7
 - Remove `Serializable` implementation
 - Remove trait `ClearsSchemaCache`
+- Remove config option `lighthouse.unbox_bensampo_enum_enum_instances`
+- Remove `ArgumentSet::enhanceBuilder()`, use `ResolveInfo::enhanceBuilder()`
+
+## v5.70.3
+
+### Fixed
+
+- Allow `\Illuminate\Http\UploadedFile` in test helper `multipartGraphQL()` argument `array $files`
 
 ## v5.70.2
 

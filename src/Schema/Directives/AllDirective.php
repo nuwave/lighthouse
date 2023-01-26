@@ -66,7 +66,11 @@ GRAPHQL;
             return $resolveInfo
                 ->enhanceBuilder(
                     $query,
-                    $this->directiveArgValue('scopes', [])
+                    $this->directiveArgValue('scopes', []),
+                    $root,
+                    $args,
+                    $context,
+                    $resolveInfo
                 )
                 ->get();
         });

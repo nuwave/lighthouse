@@ -2,10 +2,12 @@
 
 namespace Nuwave\Lighthouse\Auth;
 
+use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class WhereAuthDirective extends BaseDirective implements FieldBuilderDirective
 {
@@ -40,7 +42,7 @@ directive @whereAuth(
 GRAPHQL;
     }
 
-    public function handleFieldBuilder(object $builder): object
+    public function handleFieldBuilder(object $builder, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): object
     {
         assert($builder instanceof EloquentBuilder);
 

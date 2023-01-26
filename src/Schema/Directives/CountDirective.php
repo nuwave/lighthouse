@@ -66,7 +66,7 @@ GRAPHQL;
                 $query = $this
                     ->namespaceModelClass($modelArg)::query();
 
-                $this->makeBuilderDecorator($resolveInfo)($query);
+                $this->makeBuilderDecorator($root, $args, $context, $resolveInfo)($query);
 
                 if ($this->directiveArgValue('distinct')) {
                     $query->distinct();
@@ -91,9 +91,9 @@ GRAPHQL;
                         $this->qualifyPath($args, $resolveInfo),
                         ['count']
                     ),
-                    function () use ($resolveInfo): RelationBatchLoader {
+                    function () use ($parent, $args, $context, $resolveInfo): RelationBatchLoader {
                         return new RelationBatchLoader(
-                            new CountModelsLoader($this->relation(), $this->makeBuilderDecorator($resolveInfo))
+                            new CountModelsLoader($this->relation(), $this->makeBuilderDecorator($parent, $args, $context, $resolveInfo))
                         );
                     }
                 );
