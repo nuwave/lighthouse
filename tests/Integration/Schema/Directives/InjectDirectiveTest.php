@@ -71,10 +71,22 @@ final class InjectDirectiveTest extends DBTestCase
 
         type User {
             id: ID
+            tasks: [Task!] @hasmany
         }
 
         type Mutation {
-            createTasks(input: [CreateTaskInput!]! @spread): Task @create @inject(context: "user.id", name: "input.*.user_id")
+            updateUser(input: UpdateUserInput @spread): User
+                @update
+                @inject(context: "user.id", name: "tasks.create.*.user_id")
+        }
+
+        input UpdateUserInput {
+            id: ID!
+            tasks: CreateTaskInputMany
+        }
+
+        input CreateTaskInputMany {
+            create: [CreateTaskInput!]
         }
 
         input CreateTaskInput {
@@ -83,32 +95,46 @@ final class InjectDirectiveTest extends DBTestCase
         ';
 
         $this->graphQL('
-        mutation {
-            createTasks(input: [{ name: "foo" }, { name: "bar" }]) {
-                id
-                name
-                user {
+        mutation ($input: UpdateUserInput!) {
+            updateUser(input: $input) {
+                tasks {
                     id
+                    name
+                    user {
+                        id
+                    }
                 }
             }
         }
-        ')->assertJson([
+        ', [
+            'input' => [
+                'id' => $user->getKey(),
+                'tasks' => [
+                    'create' => [
+                        [ 'name' => 'foo' ],
+                        [ 'name' => 'bar' ],
+                    ],
+                ],
+            ],
+        ])->assertJson([
             'data' => [
-                'createTasks' => [
-                    [
-                        'id' => '1',
-                        'name' => 'foo',
-                        'user' => [
+                'updateUser' => [
+                    'tasks' => [
+                        [
                             'id' => '1',
+                            'name' => 'foo',
+                            'user' => [
+                                'id' => '1',
+                            ],
+                        ],
+                        [
+                            'id' => '2',
+                            'name' => 'bar',
+                            'user' => [
+                                'id' => '1',
+                            ],
                         ],
                     ],
-                    [
-                        'id' => '2',
-                        'name' => 'bar',
-                        'user' => [
-                            'id' => '1',
-                        ],
-                    ]
                 ],
             ],
         ]);
