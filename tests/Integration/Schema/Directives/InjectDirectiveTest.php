@@ -12,7 +12,7 @@ final class InjectDirectiveTest extends DBTestCase
         $user = factory(User::class)->create();
         $this->be($user);
 
-        $this->schema .= '
+        $this->schema .= /* @lang GraphQL */ '
         type Task {
             id: ID!
             name: String!
@@ -62,7 +62,7 @@ final class InjectDirectiveTest extends DBTestCase
         $user = factory(User::class)->create();
         $this->be($user);
 
-        $this->schema .= '
+        $this->schema .= /* @lang GraphQL */ '
         type Task {
             id: ID!
             name: String!
