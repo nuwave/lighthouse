@@ -2,6 +2,8 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
+use GraphQL\Error\Error;
+
 class ArgumentSet
 {
     /**
@@ -86,6 +88,10 @@ class ArgumentSet
             $key = array_shift($keys);
 
             if ($key === '*') {
+                if (!is_array($argumentSet)) {
+                    throw new Error('Asterisk `*` must target an array in the list.');
+                }
+
                 foreach ($argumentSet as $argument) {
                     self::applyValue($keys, $value, $argument);
                 }
