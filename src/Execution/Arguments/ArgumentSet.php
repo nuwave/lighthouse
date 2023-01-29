@@ -69,7 +69,7 @@ class ArgumentSet
         $argumentSet = $this;
         $keys = explode('.', $path);
 
-        self::setArgumentsValue($keys, $value, $argumentSet);
+        self::applyValue($keys, $value, $argumentSet);
 
         return $this;
     }
@@ -79,14 +79,14 @@ class ArgumentSet
      * @param  mixed  $value any value to inject
      * @param  ArgumentSet  $argumentSet
      */
-    private function setArgumentsValue(array $keys, $value, ArgumentSet $argumentSet): void
+    private static function applyValue(array $keys, $value, ArgumentSet $argumentSet): void
     {
         while (count($keys) > 1) {
             $key = array_shift($keys);
 
             if ($key === '*') {
                 foreach ($argumentSet as $argument) {
-                    self::setArgumentsValue($keys, $value, $argument);
+                    self::applyValue($keys, $value, $argument);
                 }
 
                 return;
