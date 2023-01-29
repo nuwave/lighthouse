@@ -61,6 +61,7 @@ class ArgumentSet
 
     /**
      * Add a value at the dot-separated path.
+     * Asterisks may be used to indicate wildcards.
      *
      * @param  mixed  $value  any value to inject
      */
