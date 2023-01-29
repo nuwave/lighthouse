@@ -64,7 +64,7 @@ class ArgumentSet
      *
      * @param  mixed  $value  any value to inject
      */
-    public function addValue(string $path, $value): self
+    public function addValue(string $path, mixed $value): self
     {
         $argumentSet = $this;
         $keys = explode('.', $path);
