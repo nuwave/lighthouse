@@ -28,6 +28,7 @@ directive @inject(
   The target name of the argument into which the value is injected.
   You can use dot notation to set the value at arbitrary depth
   within the incoming argument.
+  Asterisks may be used to indicate wildcards.
   """
   name: String!
 ) repeatable on FIELD_DEFINITION
