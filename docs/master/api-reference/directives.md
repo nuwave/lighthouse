@@ -1761,9 +1761,9 @@ If you have an array you need to inject a value into, you can use an asterisk `*
 
 ```graphql
 type Mutation {
-  createTask(input: CreateTaskInput!): Task
-    @create
-    @inject(context: "user.id", name: "input.*.user_id")
+  updateUser(input: UpdateUser!): Task
+    @update
+    @inject(context: "user.id", name: "input.tasks.create.*.user_id")
 }
 ```
 
