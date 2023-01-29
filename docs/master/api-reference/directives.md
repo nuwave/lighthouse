@@ -1757,7 +1757,7 @@ type Mutation {
 }
 ```
 
-If you have an array you need to inject an argument into, you can use an asterisk `*`. 
+If you have an array you need to inject a value into, you can use an asterisk `*`. 
 
 ```graphql
 type Mutation {
