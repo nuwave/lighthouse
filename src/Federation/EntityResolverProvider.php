@@ -283,6 +283,7 @@ class EntityResolverProvider
         if (! $field) {
             return false;
         }
+
         return ASTHelper::hasDirective($field, $directiveName);
     }
 

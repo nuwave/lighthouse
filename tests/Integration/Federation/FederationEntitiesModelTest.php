@@ -2,14 +2,9 @@
 
 namespace Tests\Integration\Federation;
 
-use GraphQL\Error\Error;
-use GraphQL\Utils\Utils;
-use Nuwave\Lighthouse\Federation\EntityResolverProvider;
 use Nuwave\Lighthouse\Federation\FederationServiceProvider;
-use Nuwave\Lighthouse\Federation\Types\Any;
 use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 use Tests\DBTestCase;
-use Tests\TestCase;
 use Tests\Utils\Models\User;
 
 final class FederationEntitiesModelTest extends DBTestCase
@@ -53,9 +48,9 @@ final class FederationEntitiesModelTest extends DBTestCase
         ])->assertExactJson([
             'data' => [
                 '_entities' => [
-                    $userRepresentation
-                ]
-            ]
+                    $userRepresentation,
+                ],
+            ],
         ]);
     }
 
@@ -90,9 +85,9 @@ final class FederationEntitiesModelTest extends DBTestCase
         ])->assertExactJson([
             'data' => [
                 '_entities' => [
-                    $userRepresentation
-                ]
-            ]
+                    $userRepresentation,
+                ],
+            ],
         ]);
     }
 }
