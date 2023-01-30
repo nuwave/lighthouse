@@ -22,6 +22,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Added
 
 - Add method `TypeRegistry::search()` that maybe finds a type with a given name
+- Decode fields with directive `@globalId` in federation model entity resolver
 
 ### Removed
 
