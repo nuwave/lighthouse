@@ -34,7 +34,6 @@ class Entities
         $assignResultsByHash = function ($result, string $hash) use ($representationHashes, &$results): void {
             foreach ($representationHashes as $index => $h) {
                 if ($hash === $h) {
-                    dump($hash, $index);
                     $results[$index] = $result;
                 }
             }
