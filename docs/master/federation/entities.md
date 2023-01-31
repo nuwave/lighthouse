@@ -64,7 +64,7 @@ final class Foo implements BatchedEntityResolver
 }
 ```
 
-The returned iterable *must* have the same keys as the given `array $representations` to enable Lighthouse
+The returned iterable _must_ have the same keys as the given `array $representations` to enable Lighthouse
 to return the results in the correct order.
 
 ## Eloquent Model Resolvers
