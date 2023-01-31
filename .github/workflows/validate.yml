@@ -23,12 +23,16 @@ jobs:
       fail-fast: false
       matrix:
         php-version:
-          - 8.0
-          - 8.1
-          - 8.2
+          - "8.0"
+          - "8.1"
+          - "8.2"
         laravel-version:
-          - ^8
-          - ^9
+          - "^8"
+          - "^9"
+          - "^10"
+        exclude:
+          - php-version: "8.0"
+            laravel-version: "^10"
 
     steps:
       - uses: actions/checkout@v3
@@ -65,12 +69,13 @@ jobs:
       fail-fast: false
       matrix:
         php-version:
-          - 8.0
-          - 8.1
-          - 8.2
+          - "8.0"
+          - "8.1"
+          - "8.2"
         laravel-version:
-          - ^8
-          - ^9
+          - "^8"
+          - "^9"
+          - "^10"
         os:
           - ubuntu-latest
         composer:
@@ -79,6 +84,9 @@ jobs:
           - name: highest
             # No args added as highest is default
             arg: ""
+        exclude:
+          - php-version: "8.0"
+            laravel-version: "^10"
 
     services:
       mysql:
@@ -130,7 +138,7 @@ jobs:
         php-version:
           - 8.1
         laravel-version:
-          - ^8
+          - ^9
 
     services:
       mysql:
@@ -179,7 +187,7 @@ jobs:
         php-version:
           - 8.1
         laravel-version:
-          - ^8
+          - ^9
 
     steps:
       - uses: actions/checkout@v3
