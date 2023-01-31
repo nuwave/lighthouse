@@ -28,10 +28,29 @@ class Entities
     {
         $results = [];
 
-        /** @var array<string, array<int, array<string, mixed>>> $groupedRepresentations */
+        $representations = $args['representations'];
+        $representationHashes = array_map('serialize', $representations);
+
+        $assignResultsByHash = function ($result, string $hash) use ($representationHashes, &$results): void {
+            foreach ($representationHashes as $index => $h) {
+                if ($hash === $h) {
+                    dump($hash, $index);
+                    $results[$index] = $result;
+                }
+            }
+        };
+
+        /**
+         * Firstly, representations are grouped by typename to allow assigning the correct resolver for each entity.
+         * Secondly, they are deduplicated based on their hash to avoid resolving the same entity twice.
+         *
+         * @var array<string, array<string, array<string, mixed>>> $groupedRepresentations
+         */
         $groupedRepresentations = [];
-        foreach ($args['representations'] as $representation) {
-            $groupedRepresentations[$representation['__typename']][] = $representation;
+        foreach ($representations as $index => $representation) {
+            $typename = $representation['__typename'];
+            $hash = $representationHashes[$index];
+            $groupedRepresentations[$typename][$hash] = $representation;
         }
 
         foreach ($groupedRepresentations as $typename => $representations) {
@@ -39,15 +58,18 @@ class Entities
 
             $resolver = $this->entityResolverProvider->resolver($typename);
             if ($resolver instanceof BatchedEntityResolver) {
-                foreach ($resolver($representations) as $result) {
-                    $results[] = $result;
+                foreach ($resolver($representations) as $hash => $result) {
+                    $assignResultsByHash($result, $hash);
                 }
             } else {
-                foreach ($representations as $representation) {
-                    $results[] = $resolver($representation);
+                foreach ($representations as $hash => $representation) {
+                    $result = $resolver($representation);
+                    $assignResultsByHash($result, $hash);
                 }
             }
         }
+
+        ksort($results);
 
         return $results;
     }

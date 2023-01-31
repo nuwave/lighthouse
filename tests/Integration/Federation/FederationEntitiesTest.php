@@ -47,7 +47,7 @@ final class FederationEntitiesTest extends TestCase
             }
         }
         ', [
-            '_representations' => [
+            'representations' => [
                 $foo,
             ],
         ])->assertExactJson([
@@ -92,7 +92,7 @@ final class FederationEntitiesTest extends TestCase
             }
         }
         ', [
-            '_representations' => [
+            'representations' => [
                 $foo1,
                 $foo2,
             ],
@@ -155,7 +155,7 @@ final class FederationEntitiesTest extends TestCase
             }
         }
         ', [
-            '_representations' => [
+            'representations' => [
                 $foo1,
                 $foo2,
                 $foo3,
