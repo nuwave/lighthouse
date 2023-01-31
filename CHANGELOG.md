@@ -14,10 +14,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Pass resolver arguments to `FieldBuilderDirective::handleFieldBuilder()` https://github.com/nuwave/lighthouse/pull/2234
 - Expected resolver arguments in `ResolveInfo::enhanceBuilder()`
 - Pass the path array to `CacheKeyAndTags::key()` https://github.com/nuwave/lighthouse/pull/2176
+- Require implementations of `BatchedEntityResolver` to maintain the keys given in `array $representations` https://github.com/nuwave/lighthouse/pull/2286
 
 ### Fixed
 
 - Return proper error for unknown types in variable definitions
+- Ensure `_entities` maintains order of representations in result https://github.com/nuwave/lighthouse/pull/2286
 
 ### Added
 
