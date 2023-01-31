@@ -14,14 +14,9 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
  */
 class Entities
 {
-    /**
-     * @var \Nuwave\Lighthouse\Federation\EntityResolverProvider
-     */
-    protected $entityResolverProvider;
-
-    public function __construct(EntityResolverProvider $entityResolverProvider)
-    {
-        $this->entityResolverProvider = $entityResolverProvider;
+    public function __construct(
+        protected EntityResolverProvider $entityResolverProvider
+    ) {
     }
 
     /**
