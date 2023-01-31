@@ -38,7 +38,7 @@
         "illuminate/routing": "^8.59 || ^9 || ^10",
         "illuminate/support": "^8.59 || ^9 || ^10",
         "illuminate/validation": "^8.59 || ^9 || ^10",
-        "laragraph/utils": "dev-graphql-php-15",
+        "laragraph/utils": "^1.5",
         "thecodingmachine/safe": "^1 || ^2",
         "webonyx/graphql-php": "^15"
     },
