@@ -29,6 +29,7 @@ jobs:
         laravel-version:
           - ^8
           - ^9
+          - ^10
 
     steps:
       - uses: actions/checkout@v3
@@ -71,6 +72,7 @@ jobs:
         laravel-version:
           - ^8
           - ^9
+          - ^10
         os:
           - ubuntu-latest
         composer:
@@ -130,7 +132,7 @@ jobs:
         php-version:
           - 8.1
         laravel-version:
-          - ^8
+          - ^9
 
     services:
       mysql:
@@ -179,7 +181,7 @@ jobs:
         php-version:
           - 8.1
         laravel-version:
-          - ^8
+          - ^9
 
     steps:
       - uses: actions/checkout@v3
