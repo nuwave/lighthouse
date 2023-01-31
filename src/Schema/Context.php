@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Auth\AuthServiceProvider;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
+/**
+ * @property \Illuminate\Contracts\Auth\Authenticatable|null $user
+ */
 class Context implements GraphQLContext
 {
     /**
@@ -34,5 +37,18 @@ class Context implements GraphQLContext
     public function request(): Request
     {
         return $this->request;
+    }
+
+    /**
+     * Lazily loads $user
+     * this helps use the correct guard if changed via @guard
+     */
+    public function __get($name)
+    {
+        if ($name === 'user') {
+            return $this->user();
+        }
+
+        return $this->{$name};
     }
 }

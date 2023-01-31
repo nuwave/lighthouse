@@ -138,7 +138,6 @@ final class GuardDirectiveTest extends TestCase
 
     public function testMultiGuardWithAuthorization(): void
     {
-        /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = $this->app->make(ConfigRepository::class);
         assert($config instanceof ConfigRepository);
 
@@ -160,8 +159,7 @@ final class GuardDirectiveTest extends TestCase
         $team->id = 1;
         $team->name = 'Test';
 
-        /** @var \Illuminate\Contracts\Auth\Factory */
-        $auth = $this->app->make('auth');
+        $auth = $this->app->make(AuthFactory::class);
         assert($auth instanceof AuthFactory);
         $auth->guard('team')->setUser($team);
 
@@ -180,8 +178,7 @@ final class GuardDirectiveTest extends TestCase
         }
         ';
 
-        $this
-            ->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ '
         {
             team {
                 id
