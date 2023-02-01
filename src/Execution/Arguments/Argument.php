@@ -4,7 +4,7 @@ namespace Nuwave\Lighthouse\Execution\Arguments;
 
 use Illuminate\Support\Collection;
 
-class Argument
+class Argument implements \ArrayAccess
 {
     /**
      * The value given by the client.
@@ -84,5 +84,29 @@ class Argument
         }
 
         return $value;
+    }
+
+    public function offsetExists(mixed $offset): bool
+    {
+        return isset($this->value[$offset]);
+    }
+
+    public function offsetGet(mixed $offset): Argument
+    {
+        return $this->value[$offset];
+    }
+
+    public function offsetSet(mixed $offset, mixed $value): void
+    {
+        $argument = $this;
+
+        $argument->value[$offset] = $value;
+    }
+
+    public function offsetUnset(mixed $offset): void
+    {
+        $argument = $this;
+
+        unset($argument[$offset]);
     }
 }
