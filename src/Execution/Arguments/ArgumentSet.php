@@ -122,7 +122,7 @@ class ArgumentSet implements \ArrayAccess
         $argumentSet = $this;
 
         $argument = new Argument();
-        $argument->value = $value;
+        $argument->value = $value ?: new self();
         $argumentSet->arguments[(string) $offset] = $argument;
     }
 
