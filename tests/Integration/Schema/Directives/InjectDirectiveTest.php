@@ -139,4 +139,59 @@ final class InjectDirectiveTest extends DBTestCase
             ],
         ]);
     }
+
+
+    public function testWillRejectValuesNotPlacedAtArrayWithWildcardInjection(): void
+    {
+        $user = factory(User::class)->create();
+        $this->be($user);
+
+        $this->schema .= /* @lang GraphQL */ '
+        type Task {
+            id: ID!
+            name: String!
+            user: User @belongsTo
+        }
+
+        type User {
+            id: ID
+        }
+
+        type Mutation {
+            createTask(input: CreateTaskInput! @spread): Task @create @inject(context: "user.id", name: "not_an_array.*.user_id")
+        }
+
+        input CreateTaskInput {
+            name: String
+            user_id: ID!
+        }
+        ';
+
+        $this->graphQL('
+        mutation ($id: ID!) {
+            createTask(input: {
+                name: "foo"
+                user_id: $id
+            }) {
+                id
+                name
+                user {
+                    id
+                }
+            }
+        }
+        ', [
+            'id' => $user->getKey(),
+        ])->assertJson([
+            'data' => [
+                'createTask' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'user' => [
+                        'id' => '1',
+                    ],
+                ],
+            ],
+        ]);
+    }
 }
