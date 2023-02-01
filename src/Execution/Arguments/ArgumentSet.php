@@ -2,9 +2,7 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
-use GraphQL\Error\Error;
-
-class ArgumentSet
+class ArgumentSet implements \ArrayAccess
 {
     /**
      * An associative array from argument names to arguments.
@@ -70,50 +68,29 @@ class ArgumentSet
     public function addValue(string $path, mixed $value): self
     {
         $argumentSet = $this;
-        $keys = explode('.', $path);
 
-        self::applyValue($keys, $value, $argumentSet);
+        data_set($argumentSet, $path, $value);
+        self::removeEmptyArrays($argumentSet);
 
         return $this;
     }
 
     /**
-     * @param  array<string>  $keys
-     * @param  mixed  $value any value to inject
-     * @param  ArgumentSet  $argumentSet
+     * Remove all arguments which is an empty array.
      */
-    private static function applyValue(array $keys, $value, ArgumentSet $argumentSet): void
+    private static function removeEmptyArrays(ArgumentSet $argumentSet): void
     {
-        while (count($keys) > 1) {
-            $key = array_shift($keys);
-
-            if ($key === '*') {
-                if (!is_array($argumentSet)) {
-                    throw new Error('Asterisk `*` must target an array in the list.');
+        foreach ($argumentSet->arguments as $name => $argument) {
+            if (is_array($argument->value)) {
+                foreach ($argument->value as $value) {
+                    self::removeEmptyArrays($value);
                 }
-
-                foreach ($argumentSet as $argument) {
-                    self::applyValue($keys, $value, $argument);
-                }
-
-                return;
             }
 
-            // If the key doesn't exist at this depth, we will just create an empty ArgumentSet
-            // to hold the next value, allowing us to create the ArgumentSet to hold a final
-            // value at the correct depth. Then we'll keep digging into the ArgumentSet.
-            if (! isset($argumentSet->arguments[$key])) {
-                $argument = new Argument();
-                $argument->value = new self();
-                $argumentSet->arguments[$key] = $argument;
+            if (is_array($argument->value) && empty($argument->value)) {
+                unset($argumentSet[$name]);
             }
-
-            $argumentSet = $argumentSet->arguments[$key]->value;
         }
-
-        $argument = new Argument();
-        $argument->value = $value;
-        $argumentSet->arguments[array_shift($keys)] = $argument;
     }
 
     /**
@@ -124,5 +101,35 @@ class ArgumentSet
     public function argumentsWithUndefined(): array
     {
         return array_merge($this->arguments, $this->undefined);
+    }
+
+    public function offsetExists(mixed $offset): bool
+    {
+        $argumentSet = $this;
+
+        return isset($argumentSet->arguments[$offset]);
+    }
+
+    public function offsetGet(mixed $offset): Argument
+    {
+        $argumentSet = $this;
+
+        return $argumentSet->arguments[$offset];
+    }
+
+    public function offsetSet(mixed $offset, mixed $value): void
+    {
+        $argumentSet = $this;
+
+        $argument = new Argument();
+        $argument->value = $value;
+        $argumentSet->arguments[(string) $offset] = $argument;
+    }
+
+    public function offsetUnset(mixed $offset): void
+    {
+        $argumentSet = $this;
+
+        unset($argumentSet->arguments[$offset]);
     }
 }
