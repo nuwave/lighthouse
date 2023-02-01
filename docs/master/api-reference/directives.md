@@ -1761,9 +1761,22 @@ If you have an array you need to inject a value into, you can use an asterisk `*
 
 ```graphql
 type Mutation {
-  updateUser(input: UpdateUser!): Task
+  updateUser(input: UpdateUserInput!): Task
     @update
     @inject(context: "user.id", name: "input.tasks.create.*.user_id")
+}
+
+input UpdateUserInput {
+  id: ID!
+  tasks: UpdateTasksHasManyInput
+}
+
+input UpdateTasksHasManyInput {
+  create: [CreateTaskInput!]
+}
+
+input CreateTaskInput {
+  title: String!
 }
 ```
 
