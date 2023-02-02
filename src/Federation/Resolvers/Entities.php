@@ -20,9 +20,9 @@ class Entities
     }
 
     /**
-     * @param  array{representations: array<int, mixed>}  $args
+     * @param  array{representations: list<mixed>}  $args
      *
-     * @return list<mixed>
+     * @return array<mixed>
      */
     public function __invoke($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): array
     {
