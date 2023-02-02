@@ -140,6 +140,54 @@ final class InjectDirectiveTest extends DBTestCase
         ]);
     }
 
+    public function testCanSendEmptyArray(): void
+    {
+        $user = factory(User::class)->create();
+        $this->be($user);
+
+        $this->schema .= /* @lang GraphQL */ '
+        type Task {
+            id: ID!
+            name: String!
+            user: User @belongsTo
+        }
+
+        type User {
+            id: ID
+        }
+
+        type Mutation {
+            createTask(input: CreateTaskInput! @spread): Task @create
+        }
+
+        input CreateTaskInput {
+            name: String
+            empty_array: [String]!
+            user_id: ID!
+        }
+        ';
+
+        $this->graphQL('
+        mutation ($id: ID!, $emptyArray: [String]!) {
+            createTask(input: {
+                name: "foo"
+                user_id: $id
+                empty_array: $emptyArray
+            }) {
+                id
+            }
+        }
+        ', [
+            'id' => $user->getKey(),
+            'emptyArray' => [],
+        ])->assertJson([
+            'data' => [
+                'createTask' => [
+                    'id' => '1',
+                ],
+            ],
+        ]);
+    }
 
     public function testWillRejectValuesNotPlacedAtArrayWithWildcardInjection(): void
     {
