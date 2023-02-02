@@ -44,7 +44,7 @@ class Foo
 
 When the client requests a large number of entities with the same type, it can be more efficient to resolve
 them all at once. When your entity resolver class implements `Nuwave\Lighthouse\Federation\BatchedEntityResolver`,
-Lighthouse will call it a single time with a list of all representations of its type. The resolver can then do
+Lighthouse will call it a single time with an array of all representations of its type. The resolver can then do
 some kind of batch query to resolve them and return them all at once.
 
 ```php
@@ -52,10 +52,10 @@ namespace App\GraphQL\Entities;
 
 use Nuwave\Lighthouse\Federation\BatchedEntityResolver;
 
-class Foo implements BatchedEntityResolver
+final class Foo implements BatchedEntityResolver
 {
     /**
-     * @param  array<int, array{__typename: string, id: int}>  $representations
+     * @param  array<string, array{__typename: string, id: int}>  $representations
      */
     public function __invoke(array $representations): iterable
     {
@@ -63,6 +63,9 @@ class Foo implements BatchedEntityResolver
     }
 }
 ```
+
+The returned iterable _must_ have the same keys as the given `array $representations` to enable Lighthouse
+to return the results in the correct order.
 
 ## Eloquent Model Resolvers
 

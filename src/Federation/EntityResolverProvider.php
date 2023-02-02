@@ -123,7 +123,7 @@ class EntityResolverProvider
         $type = null;
         try {
             $type = $this->schema->getType($typename);
-        } catch (DefinitionException $definitionException) {
+        } catch (DefinitionException) {
             // Signalizes the type is unknown, handled by the null check below
         }
         if (null === $type) {
