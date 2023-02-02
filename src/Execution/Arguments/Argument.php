@@ -4,7 +4,7 @@ namespace Nuwave\Lighthouse\Execution\Arguments;
 
 use Illuminate\Support\Collection;
 
-class Argument implements \ArrayAccess
+class Argument implements \ArrayAccess, \IteratorAggregate
 {
     /**
      * The value given by the client.
@@ -108,5 +108,10 @@ class Argument implements \ArrayAccess
         $argument = $this;
 
         unset($argument[$offset]);
+    }
+
+    public function getIterator(): \ArrayIterator
+    {
+        return new \ArrayIterator($this->value);
     }
 }
