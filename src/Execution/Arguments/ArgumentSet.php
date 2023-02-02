@@ -70,27 +70,8 @@ class ArgumentSet implements \ArrayAccess
         $argumentSet = $this;
 
         data_set($argumentSet, $path, $value);
-        self::removeEmptyArrays($argumentSet);
 
         return $this;
-    }
-
-    /**
-     * Remove all arguments which is an empty array.
-     */
-    private static function removeEmptyArrays(ArgumentSet $argumentSet): void
-    {
-        foreach ($argumentSet->arguments as $name => $argument) {
-            if (is_array($argument->value)) {
-                foreach ($argument->value as $value) {
-                    self::removeEmptyArrays($value);
-                }
-            }
-
-            if (is_array($argument->value) && empty($argument->value)) {
-                unset($argumentSet[$name]);
-            }
-        }
     }
 
     /**
