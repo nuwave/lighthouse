@@ -155,41 +155,51 @@ final class InjectDirectiveTest extends DBTestCase
 
         type User {
             id: ID
+            tasks: [Task!] @hasmany
         }
 
         type Mutation {
-            createTask(input: CreateTaskInput! @spread): Task @create @inject(context: "user.id", name: "not_an_array.*.user_id")
+            updateUser(input: UpdateUserInput @spread): User
+                @update
+                @inject(context: "user.id", name: "tasks.create.*.user_id")
+        }
+
+        input UpdateUserInput {
+            id: ID!
+            tasks: CreateTaskInputMany
+        }
+
+        input CreateTaskInputMany {
+            create: [CreateTaskInput!]
         }
 
         input CreateTaskInput {
             name: String
-            user_id: ID!
         }
         ';
 
         $this->graphQL('
-        mutation ($id: ID!) {
-            createTask(input: {
-                name: "foo"
-                user_id: $id
-            }) {
+        mutation ($input: UpdateUserInput!) {
+            updateUser(input: $input) {
                 id
-                name
-                user {
+                tasks {
                     id
+                    name
+                    user {
+                        id
+                    }
                 }
             }
         }
         ', [
-            'id' => $user->getKey(),
+            'input' => [
+                'id' => $user->getKey(),
+            ],
         ])->assertJson([
             'data' => [
-                'createTask' => [
-                    'id' => '1',
-                    'name' => 'foo',
-                    'user' => [
-                        'id' => '1',
-                    ],
+                'updateUser' => [
+                    'id' => $user->getKey(),
+                    'tasks' => [],
                 ],
             ],
         ]);
