@@ -104,13 +104,10 @@ class Argument implements \ArrayAccess, \IteratorAggregate
     {
         $argument = $this;
 
-        if (is_array($value)) {
-            $argumentSet = new ArgumentSet();
-            $argumentSet[(string) $offset] = $value;
-            $argument->value = $argumentSet;
-        } else {
-            $argument->value[$offset] = $value;
-        }
+        $argumentSet = new ArgumentSet();
+        $argumentSet[(string) $offset] = $value;
+
+        $argument->value = $argumentSet;
     }
 
     public function offsetUnset(mixed $offset): void
