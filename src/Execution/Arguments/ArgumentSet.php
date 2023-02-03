@@ -2,7 +2,7 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
-class ArgumentSet implements \ArrayAccess
+class ArgumentSet implements \ArrayAccess, \IteratorAggregate
 {
     /**
      * An associative array from argument names to arguments.
@@ -91,7 +91,7 @@ class ArgumentSet implements \ArrayAccess
         return isset($argumentSet->arguments[$offset]);
     }
 
-    public function offsetGet(mixed $offset): Argument
+    public function &offsetGet(mixed $offset): Argument
     {
         $argumentSet = $this;
 
@@ -112,5 +112,12 @@ class ArgumentSet implements \ArrayAccess
         $argumentSet = $this;
 
         unset($argumentSet->arguments[$offset]);
+    }
+
+    public function getIterator(): \ArrayIterator
+    {
+        $arguments = $this->arguments;
+
+        return new \ArrayIterator($arguments);
     }
 }

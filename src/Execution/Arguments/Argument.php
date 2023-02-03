@@ -88,19 +88,29 @@ class Argument implements \ArrayAccess, \IteratorAggregate
 
     public function offsetExists(mixed $offset): bool
     {
-        return isset($this->value[$offset]);
+        $argument = $this;
+
+        return isset($argument->value[$offset]);
     }
 
-    public function offsetGet(mixed $offset): Argument
+    public function &offsetGet(mixed $offset): mixed
     {
-        return $this->value[$offset];
+        $argument = $this;
+
+        return $argument->value[$offset];
     }
 
     public function offsetSet(mixed $offset, mixed $value): void
     {
         $argument = $this;
 
-        $argument->value[$offset] = $value;
+        if (is_array($value)) {
+            $argumentSet = new ArgumentSet();
+            $argumentSet[(string) $offset] = $value;
+            $argument->value = $argumentSet;
+        } else {
+            $argument->value[$offset] = $value;
+        }
     }
 
     public function offsetUnset(mixed $offset): void
@@ -112,6 +122,8 @@ class Argument implements \ArrayAccess, \IteratorAggregate
 
     public function getIterator(): \ArrayIterator
     {
-        return new \ArrayIterator($this->value);
+        $value = $this->value;
+
+        return new \ArrayIterator($value);
     }
 }
