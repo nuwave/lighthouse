@@ -968,33 +968,23 @@ directive @delete(
 ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-Use it on a root mutation field that returns an instance of the Model.
+Use this on root mutation fields.
+It will return an instance of the Model so you can show its data one last time.
 
 ```graphql
 type Mutation {
-  deletePost(id: ID!): Post @delete
+  deletePost(id: ID! @eq): Post! @delete
 }
 ```
 
-In the upcoming `v6`, the `@delete`, `@forceDelete` and `@restore` directives no longer offer the
-`globalId` argument. Use `@globalId` on the argument instead.
-
-```diff
-type Mutation {
--   deleteUser(id: ID!): User! @delete(globalId: true)
-+   deleteUser(id: ID! @globalId): User! @delete
-}
-```
-
-You can also delete multiple models at once.
-Define a field that takes a list of IDs and returns a collection of the
-deleted models.
+You can also delete multiple models at once, for example by a list of IDs or a filter.
+Be careful with the filters you offer to avoid accidental mass deletion.
 
 _In contrast to Laravel mass updates, this does trigger model events._
 
 ```graphql
 type Mutation {
-  deletePosts(id: [ID!]!): [Post!]! @delete
+  deletePosts(ids: [ID!] @in(key: "id"), title: String @eq): [Post!]! @delete
 }
 ```
 
@@ -1011,7 +1001,7 @@ This directive can also be used as a [nested arg resolver](../concepts/arg-resol
 
 ```graphql
 type Mutation {
-  updateUser(id: Int, deleteTasks: [Int!]! @delete(relation: "tasks")): User
+  updateUser(id: ID!, deleteTasks: [ID!]! @delete(relation: "tasks")): User!
     @update
 }
 ```
@@ -1022,7 +1012,7 @@ possible model that can be deleted.
 
 ```graphql
 type Mutation {
-  updateTask(id: Int, deleteUser: Boolean @delete(relation: "user")): Task
+  updateTask(id: ID!, deleteUser: Boolean @delete(relation: "user")): Task!
     @update
 }
 ```

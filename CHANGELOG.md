@@ -15,6 +15,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Expected resolver arguments in `ResolveInfo::enhanceBuilder()`
 - Pass the path array to `CacheKeyAndTags::key()` https://github.com/nuwave/lighthouse/pull/2176
 - Require implementations of `BatchedEntityResolver` to maintain the keys given in `array $representations` https://github.com/nuwave/lighthouse/pull/2286
+- Require filter directives such as `@eq` in `@delete`, `@forceDelete` and `@restore`
 
 ### Fixed
 
@@ -40,6 +41,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove trait `ClearsSchemaCache`
 - Remove config option `lighthouse.unbox_bensampo_enum_enum_instances`
 - Remove `ArgumentSet::enhanceBuilder()`, use `ResolveInfo::enhanceBuilder()`
+- Remove the `globalId` argument from `@delete`, `@forceDelete` and `@restore`
 
 ## v5.70.3
 

@@ -23,7 +23,7 @@ final class DeleteDirectiveTest extends DBTestCase
         }
 
         type Mutation {
-            deleteUser(id: ID!): User @delete
+            deleteUser(id: ID! @eq): User @delete
         }
         ';
 
@@ -54,7 +54,7 @@ final class DeleteDirectiveTest extends DBTestCase
         }
 
         type Mutation {
-            deleteUser(id: ID!): User @delete
+            deleteUser(id: ID! @eq): User @delete
         }
         ';
 
@@ -82,7 +82,7 @@ final class DeleteDirectiveTest extends DBTestCase
         }
 
         type Mutation {
-            deleteUsers(ids: [ID!]!): [User!]! @delete
+            deleteUsers(ids: [ID!]! @in(key: "id")): [User!]! @delete
         }
         ';
 
@@ -107,7 +107,7 @@ final class DeleteDirectiveTest extends DBTestCase
         }
 
         type Mutation {
-            deleteUsers(ids: [ID!]!): [User!]! @delete
+            deleteUsers(ids: [ID!]! @in(key: "id")): [User!]! @delete
         }
         ';
 
@@ -132,7 +132,7 @@ final class DeleteDirectiveTest extends DBTestCase
         }
 
         type Mutation {
-            deleteUsers(ids: [ID!]!): [User!]! @delete
+            deleteUsers(ids: [ID!]! @in(key: "id")): [User!]! @delete
         }
         ';
 
@@ -147,52 +147,6 @@ final class DeleteDirectiveTest extends DBTestCase
                 'deleteUsers' => [],
             ],
         ]);
-    }
-
-    public function testRejectsDefinitionWithNullableArgument(): void
-    {
-        $this->expectException(DefinitionException::class);
-
-        $this->buildSchema(/** @lang GraphQL */ '
-        type User {
-            id: ID!
-            name: String
-        }
-
-        type Mutation {
-            deleteUser(id: ID): User @delete
-        }
-        ' . self::PLACEHOLDER_QUERY);
-    }
-
-    public function testRejectsDefinitionWithNoArgument(): void
-    {
-        $this->expectException(DefinitionException::class);
-
-        $this->buildSchema(/** @lang GraphQL */ '
-        type User {
-            id: ID!
-        }
-
-        type Mutation {
-            deleteUser: User @delete
-        }
-        ' . self::PLACEHOLDER_QUERY);
-    }
-
-    public function testRejectsDefinitionWithMultipleArguments(): void
-    {
-        $this->expectException(DefinitionException::class);
-
-        $this->buildSchema(/** @lang GraphQL */ '
-        type User {
-            id: ID!
-        }
-
-        type Mutation {
-            deleteUser(foo: String, bar: Int): User @delete
-        }
-        ' . self::PLACEHOLDER_QUERY);
     }
 
     public function testRequiresRelationWhenUsingAsArgResolver(): void
@@ -405,7 +359,7 @@ final class DeleteDirectiveTest extends DBTestCase
         }
 
         type Mutation {
-            deleteUser(id: ID!): User @delete
+            deleteUser(id: ID! @eq): User @delete
         }
         ';
 

@@ -219,7 +219,7 @@ final class CanDirectiveDBTest extends DBTestCase
 
         $this->schema = /** @lang GraphQL */ '
         type Mutation {
-            deletePosts(ids: [ID!]!): [Post!]!
+            deletePosts(ids: [ID!]! @in(key: "id")): [Post!]!
                 @can(ability: "delete", find: "ids")
                 @delete
         }
@@ -382,7 +382,7 @@ final class CanDirectiveDBTest extends DBTestCase
 
         $this->schema = /** @lang GraphQL */ '
         type Mutation {
-            deletePosts(ids: [ID!]!): [Post!]!
+            deletePosts(ids: [ID!]! @in(key: "id")): [Post!]!
                 @can(ability: "delete", query: true)
                 @delete
         }
