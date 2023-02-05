@@ -23,7 +23,7 @@ final class DeleteDirectiveTest extends DBTestCase
         }
 
         type Mutation {
-            deleteUser(id: ID! @eq): User @delete
+            deleteUser(id: ID! @whereKey): User @delete
         }
         ';
 
@@ -54,7 +54,7 @@ final class DeleteDirectiveTest extends DBTestCase
         }
 
         type Mutation {
-            deleteUser(id: ID! @eq): User @delete
+            deleteUser(id: ID! @whereKey): User @delete
         }
         ';
 
@@ -82,7 +82,7 @@ final class DeleteDirectiveTest extends DBTestCase
         }
 
         type Mutation {
-            deleteUsers(ids: [ID!]! @in(key: "id")): [User!]! @delete
+            deleteUsers(ids: [ID!]! @whereKey): [User!]! @delete
         }
         ';
 
@@ -107,7 +107,7 @@ final class DeleteDirectiveTest extends DBTestCase
         }
 
         type Mutation {
-            deleteUsers(ids: [ID!]! @in(key: "id")): [User!]! @delete
+            deleteUsers(ids: [ID!]! @whereKey): [User!]! @delete
         }
         ';
 
@@ -132,7 +132,7 @@ final class DeleteDirectiveTest extends DBTestCase
         }
 
         type Mutation {
-            deleteUsers(ids: [ID!]! @in(key: "id")): [User!]! @delete
+            deleteUsers(ids: [ID!]! @whereKey): [User!]! @delete
         }
         ';
 
@@ -359,7 +359,7 @@ final class DeleteDirectiveTest extends DBTestCase
         }
 
         type Mutation {
-            deleteUser(id: ID! @eq): User @delete
+            deleteUser(id: ID! @whereKey): User @delete
         }
         ';
 

@@ -285,7 +285,7 @@ Deleting models is a breeze using the [@delete](../api-reference/directives.md#d
 
 ```graphql
 type Mutation {
-  deleteUser(id: ID!): User @delete
+  deleteUser(id: ID! @whereKey): User @delete
 }
 ```
 

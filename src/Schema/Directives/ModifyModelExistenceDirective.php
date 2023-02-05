@@ -4,6 +4,8 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Error\Error;
 use GraphQL\Language\AST\ListTypeNode;
+use GraphQL\Language\AST\NonNullTypeNode;
+use GraphQL\Language\AST\TypeNode;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Execution\ErrorPool;
@@ -47,7 +49,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
 
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
-        $expectsList = $fieldValue->getField()->type instanceof ListTypeNode;
+        $expectsList = $this->expectsList($fieldValue->getField()->type);
 
         $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($expectsList) {
             $builder = $resolveInfo->enhanceBuilder(
@@ -79,6 +81,15 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
         });
 
         return $fieldValue;
+    }
+
+    private function expectsList(TypeNode $typeNode): bool
+    {
+        if ($typeNode instanceof NonNullTypeNode) {
+            return $this->expectsList($typeNode->type);
+        }
+
+        return $typeNode instanceof ListTypeNode;
     }
 
     /**

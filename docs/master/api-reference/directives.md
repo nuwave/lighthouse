@@ -973,7 +973,7 @@ It will return an instance of the Model so you can show its data one last time.
 
 ```graphql
 type Mutation {
-  deletePost(id: ID! @eq): Post! @delete
+  deletePost(id: ID! @whereKey): Post! @delete
 }
 ```
 
@@ -984,7 +984,7 @@ _In contrast to Laravel mass updates, this does trigger model events._
 
 ```graphql
 type Mutation {
-  deletePosts(ids: [ID!] @in(key: "id"), title: String @eq): [Post!]! @delete
+  deletePosts(ids: [ID!] @whereKey, title: String @eq): [Post!]! @delete
 }
 ```
 
@@ -993,7 +993,7 @@ or is located in a non-default namespace, set it with the `model` argument.
 
 ```graphql
 type Mutation {
-  deletePost(id: ID!): Post @delete(model: "Bar\\Baz\\MyPost")
+  deletePost(id: ID! @whereKey): Post @delete(model: "Bar\\Baz\\MyPost")
 }
 ```
 
@@ -1223,7 +1223,7 @@ Use it on a root mutation field that returns an instance of the Model.
 
 ```graphql
 type Mutation {
-  forceDeletePost(id: ID!): Post @forceDelete
+  forceDeletePost(id: ID! @whereKey): Post @forceDelete
 }
 ```
 
@@ -2924,7 +2924,7 @@ Use it on a root mutation field that returns an instance of the Model.
 
 ```graphql
 type Mutation {
-  restorePost(id: ID!): Post @restore
+  restorePost(id: ID! @whereKey): Post @restore
 }
 ```
 
@@ -3738,6 +3738,39 @@ You may use the `key` argument to look into the JSON content:
 ```graphql
 type Query {
   posts(tags: [String]! @whereJsonContains(key: "tags->recent")): [Post!]! @all
+}
+```
+
+## @whereKey
+
+```graphql
+"""
+Add a where clause on the primary key to the Eloquent Model query.
+"""
+directive @whereKey(
+  """
+  Provide a value to compare against.
+  Only required when this directive is used on a field.
+  """
+  value: WhereKeyValue
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+
+"""
+Any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
+"""
+scalar WhereKeyValue
+```
+
+Use together with directives that make Eloquent queries such as [@find](#find), [@all](#all) or [@delete](#delete).
+
+```graphql
+type Query {
+    post(id: ID! @whereKey): Post @find
+    posts(ids: [ID!]! @whereKey): [Post!]! @all
+}
+
+type Mutation {
+    deletePost(id: ID! @whereKey): Post! @delete
 }
 ```
 
