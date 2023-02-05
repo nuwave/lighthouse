@@ -3765,12 +3765,12 @@ Use together with directives that make Eloquent queries such as [@find](#find), 
 
 ```graphql
 type Query {
-    post(id: ID! @whereKey): Post @find
-    posts(ids: [ID!]! @whereKey): [Post!]! @all
+  post(id: ID! @whereKey): Post @find
+  posts(ids: [ID!]! @whereKey): [Post!]! @all
 }
 
 type Mutation {
-    deletePost(id: ID! @whereKey): Post! @delete
+  deletePost(id: ID! @whereKey): Post! @delete
 }
 ```
 
