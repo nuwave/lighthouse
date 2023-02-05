@@ -44,16 +44,11 @@ GRAPHQL;
         return (bool) $model->restore();
     }
 
-    /**
-     * Manipulate the AST based on a field definition.
-     */
     public function manipulateFieldDefinition(
         DocumentAST &$documentAST,
         FieldDefinitionNode &$fieldDefinition,
         ObjectTypeDefinitionNode &$parentType
     ): void {
-        parent::manipulateFieldDefinition($documentAST, $fieldDefinition, $parentType);
-
         SoftDeletesServiceProvider::assertModelUsesSoftDeletes(
             $this->getModelClass(),
             self::MODEL_NOT_USING_SOFT_DELETES

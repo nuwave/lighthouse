@@ -8,8 +8,9 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\ModifyModelExistenceDirective;
+use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 
-class ForceDeleteDirective extends ModifyModelExistenceDirective
+class ForceDeleteDirective extends ModifyModelExistenceDirective implements FieldManipulator
 {
     public const MODEL_NOT_USING_SOFT_DELETES = 'Use the @forceDelete directive only for Model classes that use the SoftDeletes trait.';
 
@@ -43,16 +44,11 @@ GRAPHQL;
         return (bool) $model->forceDelete();
     }
 
-    /**
-     * Manipulate the AST based on a field definition.
-     */
     public function manipulateFieldDefinition(
         DocumentAST &$documentAST,
         FieldDefinitionNode &$fieldDefinition,
         ObjectTypeDefinitionNode &$parentType
     ): void {
-        parent::manipulateFieldDefinition($documentAST, $fieldDefinition, $parentType);
-
         SoftDeletesServiceProvider::assertModelUsesSoftDeletes(
             $this->getModelClass(),
             self::MODEL_NOT_USING_SOFT_DELETES
