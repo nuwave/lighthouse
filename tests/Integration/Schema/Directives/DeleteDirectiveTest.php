@@ -71,7 +71,7 @@ final class DeleteDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testDeletesMultipleUsersAndReturnsThem(): void
+    public function testDeletesMultipleUsersByIDAndReturnsThem(): void
     {
         $users = factory(User::class, 2)->create();
         assert($users instanceof EloquentCollection);
@@ -97,6 +97,49 @@ final class DeleteDirectiveTest extends DBTestCase
         ])->assertJsonCount(2, 'data.deleteUsers');
 
         $this->assertCount(0, User::all());
+    }
+
+    public function testDeleteByNonPrimaryKey(): void
+    {
+        $foo = factory(User::class)->make();
+        assert($foo instanceof User);
+        $foo->name = 'foo';
+        $foo->save();
+
+        $bar = factory(User::class)->make();
+        assert($bar instanceof User);
+        $bar->name = 'bar';
+        $bar->save();
+
+        $this->schema .= /** @lang GraphQL */ '
+        type User {
+            id: ID!
+        }
+
+        type Mutation {
+            deleteUsers(name: String! @eq): [User!]! @delete
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation ($name: String!) {
+            deleteUsers(name: $name) {
+                id
+            }
+        }
+        ', [
+            'name' => $foo->name,
+        ])->assertJson([
+            'data' => [
+                'deleteUsers' => [
+                    [
+                        'id' => $foo->id,
+                    ]
+                ]
+            ]
+        ]);
+
+        $this->assertCount(1, User::all());
     }
 
     public function testDeletesMultipleNonExisting(): void
@@ -344,11 +387,9 @@ final class DeleteDirectiveTest extends DBTestCase
         $this->assertNull(User::find($user->id));
     }
 
-    public function testNotDeleting(): void
+    public function testDeletingReturnsFalseTriggersException(): void
     {
-        User::deleting(function (): bool {
-            return false;
-        });
+        User::deleting(fn (): bool => false);
 
         $user = factory(User::class)->create();
         assert($user instanceof User);
