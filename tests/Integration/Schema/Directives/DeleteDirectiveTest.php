@@ -134,9 +134,9 @@ final class DeleteDirectiveTest extends DBTestCase
                 'deleteUsers' => [
                     [
                         'id' => $foo->id,
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ]);
 
         $this->assertCount(1, User::all());
