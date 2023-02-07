@@ -498,8 +498,7 @@ GRAPHQL
         }
 
         type Query {
-            users1: [User!]! @paginate(maxCount: 6, resolver: "' . $this->qualifyTestResolver('returnPaginatedDataInsteadOfBuilder') . '")
-            users2: [User!]! @paginate(maxCount: 10)
+            users: [User!]! @paginate(maxCount: 6, resolver: "' . $this->qualifyTestResolver('returnPaginatedDataInsteadOfBuilder') . '")
         }
         ';
 
