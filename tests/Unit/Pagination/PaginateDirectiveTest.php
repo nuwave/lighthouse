@@ -504,7 +504,7 @@ GRAPHQL
 
         $result = $this->graphQL(/** @lang GraphQL */ '
         {
-            users1(first: 10) {
+            users(first: 10) {
                 data {
                     id
                     name
