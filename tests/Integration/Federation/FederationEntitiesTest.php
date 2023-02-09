@@ -38,8 +38,8 @@ final class FederationEntitiesTest extends TestCase
         ];
 
         $this->graphQL(/** @lang GraphQL */ '
-        query ($_representations: [_Any!]!) {
-            _entities(representations: $_representations) {
+        query ($representations: [_Any!]!) {
+            _entities(representations: $representations) {
                 __typename
                 ... on Foo {
                     id
@@ -47,7 +47,7 @@ final class FederationEntitiesTest extends TestCase
             }
         }
         ', [
-            '_representations' => [
+            'representations' => [
                 $foo,
             ],
         ])->assertExactJson([
@@ -83,8 +83,8 @@ final class FederationEntitiesTest extends TestCase
         ];
 
         $this->graphQL(/** @lang GraphQL */ '
-        query ($_representations: [_Any!]!) {
-            _entities(representations: $_representations) {
+        query ($representations: [_Any!]!) {
+            _entities(representations: $representations) {
                 __typename
                 ... on BatchedFoo {
                     id
@@ -92,7 +92,7 @@ final class FederationEntitiesTest extends TestCase
             }
         }
         ', [
-            '_representations' => [
+            'representations' => [
                 $foo1,
                 $foo2,
             ],
@@ -106,11 +106,11 @@ final class FederationEntitiesTest extends TestCase
         ]);
     }
 
-    public function testMaintainsOrderBetweenOfRepresentationsInResult(): void
+    /**
+     * https://github.com/apollographql/apollo-federation-subgraph-compatibility/issues/70.
+     */
+    public function testMaintainsOrderOfRepresentationsInResult(): void
     {
-        $this->markTestSkipped('Not necessarily required: https://github.com/apollographql/apollo-federation-subgraph-compatibility/issues/70');
-
-        // @phpstan-ignore-next-line of course unreachable
         $this->schema = /** @lang GraphQL */ '
         type Foo @key(fields: "id") {
           id: ID! @external
@@ -143,8 +143,8 @@ final class FederationEntitiesTest extends TestCase
         ];
 
         $this->graphQL(/** @lang GraphQL */ '
-        query ($_representations: [_Any!]!) {
-            _entities(representations: $_representations) {
+        query ($representations: [_Any!]!) {
+            _entities(representations: $representations) {
                 __typename
                 ... on Foo {
                     id
@@ -155,7 +155,7 @@ final class FederationEntitiesTest extends TestCase
             }
         }
         ', [
-            '_representations' => [
+            'representations' => [
                 $foo1,
                 $foo2,
                 $foo3,

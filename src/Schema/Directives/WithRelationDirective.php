@@ -16,7 +16,11 @@ abstract class WithRelationDirective extends BaseDirective implements FieldMiddl
 {
     use RelationDirectiveHelpers;
 
-    abstract protected function modelsLoader(ResolveInfo $resolveInfo): ModelsLoader;
+    /**
+     * @param  mixed  $parent the parent node
+     * @param  array<string, mixed>  $args
+     */
+    abstract protected function modelsLoader($parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ModelsLoader;
 
     public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
     {
@@ -24,7 +28,7 @@ abstract class WithRelationDirective extends BaseDirective implements FieldMiddl
 
         $fieldValue->setResolver(function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
             return $this
-                ->loadRelation($parent, $args, $resolveInfo)
+                ->loadRelation($parent, $args, $context, $resolveInfo)
                 ->then(static function () use ($previousResolver, $parent, $args, $context, $resolveInfo) {
                     return $previousResolver($parent, $args, $context, $resolveInfo);
                 });
@@ -36,12 +40,12 @@ abstract class WithRelationDirective extends BaseDirective implements FieldMiddl
     /**
      * @param  array<string, mixed>  $args
      */
-    protected function loadRelation(Model $parent, array $args, ResolveInfo $resolveInfo): Deferred
+    protected function loadRelation(Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Deferred
     {
         $relationBatchLoader = BatchLoaderRegistry::instance(
             $this->qualifyPath($args, $resolveInfo),
-            function () use ($resolveInfo): RelationBatchLoader {
-                return new RelationBatchLoader($this->modelsLoader($resolveInfo));
+            function () use ($parent, $args, $context, $resolveInfo): RelationBatchLoader {
+                return new RelationBatchLoader($this->modelsLoader($parent, $args, $context, $resolveInfo));
             }
         );
         assert($relationBatchLoader instanceof RelationBatchLoader);

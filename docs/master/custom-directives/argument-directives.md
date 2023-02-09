@@ -45,8 +45,6 @@ takes an incoming value and returns a new value.
 Let's take a look at the built-in [@trim](../api-reference/directives.md#trim) directive.
 
 ```php
-<?php
-
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
@@ -90,8 +88,6 @@ type Mutation {
 When you resolve the field, the argument will hold the sanitized value.
 
 ```php
-<?php
-
 namespace App\GraphQL\Mutations;
 
 use App\User;
@@ -149,8 +145,6 @@ where the `category` column is equal to the value of the `category` argument.
 So let's take a look at the built-in [@eq](../api-reference/directives.md#eq) directive.
 
 ```php
-<?php
-
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
@@ -229,8 +223,6 @@ For example, you might want to add a directive that automagically derives the ar
 for a field based on an object type. A skeleton for this directive might look something like this:
 
 ```php
-<?php
-
 namespace App\GraphQL\Directives;
 
 use GraphQL\Language\AST\FieldDefinitionNode;

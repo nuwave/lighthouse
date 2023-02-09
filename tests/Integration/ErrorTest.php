@@ -14,16 +14,14 @@ final class ErrorTest extends TestCase
     {
         $this->postGraphQL([])
             ->assertStatus(200)
-            ->assertGraphQLErrorMessage('GraphQL Request must include at least one of those two parameters: "query" or "queryId"')
-            ->assertGraphQLErrorCategory('request');
+            ->assertGraphQLErrorMessage('GraphQL Request must include at least one of those two parameters: "query" or "queryId"');
     }
 
     public function testEmptyQuery(): void
     {
         $this->graphQL(/** @lang GraphQL */ '')
             ->assertStatus(200)
-            ->assertGraphQLErrorMessage('GraphQL Request must include at least one of those two parameters: "query" or "queryId"')
-            ->assertGraphQLErrorCategory('request');
+            ->assertGraphQLErrorMessage('GraphQL Request must include at least one of those two parameters: "query" or "queryId"');
     }
 
     public function testRejectsInvalidQuery(): void
@@ -55,16 +53,14 @@ final class ErrorTest extends TestCase
     {
         $this->postGraphQL([])
             ->assertStatus(200)
-            ->assertGraphQLErrorMessage('GraphQL Request must include at least one of those two parameters: "query" or "queryId"')
-            ->assertGraphQLErrorCategory('request');
+            ->assertGraphQLErrorMessage('GraphQL Request must include at least one of those two parameters: "query" or "queryId"');
     }
 
     public function testRejectsEmptyQuery(): void
     {
         $this->graphQL('')
             ->assertStatus(200)
-            ->assertGraphQLErrorMessage('GraphQL Request must include at least one of those two parameters: "query" or "queryId"')
-            ->assertGraphQLErrorCategory('request');
+            ->assertGraphQLErrorMessage('GraphQL Request must include at least one of those two parameters: "query" or "queryId"');
     }
 
     public function testHandlesErrorInResolver(): void
@@ -154,6 +150,23 @@ final class ErrorTest extends TestCase
             ->assertStatus(200)
             ->assertGraphQLErrorMessage('Field TestInput.string of required type String! was not provided.')
             ->assertGraphQLErrorMessage('Field TestInput.integer of required type Int! was not provided.');
+    }
+
+    public function testUnknownTypeInVariableDefinition(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(bar: ID): ID
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            query ($bar: UnknownType) {
+                foo(bar: $bar)
+            }
+            ')
+            ->assertGraphQLErrorMessage('Unknown type "UnknownType".');
     }
 
     public function testAssertGraphQLDebugMessage(): void

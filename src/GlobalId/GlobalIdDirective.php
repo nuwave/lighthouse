@@ -12,6 +12,8 @@ use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 
 class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgSanitizerDirective, ArgDirective
 {
+    public const NAME = 'globalId';
+
     /**
      * @var \Nuwave\Lighthouse\Support\Contracts\GlobalId
      */

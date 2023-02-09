@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse;
 
 use GraphQL\Error\ClientAware;
 use GraphQL\Error\Error;
+use GraphQL\Error\ProvidesExtensions;
 use GraphQL\Executor\ExecutionResult;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Container\Container;
@@ -27,7 +28,6 @@ use Nuwave\Lighthouse\Console\SubscriptionCommand;
 use Nuwave\Lighthouse\Console\UnionCommand;
 use Nuwave\Lighthouse\Console\ValidateSchemaCommand;
 use Nuwave\Lighthouse\Console\ValidatorCommand;
-use Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions;
 use Nuwave\Lighthouse\Execution\ContextFactory;
 use Nuwave\Lighthouse\Execution\ErrorPool;
 use Nuwave\Lighthouse\Execution\SingleResponse;
@@ -51,7 +51,6 @@ use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules;
 use Nuwave\Lighthouse\Support\Http\Responses\ResponseStream;
-use Nuwave\Lighthouse\Testing\TestingServiceProvider;
 
 class LighthouseServiceProvider extends ServiceProvider
 {
@@ -127,9 +126,6 @@ class LighthouseServiceProvider extends ServiceProvider
         });
 
         $this->commands(self::COMMANDS);
-
-        // Always registered in order to ensure macros are recognized by Larastan
-        $this->app->register(TestingServiceProvider::class);
     }
 
     public function boot(ConfigRepository $configRepository): void
@@ -162,7 +158,7 @@ class LighthouseServiceProvider extends ServiceProvider
                             [],
                             null,
                             $error,
-                            $error instanceof RendersErrorsExtensions ? $error->extensionsContent() : []
+                            $error instanceof ProvidesExtensions ? $error->getExtensions() : []
                         );
                     }
 

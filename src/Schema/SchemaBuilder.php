@@ -75,8 +75,8 @@ class SchemaBuilder
 
         // Use lazy type loading to prevent unnecessary work
         $config->setTypeLoader(
-            function (string $name): Type {
-                return $this->typeRegistry->get($name);
+            function (string $name): ?Type {
+                return $this->typeRegistry->search($name);
             }
         );
 

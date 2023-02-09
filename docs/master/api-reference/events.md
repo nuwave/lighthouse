@@ -9,8 +9,6 @@ Lighthouse dispatches the following order of events during a request.
 ### StartRequest
 
 ```php
-<?php
-
 namespace Nuwave\Lighthouse\Events;
 
 use Illuminate\Http\Request;
@@ -51,8 +49,6 @@ class StartRequest
 ### StartOperationOrOperations
 
 ```php
-<?php
-
 namespace Nuwave\Lighthouse\Events;
 
 /**
@@ -80,8 +76,6 @@ class StartOperationOrOperations
 ### BuildSchemaString
 
 ```php
-<?php
-
 namespace Nuwave\Lighthouse\Events;
 
 /**
@@ -111,8 +105,6 @@ class BuildSchemaString
 ### RegisterDirectiveNamespaces
 
 ```php
-<?php
-
 namespace Nuwave\Lighthouse\Events;
 
 /**
@@ -132,8 +124,6 @@ class RegisterDirectiveNamespaces
 ### ManipulateAST
 
 ```php
-<?php
-
 namespace Nuwave\Lighthouse\Events;
 
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
@@ -165,8 +155,6 @@ class ManipulateAST
 ### StartExecution
 
 ```php
-<?php
-
 namespace Nuwave\Lighthouse\Events;
 
 use GraphQL\Language\AST\DocumentNode;
@@ -240,8 +228,6 @@ class StartExecution
 ### BuildExtensionsResponse
 
 ```php
-<?php
-
 namespace Nuwave\Lighthouse\Events;
 
 /**
@@ -257,8 +243,6 @@ class BuildExtensionsResponse
 ```
 
 ```php
-<?php
-
 namespace Nuwave\Lighthouse\Execution;
 
 /**
@@ -308,8 +292,6 @@ class ExtensionsResponse
 ### ManipulateResult
 
 ```php
-<?php
-
 namespace Nuwave\Lighthouse\Events;
 
 use GraphQL\Executor\ExecutionResult;
@@ -339,8 +321,6 @@ class ManipulateResult
 ### EndExecution
 
 ```php
-<?php
-
 namespace Nuwave\Lighthouse\Events;
 
 use GraphQL\Executor\ExecutionResult;
@@ -376,8 +356,6 @@ class EndExecution
 ### EndOperationOrOperations
 
 ```php
-<?php
-
 namespace Nuwave\Lighthouse\Events;
 
 /**
@@ -405,8 +383,6 @@ class EndOperationOrOperations
 ### EndRequest
 
 ```php
-<?php
-
 namespace Nuwave\Lighthouse\Events;
 
 use Illuminate\Support\Carbon;
@@ -451,8 +427,6 @@ The following events happen outside of the execution lifecycle.
 ### ValidateSchema
 
 ```php
-<?php
-
 namespace Nuwave\Lighthouse\Events;
 
 use GraphQL\Type\Schema;

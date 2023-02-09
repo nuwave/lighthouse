@@ -268,7 +268,6 @@ return [
         \Nuwave\Lighthouse\Execution\AuthenticationErrorHandler::class,
         \Nuwave\Lighthouse\Execution\AuthorizationErrorHandler::class,
         \Nuwave\Lighthouse\Execution\ValidationErrorHandler::class,
-        \Nuwave\Lighthouse\Execution\ExtensionErrorHandler::class,
         \Nuwave\Lighthouse\Execution\ReportingErrorHandler::class,
     ],
 
@@ -383,24 +382,6 @@ return [
     */
 
     'non_null_pagination_results' => false,
-
-    /*
-    |--------------------------------------------------------------------------
-    | Unbox BenSampo\Enum\Enum instances
-    |--------------------------------------------------------------------------
-    |
-    | If set to true, Lighthouse will extract the internal $value from instances of
-    | BenSampo\Enum\Enum before passing it to ArgBuilderDirective::handleBuilder().
-    |
-    | This setting will be removed and always behave as if it were false in v6.
-    |
-    | It is only here to preserve compatibility, e.g. when expecting the internal
-    | value to be passed to a scope when using @scope, but not needed due to Laravel
-    | calling the Enum's __toString() method automagically when used in a query.
-    |
-    */
-
-    'unbox_bensampo_enum_enum_instances' => true,
 
     /*
     |--------------------------------------------------------------------------

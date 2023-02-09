@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Schema\Factories;
 
 use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Type\Definition\Directive;
-use GraphQL\Type\Definition\FieldArgument;
 use GraphQL\Type\Definition\InputType;
 use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
@@ -44,7 +43,7 @@ class DirectiveFactory
                 ];
             }
 
-            $arguments[] = new FieldArgument($argumentConfig);
+            $arguments[] = $argumentConfig;
         }
 
         $locations = [];

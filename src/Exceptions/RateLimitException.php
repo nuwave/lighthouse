@@ -9,8 +9,6 @@ use GraphQL\Error\ClientAware;
  */
 class RateLimitException extends \RuntimeException implements ClientAware
 {
-    public const CATEGORY = 'rate-limit';
-
     public function __construct(string $fieldReference)
     {
         parent::__construct("Rate limit for {$fieldReference} exceeded. Try again later.");
@@ -19,10 +17,5 @@ class RateLimitException extends \RuntimeException implements ClientAware
     public function isClientSafe(): bool
     {
         return true;
-    }
-
-    public function getCategory(): string
-    {
-        return self::CATEGORY;
     }
 }

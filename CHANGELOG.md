@@ -9,6 +9,57 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Changed
+
+- Add validation support to `Paginator` with `resolver` mode
+- Pass resolver arguments to `FieldBuilderDirective::handleFieldBuilder()` https://github.com/nuwave/lighthouse/pull/2234
+- Expected resolver arguments in `ResolveInfo::enhanceBuilder()`
+- Pass the path array to `CacheKeyAndTags::key()` https://github.com/nuwave/lighthouse/pull/2176
+- Require implementations of `BatchedEntityResolver` to maintain the keys given in `array $representations` https://github.com/nuwave/lighthouse/pull/2286
+
+### Fixed
+
+- Return proper error for unknown types in variable definitions
+- Ensure `_entities` maintains order of representations in result https://github.com/nuwave/lighthouse/pull/2286
+
+### Added
+
+- Add method `TypeRegistry::search()` that maybe finds a type with a given name
+- Decode fields with directive `@globalId` in federation model entity resolver
+- Support Laravel 10 https://github.com/nuwave/lighthouse/pull/2287
+
+### Removed
+
+- Remove mixin `TestResponse::assertGraphQLErrorCategory()`
+- Remove class `Nuwave\Lighthouse\Exceptions\GenericException`
+- Remove error extension field `category`
+- Remove interface `Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions`
+- Remove `Nuwave\Lighthouse\Execution\ExtensionErrorHandler`
+- Remove support for PHP 7.2, 7.3, 7.4
+- Remove support for Laravel 5, 6, 7
+- Remove `Serializable` implementation
+- Remove trait `ClearsSchemaCache`
+- Remove config option `lighthouse.unbox_bensampo_enum_enum_instances`
+- Remove `ArgumentSet::enhanceBuilder()`, use `ResolveInfo::enhanceBuilder()`
+
+## v5.70.3
+
+### Fixed
+
+- Allow `\Illuminate\Http\UploadedFile` in test helper `multipartGraphQL()` argument `array $files`
+
+## v5.70.2
+
+### Fixed
+
+- Fix batch loading relations of parents that were partially cached https://github.com/nuwave/lighthouse/issues/2269
+
+## v5.70.1
+
+### Fixed
+
+- Fix batch loading a paginated BelongsToMany relation with duplicates https://github.com/nuwave/lighthouse/pull/2277
+
 ## v5.70.0
 
 ### Added

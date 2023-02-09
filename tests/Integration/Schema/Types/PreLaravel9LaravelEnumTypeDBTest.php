@@ -117,7 +117,6 @@ final class PreLaravel9LaravelEnumTypeDBTest extends DBTestCase
         type Query {
             withEnum(
                 byType: AOrB @scope
-                byTypeInternal: AOrB @scope # TODO remove in v6
             ): PreLaravel9WithEnum @find
         }
 
@@ -135,24 +134,6 @@ final class PreLaravel9LaravelEnumTypeDBTest extends DBTestCase
         $withEnum = new PreLaravel9WithEnum();
         $withEnum->type = $a;
         $withEnum->save();
-
-        // TODO remove in v6
-        $this->graphQL(/** @lang GraphQL */ '
-        query ($type: AOrB) {
-            withEnum(byTypeInternal: $type) {
-                type
-            }
-        }
-        ', [
-            'type' => $a->key,
-        ])->assertJson([
-            'data' => [
-                'withEnum' => [
-                    'type' => $a->key,
-                ],
-            ],
-        ]);
-        config(['lighthouse.unbox_bensampo_enum_enum_instances' => false]);
 
         $this->graphQL(/** @lang GraphQL */ '
         query ($type: AOrB) {

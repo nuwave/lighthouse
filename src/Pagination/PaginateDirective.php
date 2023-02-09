@@ -128,6 +128,9 @@ GRAPHQL;
     {
         $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Paginator {
             if ($this->directiveHasArgument('resolver')) {
+                // This is done only for validation
+                PaginationArgs::extractArgs($args, $this->paginationType(), $this->paginateMaxCount());
+
                 $paginator = $this->getResolverFromArgument('resolver')($root, $args, $context, $resolveInfo);
 
                 assert(
@@ -153,7 +156,11 @@ GRAPHQL;
 
             $query = $resolveInfo->enhanceBuilder(
                 $query,
-                $this->directiveArgValue('scopes', [])
+                $this->directiveArgValue('scopes', []),
+                $root,
+                $args,
+                $context,
+                $resolveInfo
             );
 
             $paginationArgs = PaginationArgs::extractArgs($args, $this->paginationType(), $this->paginateMaxCount());

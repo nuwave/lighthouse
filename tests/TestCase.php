@@ -20,9 +20,9 @@ use Nuwave\Lighthouse\Pagination\PaginationServiceProvider;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Scout\ScoutServiceProvider as LighthouseScoutServiceProvider;
 use Nuwave\Lighthouse\SoftDeletes\SoftDeletesServiceProvider;
-use Nuwave\Lighthouse\Support\AppVersion;
 use Nuwave\Lighthouse\Testing\MakesGraphQLRequests;
 use Nuwave\Lighthouse\Testing\MocksResolvers;
+use Nuwave\Lighthouse\Testing\TestingServiceProvider;
 use Nuwave\Lighthouse\Testing\UsesTestSchema;
 use Nuwave\Lighthouse\Validation\ValidationServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
@@ -85,6 +85,7 @@ GRAPHQL;
             OrderByServiceProvider::class,
             PaginationServiceProvider::class,
             SoftDeletesServiceProvider::class,
+            TestingServiceProvider::class,
             ValidationServiceProvider::class,
         ];
     }
@@ -174,8 +175,6 @@ GRAPHQL;
         ]);
 
         $config->set('lighthouse.cache.enable', false);
-
-        $config->set('lighthouse.unbox_bensampo_enum_enum_instances', true);
     }
 
     /**
@@ -187,11 +186,7 @@ GRAPHQL;
     protected function resolveApplicationExceptionHandler($app): void
     {
         $app->singleton(ExceptionHandler::class, function () {
-            if (AppVersion::atLeast(7.0)) {
-                return new Laravel7ExceptionHandler();
-            }
-
-            return new PreLaravel7ExceptionHandler();
+            return new ThrowingExceptionHandler();
         });
     }
 

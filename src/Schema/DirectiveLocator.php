@@ -228,6 +228,7 @@ class DirectiveLocator
      */
     public function associated(Node $node): Collection
     {
+        // @phpstan-ignore-next-line https://github.com/phpstan/phpstan/issues/8474
         if (! property_exists($node, 'directives')) {
             throw new \Exception('Expected Node class with property `directives`, got: ' . get_class($node));
         }
@@ -297,6 +298,7 @@ class DirectiveLocator
                 })
                 ->implode(', ');
 
+            // @phpstan-ignore-next-line https://github.com/phpstan/phpstan/issues/8474
             if (! property_exists($node, 'name')) {
                 throw new \Exception('Expected Node class with property `name`, got: ' . get_class($node));
             }

@@ -12,6 +12,7 @@ class CacheKeyAndTagsGenerator implements CacheKeyAndTags
     /**
      * @param  int|string|null  $id
      * @param  array<string, mixed>  $args
+     * @param  array<int, string|int> $path
      */
     public function key(
         ?Authenticatable $user,
@@ -19,7 +20,8 @@ class CacheKeyAndTagsGenerator implements CacheKeyAndTags
         string $parentName,
         $id,
         string $fieldName,
-        array $args
+        array $args,
+        array $path
     ): string {
         $parts = [self::PREFIX];
 

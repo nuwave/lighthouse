@@ -154,8 +154,6 @@ Begin by defining models and migrations for your posts and comments
 Replace the newly generated `app/Models/Post.php` and the `create_posts_table.php` with this:
 
 ```php
-<?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -177,8 +175,6 @@ class Post extends Model
 ```
 
 ```php
-<?php
-
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
@@ -208,8 +204,6 @@ Let's do the same for the Comment model:
     php artisan make:model -m Comment
 
 ```php
-<?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -225,8 +219,6 @@ class Comment extends Model
 ```
 
 ```php
-<?php
-
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
@@ -257,8 +249,6 @@ Remember to run the migrations:
 Finally, add the `posts` relation to `app/Models/User.php`
 
 ```php
-<?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
