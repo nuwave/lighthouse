@@ -8,16 +8,15 @@ use Nuwave\Lighthouse\Auth\AuthServiceProvider;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 /**
- * @property \Illuminate\Contracts\Auth\Authenticatable|null $user
+ * @property-read ?Authenticatable $user
+ * @property-read Request $request
  */
 class Context implements GraphQLContext
 {
     /**
      * An instance of the incoming HTTP request.
-     *
-     * @var \Illuminate\Http\Request
      */
-    public $request;
+    protected Request $request;
 
     public function __construct(Request $request)
     {
@@ -39,16 +38,15 @@ class Context implements GraphQLContext
         return $this->request;
     }
 
-    /**
-     * Lazily loads $user
-     * this helps use the correct guard if changed via @guard
-     */
-    public function __get($name)
+    public function __get(string $name): mixed
     {
-        if ($name === 'user') {
-            return $this->user();
-        }
+        return method_exists($this, $name)
+            ? $this->{$name}()
+            : $this->{$name};
+    }
 
-        return $this->{$name};
+    public function __isset(string $name): bool
+    {
+        return method_exists($this, $name) || property_exists($this, $name);
     }
 }

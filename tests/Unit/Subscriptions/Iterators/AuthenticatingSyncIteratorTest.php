@@ -27,9 +27,8 @@ final class AuthenticatingSyncIteratorTest extends IteratorTest
         $subscribers = $this
             ->subscribers($subscriberCount)
             ->map(static function (Subscriber $subscriber, int $index): Subscriber {
-                /** @var \Nuwave\Lighthouse\Schema\Context $context */
-                $context = $subscriber->context;
-                $context->user = new AuthenticatingSyncIteratorAuthenticatableStub($index + 1);
+                $user = new AuthenticatingSyncIteratorAuthenticatableStub($index + 1);
+                $subscriber->context->request()->setUserResolver(fn () => $user);
 
                 return $subscriber;
             });
