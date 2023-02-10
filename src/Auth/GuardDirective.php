@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Auth;
 
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionNode;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Nuwave\Lighthouse\Exceptions\AuthenticationException;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
@@ -59,7 +60,7 @@ GRAPHQL;
         $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
             // TODO remove cast in v6
             $with = (array) $this->directiveArgValue('with', AuthServiceProvider::guard());
-            $this->authenticate($with);
+            $context->setUser($this->authenticate($with));
 
             return $previousResolver($root, $args, $context, $resolveInfo);
         });
@@ -74,14 +75,16 @@ GRAPHQL;
      *
      * @throws \Illuminate\Auth\AuthenticationException
      */
-    protected function authenticate(array $guards): void
+    protected function authenticate(array $guards): Authenticatable
     {
         foreach ($guards as $guard) {
-            if ($this->auth->guard($guard)->check()) {
+            $user = $this->auth->guard($guard)->user();
+
+            if (!is_null($user)) {
                 // @phpstan-ignore-next-line passing null works fine here
                 $this->auth->shouldUse($guard);
 
-                return;
+                return $user;
             }
         }
 
@@ -92,6 +95,7 @@ GRAPHQL;
      * Handle an unauthenticated user.
      *
      * @param  array<string|null>  $guards
+     * @throws AuthenticationException
      */
     protected function unauthenticated(array $guards): void
     {

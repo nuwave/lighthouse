@@ -28,7 +28,7 @@ final class AuthenticatingSyncIteratorTest extends IteratorTest
             ->subscribers($subscriberCount)
             ->map(static function (Subscriber $subscriber, int $index): Subscriber {
                 $user = new AuthenticatingSyncIteratorAuthenticatableStub($index + 1);
-                $subscriber->context->request()->setUserResolver(fn () => $user);
+                $subscriber->context->setUser($user);
 
                 return $subscriber;
             });

@@ -7,20 +7,22 @@ use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Auth\AuthServiceProvider;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-/**
- * @property-read ?Authenticatable $user
- * @property-read Request $request
- */
 class Context implements GraphQLContext
 {
     /**
      * An instance of the incoming HTTP request.
      */
-    protected Request $request;
+    public Request $request;
+
+    /**
+     * An instance of the currently authenticated user.
+     */
+    public ?Authenticatable $user;
 
     public function __construct(Request $request)
     {
         $this->request = $request;
+        $this->user = $request->user(AuthServiceProvider::guard());
     }
 
     /**
@@ -30,23 +32,16 @@ class Context implements GraphQLContext
      */
     public function user(): ?Authenticatable
     {
-        return $this->request->user(AuthServiceProvider::guard());
+        return $this->user;
+    }
+
+    public function setUser(?Authenticatable $user): void
+    {
+        $this->user = $user;
     }
 
     public function request(): Request
     {
         return $this->request;
-    }
-
-    public function __get(string $name): mixed
-    {
-        return method_exists($this, $name)
-            ? $this->{$name}()
-            : $this->{$name};
-    }
-
-    public function __isset(string $name): bool
-    {
-        return method_exists($this, $name) || property_exists($this, $name);
     }
 }

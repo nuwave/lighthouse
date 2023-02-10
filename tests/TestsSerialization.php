@@ -31,6 +31,10 @@ trait TestsSerialization
                     {
                         return new Request();
                     }
+
+                    public function setUser(mixed $user)
+                    {
+                    }
                 };
             }
         };
