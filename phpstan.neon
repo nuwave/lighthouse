@@ -35,10 +35,6 @@ parameters:
   # As long as we support multiple Laravel versions at once, there will be some dead spots
   reportUnmatchedIgnoredErrors: false
 
-  earlyTerminatingMethodCalls:
-    Nuwave\Lighthouse\Auth\GuardDirective:
-      - unauthenticated
-
   ignoreErrors:
   # PHPStan does not get it
   - '#Parameter \#1 \$callback of static method Closure::fromCallable\(\) expects callable\(\): mixed, array{object, .*} given\.#'

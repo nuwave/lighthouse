@@ -80,7 +80,7 @@ GRAPHQL;
         foreach ($guards as $guard) {
             $user = $this->auth->guard($guard)->user();
 
-            if (!is_null($user)) {
+            if ($user) {
                 // @phpstan-ignore-next-line passing null works fine here
                 $this->auth->shouldUse($guard);
 
@@ -95,6 +95,8 @@ GRAPHQL;
      * Handle an unauthenticated user.
      *
      * @param  array<string|null>  $guards
+     *
+     * @return never
      * @throws AuthenticationException
      */
     protected function unauthenticated(array $guards): void
