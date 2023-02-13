@@ -16,17 +16,20 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Expected resolver arguments in `ResolveInfo::enhanceBuilder()`
 - Pass the path array to `CacheKeyAndTags::key()` https://github.com/nuwave/lighthouse/pull/2176
 - Require implementations of `BatchedEntityResolver` to maintain the keys given in `array $representations` https://github.com/nuwave/lighthouse/pull/2286
+- Use the strongest possible property types over PHPDocs
 
 ### Fixed
 
 - Return proper error for unknown types in variable definitions
 - Ensure `_entities` maintains order of representations in result https://github.com/nuwave/lighthouse/pull/2286
+- Allow combining `@can` with non-default `@guard` https://github.com/nuwave/lighthouse/pull/2276
 
 ### Added
 
 - Add method `TypeRegistry::search()` that maybe finds a type with a given name
 - Decode fields with directive `@globalId` in federation model entity resolver
 - Support Laravel 10 https://github.com/nuwave/lighthouse/pull/2287
+- Add `GraphQLContext:: setUser(?Authenticatable $user): void`
 
 ### Removed
 

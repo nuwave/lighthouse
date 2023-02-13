@@ -3,8 +3,8 @@
 namespace Tests\Unit\Auth;
 
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
-use Nuwave\Lighthouse\Exceptions\AuthenticationException;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
+use Nuwave\Lighthouse\Exceptions\AuthenticationException;
 use Tests\TestCase;
 use Tests\Utils\Models\Team;
 use Tests\Utils\Queries\Foo;
@@ -31,35 +31,6 @@ final class GuardDirectiveTest extends TestCase
         $this->schema = /** @lang GraphQL */ '
         type Query {
             foo: Int @guard(with: ["web"])
-        }
-        ';
-
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            foo
-        }
-        ')->assertJson([
-            'errors' => [
-                [
-                    'message' => AuthenticationException::MESSAGE,
-                    'extensions' => [
-                        'guards' => [
-                            'web',
-                        ],
-                    ],
-                ],
-            ],
-        ]);
-    }
-
-    /**
-     * @deprecated remove cast in v6
-     */
-    public function testSpecifyGuardAsString(): void
-    {
-        $this->schema = /** @lang GraphQL */ '
-        type Query {
-            foo: Int @guard(with: "web")
         }
         ';
 
@@ -145,7 +116,7 @@ final class GuardDirectiveTest extends TestCase
             'teams' => [
                 'driver' => 'eloquent',
                 'model' => Team::class,
-            ]
+            ],
         ]));
 
         $config->set('auth.guards', array_merge($config->get('auth.guards'), [
@@ -189,7 +160,7 @@ final class GuardDirectiveTest extends TestCase
             ->assertJson([
                 'data' => [
                     'team' => [
-                        'id' => (string)$team->id,
+                        'id' => (string) $team->id,
                     ],
                 ],
             ]);

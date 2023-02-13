@@ -11,10 +11,7 @@ final class FooContext implements GraphQLContext
 {
     public const FROM_FOO_CONTEXT = 'custom.context';
 
-    /**
-     * @var \Illuminate\Http\Request
-     */
-    private $request;
+    private Request $request;
 
     public function __construct(Request $request)
     {

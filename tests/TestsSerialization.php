@@ -3,6 +3,7 @@
 namespace Tests;
 
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
@@ -14,25 +15,25 @@ trait TestsSerialization
     protected function fakeContextSerializer(): void
     {
         $contextSerializer = new class() implements ContextSerializer {
-            public function serialize(GraphQLContext $context)
+            public function serialize(GraphQLContext $context): string
             {
                 return 'foo';
             }
 
-            public function unserialize(string $context)
+            public function unserialize(string $context): GraphQLContext
             {
                 return new class() implements GraphQLContext {
-                    public function user()
+                    public function user(): User
                     {
                         return new User();
                     }
 
-                    public function request()
+                    public function request(): Request
                     {
                         return new Request();
                     }
 
-                    public function setUser(mixed $user)
+                    public function setUser(?Authenticatable $user): void
                     {
                     }
                 };
