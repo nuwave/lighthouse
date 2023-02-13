@@ -4,6 +4,7 @@ namespace Tests\Integration\Validation;
 
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
 use Tests\Utils\Rules\FooBarRule;
@@ -217,7 +218,9 @@ final class RulesDirectiveTest extends TestCase
             }
             ')
             ->assertGraphQLValidationError('bar', 'The baz field is required.')
-            ->assertGraphQLValidationError('emails', 'The email list must have at least 3 items.')
+            ->assertGraphQLValidationError('emails', AppVersion::atLeast(10.0)
+                ? 'The email list field must have at least 3 items.'
+                : 'The email list must have at least 3 items.')
             ->assertGraphQLValidationError('input.name', 'The name field is required.')
             ->assertGraphQLValidationError('input.type.name', 'The name field is required.')
             ->assertGraphQLValidationError('input.type.type', 'The input.type.type field is required.');
