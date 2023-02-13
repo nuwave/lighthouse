@@ -5,7 +5,6 @@ namespace Tests\Integration\Validation;
 use Nuwave\Lighthouse\Support\AppVersion;
 use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 use Tests\TestCase;
-use Tests\Utils\Validators\EmailCustomAttributeValidator;
 use Tests\Utils\Validators\EmailCustomMessageValidator;
 
 final class ValidatorDirectiveTest extends TestCase

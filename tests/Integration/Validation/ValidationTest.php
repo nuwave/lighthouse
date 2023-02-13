@@ -429,8 +429,8 @@ final class ValidationTest extends TestCase
             }
             ')
             ->assertGraphQLValidationError('input.foo', AppVersion::atLeast(10.0)
-                ?'The input.foo field must be a date after 2018-01-01.'
-                :'The input.foo must be a date after 2018-01-01.')
+                ? 'The input.foo field must be a date after 2018-01-01.'
+                : 'The input.foo must be a date after 2018-01-01.')
             ->assertGraphQLValidationError('input.bar', AppVersion::atLeast(10.0)
                 ? 'The input.bar field must be a date after input.foo.'
                 : 'The input.bar must be a date after input.foo.');
@@ -618,10 +618,10 @@ final class ValidationTest extends TestCase
             }
             ')
             ->assertGraphQLValidationError('input.email', AppVersion::atLeast(10.0)
-                ?'The input.email field must be a valid email address.'
-                :'The input.email must be a valid email address.')
+                ? 'The input.email field must be a valid email address.'
+                : 'The input.email must be a valid email address.')
             ->assertGraphQLValidationError('input.email', AppVersion::atLeast(10.0)
-                ?'The input.email field must be at least 16 characters.'
-                :'The input.email must be at least 16 characters.');
+                ? 'The input.email field must be at least 16 characters.'
+                : 'The input.email must be at least 16 characters.');
     }
 }
