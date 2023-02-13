@@ -28,7 +28,7 @@
     "require": {
         "php": "^8",
         "ext-json": "*",
-        "haydenpierce/class-finder": "^0.4",
+        "haydenpierce/class-finder": "^0.4 || ^0.5",
         "illuminate/auth": "^8.59 || ^9 || ^10",
         "illuminate/bus": "^8.59 || ^9 || ^10",
         "illuminate/contracts": "^8.59 || ^9 || ^10",
