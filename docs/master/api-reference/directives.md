@@ -941,18 +941,9 @@ This directive can also be used as a [nested arg resolver](../concepts/arg-resol
 
 ```graphql
 """
-Delete one or more models by their ID.
-The field must have a single non-null argument that may be a list.
+Delete one or more models.
 """
 directive @delete(
-  """
-  DEPRECATED use @globalId, will be removed in v6
-
-  Set to `true` to use global ids for finding the model.
-  If set to `false`, regular non-global ids are used.
-  """
-  globalId: Boolean = false
-
   """
   Specify the class name of the model to use.
   This is only needed when the default model detection does not work.
@@ -1199,18 +1190,9 @@ type Query {
 
 ```graphql
 """
-Permanently remove one or more soft deleted models by their ID.
-The field must have a single non-null argument that may be a list.
+Permanently remove one or more soft deleted models.
 """
 directive @forceDelete(
-  """
-  DEPRECATED use @globalId, will be removed in v6
-
-  Set to `true` to use global ids for finding the model.
-  If set to `false`, regular non-global ids are used.
-  """
-  globalId: Boolean = false
-
   """
   Specify the class name of the model to use.
   This is only needed when the default model detection does not work.
@@ -2900,23 +2882,14 @@ input UserInput {
 
 ```graphql
 """
-Un-delete one or more soft deleted models by their ID.
-The field must have a single non-null argument that may be a list.
+Un-delete one or more soft deleted models.
 """
 directive @restore(
-  """
-  DEPRECATED use @globalId, will be removed in v6
-
-  Set to `true` to use global ids for finding the model.
-  If set to `false`, regular non-global ids are used.
-  """
-  globalId: Boolean = false
-
   """
   Specify the class name of the model to use.
   This is only needed when the default model detection does not work.
   """
-  model: String
+model: String
 ) on FIELD_DEFINITION
 ```
 
