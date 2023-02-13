@@ -487,6 +487,38 @@ GRAPHQL
         );
     }
 
+    public function testIsLimitedByMaxCountFromDirectiveWithResolver(): void
+    {
+        config(['lighthouse.pagination.max_count' => 5]);
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID!
+            name: String!
+        }
+
+        type Query {
+            users: [User!]! @paginate(maxCount: 6, resolver: "' . $this->qualifyTestResolver('returnPaginatedDataInsteadOfBuilder') . '")
+        }
+        ';
+
+        $result = $this->graphQL(/** @lang GraphQL */ '
+        {
+            users(first: 10) {
+                data {
+                    id
+                    name
+                }
+            }
+        }
+        ');
+
+        $this->assertSame(
+            PaginationArgs::requestedTooManyItems(6, 10),
+            $result->json('errors.0.message')
+        );
+    }
+
     public function testIsLimitedToMaxCountFromConfig(): void
     {
         config(['lighthouse.pagination.max_count' => 5]);
