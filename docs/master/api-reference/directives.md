@@ -956,6 +956,11 @@ directive @delete(
   resolver and if the name of the relation is not the arg name.
   """
   relation: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
 ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
@@ -1198,6 +1203,11 @@ directive @forceDelete(
   This is only needed when the default model detection does not work.
   """
   model: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
 ) on FIELD_DEFINITION
 ```
 
@@ -2889,7 +2899,12 @@ directive @restore(
   Specify the class name of the model to use.
   This is only needed when the default model detection does not work.
   """
-model: String
+  model: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
 ) on FIELD_DEFINITION
 ```
 

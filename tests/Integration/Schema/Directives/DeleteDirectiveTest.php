@@ -142,6 +142,59 @@ final class DeleteDirectiveTest extends DBTestCase
         $this->assertCount(1, User::all());
     }
 
+    public function testDeleteWithScopes(): void
+    {
+        $named = factory(User::class)->make();
+        assert($named instanceof User);
+        $named->name = 'foo';
+        $named->save();
+
+        $unnamed = factory(User::class)->make();
+        assert($unnamed instanceof User);
+        $unnamed->name = null;
+        $unnamed->save();
+
+        $this->schema .= /** @lang GraphQL */ '
+        type User {
+            id: ID!
+        }
+
+        type Mutation {
+            deleteUser(id: ID! @whereKey): User @delete(scopes: ["named"])
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation ($id: ID!) {
+            deleteUser(id: $id) {
+                id
+            }
+        }
+        ', [
+            'id' => $named->id,
+        ])->assertJson([
+            'data' => [
+                'deleteUser' => [
+                    'id' => $named->id,
+                ],
+            ],
+        ]);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation ($id: ID!) {
+            deleteUser(id: $id) {
+                id
+            }
+        }
+        ', [
+            'id' => $unnamed->id,
+        ])->assertJson([
+            'data' => [
+                'deleteUser' => null,
+            ],
+        ]);
+    }
+
     public function testDeletesMultipleNonExisting(): void
     {
         $this->schema .= /** @lang GraphQL */ '

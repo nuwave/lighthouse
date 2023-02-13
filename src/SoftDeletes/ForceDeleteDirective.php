@@ -26,6 +26,11 @@ directive @forceDelete(
   This is only needed when the default model detection does not work.
   """
   model: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
 ) on FIELD_DEFINITION
 GRAPHQL;
     }

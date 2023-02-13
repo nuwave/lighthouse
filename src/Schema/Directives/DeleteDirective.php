@@ -37,6 +37,11 @@ directive @delete(
   resolver and if the name of the relation is not the arg name.
   """
   relation: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
 ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 GRAPHQL;
     }
