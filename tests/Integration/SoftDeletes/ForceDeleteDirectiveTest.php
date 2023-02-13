@@ -2,7 +2,6 @@
 
 namespace Tests\Integration\SoftDeletes;
 
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\SoftDeletes\ForceDeleteDirective;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
@@ -21,7 +20,7 @@ final class ForceDeleteDirectiveTest extends DBTestCase
         }
 
         type Mutation {
-            forceDeleteTask(id: ID!): Task @forceDelete
+            forceDeleteTask(id: ID! @whereKey): Task @forceDelete
         }
         ';
 
@@ -53,7 +52,7 @@ final class ForceDeleteDirectiveTest extends DBTestCase
         }
 
         type Mutation {
-            forceDeleteTask(id: ID!): Task @forceDelete
+            forceDeleteTask(id: ID! @whereKey): Task @forceDelete
         }
         ';
 
@@ -85,7 +84,7 @@ final class ForceDeleteDirectiveTest extends DBTestCase
         }
 
         type Mutation {
-            forceDeleteTasks(id: [ID!]!): [Task!]! @forceDelete
+            forceDeleteTasks(id: [ID!]! @whereKey): [Task!]! @forceDelete
         }
         ';
 
@@ -118,7 +117,7 @@ final class ForceDeleteDirectiveTest extends DBTestCase
         }
 
         type Mutation {
-            forceDeleteTasks(id: ID! @eq): Task!
+            forceDeleteTasks(id: ID! @whereKey): Task!
                 @can(ability: "delete", query: true)
                 @forceDelete
         }
@@ -153,7 +152,7 @@ final class ForceDeleteDirectiveTest extends DBTestCase
         }
 
         type Mutation {
-            forceDeleteTasks(id: ID! @eq): Task!
+            forceDeleteTasks(id: ID! @whereKey): Task!
                 @can(ability: "delete", query: true)
                 @forceDelete
                 # The order has to be like this, otherwise @forceDelete will throw
@@ -172,52 +171,7 @@ final class ForceDeleteDirectiveTest extends DBTestCase
         $this->assertCount(0, Task::withTrashed()->get());
     }
 
-    public function testRejectsDefinitionWithNullableArgument(): void
-    {
-        $this->expectException(DefinitionException::class);
-
-        $this->buildSchema(/** @lang GraphQL */ '
-        type Task {
-            id: ID!
-        }
-
-        type Query {
-            deleteTask(id: ID): Task @forceDelete
-        }
-        ');
-    }
-
-    public function testRejectsDefinitionWithNoArgument(): void
-    {
-        $this->expectException(DefinitionException::class);
-
-        $this->buildSchema(/** @lang GraphQL */ '
-        type Task {
-            id: ID!
-        }
-
-        type Query {
-            deleteTask: Task @forceDelete
-        }
-        ');
-    }
-
-    public function testRejectsDefinitionWithMultipleArguments(): void
-    {
-        $this->expectException(DefinitionException::class);
-
-        $this->buildSchema(/** @lang GraphQL */ '
-        type Task {
-            id: ID!
-        }
-
-        type Query {
-            deleteTask(foo: String, bar: Int): Task @forceDelete
-        }
-        ');
-    }
-
-    public function testRejectsUsingDirectiveWithNoSoftDeleteModels(): void
+    public function testRejectsUsingDirectiveWithNonSoftDeleteModels(): void
     {
         $this->expectExceptionMessage(ForceDeleteDirective::MODEL_NOT_USING_SOFT_DELETES);
         $this->buildSchema(/** @lang GraphQL */ '
@@ -226,7 +180,7 @@ final class ForceDeleteDirectiveTest extends DBTestCase
         }
 
         type Query {
-            deleteUser(id: ID!): User @forceDelete
+            deleteUser(id: ID! @whereKey): User @forceDelete
         }
         ');
     }

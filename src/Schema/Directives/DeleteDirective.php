@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -21,18 +22,9 @@ class DeleteDirective extends ModifyModelExistenceDirective implements ArgResolv
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Delete one or more models by their ID.
-The field must have a single non-null argument that may be a list.
+Delete one or more models.
 """
 directive @delete(
-  """
-  DEPRECATED use @globalId, will be removed in v6
-
-  Set to `true` to use global ids for finding the model.
-  If set to `false`, regular non-global ids are used.
-  """
-  globalId: Boolean = false
-
   """
   Specify the class name of the model to use.
   This is only needed when the default model detection does not work.
@@ -45,13 +37,18 @@ directive @delete(
   resolver and if the name of the relation is not the arg name.
   """
   relation: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
 ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 GRAPHQL;
     }
 
-    protected function find(string $modelClass, $idOrIds)
+    protected function enhanceBuilder(EloquentBuilder $builder): EloquentBuilder
     {
-        return $modelClass::find($idOrIds);
+        return $builder;
     }
 
     protected function modifyExistence(Model $model): bool
@@ -88,7 +85,7 @@ GRAPHQL;
             // Deleting when `false` is given seems wrong.
             if ($idOrIds) {
                 if ($relationIsBelongsToLike) {
-                    /** @var \Illuminate\Database\Eloquent\Relations\BelongsTo $relation TODO remove with newer PHPStan */
+                    /** @var \Illuminate\Database\Eloquent\Relations\BelongsTo $relation TODO remove with newer PHPStan that comes with Laravel 9 */
                     $relation->dissociate();
                     $relation->getParent()->save();
                 }
@@ -111,9 +108,7 @@ GRAPHQL;
         ObjectTypeDefinitionNode &$parentType
     ) {
         if (! $this->directiveArgValue('relation')) {
-            throw new DefinitionException(
-                'The @delete directive requires the "relation" to be set when used as an argument resolver.'
-            );
+            throw new DefinitionException('The @delete directive requires "relation" to be set when used as an argument resolver.');
         }
     }
 }

@@ -30,6 +30,23 @@ within the directive definition and leads to static validation errors.
 )
 ```
 
+### Use filters in `@delete`, `@forceDelete` and `@restore`
+
+Whereas previously, those directives enforced the usage of a single argument and assumed that
+to be the ID or list of IDs of the models to modify, they now leverage argument filter directives.
+This brings them in line with other directives such as `@find` and `@all`.
+
+You will need to explicitly add `@whereKey` to the argument that contained the ID or IDs.
+
+```diff
+type Mutation {
+-   deleteUser(id: ID!): User! @delete
++   deleteUser(id: ID! @whereKey): User! @delete
+-   restoreUsers(userIDs: [ID!]!): [User!]! @restore
++   restoreUsers(userIDs: [ID!]! @whereKey): [User!]! @restore
+}
+```
+
 ### Use `@globalId` over `@delete(globalId: true)`
 
 The `@delete`, `@forceDelete`, `@restore` and `@upsert` directives no longer offer the
@@ -38,7 +55,7 @@ The `@delete`, `@forceDelete`, `@restore` and `@upsert` directives no longer off
 ```diff
 type Mutation {
 -   deleteUser(id: ID!): User! @delete(globalId: true)
-+   deleteUser(id: ID! @globalId): User! @delete
++   deleteUser(id: ID! @globalId @whereKey): User! @delete
 }
 ```
 

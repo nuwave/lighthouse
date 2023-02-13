@@ -3,22 +3,20 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Error\Error;
-use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ListTypeNode;
 use GraphQL\Language\AST\NonNullTypeNode;
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use GraphQL\Language\AST\TypeNode;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\ErrorPool;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Execution\TransactionalMutations;
-use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GlobalId;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-abstract class ModifyModelExistenceDirective extends BaseDirective implements FieldResolver, FieldManipulator
+abstract class ModifyModelExistenceDirective extends BaseDirective implements FieldResolver
 {
     /**
      * @var \Nuwave\Lighthouse\Support\Contracts\GlobalId
@@ -51,116 +49,53 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
 
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
-        $fieldValue->setResolver(function ($root, array $args) {
-            /** @var string|int|array<string>|array<int> $idOrIds */
-            $idOrIds = reset($args);
+        $expectsList = $this->expectsList($fieldValue->getField()->type);
 
-            // TODO remove in v6
-            if ($this->directiveArgValue('globalId')) {
-                // @phpstan-ignore-next-line We know that global ids must be strings
-                $idOrIds = $this->decodeIdOrIds($idOrIds);
-            }
-
-            $modelOrModels = $this->find(
-                $this->getModelClass(),
-                $idOrIds
+        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($expectsList) {
+            $builder = $resolveInfo->enhanceBuilder(
+                $this->getModelClass()::query(),
+                $this->directiveArgValue('scopes', []),
+                $root,
+                $args,
+                $context,
+                $resolveInfo
             );
+            assert($builder instanceof EloquentBuilder);
 
-            $modifyModelExistence = function (Model $model): void {
+            $modelOrModels = $this->enhanceBuilder($builder)->get();
+
+            foreach ($modelOrModels as $model) {
                 $success = $this->transactionalMutations->execute(
-                    function () use ($model): bool {
-                        return $this->modifyExistence($model);
-                    },
+                    fn (): bool => $this->modifyExistence($model),
                     $model->getConnectionName()
                 );
 
                 if (! $success) {
                     $this->errorPool->record(self::couldNotModify($model));
                 }
-            };
-
-            if ($modelOrModels instanceof Model) {
-                $modifyModelExistence($modelOrModels);
-            } elseif ($modelOrModels instanceof EloquentCollection) {
-                foreach ($modelOrModels as $model) {
-                    $modifyModelExistence($model);
-                }
             }
 
-            return $modelOrModels;
+            return $expectsList
+                ? $modelOrModels
+                : $modelOrModels->first();
         });
 
         return $fieldValue;
     }
 
-    /**
-     * Get the type of the id argument.
-     *
-     * Not using an actual type hint, as the manipulateFieldDefinition function
-     * validates the type during schema build time.
-     *
-     * @return mixed but should be a \GraphQL\Language\AST\NonNullTypeNode
-     */
-    protected function idArgument()
+    private function expectsList(TypeNode $typeNode): bool
     {
-        $fieldNode = $this->definitionNode;
-        assert($fieldNode instanceof FieldDefinitionNode);
-
-        return $fieldNode->arguments[0]->type;
-    }
-
-    public function manipulateFieldDefinition(
-        DocumentAST &$documentAST,
-        FieldDefinitionNode &$fieldDefinition,
-        ObjectTypeDefinitionNode &$parentType
-    ): void {
-        // Ensure there is only a single argument defined on the field.
-        if (1 !== count($fieldDefinition->arguments)) {
-            throw new DefinitionException(
-                'The @' . $this->name() . " directive requires the field {$this->nodeName()} to only contain a single argument."
-            );
+        if ($typeNode instanceof NonNullTypeNode) {
+            return $this->expectsList($typeNode->type);
         }
 
-        if (! $this->idArgument() instanceof NonNullTypeNode) {
-            throw new DefinitionException(
-                'The @' . $this->name() . " directive requires the field {$this->nodeName()} to have a NonNull argument. Mark it with !"
-            );
-        }
+        return $typeNode instanceof ListTypeNode;
     }
 
     /**
-     * @param  string|array<string>  $idOrIds
-     *
-     * @return string|array<string>
+     * Enhance the builder used to resolve the models.
      */
-    protected function decodeIdOrIds($idOrIds)
-    {
-        // At this point we know the type is at least wrapped in a NonNull type, so we go one deeper
-        if ($this->idArgument()->type instanceof ListTypeNode) {
-            assert(is_array($idOrIds));
-
-            return array_map(
-                function (string $id): string {
-                    return $this->globalId->decodeID($id);
-                },
-                $idOrIds
-            );
-        } else {
-            assert(is_string($idOrIds));
-
-            return $this->globalId->decodeID($idOrIds);
-        }
-    }
-
-    /**
-     * Find one or more models by id.
-     *
-     * @param  class-string<\Illuminate\Database\Eloquent\Model>  $modelClass
-     * @param  string|int|array<string>|array<int>  $idOrIds
-     *
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>|null
-     */
-    abstract protected function find(string $modelClass, $idOrIds);
+    abstract protected function enhanceBuilder(EloquentBuilder $builder): EloquentBuilder;
 
     /**
      * Bring a model in or out of existence.

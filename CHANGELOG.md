@@ -17,6 +17,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Pass the path array to `CacheKeyAndTags::key()` https://github.com/nuwave/lighthouse/pull/2176
 - Require implementations of `BatchedEntityResolver` to maintain the keys given in `array $representations` https://github.com/nuwave/lighthouse/pull/2286
 - Use the strongest possible property types over PHPDocs
+- Require filter directives such as `@whereKey` in `@delete`, `@forceDelete` and `@restore` https://github.com/nuwave/lighthouse/pull/2289
 
 ### Fixed
 
@@ -30,6 +31,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Decode fields with directive `@globalId` in federation model entity resolver
 - Support Laravel 10 https://github.com/nuwave/lighthouse/pull/2287
 - Add `GraphQLContext:: setUser(?Authenticatable $user): void`
+- Add directive `@whereKey` to filter Models by their primary key https://github.com/nuwave/lighthouse/pull/2289
 
 ### Removed
 
@@ -44,6 +46,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove trait `ClearsSchemaCache`
 - Remove config option `lighthouse.unbox_bensampo_enum_enum_instances`
 - Remove `ArgumentSet::enhanceBuilder()`, use `ResolveInfo::enhanceBuilder()`
+- Remove the `globalId` argument from `@delete`, `@forceDelete` and `@restore` https://github.com/nuwave/lighthouse/pull/2289
 
 ## v5.70.3
 

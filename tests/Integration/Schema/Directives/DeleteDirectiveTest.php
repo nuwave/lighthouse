@@ -23,7 +23,7 @@ final class DeleteDirectiveTest extends DBTestCase
         }
 
         type Mutation {
-            deleteUser(id: ID!): User @delete
+            deleteUser(id: ID! @whereKey): User @delete
         }
         ';
 
@@ -54,7 +54,7 @@ final class DeleteDirectiveTest extends DBTestCase
         }
 
         type Mutation {
-            deleteUser(id: ID!): User @delete
+            deleteUser(id: ID! @whereKey): User @delete
         }
         ';
 
@@ -71,7 +71,7 @@ final class DeleteDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testDeletesMultipleUsersAndReturnsThem(): void
+    public function testDeletesMultipleUsersByIDAndReturnsThem(): void
     {
         $users = factory(User::class, 2)->create();
         assert($users instanceof EloquentCollection);
@@ -82,7 +82,7 @@ final class DeleteDirectiveTest extends DBTestCase
         }
 
         type Mutation {
-            deleteUsers(ids: [ID!]!): [User!]! @delete
+            deleteUsers(ids: [ID!]! @whereKey): [User!]! @delete
         }
         ';
 
@@ -99,6 +99,102 @@ final class DeleteDirectiveTest extends DBTestCase
         $this->assertCount(0, User::all());
     }
 
+    public function testDeleteByNonPrimaryKey(): void
+    {
+        $foo = factory(User::class)->make();
+        assert($foo instanceof User);
+        $foo->name = 'foo';
+        $foo->save();
+
+        $bar = factory(User::class)->make();
+        assert($bar instanceof User);
+        $bar->name = 'bar';
+        $bar->save();
+
+        $this->schema .= /** @lang GraphQL */ '
+        type User {
+            id: ID!
+        }
+
+        type Mutation {
+            deleteUsers(name: String! @eq): [User!]! @delete
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation ($name: String!) {
+            deleteUsers(name: $name) {
+                id
+            }
+        }
+        ', [
+            'name' => $foo->name,
+        ])->assertJson([
+            'data' => [
+                'deleteUsers' => [
+                    [
+                        'id' => $foo->id,
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertCount(1, User::all());
+    }
+
+    public function testDeleteWithScopes(): void
+    {
+        $named = factory(User::class)->make();
+        assert($named instanceof User);
+        $named->name = 'foo';
+        $named->save();
+
+        $unnamed = factory(User::class)->make();
+        assert($unnamed instanceof User);
+        $unnamed->name = null;
+        $unnamed->save();
+
+        $this->schema .= /** @lang GraphQL */ '
+        type User {
+            id: ID!
+        }
+
+        type Mutation {
+            deleteUser(id: ID! @whereKey): User @delete(scopes: ["named"])
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation ($id: ID!) {
+            deleteUser(id: $id) {
+                id
+            }
+        }
+        ', [
+            'id' => $named->id,
+        ])->assertJson([
+            'data' => [
+                'deleteUser' => [
+                    'id' => $named->id,
+                ],
+            ],
+        ]);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation ($id: ID!) {
+            deleteUser(id: $id) {
+                id
+            }
+        }
+        ', [
+            'id' => $unnamed->id,
+        ])->assertJson([
+            'data' => [
+                'deleteUser' => null,
+            ],
+        ]);
+    }
+
     public function testDeletesMultipleNonExisting(): void
     {
         $this->schema .= /** @lang GraphQL */ '
@@ -107,7 +203,7 @@ final class DeleteDirectiveTest extends DBTestCase
         }
 
         type Mutation {
-            deleteUsers(ids: [ID!]!): [User!]! @delete
+            deleteUsers(ids: [ID!]! @whereKey): [User!]! @delete
         }
         ';
 
@@ -132,7 +228,7 @@ final class DeleteDirectiveTest extends DBTestCase
         }
 
         type Mutation {
-            deleteUsers(ids: [ID!]!): [User!]! @delete
+            deleteUsers(ids: [ID!]! @whereKey): [User!]! @delete
         }
         ';
 
@@ -147,52 +243,6 @@ final class DeleteDirectiveTest extends DBTestCase
                 'deleteUsers' => [],
             ],
         ]);
-    }
-
-    public function testRejectsDefinitionWithNullableArgument(): void
-    {
-        $this->expectException(DefinitionException::class);
-
-        $this->buildSchema(/** @lang GraphQL */ '
-        type User {
-            id: ID!
-            name: String
-        }
-
-        type Mutation {
-            deleteUser(id: ID): User @delete
-        }
-        ' . self::PLACEHOLDER_QUERY);
-    }
-
-    public function testRejectsDefinitionWithNoArgument(): void
-    {
-        $this->expectException(DefinitionException::class);
-
-        $this->buildSchema(/** @lang GraphQL */ '
-        type User {
-            id: ID!
-        }
-
-        type Mutation {
-            deleteUser: User @delete
-        }
-        ' . self::PLACEHOLDER_QUERY);
-    }
-
-    public function testRejectsDefinitionWithMultipleArguments(): void
-    {
-        $this->expectException(DefinitionException::class);
-
-        $this->buildSchema(/** @lang GraphQL */ '
-        type User {
-            id: ID!
-        }
-
-        type Mutation {
-            deleteUser(foo: String, bar: Int): User @delete
-        }
-        ' . self::PLACEHOLDER_QUERY);
     }
 
     public function testRequiresRelationWhenUsingAsArgResolver(): void
@@ -390,11 +440,9 @@ final class DeleteDirectiveTest extends DBTestCase
         $this->assertNull(User::find($user->id));
     }
 
-    public function testNotDeleting(): void
+    public function testDeletingReturnsFalseTriggersException(): void
     {
-        User::deleting(function (): bool {
-            return false;
-        });
+        User::deleting(fn (): bool => false);
 
         $user = factory(User::class)->create();
         assert($user instanceof User);
@@ -405,7 +453,7 @@ final class DeleteDirectiveTest extends DBTestCase
         }
 
         type Mutation {
-            deleteUser(id: ID!): User @delete
+            deleteUser(id: ID! @whereKey): User @delete
         }
         ';
 

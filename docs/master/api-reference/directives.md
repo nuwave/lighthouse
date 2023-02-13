@@ -941,18 +941,9 @@ This directive can also be used as a [nested arg resolver](../concepts/arg-resol
 
 ```graphql
 """
-Delete one or more models by their ID.
-The field must have a single non-null argument that may be a list.
+Delete one or more models.
 """
 directive @delete(
-  """
-  DEPRECATED use @globalId, will be removed in v6
-
-  Set to `true` to use global ids for finding the model.
-  If set to `false`, regular non-global ids are used.
-  """
-  globalId: Boolean = false
-
   """
   Specify the class name of the model to use.
   This is only needed when the default model detection does not work.
@@ -965,36 +956,31 @@ directive @delete(
   resolver and if the name of the relation is not the arg name.
   """
   relation: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
 ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-Use it on a root mutation field that returns an instance of the Model.
+Use this on root mutation fields.
+It will return an instance of the Model so you can show its data one last time.
 
 ```graphql
 type Mutation {
-  deletePost(id: ID!): Post @delete
+  deletePost(id: ID! @whereKey): Post! @delete
 }
 ```
 
-In the upcoming `v6`, the `@delete`, `@forceDelete` and `@restore` directives no longer offer the
-`globalId` argument. Use `@globalId` on the argument instead.
-
-```diff
-type Mutation {
--   deleteUser(id: ID!): User! @delete(globalId: true)
-+   deleteUser(id: ID! @globalId): User! @delete
-}
-```
-
-You can also delete multiple models at once.
-Define a field that takes a list of IDs and returns a collection of the
-deleted models.
+You can also delete multiple models at once, for example by a list of IDs or a filter.
+Be careful with the filters you offer to avoid accidental mass deletion.
 
 _In contrast to Laravel mass updates, this does trigger model events._
 
 ```graphql
 type Mutation {
-  deletePosts(id: [ID!]!): [Post!]! @delete
+  deletePosts(ids: [ID!] @whereKey, title: String @eq): [Post!]! @delete
 }
 ```
 
@@ -1003,7 +989,7 @@ or is located in a non-default namespace, set it with the `model` argument.
 
 ```graphql
 type Mutation {
-  deletePost(id: ID!): Post @delete(model: "Bar\\Baz\\MyPost")
+  deletePost(id: ID! @whereKey): Post @delete(model: "Bar\\Baz\\MyPost")
 }
 ```
 
@@ -1011,7 +997,7 @@ This directive can also be used as a [nested arg resolver](../concepts/arg-resol
 
 ```graphql
 type Mutation {
-  updateUser(id: Int, deleteTasks: [Int!]! @delete(relation: "tasks")): User
+  updateUser(id: ID!, deleteTasks: [ID!]! @delete(relation: "tasks")): User!
     @update
 }
 ```
@@ -1022,7 +1008,7 @@ possible model that can be deleted.
 
 ```graphql
 type Mutation {
-  updateTask(id: Int, deleteUser: Boolean @delete(relation: "user")): Task
+  updateTask(id: ID!, deleteUser: Boolean @delete(relation: "user")): Task!
     @update
 }
 ```
@@ -1209,23 +1195,19 @@ type Query {
 
 ```graphql
 """
-Permanently remove one or more soft deleted models by their ID.
-The field must have a single non-null argument that may be a list.
+Permanently remove one or more soft deleted models.
 """
 directive @forceDelete(
-  """
-  DEPRECATED use @globalId, will be removed in v6
-
-  Set to `true` to use global ids for finding the model.
-  If set to `false`, regular non-global ids are used.
-  """
-  globalId: Boolean = false
-
   """
   Specify the class name of the model to use.
   This is only needed when the default model detection does not work.
   """
   model: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
 ) on FIELD_DEFINITION
 ```
 
@@ -1233,7 +1215,7 @@ Use it on a root mutation field that returns an instance of the Model.
 
 ```graphql
 type Mutation {
-  forceDeletePost(id: ID!): Post @forceDelete
+  forceDeletePost(id: ID! @whereKey): Post @forceDelete
 }
 ```
 
@@ -2910,23 +2892,19 @@ input UserInput {
 
 ```graphql
 """
-Un-delete one or more soft deleted models by their ID.
-The field must have a single non-null argument that may be a list.
+Un-delete one or more soft deleted models.
 """
 directive @restore(
-  """
-  DEPRECATED use @globalId, will be removed in v6
-
-  Set to `true` to use global ids for finding the model.
-  If set to `false`, regular non-global ids are used.
-  """
-  globalId: Boolean = false
-
   """
   Specify the class name of the model to use.
   This is only needed when the default model detection does not work.
   """
   model: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
 ) on FIELD_DEFINITION
 ```
 
@@ -2934,7 +2912,7 @@ Use it on a root mutation field that returns an instance of the Model.
 
 ```graphql
 type Mutation {
-  restorePost(id: ID!): Post @restore
+  restorePost(id: ID! @whereKey): Post @restore
 }
 ```
 
@@ -3748,6 +3726,39 @@ You may use the `key` argument to look into the JSON content:
 ```graphql
 type Query {
   posts(tags: [String]! @whereJsonContains(key: "tags->recent")): [Post!]! @all
+}
+```
+
+## @whereKey
+
+```graphql
+"""
+Add a where clause on the primary key to the Eloquent Model query.
+"""
+directive @whereKey(
+  """
+  Provide a value to compare against.
+  Only required when this directive is used on a field.
+  """
+  value: WhereKeyValue
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+
+"""
+Any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
+"""
+scalar WhereKeyValue
+```
+
+Use together with directives that make Eloquent queries such as [@find](#find), [@all](#all) or [@delete](#delete).
+
+```graphql
+type Query {
+  post(id: ID! @whereKey): Post @find
+  posts(ids: [ID!]! @whereKey): [Post!]! @all
+}
+
+type Mutation {
+  deletePost(id: ID! @whereKey): Post! @delete
 }
 ```
 
