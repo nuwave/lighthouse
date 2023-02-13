@@ -22,10 +22,7 @@ use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
  */
 class GuardDirective extends BaseDirective implements FieldMiddleware, TypeManipulator, TypeExtensionManipulator
 {
-    /**
-     * @var \Illuminate\Contracts\Auth\Factory
-     */
-    protected $auth;
+    protected AuthFactory $auth;
 
     public function __construct(AuthFactory $auth)
     {
@@ -58,8 +55,7 @@ GRAPHQL;
         $previousResolver = $fieldValue->getResolver();
 
         $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
-            // TODO remove cast in v6
-            $with = (array) $this->directiveArgValue('with', AuthServiceProvider::guard());
+            $with = $this->directiveArgValue('with', (array) AuthServiceProvider::guard());
             $context->setUser($this->authenticate($with));
 
             return $previousResolver($root, $args, $context, $resolveInfo);

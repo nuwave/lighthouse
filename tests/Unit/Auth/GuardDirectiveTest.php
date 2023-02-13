@@ -52,35 +52,6 @@ final class GuardDirectiveTest extends TestCase
         ]);
     }
 
-    /**
-     * @deprecated remove cast in v6
-     */
-    public function testSpecifyGuardAsString(): void
-    {
-        $this->schema = /** @lang GraphQL */ '
-        type Query {
-            foo: Int @guard(with: "web")
-        }
-        ';
-
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            foo
-        }
-        ')->assertJson([
-            'errors' => [
-                [
-                    'message' => AuthenticationException::MESSAGE,
-                    'extensions' => [
-                        'guards' => [
-                            'web',
-                        ],
-                    ],
-                ],
-            ],
-        ]);
-    }
-
     public function testPassesOneFieldButThrowsInAnother(): void
     {
         $this->schema = /** @lang GraphQL */ '
