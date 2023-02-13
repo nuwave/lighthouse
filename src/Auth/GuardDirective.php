@@ -91,7 +91,9 @@ GRAPHQL;
      * Handle an unauthenticated user.
      *
      * @param  array<string|null>  $guards
+     *
      * @throws \Illuminate\Auth\AuthenticationException
+     *
      * @return never
      */
     protected function unauthenticated(array $guards): void
