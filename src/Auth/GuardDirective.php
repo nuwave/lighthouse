@@ -95,16 +95,12 @@ GRAPHQL;
      * Handle an unauthenticated user.
      *
      * @param  array<string|null>  $guards
-     *
+     * @throws \Illuminate\Auth\AuthenticationException
      * @return never
-     * @throws AuthenticationException
      */
     protected function unauthenticated(array $guards): void
     {
-        throw new AuthenticationException(
-            AuthenticationException::MESSAGE,
-            $guards
-        );
+        throw new AuthenticationException(AuthenticationException::MESSAGE, $guards);
     }
 
     public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition): void
