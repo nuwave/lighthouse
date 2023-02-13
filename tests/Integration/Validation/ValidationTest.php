@@ -350,7 +350,9 @@ final class ValidationTest extends TestCase
                 foo(bar: "fasdf")
             }
             ')
-            ->assertGraphQLValidationError('bar', 'The bar must not be greater than 3 characters.');
+            ->assertGraphQLValidationError('bar', AppVersion::atLeast(10.0)
+                ? 'The bar field must not be greater than 3 characters.'
+                : 'The bar must not be greater than 3 characters.');
     }
 
     public function testSingleFieldReferencesAreQualified(): void
