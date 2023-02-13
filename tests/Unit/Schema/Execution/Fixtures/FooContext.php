@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Schema\Execution\Fixtures;
 
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -23,6 +24,10 @@ final class FooContext implements GraphQLContext
     public function user(): User
     {
         return new User();
+    }
+
+    public function setUser(?Authenticatable $user): void
+    {
     }
 
     public function request(): Request

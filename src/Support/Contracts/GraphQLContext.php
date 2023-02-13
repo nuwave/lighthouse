@@ -2,6 +2,8 @@
 
 namespace Nuwave\Lighthouse\Support\Contracts;
 
+use Illuminate\Contracts\Auth\Authenticatable;
+
 interface GraphQLContext
 {
     /**
@@ -17,4 +19,12 @@ interface GraphQLContext
      * @return \Illuminate\Http\Request
      */
     public function request();
+
+    /**
+     * Set the authenticated user.
+     *
+     * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
+     * @return void
+     */
+    public function setUser(?Authenticatable $user);
 }
