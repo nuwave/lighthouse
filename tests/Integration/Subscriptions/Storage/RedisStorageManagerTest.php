@@ -77,8 +77,8 @@ final class RedisStorageManagerTest extends TestCase
 
     public function testSubscribersByTopic(): void
     {
-        /** @var RedisStorageManager $storage */
         $storage = $this->app->make(RedisStorageManager::class);
+        assert($storage instanceof RedisStorageManager);
 
         $this->querySubscription();
         $this->querySubscription();
