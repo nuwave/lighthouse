@@ -60,7 +60,7 @@ class PostUpdatedSubscription extends GraphQLSubscription
     public function filter(Subscriber $subscriber, mixed $root): bool
     {
         // Filter out the sender
-        return $subscriber->socket_id !== request()->header("x-socket-id");
+        return $subscriber->socket_id !== request()->header('X-Socket-ID');
     }
 }
 ```
