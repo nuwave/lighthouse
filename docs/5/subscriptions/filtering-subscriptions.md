@@ -69,7 +69,8 @@ When you initialize a Laravel Echo instance, a socket ID is assigned to the conn
 If you are using a global [Axios](https://github.com/mzabriskie/axios) instance to make HTTP requests from your JavaScript application, the socket ID will automatically be attached to every outgoing request in the `X-Socket-ID` header.
 Then, you can access that in your filter function.
 
-If you are not using a global Axios instance, you will need to manually configure your JavaScript application to send the X-Socket-ID header with all outgoing requests. You may retrieve the socket ID using the Echo.socketId method:
+If you are not using a global Axios instance, you will need to manually configure your JavaScript application to send the `X-Socket-ID` header with all outgoing requests.
+You may retrieve the socket ID using the `Echo.socketId()` method:
 
 ```js
 var socketId = Echo.socketId();
