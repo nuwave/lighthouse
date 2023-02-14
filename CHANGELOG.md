@@ -18,7 +18,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Require implementations of `BatchedEntityResolver` to maintain the keys given in `array $representations` https://github.com/nuwave/lighthouse/pull/2286
 - Use the strongest possible property types over PHPDocs
 - Require filter directives such as `@whereKey` in `@delete`, `@forceDelete` and `@restore` https://github.com/nuwave/lighthouse/pull/2289
-- Subscriptions can now be filtered via `$subscriber->socket_id` and `request()->header("x-socket-id")` https://github.com/nuwave/lighthouse/pull/2298
+- Subscriptions can now be filtered via `$subscriber->socket_id` and `request()->header('X-Socket-ID')` https://github.com/nuwave/lighthouse/pull/2298
 
 ### Fixed
 
