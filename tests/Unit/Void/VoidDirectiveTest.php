@@ -5,13 +5,13 @@ namespace Tests\Unit\Void;
 use Nuwave\Lighthouse\Void\VoidServiceProvider;
 use Tests\TestCase;
 
-class VoidDirectiveTest extends TestCase
+final class VoidDirectiveTest extends TestCase
 {
     public function testVoid(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            foo: Int @void
+            foo: _ @void
         }
         ';
 
