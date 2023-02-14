@@ -40,6 +40,8 @@ abstract class GraphQLSubscription
 
     /**
      * Resolve the subscription.
+     *
+     * @param  array<string, mixed>  $args
      */
     public function resolve(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): mixed
     {
