@@ -116,11 +116,16 @@ jobs:
       - name: "Remove conflicting dependencies that are not needed here"
         run: composer remove --dev nunomaduro/larastan phpstan/phpstan-mockery phpbench/phpbench rector/rector --no-update
 
-      - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
+      - run: |
+          composer require
+          illuminate/contracts:${{ matrix.laravel-version }}
+          --no-interaction
+          --prefer-dist
+          --no-progress
+          --update-with-all-dependencies
+          ${{ matrix.composer.arg }}
 
-      - run: composer update ${{ matrix.composer.arg }}
-
-      - run: vendor/bin/phpunit --colors=always --verbose
+      - run: vendor/bin/phpunit
 
   coverage:
     runs-on: ubuntu-latest
