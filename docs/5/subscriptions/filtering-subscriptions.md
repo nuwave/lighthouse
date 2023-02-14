@@ -40,3 +40,38 @@ class PostUpdatedSubscription extends GraphQLSubscription
     }
 }
 ```
+
+## Only To Others
+
+When building an application that utilizes event broadcasting, you may occasionally need to broadcast an event to all subscribers to a given channel except for the current user. You may accomplish this using the filter function, this following snippet is the equivalent of [toOthers method from Laravel's broadcast helper](https://laravel.com/docs/9.x/broadcasting#only-to-others).
+
+```php
+namespace App\GraphQL\Subscriptions;
+
+use Nuwave\Lighthouse\Subscriptions\Subscriber;
+use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
+
+class PostUpdatedSubscription extends GraphQLSubscription
+{
+    /**
+     * Filter which subscribers should receive the subscription.
+     *
+     * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
+     * @param  mixed  $root
+     * @return bool
+     */
+    public function filter(Subscriber $subscriber, $root): bool
+    {
+        // Filter out the sender
+        return $subscriber->socket_id !== request()->header("x-socket-id");
+    }
+}
+```
+
+When you initialize a Laravel Echo instance, a socket ID is assigned to the connection. If you are using a global [Axios](https://github.com/mzabriskie/axios) instance to make HTTP requests from your JavaScript application, the socket ID will automatically be attached to every outgoing request as a `X-Socket-ID` header. Then, you can access that in your filter function.
+
+If you are not using a global Axios instance, you will need to manually configure your JavaScript application to send the X-Socket-ID header with all outgoing requests. You may retrieve the socket ID using the Echo.socketId method:
+
+```js
+var socketId = Echo.socketId();
+```

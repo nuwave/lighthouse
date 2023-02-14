@@ -16,6 +16,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Expected resolver arguments in `ResolveInfo::enhanceBuilder()`
 - Pass the path array to `CacheKeyAndTags::key()` https://github.com/nuwave/lighthouse/pull/2176
 - Require implementations of `BatchedEntityResolver` to maintain the keys given in `array $representations` https://github.com/nuwave/lighthouse/pull/2286
+- Subscriptions can now be filtered via `$subscriber->socket_id` and `request()->header("x-socket-id")` 
 
 ### Fixed
 

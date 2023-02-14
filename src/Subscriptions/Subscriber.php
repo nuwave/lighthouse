@@ -25,6 +25,11 @@ class Subscriber
     public $channel;
 
     /**
+     * X-SOCKET-ID header passed on the subscription query.
+     */
+    public ?string $socket_id;
+
+    /**
      * The topic subscribed to.
      *
      * @var string
@@ -90,6 +95,7 @@ class Subscriber
         $this->args = $args;
         $this->variables = $resolveInfo->variableValues;
         $this->context = $context;
+        $this->socket_id = request()->header('x-socket-id');
 
         $operation = $resolveInfo->operation;
         assert($operation instanceof OperationDefinitionNode, 'Must be here, since webonyx/graphql-php validated the subscription.');
@@ -108,6 +114,7 @@ class Subscriber
     public function __serialize(): array
     {
         return [
+            'socket_id' => $this->socket_id,
             'channel' => $this->channel,
             'topic' => $this->topic,
             'query' => serialize(
@@ -133,6 +140,7 @@ class Subscriber
         );
         assert($documentNode instanceof DocumentNode, 'We know the type since it is set during construction and serialized.');
 
+        $this->socket_id = $data['socket_id'];
         $this->query = $documentNode;
         $this->fieldName = $data['field_name'];
         $this->args = $data['args'];
