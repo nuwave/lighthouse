@@ -1,4 +1,4 @@
-name: "Autoformat"
+name: "Format"
 on:
   push:
     branches:
