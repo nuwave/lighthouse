@@ -26,9 +26,8 @@ class Subscriber
 
     /**
      * X-Socket-ID header passed on the subscription query.
-     * @var string|null|array<mixed>
      */
-    public $socket_id;
+    public ?string $socket_id;
 
     /**
      * The topic subscribed to.
@@ -96,7 +95,13 @@ class Subscriber
         $this->args = $args;
         $this->variables = $resolveInfo->variableValues;
         $this->context = $context;
-        $this->socket_id = request()->header('X-Socket-ID');
+
+        $xSocketID = request()->header('X-Socket-ID');
+        // @phpstan-ignore-next-line
+        if (is_array($xSocketID)) {
+            throw new \Exception('X-Socket-ID must be a string or null.');
+        }
+        $this->socket_id = $xSocketID;
 
         $operation = $resolveInfo->operation;
         assert($operation instanceof OperationDefinitionNode, 'Must be here, since webonyx/graphql-php validated the subscription.');
