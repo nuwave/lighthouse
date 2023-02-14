@@ -63,7 +63,7 @@ final class SubscriptionTest extends TestCase
                 return true;
             }
 
-            public function filter(Subscriber $subscriber, $root): bool
+            public function filter(Subscriber $subscriber, mixed $root): bool
             {
                 return true;
             }
