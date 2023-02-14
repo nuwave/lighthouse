@@ -2,24 +2,15 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class AggregateDirectiveTest extends DBTestCase
+final class AggregateDirectiveTest extends DBTestCase
 {
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        if (AppVersion::below(8.0)) {
-            $this->markTestSkipped('Eager aggregate loading is only available in Laravel 8+.');
-        }
-    }
-
     public function testRequiresARelationOrModelArgument(): void
     {
         $this->schema = /** @lang GraphQL */ '
@@ -112,41 +103,36 @@ class AggregateDirectiveTest extends DBTestCase
         factory(User::class, 3)
             ->create()
             ->each(function (User $user, int $index): void {
-                /** @var \Tests\Utils\Models\Task $task */
                 $task = factory(Task::class)->make();
+                assert($task instanceof Task);
                 $task->difficulty = $index;
                 $task->user()->associate($user);
                 $task->save();
             });
 
-        $queries = 0;
-        DB::listen(static function () use (&$queries): void {
-            ++$queries;
-        });
-
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            users {
-                workload
+        $this->assertQueryCountMatches(2, function (): void {
+            $this->graphQL(/** @lang GraphQL */ '
+            {
+                users {
+                    workload
+                }
             }
-        }
-        ')->assertExactJson([
-            'data' => [
-                'users' => [
-                    [
-                        'workload' => 0,
-                    ],
-                    [
-                        'workload' => 1,
-                    ],
-                    [
-                        'workload' => 2,
+            ')->assertExactJson([
+                'data' => [
+                    'users' => [
+                        [
+                            'workload' => 0,
+                        ],
+                        [
+                            'workload' => 1,
+                        ],
+                        [
+                            'workload' => 2,
+                        ],
                     ],
                 ],
-            ],
-        ]);
-
-        $this->assertSame(2, $queries);
+            ]);
+        });
     }
 
     public function testSumRelationWithScopes(): void
@@ -161,14 +147,14 @@ class AggregateDirectiveTest extends DBTestCase
         }
         ';
 
-        /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
+        assert($user instanceof User);
 
         $ongoing = factory(Task::class)->make();
         $user->tasks()->save($ongoing);
 
-        /** @var \Tests\Utils\Models\Task $completed */
         $completed = factory(Task::class)->state('completed')->make();
+        assert($completed instanceof Task);
         $user->tasks()->save($completed);
 
         $this->graphQL(/** @lang GraphQL */ '
@@ -184,5 +170,127 @@ class AggregateDirectiveTest extends DBTestCase
                 ],
             ],
         ]);
+    }
+
+    public function testMultipleAggregatesOnSameRelationWithAliases(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            difficulty(
+                minimum: Int @where(key: "difficulty", operator: ">=")
+                maximum: Int @where(key: "difficulty", operator: "<=")
+            ): Int! @aggregate(relation: "tasks", function: SUM, column: "difficulty")
+        }
+
+        type Query {
+            users: [User!]! @all
+        }
+        ';
+
+        $user1 = factory(User::class)->create();
+        assert($user1 instanceof User);
+
+        $low1 = factory(Task::class)->make();
+        assert($low1 instanceof Task);
+        $low1->difficulty = 42;
+        $user1->tasks()->save($low1);
+
+        $high1 = factory(Task::class)->make();
+        assert($high1 instanceof Task);
+        $high1->difficulty = 9001;
+        $user1->tasks()->save($high1);
+
+        $user2 = factory(User::class)->create();
+        assert($user2 instanceof User);
+
+        $low2 = factory(Task::class)->make();
+        assert($low2 instanceof Task);
+        $low2->difficulty = 69;
+        $user2->tasks()->save($low2);
+
+        $high2 = factory(Task::class)->make();
+        assert($high2 instanceof Task);
+        $high2->difficulty = 9002;
+        $user2->tasks()->save($high2);
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            query {
+                users {
+                    lowDifficulty: difficulty(maximum: 9000)
+                    highDifficulty: difficulty(minimum: 9000)
+                }
+            }
+            ')
+            ->assertExactJson([
+                'data' => [
+                    'users' => [
+                        [
+                            'lowDifficulty' => 42,
+                            'highDifficulty' => 9001,
+                        ],
+                        [
+                            'lowDifficulty' => 69,
+                            'highDifficulty' => 9002,
+                        ],
+                    ],
+                ],
+            ]);
+    }
+
+    public function testAggregateWithBuilder(): void
+    {
+        $this->schema = /** @lang GraphQL */ "
+        type Query {
+            sum(
+                difficulty: Int! @eq
+                exclude: ID!
+            ): Int! @aggregate(builder: \"{$this->qualifyTestResolver('builder')}\", function: SUM, column: \"difficulty\")
+        }
+        ";
+
+        $difficulty = 5;
+
+        $task1 = factory(Task::class)->make();
+        assert($task1 instanceof Task);
+        $task1->difficulty = 3;
+        $task1->save();
+
+        $task2 = factory(Task::class)->make();
+        assert($task2 instanceof Task);
+        $task2->difficulty = $difficulty;
+        $task2->save();
+
+        $task3 = factory(Task::class)->make();
+        assert($task3 instanceof Task);
+        $task3->difficulty = $difficulty;
+        $task3->save();
+
+        $task4 = factory(Task::class)->make();
+        assert($task4 instanceof Task);
+        $task4->difficulty = $difficulty;
+        $task4->save();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($difficulty: Int!, $exclude: ID!) {
+            sum(difficulty: $difficulty, exclude: $exclude)
+        }
+        ', [
+            'difficulty' => $difficulty,
+            'exclude' => $task4->id,
+        ])->assertJson([
+            'data' => [
+                'sum' => $difficulty * 2,
+            ],
+        ]);
+    }
+
+    /**
+     * @param array{difficulty: int, exclude: int} $args
+     */
+    public function builder($root, array $args): Builder
+    {
+        return DB::table('tasks')
+            ->where('id', '!=', $args['exclude']);
     }
 }

@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Defer;
 
-use Closure;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Events\StartExecution;
@@ -98,7 +97,7 @@ class Defer implements CreatesResponse
      *
      * @return mixed the data if it is already available
      */
-    public function defer(Closure $resolver, string $path)
+    public function defer(\Closure $resolver, string $path)
     {
         $data = $this->getData($path);
         if (null !== $data) {
@@ -133,7 +132,7 @@ class Defer implements CreatesResponse
      *
      * @return mixed The loaded data
      */
-    protected function resolve(Closure $resolver, string $path)
+    protected function resolve(\Closure $resolver, string $path)
     {
         unset($this->deferred[$path]);
         $this->resolved[] = $path;
@@ -146,7 +145,7 @@ class Defer implements CreatesResponse
      *
      * @return mixed The loaded data
      */
-    public function findOrResolve(Closure $originalResolver, string $path)
+    public function findOrResolve(\Closure $originalResolver, string $path)
     {
         if ($this->hasData($path)) {
             return $this->getData($path);
@@ -209,7 +208,7 @@ class Defer implements CreatesResponse
 
     protected function hasRemainingDeferred(): bool
     {
-        return count($this->deferred) > 0;
+        return [] !== $this->deferred;
     }
 
     protected function stream(): void
@@ -247,7 +246,7 @@ class Defer implements CreatesResponse
 
     protected function executeDeferred(): void
     {
-        $executionResult = $this->graphQL->executeQuery(
+        $executionResult = $this->graphQL->executeParsedQuery(
             $this->startExecution->query,
             $this->startExecution->context,
             $this->startExecution->variables,

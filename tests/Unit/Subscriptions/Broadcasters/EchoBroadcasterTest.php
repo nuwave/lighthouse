@@ -12,7 +12,7 @@ use PHPUnit\Framework\Constraint\Callback;
 use Tests\TestCase;
 use Tests\TestsSubscriptions;
 
-class EchoBroadcasterTest extends TestCase
+final class EchoBroadcasterTest extends TestCase
 {
     use TestsSubscriptions;
 

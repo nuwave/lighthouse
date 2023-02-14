@@ -7,7 +7,7 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Role;
 use Tests\Utils\Models\User;
 
-class BelongsToManyTest extends DBTestCase
+final class BelongsToManyTest extends DBTestCase
 {
     protected $schema = /** @lang GraphQL */ '
     type Role {
@@ -553,7 +553,7 @@ GRAPHQL
     /**
      * @return array<array<string, string>>
      */
-    public function existingModelMutations(): array
+    public static function existingModelMutations(): array
     {
         return [
             ['Update action' => 'update'],
@@ -577,11 +577,11 @@ GRAPHQL
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            ${action}Role(input: {
+            {$action}Role(input: {
                 id: 1
                 name: "is_user"
                 users: {
-                    ${action}: [{
+                    {$action}: [{
                         id: 1
                         name: "user1"
                     },
@@ -602,7 +602,7 @@ GRAPHQL
 GRAPHQL
         )->assertJson([
             'data' => [
-                "${action}Role" => [
+                "{$action}Role" => [
                     'id' => '1',
                     'name' => 'is_user',
                     'users' => [
@@ -641,7 +641,7 @@ GRAPHQL
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            ${action}Role(input: {
+            {$action}Role(input: {
                 id: 1
                 name: "is_user"
                 users: {
@@ -658,7 +658,7 @@ GRAPHQL
 GRAPHQL
         )->assertJson([
             'data' => [
-                "${action}Role" => [
+                "{$action}Role" => [
                     'id' => '1',
                     'name' => 'is_user',
                     'users' => [
@@ -694,7 +694,7 @@ GRAPHQL
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            ${action}Role(input: {
+            {$action}Role(input: {
                 id: 1
                 users: {
                     connect: [1]
@@ -710,7 +710,7 @@ GRAPHQL
 GRAPHQL
         )->assertJson([
             'data' => [
-                "${action}Role" => [
+                "{$action}Role" => [
                     'id' => '1',
                     'users' => [
                         [
@@ -744,7 +744,7 @@ GRAPHQL
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            ${action}Role(input: {
+            {$action}Role(input: {
                 id: 1
                 users: {
                     sync: [1, 2]
@@ -760,7 +760,7 @@ GRAPHQL
 GRAPHQL
         )->assertJson([
             'data' => [
-                "${action}Role" => [
+                "{$action}Role" => [
                     'id' => '1',
                     'users' => [
                         [
@@ -793,7 +793,7 @@ GRAPHQL
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            ${action}Role(input: {
+            {$action}Role(input: {
                 id: 1
                 users: {
                     disconnect: [1]
@@ -808,7 +808,7 @@ GRAPHQL
 GRAPHQL
         )->assertJson([
             'data' => [
-                "${action}Role" => [
+                "{$action}Role" => [
                     'id' => '1',
                     'users' => [
                         [
@@ -918,7 +918,7 @@ GRAPHQL
 
         $this->graphQL(/** @lang GraphQL */ "
         mutation {
-            ${action}Role(input: {
+            {$action}Role(input: {
                 id: 1
                 users: {
                     sync: []
@@ -933,7 +933,7 @@ GRAPHQL
         }
         ")->assertJson([
             'data' => [
-                "${action}Role" => [
+                "{$action}Role" => [
                     'id' => '1',
                     'users' => [],
                 ],

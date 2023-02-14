@@ -6,6 +6,7 @@ use GraphQL\Type\Introspection;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Arr;
+use Illuminate\Testing\TestResponse;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 use Nuwave\Lighthouse\Support\Http\Responses\MemoryStream;
 use PHPUnit\Framework\Assert;
@@ -23,34 +24,28 @@ trait MakesGraphQLRequests
      *
      * On the first call to introspect() this property is set to
      * cache the result, as introspection is quite expensive.
-     *
-     * @var \Illuminate\Testing\TestResponse|null
      */
-    protected $introspectionResult;
+    protected TestResponse $introspectionResult;
 
     /**
      * Used to test deferred queries.
-     *
-     * @var \Nuwave\Lighthouse\Support\Http\Responses\MemoryStream|null
      */
-    protected $deferStream;
+    protected MemoryStream $deferStream;
 
     /**
-     * Execute a query as if it was sent as a request to the server.
+     * Execute a GraphQL operation as if it was sent as a request to the server.
      *
-     * @param  string  $query  The GraphQL query to send
+     * @param  string  $query  The GraphQL operation to send
      * @param  array<string, mixed>  $variables  The variables to include in the query
      * @param  array<string, mixed>  $extraParams  Extra parameters to add to the JSON payload
      * @param  array<string, mixed>  $headers  HTTP headers to pass to the POST request
-     *
-     * @return \Illuminate\Testing\TestResponse
      */
     protected function graphQL(
         string $query,
         array $variables = [],
         array $extraParams = [],
         array $headers = []
-    ) {
+    ): TestResponse {
         $params = ['query' => $query];
 
         if ([] !== $variables) {
@@ -63,17 +58,15 @@ trait MakesGraphQLRequests
     }
 
     /**
-     * Execute a POST to the GraphQL endpoint.
+     * Send a POST request to the GraphQL endpoint.
      *
      * Use this over graphQL() when you need more control or want to
      * test how your server behaves on incorrect inputs.
      *
      * @param  array<mixed, mixed>  $data  JSON-serializable payload
      * @param  array<string, string>  $headers  HTTP headers to pass to the POST request
-     *
-     * @return \Illuminate\Testing\TestResponse
      */
-    protected function postGraphQL(array $data, array $headers = [])
+    protected function postGraphQL(array $data, array $headers = []): TestResponse
     {
         return $this->postJson(
             $this->graphQLEndpointUrl(),
@@ -83,27 +76,25 @@ trait MakesGraphQLRequests
     }
 
     /**
-     * Send a multipart form request to GraphQL.
+     * Send a multipart form request to the GraphQL endpoint.
      *
      * This is used for file uploads conforming to the specification:
      * https://github.com/jaydenseric/graphql-multipart-request-spec
      *
      * @param  array<string, mixed>|array<int, array<string, mixed>>  $operations
-     * @param  array<int|string, array<int, string>>  $map
-     * @param  array<int|string, \Illuminate\Http\Testing\File>|array<int|string, array>  $files
+     * @param  array<array<int, string>>  $map
+     * @param  array<\Illuminate\Http\UploadedFile>|array<array<mixed>>  $files
      * @param  array<string, string>  $headers  Will be merged with Content-Type: multipart/form-data
-     *
-     * @return \Illuminate\Testing\TestResponse
      */
     protected function multipartGraphQL(
         array $operations,
         array $map,
         array $files,
         array $headers = []
-    ) {
+    ): TestResponse {
         $parameters = [
-            'operations' => json_encode($operations),
-            'map' => json_encode($map),
+            'operations' => \Safe\json_encode($operations),
+            'map' => \Safe\json_encode($map),
         ];
 
         return $this->call(
@@ -122,17 +113,13 @@ trait MakesGraphQLRequests
     }
 
     /**
-     * Execute the introspection query on the GraphQL server.
+     * Send the introspection query to the GraphQL server.
      *
-     * @return \Illuminate\Testing\TestResponse
+     * Returns the cached first result on repeated calls.
      */
-    protected function introspect()
+    protected function introspect(): TestResponse
     {
-        if (null !== $this->introspectionResult) {
-            return $this->introspectionResult;
-        }
-
-        return $this->introspectionResult = $this->graphQL(Introspection::getIntrospectionQuery());
+        return $this->introspectionResult ??= $this->graphQL(Introspection::getIntrospectionQuery());
     }
 
     /**
@@ -162,17 +149,9 @@ trait MakesGraphQLRequests
      */
     protected function introspectByName(string $path, string $name): ?array
     {
-        if (null === $this->introspectionResult) {
-            $this->introspect();
-        }
-
-        $results = $this->introspectionResult->json($path);
-
         return Arr::first(
-            $results,
-            static function (array $result) use ($name): bool {
-                return $result['name'] === $name;
-            }
+            $this->introspect()->json($path),
+            static fn (array $result): bool => $result['name'] === $name
         );
     }
 
@@ -181,8 +160,8 @@ trait MakesGraphQLRequests
      */
     protected function graphQLEndpointUrl(): string
     {
-        /** @var \Illuminate\Contracts\Config\Repository $config */
-        $config = app(ConfigRepository::class);
+        $config = Container::getInstance()->make(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
 
         return route($config->get('lighthouse.route.name'));
     }
@@ -203,17 +182,19 @@ trait MakesGraphQLRequests
         array $extraParams = [],
         array $headers = []
     ): array {
-        if (null === $this->deferStream) {
+        if (! isset($this->deferStream)) {
             $this->setUpDeferStream();
         }
 
         $response = $this->graphQL($query, $variables, $extraParams, $headers);
 
-        if (! $response->baseResponse instanceof StreamedResponse) {
+        /** @var mixed $baseResponse Laravel type hint is wrong */
+        $baseResponse = $response->baseResponse;
+        if (! $baseResponse instanceof StreamedResponse) {
             Assert::fail('Expected the response to be a streamed response but got a regular response.');
         }
 
-        $response->send();
+        $baseResponse->send();
 
         return $this->deferStream->chunks;
     }
@@ -230,10 +211,14 @@ trait MakesGraphQLRequests
         });
     }
 
+    /**
+     * Configure an error handler that rethrows all errors passed to it.
+     */
     protected function rethrowGraphQLErrors(): void
     {
-        /** @var \Illuminate\Contracts\Config\Repository $config */
-        $config = app(ConfigRepository::class);
+        $config = Container::getInstance()->make(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
+
         $config->set('lighthouse.error_handlers', [RethrowingErrorHandler::class]);
     }
 }

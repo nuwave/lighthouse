@@ -9,7 +9,7 @@ use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Tests\TestCase;
 use Tests\TestsSubscriptions;
 
-class CacheStorageManagerTest extends TestCase
+final class CacheStorageManagerTest extends TestCase
 {
     use TestsSubscriptions;
 
@@ -22,7 +22,7 @@ class CacheStorageManagerTest extends TestCase
     {
         parent::setUp();
 
-        $this->storage = app(CacheStorageManager::class);
+        $this->storage = $this->app->make(CacheStorageManager::class);
     }
 
     /**

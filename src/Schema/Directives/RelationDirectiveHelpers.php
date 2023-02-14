@@ -2,9 +2,11 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Closure;
-use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder as QueryBuilder;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 trait RelationDirectiveHelpers
 {
@@ -17,29 +19,34 @@ trait RelationDirectiveHelpers
      */
     protected function scopes(): array
     {
-        return $this->directiveArgValue('scopes')
-            ?? [];
+        return $this->directiveArgValue('scopes', []);
     }
 
     protected function relation(): string
     {
-        return $this->directiveArgValue('relation')
-            ?? $this->nodeName();
+        return $this->directiveArgValue('relation', $this->nodeName());
     }
 
     /**
-     * @return \Closure(object): void
+     * @param  array<string, mixed>  $args
+     *
+     * @return \Closure(QueryBuilder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation): void
      */
-    protected function makeBuilderDecorator(ResolveInfo $resolveInfo): Closure
+    protected function makeBuilderDecorator($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): \Closure
     {
-        return function (object $builder) use ($resolveInfo) {
+        return function (object $builder) use ($root, $args, $context, $resolveInfo): void {
             if ($builder instanceof Relation) {
                 $builder = $builder->getQuery();
             }
+            assert($builder instanceof QueryBuilder || $builder instanceof EloquentBuilder);
 
-            $resolveInfo->argumentSet->enhanceBuilder(
+            $resolveInfo->enhanceBuilder(
                 $builder,
-                $this->scopes()
+                $this->scopes(),
+                $root,
+                $args,
+                $context,
+                $resolveInfo
             );
         };
     }

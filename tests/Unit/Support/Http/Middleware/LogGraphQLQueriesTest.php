@@ -2,11 +2,12 @@
 
 namespace Tests\Unit\Support\Http\Middleware;
 
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Nuwave\Lighthouse\Support\Http\Middleware\LogGraphQLQueries;
 use Psr\Log\LoggerInterface;
 use Tests\TestCase;
 
-class LogGraphQLQueriesTest extends TestCase
+final class LogGraphQLQueriesTest extends TestCase
 {
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&\Psr\Log\LoggerInterface
@@ -17,8 +18,8 @@ class LogGraphQLQueriesTest extends TestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        /** @var \Illuminate\Contracts\Config\Repository $config */
-        $config = $app->make('config');
+        $config = $app->make(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
 
         $config->set('lighthouse.route.middleware', [
             LogGraphQLQueries::class,

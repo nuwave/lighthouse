@@ -4,7 +4,7 @@ namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
 
-class NestDirectiveTest extends DBTestCase
+final class NestDirectiveTest extends DBTestCase
 {
     public function testNestDelegates(): void
     {
@@ -15,19 +15,19 @@ class NestDirectiveTest extends DBTestCase
                 tasks: UserTasksOperations @nest
             ): User @create
         }
-        
+
         input UserTasksOperations {
             newTask: CreateTaskInput @create(relation: "tasks")
         }
-        
+
         input CreateTaskInput {
             name: String
         }
-        
+
         type Task {
             name: String!
         }
-        
+
         type User {
             name: String
             tasks: [Task!]! @hasMany

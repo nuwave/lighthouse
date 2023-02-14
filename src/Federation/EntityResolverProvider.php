@@ -2,22 +2,31 @@
 
 namespace Nuwave\Lighthouse\Federation;
 
-use Closure;
 use GraphQL\Error\Error;
+use GraphQL\Language\AST\FieldNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\SelectionSetNode;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Exceptions\FederationException;
 use Nuwave\Lighthouse\Federation\Directives\KeyDirective;
+use Nuwave\Lighthouse\GlobalId\GlobalIdDirective;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\Directives\ModelDirective;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
+use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 use Nuwave\Lighthouse\Support\Utils;
 
+/**
+ * @phpstan-type SingleEntityResolverFn \Closure(array<string, mixed>): mixed
+ * @phpstan-type EntityResolver SingleEntityResolverFn|BatchedEntityResolver
+ */
 class EntityResolverProvider
 {
     /**
@@ -36,6 +45,11 @@ class EntityResolverProvider
     protected $configRepository;
 
     /**
+     * @var \Illuminate\Contracts\Container\Container
+     */
+    protected $container;
+
+    /**
      * Maps from __typename to definitions.
      *
      * @var array<string, \GraphQL\Language\AST\ObjectTypeDefinitionNode>
@@ -45,15 +59,27 @@ class EntityResolverProvider
     /**
      * Maps from __typename to resolver.
      *
-     * @var array<string, \Closure(array<string, mixed>): mixed>
+     * @var array<string, SingleEntityResolverFn|BatchedEntityResolver>
      */
     protected $resolvers;
 
-    public function __construct(SchemaBuilder $schemaBuilder, DirectiveLocator $directiveLocator, ConfigRepository $configRepository)
-    {
+    /**
+     * @var \Nuwave\Lighthouse\Support\Contracts\GlobalId
+     */
+    protected $globalId;
+
+    public function __construct(
+        SchemaBuilder $schemaBuilder,
+        DirectiveLocator $directiveLocator,
+        ConfigRepository $configRepository,
+        Container $container,
+        GlobalId $globalId,
+    ) {
         $this->schema = $schemaBuilder->schema();
         $this->directiveLocator = $directiveLocator;
         $this->configRepository = $configRepository;
+        $this->container = $container;
+        $this->globalId = $globalId;
     }
 
     public static function missingResolver(string $typename): string
@@ -67,9 +93,9 @@ class EntityResolverProvider
     }
 
     /**
-     * @return \Closure(array<string, mixed> $representations): mixed
+     * @return EntityResolver
      */
-    public function resolver(string $typename): Closure
+    public function resolver(string $typename): callable
     {
         if (isset($this->resolvers[$typename])) {
             return $this->resolvers[$typename];
@@ -97,19 +123,14 @@ class EntityResolverProvider
         $type = null;
         try {
             $type = $this->schema->getType($typename);
-        } catch (DefinitionException $definitionException) {
+        } catch (DefinitionException) {
             // Signalizes the type is unknown, handled by the null check below
         }
         if (null === $type) {
             throw new Error(self::unknownTypename($typename));
         }
 
-        /**
-         * TODO remove when upgrading graphql-php.
-         *
-         * @var (\GraphQL\Language\AST\Node&\GraphQL\Language\AST\TypeDefinitionNode)|null $definition
-         */
-        $definition = $type->astNode;
+        $definition = $type->astNode();
         if (null === $definition) {
             throw new FederationException("Must provide AST definition for type `{$typename}`.");
         }
@@ -123,7 +144,10 @@ class EntityResolverProvider
         return $definition;
     }
 
-    protected function resolverFromClass(string $typename): ?Closure
+    /**
+     * @return EntityResolver|null
+     */
+    protected function resolverFromClass(string $typename): ?callable
     {
         $resolverClass = Utils::namespaceClassname(
             $typename,
@@ -135,10 +159,17 @@ class EntityResolverProvider
             return null;
         }
 
+        if (is_a($resolverClass, BatchedEntityResolver::class, true)) {
+            return $this->container->make($resolverClass);
+        }
+
         return Utils::constructResolver($resolverClass, '__invoke');
     }
 
-    protected function resolverFromModel(string $typeName): ?Closure
+    /**
+     * @return SingleEntityResolverFn|null
+     */
+    protected function resolverFromModel(string $typeName): ?\Closure
     {
         $definition = $this->typeDefinition($typeName);
 
@@ -158,10 +189,11 @@ class EntityResolverProvider
 
         $keyFieldsSelections = $this->keyFieldsSelections($definition);
 
-        return function (array $representation) use ($keyFieldsSelections, $modelClass): ?Model {
-            /** @var \Illuminate\Database\Eloquent\Builder $builder */
+        return function (array $representation) use ($keyFieldsSelections, $modelClass, $definition): ?Model {
             $builder = $modelClass::query();
-            $this->constrainKeys($builder, $keyFieldsSelections, $representation);
+            assert($builder instanceof Builder);
+
+            $this->constrainKeys($builder, $keyFieldsSelections, $representation, $definition);
 
             $results = $builder->get();
             if ($results->count() > 1) {
@@ -176,12 +208,13 @@ class EntityResolverProvider
      * @param  \Illuminate\Support\Collection<\GraphQL\Language\AST\SelectionSetNode>  $keyFieldsSelections
      * @param  array<string, mixed>  $representation
      */
-    protected function constrainKeys(Builder $builder, Collection $keyFieldsSelections, array $representation): void
+    protected function constrainKeys(EloquentBuilder $builder, Collection $keyFieldsSelections, array $representation, ObjectTypeDefinitionNode $definition): void
     {
         $this->applySatisfiedSelection(
             $builder,
             $this->firstSatisfiedKeyFields($keyFieldsSelections, $representation),
-            $representation
+            $representation,
+            $definition
         );
     }
 
@@ -190,14 +223,10 @@ class EntityResolverProvider
      */
     protected function satisfiesKeyFields(SelectionSetNode $keyFields, array $representation): bool
     {
-        /**
-         * Fragments or spreads are not allowed in key fields.
-         *
-         * @see \Nuwave\Lighthouse\Federation\SchemaValidator
-         *
-         * @var \GraphQL\Language\AST\FieldNode $field
-         */
         foreach ($keyFields->selections as $field) {
+            /** @see \Nuwave\Lighthouse\Federation\SchemaValidator */
+            assert($field instanceof FieldNode, 'Fragments or spreads are not allowed in key fields');
+
             $fieldName = $field->name->value;
             $value = $representation[$fieldName] ?? null;
             if (null === $value) {
@@ -223,26 +252,39 @@ class EntityResolverProvider
     /**
      * @param  array<string, mixed>  $representation
      */
-    protected function applySatisfiedSelection(Builder $builder, SelectionSetNode $keyFields, array $representation): void
+    protected function applySatisfiedSelection(EloquentBuilder $builder, SelectionSetNode $keyFields, array $representation, ObjectTypeDefinitionNode $definition): void
     {
-        /**
-         * Fragments or spreads are not allowed in key fields.
-         *
-         * @var \GraphQL\Language\AST\FieldNode $field
-         */
         foreach ($keyFields->selections as $field) {
+            /** @see \Nuwave\Lighthouse\Federation\SchemaValidator */
+            assert($field instanceof FieldNode, 'Fragments or spreads are not allowed in key fields');
+
             $fieldName = $field->name->value;
             $value = $representation[$fieldName];
 
             $subSelection = $field->selectionSet;
             if (null === $subSelection) {
-                $builder->where($fieldName, $value);
+                $builder->where(
+                    $fieldName,
+                    $this->hasFieldWithDirective($definition, $fieldName, GlobalIdDirective::NAME)
+                        ? $this->globalId->decodeID($value)
+                        : $value
+                );
 
                 return;
             }
 
-            $this->applySatisfiedSelection($builder, $subSelection, $representation);
+            $this->applySatisfiedSelection($builder, $subSelection, $representation, $definition);
         }
+    }
+
+    private function hasFieldWithDirective(ObjectTypeDefinitionNode $definition, string $fieldName, string $directiveName): bool
+    {
+        $field = ASTHelper::firstByName($definition->fields, $fieldName);
+        if (! $field) {
+            return false;
+        }
+
+        return ASTHelper::hasDirective($field, $directiveName);
     }
 
     /**

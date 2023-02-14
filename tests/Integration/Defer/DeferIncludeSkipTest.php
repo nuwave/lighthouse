@@ -5,7 +5,7 @@ namespace Tests\Integration\Defer;
 use Nuwave\Lighthouse\Defer\DeferServiceProvider;
 use Tests\TestCase;
 
-class DeferIncludeSkipTest extends TestCase
+final class DeferIncludeSkipTest extends TestCase
 {
     protected $schema = /** @lang GraphQL */ '
     directive @include(if: Boolean!) on FIELD

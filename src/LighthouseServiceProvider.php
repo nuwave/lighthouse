@@ -2,10 +2,9 @@
 
 namespace Nuwave\Lighthouse;
 
-use Closure;
-use Exception;
 use GraphQL\Error\ClientAware;
 use GraphQL\Error\Error;
+use GraphQL\Error\ProvidesExtensions;
 use GraphQL\Executor\ExecutionResult;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Container\Container;
@@ -29,7 +28,6 @@ use Nuwave\Lighthouse\Console\SubscriptionCommand;
 use Nuwave\Lighthouse\Console\UnionCommand;
 use Nuwave\Lighthouse\Console\ValidateSchemaCommand;
 use Nuwave\Lighthouse\Console\ValidatorCommand;
-use Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions;
 use Nuwave\Lighthouse\Execution\ContextFactory;
 use Nuwave\Lighthouse\Execution\ErrorPool;
 use Nuwave\Lighthouse\Execution\SingleResponse;
@@ -53,7 +51,6 @@ use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules;
 use Nuwave\Lighthouse\Support\Http\Responses\ResponseStream;
-use Nuwave\Lighthouse\Testing\TestingServiceProvider;
 
 class LighthouseServiceProvider extends ServiceProvider
 {
@@ -100,9 +97,9 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->app->bind(ProvidesResolver::class, ResolverProvider::class);
         $this->app->bind(ProvidesSubscriptionResolver::class, static function (): ProvidesSubscriptionResolver {
             return new class() implements ProvidesSubscriptionResolver {
-                public function provideSubscriptionResolver(FieldValue $fieldValue): Closure
+                public function provideSubscriptionResolver(FieldValue $fieldValue): \Closure
                 {
-                    throw new Exception(
+                    throw new \Exception(
                         'Add the SubscriptionServiceProvider to your config/app.php to enable subscriptions.'
                     );
                 }
@@ -123,18 +120,12 @@ class LighthouseServiceProvider extends ServiceProvider
                 return new LumenMiddlewareAdapter();
             }
 
-            throw new Exception(
+            throw new \Exception(
                 'Could not correctly determine Laravel framework flavor, got ' . get_class($app) . '.'
             );
         });
 
-        if ($this->app->runningInConsole()) {
-            $this->commands(self::COMMANDS);
-        }
-
-        if ($this->app->runningUnitTests()) {
-            $this->app->register(TestingServiceProvider::class);
-        }
+        $this->commands(self::COMMANDS);
     }
 
     public function boot(ConfigRepository $configRepository): void
@@ -157,7 +148,8 @@ class LighthouseServiceProvider extends ServiceProvider
         ) {
             $exceptionHandler->renderable(
                 function (ClientAware $error) {
-                    /** @var \GraphQL\Error\ClientAware&\Throwable $error Only throwables can end up in here */
+                    assert($error instanceof \Throwable);
+
                     if (! $error instanceof Error) {
                         $error = new Error(
                             $error->getMessage(),
@@ -166,12 +158,13 @@ class LighthouseServiceProvider extends ServiceProvider
                             [],
                             null,
                             $error,
-                            $error instanceof RendersErrorsExtensions ? $error->extensionsContent() : []
+                            $error instanceof ProvidesExtensions ? $error->getExtensions() : []
                         );
                     }
 
-                    /** @var \Nuwave\Lighthouse\GraphQL $graphQL */
                     $graphQL = $this->app->make(GraphQL::class);
+                    assert($graphQL instanceof GraphQL);
+
                     $executionResult = new ExecutionResult(null, [$error]);
 
                     return new JsonResponse($graphQL->serializable($executionResult));

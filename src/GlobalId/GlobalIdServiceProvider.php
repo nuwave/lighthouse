@@ -56,16 +56,17 @@ class GlobalIdServiceProvider extends ServiceProvider
         $documentAST->setTypeDefinition(
             Parser::interfaceTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
 "Any object implementing this type can be found by ID through `Query.node`."
-interface $node @interface(resolveType: "Nuwave\\\Lighthouse\\\GlobalId\\\NodeRegistry@resolveType") {
+interface {$node} @interface(resolveType: "Nuwave\\\Lighthouse\\\GlobalId\\\NodeRegistry@resolveType") {
   "Global identifier that can be used to resolve any Node implementation."
-  $globalId: ID!
+  {$globalId}: ID!
 }
 GRAPHQL
             )
         );
 
-        /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
         $queryType = $documentAST->types[RootType::QUERY];
+        assert($queryType instanceof ObjectTypeDefinitionNode);
+
         $queryType->fields[] = Parser::fieldDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
   node(id: ID! @globalId): Node @field(resolver: "Nuwave\\Lighthouse\\GlobalId\\NodeRegistry@resolve")
 GRAPHQL

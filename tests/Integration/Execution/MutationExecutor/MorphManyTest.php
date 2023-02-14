@@ -6,7 +6,7 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Image;
 use Tests\Utils\Models\Task;
 
-class MorphManyTest extends DBTestCase
+final class MorphManyTest extends DBTestCase
 {
     protected $schema = /** @lang GraphQL */ '
     type Task {
@@ -156,7 +156,7 @@ class MorphManyTest extends DBTestCase
         $image1 = factory(Image::class)->create();
 
         $this->graphQL(/** @lang GraphQL */ '
-            mutation createTask($input: CreateTaskInput!){
+            mutation ($input: CreateTaskInput!){
                 createTask(input: $input) {
                     id
                     name
@@ -190,7 +190,7 @@ class MorphManyTest extends DBTestCase
 
     public function testUpsertMorphManyWithoutId(): void
     {
-        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             upsertTask(input: {
                 name: "foo"
@@ -208,8 +208,7 @@ class MorphManyTest extends DBTestCase
                 }
             }
         }
-GRAPHQL
-        )->assertJson([
+        ')->assertJson([
             'data' => [
                 'upsertTask' => [
                     'id' => '1',
@@ -260,7 +259,7 @@ GRAPHQL
     /**
      * @return array<array<string, string>>
      */
-    public function existingModelMutations(): array
+    public static function existingModelMutations(): array
     {
         return [
             ['Update action' => 'update'],
@@ -275,14 +274,14 @@ GRAPHQL
     {
         factory(Task::class)->create();
 
-        $this->graphQL(/** @lang GraphQL */ "
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            ${action}Task(input: {
+            {$action}Task(input: {
                 id: 1
-                name: \"foo\"
+                name: "foo"
                 images: {
                     create: [{
-                        url: \"foo\"
+                        url: "foo"
                     }]
                 }
             }) {
@@ -293,9 +292,10 @@ GRAPHQL
                 }
             }
         }
-        ")->assertJson([
+GRAPHQL
+        )->assertJson([
             'data' => [
-                "${action}Task" => [
+                "{$action}Task" => [
                     'id' => '1',
                     'name' => 'foo',
                     'images' => [
@@ -320,15 +320,15 @@ GRAPHQL
                 factory(Image::class)->create()
             );
 
-        $this->graphQL(/** @lang GraphQL */ "
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            ${action}Task(input: {
+            {$action}Task(input: {
                 id: 1
-                name: \"foo\"
+                name: "foo"
                 images: {
                     update: [{
                         id: 1
-                        url: \"foo\"
+                        url: "foo"
                     }]
                 }
             }) {
@@ -339,9 +339,10 @@ GRAPHQL
                 }
             }
         }
-        ")->assertJson([
+GRAPHQL
+        )->assertJson([
             'data' => [
-                "${action}Task" => [
+                "{$action}Task" => [
                     'id' => '1',
                     'name' => 'foo',
                     'images' => [
@@ -366,15 +367,15 @@ GRAPHQL
                 factory(Image::class)->create()
             );
 
-        $this->graphQL(/** @lang GraphQL */ "
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            ${action}Task(input: {
+            {$action}Task(input: {
                 id: 1
-                name: \"foo\"
+                name: "foo"
                 images: {
                     upsert: [{
                         id: 1
-                        url: \"foo\"
+                        url: "foo"
                     }]
                 }
             }) {
@@ -385,9 +386,10 @@ GRAPHQL
                 }
             }
         }
-        ")->assertJson([
+GRAPHQL
+        )->assertJson([
             'data' => [
-                "${action}Task" => [
+                "{$action}Task" => [
                     'id' => '1',
                     'name' => 'foo',
                     'images' => [
@@ -412,11 +414,11 @@ GRAPHQL
                 factory(Image::class)->create()
             );
 
-        $this->graphQL(/** @lang GraphQL */ "
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            ${action}Task(input: {
+            {$action}Task(input: {
                 id: 1
-                name: \"foo\"
+                name: "foo"
                 images: {
                     delete: [1]
                 }
@@ -428,9 +430,10 @@ GRAPHQL
                 }
             }
         }
-        ")->assertJson([
+GRAPHQL
+        )->assertJson([
             'data' => [
-                "${action}Task" => [
+                "{$action}Task" => [
                     'id' => '1',
                     'name' => 'foo',
                     'images' => [],
@@ -447,11 +450,13 @@ GRAPHQL
         $task = factory(Task::class)->create();
         $image = factory(Image::class)->create();
 
-        $actionInputName = ucfirst($action);
+        $actionInput = ucfirst($action) . 'TaskInput';
 
-        $this->graphQL(/** @lang GraphQL */ "
-            mutation ${action}Task(\$input: {$actionInputName}TaskInput!) {
-                ${action}Task(input: \$input) {
+        $newTaskName = 'foo';
+
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+            mutation (\$input: {$actionInput}!) {
+                {$action}Task(input: \$input) {
                     id
                     name
                     images {
@@ -459,29 +464,30 @@ GRAPHQL
                     }
                 }
             }
-        ", [
-            'input' => [
-                'id' => $task->id,
-                'name' => 'foo',
-                'images' => [
-                    'connect' => [
-                        $image->id,
-                    ],
-                ],
-            ],
-        ])->assertJson([
-            'data' => [
-                "${action}Task" => [
-                    'id' => '1',
-                    'name' => 'foo',
+GRAPHQL
+            , [
+                'input' => [
+                    'id' => $task->id,
+                    'name' => $newTaskName,
                     'images' => [
-                        [
-                            'url' => $image->url,
+                        'connect' => [
+                            $image->id,
                         ],
                     ],
                 ],
-            ],
-        ]);
+            ])->assertJson([
+                'data' => [
+                    "{$action}Task" => [
+                        'id' => "{$task->id}",
+                        'name' => $newTaskName,
+                        'images' => [
+                            [
+                                'url' => $image->url,
+                            ],
+                        ],
+                    ],
+                ],
+            ]);
     }
 
     /**
@@ -496,11 +502,13 @@ GRAPHQL
         $image = factory(Image::class)->make();
         $task->images()->save($image);
 
-        $actionInputName = ucfirst($action);
+        $actionInput = ucfirst($action) . 'TaskInput';
 
-        $this->graphQL(/** @lang GraphQL */ "
-            mutation ${action}Task(\$input: {$actionInputName}TaskInput!) {
-                ${action}Task(input: \$input) {
+        $newTaskName = 'foo';
+
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+            mutation (\$input: {$actionInput}!) {
+                {$action}Task(input: \$input) {
                     id
                     name
                     images {
@@ -508,26 +516,77 @@ GRAPHQL
                     }
                 }
             }
-        ", [
-            'input' => [
-                'id' => $task->id,
-                'name' => 'foo',
-                'images' => [
-                    'disconnect' => [
-                        $image->id,
+GRAPHQL
+            , [
+                'input' => [
+                    'id' => $task->id,
+                    'name' => $newTaskName,
+                    'images' => [
+                        'disconnect' => [
+                            $image->id,
+                        ],
                     ],
                 ],
-            ],
-        ])->assertJson([
-            'data' => [
-                "${action}Task" => [
-                    'id' => '1',
-                    'name' => 'foo',
-                    'images' => [],
+            ])->assertJson([
+                'data' => [
+                    "{$action}Task" => [
+                        'id' => "{$task->id}",
+                        'name' => $newTaskName,
+                        'images' => [],
+                    ],
                 ],
-            ],
-        ]);
+            ]);
 
         $this->assertNull($image->refresh()->imageable);
+    }
+
+    /**
+     * @dataProvider existingModelMutations
+     */
+    public function testDisconnectModelEventsMorphMany(string $action): void
+    {
+        /** @var \Tests\Utils\Models\Task $task */
+        $task = factory(Task::class)->create();
+
+        /** @var \Tests\Utils\Models\Image $image */
+        $image = factory(Image::class)->make();
+        $task->images()->save($image);
+
+        $actionInput = ucfirst($action) . 'TaskInput';
+
+        $calledImageSaving = 0;
+        Image::saving(function () use (&$calledImageSaving): void {
+            ++$calledImageSaving;
+        });
+
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+            mutation (\$input: {$actionInput}!) {
+                {$action}Task(input: \$input) {
+                    id
+                    images {
+                        url
+                    }
+                }
+            }
+GRAPHQL
+            , [
+                'input' => [
+                    'id' => $task->id,
+                    'images' => [
+                        'disconnect' => [
+                            $image->id,
+                        ],
+                    ],
+                ],
+            ])->assertJson([
+                'data' => [
+                    "{$action}Task" => [
+                        'id' => "{$task->id}",
+                        'images' => [],
+                    ],
+                ],
+            ]);
+
+        $this->assertSame(1, $calledImageSaving);
     }
 }

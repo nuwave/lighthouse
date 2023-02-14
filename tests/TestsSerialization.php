@@ -2,10 +2,9 @@
 
 namespace Tests;
 
-use Illuminate\Cache\CacheManager;
-use Illuminate\Cache\Repository;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Illuminate\Contracts\Container\Container;
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -13,45 +12,41 @@ use Tests\Utils\Models\User;
 
 trait TestsSerialization
 {
-    protected function fakeContextSerializer(Container $app): void
+    protected function fakeContextSerializer(): void
     {
         $contextSerializer = new class() implements ContextSerializer {
-            public function serialize(GraphQLContext $context)
+            public function serialize(GraphQLContext $context): string
             {
                 return 'foo';
             }
 
-            public function unserialize(string $context)
+            public function unserialize(string $context): GraphQLContext
             {
                 return new class() implements GraphQLContext {
-                    public function user()
+                    public function user(): User
                     {
                         return new User();
                     }
 
-                    public function request()
+                    public function request(): Request
                     {
                         return new Request();
+                    }
+
+                    public function setUser(?Authenticatable $user): void
+                    {
                     }
                 };
             }
         };
 
-        $app->instance(ContextSerializer::class, $contextSerializer);
+        Container::getInstance()->instance(ContextSerializer::class, $contextSerializer);
     }
 
-    protected function useSerializingArrayStore(Container $app): void
+    protected function useSerializingArrayStore(): void
     {
-        /** @var \Illuminate\Cache\CacheManager $cache */
-        $cache = $app->make(CacheManager::class);
-        $cache->extend('serializing-array', function () {
-            return new Repository(
-                new SerializingArrayStore()
-            );
-        });
-
-        /** @var \Illuminate\Contracts\Config\Repository $config */
-        $config = $app->make(ConfigRepository::class);
-        $config->set('cache.stores.array.driver', 'serializing-array');
+        $config = Container::getInstance()->make(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
+        $config->set('cache.stores.array.serialize', true);
     }
 }

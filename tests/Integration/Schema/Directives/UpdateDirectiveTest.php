@@ -10,7 +10,7 @@ use Tests\Utils\Models\Company;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class UpdateDirectiveTest extends DBTestCase
+final class UpdateDirectiveTest extends DBTestCase
 {
     public function testUpdateFromFieldArguments(): void
     {

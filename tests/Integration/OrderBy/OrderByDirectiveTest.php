@@ -4,10 +4,9 @@ namespace Tests\Integration\OrderBy;
 
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\InputObjectType;
-use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\TestCase;
 
-class OrderByDirectiveTest extends TestCase
+final class OrderByDirectiveTest extends TestCase
 {
     public function testGeneratesInputWithFullyQualifiedName(): void
     {
@@ -83,10 +82,6 @@ class OrderByDirectiveTest extends TestCase
 
     public function testValidatesOnlyColumnOrOneRelationIsUsed(): void
     {
-        if (AppVersion::below(8.0)) {
-            $this->markTestSkipped('prohibits rule is not available');
-        }
-
         $this->schema = /** @lang GraphQL */ '
         type Query {
             foo(

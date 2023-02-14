@@ -30,6 +30,23 @@ within the directive definition and leads to static validation errors.
 )
 ```
 
+### Use filters in `@delete`, `@forceDelete` and `@restore`
+
+Whereas previously, those directives enforced the usage of a single argument and assumed that
+to be the ID or list of IDs of the models to modify, they now leverage argument filter directives.
+This brings them in line with other directives such as `@find` and `@all`.
+
+You will need to explicitly add `@whereKey` to the argument that contained the ID or IDs.
+
+```diff
+type Mutation {
+-   deleteUser(id: ID!): User! @delete
++   deleteUser(id: ID! @whereKey): User! @delete
+-   restoreUsers(userIDs: [ID!]!): [User!]! @restore
++   restoreUsers(userIDs: [ID!]! @whereKey): [User!]! @restore
+}
+```
+
 ### Use `@globalId` over `@delete(globalId: true)`
 
 The `@delete`, `@forceDelete`, `@restore` and `@upsert` directives no longer offer the
@@ -38,7 +55,7 @@ The `@delete`, `@forceDelete`, `@restore` and `@upsert` directives no longer off
 ```diff
 type Mutation {
 -   deleteUser(id: ID!): User! @delete(globalId: true)
-+   deleteUser(id: ID! @globalId): User! @delete
++   deleteUser(id: ID! @globalId @whereKey): User! @delete
 }
 ```
 
@@ -85,6 +102,14 @@ The setting `non_null_pagination_results` was removed and now always behaves as 
 This is generally more convenient for clients, but will
 cause validation errors to bubble further up in the result.
 
+### Nullability of pagination `first`
+
+Previously, the pagination argument `first` was either marked as non-nullable,
+or non-nullable with a default value.
+
+Now, it will always be marked as non-nullable, regardless if it has a default or not.
+This prevents clients from passing an invalid explicit `null`.
+
 ### Include field cost in `@complexity` calculation
 
 Previous to `v6`, the default query complexity calculation of fields with `@complexity`
@@ -95,7 +120,7 @@ This change will increase the complexity of queries on fields using `@complexity
 a custom complexity resolver. If you configured `security.max_query_complexity`, complex
 queries that previously passed might now fail.
 
-### Passing of BenSampo\Enum\Enum instances to ArgBuilderDirective::handleBuilder()
+### Passing of `BenSampo\Enum\Enum` instances to `ArgBuilderDirective::handleBuilder()`
 
 Previous to `v6`, Lighthouse would extract the internal `$value` from instances of
 `BenSampo\Enum\Enum` before passing it to `ArgBuilderDirective::handleBuilder()`
@@ -124,6 +149,88 @@ the new behaviour before upgrading by setting `unbox_bensampo_enum_enum_instance
 
 ```php
 public function scopeByType(Builder $builder, AOrB $aOrB): Builder
+```
+
+### Adopt `FieldBuilderDirective::handleFieldBuilder()` signature
+
+Lighthouse now passes the typical 4 resolver arguments to `FieldBuilderDirective::handleFieldBuilder()`.
+Custom directives the implement `FieldBuilderDirective` now have to accept those extra arguments.
+
+```diff
++ use GraphQL\Type\Definition\ResolveInfo;
++ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+
+final class MyDirective extends BaseDirective implements FieldBuilderDirective
+{
+-    public function handleFieldBuilder(object $builder): object;
++    public function handleFieldBuilder(object $builder, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): object;
+}
+```
+
+### Use `ResolveInfo::enhanceBuilder()`
+
+`ArgumentSet::enhanceBuilder()` was removed.
+You must now call `ResolveInfo::enhanceBuilder()` and pass the resolver arguments.
+
+```diff
+use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+
+// Some resolver function or directive middleware
+function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
+-   $resolveInfo->argumentSet->enhanceBuilder($builder, $scopes, $directiveFilter);
++   $resolveInfo->enhanceBuilder($builder, $scopes, $root, $args, $context, $resolveInfo, $directiveFilter);
+```
+
+### Replace `Nuwave\Lighthouse\GraphQL::executeQuery()` usage
+
+Use `parseAndExecuteQuery()` for executing a string query or `executeParsedQuery()` for 
+executing an already parsed `DocumentNode` instance.
+
+### Removed error extension field `category`
+
+See https://github.com/webonyx/graphql-php/blob/master/UPGRADE.md#breaking-removed-error-extension-field-category
+
+### Use native interface for errors with extensions
+
+Use `GraphQL\Error\ProvidesExtensions::getExtensions()` over `Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions::extensionsContent()`
+to return extra information from exceptions:
+
+```diff
+use Exception;
+-use Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions;
++use GraphQL\Error\ClientAware;
++use GraphQL\Error\ProvidesExtensions;
+
+-class CustomException extends Exception implements RendersErrorsExtensions
++class CustomException extends Exception implements ClientAware, ProvidesExtensions
+{
+-   public function extensionsContent(): array
++   public function getExtensions(): array
+```
+
+### Use `RefreshesSchemaCache` over `ClearsSchemaCache`
+
+The `ClearsSchemaCache` testing trait was prone to race conditions when running tests in parallel.
+
+```diff
+-use Nuwave\Lighthouse\Testing\ClearsSchemaCache;
++use Nuwave\Lighthouse\Testing\RefreshesSchemaCache;
+use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+
+abstract class TestCase extends BaseTestCase
+{
+    use CreatesApplication;
+-   use ClearsSchemaCache;
++   use RefreshesSchemaCache;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+-       $this->bootClearsSchemaCache();
++       $this->bootRefreshesSchemaCache();
+     }
+}
 ```
 
 ## v4 to v5

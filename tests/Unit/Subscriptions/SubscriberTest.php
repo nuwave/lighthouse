@@ -11,7 +11,7 @@ use Tests\TestCase;
 use Tests\TestsSerialization;
 use Tests\TestsSubscriptions;
 
-class SubscriberTest extends TestCase
+final class SubscriberTest extends TestCase
 {
     use TestsSerialization;
     use TestsSubscriptions;
@@ -20,8 +20,8 @@ class SubscriberTest extends TestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        $this->useSerializingArrayStore($app);
-        $this->fakeContextSerializer($app);
+        $this->useSerializingArrayStore();
+        $this->fakeContextSerializer();
     }
 
     public function testSerializable(): void

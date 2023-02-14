@@ -4,11 +4,12 @@ namespace Tests\Integration\Validation;
 
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
 use Tests\Utils\Rules\FooBarRule;
 
-class RulesDirectiveTest extends TestCase
+final class RulesDirectiveTest extends TestCase
 {
     protected function getEnvironmentSetUp($app): void
     {
@@ -217,7 +218,9 @@ class RulesDirectiveTest extends TestCase
             }
             ')
             ->assertGraphQLValidationError('bar', 'The baz field is required.')
-            ->assertGraphQLValidationError('emails', 'The email list must have at least 3 items.')
+            ->assertGraphQLValidationError('emails', AppVersion::atLeast(10.0)
+                ? 'The email list field must have at least 3 items.'
+                : 'The email list must have at least 3 items.')
             ->assertGraphQLValidationError('input.name', 'The name field is required.')
             ->assertGraphQLValidationError('input.type.name', 'The name field is required.')
             ->assertGraphQLValidationError('input.type.type', 'The input.type.type field is required.');
@@ -274,7 +277,7 @@ class RulesDirectiveTest extends TestCase
     /**
      * @return array<array<int, string>>
      */
-    public function invalidApplyArguments(): array
+    public static function invalidApplyArguments(): array
     {
         return [
             [/** @lang GraphQL */ '123'],
@@ -300,7 +303,7 @@ class RulesDirectiveTest extends TestCase
     /**
      * @return array<array<int, string>>
      */
-    public function invalidMessageArguments(): array
+    public static function invalidMessageArguments(): array
     {
         return [
             [/** @lang GraphQL */ '"foo"'],

@@ -127,12 +127,12 @@ class ASTBuilder
     protected function applyTypeDefinitionManipulators(): void
     {
         foreach ($this->documentAST->types as $typeDefinition) {
-            /** @var \Nuwave\Lighthouse\Support\Contracts\TypeManipulator $typeDefinitionManipulator */
             foreach (
                 $this->directiveLocator->associatedOfType($typeDefinition, TypeManipulator::class)
-                as $typeDefinitionManipulator
+                as $typeManipulator
             ) {
-                $typeDefinitionManipulator->manipulateTypeDefinition($this->documentAST, $typeDefinition);
+                assert($typeManipulator instanceof TypeManipulator);
+                $typeManipulator->manipulateTypeDefinition($this->documentAST, $typeDefinition);
             }
         }
     }
@@ -146,11 +146,11 @@ class ASTBuilder
             foreach ($typeExtensionsList as $typeExtension) {
                 // Before we actually extend the types, we apply the manipulator directives
                 // that are defined on type extensions themselves
-                /** @var \Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator $typeExtensionManipulator */
                 foreach (
                     $this->directiveLocator->associatedOfType($typeExtension, TypeExtensionManipulator::class)
                     as $typeExtensionManipulator
                 ) {
+                    assert($typeExtensionManipulator instanceof TypeExtensionManipulator);
                     $typeExtensionManipulator->manipulateTypeExtension($this->documentAST, $typeExtension);
                 }
 
@@ -174,7 +174,6 @@ class ASTBuilder
      */
     protected function extendObjectLikeType(string $typeName, TypeExtensionNode $typeExtension): void
     {
-        /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\InputObjectTypeDefinitionNode|\GraphQL\Language\AST\InterfaceTypeDefinitionNode|null $extendedObjectLikeType */
         $extendedObjectLikeType = $this->documentAST->types[$typeName] ?? null;
         if (null === $extendedObjectLikeType) {
             if (RootType::isRootType($typeName)) {
@@ -186,6 +185,7 @@ class ASTBuilder
                 );
             }
         }
+        assert($extendedObjectLikeType instanceof ObjectTypeDefinitionNode || $extendedObjectLikeType instanceof InputObjectTypeDefinitionNode || $extendedObjectLikeType instanceof InterfaceTypeDefinitionNode);
 
         $this->assertExtensionMatchesDefinition($typeExtension, $extendedObjectLikeType);
 
@@ -198,11 +198,7 @@ class ASTBuilder
         );
 
         if ($extendedObjectLikeType instanceof ObjectTypeDefinitionNode) {
-            /**
-             * We know this because we passed assertExtensionMatchesDefinition().
-             *
-             * @var \GraphQL\Language\AST\ObjectTypeExtensionNode $typeExtension
-             */
+            assert($typeExtension instanceof ObjectTypeExtensionNode, 'We know this because we passed assertExtensionMatchesDefinition().');
             $extendedObjectLikeType->interfaces = ASTHelper::mergeUniqueNodeList(
                 $extendedObjectLikeType->interfaces,
                 $typeExtension->interfaces
@@ -212,13 +208,13 @@ class ASTBuilder
 
     protected function extendEnumType(string $typeName, EnumTypeExtensionNode $typeExtension): void
     {
-        /** @var \GraphQL\Language\AST\EnumTypeDefinitionNode|null $extendedEnum */
         $extendedEnum = $this->documentAST->types[$typeName] ?? null;
         if (null === $extendedEnum) {
             throw new DefinitionException(
                 $this->missingBaseDefinition($typeName, $typeExtension)
             );
         }
+        assert($extendedEnum instanceof EnumTypeDefinitionNode);
 
         $this->assertExtensionMatchesDefinition($typeExtension, $extendedEnum);
 
@@ -259,11 +255,11 @@ class ASTBuilder
         foreach ($this->documentAST->types as $typeDefinition) {
             if ($typeDefinition instanceof ObjectTypeDefinitionNode) {
                 foreach ($typeDefinition->fields as $fieldDefinition) {
-                    /** @var \Nuwave\Lighthouse\Support\Contracts\FieldManipulator $fieldManipulator */
                     foreach (
                         $this->directiveLocator->associatedOfType($fieldDefinition, FieldManipulator::class)
                         as $fieldManipulator
                     ) {
+                        assert($fieldManipulator instanceof FieldManipulator);
                         $fieldManipulator->manipulateFieldDefinition($this->documentAST, $fieldDefinition, $typeDefinition);
                     }
                 }
@@ -280,11 +276,11 @@ class ASTBuilder
             if ($typeDefinition instanceof ObjectTypeDefinitionNode) {
                 foreach ($typeDefinition->fields as $fieldDefinition) {
                     foreach ($fieldDefinition->arguments as $argumentDefinition) {
-                        /** @var \Nuwave\Lighthouse\Support\Contracts\ArgManipulator $argManipulator */
                         foreach (
                             $this->directiveLocator->associatedOfType($argumentDefinition, ArgManipulator::class)
                             as $argManipulator
                         ) {
+                            assert($argManipulator instanceof ArgManipulator);
                             $argManipulator->manipulateArgDefinition(
                                 $this->documentAST,
                                 $argumentDefinition,

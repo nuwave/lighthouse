@@ -2,7 +2,10 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
+use GraphQL\Language\AST\ListTypeNode;
+use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\NodeKind;
+use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\TypeNode;
 use Illuminate\Support\Collection;
 
@@ -33,7 +36,8 @@ abstract class TypeNodeConverter
         // Recursively unwrap the type and save the wrappers
         $nodeKind = $node->kind;
         if (in_array($nodeKind, [NodeKind::NON_NULL_TYPE, NodeKind::LIST_TYPE])) {
-            /** @var \GraphQL\Language\AST\NonNullTypeNode|\GraphQL\Language\AST\ListTypeNode $node */
+            assert($node instanceof NonNullTypeNode || $node instanceof ListTypeNode);
+
             $wrappers[] = $nodeKind;
 
             return $this->convertWrappedTypeNode(
@@ -41,7 +45,7 @@ abstract class TypeNodeConverter
                 $wrappers
             );
         }
-        /** @var \GraphQL\Language\AST\NamedTypeNode $node */
+        assert($node instanceof NamedTypeNode);
 
         // Re-wrap the type by applying the wrappers in the reversed order
         return (new Collection($wrappers))

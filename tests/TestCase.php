@@ -11,6 +11,8 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Redis\RedisServiceProvider;
 use Laravel\Scout\ScoutServiceProvider as LaravelScoutServiceProvider;
 use Nuwave\Lighthouse\Auth\AuthServiceProvider as LighthouseAuthServiceProvider;
+use Nuwave\Lighthouse\Cache\CacheServiceProvider;
+use Nuwave\Lighthouse\CacheControl\CacheControlServiceProvider;
 use Nuwave\Lighthouse\GlobalId\GlobalIdServiceProvider;
 use Nuwave\Lighthouse\LighthouseServiceProvider;
 use Nuwave\Lighthouse\OrderBy\OrderByServiceProvider;
@@ -18,9 +20,9 @@ use Nuwave\Lighthouse\Pagination\PaginationServiceProvider;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Scout\ScoutServiceProvider as LighthouseScoutServiceProvider;
 use Nuwave\Lighthouse\SoftDeletes\SoftDeletesServiceProvider;
-use Nuwave\Lighthouse\Support\AppVersion;
 use Nuwave\Lighthouse\Testing\MakesGraphQLRequests;
 use Nuwave\Lighthouse\Testing\MocksResolvers;
+use Nuwave\Lighthouse\Testing\TestingServiceProvider;
 use Nuwave\Lighthouse\Testing\UsesTestSchema;
 use Nuwave\Lighthouse\Validation\ValidationServiceProvider;
 use Nuwave\Lighthouse\Void\VoidServiceProvider;
@@ -33,6 +35,13 @@ abstract class TestCase extends BaseTestCase
     use MakesGraphQLRequests;
     use MocksResolvers;
     use UsesTestSchema;
+
+    /**
+     * Set when not in setUp.
+     *
+     * @var \Illuminate\Foundation\Application
+     */
+    protected $app;
 
     /**
      * A dummy query type definition that is added to tests by default.
@@ -58,10 +67,6 @@ GRAPHQL;
     }
 
     /**
-     * Get package providers.
-     *
-     * @param  \Illuminate\Foundation\Application  $app
-     *
      * @return array<class-string<\Illuminate\Support\ServiceProvider>>
      */
     protected function getPackageProviders($app): array
@@ -74,21 +79,19 @@ GRAPHQL;
             // Lighthouse's own
             LighthouseServiceProvider::class,
             LighthouseAuthServiceProvider::class,
+            CacheServiceProvider::class,
+            CacheControlServiceProvider::class,
             GlobalIdServiceProvider::class,
             LighthouseScoutServiceProvider::class,
             OrderByServiceProvider::class,
             PaginationServiceProvider::class,
             SoftDeletesServiceProvider::class,
+            TestingServiceProvider::class,
             ValidationServiceProvider::class,
             VoidServiceProvider::class,
         ];
     }
 
-    /**
-     * Define environment setup.
-     *
-     * @param  \Illuminate\Foundation\Application  $app
-     */
     protected function getEnvironmentSetUp($app): void
     {
         /** @var \Illuminate\Contracts\Config\Repository $config */
@@ -147,6 +150,13 @@ GRAPHQL;
             'broadcaster' => 'log',
         ]);
 
+        $config->set('broadcasting.connections.pusher', [
+            'driver' => 'pusher',
+            'key' => 'foo',
+            'secret' => 'bar',
+            'app_id' => 'baz',
+        ]);
+
         $config->set('database.redis.default', [
             'url' => env('LIGHTHOUSE_TEST_REDIS_URL'),
             'host' => env('LIGHTHOUSE_TEST_REDIS_HOST', 'redis'),
@@ -167,8 +177,6 @@ GRAPHQL;
         ]);
 
         $config->set('lighthouse.cache.enable', false);
-
-        $config->set('lighthouse.unbox_bensampo_enum_enum_instances', true);
     }
 
     /**
@@ -176,24 +184,18 @@ GRAPHQL;
      *
      * This makes debugging the tests much simpler as Exceptions
      * are fully dumped to the console when making requests.
-     *
-     * @param  \Illuminate\Foundation\Application  $app
      */
     protected function resolveApplicationExceptionHandler($app): void
     {
         $app->singleton(ExceptionHandler::class, function () {
-            if (AppVersion::atLeast(7.0)) {
-                return new Laravel7ExceptionHandler();
-            }
-
-            return new PreLaravel7ExceptionHandler();
+            return new ThrowingExceptionHandler();
         });
     }
 
     /**
      * Build an executable schema from a SDL string, adding on a default Query type.
      */
-    protected function buildSchemaWithPlaceholderQuery(string $schema = ''): Schema
+    protected function buildSchemaWithPlaceholderQuery(string $schema): Schema
     {
         return $this->buildSchema(
             $schema . self::PLACEHOLDER_QUERY
@@ -207,8 +209,8 @@ GRAPHQL;
     {
         $this->schema = $schema;
 
-        /** @var \Nuwave\Lighthouse\Schema\SchemaBuilder $schemaBuilder */
         $schemaBuilder = $this->app->make(SchemaBuilder::class);
+        assert($schemaBuilder instanceof SchemaBuilder);
 
         return $schemaBuilder->schema();
     }
@@ -216,14 +218,11 @@ GRAPHQL;
     /**
      * Get a fully qualified reference to a method that is defined on the test class.
      */
-    protected function qualifyTestResolver(string $method = 'resolve'): string
+    protected function qualifyTestResolver(string $method): string
     {
         return addslashes(static::class) . '@' . $method;
     }
 
-    /**
-     * Construct a command tester.
-     */
     protected function commandTester(Command $command): CommandTester
     {
         $command->setLaravel($this->app);

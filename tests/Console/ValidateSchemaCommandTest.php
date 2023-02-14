@@ -6,7 +6,7 @@ use Nuwave\Lighthouse\Console\ValidateSchemaCommand;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Tests\TestCase;
 
-class ValidateSchemaCommandTest extends TestCase
+final class ValidateSchemaCommandTest extends TestCase
 {
     public function testValidatesCorrectSchema(): void
     {

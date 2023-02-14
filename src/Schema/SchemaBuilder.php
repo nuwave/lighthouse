@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema;
 
 use GraphQL\GraphQL;
+use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
@@ -54,28 +55,28 @@ class SchemaBuilder
         $this->typeRegistry->setDocumentAST($documentAST);
 
         // Always set Query since it is required
-        /** @var \GraphQL\Type\Definition\ObjectType $query */
         $query = $this->typeRegistry->get(RootType::QUERY);
+        assert($query instanceof ObjectType);
         $config->setQuery($query);
 
         // Mutation and Subscription are optional, so only add them
         // if they are present in the schema
         if (isset($documentAST->types[RootType::MUTATION])) {
-            /** @var \GraphQL\Type\Definition\ObjectType $mutation */
             $mutation = $this->typeRegistry->get(RootType::MUTATION);
+            assert($mutation instanceof ObjectType);
             $config->setMutation($mutation);
         }
 
         if (isset($documentAST->types[RootType::SUBSCRIPTION])) {
-            /** @var \GraphQL\Type\Definition\ObjectType $subscription */
             $subscription = $this->typeRegistry->get(RootType::SUBSCRIPTION);
+            assert($subscription instanceof ObjectType);
             $config->setSubscription($subscription);
         }
 
         // Use lazy type loading to prevent unnecessary work
         $config->setTypeLoader(
-            function (string $name): Type {
-                return $this->typeRegistry->get($name);
+            function (string $name): ?Type {
+                return $this->typeRegistry->search($name);
             }
         );
 

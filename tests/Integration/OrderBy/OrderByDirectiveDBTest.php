@@ -4,12 +4,11 @@ namespace Tests\Integration\OrderBy;
 
 use Illuminate\Support\Carbon;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class OrderByDirectiveDBTest extends DBTestCase
+final class OrderByDirectiveDBTest extends DBTestCase
 {
     protected $schema = /** @lang GraphQL */ '
     type Query {
@@ -349,10 +348,6 @@ class OrderByDirectiveDBTest extends DBTestCase
 
     public function testOrderByRelationAggregate(): void
     {
-        if (AppVersion::below(8.0)) {
-            $this->markTestSkipped('relation aggregates are not available');
-        }
-
         $this->schema = /** @lang GraphQL */ '
         type Query {
             users(

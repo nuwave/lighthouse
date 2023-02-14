@@ -2,13 +2,12 @@
 
 namespace Nuwave\Lighthouse\Defer;
 
-use Closure;
 use GraphQL\Error\Error;
 use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\TypeNode;
 use GraphQL\Type\Definition\Directive;
-use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\ClientDirectives\ClientDirective;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -42,25 +41,23 @@ GRAPHQL;
         $this->defer = $defer;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
     {
         $previousResolver = $fieldValue->getResolver();
         $fieldType = $fieldValue->getField()->type;
 
-        $fieldValue->setResolver(
-            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver, $fieldType) {
-                $wrappedResolver = function () use ($previousResolver, $root, $args, $context, $resolveInfo) {
-                    return $previousResolver($root, $args, $context, $resolveInfo);
-                };
-                $path = implode('.', $resolveInfo->path);
+        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver, $fieldType) {
+            $wrappedResolver = function () use ($previousResolver, $root, $args, $context, $resolveInfo) {
+                return $previousResolver($root, $args, $context, $resolveInfo);
+            };
+            $path = implode('.', $resolveInfo->path);
 
-                if ($this->shouldDefer($fieldType, $resolveInfo)) {
-                    return $this->defer->defer($wrappedResolver, $path);
-                }
-
-                return $this->defer->findOrResolve($wrappedResolver, $path);
+            if ($this->shouldDefer($fieldType, $resolveInfo)) {
+                return $this->defer->defer($wrappedResolver, $path);
             }
-        );
+
+            return $this->defer->findOrResolve($wrappedResolver, $path);
+        });
 
         return $next($fieldValue);
     }

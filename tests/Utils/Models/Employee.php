@@ -15,14 +15,14 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
  * @property string $position
  *
  * Timestamps
- * @property \lluminate\Support\Carbon $created_at
- * @property \lluminate\Support\Carbon $updated_at
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property \Illuminate\Support\Carbon $updated_at
  *
  * Relations
  * @property-read \Tests\Utils\Models\User $user
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Color> $colors
  */
-class Employee extends Model
+final class Employee extends Model
 {
     public function user(): MorphOne
     {

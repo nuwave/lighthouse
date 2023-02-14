@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Execution\DataLoader;
 
 use GraphQL\Deferred;
+use Illuminate\Container\Container;
 
 /**
  * @deprecated implement your own batch loader instead
@@ -56,7 +57,7 @@ abstract class BatchLoader
             return self::$instances[$instanceName];
         }
 
-        return self::$instances[$instanceName] = app()->makeWith($loaderClass, $constructorArgs);
+        return self::$instances[$instanceName] = Container::getInstance()->makeWith($loaderClass, $constructorArgs);
     }
 
     /**

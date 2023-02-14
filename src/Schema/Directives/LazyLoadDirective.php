@@ -2,10 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Closure;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
@@ -31,15 +30,15 @@ directive @lazyLoad(
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
     {
         $relations = $this->directiveArgValue('relations');
 
         $fieldValue->resultHandler(
             /**
-             * @param  Collection|LengthAwarePaginator  $items
+             * @param EloquentCollection|LengthAwarePaginator  $items
              *
-             * @return Collection|LengthAwarePaginator
+             * @return EloquentCollection|LengthAwarePaginator
              */
             static function ($items) use ($relations) {
                 $items->load($relations);

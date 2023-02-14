@@ -17,7 +17,7 @@ use Tests\DBTestCase;
  * Relations
  * @property-read \Tests\Utils\Models\User|null $user
  */
-class AlternateConnection extends Model
+final class AlternateConnection extends Model
 {
     public $timestamps = false;
 

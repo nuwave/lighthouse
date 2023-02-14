@@ -6,7 +6,7 @@ use Nuwave\Lighthouse\GlobalId\GlobalId;
 use Nuwave\Lighthouse\GlobalId\GlobalIdException;
 use Tests\TestCase;
 
-class GlobalIdTest extends TestCase
+final class GlobalIdTest extends TestCase
 {
     /**
      * @var \Nuwave\Lighthouse\GlobalId\GlobalId
@@ -54,7 +54,7 @@ class GlobalIdTest extends TestCase
     /**
      * @return array<int, array{0: string}>
      */
-    public function provideInvalidGlobalIds(): array
+    public static function provideInvalidGlobalIds(): array
     {
         return [
             ['foo'],

@@ -3,17 +3,20 @@
 namespace Tests\Utils\Exceptions;
 
 use GraphQL\Error\ClientAware;
-use Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions;
+use GraphQL\Error\ProvidesExtensions;
 
-class WithExtensionsException extends \Exception implements ClientAware, RendersErrorsExtensions
+/**
+ * @phpstan-type ExtensionsContent array<string, mixed>
+ */
+final class WithExtensionsException extends \Exception implements ClientAware, ProvidesExtensions
 {
     /**
-     * @var array<string, mixed>
+     * @var ExtensionsContent
      */
     protected $extensionsContent;
 
     /**
-     * @param  array<string, mixed>  $extensionsContent
+     * @param  ExtensionsContent  $extensionsContent
      */
     public function __construct(string $message, array $extensionsContent)
     {
@@ -27,12 +30,10 @@ class WithExtensionsException extends \Exception implements ClientAware, Renders
         return true;
     }
 
-    public function getCategory(): string
-    {
-        return 'literally no one cares';
-    }
-
-    public function extensionsContent(): array
+    /**
+     * @return ExtensionsContent
+     */
+    public function getExtensions(): array
     {
         return $this->extensionsContent;
     }

@@ -46,15 +46,15 @@ GRAPHQL;
 
         $additionalData = $this->directiveArgValue('args');
 
-        return $fieldValue->setResolver(
-            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $additionalData) {
-                return $resolver(
-                    $root,
-                    array_merge($args, ['directive' => $additionalData]),
-                    $context,
-                    $resolveInfo
-                );
-            }
-        );
+        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $additionalData) {
+            return $resolver(
+                $root,
+                array_merge($args, ['directive' => $additionalData]),
+                $context,
+                $resolveInfo
+            );
+        });
+
+        return $fieldValue;
     }
 }

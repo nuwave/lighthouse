@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Console;
 
 use Illuminate\Console\GeneratorCommand;
-use InvalidArgumentException;
 
 abstract class LighthouseGeneratorCommand extends GeneratorCommand
 {
@@ -18,7 +17,7 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
     {
         $name = $this->argument('name');
         if (! is_string($name)) {
-            throw new InvalidArgumentException('You must the name for the class to generate.');
+            throw new \InvalidArgumentException('You must the name for the class to generate.');
         }
 
         return ucfirst(trim($name));
@@ -49,7 +48,7 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
     public static function commonNamespace(array $namespaces): string
     {
         if ([] === $namespaces) {
-            throw new InvalidArgumentException(
+            throw new \InvalidArgumentException(
                 'A default namespace is required for code generation.'
             );
         }
@@ -64,7 +63,7 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
         // If the strings are sorted, any prefix common to all strings
         // will be common to the sorted first and last strings.
         // All the strings in the middle can be ignored.
-        \Safe\sort($namespaces);
+        sort($namespaces);
 
         $firstParts = explode('\\', reset($namespaces));
         $lastParts = explode('\\', end($namespaces));

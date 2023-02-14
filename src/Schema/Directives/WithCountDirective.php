@@ -4,13 +4,14 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\ModelsLoader\CountModelsLoader;
 use Nuwave\Lighthouse\Execution\ModelsLoader\ModelsLoader;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class WithCountDirective extends WithRelationDirective implements FieldManipulator
 {
@@ -51,13 +52,15 @@ GRAPHQL;
     }
 
     /**
+     * @param  array<string, mixed>  $args
+     *
      * @return CountModelsLoader
      */
-    protected function relationLoader(ResolveInfo $resolveInfo): ModelsLoader
+    protected function modelsLoader($parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ModelsLoader
     {
         return new CountModelsLoader(
             $this->relation(),
-            $this->makeBuilderDecorator($resolveInfo)
+            $this->makeBuilderDecorator($parent, $args, $context, $resolveInfo)
         );
     }
 }

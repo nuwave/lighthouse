@@ -7,10 +7,9 @@ use Nuwave\Lighthouse\Console\PrintSchemaCommand;
 use Nuwave\Lighthouse\Federation\FederationServiceProvider;
 use Tests\TestCase;
 
-class PrintFederationSchemaCommandTest extends TestCase
+final class PrintFederationSchemaCommandTest extends TestCase
 {
-    protected const SCHEMA_TYPE /** @lang GraphQL */
-        = <<<'GRAPHQL'
+    protected const SCHEMA_TYPE = /** @lang GraphQL */ <<<'GRAPHQL'
 type Foo @key(fields: "id") {
   id: ID! @external
   foo: String!
@@ -18,8 +17,7 @@ type Foo @key(fields: "id") {
 
 GRAPHQL;
 
-    protected const SCHEMA_QUERY /** @lang GraphQL */
-        = <<<'GRAPHQL'
+    protected const SCHEMA_QUERY = /** @lang GraphQL */ <<<'GRAPHQL'
 type Query {
   foo: Int!
 }
@@ -54,6 +52,7 @@ GRAPHQL;
 
         $fileContent = Storage::get(PrintSchemaCommand::GRAPHQL_FEDERATION_FILENAME);
 
+        $this->assertIsString($fileContent);
         $this->assertStringContainsString(self::SCHEMA_TYPE, $fileContent);
         $this->assertStringContainsString(self::SCHEMA_QUERY, $fileContent);
     }

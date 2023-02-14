@@ -51,15 +51,15 @@ class SaveModel implements ArgResolver
         }
 
         foreach ($belongsTo->arguments as $relationName => $nestedOperations) {
-            /** @var \Illuminate\Database\Eloquent\Relations\BelongsTo $belongsTo */
             $belongsTo = $model->{$relationName}();
+            assert($belongsTo instanceof BelongsTo);
             $belongsToResolver = new ResolveNested(new NestedBelongsTo($belongsTo));
             $belongsToResolver($model, $nestedOperations->value);
         }
 
         foreach ($morphTo->arguments as $relationName => $nestedOperations) {
-            /** @var \Illuminate\Database\Eloquent\Relations\MorphTo $morphTo */
             $morphTo = $model->{$relationName}();
+            assert($morphTo instanceof MorphTo);
             $morphToResolver = new ResolveNested(new NestedMorphTo($morphTo));
             $morphToResolver($model, $nestedOperations->value);
         }

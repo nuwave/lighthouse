@@ -10,14 +10,14 @@ use Nuwave\Lighthouse\Schema\Directives\FieldDirective;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\TestCase;
 
-class IdeHelperCommandTest extends TestCase
+final class IdeHelperCommandTest extends TestCase
 {
     protected function getEnvironmentSetUp($app): void
     {
         parent::getEnvironmentSetUp($app);
 
-        /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = $app->make(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
 
         $config->set('lighthouse.namespaces.directives', [
             // Contains an overwritten UnionDirective
@@ -32,7 +32,9 @@ class IdeHelperCommandTest extends TestCase
      */
     public function testGeneratesIdeHelperFiles(): void
     {
-        $typeRegistry = app(TypeRegistry::class);
+        $typeRegistry = $this->app->make(TypeRegistry::class);
+        assert($typeRegistry instanceof TypeRegistry);
+
         $programmaticType = new EnumType([
             'name' => 'Foo',
             'values' => [

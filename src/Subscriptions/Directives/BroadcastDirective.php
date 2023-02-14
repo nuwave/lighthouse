@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Subscriptions\Directives;
 
-use Closure;
 use Nuwave\Lighthouse\Execution\Utils\Subscription;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -31,7 +30,7 @@ directive @broadcast(
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
     {
         // Ensure this is run after the other field middleware directives
         $fieldValue = $next($fieldValue);

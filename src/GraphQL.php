@@ -7,11 +7,14 @@ use GraphQL\Error\Error;
 use GraphQL\Error\SyntaxError;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\GraphQL as GraphQLBase;
+use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\Parser;
 use GraphQL\Server\Helper as GraphQLHelper;
 use GraphQL\Server\OperationParams;
 use GraphQL\Server\RequestError;
 use GraphQL\Type\Schema;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Illuminate\Pipeline\Pipeline;
@@ -31,7 +34,9 @@ use Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules;
 use Nuwave\Lighthouse\Support\Utils as LighthouseUtils;
 
 /**
- * The main entrypoint to start and end GraphQL execution.
+ * The main entrypoint to GraphQL execution.
+ *
+ * @phpstan-import-type ErrorsHandler from \GraphQL\Executor\ExecutionResult
  */
 class GraphQL
 {
@@ -73,10 +78,7 @@ class GraphQL
     /**
      * Lazily initialized.
      *
-     * @var \Closure(
-     *   array<\GraphQL\Error\Error> $errors,
-     *   callable(\GraphQL\Error\Error $error): ?array<string, mixed>
-     * ): array<string, mixed>
+     * @var ErrorsHandler
      */
     protected $errorsHandler;
 
@@ -99,7 +101,7 @@ class GraphQL
     }
 
     /**
-     * Run one ore more GraphQL operations against the schema.
+     * Run one or more GraphQL operations against the schema.
      *
      * @param  \GraphQL\Server\OperationParams|array<int, \GraphQL\Server\OperationParams>  $operationOrOperations
      *
@@ -111,7 +113,7 @@ class GraphQL
             new StartOperationOrOperations($operationOrOperations)
         );
 
-        $resultOrResults = LighthouseUtils::applyEach(
+        $resultOrResults = LighthouseUtils::mapEach(
             /**
              * @return array<string, mixed>
              */
@@ -137,13 +139,6 @@ class GraphQL
     {
         $errors = $this->graphQLHelper->validateOperationParams($params);
 
-        $query = $params->query;
-        if (! is_string($query) || '' === $query) {
-            $errors[] = new RequestError(
-                'GraphQL Request parameter "query" is required and must not be empty.'
-            );
-        }
-
         if (count($errors) > 0) {
             $errors = array_map(
                 static function (RequestError $err): Error {
@@ -156,51 +151,111 @@ class GraphQL
                 new ExecutionResult(null, $errors)
             );
         }
-        /** @var string $query Otherwise we would have bailed with an error */
-        $result = $this->executeQuery(
-            $query,
-            $context,
-            $params->variables,
-            null,
-            $params->operation
-        );
+
+        $queryString = $params->query;
+        if (is_string($queryString)) {
+            $result = $this->parseAndExecuteQuery(
+                $queryString,
+                $context,
+                $params->variables,
+                null,
+                $params->operation
+            );
+        // @phpstan-ignore-next-line TODO remove when graphql-php 15 correctly types OperationParams::$query as nullable
+        } else {
+            try {
+                $result = $this->executeParsedQuery(
+                    $this->loadPersistedQuery($params->queryId),
+                    $context,
+                    $params->variables,
+                    null,
+                    $params->operation
+                );
+            } catch (Error $error) {
+                return $this->serializable(
+                    new ExecutionResult(null, [$error])
+                );
+            }
+        }
 
         return $this->serializable($result);
     }
 
     /**
-     * Execute a GraphQL query on the Lighthouse schema and return the raw result.
+     * Parses query and executes it.
      *
-     * To render the @see ExecutionResult, you will probably want to call `->toArray($debug)` on it,
-     * with $debug being a combination of flags in @see \GraphQL\Error\DebugFlag
-     *
-     * @param  string|\GraphQL\Language\AST\DocumentNode  $query
-     * @param  array<string, mixed>|null  $variables
-     * @param  mixed|null  $rootValue
+     * @param array<string, mixed>|null $variables
+     * @param mixed|null $rootValue
      */
-    public function executeQuery(
-        $query,
+    public function parseAndExecuteQuery(
+        string $query,
         GraphQLContext $context,
         ?array $variables = [],
         $rootValue = null,
         ?string $operationName = null
     ): ExecutionResult {
-        // TODO make executeQuery require a DocumentNode and move this parsing out of here
-        if (is_string($query)) {
-            try {
-                $query = Parser::parse($query);
-            } catch (SyntaxError $syntaxError) {
-                return new ExecutionResult(null, [$syntaxError]);
-            }
+        try {
+            $parsedQuery = $this->parse($query);
+        } catch (SyntaxError $syntaxError) {
+            return new ExecutionResult(null, [$syntaxError]);
         }
 
+        return $this->executeParsedQuery($parsedQuery, $context, $variables, $rootValue, $operationName);
+    }
+
+    /**
+     * Parse the given query string into a DocumentNode.
+     *
+     * Caches the parsed result if the query cache is enabled in the configuration.
+     *
+     * @throws SyntaxError
+     */
+    public function parse(string $query): DocumentNode
+    {
+        $cacheConfig = $this->configRepository->get('lighthouse.query_cache');
+
+        if (! $cacheConfig['enable']) {
+            return Parser::parse($query);
+        }
+
+        $cacheFactory = Container::getInstance()->make(CacheFactory::class);
+        assert($cacheFactory instanceof CacheFactory);
+
+        $store = $cacheFactory->store($cacheConfig['store']);
+
+        return $store->remember(
+            'lighthouse:query:' . hash('sha256', $query),
+            $cacheConfig['ttl'],
+            static function () use ($query): DocumentNode {
+                return Parser::parse($query);
+            }
+        );
+    }
+
+    /**
+     * Execute a GraphQL query on the Lighthouse schema and return the raw result.
+     *
+     * To render the @see \GraphQL\Executor\ExecutionResult
+     * you will probably want to call `->toArray($debug)` on it,
+     * with $debug being a combination of flags in @see \GraphQL\Error\DebugFlag
+     *
+     * @param array<string, mixed>|null $variables
+     * @param mixed|null $rootValue
+     */
+    public function executeParsedQuery(
+        DocumentNode $query,
+        GraphQLContext $context,
+        ?array $variables = [],
+        $rootValue = null,
+        ?string $operationName = null
+    ): ExecutionResult {
         // Building the executable schema might take a while to do,
         // so we do it before we fire the StartExecution event.
         // This allows tracking the time for batched queries independently.
         $schema = $this->schemaBuilder->schema();
 
         $this->eventDispatcher->dispatch(
-            new StartExecution($query, $variables, $operationName, $context)
+            new StartExecution($schema, $query, $variables, $operationName, $context)
         );
 
         $result = GraphQLBase::executeQuery(
@@ -243,15 +298,6 @@ class GraphQL
         return $result;
     }
 
-    protected function cleanUpAfterExecution(): void
-    {
-        BatchLoaderRegistry::forgetInstances();
-        $this->errorPool->clear();
-
-        // TODO remove in v6
-        BatchLoader::forgetInstances();
-    }
-
     /**
      * Convert the result to a serializable array.
      *
@@ -265,20 +311,74 @@ class GraphQL
     }
 
     /**
-     * @return \Closure(
-     *   array<\GraphQL\Error\Error> $errors,
-     *   callable(\GraphQL\Error\Error $error): ?array<string, mixed>
-     * ): array<string, mixed>
+     * Loads persisted query from the query cache.
+     *
+     * @throws Error if this feature is disabled or no query is found
      */
-    protected function errorsHandler(): \Closure
+    protected function loadPersistedQuery(string $sha256hash): DocumentNode
+    {
+        $lighthouseConfig = $this->configRepository->get('lighthouse');
+        $cacheConfig = $lighthouseConfig['query_cache'] ?? null;
+        if (
+            ! ($lighthouseConfig['persisted_queries'] ?? false)
+            || ! ($cacheConfig['enable'] ?? false)
+        ) {
+            // https://github.com/apollographql/apollo-server/blob/37a5c862261806817a1d71852c4e1d9cdb59eab2/packages/apollo-server-errors/src/index.ts#L240-L248
+            throw new Error(
+                'PersistedQueryNotSupported',
+                null,
+                null,
+                [],
+                null,
+                null,
+                ['code' => 'PERSISTED_QUERY_NOT_SUPPORTED']
+            );
+        }
+
+        $cacheFactory = Container::getInstance()->make(CacheFactory::class);
+        assert($cacheFactory instanceof CacheFactory);
+
+        $store = $cacheFactory->store($cacheConfig['store']);
+
+        $document = $store->get("lighthouse:query:{$sha256hash}");
+        if (null === $document) {
+            // https://github.com/apollographql/apollo-server/blob/37a5c862261806817a1d71852c4e1d9cdb59eab2/packages/apollo-server-errors/src/index.ts#L230-L239
+            throw new Error(
+                'PersistedQueryNotFound',
+                null,
+                null,
+                [],
+                null,
+                null,
+                ['code' => 'PERSISTED_QUERY_NOT_FOUND']
+            );
+        }
+
+        return $document;
+    }
+
+    protected function cleanUpAfterExecution(): void
+    {
+        BatchLoaderRegistry::forgetInstances();
+        $this->errorPool->clear();
+
+        // TODO remove in v6
+        BatchLoader::forgetInstances();
+    }
+
+    /**
+     * @return ErrorsHandler
+     */
+    protected function errorsHandler(): callable
     {
         if (! isset($this->errorsHandler)) {
-            $this->errorsHandler = function (array $errors, callable $formatter): array {
+            // @phpstan-ignore-next-line callable is not recognized correctly and can not be type-hinted to match
+            return $this->errorsHandler = function (array $errors, callable $formatter): array {
                 // User defined error handlers, implementing \Nuwave\Lighthouse\Execution\ErrorHandler
                 // This allows the user to register multiple handlers and pipe the errors through.
                 $handlers = [];
                 foreach ($this->configRepository->get('lighthouse.error_handlers', []) as $handlerClass) {
-                    $handlers[] = app($handlerClass);
+                    $handlers[] = Container::getInstance()->make($handlerClass);
                 }
 
                 return (new Collection($errors))
@@ -286,13 +386,11 @@ class GraphQL
                         return $this->pipeline
                             ->send($error)
                             ->through($handlers)
-                            ->then(function (?Error $error) use ($formatter): ?array {
-                                if (null === $error) {
-                                    return null;
-                                }
-
-                                return $formatter($error);
-                            });
+                            ->then(
+                                fn (?Error $error): ?array => null === $error
+                                ? null
+                                : $formatter($error)
+                            );
                     })
                     ->filter()
                     ->all();
@@ -310,6 +408,31 @@ class GraphQL
         return $this->configRepository->get('app.debug')
             ? (int) $this->configRepository->get('lighthouse.debug')
             : DebugFlag::NONE;
+    }
+
+    /**
+     * This method will be removed in the next major update. Please use executeParsedQuery or parseAndExecuteQuery.
+     *
+     * @param string|\GraphQL\Language\AST\DocumentNode $query
+     * @param array<string, mixed>|null $variables
+     * @param mixed|null $rootValue
+     *
+     * @see executeParsedQuery
+     * @see parseAndExecuteQuery
+     * @deprecated
+     */
+    public function executeQuery(
+        $query,
+        GraphQLContext $context,
+        ?array $variables = [],
+        $rootValue = null,
+        ?string $operationName = null
+    ): ExecutionResult {
+        if (is_string($query)) {
+            return $this->parseAndExecuteQuery($query, $context, $variables, $rootValue, $operationName);
+        }
+
+        return $this->executeParsedQuery($query, $context, $variables, $rootValue, $operationName);
     }
 
     /**

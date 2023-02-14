@@ -2,22 +2,25 @@
 
 namespace Nuwave\Lighthouse\Pagination;
 
+use GraphQL\Type\Definition\InterfaceType;
+use GraphQL\Type\Definition\NonNull;
+use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class ConnectionField
 {
     /**
-     * Resolve page info for connection.
-     *
      * @return array<string, mixed>
      */
     public function pageInfoResolver(LengthAwarePaginator $paginator): array
     {
         /** @var int|null $firstItem Laravel type-hints are inaccurate here */
         $firstItem = $paginator->firstItem();
+
         /** @var int|null $lastItem Laravel type-hints are inaccurate here */
         $lastItem = $paginator->lastItem();
 
@@ -31,37 +34,32 @@ class ConnectionField
                 ? Cursor::encode($lastItem)
                 : null,
             'total' => $paginator->total(),
-            'count' => $paginator->count(),
+            'count' => count($paginator->items()),
             'currentPage' => $paginator->currentPage(),
             'lastPage' => $paginator->lastPage(),
         ];
     }
 
     /**
-     * Resolve edges for connection.
-     *
-     * @param  \Illuminate\Pagination\LengthAwarePaginator<mixed>  $paginator
      * @param  array<string, mixed>  $args
+     *
+     * @return Collection<array<string, mixed>>
      */
-    public function edgeResolver(LengthAwarePaginator $paginator, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Collection
+    public function edgeResolver(Paginator $paginator, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Collection
     {
         // We know those types because we manipulated them during PaginationManipulator
-        /** @var \GraphQL\Type\Definition\NonNull $nonNullList */
         $nonNullList = $resolveInfo->returnType;
-        /** @var \GraphQL\Type\Definition\ObjectType|\GraphQL\Type\Definition\InterfaceType $objectLikeType */
-        $objectLikeType = $nonNullList->getWrappedType(true);
+        assert($nonNullList instanceof NonNull);
+
+        $objectLikeType = $nonNullList->getInnermostType();
+        assert($objectLikeType instanceof ObjectType || $objectLikeType instanceof InterfaceType);
 
         $returnTypeFields = $objectLikeType->getFields();
 
         /** @var int|null $firstItem Laravel type-hints are inaccurate here */
         $firstItem = $paginator->firstItem();
 
-        /**
-         * The return type `static` refers to the wrong class because it is a proxied method call.
-         *
-         * @var \Illuminate\Support\Collection<mixed> $values
-         */
-        $values = $paginator->values();
+        $values = new Collection(array_values($paginator->items()));
 
         return $values->map(function ($item, int $index) use ($returnTypeFields, $firstItem): array {
             $data = [];

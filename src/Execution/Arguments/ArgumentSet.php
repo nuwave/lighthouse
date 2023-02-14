@@ -2,13 +2,6 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
-use Closure;
-use Nuwave\Lighthouse\Schema\Directives\RenameDirective;
-use Nuwave\Lighthouse\Scout\ScoutEnhancer;
-use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
-use Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective;
-use Nuwave\Lighthouse\Support\Utils;
-
 class ArgumentSet
 {
     /**
@@ -59,138 +52,11 @@ class ArgumentSet
     {
         $argument = $this->arguments[$key] ?? null;
 
-        if (null === $argument) {
+        if (! $argument instanceof Argument) {
             return false;
         }
 
         return null !== $argument->value;
-    }
-
-    /**
-     * Apply the @rename directive and return a new, modified instance.
-     *
-     * @noRector \Rector\DeadCode\Rector\ClassMethod\RemoveDeadRecursiveClassMethodRector
-     */
-    public function rename(): self
-    {
-        $argumentSet = new self();
-        $argumentSet->directives = $this->directives;
-
-        foreach ($this->arguments as $name => $argument) {
-            // Recursively apply the renaming to nested inputs.
-            // We look for further ArgumentSet instances, they
-            // might be contained within an array.
-            $argument->value = Utils::applyEach(
-                function ($value) {
-                    if ($value instanceof self) {
-                        return $value->rename();
-                    }
-
-                    return $value;
-                },
-                $argument->value
-            );
-
-            /** @var \Nuwave\Lighthouse\Schema\Directives\RenameDirective|null $renameDirective */
-            $renameDirective = $argument->directives->first(function ($directive) {
-                return $directive instanceof RenameDirective;
-            });
-
-            if (null !== $renameDirective) {
-                $argumentSet->arguments[$renameDirective->attributeArgValue()] = $argument;
-            } else {
-                $argumentSet->arguments[$name] = $argument;
-            }
-        }
-
-        return $argumentSet;
-    }
-
-    /**
-     * Apply ArgBuilderDirectives and scopes to the builder.
-     *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @param  array<string>  $scopes
-     *
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Laravel\Scout\Builder
-     */
-    public function enhanceBuilder(object $builder, array $scopes, Closure $directiveFilter = null): object
-    {
-        $scoutEnhancer = new ScoutEnhancer($this, $builder);
-        if ($scoutEnhancer->hasSearchArguments()) {
-            return $scoutEnhancer->enhanceBuilder();
-        }
-
-        self::applyArgBuilderDirectives($this, $builder, $directiveFilter);
-        self::applyFieldBuilderDirectives($this, $builder);
-
-        foreach ($scopes as $scope) {
-            $builder->{$scope}($this->toArray());
-        }
-
-        return $builder;
-    }
-
-    /**
-     * Recursively apply the ArgBuilderDirectives onto the builder.
-     *
-     * TODO get rid of the reference passing in here. The issue is that @search makes a new builder instance,
-     * but we must special case that in some way anyhow, as only eq filters can be added on top of search.
-     *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @param  (\Closure(\Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective): bool)|null  $directiveFilter
-     */
-    protected static function applyArgBuilderDirectives(self $argumentSet, object &$builder, Closure $directiveFilter = null): void
-    {
-        $unboxBenSampoEnumEnumInstances = config('lighthouse.unbox_bensampo_enum_enum_instances');
-
-        foreach ($argumentSet->arguments as $argument) {
-            $value = $argument->toPlain();
-
-            // TODO remove in v6, Laravel automagically calls the Enum's __toString() method
-            // Unbox Enum values to ensure their underlying value is used for queries
-            if ($unboxBenSampoEnumEnumInstances && is_a($value, '\BenSampo\Enum\Enum')) {
-                $value = $value->value;
-            }
-
-            $filteredDirectives = $argument
-                ->directives
-                ->filter(Utils::instanceofMatcher(ArgBuilderDirective::class));
-
-            if (null !== $directiveFilter) {
-                $filteredDirectives = $filteredDirectives->filter($directiveFilter);
-            }
-
-            $filteredDirectives->each(static function (ArgBuilderDirective $argBuilderDirective) use (&$builder, $value): void {
-                $builder = $argBuilderDirective->handleBuilder($builder, $value);
-            });
-
-            Utils::applyEach(
-                static function ($value) use (&$builder, $directiveFilter) {
-                    if ($value instanceof self) {
-                        self::applyArgBuilderDirectives($value, $builder, $directiveFilter);
-                    }
-                },
-                $argument->value
-            );
-        }
-    }
-
-    /**
-     * Apply the FieldBuilderDirectives onto the builder.
-     *
-     * TODO get rid of the reference passing in here. The issue is that @search makes a new builder instance,
-     * but we must special case that in some way anyhow, as only eq filters can be added on top of search.
-     *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     */
-    protected static function applyFieldBuilderDirectives(self $argumentSet, object &$builder): void
-    {
-        $argumentSet->directives
-            ->filter(Utils::instanceofMatcher(FieldBuilderDirective::class))
-            ->each(static function (FieldBuilderDirective $fieldBuilderDirective) use (&$builder): void {
-                $builder = $fieldBuilderDirective->handleFieldBuilder($builder);
-            });
     }
 
     /**

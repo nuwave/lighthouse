@@ -2,11 +2,12 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
-use Closure;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Filesystem\Filesystem;
+use Nuwave\Lighthouse\Exceptions\InvalidSchemaCacheContentsException;
 use Nuwave\Lighthouse\Exceptions\UnknownCacheVersionException;
 
 /**
@@ -18,6 +19,8 @@ use Nuwave\Lighthouse\Exceptions\UnknownCacheVersionException;
  *   ttl: int|null,
  *   path: string|null,
  * }
+ *
+ * @phpstan-import-type SerializableDocumentAST from DocumentAST
  */
 class ASTCache
 {
@@ -73,7 +76,7 @@ class ASTCache
                 throw new UnknownCacheVersionException($version);
         }
 
-        $this->version = $version;
+        $this->version = (int) $version;
     }
 
     public function isEnabled(): bool
@@ -107,7 +110,7 @@ class ASTCache
     /**
      * @param \Closure(): DocumentAST $build
      */
-    public function fromCacheOrBuild(Closure $build): DocumentAST
+    public function fromCacheOrBuild(\Closure $build): DocumentAST
     {
         if (1 === $this->version) {
             return $this->store()->remember(
@@ -118,7 +121,13 @@ class ASTCache
         }
 
         if ($this->filesystem()->exists($this->path)) {
-            return DocumentAST::fromArray(require $this->path);
+            $ast = require $this->path;
+            if (! is_array($ast)) {
+                throw new InvalidSchemaCacheContentsException($this->path, $ast);
+            }
+            /** @var SerializableDocumentAST $ast */
+
+            return DocumentAST::fromArray($ast);
         }
 
         $documentAST = $build();
@@ -129,14 +138,14 @@ class ASTCache
 
     protected function store(): CacheRepository
     {
-        /** @var \Illuminate\Contracts\Cache\Factory $cacheFactory */
-        $cacheFactory = app(CacheFactory::class);
+        $cacheFactory = Container::getInstance()->make(CacheFactory::class);
+        assert($cacheFactory instanceof CacheFactory);
 
         return $cacheFactory->store($this->store);
     }
 
     protected function filesystem(): Filesystem
     {
-        return app(Filesystem::class);
+        return Container::getInstance()->make(Filesystem::class);
     }
 }

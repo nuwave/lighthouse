@@ -4,7 +4,7 @@ namespace Tests\Utils\Validators;
 
 use Nuwave\Lighthouse\Validation\Validator;
 
-class EmailCustomMessageValidator extends Validator
+final class EmailCustomMessageValidator extends Validator
 {
     public const MESSAGE = 'this is a custom error message';
 

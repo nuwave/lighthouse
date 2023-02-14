@@ -7,7 +7,7 @@ use Tests\Utils\Models\Image;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class MorphOneDirectiveTest extends DBTestCase
+final class MorphOneDirectiveTest extends DBTestCase
 {
     /**
      * The authenticated user.

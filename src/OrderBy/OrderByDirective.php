@@ -6,18 +6,19 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
-use Illuminate\Database\Eloquent\Builder;
+use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Support\AppVersion;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Traits\GeneratesColumnsEnum;
 
 class OrderByDirective extends BaseDirective implements ArgBuilderDirective, ArgDirectiveForArray, ArgManipulator, FieldBuilderDirective
@@ -34,15 +35,15 @@ directive @orderBy(
     """
     Restrict the allowed column names to a well-defined list.
     This improves introspection capabilities and security.
-    Mutually exclusive with the `columnsEnum` argument.
+    Mutually exclusive with `columnsEnum`.
     Only used when the directive is added on an argument.
     """
     columns: [String!]
 
     """
     Use an existing enumeration type to restrict the allowed columns to a predefined list.
-    This allowes you to re-use the same enum for multiple fields.
-    Mutually exclusive with the `columns` argument.
+    This allows you to re-use the same enum for multiple fields.
+    Mutually exclusive with `columns`.
     Only used when the directive is added on an argument.
     """
     columnsEnum: String
@@ -86,21 +87,21 @@ Options for the `relations` argument on `@orderBy`.
 """
 input OrderByRelation {
     """
-    TODO: description
+    Name of the relation.
     """
     relation: String!
 
     """
     Restrict the allowed column names to a well-defined list.
     This improves introspection capabilities and security.
-    Mutually exclusive with the `columnsEnum` argument.
+    Mutually exclusive with `columnsEnum`.
     """
     columns: [String!]
 
     """
     Use an existing enumeration type to restrict the allowed columns to a predefined list.
-    This allowes you to re-use the same enum for multiple fields.
-    Mutually exclusive with the `columns` argument.
+    This allows you to re-use the same enum for multiple fields.
+    Mutually exclusive with `columns`.
     """
     columnsEnum: String
 }
@@ -117,7 +118,7 @@ GRAPHQL;
             $column = Arr::pull($orderByClause, 'column');
 
             if (null === $column) {
-                if (! $builder instanceof Builder) {
+                if (! $builder instanceof EloquentBuilder) {
                     throw new DefinitionException('Can not order by relations on non-Eloquent builders, got: ' . get_class($builder));
                 }
 
@@ -153,6 +154,8 @@ GRAPHQL;
         FieldDefinitionNode &$parentField,
         ObjectTypeDefinitionNode &$parentType
     ): void {
+        $this->validateMutuallyExclusiveArguments(['columns', 'columnsEnum']);
+
         if (! $this->hasAllowedColumns() && ! $this->directiveHasArgument('relations')) {
             $argDefinition->type = Parser::typeReference('[' . OrderByServiceProvider::DEFAULT_ORDER_BY_CLAUSE . '!]');
 
@@ -217,7 +220,7 @@ GRAPHQL;
                 "Order by clause for {$parentType->name->value}.{$parentField->name->value}.{$argDefinition->name->value}."
                 input {$qualifiedRelationOrderByName} {
                     "The column that is used for ordering."
-                    column: $allowedColumnsTypeName {$this->mutuallyExclusiveRule($relationNames)}
+                    column: {$allowedColumnsTypeName} {$this->mutuallyExclusiveRule($relationNames)}
 
                     "The direction that is used for ordering."
                     order: SortOrder!
@@ -256,7 +259,7 @@ GRAPHQL;
         }
     }
 
-    public function handleFieldBuilder(object $builder): object
+    public function handleFieldBuilder(object $builder, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): object
     {
         return $builder->orderBy(
             $this->directiveArgValue('column'),
@@ -269,10 +272,6 @@ GRAPHQL;
      */
     protected function mutuallyExclusiveRule(array $otherOptions): string
     {
-        if (AppVersion::below(8.0)) {
-            return '';
-        }
-
         $optionsString = implode(',', $otherOptions);
 
         return "@rules(apply: [\"prohibits:{$optionsString}\"])";

@@ -2,12 +2,12 @@
 
 namespace Nuwave\Lighthouse\Auth;
 
-use Closure;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionNode;
-use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Nuwave\Lighthouse\Exceptions\AuthenticationException;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -22,10 +22,7 @@ use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
  */
 class GuardDirective extends BaseDirective implements FieldMiddleware, TypeManipulator, TypeExtensionManipulator
 {
-    /**
-     * @var \Illuminate\Contracts\Auth\Factory
-     */
-    protected $auth;
+    protected AuthFactory $auth;
 
     public function __construct(AuthFactory $auth)
     {
@@ -45,7 +42,7 @@ Used upon an object, it applies to all fields within.
 """
 directive @guard(
   """
-  Specify which guards to use, e.g. ["api"].
+  Specify which guards to use, e.g. ["web"].
   When not defined, the default from `lighthouse.php` is used.
   """
   with: [String!]
@@ -53,22 +50,16 @@ directive @guard(
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
     {
         $previousResolver = $fieldValue->getResolver();
-        // TODO remove cast in v6
-        $with = (array) (
-            $this->directiveArgValue('with')
-            ?? [AuthServiceProvider::guard()]
-        );
 
-        $fieldValue->setResolver(
-            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($with, $previousResolver) {
-                $this->authenticate($with);
+        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
+            $with = $this->directiveArgValue('with', (array) AuthServiceProvider::guard());
+            $context->setUser($this->authenticate($with));
 
-                return $previousResolver($root, $args, $context, $resolveInfo);
-            }
-        );
+            return $previousResolver($root, $args, $context, $resolveInfo);
+        });
 
         return $next($fieldValue);
     }
@@ -80,14 +71,16 @@ GRAPHQL;
      *
      * @throws \Illuminate\Auth\AuthenticationException
      */
-    protected function authenticate(array $guards): void
+    protected function authenticate(array $guards): Authenticatable
     {
         foreach ($guards as $guard) {
-            if ($this->auth->guard($guard)->check()) {
+            $user = $this->auth->guard($guard)->user();
+
+            if ($user) {
                 // @phpstan-ignore-next-line passing null works fine here
                 $this->auth->shouldUse($guard);
 
-                return;
+                return $user;
             }
         }
 
@@ -98,13 +91,14 @@ GRAPHQL;
      * Handle an unauthenticated user.
      *
      * @param  array<string|null>  $guards
+     *
+     * @throws \Illuminate\Auth\AuthenticationException
+     *
+     * @return never
      */
     protected function unauthenticated(array $guards): void
     {
-        throw new AuthenticationException(
-            AuthenticationException::MESSAGE,
-            $guards
-        );
+        throw new AuthenticationException(AuthenticationException::MESSAGE, $guards);
     }
 
     public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition): void

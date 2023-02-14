@@ -2,10 +2,10 @@
 
 namespace Nuwave\Lighthouse\Validation;
 
-use Closure;
-use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Nuwave\Lighthouse\Exceptions\ValidationException;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
@@ -23,36 +23,33 @@ directive @validate on FIELD_DEFINITION
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
     {
         $resolver = $fieldValue->getResolver();
 
-        return $next(
-            $fieldValue->setResolver(
-                function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
-                    $argumentSet = $resolveInfo->argumentSet;
-                    $rulesGatherer = new RulesGatherer($argumentSet);
+        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
+            $argumentSet = $resolveInfo->argumentSet;
+            $rulesGatherer = new RulesGatherer($argumentSet);
 
-                    /**
-                     * @var \Illuminate\Contracts\Validation\Factory $validationFactory
-                     */
-                    $validationFactory = app(ValidationFactory::class);
-                    $validator = $validationFactory->make(
-                        $args,
-                        $rulesGatherer->rules,
-                        $rulesGatherer->messages,
-                        $rulesGatherer->attributes
-                    );
+            $validationFactory = Container::getInstance()->make(ValidationFactory::class);
+            assert($validationFactory instanceof ValidationFactory);
 
-                    if ($validator->fails()) {
-                        $path = implode('.', $resolveInfo->path);
+            $validator = $validationFactory->make(
+                $args,
+                $rulesGatherer->rules,
+                $rulesGatherer->messages,
+                $rulesGatherer->attributes
+            );
 
-                        throw new ValidationException("Validation failed for the field [$path].", $validator);
-                    }
+            if ($validator->fails()) {
+                $path = implode('.', $resolveInfo->path);
 
-                    return $resolver($root, $args, $context, $resolveInfo);
-                }
-            )
-        );
+                throw new ValidationException("Validation failed for the field [{$path}].", $validator);
+            }
+
+            return $resolver($root, $args, $context, $resolveInfo);
+        });
+
+        return $next($fieldValue);
     }
 }

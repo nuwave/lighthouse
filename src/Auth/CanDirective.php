@@ -2,25 +2,26 @@
 
 namespace Nuwave\Lighthouse\Auth;
 
-use Closure;
 use GraphQL\Error\Error;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
+use Nuwave\Lighthouse\Execution\Resolved;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\SoftDeletes\ForceDeleteDirective;
 use Nuwave\Lighthouse\SoftDeletes\RestoreDirective;
 use Nuwave\Lighthouse\SoftDeletes\TrashedDirective;
-use Nuwave\Lighthouse\Support\AppVersion;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -54,17 +55,12 @@ directive @can(
   ability: String!
 
   """
-  Query for specific model instances to check the policy against, using arguments
-  with directives that add constraints to the query builder, such as `@eq`.
+  Check the policy against the model instances returned by the field resolver.
+  Only use this if the field does not mutate data, it is run before checking.
 
-  Mutually exclusive with `find`.
+  Mutually exclusive with `query` and `find`.
   """
-  query: Boolean = false
-
-  """
-  Apply scopes to the underlying query.
-  """
-  scopes: [String!]
+  resolved: Boolean! = false
 
   """
   Specify the class name of the model to use.
@@ -75,15 +71,28 @@ directive @can(
   """
   Pass along the client given input data as arguments to `Gate::check`.
   """
-  injectArgs: Boolean = false
+  injectArgs: Boolean! = false
 
   """
   Statically defined arguments that are passed to `Gate::check`.
 
-  You may pass pass arbitrary GraphQL literals,
+  You may pass arbitrary GraphQL literals,
   e.g.: [1, 2, 3] or { foo: "bar" }
   """
   args: CanArgs
+
+  """
+  Query for specific model instances to check the policy against, using arguments
+  with directives that add constraints to the query builder, such as `@eq`.
+
+  Mutually exclusive with `resolved` and `find`.
+  """
+  query: Boolean! = false
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
 
   """
   If your policy checks against specific model instances, specify
@@ -91,7 +100,7 @@ directive @can(
 
   You may pass the string in dot notation to use nested inputs.
 
-  Mutually exclusive with `search`.
+  Mutually exclusive with `resolved` and `query`.
   """
   find: String
 ) repeatable on FIELD_DEFINITION
@@ -106,23 +115,39 @@ GRAPHQL;
     /**
      * Ensure the user is authorized to access this field.
      */
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
     {
         $previousResolver = $fieldValue->getResolver();
         $ability = $this->directiveArgValue('ability');
+        $resolved = $this->directiveArgValue('resolved');
 
-        $fieldValue->setResolver(
-            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($ability, $previousResolver) {
-                $gate = $this->gate->forUser($context->user());
-                $checkArguments = $this->buildCheckArguments($args);
+        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver, $ability, $resolved) {
+            $gate = $this->gate->forUser($context->user());
+            $checkArguments = $this->buildCheckArguments($args);
 
-                foreach ($this->modelsToCheck($resolveInfo->argumentSet, $args) as $model) {
-                    $this->authorize($gate, $ability, $model, $checkArguments);
-                }
+            if ($resolved) {
+                return Resolved::handle(
+                    $previousResolver($root, $args, $context, $resolveInfo),
+                    function ($modelLike) use ($gate, $ability, $checkArguments) {
+                        $modelOrModels = $modelLike instanceof Paginator
+                            ? $modelLike->items()
+                            : $modelLike;
 
-                return $previousResolver($root, $args, $context, $resolveInfo);
+                        Utils::applyEach(function (?Model $model) use ($gate, $ability, $checkArguments): void {
+                            $this->authorize($gate, $ability, $model, $checkArguments);
+                        }, $modelOrModels);
+
+                        return $modelLike;
+                    }
+                );
             }
-        );
+
+            foreach ($this->modelsToCheck($root, $args, $context, $resolveInfo) as $model) {
+                $this->authorize($gate, $ability, $model, $checkArguments);
+            }
+
+            return $previousResolver($root, $args, $context, $resolveInfo);
+        });
 
         return $next($fieldValue);
     }
@@ -134,13 +159,17 @@ GRAPHQL;
      *
      * @return iterable<\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>>
      */
-    protected function modelsToCheck(ArgumentSet $argumentSet, array $args): iterable
+    protected function modelsToCheck($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): iterable
     {
         if ($this->directiveArgValue('query')) {
-            return $argumentSet
+            return $resolveInfo
                 ->enhanceBuilder(
                     $this->getModelClass()::query(),
-                    $this->directiveArgValue('scopes', [])
+                    $this->directiveArgValue('scopes', []),
+                    $root,
+                    $args,
+                    $context,
+                    $resolveInfo
                 )
                 ->get();
         }
@@ -148,12 +177,13 @@ GRAPHQL;
         if ($find = $this->directiveArgValue('find')) {
             $findValue = Arr::get($args, $find);
             if (null === $findValue) {
-                throw new Error(self::missingKeyToFindModel($find));
+                throw self::missingKeyToFindModel($find);
             }
 
             $queryBuilder = $this->getModelClass()::query();
 
-            $directivesContainsForceDelete = $argumentSet->directives->contains(
+            $argumentSetDirectives = $resolveInfo->argumentSet->directives;
+            $directivesContainsForceDelete = $argumentSetDirectives->contains(
                 Utils::instanceofMatcher(ForceDeleteDirective::class)
             );
             if ($directivesContainsForceDelete) {
@@ -162,7 +192,7 @@ GRAPHQL;
                 $queryBuilder->withTrashed();
             }
 
-            $directivesContainsRestore = $argumentSet->directives->contains(
+            $directivesContainsRestore = $argumentSetDirectives->contains(
                 Utils::instanceofMatcher(RestoreDirective::class)
             );
             if ($directivesContainsRestore) {
@@ -172,16 +202,16 @@ GRAPHQL;
             }
 
             try {
-                /**
-                 * TODO use generics.
-                 *
-                 * @var \Illuminate\Database\Eloquent\Builder $enhancedBuilder
-                 */
-                $enhancedBuilder = $argumentSet->enhanceBuilder(
+                $enhancedBuilder = $resolveInfo->enhanceBuilder(
                     $queryBuilder,
                     $this->directiveArgValue('scopes', []),
+                    $root,
+                    $args,
+                    $context,
+                    $resolveInfo,
                     Utils::instanceofMatcher(TrashedDirective::class)
                 );
+                assert($enhancedBuilder instanceof EloquentBuilder);
 
                 $modelOrModels = $enhancedBuilder->findOrFail($findValue);
             } catch (ModelNotFoundException $exception) {
@@ -198,14 +228,14 @@ GRAPHQL;
         return [$this->getModelClass()];
     }
 
-    public static function missingKeyToFindModel(string $find): string
+    public static function missingKeyToFindModel(string $find): Error
     {
-        return "Got no key to find a model at the expected input path: ${find}.";
+        return new Error("Got no key to find a model at the expected input path: {$find}.");
     }
 
     /**
      * @param  string|array<string>  $ability
-     * @param  string|\Illuminate\Database\Eloquent\Model  $model
+     * @param  string|\Illuminate\Database\Eloquent\Model|null  $model
      * @param  array<int, mixed>  $arguments
      *
      * @throws \Nuwave\Lighthouse\Exceptions\AuthorizationException
@@ -216,24 +246,16 @@ GRAPHQL;
         // should be [modelClassName, additionalArg, additionalArg...]
         array_unshift($arguments, $model);
 
-        // Gate responses were introduced in Laravel 6
-        // TODO remove with Laravel < 6 support
-        if (AppVersion::atLeast(6.0)) {
-            Utils::applyEach(
-                function ($ability) use ($gate, $arguments) {
-                    $response = $gate->inspect($ability, $arguments);
+        Utils::applyEach(
+            function ($ability) use ($gate, $arguments) {
+                $response = $gate->inspect($ability, $arguments);
 
-                    if ($response->denied()) {
-                        throw new AuthorizationException($response->message(), $response->code());
-                    }
-                },
-                $ability
-            );
-        } elseif (! $gate->check($ability, $arguments)) {
-            throw new AuthorizationException(
-                "You are not authorized to access {$this->nodeName()}"
-            );
-        }
+                if ($response->denied()) {
+                    throw new AuthorizationException($response->message(), $response->code());
+                }
+            },
+            $ability
+        );
     }
 
     /**
@@ -261,13 +283,15 @@ GRAPHQL;
 
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType)
     {
-        if ($this->directiveHasArgument('find') && $this->directiveHasArgument('query')) {
-            throw new DefinitionException(self::findAndQueryAreMutuallyExclusive());
+        $this->validateMutuallyExclusiveArguments(['resolved', 'query', 'find']);
+
+        if ($this->directiveHasArgument('resolved') && RootType::MUTATION === $parentType->name->value) {
+            throw self::resolvedIsUnsafeInMutations($fieldDefinition->name->value);
         }
     }
 
-    public static function findAndQueryAreMutuallyExclusive(): string
+    public static function resolvedIsUnsafeInMutations(string $fieldName): DefinitionException
     {
-        return 'The arguments `find` and `query` are mutually exclusive in the `@can` directive.';
+        return new DefinitionException("Do not use @can with `resolved` on mutation {$fieldName}, it is unsafe as the resolver will run before checking permissions. Use `query` or `find`.");
     }
 }

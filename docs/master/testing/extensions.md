@@ -7,25 +7,14 @@ your extensions in isolation from the rest of your application.
 
 When you enhance functionality related to the schema definition, such as adding
 a [custom directive](../custom-directives/getting-started.md), you need a test schema where you can use it.
-Add the `UsesTestSchema` trait to your test class, call `setUpTestSchema()` and define your test schema:
+Add the `UsesTestSchema` trait to your base test class, call `setUpTestSchema()` and define your test schema:
 
 ```php
-<?php
-
-namespace Tests;
-
 use Nuwave\Lighthouse\Testing\UsesTestSchema;
 
 class MyCustomDirectiveTest extends TestCase
 {
     use UsesTestSchema;
-
-    // You may set the schema once and use it in many test methods
-    protected $schema = /** @lang GraphQL */ '
-    type Query {
-        foo: Int @myCustom
-    }
-    ';
 
     protected function setUp(): void
     {
@@ -34,9 +23,8 @@ class MyCustomDirectiveTest extends TestCase
         $this->setUpTestSchema();
     }
 
-    public function testSpecificScenario(): void
+    public function testMyCustomOnArgument(): void
     {
-        // You can overwrite the schema for testing specific cases
         $this->schema = /** @lang GraphQL */ '
         type Query {
             foo(bar: String @myCustom): Int
@@ -48,6 +36,8 @@ class MyCustomDirectiveTest extends TestCase
 }
 ```
 
+> `UsesTestSchema` does not work with `RefreshesSchemaCache`, choose one.
+
 ## Mock resolvers
 
 When testing custom functionality through a dummy schema, you still need to have
@@ -56,8 +46,6 @@ a way to resolve fields. Lighthouse provides a simple way to mock resolvers in a
 Add the `MocksResolvers` trait to your test class:
 
 ```php
-<?php
-
 namespace Tests;
 
 use Nuwave\Lighthouse\Testing\MocksResolvers;
@@ -72,9 +60,9 @@ In this example, we will be testing this fictional custom directive:
 
 ```graphql
 """
-Reverts a string, e.g. 'foo' => 'oof'.
+Reverses a string, e.g. 'foo' => 'oof'.
 """
-directive @revert on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+directive @reverse on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 The simplest way to mock a resolver is to have it return static data:

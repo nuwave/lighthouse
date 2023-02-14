@@ -49,9 +49,9 @@ class PaginationArgs
             $instance->page = Arr::get($args, 'page', 1);
         }
 
-        if ($instance->first <= 0) {
+        if ($instance->first < 0) {
             throw new Error(
-                self::requestedZeroOrLessItems($instance->first)
+                self::requestedLessThanZeroItems($instance->first)
             );
         }
 
@@ -68,9 +68,9 @@ class PaginationArgs
         return $instance;
     }
 
-    public static function requestedZeroOrLessItems(int $amount): string
+    public static function requestedLessThanZeroItems(int $amount): string
     {
-        return "Requested pagination amount must be more than 0, got {$amount}.";
+        return "Requested pagination amount must be non-negative, got {$amount}.";
     }
 
     public static function requestedTooManyItems(int $maxCount, int $actualCount): string
@@ -100,6 +100,11 @@ class PaginationArgs
             : 'paginate';
 
         if ($builder instanceof ScoutBuilder) {
+            // TODO remove fallback when requiring Laravel 8.6.0+
+            if ($this->type->isSimple() && ! method_exists($builder, 'simplePaginate')) {
+                $methodName = 'paginate';
+            }
+
             return $builder->{$methodName}($this->first, 'page', $this->page);
         }
 

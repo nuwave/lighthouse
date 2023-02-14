@@ -15,8 +15,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property array<string, mixed> $extra
  *
  * Timestamps
- * @property \lluminate\Support\Carbon $created_at
- * @property \lluminate\Support\Carbon $updated_at
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property \Illuminate\Support\Carbon $updated_at
  *
  * Foreign keys
  * @property int|null $parent_id
@@ -25,7 +25,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read \Tests\Utils\Models\Location $parent
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Location> $children
  */
-class Location extends Model
+final class Location extends Model
 {
     /** @var array<string, string> */
     protected $casts = [

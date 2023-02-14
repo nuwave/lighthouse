@@ -4,9 +4,9 @@ namespace Nuwave\Lighthouse\ClientDirectives;
 
 use GraphQL\Executor\Values;
 use GraphQL\Type\Definition\Directive;
-use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Container\Container;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\GraphQL;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 
 /**
@@ -65,13 +65,14 @@ class ClientDirective
             return $this->definition;
         }
 
-        /** @var \Nuwave\Lighthouse\Schema\SchemaBuilder $schemaBuilder */
-        $schemaBuilder = app(SchemaBuilder::class);
+        $schemaBuilder = Container::getInstance()->make(SchemaBuilder::class);
+        assert($schemaBuilder instanceof SchemaBuilder);
+
         $schema = $schemaBuilder->schema();
 
         $definition = $schema->getDirective($this->name);
-        if (null === $definition) {
-            throw new DefinitionException("Missing a schema definition for the client directive $this->name");
+        if (! $definition instanceof Directive) {
+            throw new DefinitionException("Missing a schema definition for the client directive {$this->name}");
         }
 
         return $this->definition = $definition;

@@ -5,8 +5,6 @@ Just like in Laravel, you can define [Eloquent Relationships](https://laravel.co
 Suppose you have defined the following model:
 
 ```php
-<?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -111,6 +109,16 @@ type Role {
 }
 ```
 
+## Has Many Through
+
+Use the [@hasManyThrough](../api-reference/directives.md#hasmanythrough) directive to define a [has-many-through relationship](https://laravel.com/docs/eloquent-relationships#has-many-through).
+
+```graphql
+type Project {
+  deployments: [Deployment!]! @hasManyThrough
+}
+```
+
 ## Renaming relations
 
 When you define a relation, Lighthouse assumes that the field and the relationship
@@ -126,8 +134,6 @@ type Post {
 This would work for the following model:
 
 ```php
-<?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
