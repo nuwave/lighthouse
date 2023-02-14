@@ -143,7 +143,7 @@ GRAPHQL
         $enumType = new LaravelEnumType(AOrB::class);
 
         $aWithoutKey = AOrB::A();
-        $aWithoutKey->key = null;
+        $aWithoutKey->key = '';
 
         $this->expectExceptionObject(LaravelEnumType::enumMustHaveKey($aWithoutKey));
         $enumType->serialize($aWithoutKey);
