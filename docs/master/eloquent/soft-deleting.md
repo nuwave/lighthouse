@@ -50,7 +50,7 @@ you can restore your model using the [@restore](../api-reference/directives.md#r
 
 ```graphql
 type Mutation {
-  restoreFlight(id: ID!): Flight @restore
+  restoreFlight(id: ID! @whereKey): Flight @restore
 }
 ```
 
@@ -74,7 +74,7 @@ Your model must use the `Illuminate\Database\Eloquent\SoftDeletes` trait.
 
 ```graphql
 type Mutation {
-  forceDeleteFlight(id: ID!): Flight @forceDelete
+  forceDeleteFlight(id: ID! @whereKey): Flight @forceDelete
 }
 ```
 

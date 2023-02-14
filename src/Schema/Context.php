@@ -11,17 +11,13 @@ class Context implements GraphQLContext
 {
     /**
      * An instance of the incoming HTTP request.
-     *
-     * @var \Illuminate\Http\Request
      */
-    public $request;
+    public Request $request;
 
     /**
      * An instance of the currently authenticated user.
-     *
-     * @var \Illuminate\Contracts\Auth\Authenticatable|null
      */
-    public $user;
+    public ?Authenticatable $user;
 
     public function __construct(Request $request)
     {
@@ -37,6 +33,11 @@ class Context implements GraphQLContext
     public function user(): ?Authenticatable
     {
         return $this->user;
+    }
+
+    public function setUser(?Authenticatable $user): void
+    {
+        $this->user = $user;
     }
 
     public function request(): Request

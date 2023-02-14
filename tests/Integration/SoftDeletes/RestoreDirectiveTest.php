@@ -2,7 +2,6 @@
 
 namespace Tests\Integration\SoftDeletes;
 
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\SoftDeletes\RestoreDirective;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
@@ -25,7 +24,7 @@ final class RestoreDirectiveTest extends DBTestCase
         }
 
         type Mutation {
-            restoreTask(id: ID!): Task @restore
+            restoreTask(id: ID! @whereKey): Task @restore
         }
         ';
 
@@ -63,7 +62,7 @@ final class RestoreDirectiveTest extends DBTestCase
         }
 
         type Mutation {
-            restoreTasks(id: [ID!]!): [Task!]! @restore
+            restoreTasks(id: [ID!]! @whereKey): [Task!]! @restore
         }
         ';
 
@@ -98,7 +97,7 @@ final class RestoreDirectiveTest extends DBTestCase
         }
 
         type Mutation {
-            restoreTasks(id: ID! @eq): Task!
+            restoreTasks(id: ID! @whereKey): Task!
                 @can(ability: "delete", query: true)
                 @restore
         }
@@ -121,52 +120,7 @@ final class RestoreDirectiveTest extends DBTestCase
         $this->assertCount(1, Task::withoutTrashed()->get());
     }
 
-    public function testRejectsDefinitionWithNullableArgument(): void
-    {
-        $this->expectException(DefinitionException::class);
-
-        $this->buildSchema(/** @lang GraphQL */ '
-        type Task {
-            id: ID!
-        }
-
-        type Query {
-            restoreTask(id: ID): Task @restore
-        }
-        ');
-    }
-
-    public function testRejectsDefinitionWithNoArgument(): void
-    {
-        $this->expectException(DefinitionException::class);
-
-        $this->buildSchema(/** @lang GraphQL */ '
-        type Task {
-            id: ID!
-        }
-
-        type Query {
-            restoreTask: Task @restore
-        }
-        ');
-    }
-
-    public function testRejectsDefinitionWithMultipleArguments(): void
-    {
-        $this->expectException(DefinitionException::class);
-
-        $this->buildSchema(/** @lang GraphQL */ '
-        type Task {
-            id: ID!
-        }
-
-        type Query {
-            restoreTask(foo: String, bar: Int): Task @restore
-        }
-        ');
-    }
-
-    public function testRejectsUsingDirectiveWithNoSoftDeleteModels(): void
+    public function testRejectsUsingDirectiveWithNonSoftDeleteModels(): void
     {
         $this->expectExceptionMessage(RestoreDirective::MODEL_NOT_USING_SOFT_DELETES);
 
@@ -176,7 +130,7 @@ final class RestoreDirectiveTest extends DBTestCase
         }
 
         type Query {
-            restoreUser(id: ID!): User @restore
+            restoreUser(id: ID! @whereKey): User @restore
         }
         ');
     }
