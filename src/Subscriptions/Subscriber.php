@@ -95,7 +95,7 @@ class Subscriber
         $this->args = $args;
         $this->variables = $resolveInfo->variableValues;
         $this->context = $context;
-        $this->socket_id = request()->header('x-socket-id');
+        $this->socket_id = request()->header('X-Socket-ID');
 
         $operation = $resolveInfo->operation;
         assert($operation instanceof OperationDefinitionNode, 'Must be here, since webonyx/graphql-php validated the subscription.');
