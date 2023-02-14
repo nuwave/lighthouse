@@ -26,8 +26,9 @@ class Subscriber
 
     /**
      * X-Socket-ID header passed on the subscription query.
+     * @var string|null|array<mixed>
      */
-    public ?string $socket_id;
+    public $socket_id;
 
     /**
      * The topic subscribed to.
