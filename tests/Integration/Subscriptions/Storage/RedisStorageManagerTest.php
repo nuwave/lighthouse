@@ -97,10 +97,26 @@ final class RedisStorageManagerTest extends TestCase
         $this->assertContainsOnlyInstancesOf(Subscriber::class, $createdSubscribers);
     }
 
+    public function testSocketIDStoredOnSubscribe(): void
+    {
+        /** @var RedisStorageManager $storage */
+        $storage = $this->app->make(RedisStorageManager::class);
+
+        $this->querySubscription('taskCreated', [
+            'X-Socket-ID' => '1234.1234',
+        ]);
+
+        $createdSubscriber = $storage->subscribersByTopic('TASK_CREATED')->first();
+
+        $this->assertSame('1234.1234', $createdSubscriber->socket_id);
+    }
+
     /**
+     * @param array<string, mixed> $headers
+     *
      * @return \Illuminate\Testing\TestResponse
      */
-    protected function querySubscription(string $topic = /** @lang GraphQL */ 'taskUpdated(id: 123)')
+    protected function querySubscription(string $topic = /** @lang GraphQL */ 'taskUpdated(id: 123)', array $headers = [])
     {
         return $this->graphQL(/** @lang GraphQL */ "
         subscription {
@@ -109,6 +125,6 @@ final class RedisStorageManagerTest extends TestCase
                 name
             }
         }
-        ");
+        ", [], [], $headers);
     }
 }
