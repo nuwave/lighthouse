@@ -73,5 +73,5 @@ If you are not using a global Axios instance, you will need to manually configur
 You may retrieve the socket ID using the `Echo.socketId()` method:
 
 ```js
-var socketId = Echo.socketId();
+const socketId = Echo.socketId();
 ```
