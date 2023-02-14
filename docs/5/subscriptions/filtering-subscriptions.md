@@ -52,7 +52,7 @@ namespace App\GraphQL\Subscriptions;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 
-class PostUpdatedSubscription extends GraphQLSubscription
+final class PostUpdatedSubscription extends GraphQLSubscription
 {
     /**
      * Filter which subscribers should receive the subscription.
