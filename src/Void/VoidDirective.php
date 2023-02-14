@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Void;
 
-use Closure;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
@@ -32,7 +31,7 @@ GRAPHQL;
         $fieldDefinition->type = Parser::typeReference(/** @lang GraphQL */ 'Unit!');
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
     {
         $fieldValue->resultHandler(static function (): string {
             return VoidServiceProvider::UNIT;
