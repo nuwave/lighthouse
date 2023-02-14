@@ -25,7 +25,7 @@ class Subscriber
     public $channel;
 
     /**
-     * X-SOCKET-ID header passed on the subscription query.
+     * X-Socket-ID header passed on the subscription query.
      */
     public ?string $socket_id;
 
