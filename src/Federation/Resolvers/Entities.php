@@ -16,8 +16,7 @@ class Entities
 {
     public function __construct(
         protected EntityResolverProvider $entityResolverProvider
-    ) {
-    }
+    ) {}
 
     /**
      * @param  array{representations: list<mixed>}  $args
