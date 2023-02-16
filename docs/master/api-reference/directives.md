@@ -3582,28 +3582,28 @@ Read more in the [validation docs](../security/validation.md#validator-classes).
 Use an input value as a [where filter](https://laravel.com/docs/queries#where-clauses).
 """
 directive @where(
-    """
-    Specify the operator to use within the WHERE condition.
-    """
-    operator: String = "="
+  """
+  Specify the operator to use within the WHERE condition.
+  """
+  operator: String = "="
 
-    """
-    Specify the database column to compare.
-    Only required if database column has a different name than the attribute in your schema.
-    """
-    key: String
+  """
+  Specify the database column to compare.
+  Only required if database column has a different name than the attribute in your schema.
+  """
+  key: String
 
-    """
-    Use Laravel's where clauses upon the query builder.
-    This only works for clauses with the signature (string $column, string $operator, mixed $value).
-    """
-    clause: String
+  """
+  Use Laravel's where clauses upon the query builder.
+  This only works for clauses with the signature (string $column, string $operator, mixed $value).
+  """
+  clause: String
 
-    """
-    Provide a value to compare against.
-    Exclusively required when this directive is used on a field.
-    """
-    value: WhereValue
+  """
+  Provide a value to compare against.
+  Exclusively required when this directive is used on a field.
+  """
+  value: WhereValue
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 
 """
