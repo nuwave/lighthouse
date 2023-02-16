@@ -964,8 +964,7 @@ directive @delete(
 ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-Use this on root mutation fields.
-It will return an instance of the Model so you can show its data one last time.
+Mutation fields using this directive will return an instance of the deleted Model (or Models).
 
 ```graphql
 type Mutation {
@@ -975,6 +974,7 @@ type Mutation {
 
 You can also delete multiple models at once, for example by a list of IDs or a filter.
 Be careful with the filters you offer to avoid accidental mass deletion.
+Lighthouse will validate that at least one argument is given.
 
 _In contrast to Laravel mass updates, this does trigger model events._
 

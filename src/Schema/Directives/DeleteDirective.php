@@ -57,7 +57,7 @@ GRAPHQL;
     }
 
     /**
-     * Delete on ore more related models.
+     * Delete one or more related models.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $parent
      * @param  mixed|array<mixed>  $idOrIds

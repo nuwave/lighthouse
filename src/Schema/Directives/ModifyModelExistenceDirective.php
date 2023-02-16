@@ -18,33 +18,11 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 abstract class ModifyModelExistenceDirective extends BaseDirective implements FieldResolver
 {
-    /**
-     * @var \Nuwave\Lighthouse\Support\Contracts\GlobalId
-     */
-    protected $globalId;
-
-    /**
-     * @var \Nuwave\Lighthouse\Execution\ErrorPool
-     */
-    protected $errorPool;
-
-    /**
-     * @var \Nuwave\Lighthouse\Execution\TransactionalMutations
-     */
-    protected $transactionalMutations;
-
-    public function __construct(GlobalId $globalId, ErrorPool $errorPool, TransactionalMutations $transactionalMutations)
-    {
-        $this->globalId = $globalId;
-        $this->errorPool = $errorPool;
-        $this->transactionalMutations = $transactionalMutations;
-    }
-
-    public static function couldNotModify(Model $model): Error
-    {
-        $modelClass = get_class($model);
-
-        return new Error("Could not modify model {$modelClass} with ID {$model->getKey()}.");
+    public function __construct(
+        protected GlobalId               $globalId,
+        protected ErrorPool              $errorPool,
+        protected TransactionalMutations $transactionalMutations
+    ) {
     }
 
     public function resolveField(FieldValue $fieldValue): FieldValue
@@ -52,6 +30,10 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
         $expectsList = $this->expectsList($fieldValue->getField()->type);
 
         $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($expectsList) {
+            if (count($args) === 0) {
+                throw self::atLeastOneArgument();
+            }
+
             $builder = $resolveInfo->enhanceBuilder(
                 $this->getModelClass()::query(),
                 $this->directiveArgValue('scopes', []),
@@ -81,6 +63,18 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
         });
 
         return $fieldValue;
+    }
+
+    public static function couldNotModify(Model $model): Error
+    {
+        $modelClass = get_class($model);
+
+        return new Error("Could not modify model {$modelClass} with ID {$model->getKey()}.");
+    }
+
+    public static function atLeastOneArgument(): Error
+    {
+        return new Error("Expected at least one argument, got none.");
     }
 
     private function expectsList(TypeNode $typeNode): bool
