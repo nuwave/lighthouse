@@ -19,8 +19,8 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 abstract class ModifyModelExistenceDirective extends BaseDirective implements FieldResolver
 {
     public function __construct(
-        protected GlobalId               $globalId,
-        protected ErrorPool              $errorPool,
+        protected GlobalId $globalId,
+        protected ErrorPool $errorPool,
         protected TransactionalMutations $transactionalMutations
     ) {
     }
@@ -30,7 +30,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
         $expectsList = $this->expectsList($fieldValue->getField()->type);
 
         $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($expectsList) {
-            if (count($args) === 0) {
+            if (0 === count($args)) {
                 throw self::atLeastOneArgument();
             }
 
@@ -74,7 +74,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
 
     public static function atLeastOneArgument(): Error
     {
-        return new Error("Expected at least one argument, got none.");
+        return new Error('Expected at least one argument, got none.');
     }
 
     private function expectsList(TypeNode $typeNode): bool
