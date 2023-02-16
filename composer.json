@@ -51,7 +51,7 @@
         "laravel/lumen-framework": "^8 || ^9 || ^10 || dev-master",
         "laravel/scout": "^8 || ^9",
         "mll-lab/graphql-php-scalars": "^6",
-        "mll-lab/php-cs-fixer-config": "^4.4.1",
+        "mll-lab/php-cs-fixer-config": "^5",
         "mockery/mockery": "^1.5",
         "nesbot/carbon": "^2.62.1",
         "nunomaduro/larastan": "^1 || ^2",
