@@ -22,6 +22,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Make pagination argument `first` non-nullable
 - Include the field `@complexity` is defined upon in its calculation, increasing it by 1
 - Move interface `Nuwave\Lighthouse\Support\Contracts\GlobalId` to `Nuwave\Lighthouse\GlobalId\GlobalId`
+- Use union type for `$id` argument in `NodeDirective`
 
 ### Fixed
 
