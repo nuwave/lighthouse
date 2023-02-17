@@ -14,7 +14,7 @@ namespace Nuwave\Lighthouse\GlobalId;
  * This can then be reversed to uniquely identify an entity in our
  * schema, just by looking at a single ID.
  */
-class DefaultGlobalId implements GlobalId
+class Base64GlobalId implements GlobalId
 {
     public function encode(string $type, $id): string
     {

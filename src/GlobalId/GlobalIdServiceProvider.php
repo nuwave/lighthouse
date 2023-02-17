@@ -19,7 +19,7 @@ class GlobalIdServiceProvider extends ServiceProvider
 
     public function register(): void
     {
-        $this->app->bind(GlobalIdContract::class, DefaultGlobalId::class);
+        $this->app->bind(GlobalIdContract::class, Base64GlobalId::class);
         $this->app->singleton(NodeRegistry::class);
     }
 
