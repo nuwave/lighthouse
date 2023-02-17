@@ -7,6 +7,7 @@ use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Scout\ScoutEnhancer;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
+use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Utils;
@@ -78,7 +79,7 @@ class ResolveInfo extends BaseResolveInfo
 
         return (new ScoutEnhancer($argumentSet, $builder))->wouldEnhanceBuilder()
             || self::wouldApplyArgBuilderDirectives($argumentSet, $builder, $directiveFilter)
-            || self::wouldApplyFieldBuilderDirectives($builder, $root, $args, $context, $resolveInfo)
+            || self::wouldApplyFieldBuilderDirectives($resolveInfo)
             || count($scopes) > 0;
     }
 
@@ -172,11 +173,8 @@ class ResolveInfo extends BaseResolveInfo
 
     /**
      * Would there be any FieldBuilderDirectives to apply to the builder?
-     *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @param  array<string, mixed>  $args
      */
-    protected static function wouldApplyFieldBuilderDirectives(object &$builder, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): bool
+    protected static function wouldApplyFieldBuilderDirectives(ResolveInfo $resolveInfo): bool
     {
         return self::fieldBuilderDirectives($resolveInfo)
             ->isNotEmpty();
@@ -187,6 +185,7 @@ class ResolveInfo extends BaseResolveInfo
      */
     protected static function fieldBuilderDirectives(ResolveInfo $resolveInfo): Collection
     {
+        // @phpstan-ignore-next-line filter is not understood
         return $resolveInfo->argumentSet
             ->directives
             ->filter(Utils::instanceofMatcher(FieldBuilderDirective::class));
