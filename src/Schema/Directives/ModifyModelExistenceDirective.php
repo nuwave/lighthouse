@@ -22,8 +22,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
         protected GlobalId $globalId,
         protected ErrorPool $errorPool,
         protected TransactionalMutations $transactionalMutations
-    ) {
-    }
+    ) {}
 
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
