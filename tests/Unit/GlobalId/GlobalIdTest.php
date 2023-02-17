@@ -2,14 +2,14 @@
 
 namespace Tests\Unit\GlobalId;
 
-use Nuwave\Lighthouse\GlobalId\GlobalId;
+use Nuwave\Lighthouse\GlobalId\DefaultGlobalId;
 use Nuwave\Lighthouse\GlobalId\GlobalIdException;
 use Tests\TestCase;
 
 final class GlobalIdTest extends TestCase
 {
     /**
-     * @var \Nuwave\Lighthouse\GlobalId\GlobalId
+     * @var \Nuwave\Lighthouse\GlobalId\DefaultGlobalId
      */
     protected $globalIdResolver;
 
@@ -17,7 +17,7 @@ final class GlobalIdTest extends TestCase
     {
         parent::setUp();
 
-        $this->globalIdResolver = new GlobalId();
+        $this->globalIdResolver = new DefaultGlobalId();
     }
 
     public function testHandleGlobalIds(): void

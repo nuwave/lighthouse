@@ -20,7 +20,7 @@ use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\Directives\ModelDirective;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
-use Nuwave\Lighthouse\Support\Contracts\GlobalId;
+use Nuwave\Lighthouse\GlobalId\GlobalId;
 use Nuwave\Lighthouse\Support\Utils;
 
 /**
@@ -64,7 +64,7 @@ class EntityResolverProvider
     protected $resolvers;
 
     /**
-     * @var \Nuwave\Lighthouse\Support\Contracts\GlobalId
+     * @var \Nuwave\Lighthouse\GlobalId\GlobalId
      */
     protected $globalId;
 

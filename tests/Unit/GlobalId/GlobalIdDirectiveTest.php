@@ -3,14 +3,14 @@
 namespace Tests\Unit\GlobalId;
 
 use Nuwave\Lighthouse\Schema\RootType;
-use Nuwave\Lighthouse\Support\Contracts\GlobalId;
+use Nuwave\Lighthouse\GlobalId\GlobalId;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
 
 final class GlobalIdDirectiveTest extends TestCase
 {
     /**
-     * @var \Nuwave\Lighthouse\Support\Contracts\GlobalId
+     * @var \Nuwave\Lighthouse\GlobalId\GlobalId
      */
     protected $globalId;
 

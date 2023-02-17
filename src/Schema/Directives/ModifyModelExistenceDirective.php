@@ -13,13 +13,13 @@ use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Execution\TransactionalMutations;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-use Nuwave\Lighthouse\Support\Contracts\GlobalId;
+use Nuwave\Lighthouse\GlobalId\GlobalId;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 abstract class ModifyModelExistenceDirective extends BaseDirective implements FieldResolver
 {
     /**
-     * @var \Nuwave\Lighthouse\Support\Contracts\GlobalId
+     * @var \Nuwave\Lighthouse\GlobalId\GlobalId
      */
     protected $globalId;
 

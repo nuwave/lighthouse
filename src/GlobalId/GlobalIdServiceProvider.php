@@ -11,7 +11,7 @@ use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\RootType;
-use Nuwave\Lighthouse\Support\Contracts\GlobalId as GlobalIdContract;
+use Nuwave\Lighthouse\GlobalId\GlobalId as GlobalIdContract;
 
 class GlobalIdServiceProvider extends ServiceProvider
 {
@@ -19,7 +19,7 @@ class GlobalIdServiceProvider extends ServiceProvider
 
     public function register(): void
     {
-        $this->app->bind(GlobalIdContract::class, GlobalId::class);
+        $this->app->bind(GlobalIdContract::class, DefaultGlobalId::class);
         $this->app->singleton(NodeRegistry::class);
     }
 
