@@ -58,6 +58,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove config option `lighthouse.unbox_bensampo_enum_enum_instances`
 - Remove `ArgumentSet::enhanceBuilder()`, use `ResolveInfo::enhanceBuilder()`
 - Remove the `globalId` argument from `@delete`, `@forceDelete` and `@restore` https://github.com/nuwave/lighthouse/pull/2289
+- Remove `MockResolver`
 
 ## v5.70.3
 
