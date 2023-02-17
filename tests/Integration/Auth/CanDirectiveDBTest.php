@@ -4,7 +4,6 @@ namespace Tests\Integration\Auth;
 
 use Nuwave\Lighthouse\Auth\CanDirective;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
-use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Company;
 use Tests\Utils\Models\Post;
@@ -577,10 +576,7 @@ final class CanDirectiveDBTest extends DBTestCase
             ],
             'errors' => [
                 [
-                    'message' => AppVersion::atLeast(6.0)
-                        ? 'This action is unauthorized.'
-                        // TODO remove with Laravel < 6 support
-                        : 'You are not authorized to access user',
+                    'message' => 'This action is unauthorized.',
                 ],
             ],
         ]);
