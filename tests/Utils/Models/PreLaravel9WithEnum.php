@@ -29,12 +29,4 @@ final class PreLaravel9WithEnum extends Model
     {
         return $builder->where('type', $aOrB);
     }
-
-    /**
-     * TODO remove in v6.
-     */
-    public function scopeByTypeInternal(EloquentBuilder $builder, string $aOrB): EloquentBuilder
-    {
-        return $builder->where('type', $aOrB);
-    }
 }
