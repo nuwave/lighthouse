@@ -27,6 +27,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Limit constructor argument `$paginationType` in `PaginationType` to literal constant values
 - Change visibility of `BaseDirective::directiveHasArgument` from `public` to `protected`
 - Replace `Illuminate\Database\DatabaseManager` with `Illuminate\Database\ConnectionResolverInterface` in `RelationDirective`
+- Replace `DirectiveLocator::beforeLast` with `Str::beforeLast`
 
 ### Fixed
 
