@@ -60,6 +60,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove the `globalId` argument from `@delete`, `@forceDelete` and `@restore` https://github.com/nuwave/lighthouse/pull/2289
 - Remove `MockResolver`
 - Remove deprecated `BatchLoader::forgetInstances()` in `GraphQL`
+- Remove method check for `Illuminate\Foundation\Exceptions\Handler::renderable`
 
 ## v5.70.3
 

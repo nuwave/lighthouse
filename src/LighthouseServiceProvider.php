@@ -141,11 +141,7 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->loadRoutesFrom(__DIR__ . '/Support/Http/routes.php');
 
         $exceptionHandler = $this->app->make(ExceptionHandlerContract::class);
-        if (
-            $exceptionHandler instanceof ExceptionHandler
-            // TODO remove when requiring a later Laravel version
-            && method_exists($exceptionHandler, 'renderable')
-        ) {
+        if ($exceptionHandler instanceof ExceptionHandler) {
             $exceptionHandler->renderable(
                 function (ClientAware $error) {
                     assert($error instanceof \Throwable);
