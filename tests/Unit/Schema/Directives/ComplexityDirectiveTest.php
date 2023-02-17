@@ -37,10 +37,6 @@ final class ComplexityDirectiveTest extends TestCase
 
     public function testMaintainsDefaultBehaviour(): void
     {
-        // TODO reenable in v6
-        self::markTestSkipped('not respecting the cost of a field itself right now');
-
-        // @phpstan-ignore-next-line unreachable
         $max = 1;
         $this->setMaxQueryComplexity($max);
 
@@ -82,9 +78,8 @@ final class ComplexityDirectiveTest extends TestCase
         }
         ';
 
-        // TODO add 1 for the field posts in v6
-        // + 2 for data & title * 10 first items
-        $expectedCount = 20;
+        // 1 + (2 for data & title * 10 first items)
+        $expectedCount = 21;
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -164,8 +159,8 @@ GRAPHQL;
 
     protected function setMaxQueryComplexity(int $max): void
     {
-        /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = $this->app->make(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
         $config->set('lighthouse.security.max_query_complexity', $max);
     }
 }

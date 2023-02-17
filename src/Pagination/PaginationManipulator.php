@@ -245,11 +245,10 @@ GRAPHQL
         }
         $description .= "\"\n";
 
-        // TODO always add ! in v6
-        $definition = 'first: Int'
-            . ($defaultCount
-                ? " =  {$defaultCount}"
-                : '!');
+        $definition = 'first: Int!';
+        if ($defaultCount) {
+            $definition .= " =  {$defaultCount}";
+        }
 
         return $description . $definition;
     }

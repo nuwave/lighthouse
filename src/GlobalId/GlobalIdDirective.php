@@ -8,14 +8,13 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgSanitizerDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
-use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 
 class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgSanitizerDirective, ArgDirective
 {
     public const NAME = 'globalId';
 
     /**
-     * @var \Nuwave\Lighthouse\Support\Contracts\GlobalId
+     * @var \Nuwave\Lighthouse\GlobalId\GlobalId
      */
     protected $globalId;
 

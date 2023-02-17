@@ -19,6 +19,9 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Use the strongest possible native types over PHPDocs
 - Require filter directives such as `@whereKey` in `@delete`, `@forceDelete` and `@restore` https://github.com/nuwave/lighthouse/pull/2289
 - Subscriptions can now be filtered via `$subscriber->socket_id` and `request()->header('X-Socket-ID')` https://github.com/nuwave/lighthouse/pull/2298
+- Make pagination argument `first` non-nullable
+- Include the field `@complexity` is defined upon in its calculation, increasing it by 1
+- Move interface `Nuwave\Lighthouse\Support\Contracts\GlobalId` to `Nuwave\Lighthouse\GlobalId\GlobalId`
 
 ### Fixed
 
