@@ -29,18 +29,14 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
         $expectsList = $this->expectsList($fieldValue->getField()->type);
 
         $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($expectsList) {
-            if (0 === count($args)) {
-                throw self::atLeastOneArgument();
+            $builder = $this->getModelClass()::query();
+            $scopes = $this->directiveArgValue('scopes', []);
+
+            if (! $resolveInfo->wouldEnhanceBuilder($builder, $scopes, $root, $args, $context, $resolveInfo)) {
+                throw self::wouldModifyAll();
             }
 
-            $builder = $resolveInfo->enhanceBuilder(
-                $this->getModelClass()::query(),
-                $this->directiveArgValue('scopes', []),
-                $root,
-                $args,
-                $context,
-                $resolveInfo
-            );
+            $builder = $resolveInfo->enhanceBuilder($builder, $scopes, $root, $args, $context, $resolveInfo);
             assert($builder instanceof EloquentBuilder);
 
             $modelOrModels = $this->enhanceBuilder($builder)->get();
@@ -71,9 +67,9 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
         return new Error("Could not modify model {$modelClass} with ID {$model->getKey()}.");
     }
 
-    public static function atLeastOneArgument(): Error
+    public static function wouldModifyAll(): Error
     {
-        return new Error('Expected at least one argument, got none.');
+        return new Error('Would modify all models, use an argument to filter.');
     }
 
     private function expectsList(TypeNode $typeNode): bool

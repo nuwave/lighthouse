@@ -61,7 +61,13 @@ class ScoutEnhancer
 
     public function canEnhanceBuilder(): bool
     {
-        return $this->hasSearchArguments() || $this->builder instanceof ScoutBuilder;
+        return $this->hasSearchArguments()
+            || $this->builder instanceof ScoutBuilder;
+    }
+
+    public function wouldEnhanceBuilder(): bool
+    {
+        return $this->hasSearchArguments();
     }
 
     public function enhanceBuilder(): ScoutBuilder
@@ -128,16 +134,20 @@ class ScoutEnhancer
         $searchArgument = $this->searchArguments[0];
 
         if (count($this->argumentsWithOnlyArgBuilders) > 0) {
-            throw new ScoutException('Found arg builder arguments that do not work with @search');
+            throw new ScoutException('Found arg builder arguments that do not work with @search.');
         }
 
         if (! $this->builder instanceof EloquentBuilder) {
-            throw new ScoutException('Can only get Model from ' . EloquentBuilder::class . ', got: ' . get_class($this->builder));
+            $eloquentBuilderClass = EloquentBuilder::class;
+            $thisBuilderClass = get_class($this->builder);
+            throw new ScoutException("Can only get Model from {$eloquentBuilderClass}, got: {$thisBuilderClass}.");
         }
         $model = $this->builder->getModel();
 
-        if (! Utils::classUsesTrait($model, Searchable::class)) {
-            throw new ScoutException('Model class ' . get_class($model) . ' does not implement trait ' . Searchable::class);
+        $searchableTraitClass = Searchable::class;
+        if (! Utils::classUsesTrait($model, $searchableTraitClass)) {
+            $modelClass = get_class($model);
+            throw new ScoutException("Model class {$modelClass} does not implement trait {$searchableTraitClass}.");
         }
 
         // @phpstan-ignore-next-line Can not use traits as types

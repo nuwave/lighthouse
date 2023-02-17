@@ -114,15 +114,7 @@ class FieldFactory
 
         $resolver = function ($root, array $args, GraphQLContext $context, BaseResolveInfo $resolveInfo) use ($resolverWithMiddleware) {
             $wrappedResolveInfo = new ResolveInfo(
-                $resolveInfo->fieldDefinition,
-                $resolveInfo->fieldNodes,
-                $resolveInfo->parentType,
-                $resolveInfo->path,
-                $resolveInfo->schema,
-                $resolveInfo->fragments,
-                $resolveInfo->rootValue,
-                $resolveInfo->operation,
-                $resolveInfo->variableValues,
+                $resolveInfo,
                 $this->argumentSetFactory->fromResolveInfo($args, $resolveInfo)
             );
 
