@@ -26,7 +26,6 @@ use Nuwave\Lighthouse\Events\ManipulateResult;
 use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Events\StartOperationOrOperations;
 use Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry;
-use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
 use Nuwave\Lighthouse\Execution\ErrorPool;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -361,9 +360,6 @@ class GraphQL
     {
         BatchLoaderRegistry::forgetInstances();
         $this->errorPool->clear();
-
-        // TODO remove in v6
-        BatchLoader::forgetInstances();
     }
 
     /**
