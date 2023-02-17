@@ -33,7 +33,7 @@ directive @eq(
 
   """
   Provide a value to compare against.
-  Only required when this directive is used on a field.
+  Exclusively required when this directive is used on a field.
   """
   value: EqValue
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
