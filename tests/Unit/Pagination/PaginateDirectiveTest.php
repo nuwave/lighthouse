@@ -311,15 +311,13 @@ GRAPHQL
             name: String
             usersPaginated: [User!]! @paginate
             usersConnection: [User!]! @paginate(type: CONNECTION)
-            usersRelay: [User!]! @paginate(type: "relay")
-            usersSimplePaginated: [User!]! @paginate(type: "simple")
+            usersSimplePaginated: [User!]! @paginate(type: SIMPLE)
         }
 
         type Query {
             usersPaginated: [User!]! @paginate
             usersConnection: [User!]! @paginate(type: CONNECTION)
-            usersRelay: [User!]! @paginate(type: "relay")
-            usersSimplePaginated: [User!]! @paginate(type: "simple")
+            usersSimplePaginated: [User!]! @paginate(type: SIMPLE)
         }
         ');
         $typeMap = $schema->getTypeMap();
