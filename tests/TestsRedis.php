@@ -19,8 +19,8 @@ trait TestsRedis
     {
         parent::getEnvironmentSetUp($app);
 
-        /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = $app->make(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
 
         $config->set('database.redis.default', [
             'url' => env('LIGHTHOUSE_TEST_REDIS_URL'),

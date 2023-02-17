@@ -92,8 +92,8 @@ GRAPHQL;
 
     protected function getEnvironmentSetUp($app): void
     {
-        /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = $app->make(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
 
         $config->set('lighthouse.namespaces', [
             'models' => [
