@@ -1269,7 +1269,7 @@ directive @eq(
 
   """
   Provide a value to compare against.
-  Only required when this directive is used on a field.
+  Exclusively required when this directive is used on a field.
   """
   value: EqValue
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
@@ -3598,7 +3598,18 @@ directive @where(
   This only works for clauses with the signature (string $column, string $operator, mixed $value).
   """
   clause: String
-) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+
+  """
+  Provide a value to compare against.
+  Exclusively required when this directive is used on a field.
+  """
+  value: WhereValue
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+
+"""
+Any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
+"""
+scalar WhereValue
 ```
 
 > This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
@@ -3617,6 +3628,14 @@ Or use the additional clauses that Laravel provides:
 ```graphql
 type Query {
   postsByYear(created_at: Int! @where(clause: "whereYear")): [Post!]! @all
+}
+```
+
+When used on a field, you must define `key` and `value`:
+
+```graphql
+type Query {
+  importantPosts: [Post!]! @all @where(key: "priority", operator: ">", value: 5)
 }
 ```
 
@@ -3738,7 +3757,7 @@ Add a where clause on the primary key to the Eloquent Model query.
 directive @whereKey(
   """
   Provide a value to compare against.
-  Only required when this directive is used on a field.
+  Exclusively required when this directive is used on a field.
   """
   value: WhereKeyValue
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION

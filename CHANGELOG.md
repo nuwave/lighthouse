@@ -33,6 +33,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Support Laravel 10 https://github.com/nuwave/lighthouse/pull/2287
 - Add `GraphQLContext:: setUser(?Authenticatable $user): void`
 - Add directive `@whereKey` to filter Models by their primary key https://github.com/nuwave/lighthouse/pull/2289
+- Allow directive `@where` on fields https://github.com/nuwave/lighthouse/pull/2306
 
 ### Removed
 
