@@ -23,17 +23,14 @@ class PaginationType
      */
     public function __construct(string $paginationType)
     {
-        // TODO remove lowercase and alternate options in v6
-        switch (strtolower($paginationType)) {
-            case 'default':
-            case 'paginator':
+        switch ($paginationType) {
+            case self::PAGINATOR:
                 $this->type = self::PAGINATOR;
                 break;
-            case 'simple':
+            case self::SIMPLE:
                 $this->type = self::SIMPLE;
                 break;
-            case 'connection':
-            case 'relay':
+            case self::CONNECTION:
                 $this->type = self::CONNECTION;
                 break;
             default:
