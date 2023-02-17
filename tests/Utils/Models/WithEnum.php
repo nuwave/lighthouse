@@ -18,7 +18,6 @@ use Tests\Utils\LaravelEnums\AOrB;
  * Scopes
  *
  * @method static \Illuminate\Database\Eloquent\Builder&static byType(AOrB $aOrB)
- * @method static \Illuminate\Database\Eloquent\Builder&static byTypeInternal(string $aOrB) TODO remove in v6
  */
 final class WithEnum extends Model
 {
