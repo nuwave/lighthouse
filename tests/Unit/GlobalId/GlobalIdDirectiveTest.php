@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\GlobalId;
 
-use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\GlobalId\GlobalId;
+use Nuwave\Lighthouse\Schema\RootType;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
 

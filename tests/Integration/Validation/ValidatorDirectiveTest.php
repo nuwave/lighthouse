@@ -2,8 +2,8 @@
 
 namespace Tests\Integration\Validation;
 
-use Nuwave\Lighthouse\Support\AppVersion;
 use Nuwave\Lighthouse\GlobalId\GlobalId;
+use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\TestCase;
 use Tests\Utils\Validators\EmailCustomMessageValidator;
 

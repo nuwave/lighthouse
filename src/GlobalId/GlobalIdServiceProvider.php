@@ -8,10 +8,10 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
+use Nuwave\Lighthouse\GlobalId\GlobalId as GlobalIdContract;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\RootType;
-use Nuwave\Lighthouse\GlobalId\GlobalId as GlobalIdContract;
 
 class GlobalIdServiceProvider extends ServiceProvider
 {

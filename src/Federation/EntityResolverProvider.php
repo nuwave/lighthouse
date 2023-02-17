@@ -15,12 +15,12 @@ use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Exceptions\FederationException;
 use Nuwave\Lighthouse\Federation\Directives\KeyDirective;
+use Nuwave\Lighthouse\GlobalId\GlobalId;
 use Nuwave\Lighthouse\GlobalId\GlobalIdDirective;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\Directives\ModelDirective;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
-use Nuwave\Lighthouse\GlobalId\GlobalId;
 use Nuwave\Lighthouse\Support\Utils;
 
 /**
