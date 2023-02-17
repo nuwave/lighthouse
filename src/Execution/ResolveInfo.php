@@ -69,7 +69,6 @@ class ResolveInfo extends BaseResolveInfo
      * Would the builder be enhanced in any way?
      *
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation|\Laravel\Scout\Builder  $builder
-     *
      * @param  array<string>  $scopes
      * @param  array<string, mixed>  $args
      */
