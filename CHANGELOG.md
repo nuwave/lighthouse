@@ -25,6 +25,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Use union type for `$id` argument in `NodeDirective`
 - Replace `Arr::first(array_keys())` with `array_key_first()` in `OrderByDirective`
 - Limit constructor argument `$paginationType` in `PaginationType` to literal constant values
+- Change visibility of `BaseDirective::directiveHasArgument` from `public` to `protected`
 
 ### Fixed
 
