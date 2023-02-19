@@ -39,7 +39,7 @@ class PaginatedModelsLoader implements ModelsLoader
 
     public function load(EloquentCollection $parents): void
     {
-        CountModelsLoader::loadCount($parents, [$this->relation => $this->decorateBuilder]);
+        $parents->loadCount([$this->relation => $this->decorateBuilder]);
 
         $relatedModels = $this->loadRelatedModels($parents);
 
