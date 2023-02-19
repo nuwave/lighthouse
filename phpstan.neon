@@ -17,6 +17,8 @@ parameters:
   - src
   - tests
   checkOctaneCompatibility: true
+  # TODO reenable once we require Laravel 9+
+  checkGenericClassInNonGenericObjectType: false
   excludePaths:
   # Indirectly refers to \App\User (maybe through larastan?)
   - tests/Utils/Models/User.php

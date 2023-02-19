@@ -111,7 +111,8 @@ final class MethodDirectiveTest extends TestCase
     protected function mockFoo(): MockObject
     {
         $foo = $this->getMockBuilder(\stdClass::class)
-            ->addMethods(['__invoke']);
+            ->addMethods(['__invoke'])
+            ->getMock();
 
         $this->mockResolver($foo);
 

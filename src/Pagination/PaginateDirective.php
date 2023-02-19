@@ -211,6 +211,21 @@ GRAPHQL;
 
     public function complexityResolver(FieldValue $fieldValue): callable
     {
-        // TODO: Implement complexityResolver() method.
+        return static function (int $childrenComplexity, array $args): int {
+            /**
+             * @see PaginationManipulator::countArgument().
+             */
+            $first = $args['first'] ?? null;
+
+            $expectedNumberOfChildren = is_int($first)
+                ? $first
+                : 1;
+
+            return
+                // Default complexity for this field itself
+                1
+                // Scale children complexity by the expected number of results
+                + $childrenComplexity * $expectedNumberOfChildren;
+        };
     }
 }
