@@ -85,7 +85,6 @@ GRAPHQL;
             // Deleting when `false` is given seems wrong.
             if ($idOrIds) {
                 if ($relationIsBelongsToLike) {
-                    /** @var \Illuminate\Database\Eloquent\Relations\BelongsTo $relation TODO remove with newer PHPStan that comes with Laravel 9 */
                     $relation->dissociate();
                     $relation->getParent()->save();
                 }

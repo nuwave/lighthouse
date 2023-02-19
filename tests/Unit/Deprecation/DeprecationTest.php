@@ -3,6 +3,7 @@
 namespace Tests\Unit\Deprecation;
 
 use GraphQL\Type\Definition\Directive;
+use GraphQL\Validator\DocumentValidator;
 use Nuwave\Lighthouse\Deprecation\DeprecatedUsage;
 use Nuwave\Lighthouse\Deprecation\DetectDeprecatedUsage;
 use Tests\TestCase;
@@ -13,7 +14,7 @@ final class DeprecationTest extends TestCase
     /**
      * @var array<string, DeprecatedUsage>
      */
-    protected $deprecations;
+    protected array $deprecations;
 
     public function setUp(): void
     {
@@ -22,8 +23,13 @@ final class DeprecationTest extends TestCase
         DetectDeprecatedUsage::handle(function (array $deprecations): void {
             $this->deprecations = $deprecations;
         });
+    }
 
-        // TODO remove rule in tearDown once we have graphql-php 15
+    protected function tearDown(): void
+    {
+        DocumentValidator::removeRule(new DetectDeprecatedUsage(fn () => null));
+
+        parent::tearDown();
     }
 
     public function testDetectsDeprecatedFields(): void

@@ -44,7 +44,8 @@
     },
     "require-dev": {
         "algolia/algoliasearch-client-php": "^3 || ^4",
-        "bensampo/laravel-enum": "^3 || ^4 || ^5 || ^6",
+        "bensampo/laravel-enum": "^5 || ^6",
+        "dms/phpunit-arraysubset-asserts": "^0.4",
         "ergebnis/composer-normalize": "^2.2.2",
         "laravel/framework": "^8.59 || ^9 || ^10",
         "laravel/legacy-factories": "^1.1.1",
@@ -54,7 +55,7 @@
         "mll-lab/php-cs-fixer-config": "^5",
         "mockery/mockery": "^1.5",
         "nesbot/carbon": "^2.62.1",
-        "nunomaduro/larastan": "^1 || ^2",
+        "nunomaduro/larastan": "^2",
         "orchestra/testbench": "^6.25 || ^7.7 || ^8.8",
         "phpbench/phpbench": "^1.2.6",
         "phpstan/phpstan": "^1.8.4",

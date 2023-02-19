@@ -13,11 +13,12 @@ use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\ComplexityResolverDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class PaginateDirective extends BaseDirective implements FieldResolver, FieldManipulator
+class PaginateDirective extends BaseDirective implements FieldResolver, FieldManipulator, ComplexityResolverDirective
 {
     public static function definition(): string
     {
@@ -206,5 +207,10 @@ GRAPHQL;
     protected function paginateMaxCount(): ?int
     {
         return $this->directiveArgValue('maxCount', config('lighthouse.pagination.max_count'));
+    }
+
+    public function complexityResolver(FieldValue $fieldValue): callable
+    {
+        // TODO: Implement complexityResolver() method.
     }
 }

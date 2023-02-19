@@ -79,8 +79,6 @@ class RelationBatchLoader
         );
 
         foreach ($parentsGroupedByClass as $parentsOfSameClass) {
-            // TODO remove when we update to Laravel 9 which has correct stubs
-            // @phpstan-ignore-next-line Parameter #1 $parents of method Nuwave\Lighthouse\Execution\ModelsLoader\ModelsLoader::load() expects Illuminate\Database\Eloquent\Collection, Illuminate\Support\Collection<(int|string), mixed> given.
             $this->modelsLoader->load($parentsOfSameClass);
         }
 

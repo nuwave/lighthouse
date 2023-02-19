@@ -17,10 +17,7 @@ use Nuwave\Lighthouse\Schema\Directives\ModelDirective;
 
 class PaginationManipulator
 {
-    /**
-     * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST
-     */
-    protected $documentAST;
+    protected DocumentAST $documentAST;
 
     /**
      * The class name of the model that is returned from the field.
@@ -31,7 +28,7 @@ class PaginationManipulator
      *
      * @var class-string<\Illuminate\Database\Eloquent\Model>|null
      */
-    protected $modelClass;
+    protected ?string $modelClass;
 
     public function __construct(DocumentAST $documentAST)
     {
