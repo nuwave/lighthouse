@@ -85,18 +85,6 @@ class SubscriptionRegistry
     }
 
     /**
-     * Get subscription keys.
-     *
-     * @return array<string>
-     *
-     * @deprecated use the `GraphQL\Type\Schema::subscriptionType()->getFieldNames()` method directly
-     */
-    public function keys(): array
-    {
-        return $this->subscriptionType()->getFieldNames();
-    }
-
-    /**
      * Get instance of subscription.
      */
     public function subscription(string $key): GraphQLSubscription

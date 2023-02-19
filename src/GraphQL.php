@@ -404,40 +404,4 @@ class GraphQL
             ? (int) $this->configRepository->get('lighthouse.debug')
             : DebugFlag::NONE;
     }
-
-    /**
-     * This method will be removed in the next major update. Please use executeParsedQuery or parseAndExecuteQuery.
-     *
-     * @param string|\GraphQL\Language\AST\DocumentNode $query
-     * @param array<string, mixed>|null $variables
-     * @param mixed|null $rootValue
-     *
-     * @see executeParsedQuery
-     * @see parseAndExecuteQuery
-     * @deprecated
-     */
-    public function executeQuery(
-        $query,
-        GraphQLContext $context,
-        ?array $variables = [],
-        $rootValue = null,
-        ?string $operationName = null
-    ): ExecutionResult {
-        if (is_string($query)) {
-            return $this->parseAndExecuteQuery($query, $context, $variables, $rootValue, $operationName);
-        }
-
-        return $this->executeParsedQuery($query, $context, $variables, $rootValue, $operationName);
-    }
-
-    /**
-     * Ensure an executable GraphQL schema is present.
-     *
-     * @deprecated
-     * @see \Nuwave\Lighthouse\Schema\SchemaBuilder::schema()
-     */
-    public function prepSchema(): Schema
-    {
-        return $this->schemaBuilder->schema();
-    }
 }
