@@ -111,13 +111,8 @@ GRAPHQL
         );
     }
 
-    /**
-     * @dataProvider nonNullPaginationResults
-     */
-    public function testManipulatesPaginator(bool $nonNullPaginationResults): void
+    public function testManipulatesPaginator(): void
     {
-        config(['lighthouse.non_null_pagination_results' => $nonNullPaginationResults]);
-
         $schema = $this->buildSchema(/** @lang GraphQL */ '
         type User {
             id: ID!
@@ -129,9 +124,6 @@ GRAPHQL
         ');
         $schemaString = SchemaPrinter::doPrint($schema);
 
-        $nonNull = $nonNullPaginationResults
-            ? '!'
-            : '';
         $this->assertStringContainsString(/** @lang GraphQL */ <<<GRAPHQL
 type Query {
   users(
@@ -140,7 +132,7 @@ type Query {
 
     "The offset from which items are returned."
     page: Int
-  ): UserPaginator{$nonNull}
+  ): UserPaginator!
 }
 GRAPHQL
             ,
@@ -162,13 +154,8 @@ GRAPHQL
         );
     }
 
-    /**
-     * @dataProvider nonNullPaginationResults
-     */
-    public function testManipulatesSimplePaginator(bool $nonNullPaginationResults): void
+    public function testManipulatesSimplePaginator(): void
     {
-        config(['lighthouse.non_null_pagination_results' => $nonNullPaginationResults]);
-
         $schema = $this->buildSchema(/** @lang GraphQL */ '
         type User {
             id: ID!
@@ -180,9 +167,6 @@ GRAPHQL
         ');
         $schemaString = SchemaPrinter::doPrint($schema);
 
-        $nonNull = $nonNullPaginationResults
-            ? '!'
-            : '';
         $this->assertStringContainsString(/** @lang GraphQL */ <<<GRAPHQL
 type Query {
   users(
@@ -191,7 +175,7 @@ type Query {
 
     "The offset from which items are returned."
     page: Int
-  ): UserSimplePaginator{$nonNull}
+  ): UserSimplePaginator!
 }
 GRAPHQL
             ,
@@ -213,13 +197,8 @@ GRAPHQL
         );
     }
 
-    /**
-     * @dataProvider nonNullPaginationResults
-     */
-    public function testManipulatesConnection(bool $nonNullPaginationResults): void
+    public function testManipulatesConnection(): void
     {
-        config(['lighthouse.non_null_pagination_results' => $nonNullPaginationResults]);
-
         $schema = $this->buildSchema(/** @lang GraphQL */ '
         type User {
             id: ID!
@@ -231,9 +210,6 @@ GRAPHQL
         ');
         $schemaString = SchemaPrinter::doPrint($schema);
 
-        $nonNull = $nonNullPaginationResults
-            ? '!'
-            : '';
         $this->assertStringContainsString(/** @lang GraphQL */ <<<GRAPHQL
 type Query {
   users(
@@ -242,7 +218,7 @@ type Query {
 
     "A cursor after which elements are returned."
     after: String
-  ): UserConnection{$nonNull}
+  ): UserConnection!
 }
 GRAPHQL
             ,
@@ -591,15 +567,6 @@ GRAPHQL
             }
             ')
             ->assertGraphQLErrorMessage(PaginationArgs::requestedLessThanZeroItems(-1));
-    }
-
-    /**
-     * @return iterable<array{bool}>
-     */
-    public static function nonNullPaginationResults(): iterable
-    {
-        yield [true];
-        yield [false];
     }
 
     public function testDoesNotRequireModelWhenUsingBuilder(): void

@@ -19,27 +19,6 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 class FieldValue
 {
     /**
-     * An instance of the type that this field returns.
-     *
-     * @var \GraphQL\Type\Definition\Type|null
-     */
-    protected $returnType;
-
-    /**
-     * The underlying AST definition of the Field.
-     *
-     * @var \GraphQL\Language\AST\FieldDefinitionNode
-     */
-    protected $field;
-
-    /**
-     * The parent type of the field.
-     *
-     * @var \Nuwave\Lighthouse\Schema\Values\TypeValue
-     */
-    protected $parent;
-
-    /**
      * The actual field resolver.
      *
      * Lazily initialized through setResolver().
@@ -48,19 +27,17 @@ class FieldValue
      */
     protected $resolver;
 
-    /**
-     * A closure that determines the complexity of executing the field.
-     *
-     * @deprecated will be removed in v6
-     *
-     * @var \Closure|null
-     */
-    protected $complexity;
+    public function __construct(
+        /**
+         * The parent type of the field.
+         */
+        protected TypeValue $parent,
 
-    public function __construct(TypeValue $parent, FieldDefinitionNode $field)
-    {
-        $this->parent = $parent;
-        $this->field = $field;
+        /**
+         * The underlying AST definition of the Field.
+         */
+        protected FieldDefinitionNode $field,
+    ) {
     }
 
     /**
@@ -149,86 +126,5 @@ class FieldValue
 
             return $handle($resolved, $args, $context, $resolveInfo);
         };
-    }
-
-    /**
-     * Return the namespaces configured for the parent type.
-     *
-     * @deprecated will be removed in v6
-     *
-     * @return array<string>
-     */
-    public function defaultNamespacesForParent(): array
-    {
-        return RootType::defaultNamespaces($this->getParentName());
-    }
-
-    /**
-     * @deprecated will be removed in v6
-     */
-    public function getDescription(): ?StringValueNode
-    {
-        return $this->field->description;
-    }
-
-    /**
-     * Is the parent of this field one of the root types?
-     *
-     * @deprecated will be removed in v6
-     */
-    public function parentIsRootType(): bool
-    {
-        return RootType::isRootType($this->getParentName());
-    }
-
-    /**
-     * Use the default resolver.
-     *
-     * @deprecated will be removed in v6
-     */
-    public function useDefaultResolver(): self
-    {
-        $this->resolver = FieldFactory::defaultResolver($this);
-
-        return $this;
-    }
-
-    /**
-     * Get current complexity.
-     *
-     * @deprecated will be removed in v6
-     */
-    public function getComplexity(): ?\Closure
-    {
-        return $this->complexity;
-    }
-
-    /**
-     * Define a closure that is used to determine the complexity of the field.
-     *
-     * @deprecated will be removed in v6
-     */
-    public function setComplexity(\Closure $complexity): self
-    {
-        $this->complexity = $complexity;
-
-        return $this;
-    }
-
-    /**
-     * Get an instance of the return type of the field.
-     *
-     * @deprecated will be removed in v6
-     */
-    public function getReturnType(): Type
-    {
-        if (null === $this->returnType) {
-            $typeNodeConverter = Container::getInstance()->make(ExecutableTypeNodeConverter::class);
-            assert($typeNodeConverter instanceof ExecutableTypeNodeConverter);
-
-            $this->returnType = $typeNodeConverter->convert($this->field->type);
-        }
-
-        return $this->returnType;
     }
 }

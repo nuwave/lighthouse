@@ -29,6 +29,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Change visibility of `BaseDirective::directiveHasArgument` from `public` to `protected`
 - Replace `Illuminate\Database\DatabaseManager` with `Illuminate\Database\ConnectionResolverInterface` in `RelationDirective`
 - Replace `DirectiveLocator::beforeLast` with `Str::beforeLast`
+- Default `subscriptions.exclude_empty` to `true`
 
 ### Fixed
 
@@ -62,6 +63,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove `MockResolver`
 - Remove deprecated `BatchLoader::forgetInstances()` in `GraphQL`
 - Remove method check for `Illuminate\Foundation\Exceptions\Handler::renderable`
+- Remove setting `non_null_pagination_results` and always behave as if it were `true`
 
 ## v5.70.3
 
