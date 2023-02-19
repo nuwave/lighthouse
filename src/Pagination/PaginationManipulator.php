@@ -38,9 +38,9 @@ class PaginationManipulator
     /**
      * Set the model class to use for code generation.
      *
-     * @param  class-string<\Illuminate\Database\Eloquent\Model>  $modelClass
+     * @param  class-string<\Illuminate\Database\Eloquent\Model>|null  $modelClass
      */
-    public function setModelClass(string $modelClass): self
+    public function setModelClass(?string $modelClass): self
     {
         $this->modelClass = $modelClass;
 
@@ -148,7 +148,7 @@ GRAPHQL
         }
 
         if (
-            $this->modelClass
+            isset($this->modelClass)
             && ! ASTHelper::hasDirective($objectType, ModelDirective::NAME)
         ) {
             $objectType->directives[] = Parser::constDirective(/** @lang GraphQL */ '@model(class: "' . addslashes($this->modelClass) . '")');
