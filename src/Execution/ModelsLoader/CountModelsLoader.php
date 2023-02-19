@@ -11,7 +11,7 @@ class CountModelsLoader implements ModelsLoader
     public function __construct(
         protected string $relation,
         protected \Closure $decorateBuilder,
-    ){}
+    ) {}
 
     public function load(EloquentCollection $parents): void
     {
