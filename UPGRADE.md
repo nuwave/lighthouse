@@ -112,7 +112,7 @@ This prevents clients from passing an invalid explicit `null`.
 
 ### Complexity calculation
 
-Previous to `v6`, overwriting the default query complexity calculation on paginated fields
+Prior to `v6`, overwriting the default query complexity calculation on paginated fields
 required the usage of `@complexity` without any arguments. Now, `@paginate` performs that
 calculation by default - with the additional change that it also includes the cost of the
 field itself, adding a value of `1` to represent the complexity more accurately.
@@ -121,7 +121,7 @@ Using `@complexity` without the `resolver` argument is now no longer supported.
 
 ### Passing of `BenSampo\Enum\Enum` instances to `ArgBuilderDirective::handleBuilder()`
 
-Previous to `v6`, Lighthouse would extract the internal `$value` from instances of
+Prior to `v6`, Lighthouse would extract the internal `$value` from instances of
 `BenSampo\Enum\Enum` before passing it to `ArgBuilderDirective::handleBuilder()`
 if the setting `unbox_bensampo_enum_enum_instances` was `true`.
 
