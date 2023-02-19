@@ -41,9 +41,8 @@ class PaginatedModelsLoader implements ModelsLoader
     {
         $parents->loadCount([$this->relation => $this->decorateBuilder]);
 
-        $relatedModels = $this->loadRelatedModels($parents);
-
         $relation = $this->relationInstance($parents);
+        $relatedModels = $this->loadRelatedModels($parents);
 
         $this->hydratePivotRelation($relation, $relatedModels);
         $this->loadDefaultWith($relatedModels);
