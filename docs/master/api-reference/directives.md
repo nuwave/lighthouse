@@ -753,7 +753,9 @@ You can provide your own function to calculate complexity.
 ```graphql
 type Query {
   posts(includeFullText: Boolean): [Post!]!
-    @complexity(resolver: "App\\GraphQL\\Security\\ComplexityAnalyzer@userPosts")
+    @complexity(
+      resolver: "App\\GraphQL\\Security\\ComplexityAnalyzer@userPosts"
+    )
 }
 ```
 
