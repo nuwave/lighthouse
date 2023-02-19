@@ -4,7 +4,6 @@ namespace Tests\Unit\Schema\Directives;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use Tests\TestCase;
-use Tests\Unit\Schema\Directives\Fixtures\Foo;
 
 final class MethodDirectiveTest extends TestCase
 {
