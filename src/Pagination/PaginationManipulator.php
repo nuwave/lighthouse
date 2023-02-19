@@ -3,10 +3,8 @@
 namespace Nuwave\Lighthouse\Pagination;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use GraphQL\Language\AST\TypeNode;
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;

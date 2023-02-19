@@ -4,13 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Values;
 
 use GraphQL\Deferred;
 use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\StringValueNode;
-use GraphQL\Type\Definition\Type;
-use Illuminate\Container\Container;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
-use Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter;
-use Nuwave\Lighthouse\Schema\Factories\FieldFactory;
-use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 /**
@@ -37,8 +31,7 @@ class FieldValue
          * The underlying AST definition of the Field.
          */
         protected FieldDefinitionNode $field,
-    ) {
-    }
+    ) {}
 
     /**
      * Get the underlying AST definition for the field.
@@ -89,7 +82,7 @@ class FieldValue
      * Register a function that will receive the final result and resolver arguments.
      *
      * For example, the following handler tries to double the result.
-     * This is somewhat non-sensical, but shows the range of what you can do.
+     * This is somewhat nonsensical, but shows the range of what you can do.
      *
      * function ($result, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
      *     if (is_numeric($result)) {
