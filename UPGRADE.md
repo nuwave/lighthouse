@@ -110,15 +110,14 @@ or non-nullable with a default value.
 Now, it will always be marked as non-nullable, regardless if it has a default or not.
 This prevents clients from passing an invalid explicit `null`.
 
-### Include field cost in `@complexity` calculation
+### Complexity calculation
 
-Previous to `v6`, the default query complexity calculation of fields with `@complexity`
-did not include the cost of the field itself - other than the default without the directive.
-In the future, a value of `1` will be added to represent the complexity more accurately.
+Previous to `v6`, overwriting the default query complexity calculation on paginated fields
+required the usage of `@complexity` without any arguments. Now, `@paginate` performs that
+calculation by default - with the additional change that it also includes the cost of the
+field itself, adding a value of `1` to represent the complexity more accurately.
 
-This change will increase the complexity of queries on fields using `@complexity` without
-a custom complexity resolver. If you configured `security.max_query_complexity`, complex
-queries that previously passed might now fail.
+Using `@complexity` without the `resolver` argument is now no longer supported.
 
 ### Passing of `BenSampo\Enum\Enum` instances to `ArgBuilderDirective::handleBuilder()`
 

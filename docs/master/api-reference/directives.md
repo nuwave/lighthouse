@@ -743,24 +743,17 @@ directive @complexity(
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
   If you pass only a class name, the method name defaults to `__invoke`.
   """
-  resolver: String
+  resolver: String!
 ) on FIELD_DEFINITION
 ```
 
+You can provide your own function to calculate complexity.
 [Read More about query complexity analysis](https://webonyx.github.io/graphql-php/security/#query-complexity-analysis)
 
 ```graphql
 type Query {
-  posts: [Post!]! @complexity
-}
-```
-
-You can provide your own function to calculate complexity.
-
-```graphql
-type Query {
-  posts: [Post!]!
-    @complexity(resolver: "App\\Security\\ComplexityAnalyzer@userPosts")
+  posts(includeFullText: Boolean): [Post!]!
+    @complexity(resolver: "App\\GraphQL\\Security\\ComplexityAnalyzer@userPosts")
 }
 ```
 
@@ -768,17 +761,17 @@ A custom complexity function may look like the following,
 refer to the [complexity function signature](resolvers.md#complexity-function-signature).
 
 ```php
-namespace App\Security;
+namespace App\GraphQL\Security;
 
-class ComplexityAnalyzer {
-
+final class ComplexityAnalyzer
+{
     public function userPosts(int $childrenComplexity, array $args): int
     {
-        $postComplexity = $args['includeFullText'])
+        $postComplexity = ($args['includeFullText'] ?? false)
             ? 3
             : 2;
 
-        return $childrenComplexity * $postComplexity;
+        return 1 + ($childrenComplexity * $postComplexity);
     }
 ```
 

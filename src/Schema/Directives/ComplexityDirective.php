@@ -22,25 +22,24 @@ directive @complexity(
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
   If you pass only a class name, the method name defaults to `__invoke`.
   """
-  resolver: String
+  resolver: String!
 ) on FIELD_DEFINITION
 GRAPHQL;
     }
 
     public function complexityResolver(FieldValue $fieldValue): callable
     {
-        if ($this->directiveHasArgument('resolver')) {
-            [$className, $methodName] = $this->getMethodArgumentParts('resolver');
+        $resolver = $this->directiveArgValue('resolver');
+        assert(is_string($resolver));
 
-            $namespacedClassName = $this->namespaceClassName(
-                $className,
-                RootType::defaultNamespaces($fieldValue->getParentName())
-            );
+        [$className, $methodName] = $this->getMethodArgumentParts('resolver');
 
-            return Utils::constructResolver($namespacedClassName, $methodName);
-        }
+        $namespacedClassName = $this->namespaceClassName(
+            $className,
+            RootType::defaultNamespaces($fieldValue->getParentName())
+        );
 
-        return [static::class, 'defaultComplexityResolver'];
+        return Utils::constructResolver($namespacedClassName, $methodName);
     }
 
     /**

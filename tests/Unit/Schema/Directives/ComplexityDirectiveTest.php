@@ -35,32 +35,6 @@ final class ComplexityDirectiveTest extends TestCase
         ')->assertGraphQLErrorMessage(QueryComplexity::maxQueryComplexityErrorMessage($max, 2));
     }
 
-    public function testMaintainsDefaultBehaviour(): void
-    {
-        $max = 1;
-        $this->setMaxQueryComplexity($max);
-
-        $this->schema = /** @lang GraphQL */ '
-        type Query {
-            posts: [Post!]!
-                @complexity
-                @all
-        }
-
-        type Post {
-            title: String
-        }
-        ';
-
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            posts {
-                title
-            }
-        }
-        ')->assertGraphQLErrorMessage(QueryComplexity::maxQueryComplexityErrorMessage($max, 2));
-    }
-
     public function testKnowsPagination(): void
     {
         $max = 1;
@@ -68,9 +42,7 @@ final class ComplexityDirectiveTest extends TestCase
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            posts: [Post!]!
-                @complexity
-                @paginate
+            posts: [Post!]! @paginate
         }
 
         type Post {
