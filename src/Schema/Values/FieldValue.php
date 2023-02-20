@@ -4,13 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Values;
 
 use GraphQL\Deferred;
 use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\StringValueNode;
-use GraphQL\Type\Definition\Type;
-use Illuminate\Container\Container;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
-use Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter;
-use Nuwave\Lighthouse\Schema\Factories\FieldFactory;
-use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 /**
@@ -18,27 +12,6 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
  */
 class FieldValue
 {
-    /**
-     * An instance of the type that this field returns.
-     *
-     * @var \GraphQL\Type\Definition\Type|null
-     */
-    protected $returnType;
-
-    /**
-     * The underlying AST definition of the Field.
-     *
-     * @var \GraphQL\Language\AST\FieldDefinitionNode
-     */
-    protected $field;
-
-    /**
-     * The parent type of the field.
-     *
-     * @var \Nuwave\Lighthouse\Schema\Values\TypeValue
-     */
-    protected $parent;
-
     /**
      * The actual field resolver.
      *
@@ -48,20 +21,17 @@ class FieldValue
      */
     protected $resolver;
 
-    /**
-     * A closure that determines the complexity of executing the field.
-     *
-     * @deprecated will be removed in v6
-     *
-     * @var \Closure|null
-     */
-    protected $complexity;
+    public function __construct(
+        /**
+         * The parent type of the field.
+         */
+        protected TypeValue $parent,
 
-    public function __construct(TypeValue $parent, FieldDefinitionNode $field)
-    {
-        $this->parent = $parent;
-        $this->field = $field;
-    }
+        /**
+         * The underlying AST definition of the Field.
+         */
+        protected FieldDefinitionNode $field,
+    ) {}
 
     /**
      * Get the underlying AST definition for the field.
@@ -112,7 +82,7 @@ class FieldValue
      * Register a function that will receive the final result and resolver arguments.
      *
      * For example, the following handler tries to double the result.
-     * This is somewhat non-sensical, but shows the range of what you can do.
+     * This is somewhat nonsensical, but shows the range of what you can do.
      *
      * function ($result, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
      *     if (is_numeric($result)) {
@@ -149,86 +119,5 @@ class FieldValue
 
             return $handle($resolved, $args, $context, $resolveInfo);
         };
-    }
-
-    /**
-     * Return the namespaces configured for the parent type.
-     *
-     * @deprecated will be removed in v6
-     *
-     * @return array<string>
-     */
-    public function defaultNamespacesForParent(): array
-    {
-        return RootType::defaultNamespaces($this->getParentName());
-    }
-
-    /**
-     * @deprecated will be removed in v6
-     */
-    public function getDescription(): ?StringValueNode
-    {
-        return $this->field->description;
-    }
-
-    /**
-     * Is the parent of this field one of the root types?
-     *
-     * @deprecated will be removed in v6
-     */
-    public function parentIsRootType(): bool
-    {
-        return RootType::isRootType($this->getParentName());
-    }
-
-    /**
-     * Use the default resolver.
-     *
-     * @deprecated will be removed in v6
-     */
-    public function useDefaultResolver(): self
-    {
-        $this->resolver = FieldFactory::defaultResolver($this);
-
-        return $this;
-    }
-
-    /**
-     * Get current complexity.
-     *
-     * @deprecated will be removed in v6
-     */
-    public function getComplexity(): ?\Closure
-    {
-        return $this->complexity;
-    }
-
-    /**
-     * Define a closure that is used to determine the complexity of the field.
-     *
-     * @deprecated will be removed in v6
-     */
-    public function setComplexity(\Closure $complexity): self
-    {
-        $this->complexity = $complexity;
-
-        return $this;
-    }
-
-    /**
-     * Get an instance of the return type of the field.
-     *
-     * @deprecated will be removed in v6
-     */
-    public function getReturnType(): Type
-    {
-        if (null === $this->returnType) {
-            $typeNodeConverter = Container::getInstance()->make(ExecutableTypeNodeConverter::class);
-            assert($typeNodeConverter instanceof ExecutableTypeNodeConverter);
-
-            $this->returnType = $typeNodeConverter->convert($this->field->type);
-        }
-
-        return $this->returnType;
     }
 }

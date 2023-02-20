@@ -20,7 +20,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Require filter directives such as `@whereKey` in `@delete`, `@forceDelete` and `@restore` https://github.com/nuwave/lighthouse/pull/2289
 - Subscriptions can now be filtered via `$subscriber->socket_id` and `request()->header('X-Socket-ID')` https://github.com/nuwave/lighthouse/pull/2298
 - Make pagination argument `first` non-nullable
-- Include the field `@complexity` is defined upon in its calculation, increasing it by 1
+- Calculate complexity for `@paginate` according to the number of items requested
+- Require argument `resolver` in directive `@complexity`
 - Move interface `Nuwave\Lighthouse\Support\Contracts\GlobalId` to `Nuwave\Lighthouse\GlobalId\GlobalId`
 - Use union type for `$id` argument in `NodeDirective`
 - Replace `Arr::first(array_keys())` with `array_key_first()` in `OrderByDirective`
@@ -28,6 +29,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Change visibility of `BaseDirective::directiveHasArgument` from `public` to `protected`
 - Replace `Illuminate\Database\DatabaseManager` with `Illuminate\Database\ConnectionResolverInterface` in `RelationDirective`
 - Replace `DirectiveLocator::beforeLast` with `Str::beforeLast`
+- Default `subscriptions.exclude_empty` to `true`
 
 ### Fixed
 
@@ -52,7 +54,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove interface `Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions`
 - Remove `Nuwave\Lighthouse\Execution\ExtensionErrorHandler`
 - Remove support for PHP 7.2, 7.3, 7.4
-- Remove support for Laravel 5, 6, 7
+- Remove support for Laravel 5, 6, 7, 8
 - Remove `Serializable` implementation
 - Remove trait `ClearsSchemaCache`
 - Remove config option `lighthouse.unbox_bensampo_enum_enum_instances`
@@ -61,6 +63,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove `MockResolver`
 - Remove deprecated `BatchLoader::forgetInstances()` in `GraphQL`
 - Remove method check for `Illuminate\Foundation\Exceptions\Handler::renderable`
+- Remove setting `non_null_pagination_results` and always behave as if it were `true`
+- Remove `Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions::subscriberByRequest()`
+- Remove deprecated methods from `FieldValue`
+- Remove deprecated `GraphQL::executeQuery()` and `GraphQL::prepSchema()`
 
 ## v5.70.3
 
@@ -2006,7 +2012,6 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove the `@security` directive in favor of defining security options through the config https://github.com/nuwave/lighthouse/pull/435
 - Rename the `resolver` argument of `@interface` and `@union` to `resolveType` https://github.com/nuwave/lighthouse/pull/435
 - Remove deprecated Traits https://github.com/nuwave/lighthouse/pull/435
-- Remove `\Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions::subscriberByRequest()`
 
 ## Pre-v3
 

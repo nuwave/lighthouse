@@ -77,7 +77,7 @@ final class DirectiveLocatorTest extends TestCase
             ->associated($fieldDefinition)
             ->first();
 
-        $this->assertObjectNotHasAttribute('definitionNode', $directive);
+        $this->assertFalse(property_exists($directive, 'definitionNode'));
     }
 
     public function testThrowsIfDirectiveNameCanNotBeResolved(): void

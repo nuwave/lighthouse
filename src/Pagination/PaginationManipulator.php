@@ -3,13 +3,9 @@
 namespace Nuwave\Lighthouse\Pagination;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use GraphQL\Language\AST\TypeNode;
 use GraphQL\Language\Parser;
-use Illuminate\Container\Container;
-use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
@@ -17,10 +13,7 @@ use Nuwave\Lighthouse\Schema\Directives\ModelDirective;
 
 class PaginationManipulator
 {
-    /**
-     * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST
-     */
-    protected $documentAST;
+    protected DocumentAST $documentAST;
 
     /**
      * The class name of the model that is returned from the field.
@@ -31,7 +24,7 @@ class PaginationManipulator
      *
      * @var class-string<\Illuminate\Database\Eloquent\Model>|null
      */
-    protected $modelClass;
+    protected ?string $modelClass;
 
     public function __construct(DocumentAST $documentAST)
     {
@@ -41,9 +34,9 @@ class PaginationManipulator
     /**
      * Set the model class to use for code generation.
      *
-     * @param  class-string<\Illuminate\Database\Eloquent\Model>  $modelClass
+     * @param  class-string<\Illuminate\Database\Eloquent\Model>|null  $modelClass
      */
-    public function setModelClass(string $modelClass): self
+    public function setModelClass(?string $modelClass): self
     {
         $this->modelClass = $modelClass;
 
@@ -151,7 +144,7 @@ GRAPHQL
         }
 
         if (
-            $this->modelClass
+            isset($this->modelClass)
             && ! ASTHelper::hasDirective($objectType, ModelDirective::NAME)
         ) {
             $objectType->directives[] = Parser::constDirective(/** @lang GraphQL */ '@model(class: "' . addslashes($this->modelClass) . '")');
@@ -253,20 +246,11 @@ GRAPHQL
         return $description . $definition;
     }
 
-    /**
-     * @return \GraphQL\Language\AST\NamedTypeNode|\GraphQL\Language\AST\NonNullTypeNode
-     */
-    protected function paginationResultType(string $typeName): TypeNode
+    protected function paginationResultType(string $typeName): NonNullTypeNode
     {
-        $config = Container::getInstance()->make(ConfigRepository::class);
-        assert($config instanceof ConfigRepository);
-        $nonNull = $config->get('lighthouse.non_null_pagination_results')
-            ? '!'
-            : '';
-
-        $typeNode = Parser::typeReference(/** @lang GraphQL */ "{$typeName}{$nonNull}");
+        $typeNode = Parser::typeReference(/** @lang GraphQL */ "{$typeName}!");
         assert(
-            $typeNode instanceof NamedTypeNode || $typeNode instanceof NonNullTypeNode,
+            $typeNode instanceof NonNullTypeNode,
             'We do not wrap the typename in [], so this will never be a ListOfTypeNode.'
         );
 
