@@ -4,14 +4,11 @@ namespace Nuwave\Lighthouse\Schema\Values;
 
 use GraphQL\Deferred;
 use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
-use Nuwave\Lighthouse\Execution\Utils\FieldPath;
-use Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter;
-use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
+use Nuwave\Lighthouse\Execution\Utils\FieldPath;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 /**
@@ -36,7 +33,7 @@ class FieldValue
     /**
      * Ordered list of callbacks to transform the incoming argument set.
      *
-     * @var array<int, callable(\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet, \GraphQL\Type\Definition\ResolveInfo $resolveInfo): \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>
+     * @var array<int, callable(\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet, \GraphQL\Type\Definition\ResolveInfo): \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>
      */
     protected $argumentSetTransformers;
 
@@ -59,6 +56,7 @@ class FieldValue
 
     /**
      * @param  array<string, mixed>  $args
+     *
      * @return mixed Really anything
      */
     public function __invoke($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
@@ -81,6 +79,7 @@ class FieldValue
 
         return ($this->resolver)($root, $args, $context, $resolveInfo);
     }
+
     /**
      * Get the underlying AST definition for the field.
      */
@@ -171,7 +170,7 @@ class FieldValue
 
     public function addArgumentSetTransformer(callable $argumentSetTransformer): self
     {
-        $this->argumentSetTransformers [] = $argumentSetTransformer;
+        $this->argumentSetTransformers[] = $argumentSetTransformer;
 
         return $this;
     }
