@@ -4,8 +4,6 @@ namespace Nuwave\Lighthouse\Schema\Values;
 
 use GraphQL\Deferred;
 use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Type\Definition\ResolveInfo;
-use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Execution\Utils\FieldPath;
