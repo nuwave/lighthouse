@@ -8,9 +8,7 @@ final class MultipleRequestsTest extends TestCase
 {
     public function testFireMultipleRequestsInOneTest(): void
     {
-        $this->mockResolver(function ($root, array $args): string {
-            return $args['this'];
-        });
+        $this->mockResolver(fn ($_, array $args): string => $args['this']);
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
