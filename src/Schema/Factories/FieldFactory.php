@@ -54,7 +54,8 @@ class FieldFactory
         $this->pipeline
             ->send($fieldValue)
             ->through($this->fieldMiddleware($fieldDefinitionNode))
-            ->via('handleField');
+            ->via('handleField')
+            ->thenReturn();
 
         // To see what is allowed here, look at the validation rules in
         // GraphQL\Type\Definition\FieldDefinition::getDefinition()

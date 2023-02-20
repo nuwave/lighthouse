@@ -26,7 +26,7 @@ class FieldValue
      *
      * @var array<int, ArgumentSetTransformer>
      */
-    protected array $argumentSetTransformers;
+    protected array $argumentSetTransformers = [];
 
     /**
      * The actual field resolver.

@@ -30,15 +30,9 @@ use Nuwave\Lighthouse\Support\Utils;
 
 class CanDirective extends BaseDirective implements FieldMiddleware, FieldManipulator
 {
-    /**
-     * @var \Illuminate\Contracts\Auth\Access\Gate
-     */
-    protected $gate;
-
-    public function __construct(Gate $gate)
-    {
-        $this->gate = $gate;
-    }
+    public function __construct(
+        protected Gate $gate
+    ){}
 
     public static function definition(): string
     {
