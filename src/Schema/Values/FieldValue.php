@@ -170,6 +170,7 @@ class FieldValue
 
     /**
      * @param  ArgumentSetTransformer  $argumentSetTransformer
+     *
      * @return $this
      */
     public function addArgumentSetTransformer(callable $argumentSetTransformer): self
