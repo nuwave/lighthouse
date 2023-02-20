@@ -12,7 +12,7 @@ final class InjectDirectiveTest extends DBTestCase
         $user = factory(User::class)->create();
         $this->be($user);
 
-        $this->schema .= '
+        $this->schema .= /* @lang GraphQL */ '
         type Task {
             id: ID!
             name: String!
@@ -52,6 +52,154 @@ final class InjectDirectiveTest extends DBTestCase
                     'user' => [
                         'id' => '1',
                     ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testCreateFromInputObjectWithWildcardInjection(): void
+    {
+        $user = factory(User::class)->create();
+        $this->be($user);
+
+        $this->schema .= /* @lang GraphQL */ '
+        type Task {
+            id: ID!
+            name: String!
+            user: User @belongsTo
+        }
+
+        type User {
+            id: ID
+            tasks: [Task!] @hasmany
+        }
+
+        type Mutation {
+            updateUser(input: UpdateUserInput @spread): User
+                @update
+                @inject(context: "user.id", name: "tasks.create.*.user_id")
+        }
+
+        input UpdateUserInput {
+            id: ID!
+            tasks: CreateTaskInputMany
+        }
+
+        input CreateTaskInputMany {
+            create: [CreateTaskInput!]
+        }
+
+        input CreateTaskInput {
+            name: String
+        }
+        ';
+
+        $this->graphQL('
+        mutation ($input: UpdateUserInput!) {
+            updateUser(input: $input) {
+                tasks {
+                    id
+                    name
+                    user {
+                        id
+                    }
+                }
+            }
+        }
+        ', [
+            'input' => [
+                'id' => $user->getKey(),
+                'tasks' => [
+                    'create' => [
+                        [ 'name' => 'foo' ],
+                        [ 'name' => 'bar' ],
+                    ],
+                ],
+            ],
+        ])->assertJson([
+            'data' => [
+                'updateUser' => [
+                    'tasks' => [
+                        [
+                            'id' => '1',
+                            'name' => 'foo',
+                            'user' => [
+                                'id' => '1',
+                            ],
+                        ],
+                        [
+                            'id' => '2',
+                            'name' => 'bar',
+                            'user' => [
+                                'id' => '1',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+
+    public function testWillRejectValuesNotPlacedAtArrayWithWildcardInjection(): void
+    {
+        $user = factory(User::class)->create();
+        $this->be($user);
+
+        $this->schema .= /* @lang GraphQL */ '
+        type Task {
+            id: ID!
+            name: String!
+            user: User @belongsTo
+        }
+
+        type User {
+            id: ID
+            tasks: [Task!] @hasmany
+        }
+
+        type Mutation {
+            updateUser(input: UpdateUserInput @spread): User
+                @update
+                @inject(context: "user.id", name: "tasks.create.*.user_id")
+        }
+
+        input UpdateUserInput {
+            id: ID!
+            tasks: CreateTaskInputMany
+        }
+
+        input CreateTaskInputMany {
+            create: [CreateTaskInput!]
+        }
+
+        input CreateTaskInput {
+            name: String
+        }
+        ';
+
+        $this->graphQL('
+        mutation ($input: UpdateUserInput!) {
+            updateUser(input: $input) {
+                id
+                tasks {
+                    id
+                    name
+                    user {
+                        id
+                    }
+                }
+            }
+        }
+        ', [
+            'input' => [
+                'id' => $user->getKey(),
+            ],
+        ])->assertJson([
+            'data' => [
+                'updateUser' => [
+                    'id' => $user->getKey(),
+                    'tasks' => [],
                 ],
             ],
         ]);

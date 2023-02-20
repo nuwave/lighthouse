@@ -2,7 +2,7 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
-class ArgumentSet
+class ArgumentSet implements \ArrayAccess, \IteratorAggregate
 {
     /**
      * An associative array from argument names to arguments.
@@ -61,34 +61,15 @@ class ArgumentSet
 
     /**
      * Add a value at the dot-separated path.
-     *
-     * Works just like @see \Illuminate\Support\Arr::add().
+     * Asterisks may be used to indicate wildcards.
      *
      * @param  mixed  $value  any value to inject
      */
-    public function addValue(string $path, $value): self
+    public function addValue(string $path, mixed $value): self
     {
         $argumentSet = $this;
-        $keys = explode('.', $path);
 
-        while (count($keys) > 1) {
-            $key = array_shift($keys);
-
-            // If the key doesn't exist at this depth, we will just create an empty ArgumentSet
-            // to hold the next value, allowing us to create the ArgumentSet to hold a final
-            // value at the correct depth. Then we'll keep digging into the ArgumentSet.
-            if (! isset($argumentSet->arguments[$key])) {
-                $argument = new Argument();
-                $argument->value = new self();
-                $argumentSet->arguments[$key] = $argument;
-            }
-
-            $argumentSet = $argumentSet->arguments[$key]->value;
-        }
-
-        $argument = new Argument();
-        $argument->value = $value;
-        $argumentSet->arguments[array_shift($keys)] = $argument;
+        data_set($argumentSet, $path, $value);
 
         return $this;
     }
@@ -101,5 +82,42 @@ class ArgumentSet
     public function argumentsWithUndefined(): array
     {
         return array_merge($this->arguments, $this->undefined);
+    }
+
+    public function offsetExists(mixed $offset): bool
+    {
+        $argumentSet = $this;
+
+        return isset($argumentSet->arguments[$offset]);
+    }
+
+    public function &offsetGet(mixed $offset): Argument
+    {
+        $argumentSet = $this;
+
+        return $argumentSet->arguments[$offset];
+    }
+
+    public function offsetSet(mixed $offset, mixed $value): void
+    {
+        $argumentSet = $this;
+
+        $argument = new Argument();
+        $argument->value = $value;
+        $argumentSet->arguments[(string) $offset] = $argument;
+    }
+
+    public function offsetUnset(mixed $offset): void
+    {
+        $argumentSet = $this;
+
+        unset($argumentSet->arguments[$offset]);
+    }
+
+    public function getIterator(): \ArrayIterator
+    {
+        $arguments = $this->arguments;
+
+        return new \ArrayIterator($arguments);
     }
 }

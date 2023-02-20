@@ -1706,6 +1706,7 @@ directive @inject(
   The target name of the argument into which the value is injected.
   You can use dot notation to set the value at arbitrary depth
   within the incoming argument.
+  Use an asterisk `*` as a path segment where the value of the argument is a list to be traversed.
   """
   name: String!
 ) repeatable on FIELD_DEFINITION
@@ -1730,6 +1731,29 @@ type Mutation {
   createTask(input: CreateTaskInput!): Task
     @create
     @inject(context: "user.id", name: "input.user_id")
+}
+```
+
+If you have an array you need to inject a value into, you can use an asterisk `*`. 
+
+```graphql
+type Mutation {
+  updateUser(input: UpdateUserInput!): Task
+    @update
+    @inject(context: "user.id", name: "input.tasks.create.*.user_id")
+}
+
+input UpdateUserInput {
+  id: ID!
+  tasks: UpdateTasksHasManyInput
+}
+
+input UpdateTasksHasManyInput {
+  create: [CreateTaskInput!]
+}
+
+input CreateTaskInput {
+  title: String!
 }
 ```
 

@@ -4,7 +4,7 @@ namespace Nuwave\Lighthouse\Execution\Arguments;
 
 use Illuminate\Support\Collection;
 
-class Argument
+class Argument implements \ArrayAccess, \IteratorAggregate
 {
     /**
      * The value given by the client.
@@ -84,5 +84,43 @@ class Argument
         }
 
         return $value;
+    }
+
+    public function offsetExists(mixed $offset): bool
+    {
+        $argument = $this;
+
+        return isset($argument->value[$offset]);
+    }
+
+    public function &offsetGet(mixed $offset): mixed
+    {
+        $argument = $this;
+
+        return $argument->value[$offset];
+    }
+
+    public function offsetSet(mixed $offset, mixed $value): void
+    {
+        $argument = $this;
+
+        $argumentSet = new ArgumentSet();
+        $argumentSet[(string) $offset] = $value;
+
+        $argument->value = $argumentSet;
+    }
+
+    public function offsetUnset(mixed $offset): void
+    {
+        $argument = $this;
+
+        unset($argument[$offset]);
+    }
+
+    public function getIterator(): \ArrayIterator
+    {
+        $value = $this->value;
+
+        return new \ArrayIterator($value);
     }
 }

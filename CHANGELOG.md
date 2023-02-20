@@ -9,6 +9,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+- Allow to set value using asterisks as a wildcard in `@inject` https://github.com/nuwave/lighthouse/pull/2280
+
 ### Changed
 
 - Add validation support to `Paginator` with `resolver` mode
