@@ -42,17 +42,35 @@ class Argument
     /**
      * Get the plain PHP value of this argument.
      *
-     * @return mixed The plain PHP value.
+     * @return mixed the plain PHP value
      */
     public function toPlain()
     {
         return static::toPlainRecursive($this->value);
     }
 
+    public function namedType(): ?NamedType
+    {
+        return static::namedTypeRecursive($this->type);
+    }
+
+    /**
+     * @param \Nuwave\Lighthouse\Execution\Arguments\ListType|\Nuwave\Lighthouse\Execution\Arguments\NamedType|null $type
+     */
+    protected static function namedTypeRecursive($type): ?NamedType
+    {
+        if ($type instanceof ListType) {
+            return static::namedTypeRecursive($type->type);
+        }
+
+        return $type;
+    }
+
     /**
      * Convert the given value to plain PHP values recursively.
      *
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>|mixed|array<mixed>  $value
+     *
      * @return mixed|array<mixed>
      */
     protected static function toPlainRecursive($value)

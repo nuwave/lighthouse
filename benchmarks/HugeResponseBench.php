@@ -38,7 +38,7 @@ GRAPHQL;
                 'children' => [],
             ];
 
-            for ($i = 0; $i < 100; $i++) {
+            for ($i = 0; $i < 100; ++$i) {
                 $parent['children'][] = [
                     'name' => "child {$i}",
                     'parent' => $parent,
@@ -51,6 +51,7 @@ GRAPHQL;
 
     /**
      * @Iterations(10)
+     *
      * @OutputTimeUnit("seconds", precision=3)
      */
     public function benchmark1(): void
@@ -66,6 +67,7 @@ GRAPHQL;
 
     /**
      * @Iterations(10)
+     *
      * @OutputTimeUnit("seconds", precision=3)
      */
     public function benchmark100(): void
@@ -83,6 +85,7 @@ GRAPHQL;
 
     /**
      * @Iterations(10)
+     *
      * @OutputTimeUnit("seconds", precision=3)
      */
     public function benchmark10k(): void

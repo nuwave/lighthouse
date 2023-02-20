@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
 use Tests\TestsSubscriptions;
 
-class BroadcastManagerTest extends TestCase
+final class BroadcastManagerTest extends TestCase
 {
     use TestsSubscriptions;
 
@@ -26,7 +26,7 @@ class BroadcastManagerTest extends TestCase
     {
         parent::setUp();
 
-        $this->broadcastManager = app(BroadcastManager::class);
+        $this->broadcastManager = $this->app->make(BroadcastManager::class);
     }
 
     public function testResolveDrivers(): void
@@ -42,8 +42,7 @@ class BroadcastManagerTest extends TestCase
     {
         $broadcasterConfig = [];
 
-        $broadcaster = new class implements Broadcaster
-        {
+        $broadcaster = new class() implements Broadcaster {
             public function authorized(Request $request)
             {
                 return new Response();
@@ -80,9 +79,7 @@ class BroadcastManagerTest extends TestCase
     public function testThrowsIfDriverDoesNotImplementInterface(): void
     {
         $this->broadcastManager->extend('foo', function () {
-            return new class
-            {
-                //
+            return new class() {
             };
         });
 

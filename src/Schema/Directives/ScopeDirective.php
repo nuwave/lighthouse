@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use BadMethodCallException;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
@@ -19,8 +18,9 @@ The scope method will receive the client-given value of the argument as the seco
 directive @scope(
   """
   The name of the scope.
+  Defaults to the name of the argument.
   """
-  name: String!
+  name: String
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 GRAPHQL;
     }
@@ -30,14 +30,14 @@ GRAPHQL;
      */
     public function handleBuilder($builder, $value): object
     {
-        $scope = $this->directiveArgValue('name');
+        $scope = $this->directiveArgValue('name', $this->nodeName());
 
         try {
             return $builder->{$scope}($value);
             // @phpstan-ignore-next-line PHPStan thinks this exception does not occur - but it does. Magic.
-        } catch (BadMethodCallException $exception) {
+        } catch (\BadMethodCallException $exception) {
             throw new DefinitionException(
-                $exception->getMessage()." in @{$this->name()} directive on {$this->nodeName()} argument.",
+                $exception->getMessage() . " in @{$this->name()} directive on {$this->nodeName()} argument.",
                 $exception->getCode(),
                 $exception->getPrevious()
             );

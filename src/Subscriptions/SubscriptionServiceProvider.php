@@ -30,8 +30,9 @@ class SubscriptionServiceProvider extends ServiceProvider
         $this->app->singleton(BroadcastManager::class);
         $this->app->singleton(SubscriptionRegistry::class);
         $this->app->singleton(StoresSubscriptions::class, static function (Container $app): StoresSubscriptions {
-            /** @var \Illuminate\Contracts\Config\Repository $configRepository */
             $configRepository = $app->make(ConfigRepository::class);
+            assert($configRepository instanceof ConfigRepository);
+
             switch ($configRepository->get('lighthouse.subscriptions.storage')) {
                 case 'redis':
                     return $app->make(RedisStorageManager::class);
@@ -52,18 +53,18 @@ class SubscriptionServiceProvider extends ServiceProvider
     {
         $eventsDispatcher->listen(
             StartExecution::class,
-            SubscriptionRegistry::class.'@handleStartExecution'
+            SubscriptionRegistry::class . '@handleStartExecution'
         );
 
         $eventsDispatcher->listen(
             BuildExtensionsResponse::class,
-            SubscriptionRegistry::class.'@handleBuildExtensionsResponse'
+            SubscriptionRegistry::class . '@handleBuildExtensionsResponse'
         );
 
         $eventsDispatcher->listen(
             RegisterDirectiveNamespaces::class,
             static function (): string {
-                return __NAMESPACE__.'\\Directives';
+                return __NAMESPACE__ . '\\Directives';
             }
         );
 
@@ -72,7 +73,7 @@ class SubscriptionServiceProvider extends ServiceProvider
         // If authentication is used, we can log in subscribers when broadcasting an update
         if ($this->app->bound(AuthManager::class)) {
             config([
-                'auth.guards.'.SubscriptionGuard::GUARD_NAME => [
+                'auth.guards.' . SubscriptionGuard::GUARD_NAME => [
                     'driver' => SubscriptionGuard::GUARD_NAME,
                 ],
             ]);
@@ -80,7 +81,7 @@ class SubscriptionServiceProvider extends ServiceProvider
             $this->app->bind(SubscriptionIterator::class, AuthenticatingSyncIterator::class);
 
             $this->app->make(AuthManager::class)->extend(SubscriptionGuard::GUARD_NAME, static function () {
-                return new SubscriptionGuard;
+                return new SubscriptionGuard();
             });
         }
     }
@@ -91,8 +92,8 @@ class SubscriptionServiceProvider extends ServiceProvider
 
         if ($routesMethod = $configRepository->get("lighthouse.subscriptions.broadcasters.{$broadcaster}.routes")) {
             [$routesProviderClass, $method] = Str::parseCallback($routesMethod, 'pusher');
-            /** @var class-string $routesProviderClass */
-            /** @var string $method */
+            assert(is_string($routesProviderClass) && class_exists($routesProviderClass));
+            assert(is_string($method));
             $routesProvider = $this->app->make($routesProviderClass);
             $router = $this->app->make('router');
 

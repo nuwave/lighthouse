@@ -5,7 +5,7 @@ namespace Tests\Utils\Policies;
 use Illuminate\Auth\Access\Response;
 use Tests\Utils\Models\User;
 
-class UserPolicy
+final class UserPolicy
 {
     public const SUPER_ADMIN = 'super admin';
     public const ADMIN = 'admin';
@@ -14,12 +14,12 @@ class UserPolicy
 
     public function adminOnly(User $user): bool
     {
-        return $user->name === self::ADMIN;
+        return self::ADMIN === $user->name;
     }
 
     public function superAdminOnly(User $user): Response
     {
-        if ($user->name === self::SUPER_ADMIN) {
+        if (self::SUPER_ADMIN === $user->name) {
             return Response::allow();
         }
 
@@ -33,7 +33,7 @@ class UserPolicy
 
     public function guestOnly(User $viewer = null): bool
     {
-        return $viewer === null;
+        return null === $viewer;
     }
 
     public function view(User $viewer, User $queriedUser): bool

@@ -14,22 +14,26 @@ abstract class BatchLoaderRegistry
     /**
      * Return an instance of a BatchLoader for a specific field.
      *
+     * @template TBatchLoader of object
+     *
      * @param  array<int|string>  $pathToField  Path to the GraphQL field from the root, is used as a key for BatchLoader instances
-     * @param  callable(): object  $makeInstance  Function to instantiate the instance once
-     * @return object The result of calling makeInstance
+     * @param  callable(): TBatchLoader  $makeInstance  Function to instantiate the instance once
      *
      * @throws \Exception
+     *
+     * @return TBatchLoader The result of calling makeInstance
      */
     public static function instance(array $pathToField, callable $makeInstance): object
     {
         // The path to the field serves as the unique key for the instance
         $instanceKey = static::instanceKey($pathToField);
 
-        if (isset(self::$instances[$instanceKey])) {
-            return self::$instances[$instanceKey];
+        if (! isset(self::$instances[$instanceKey])) {
+            return self::$instances[$instanceKey] = $makeInstance();
         }
 
-        return self::$instances[$instanceKey] = $makeInstance();
+        // @phpstan-ignore-next-line Method Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry::instance() should return TBatchLoader of object but returns object.
+        return self::$instances[$instanceKey];
     }
 
     /**
@@ -54,7 +58,7 @@ abstract class BatchLoaderRegistry
             $path,
             static function ($segment): bool {
                 // Ignore numeric path entries, as those signify a list of fields.
-                // Combining the queries for those is the very purpose of the
+                // Combining the queries for lists is the very purpose of the
                 // batch loader, so they must not be included.
                 return ! is_numeric($segment);
             }
@@ -62,7 +66,7 @@ abstract class BatchLoaderRegistry
 
         // Using . as the separator would combine relations in nested fields with
         // higher up relations using dot notation, matching the field path.
-        // We might optimize this in the future to enable batching them anyways,
+        // We might optimize this in the future to enable batching them anyway,
         // but employ this solution for now, as it preserves correctness.
         return implode('|', $significantPathSegments);
     }

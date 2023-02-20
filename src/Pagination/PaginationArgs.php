@@ -49,15 +49,15 @@ class PaginationArgs
             $instance->page = Arr::get($args, 'page', 1);
         }
 
-        if ($instance->first <= 0) {
+        if ($instance->first < 0) {
             throw new Error(
-                self::requestedZeroOrLessItems($instance->first)
+                self::requestedLessThanZeroItems($instance->first)
             );
         }
 
         // Make sure the maximum pagination count is not exceeded
         if (
-            $paginateMaxCount !== null
+            null !== $paginateMaxCount
             && $instance->first > $paginateMaxCount
         ) {
             throw new Error(
@@ -68,9 +68,9 @@ class PaginationArgs
         return $instance;
     }
 
-    public static function requestedZeroOrLessItems(int $amount): string
+    public static function requestedLessThanZeroItems(int $amount): string
     {
-        return "Requested pagination amount must be more than 0, got {$amount}.";
+        return "Requested pagination amount must be non-negative, got {$amount}.";
     }
 
     public static function requestedTooManyItems(int $maxCount, int $actualCount): string

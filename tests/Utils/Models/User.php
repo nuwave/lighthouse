@@ -2,22 +2,28 @@
 
 namespace Tests\Utils\Models;
 
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Tests\DBTestCase;
+use Tests\Integration\Execution\DataLoader\RelationBatchLoaderTest;
 
 /**
- * Primary key.
+ * Account of a person who utilizes this application.
+ *
+ * Primary key
  *
  * @property int $id
  *
  * Attributes
  * @property string|null $name
  * @property string|null $email
+ * @property \Illuminate\Support\Carbon|null $email_verified_at
  * @property string|null $password
+ * @property string|null $remember_token
  *
  * Timestamps
  * @property \Illuminate\Support\Carbon $created_at
@@ -30,6 +36,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @property string|null $person_type
  *
  * Relations
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\AlternateConnection> $alternateConnections
  * @property-read \Tests\Utils\Models\Company|null $company
  * @property-read \Tests\Utils\Models\Image|null $image
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Post> $posts
@@ -38,8 +45,24 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Task> $tasks
  * @property-read \Tests\Utils\Models\Team|null $team
  */
-class User extends Authenticatable
+final class User extends Authenticatable
 {
+    /**
+     * Ensure that this is functionally equivalent to leaving this as null.
+     *
+     * @see RelationBatchLoaderTest::testDoesNotBatchloadRelationsWithDifferentDatabaseConnections()
+     */
+    protected $connection = DBTestCase::DEFAULT_CONNECTION;
+
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
+
+    public function alternateConnections(): HasMany
+    {
+        return $this->hasMany(AlternateConnection::class);
+    }
+
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
@@ -59,7 +82,7 @@ class User extends Authenticatable
     {
         return $this
             ->belongsToMany(Role::class)
-            ->withPivot(['meta']);
+            ->withPivot('meta');
     }
 
     public function rolesPivot(): HasMany
@@ -77,14 +100,19 @@ class User extends Authenticatable
         return $this->belongsTo(Team::class);
     }
 
-    public function scopeCompanyName(Builder $query, array $args): Builder
+    public function customPrimaryKeys(): HasMany
     {
-        return $query->whereHas('company', function (Builder $q) use ($args): void {
+        return $this->hasMany(CustomPrimaryKey::class, 'user_id');
+    }
+
+    public function scopeCompanyName(EloquentBuilder $query, array $args): EloquentBuilder
+    {
+        return $query->whereHas('company', function (EloquentBuilder $q) use ($args): void {
             $q->where('name', $args['company']);
         });
     }
 
-    public function scopeNamed(Builder $query): Builder
+    public function scopeNamed(EloquentBuilder $query): EloquentBuilder
     {
         return $query->whereNotNull('name');
     }
@@ -132,5 +160,10 @@ class User extends Authenticatable
     {
         return $this->postsTaskLoaded()
             && $this->postsCommentsLoaded();
+    }
+
+    public function nonRelationPrimitive(): string
+    {
+        return 'foo';
     }
 }

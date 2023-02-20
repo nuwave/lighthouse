@@ -11,6 +11,7 @@ class SimplePaginatorField
      * Resolve simple paginator info for connection.
      *
      * @param  \Illuminate\Pagination\Paginator<mixed>  $root
+     *
      * @return array<string, mixed>
      */
     public function paginatorInfoResolver(Paginator $root): array
@@ -21,6 +22,7 @@ class SimplePaginatorField
             'firstItem' => $root->firstItem(),
             'lastItem' => $root->lastItem(),
             'perPage' => $root->perPage(),
+            'hasMorePages' => $root->hasMorePages(),
         ];
     }
 
@@ -28,16 +30,13 @@ class SimplePaginatorField
      * Resolve data for connection.
      *
      * @param  \Illuminate\Pagination\Paginator<mixed>  $root
+     *
      * @return \Illuminate\Support\Collection<mixed>
      */
     public function dataResolver(Paginator $root): Collection
     {
-        /**
-         * The return type `static` refers to the wrong class because it is a proxied method call.
-         *
-         * @var \Illuminate\Support\Collection<mixed> $values
-         */
         $values = $root->values();
+        assert($values instanceof Collection, 'The return type `static` refers to the wrong class because it is a proxied method call.');
 
         return $values;
     }

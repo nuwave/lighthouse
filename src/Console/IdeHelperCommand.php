@@ -2,14 +2,17 @@
 
 namespace Nuwave\Lighthouse\Console;
 
+use GraphQL\Language\AST\TypeDefinitionNode;
+use GraphQL\Language\Parser;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Utils\SchemaPrinter;
 use HaydenPierce\ClassFinder\ClassFinder;
 use Illuminate\Console\Command;
-use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Schema\AST\ASTCache;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
-use Nuwave\Lighthouse\Schema\TypeRegistry;
+use Nuwave\Lighthouse\Schema\SchemaBuilder;
+use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 
 class IdeHelperCommand extends Command
@@ -28,11 +31,11 @@ GRAPHQL;
 
     protected $description = 'Create IDE helper files to improve type checking and autocompletion.';
 
-    public function handle(DirectiveLocator $directiveLocator, TypeRegistry $typeRegistry): int
+    public function handle(): int
     {
-        $this->schemaDirectiveDefinitions($directiveLocator);
-        $this->programmaticTypes($typeRegistry);
-        $this->phpIdeHelper();
+        $this->laravel->call([$this, 'schemaDirectiveDefinitions']);
+        $this->laravel->call([$this, 'programmaticTypes']);
+        $this->laravel->call([$this, 'phpIdeHelper']);
 
         $this->info("\nIt is recommended to add them to your .gitignore file.");
 
@@ -42,7 +45,7 @@ GRAPHQL;
     /**
      * Create and write schema directive definitions to a file.
      */
-    protected function schemaDirectiveDefinitions(DirectiveLocator $directiveLocator): void
+    public function schemaDirectiveDefinitions(DirectiveLocator $directiveLocator): void
     {
         $schema = /** @lang GraphQL */ <<<'GRAPHQL'
 """
@@ -62,22 +65,23 @@ GRAPHQL;
 
             $schema .= /** @lang GraphQL */ <<<GRAPHQL
 
-# Directive class: $directiveClass
-$definition
+# Directive class: {$directiveClass}
+{$definition}
 
 GRAPHQL;
         }
 
         $filePath = static::schemaDirectivesPath();
-        \Safe\file_put_contents($filePath, self::GENERATED_NOTICE.$schema);
+        \Safe\file_put_contents($filePath, self::GENERATED_NOTICE . $schema);
 
-        $this->info("Wrote schema directive definitions to $filePath.");
+        $this->info("Wrote schema directive definitions to {$filePath}.");
     }
 
     /**
      * Scan the given namespaces for directive classes.
      *
      * @param  array<string>  $directiveNamespaces
+     *
      * @return array<string, class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>>
      */
     protected function scanForDirectives(array $directiveNamespaces): array
@@ -128,60 +132,78 @@ GRAPHQL;
 
     public static function schemaDirectivesPath(): string
     {
-        return base_path().'/schema-directives.graphql';
+        return base_path() . '/schema-directives.graphql';
     }
 
-    protected function programmaticTypes(TypeRegistry $typeRegistry): void
+    /**
+     * Users may register types programmatically, e.g. in service providers.
+     * In order to allow referencing those in the schema, it is useful to print
+     * those types to a helper schema, excluding types the user defined in the schema.
+     */
+    public function programmaticTypes(SchemaSourceProvider $schemaSourceProvider, ASTCache $astCache, SchemaBuilder $schemaBuilder): void
     {
-        // Users may register types programmatically, e.g. in service providers
-        // In order to allow referencing those in the schema, it is useful to print
-        // those types to a helper schema, excluding types the user defined in the schema
-        $types = new Collection($typeRegistry->resolvedTypes());
+        $sourceSchema = Parser::parse($schemaSourceProvider->getSchemaString());
+        $sourceTypes = [];
+        foreach ($sourceSchema->definitions as $definition) {
+            if ($definition instanceof TypeDefinitionNode) {
+                $sourceTypes[$definition->getName()->value] = true;
+            }
+        }
+
+        $astCache->clear();
+
+        $allTypes = $schemaBuilder->schema()->getTypeMap();
+
+        $programmaticTypes = array_diff_key($allTypes, $sourceTypes);
 
         $filePath = static::programmaticTypesPath();
 
-        if ($types->isEmpty() && file_exists($filePath)) {
+        if ([] === $programmaticTypes && file_exists($filePath)) {
             \Safe\unlink($filePath);
 
             return;
         }
 
-        $schema = $types
-            ->map(function (Type $type): string {
-                return SchemaPrinter::printType($type);
-            })
-            ->implode("\n");
+        $schema = implode(
+            "\n\n",
+            array_map(
+                function (Type $type): string {
+                    return SchemaPrinter::printType($type);
+                },
+                $programmaticTypes
+            )
+        );
 
-        \Safe\file_put_contents($filePath, self::GENERATED_NOTICE.$schema);
+        \Safe\file_put_contents($filePath, self::GENERATED_NOTICE . $schema . "\n");
 
-        $this->info("Wrote definitions for programmatically registered types to $filePath.");
+        $this->info("Wrote definitions for programmatically registered types to {$filePath}.");
     }
 
     public static function programmaticTypesPath(): string
     {
-        return base_path().'/programmatic-types.graphql';
+        return base_path() . '/programmatic-types.graphql';
     }
 
-    protected function phpIdeHelper(): void
+    public function phpIdeHelper(): void
     {
         $filePath = static::phpIdeHelperPath();
-        $contents = \Safe\file_get_contents(__DIR__.'/../../_ide_helper.php');
+        $contents = \Safe\file_get_contents(__DIR__ . '/../../_ide_helper.php');
 
         \Safe\file_put_contents($filePath, $this->withGeneratedNotice($contents));
 
-        $this->info("Wrote PHP definitions to $filePath.");
+        $this->info("Wrote PHP definitions to {$filePath}.");
     }
 
     public static function phpIdeHelperPath(): string
     {
-        return base_path().'/_lighthouse_ide_helper.php';
+        return base_path() . '/_lighthouse_ide_helper.php';
     }
 
     protected function withGeneratedNotice(string $phpContents): string
     {
         return substr_replace(
             $phpContents,
-            self::OPENING_PHP_TAG.self::GENERATED_NOTICE,
+            self::OPENING_PHP_TAG . self::GENERATED_NOTICE,
             0,
             strlen(self::OPENING_PHP_TAG)
         );

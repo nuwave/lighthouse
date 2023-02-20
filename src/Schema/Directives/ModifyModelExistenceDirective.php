@@ -3,154 +3,88 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Error\Error;
-use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ListTypeNode;
 use GraphQL\Language\AST\NonNullTypeNode;
-use Illuminate\Database\Eloquent\Collection;
+use GraphQL\Language\AST\TypeNode;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\ErrorPool;
-use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
+use Nuwave\Lighthouse\Execution\TransactionalMutations;
+use Nuwave\Lighthouse\GlobalId\GlobalId;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-use Nuwave\Lighthouse\Support\Contracts\GlobalId;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-abstract class ModifyModelExistenceDirective extends BaseDirective implements FieldResolver, FieldManipulator
+abstract class ModifyModelExistenceDirective extends BaseDirective implements FieldResolver
 {
-    /**
-     * @var \Nuwave\Lighthouse\Support\Contracts\GlobalId
-     */
-    protected $globalId;
-
-    /**
-     * @var \Nuwave\Lighthouse\Execution\ErrorPool
-     */
-    protected $errorPool;
-
-    public function __construct(GlobalId $globalId, ErrorPool $errorPool)
-    {
-        $this->globalId = $globalId;
-        $this->errorPool = $errorPool;
-    }
-
-    public static function couldNotModify(Model $user): string
-    {
-        return 'Could not modify model '.get_class($user).' with ID '.$user->getKey().'.';
-    }
+    public function __construct(
+        protected GlobalId $globalId,
+        protected ErrorPool $errorPool,
+        protected TransactionalMutations $transactionalMutations
+    ) {}
 
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
-        return $fieldValue->setResolver(
-            function ($root, array $args) {
-                /** @var string|int|array<string>|array<int> $idOrIds */
-                $idOrIds = reset($args);
+        $expectsList = $this->expectsList($fieldValue->getField()->type);
 
-                // TODO remove in v6
-                if ($this->directiveArgValue('globalId') ?? false) {
-                    // @phpstan-ignore-next-line We know that global ids must be strings
-                    $idOrIds = $this->decodeIdOrIds($idOrIds);
-                }
+        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($expectsList) {
+            $builder = $this->getModelClass()::query();
+            $scopes = $this->directiveArgValue('scopes', []);
 
-                $modelOrModels = $this->find(
-                    $this->getModelClass(),
-                    $idOrIds
+            if (! $resolveInfo->wouldEnhanceBuilder($builder, $scopes, $root, $args, $context, $resolveInfo)) {
+                throw self::wouldModifyAll();
+            }
+
+            $builder = $resolveInfo->enhanceBuilder($builder, $scopes, $root, $args, $context, $resolveInfo);
+            assert($builder instanceof EloquentBuilder);
+
+            $modelOrModels = $this->enhanceBuilder($builder)->get();
+
+            foreach ($modelOrModels as $model) {
+                $success = $this->transactionalMutations->execute(
+                    fn (): bool => $this->modifyExistence($model),
+                    $model->getConnectionName()
                 );
 
-                if ($modelOrModels === null) {
-                    return null;
+                if (! $success) {
+                    $this->errorPool->record(self::couldNotModify($model));
                 }
-
-                $modifyModelExistence = function (Model $model): void {
-                    if (! $this->modifyExistence($model)) {
-                        $this->errorPool->record(
-                            new Error(
-                                self::couldNotModify($model)
-                            )
-                        );
-                    }
-                };
-
-                if ($modelOrModels instanceof Model) {
-                    $modifyModelExistence($modelOrModels);
-                } elseif ($modelOrModels instanceof Collection) {
-                    foreach ($modelOrModels as $model) {
-                        $modifyModelExistence($model);
-                    }
-                }
-
-                return $modelOrModels;
             }
-        );
+
+            return $expectsList
+                ? $modelOrModels
+                : $modelOrModels->first();
+        });
+
+        return $fieldValue;
     }
 
-    /**
-     * Get the type of the id argument.
-     *
-     * Not using an actual type hint, as the manipulateFieldDefinition function
-     * validates the type during schema build time.
-     *
-     * @return mixed but should be a \GraphQL\Language\AST\NonNullTypeNode
-     */
-    protected function idArgument()
+    public static function couldNotModify(Model $model): Error
     {
-        /** @var \GraphQL\Language\AST\FieldDefinitionNode $fieldNode */
-        $fieldNode = $this->definitionNode;
+        $modelClass = get_class($model);
 
-        return $fieldNode->arguments[0]->type;
+        return new Error("Could not modify model {$modelClass} with ID {$model->getKey()}.");
     }
 
-    /**
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
-     */
-    public function manipulateFieldDefinition(
-        DocumentAST &$documentAST,
-        FieldDefinitionNode &$fieldDefinition,
-        &$parentType
-    ): void {
-        // Ensure there is only a single argument defined on the field.
-        if (count($fieldDefinition->arguments) !== 1) {
-            throw new DefinitionException(
-                'The @'.$this->name()." directive requires the field {$this->nodeName()} to only contain a single argument."
-            );
-        }
-
-        if (! $this->idArgument() instanceof NonNullTypeNode) {
-            throw new DefinitionException(
-                'The @'.$this->name()." directive requires the field {$this->nodeName()} to have a NonNull argument. Mark it with !"
-            );
-        }
-    }
-
-    /**
-     * @param  string|array<string>  $idOrIds
-     * @return string|array<string>
-     */
-    protected function decodeIdOrIds($idOrIds)
+    public static function wouldModifyAll(): Error
     {
-        // At this point we know the type is at least wrapped in a NonNull type, so we go one deeper
-        if ($this->idArgument()->type instanceof ListTypeNode) {
-            /** @var array<string> $idOrIds */
-            return array_map(
-                function (string $id): string {
-                    return $this->globalId->decodeID($id);
-                },
-                $idOrIds
-            );
-        } else {
-            /** @var string $idOrIds */
-            return $this->globalId->decodeID($idOrIds);
+        return new Error('Would modify all models, use an argument to filter.');
+    }
+
+    private function expectsList(TypeNode $typeNode): bool
+    {
+        if ($typeNode instanceof NonNullTypeNode) {
+            return $this->expectsList($typeNode->type);
         }
+
+        return $typeNode instanceof ListTypeNode;
     }
 
     /**
-     * Find one or more models by id.
-     *
-     * @param  class-string<\Illuminate\Database\Eloquent\Model>  $modelClass
-     * @param  string|int|array<string>|array<int>  $idOrIds
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>|null
+     * Enhance the builder used to resolve the models.
      */
-    abstract protected function find(string $modelClass, $idOrIds);
+    abstract protected function enhanceBuilder(EloquentBuilder $builder): EloquentBuilder;
 
     /**
      * Bring a model in or out of existence.

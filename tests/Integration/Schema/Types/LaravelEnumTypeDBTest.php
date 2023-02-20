@@ -4,11 +4,12 @@ namespace Tests\Integration\Schema\Types;
 
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\Types\LaravelEnumType;
+use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\DBTestCase;
 use Tests\Utils\LaravelEnums\AOrB;
 use Tests\Utils\Models\WithEnum;
 
-class LaravelEnumTypeDBTest extends DBTestCase
+final class LaravelEnumTypeDBTest extends DBTestCase
 {
     /**
      * @var \Nuwave\Lighthouse\Schema\TypeRegistry
@@ -18,6 +19,10 @@ class LaravelEnumTypeDBTest extends DBTestCase
     public function setUp(): void
     {
         parent::setUp();
+
+        if (AppVersion::below(9.0)) {
+            $this->markTestSkipped('Uses Laravel 9 style enums');
+        }
 
         $this->typeRegistry = $this->app->make(TypeRegistry::class);
     }
@@ -98,6 +103,47 @@ class LaravelEnumTypeDBTest extends DBTestCase
             'data' => [
                 'withEnum' => [
                     'name' => $encodedType,
+                ],
+            ],
+        ]);
+    }
+
+    public function testScopeUsingEnumType(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            withEnum(
+                byType: AOrB @scope
+            ): WithEnum @find
+        }
+
+        type WithEnum {
+            type: AOrB
+        }
+        ';
+
+        $this->typeRegistry->register(
+            new LaravelEnumType(AOrB::class)
+        );
+
+        $a = AOrB::A();
+
+        $withEnum = new WithEnum();
+        $withEnum->type = $a;
+        $withEnum->save();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($type: AOrB) {
+            withEnum(byType: $type) {
+                type
+            }
+        }
+        ', [
+            'type' => $a->key,
+        ])->assertJson([
+            'data' => [
+                'withEnum' => [
+                    'type' => $a->key,
                 ],
             ],
         ]);

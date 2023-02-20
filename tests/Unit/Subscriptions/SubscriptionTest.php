@@ -3,7 +3,6 @@
 namespace Tests\Unit\Subscriptions;
 
 use Illuminate\Http\Request;
-use InvalidArgumentException;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\Utils\Subscription;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
@@ -15,7 +14,7 @@ use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
 use Tests\TestCase;
 use Tests\TestsSubscriptions;
 
-class SubscriptionTest extends TestCase
+final class SubscriptionTest extends TestCase
 {
     use TestsSubscriptions;
 
@@ -32,7 +31,7 @@ class SubscriptionTest extends TestCase
         $subscriptionField = 'onPostCreated';
         $this->schema .= /** @lang GraphQL */ "
         type Subscription {
-            ${subscriptionField}: ID
+            {$subscriptionField}: ID
         }
         ";
 
@@ -55,16 +54,16 @@ class SubscriptionTest extends TestCase
 
     public function testBroadcastProgrammaticallyRegisteredSubscription(): void
     {
-        $subscriptionRegistry = app(SubscriptionRegistry::class);
+        $subscriptionRegistry = $this->app->make(SubscriptionRegistry::class);
+        assert($subscriptionRegistry instanceof SubscriptionRegistry);
 
-        $subscription = new class extends GraphQLSubscription
-        {
+        $subscription = new class() extends GraphQLSubscription {
             public function authorize(Subscriber $subscriber, Request $request): bool
             {
                 return true;
             }
 
-            public function filter(Subscriber $subscriber, $root): bool
+            public function filter(Subscriber $subscriber, mixed $root): bool
             {
                 return true;
             }
@@ -93,7 +92,7 @@ class SubscriptionTest extends TestCase
         }
         ';
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
 
         Subscription::broadcast('unknownField', []);
     }

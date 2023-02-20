@@ -7,9 +7,9 @@ use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
 
-class ComplexityDirectiveTest extends TestCase
+final class ComplexityDirectiveTest extends TestCase
 {
-    const CUSTOM_COMPLEXITY = 123;
+    public const CUSTOM_COMPLEXITY = 123;
 
     public function testDefaultComplexity(): void
     {
@@ -35,36 +35,6 @@ class ComplexityDirectiveTest extends TestCase
         ')->assertGraphQLErrorMessage(QueryComplexity::maxQueryComplexityErrorMessage($max, 2));
     }
 
-    public function testMaintainsDefaultBehaviour(): void
-    {
-        // TODO reenable in v6
-        self::markTestSkipped('not respecting the cost of a field itself right now');
-
-        // @phpstan-ignore-next-line unreachable
-        $max = 1;
-        $this->setMaxQueryComplexity($max);
-
-        $this->schema = /** @lang GraphQL */ '
-        type Query {
-            posts: [Post!]!
-                @complexity
-                @all
-        }
-
-        type Post {
-            title: String
-        }
-        ';
-
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            posts {
-                title
-            }
-        }
-        ')->assertGraphQLErrorMessage(QueryComplexity::maxQueryComplexityErrorMessage($max, 2));
-    }
-
     public function testKnowsPagination(): void
     {
         $max = 1;
@@ -72,9 +42,7 @@ class ComplexityDirectiveTest extends TestCase
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            posts: [Post!]!
-                @complexity
-                @paginate
+            posts: [Post!]! @paginate
         }
 
         type Post {
@@ -82,9 +50,8 @@ class ComplexityDirectiveTest extends TestCase
         }
         ';
 
-        // TODO add 1 for the field posts in v6
-        // + 2 for data & title * 10 first items
-        $expectedCount = 20;
+        // 1 + (2 for data & title * 10 first items)
+        $expectedCount = 21;
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -157,15 +124,15 @@ GRAPHQL;
         ')->assertGraphQLErrorMessage(QueryComplexity::maxQueryComplexityErrorMessage($max, Foo::THE_ANSWER));
     }
 
-    public function complexity(): int
+    public static function complexity(): int
     {
         return self::CUSTOM_COMPLEXITY;
     }
 
     protected function setMaxQueryComplexity(int $max): void
     {
-        /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = $this->app->make(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
         $config->set('lighthouse.security.max_query_complexity', $max);
     }
 }

@@ -1,6 +1,6 @@
 # Testing with PHPUnit
 
-Lighthouse makes it easy to add automated tests through PHPUnit.
+Lighthouse makes it easy to add automated tests through [PHPUnit](https://phpunit.de).
 
 ## Setup
 
@@ -19,23 +19,22 @@ abstract class TestCase extends BaseTestCase
 ```
 
 Enabling the schema cache speeds up your tests. To ensure the schema is fresh
-before running tests, add the `ClearSchemaCache` trait to your test class and call it during set up.
+before running tests, add the `RefreshesSchemaCache` trait to your test class and call it during set up.
 
 ```diff
-+use Nuwave\Lighthouse\Testing\ClearsSchemaCache;
++use Nuwave\Lighthouse\Testing\RefreshesSchemaCache;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
 {
     use CreatesApplication;
-+   use ClearsSchemaCache;
-
++   use RefreshesSchemaCache;
 
     protected function setUp(): void
     {
         parent::setUp();
-+       $this->bootClearsSchemaCache();
-     }
++       $this->bootRefreshesSchemaCache();
+    }
 }
 ```
 

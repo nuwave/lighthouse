@@ -7,7 +7,7 @@ use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Type\Definition\ResolveInfo;
-use InvalidArgumentException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
 
@@ -45,12 +45,10 @@ class ArgumentSetFactory
      */
     public function fromResolveInfo(array $args, ResolveInfo $resolveInfo): ArgumentSet
     {
-        /**
-         * TODO handle programmatic types without an AST gracefully.
-         *
-         * @var \GraphQL\Language\AST\FieldDefinitionNode $definition
-         */
         $definition = $resolveInfo->fieldDefinition->astNode;
+        if (! $definition) {
+            throw new DefinitionException('Can not handle programmatic object types due to missing AST.');
+        }
 
         return $this->wrapArgs($definition, $args);
     }
@@ -71,7 +69,7 @@ class ArgumentSetFactory
         } elseif ($definition instanceof InputObjectTypeDefinitionNode) {
             $argDefinitions = $definition->fields;
         } else {
-            throw new InvalidArgumentException('Got unexpected node of type '.get_class($definition));
+            throw new \InvalidArgumentException('Got unexpected node of type ' . get_class($definition));
         }
 
         $argumentDefinitionMap = $this->makeDefinitionMap($argDefinitions);
@@ -91,9 +89,10 @@ class ArgumentSetFactory
      * Make a map with the name as keys.
      *
      * @param  iterable<\GraphQL\Language\AST\InputValueDefinitionNode>  $argumentDefinitions
+     *
      * @return array<string, \GraphQL\Language\AST\InputValueDefinitionNode>
      */
-    protected function makeDefinitionMap($argumentDefinitions): array
+    protected function makeDefinitionMap(iterable $argumentDefinitions): array
     {
         $argumentDefinitionMap = [];
 
@@ -107,7 +106,7 @@ class ArgumentSetFactory
     /**
      * Wrap a single client-given argument with type information.
      *
-     * @param  mixed  $value  The client given value.
+     * @param  mixed  $value  the client given value
      */
     protected function wrapInArgument($value, InputValueDefinitionNode $definition): Argument
     {
@@ -126,12 +125,13 @@ class ArgumentSetFactory
      *
      * @param  mixed|array<mixed>  $valueOrValues
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ListType|\Nuwave\Lighthouse\Execution\Arguments\NamedType  $type
+     *
      * @return array|mixed|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet
      */
     protected function wrapWithType($valueOrValues, $type)
     {
         // No need to recurse down further if the value is null
-        if ($valueOrValues === null) {
+        if (null === $valueOrValues) {
             return null;
         }
 
@@ -142,7 +142,7 @@ class ArgumentSetFactory
 
             $values = [];
             foreach ($valueOrValues as $singleValue) {
-                $values [] = $this->wrapWithType($singleValue, $typeInList);
+                $values[] = $this->wrapWithType($singleValue, $typeInList);
             }
 
             return $values;
@@ -154,7 +154,8 @@ class ArgumentSetFactory
     /**
      * Wrap a client-given value with information from a named type.
      *
-     * @param  mixed  $value  The client given value.
+     * @param  mixed  $value  the client given value
+     *
      * @return \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|mixed
      */
     protected function wrapWithNamedType($value, NamedType $namedType)

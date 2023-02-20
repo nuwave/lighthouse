@@ -4,12 +4,12 @@ Thank you for contributing to Lighthouse. Here are some tips to make this easy f
 
 ## The process
 
-If this is your first time contributing to any project on GitHub, try [First Contributions](https://github.com/firstcontributions/first-contributions/blob/master/README.md).
+If this is your first time contributing to any project on GitHub, see [First Contributions](https://github.com/firstcontributions/first-contributions/blob/master/README.md).
 For this project specifically, follow these steps:
 
 1. Fork the project
 1. Clone the repository
-1. [Setup the project](#setup)
+1. [Set up the project](#setup)
 1. Create a branch
 1. Code according to the [guidelines](#code-guidelines) and [style](#code-style)
 1. [Test your changes](#testing)
@@ -25,8 +25,8 @@ and other quality tools.
 
 A reproducible environment with minimal dependencies:
 
-- [docker-compose](https://docs.docker.com/compose/install/)
-- [GNU Make](https://www.gnu.org/software/make/) (optional)
+- [docker-compose](https://docs.docker.com/compose/install)
+- [GNU Make](https://www.gnu.org/software/make) (optional)
 
 For convenience, common tasks during development are wrapped up in the [Makefile](Makefile).
 To see the available commands, run:
@@ -82,6 +82,37 @@ Set the environment variable `XDEBUG_REMOTE_HOST` to the IP of your host machine
 seen from the Docker container. This may differ based on your setup: When running
 Docker for Desktop, it is usually `10.0.2.2`, when running from a VM it is something else.
 
+### Test Data Setup
+
+Use relations over direct access to foreign keys.
+
+```php
+$user = factory(User::class)->create();
+
+// Right
+$post = factory(Post::class)->make();
+$user->post()->save();
+
+// Wrong
+$user = factory(Post::class)->create([
+    'user_id' => $post->id,
+]);
+```
+
+Use properties over arrays to fill fields.
+
+```php
+// Right
+$user = new User();
+$user->name = 'Sepp';
+$user->save();
+
+// Wrong
+$user = User::create([
+    'name' => 'Sepp',
+]);
+```
+
 ## Documentation
 
 ### External
@@ -113,10 +144,17 @@ Then, add a short description of your change and close it off with a link to you
 
 ## Code guidelines
 
-### `protected` over `private`
+### Extensibility
 
-Always use class member visibility `protected` over `private`. We cannot foresee every
-possible use case in advance, extending the code should remain possible. 
+We cannot foresee every possible use case in advance, extending the code should remain possible.
+
+#### `protected` over `private`
+
+Always use class member visibility `protected` over `private`.
+
+#### `final` classes
+
+Prefer `final` classes in [tests](tests), but never use them in [src](src).
 
 ### Laravel feature usage
 
@@ -127,13 +165,10 @@ Not every application has them enabled - Lumen does not use Facades by default.
 
 Prefer direct usage of Illuminate classes instead of helpers.
 
-```php
-// Correct usage
-use \Illuminate\Support\Arr;
-Arr::get($foo, 'bar');
-
-// Wrong usage
-array_get($foo, 'bar');
+```diff
+-array_get($foo, 'bar');
++use \Illuminate\Support\Arr;
++Arr::get($foo, 'bar');
 ```
 
 A notable exception is the `response()` helper - using DI for injecting a
@@ -173,8 +208,6 @@ differentiate between cases where you return the original object instance and
 other cases where you instantiate a new class.
 
 ```php
-<?php
-
 class Foo
 {
     /**
@@ -235,8 +268,9 @@ function bar(){
 
 ## Code style
 
-We use [StyleCI](https://styleci.io/) to ensure clean formatting, oriented
-at the Laravel coding style.
+We format the code automatically with [php-cs-fixer](https://github.com/friendsofphp/php-cs-fixer).
+
+    make fix
 
 Prefer explicit naming and short, focused functions over excessive comments.
 
@@ -274,8 +308,6 @@ When used in the actual source code, classes must always be imported at the top.
 Class references in PHPDoc must use the full namespace.
 
 ```php
-<?php
-
 use Illuminate\Database\Eloquent\Model;
 
 class Foo
@@ -297,37 +329,6 @@ You can use the following two case-sensitive regexes to search for violations:
 ```regexp
 @(var|param|return|throws).*\|[A-Z]
 @(var|param|return|throws)\s*[A-Z]
-```
-
-### Test Data Setup
-
-Use relations over direct access to foreign keys.
-
-```php
-$user = factory(User::class)->create();
-
-// Right
-$post = factory(Post::class)->make();
-$user->post()->save();
-
-// Wrong
-$user = factory(Post::class)->create([
-    'user_id' => $post->id,
-]);
-```
-
-Use properties over arrays to fill fields.
-
-```php
-// Right
-$user = new User();
-$user->name = 'Sepp';
-$user->save();
-
-// Wrong
-$user = User::create([
-    'name' => 'Sepp',
-]);
 ```
 
 ## Benchmarks

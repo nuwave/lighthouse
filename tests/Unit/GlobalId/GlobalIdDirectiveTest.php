@@ -2,12 +2,12 @@
 
 namespace Tests\Unit\GlobalId;
 
+use Nuwave\Lighthouse\GlobalId\GlobalId;
 use Nuwave\Lighthouse\Schema\RootType;
-use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
 
-class GlobalIdDirectiveTest extends TestCase
+final class GlobalIdDirectiveTest extends TestCase
 {
     /**
      * @var \Nuwave\Lighthouse\GlobalId\GlobalId
@@ -145,7 +145,7 @@ class GlobalIdDirectiveTest extends TestCase
             }
         );
 
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             foo(
                 type: ID! @globalId(decode: TYPE)

@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Tracing;
 
-use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Execution\Resolved;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -33,7 +32,7 @@ directive @tracing on FIELD_DEFINITION
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
     {
         // Make sure this middleware is applied last
         $fieldValue = $next($fieldValue);
@@ -41,9 +40,9 @@ GRAPHQL;
         $previousResolver = $fieldValue->getResolver();
 
         $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
-            $start = $this->tracing->getTime();
+            $start = $this->tracing->timestamp();
             $result = $previousResolver($root, $args, $context, $resolveInfo);
-            $end = $this->tracing->getTime();
+            $end = $this->tracing->timestamp();
 
             Resolved::handle($result, function () use ($resolveInfo, $start, $end): void {
                 $this->tracing->record($resolveInfo, $start, $end);

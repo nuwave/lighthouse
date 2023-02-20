@@ -2,12 +2,24 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Illuminate\Contracts\Cache\Repository as CacheRepository;
+use Nuwave\Lighthouse\Cache\CacheKeyAndTagsGenerator;
 use Tests\DBTestCase;
+use Tests\TestsSerialization;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class LimitDirectiveTest extends DBTestCase
+final class LimitDirectiveTest extends DBTestCase
 {
+    use TestsSerialization;
+
+    protected function getEnvironmentSetUp($app): void
+    {
+        parent::getEnvironmentSetUp($app);
+
+        $this->useSerializingArrayStore();
+    }
+
     public function testLimitsResults(): void
     {
         factory(User::class, 2)->create();
@@ -114,5 +126,91 @@ class LimitDirectiveTest extends DBTestCase
             ])
             ->assertJsonCount($limit, 'data.users.0.tasks')
             ->assertJsonCount($limit, 'data.users.1.tasks');
+    }
+
+    public function testLimitsWithCache(): void
+    {
+        $user1 = factory(User::class)->create();
+        $user2 = factory(User::class)->create();
+
+        foreach ([$user1, $user2] as $user) {
+            assert($user instanceof User);
+            $user->tasks()->saveMany(
+                factory(Task::class, 2)->make()
+            );
+        }
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID! @cacheKey
+            tasks(limit: Int @limit): [Task!]! @hasMany @cache
+        }
+
+        type Task {
+            id: ID!
+        }
+
+        type Query {
+            user: [User!]! @all
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                user {
+                    id
+                    tasks(limit: 1) {
+                        id
+                    }
+                }
+            }
+            ');
+
+        $cache = $this->app->make(CacheRepository::class);
+        assert($cache instanceof CacheRepository);
+
+        $data = $cache->get(
+            (new CacheKeyAndTagsGenerator())->key(null, false, 'User', $user2->id, 'tasks', ['limit' => 1], ['user', $user2->id, 'tasks'])
+        );
+        $this->assertIsArray($data);
+
+        $task = $data[0];
+        $this->assertInstanceOf(Task::class, $task);
+        $this->assertSame(3, $task->id);
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                user {
+                    id
+                    tasks(limit: 1) {
+                        id
+                    }
+                }
+            }
+            ')
+            ->assertJson([
+                'data' => [
+                    'user' => [
+                        [
+                            'id' => 1,
+                            'tasks' => [
+                                [
+                                    'id' => 1,
+                                ],
+                            ],
+                        ],
+                        [
+                            'id' => 2,
+                            'tasks' => [
+                                [
+                                    'id' => 3,
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]);
     }
 }

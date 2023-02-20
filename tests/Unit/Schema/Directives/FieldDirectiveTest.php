@@ -6,7 +6,7 @@ use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\TestCase;
 use Tests\Utils\Queries\FooBar;
 
-class FieldDirectiveTest extends TestCase
+final class FieldDirectiveTest extends TestCase
 {
     public function testAssignsResolverFromCombinedDefinition(): void
     {
@@ -105,15 +105,14 @@ class FieldDirectiveTest extends TestCase
 
     public function testThrowsAnErrorWhenNoClassFound(): void
     {
-        $this->expectException(DefinitionException::class);
-        $this->expectExceptionMessage('No class `NonExisting` was found for directive `@field`');
-
         $this->schema = /** @lang GraphQL */ '
         type Query {
             foo: String! @field(resolver: "NonExisting")
         }
         ';
 
+        $this->expectException(DefinitionException::class);
+        $this->expectExceptionMessage('Failed to find class NonExisting in namespaces [Tests\Utils\Queries, Tests\Utils\QueriesSecondary] for directive @field.');
         $this->graphQL(/** @lang GraphQL */ '
         {
             foo
@@ -123,15 +122,14 @@ class FieldDirectiveTest extends TestCase
 
     public function testThrowsAnErrorWhenClassIsNotInvokable(): void
     {
-        $this->expectException(DefinitionException::class);
-        $this->expectExceptionMessage("Method '__invoke' does not exist on class 'Tests\Utils\Queries\MissingInvoke'");
-
         $this->schema = /** @lang GraphQL */ '
         type Query {
             bar: String! @field(resolver: "MissingInvoke")
         }
         ';
 
+        $this->expectException(DefinitionException::class);
+        $this->expectExceptionMessage("Method '__invoke' does not exist on class 'Tests\Utils\Queries\MissingInvoke'.");
         $this->graphQL(/** @lang GraphQL */ '
         {
             bar

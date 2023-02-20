@@ -48,11 +48,6 @@ abstract class DateScalarTest extends TestCase
 
     public function testConvertsCarbonCarbonImmutableToIlluminateSupportCarbon(): void
     {
-        // TODO remove when we stop supporting Laravel 5.7
-        if (! class_exists('\Carbon\CarbonImmutable')) {
-            $this->markTestSkipped('CarbonImmutable is not available with older Laravel versions');
-        }
-
         $this->assertInstanceOf(
             IlluminateCarbon::class,
             $this->scalarInstance()->parseValue(CarbonCarbonImmutable::now())
@@ -64,7 +59,7 @@ abstract class DateScalarTest extends TestCase
      *
      * @return array<array<mixed>>
      */
-    public function invalidDateValues(): array
+    public static function invalidDateValues(): array
     {
         return [
             [1],
@@ -112,8 +107,7 @@ abstract class DateScalarTest extends TestCase
         $now = IlluminateCarbon::now();
         $result = $this->scalarInstance()->serialize($now);
 
-        // TODO use native assertIsString when upgrading PHPUnit
-        $this->assertTrue(is_string($result));
+        self::assertIsString($result);
     }
 
     /**
@@ -134,16 +128,16 @@ abstract class DateScalarTest extends TestCase
     /**
      * Data provider for valid date strings.
      *
-     * @return array<array<string>>
+     * @return iterable<array<string>>
      */
-    abstract public function validDates(): array;
+    abstract public function validDates(): iterable;
 
     /**
      * Data provider with pairs of dates:
      * 1. A valid representation of the date
-     * 1. The canonical representation of the date.
+     * 2. The canonical representation of the date.
      *
-     * @return array<array<string>>
+     * @return iterable<array{string, string}>
      */
-    abstract public function canonicalizeDates(): array;
+    abstract public function canonicalizeDates(): iterable;
 }

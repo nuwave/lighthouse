@@ -12,8 +12,8 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property int $id
  *
  * Timestamps
- * @property \lluminate\Support\Carbon $created_at
- * @property \lluminate\Support\Carbon $updated_at
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property \Illuminate\Support\Carbon $updated_at
  *
  * Foreign keys
  * @property int $activity_id
@@ -24,7 +24,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property-read \Tests\Utils\Models\Post|\Tests\Utils\Models\Task $content
  * @property-read \Tests\Utils\Models\User $user
  */
-class Activity extends Model
+final class Activity extends Model
 {
     public function content(): MorphTo
     {

@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Execution;
 
-use Closure;
 use GraphQL\Error\Error;
 use Illuminate\Auth\Access\AuthorizationException as LaravelAuthorizationException;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
@@ -12,9 +11,9 @@ use Nuwave\Lighthouse\Exceptions\AuthorizationException;
  */
 class AuthorizationErrorHandler implements ErrorHandler
 {
-    public function __invoke(?Error $error, Closure $next): ?array
+    public function __invoke(?Error $error, \Closure $next): ?array
     {
-        if ($error === null) {
+        if (null === $error) {
             return $next(null);
         }
 

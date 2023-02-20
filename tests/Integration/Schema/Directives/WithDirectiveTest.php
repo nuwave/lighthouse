@@ -11,7 +11,7 @@ use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class WithDirectiveTest extends DBTestCase
+final class WithDirectiveTest extends DBTestCase
 {
     public function testEagerLoadsRelation(): void
     {
@@ -27,11 +27,11 @@ class WithDirectiveTest extends DBTestCase
         }
         ';
 
-        /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
+        assert($user instanceof User);
 
-        /** @var \Tests\Utils\Models\Task $task */
         foreach (factory(Task::class, 3)->make() as $task) {
+            assert($task instanceof Task);
             $task->user()->associate($user);
             $task->save();
         }
@@ -70,16 +70,16 @@ class WithDirectiveTest extends DBTestCase
         }
         ';
 
-        /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
+        assert($user instanceof User);
 
-        /** @var \Tests\Utils\Models\Post $post */
         foreach (factory(Post::class, 2)->make() as $post) {
+            assert($post instanceof Post);
             $post->user()->associate($user);
             $post->save();
 
-            /** @var \Tests\Utils\Models\Comment $comment */
             $comment = factory(Comment::class)->make();
+            assert($comment instanceof Comment);
             $comment->user()->associate($user);
             $comment->post()->associate($post);
             $comment->save();
@@ -134,31 +134,35 @@ class WithDirectiveTest extends DBTestCase
         }
         ';
 
-        /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
+        assert($user instanceof User);
 
-        /** @var \Tests\Utils\Models\Post $post1 */
         $post1 = factory(Post::class)->make();
-        $user->posts()->save($post1);
+        assert($post1 instanceof Post);
+        $post1->user()->associate($user);
+        $post1->save();
 
-        /** @var \Tests\Utils\Models\Activity $activity1 */
         $activity1 = factory(Activity::class)->make();
+        assert($activity1 instanceof Activity);
         $activity1->user()->associate($user);
-        $post1->activity()->save($activity1);
+        $activity1->content()->associate($post1);
+        $activity1->save();
 
         $post1->images()
             ->saveMany(
                 factory(Image::class, 3)->make()
             );
 
-        /** @var \Tests\Utils\Models\Post $post2 */
         $post2 = factory(Post::class)->make();
-        $user->posts()->save($post2);
+        assert($post2 instanceof Post);
+        $post2->user()->associate($user);
+        $post2->save();
 
-        /** @var \Tests\Utils\Models\Activity $activity2 */
         $activity2 = factory(Activity::class)->make();
+        assert($activity2 instanceof Activity);
         $activity2->user()->associate($user);
-        $post2->activity()->save($activity2);
+        $activity2->content()->associate($post2);
+        $activity2->save();
 
         $post2->images()
             ->saveMany(
@@ -167,10 +171,11 @@ class WithDirectiveTest extends DBTestCase
 
         $task = $post1->task;
 
-        /** @var \Tests\Utils\Models\Activity $activity3 */
         $activity3 = factory(Activity::class)->make();
+        assert($activity3 instanceof Activity);
         $activity3->user()->associate($user);
-        $task->activity()->save($activity3);
+        $activity3->content()->associate($task);
+        $activity3->save();
 
         $task->images()
             ->saveMany(
@@ -210,7 +215,7 @@ class WithDirectiveTest extends DBTestCase
                             'id' => "{$post1->id}",
                             'images' => $post1->images()->get()
                                 ->map(function (Image $image) {
-                                    return  ['id' => "{$image->id}"];
+                                    return ['id' => "{$image->id}"];
                                 }),
                         ],
                     ],
@@ -221,7 +226,7 @@ class WithDirectiveTest extends DBTestCase
                             'id' => "{$post2->id}",
                             'images' => $post2->images()->get()
                                 ->map(function (Image $image) {
-                                    return  ['id' => "{$image->id}"];
+                                    return ['id' => "{$image->id}"];
                                 }),
                         ],
                     ],
@@ -232,7 +237,7 @@ class WithDirectiveTest extends DBTestCase
                             'id' => "{$task->id}",
                             'images' => $task->images()->get()
                                 ->map(static function (Image $image): array {
-                                    return  ['id' => "{$image->id}"];
+                                    return ['id' => "{$image->id}"];
                                 }),
                         ],
                     ],
@@ -257,22 +262,22 @@ class WithDirectiveTest extends DBTestCase
         }
         ';
 
-        /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
+        assert($user instanceof User);
 
-        /** @var \Tests\Utils\Models\Task $task */
         foreach (factory(Task::class, 3)->make() as $task) {
+            assert($task instanceof Task);
             $task->user()->associate($user);
             $task->save();
         }
 
-        /** @var \Tests\Utils\Models\Post $post */
         foreach (factory(Post::class, 2)->make() as $post) {
+            assert($post instanceof Post);
             $post->user()->associate($user);
             $post->save();
 
-            /** @var \Tests\Utils\Models\Comment $comment */
             $comment = factory(Comment::class)->make();
+            assert($comment instanceof Comment);
             $comment->user()->associate($user);
             $comment->post()->associate($post);
             $comment->save();
@@ -317,34 +322,34 @@ class WithDirectiveTest extends DBTestCase
         }
         ';
 
-        /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
+        assert($user instanceof User);
 
-        /** @var \Tests\Utils\Models\Task $taskA */
         $taskA = factory(Task::class)->make();
+        assert($taskA instanceof Task);
         $taskA->user()->associate($user);
         $taskA->save();
 
-        /** @var \Tests\Utils\Models\Task $taskB */
         $taskB = factory(Task::class)->make();
+        assert($taskB instanceof Task);
         $taskB->user()->associate($user);
         $taskB->save();
 
-        /** @var \Tests\Utils\Models\Post $postA */
         $postA = factory(Post::class)->make();
+        assert($postA instanceof Post);
         $postA->user()->associate($user);
         $postA->task()->associate($taskA);
         $postA->save();
 
-        /** @var \Tests\Utils\Models\Post $postB */
         $postB = factory(Post::class)->make();
+        assert($postB instanceof Post);
         $postB->user()->associate($user);
         $postB->task()->associate($taskB);
         $postB->save();
 
         foreach ([$postA, $postB] as $post) {
-            /** @var \Tests\Utils\Models\Comment $comment */
             $comment = factory(Comment::class)->make();
+            assert($comment instanceof Comment);
             $comment->user()->associate($user);
             $comment->post()->associate($post);
             $comment->save();

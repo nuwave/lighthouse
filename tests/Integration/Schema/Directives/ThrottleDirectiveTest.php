@@ -8,11 +8,10 @@ use Illuminate\Http\Response;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Exceptions\RateLimitException;
-use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
 
-class ThrottleDirectiveTest extends TestCase
+final class ThrottleDirectiveTest extends TestCase
 {
     public function testWrongLimiterName(): void
     {
@@ -32,10 +31,6 @@ class ThrottleDirectiveTest extends TestCase
 
     public function testNamedLimiterReturnsRequest(): void
     {
-        if (AppVersion::below(8.0)) {
-            $this->markTestSkipped('Version less than 8.0 does not support named requests.');
-        }
-
         $this->schema = /** @lang GraphQL */ '
         type Query {
             foo: Int @throttle(name: "test")
@@ -62,10 +57,6 @@ class ThrottleDirectiveTest extends TestCase
 
     public function testNamedLimiter(): void
     {
-        if (AppVersion::below(8.0)) {
-            $this->markTestSkipped('Version less than 8.0 does not support named requests.');
-        }
-
         $this->schema = /** @lang GraphQL */ '
         type Query {
             foo: Int @throttle(name: "test")
@@ -97,12 +88,14 @@ class ThrottleDirectiveTest extends TestCase
         {
             foo
         }
-        ')->assertGraphQLErrorMessage(RateLimitException::MESSAGE);
+        ')->assertGraphQLError(
+            new RateLimitException('Query.foo')
+        );
     }
 
     public function testInlineLimiter(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             foo: Int @throttle(maxAttempts: 1)
         }
@@ -122,6 +115,8 @@ class ThrottleDirectiveTest extends TestCase
         {
             foo
         }
-        ')->assertGraphQLErrorMessage(RateLimitException::MESSAGE);
+        ')->assertGraphQLError(
+            new RateLimitException('Query.foo')
+        );
     }
 }

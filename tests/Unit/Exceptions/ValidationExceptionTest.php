@@ -6,7 +6,7 @@ use Illuminate\Validation\ValidationException as LaravelValidationException;
 use Nuwave\Lighthouse\Exceptions\ValidationException;
 use Tests\TestCase;
 
-class ValidationExceptionTest extends TestCase
+final class ValidationExceptionTest extends TestCase
 {
     public function testWithMessages(): void
     {
@@ -14,7 +14,7 @@ class ValidationExceptionTest extends TestCase
         $message = 'The email or password does not match';
         $exception = ValidationException::withMessages([$rule => $message]);
 
-        $validation = $exception->extensionsContent()[ValidationException::CATEGORY];
+        $validation = $exception->getExtensions()[ValidationException::KEY];
         $this->assertSame([$message], $validation[$rule]);
     }
 
@@ -25,7 +25,7 @@ class ValidationExceptionTest extends TestCase
         $laravelException = LaravelValidationException::withMessages([$rule => $message]);
         $exception = ValidationException::fromLaravel($laravelException);
 
-        $validation = $exception->extensionsContent()[ValidationException::CATEGORY];
+        $validation = $exception->getExtensions()[ValidationException::KEY];
         $this->assertSame([$message], $validation[$rule]);
     }
 }

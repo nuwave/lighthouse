@@ -18,8 +18,6 @@ You may use it to handle incoming values before reaching the final resolver
 as well as the outgoing result of resolving the field.
 
 ```php
-<?php
-
 namespace App\GraphQL\Directives;
 
 use Closure;
@@ -77,6 +75,9 @@ type Query {
 A [`\Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/FieldBuilderDirective.php)
 directive allows modifying the database query that Lighthouse creates for a field.
 
+> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
+> Built-in field resolver directives that query the database do this, such as [@all](../api-reference/directives.md#all) or [@hasMany](../api-reference/directives.md#hasmany).
+
 The following directives use the defined filter for resolving the query:
 
 - [@whereAuth](../api-reference/directives.md#whereauth)
@@ -88,7 +89,12 @@ directive can be used to manipulate the schema AST.
 
 ## ValidationDirective
 
-This directive type is implemented as an abstract class rather then a pure interface and allows
+This directive type is implemented as an abstract class rather than a pure interface and allows
 you to define complex validation rules for a field with ease.
 
 [Read more about it in the Validation section](../security/validation.md#validate-fields).
+
+## ComplexityResolverDirective
+
+A [`\Nuwave\Lighthouse\Support\Contracts\ComplexityResolverDirective`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ComplexityResolverDirective.php)
+directive allows you to overwrite the default query complexity calculation.

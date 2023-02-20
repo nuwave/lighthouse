@@ -3,7 +3,7 @@
 namespace Nuwave\Lighthouse\Federation\Directives;
 
 use GraphQL\Executor\Executor;
-use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
@@ -11,7 +11,7 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class ExternalDirective extends BaseDirective implements FieldResolver
 {
-    const NAME = 'external';
+    public const NAME = 'external';
 
     public static function definition(): string
     {
@@ -29,11 +29,13 @@ GRAPHQL;
 
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
-        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
+        $defaultFieldResolver = Executor::getDefaultFieldResolver();
+
+        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($defaultFieldResolver) {
             // The parent might just hold a foreign key to the external object, in which case we just return that.
             return is_scalar($root)
                 ? $root
-                : (Executor::getDefaultFieldResolver())($root, $args, $context, $resolveInfo);
+                : $defaultFieldResolver($root, $args, $context, $resolveInfo);
         });
 
         return $fieldValue;

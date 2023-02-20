@@ -23,14 +23,14 @@ GRAPHQL;
     /**
      * Delegate to nested arg resolvers.
      *
-     * @param  mixed  $root  The result of the parent resolver.
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>  $args  The slice of arguments that belongs to this nested resolver.
+     * @param  mixed  $root  the result of the parent resolver
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>  $args  the slice of arguments that belongs to this nested resolver
      */
     public function __invoke($root, $args)
     {
         $resolveNested = new ResolveNested();
 
-        return Utils::applyEach(
+        return Utils::mapEach(
             static function (ArgumentSet $argumentSet) use ($resolveNested, $root) {
                 return $resolveNested($root, $argumentSet);
             },

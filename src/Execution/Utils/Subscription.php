@@ -2,12 +2,11 @@
 
 namespace Nuwave\Lighthouse\Execution\Utils;
 
-use InvalidArgumentException;
+use Illuminate\Container\Container;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionExceptionHandler;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry;
-use Throwable;
 
 class Subscription
 {
@@ -20,22 +19,23 @@ class Subscription
     {
         // Ensure we have a schema and registered subscription fields
         // in the event we are calling this method in code.
-        /** @var \Nuwave\Lighthouse\Schema\SchemaBuilder $schemaBuilder */
-        $schemaBuilder = app(SchemaBuilder::class);
+        $schemaBuilder = Container::getInstance()->make(SchemaBuilder::class);
+        assert($schemaBuilder instanceof SchemaBuilder);
+
         $schemaBuilder->schema();
 
-        /** @var \Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry $registry */
-        $registry = app(SubscriptionRegistry::class);
+        $registry = Container::getInstance()->make(SubscriptionRegistry::class);
+        assert($registry instanceof SubscriptionRegistry);
 
         if (! $registry->has($subscriptionField)) {
-            throw new InvalidArgumentException("No subscription field registered for {$subscriptionField}");
+            throw new \InvalidArgumentException("No subscription field registered for {$subscriptionField}");
         }
 
-        /** @var \Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions $broadcaster */
-        $broadcaster = app(BroadcastsSubscriptions::class);
+        $broadcaster = Container::getInstance()->make(BroadcastsSubscriptions::class);
+        assert($broadcaster instanceof BroadcastsSubscriptions);
 
         // Default to the configuration setting if not specified
-        if ($shouldQueue === null) {
+        if (null === $shouldQueue) {
             $shouldQueue = config('lighthouse.subscriptions.queue_broadcasts', false);
         }
 
@@ -47,9 +47,10 @@ class Subscription
             } else {
                 $broadcaster->broadcast($subscription, $subscriptionField, $root);
             }
-        } catch (Throwable $e) {
-            /** @var \Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionExceptionHandler $exceptionHandler */
-            $exceptionHandler = app(SubscriptionExceptionHandler::class);
+        } catch (\Throwable $e) {
+            $exceptionHandler = Container::getInstance()->make(SubscriptionExceptionHandler::class);
+            assert($exceptionHandler instanceof SubscriptionExceptionHandler);
+
             $exceptionHandler->handleBroadcastError($e);
         }
     }

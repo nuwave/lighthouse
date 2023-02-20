@@ -134,8 +134,6 @@ to the database and return that instance to Lighthouse.
 A simplified, generic implementation of an appropriate field resolver would look something like this:
 
 ```php
-<?php
-
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Illuminate\Database\Eloquent\Model;
@@ -148,21 +146,21 @@ class CreateDirective extends BaseDirective implements FieldResolver
 {
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
-        return $fieldValue->setResolver(
-            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Model {
-                // Wrap the operation and let Lighthouse take care of splitting the input
-                $nestedSave = new ResolveNested(function($model, $args) {
-                    $model->fill($args->toArray());
-                    $model->save();
-                });
+        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Model {
+            // Wrap the operation and let Lighthouse take care of splitting the input
+            $nestedSave = new ResolveNested(function($model, $args) {
+                $model->fill($args->toArray());
+                $model->save();
+            });
 
-                $modelClass = $this->getModelClass();
-                /** @var \Illuminate\Database\Eloquent\Model $model */
-                $model = new $modelClass;
+            $modelClass = $this->getModelClass();
+            /** @var \Illuminate\Database\Eloquent\Model $model */
+            $model = new $modelClass;
 
-                return $nestedSave($model, $resolveInfo->argumentSet);
-            }
-        );
+            return $nestedSave($model, $resolveInfo->argumentSet);
+        });
+
+        return $fieldValue;
     }
 }
 ```
@@ -174,8 +172,6 @@ and create and attach a related `Note` model.
 We can extend our previous implementation of [@create](../api-reference/directives.md#create) by allowing it to be used as an `ArgResolver`:
 
 ```php
-<?php
-
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Schema\Values\FieldValue;

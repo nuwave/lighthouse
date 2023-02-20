@@ -2,14 +2,14 @@
 
 namespace Tests\Unit\GlobalId;
 
-use Nuwave\Lighthouse\GlobalId\GlobalId;
+use Nuwave\Lighthouse\GlobalId\Base64GlobalId;
 use Nuwave\Lighthouse\GlobalId\GlobalIdException;
 use Tests\TestCase;
 
-class GlobalIdTest extends TestCase
+final class GlobalIdTest extends TestCase
 {
     /**
-     * @var \Nuwave\Lighthouse\GlobalId\GlobalId
+     * @var \Nuwave\Lighthouse\GlobalId\Base64GlobalId
      */
     protected $globalIdResolver;
 
@@ -17,7 +17,7 @@ class GlobalIdTest extends TestCase
     {
         parent::setUp();
 
-        $this->globalIdResolver = new GlobalId;
+        $this->globalIdResolver = new Base64GlobalId();
     }
 
     public function testHandleGlobalIds(): void
@@ -54,7 +54,7 @@ class GlobalIdTest extends TestCase
     /**
      * @return array<int, array{0: string}>
      */
-    public function provideInvalidGlobalIds(): array
+    public static function provideInvalidGlobalIds(): array
     {
         return [
             ['foo'],

@@ -25,6 +25,13 @@ class FallbackTypeNodeConverter extends TypeNodeConverter
         return Type::nonNull($type);
     }
 
+    /**
+     * @param T|callable():T $type
+     *
+     * @return ListOfType<T>
+     *
+     * @template T of Type
+     */
     protected function listOf($type): ListOfType
     {
         return Type::listOf($type);
@@ -32,8 +39,9 @@ class FallbackTypeNodeConverter extends TypeNodeConverter
 
     protected function namedType(string $nodeName): Type
     {
-        if (isset(Type::getStandardTypes()[$nodeName])) {
-            return Type::getStandardTypes()[$nodeName];
+        $standardTypes = Type::getStandardTypes();
+        if (isset($standardTypes[$nodeName])) {
+            return $standardTypes[$nodeName];
         }
 
         if (! $this->typeRegistry->has($nodeName)) {

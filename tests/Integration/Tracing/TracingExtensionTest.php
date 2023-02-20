@@ -5,13 +5,13 @@ namespace Tests\Integration\Tracing;
 use Nuwave\Lighthouse\Tracing\TracingServiceProvider;
 use Tests\TestCase;
 
-class TracingExtensionTest extends TestCase
+final class TracingExtensionTest extends TestCase
 {
-    protected $schema = <<<SCHEMA
-type Query {
-    foo: String! @field(resolver: "Tests\\\Integration\\\Tracing\\\TracingExtensionTest@resolve")
-}
-SCHEMA;
+    protected $schema = /** @lang GraphQL */ '
+    type Query {
+        foo: String! @field(resolver: "Tests\\\Integration\\\Tracing\\\TracingExtensionTest@resolve")
+    }
+    ';
 
     protected function getPackageProviders($app): array
     {
@@ -23,25 +23,27 @@ SCHEMA;
 
     public function testAddTracingExtensionMetaToResult(): void
     {
-        $this->graphQL('
-        {
-            foo
-        }
-        ')->assertJsonStructure([
-            'extensions' => [
-                'tracing' => [
-                    'execution' => [
-                        'resolvers',
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo
+            }
+            ')
+            ->assertJsonStructure([
+                'extensions' => [
+                    'tracing' => [
+                        'execution' => [
+                            'resolvers',
+                        ],
                     ],
                 ],
-            ],
-        ]);
+            ]);
     }
 
     public function testAddTracingExtensionMetaToBatchedResults(): void
     {
         $postData = [
-            'query' => '
+            'query' => /** @lang GraphQL */ '
                 {
                     foo
                 }
@@ -56,32 +58,41 @@ SCHEMA;
                 ],
             ],
         ];
-        $result = $this->postGraphQL([
-            $postData,
-            $postData,
-        ])->assertJsonCount(2)
+
+        $result = $this
+            ->postGraphQL([
+                $postData,
+                $postData,
+            ])
+            ->assertJsonCount(2)
             ->assertJsonStructure([
                 $expectedResponse,
                 $expectedResponse,
             ]);
 
-        $this->assertSame(
-            $result->json('0.extensions.tracing.startTime'),
-            $result->json('1.extensions.tracing.startTime')
-        );
+        $startTime1 = $result->json('0.extensions.tracing.startTime');
+        $endTime1 = $result->json('0.extensions.tracing.endTime');
 
-        $this->assertNotSame(
-            $result->json('0.extensions.tracing.endTime'),
-            $result->json('1.extensions.tracing.endTime')
-        );
+        $startTime2 = $result->json('1.extensions.tracing.startTime');
+        $endTime2 = $result->json('1.extensions.tracing.endTime');
+
+        // Guaranteed by the usleep() in $this->resolve()
+        $this->assertGreaterThan($startTime1, $endTime1);
+
+        // Might be the same timestamp if Lighthouse runs quickly in a given environment
+        $this->assertGreaterThanOrEqual($endTime1, $startTime2);
+
+        // Guaranteed by the usleep() in $this->resolve()
+        $this->assertGreaterThan($startTime2, $endTime2);
 
         $this->assertCount(1, $result->json('0.extensions.tracing.execution.resolvers'));
         $this->assertCount(1, $result->json('1.extensions.tracing.execution.resolvers'));
     }
 
-    public function resolve(): string
+    public static function resolve(): string
     {
-        usleep(20000); // 20 milliseconds
+        // Just enough to consistently change the resulting timestamp
+        usleep(1000);
 
         return 'bar';
     }

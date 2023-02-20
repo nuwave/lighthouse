@@ -11,7 +11,7 @@ use Tests\TestCase;
 use Tests\TestsSubscriptions;
 use Tests\Utils\Subscriptions\DummySubscriber;
 
-class RedisStorageManagerTest extends TestCase
+final class RedisStorageManagerTest extends TestCase
 {
     use TestsSubscriptions;
 
@@ -26,7 +26,7 @@ class RedisStorageManagerTest extends TestCase
         $subscriber = new DummySubscriber($channel, 'test-topic');
         $redisConnection->expects($this->once())
             ->method('command')
-            ->with('get', ['graphql.subscriber.'.$channel])
+            ->with('get', ['graphql.subscriber.' . $channel])
             ->willReturn(serialize($subscriber));
 
         $manager = new RedisStorageManager($config, $redisFactory);
@@ -42,14 +42,14 @@ class RedisStorageManagerTest extends TestCase
         $redisFactory = $this->getRedisFactory($redisConnection);
 
         $channel = 'test-channel';
-        $prefixedChannel = 'graphql.subscriber.'.$channel;
+        $prefixedChannel = 'graphql.subscriber.' . $channel;
         $subscriber = new DummySubscriber($channel, 'test-topic');
         $redisConnection->expects($this->exactly(3))
             ->method('command')
             ->withConsecutive(
                 ['get', [$prefixedChannel]],
                 ['del', [$prefixedChannel]],
-                ['srem', ['graphql.topic.'.$subscriber->topic, $channel]]
+                ['srem', ['graphql.topic.' . $subscriber->topic, $channel]]
             )
             ->willReturnOnConsecutiveCalls(
                 serialize($subscriber)
@@ -72,6 +72,9 @@ class RedisStorageManagerTest extends TestCase
         $channel = 'private-lighthouse-foo';
         $subscriber = new DummySubscriber($channel, 'dummy-topic');
 
+        $storedTopic = 'some-topic';
+        $subscriberUnderTopic = new DummySubscriber($channel, $storedTopic);
+
         $topicKey = 'graphql.topic.some-topic';
         $redisConnection->expects($this->exactly(3))
             ->method('command')
@@ -87,15 +90,12 @@ class RedisStorageManagerTest extends TestCase
                 ['setex', [
                     'graphql.subscriber.private-lighthouse-foo',
                     $ttl,
-                    'C:41:"Tests\Utils\Subscriptions\DummySubscriber":57:{'.\Safe\json_encode([
-                        'channel' => $channel,
-                        'topic' => 'some-topic',
-                    ]).'}',
+                    serialize($subscriberUnderTopic),
                 ]]
             );
 
         $manager = new RedisStorageManager($config, $redisFactory);
-        $manager->storeSubscriber($subscriber, 'some-topic');
+        $manager->storeSubscriber($subscriber, $storedTopic);
     }
 
     public function testStoreSubscriberWithoutTtl(): void
@@ -110,6 +110,9 @@ class RedisStorageManagerTest extends TestCase
         $channel = 'private-lighthouse-foo';
         $subscriber = new DummySubscriber($channel, 'dummy-topic');
 
+        $storedTopic = 'some-topic';
+        $subscriberUnderTopic = new DummySubscriber($channel, $storedTopic);
+
         $topicKey = 'graphql.topic.some-topic';
         $redisConnection->expects($this->exactly(2))
             ->method('command')
@@ -120,15 +123,12 @@ class RedisStorageManagerTest extends TestCase
                 ]],
                 ['set', [
                     'graphql.subscriber.private-lighthouse-foo',
-                    'C:41:"Tests\Utils\Subscriptions\DummySubscriber":57:{'.\Safe\json_encode([
-                        'channel' => $channel,
-                        'topic' => 'some-topic',
-                    ]).'}',
+                    serialize($subscriberUnderTopic),
                 ]]
             );
 
         $manager = new RedisStorageManager($config, $redisFactory);
-        $manager->storeSubscriber($subscriber, 'some-topic');
+        $manager->storeSubscriber($subscriber, $storedTopic);
     }
 
     public function testSubscribersByTopic(): void
@@ -138,34 +138,51 @@ class RedisStorageManagerTest extends TestCase
         $redisFactory = $this->getRedisFactory($redisConnection);
 
         $topic = 'bar';
+
+        $subscriber1 = new DummySubscriber('foo1', $topic);
+        $subscriber2 = new DummySubscriber('foo2', $topic);
+
         $subscribers = [
-            new DummySubscriber('foo1', $topic),
-            new DummySubscriber('foo2', $topic),
+            $subscriber1,
+            $subscriber2,
         ];
 
         $redisConnection->expects($this->exactly(2))
             ->method('command')
             ->withConsecutive(
-                ['smembers', ['graphql.topic.'.$topic]],
+                ['smembers', ["graphql.topic.{$topic}"]],
                 ['mget', [[
                     'graphql.subscriber.foo1',
                     'graphql.subscriber.foo2',
+                    'graphql.subscriber.foo3',
                 ]]]
             )
             ->willReturnOnConsecutiveCalls(
-                ['foo1', 'foo2'],
-                array_map('serialize', $subscribers)
+                ['foo1', 'foo2', 'foo3'],
+                [
+                    serialize($subscriber1),
+                    serialize($subscriber2),
+                    // Simulate an expired key, see https://github.com/nuwave/lighthouse/issues/2035
+                    null,
+                    // Depending on the setup, redis can also return this invalid result https://github.com/nuwave/lighthouse/issues/2085
+                    '(nil)',
+                    // mget non-existing-entry
+                    false,
+                ]
             );
 
-        $manager = new RedisStorageManager($config, $redisFactory);
         $this->assertEquals(
             $subscribers,
-            $manager->subscribersByTopic($topic)->all()
+            (new RedisStorageManager($config, $redisFactory))
+                ->subscribersByTopic($topic)
+                ->values()
+                ->all()
         );
     }
 
     /**
      * @param  \PHPUnit\Framework\MockObject\MockObject&\Illuminate\Redis\Connections\Connection  $redisConnection
+     *
      * @return \PHPUnit\Framework\MockObject\MockObject&\Illuminate\Contracts\Redis\Factory
      */
     protected function getRedisFactory(MockObject $redisConnection): MockObject

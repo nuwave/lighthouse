@@ -9,7 +9,7 @@ namespace Tests;
  *
  * As migrations are not namespaced, they do not play nice with PHPStan.
  */
-class Constants
+final class Constants
 {
     public const TAGS_DEFAULT_STRING = 'this is the default string';
 }

@@ -2,26 +2,26 @@
 
 namespace Tests\Integration;
 
-use Exception;
 use GraphQL\Error\DebugFlag;
 use GraphQL\Error\Error;
+use GraphQL\Error\FormattedError;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Tests\TestCase;
 
-class ErrorTest extends TestCase
+final class ErrorTest extends TestCase
 {
     public function testMissingQuery(): void
     {
         $this->postGraphQL([])
-            ->assertGraphQLErrorMessage('GraphQL Request must include at least one of those two parameters: "query" or "queryId"')
-            ->assertGraphQLErrorCategory('request');
+            ->assertStatus(200)
+            ->assertGraphQLErrorMessage('GraphQL Request must include at least one of those two parameters: "query" or "queryId"');
     }
 
     public function testEmptyQuery(): void
     {
         $this->graphQL(/** @lang GraphQL */ '')
-            ->assertGraphQLErrorMessage('GraphQL Request parameter "query" is required and must not be empty.')
-            ->assertGraphQLErrorCategory('request');
+            ->assertStatus(200)
+            ->assertGraphQLErrorMessage('GraphQL Request must include at least one of those two parameters: "query" or "queryId"');
     }
 
     public function testRejectsInvalidQuery(): void
@@ -31,6 +31,7 @@ class ErrorTest extends TestCase
             nonExistingField
         }
         ');
+        $result->assertStatus(200);
 
         $this->assertStringContainsString(
             'nonExistingField',
@@ -40,28 +41,26 @@ class ErrorTest extends TestCase
 
     public function testIgnoresInvalidJSONVariables(): void
     {
-        $result = $this->postGraphQL([
-            'query' => /** @lang GraphQL */ '{}',
-            'variables' => '{}',
-        ]);
-
-        $result->assertStatus(200);
+        $this
+            ->postGraphQL([
+                'query' => /** @lang GraphQL */ '{}',
+                'variables' => '{}',
+            ])
+            ->assertStatus(200);
     }
 
     public function testRejectsEmptyRequest(): void
     {
         $this->postGraphQL([])
             ->assertStatus(200)
-            ->assertGraphQLErrorMessage('GraphQL Request must include at least one of those two parameters: "query" or "queryId"')
-            ->assertGraphQLErrorCategory('request');
+            ->assertGraphQLErrorMessage('GraphQL Request must include at least one of those two parameters: "query" or "queryId"');
     }
 
     public function testRejectsEmptyQuery(): void
     {
         $this->graphQL('')
             ->assertStatus(200)
-            ->assertGraphQLErrorMessage('GraphQL Request must include at least one of those two parameters: "query" or "queryId"')
-            ->assertGraphQLErrorCategory('request');
+            ->assertGraphQLErrorMessage('GraphQL Request must include at least one of those two parameters: "query" or "queryId"');
     }
 
     public function testHandlesErrorInResolver(): void
@@ -82,6 +81,7 @@ class ErrorTest extends TestCase
                 foo
             }
             ')
+            ->assertStatus(200)
             ->assertJson([
                 'data' => [
                     'foo' => null,
@@ -91,18 +91,17 @@ class ErrorTest extends TestCase
                         'message' => $message,
                     ],
                 ],
-            ])
-            ->assertStatus(200);
+            ]);
     }
 
     public function testRethrowsInternalExceptions(): void
     {
-        /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = $this->app->make(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
         $config->set('lighthouse.debug', DebugFlag::INCLUDE_DEBUG_MESSAGE);
 
         $this->mockResolver()
-            ->willThrowException(new Exception('foo'));
+            ->willThrowException(new \Exception('foo'));
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -116,11 +115,12 @@ class ErrorTest extends TestCase
                 foo
             }
             ')
+            ->assertStatus(200)
             ->assertJsonCount(1, 'errors');
 
         $config->set('lighthouse.debug', DebugFlag::RETHROW_INTERNAL_EXCEPTIONS);
 
-        $this->expectException(Exception::class);
+        $this->expectException(\Exception::class);
         $this->graphQL(/** @lang GraphQL */ '
         {
             foo
@@ -130,7 +130,7 @@ class ErrorTest extends TestCase
 
     public function testReturnsMultipleErrors(): void
     {
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         input TestInput {
             string: String!
             integer: Int!
@@ -147,7 +147,106 @@ class ErrorTest extends TestCase
                 foo(input: {})
             }
             ')
+            ->assertStatus(200)
             ->assertGraphQLErrorMessage('Field TestInput.string of required type String! was not provided.')
             ->assertGraphQLErrorMessage('Field TestInput.integer of required type Int! was not provided.');
+    }
+
+    public function testUnknownTypeInVariableDefinition(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(bar: ID): ID
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            query ($bar: UnknownType) {
+                foo(bar: $bar)
+            }
+            ')
+            ->assertGraphQLErrorMessage('Unknown type "UnknownType".');
+    }
+
+    public function testAssertGraphQLDebugMessage(): void
+    {
+        $config = $this->app->make(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
+        $config->set('lighthouse.debug', DebugFlag::INCLUDE_DEBUG_MESSAGE);
+
+        $message = 'foo';
+
+        $this->mockResolver()
+            ->willThrowException(new \Exception($message));
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo: ID @mock
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo
+            }
+            ')
+            ->assertStatus(200)
+            /** @see FormattedError::$internalErrorMessage */
+            ->assertGraphQLErrorMessage('Internal server error')
+            ->assertGraphQLDebugMessage($message);
+    }
+
+    public function testAssertGraphQLErrorClientSafe(): void
+    {
+        $error = new Error('foo');
+
+        $this->mockResolver()
+            ->willThrowException($error);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo: ID @mock
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo
+            }
+            ')
+            ->assertStatus(200)
+            ->assertGraphQLError($error);
+    }
+
+    public function testAssertGraphQLErrorNonClientSafe(): void
+    {
+        $config = $this->app->make(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
+        $config->set('lighthouse.debug', DebugFlag::INCLUDE_DEBUG_MESSAGE);
+
+        $exception = new \Exception('foo');
+
+        $this->mockResolver()
+            ->willThrowException($exception);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo: ID @mock
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo
+            }
+            ')
+            ->assertStatus(200)
+            /** @see FormattedError::$internalErrorMessage */
+            ->assertGraphQLErrorMessage('Internal server error')
+            ->assertGraphQLError($exception);
     }
 }

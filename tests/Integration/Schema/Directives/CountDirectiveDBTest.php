@@ -3,7 +3,6 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Activity;
@@ -12,7 +11,7 @@ use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class CountDirectiveDBTest extends DBTestCase
+final class CountDirectiveDBTest extends DBTestCase
 {
     public function testRequiresARelationOrModelArgument(): void
     {
@@ -94,34 +93,29 @@ class CountDirectiveDBTest extends DBTestCase
                 ]);
             });
 
-        $queries = 0;
-        DB::listen(function () use (&$queries): void {
-            $queries++;
-        });
-
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            users {
-                tasks_count
+        $this->assertQueryCountMatches(2, function (): void {
+            $this->graphQL(/** @lang GraphQL */ '
+            {
+                users {
+                    tasks_count
+                }
             }
-        }
-        ')->assertExactJson([
-            'data' => [
-                'users' => [
-                    [
-                        'tasks_count' => 3,
-                    ],
-                    [
-                        'tasks_count' => 2,
-                    ],
-                    [
-                        'tasks_count' => 1,
+            ')->assertExactJson([
+                'data' => [
+                    'users' => [
+                        [
+                            'tasks_count' => 3,
+                        ],
+                        [
+                            'tasks_count' => 2,
+                        ],
+                        [
+                            'tasks_count' => 1,
+                        ],
                     ],
                 ],
-            ],
-        ]);
-
-        $this->assertEquals(2, $queries);
+            ]);
+        });
     }
 
     public function testCountRelationThatIsNotSuffixedWithCount(): void
@@ -417,6 +411,64 @@ class CountDirectiveDBTest extends DBTestCase
                     ],
                     'taskCount' => 2,
                 ],
+            ],
+        ]);
+    }
+
+    public function testCountModelWithColumns(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            tasks: Int @count(model: "Task", columns: ["difficulty"])
+        }
+        ';
+
+        $notNull = factory(Task::class)->make();
+        assert($notNull instanceof Task);
+        $notNull->difficulty = null;
+        $notNull->save();
+
+        $notNull = factory(Task::class)->make();
+        assert($notNull instanceof Task);
+        $notNull->difficulty = 2;
+        $notNull->save();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            tasks
+        }
+        ')->assertExactJson([
+            'data' => [
+                'tasks' => 1,
+            ],
+        ]);
+    }
+
+    public function testCountModelWithColumnsAndDistinct(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            tasks: Int @count(model: "Task", distinct: true, columns: ["difficulty"])
+        }
+        ';
+        foreach (factory(Task::class, 2)->make() as $task) {
+            assert($task instanceof Task);
+            $task->difficulty = 1;
+            $task->save();
+        }
+
+        $other = factory(Task::class)->make();
+        assert($other instanceof Task);
+        $other->difficulty = 2;
+        $other->save();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            tasks
+        }
+        ')->assertExactJson([
+            'data' => [
+                'tasks' => 2,
             ],
         ]);
     }

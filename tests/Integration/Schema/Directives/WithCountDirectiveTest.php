@@ -2,13 +2,12 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use Illuminate\Support\Facades\DB;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class WithCountDirectiveTest extends DBTestCase
+final class WithCountDirectiveTest extends DBTestCase
 {
     public function testEagerLoadsRelationCount(): void
     {
@@ -31,34 +30,29 @@ class WithCountDirectiveTest extends DBTestCase
                 ]);
             });
 
-        $queries = 0;
-        DB::listen(function () use (&$queries): void {
-            $queries++;
-        });
-
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            users {
-                tasksCountLoaded
+        $this->assertQueryCountMatches(2, function (): void {
+            $this->graphQL(/** @lang GraphQL */ '
+            {
+                users {
+                    tasksCountLoaded
+                }
             }
-        }
-        ')->assertExactJson([
-            'data' => [
-                'users' => [
-                    [
-                        'tasksCountLoaded' => true,
-                    ],
-                    [
-                        'tasksCountLoaded' => true,
-                    ],
-                    [
-                        'tasksCountLoaded' => true,
+            ')->assertExactJson([
+                'data' => [
+                    'users' => [
+                        [
+                            'tasksCountLoaded' => true,
+                        ],
+                        [
+                            'tasksCountLoaded' => true,
+                        ],
+                        [
+                            'tasksCountLoaded' => true,
+                        ],
                     ],
                 ],
-            ],
-        ]);
-
-        $this->assertSame(2, $queries);
+            ]);
+        });
     }
 
     public function testFailsToEagerLoadRelationCountWithoutRelation(): void

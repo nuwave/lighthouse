@@ -19,6 +19,8 @@ namespace configured in `lighthouse.federation.entities_resolver_namespace`.
 }
 ```
 
+### Single Entity Resolvers
+
 After validating the type `Foo` exists, Lighthouse will look for a resolver class in `App\GraphQL\Entities\Foo`.
 The resolver class is expected to contain a method `__invoke()` which takes a single argument:
 the array form of the representation.
@@ -34,6 +36,30 @@ class Foo
     public function __invoke(array $representation)
     {
         // TODO return a value that matches type Foo
+    }
+}
+```
+
+### Batched Entity Resolves
+
+When the client requests a large number of entities with the same type, it can be more efficient to resolve
+them all at once. When your entity resolver class implements `Nuwave\Lighthouse\Federation\BatchedEntityResolver`,
+Lighthouse will call it a single time with a list of all representations of its type. The resolver can then do
+some kind of batch query to resolve them and return them all at once.
+
+```php
+namespace App\GraphQL\Entities;
+
+use Nuwave\Lighthouse\Federation\BatchedEntityResolver;
+
+class Foo implements BatchedEntityResolver
+{
+    /**
+     * @param  array<int, array{__typename: string, id: int}>  $representations
+     */
+    public function __invoke(array $representations): iterable
+    {
+        // TODO return multiple values that match type Foo
     }
 }
 ```

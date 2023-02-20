@@ -5,7 +5,7 @@ namespace Tests\Integration\Execution\MutationExecutor;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Tag;
 
-class MorphToManyTest extends DBTestCase
+final class MorphToManyTest extends DBTestCase
 {
     protected $schema = /** @lang GraphQL */ '
     type Mutation {
@@ -57,7 +57,7 @@ class MorphToManyTest extends DBTestCase
         id: ID!
         name: String!
     }
-    '.self::PLACEHOLDER_QUERY;
+    ' . self::PLACEHOLDER_QUERY;
 
     public function testCreateATaskWithExistingTagsByUsingConnect(): void
     {

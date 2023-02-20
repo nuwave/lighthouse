@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Defer;
 
-use Closure;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Events\StartExecution;
@@ -67,6 +66,7 @@ class Defer implements CreatesResponse
      * @var float|int
      */
     protected $maxExecutionTime = 0;
+
     /**
      * @var int
      */
@@ -94,12 +94,13 @@ class Defer implements CreatesResponse
      * Register deferred field.
      *
      * @param  \Closure(): mixed  $resolver
-     * @return mixed The data if it is already available.
+     *
+     * @return mixed the data if it is already available
      */
-    public function defer(Closure $resolver, string $path)
+    public function defer(\Closure $resolver, string $path)
     {
         $data = $this->getData($path);
-        if ($data !== null) {
+        if (null !== $data) {
             return $data;
         }
 
@@ -128,21 +129,23 @@ class Defer implements CreatesResponse
 
     /**
      * @param  \Closure(): mixed  $resolver
+     *
      * @return mixed The loaded data
      */
-    protected function resolve(Closure $resolver, string $path)
+    protected function resolve(\Closure $resolver, string $path)
     {
         unset($this->deferred[$path]);
-        $this->resolved [] = $path;
+        $this->resolved[] = $path;
 
         return $resolver();
     }
 
     /**
      * @param  \Closure(): mixed  $originalResolver
+     *
      * @return mixed The loaded data
      */
-    public function findOrResolve(Closure $originalResolver, string $path)
+    public function findOrResolve(\Closure $originalResolver, string $path)
     {
         if ($this->hasData($path)) {
             return $this->getData($path);
@@ -160,6 +163,7 @@ class Defer implements CreatesResponse
      * Return either a final response or a stream of responses.
      *
      * @param  array<string, mixed>  $result
+     *
      * @return \Illuminate\Http\Response|\Symfony\Component\HttpFoundation\StreamedResponse
      */
     public function createResponse(array $result): Response
@@ -181,7 +185,7 @@ class Defer implements CreatesResponse
                     && ! $this->maxExecutionTimeReached()
                     && ! $this->maxNestedFieldsResolved($nested)
                 ) {
-                    $nested++;
+                    ++$nested;
                     $this->executeDeferred();
                 }
 
@@ -204,7 +208,7 @@ class Defer implements CreatesResponse
 
     protected function hasRemainingDeferred(): bool
     {
-        return count($this->deferred) > 0;
+        return [] !== $this->deferred;
     }
 
     protected function stream(): void
@@ -221,7 +225,7 @@ class Defer implements CreatesResponse
      */
     protected function maxExecutionTimeReached(): bool
     {
-        if ($this->maxExecutionTime === 0) {
+        if (0 === $this->maxExecutionTime) {
             return false;
         }
 
@@ -233,7 +237,7 @@ class Defer implements CreatesResponse
      */
     protected function maxNestedFieldsResolved(int $nested): bool
     {
-        if ($this->maxNestedFields === 0) {
+        if (0 === $this->maxNestedFields) {
             return false;
         }
 
@@ -242,7 +246,7 @@ class Defer implements CreatesResponse
 
     protected function executeDeferred(): void
     {
-        $executionResult = $this->graphQL->executeQuery(
+        $executionResult = $this->graphQL->executeParsedQuery(
             $this->startExecution->query,
             $this->startExecution->context,
             $this->startExecution->variables,

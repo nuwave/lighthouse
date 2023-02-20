@@ -12,7 +12,7 @@ abstract class FieldGeneratorCommand extends LighthouseGeneratorCommand
             ? 'field_full'
             : 'field_simple';
 
-        return __DIR__."/stubs/{$stub}.stub";
+        return __DIR__ . "/stubs/{$stub}.stub";
     }
 
     /**

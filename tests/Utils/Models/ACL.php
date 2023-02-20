@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property bool $update_post
  * @property bool $delete_post
  */
-class ACL extends Model
+final class ACL extends Model
 {
     protected $table = 'acls';
 

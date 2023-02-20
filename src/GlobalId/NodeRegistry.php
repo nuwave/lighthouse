@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\GlobalId;
 
-use Closure;
 use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
@@ -49,7 +48,7 @@ class NodeRegistry
      *
      * @example fn($id, GraphQLContext $context, ResolveInfo $resolveInfo) => $this->db->getUserById($id)
      */
-    public function registerNode(string $typeName, Closure $resolve): self
+    public function registerNode(string $typeName, \Closure $resolve): self
     {
         $this->nodeResolver[$typeName] = $resolve;
 
@@ -60,9 +59,10 @@ class NodeRegistry
      * Get the appropriate resolver for the node and call it with the decoded id.
      *
      * @param  array<string, mixed>  $args
-     * @return mixed The result of calling the resolver.
      *
      * @throws \GraphQL\Error\Error
+     *
+     * @return mixed the result of calling the resolver
      */
     public function resolve($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
     {

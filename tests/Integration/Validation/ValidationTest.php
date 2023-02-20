@@ -14,14 +14,14 @@ use Tests\Utils\Validators\FooClosureValidator;
 /**
  * Covers fundamentals of the validation process.
  */
-class ValidationTest extends TestCase
+final class ValidationTest extends TestCase
 {
     protected function getEnvironmentSetUp($app): void
     {
         parent::getEnvironmentSetUp($app);
 
-        /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = $app->make(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
 
         // Ensure we test for the result the end user receives
         $config->set('app.debug', false);
@@ -71,8 +71,7 @@ class ValidationTest extends TestCase
                     [
                         'message' => 'Validation failed for the field [foo].',
                         'extensions' => [
-                            'category' => ValidationException::CATEGORY,
-                            ValidationException::CATEGORY => [
+                            ValidationException::KEY => [
                                 'bar' => [
                                     'The bar field is required.',
                                 ],
@@ -134,7 +133,7 @@ class ValidationTest extends TestCase
                         'path' => ['foo'],
                         'message' => 'Validation failed for the field [foo.baz].',
                         'extensions' => [
-                            ValidationException::CATEGORY => [
+                            ValidationException::KEY => [
                                 'required' => [
                                     'The required field is required.',
                                 ],
@@ -165,8 +164,12 @@ class ValidationTest extends TestCase
                 )
             }
             ')
-            ->assertGraphQLValidationError('bar', 'The bar must be at least 42 characters.')
-            ->assertGraphQLValidationError('baz', 'The baz must be at least 42.');
+            ->assertGraphQLValidationError('bar', AppVersion::atLeast(10.0)
+                ? 'The bar field must be at least 42 characters.'
+                : 'The bar must be at least 42 characters.')
+            ->assertGraphQLValidationError('baz', AppVersion::atLeast(10.0)
+                ? 'The baz field must be at least 42.'
+                : 'The baz must be at least 42.');
     }
 
     public function testValidatesDifferentPathsIndividually(): void
@@ -337,11 +340,9 @@ class ValidationTest extends TestCase
                 foo(bar: "f")
             }
             ')
-            ->assertGraphQLValidationError('bar', 'The bar must be at least 2 characters.');
-
-        $message = AppVersion::atLeast(8.32)
-            ? 'The bar must not be greater than 3 characters.'
-            : 'The bar may not be greater than 3 characters.';
+            ->assertGraphQLValidationError('bar', AppVersion::atLeast(10.0)
+                ? 'The bar field must be at least 2 characters.'
+                : 'The bar must be at least 2 characters.');
 
         $this
             ->graphQL(/** @lang GraphQL */ '
@@ -349,7 +350,9 @@ class ValidationTest extends TestCase
                 foo(bar: "fasdf")
             }
             ')
-            ->assertGraphQLValidationError('bar', $message);
+            ->assertGraphQLValidationError('bar', AppVersion::atLeast(10.0)
+                ? 'The bar field must not be greater than 3 characters.'
+                : 'The bar must not be greater than 3 characters.');
     }
 
     public function testSingleFieldReferencesAreQualified(): void
@@ -427,8 +430,12 @@ class ValidationTest extends TestCase
                 )
             }
             ')
-            ->assertGraphQLValidationError('input.foo', 'The input.foo must be a date after 2018-01-01.')
-            ->assertGraphQLValidationError('input.bar', 'The input.bar must be a date after input.foo.');
+            ->assertGraphQLValidationError('input.foo', AppVersion::atLeast(10.0)
+                ? 'The input.foo field must be a date after 2018-01-01.'
+                : 'The input.foo must be a date after 2018-01-01.')
+            ->assertGraphQLValidationError('input.bar', AppVersion::atLeast(10.0)
+                ? 'The input.bar field must be a date after input.foo.'
+                : 'The input.bar must be a date after input.foo.');
     }
 
     public function testCustomValidationWithReferencesAreQualified(): void
@@ -612,7 +619,11 @@ class ValidationTest extends TestCase
                 )
             }
             ')
-            ->assertGraphQLValidationError('input.email', 'The input.email must be a valid email address.')
-            ->assertGraphQLValidationError('input.email', 'The input.email must be at least 16 characters.');
+            ->assertGraphQLValidationError('input.email', AppVersion::atLeast(10.0)
+                ? 'The input.email field must be a valid email address.'
+                : 'The input.email must be a valid email address.')
+            ->assertGraphQLValidationError('input.email', AppVersion::atLeast(10.0)
+                ? 'The input.email field must be at least 16 characters.'
+                : 'The input.email must be at least 16 characters.');
     }
 }

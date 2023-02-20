@@ -7,17 +7,11 @@ use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Utils\Utils;
 
-class Email extends ScalarType
+final class Email extends ScalarType
 {
-    /**
-     * @var string
-     */
-    public $name = 'Email';
+    public string $name = 'Email';
 
-    /**
-     * @var string
-     */
-    public $description = 'Email address.';
+    public ?string $description = 'Email address.';
 
     public function serialize($value)
     {
@@ -27,7 +21,7 @@ class Email extends ScalarType
     public function parseValue($value): string
     {
         if (! filter_var($value, FILTER_VALIDATE_EMAIL)) {
-            throw new Error('Cannot represent following value as email: '.Utils::printSafeJson($value));
+            throw new Error('Cannot represent following value as email: ' . Utils::printSafeJson($value));
         }
 
         return $value;
@@ -41,7 +35,7 @@ class Email extends ScalarType
     public function parseLiteral($valueNode, ?array $variables = null): string
     {
         if (! $valueNode instanceof StringValueNode) {
-            throw new Error('Query error: Can only parse strings got: '.$valueNode->kind, $valueNode);
+            throw new Error('Query error: Can only parse strings got: ' . $valueNode->kind, $valueNode);
         }
 
         if (! filter_var($valueNode->value, FILTER_VALIDATE_EMAIL)) {

@@ -6,20 +6,14 @@ use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 
-class OnPostCreated extends GraphQLSubscription
+final class OnPostCreated extends GraphQLSubscription
 {
-    /**
-     * Check if subscriber is allowed to listen to the subscription.
-     */
     public function authorize(Subscriber $subscriber, Request $request): bool
     {
         return true;
     }
 
-    /**
-     * Filter which subscribers should receive the subscription.
-     */
-    public function filter(Subscriber $subscriber, $root): bool
+    public function filter(Subscriber $subscriber, mixed $root): bool
     {
         return true;
     }

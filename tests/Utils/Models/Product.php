@@ -24,11 +24,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * Relations
  * @property-read \Tests\Utils\Models\Color $color
  */
-class Product extends Model
+final class Product extends Model
 {
     /**
      * @var array<string>
      */
+    // @phpstan-ignore-next-line PHPDoc type array<string> of property Tests\Utils\Models\Product::$primaryKey is not covariant with PHPDoc type string of overridden property Illuminate\Database\Eloquent\Model::$primaryKey.
     protected $primaryKey = ['barcode', 'uuid'];
 
     public $incrementing = false;

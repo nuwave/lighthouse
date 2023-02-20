@@ -5,12 +5,12 @@ namespace Tests\Utils\Rules;
 use Illuminate\Contracts\Validation\Rule;
 use Nuwave\Lighthouse\Support\Contracts\WithReferenceRule;
 
-class EqualFieldRule implements Rule, WithReferenceRule
+final class EqualFieldRule implements Rule, WithReferenceRule
 {
     /**
      * @var string
      */
-    protected $argumentPath;
+    private $argumentPath;
 
     public function passes($attribute, $value): bool
     {

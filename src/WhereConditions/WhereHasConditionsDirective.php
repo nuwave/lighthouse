@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\WhereConditions;
 
-use Exception;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Support\Str;
 
@@ -28,16 +27,29 @@ directive @whereHasConditions(
     """
     Restrict the allowed column names to a well-defined list.
     This improves introspection capabilities and security.
-    Mutually exclusive with the `columnsEnum` argument.
+    Mutually exclusive with `columnsEnum`.
     """
     columns: [String!]
 
     """
     Use an existing enumeration type to restrict the allowed columns to a predefined list.
-    This allowes you to re-use the same enum for multiple fields.
-    Mutually exclusive with the `columns` argument.
+    This allows you to re-use the same enum for multiple fields.
+    Mutually exclusive with `columns`.
     """
     columnsEnum: String
+
+    """
+    Reference a method that applies the client given conditions to the query builder.
+
+    Expected signature: `(
+        \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder,
+        array<string, mixed> $whereConditions
+    ): void`
+
+    Consists of two parts: a class name and a method name, separated by an `@` symbol.
+    If you pass only a class name, the method name defaults to `__invoke`.
+    """
+    handler: String = "\\Nuwave\\Lighthouse\\WhereConditions\\WhereConditionsHandler"
 ) on ARGUMENT_DEFINITION
 GRAPHQL;
     }
@@ -52,21 +64,19 @@ GRAPHQL;
         }
 
         if (! $builder instanceof EloquentBuilder) {
-            throw new Exception('Can not get model from builder of class: '.get_class($builder));
+            throw new \Exception('Can not get model from builder of class: ' . get_class($builder));
         }
-        $model = $builder->getModel();
 
-        $this->handleWhereConditions(
+        $this->handle(
             $builder,
             [
                 'HAS' => [
-                    'relation' => $this->getRelationName(),
+                    'relation' => $this->relationName(),
                     'amount' => WhereConditionsServiceProvider::DEFAULT_HAS_AMOUNT,
                     'operator' => '>=',
                     'condition' => $value,
                 ],
-            ],
-            $model
+            ]
         );
 
         return $builder;
@@ -75,7 +85,7 @@ GRAPHQL;
     /**
      * Get the name of the Eloquent relationship that is used for the query.
      */
-    public function getRelationName(): string
+    protected function relationName(): string
     {
         $relationName = $this->directiveArgValue('relation');
 

@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Subscriptions\Broadcasters;
 
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -32,7 +33,7 @@ class PusherBroadcaster implements Broadcaster
     {
         $this->pusher = $pusher;
         $this->exceptionHandler = $exceptionHandler;
-        $this->storage = app(StoresSubscriptions::class);
+        $this->storage = Container::getInstance()->make(StoresSubscriptions::class);
     }
 
     public function authorized(Request $request): JsonResponse
@@ -57,7 +58,7 @@ class PusherBroadcaster implements Broadcaster
     public function hook(Request $request): JsonResponse
     {
         foreach ($request->input('events', []) as $event) {
-            if ($event['name'] === 'channel_vacated') {
+            if ('channel_vacated' === $event['name']) {
                 $this->storage->deleteSubscriber($event['channel']);
             }
         }

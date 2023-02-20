@@ -9,7 +9,6 @@ use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Utils\SchemaPrinter as GraphQLSchemaPrinter;
-use GraphQL\Utils\Utils;
 
 class SchemaPrinter extends GraphQLSchemaPrinter
 {
@@ -26,15 +25,15 @@ class SchemaPrinter extends GraphQLSchemaPrinter
             array_map(
                 static function (FieldDefinition $f) use (&$firstInBlock, $options): string {
                     $description = static::printDescription($options, $f, '  ', $firstInBlock)
-                        .'  '
-                        .$f->name
-                        .static::printArgs($options, $f->args, '  ')
-                        .': '
-                        .$f->getType()
-                        .(isset($options['printDirectives'])
+                        . '  '
+                        . $f->name
+                        . static::printArgs($options, $f->args, '  ')
+                        . ': '
+                        . $f->getType()
+                        . (isset($options['printDirectives'])
                             ? $options['printDirectives']($f)
                             : '')
-                        .static::printDeprecated($f);
+                        . static::printDeprecated($f);
 
                     $firstInBlock = false;
 
@@ -69,7 +68,7 @@ class SchemaPrinter extends GraphQLSchemaPrinter
     {
         $interfaces = $type->getInterfaces();
         $implementedInterfaces = count($interfaces) > 0
-            ? ' implements '.implode(
+            ? ' implements ' . implode(
                 ' & ',
                 array_map(
                     static function (InterfaceType $interface): string {
@@ -98,16 +97,19 @@ GRAPHQL;
      */
     public static function printDirectives(array $directives): string
     {
-        if (count($directives) === 0) {
+        if (0 === count($directives)) {
             return '';
         }
 
         return ' '
-            .implode(
+            . implode(
                 ' ',
-                Utils::map($directives, static function (DirectiveNode $directive): string {
-                    return Printer::doPrint($directive);
-                })
+                array_map(
+                    static function (DirectiveNode $directive): string {
+                        return Printer::doPrint($directive);
+                    },
+                    $directives
+                )
             );
     }
 }

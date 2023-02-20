@@ -85,18 +85,6 @@ class SubscriptionRegistry
     }
 
     /**
-     * Get subscription keys.
-     *
-     * @return array<string>
-     *
-     * @deprecated Use the `GraphQL\Type\Schema::subscriptionType()->getFieldNames()` method directly.
-     */
-    public function keys(): array
-    {
-        return $this->subscriptionType()->getFieldNames();
-    }
-
-    /**
      * Get instance of subscription.
      */
     public function subscription(string $key): GraphQLSubscription
@@ -138,22 +126,26 @@ class SubscriptionRegistry
             ->filter(
                 Utils::instanceofMatcher(OperationDefinitionNode::class)
             )
+            // @phpstan-ignore-next-line type of $node was narrowed by the preceding filter
             ->filter(function (OperationDefinitionNode $node): bool {
-                return $node->operation === 'subscription';
+                return 'subscription' === $node->operation;
             })
-            ->flatMap(function (OperationDefinitionNode $node): array {
+            // @phpstan-ignore-next-line type of $node was narrowed by the preceding filter
+            ->map(function (OperationDefinitionNode $node): array {
                 return (new Collection($node->selectionSet->selections))
+                    // @phpstan-ignore-next-line subscriptions must only have a single field
                     ->map(function (FieldNode $field): string {
                         return $field->name->value;
                     })
                     ->all();
             })
+            ->collapse()
             ->map(function (string $subscriptionField): GraphQLSubscription {
                 if ($this->has($subscriptionField)) {
                     return $this->subscription($subscriptionField);
                 }
 
-                return new NotFoundSubscription;
+                return new NotFoundSubscription();
             });
     }
 
@@ -173,7 +165,7 @@ class SubscriptionRegistry
             ? reset($this->subscribers)
             : null;
 
-        if ($channel === null && ($subscriptionsConfig['exclude_empty'] ?? false)) {
+        if (null === $channel && ($subscriptionsConfig['exclude_empty'] ?? false)) {
             return null;
         }
 
@@ -203,7 +195,7 @@ class SubscriptionRegistry
     {
         $subscriptionType = $this->schemaBuilder->schema()->getSubscriptionType();
 
-        if ($subscriptionType === null) {
+        if (null === $subscriptionType) {
             throw new DefinitionException('Schema is missing subscription root type.');
         }
 

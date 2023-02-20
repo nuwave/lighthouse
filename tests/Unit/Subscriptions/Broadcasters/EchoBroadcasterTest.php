@@ -12,7 +12,7 @@ use PHPUnit\Framework\Constraint\Callback;
 use Tests\TestCase;
 use Tests\TestsSubscriptions;
 
-class EchoBroadcasterTest extends TestCase
+final class EchoBroadcasterTest extends TestCase
 {
     use TestsSubscriptions;
 
@@ -22,9 +22,9 @@ class EchoBroadcasterTest extends TestCase
         $broadcastManager->expects($this->once())
             ->method('event')
             ->with(new Callback(function (EchoSubscriptionEvent $event) {
-                return $event->broadcastAs() === Broadcaster::EVENT_NAME
-                    && $event->broadcastOn()->name === 'test-123'
-                    && $event->data === 'foo';
+                return Broadcaster::EVENT_NAME === $event->broadcastAs()
+                    && 'test-123' === $event->broadcastOn()->name
+                    && 'foo' === $event->data;
             }));
 
         $redisBroadcaster = new EchoBroadcaster($broadcastManager);
@@ -40,7 +40,7 @@ class EchoBroadcasterTest extends TestCase
         $broadcastManager->expects($this->once())
             ->method('event')
             ->with(new Callback(function (EchoSubscriptionEvent $event) {
-                return $event->broadcastOn()->name === 'private-test-123';
+                return 'private-test-123' === $event->broadcastOn()->name;
             }));
 
         $redisBroadcaster = new EchoBroadcaster($broadcastManager);

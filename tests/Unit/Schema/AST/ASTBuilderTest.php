@@ -10,7 +10,7 @@ use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\RootType;
 use Tests\TestCase;
 
-class ASTBuilderTest extends TestCase
+final class ASTBuilderTest extends TestCase
 {
     /**
      * @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder
@@ -21,7 +21,7 @@ class ASTBuilderTest extends TestCase
     {
         parent::setUp();
 
-        $this->astBuilder = app(ASTBuilder::class);
+        $this->astBuilder = $this->app->make(ASTBuilder::class);
     }
 
     public function testMergeTypeExtensionFields(): void
@@ -184,7 +184,7 @@ class ASTBuilderTest extends TestCase
         ';
 
         $this->expectException(DefinitionException::class);
-        $this->expectExceptionMessage('Could not find a base definition Foo of kind '.NodeKind::OBJECT_TYPE_EXTENSION.' to extend.');
+        $this->expectExceptionMessage('Could not find a base definition Foo of kind ' . NodeKind::OBJECT_TYPE_EXTENSION . ' to extend.');
         $this->astBuilder->documentAST();
     }
 
@@ -271,7 +271,7 @@ class ASTBuilderTest extends TestCase
         ';
 
         $this->expectException(DefinitionException::class);
-        $this->expectExceptionMessage('The type extension Foo of kind '.NodeKind::INTERFACE_TYPE_EXTENSION.' can not extend a definition of kind '.NodeKind::OBJECT_TYPE_DEFINITION.'.');
+        $this->expectExceptionMessage('The type extension Foo of kind ' . NodeKind::INTERFACE_TYPE_EXTENSION . ' can not extend a definition of kind ' . NodeKind::OBJECT_TYPE_DEFINITION . '.');
         $this->astBuilder->documentAST();
     }
 

@@ -4,14 +4,15 @@ namespace Nuwave\Lighthouse\Subscriptions;
 
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\AST\NodeList;
+use GraphQL\Language\AST\OperationDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Utils\AST;
+use Illuminate\Container\Container;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-use Serializable;
 
-class Subscriber implements Serializable
+class Subscriber
 {
     /**
      * A unique key for the subscriber's channel.
@@ -22,6 +23,11 @@ class Subscriber implements Serializable
      * @var string
      */
     public $channel;
+
+    /**
+     * X-Socket-ID header passed on the subscription query.
+     */
+    public ?string $socket_id;
 
     /**
      * The topic subscribed to.
@@ -51,7 +57,7 @@ class Subscriber implements Serializable
     /**
      * The root element of the query.
      *
-     * @var mixed Can be anything.
+     * @var mixed can be anything
      */
     public $root;
 
@@ -90,12 +96,15 @@ class Subscriber implements Serializable
         $this->variables = $resolveInfo->variableValues;
         $this->context = $context;
 
-        /**
-         * Must be here, since webonyx/graphql-php validated the subscription.
-         *
-         * @var \GraphQL\Language\AST\OperationDefinitionNode $operation
-         */
+        $xSocketID = request()->header('X-Socket-ID');
+        // @phpstan-ignore-next-line
+        if (is_array($xSocketID)) {
+            throw new \Exception('X-Socket-ID must be a string or null.');
+        }
+        $this->socket_id = $xSocketID;
+
         $operation = $resolveInfo->operation;
+        assert($operation instanceof OperationDefinitionNode, 'Must be here, since webonyx/graphql-php validated the subscription.');
 
         $this->query = new DocumentNode([
             'definitions' => new NodeList(array_merge(
@@ -106,25 +115,38 @@ class Subscriber implements Serializable
     }
 
     /**
-     * Unserialize subscription from a JSON string.
-     *
-     * @param  string  $subscription
+     * @return array<string, mixed>
      */
-    public function unserialize($subscription): void
+    public function __serialize(): array
     {
-        $data = \Safe\json_decode($subscription, true);
+        return [
+            'socket_id' => $this->socket_id,
+            'channel' => $this->channel,
+            'topic' => $this->topic,
+            'query' => serialize(
+                AST::toArray($this->query)
+            ),
+            'field_name' => $this->fieldName,
+            'args' => $this->args,
+            'variables' => $this->variables,
+            'context' => $this->contextSerializer()->serialize($this->context),
+        ];
+    }
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    public function __unserialize(array $data): void
+    {
         $this->channel = $data['channel'];
         $this->topic = $data['topic'];
 
-        /**
-         * We know the type since it is set during construction and serialized.
-         *
-         * @var \GraphQL\Language\AST\DocumentNode $documentNode
-         */
         $documentNode = AST::fromArray(
             unserialize($data['query'])
         );
+        assert($documentNode instanceof DocumentNode, 'We know the type since it is set during construction and serialized.');
+
+        $this->socket_id = $data['socket_id'];
         $this->query = $documentNode;
         $this->fieldName = $data['field_name'];
         $this->args = $data['args'];
@@ -135,45 +157,15 @@ class Subscriber implements Serializable
     }
 
     /**
-     * Convert this into a JSON string.
-     */
-    public function serialize(): string
-    {
-        return \Safe\json_encode([
-            'channel' => $this->channel,
-            'topic' => $this->topic,
-            'query' => serialize(
-                AST::toArray($this->query)
-            ),
-            'field_name' => $this->fieldName,
-            'args' => $this->args,
-            'variables' => $this->variables,
-            'context' => $this->contextSerializer()->serialize($this->context),
-        ]);
-    }
-
-    /**
-     * Set root data.
-     *
-     * @deprecated set the attribute directly
-     */
-    public function setRoot($root): self
-    {
-        $this->root = $root;
-
-        return $this;
-    }
-
-    /**
      * Generate a unique private channel name.
      */
     public static function uniqueChannelName(): string
     {
-        return 'private-lighthouse-'.Str::random(32).'-'.time();
+        return 'private-lighthouse-' . Str::random(32) . '-' . time();
     }
 
     protected function contextSerializer(): ContextSerializer
     {
-        return app(ContextSerializer::class);
+        return Container::getInstance()->make(ContextSerializer::class);
     }
 }

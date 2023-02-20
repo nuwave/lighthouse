@@ -4,16 +4,17 @@ namespace Tests\Unit\Testing;
 
 use GraphQL\Error\Error;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
+use Illuminate\Http\Request;
 use Tests\TestCase;
 
-class MakesGraphQLRequestsTest extends TestCase
+final class MakesGraphQLRequestsTest extends TestCase
 {
     protected function getEnvironmentSetUp($app): void
     {
         parent::getEnvironmentSetUp($app);
 
-        /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = $app->make(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
         $config->set('lighthouse.route.prefix', 'prefix');
     }
 
@@ -42,7 +43,7 @@ class MakesGraphQLRequestsTest extends TestCase
         {
             foo
         }
-        ')->assertGraphQLErrorMessage($error->getMessage());
+        ')->assertGraphQLError($error);
 
         $this->rethrowGraphQLErrors();
 
@@ -52,5 +53,38 @@ class MakesGraphQLRequestsTest extends TestCase
             foo
         }
         ');
+    }
+
+    public function testGraphQLWithHeaders(): void
+    {
+        /** @var \Illuminate\Http\Request|null $request */
+        $request = null;
+        $this->mockResolver(function () use (&$request): void {
+            $request = $this->app->make(Request::class);
+        });
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo: ID @mock
+        }
+        ';
+
+        $key = 'foo';
+        $value = 'bar';
+
+        $this->graphQL(
+            /** @lang GraphQL */
+            '
+            {
+                foo
+            }
+            ',
+            [],
+            [],
+            [$key => $value]
+        );
+
+        $this->assertInstanceOf(Request::class, $request);
+        $this->assertSame($value, $request->header($key));
     }
 }

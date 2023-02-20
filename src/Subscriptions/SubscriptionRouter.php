@@ -13,12 +13,12 @@ class SubscriptionRouter
     {
         $router->post('graphql/subscriptions/auth', [
             'as' => 'lighthouse.subscriptions.auth',
-            'uses' => SubscriptionController::class.'@authorize',
+            'uses' => SubscriptionController::class . '@authorize',
         ]);
 
         $router->post('graphql/subscriptions/webhook', [
             'as' => 'lighthouse.subscriptions.webhook',
-            'uses' => SubscriptionController::class.'@webhook',
+            'uses' => SubscriptionController::class . '@webhook',
         ]);
     }
 
@@ -29,7 +29,7 @@ class SubscriptionRouter
     {
         $router->post('graphql/subscriptions/auth', [
             'as' => 'lighthouse.subscriptions.auth',
-            'uses' => SubscriptionController::class.'@authorize',
+            'uses' => SubscriptionController::class . '@authorize',
         ]);
     }
 }

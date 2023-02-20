@@ -12,20 +12,16 @@ abstract class GraphQLSubscription
 {
     /**
      * Check if subscriber is allowed to listen to this subscription.
-     *
-     * @return bool
      */
-    public function can(Subscriber $subscriber)
+    public function can(Subscriber $subscriber): bool
     {
         return true;
     }
 
     /**
      * Encode topic name.
-     *
-     * @return string
      */
-    public function encodeTopic(Subscriber $subscriber, string $fieldName)
+    public function encodeTopic(Subscriber $subscriber, string $fieldName): string
     {
         return strtoupper(
             Str::snake($fieldName)
@@ -34,10 +30,8 @@ abstract class GraphQLSubscription
 
     /**
      * Decode topic name.
-     *
-     * @return string
      */
-    public function decodeTopic(string $fieldName, $root)
+    public function decodeTopic(string $fieldName, mixed $root): string
     {
         return strtoupper(
             Str::snake($fieldName)
@@ -48,24 +42,19 @@ abstract class GraphQLSubscription
      * Resolve the subscription.
      *
      * @param  array<string, mixed>  $args
-     * @return mixed The root value.
      */
-    public function resolve($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
+    public function resolve(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): mixed
     {
         return $root;
     }
 
     /**
      * Check if subscriber is allowed to listen to the subscription.
-     *
-     * @return bool
      */
-    abstract public function authorize(Subscriber $subscriber, Request $request);
+    abstract public function authorize(Subscriber $subscriber, Request $request): bool;
 
     /**
      * Filter which subscribers should receive the subscription.
-     *
-     * @return bool
      */
-    abstract public function filter(Subscriber $subscriber, $root);
+    abstract public function filter(Subscriber $subscriber, mixed $root): bool;
 }

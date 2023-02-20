@@ -7,6 +7,6 @@ use Tests\Utils\Models\Employee;
 
 $factory->define(Employee::class, function (Faker $faker): array {
     return [
-        'position' => $faker->jobTitle,
+        'position' => $faker->word,
     ];
 });

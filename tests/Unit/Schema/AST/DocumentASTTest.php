@@ -6,12 +6,14 @@ use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Exceptions\ParseException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\RootType;
 use Tests\TestCase;
+use Tests\Utils\Models\User;
 
-class DocumentASTTest extends TestCase
+final class DocumentASTTest extends TestCase
 {
     public function testParsesSimpleSchema(): void
     {
@@ -47,6 +49,18 @@ class DocumentASTTest extends TestCase
         ');
     }
 
+    public function testThrowsOnUnknownModelClasses(): void
+    {
+        $this->expectException(DefinitionException::class);
+        $this->expectExceptionMessage('Failed to find a model class Unknown in namespaces [Tests\Utils\Models, Tests\Utils\ModelsSecondary] referenced in @model on type Query.');
+
+        DocumentAST::fromSource(/** @lang GraphQL */ '
+        type Query @model(class: "Unknown") {
+            foo: Int!
+        }
+        ');
+    }
+
     public function testOverwritesDefinitionWithSameName(): void
     {
         $documentAST = DocumentAST::fromSource(/** @lang GraphQL */ '
@@ -72,7 +86,7 @@ class DocumentASTTest extends TestCase
     public function testBeSerialized(): void
     {
         $documentAST = DocumentAST::fromSource(/** @lang GraphQL */ '
-        type Query {
+        type Query @model(class: "User") {
             foo: Int
         }
 
@@ -84,21 +98,12 @@ class DocumentASTTest extends TestCase
             serialize($documentAST)
         );
 
-        /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
         $queryType = $reserialized->types[RootType::QUERY];
-        $this->assertInstanceOf(
-            ObjectTypeDefinitionNode::class,
-            $queryType
-        );
+        $this->assertInstanceOf(ObjectTypeDefinitionNode::class, $queryType);
+        $this->assertInstanceOf(FieldDefinitionNode::class, $queryType->fields[0]);
 
-        $this->assertInstanceOf(
-            FieldDefinitionNode::class,
-            $queryType->fields[0]
-        );
+        $this->assertInstanceOf(DirectiveDefinitionNode::class, $reserialized->directives['foo']);
 
-        $this->assertInstanceOf(
-            DirectiveDefinitionNode::class,
-            $reserialized->directives['foo']
-        );
+        $this->assertSame(['Query'], $reserialized->classNameToObjectTypeNames[User::class]);
     }
 }

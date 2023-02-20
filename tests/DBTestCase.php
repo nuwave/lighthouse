@@ -7,6 +7,11 @@ use Illuminate\Support\Facades\DB;
 
 abstract class DBTestCase extends TestCase
 {
+    use AssertsQueryCounts;
+
+    public const DEFAULT_CONNECTION = 'mysql';
+    public const ALTERNATE_CONNECTION = 'alternate';
+
     /**
      * Indicates if migrations ran.
      *
@@ -20,7 +25,7 @@ abstract class DBTestCase extends TestCase
 
         if (! static::$migrated) {
             $this->artisan('migrate:fresh', [
-                '--path' => __DIR__.'/database/migrations',
+                '--path' => __DIR__ . '/database/migrations',
                 '--realpath' => true,
             ]);
 
@@ -35,18 +40,19 @@ abstract class DBTestCase extends TestCase
             DB::table($table->{$columnName})->truncate();
         }
 
-        $this->withFactories(__DIR__.'/database/factories');
+        $this->withFactories(__DIR__ . '/database/factories');
     }
 
     protected function getEnvironmentSetUp($app): void
     {
         parent::getEnvironmentSetUp($app);
 
-        /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = $app->make(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
 
-        $config->set('database.default', 'mysql');
-        $config->set('database.connections.mysql', $this->mysqlOptions());
+        $config->set('database.default', self::DEFAULT_CONNECTION);
+        $config->set('database.connections.' . self::DEFAULT_CONNECTION, $this->mysqlOptions());
+        $config->set('database.connections.' . self::ALTERNATE_CONNECTION, $this->mysqlOptions());
     }
 
     /**

@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Support\Http\Middleware;
 
-use Closure;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Auth\AuthServiceProvider;
@@ -24,9 +23,10 @@ class AttemptAuthentication
 
     /**
      * @param  string  ...$guards
+     *
      * @return mixed Any kind of response
      */
-    public function handle(Request $request, Closure $next, ...$guards)
+    public function handle(Request $request, \Closure $next, ...$guards)
     {
         $this->attemptAuthentication($guards);
 

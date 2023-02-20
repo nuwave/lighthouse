@@ -2,13 +2,14 @@
 
 namespace Nuwave\Lighthouse\Schema\Types\Scalars;
 
-use Exception;
+use Carbon\Carbon as CarbonCarbon;
+use Carbon\CarbonImmutable;
 use GraphQL\Error\Error;
 use GraphQL\Error\InvariantViolation;
 use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Utils\Utils;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Carbon as IlluminateCarbon;
 
 abstract class DateScalar extends ScalarType
 {
@@ -19,7 +20,7 @@ abstract class DateScalar extends ScalarType
      */
     public function serialize($value): string
     {
-        if (! $value instanceof Carbon) {
+        if (! $value instanceof IlluminateCarbon) {
             $value = $this->tryParsingDate($value, InvariantViolation::class);
         }
 
@@ -31,7 +32,7 @@ abstract class DateScalar extends ScalarType
      *
      * @param  string  $value
      */
-    public function parseValue($value): Carbon
+    public function parseValue($value): IlluminateCarbon
     {
         return $this->tryParsingDate($value, Error::class);
     }
@@ -44,7 +45,7 @@ abstract class DateScalar extends ScalarType
      *
      * @throws \GraphQL\Error\Error
      */
-    public function parseLiteral($valueNode, ?array $variables = null): Carbon
+    public function parseLiteral($valueNode, ?array $variables = null): IlluminateCarbon
     {
         if (! $valueNode instanceof StringValueNode) {
             throw new Error(
@@ -64,7 +65,7 @@ abstract class DateScalar extends ScalarType
      *
      * @throws \GraphQL\Error\InvariantViolation|\GraphQL\Error\Error
      */
-    protected function tryParsingDate($value, string $exceptionClass): Carbon
+    protected function tryParsingDate($value, string $exceptionClass): IlluminateCarbon
     {
         try {
             if (
@@ -72,16 +73,13 @@ abstract class DateScalar extends ScalarType
                 // We want to know if we have exactly a Carbon\Carbon, not a subclass thereof
                 // @noRector Rector\CodeQuality\Rector\Identical\GetClassToInstanceOfRector
                 && (
-                    get_class($value) === \Carbon\Carbon::class
-                    || get_class($value) === \Carbon\CarbonImmutable::class
+                    CarbonCarbon::class === get_class($value)
+                    || CarbonImmutable::class === get_class($value)
                 )
             ) {
-                /**
-                 * Given we had a valid \Carbon\Carbon before, this can not fail.
-                 *
-                 * @var \Illuminate\Support\Carbon $carbon
-                 */
-                $carbon = Carbon::create(
+                assert($value instanceof CarbonCarbon || $value instanceof CarbonImmutable);
+
+                $carbon = IlluminateCarbon::create(
                     $value->year,
                     $value->month,
                     $value->day,
@@ -90,12 +88,13 @@ abstract class DateScalar extends ScalarType
                     $value->second,
                     $value->timezone
                 );
+                assert($carbon instanceof IlluminateCarbon, 'Given we had a valid Carbon instance5 before, this can not fail.');
 
                 return $carbon;
             }
 
             return $this->parse($value);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new $exceptionClass(
                 Utils::printSafeJson($e->getMessage())
             );
@@ -105,12 +104,12 @@ abstract class DateScalar extends ScalarType
     /**
      * Serialize the Carbon instance.
      */
-    abstract protected function format(Carbon $carbon): string;
+    abstract protected function format(IlluminateCarbon $carbon): string;
 
     /**
      * Try turning a client value into a Carbon instance.
      *
-     * @param  mixed  $value  A possibly faulty client value.
+     * @param  mixed  $value  a possibly faulty client value
      */
-    abstract protected function parse($value): Carbon;
+    abstract protected function parse($value): IlluminateCarbon;
 }

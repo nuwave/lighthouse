@@ -9,8 +9,6 @@ Lighthouse dispatches the following order of events during a request.
 ### StartRequest
 
 ```php
-<?php
-
 namespace Nuwave\Lighthouse\Events;
 
 use Illuminate\Http\Request;
@@ -51,8 +49,6 @@ class StartRequest
 ### StartOperationOrOperations
 
 ```php
-<?php
-
 namespace Nuwave\Lighthouse\Events;
 
 /**
@@ -80,8 +76,6 @@ class StartOperationOrOperations
 ### BuildSchemaString
 
 ```php
-<?php
-
 namespace Nuwave\Lighthouse\Events;
 
 /**
@@ -111,8 +105,6 @@ class BuildSchemaString
 ### RegisterDirectiveNamespaces
 
 ```php
-<?php
-
 namespace Nuwave\Lighthouse\Events;
 
 /**
@@ -132,8 +124,6 @@ class RegisterDirectiveNamespaces
 ### ManipulateAST
 
 ```php
-<?php
-
 namespace Nuwave\Lighthouse\Events;
 
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
@@ -165,8 +155,6 @@ class ManipulateAST
 ### StartExecution
 
 ```php
-<?php
-
 namespace Nuwave\Lighthouse\Events;
 
 use GraphQL\Language\AST\DocumentNode;
@@ -180,6 +168,13 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
  */
 class StartExecution
 {
+    /**
+     * The parsed schema.
+     *
+     * @var \GraphQL\Type\Schema;
+     */
+    public $schema;
+
     /**
      * The client given parsed query string.
      *
@@ -218,8 +213,9 @@ class StartExecution
     /**
      * @param array<string, mixed>|null $variables
      */
-    public function __construct(DocumentNode $query, ?array $variables, ?string $operationName, GraphQLContext $context)
+    public function __construct(Schema $schema, DocumentNode $query, ?array $variables, ?string $operationName, GraphQLContext $context)
     {
+        $this->schema = $schema;
         $this->query = $query;
         $this->variables = $variables;
         $this->operationName = $operationName;
@@ -232,8 +228,6 @@ class StartExecution
 ### BuildExtensionsResponse
 
 ```php
-<?php
-
 namespace Nuwave\Lighthouse\Events;
 
 /**
@@ -249,8 +243,6 @@ class BuildExtensionsResponse
 ```
 
 ```php
-<?php
-
 namespace Nuwave\Lighthouse\Execution;
 
 /**
@@ -300,8 +292,6 @@ class ExtensionsResponse
 ### ManipulateResult
 
 ```php
-<?php
-
 namespace Nuwave\Lighthouse\Events;
 
 use GraphQL\Executor\ExecutionResult;
@@ -331,8 +321,6 @@ class ManipulateResult
 ### EndExecution
 
 ```php
-<?php
-
 namespace Nuwave\Lighthouse\Events;
 
 use GraphQL\Executor\ExecutionResult;
@@ -368,8 +356,6 @@ class EndExecution
 ### EndOperationOrOperations
 
 ```php
-<?php
-
 namespace Nuwave\Lighthouse\Events;
 
 /**
@@ -397,8 +383,6 @@ class EndOperationOrOperations
 ### EndRequest
 
 ```php
-<?php
-
 namespace Nuwave\Lighthouse\Events;
 
 use Illuminate\Support\Carbon;
@@ -443,8 +427,6 @@ The following events happen outside of the execution lifecycle.
 ### ValidateSchema
 
 ```php
-<?php
-
 namespace Nuwave\Lighthouse\Events;
 
 use GraphQL\Type\Schema;

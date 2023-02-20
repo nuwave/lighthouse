@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Support\Contracts;
 
-use Closure;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 
 interface ProvidesSubscriptionResolver
@@ -12,5 +11,5 @@ interface ProvidesSubscriptionResolver
      *
      * This function is expected to call @see \Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry::register().
      */
-    public function provideSubscriptionResolver(FieldValue $fieldValue): Closure;
+    public function provideSubscriptionResolver(FieldValue $fieldValue): \Closure;
 }

@@ -5,19 +5,19 @@ namespace Tests\Utils\Policies;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class TaskPolicy
+final class TaskPolicy
 {
     public const ADMIN = 'admin';
 
     public function adminOnly(User $user): bool
     {
-        return $user->name === self::ADMIN;
+        return self::ADMIN === $user->name;
     }
 
     public function delete(User $user, Task $task): bool
     {
         $taskUser = $task->user;
-        if ($taskUser === null) {
+        if (null === $taskUser) {
             return false;
         }
 

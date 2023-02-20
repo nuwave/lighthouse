@@ -2,7 +2,6 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use Exception;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
@@ -12,7 +11,7 @@ use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class MorphManyDirectiveTest extends DBTestCase
+final class MorphManyDirectiveTest extends DBTestCase
 {
     use WithFaker;
 
@@ -52,42 +51,39 @@ class MorphManyDirectiveTest extends DBTestCase
         $this->task = factory(Task::class)->create([
             'user_id' => $this->user->id,
         ]);
-        $this->taskImages = Collection
-            ::times(10)
-            ->map(function (): Image {
-                $image = $this->task
-                    ->images()
-                    ->save(
-                        factory(Image::class)->create()
-                    );
+        $this->taskImages = Collection::times(10, function (): Image {
+            $image = $this->task
+                ->images()
+                ->save(
+                    factory(Image::class)->create()
+                );
 
-                if ($image === false) {
-                    throw new Exception('Failed to save Image');
-                }
+            if (false === $image) {
+                throw new \Exception('Failed to save Image');
+            }
 
-                return $image;
-            });
+            return $image;
+        });
 
         $this->post = factory(Post::class)->create([
             'user_id' => $this->user->id,
         ]);
-        $this->postImages = Collection
-            ::times(
-                $this->faker()->numberBetween(1, 10)
-            )
-            ->map(function () {
+        $this->postImages = Collection::times(
+            $this->faker()->numberBetween(1, 10),
+            function () {
                 $image = $this->post
                     ->images()
                     ->save(
                         factory(Image::class)->create()
                     );
 
-                if ($image === false) {
-                    throw new Exception('Failed to save Image');
+                if (false === $image) {
+                    throw new \Exception('Failed to save Image');
                 }
 
                 return $image;
-            });
+            }
+        );
     }
 
     public function testQueryMorphManyRelationship(): void
@@ -309,6 +305,45 @@ class MorphManyDirectiveTest extends DBTestCase
         );
     }
 
+    public function testPaginatorTypeIsUnlimitedByMaxCountFromDirective(): void
+    {
+        config(['lighthouse.pagination.max_count' => 1]);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Post {
+            id: ID!
+            title: String!
+            images: [Image!] @morphMany(type: PAGINATOR, maxCount: null)
+        }
+
+        type Image {
+            id: ID!
+        }
+
+        type Query {
+            post (
+                id: ID! @eq
+            ): Post @find
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ "
+            {
+                post(id: {$this->post->id}) {
+                    id
+                    title
+                    images(first: 10) {
+                        data {
+                            id
+                        }
+                    }
+                }
+            }
+            ")
+            ->assertGraphQLErrorFree();
+    }
+
     public function testHandlesPaginationWithCountZero(): void
     {
         $this->schema = /** @lang GraphQL */ '
@@ -337,13 +372,39 @@ class MorphManyDirectiveTest extends DBTestCase
                         data {
                             id
                         }
+                        paginatorInfo {
+                            count
+                            currentPage
+                            firstItem
+                            hasMorePages
+                            lastItem
+                            lastPage
+                            perPage
+                        }
                     }
                 }
             }
             ', [
                 'id' => $this->post->id,
             ])
-            ->assertGraphQLErrorMessage(PaginationArgs::requestedZeroOrLessItems(0));
+            ->assertExactJson([
+                'data' => [
+                    'post' => [
+                        'images' => [
+                            'data' => [],
+                            'paginatorInfo' => [
+                                'count' => 0,
+                                'currentPage' => 1,
+                                'firstItem' => null,
+                                'hasMorePages' => false,
+                                'lastItem' => null,
+                                'lastPage' => 0,
+                                'perPage' => 0,
+                            ],
+                        ],
+                    ],
+                ],
+            ]);
     }
 
     public function testQueryMorphManyPaginatorWithADefaultCount(): void

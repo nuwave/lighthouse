@@ -6,7 +6,7 @@ use Tests\TestCase;
 use Tests\Utils\Queries\Bar;
 use Tests\Utils\Queries\Foo;
 
-class GraphQLTest extends TestCase
+final class GraphQLTest extends TestCase
 {
     protected $schema = /** @lang GraphQL */ '
     type Query {
@@ -23,6 +23,7 @@ class GraphQLTest extends TestCase
                 foo
             }
             ')
+            ->assertGraphQLErrorFree()
             ->assertExactJson([
                 'data' => [
                     'foo' => Foo::THE_ANSWER,
@@ -35,7 +36,7 @@ class GraphQLTest extends TestCase
         $this
             ->getJson(
                 'graphql?'
-                .http_build_query(
+                . http_build_query(
                     [
                         'query' => /** @lang GraphQL */ '
                         {
@@ -54,21 +55,23 @@ class GraphQLTest extends TestCase
 
     public function testResolvesNamedOperation(): void
     {
-        $this->postGraphQL([
-            'query' => /** @lang GraphQL */ '
-                query Foo {
-                    foo
-                }
-                query Bar {
-                    bar
-                }
-            ',
-            'operationName' => 'Bar',
-        ])->assertExactJson([
-            'data' => [
-                'bar' => Bar::RESULT,
-            ],
-        ]);
+        $this
+            ->postGraphQL([
+                'query' => /** @lang GraphQL */ '
+                    query Foo {
+                        foo
+                    }
+                    query Bar {
+                        bar
+                    }
+                ',
+                'operationName' => 'Bar',
+            ])
+            ->assertExactJson([
+                'data' => [
+                    'bar' => Bar::RESULT,
+                ],
+            ]);
     }
 
     public function testResolveBatchedQueries(): void

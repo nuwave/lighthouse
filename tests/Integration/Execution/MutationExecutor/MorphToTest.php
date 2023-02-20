@@ -6,7 +6,7 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Image;
 use Tests\Utils\Models\Task;
 
-class MorphToTest extends DBTestCase
+final class MorphToTest extends DBTestCase
 {
     protected $schema = /** @lang GraphQL */ '
     type Task {
@@ -69,7 +69,7 @@ class MorphToTest extends DBTestCase
         disconnect: Boolean
         delete: Boolean
     }
-    '.self::PLACEHOLDER_QUERY;
+    ' . self::PLACEHOLDER_QUERY;
 
     public function testConnectsMorphTo(): void
     {
@@ -180,7 +180,7 @@ class MorphToTest extends DBTestCase
     /**
      * @return array<array<string, string>>
      */
-    public function existingModelMutations(): array
+    public static function existingModelMutations(): array
     {
         return [
             ['Update action' => 'update'],
@@ -201,7 +201,7 @@ class MorphToTest extends DBTestCase
         $image->url = 'bar';
         $image->save();
 
-        $field = "${action}Image";
+        $field = "{$action}Image";
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
             {$field}(input: {
@@ -242,7 +242,7 @@ GRAPHQL
         $image->url = 'bar';
         $image->save();
 
-        $field = "${action}Image";
+        $field = "{$action}Image";
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
             {$field}(input: {

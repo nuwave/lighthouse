@@ -48,16 +48,16 @@ Stateless guards are recommended for most use cases, such as the default `api` g
 
 ### Laravel Sanctum
 
-If you are using [Laravel Sanctum](https://laravel.com/docs/master/sanctum) for your API, set the guard
+If you are using [Laravel Sanctum](https://laravel.com/docs/sanctum) for your API, set the guard
 to `sanctum` and register Sanctum's `EnsureFrontendRequestsAreStateful` as first middleware for Lighthouse's route.
 
 ```php
     'route' => [
         // ...
         'middleware' => [
-            // ... other middleware
-
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+
+            // ... other middleware
         ],
     ],
     'guard' => 'sanctum',

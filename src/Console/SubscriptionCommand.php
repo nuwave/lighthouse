@@ -19,6 +19,6 @@ class SubscriptionCommand extends LighthouseGeneratorCommand
 
     protected function getStub(): string
     {
-        return __DIR__.'/stubs/subscription.stub';
+        return __DIR__ . '/stubs/subscription.stub';
     }
 }

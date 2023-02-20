@@ -2,19 +2,21 @@
 
 namespace Nuwave\Lighthouse\Federation;
 
-use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Type\Definition\Argument;
 use GraphQL\Type\Definition\Directive;
+use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\EnumValueDefinition;
-use GraphQL\Type\Definition\FieldArgument;
 use GraphQL\Type\Definition\FieldDefinition;
 use GraphQL\Type\Definition\InputObjectField;
+use GraphQL\Type\Definition\InputObjectType;
+use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\Type;
+use GraphQL\Type\Definition\ScalarType;
+use GraphQL\Type\Definition\UnionType;
 use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
-use GraphQL\Utils\Utils;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Federation\Directives\ExtendsDirective;
 use Nuwave\Lighthouse\Federation\Directives\ExternalDirective;
@@ -25,19 +27,19 @@ use Nuwave\Lighthouse\Schema\RootType;
 
 class FederationPrinter
 {
-    const FEDERATION_TYPES = [
+    public const FEDERATION_TYPES = [
         '_Any',
         '_Entity',
         '_FieldSet',
         '_Service',
     ];
 
-    const FEDERATION_FIELDS = [
+    public const FEDERATION_FIELDS = [
         '_service',
         '_entities',
     ];
 
-    const FEDERATION_DIRECTIVES = [
+    public const FEDERATION_DIRECTIVES = [
         ExtendsDirective::NAME,
         ExternalDirective::NAME,
         KeyDirective::NAME,
@@ -54,8 +56,9 @@ class FederationPrinter
             unset($types[$type]);
         }
 
-        /** @var \GraphQL\Type\Definition\ObjectType $originalQueryType */
         $originalQueryType = Arr::pull($types, RootType::QUERY);
+        assert($originalQueryType instanceof ObjectType);
+
         $queryFieldsWithoutFederation = array_filter(
             $originalQueryType->getFields(),
             static function (FieldDefinition $field): bool {
@@ -85,37 +88,50 @@ class FederationPrinter
         ));
 
         $printDirectives = static function ($definition): string {
-            /** @var Type|EnumValueDefinition|FieldArgument|FieldDefinition|InputObjectField $definition */
+            assert(
+                $definition instanceof EnumType
+                || $definition instanceof InputObjectType
+                || $definition instanceof InterfaceType
+                || $definition instanceof ObjectType
+                || $definition instanceof ScalarType
+                || $definition instanceof UnionType
+                || $definition instanceof EnumValueDefinition
+                || $definition instanceof Argument
+                || $definition instanceof FieldDefinition
+                || $definition instanceof InputObjectField
+            );
+
             $astNode = $definition->astNode;
-            if ($astNode === null) {
-                return '';
-            }
 
             if ($astNode instanceof ObjectTypeDefinitionNode) {
-                return SchemaPrinter::printDirectives(
-                    Utils::filter(
-                        $astNode->directives,
-                        static function (DirectiveNode $directive): bool {
-                            $name = $directive->name->value;
+                $federationDirectives = [];
+                foreach ($astNode->directives as $directive) {
+                    $name = $directive->name->value;
 
-                            return $name === KeyDirective::NAME
-                                || $name === ExtendsDirective::NAME;
-                        }
-                    )
-                );
-            } elseif ($astNode instanceof FieldDefinitionNode) {
-                return SchemaPrinter::printDirectives(
-                    Utils::filter(
-                        $astNode->directives,
-                        static function (DirectiveNode $directive): bool {
-                            $name = $directive->name->value;
+                    if (KeyDirective::NAME === $name
+                        || ExtendsDirective::NAME === $name
+                    ) {
+                        $federationDirectives[] = $directive;
+                    }
+                }
 
-                            return $name === ProvidesDirective::NAME
-                                || $name === RequiresDirective::NAME
-                                || $name === ExternalDirective::NAME;
-                        }
-                    )
-                );
+                return SchemaPrinter::printDirectives($federationDirectives);
+            }
+
+            if ($astNode instanceof FieldDefinitionNode) {
+                $federationDirectives = [];
+                foreach ($astNode->directives as $directive) {
+                    $name = $directive->name->value;
+
+                    if (ProvidesDirective::NAME === $name
+                        || RequiresDirective::NAME === $name
+                        || ExternalDirective::NAME === $name
+                    ) {
+                        $federationDirectives[] = $directive;
+                    }
+                }
+
+                return SchemaPrinter::printDirectives($federationDirectives);
             }
 
             return '';

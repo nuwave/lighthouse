@@ -2,11 +2,16 @@
 
 namespace Nuwave\Lighthouse;
 
-use Closure;
-use Exception;
+use GraphQL\Error\ClientAware;
+use GraphQL\Error\Error;
+use GraphQL\Error\ProvidesExtensions;
+use GraphQL\Executor\ExecutionResult;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
 use Illuminate\Foundation\Application as LaravelApplication;
+use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Lumen\Application as LumenApplication;
@@ -46,14 +51,13 @@ use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules;
 use Nuwave\Lighthouse\Support\Http\Responses\ResponseStream;
-use Nuwave\Lighthouse\Testing\TestingServiceProvider;
 
 class LighthouseServiceProvider extends ServiceProvider
 {
     /**
-     * @var array<int, class-string<\Illuminate\Console\Command>
+     * @var array<int, class-string<\Illuminate\Console\Command>>
      */
-    const COMMANDS = [
+    public const COMMANDS = [
         CacheCommand::class,
         ClearCacheCommand::class,
         DirectiveCommand::class,
@@ -71,7 +75,7 @@ class LighthouseServiceProvider extends ServiceProvider
 
     public function register(): void
     {
-        $this->mergeConfigFrom(__DIR__.'/lighthouse.php', 'lighthouse');
+        $this->mergeConfigFrom(__DIR__ . '/lighthouse.php', 'lighthouse');
 
         $this->app->singleton(GraphQL::class);
         $this->app->singleton(ASTBuilder::class);
@@ -92,11 +96,10 @@ class LighthouseServiceProvider extends ServiceProvider
 
         $this->app->bind(ProvidesResolver::class, ResolverProvider::class);
         $this->app->bind(ProvidesSubscriptionResolver::class, static function (): ProvidesSubscriptionResolver {
-            return new class implements ProvidesSubscriptionResolver
-            {
-                public function provideSubscriptionResolver(FieldValue $fieldValue): Closure
+            return new class() implements ProvidesSubscriptionResolver {
+                public function provideSubscriptionResolver(FieldValue $fieldValue): \Closure
                 {
-                    throw new Exception(
+                    throw new \Exception(
                         'Add the SubscriptionServiceProvider to your config/app.php to enable subscriptions.'
                     );
                 }
@@ -117,31 +120,53 @@ class LighthouseServiceProvider extends ServiceProvider
                 return new LumenMiddlewareAdapter();
             }
 
-            throw new Exception(
-                'Could not correctly determine Laravel framework flavor, got '.get_class($app).'.'
+            throw new \Exception(
+                'Could not correctly determine Laravel framework flavor, got ' . get_class($app) . '.'
             );
         });
 
-        if ($this->app->runningInConsole()) {
-            $this->commands(self::COMMANDS);
-        }
-
-        if ($this->app->runningUnitTests()) {
-            $this->app->register(TestingServiceProvider::class);
-        }
+        $this->commands(self::COMMANDS);
     }
 
     public function boot(ConfigRepository $configRepository): void
     {
         $this->publishes([
-            __DIR__.'/lighthouse.php' => $this->app->configPath().'/lighthouse.php',
+            __DIR__ . '/lighthouse.php' => $this->app->configPath() . '/lighthouse.php',
         ], 'lighthouse-config');
 
         $this->publishes([
-            __DIR__.'/default-schema.graphql' => $configRepository->get('lighthouse.schema.register'),
+            __DIR__ . '/default-schema.graphql' => $configRepository->get('lighthouse.schema.register'),
         ], 'lighthouse-schema');
 
-        $this->loadRoutesFrom(__DIR__.'/Support/Http/routes.php');
+        $this->loadRoutesFrom(__DIR__ . '/Support/Http/routes.php');
+
+        $exceptionHandler = $this->app->make(ExceptionHandlerContract::class);
+        if ($exceptionHandler instanceof ExceptionHandler) {
+            $exceptionHandler->renderable(
+                function (ClientAware $error) {
+                    assert($error instanceof \Throwable);
+
+                    if (! $error instanceof Error) {
+                        $error = new Error(
+                            $error->getMessage(),
+                            null,
+                            null,
+                            [],
+                            null,
+                            $error,
+                            $error instanceof ProvidesExtensions ? $error->getExtensions() : []
+                        );
+                    }
+
+                    $graphQL = $this->app->make(GraphQL::class);
+                    assert($graphQL instanceof GraphQL);
+
+                    $executionResult = new ExecutionResult(null, [$error]);
+
+                    return new JsonResponse($graphQL->serializable($executionResult));
+                }
+            );
+        }
     }
 
     protected function loadRoutesFrom($path): void

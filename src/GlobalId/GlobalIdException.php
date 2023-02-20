@@ -10,9 +10,4 @@ class GlobalIdException extends \Exception implements ClientAware
     {
         return true;
     }
-
-    public function getCategory(): string
-    {
-        return 'global-id';
-    }
 }

@@ -8,5 +8,4 @@ namespace Nuwave\Lighthouse\Support\Contracts;
  */
 interface ArgDirectiveForArray extends Directive
 {
-    //
 }

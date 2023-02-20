@@ -9,7 +9,7 @@ use Nuwave\Lighthouse\Federation\FederationServiceProvider;
 use Nuwave\Lighthouse\Federation\SchemaValidator;
 use Tests\TestCase;
 
-class SchemaValidatorTest extends TestCase
+final class SchemaValidatorTest extends TestCase
 {
     protected function getPackageProviders($app): array
     {
@@ -25,7 +25,7 @@ class SchemaValidatorTest extends TestCase
         type Foo @key(fields: "not_defined_on_the_object_type") {
           id: ID!
         }
-        '.self::PLACEHOLDER_QUERY;
+        ' . self::PLACEHOLDER_QUERY;
         $tester = $this->commandTester(new ValidateSchemaCommand());
 
         $this->expectException(FederationException::class);
@@ -40,8 +40,8 @@ class SchemaValidatorTest extends TestCase
         }
         ');
 
-        /** @var \Nuwave\Lighthouse\Federation\SchemaValidator $validator */
-        $validator = app(SchemaValidator::class);
+        $validator = $this->app->make(SchemaValidator::class);
+        assert($validator instanceof SchemaValidator);
 
         $validator->handle(new ValidateSchema($schema));
         $this->assertTrue(true);
@@ -55,8 +55,8 @@ class SchemaValidatorTest extends TestCase
         }
         ');
 
-        /** @var \Nuwave\Lighthouse\Federation\SchemaValidator $validator */
-        $validator = app(SchemaValidator::class);
+        $validator = $this->app->make(SchemaValidator::class);
+        assert($validator instanceof SchemaValidator);
 
         $this->expectException(FederationException::class);
         $validator->handle(new ValidateSchema($schema));
@@ -70,8 +70,8 @@ class SchemaValidatorTest extends TestCase
         }
         ');
 
-        /** @var \Nuwave\Lighthouse\Federation\SchemaValidator $validator */
-        $validator = app(SchemaValidator::class);
+        $validator = $this->app->make(SchemaValidator::class);
+        assert($validator instanceof SchemaValidator);
 
         $this->expectException(FederationException::class);
         $validator->handle(new ValidateSchema($schema));
@@ -90,8 +90,8 @@ class SchemaValidatorTest extends TestCase
         }
         ');
 
-        /** @var \Nuwave\Lighthouse\Federation\SchemaValidator $validator */
-        $validator = app(SchemaValidator::class);
+        $validator = $this->app->make(SchemaValidator::class);
+        assert($validator instanceof SchemaValidator);
 
         $validator->handle(new ValidateSchema($schema));
         $this->assertTrue(true);
@@ -110,8 +110,8 @@ class SchemaValidatorTest extends TestCase
         }
         ');
 
-        /** @var \Nuwave\Lighthouse\Federation\SchemaValidator $validator */
-        $validator = app(SchemaValidator::class);
+        $validator = $this->app->make(SchemaValidator::class);
+        assert($validator instanceof SchemaValidator);
 
         $this->expectException(FederationException::class);
         $validator->handle(new ValidateSchema($schema));

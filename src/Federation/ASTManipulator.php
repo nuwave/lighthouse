@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Federation;
 
+use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Events\ManipulateAST;
@@ -37,7 +38,7 @@ class ASTManipulator
     }
 
     /**
-     * Combine object types with `@key` into the _Entity union.
+     * Combine object types with @key into the _Entity union.
      *
      * @throws \Nuwave\Lighthouse\Exceptions\FederationException
      */
@@ -51,16 +52,16 @@ class ASTManipulator
                 continue;
             }
 
-            /** @var \GraphQL\Language\AST\DirectiveNode $directive */
             foreach ($type->directives as $directive) {
-                if ($directive->name->value === 'key') {
+                assert($directive instanceof DirectiveNode);
+                if ('key' === $directive->name->value) {
                     $entities[] = $type->name->value;
                     break;
                 }
             }
         }
 
-        if (count($entities) === 0) {
+        if (0 === count($entities)) {
             throw new FederationException('There must be at least one type using the @key directive when federation is enabled.');
         }
 
@@ -80,16 +81,16 @@ class ASTManipulator
             $documentAST->types[RootType::QUERY] = Parser::objectTypeDefinition(/** @lang GraphQL */ 'type Query');
         }
 
-        /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
         $queryType = $documentAST->types[RootType::QUERY];
+        assert($queryType instanceof ObjectTypeDefinitionNode);
 
-        $queryType->fields [] = Parser::fieldDefinition(/** @lang GraphQL */ '
+        $queryType->fields[] = Parser::fieldDefinition(/** @lang GraphQL */ '
         _entities(
             representations: [_Any!]!
         ): [_Entity]! @field(resolver: "Nuwave\\\Lighthouse\\\Federation\\\Resolvers\\\Entities")
         ');
 
-        $queryType->fields [] = Parser::fieldDefinition(/** @lang GraphQL */ '
+        $queryType->fields[] = Parser::fieldDefinition(/** @lang GraphQL */ '
         _service: _Service! @field(resolver: "Nuwave\\\Lighthouse\\\Federation\\\Resolvers\\\Service")
         ');
     }

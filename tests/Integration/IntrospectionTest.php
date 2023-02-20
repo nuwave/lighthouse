@@ -7,17 +7,12 @@ use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\TestCase;
 use Tests\Utils\Scalars\Email;
 
-class IntrospectionTest extends TestCase
+final class IntrospectionTest extends TestCase
 {
     /**
      * @var \Nuwave\Lighthouse\Schema\TypeRegistry
      */
     protected $typeRegistry;
-
-    /**
-     * @var \Illuminate\Testing\TestResponse|null
-     */
-    protected $introspectionResult;
 
     public function setUp(): void
     {

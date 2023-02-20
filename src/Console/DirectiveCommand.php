@@ -23,7 +23,7 @@ use Symfony\Component\Console\Input\InputOption;
 class DirectiveCommand extends LighthouseGeneratorCommand
 {
     /** @var array<int, class-string> */
-    const ARGUMENT_INTERFACES = [
+    public const ARGUMENT_INTERFACES = [
         ArgTransformerDirective::class,
         ArgBuilderDirective::class,
         ArgResolver::class,
@@ -31,14 +31,14 @@ class DirectiveCommand extends LighthouseGeneratorCommand
     ];
 
     /** @var array<int, class-string> */
-    const FIELD_INTERFACES = [
+    public const FIELD_INTERFACES = [
         FieldResolver::class,
         FieldMiddleware::class,
         FieldManipulator::class,
     ];
 
     /** @var array<int, class-string> */
-    const TYPE_INTERFACES = [
+    public const TYPE_INTERFACES = [
         TypeManipulator::class,
         TypeMiddleware::class,
         TypeResolver::class,
@@ -86,7 +86,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
 
     protected function getNameInput(): string
     {
-        return parent::getNameInput().'Directive';
+        return parent::getNameInput() . 'Directive';
     }
 
     protected function namespaceConfigKey(): string
@@ -190,7 +190,6 @@ class DirectiveCommand extends LighthouseGeneratorCommand
      */
     protected function askForInterfaces(array $availableInterfaces): void
     {
-        /** @var array<class-string> $implementedInterfaces Because we set $multiple = true */
         $implementedInterfaces = $this->choice(
             'Which interfaces should the directive implement?',
             $availableInterfaces,
@@ -198,6 +197,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
             null,
             true
         );
+        assert(is_array($implementedInterfaces), 'Because we set $multiple = true');
 
         foreach ($implementedInterfaces as $interface) {
             $this->implementInterface($interface);
@@ -209,7 +209,6 @@ class DirectiveCommand extends LighthouseGeneratorCommand
      */
     public function askForLocations(array $availableLocations): void
     {
-        /** @var array<string> $usedLocations Because we set $multiple = true */
         $usedLocations = $this->choice(
             'In which schema locations can the directive be used?',
             $availableLocations,
@@ -217,6 +216,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
             null,
             true
         );
+        assert(is_array($usedLocations), 'Because we set $multiple = true');
 
         foreach ($usedLocations as $location) {
             $this->addLocation($location);
@@ -257,20 +257,20 @@ class DirectiveCommand extends LighthouseGeneratorCommand
 
     protected function getStub(): string
     {
-        return __DIR__.'/stubs/directive.stub';
+        return __DIR__ . '/stubs/directive.stub';
     }
 
     protected function interfaceMethods(string $interface): ?string
     {
         return $this->getFileIfExists(
-            __DIR__.'/stubs/directives/'.Str::snake($interface).'_methods.stub'
+            __DIR__ . '/stubs/directives/' . Str::snake($interface) . '_methods.stub'
         );
     }
 
     protected function interfaceImports(string $interface): ?string
     {
         return $this->getFileIfExists(
-            __DIR__.'/stubs/directives/'.Str::snake($interface).'_imports.stub'
+            __DIR__ . '/stubs/directives/' . Str::snake($interface) . '_imports.stub'
         );
     }
 

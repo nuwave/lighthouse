@@ -13,15 +13,11 @@ use GraphQL\Language\AST\ObjectTypeExtensionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionNode;
 use GraphQL\Language\Parser;
-use Illuminate\Contracts\Cache\Factory as CacheFactory;
-use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Events\BuildSchemaString;
 use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Exceptions\UnknownCacheVersionException;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
@@ -55,9 +51,9 @@ class ASTBuilder
     protected $eventsDispatcher;
 
     /**
-     * @var \Illuminate\Contracts\Config\Repository
+     * @var \Nuwave\Lighthouse\Schema\AST\ASTCache
      */
-    protected $configRepository;
+    protected $astCache;
 
     /**
      * Initialized lazily in $this->documentAST().
@@ -70,72 +66,34 @@ class ASTBuilder
         DirectiveLocator $directiveLocator,
         SchemaSourceProvider $schemaSourceProvider,
         EventsDispatcher $eventsDispatcher,
-        ConfigRepository $configRepository
+        ASTCache $astCache
     ) {
         $this->directiveLocator = $directiveLocator;
         $this->schemaSourceProvider = $schemaSourceProvider;
         $this->eventsDispatcher = $eventsDispatcher;
-        $this->configRepository = $configRepository;
+        $this->astCache = $astCache;
     }
 
     public function documentAST(): DocumentAST
     {
         if (! isset($this->documentAST)) {
-            $cacheConfig = $this->configRepository->get('lighthouse.cache');
-
-            $this->documentAST = $cacheConfig['enable']
-                ? $this->fromCacheOrBuild($cacheConfig)
+            return $this->documentAST = $this->astCache->isEnabled()
+                ? $this->astCache->fromCacheOrBuild(function (): DocumentAST {
+                    return $this->build();
+                })
                 : $this->build();
         }
 
         return $this->documentAST;
     }
 
-    /**
-     * @param  array<string, mixed>  $cacheConfig
-     */
-    protected function fromCacheOrBuild(array $cacheConfig): DocumentAST
-    {
-        $version = $cacheConfig['version'] ?? 1;
-        switch ($version) {
-            case 1:
-                /** @var \Illuminate\Contracts\Cache\Factory $cacheFactory */
-                $cacheFactory = app(CacheFactory::class);
-                $cache = $cacheFactory->store($cacheConfig['store'] ?? null);
-
-                return $cache->remember(
-                    $cacheConfig['key'],
-                    $cacheConfig['ttl'],
-                    function (): DocumentAST {
-                        return $this->build();
-                    }
-                );
-            case 2:
-                /** @var \Illuminate\Filesystem\Filesystem $filesystem */
-                $filesystem = app(Filesystem::class);
-                $path = $cacheConfig['path'] ?? base_path('bootstrap/cache/lighthouse-schema.php');
-
-                if ($filesystem->exists($path)) {
-                    return DocumentAST::fromArray(require $path);
-                }
-
-                $documentAST = $this->build();
-                $variable = var_export($documentAST->toArray(), true);
-                $filesystem->put($path, /** @lang PHP */ "<?php return {$variable};");
-
-                return $documentAST;
-            default:
-                throw new UnknownCacheVersionException($version);
-        }
-    }
-
-    protected function build(): DocumentAST
+    public function build(): DocumentAST
     {
         $schemaString = $this->schemaSourceProvider->getSchemaString();
 
-        // Allow to register listeners that add in additional schema definitions.
+        // Allow registering listeners that inject additional schema definitions.
         // This can be used by plugins to hook into the schema building process
-        // while still allowing the user to add in their schema as usual.
+        // while still allowing the user to define their schema as usual.
         $additionalSchemas = (array) $this->eventsDispatcher->dispatch(
             new BuildSchemaString($schemaString)
         );
@@ -169,12 +127,12 @@ class ASTBuilder
     protected function applyTypeDefinitionManipulators(): void
     {
         foreach ($this->documentAST->types as $typeDefinition) {
-            /** @var \Nuwave\Lighthouse\Support\Contracts\TypeManipulator $typeDefinitionManipulator */
             foreach (
                 $this->directiveLocator->associatedOfType($typeDefinition, TypeManipulator::class)
-                as $typeDefinitionManipulator
+                as $typeManipulator
             ) {
-                $typeDefinitionManipulator->manipulateTypeDefinition($this->documentAST, $typeDefinition);
+                assert($typeManipulator instanceof TypeManipulator);
+                $typeManipulator->manipulateTypeDefinition($this->documentAST, $typeDefinition);
             }
         }
     }
@@ -188,11 +146,11 @@ class ASTBuilder
             foreach ($typeExtensionsList as $typeExtension) {
                 // Before we actually extend the types, we apply the manipulator directives
                 // that are defined on type extensions themselves
-                /** @var \Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator $typeExtensionManipulator */
                 foreach (
                     $this->directiveLocator->associatedOfType($typeExtension, TypeExtensionManipulator::class)
                     as $typeExtensionManipulator
                 ) {
+                    assert($typeExtensionManipulator instanceof TypeExtensionManipulator);
                     $typeExtensionManipulator->manipulateTypeExtension($this->documentAST, $typeExtension);
                 }
 
@@ -216,9 +174,8 @@ class ASTBuilder
      */
     protected function extendObjectLikeType(string $typeName, TypeExtensionNode $typeExtension): void
     {
-        /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\InputObjectTypeDefinitionNode|\GraphQL\Language\AST\InterfaceTypeDefinitionNode|null $extendedObjectLikeType */
         $extendedObjectLikeType = $this->documentAST->types[$typeName] ?? null;
-        if ($extendedObjectLikeType === null) {
+        if (null === $extendedObjectLikeType) {
             if (RootType::isRootType($typeName)) {
                 $extendedObjectLikeType = Parser::objectTypeDefinition(/** @lang GraphQL */ "type {$typeName}");
                 $this->documentAST->setTypeDefinition($extendedObjectLikeType);
@@ -228,6 +185,7 @@ class ASTBuilder
                 );
             }
         }
+        assert($extendedObjectLikeType instanceof ObjectTypeDefinitionNode || $extendedObjectLikeType instanceof InputObjectTypeDefinitionNode || $extendedObjectLikeType instanceof InterfaceTypeDefinitionNode);
 
         $this->assertExtensionMatchesDefinition($typeExtension, $extendedObjectLikeType);
 
@@ -240,11 +198,7 @@ class ASTBuilder
         );
 
         if ($extendedObjectLikeType instanceof ObjectTypeDefinitionNode) {
-            /**
-             * We know this because we passed assertExtensionMatchesDefinition().
-             *
-             * @var \GraphQL\Language\AST\ObjectTypeExtensionNode $typeExtension
-             */
+            assert($typeExtension instanceof ObjectTypeExtensionNode, 'We know this because we passed assertExtensionMatchesDefinition().');
             $extendedObjectLikeType->interfaces = ASTHelper::mergeUniqueNodeList(
                 $extendedObjectLikeType->interfaces,
                 $typeExtension->interfaces
@@ -254,13 +208,13 @@ class ASTBuilder
 
     protected function extendEnumType(string $typeName, EnumTypeExtensionNode $typeExtension): void
     {
-        /** @var \GraphQL\Language\AST\EnumTypeDefinitionNode|null $extendedEnum */
         $extendedEnum = $this->documentAST->types[$typeName] ?? null;
-        if ($extendedEnum === null) {
+        if (null === $extendedEnum) {
             throw new DefinitionException(
                 $this->missingBaseDefinition($typeName, $typeExtension)
             );
         }
+        assert($extendedEnum instanceof EnumTypeDefinitionNode);
 
         $this->assertExtensionMatchesDefinition($typeExtension, $extendedEnum);
 
@@ -301,11 +255,11 @@ class ASTBuilder
         foreach ($this->documentAST->types as $typeDefinition) {
             if ($typeDefinition instanceof ObjectTypeDefinitionNode || $typeDefinition instanceof InterfaceTypeDefinitionNode) {
                 foreach ($typeDefinition->fields as $fieldDefinition) {
-                    /** @var \Nuwave\Lighthouse\Support\Contracts\FieldManipulator $fieldManipulator */
                     foreach (
                         $this->directiveLocator->associatedOfType($fieldDefinition, FieldManipulator::class)
                         as $fieldManipulator
                     ) {
+                        assert($fieldManipulator instanceof FieldManipulator);
                         $fieldManipulator->manipulateFieldDefinition($this->documentAST, $fieldDefinition, $typeDefinition);
                     }
                 }
@@ -322,11 +276,11 @@ class ASTBuilder
             if ($typeDefinition instanceof ObjectTypeDefinitionNode) {
                 foreach ($typeDefinition->fields as $fieldDefinition) {
                     foreach ($fieldDefinition->arguments as $argumentDefinition) {
-                        /** @var \Nuwave\Lighthouse\Support\Contracts\ArgManipulator $argManipulator */
                         foreach (
                             $this->directiveLocator->associatedOfType($argumentDefinition, ArgManipulator::class)
                             as $argManipulator
                         ) {
+                            assert($argManipulator instanceof ArgManipulator);
                             $argManipulator->manipulateArgDefinition(
                                 $this->documentAST,
                                 $argumentDefinition,

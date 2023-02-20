@@ -7,7 +7,7 @@ use Tests\TestCase;
 use Tests\TestsRedis;
 use Tests\TestsSubscriptions;
 
-class AuthorizeRequestsTest extends TestCase
+final class AuthorizeRequestsTest extends TestCase
 {
     use TestsRedis;
     use TestsSubscriptions;
@@ -21,7 +21,7 @@ class AuthorizeRequestsTest extends TestCase
     type Subscription {
         taskUpdated(id: ID!): Task
     }
-    '.self::PLACEHOLDER_QUERY;
+    ' . self::PLACEHOLDER_QUERY;
 
     public function testEchoClientAuthorizesSuccessfully(): void
     {
@@ -47,7 +47,7 @@ class AuthorizeRequestsTest extends TestCase
         $channel = $response->json('extensions.lighthouse_subscriptions.channel');
         $this
             ->postJson('graphql/subscriptions/auth', [
-                'channel_name' => 'presence-'.$channel,
+                'channel_name' => 'presence-' . $channel,
             ])
             ->assertSuccessful()
             ->assertJsonStructure([
@@ -64,7 +64,7 @@ class AuthorizeRequestsTest extends TestCase
         $channel = $response->json('extensions.lighthouse_subscriptions.channel');
         $this
             ->postJson('graphql/subscriptions/auth', [
-                'channel_name' => 'anything-before-'.$channel,
+                'channel_name' => 'anything-before-' . $channel,
             ])
             ->assertForbidden();
     }
@@ -76,7 +76,7 @@ class AuthorizeRequestsTest extends TestCase
         $channel = $response->json('extensions.lighthouse_subscriptions.channel');
         $this
             ->postJson('graphql/subscriptions/auth', [
-                'channel_name' => $channel.'plain-wrong',
+                'channel_name' => $channel . 'plain-wrong',
             ])
             ->assertForbidden();
     }

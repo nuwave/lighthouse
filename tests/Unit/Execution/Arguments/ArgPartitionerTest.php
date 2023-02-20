@@ -12,7 +12,7 @@ use Tests\Unit\Execution\Arguments\Fixtures\Nested;
 use Tests\Utils\Models\User;
 use Tests\Utils\Models\WithoutRelationClassImport;
 
-class ArgPartitionerTest extends TestCase
+final class ArgPartitionerTest extends TestCase
 {
     public function testPartitionArgsWithArgResolvers(): void
     {
@@ -66,6 +66,31 @@ class ArgPartitionerTest extends TestCase
 
         $this->assertSame(
             ['tasks' => $tasksRelation],
+            $hasManyArgs->arguments
+        );
+    }
+
+    public function testArgsMatchingNonRelationMethod(): void
+    {
+        $argumentSet = new ArgumentSet();
+
+        /** @see User::nonRelationPrimitive() */
+        $nonRelationPrimitive = new Argument();
+        $argumentSet->arguments['nonRelationPrimitive'] = $nonRelationPrimitive;
+
+        [$hasManyArgs, $regularArgs] = ArgPartitioner::relationMethods(
+            $argumentSet,
+            new User(),
+            HasMany::class
+        );
+
+        $this->assertSame(
+            ['nonRelationPrimitive' => $nonRelationPrimitive],
+            $regularArgs->arguments
+        );
+
+        $this->assertSame(
+            [],
             $hasManyArgs->arguments
         );
     }

@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
-use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Container\Container;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
@@ -31,37 +31,42 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
     /**
      * Provide a resolver for a subscription field in case no resolver directive is defined.
      *
-     * @return \Closure(mixed, array<string, mixed>, \Nuwave\Lighthouse\Support\Contracts\GraphQLContext, \GraphQL\Type\Definition\ResolveInfo): mixed
-     *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
+     *
+     * @return \Closure(mixed, array<string, mixed>, \Nuwave\Lighthouse\Support\Contracts\GraphQLContext, \GraphQL\Type\Definition\ResolveInfo): mixed
      */
-    public function provideSubscriptionResolver(FieldValue $fieldValue): Closure
+    public function provideSubscriptionResolver(FieldValue $fieldValue): \Closure
     {
         $fieldName = $fieldValue->getFieldName();
 
         $directive = ASTHelper::directiveDefinition($fieldValue->getField(), SubscriptionDirective::NAME);
-        if ($directive !== null) {
+        if (null !== $directive) {
             $className = ASTHelper::directiveArgValue($directive, 'class');
         } else {
             $className = Str::studly($fieldName);
         }
 
+        $namespacesToTry = RootType::defaultNamespaces($fieldValue->getParentName());
         $className = Utils::namespaceClassname(
             $className,
-            RootType::defaultNamespaces($fieldValue->getParentName()),
+            $namespacesToTry,
             function (string $class): bool {
                 return is_subclass_of($class, GraphQLSubscription::class);
             }
         );
 
         if (! $className) {
+            $subscriptionClass = GraphQLSubscription::class;
+            $consideredNamespaces = implode(', ', $namespacesToTry);
             throw new DefinitionException(
-                "No class found for the subscription field {$fieldName}"
+                "Failed to find class {$className} extends {$subscriptionClass} in namespaces [{$consideredNamespaces}] for the subscription field {$fieldName}"
             );
         }
+        assert(is_subclass_of($className, GraphQLSubscription::class));
 
-        /** @var \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription $subscription */
-        $subscription = app($className);
+        $subscription = Container::getInstance()->make($className);
+        /** @var \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription $subscription PHPStan thinks it is *NEVER* with Laravel 9 */
+        assert($subscription instanceof GraphQLSubscription);
 
         // Subscriptions can only be placed on a single field on the root
         // query, so there is no need to consider the field path

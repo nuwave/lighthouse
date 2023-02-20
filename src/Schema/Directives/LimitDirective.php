@@ -2,12 +2,11 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Closure;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
-use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -36,20 +35,20 @@ GRAPHQL;
         &$parentType
     ): void {
         $argType = ASTHelper::getUnderlyingTypeName($argDefinition->type);
-        if ($argType !== Type::INT) {
+        if (Type::INT !== $argType) {
             throw new DefinitionException(
-                "The {$this->name()} directive must only be used on arguments of type ".Type::INT
-                .", got {$argType} on {$parentField->name->value}.{$this->nodeName()}."
+                "The {$this->name()} directive must only be used on arguments of type " . Type::INT
+                . ", got {$argType} on {$parentField->name->value}.{$this->nodeName()}."
             );
         }
 
-        $parentField->directives [] = $this->directiveNode;
+        $parentField->directives[] = $this->directiveNode;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next)
+    public function handleField(FieldValue $fieldValue, \Closure $next)
     {
         $fieldValue->resultHandler(static function (?iterable $result, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ?iterable {
-            if ($result === null) {
+            if (null === $result) {
                 return null;
             }
 
@@ -73,12 +72,12 @@ GRAPHQL;
             $limited = [];
 
             foreach ($result as $value) {
-                if ($limit === 0) {
+                if (0 === $limit) {
                     break;
                 }
-                $limit--;
+                --$limit;
 
-                $limited [] = $value;
+                $limited[] = $value;
             }
 
             return $limited;

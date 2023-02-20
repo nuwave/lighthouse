@@ -27,8 +27,6 @@ or `App\GraphQL\Mutations` and calls its `__invoke` function with [the usual res
 In this case, our field is a query and is called `hello`, so we need to define our class as follows:
 
 ```php
-<?php
-
 namespace App\GraphQL\Queries;
 
 class Hello
@@ -87,8 +85,6 @@ The second argument of the resolver function is an associative array of the
 arguments that are passed to the query.
 
 ```php
-<?php
-
 namespace App\GraphQL\Queries;
 
 class Greet
@@ -184,8 +180,6 @@ field, in this case a User model.
 A naive implementation of a resolver for `id` might look like this:
 
 ```php
-<?php
-
 use App\Models\User;
 
 function resolveUserId(User $user): string
@@ -199,8 +193,6 @@ We can utilize the fourth and final resolver argument `ResolveInfo`, which will 
 to the requested field name, to dynamically access the matching property.
 
 ```php
-<?php
-
 use App\Models\User;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;

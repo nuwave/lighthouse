@@ -2,13 +2,14 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Database\Eloquent\MassAssignmentException;
 use Tests\Constants;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class CreateDirectiveTest extends DBTestCase
+final class CreateDirectiveTest extends DBTestCase
 {
     public function testCreateFromFieldArguments(): void
     {
@@ -110,7 +111,9 @@ class CreateDirectiveTest extends DBTestCase
     {
         factory(Task::class)->create(['name' => 'Uniq']);
 
-        $this->app['config']->set('app.debug', false);
+        $config = $this->app->make(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
+        $config->set('app.debug', false);
 
         $this->schema .= /** @lang GraphQL */ '
         type Task {
@@ -176,8 +179,10 @@ class CreateDirectiveTest extends DBTestCase
     {
         factory(Task::class)->create(['name' => 'Uniq']);
 
-        $this->app['config']->set('app.debug', false);
-        config(['lighthouse.transactional_mutations' => false]);
+        $config = $this->app->make(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
+        $config->set('app.debug', false);
+        $config->set('lighthouse.transactional_mutations', false);
 
         $this->schema .= /** @lang GraphQL */ '
         type Task {

@@ -10,7 +10,7 @@ use Tests\Utils\Models\Tag;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class MorphToManyDirectiveTest extends DBTestCase
+final class MorphToManyDirectiveTest extends DBTestCase
 {
     use WithFaker;
 
@@ -29,7 +29,7 @@ class MorphToManyDirectiveTest extends DBTestCase
         parent::setUp();
 
         $this->post = factory(Post::class)->create();
-        $this->postTags = Collection::times($this->faker->numberBetween(3, 7))->map(function () {
+        $this->postTags = Collection::times($this->faker->numberBetween(3, 7), function () {
             $tag = factory(Tag::class)->create();
             $this->post->tags()->attach($tag);
 
@@ -84,6 +84,63 @@ class MorphToManyDirectiveTest extends DBTestCase
                             'name' => $tag->name,
                         ];
                     })->toArray(),
+                ],
+            ],
+        ]);
+    }
+
+    public function testResolveMorphToManyRelationshipWithRelayConnection(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Tag {
+            id: ID!
+            name: String!
+        }
+
+        type Post {
+            id: ID!
+            tags: [Tag!]! @morphToMany(relation: "tags", type: CONNECTION)
+        }
+
+        type Query {
+            post (
+                id: ID! @eq
+            ): Post @find
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($id: ID!) {
+            post(id: $id) {
+                id
+                tags(first: 7) {
+                    edges {
+                        node {
+                            id
+                            ...on Tag {
+                                name
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        ', [
+            'id' => $this->post->id,
+        ])->assertJson([
+            'data' => [
+                'post' => [
+                    'id' => $this->post->id,
+                    'tags' => [
+                        'edges' => $this->postTags->map(function (Tag $tag) {
+                            return [
+                                'node' => [
+                                    'id' => $tag->id,
+                                    'name' => $tag->name,
+                                ],
+                            ];
+                        })->toArray(),
+                    ],
                 ],
             ],
         ]);
@@ -149,7 +206,7 @@ class MorphToManyDirectiveTest extends DBTestCase
         $post = factory(Post::class)->create([
             'user_id' => $user->id,
         ]);
-        /** @var \Illuminate\Database\Eloquent\Collection $postTags */
+        /** @var \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Tag> $postTags */
         $postTags = factory(Tag::class, 3)->create()->map(function (Tag $tag) use ($post) {
             $post->tags()->attach($tag);
 
@@ -159,7 +216,7 @@ class MorphToManyDirectiveTest extends DBTestCase
         $task = factory(Task::class)->create([
             'user_id' => $user->id,
         ]);
-        /** @var \Illuminate\Database\Eloquent\Collection $taskTags */
+        /** @var \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Tag> $taskTags */
         $taskTags = factory(Tag::class, 3)->create()->map(function (Tag $tag) use ($task) {
             $task->tags()->attach($tag);
 
@@ -167,7 +224,7 @@ class MorphToManyDirectiveTest extends DBTestCase
         });
 
         $this->schema = /** @lang GraphQL */ '
-        interface Tag @interface(resolveType: "'.$this->qualifyTestResolver('resolveType').'") {
+        interface Tag @interface(resolveType: "' . $this->qualifyTestResolver('resolveType') . '") {
             id: ID!
         }
 
@@ -247,23 +304,29 @@ class MorphToManyDirectiveTest extends DBTestCase
                     'posts' => [
                         [
                             'id' => $post->id,
-                            'tags' => $postTags->map(function (Tag $tag) {
-                                return [
-                                    'id' => $tag->id,
-                                    'name' => $tag->name,
-                                ];
-                            })->toArray(),
+                            'tags' => $postTags
+                                // @phpstan-ignore-next-line model type is known
+                                ->map(function (Tag $tag): array {
+                                    return [
+                                        'id' => $tag->id,
+                                        'name' => $tag->name,
+                                    ];
+                                })
+                                ->all(),
                         ],
                     ],
                     'tasks' => [
                         [
                             'id' => $task->id,
-                            'tags' => $taskTags->map(function (Tag $tag) {
-                                return [
-                                    'id' => $tag->id,
-                                    'title' => $tag->name,
-                                ];
-                            })->toArray(),
+                            'tags' => $taskTags
+                                // @phpstan-ignore-next-line model type is known
+                                ->map(function (Tag $tag): array {
+                                    return [
+                                        'id' => $tag->id,
+                                        'title' => $tag->name,
+                                    ];
+                                })
+                                ->toArray(),
                         ],
                     ],
                 ],
@@ -271,7 +334,7 @@ class MorphToManyDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function resolveType($root): string
+    public static function resolveType($root): string
     {
         return $root->posts()->count() ? 'PostTag' : 'TaskTag';
     }

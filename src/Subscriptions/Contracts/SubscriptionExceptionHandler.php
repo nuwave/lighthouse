@@ -2,8 +2,6 @@
 
 namespace Nuwave\Lighthouse\Subscriptions\Contracts;
 
-use Throwable;
-
 interface SubscriptionExceptionHandler
 {
     /**
@@ -11,12 +9,12 @@ interface SubscriptionExceptionHandler
      *
      * @return void
      */
-    public function handleAuthError(Throwable $e);
+    public function handleAuthError(\Throwable $e);
 
     /**
      * Handle broadcast error.
      *
      * @return void
      */
-    public function handleBroadcastError(Throwable $e);
+    public function handleBroadcastError(\Throwable $e);
 }

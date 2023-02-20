@@ -4,9 +4,11 @@ namespace Nuwave\Lighthouse\Federation;
 
 use GraphQL\Error\InvariantViolation;
 use GraphQL\Language\AST\FieldNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\SelectionSetNode;
 use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\WrappingType;
+use GraphQL\Type\Definition\Type;
+use GraphQL\Utils\Utils;
 use Nuwave\Lighthouse\Events\ValidateSchema;
 use Nuwave\Lighthouse\Exceptions\FederationException;
 use Nuwave\Lighthouse\Federation\Directives\ExtendsDirective;
@@ -41,13 +43,12 @@ class SchemaValidator
     protected function validateObjectType(ObjectType $type): void
     {
         $ast = $type->astNode;
-        if ($ast !== null) {
+        if (null !== $ast) {
             $directives = $this->directiveLocator->associated($ast);
 
-            /** @var \Nuwave\Lighthouse\Support\Contracts\Directive $directive */
             foreach ($directives as $directive) {
                 if ($directive instanceof KeyDirective) {
-                    $this->validateKeySelectionSet($directive->fields(), $type);
+                    $this->validateKeySelectionSet($directive->fields(), $type, $ast);
                 }
             }
         }
@@ -56,7 +57,7 @@ class SchemaValidator
     /**
      * @throws \Nuwave\Lighthouse\Exceptions\FederationException
      */
-    protected function validateKeySelectionSet(SelectionSetNode $selectionSet, ObjectType $type): void
+    protected function validateKeySelectionSet(SelectionSetNode $selectionSet, ObjectType $type, ObjectTypeDefinitionNode $typeAST): void
     {
         foreach ($selectionSet->selections as $selection) {
             if (! $selection instanceof FieldNode) {
@@ -70,21 +71,32 @@ class SchemaValidator
                 throw new FederationException($i->getMessage(), $i->getCode(), $i);
             }
 
+            $fieldASTNode = $field->astNode;
+            if (null === $fieldASTNode) {
+                throw new FederationException("Missing AST node for {$type->name}.{$field->name}.");
+            }
+
             if (
-                ASTHelper::hasDirective($type->astNode, ExtendsDirective::NAME)
-                && ! ASTHelper::hasDirective($field->astNode, ExternalDirective::NAME)
+                ASTHelper::hasDirective($typeAST, ExtendsDirective::NAME)
+                && ! ASTHelper::hasDirective($fieldASTNode, ExternalDirective::NAME)
             ) {
                 throw new FederationException("A @key directive on `{$type->name}` specifies the `{$field->name}` field which has no @external directive.");
             }
 
             $nestedSelection = $selection->selectionSet;
-            if ($nestedSelection !== null) {
-                $type = $field->getType();
-                if ($type instanceof WrappingType) {
-                    $type = $type->getWrappedType(true);
+            if (null !== $nestedSelection) {
+                $fieldType = Type::getNamedType($field->getType());
+                if (! $fieldType instanceof ObjectType) {
+                    $notObjectType = Utils::printSafe($fieldType);
+                    throw new FederationException("Expected type of field {$type->name}.{$field->name} with subselection to be object type, got: {$notObjectType}.");
                 }
 
-                $this->validateKeySelectionSet($nestedSelection, $type);
+                $fieldTypeASTNode = $fieldType->astNode;
+                if (null === $fieldTypeASTNode) {
+                    throw new FederationException("Missing AST node for {$fieldType->name}.");
+                }
+
+                $this->validateKeySelectionSet($nestedSelection, $fieldType, $fieldTypeASTNode);
             }
         }
     }

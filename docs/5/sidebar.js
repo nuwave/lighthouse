@@ -29,7 +29,7 @@ module.exports = [
   },
   {
     title: "Testing",
-    children: ["testing/phpunit", "testing/extensions"],
+    children: ["testing/phpunit", "testing/phpstan", "testing/extensions"],
   },
   {
     title: "Subscriptions",
@@ -52,11 +52,13 @@ module.exports = [
     title: "Digging Deeper",
     children: [
       "digging-deeper/schema-organisation",
+      "digging-deeper/ordering",
       "digging-deeper/relay",
       "digging-deeper/error-handling",
       "digging-deeper/adding-types-programmatically",
       "digging-deeper/file-uploads",
       "digging-deeper/client-directives",
+      "digging-deeper/deprecation",
       "digging-deeper/extending-lighthouse",
     ],
   },
@@ -74,6 +76,7 @@ module.exports = [
     children: [
       "security/authentication",
       "security/authorization",
+      "security/csrf",
       "security/validation",
       "security/sanitization",
       "security/resource-exhaustion",
@@ -83,7 +86,9 @@ module.exports = [
     title: "Performance",
     children: [
       "performance/schema-caching",
+      "performance/query-caching",
       ["performance/n-plus-one", "The N+1 Query Problem"],
+      "performance/caching",
       "performance/deferred",
       "performance/tracing",
       "performance/server-configuration",

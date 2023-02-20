@@ -11,7 +11,6 @@
 [![Continuous Integration](https://github.com/nuwave/lighthouse/workflows/Continuous%20Integration/badge.svg)](https://github.com/nuwave/lighthouse/actions)
 [![Code Coverage](https://codecov.io/gh/nuwave/lighthouse/branch/master/graph/badge.svg)](https://codecov.io/gh/nuwave/lighthouse)
 [![PHPStan](https://img.shields.io/badge/PHPStan-enabled-brightgreen.svg?style=flat)](https://github.com/phpstan/phpstan)
-[![StyleCI](https://github.styleci.io/repos/59965104/shield?branch=master&style=flat)](https://github.styleci.io/repos/59965104)
 
 [![Packagist](https://img.shields.io/packagist/dt/nuwave/lighthouse.svg)](https://packagist.org/packages/nuwave/lighthouse)
 [![Latest Stable Version](https://poser.pugx.org/nuwave/lighthouse/v/stable)](https://packagist.org/packages/nuwave/lighthouse)
@@ -30,14 +29,11 @@ and offer flexibility when you need it.
 
 ## Documentation
 
-The documentation lives at [lighthouse-php.com](https://lighthouse-php.com/).
+The documentation lives at [lighthouse-php.com](https://lighthouse-php.com).
 
 The site includes the latest docs for each major version of Lighthouse.
 You can find docs for specific versions by looking at the contents of [/docs/master](/docs/master)
 at that point in the git history: `https://github.com/nuwave/lighthouse/tree/<SPECIFIC-TAG>/docs/master`.
-
-A chinese translation is available at [lighthouse-php.cn](http://lighthouse-php.cn/) and is maintained
-over at https://github.com/haxibiao/lighthouse.
 
 ## Get involved
 
@@ -62,5 +58,10 @@ We welcome contributions of any kind, see how in [`CONTRIBUTING.md`](CONTRIBUTIN
 ## Security Vulnerabilities
 
 If you discover a security vulnerability within Lighthouse,
-please email Benedikt Franke via [benedikt@franke.tech](mailto:benedikt@franke.tech)
-or visit https://tidelift.com/security.
+please email Benedikt Franke via [benedikt@franke.tech](mailto:benedikt@franke.tech).
+
+## Sponsors
+
+Lighthouse is supported by [its awesome sponsors](https://lighthouse-php.com/sponsors).
+
+If you want to support the development of Lighthouse and see your logo there, consider [sponsoring](https://github.com/sponsors/spawnia).

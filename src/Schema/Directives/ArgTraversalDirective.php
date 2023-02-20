@@ -2,10 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Closure;
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
@@ -16,24 +15,22 @@ use Nuwave\Lighthouse\Support\Utils;
 
 abstract class ArgTraversalDirective extends BaseDirective implements FieldMiddleware
 {
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
     {
         $resolver = $fieldValue->getResolver();
 
-        return $next(
-            $fieldValue->setResolver(
-                function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
-                    $resolveInfo->argumentSet = $this->transformRecursively($resolveInfo->argumentSet);
+        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
+            $resolveInfo->argumentSet = $this->transformRecursively($resolveInfo->argumentSet);
 
-                    return $resolver(
-                        $root,
-                        $resolveInfo->argumentSet->toArray(),
-                        $context,
-                        $resolveInfo
-                    );
-                }
-            )
-        );
+            return $resolver(
+                $root,
+                $resolveInfo->argumentSet->toArray(),
+                $context,
+                $resolveInfo
+            );
+        });
+
+        return $next($fieldValue);
     }
 
     public function transformRecursively(ArgumentSet $argumentSet): ArgumentSet
@@ -48,15 +45,15 @@ abstract class ArgTraversalDirective extends BaseDirective implements FieldMiddl
                 Utils::instanceofMatcher(ArgDirective::class)
             );
 
-            $argument->value = Utils::applyEach(
+            $argument->value = Utils::mapEach(
                 function ($value) use ($directivesForArgument) {
                     if ($value instanceof ArgumentSet) {
                         $value = $this->transform($value, $directivesForArgument);
 
                         return $this->transformRecursively($value);
-                    } else {
-                        return $this->transform($value, $directivesForArgument);
                     }
+
+                    return $this->transform($value, $directivesForArgument);
                 },
                 $argument->value
             );
@@ -67,6 +64,7 @@ abstract class ArgTraversalDirective extends BaseDirective implements FieldMiddl
 
     /**
      * @param  mixed  $value  The client given value
+     *
      * @return mixed The transformed value
      */
     protected function transform($value, Collection $directivesForArgument)
@@ -80,6 +78,7 @@ abstract class ArgTraversalDirective extends BaseDirective implements FieldMiddl
 
     /**
      * @param  mixed  $value  The client given value
+     *
      * @return mixed The transformed value
      */
     abstract protected function applyDirective(Directive $directive, $value);

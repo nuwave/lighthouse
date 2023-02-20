@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Schema;
 
-use Closure;
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
@@ -10,10 +9,10 @@ use Nuwave\Lighthouse\Schema\Directives\FieldDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-use ReflectionProperty;
+use Nuwave\Lighthouse\Support\Utils;
 use Tests\TestCase;
 
-class DirectiveLocatorTest extends TestCase
+final class DirectiveLocatorTest extends TestCase
 {
     /**
      * @var \Nuwave\Lighthouse\Schema\DirectiveLocator
@@ -41,18 +40,15 @@ class DirectiveLocatorTest extends TestCase
             foo: String @field
         ');
 
-        /** @var \Nuwave\Lighthouse\Schema\Directives\FieldDirective $fieldDirective */
         $fieldDirective = $this
             ->directiveLocator
             ->associated($fieldDefinition)
             ->first();
-
-        $definitionNode = new ReflectionProperty($fieldDirective, 'definitionNode');
-        $definitionNode->setAccessible(true);
+        assert($fieldDirective instanceof FieldDirective);
 
         $this->assertSame(
             $fieldDefinition,
-            $definitionNode->getValue($fieldDirective)
+            Utils::accessProtected($fieldDirective, 'definitionNode')
         );
     }
 
@@ -62,14 +58,13 @@ class DirectiveLocatorTest extends TestCase
             foo: String @foo
         ');
 
-        $directive = new class implements FieldMiddleware
-        {
+        $directive = new class() implements FieldMiddleware {
             public static function definition(): string
             {
                 return /** @lang GraphQL */ 'foo';
             }
 
-            public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+            public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
             {
                 return $fieldValue;
             }
@@ -82,7 +77,7 @@ class DirectiveLocatorTest extends TestCase
             ->associated($fieldDefinition)
             ->first();
 
-        $this->assertObjectNotHasAttribute('definitionNode', $directive);
+        $this->assertFalse(property_exists($directive, 'definitionNode'));
     }
 
     public function testThrowsIfDirectiveNameCanNotBeResolved(): void

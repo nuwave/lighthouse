@@ -8,15 +8,14 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Tests\TestCase;
 use Tests\Unit\Schema\Execution\Fixtures\FooContext;
 
-class ContextFactoryTest extends TestCase
+final class ContextFactoryTest extends TestCase
 {
     protected function getEnvironmentSetUp($app): void
     {
         parent::getEnvironmentSetUp($app);
 
         $app->singleton(CreatesContext::class, function (): CreatesContext {
-            return new class implements CreatesContext
-            {
+            return new class() implements CreatesContext {
                 public function generate(Request $request): GraphQLContext
                 {
                     return new FooContext($request);
