@@ -743,24 +743,19 @@ directive @complexity(
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
   If you pass only a class name, the method name defaults to `__invoke`.
   """
-  resolver: String
+  resolver: String!
 ) on FIELD_DEFINITION
 ```
 
+You can provide your own function to calculate complexity.
 [Read More about query complexity analysis](https://webonyx.github.io/graphql-php/security/#query-complexity-analysis)
 
 ```graphql
 type Query {
-  posts: [Post!]! @complexity
-}
-```
-
-You can provide your own function to calculate complexity.
-
-```graphql
-type Query {
-  posts: [Post!]!
-    @complexity(resolver: "App\\Security\\ComplexityAnalyzer@userPosts")
+  posts(includeFullText: Boolean): [Post!]!
+    @complexity(
+      resolver: "App\\GraphQL\\Security\\ComplexityAnalyzer@userPosts"
+    )
 }
 ```
 
@@ -768,17 +763,17 @@ A custom complexity function may look like the following,
 refer to the [complexity function signature](resolvers.md#complexity-function-signature).
 
 ```php
-namespace App\Security;
+namespace App\GraphQL\Security;
 
-class ComplexityAnalyzer {
-
+final class ComplexityAnalyzer
+{
     public function userPosts(int $childrenComplexity, array $args): int
     {
-        $postComplexity = $args['includeFullText'])
+        $postComplexity = ($args['includeFullText'] ?? false)
             ? 3
             : 2;
 
-        return $childrenComplexity * $postComplexity;
+        return 1 + ($childrenComplexity * $postComplexity);
     }
 ```
 
@@ -964,8 +959,7 @@ directive @delete(
 ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-Use this on root mutation fields.
-It will return an instance of the Model so you can show its data one last time.
+Mutation fields using this directive will return an instance of the deleted Model (or Models).
 
 ```graphql
 type Mutation {
@@ -975,6 +969,7 @@ type Mutation {
 
 You can also delete multiple models at once, for example by a list of IDs or a filter.
 Be careful with the filters you offer to avoid accidental mass deletion.
+Lighthouse will validate that at least one argument is given.
 
 _In contrast to Laravel mass updates, this does trigger model events._
 
@@ -1269,7 +1264,7 @@ directive @eq(
 
   """
   Provide a value to compare against.
-  Only required when this directive is used on a field.
+  Exclusively required when this directive is used on a field.
   """
   value: EqValue
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
@@ -3527,14 +3522,6 @@ directive @upsert(
   model: String
 
   """
-  DEPRECATED use @globalId, will be removed in v6
-
-  Set to `true` to use global ids for finding the model.
-  If set to `false`, regular non-global ids are used.
-  """
-  globalId: Boolean = false
-
-  """
   Specify the name of the relation on the parent model.
   This is only needed when using this directive as a nested arg
   resolver and if the name of the relation is not the arg name.
@@ -3643,7 +3630,18 @@ directive @where(
   This only works for clauses with the signature (string $column, string $operator, mixed $value).
   """
   clause: String
-) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+
+  """
+  Provide a value to compare against.
+  Exclusively required when this directive is used on a field.
+  """
+  value: WhereValue
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+
+"""
+Any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
+"""
+scalar WhereValue
 ```
 
 > This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
@@ -3662,6 +3660,14 @@ Or use the additional clauses that Laravel provides:
 ```graphql
 type Query {
   postsByYear(created_at: Int! @where(clause: "whereYear")): [Post!]! @all
+}
+```
+
+When used on a field, you must define `key` and `value`:
+
+```graphql
+type Query {
+  importantPosts: [Post!]! @all @where(key: "priority", operator: ">", value: 5)
 }
 ```
 
@@ -3783,7 +3789,7 @@ Add a where clause on the primary key to the Eloquent Model query.
 directive @whereKey(
   """
   Provide a value to compare against.
-  Only required when this directive is used on a field.
+  Exclusively required when this directive is used on a field.
   """
   value: WhereKeyValue
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION

@@ -118,17 +118,6 @@ final class ASTHelperTest extends TestCase
         $this->assertFalse(ASTHelper::typeImplementsInterface($type, 'FakeInterface'));
     }
 
-    public function testThrowsWhenDefinedOnInvalidTypes(): void
-    {
-        $notAnObject = Parser::scalarTypeDefinition(/** @lang GraphQL */ '
-        scalar NotAnObject
-        ');
-        $directive = Parser::constDirective(/** @lang GraphQL */ '@foo');
-
-        $this->expectException(DefinitionException::class);
-        ASTHelper::addDirectiveToFields($directive, $notAnObject);
-    }
-
     public function testAddDirectiveToFields(): void
     {
         $object = Parser::objectTypeDefinition(/** @lang GraphQL */ '

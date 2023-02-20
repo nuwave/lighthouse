@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\ModelsLoader\CountModelsLoader;
@@ -39,7 +40,7 @@ directive @withCount(
 GRAPHQL;
     }
 
-    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType)
+    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType)
     {
         if (RootType::isRootType($parentType->name->value)) {
             throw new DefinitionException("Can not use @{$this->name()} on fields of a root type.");

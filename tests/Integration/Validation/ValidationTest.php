@@ -20,8 +20,8 @@ final class ValidationTest extends TestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = $app->make(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
 
         // Ensure we test for the result the end user receives
         $config->set('app.debug', false);
@@ -244,9 +244,7 @@ final class ValidationTest extends TestCase
 
     public function testSanitizeValidateTransform(): void
     {
-        $this->mockResolver(function ($root, array $args): string {
-            return $args['password'];
-        });
+        $this->mockResolver(fn ($_, array $args): string => $args['password']);
 
         $this->schema = /** @lang GraphQL */ '
         type Query {

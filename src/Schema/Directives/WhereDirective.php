@@ -2,9 +2,12 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
+use Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class WhereDirective extends BaseDirective implements ArgBuilderDirective
+class WhereDirective extends BaseDirective implements ArgBuilderDirective, FieldBuilderDirective
 {
     public static function definition(): string
     {
@@ -29,7 +32,18 @@ directive @where(
   This only works for clauses with the signature (string $column, string $operator, mixed $value).
   """
   clause: String
-) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+
+  """
+  Provide a value to compare against.
+  Exclusively required when this directive is used on a field.
+  """
+  value: WhereValue
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+
+"""
+Any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
+"""
+scalar WhereValue
 GRAPHQL;
     }
 
@@ -42,6 +56,14 @@ GRAPHQL;
             $this->directiveArgValue('key', $this->nodeName()),
             $this->directiveArgValue('operator', '='),
             $value
+        );
+    }
+
+    public function handleFieldBuilder(object $builder, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): object
+    {
+        return $this->handleBuilder(
+            $builder,
+            $this->directiveArgValue('value')
         );
     }
 }

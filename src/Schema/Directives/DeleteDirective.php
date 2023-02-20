@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
@@ -57,7 +58,7 @@ GRAPHQL;
     }
 
     /**
-     * Delete on ore more related models.
+     * Delete one or more related models.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $parent
      * @param  mixed|array<mixed>  $idOrIds
@@ -85,7 +86,6 @@ GRAPHQL;
             // Deleting when `false` is given seems wrong.
             if ($idOrIds) {
                 if ($relationIsBelongsToLike) {
-                    /** @var \Illuminate\Database\Eloquent\Relations\BelongsTo $relation TODO remove with newer PHPStan that comes with Laravel 9 */
                     $relation->dissociate();
                     $relation->getParent()->save();
                 }
@@ -105,7 +105,7 @@ GRAPHQL;
         DocumentAST &$documentAST,
         InputValueDefinitionNode &$argDefinition,
         FieldDefinitionNode &$parentField,
-        ObjectTypeDefinitionNode &$parentType
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType
     ) {
         if (! $this->directiveArgValue('relation')) {
             throw new DefinitionException('The @delete directive requires "relation" to be set when used as an argument resolver.');

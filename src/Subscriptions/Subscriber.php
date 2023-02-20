@@ -25,6 +25,11 @@ class Subscriber
     public $channel;
 
     /**
+     * X-Socket-ID header passed on the subscription query.
+     */
+    public ?string $socket_id;
+
+    /**
      * The topic subscribed to.
      *
      * @var string
@@ -91,6 +96,13 @@ class Subscriber
         $this->variables = $resolveInfo->variableValues;
         $this->context = $context;
 
+        $xSocketID = request()->header('X-Socket-ID');
+        // @phpstan-ignore-next-line
+        if (is_array($xSocketID)) {
+            throw new \Exception('X-Socket-ID must be a string or null.');
+        }
+        $this->socket_id = $xSocketID;
+
         $operation = $resolveInfo->operation;
         assert($operation instanceof OperationDefinitionNode, 'Must be here, since webonyx/graphql-php validated the subscription.');
 
@@ -108,6 +120,7 @@ class Subscriber
     public function __serialize(): array
     {
         return [
+            'socket_id' => $this->socket_id,
             'channel' => $this->channel,
             'topic' => $this->topic,
             'query' => serialize(
@@ -133,6 +146,7 @@ class Subscriber
         );
         assert($documentNode instanceof DocumentNode, 'We know the type since it is set during construction and serialized.');
 
+        $this->socket_id = $data['socket_id'];
         $this->query = $documentNode;
         $this->fieldName = $data['field_name'];
         $this->args = $data['args'];
@@ -140,18 +154,6 @@ class Subscriber
         $this->context = $this->contextSerializer()->unserialize(
             $data['context']
         );
-    }
-
-    /**
-     * Set root data.
-     *
-     * @deprecated set the attribute directly
-     */
-    public function setRoot($root): self
-    {
-        $this->root = $root;
-
-        return $this;
     }
 
     /**

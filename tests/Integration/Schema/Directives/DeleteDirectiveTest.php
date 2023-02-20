@@ -245,6 +245,48 @@ final class DeleteDirectiveTest extends DBTestCase
         ]);
     }
 
+    public function testDeleteRequiresAtLeastOneArgument(): void
+    {
+        $this->schema .= /** @lang GraphQL */ '
+        type User {
+            id: ID!
+        }
+
+        type Mutation {
+            deleteUser(id: ID @whereKey, email: String @eq): User @delete
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            deleteUser {
+                id
+            }
+        }
+        ')->assertGraphQLError(ModifyModelExistenceDirective::wouldModifyAll());
+    }
+
+    public function testDoesNotAcceptArgumentWithoutArgBuilderDirective(): void
+    {
+        $this->schema .= /** @lang GraphQL */ '
+        type User {
+            id: ID!
+        }
+
+        type Mutation {
+            deleteUser(id: ID): User @delete
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            deleteUser(id: 1) {
+                id
+            }
+        }
+        ')->assertGraphQLError(ModifyModelExistenceDirective::wouldModifyAll());
+    }
+
     public function testRequiresRelationWhenUsingAsArgResolver(): void
     {
         $this->expectException(DefinitionException::class);

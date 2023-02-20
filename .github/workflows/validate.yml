@@ -27,7 +27,6 @@ jobs:
           - "8.1"
           - "8.2"
         laravel-version:
-          - "^8"
           - "^9"
           - "^10"
         exclude:
@@ -53,10 +52,6 @@ jobs:
       - name: "Remove conflicting dependencies that are not needed here"
         run: composer remove --dev phpbench/phpbench rector/rector --no-update
 
-      - name: "Fix https://github.com/BenSampo/laravel-enum/issues/249"
-        if: matrix.laravel-version == '^9'
-        run: composer require --dev composer/composer:'dev-main as v2.3.0' --no-install
-
       - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
 
       - run: vendor/bin/phpstan
@@ -73,7 +68,6 @@ jobs:
           - "8.1"
           - "8.2"
         laravel-version:
-          - "^8"
           - "^9"
           - "^10"
         os:
@@ -120,15 +114,16 @@ jobs:
       - name: "Remove conflicting dependencies that are not needed here"
         run: composer remove --dev nunomaduro/larastan phpstan/phpstan-mockery phpbench/phpbench rector/rector --no-update
 
-      - name: "Fix https://github.com/BenSampo/laravel-enum/issues/249"
-        if: matrix.laravel-version == '^9'
-        run: composer require --dev composer/composer:'dev-main as v2.3.0' --no-install
+      - run: >
+          composer require
+          illuminate/contracts:${{ matrix.laravel-version }}
+          --no-interaction
+          --prefer-dist
+          --no-progress
+          --update-with-all-dependencies
+          ${{ matrix.composer.arg }}
 
-      - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
-
-      - run: composer update ${{ matrix.composer.arg }}
-
-      - run: vendor/bin/phpunit --colors=always --verbose
+      - run: vendor/bin/phpunit
 
   coverage:
     runs-on: ubuntu-latest

@@ -18,7 +18,6 @@ use Tests\Utils\LaravelEnums\AOrB;
  * Scopes
  *
  * @method static \Illuminate\Database\Eloquent\Builder&static byType(AOrB $aOrB)
- * @method static \Illuminate\Database\Eloquent\Builder&static byTypeInternal(string $aOrB) TODO remove in v6
  */
 final class WithEnum extends Model
 {
@@ -32,14 +31,6 @@ final class WithEnum extends Model
     ];
 
     public function scopeByType(EloquentBuilder $builder, AOrB $aOrB): EloquentBuilder
-    {
-        return $builder->where('type', $aOrB);
-    }
-
-    /**
-     * TODO remove in v6.
-     */
-    public function scopeByTypeInternal(EloquentBuilder $builder, string $aOrB): EloquentBuilder
     {
         return $builder->where('type', $aOrB);
     }

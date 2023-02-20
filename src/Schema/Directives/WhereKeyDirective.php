@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
@@ -24,7 +25,7 @@ Add a where clause on the primary key to the Eloquent Model query.
 directive @whereKey(
   """
   Provide a value to compare against.
-  Only required when this directive is used on a field.
+  Exclusively required when this directive is used on a field.
   """
   value: WhereKeyValue
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
@@ -46,7 +47,7 @@ GRAPHQL;
         return $builder->whereKey($value);
     }
 
-    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType)
+    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType)
     {
         if (! $this->directiveHasArgument('value')) {
             throw new DefinitionException("Must provide the argument `value` when using {$this->name()} on field `{$parentType->name->value}.{$fieldDefinition->name->value}`.");

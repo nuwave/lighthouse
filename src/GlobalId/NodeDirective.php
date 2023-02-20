@@ -62,10 +62,7 @@ GRAPHQL;
         if ($this->directiveHasArgument('resolver')) {
             $resolver = $this->getResolverFromArgument('resolver');
         } else {
-            $resolver = function ($id): ?Model {
-                // TODO use union type
-                assert(is_int($id) || is_string($id));
-
+            $resolver = function (int|string $id): ?Model {
                 return $this->getModelClass()::find($id);
             };
         }

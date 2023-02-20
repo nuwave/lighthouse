@@ -3,7 +3,7 @@
 namespace Tests\Integration\Federation;
 
 use Nuwave\Lighthouse\Federation\FederationServiceProvider;
-use Nuwave\Lighthouse\Support\Contracts\GlobalId;
+use Nuwave\Lighthouse\GlobalId\GlobalId;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 

@@ -47,8 +47,8 @@ abstract class DBTestCase extends TestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = $app->make(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
 
         $config->set('database.default', self::DEFAULT_CONNECTION);
         $config->set('database.connections.' . self::DEFAULT_CONNECTION, $this->mysqlOptions());

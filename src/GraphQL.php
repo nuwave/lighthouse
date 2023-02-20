@@ -26,7 +26,6 @@ use Nuwave\Lighthouse\Events\ManipulateResult;
 use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Events\StartOperationOrOperations;
 use Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry;
-use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
 use Nuwave\Lighthouse\Execution\ErrorPool;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -161,7 +160,6 @@ class GraphQL
                 null,
                 $params->operation
             );
-        // @phpstan-ignore-next-line TODO remove when graphql-php 15 correctly types OperationParams::$query as nullable
         } else {
             try {
                 $result = $this->executeParsedQuery(
@@ -361,9 +359,6 @@ class GraphQL
     {
         BatchLoaderRegistry::forgetInstances();
         $this->errorPool->clear();
-
-        // TODO remove in v6
-        BatchLoader::forgetInstances();
     }
 
     /**
@@ -408,41 +403,5 @@ class GraphQL
         return $this->configRepository->get('app.debug')
             ? (int) $this->configRepository->get('lighthouse.debug')
             : DebugFlag::NONE;
-    }
-
-    /**
-     * This method will be removed in the next major update. Please use executeParsedQuery or parseAndExecuteQuery.
-     *
-     * @param string|\GraphQL\Language\AST\DocumentNode $query
-     * @param array<string, mixed>|null $variables
-     * @param mixed|null $rootValue
-     *
-     * @see executeParsedQuery
-     * @see parseAndExecuteQuery
-     * @deprecated
-     */
-    public function executeQuery(
-        $query,
-        GraphQLContext $context,
-        ?array $variables = [],
-        $rootValue = null,
-        ?string $operationName = null
-    ): ExecutionResult {
-        if (is_string($query)) {
-            return $this->parseAndExecuteQuery($query, $context, $variables, $rootValue, $operationName);
-        }
-
-        return $this->executeParsedQuery($query, $context, $variables, $rootValue, $operationName);
-    }
-
-    /**
-     * Ensure an executable GraphQL schema is present.
-     *
-     * @deprecated
-     * @see \Nuwave\Lighthouse\Schema\SchemaBuilder::schema()
-     */
-    public function prepSchema(): Schema
-    {
-        return $this->schemaBuilder->schema();
     }
 }

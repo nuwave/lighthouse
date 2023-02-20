@@ -107,8 +107,7 @@ abstract class DateScalarTest extends TestCase
         $now = IlluminateCarbon::now();
         $result = $this->scalarInstance()->serialize($now);
 
-        // TODO use native assertIsString when upgrading PHPUnit
-        $this->assertTrue(is_string($result));
+        self::assertIsString($result);
     }
 
     /**
