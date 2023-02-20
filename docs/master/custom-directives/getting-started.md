@@ -62,7 +62,7 @@ we can wrap around it by using the `FieldMiddleware` directive.
 namespace App\GraphQL\Directives;
 
 use Closure;
-use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;

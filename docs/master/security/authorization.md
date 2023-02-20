@@ -182,7 +182,7 @@ It assumes a simple role system where a `User` has a single attribute `$role`.
 namespace App\GraphQL\Directives;
 
 use Closure;
-use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;

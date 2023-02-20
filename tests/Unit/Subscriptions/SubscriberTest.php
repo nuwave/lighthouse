@@ -3,7 +3,7 @@
 namespace Tests\Unit\Subscriptions;
 
 use GraphQL\Language\AST\OperationDefinitionNode;
-use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Schema\Context;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;

@@ -31,7 +31,7 @@ class FieldValue
     /**
      * Ordered list of callbacks to transform the incoming argument set.
      *
-     * @var array<int, callable(\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet, \GraphQL\Type\Definition\ResolveInfo): \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>
+     * @var array<int, callable(\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet, \Nuwave\Lighthouse\Execution\ResolveInfo): \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>
      */
     protected $argumentSetTransformers;
 
@@ -63,10 +63,11 @@ class FieldValue
 
         if (! isset(self::$transformedResolveArgs[$path])) {
             $argumentSetFactory = app(ArgumentSetFactory::class);
+            assert($argumentSetFactory instanceof ArgumentSetFactory);
             $argumentSet = $argumentSetFactory->fromResolveInfo($args, $resolveInfo);
 
             foreach ($this->argumentSetTransformers as $transform) {
-                $argumentSet = $transform($argumentSet);
+                $argumentSet = $transform($argumentSet, $resolveInfo);
             }
 
             self::$transformedResolveArgs[$path] = [$argumentSet->toArray(), $argumentSet];

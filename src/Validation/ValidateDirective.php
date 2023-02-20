@@ -30,7 +30,7 @@ GRAPHQL;
             $rulesGatherer = new RulesGatherer($argumentSet);
 
             $validationFactory = Container::getInstance()->make(ValidationFactory::class);
-            assert($validationFactoryinstanceof ValidationFactory);
+            assert($validationFactory instanceof ValidationFactory);
 
             $validator = $validationFactory->make(
                 $argumentSet->toArray(),

@@ -70,7 +70,7 @@ and it will display additional error output.
 namespace App\GraphQL\Queries;
 
 use App\Exceptions\CustomException;
-use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class SomeField

@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\Subscriptions;
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\OperationDefinitionNode;
-use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use GraphQL\Utils\AST;
 use Illuminate\Container\Container;
 use Illuminate\Support\Str;

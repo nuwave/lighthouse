@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
-use Closure;
 use GraphQL\Error\InvariantViolation;
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;

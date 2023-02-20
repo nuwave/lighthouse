@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Tracing;
 
-use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Execution\Resolved;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;

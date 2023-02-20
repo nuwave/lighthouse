@@ -156,7 +156,7 @@ Lighthouse now passes the typical 4 resolver arguments to `FieldBuilderDirective
 Custom directives the implement `FieldBuilderDirective` now have to accept those extra arguments.
 
 ```diff
-+ use GraphQL\Type\Definition\ResolveInfo;
++ use Nuwave\Lighthouse\Execution\ResolveInfo
 + use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 final class MyDirective extends BaseDirective implements FieldBuilderDirective
@@ -172,7 +172,7 @@ final class MyDirective extends BaseDirective implements FieldBuilderDirective
 You must now call `ResolveInfo::enhanceBuilder()` and pass the resolver arguments.
 
 ```diff
-use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 // Some resolver function or directive middleware

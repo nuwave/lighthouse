@@ -4,7 +4,7 @@ namespace Tests\Unit\Subscriptions\Iterators;
 
 use GraphQL\Language\AST\NameNode;
 use GraphQL\Language\AST\OperationDefinitionNode;
-use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\Context;

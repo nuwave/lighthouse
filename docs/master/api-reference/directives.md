@@ -499,7 +499,7 @@ type Query {
 
 ```php
 use Illuminate\Database\Eloquent\Builder;
-use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 final class MyClass
@@ -1768,7 +1768,7 @@ return an Object Type. You can get the appropriate Object Type from Lighthouse's
 namespace App\GraphQL\Interfaces;
 
 use GraphQL\Type\Definition\Type;
-use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
@@ -2796,7 +2796,7 @@ namespace App\Models;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Query\Builder;
-use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class Blog
@@ -3382,7 +3382,7 @@ resolve an Object Type from Lighthouse's `TypeRegistry`.
 namespace App\GraphQL\Unions;
 
 use GraphQL\Type\Definition\Type;
-use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
