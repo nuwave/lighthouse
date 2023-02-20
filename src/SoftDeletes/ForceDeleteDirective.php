@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\SoftDeletes;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
@@ -52,7 +53,7 @@ GRAPHQL;
     public function manipulateFieldDefinition(
         DocumentAST &$documentAST,
         FieldDefinitionNode &$fieldDefinition,
-        ObjectTypeDefinitionNode &$parentType
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType
     ): void {
         SoftDeletesServiceProvider::assertModelUsesSoftDeletes(
             $this->getModelClass(),

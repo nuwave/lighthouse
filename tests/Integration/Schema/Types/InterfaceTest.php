@@ -293,6 +293,54 @@ GRAPHQL;
         $this->assertCount(2, $interface['possibleTypes']);
     }
 
+    public function testInterfaceManipulation(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        interface HasPosts {
+            posts: [Post!]! @paginate
+        }
+
+        type Post {
+            id: ID!
+        }
+
+        type User implements HasPosts {
+            id: ID!
+            posts: [Post!]! @paginate
+        }
+
+        type Team implements HasPosts {
+            posts: [Post!]! @paginate
+        }
+
+        type Query {
+            foo: String
+        }
+GRAPHQL;
+
+        $result = $this->graphQL(/** @lang GraphQL */ '
+        {
+            __type(name: "HasPosts") {
+                name
+                kind
+                fields {
+                    name
+                    type {
+                        ofType {
+                            name
+                            kind
+                        }
+                    }
+                }
+            }
+        }
+        ');
+
+        $this->assertSame('HasPosts', $result->json('data.__type.name'));
+        $this->assertSame('INTERFACE', $result->json('data.__type.kind'));
+        $this->assertSame('PostPaginator', $result->json('data.__type.fields.0.type.ofType.name'));
+    }
+
     /**
      * @return \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\User|\Tests\Utils\Models\Team>
      */

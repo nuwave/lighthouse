@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
@@ -33,7 +34,7 @@ GRAPHQL;
         DocumentAST &$documentAST,
         InputValueDefinitionNode &$argDefinition,
         FieldDefinitionNode &$parentField,
-        ObjectTypeDefinitionNode &$parentType
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType
     ): void {
         $argType = ASTHelper::getUnderlyingTypeName($argDefinition->type);
         if (Type::INT !== $argType) {

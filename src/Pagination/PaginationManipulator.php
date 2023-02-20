@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Pagination;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
@@ -52,7 +53,7 @@ class PaginationManipulator
     public function transformToPaginatedField(
         PaginationType $paginationType,
         FieldDefinitionNode &$fieldDefinition,
-        ObjectTypeDefinitionNode &$parentType,
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
         ?int $defaultCount = null,
         ?int $maxCount = null,
         ?ObjectTypeDefinitionNode $edgeType = null
@@ -68,7 +69,7 @@ class PaginationManipulator
 
     protected function registerConnection(
         FieldDefinitionNode &$fieldDefinition,
-        ObjectTypeDefinitionNode &$parentType,
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
         PaginationType $paginationType,
         ?int $defaultCount = null,
         ?int $maxCount = null,
@@ -155,7 +156,7 @@ GRAPHQL
 
     protected function registerPaginator(
         FieldDefinitionNode &$fieldDefinition,
-        ObjectTypeDefinitionNode &$parentType,
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
         PaginationType $paginationType,
         ?int $defaultCount = null,
         ?int $maxCount = null
@@ -192,7 +193,7 @@ GRAPHQL
 
     protected function registerSimplePaginator(
         FieldDefinitionNode &$fieldDefinition,
-        ObjectTypeDefinitionNode &$parentType,
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
         PaginationType $paginationType,
         ?int $defaultCount = null,
         ?int $maxCount = null

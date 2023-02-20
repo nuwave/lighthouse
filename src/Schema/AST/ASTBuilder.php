@@ -253,7 +253,7 @@ class ASTBuilder
     protected function applyFieldManipulators(): void
     {
         foreach ($this->documentAST->types as $typeDefinition) {
-            if ($typeDefinition instanceof ObjectTypeDefinitionNode) {
+            if ($typeDefinition instanceof ObjectTypeDefinitionNode || $typeDefinition instanceof InterfaceTypeDefinitionNode) {
                 foreach ($typeDefinition->fields as $fieldDefinition) {
                     foreach (
                         $this->directiveLocator->associatedOfType($fieldDefinition, FieldManipulator::class)
@@ -273,7 +273,7 @@ class ASTBuilder
     protected function applyArgManipulators(): void
     {
         foreach ($this->documentAST->types as $typeDefinition) {
-            if ($typeDefinition instanceof ObjectTypeDefinitionNode) {
+            if ($typeDefinition instanceof ObjectTypeDefinitionNode || $typeDefinition instanceof InterfaceTypeDefinitionNode) {
                 foreach ($typeDefinition->fields as $fieldDefinition) {
                     foreach ($fieldDefinition->arguments as $argumentDefinition) {
                         foreach (
