@@ -14,9 +14,7 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
         }
         ';
 
-        $this->mockResolver(function ($_, array $args): ?string {
-            return $args['bar'];
-        });
+        $this->mockResolver(fn ($_, array $args): ?string => $args['bar']);
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -37,9 +35,7 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
         }
         ';
 
-        $this->mockResolver(function ($_, array $args): ?array {
-            return $args['bar'];
-        });
+        $this->mockResolver(fn ($_, array $args): ?array => $args['bar']);
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -54,9 +50,7 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
 
     public function testOnField(): void
     {
-        $this->mockResolver(static function ($root, array $args): array {
-            return $args;
-        });
+        $this->mockResolver(static fn ($_, array $args): array => $args);
 
         $this->schema .= /** @lang GraphQL */ '
         type Foo {
@@ -104,9 +98,7 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
 
     public function testDoesNotConvertNonNullableArgumentsWhenUsedOnField(): void
     {
-        $this->mockResolver(static function ($root, array $args): array {
-            return $args;
-        });
+        $this->mockResolver(static fn ($_, array $args): array => $args);
 
         $this->schema .= /** @lang GraphQL */ '
         type Foo {
@@ -155,9 +147,7 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
         }
         ';
 
-        $this->mockResolver(function ($_, array $args): ?string {
-            return $args['bar'];
-        });
+        $this->mockResolver(fn ($_, array $args): ?string => $args['bar']);
 
         $this->graphQL(/** @lang GraphQL */ '
         {
