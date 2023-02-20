@@ -26,44 +26,13 @@ use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
  */
 class FieldFactory
 {
-    /**
-     * @var \Illuminate\Pipeline\Pipeline
-     */
-    protected $pipeline;
-
-    /**
-     * @var \Illuminate\Contracts\Config\Repository
-     */
-    protected $config;
-
-    /**
-     * @var \Nuwave\Lighthouse\Schema\DirectiveLocator
-     */
-    protected $directiveLocator;
-
-    /**
-     * @var \Nuwave\Lighthouse\Schema\Factories\ArgumentFactory
-     */
-    protected $argumentFactory;
-
-    /**
-     * @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory
-     */
-    protected $argumentSetFactory;
-
     public function __construct(
-        Pipeline $pipeline,
-        ConfigRepository $config,
-        DirectiveLocator $directiveLocator,
-        ArgumentFactory $argumentFactory,
-        ArgumentSetFactory $argumentSetFactory
-    ) {
-        $this->pipeline = $pipeline;
-        $this->config = $config;
-        $this->directiveLocator = $directiveLocator;
-        $this->argumentFactory = $argumentFactory;
-        $this->argumentSetFactory = $argumentSetFactory;
-    }
+        protected Pipeline $pipeline,
+        protected ConfigRepository $config,
+        protected DirectiveLocator $directiveLocator,
+        protected ArgumentFactory $argumentFactory,
+        protected ArgumentSetFactory $argumentSetFactory
+    ) {}
 
     /**
      * Convert a FieldValue to an executable FieldDefinition.
@@ -108,9 +77,9 @@ class FieldFactory
      */
     protected function fieldMiddleware(FieldDefinitionNode $fieldDefinitionNode): array
     {
-        $globalFieldMiddleware = config('lighthouse.field_middleware');
+        $globalFieldMiddleware = $this->config->get('lighthouse.field_middleware');
 
-        $directiveFieldMiddleware = $this->directiveFactory
+        $directiveFieldMiddleware = $this->directiveLocator
             ->associatedOfType($fieldDefinitionNode, FieldMiddleware::class)
             ->all();
 

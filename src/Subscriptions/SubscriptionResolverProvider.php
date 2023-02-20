@@ -33,7 +33,7 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      *
-     * @return \Closure(mixed, array<string, mixed>, \Nuwave\Lighthouse\Support\Contracts\GraphQLContext, \GraphQL\Type\Definition\ResolveInfo): mixed
+     * @return \Closure(mixed, array<string, mixed>, \Nuwave\Lighthouse\Support\Contracts\GraphQLContext, \Nuwave\Lighthouse\Execution\ResolveInfo): mixed
      */
     public function provideSubscriptionResolver(FieldValue $fieldValue): \Closure
     {

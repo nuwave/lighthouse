@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Values;
 
 use GraphQL\Deferred;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Type\Definition\ResolveInfo as BaseResolveInfo;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Execution\Utils\FieldPath;
@@ -11,13 +12,21 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 /**
  * @phpstan-type Resolver callable(mixed, array<string, mixed>, \Nuwave\Lighthouse\Support\Contracts\GraphQLContext, \Nuwave\Lighthouse\Execution\ResolveInfo): mixed
+ * @phpstan-type ArgumentSetTransformer callable(\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet, \GraphQL\Type\Definition\ResolveInfo): \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet
  */
 class FieldValue
 {
     /**
      * @var array<string, array{0: array<string, mixed>, 1: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet}>
      */
-    protected static $transformedResolveArgs = [];
+    protected static array $transformedResolveArgs = [];
+
+    /**
+     * Ordered list of callbacks to transform the incoming argument set.
+     *
+     * @var array<int, ArgumentSetTransformer>
+     */
+    protected array $argumentSetTransformers;
 
     /**
      * The actual field resolver.
@@ -27,13 +36,6 @@ class FieldValue
      * @var Resolver
      */
     protected $resolver;
-
-    /**
-     * Ordered list of callbacks to transform the incoming argument set.
-     *
-     * @var array<int, callable(\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet, \Nuwave\Lighthouse\Execution\ResolveInfo): \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>
-     */
-    protected $argumentSetTransformers;
 
     public function __construct(
         /**
@@ -54,26 +56,25 @@ class FieldValue
 
     /**
      * @param  array<string, mixed>  $args
-     *
-     * @return mixed Really anything
      */
-    public function __invoke($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
+    public function __invoke($root, array $args, GraphQLContext $context, BaseResolveInfo $baseResolveInfo): mixed
     {
-        $path = FieldPath::withoutLists($resolveInfo->path);
+        $path = FieldPath::withoutLists($baseResolveInfo->path);
 
         if (! isset(self::$transformedResolveArgs[$path])) {
             $argumentSetFactory = app(ArgumentSetFactory::class);
             assert($argumentSetFactory instanceof ArgumentSetFactory);
-            $argumentSet = $argumentSetFactory->fromResolveInfo($args, $resolveInfo);
+            $argumentSet = $argumentSetFactory->fromResolveInfo($args, $baseResolveInfo);
 
             foreach ($this->argumentSetTransformers as $transform) {
-                $argumentSet = $transform($argumentSet, $resolveInfo);
+                $argumentSet = $transform($argumentSet, $baseResolveInfo);
             }
 
             self::$transformedResolveArgs[$path] = [$argumentSet->toArray(), $argumentSet];
         }
 
         [$args, $argumentSet] = self::$transformedResolveArgs[$path];
+        $resolveInfo = new ResolveInfo($baseResolveInfo, $argumentSet);
         $resolveInfo->argumentSet = $argumentSet;
 
         return ($this->resolver)($root, $args, $context, $resolveInfo);
@@ -167,6 +168,10 @@ class FieldValue
         };
     }
 
+    /**
+     * @param  ArgumentSetTransformer  $argumentSetTransformer
+     * @return $this
+     */
     public function addArgumentSetTransformer(callable $argumentSetTransformer): self
     {
         $this->argumentSetTransformers[] = $argumentSetTransformer;

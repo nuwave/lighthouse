@@ -27,7 +27,7 @@ GRAPHQL;
         return $next($fieldValue);
     }
 
-    protected function rename(ArgumentSet &$argumentSet): void
+    protected function rename(ArgumentSet &$argumentSet): ArgumentSet
     {
         foreach ($argumentSet->arguments as $name => $argument) {
             // Recursively apply the renaming to nested inputs.
@@ -51,5 +51,7 @@ GRAPHQL;
                 unset($argumentSet->arguments[$name]);
             }
         }
+
+        return $argumentSet;
     }
 }
