@@ -31,6 +31,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Replace `DirectiveLocator::beforeLast` with `Str::beforeLast`
 - Default `subscriptions.exclude_empty` to `true`
 - Allow `FieldManipulator` and `ArgManipulator` directives on interfaces https://github.com/nuwave/lighthouse/pull/1955
+- Apply argument transformation only once per field https://github.com/nuwave/lighthouse/pull/1706
 
 ### Fixed
 
