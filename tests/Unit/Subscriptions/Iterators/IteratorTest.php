@@ -4,9 +4,9 @@ namespace Tests\Unit\Subscriptions\Iterators;
 
 use GraphQL\Language\AST\NameNode;
 use GraphQL\Language\AST\OperationDefinitionNode;
-use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Context;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;

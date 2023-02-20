@@ -2,10 +2,10 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
-use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Illuminate\Container\Container;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
