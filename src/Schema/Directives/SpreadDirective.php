@@ -36,6 +36,7 @@ GRAPHQL;
     {
         $next = new ArgumentSet();
         $next->directives = $original->directives;
+        $next->undefined = $original->undefined;
 
         foreach ($original->arguments as $name => $argument) {
             // Recurse down first, as that resolves the more deeply nested spreads first
