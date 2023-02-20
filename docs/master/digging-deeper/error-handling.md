@@ -126,13 +126,12 @@ An error handler class must implement [`\Nuwave\Lighthouse\Execution\ErrorHandle
 ```php
 namespace App\GraphQL;
 
-use Closure;
 use GraphQL\Error\Error;
 use Nuwave\Lighthouse\Execution\ErrorHandler;
 
 final class CountErrorHandler implements ErrorHandler
 {
-    public function __invoke(?Error $error, Closure $next): ?array
+    public function __invoke(?Error $error, \Closure $next): ?array
     {
         // You can discard errors by returning null
         if ($this->shouldBeDiscarded($error)) {

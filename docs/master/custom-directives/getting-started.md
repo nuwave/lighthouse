@@ -61,7 +61,6 @@ we can wrap around it by using the `FieldMiddleware` directive.
 ```php
 namespace App\GraphQL\Directives;
 
-use Closure;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -79,7 +78,7 @@ class UpperCaseDirective extends BaseDirective implements FieldMiddleware
      * @param \Closure $next
      * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
     {
         // Retrieve the existing resolver function
         /** @var Closure $previousResolver */

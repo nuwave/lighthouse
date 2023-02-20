@@ -181,7 +181,6 @@ It assumes a simple role system where a `User` has a single attribute `$role`.
 ```php
 namespace App\GraphQL\Directives;
 
-use Closure;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -206,7 +205,7 @@ directive @canAccess(
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
     {
         $originalResolver = $fieldValue->getResolver();
 
