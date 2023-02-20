@@ -40,11 +40,9 @@ GRAPHQL;
         );
     }
 
-    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue): void
     {
         $fieldValue->addArgumentSetTransformer(fn (ArgumentSet $argumentSet): ArgumentSet => $this->transformArgumentSet($argumentSet));
-
-        return $next($fieldValue);
     }
 
     protected function transformArgumentSet(ArgumentSet $argumentSet): ArgumentSet

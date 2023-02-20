@@ -150,6 +150,33 @@ the new behaviour before upgrading by setting `unbox_bensampo_enum_enum_instance
 public function scopeByType(Builder $builder, AOrB $aOrB): Builder
 ```
 
+### Simplify wrapping resolvers in `FieldMiddleware` directives
+
+Wrapping resolvers is very common in `FieldMiddleware` directives and is now simplified.
+
+```diff
+use Nuwave\Lighthouse\Execution\ResolveInfo
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+
+final class MyDirective extends BaseDirective implements FieldMiddleware
+{
+-   public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
+-   {
+-       $previousResolver = $fieldValue->getResolver();
+-       $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
+-           return $previousResolver($root, $args, $context, $resolveInfo);
+-       });
+-       return $next($fieldValue);
++   public function handleField(FieldValue $fieldValue): void
++   {
++       $fieldValue->wrapResolver(fn (callable $previousResolver) => function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
++           return $previousResolver($root, $args, $context, $resolveInfo);
++       });
+    }
+}
+```
+
 ### Adopt `FieldBuilderDirective::handleFieldBuilder()` signature
 
 Lighthouse now passes the typical 4 resolver arguments to `FieldBuilderDirective::handleFieldBuilder()`.

@@ -88,8 +88,8 @@ final class LimitDirectiveTest extends DBTestCase
     {
         $users = factory(User::class, 2)->create();
 
-        /** @var \Tests\Utils\Models\User $user */
         foreach ($users as $user) {
+            assert($user instanceof User);
             $user->tasks()->saveMany(
                 factory(Task::class, 2)->make()
             );

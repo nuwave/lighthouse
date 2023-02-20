@@ -68,26 +68,22 @@ directive @throttle(
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue): void
     {
         /** @var array<int, array{key: string, maxAttempts: int, decayMinutes: float}> $limits */
         $limits = [];
 
         $name = $this->directiveArgValue('name');
         if (null !== $name) {
-            // @phpstan-ignore-next-line won't be executed on Laravel < 8
             $limiter = $this->limiter->limiter($name);
 
             $limiterResponse = $limiter($this->request);
-            // @phpstan-ignore-next-line won't be executed on Laravel < 8
             if ($limiterResponse instanceof Unlimited) {
-                return $next($fieldValue);
+                return;
             }
 
             if ($limiterResponse instanceof Response) {
-                throw new DirectiveException(
-                    "Expected named limiter {$name} to return an array, got instance of " . get_class($limiterResponse)
-                );
+                throw new DirectiveException("Expected named limiter {$name} to return an array, got instance of " . get_class($limiterResponse));
             }
 
             foreach (Arr::wrap($limiterResponse) as $limit) {
@@ -105,9 +101,7 @@ GRAPHQL;
             ];
         }
 
-        $resolver = $fieldValue->getResolver();
-
-        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $limits) {
+        $fieldValue->wrapResolver(fn (callable $previousResolver) => function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver, $limits) {
             foreach ($limits as $limit) {
                 $this->handleLimit(
                     $limit['key'],
@@ -117,10 +111,8 @@ GRAPHQL;
                 );
             }
 
-            return $resolver($root, $args, $context, $resolveInfo);
+            return $previousResolver($root, $args, $context, $resolveInfo);
         });
-
-        return $next($fieldValue);
     }
 
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType): void

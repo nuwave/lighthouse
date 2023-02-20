@@ -20,11 +20,9 @@ directive @renameArgs on FIELD_DEFINITION
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, \Closure $next)
+    public function handleField(FieldValue $fieldValue): void
     {
         $fieldValue->addArgumentSetTransformer(fn (ArgumentSet $argumentSet): ArgumentSet => $this->rename($argumentSet));
-
-        return $next($fieldValue);
     }
 
     protected function rename(ArgumentSet &$argumentSet): ArgumentSet

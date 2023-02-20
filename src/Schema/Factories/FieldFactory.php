@@ -54,11 +54,9 @@ class FieldFactory
             $fieldValue->setResolver(static::defaultResolver($fieldValue));
         }
 
-        $this->pipeline
-            ->send($fieldValue)
-            ->through($this->fieldMiddleware($fieldDefinitionNode))
-            ->via('handleField')
-            ->thenReturn();
+        foreach ($this->fieldMiddleware($fieldDefinitionNode) as $fieldMiddleware) {
+            $fieldMiddleware->handleField($fieldValue);
+        }
 
         // To see what is allowed here, look at the validation rules in
         // GraphQL\Type\Definition\FieldDefinition::getDefinition()
@@ -68,7 +66,7 @@ class FieldFactory
             'args' => $this->argumentFactory->toTypeMap(
                 $fieldValue->getField()->arguments
             ),
-            'resolve' => $fieldValue,
+            'resolve' => $fieldValue->finishResolver(),
             'description' => $fieldDefinitionNode->description->value ?? null,
             'complexity' => $this->complexity($fieldValue),
             'deprecationReason' => ASTHelper::deprecationReason($fieldDefinitionNode),
@@ -94,10 +92,7 @@ class FieldFactory
             ->associatedOfType($fieldDefinitionNode, FieldMiddleware::class)
             ->all();
 
-        $fieldMiddleware = array_merge($globalFieldMiddleware, $directiveFieldMiddleware);
-
-        // Middleware resolve in reversed order
-        return array_reverse($fieldMiddleware);
+        return array_merge($globalFieldMiddleware, $directiveFieldMiddleware);
     }
 
     /**

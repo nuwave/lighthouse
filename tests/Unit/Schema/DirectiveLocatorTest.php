@@ -64,9 +64,8 @@ final class DirectiveLocatorTest extends TestCase
                 return /** @lang GraphQL */ 'foo';
             }
 
-            public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
+            public function handleField(FieldValue $fieldValue): void
             {
-                return $fieldValue;
             }
         };
 

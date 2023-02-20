@@ -13,11 +13,9 @@ use Nuwave\Lighthouse\Support\Utils;
 
 abstract class ArgTraversalDirective extends BaseDirective implements FieldMiddleware
 {
-    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue): void
     {
         $fieldValue->addArgumentSetTransformer(fn (ArgumentSet $argumentSet): ArgumentSet => $this->transformRecursively($argumentSet));
-
-        return $next($fieldValue);
     }
 
     protected function transformRecursively(ArgumentSet $argumentSet): ArgumentSet

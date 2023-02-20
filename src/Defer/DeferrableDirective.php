@@ -31,22 +31,15 @@ directive @deferrable on FIELD_DEFINITION
 GRAPHQL;
     }
 
-    /**
-     * @var \Nuwave\Lighthouse\Defer\Defer
-     */
-    protected $defer;
+    public function __construct(
+        protected Defer $defer
+    ) {}
 
-    public function __construct(Defer $defer)
+    public function handleField(FieldValue $fieldValue): void
     {
-        $this->defer = $defer;
-    }
-
-    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
-    {
-        $previousResolver = $fieldValue->getResolver();
         $fieldType = $fieldValue->getField()->type;
 
-        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver, $fieldType) {
+        $fieldValue->wrapResolver(fn (callable $previousResolver) => function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver, $fieldType) {
             $wrappedResolver = function () use ($previousResolver, $root, $args, $context, $resolveInfo) {
                 return $previousResolver($root, $args, $context, $resolveInfo);
             };
@@ -58,8 +51,6 @@ GRAPHQL;
 
             return $this->defer->findOrResolve($wrappedResolver, $path);
         });
-
-        return $next($fieldValue);
     }
 
     /**

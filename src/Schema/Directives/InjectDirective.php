@@ -34,40 +34,30 @@ directive @inject(
 GRAPHQL;
     }
 
-    /**
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
-     */
-    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue): void
     {
         $contextAttributeName = $this->directiveArgValue('context');
         if (! $contextAttributeName) {
-            throw new DefinitionException(
-                "The `inject` directive on {$fieldValue->getParentName()} [{$fieldValue->getFieldName()}] must have a `context` argument"
-            );
+            throw new DefinitionException("The `inject` directive on {$fieldValue->getParentName()} [{$fieldValue->getFieldName()}] must have a `context` argument");
         }
 
         $argumentName = $this->directiveArgValue('name');
         if (! $argumentName) {
-            throw new DefinitionException(
-                "The `inject` directive on {$fieldValue->getParentName()} [{$fieldValue->getFieldName()}] must have a `name` argument"
-            );
+            throw new DefinitionException("The `inject` directive on {$fieldValue->getParentName()} [{$fieldValue->getFieldName()}] must have a `name` argument");
         }
 
-        $previousResolver = $fieldValue->getResolver();
-
-        $fieldValue->setResolver(function ($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($contextAttributeName, $argumentName, $previousResolver) {
+        $fieldValue->wrapResolver(fn (callable $previousResolver) => function ($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($contextAttributeName, $argumentName, $previousResolver) {
             $valueFromContext = data_get($context, $contextAttributeName);
 
-            $resolveInfo->argumentSet->addValue($argumentName, $valueFromContext);
+            $argumentSet = $resolveInfo->argumentSet;
+            $argumentSet->addValue($argumentName, $valueFromContext);
 
             return $previousResolver(
                 $rootValue,
-                $resolveInfo->argumentSet->toArray(),
+                $argumentSet->toArray(),
                 $context,
                 $resolveInfo
             );
         });
-
-        return $next($fieldValue);
     }
 }

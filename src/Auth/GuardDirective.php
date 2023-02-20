@@ -50,18 +50,14 @@ directive @guard(
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue): void
     {
-        $previousResolver = $fieldValue->getResolver();
-
-        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
+        $fieldValue->wrapResolver(fn (callable $previousResolver) => function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
             $with = $this->directiveArgValue('with', (array) AuthServiceProvider::guard());
             $context->setUser($this->authenticate($with));
 
             return $previousResolver($root, $args, $context, $resolveInfo);
         });
-
-        return $next($fieldValue);
     }
 
     /**

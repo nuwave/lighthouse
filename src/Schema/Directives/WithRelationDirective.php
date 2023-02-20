@@ -22,19 +22,13 @@ abstract class WithRelationDirective extends BaseDirective implements FieldMiddl
      */
     abstract protected function modelsLoader($parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ModelsLoader;
 
-    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue): void
     {
-        $previousResolver = $fieldValue->getResolver();
-
-        $fieldValue->setResolver(function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
+        $fieldValue->wrapResolver(fn (callable $previousResolver) => function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
             return $this
                 ->loadRelation($parent, $args, $context, $resolveInfo)
-                ->then(static function () use ($previousResolver, $parent, $args, $context, $resolveInfo) {
-                    return $previousResolver($parent, $args, $context, $resolveInfo);
-                });
+                ->then(static fn () => $previousResolver($parent, $args, $context, $resolveInfo));
         });
-
-        return $next($fieldValue);
     }
 
     /**

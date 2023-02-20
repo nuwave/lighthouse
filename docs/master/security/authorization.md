@@ -205,11 +205,9 @@ directive @canAccess(
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue): void
     {
-        $originalResolver = $fieldValue->getResolver();
-
-        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($originalResolver) {
+        $fieldValue->wrapResolver(fn (callable $previousResolver) => function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
             $requiredRole = $this->directiveArgValue('requiredRole');
             // Throw in case of an invalid schema definition to remind the developer
             if ($requiredRole === null) {
@@ -226,10 +224,8 @@ GRAPHQL;
                 return null;
             }
 
-            return $originalResolver($root, $args, $context, $resolveInfo);
+            return $previousResolver($root, $args, $context, $resolveInfo);
         });
-
-        return $next($fieldValue);
     }
 }
 ```

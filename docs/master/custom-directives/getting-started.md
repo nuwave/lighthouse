@@ -67,38 +67,22 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class UpperCaseDirective extends BaseDirective implements FieldMiddleware
+final class UpperCaseDirective extends BaseDirective implements FieldMiddleware
 {
     public static function definition(): string {}
 
     /**
      * Wrap around the final field resolver.
-     *
-     * @param \Nuwave\Lighthouse\Schema\Values\FieldValue $fieldValue
-     * @param \Closure $next
-     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
-    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue): void
     {
-        // Retrieve the existing resolver function
-        /** @var Closure $previousResolver */
-        $previousResolver = $fieldValue->getResolver();
-
-        // Wrap around the resolver
-        $wrappedResolver = function ($root, array $args, GraphQLContext $context, ResolveInfo $info) use ($previousResolver): string {
+        $fieldValue->wrapResolver(fn (callable $previousResolver) => function ($root, array $args, GraphQLContext $context, ResolveInfo $info) use ($previousResolver): string {
             // Call the resolver, passing along the resolver arguments
-            /** @var string $result */
             $result = $previousResolver($root, $args, $context, $info);
+            assert(is_string($result));
 
             return strtoupper($result);
-        };
-
-        // Place the wrapped resolver back upon the FieldValue
-        // It is not resolved right now - we just prepare it
-        $fieldValue->setResolver($wrappedResolver);
-
-        // Keep the middleware chain going
-        return $next($fieldValue);
+        });
     }
 }
 ```

@@ -7,7 +7,6 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Nuwave\Lighthouse\Exceptions\ValidationException;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
-use Nuwave\Lighthouse\Execution\Utils\FieldPath;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
@@ -24,7 +23,7 @@ directive @validate on FIELD_DEFINITION
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue): void
     {
         $fieldValue->addArgumentSetTransformer(function (ArgumentSet $argumentSet, ResolveInfo $resolveInfo): ArgumentSet {
             $rulesGatherer = new RulesGatherer($argumentSet);
@@ -40,14 +39,12 @@ GRAPHQL;
             );
 
             if ($validator->fails()) {
-                $path = FieldPath::withoutLists($resolveInfo->path);
+                $path = implode('.', $resolveInfo->path);
 
                 throw new ValidationException("Validation failed for the field [{$path}].", $validator);
             }
 
             return $argumentSet;
         });
-
-        return $next($fieldValue);
     }
 }

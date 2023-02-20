@@ -16,14 +16,14 @@ directive @globalFieldMiddleware on FIELD_DEFINITION
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, \Closure $next)
+    public function handleField(FieldValue $fieldValue): void
     {
-        $fieldValue->setResolver(function (): bool {
-            return $this->definitionNode instanceof FieldDefinitionNode
+        $fieldValue->wrapResolver(
+            fn (): callable
+            // Must not crash
+            => fn (): bool => $this->definitionNode instanceof FieldDefinitionNode
                 // Must not crash
-                && null === $this->directiveArgValue('random');
-        });
-
-        return $next($fieldValue);
+                && null === $this->directiveArgValue('random')
+        );
     }
 }

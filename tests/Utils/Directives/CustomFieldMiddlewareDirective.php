@@ -15,12 +15,8 @@ directive @customFieldMiddleware on FIELD_DEFINITION
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, \Closure $next)
+    public function handleField(FieldValue $fieldValue): void
     {
-        $fieldValue->setResolver(static function ($root, array $args): array {
-            return $args;
-        });
-
-        return $next($fieldValue);
+        $fieldValue->wrapResolver(fn (): callable => fn ($root, array $args): array => $args);
     }
 }

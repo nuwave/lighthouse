@@ -11,7 +11,9 @@ use Nuwave\Lighthouse\Execution\Utils\FieldPath;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 /**
+ * @phpstan-type BaseResolver callable(mixed, array<string, mixed>, \Nuwave\Lighthouse\Support\Contracts\GraphQLContext, \GraphQL\Type\Definition\ResolveInfo): mixed
  * @phpstan-type Resolver callable(mixed, array<string, mixed>, \Nuwave\Lighthouse\Support\Contracts\GraphQLContext, \Nuwave\Lighthouse\Execution\ResolveInfo): mixed
+ * @phpstan-type ResolverWrapper callable(Resolver): Resolver
  * @phpstan-type ArgumentSetTransformer callable(\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet, \GraphQL\Type\Definition\ResolveInfo): \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet
  */
 class FieldValue
@@ -37,6 +39,11 @@ class FieldValue
      */
     protected $resolver;
 
+    /**
+     * @var array<int, ResolverWrapper>
+     */
+    protected array $resolverWrappers = [];
+
     public function __construct(
         /**
          * The parent type of the field.
@@ -52,32 +59,6 @@ class FieldValue
     public static function clear(): void
     {
         self::$transformedResolveArgs = [];
-    }
-
-    /**
-     * @param  array<string, mixed>  $args
-     */
-    public function __invoke($root, array $args, GraphQLContext $context, BaseResolveInfo $baseResolveInfo): mixed
-    {
-        $path = FieldPath::withoutLists($baseResolveInfo->path);
-
-        if (! isset(self::$transformedResolveArgs[$path])) {
-            $argumentSetFactory = app(ArgumentSetFactory::class);
-            assert($argumentSetFactory instanceof ArgumentSetFactory);
-            $argumentSet = $argumentSetFactory->fromResolveInfo($args, $baseResolveInfo);
-
-            foreach ($this->argumentSetTransformers as $transform) {
-                $argumentSet = $transform($argumentSet, $baseResolveInfo);
-            }
-
-            self::$transformedResolveArgs[$path] = [$argumentSet->toArray(), $argumentSet];
-        }
-
-        [$args, $argumentSet] = self::$transformedResolveArgs[$path];
-        $resolveInfo = new ResolveInfo($baseResolveInfo, $argumentSet);
-        $resolveInfo->argumentSet = $argumentSet;
-
-        return ($this->resolver)($root, $args, $context, $resolveInfo);
     }
 
     /**
@@ -104,17 +85,9 @@ class FieldValue
     }
 
     /**
-     * Get field resolver.
-     *
-     * @return Resolver
-     */
-    public function getResolver(): callable
-    {
-        return $this->resolver;
-    }
-
-    /**
      * Overwrite the current/default resolver.
+     *
+     * @param  Resolver  $resolver
      *
      * @return $this
      */
@@ -123,6 +96,16 @@ class FieldValue
         $this->resolver = $resolver;
 
         return $this;
+    }
+
+    /**
+     * Wrap the previous resolver with another resolver.
+     *
+     * @param  callable(Resolver): Resolver  $resolverWrapper
+     */
+    public function wrapResolver(callable $resolverWrapper): void
+    {
+        $this->resolverWrappers[] = $resolverWrapper;
     }
 
     /**
@@ -149,13 +132,11 @@ class FieldValue
      *     return $result;
      * }
      *
-     * @param Resolver $handle
+     * @param  Resolver  $handle
      */
     public function resultHandler(callable $handle): void
     {
-        $previousResolver = $this->resolver;
-
-        $this->resolver = function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver, $handle) {
+        $this->wrapResolver(fn (callable $previousResolver) => function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver, $handle): mixed {
             $resolved = $previousResolver($root, $args, $context, $resolveInfo);
 
             if ($resolved instanceof Deferred) {
@@ -165,7 +146,7 @@ class FieldValue
             }
 
             return $handle($resolved, $args, $context, $resolveInfo);
-        };
+        });
     }
 
     /**
@@ -178,5 +159,39 @@ class FieldValue
         $this->argumentSetTransformers[] = $argumentSetTransformer;
 
         return $this;
+    }
+
+    /**
+     * @return BaseResolver
+     */
+    public function finishResolver(): callable
+    {
+        // We expect the wrapped resolvers to run in order, but nesting them causes the last
+        // applied wrapper to be run first. Thus, we reverse the wrappers before applying them.
+        foreach (array_reverse($this->resolverWrappers) as $wrapper) {
+            $this->resolver = $wrapper($this->resolver);
+        }
+
+        return function ($root, array $args, GraphQLContext $context, BaseResolveInfo $baseResolveInfo): mixed {
+            $path = FieldPath::withoutLists($baseResolveInfo->path);
+
+            if (! isset(self::$transformedResolveArgs[$path])) {
+                $argumentSetFactory = app(ArgumentSetFactory::class);
+                assert($argumentSetFactory instanceof ArgumentSetFactory);
+                $argumentSet = $argumentSetFactory->fromResolveInfo($args, $baseResolveInfo);
+
+                foreach ($this->argumentSetTransformers as $transform) {
+                    $argumentSet = $transform($argumentSet, $baseResolveInfo);
+                }
+
+                self::$transformedResolveArgs[$path] = [$argumentSet->toArray(), $argumentSet];
+            }
+
+            [$args, $argumentSet] = self::$transformedResolveArgs[$path];
+            $resolveInfo = new ResolveInfo($baseResolveInfo, $argumentSet);
+            $resolveInfo->argumentSet = $argumentSet;
+
+            return ($this->resolver)($root, $args, $context, $resolveInfo);
+        };
     }
 }

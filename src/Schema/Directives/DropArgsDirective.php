@@ -3,11 +3,9 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
-use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Utils;
 
 class DropArgsDirective extends BaseDirective implements FieldMiddleware
@@ -22,26 +20,12 @@ directive @dropArgs on FIELD_DEFINITION
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, \Closure $next)
+    public function handleField(FieldValue $fieldValue): void
     {
-        $resolver = $fieldValue->getResolver();
-
-        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
-            $argumentSet = $resolveInfo->argumentSet;
-            $this->drop($argumentSet);
-
-            return $resolver(
-                $root,
-                $argumentSet->toArray(),
-                $context,
-                $resolveInfo
-            );
-        });
-
-        return $next($fieldValue);
+        $fieldValue->addArgumentSetTransformer(fn (ArgumentSet $argumentSet): ArgumentSet => $this->drop($argumentSet));
     }
 
-    protected function drop(ArgumentSet &$argumentSet): void
+    protected function drop(ArgumentSet &$argumentSet): ArgumentSet
     {
         foreach ($argumentSet->arguments as $name => $argument) {
             $maybeDropDirective = $argument->directives->first(function (Directive $directive): bool {
@@ -64,5 +48,7 @@ GRAPHQL;
                 );
             }
         }
+
+        return $argumentSet;
     }
 }
