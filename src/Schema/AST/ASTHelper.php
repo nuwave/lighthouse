@@ -10,6 +10,7 @@ use GraphQL\Language\AST\EnumValueNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeExtensionNode;
 use GraphQL\Language\AST\ListTypeNode;
 use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\Node;
@@ -41,7 +42,7 @@ class ASTHelper
      *
      * @param  \GraphQL\Language\AST\NodeList<TNode>|array<TNode>  $original
      * @param  \GraphQL\Language\AST\NodeList<TNode>|array<TNode>  $addition
-     * @param  bool  $overwriteDuplicates  By default this function throws if a collision occurs.
+     * @param  bool  $overwriteDuplicates  By default, this function throws if a collision occurs.
      *                                     If set to true, the fields of the original list will be overwritten.
      *
      * @return \GraphQL\Language\AST\NodeList<TNode>
@@ -263,22 +264,11 @@ class ASTHelper
     }
 
     /**
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\ObjectTypeExtensionNode|mixed  $objectType
-     *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
-    public static function addDirectiveToFields(DirectiveNode $directiveNode, &$objectType): void
+    public static function addDirectiveToFields(DirectiveNode $directiveNode, ObjectTypeDefinitionNode|ObjectTypeExtensionNode|InterfaceTypeDefinitionNode|InterfaceTypeExtensionNode &$typeWithFields): void
     {
         $name = $directiveNode->name->value;
-
-        if (
-            ! $objectType instanceof ObjectTypeDefinitionNode
-            && ! $objectType instanceof ObjectTypeExtensionNode
-        ) {
-            throw new DefinitionException(
-                "The @{$name} directive may only be placed on fields or object types."
-            );
-        }
 
         $directiveLocator = Container::getInstance()->make(DirectiveLocator::class);
         assert($directiveLocator instanceof DirectiveLocator);
@@ -286,7 +276,7 @@ class ASTHelper
         $directive = $directiveLocator->resolve($name);
         $directiveDefinition = self::extractDirectiveDefinition($directive::definition());
 
-        foreach ($objectType->fields as $fieldDefinition) {
+        foreach ($typeWithFields->fields as $fieldDefinition) {
             assert($fieldDefinition instanceof FieldDefinitionNode);
             // If the field already has the same directive defined, and it is not
             // a repeatable directive, skip over it.
@@ -314,7 +304,7 @@ class ASTHelper
     public static function qualifiedArgType(
         InputValueDefinitionNode &$argDefinition,
         FieldDefinitionNode &$parentField,
-        &$parentType
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType
     ): string {
         return Str::studly($parentType->name->value)
             . Str::studly($parentField->name->value)

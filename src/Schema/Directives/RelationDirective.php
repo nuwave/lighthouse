@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
@@ -103,7 +104,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
     public function manipulateFieldDefinition(
         DocumentAST &$documentAST,
         FieldDefinitionNode &$fieldDefinition,
-        &$parentType
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType
     ): void {
         $paginationType = $this->paginationType();
 
