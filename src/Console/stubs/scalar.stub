@@ -5,9 +5,9 @@ namespace DummyNamespace;
 use GraphQL\Type\Definition\ScalarType;
 
 /**
- * Read more about scalars here https://webonyx.github.io/graphql-php/type-system/scalar-types/
+ * Read more about scalars here https://webonyx.github.io/graphql-php/type-definitions/scalars
  */
-class DummyClass extends ScalarType
+final class DummyClass extends ScalarType
 {
     /**
      * Serializes an internal value to include in a response.

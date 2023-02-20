@@ -16,7 +16,7 @@ use Illuminate\Support\Carbon;
 class StartRequest
 {
     /**
-     * HTTP request instance.
+     * The request sent from the client.
      *
      * @var \Illuminate\Http\Request
      */

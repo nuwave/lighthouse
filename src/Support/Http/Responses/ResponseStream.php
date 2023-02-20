@@ -2,22 +2,21 @@
 
 namespace Nuwave\Lighthouse\Support\Http\Responses;
 
-use Closure;
-use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 
 class ResponseStream extends Stream implements CanStreamResponse
 {
-    /**
-     * @var string
-     */
     public const EOL = "\r\n";
 
-    public function stream(array $data, array $paths, bool $final): void
+    public function stream(array $data, array $paths, bool $isFinalChunk): void
     {
-        if (! empty($paths)) {
+        if (empty($paths)) {
+            $this->emit(
+                $this->chunk($data, $isFinalChunk)
+            );
+        } else {
             $chunk = [];
             $lastKey = count($paths) - 1;
 
@@ -36,31 +35,27 @@ class ResponseStream extends Stream implements CanStreamResponse
                     $chunk['errors'] = $errors;
                 }
 
-                $terminating = $final && $i === $lastKey;
+                $terminating = $isFinalChunk && $i === $lastKey;
 
                 $this->emit(
                     $this->chunk($chunk, $terminating)
                 );
             }
-        } else {
-            $this->emit(
-                $this->chunk($data, $final)
-            );
         }
 
-        if ($final) {
+        if ($isFinalChunk) {
             $this->emit($this->terminatingBoundary());
         }
     }
 
     protected function boundary(): string
     {
-        return self::EOL.'---'.self::EOL;
+        return self::EOL . '---' . self::EOL;
     }
 
     protected function terminatingBoundary(): string
     {
-        return self::EOL.'-----'.self::EOL;
+        return self::EOL . '-----' . self::EOL;
     }
 
     /**
@@ -74,17 +69,17 @@ class ResponseStream extends Stream implements CanStreamResponse
 
         $length = $terminating
             ? strlen($json)
-            : strlen($json.self::EOL);
+            : strlen($json . self::EOL);
 
         $chunk = implode(self::EOL, [
             'Content-Type: application/json',
-            'Content-Length: '.$length,
+            'Content-Length: ' . $length,
             '',
             $json,
             '',
         ]);
 
-        return $this->boundary().$chunk;
+        return $this->boundary() . $chunk;
     }
 
     /**
@@ -94,21 +89,20 @@ class ResponseStream extends Stream implements CanStreamResponse
     {
         echo $chunk;
 
-        $this->flush(Closure::fromCallable('ob_flush'));
-        $this->flush(Closure::fromCallable('flush'));
+        $this->flush(\Closure::fromCallable('ob_flush'));
+        $this->flush(\Closure::fromCallable('flush'));
     }
 
     /**
      * Flush buffer cache.
      *
      * Note: We can run into exceptions when flushing the buffer, these should be safe to ignore.
-     * TODO Investigate exceptions that occur on Apache
      */
-    protected function flush(Closure $flush): void
+    protected function flush(\Closure $flush): void
     {
         try {
             $flush();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             // buffer error, do nothing...
         }
     }

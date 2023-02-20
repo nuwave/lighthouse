@@ -12,30 +12,20 @@ class LumenMiddlewareAdapter implements MiddlewareAdapter
      */
     protected $app;
 
-    public function __construct(Application $app)
+    public function __construct()
     {
-        $this->app = $app;
+        $this->app = Application::getInstance();
     }
 
-    /**
-     * Get all of the defined middleware short-hand names.
-     *
-     * @return array<string>
-     */
     public function getMiddleware(): array
     {
         // TODO remove once Lumen gains public access to the middleware/routeMiddleware
-        $globalMiddleware = Utils::accessProtected($this->app, 'middleware', []);
-        $routeMiddleware = Utils::accessProtected($this->app, 'routeMiddleware', []);
+        $globalMiddleware = Utils::accessProtected($this->app, 'middleware');
+        $routeMiddleware = Utils::accessProtected($this->app, 'routeMiddleware');
 
         return array_merge($globalMiddleware, $routeMiddleware);
     }
 
-    /**
-     * Get all of the defined middleware groups.
-     *
-     * @return array<string>
-     */
     public function getMiddlewareGroups(): array
     {
         // Lumen doesn't have middleware groups

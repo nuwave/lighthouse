@@ -2,10 +2,8 @@
 
 namespace Nuwave\Lighthouse\Subscriptions\Iterators;
 
-use Closure;
-use Exception;
-use Illuminate\Contracts\Auth\Factory;
-use Illuminate\Contracts\Config\Repository;
+use Illuminate\Contracts\Auth\Factory as AuthFactory;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
@@ -26,45 +24,56 @@ class AuthenticatingSyncIterator implements SubscriptionIterator
      */
     protected $authFactory;
 
-    public function __construct(Repository $configRepository, Factory $authFactory)
+    public function __construct(ConfigRepository $configRepository, AuthFactory $authFactory)
     {
-        $this->authFactory = $authFactory;
         $this->configRepository = $configRepository;
+        $this->authFactory = $authFactory;
     }
 
-    public function process(Collection $subscribers, Closure $handleSubscriber, Closure $handleError = null): void
+    public function process(Collection $subscribers, \Closure $handleSubscriber, \Closure $handleError = null): void
     {
         // Store the previous default guard name so we can restore it after we're done
         $previousGuardName = $this->configRepository->get('auth.defaults.guard');
 
+        // Store the previous default Lighthouse guard name, so we can restore it after we're done
+        $defaultLighthouseGuardName = $this->configRepository->get('lighthouse.guard');
+
+        // Set our subscription guard as the default guard for Lighthouse
+        $this->configRepository->set('lighthouse.guard', SubscriptionGuard::GUARD_NAME);
+
         // Set our subscription guard as the default guard for the application
         $this->authFactory->shouldUse(SubscriptionGuard::GUARD_NAME);
 
-        /** @var \Nuwave\Lighthouse\Subscriptions\SubscriptionGuard $guard */
         $guard = $this->authFactory->guard(SubscriptionGuard::GUARD_NAME);
+        assert($guard instanceof SubscriptionGuard);
 
-        $subscribers->each(static function (Subscriber $item) use ($handleSubscriber, $handleError, $guard): void {
-            // If there is an authenticated user set in the context, set that user as the authenticated user
-            $user = $item->context->user();
-            if ($user !== null) {
-                $guard->setUser($user);
-            }
-
-            try {
-                $handleSubscriber($item);
-            } catch (Exception $e) {
-                if ($handleError === null) {
-                    throw $e;
+        try {
+            $subscribers->each(static function (Subscriber $item) use ($handleSubscriber, $handleError, $guard): void {
+                // If there is an authenticated user set in the context, set that user as the authenticated user
+                $user = $item->context->user();
+                if (null !== $user) {
+                    $guard->setUser($user);
                 }
 
-                $handleError($e);
-            } finally {
-                // Unset the authenticated user after each iteration to restore the guard to a unauthenticated state
-                $guard->reset();
-            }
-        });
+                try {
+                    $handleSubscriber($item);
+                } catch (\Exception $e) {
+                    if (null === $handleError) {
+                        throw $e;
+                    }
 
-        // Restore the previous default guard name
-        $this->authFactory->shouldUse($previousGuardName);
+                    $handleError($e);
+                } finally {
+                    // Unset the authenticated user after each iteration to restore the guard to its unauthenticated state
+                    $guard->reset();
+                }
+            });
+        } finally {
+            // Restore the previous default Lighthouse guard name
+            $this->configRepository->set('lighthouse.guard', $defaultLighthouseGuardName);
+
+            // Restore the previous default guard name
+            $this->authFactory->shouldUse($previousGuardName);
+        }
     }
 }

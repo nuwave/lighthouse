@@ -2,15 +2,17 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class LikeDirective extends BaseDirective implements ArgBuilderDirective, FieldBuilderDirective
 {
-    const ESCAPE = '\\';
-    const PERCENTAGE = '%';
-    const UNDERSCORE = '_';
-    const PLACEHOLDER = '{}';
+    public const ESCAPE = '\\';
+    public const PERCENTAGE = '%';
+    public const UNDERSCORE = '_';
+    public const PLACEHOLDER = '{}';
 
     public static function definition(): string
     {
@@ -44,9 +46,12 @@ directive @like(
 GRAPHQL;
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
+     */
     public function handleBuilder($builder, $value): object
     {
-        if ($value === null) {
+        if (null === $value) {
             return $builder;
         }
 
@@ -62,7 +67,7 @@ GRAPHQL;
         );
     }
 
-    public function handleFieldBuilder(object $builder): object
+    public function handleFieldBuilder(object $builder, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): object
     {
         return $this->handleBuilder(
             $builder,
@@ -83,7 +88,7 @@ GRAPHQL;
     {
         return str_replace(
             [self::ESCAPE, self::PERCENTAGE, self::UNDERSCORE],
-            [self::ESCAPE.self::ESCAPE, self::ESCAPE.self::PERCENTAGE, self::ESCAPE.self::UNDERSCORE],
+            [self::ESCAPE . self::ESCAPE, self::ESCAPE . self::PERCENTAGE, self::ESCAPE . self::UNDERSCORE],
             $value
         );
     }

@@ -7,9 +7,9 @@ use Nuwave\Lighthouse\Events\ManipulateResult;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
 
-class ManipulateResultTest extends TestCase
+final class ManipulateResultTest extends TestCase
 {
-    public function testCanManipulateTheResult(): void
+    public function testManipulateTheResult(): void
     {
         Event::listen(
             ManipulateResult::class,

@@ -2,13 +2,14 @@
 
 namespace Tests\Unit\Events;
 
+use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Tests\Integration\Events\FieldDirective as TestFieldDirective;
 use Tests\TestCase;
 use Tests\Utils\Directives\FooDirective;
 
-class RegisterDirectiveNamespacesTest extends TestCase
+final class RegisterDirectiveNamespacesTest extends TestCase
 {
     /**
      * @var \Nuwave\Lighthouse\Schema\DirectiveLocator
@@ -17,7 +18,10 @@ class RegisterDirectiveNamespacesTest extends TestCase
 
     protected function getEnvironmentSetUp($app): void
     {
-        $app->make('events')->listen(
+        $dispatcher = $app->make(EventsDispatcher::class);
+        assert($dispatcher instanceof EventsDispatcher);
+
+        $dispatcher->listen(
             RegisterDirectiveNamespaces::class,
             function (): array {
                 return [
@@ -32,14 +36,14 @@ class RegisterDirectiveNamespacesTest extends TestCase
         parent::getEnvironmentSetUp($app);
     }
 
-    public function testCanAddAdditionalDirectiveBaseNamespacesThroughEvent(): void
+    public function testAddAdditionalDirectiveBaseNamespacesThroughEvent(): void
     {
         $directive = $this->directiveLocator->create('foo');
 
         $this->assertInstanceOf(FooDirective::class, $directive);
     }
 
-    public function testCanOverwriteDefaultDirectiveThroughEvent(): void
+    public function testOverwriteDefaultDirectiveThroughEvent(): void
     {
         $directive = $this->directiveLocator->create('field');
 

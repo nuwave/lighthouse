@@ -4,9 +4,9 @@ namespace Tests\Integration;
 
 use Tests\TestCase;
 
-class MultipleRequestsTest extends TestCase
+final class MultipleRequestsTest extends TestCase
 {
-    public function testCanFireMultipleRequestsInOneTest(): void
+    public function testFireMultipleRequestsInOneTest(): void
     {
         $this->mockResolver(function ($root, array $args): string {
             return $args['this'];

@@ -14,30 +14,45 @@ directive @whereConditions(
     """
     Restrict the allowed column names to a well-defined list.
     This improves introspection capabilities and security.
-    Mutually exclusive with the `columnsEnum` argument.
+    Mutually exclusive with `columnsEnum`.
     """
     columns: [String!]
 
     """
     Use an existing enumeration type to restrict the allowed columns to a predefined list.
-    This allowes you to re-use the same enum for multiple fields.
-    Mutually exclusive with the `columns` argument.
+    This allows you to re-use the same enum for multiple fields.
+    Mutually exclusive with `columns`.
     """
     columnsEnum: String
+
+    """
+    Reference a method that applies the client given conditions to the query builder.
+
+    Expected signature: `(
+        \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder,
+        array<string, mixed> $whereConditions
+    ): void`
+
+    Consists of two parts: a class name and a method name, separated by an `@` symbol.
+    If you pass only a class name, the method name defaults to `__invoke`.
+    """
+    handler: String = "\\Nuwave\\Lighthouse\\WhereConditions\\WhereConditionsHandler"
 ) on ARGUMENT_DEFINITION
 GRAPHQL;
     }
 
     /**
-     * @param  array<string, mixed>|null  $whereConditions
+     * @param  array<string, mixed>|null  $value
      */
-    public function handleBuilder($builder, $whereConditions): object
+    public function handleBuilder($builder, $value): object
     {
-        if (null === $whereConditions) {
+        if (null === $value) {
             return $builder;
         }
 
-        return $this->handleWhereConditions($builder, $whereConditions);
+        $this->handle($builder, $value);
+
+        return $builder;
     }
 
     protected function generatedInputSuffix(): string

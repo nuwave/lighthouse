@@ -4,9 +4,7 @@ namespace Nuwave\Lighthouse\Support;
 
 use Closure;
 use Illuminate\Container\Container as Application;
-use InvalidArgumentException;
 use Nuwave\Lighthouse\Exceptions\InvalidDriverException;
-use ReflectionClass;
 
 /**
  * NOTE: Implementation pulled from \Illuminate\Cache\CacheManager. Purpose is
@@ -44,7 +42,7 @@ abstract class DriverManager
     /**
      * Get a driver instance by name.
      *
-     * @return object The driver instance.
+     * @return object the driver instance
      */
     public function driver(?string $name = null)
     {
@@ -56,7 +54,7 @@ abstract class DriverManager
     /**
      * Attempt to get the driver from the local cache.
      *
-     * @return object The resolved driver.
+     * @return object the resolved driver
      */
     protected function get(string $name)
     {
@@ -94,10 +92,8 @@ abstract class DriverManager
 
     /**
      * Register a custom driver creator Closure.
-     *
-     * @return $this
      */
-    public function extend(string $driver, Closure $callback): self
+    public function extend(string $driver, \Closure $callback): self
     {
         $this->customCreators[$driver] = $callback;
 
@@ -107,9 +103,9 @@ abstract class DriverManager
     /**
      * Resolve the given driver.
      *
-     * @return object The resolved driver.
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return object the resolved driver
      */
     protected function resolve(string $name)
     {
@@ -119,20 +115,21 @@ abstract class DriverManager
             return $this->validateDriver($this->callCustomCreator($config));
         }
 
-        $driverMethod = 'create'.ucfirst($config['driver']).'Driver';
+        $driverMethod = 'create' . ucfirst($config['driver']) . 'Driver';
 
         if (method_exists($this, $driverMethod)) {
             return $this->validateDriver($this->{$driverMethod}($config));
         }
 
-        throw new InvalidArgumentException("Driver [{$config['driver']}] is not supported.");
+        throw new \InvalidArgumentException("Driver [{$config['driver']}] is not supported.");
     }
 
     /**
      * Call a custom driver creator.
      *
      * @param  array<string, mixed>  $config
-     * @return object The created driver.
+     *
+     * @return object the created driver
      */
     protected function callCustomCreator(array $config)
     {
@@ -143,16 +140,17 @@ abstract class DriverManager
      * Validate driver implements the proper interface.
      *
      * @param  object  $driver
-     * @return object
      *
      * @throws \Nuwave\Lighthouse\Exceptions\InvalidDriverException
+     *
+     * @return object
      */
     protected function validateDriver($driver)
     {
         $interface = $this->interface();
 
-        if (! (new ReflectionClass($driver))->implementsInterface($interface)) {
-            throw new InvalidDriverException(get_class($driver)." does not implement {$interface}");
+        if (! (new \ReflectionClass($driver))->implementsInterface($interface)) {
+            throw new InvalidDriverException(get_class($driver) . " does not implement {$interface}");
         }
 
         return $driver;
@@ -162,7 +160,8 @@ abstract class DriverManager
      * Dynamically call the default driver instance.
      *
      * @param  array<mixed>  $parameters
-     * @return mixed Whatever the driver returned.
+     *
+     * @return mixed whatever the driver returned
      */
     public function __call(string $method, array $parameters)
     {

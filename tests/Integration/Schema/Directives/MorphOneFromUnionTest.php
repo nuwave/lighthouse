@@ -10,9 +10,9 @@ use Tests\Utils\Models\Employee;
 use Tests\Utils\Models\Team;
 use Tests\Utils\Models\User;
 
-class MorphOneFromUnionTest extends DBTestCase
+final class MorphOneFromUnionTest extends DBTestCase
 {
-    public function testCanResolveMorphOneRelationshipOnInterface(): void
+    public function testResolveMorphOneRelationshipOnInterface(): void
     {
         /** @var \Tests\Utils\Models\Employee $employee */
         $employee = factory(Employee::class)->create();

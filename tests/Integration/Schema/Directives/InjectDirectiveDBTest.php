@@ -5,9 +5,9 @@ namespace Tests\Integration\Schema\Directives;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
-class InjectDirectiveDBTest extends DBTestCase
+final class InjectDirectiveDBTest extends DBTestCase
 {
-    public function testCanInjectDataFromContextIntoArgs(): void
+    public function testInjectDataFromContextIntoArgs(): void
     {
         $user = factory(User::class)->create();
         $this->be($user);

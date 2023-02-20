@@ -7,15 +7,15 @@ use Illuminate\Auth\Access\AuthorizationException as IlluminateAuthorizationExce
 
 class AuthorizationException extends IlluminateAuthorizationException implements ClientAware
 {
-    public const CATEGORY = 'authorization';
+    public const MESSAGE = 'This action is unauthorized.';
 
     public function isClientSafe(): bool
     {
         return true;
     }
 
-    public function getCategory(): string
+    public static function fromLaravel(IlluminateAuthorizationException $laravelException): self
     {
-        return self::CATEGORY;
+        return new static($laravelException->getMessage(), $laravelException->getCode());
     }
 }

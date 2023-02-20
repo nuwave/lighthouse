@@ -1,32 +1,28 @@
 export default ({
-    Vue, // the version of Vue being used in the VuePress app
-    options, // the options for the root Vue instance
-    router, // the router instance for the app
-    siteData // site metadata
+  Vue, // the version of Vue being used in the VuePress app
+  options, // the options for the root Vue instance
+  router, // the router instance for the app
+  siteData, // site metadata
 }) => {
+  router.beforeEach((to, from, next) => {
+    const pathFragments = to.path.split("/");
+    const version = pathFragments[1];
+    const rest = pathFragments.splice(2).join("/");
 
-    // Redirect to latest docs
-    router.addRoutes([{
-            path: '/docs/latest.html',
-            redirect: `/${siteData.themeConfig.versions.latest}/getting-started/installation.html`
-        },
-        {
-            path: '/docs/latest/the-basics/schema.html',
-            redirect: `/${siteData.themeConfig.versions.latest}/the-basics/schema.html`
-        },
-        {
-            path: '/docs/latest/eloquent/getting-started.html',
-            redirect: `/${siteData.themeConfig.versions.latest}/eloquent/getting-started.html`
-        },
-    ])
+    // Used in the `Get Started` link of the index page
+    if (version === "latest") {
+      return next({ path: `/${siteData.themeConfig.latest}/${rest}` });
+    }
 
-    // Select docs version based on url path
-    // Example: "/2.6/guides/installation.html" will use "2.6"
-    router.afterEach((to, from) => {
-        const version = to.path.split('/')[1]
+    // We previously had docs for each minor version, but now only
+    // keep the latest docs of major versions around. In consideration
+    // of potential old links floating around, we redirect them.
+    const versionParts = version.split(".");
+    if (versionParts.length > 1) {
+      const major = versionParts[0];
+      return next({ path: `/${major}/${rest}` });
+    }
 
-        if (siteData.themeConfig.versions.all.includes(version)) {
-            siteData.themeConfig.versions.selected = version
-        }
-    })
-}
+    return next();
+  });
+};

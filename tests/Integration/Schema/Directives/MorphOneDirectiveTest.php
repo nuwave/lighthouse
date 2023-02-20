@@ -7,10 +7,10 @@ use Tests\Utils\Models\Image;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class MorphOneDirectiveTest extends DBTestCase
+final class MorphOneDirectiveTest extends DBTestCase
 {
     /**
-     * Auth user.
+     * The authenticated user.
      *
      * @var \Tests\Utils\Models\User
      */
@@ -45,7 +45,7 @@ class MorphOneDirectiveTest extends DBTestCase
             );
     }
 
-    public function testCanResolveMorphOneRelationship(): void
+    public function testResolveMorphOneRelationship(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Image {
@@ -90,7 +90,7 @@ class MorphOneDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testCanResolveMorphOneWithCustomName(): void
+    public function testResolveMorphOneWithCustomName(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Image {

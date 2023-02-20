@@ -6,7 +6,7 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Image;
 use Tests\Utils\Models\Task;
 
-class MorphOneTest extends DBTestCase
+final class MorphOneTest extends DBTestCase
 {
     protected $schema = /** @lang GraphQL */ '
     type Task {
@@ -75,9 +75,9 @@ class MorphOneTest extends DBTestCase
         id: ID
         url: String
     }
-    '.self::PLACEHOLDER_QUERY;
+    ' . self::PLACEHOLDER_QUERY;
 
-    public function testCanCreateWithNewMorphOne(): void
+    public function testCreateWithNewMorphOne(): void
     {
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -109,7 +109,7 @@ class MorphOneTest extends DBTestCase
         ]);
     }
 
-    public function testCanCreateWithUpsertMorphOne(): void
+    public function testCreateWithUpsertMorphOne(): void
     {
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -212,7 +212,7 @@ GRAPHQL
     /**
      * @return array<array<string, string>>
      */
-    public function existingModelMutations(): array
+    public static function existingModelMutations(): array
     {
         return [
             ['Update action' => 'update'],
@@ -223,13 +223,13 @@ GRAPHQL
     /**
      * @dataProvider existingModelMutations
      */
-    public function testCanUpdateWithNewMorphOne(string $action): void
+    public function testUpdateWithNewMorphOne(string $action): void
     {
         factory(Task::class)->create();
 
         $this->graphQL(/** @lang GraphQL */ "
         mutation {
-            ${action}Task(input: {
+            {$action}Task(input: {
                 id: 1
                 name: \"foo\"
                 image: {
@@ -247,7 +247,7 @@ GRAPHQL
         }
         ")->assertJson([
             'data' => [
-                "${action}Task" => [
+                "{$action}Task" => [
                     'id' => '1',
                     'name' => 'foo',
                     'image' => [
@@ -261,13 +261,13 @@ GRAPHQL
     /**
      * @dataProvider existingModelMutations
      */
-    public function testCanUpdateWithUpsertMorphOne(string $action): void
+    public function testUpdateWithUpsertMorphOne(string $action): void
     {
         factory(Task::class)->create();
 
         $this->graphQL(/** @lang GraphQL */ "
         mutation {
-            ${action}Task(input: {
+            {$action}Task(input: {
                 id: 1
                 name: \"foo\"
                 image: {
@@ -286,7 +286,7 @@ GRAPHQL
         }
         ")->assertJson([
             'data' => [
-                "${action}Task" => [
+                "{$action}Task" => [
                     'id' => '1',
                     'name' => 'foo',
                     'image' => [
@@ -300,7 +300,7 @@ GRAPHQL
     /**
      * @dataProvider existingModelMutations
      */
-    public function testCanUpdateAndUpdateMorphOne(string $action): void
+    public function testUpdateAndUpdateMorphOne(string $action): void
     {
         factory(Task::class)
             ->create()
@@ -311,7 +311,7 @@ GRAPHQL
 
         $this->graphQL(/** @lang GraphQL */ "
         mutation {
-            ${action}Task(input: {
+            {$action}Task(input: {
                 id: 1
                 name: \"foo\"
                 image: {
@@ -330,7 +330,7 @@ GRAPHQL
         }
         ")->assertJson([
             'data' => [
-                "${action}Task" => [
+                "{$action}Task" => [
                     'id' => '1',
                     'name' => 'foo',
                     'image' => [
@@ -344,7 +344,7 @@ GRAPHQL
     /**
      * @dataProvider existingModelMutations
      */
-    public function testCanUpdateAndDeleteMorphOne(string $action): void
+    public function testUpdateAndDeleteMorphOne(string $action): void
     {
         factory(Task::class)
             ->create()
@@ -355,7 +355,7 @@ GRAPHQL
 
         $this->graphQL("
         mutation {
-            ${action}Task(input: {
+            {$action}Task(input: {
                 id: 1
                 name: \"foo\"
                 image: {
@@ -371,7 +371,7 @@ GRAPHQL
         }
         ")->assertJson([
             'data' => [
-                "${action}Task" => [
+                "{$action}Task" => [
                     'id' => '1',
                     'name' => 'foo',
                     'image' => null,

@@ -2,10 +2,9 @@
 
 namespace Tests\Utils\InterfacesSecondary;
 
-class Bar
+final class Bar
 {
     public function __invoke(): void
     {
-        //
     }
 }

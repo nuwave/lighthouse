@@ -6,23 +6,32 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
+ * Primary key.
+ *
  * @property string $barcode
  * @property string $uuid
+ *
+ * Attributes
  * @property string $name
- * @property int $color_id
+ *
+ * Timestamps
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
+ *
+ * Foreign keys
+ * @property int $color_id
+ *
+ * Relations
+ * @property-read \Tests\Utils\Models\Color $color
  */
-class Product extends Model
+final class Product extends Model
 {
     /**
      * @var array<string>
      */
+    // @phpstan-ignore-next-line PHPDoc type array<string> of property Tests\Utils\Models\Product::$primaryKey is not covariant with PHPDoc type string of overridden property Illuminate\Database\Eloquent\Model::$primaryKey.
     protected $primaryKey = ['barcode', 'uuid'];
 
-    /**
-     * @var bool
-     */
     public $incrementing = false;
 
     public function color(): BelongsTo

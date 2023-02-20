@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Route Configuration
@@ -40,10 +39,11 @@ return [
         ],
 
         /*
-         * The `prefix` and `domain` configuration options are optional.
+         * The `prefix`, `domain` and `where` configuration options are optional.
          */
-        //'prefix' => '',
-        //'domain' => '',
+        // 'prefix' => '',
+        // 'domain' => '',
+        // 'where' => [],
     ],
 
     /*
@@ -52,8 +52,8 @@ return [
     |--------------------------------------------------------------------------
     |
     | The guard to use for authenticating GraphQL requests, if needed.
-    | This setting is used whenever Lighthouse looks for an authenticated user, for example in directives
-    | such as `@guard` and when applying the `AttemptAuthentication` middleware.
+    | Used in directives such as `@guard` or the `AttemptAuthentication` middleware.
+    | Falls back to the Laravel default if the defined guard is either `null` or not found.
     |
     */
 
@@ -79,7 +79,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | A large part of schema generation consists of parsing and AST manipulation.
-    | This operation is very expensive, so it is highly recommended to enable
+    | This operation is very expensive, so it is highly recommended enabling
     | caching of the final schema to optimize performance of large schemas.
     |
     */
@@ -88,22 +88,74 @@ return [
         /*
          * Setting to true enables schema caching.
          */
-        'enable' => env('LIGHTHOUSE_CACHE_ENABLE', env('APP_ENV') !== 'local'),
+        'enable' => env('LIGHTHOUSE_CACHE_ENABLE', 'local' !== env('APP_ENV')),
 
         /*
-         * The name of the cache item for the schema cache.
+         * Allowed values:
+         * - 1: uses the store, key and ttl config values to store the schema as a string in the given cache store.
+         * - 2: uses the path config value to store the schema in a PHP file allowing OPcache to pick it up.
          */
-        'key' => env('LIGHTHOUSE_CACHE_KEY', 'lighthouse-schema'),
+        'version' => env('LIGHTHOUSE_CACHE_VERSION', 1),
 
         /*
          * Allows using a specific cache store, uses the app's default if set to null.
+         * Only relevant if version is set to 1.
          */
         'store' => env('LIGHTHOUSE_CACHE_STORE', null),
 
         /*
+         * The name of the cache item for the schema cache.
+         * Only relevant if version is set to 1.
+         */
+        'key' => env('LIGHTHOUSE_CACHE_KEY', 'lighthouse-schema'),
+
+        /*
          * Duration in seconds the schema should remain cached, null means forever.
+         * Only relevant if version is set to 1.
          */
         'ttl' => env('LIGHTHOUSE_CACHE_TTL', null),
+
+        /*
+         * File path to store the lighthouse schema.
+         * Only relevant if version is set to 2.
+         */
+        'path' => env('LIGHTHOUSE_CACHE_PATH', base_path('bootstrap/cache/lighthouse-schema.php')),
+
+        /*
+         * Should the `@cache` directive use a tagged cache?
+         */
+        'tags' => false,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Query Cache
+    |--------------------------------------------------------------------------
+    |
+    | Caches the result of parsing incoming query strings to boost performance on subsequent requests.
+    |
+    */
+
+    'query_cache' => [
+        /*
+         * Setting to true enables query caching.
+         */
+        'enable' => env('LIGHTHOUSE_QUERY_CACHE_ENABLE', true),
+
+        /*
+         * Allows using a specific cache store, uses the app's default if set to null.
+         */
+        'store' => env('LIGHTHOUSE_QUERY_CACHE_STORE', null),
+
+        /*
+         * Duration in seconds (minutes for Laravel pre-5.8) the query should remain cached, null means forever.
+         */
+        'ttl' => env(
+            'LIGHTHOUSE_QUERY_CACHE_TTL',
+            \Nuwave\Lighthouse\Support\AppVersion::atLeast(5.8)
+                ? 24 * 60 * 60 // 1 day in seconds
+                : 24 * 60 // 1 day in minutes
+        ),
     ],
 
     /*
@@ -142,7 +194,9 @@ return [
     'security' => [
         'max_query_complexity' => \GraphQL\Validator\Rules\QueryComplexity::DISABLED,
         'max_query_depth' => \GraphQL\Validator\Rules\QueryDepth::DISABLED,
-        'disable_introspection' => \GraphQL\Validator\Rules\DisableIntrospection::DISABLED,
+        'disable_introspection' => (bool) env('LIGHTHOUSE_SECURITY_DISABLE_INTROSPECTION', false)
+            ? \GraphQL\Validator\Rules\DisableIntrospection::ENABLED
+            : \GraphQL\Validator\Rules\DisableIntrospection::DISABLED,
     ],
 
     /*
@@ -211,7 +265,9 @@ return [
     */
 
     'error_handlers' => [
-        \Nuwave\Lighthouse\Execution\ExtensionErrorHandler::class,
+        \Nuwave\Lighthouse\Execution\AuthenticationErrorHandler::class,
+        \Nuwave\Lighthouse\Execution\AuthorizationErrorHandler::class,
+        \Nuwave\Lighthouse\Execution\ValidationErrorHandler::class,
         \Nuwave\Lighthouse\Execution\ReportingErrorHandler::class,
     ],
 
@@ -228,11 +284,13 @@ return [
 
     'field_middleware' => [
         \Nuwave\Lighthouse\Schema\Directives\TrimDirective::class,
+        \Nuwave\Lighthouse\Schema\Directives\ConvertEmptyStringsToNullDirective::class,
         \Nuwave\Lighthouse\Schema\Directives\SanitizeDirective::class,
         \Nuwave\Lighthouse\Validation\ValidateDirective::class,
         \Nuwave\Lighthouse\Schema\Directives\TransformArgsDirective::class,
         \Nuwave\Lighthouse\Schema\Directives\SpreadDirective::class,
         \Nuwave\Lighthouse\Schema\Directives\RenameArgsDirective::class,
+        \Nuwave\Lighthouse\Schema\Directives\DropArgsDirective::class,
     ],
 
     /*
@@ -249,22 +307,23 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Batched Queries
+    | Persisted Queries
     |--------------------------------------------------------------------------
     |
-    | GraphQL query batching means sending multiple queries to the server in one request,
-    | You may set this flag to either process or deny batched queries.
+    | Lighthouse supports Automatic Persisted Queries (APQ), compatible with the
+    | [Apollo implementation](https://www.apollographql.com/docs/apollo-server/performance/apq).
+    | You may set this flag to either process or deny these queries.
     |
     */
 
-    'batched_queries' => true,
+    'persisted_queries' => true,
 
     /*
     |--------------------------------------------------------------------------
     | Transactional Mutations
     |--------------------------------------------------------------------------
     |
-    | If set to true, mutations such as @create or @update will be
+    | If set to true, built-in directives that mutate models will be
     | wrapped in a transaction to ensure atomicity.
     |
     */
@@ -298,10 +357,23 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Shortcut Foreign Key Selection
+    |--------------------------------------------------------------------------
+    |
+    | If set to true, Lighthouse will shortcut queries where the client selects only the
+    | foreign key pointing to a related model. Only works if the related model's primary
+    | key field is called exactly `id` for every type in your schema.
+    |
+    */
+
+    'shortcut_foreign_key_selection' => false,
+
+    /*
+    |--------------------------------------------------------------------------
     | GraphQL Subscriptions
     |--------------------------------------------------------------------------
     |
-    | Here you can define GraphQL subscription "broadcasters" and "storage" drivers
+    | Here you can define GraphQL subscription broadcaster and storage drivers
     | as well their required configuration options.
     |
     */
@@ -347,13 +419,13 @@ return [
             ],
             'pusher' => [
                 'driver' => 'pusher',
-                'routes' => \Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class.'@pusher',
+                'routes' => \Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class . '@pusher',
                 'connection' => 'pusher',
             ],
             'echo' => [
                 'driver' => 'echo',
                 'connection' => env('LIGHTHOUSE_SUBSCRIPTION_REDIS_CONNECTION', 'default'),
-                'routes' => \Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class.'@echoRoutes',
+                'routes' => \Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class . '@echoRoutes',
             ],
         ],
 
@@ -362,6 +434,12 @@ return [
          * Allowed values: 1, 2
          */
         'version' => env('LIGHTHOUSE_SUBSCRIPTION_VERSION', 1),
+
+        /*
+         * Should the subscriptions extension be excluded when the response has no subscription channel?
+         * This optimizes performance by sending less data, but clients must anticipate this appropriately.
+         */
+        'exclude_empty' => env('LIGHTHOUSE_SUBSCRIPTION_EXCLUDE_EMPTY', true),
     ],
 
     /*
@@ -389,4 +467,19 @@ return [
         'max_execution_ms' => 0,
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Apollo Federation
+    |--------------------------------------------------------------------------
+    |
+    | Lighthouse can act as a federated service: https://www.apollographql.com/docs/federation/federation-spec.
+    |
+    */
+
+    'federation' => [
+        /*
+         * Location of resolver classes when resolving the `_entities` field.
+         */
+        'entities_resolver_namespace' => 'App\\GraphQL\\Entities',
+    ],
 ];

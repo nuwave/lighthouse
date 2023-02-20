@@ -3,7 +3,7 @@
 namespace Nuwave\Lighthouse\Pagination;
 
 use GraphQL\Error\Error;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Support\Arr;
 use Laravel\Scout\Builder as ScoutBuilder;
 
@@ -20,17 +20,22 @@ class PaginationArgs
     public $first;
 
     /**
+     * @var \Nuwave\Lighthouse\Pagination\PaginationType
+     */
+    public $type;
+
+    /**
      * Create a new instance from user given args.
      *
      * @param  array<string, mixed>  $args
-     * @param  \Nuwave\Lighthouse\Pagination\PaginationType  $paginationType
-     * @return static
      *
      * @throws \GraphQL\Error\Error
      */
     public static function extractArgs(array $args, PaginationType $paginationType, ?int $paginateMaxCount): self
     {
         $instance = new static();
+
+        $instance->type = $paginationType;
 
         if ($paginationType->isConnection()) {
             $instance->first = $args['first'];
@@ -39,19 +44,20 @@ class PaginationArgs
                 Cursor::decode($args)
             );
         } else {
+            // Handles cases "paginate" and "simple", which both take the same args.
             $instance->first = $args['first'];
             $instance->page = Arr::get($args, 'page', 1);
         }
 
-        if ($instance->first <= 0) {
+        if ($instance->first < 0) {
             throw new Error(
-                self::requestedZeroOrLessItems($instance->first)
+                self::requestedLessThanZeroItems($instance->first)
             );
         }
 
         // Make sure the maximum pagination count is not exceeded
         if (
-            $paginateMaxCount !== null
+            null !== $paginateMaxCount
             && $instance->first > $paginateMaxCount
         ) {
             throw new Error(
@@ -62,9 +68,9 @@ class PaginationArgs
         return $instance;
     }
 
-    public static function requestedZeroOrLessItems(int $amount): string
+    public static function requestedLessThanZeroItems(int $amount): string
     {
-        return "Requested pagination amount must be more than 0, got {$amount}.";
+        return "Requested pagination amount must be non-negative, got {$amount}.";
     }
 
     public static function requestedTooManyItems(int $maxCount, int $actualCount): string
@@ -87,13 +93,17 @@ class PaginationArgs
      *
      * @param  \Illuminate\Database\Query\Builder|\Laravel\Scout\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation  $builder
      */
-    public function applyToBuilder(object $builder): LengthAwarePaginator
+    public function applyToBuilder(object $builder): Paginator
     {
+        $methodName = $this->type->isSimple()
+            ? 'simplePaginate'
+            : 'paginate';
+
         if ($builder instanceof ScoutBuilder) {
-            return $builder->paginate($this->first, 'page', $this->page);
+            return $builder->{$methodName}($this->first, 'page', $this->page);
         }
 
         // @phpstan-ignore-next-line Relation&Builder mixin not recognized
-        return $builder->paginate($this->first, ['*'], 'page', $this->page);
+        return $builder->{$methodName}($this->first, ['*'], 'page', $this->page);
     }
 }

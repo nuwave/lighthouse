@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -38,22 +39,22 @@ GRAPHQL;
 
         $namespacedClassName = $this->namespaceClassName(
             $className,
-            $fieldValue->defaultNamespacesForParent()
+            RootType::defaultNamespaces($fieldValue->getParentName())
         );
 
         $resolver = Utils::constructResolver($namespacedClassName, $methodName);
 
         $additionalData = $this->directiveArgValue('args');
 
-        return $fieldValue->setResolver(
-            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $additionalData) {
-                return $resolver(
-                    $root,
-                    array_merge($args, ['directive' => $additionalData]),
-                    $context,
-                    $resolveInfo
-                );
-            }
-        );
+        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $additionalData) {
+            return $resolver(
+                $root,
+                array_merge($args, ['directive' => $additionalData]),
+                $context,
+                $resolveInfo
+            );
+        });
+
+        return $fieldValue;
     }
 }

@@ -10,7 +10,7 @@ use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\RootType;
 use Tests\TestCase;
 
-class ASTBuilderTest extends TestCase
+final class ASTBuilderTest extends TestCase
 {
     /**
      * @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder
@@ -21,10 +21,10 @@ class ASTBuilderTest extends TestCase
     {
         parent::setUp();
 
-        $this->astBuilder = app(ASTBuilder::class);
+        $this->astBuilder = $this->app->make(ASTBuilder::class);
     }
 
-    public function testCanMergeTypeExtensionFields(): void
+    public function testMergeTypeExtensionFields(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -92,7 +92,7 @@ class ASTBuilderTest extends TestCase
         $this->assertCount(1, $subscriptionFields);
     }
 
-    public function testCanMergeInputExtensionFields(): void
+    public function testMergeInputExtensionFields(): void
     {
         $this->schema = /** @lang GraphQL */ '
         input Inputs {
@@ -118,7 +118,7 @@ class ASTBuilderTest extends TestCase
         $this->assertCount(3, $fields);
     }
 
-    public function testCanMergeInterfaceExtensionFields(): void
+    public function testMergeInterfaceExtensionFields(): void
     {
         $this->schema = /** @lang GraphQL */ '
         interface Named {
@@ -144,7 +144,7 @@ class ASTBuilderTest extends TestCase
         $this->assertCount(3, $fields);
     }
 
-    public function testCanMergeEnumExtensionFields(): void
+    public function testMergeEnumExtensionFields(): void
     {
         $this->schema = /** @lang GraphQL */ '
         enum MyEnum {
@@ -184,7 +184,7 @@ class ASTBuilderTest extends TestCase
         ';
 
         $this->expectException(DefinitionException::class);
-        $this->expectExceptionMessage('Could not find a base definition Foo of kind '.NodeKind::OBJECT_TYPE_EXTENSION.' to extend.');
+        $this->expectExceptionMessage('Could not find a base definition Foo of kind ' . NodeKind::OBJECT_TYPE_EXTENSION . ' to extend.');
         $this->astBuilder->documentAST();
     }
 
@@ -271,11 +271,11 @@ class ASTBuilderTest extends TestCase
         ';
 
         $this->expectException(DefinitionException::class);
-        $this->expectExceptionMessage('The type extension Foo of kind '.NodeKind::INTERFACE_TYPE_EXTENSION.' can not extend a definition of kind '.NodeKind::OBJECT_TYPE_DEFINITION.'.');
+        $this->expectExceptionMessage('The type extension Foo of kind ' . NodeKind::INTERFACE_TYPE_EXTENSION . ' can not extend a definition of kind ' . NodeKind::OBJECT_TYPE_DEFINITION . '.');
         $this->astBuilder->documentAST();
     }
 
-    public function testCanMergeTypeExtensionInterfaces(): void
+    public function testMergeTypeExtensionInterfaces(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type User implements Emailable {

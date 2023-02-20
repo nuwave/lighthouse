@@ -2,16 +2,18 @@
 
 namespace Tests\Integration\WhereConditions;
 
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Nuwave\Lighthouse\WhereConditions\SQLOperator;
-use Nuwave\Lighthouse\WhereConditions\WhereConditionsDirective;
+use Nuwave\Lighthouse\WhereConditions\WhereConditionsHandler;
 use Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Comment;
+use Tests\Utils\Models\Location;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class WhereConditionsDirectiveTest extends DBTestCase
+final class WhereConditionsDirectiveTest extends DBTestCase
 {
     protected $schema = /** @lang GraphQL */ '
     type User {
@@ -353,7 +355,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
         $commentTwo->comment = 'test';
         $commentTwo->save();
 
-        for ($i = 0; $i < 5; $i++) {
+        for ($i = 0; $i < 5; ++$i) {
             $commentBatch = new Comment();
             $commentBatch->post_id = 9;
             $commentBatch->user_id = 2;
@@ -469,7 +471,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
             $user->posts()->saveMany(factory(Post::class, 2)->create());
         });
 
-        for ($i = 0; $i < 5; $i++) {
+        for ($i = 0; $i < 5; ++$i) {
             $commentBatchOne = new Comment();
             $commentBatchOne->user_id = 1;
             $commentBatchOne->post_id = 3;
@@ -477,7 +479,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
             $commentBatchOne->save();
         }
 
-        for ($i = 0; $i < 2; $i++) {
+        for ($i = 0; $i < 2; ++$i) {
             $commentBatchTwo = new Comment();
             $commentBatchTwo->user_id = 1;
             $commentBatchTwo->post_id = 7;
@@ -515,7 +517,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
             $user->posts()->saveMany(factory(Post::class, 2)->create());
         });
 
-        for ($i = 0; $i < 5; $i++) {
+        for ($i = 0; $i < 5; ++$i) {
             $commentBatchOne = new Comment();
             $commentBatchOne->user_id = 1;
             $commentBatchOne->post_id = 3;
@@ -523,7 +525,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
             $commentBatchOne->save();
         }
 
-        for ($i = 0; $i < 6; $i++) {
+        for ($i = 0; $i < 6; ++$i) {
             $commentBatchTwo = new Comment();
             $commentBatchTwo->user_id = 1;
             $commentBatchTwo->post_id = 7;
@@ -720,44 +722,10 @@ class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertJsonFragment([
-            'message' => WhereConditionsDirective::invalidColumnName("Robert'); DROP TABLE Students;--"),
-        ]);
+        ')->assertGraphQLErrorMessage(WhereConditionsHandler::invalidColumnName("Robert'); DROP TABLE Students;--"));
     }
 
-    public function testQueriesEmptyStrings(): void
-    {
-        factory(User::class, 3)->create();
-
-        $userNamedEmptyString = factory(User::class)->create([
-            'name' => '',
-        ]);
-
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            users(
-                where: {
-                    column: "name"
-                    value: ""
-                }
-            ) {
-                id
-                name
-            }
-        }
-        ')->assertJson([
-            'data' => [
-                'users' => [
-                    [
-                        'id' => $userNamedEmptyString->id,
-                        'name' => $userNamedEmptyString->name,
-                    ],
-                ],
-            ],
-        ]);
-    }
-
-    public function testCanQueryForNull(): void
+    public function testQueryForNull(): void
     {
         factory(User::class, 3)->create();
 
@@ -801,9 +769,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertJsonFragment([
-            'message' => SQLOperator::missingValueForColumn('no_value'),
-        ]);
+        ')->assertGraphQLErrorMessage(SQLOperator::missingValueForColumn('no_value'));
     }
 
     public function testOnlyAllowsWhitelistedColumns(): void
@@ -835,38 +801,26 @@ class WhereConditionsDirectiveTest extends DBTestCase
         $enum = $this->introspectType($expectedEnumName);
 
         $this->assertNotNull($enum);
-        /** @var array<string, mixed> $enum */
 
-        // TODO: Replace with dms/phpunit-arraysubset-asserts when we require PHPUnit 9 + PHP 7.3
-        $this->assertSame(
+        $this->assertArraySubset(
             [
                 'kind' => 'ENUM',
                 'name' => $expectedEnumName,
-                'description' => 'Allowed column names for the `where` argument on field `whitelistedColumns` on type `Query`.',
-                'fields' => null,
-                'inputFields' => null,
-                'interfaces' => null,
+                'description' => 'Allowed column names for Query.whitelistedColumns.where.',
                 'enumValues' => [
                     [
                         'name' => 'ID',
-                        'description' => null,
-                        'isDeprecated' => false,
-                        'deprecationReason' => null,
                     ],
                     [
                         'name' => 'CAMEL_CASE',
-                        'description' => null,
-                        'isDeprecated' => false,
-                        'deprecationReason' => null,
                     ],
                 ],
-                'possibleTypes' => null,
             ],
             $enum
         );
     }
 
-    public function testCanUseColumnEnumsArg(): void
+    public function testUseColumnEnumsArg(): void
     {
         factory(User::class)->create();
 
@@ -913,5 +867,104 @@ class WhereConditionsDirectiveTest extends DBTestCase
                 ],
             ],
         ]);
+    }
+
+    public function testWhereConditionOnJSONColumn(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Location {
+            id: Int!
+        }
+
+        type Query {
+            locations(where: _ @whereConditions): [Location!]! @all
+        }
+        ';
+
+        /** @var \Tests\Utils\Models\Location $location */
+        $location = factory(Location::class)->make();
+        $location->extra = [
+            'value' => 'exampleValue',
+        ];
+        $location->save();
+
+        factory(Location::class)->create();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            locations(
+                where: {
+                    column: "extra->value",
+                    value: "exampleValue"
+                }
+            ) {
+                id
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'locations' => [
+                    [
+                        'id' => $location->id,
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testHandler(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        type User {
+            id: ID!
+        }
+
+        type Query {
+            users(where: _ @whereConditions(
+                columns: ["name"],
+                handler: "{$this->qualifyTestResolver('handler')}")
+            ): [User!]! @all
+        }
+GRAPHQL;
+
+        /** @var \Tests\Utils\Models\User $user1 */
+        $user1 = factory(User::class)->make();
+        $user1->name = 'foo';
+        $user1->save();
+
+        /** @var \Tests\Utils\Models\User $user2 */
+        $user2 = factory(User::class)->make();
+        $user2->name = 'foofoo';
+        $user2->save();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users(
+                where: {
+                    column: NAME,
+                    value: "foo"
+                }
+            ) {
+                id
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => "{$user2->id}",
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @param array<string, mixed> $conditions
+     */
+    public static function handler(EloquentBuilder $builder, array $conditions): void
+    {
+        $value = $conditions['value'];
+        $builder->where($conditions['column'], $value . $value);
     }
 }

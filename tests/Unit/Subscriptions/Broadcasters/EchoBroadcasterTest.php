@@ -5,13 +5,14 @@ namespace Tests\Unit\Subscriptions\Broadcasters;
 use Illuminate\Broadcasting\BroadcastManager;
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\EchoBroadcaster;
+use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use Nuwave\Lighthouse\Subscriptions\Events\EchoSubscriptionEvent;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use PHPUnit\Framework\Constraint\Callback;
 use Tests\TestCase;
 use Tests\TestsSubscriptions;
 
-class EchoBroadcasterTest extends TestCase
+final class EchoBroadcasterTest extends TestCase
 {
     use TestsSubscriptions;
 
@@ -21,14 +22,30 @@ class EchoBroadcasterTest extends TestCase
         $broadcastManager->expects($this->once())
             ->method('event')
             ->with(new Callback(function (EchoSubscriptionEvent $event) {
-                return $event->broadcastAs() === 'lighthouse.subscription' &&
-                    $event->broadcastOn()->name === 'presence-test-123' &&
-                    $event->data === 'foo';
+                return Broadcaster::EVENT_NAME === $event->broadcastAs()
+                    && 'test-123' === $event->broadcastOn()->name
+                    && 'foo' === $event->data;
             }));
 
         $redisBroadcaster = new EchoBroadcaster($broadcastManager);
         $subscriber = $this->createMock(Subscriber::class);
         $subscriber->channel = 'test-123';
+
+        $redisBroadcaster->broadcast($subscriber, 'foo');
+    }
+
+    public function testBroadcastChannelNameIsNotModified(): void
+    {
+        $broadcastManager = $this->createMock(BroadcastManager::class);
+        $broadcastManager->expects($this->once())
+            ->method('event')
+            ->with(new Callback(function (EchoSubscriptionEvent $event) {
+                return 'private-test-123' === $event->broadcastOn()->name;
+            }));
+
+        $redisBroadcaster = new EchoBroadcaster($broadcastManager);
+        $subscriber = $this->createMock(Subscriber::class);
+        $subscriber->channel = 'private-test-123';
 
         $redisBroadcaster->broadcast($subscriber, 'foo');
     }

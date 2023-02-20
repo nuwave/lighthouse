@@ -3,7 +3,7 @@
 namespace Tests\Integration\Execution\DataLoader;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Nuwave\Lighthouse\Execution\DataLoader\PaginatedRelationLoader;
+use Nuwave\Lighthouse\Execution\ModelsLoader\PaginatedModelsLoader;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
@@ -11,7 +11,7 @@ use Tests\Utils\Models\Tag;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class PaginatedRelationLoaderTest extends DBTestCase
+final class PaginatedRelationLoaderTest extends DBTestCase
 {
     public function testLoadRelationshipsWithLimitsOnCollection(): void
     {
@@ -29,11 +29,12 @@ class PaginatedRelationLoaderTest extends DBTestCase
 
         $pageSize = 3;
         $users = User::all();
-        (new PaginatedRelationLoader(
+        (new PaginatedModelsLoader(
+            'tasks',
             static function () {
             },
             $this->makePaginationArgs($pageSize)
-        ))->load($users, 'tasks');
+        ))->load($users);
 
         /** @var \Tests\Utils\Models\User $firstUser */
         $firstUser = $users[0];
@@ -71,11 +72,12 @@ class PaginatedRelationLoaderTest extends DBTestCase
 
         $users = User::all();
 
-        (new PaginatedRelationLoader(
+        (new PaginatedModelsLoader(
+            'tasks',
             static function () {
             },
             $this->makePaginationArgs(10)
-        ))->load($users, 'tasks');
+        ))->load($users);
 
         /** @var \Tests\Utils\Models\User $firstUser */
         $firstUser = $users[0];
@@ -100,17 +102,19 @@ class PaginatedRelationLoaderTest extends DBTestCase
 
         $users = User::all();
 
-        (new PaginatedRelationLoader(
+        (new PaginatedModelsLoader(
+            'tasks',
             static function () {
             },
             $this->makePaginationArgs(4)
-        ))->load($users, 'tasks');
+        ))->load($users);
 
-        (new PaginatedRelationLoader(
+        (new PaginatedModelsLoader(
+            'posts',
             static function () {
             },
             $this->makePaginationArgs(4)
-        ))->load($users, 'posts');
+        ))->load($users);
 
         /** @var \Tests\Utils\Models\User $firstUser */
         $firstUser = $users[0];
@@ -119,7 +123,7 @@ class PaginatedRelationLoaderTest extends DBTestCase
         $this->assertTrue($firstUser->relationLoaded('posts'));
     }
 
-    public function testCanHandleSoftDeletes(): void
+    public function testHandleSoftDeletes(): void
     {
         /** @var \Tests\Utils\Models\User $user1 */
         $user1 = factory(User::class)->create();
@@ -147,11 +151,12 @@ class PaginatedRelationLoaderTest extends DBTestCase
 
         $users = User::all();
 
-        (new PaginatedRelationLoader(
+        (new PaginatedModelsLoader(
+            'tasks',
             static function () {
             },
             $this->makePaginationArgs(4)
-        ))->load($users, 'tasks');
+        ))->load($users);
 
         /** @var \Tests\Utils\Models\User $firstUser */
         $firstUser = $users[0];
@@ -177,11 +182,12 @@ class PaginatedRelationLoaderTest extends DBTestCase
         $first = 2;
         $tasks = Task::all();
 
-        (new PaginatedRelationLoader(
+        (new PaginatedModelsLoader(
+            'tags',
             static function () {
             },
             $this->makePaginationArgs($first)
-        ))->load($tasks, 'tags');
+        ))->load($tasks);
 
         /** @var \Tests\Utils\Models\Task $firstTask */
         $firstTask = $tasks[0];

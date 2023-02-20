@@ -9,7 +9,7 @@ use Tests\DBTestCase;
 use Tests\TestsSubscriptions;
 use Tests\Utils\Models\User;
 
-class SerializerTest extends DBTestCase
+final class SerializerTest extends DBTestCase
 {
     use TestsSubscriptions;
 
@@ -18,7 +18,7 @@ class SerializerTest extends DBTestCase
         $user = factory(User::class)->create();
 
         $serializer = new Serializer(
-            $contextFactory = new ContextFactory
+            $contextFactory = new ContextFactory()
         );
 
         $request = new Request();

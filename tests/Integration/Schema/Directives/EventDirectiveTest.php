@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Event;
 use Tests\DBTestCase;
 use Tests\Integration\Schema\Directives\Fixtures\CompanyWasCreatedEvent;
 
-class EventDirectiveTest extends DBTestCase
+final class EventDirectiveTest extends DBTestCase
 {
     public function testDispatchesAnEvent(): void
     {
@@ -43,8 +43,8 @@ class EventDirectiveTest extends DBTestCase
         ]);
 
         Event::assertDispatched(CompanyWasCreatedEvent::class, function ($event): bool {
-            return $event->company->id === 1
-                && $event->company->name === 'foo';
+            return 1 === $event->company->id
+                && 'foo' === $event->company->name;
         });
     }
 }

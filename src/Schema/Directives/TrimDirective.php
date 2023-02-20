@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgSanitizerDirective;
@@ -31,7 +32,7 @@ GRAPHQL;
      */
     public function sanitize($argumentValue)
     {
-        return Utils::applyEach(
+        return Utils::mapEach(
             function ($value) {
                 return $value instanceof ArgumentSet
                     ? $this->transformArgumentSet($value)
@@ -41,11 +42,9 @@ GRAPHQL;
         );
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
     {
-        $fieldValue->addArgumentSetTransformer(function (ArgumentSet $argumentSet): ArgumentSet {
-            return $this->transformArgumentSet($argumentSet);
-        });
+        $fieldValue->addArgumentSetTransformer(fn (ArgumentSet $argumentSet): ArgumentSet => $this->transformArgumentSet($argumentSet));
 
         return $next($fieldValue);
     }
@@ -60,7 +59,8 @@ GRAPHQL;
     }
 
     /**
-     * @param  mixed  $value The client given value
+     * @param  mixed  $value  The client given value
+     *
      * @return mixed The transformed value
      */
     protected function transformLeaf($value)

@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
-use Closure;
 use GraphQL\Executor\Executor;
+use Illuminate\Container\Container;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -17,21 +17,22 @@ class ResolverProvider implements ProvidesResolver
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
-    public function provideResolver(FieldValue $fieldValue): Closure
+    public function provideResolver(FieldValue $fieldValue): \Closure
     {
-        if ($fieldValue->parentIsRootType()) {
+        if (RootType::isRootType($fieldValue->getParentName())) {
             $resolverClass = $this->findResolverClass($fieldValue, '__invoke');
-            if ($resolverClass === null) {
+            if (null === $resolverClass) {
                 $this->throwMissingResolver($fieldValue);
             }
 
-            return Closure::fromCallable(
-                // @phpstan-ignore-next-line this works
-                [app($resolverClass), '__invoke']
-            );
+            $resolver = Container::getInstance()->make($resolverClass);
+            assert(is_object($resolver));
+            /** @var object $resolver PHPStan thinks it is *NEVER* with Laravel 9 */
+
+            return \Closure::fromCallable([$resolver, '__invoke']);
         }
 
-        return Closure::fromCallable(
+        return \Closure::fromCallable(
             Executor::getDefaultFieldResolver()
         );
     }
@@ -43,7 +44,7 @@ class ResolverProvider implements ProvidesResolver
     {
         return Utils::namespaceClassname(
             Str::studly($fieldValue->getFieldName()),
-            $fieldValue->defaultNamespacesForParent(),
+            RootType::defaultNamespaces($fieldValue->getParentName()),
             function (string $class) use ($methodName): bool {
                 return method_exists($class, $methodName);
             }
@@ -52,6 +53,8 @@ class ResolverProvider implements ProvidesResolver
 
     /**
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
+     *
+     * @return never
      */
     protected function throwMissingResolver(FieldValue $fieldValue): void
     {
@@ -61,7 +64,8 @@ class ResolverProvider implements ProvidesResolver
         $fieldName = $fieldValue->getFieldName();
         $proposedResolverClass = ucfirst($fieldName);
 
-        throw new DefinitionException(<<<MESSAGE
+        throw new DefinitionException(
+            <<<MESSAGE
 Could not locate a field resolver for the {$parent}: {$fieldName}.
 
 Either add a resolver directive such as @all, @find or @create or add

@@ -11,6 +11,7 @@ trait TestsRedis
     protected function tearDown(): void
     {
         Redis::flushall();
+
         parent::tearDown();
     }
 
@@ -18,8 +19,8 @@ trait TestsRedis
     {
         parent::getEnvironmentSetUp($app);
 
-        /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = $app->make(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
 
         $config->set('database.redis.default', [
             'url' => env('LIGHTHOUSE_TEST_REDIS_URL'),
@@ -40,7 +41,7 @@ trait TestsRedis
             'broadcasters' => [
                 'echo' => [
                     'driver' => 'echo',
-                    'routes' => SubscriptionRouter::class.'@echoRoutes',
+                    'routes' => SubscriptionRouter::class . '@echoRoutes',
                 ],
             ],
         ]);

@@ -2,11 +2,13 @@
 
 namespace Tests\Unit\Schema\Types\Scalars;
 
+use Carbon\Carbon as CarbonCarbon;
+use Carbon\CarbonImmutable as CarbonCarbonImmutable;
 use GraphQL\Error\Error;
 use GraphQL\Error\InvariantViolation;
 use GraphQL\Language\AST\IntValueNode;
 use GraphQL\Language\AST\StringValueNode;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Carbon as IlluminateCarbon;
 use Nuwave\Lighthouse\Schema\Types\Scalars\DateScalar;
 use Tests\TestCase;
 
@@ -15,7 +17,7 @@ abstract class DateScalarTest extends TestCase
     /**
      * @dataProvider invalidDateValues
      *
-     * @param  mixed  $value An invalid value for a date
+     * @param  mixed  $value  An invalid value for a date
      */
     public function testThrowsIfSerializingInvalidDates($value): void
     {
@@ -27,7 +29,7 @@ abstract class DateScalarTest extends TestCase
     /**
      * @dataProvider invalidDateValues
      *
-     * @param  mixed  $value An invalid value for a date
+     * @param  mixed  $value  An invalid value for a date
      */
     public function testThrowsIfParseValueInvalidDate($value): void
     {
@@ -39,8 +41,16 @@ abstract class DateScalarTest extends TestCase
     public function testConvertsCarbonCarbonToIlluminateSupportCarbon(): void
     {
         $this->assertInstanceOf(
-            \Illuminate\Support\Carbon::class,
-            $this->scalarInstance()->parseValue(\Carbon\Carbon::now())
+            IlluminateCarbon::class,
+            $this->scalarInstance()->parseValue(CarbonCarbon::now())
+        );
+    }
+
+    public function testConvertsCarbonCarbonImmutableToIlluminateSupportCarbon(): void
+    {
+        $this->assertInstanceOf(
+            IlluminateCarbon::class,
+            $this->scalarInstance()->parseValue(CarbonCarbonImmutable::now())
         );
     }
 
@@ -49,7 +59,7 @@ abstract class DateScalarTest extends TestCase
      *
      * @return array<array<mixed>>
      */
-    public function invalidDateValues(): array
+    public static function invalidDateValues(): array
     {
         return [
             [1],
@@ -65,7 +75,7 @@ abstract class DateScalarTest extends TestCase
     public function testParsesValueString(string $date): void
     {
         $this->assertInstanceOf(
-            Carbon::class,
+            IlluminateCarbon::class,
             $this->scalarInstance()->parseValue($date)
         );
     }
@@ -80,7 +90,7 @@ abstract class DateScalarTest extends TestCase
         );
         $parsed = $this->scalarInstance()->parseLiteral($dateLiteral);
 
-        $this->assertInstanceOf(Carbon::class, $parsed);
+        $this->assertInstanceOf(IlluminateCarbon::class, $parsed);
     }
 
     public function testThrowsIfParseLiteralNonString(): void
@@ -94,11 +104,10 @@ abstract class DateScalarTest extends TestCase
 
     public function testSerializesCarbonInstance(): void
     {
-        $now = Carbon::now();
+        $now = IlluminateCarbon::now();
         $result = $this->scalarInstance()->serialize($now);
 
-        // TODO use native assertIsString when upgrading PHPUnit
-        $this->assertTrue(is_string($result));
+        self::assertIsString($result);
     }
 
     /**
@@ -119,16 +128,16 @@ abstract class DateScalarTest extends TestCase
     /**
      * Data provider for valid date strings.
      *
-     * @return array<array<string>>
+     * @return iterable<array<string>>
      */
-    abstract public function validDates(): array;
+    abstract public function validDates(): iterable;
 
     /**
      * Data provider with pairs of dates:
      * 1. A valid representation of the date
-     * 1. The canonical representation of the date.
+     * 2. The canonical representation of the date.
      *
-     * @return array<array<string>>
+     * @return iterable<array{string, string}>
      */
-    abstract public function canonicalizeDates(): array;
+    abstract public function canonicalizeDates(): iterable;
 }

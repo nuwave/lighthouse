@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTestbenchPostsTable extends Migration
+final class CreateTestbenchPostsTable extends Migration
 {
     public function up(): void
     {
@@ -19,12 +19,6 @@ class CreateTestbenchPostsTable extends Migration
 
             $table->timestamps();
             $table->softDeletes();
-        });
-
-        Schema::table('posts', function (Blueprint $table): void {
-            $table->foreign('parent_id')
-                ->references('id')
-                ->on('posts');
         });
     }
 

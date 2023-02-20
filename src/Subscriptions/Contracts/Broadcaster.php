@@ -7,6 +7,8 @@ use Nuwave\Lighthouse\Subscriptions\Subscriber;
 
 interface Broadcaster
 {
+    public const EVENT_NAME = 'lighthouse-subscription';
+
     /**
      * Handle authorized subscription request.
      *
@@ -31,7 +33,8 @@ interface Broadcaster
     /**
      * Send data to subscriber.
      *
-     * @param  mixed  $data The data to broadcast
+     * @param  mixed  $data  The data to broadcast
+     *
      * @return void
      */
     public function broadcast(Subscriber $subscriber, $data);

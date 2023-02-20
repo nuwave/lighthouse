@@ -5,7 +5,7 @@ namespace Tests\Unit\Schema\Directives;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\TestCase;
 
-class RenameDirectiveTest extends TestCase
+final class RenameDirectiveTest extends TestCase
 {
     public function testRenameField(): void
     {
@@ -50,7 +50,7 @@ class RenameDirectiveTest extends TestCase
 
         $this->graphQL(/** @lang GraphQL */ '
         {
-            fooBar
+            foo
         }
         ');
     }

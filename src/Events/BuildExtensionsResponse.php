@@ -5,11 +5,9 @@ namespace Nuwave\Lighthouse\Events;
 /**
  * Fires after a query was resolved.
  *
- * Listeners of this event may return an instance of
- * @see \Nuwave\Lighthouse\Execution\ExtensionsResponse
- * that is then added to the response.
+ * Listeners may return a @see \Nuwave\Lighthouse\Execution\ExtensionsResponse
+ * to include in the response.
  */
 class BuildExtensionsResponse
 {
-    //
 }

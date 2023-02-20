@@ -9,7 +9,7 @@ use Nuwave\Lighthouse\Defer\DeferrableDirective;
 use Nuwave\Lighthouse\Defer\DeferServiceProvider;
 use Tests\TestCase;
 
-class DeferTest extends TestCase
+final class DeferTest extends TestCase
 {
     public function setUp(): void
     {
@@ -44,7 +44,7 @@ class DeferTest extends TestCase
         );
     }
 
-    public function testCanDeferFields(): void
+    public function testDeferFields(): void
     {
         $this->mockResolver([
             'name' => 'John Doe',
@@ -97,7 +97,7 @@ class DeferTest extends TestCase
         );
     }
 
-    public function testCanDeferNestedFields(): void
+    public function testDeferNestedFields(): void
     {
         $data = [
             'name' => 'John Doe',
@@ -151,7 +151,7 @@ class DeferTest extends TestCase
         $this->assertSame($data['parent']['parent']['name'], $nestedDeferred['data']['name']);
     }
 
-    public function testCanDeferNestedFieldsOnMutations(): void
+    public function testDeferNestedFieldsOnMutations(): void
     {
         $this->mockResolver([
             'name' => 'John Doe',
@@ -210,7 +210,7 @@ class DeferTest extends TestCase
         );
     }
 
-    public function testCanDeferListFields(): void
+    public function testDeferListFields(): void
     {
         $data = [
             [
@@ -266,7 +266,7 @@ class DeferTest extends TestCase
         $this->assertSame($data[1]['author']['name'], Arr::get($deferredPost2, 'name'));
     }
 
-    public function testCanDeferGroupedListFields(): void
+    public function testDeferGroupedListFields(): void
     {
         $data = [
             [
@@ -368,8 +368,9 @@ class DeferTest extends TestCase
         }
         ';
 
-        /** @var \Nuwave\Lighthouse\Defer\Defer $defer */
-        $defer = app(Defer::class);
+        $defer = $this->app->make(Defer::class);
+        assert($defer instanceof Defer);
+
         // Set max execution time to now so we immediately resolve deferred fields
         $defer->setMaxExecutionTime(microtime(true));
 
@@ -424,8 +425,9 @@ class DeferTest extends TestCase
         }
         ';
 
-        /** @var \Nuwave\Lighthouse\Defer\Defer $defer */
-        $defer = app(Defer::class);
+        $defer = $this->app->make(Defer::class);
+        assert($defer instanceof Defer);
+
         $defer->setMaxNestedFields(1);
 
         $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
@@ -483,13 +485,7 @@ class DeferTest extends TestCase
                 }
             }
         }
-        ')->assertJson([
-            'errors' => [
-                [
-                    'message' => DeferrableDirective::THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_NON_NULLABLE_FIELD,
-                ],
-            ],
-        ]);
+        ')->assertGraphQLErrorMessage(DeferrableDirective::THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_NON_NULLABLE_FIELD);
     }
 
     public function testDoesNotDeferWithIncludeAndSkipDirectives(): void
@@ -639,7 +635,7 @@ class DeferTest extends TestCase
         type Mutation {
             updateUser(name: String!): User @mock
         }
-        '.self::PLACEHOLDER_QUERY;
+        ' . self::PLACEHOLDER_QUERY;
 
         $this->graphQL(/** @lang GraphQL */ '
         mutation UpdateUser {
@@ -647,13 +643,7 @@ class DeferTest extends TestCase
                 name
             }
         }
-        ')->assertJson([
-            'errors' => [
-                [
-                    'message' => DeferrableDirective::THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_ROOT_MUTATION_FIELD,
-                ],
-            ],
-        ]);
+        ')->assertGraphQLErrorMessage(DeferrableDirective::THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_ROOT_MUTATION_FIELD);
     }
 
     public function testDoesNotDeferFieldsIfFalse(): void

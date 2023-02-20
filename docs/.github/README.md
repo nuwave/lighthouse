@@ -1,17 +1,15 @@
 # Lighthouse Website
 
 The Lighthouse docs website uses [Vue Press](https://vuepress.vuejs.org),
-a minimalistic [Vue](https://vuejs.org/) powered static site generator.
+a minimalistic [Vue](https://vuejs.org) powered static site generator.
 
 ## Directory structure
 
 ```
 docs/
-├── .vuepress/
-│   ├── config.js         # global site config
-│   └── versions.json     # auto-generated versions file
+├── .vuepress/            # https://vuepress.vuejs.org/guide/directory-structure.html
 │
-├── master/
+├── master/               # Docs for the current version
 │   ├── guides/
 │   │   └── auth.md       # https://mysite.com/master/guides/auth.html
 │   ├── the-basics/
@@ -19,11 +17,13 @@ docs/
 │   │
 │   └── sidebar.js        # versioned sidebar for this version
 │
-├── 2.6/
+├── 2/                    # Archived docs for the latest 2.x version, same for other old versions
+│   └── ...               # same structure as "docs/master/"
+|
+├── [x]/                  # Docs for the current stable version, usually a copy of "docs/master/"
 │   └── ...               # same structure as "docs/master/"
 │
-├── pages/
-│   └── ...               # Not versioned, it remains the same for all docs versions
+├── pages/                # Pages independent from the version
 │
 ├── package.json          # vuepress dependencies
 └── INDEX.md              # the beautiful home page
@@ -56,11 +56,8 @@ Finally, navigate to http://localhost:8081
 
 ### Creating new files
 
-Place the new file into the corresponding version folder,
-e.g. `docs/3.1/guides/cruds.md`
-
-Include the reference for the new file into the corresponding `sidebar.js`,
-according to its version number, e.g. `docs/3.1/sidebar.js`
+- Place the new file into `master`, e.g. `docs/master/new/feature.md`
+- Include the reference to the new file into `docs/master/sidebar.js`
 
 ### Linking files
 
@@ -78,17 +75,22 @@ See [configuration](../getting-started/configuration.md) for more info.
 
 ## Versioning
 
-Each subfolder in `docs/` will represent a documentation version,
-except `docs/pages/` that will remain the same for all docs versions.
+The numbered directories (2, 3, ...) in `docs/` correspond to major releases of Lighthouse,
+`docs/pages/` remains the same for all versions.
 
 This ensures that the docs are always in sync with the released version of Lighthouse.
 Version specific changes are handled by keeping the docs for each version separate.
 
-| Path                                 | Web route                                           |
-| ------------------------------------ | --------------------------------------------------- |
+| Path                                 | Web route                                            |
+| ------------------------------------ | ---------------------------------------------------- |
 | `docs/master/guides/installation.md` | `https://mysite.com/master/guides/installation.html` |
-| `docs/2.6/guides/installation.md`    | `https://mysite.com/2.6/guides/installation.html`    |
+| `docs/2/guides/installation.md`      | `https://mysite.com/2/guides/installation.html`      |
 | `docs/pages/users.md`                | `https://mysite.com/pages/users.html`                |
+
+### Documenting new features
+
+Add documentation for new features to `docs/master/`.
+See [Tagging a new version](#tagging-a-new-version) for how they are released.
 
 ### Updating existing versions
 
@@ -100,15 +102,12 @@ in a single PR.
 
 ### Tagging a new version
 
-1.  First, finish your work on `docs/master`.
+After you finished your work on `docs/master/`, copy the updated docs
+into the directory of the current major version by running:
 
-1.  Enter a new version number. We only tag minor releases, so `3.1` will get separate
-    docs, but `3.1.4` will not.
+    make release
 
-        yarn bump 3.1
-
-This will copy the contents of `docs/master/` into `docs/<version>/`
-and place a new version number in `docs/.vuepress/versions.json`.
+When releasing a new major version, update the version number in the `release` target in [Makefile](../Makefile).
 
 ## Deployment
 

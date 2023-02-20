@@ -4,11 +4,14 @@ namespace Nuwave\Lighthouse\Validation;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\Parser;
+use Illuminate\Container\Container;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -38,8 +41,8 @@ directive @validator(
   The name of the class to use.
 
   If defined on an input, this defaults to a class called `{$inputName}Validator` in the
-  default validator namespace. For fields, it uses the name of the parent type
-  and the field name: `{$parent}{$field}Validator`.
+  default validator namespace. For fields, it uses the namespace of the parent type
+  and the field name: `{$parent}\{$field}Validator`.
   """
   class: String
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION | INPUT_OBJECT
@@ -63,13 +66,15 @@ GRAPHQL;
 
     protected function validator(): Validator
     {
-        if ($this->validator === null) {
-            /** @var \Nuwave\Lighthouse\Validation\Validator $validator */
-            $validator = app(
-                // We precomputed and validated the full class name at schema build time
-                $this->directiveArgValue('class')
-            );
-            // @phpstan-ignore-next-line Since this directive can only be defined on a field or input, this must be ArgumentSet
+        if (null === $this->validator) {
+            // We precomputed and validated the full class name at schema build time
+            $validatorClass = $this->directiveArgValue('class');
+
+            $validator = Container::getInstance()->make($validatorClass);
+            /** @var \Nuwave\Lighthouse\Validation\Validator $validator PHPStan thinks it is *NEVER* with Laravel 9 */
+            assert($validator instanceof Validator);
+
+            assert($this->argumentValue instanceof ArgumentSet, 'this directive can only be defined on a field or input');
             $validator->setArgs($this->argumentValue);
 
             return $this->validator = $validator;
@@ -81,35 +86,30 @@ GRAPHQL;
     public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition)
     {
         if (! $typeDefinition instanceof InputObjectTypeDefinitionNode) {
-            throw new DefinitionException(
-                "Can not use @validator on non input type {$typeDefinition->name->value}."
-            );
+            throw new DefinitionException("Can not use @validator on non input type {$typeDefinition->getName()->value}.");
         }
 
-        if ($this->directiveHasArgument('class')) {
-            $classCandidate = $this->directiveArgValue('class');
-        } else {
-            $classCandidate = $typeDefinition->name->value.'Validator';
-        }
-
-        $this->setFullClassnameOnDirective($typeDefinition, $classCandidate);
+        $this->setFullClassnameOnDirective(
+            $typeDefinition,
+            $this->directiveArgValue('class', "{$typeDefinition->name->value}Validator")
+        );
     }
 
     public function manipulateFieldDefinition(
         DocumentAST &$documentAST,
         FieldDefinitionNode &$fieldDefinition,
-        ObjectTypeDefinitionNode &$parentType
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType
     ) {
-        if ($this->directiveHasArgument('class')) {
-            $classCandidate = $this->directiveArgValue('class');
-        } else {
-            $classCandidate = $parentType->name->value
-                .'\\'
-                .ucfirst($fieldDefinition->name->value)
-                .'Validator';
-        }
-
-        $this->setFullClassnameOnDirective($fieldDefinition, $classCandidate);
+        $this->setFullClassnameOnDirective(
+            $fieldDefinition,
+            $this->directiveArgValue(
+                'class',
+                $parentType->name->value
+                    . '\\'
+                    . ucfirst($fieldDefinition->name->value)
+                    . 'Validator'
+            )
+        );
     }
 
     /**
@@ -128,21 +128,27 @@ GRAPHQL;
             if ($directive->name->value === $this->name()) {
                 $directive->arguments = ASTHelper::mergeUniqueNodeList(
                     $directive->arguments,
-                    [Parser::argument('class: "'.addslashes($validatorClass).'"')],
+                    [Parser::argument('class: "' . addslashes($validatorClass) . '"')],
                     true
                 );
             }
         }
     }
 
+    /**
+     * @return class-string<\Nuwave\Lighthouse\Validation\Validator>
+     */
     protected function namespaceValidatorClass(string $classCandidate): string
     {
-        return $this->namespaceClassName(
+        $validatorClassName = $this->namespaceClassName(
             $classCandidate,
             (array) config('lighthouse.namespaces.validators'),
             function (string $classCandidate): bool {
                 return is_subclass_of($classCandidate, Validator::class);
             }
         );
+        assert(is_subclass_of($validatorClassName, Validator::class));
+
+        return $validatorClassName;
     }
 }

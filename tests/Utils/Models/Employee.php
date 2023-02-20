@@ -7,12 +7,22 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 /**
+ * Primary key.
+ *
  * @property int $id
+ *
+ * Attributes
  * @property string $position
- * @property \lluminate\Support\Carbon $created_at
- * @property \lluminate\Support\Carbon $updated_at
+ *
+ * Timestamps
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property \Illuminate\Support\Carbon $updated_at
+ *
+ * Relations
+ * @property-read \Tests\Utils\Models\User $user
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Color> $colors
  */
-class Employee extends Model
+final class Employee extends Model
 {
     public function user(): MorphOne
     {

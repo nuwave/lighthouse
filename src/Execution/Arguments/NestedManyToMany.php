@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
@@ -23,8 +24,8 @@ class NestedManyToMany implements ArgResolver
      */
     public function __invoke($parent, $args): void
     {
-        /** @var \Illuminate\Database\Eloquent\Relations\BelongsToMany|\Illuminate\Database\Eloquent\Relations\MorphToMany $relation */
         $relation = $parent->{$this->relationName}();
+        assert($relation instanceof BelongsToMany);
 
         if ($args->has('sync')) {
             $relation->sync(
@@ -67,7 +68,6 @@ class NestedManyToMany implements ArgResolver
      * data to store in the pivot table. That array expects passing the id's
      * as keys, so we transform the passed arguments to match that.
      *
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\Argument $args
      * @return array<mixed>
      */
     protected function generateRelationArray(Argument $args): array

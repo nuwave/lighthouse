@@ -7,7 +7,7 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
 
-class FieldBuilderDirectiveTest extends DBTestCase
+final class FieldBuilderDirectiveTest extends DBTestCase
 {
     protected $schema = /** @lang GraphQL */ '
     type Post {
@@ -15,7 +15,7 @@ class FieldBuilderDirectiveTest extends DBTestCase
     }
     ';
 
-    public function testCanLimitPostByAuthenticatedUser(): void
+    public function testLimitPostByAuthenticatedUser(): void
     {
         $this->schema .= /** @lang GraphQL */ '
         type Query {
@@ -29,7 +29,7 @@ class FieldBuilderDirectiveTest extends DBTestCase
         $ownedPosts = factory(Post::class, 3)->create([
             'user_id' => $user->getKey(),
         ]);
-        $nonOwnedPosts = factory(Post::class, 3)->create();
+        factory(Post::class, 3)->create();
 
         $this->be($user);
 
@@ -47,7 +47,7 @@ class FieldBuilderDirectiveTest extends DBTestCase
         );
     }
 
-    public function testCanChangeGuard(): void
+    public function testChangeGuard(): void
     {
         $this->schema .= /** @lang GraphQL */ '
         type Query {
@@ -55,7 +55,7 @@ class FieldBuilderDirectiveTest extends DBTestCase
                 @all
                 @whereAuth(
                     relation: "user"
-                    guard: "api"
+                    guard: "web"
                 )
         }
         ';
@@ -63,10 +63,10 @@ class FieldBuilderDirectiveTest extends DBTestCase
         $ownedPosts = factory(Post::class, 3)->create([
             'user_id' => $user->getKey(),
         ]);
-        $nonOwnedPosts = factory(Post::class, 3)->create();
+        factory(Post::class, 3)->create();
 
         $authFactory = $this->app->make(AuthFactory::class);
-        $authFactory->guard('api')->setUser($user);
+        $authFactory->guard('web')->setUser($user);
 
         $response = $this
             ->graphQL(/** @lang GraphQL */ '

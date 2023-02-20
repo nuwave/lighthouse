@@ -5,7 +5,7 @@ namespace Tests\Utils\Policies;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
 
-class PostPolicy
+final class PostPolicy
 {
     public function view(User $user, Post $post): bool
     {

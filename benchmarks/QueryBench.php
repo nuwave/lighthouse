@@ -35,13 +35,14 @@ abstract class QueryBench extends TestCase
     /**
      * Define environment setup.
      *
-     * @param \Illuminate\Foundation\Application $app
+     * @param  \Illuminate\Foundation\Application  $app
      */
     protected function getEnvironmentSetUp($app): void
     {
-        /** @var \Illuminate\Contracts\Config\Repository $config */
-        $config = $app->make(ConfigRepository::class);
+        parent::getEnvironmentSetUp($app);
 
+        $config = $app->make(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
         $config->set('lighthouse.field_middleware', []);
     }
 }

@@ -2,10 +2,11 @@
 
 namespace Nuwave\Lighthouse\Subscriptions\Events;
 
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Broadcasting\Channel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
+use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 
-class EchoSubscriptionEvent implements ShouldBroadcast
+class EchoSubscriptionEvent implements ShouldBroadcastNow
 {
     /**
      * @var string
@@ -13,12 +14,12 @@ class EchoSubscriptionEvent implements ShouldBroadcast
     public $channel;
 
     /**
-     * @var mixed The data to broadcast.
+     * @var mixed the data to broadcast
      */
     public $data;
 
     /**
-     * @param mixed $data The data to broadcast.
+     * @param  mixed  $data  the data to broadcast
      */
     public function __construct(string $channel, $data)
     {
@@ -26,9 +27,9 @@ class EchoSubscriptionEvent implements ShouldBroadcast
         $this->data = $data;
     }
 
-    public function broadcastOn(): PresenceChannel
+    public function broadcastOn(): Channel
     {
-        return new PresenceChannel($this->channel);
+        return new Channel($this->channel);
     }
 
     /**
@@ -38,6 +39,6 @@ class EchoSubscriptionEvent implements ShouldBroadcast
      */
     public function broadcastAs(): string
     {
-        return 'lighthouse.subscription';
+        return Broadcaster::EVENT_NAME;
     }
 }

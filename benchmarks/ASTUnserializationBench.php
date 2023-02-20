@@ -54,6 +54,7 @@ GRAPHQL;
 
     /**
      * @Revs(100)
+     *
      * @Iterations(10)
      */
     public function benchUnserializeDocumentNode(): void
@@ -63,6 +64,7 @@ GRAPHQL;
 
     /**
      * @Revs(100)
+     *
      * @Iterations(10)
      */
     public function benchUnserializeDocumentAST(): void

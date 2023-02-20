@@ -3,12 +3,15 @@
 namespace Tests\Unit\Schema\AST;
 
 use GraphQL\Language\AST\DirectiveDefinitionNode;
+use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use GraphQL\Language\Parser;
+use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Tests\TestCase;
 
-class ASTHelperTest extends TestCase
+final class ASTHelperTest extends TestCase
 {
     public function testThrowsWhenMergingUniqueNodeListWithCollision(): void
     {
@@ -25,8 +28,7 @@ class ASTHelperTest extends TestCase
         ');
 
         $this->expectException(DefinitionException::class);
-
-        $objectType1->fields = ASTHelper::mergeUniqueNodeList(
+        ASTHelper::mergeUniqueNodeList(
             $objectType1->fields,
             $objectType2->fields
         );
@@ -56,13 +58,13 @@ class ASTHelperTest extends TestCase
 
         $this->assertCount(3, $objectType1->fields);
 
-        /** @var \GraphQL\Language\AST\FieldDefinitionNode $firstNameField */
         $firstNameField = ASTHelper::firstByName($objectType1->fields, 'first_name');
 
+        assert($firstNameField instanceof FieldDefinitionNode);
         $this->assertCount(1, $firstNameField->directives);
     }
 
-    public function testCanExtractStringArguments(): void
+    public function testExtractStringArguments(): void
     {
         $directive = Parser::constDirective(/** @lang GraphQL */ '@foo(bar: "baz")');
         $this->assertSame(
@@ -71,7 +73,7 @@ class ASTHelperTest extends TestCase
         );
     }
 
-    public function testCanExtractBooleanArguments(): void
+    public function testExtractBooleanArguments(): void
     {
         $directive = Parser::constDirective(/** @lang GraphQL */ '@foo(bar: true)');
         $this->assertTrue(
@@ -79,7 +81,7 @@ class ASTHelperTest extends TestCase
         );
     }
 
-    public function testCanExtractArrayArguments(): void
+    public function testExtractArrayArguments(): void
     {
         $directive = Parser::constDirective(/** @lang GraphQL */ '@foo(bar: ["one", "two"])');
         $this->assertSame(
@@ -88,7 +90,7 @@ class ASTHelperTest extends TestCase
         );
     }
 
-    public function testCanExtractObjectArguments(): void
+    public function testExtractObjectArguments(): void
     {
         $directive = Parser::constDirective(/** @lang GraphQL */ '@foo(bar: { baz: "foobar" })');
         $this->assertSame(
@@ -116,17 +118,6 @@ class ASTHelperTest extends TestCase
         $this->assertFalse(ASTHelper::typeImplementsInterface($type, 'FakeInterface'));
     }
 
-    public function testThrowsWhenDefinedOnInvalidTypes(): void
-    {
-        $notAnObject = Parser::scalarTypeDefinition(/** @lang GraphQL */ '
-        scalar NotAnObject
-        ');
-        $directive = Parser::constDirective(/** @lang GraphQL */ '@foo');
-
-        $this->expectException(DefinitionException::class);
-        ASTHelper::addDirectiveToFields($directive, $notAnObject);
-    }
-
     public function testAddDirectiveToFields(): void
     {
         $object = Parser::objectTypeDefinition(/** @lang GraphQL */ '
@@ -150,24 +141,21 @@ class ASTHelperTest extends TestCase
     {
         $object = Parser::objectTypeDefinition(/** @lang GraphQL */ '
         type Query {
-            foo: Int @guard(with: ["api"])
+            foo: Int @complexity(resolver: "Foo")
             bar: String
         }
         ');
 
         ASTHelper::addDirectiveToFields(
-            Parser::constDirective(/** @lang GraphQL */ '@guard'),
+            Parser::constDirective(/** @lang GraphQL */ '@complexity'),
             $object
         );
 
-        $guardOnFooArguments = $object->fields[0]->directives[0];
-        $fieldGuard = ASTHelper::directiveArgValue($guardOnFooArguments, 'with');
+        $onBar = $object->fields[1]->directives[0];
+        $this->assertSame('complexity', $onBar->name->value);
 
-        $this->assertSame(['api'], $fieldGuard);
-        $this->assertSame(
-            'guard',
-            $object->fields[1]->directives[0]->name->value
-        );
+        $onFoo = $object->fields[0]->directives[0];
+        $this->assertSame('Foo', ASTHelper::directiveArgValue($onFoo, 'resolver'));
     }
 
     public function testExtractDirectiveDefinition(): void
@@ -186,14 +174,13 @@ class ASTHelperTest extends TestCase
 directive @foo on OBJECT
 scalar Bar
 GRAPHQL
-)
+            )
         );
     }
 
     public function testThrowsOnSyntaxError(): void
     {
         $this->expectException(DefinitionException::class);
-
         ASTHelper::extractDirectiveDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
 invalid GraphQL
 GRAPHQL
@@ -203,7 +190,6 @@ GRAPHQL
     public function testThrowsIfMissingDirectiveDefinitions(): void
     {
         $this->expectException(DefinitionException::class);
-
         ASTHelper::extractDirectiveDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
 scalar Foo
 GRAPHQL
@@ -213,11 +199,20 @@ GRAPHQL
     public function testThrowsOnMultipleDirectiveDefinitions(): void
     {
         $this->expectException(DefinitionException::class);
-
         ASTHelper::extractDirectiveDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
 directive @foo on OBJECT
 directive @bar on OBJECT
 GRAPHQL
         );
+    }
+
+    public function testUnderlyingTypeKnowsStandardTypes(): void
+    {
+        $type = ASTHelper::underlyingType(
+            Parser::fieldDefinition('foo: ID')
+        );
+
+        $this->assertInstanceOf(ScalarTypeDefinitionNode::class, $type);
+        $this->assertSame(Type::ID, $type->name->value);
     }
 }

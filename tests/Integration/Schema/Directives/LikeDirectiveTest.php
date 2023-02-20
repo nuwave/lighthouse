@@ -5,7 +5,7 @@ namespace Tests\Integration\Schema\Directives;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
-class LikeDirectiveTest extends DBTestCase
+final class LikeDirectiveTest extends DBTestCase
 {
     public function testLikeClientsCanPassWildcards(): void
     {

@@ -5,7 +5,7 @@ namespace Tests\Unit\Schema;
 use GraphQL\Type\Definition\Directive;
 use Tests\TestCase;
 
-class ClientDirectiveTest extends TestCase
+final class ClientDirectiveTest extends TestCase
 {
     public function testReturnsDefaultDirectivesInIntrospection(): void
     {
@@ -17,7 +17,7 @@ class ClientDirectiveTest extends TestCase
         );
     }
 
-    public function testCanDefineACustomClientDirective(): void
+    public function testDefineACustomClientDirective(): void
     {
         $this->schema .= /** @lang GraphQL */ '
         "foo"

@@ -3,17 +3,18 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Execution\DataLoader\RelationLoader;
-use Nuwave\Lighthouse\Execution\DataLoader\SimpleRelationLoader;
+use Nuwave\Lighthouse\Execution\ModelsLoader\ModelsLoader;
+use Nuwave\Lighthouse\Execution\ModelsLoader\SimpleModelsLoader;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
-use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class WithDirective extends WithRelationDirective implements FieldMiddleware, FieldManipulator
+class WithDirective extends WithRelationDirective implements FieldManipulator
 {
     public static function definition(): string
     {
@@ -36,23 +37,21 @@ directive @with(
 GRAPHQL;
     }
 
-    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType)
+    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType)
     {
         if (RootType::isRootType($parentType->name->value)) {
             throw new DefinitionException("Can not use @{$this->name()} on fields of a root type.");
         }
     }
 
-    protected function relationName(): string
+    /**
+     * @return \Nuwave\Lighthouse\Execution\ModelsLoader\SimpleModelsLoader
+     */
+    protected function modelsLoader($parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ModelsLoader
     {
-        return $this->directiveArgValue('relation')
-            ?? $this->nodeName();
-    }
-
-    protected function relationLoader(ResolveInfo $resolveInfo): RelationLoader
-    {
-        return new SimpleRelationLoader(
-            $this->decorateBuilder($resolveInfo)
+        return new SimpleModelsLoader(
+            $this->relation(),
+            $this->makeBuilderDecorator($parent, $args, $context, $resolveInfo)
         );
     }
 }

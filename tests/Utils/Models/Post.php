@@ -12,15 +12,22 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Scout\Searchable;
 
 /**
+ * Primary key.
+ *
  * @property int $id
+ *
+ * Attributes
  * @property string $title
  * @property string|null $body
+ *
+ * Timestamps
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property \Illuminate\Support\Carbon $updated_at
+ *
+ * Foreign keys
  * @property int|null $user_id
  * @property int $task_id
  * @property int|null $parent_id
- * @property \lluminate\Support\Carbon $created_at
- * @property \lluminate\Support\Carbon $updated_at
- *
  * @property-read \Tests\Utils\Models\User $user
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Activity> $activity
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Comment> $comments
@@ -29,8 +36,9 @@ use Laravel\Scout\Searchable;
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Post> $children
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Tag> $tags
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Image> $images
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\RoleUserPivot> $roles
  */
-class Post extends Model
+final class Post extends Model
 {
     use Searchable;
     use SoftDeletes;
@@ -78,5 +86,10 @@ class Post extends Model
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class, 'category_post', 'category_id', 'post_id');
+    }
+
+    public function roles(): HasMany
+    {
+        return $this->hasMany(RoleUserPivot::class, 'user_id', 'user_id');
     }
 }

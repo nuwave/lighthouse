@@ -12,15 +12,12 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 use Nuwave\Lighthouse\Support\Utils;
-use ReflectionClass;
-use ReflectionNamedType;
 
 class ArgPartitioner
 {
     /**
      * Partition the arguments into nested and regular.
      *
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $argumentSet
      * @return array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>
      */
     public static function nestedArgResolvers(ArgumentSet $argumentSet, $root): array
@@ -36,7 +33,7 @@ class ArgPartitioner
         return static::partition(
             $argumentSet,
             static function (string $name, Argument $argument): bool {
-                return $argument->resolver !== null;
+                return null !== $argument->resolver;
             }
         );
     }
@@ -64,15 +61,14 @@ class ArgPartitioner
      *   ]
      * ]
      *
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $argumentSet
-     * @return array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>
+     * @return array{0: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet, 1: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet}
      */
     public static function relationMethods(
         ArgumentSet $argumentSet,
         Model $model,
         string $relationClass
     ): array {
-        $modelReflection = new ReflectionClass($model);
+        $modelReflection = new \ReflectionClass($model);
 
         [$relations, $remaining] = static::partition(
             $argumentSet,
@@ -94,10 +90,8 @@ class ArgPartitioner
 
     /**
      * Attach a nested argument resolver to an argument.
-     *
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\Argument  $argument
      */
-    protected static function attachNestedArgResolver(string $name, Argument &$argument, ?ReflectionClass $model): void
+    protected static function attachNestedArgResolver(string $name, Argument &$argument, ?\ReflectionClass $model): void
     {
         $resolverDirective = $argument->directives->first(
             Utils::instanceofMatcher(ArgResolver::class)
@@ -137,8 +131,6 @@ class ArgPartitioner
                 || $isRelation(MorphToMany::class)
             ) {
                 $argument->resolver = new ResolveNested(new NestedManyToMany($name));
-
-                return;
             }
         }
     }
@@ -155,8 +147,7 @@ class ArgPartitioner
      * - the first one contains all arguments for which the predicate matched
      * - the second one contains all arguments for which the predicate did not match
      *
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $argumentSet
-     * @return array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>
+     * @return array{0: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet, 1: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet}
      */
     public static function partition(ArgumentSet $argumentSet, \Closure $predicate): array
     {
@@ -181,7 +172,7 @@ class ArgPartitioner
      * Does a method on the model return a relation of the given class?
      */
     public static function methodReturnsRelation(
-        ReflectionClass $modelReflection,
+        \ReflectionClass $modelReflection,
         string $name,
         string $relationClass
     ): bool {
@@ -192,16 +183,16 @@ class ArgPartitioner
         $relationMethodCandidate = $modelReflection->getMethod($name);
 
         $returnType = $relationMethodCandidate->getReturnType();
-        if ($returnType === null) {
+        if (! $returnType instanceof \ReflectionNamedType) {
             return false;
         }
 
-        if (! $returnType instanceof ReflectionNamedType) {
+        if ($returnType->isBuiltin()) {
             return false;
         }
 
         if (! class_exists($returnType->getName())) {
-            throw new DefinitionException('Class '.$returnType->getName().' does not exist, did you forget to import the Eloquent relation class?');
+            throw new DefinitionException('Class ' . $returnType->getName() . ' does not exist, did you forget to import the Eloquent relation class?');
         }
 
         return is_a($returnType->getName(), $relationClass, true);

@@ -4,8 +4,12 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
+use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Support\Utils;
 
 class SpreadDirective extends BaseDirective implements FieldMiddleware
 {
@@ -20,12 +24,48 @@ directive @spread on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next)
+    public function handleField(FieldValue $fieldValue, \Closure $next)
     {
-        $fieldValue->addArgumentSetTransformer(function (ArgumentSet $argumentSet): ArgumentSet {
-            return $argumentSet->spread();
-        });
+        $fieldValue->addArgumentSetTransformer(fn (ArgumentSet $argumentSet): ArgumentSet => $this->spread($argumentSet));
 
         return $next($fieldValue);
+    }
+
+    /**
+     * Apply the @spread directive and return a new, modified ArgumentSet.
+     *
+     * @noRector \Rector\DeadCode\Rector\ClassMethod\RemoveDeadRecursiveClassMethodRector
+     */
+    protected function spread(ArgumentSet $original): ArgumentSet
+    {
+        $next = new ArgumentSet();
+        $next->directives = $original->directives;
+
+        foreach ($original->arguments as $name => $argument) {
+            // Recurse down first, as that resolves the more deeply nested spreads first
+            $argument->value = Utils::mapEach(
+                function ($value) {
+                    if ($value instanceof ArgumentSet) {
+                        return $this->spread($value);
+                    }
+
+                    return $value;
+                },
+                $argument->value
+            );
+
+            if (
+                $argument->value instanceof ArgumentSet
+                && $argument->directives->contains(
+                    Utils::instanceofMatcher(static::class)
+                )
+            ) {
+                $next->arguments += $argument->value->arguments;
+            } else {
+                $next->arguments[$name] = $argument;
+            }
+        }
+
+        return $next;
     }
 }

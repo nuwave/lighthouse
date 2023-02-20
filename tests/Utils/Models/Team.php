@@ -2,16 +2,25 @@
 
 namespace Tests\Utils\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 /**
+ * Primary key.
+ *
  * @property int $id
+ *
+ * Attributes
  * @property string $name
- * @property \lluminate\Support\Carbon $created_at
- * @property \lluminate\Support\Carbon $updated_at
+ *
+ * Timestamps
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property \Illuminate\Support\Carbon $updated_at
+ *
+ * Relations
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\User> $users
  */
-class Team extends Model
+final class Team extends Authenticatable
 {
     public function users(): HasMany
     {

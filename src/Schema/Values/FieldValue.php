@@ -11,10 +11,12 @@ use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
 use Nuwave\Lighthouse\Execution\Utils\FieldPath;
 use Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter;
 use Nuwave\Lighthouse\Schema\RootType;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
-use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 
+/**
+ * @phpstan-type Resolver callable(mixed, array<string, mixed>, \Nuwave\Lighthouse\Support\Contracts\GraphQLContext, \Nuwave\Lighthouse\Execution\ResolveInfo): mixed
+ */
 class FieldValue
 {
     /**
@@ -23,41 +25,13 @@ class FieldValue
     protected static $transformedResolveArgs = [];
 
     /**
-     * An instance of the type that this field returns.
-     *
-     * @var \GraphQL\Type\Definition\Type|null
-     */
-    protected $returnType;
-
-    /**
-     * The underlying AST definition of the Field.
-     *
-     * @var \GraphQL\Language\AST\FieldDefinitionNode
-     */
-    protected $field;
-
-    /**
-     * The parent type of the field.
-     *
-     * @var \Nuwave\Lighthouse\Schema\Values\TypeValue
-     */
-    protected $parent;
-
-    /**
      * The actual field resolver.
      *
      * Lazily initialized through setResolver().
      *
-     * @var callable
+     * @var Resolver
      */
     protected $resolver;
-
-    /**
-     * A closure that determines the complexity of executing the field.
-     *
-     * @var callable|null
-     */
-    protected $complexity;
 
     /**
      * Ordered list of callbacks to transform the incoming argument set.
@@ -66,11 +40,17 @@ class FieldValue
      */
     protected $argumentSetTransformers;
 
-    public function __construct(TypeValue $parent, FieldDefinitionNode $field)
-    {
-        $this->parent = $parent;
-        $this->field = $field;
-    }
+    public function __construct(
+        /**
+         * The parent type of the field.
+         */
+        protected TypeValue $parent,
+
+        /**
+         * The underlying AST definition of the Field.
+         */
+        protected FieldDefinitionNode $field,
+    ) {}
 
     public static function clear(): void
     {
@@ -101,45 +81,6 @@ class FieldValue
 
         return ($this->resolver)($root, $args, $context, $resolveInfo);
     }
-
-    /**
-     * Use the default resolver.
-     *
-     * @return $this
-     */
-    public function useDefaultResolver(): self
-    {
-        $this->resolver = $this->getParentName() === RootType::SUBSCRIPTION
-            ? app(ProvidesSubscriptionResolver::class)->provideSubscriptionResolver($this)
-            : app(ProvidesResolver::class)->provideResolver($this);
-
-        return $this;
-    }
-
-    public function getParentName(): string
-    {
-        return $this->getParent()->getTypeDefinitionName();
-    }
-
-    public function getParent(): TypeValue
-    {
-        return $this->parent;
-    }
-
-    /**
-     * Get an instance of the return type of the field.
-     */
-    public function getReturnType(): Type
-    {
-        if ($this->returnType === null) {
-            /** @var \Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter $typeNodeConverter */
-            $typeNodeConverter = app(ExecutableTypeNodeConverter::class);
-            $this->returnType = $typeNodeConverter->convert($this->field->type);
-        }
-
-        return $this->returnType;
-    }
-
     /**
      * Get the underlying AST definition for the field.
      */
@@ -148,8 +89,25 @@ class FieldValue
         return $this->field;
     }
 
+    public function getFieldName(): string
+    {
+        return $this->field->name->value;
+    }
+
+    public function getParent(): TypeValue
+    {
+        return $this->parent;
+    }
+
+    public function getParentName(): string
+    {
+        return $this->parent->getTypeDefinitionName();
+    }
+
     /**
      * Get field resolver.
+     *
+     * @return Resolver
      */
     public function getResolver(): callable
     {
@@ -169,70 +127,10 @@ class FieldValue
     }
 
     /**
-     * Return the namespaces configured for the parent type.
-     *
-     * @return array<string>
-     */
-    public function defaultNamespacesForParent(): array
-    {
-        switch ($this->getParentName()) {
-            case RootType::QUERY:
-                return (array) config('lighthouse.namespaces.queries');
-            case RootType::MUTATION:
-                return (array) config('lighthouse.namespaces.mutations');
-            case RootType::SUBSCRIPTION:
-                return (array) config('lighthouse.namespaces.subscriptions');
-            default:
-               return [];
-        }
-    }
-
-    /**
-     * @deprecated
-     */
-    public function getDescription(): ?StringValueNode
-    {
-        return $this->field->description;
-    }
-
-    /**
-     * Get current complexity.
-     */
-    public function getComplexity(): ?callable
-    {
-        return $this->complexity;
-    }
-
-    /**
-     * Define a callable that is used to determine the complexity of the field.
-     *
-     * @return $this
-     */
-    public function setComplexity(callable $complexity): self
-    {
-        $this->complexity = $complexity;
-
-        return $this;
-    }
-
-    public function getFieldName(): string
-    {
-        return $this->field->name->value;
-    }
-
-    /**
-     * Is the parent of this field one of the root types?
-     */
-    public function parentIsRootType(): bool
-    {
-        return RootType::isRootType($this->getParentName());
-    }
-
-    /**
      * Register a function that will receive the final result and resolver arguments.
      *
      * For example, the following handler tries to double the result.
-     * This is somewhat non-sensical, but shows the range of what you can do.
+     * This is somewhat nonsensical, but shows the range of what you can do.
      *
      * function ($result, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
      *     if (is_numeric($result)) {
@@ -245,14 +143,14 @@ class FieldValue
      *          return null;
      *     }
      *
-     *     // You can also run side-effects
+     *     // You can also run side effects
      *     Log::debug("Doubled to {$result}.");
      *
      *     // Don't forget to return something
      *     return $result;
      * }
      *
-     * @param callable(mixed $result, array<string, mixed> $args, GraphQLContext $context, ResolveInfo $resolveInfo): mixed $handle
+     * @param Resolver $handle
      */
     public function resultHandler(callable $handle): void
     {

@@ -9,12 +9,12 @@ use Tests\TestCase;
 use Tests\TestsRedis;
 use Tests\TestsSubscriptions;
 
-class RedisStorageManagerTest extends TestCase
+final class RedisStorageManagerTest extends TestCase
 {
     use TestsRedis;
     use TestsSubscriptions;
 
-    protected $schema = /** @lang GraphQL */'
+    protected $schema = /** @lang GraphQL */ '
     type Task {
         id: ID!
         name: String!
@@ -24,18 +24,18 @@ class RedisStorageManagerTest extends TestCase
         taskUpdated(id: ID!): Task
         taskCreated: Task
     }
-    '.self::PLACEHOLDER_QUERY;
+    ' . self::PLACEHOLDER_QUERY;
 
     public function testSubscriptionStoredWithPrefix(): void
     {
         $response = $this->querySubscription();
 
         // externally, we do not see a redis prefix
-        $channel = $response->json('extensions.lighthouse_subscriptions.channels.taskUpdated');
+        $channel = $response->json('extensions.lighthouse_subscriptions.channel');
         $this->assertStringStartsWith('private-lighthouse-', $channel);
 
         // internally when using the redis driver to access the keys there seems to be no prefix
-        $this->assertRedisHas('graphql.subscriber.'.$channel);
+        $this->assertRedisHas('graphql.subscriber.' . $channel);
         $this->assertRedisHas('graphql.topic.TASK_UPDATED');
 
         // but in reality redis stores with a prefix
@@ -51,21 +51,21 @@ class RedisStorageManagerTest extends TestCase
         $storage = $this->app->make(RedisStorageManager::class);
 
         $response = $this->querySubscription();
-        $channel = $response->json('extensions.lighthouse_subscriptions.channels.taskUpdated');
+        $channel = $response->json('extensions.lighthouse_subscriptions.channel');
 
         // when it's the only subscriber to a topic, the topic gets deleted with the subscriber
-        $this->assertRedisHas('graphql.subscriber.'.$channel);
+        $this->assertRedisHas('graphql.subscriber.' . $channel);
         $this->assertRedisHas('graphql.topic.TASK_UPDATED');
 
         $storage->deleteSubscriber($channel);
-        $this->assertRedisMissing('graphql.subscriber.'.$channel);
+        $this->assertRedisMissing('graphql.subscriber.' . $channel);
         $this->assertRedisMissing('graphql.topic.TASK_UPDATED');
 
         // when there are multiple subscribers, the topic stays as long as there are subscribers
         $firstResponse = $this->querySubscription();
-        $firstChannel = $firstResponse->json('extensions.lighthouse_subscriptions.channels.taskUpdated');
+        $firstChannel = $firstResponse->json('extensions.lighthouse_subscriptions.channel');
         $secondResponse = $this->querySubscription();
-        $secondChannel = $secondResponse->json('extensions.lighthouse_subscriptions.channels.taskUpdated');
+        $secondChannel = $secondResponse->json('extensions.lighthouse_subscriptions.channel');
         $this->assertRedisHas('graphql.topic.TASK_UPDATED');
 
         $storage->deleteSubscriber($firstChannel);
@@ -77,17 +77,19 @@ class RedisStorageManagerTest extends TestCase
 
     public function testSubscribersByTopic(): void
     {
-        /** @var RedisStorageManager $storage */
         $storage = $this->app->make(RedisStorageManager::class);
+        assert($storage instanceof RedisStorageManager);
 
         $this->querySubscription();
         $this->querySubscription();
         $this->querySubscription();
         $this->querySubscription('taskCreated');
 
+        $unknownSubscribers = $storage->subscribersByTopic('SOMETHING_UNKNOWN');
         $updatedSubscribers = $storage->subscribersByTopic('TASK_UPDATED');
         $createdSubscribers = $storage->subscribersByTopic('TASK_CREATED');
 
+        $this->assertCount(0, $unknownSubscribers);
         $this->assertCount(3, $updatedSubscribers);
         $this->assertCount(1, $createdSubscribers);
 
@@ -95,10 +97,26 @@ class RedisStorageManagerTest extends TestCase
         $this->assertContainsOnlyInstancesOf(Subscriber::class, $createdSubscribers);
     }
 
+    public function testSocketIDStoredOnSubscribe(): void
+    {
+        $storage = $this->app->make(RedisStorageManager::class);
+        assert($storage instanceof RedisStorageManager);
+
+        $this->querySubscription('taskCreated', [
+            'X-Socket-ID' => '1234.1234',
+        ]);
+
+        $createdSubscriber = $storage->subscribersByTopic('TASK_CREATED')->first();
+
+        $this->assertSame('1234.1234', $createdSubscriber->socket_id);
+    }
+
     /**
+     * @param array<string, mixed> $headers
+     *
      * @return \Illuminate\Testing\TestResponse
      */
-    private function querySubscription(string $topic = /** @lang GraphQL */ 'taskUpdated(id: 123)')
+    protected function querySubscription(string $topic = /** @lang GraphQL */ 'taskUpdated(id: 123)', array $headers = [])
     {
         return $this->graphQL(/** @lang GraphQL */ "
         subscription {
@@ -107,6 +125,6 @@ class RedisStorageManagerTest extends TestCase
                 name
             }
         }
-        ");
+        ", [], [], $headers);
     }
 }

@@ -3,17 +3,18 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Execution\DataLoader\RelationCountLoader;
-use Nuwave\Lighthouse\Execution\DataLoader\RelationLoader;
+use Nuwave\Lighthouse\Execution\ModelsLoader\CountModelsLoader;
+use Nuwave\Lighthouse\Execution\ModelsLoader\ModelsLoader;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
-use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class WithCountDirective extends WithRelationDirective implements FieldMiddleware, FieldManipulator
+class WithCountDirective extends WithRelationDirective implements FieldManipulator
 {
     public static function definition(): string
     {
@@ -39,7 +40,7 @@ directive @withCount(
 GRAPHQL;
     }
 
-    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType)
+    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType)
     {
         if (RootType::isRootType($parentType->name->value)) {
             throw new DefinitionException("Can not use @{$this->name()} on fields of a root type.");
@@ -51,22 +52,16 @@ GRAPHQL;
         }
     }
 
-    protected function relationName(): string
+    /**
+     * @param  array<string, mixed>  $args
+     *
+     * @return CountModelsLoader
+     */
+    protected function modelsLoader($parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ModelsLoader
     {
-        /**
-         * We validated the argument during schema manipulation.
-         *
-         * @var string $relation
-         */
-        $relation = $this->directiveArgValue('relation');
-
-        return $relation;
-    }
-
-    protected function relationLoader(ResolveInfo $resolveInfo): RelationLoader
-    {
-        return new RelationCountLoader(
-            $this->decorateBuilder($resolveInfo)
+        return new CountModelsLoader(
+            $this->relation(),
+            $this->makeBuilderDecorator($parent, $args, $context, $resolveInfo)
         );
     }
 }

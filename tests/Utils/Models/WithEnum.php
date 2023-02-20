@@ -2,20 +2,25 @@
 
 namespace Tests\Utils\Models;
 
-use BenSampo\Enum\Traits\CastsEnums;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Tests\Utils\LaravelEnums\AOrB;
 
 /**
+ * Primary key.
+ *
  * @property int $id
+ *
+ * Attributes
  * @property string|null $name
  * @property AOrB|null $type
+ *
+ * Scopes
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder&static byType(AOrB $aOrB)
  */
-class WithEnum extends Model
+final class WithEnum extends Model
 {
-    use CastsEnums;
-
-    /** @var bool */
     public $timestamps = false;
 
     /**
@@ -24,4 +29,9 @@ class WithEnum extends Model
     protected $enumCasts = [
         'type' => AOrB::class,
     ];
+
+    public function scopeByType(EloquentBuilder $builder, AOrB $aOrB): EloquentBuilder
+    {
+        return $builder->where('type', $aOrB);
+    }
 }

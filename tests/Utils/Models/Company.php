@@ -6,12 +6,21 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
+ * Primary key.
+ *
  * @property int $id
+ *
+ * Attributes
  * @property string $name
- * @property \lluminate\Support\Carbon $created_at
- * @property \lluminate\Support\Carbon $updated_at
+ *
+ * Timestamps
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property \Illuminate\Support\Carbon $updated_at
+ *
+ * Relations
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\User> $users
  */
-class Company extends Model
+final class Company extends Model
 {
     public function users(): HasMany
     {

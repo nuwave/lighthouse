@@ -2,14 +2,14 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
-use Illuminate\Support\Arr;
+use Illuminate\Contracts\Debug\ExceptionHandler as LaravelExceptionHandler;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\EchoBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\PusherBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use Nuwave\Lighthouse\Support\DriverManager;
+use Psr\Log\LoggerInterface;
 use Pusher\Pusher;
-use RuntimeException;
 
 /**
  * @method void broadcast(\Nuwave\Lighthouse\Subscriptions\Subscriber $subscriber, array $data)
@@ -36,6 +36,7 @@ class BroadcastManager extends DriverManager
 
     /**
      * @param  array<string, mixed>  $config
+     *
      * @throws \RuntimeException
      */
     protected function createPusherDriver(array $config): PusherBroadcaster
@@ -43,18 +44,22 @@ class BroadcastManager extends DriverManager
         $connection = $config['connection'] ?? 'pusher';
         $driverConfig = config("broadcasting.connections.{$connection}");
 
-        if (empty($driverConfig) || $driverConfig['driver'] !== 'pusher') {
-            throw new RuntimeException("Could not initialize Pusher broadcast driver for connection: {$connection}.");
+        if (empty($driverConfig) || 'pusher' !== $driverConfig['driver']) {
+            throw new \RuntimeException("Could not initialize Pusher broadcast driver for connection: {$connection}.");
         }
 
-        $appKey = Arr::get($driverConfig, 'key');
-        $appSecret = Arr::get($driverConfig, 'secret');
-        $appId = Arr::get($driverConfig, 'app_id');
-        $options = Arr::get($driverConfig, 'options', []);
+        $pusher = new Pusher(
+            $driverConfig['key'],
+            $driverConfig['secret'],
+            $driverConfig['app_id'],
+            $driverConfig['options'] ?? []
+        );
 
-        $pusher = new Pusher($appKey, $appSecret, $appId, $options);
+        if ($driverConfig['log'] ?? false) {
+            $pusher->setLogger($this->app->make(LoggerInterface::class));
+        }
 
-        return new PusherBroadcaster($pusher);
+        return new PusherBroadcaster($pusher, $this->app->make(LaravelExceptionHandler::class));
     }
 
     /**

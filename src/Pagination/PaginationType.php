@@ -10,6 +10,7 @@ use Nuwave\Lighthouse\Exceptions\DefinitionException;
 class PaginationType
 {
     public const PAGINATOR = 'PAGINATOR';
+    public const SIMPLE = 'SIMPLE';
     public const CONNECTION = 'CONNECTION';
 
     /**
@@ -22,30 +23,46 @@ class PaginationType
      */
     public function __construct(string $paginationType)
     {
-        // TODO remove lowercase and alternate options in v6
-        switch (strtolower($paginationType)) {
-            case 'default':
-            case 'paginator':
+        switch ($paginationType) {
+            case self::PAGINATOR:
                 $this->type = self::PAGINATOR;
                 break;
-            case 'connection':
-            case 'relay':
+            case self::SIMPLE:
+                $this->type = self::SIMPLE;
+                break;
+            case self::CONNECTION:
                 $this->type = self::CONNECTION;
                 break;
             default:
-                throw new DefinitionException(
-                    "Found invalid pagination type: {$paginationType}"
-                );
+                throw new DefinitionException("Found invalid pagination type: {$paginationType}");
         }
     }
 
     public function isPaginator(): bool
     {
-        return $this->type === self::PAGINATOR;
+        return self::PAGINATOR === $this->type;
+    }
+
+    public function isSimple(): bool
+    {
+        return self::SIMPLE === $this->type;
     }
 
     public function isConnection(): bool
     {
-        return $this->type === self::CONNECTION;
+        return self::CONNECTION === $this->type;
+    }
+
+    public function infoFieldName(): string
+    {
+        switch ($this->type) {
+            case self::PAGINATOR:
+            case self::SIMPLE:
+                return 'paginatorInfo';
+            case self::CONNECTION:
+                return 'pageInfo';
+            default:
+                throw new \Exception("infoFieldName is not implemented for pagination type: {$this->type}.");
+        }
     }
 }

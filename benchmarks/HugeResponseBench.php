@@ -2,18 +2,8 @@
 
 namespace Benchmarks;
 
-/**
- * @BeforeMethods({"setUp"})
- */
 class HugeResponseBench extends QueryBench
 {
-    /**
-     * Cached value of parent with recursive children.
-     *
-     * @var array<string, mixed>
-     */
-    protected $parent;
-
     protected $schema = /** @lang GraphQL */ <<<'GRAPHQL'
 type Query {
   parent: Parent
@@ -36,31 +26,32 @@ GRAPHQL;
      * Resolves parent.
      *
      * @skip
+     *
      * @return array<string, mixed>
      */
     public function resolve(): array
     {
-        if (isset($this->parent)) {
-            return $this->parent;
-        }
-
-        $this->parent = [
-            'name' => 'parent',
-            'children' => [],
-        ];
-
-        for ($i = 0; $i < 100; $i++) {
-            $this->parent['children'][] = [
-                'name' => "child {$i}",
-                'parent' => $this->parent,
+        static $parent;
+        if (! isset($parent)) {
+            $parent = [
+                'name' => 'parent',
+                'children' => [],
             ];
+
+            for ($i = 0; $i < 100; ++$i) {
+                $parent['children'][] = [
+                    'name' => "child {$i}",
+                    'parent' => $parent,
+                ];
+            }
         }
 
-        return $this->parent;
+        return $parent;
     }
 
     /**
      * @Iterations(10)
+     *
      * @OutputTimeUnit("seconds", precision=3)
      */
     public function benchmark1(): void
@@ -76,6 +67,7 @@ GRAPHQL;
 
     /**
      * @Iterations(10)
+     *
      * @OutputTimeUnit("seconds", precision=3)
      */
     public function benchmark100(): void
@@ -93,6 +85,7 @@ GRAPHQL;
 
     /**
      * @Iterations(10)
+     *
      * @OutputTimeUnit("seconds", precision=3)
      */
     public function benchmark10k(): void

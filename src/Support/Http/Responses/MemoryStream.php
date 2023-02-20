@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Support\Http\Responses;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 
 class MemoryStream extends Stream implements CanStreamResponse
@@ -13,28 +12,23 @@ class MemoryStream extends Stream implements CanStreamResponse
      */
     public $chunks = [];
 
-    public function stream(array $data, array $paths, bool $final): void
+    public function stream(array $data, array $paths, bool $isFinalChunk): void
     {
-        if (! empty($paths)) {
-            $data = (new Collection($paths))
-                ->mapWithKeys(
-                    /**
-                     * @return array<string, array<string, mixed>>
-                     */
-                    function (string $path) use ($data): array {
-                        $response = ['data' => Arr::get($data, "data.{$path}", [])];
+        if (empty($paths)) {
+            $this->chunks[] = $data;
+        } else {
+            $chunk = [];
+            foreach ($paths as $path) {
+                $response = ['data' => Arr::get($data, "data.{$path}", [])];
 
-                        $errors = $this->chunkError($path, $data);
-                        if (! empty($errors)) {
-                            $response['errors'] = $errors;
-                        }
+                $errors = $this->chunkError($path, $data);
+                if (! empty($errors)) {
+                    $response['errors'] = $errors;
+                }
 
-                        return [$path => $response];
-                    }
-                )
-                ->all();
+                $chunk[$path] = $response;
+            }
+            $this->chunks[] = $chunk;
         }
-
-        $this->chunks[] = $data;
     }
 }

@@ -4,8 +4,10 @@ namespace Tests\Integration\Schema\Directives;
 
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\DBTestCase;
+use Tests\Utils\Models\Task;
+use Tests\Utils\Models\User;
 
-class LazyLoadDirectiveTest extends DBTestCase
+final class LazyLoadDirectiveTest extends DBTestCase
 {
     public function testLazyLoadRequiresRelationArgument(): void
     {
@@ -27,5 +29,59 @@ class LazyLoadDirectiveTest extends DBTestCase
             foo: ID @lazyLoad(relations: [])
         }
         ');
+    }
+
+    public function testLazyLoadRelationsOnConnections(): void
+    {
+        /** @var \Tests\Utils\Models\User $user */
+        $user = factory(User::class)->create();
+
+        $tasks = factory(Task::class, 3)->make();
+        $user->tasks()->saveMany($tasks);
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            tasks: [Task!]!
+                @lazyLoad(relations: ["user"])
+                @hasMany(type: CONNECTION)
+        }
+
+        type Task {
+            id: ID!
+            userLoaded: Boolean! @method
+        }
+
+        type Query {
+            user: User @first
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            user {
+                tasks(first: 1) {
+                    edges {
+                        node {
+                            userLoaded
+                        }
+                    }
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'tasks' => [
+                        'edges' => [
+                            [
+                                'node' => [
+                                    'userLoaded' => true,
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
     }
 }

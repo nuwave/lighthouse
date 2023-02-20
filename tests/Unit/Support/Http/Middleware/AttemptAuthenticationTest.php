@@ -3,13 +3,14 @@
 namespace Tests\Unit\Support\Http\Middleware;
 
 use Illuminate\Auth\AuthManager;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Nuwave\Lighthouse\Schema\Context;
 use Nuwave\Lighthouse\Support\Http\Middleware\AttemptAuthentication;
 use PHPUnit\Framework\Constraint\Callback;
 use Tests\TestCase;
 use Tests\Utils\Models\User;
 
-class AttemptAuthenticationTest extends TestCase
+final class AttemptAuthenticationTest extends TestCase
 {
     /** @var \Tests\Utils\Models\User|null */
     public $user;
@@ -18,14 +19,15 @@ class AttemptAuthenticationTest extends TestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        /** @var \Illuminate\Auth\AuthManager $authManager */
         $authManager = $app->make(AuthManager::class);
+        assert($authManager instanceof AuthManager);
+
         $authManager->viaRequest('foo', function () {
             return $this->user;
         });
 
-        /** @var \Illuminate\Contracts\Config\Repository $config */
-        $config = $app->make('config');
+        $config = $app->make(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
 
         $config->set('lighthouse.route.middleware', [
             AttemptAuthentication::class,
@@ -44,7 +46,7 @@ class AttemptAuthenticationTest extends TestCase
                 null,
                 [],
                 new Callback(function (Context $context) {
-                    return $this->user === null;
+                    return null === $this->user;
                 })
             );
 

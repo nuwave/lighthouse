@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\WhereConditions;
 
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\Events\ManipulateAST;
@@ -26,7 +27,7 @@ class WhereConditionsServiceProvider extends ServiceProvider
     {
         $dispatcher->listen(
             RegisterDirectiveNamespaces::class,
-            function (RegisterDirectiveNamespaces $_): string {
+            static function (): string {
                 return __NAMESPACE__;
             }
         );
@@ -34,8 +35,8 @@ class WhereConditionsServiceProvider extends ServiceProvider
         $dispatcher->listen(
             ManipulateAST::class,
             function (ManipulateAST $manipulateAST): void {
-                /** @var \Nuwave\Lighthouse\WhereConditions\Operator $operator */
                 $operator = $this->app->make(Operator::class);
+                assert($operator instanceof Operator);
 
                 $manipulateAST->documentAST
                     ->setTypeDefinition(
@@ -67,39 +68,38 @@ class WhereConditionsServiceProvider extends ServiceProvider
 
     public static function createWhereConditionsInputType(string $name, string $description, string $columnType): InputObjectTypeDefinitionNode
     {
-        $hasRelationInputName = $name.self::DEFAULT_WHERE_RELATION_CONDITIONS;
+        $hasRelationInputName = $name . self::DEFAULT_WHERE_RELATION_CONDITIONS;
 
-        /** @var \Nuwave\Lighthouse\WhereConditions\Operator $operator */
-        $operator = app(Operator::class);
+        $operator = Container::getInstance()->make(Operator::class);
+        assert($operator instanceof Operator);
 
-        $operatorName = Parser
-            ::enumTypeDefinition(
-                $operator->enumDefinition()
-            )
+        $operatorName = Parser::enumTypeDefinition(
+            $operator->enumDefinition()
+        )
             ->name
             ->value;
         $operatorDefault = $operator->default();
 
         return Parser::inputObjectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
-            "$description"
-            input $name {
+            "{$description}"
+            input {$name} {
                 "The column that is used for the condition."
-                column: $columnType
+                column: {$columnType}
 
                 "The operator that is used for the condition."
-                operator: $operatorName = $operatorDefault
+                operator: {$operatorName} = {$operatorDefault}
 
                 "The value that is used for the condition."
                 value: Mixed
 
                 "A set of conditions that requires all conditions to match."
-                AND: [$name!]
+                AND: [{$name}!]
 
                 "A set of conditions that requires at least one condition to match."
-                OR: [$name!]
+                OR: [{$name}!]
 
                 "Check whether a relation exists. Extra conditions or a minimum amount can be applied."
-                HAS: $hasRelationInputName
+                HAS: {$hasRelationInputName}
             }
 GRAPHQL
         );
@@ -107,34 +107,33 @@ GRAPHQL
 
     public static function createHasConditionsInputType(string $name, string $description): InputObjectTypeDefinitionNode
     {
-        $hasRelationInputName = $name.self::DEFAULT_WHERE_RELATION_CONDITIONS;
+        $hasRelationInputName = $name . self::DEFAULT_WHERE_RELATION_CONDITIONS;
         $defaultHasAmount = self::DEFAULT_HAS_AMOUNT;
 
-        /** @var \Nuwave\Lighthouse\WhereConditions\Operator $operator */
-        $operator = app(Operator::class);
+        $operator = Container::getInstance()->make(Operator::class);
+        assert($operator instanceof Operator);
 
-        $operatorName = Parser
-            ::enumTypeDefinition(
-                $operator->enumDefinition()
-            )
+        $operatorName = Parser::enumTypeDefinition(
+            $operator->enumDefinition()
+        )
             ->name
             ->value;
         $operatorDefault = $operator->defaultHasOperator();
 
         return Parser::inputObjectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
-            "$description"
-            input $hasRelationInputName {
+            "{$description}"
+            input {$hasRelationInputName} {
                 "The relation that is checked."
                 relation: String!
 
-                "The comparision operator to test against the amount."
-                operator: $operatorName = $operatorDefault
+                "The comparison operator to test against the amount."
+                operator: {$operatorName} = {$operatorDefault}
 
                 "The amount to test."
-                amount: Int = $defaultHasAmount
+                amount: Int = {$defaultHasAmount}
 
                 "Additional condition logic."
-                condition: $name
+                condition: {$name}
             }
 GRAPHQL
         );

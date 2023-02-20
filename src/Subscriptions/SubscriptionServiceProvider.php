@@ -3,11 +3,13 @@
 namespace Nuwave\Lighthouse\Subscriptions;
 
 use Illuminate\Auth\AuthManager;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
+use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
@@ -23,51 +25,19 @@ use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 
 class SubscriptionServiceProvider extends ServiceProvider
 {
-    public function boot(EventsDispatcher $eventsDispatcher, ConfigRepository $configRepository): void
-    {
-        $eventsDispatcher->listen(
-            StartExecution::class,
-            SubscriptionRegistry::class.'@handleStartExecution'
-        );
-
-        $eventsDispatcher->listen(
-            BuildExtensionsResponse::class,
-            SubscriptionRegistry::class.'@handleBuildExtensionsResponse'
-        );
-
-        $this->registerBroadcasterRoutes($configRepository);
-
-        // If authentication is used, we can log in subscribers when broadcasting an update
-        if ($this->app->bound(AuthManager::class)) {
-            config([
-                'auth.guards.'.SubscriptionGuard::GUARD_NAME => [
-                    'driver' => SubscriptionGuard::GUARD_NAME,
-                ],
-            ]);
-
-            $this->app->bind(SubscriptionIterator::class, AuthenticatingSyncIterator::class);
-
-            $this->app->make(AuthManager::class)->extend(SubscriptionGuard::GUARD_NAME, static function () {
-                return new SubscriptionGuard;
-            });
-        }
-    }
-
-    /**
-     * Register subscription services.
-     */
     public function register(): void
     {
         $this->app->singleton(BroadcastManager::class);
         $this->app->singleton(SubscriptionRegistry::class);
-        $this->app->singleton(StoresSubscriptions::class, function () {
-            /** @var \Illuminate\Contracts\Config\Repository $configRepository */
-            $configRepository = $this->app->make(ConfigRepository::class);
+        $this->app->singleton(StoresSubscriptions::class, static function (Container $app): StoresSubscriptions {
+            $configRepository = $app->make(ConfigRepository::class);
+            assert($configRepository instanceof ConfigRepository);
+
             switch ($configRepository->get('lighthouse.subscriptions.storage')) {
                 case 'redis':
-                    return $this->app->make(RedisStorageManager::class);
+                    return $app->make(RedisStorageManager::class);
                 default:
-                    return $this->app->make(CacheStorageManager::class);
+                    return $app->make(CacheStorageManager::class);
             }
         });
 
@@ -79,14 +49,51 @@ class SubscriptionServiceProvider extends ServiceProvider
         $this->app->bind(ProvidesSubscriptionResolver::class, SubscriptionResolverProvider::class);
     }
 
+    public function boot(EventsDispatcher $eventsDispatcher, ConfigRepository $configRepository): void
+    {
+        $eventsDispatcher->listen(
+            StartExecution::class,
+            SubscriptionRegistry::class . '@handleStartExecution'
+        );
+
+        $eventsDispatcher->listen(
+            BuildExtensionsResponse::class,
+            SubscriptionRegistry::class . '@handleBuildExtensionsResponse'
+        );
+
+        $eventsDispatcher->listen(
+            RegisterDirectiveNamespaces::class,
+            static function (): string {
+                return __NAMESPACE__ . '\\Directives';
+            }
+        );
+
+        $this->registerBroadcasterRoutes($configRepository);
+
+        // If authentication is used, we can log in subscribers when broadcasting an update
+        if ($this->app->bound(AuthManager::class)) {
+            config([
+                'auth.guards.' . SubscriptionGuard::GUARD_NAME => [
+                    'driver' => SubscriptionGuard::GUARD_NAME,
+                ],
+            ]);
+
+            $this->app->bind(SubscriptionIterator::class, AuthenticatingSyncIterator::class);
+
+            $this->app->make(AuthManager::class)->extend(SubscriptionGuard::GUARD_NAME, static function () {
+                return new SubscriptionGuard();
+            });
+        }
+    }
+
     protected function registerBroadcasterRoutes(ConfigRepository $configRepository): void
     {
         $broadcaster = $configRepository->get('lighthouse.subscriptions.broadcaster');
 
         if ($routesMethod = $configRepository->get("lighthouse.subscriptions.broadcasters.{$broadcaster}.routes")) {
             [$routesProviderClass, $method] = Str::parseCallback($routesMethod, 'pusher');
-            /** @var class-string $routesProviderClass */
-            /** @var string $method */
+            assert(is_string($routesProviderClass) && class_exists($routesProviderClass));
+            assert(is_string($method));
             $routesProvider = $this->app->make($routesProviderClass);
             $router = $this->app->make('router');
 

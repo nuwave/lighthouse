@@ -2,23 +2,28 @@
 
 namespace Tests;
 
+use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 use GraphQL\Error\DebugFlag;
 use GraphQL\Type\Schema;
+use Illuminate\Console\Application as ConsoleApplication;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Redis\RedisServiceProvider;
 use Laravel\Scout\ScoutServiceProvider as LaravelScoutServiceProvider;
+use Nuwave\Lighthouse\Auth\AuthServiceProvider as LighthouseAuthServiceProvider;
+use Nuwave\Lighthouse\Cache\CacheServiceProvider;
+use Nuwave\Lighthouse\CacheControl\CacheControlServiceProvider;
 use Nuwave\Lighthouse\GlobalId\GlobalIdServiceProvider;
-use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\LighthouseServiceProvider;
 use Nuwave\Lighthouse\OrderBy\OrderByServiceProvider;
 use Nuwave\Lighthouse\Pagination\PaginationServiceProvider;
+use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Scout\ScoutServiceProvider as LighthouseScoutServiceProvider;
 use Nuwave\Lighthouse\SoftDeletes\SoftDeletesServiceProvider;
-use Nuwave\Lighthouse\Support\AppVersion;
 use Nuwave\Lighthouse\Testing\MakesGraphQLRequests;
 use Nuwave\Lighthouse\Testing\MocksResolvers;
+use Nuwave\Lighthouse\Testing\TestingServiceProvider;
 use Nuwave\Lighthouse\Testing\UsesTestSchema;
 use Nuwave\Lighthouse\Validation\ValidationServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
@@ -27,9 +32,17 @@ use Tests\Utils\Policies\AuthServiceProvider;
 
 abstract class TestCase extends BaseTestCase
 {
+    use ArraySubsetAsserts;
     use MakesGraphQLRequests;
     use MocksResolvers;
     use UsesTestSchema;
+
+    /**
+     * Set when not in setUp.
+     *
+     * @var \Illuminate\Foundation\Application
+     */
+    protected $app;
 
     /**
      * A dummy query type definition that is added to tests by default.
@@ -45,7 +58,9 @@ GRAPHQL;
     {
         parent::setUp();
 
-        if ($this->schema === null) {
+        // This default is only valid for testing Lighthouse itself and thus
+        // is not defined in the reusable test trait.
+        if (! isset($this->schema)) {
             $this->schema = self::PLACEHOLDER_QUERY;
         }
 
@@ -53,9 +68,6 @@ GRAPHQL;
     }
 
     /**
-     * Get package providers.
-     *
-     * @param  \Illuminate\Foundation\Application  $app
      * @return array<class-string<\Illuminate\Support\ServiceProvider>>
      */
     protected function getPackageProviders($app): array
@@ -67,24 +79,23 @@ GRAPHQL;
 
             // Lighthouse's own
             LighthouseServiceProvider::class,
+            LighthouseAuthServiceProvider::class,
+            CacheServiceProvider::class,
+            CacheControlServiceProvider::class,
             GlobalIdServiceProvider::class,
             LighthouseScoutServiceProvider::class,
             OrderByServiceProvider::class,
             PaginationServiceProvider::class,
             SoftDeletesServiceProvider::class,
+            TestingServiceProvider::class,
             ValidationServiceProvider::class,
         ];
     }
 
-    /**
-     * Define environment setup.
-     *
-     * @param  \Illuminate\Foundation\Application  $app
-     */
     protected function getEnvironmentSetUp($app): void
     {
-        /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = $app->make(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
 
         $config->set('lighthouse.namespaces', [
             'models' => [
@@ -123,7 +134,8 @@ GRAPHQL;
         ]);
 
         $config->set('app.debug', true);
-        $config->set('lighthouse.debug',
+        $config->set(
+            'lighthouse.debug',
             DebugFlag::INCLUDE_DEBUG_MESSAGE
             | DebugFlag::INCLUDE_TRACE
             // | Debug::RETHROW_INTERNAL_EXCEPTIONS
@@ -136,6 +148,13 @@ GRAPHQL;
             'version' => 1,
             'storage' => 'array',
             'broadcaster' => 'log',
+        ]);
+
+        $config->set('broadcasting.connections.pusher', [
+            'driver' => 'pusher',
+            'key' => 'foo',
+            'secret' => 'bar',
+            'app_id' => 'baz',
         ]);
 
         $config->set('database.redis.default', [
@@ -152,6 +171,12 @@ GRAPHQL;
 
         // Defaults to "algolia", which is not needed in our test setup
         $config->set('scout.driver', null);
+
+        $config->set('lighthouse.federation', [
+            'entities_resolver_namespace' => 'Tests\\Utils\\Entities',
+        ]);
+
+        $config->set('lighthouse.cache.enable', false);
     }
 
     /**
@@ -159,17 +184,11 @@ GRAPHQL;
      *
      * This makes debugging the tests much simpler as Exceptions
      * are fully dumped to the console when making requests.
-     *
-     * @param  \Illuminate\Foundation\Application  $app
      */
     protected function resolveApplicationExceptionHandler($app): void
     {
         $app->singleton(ExceptionHandler::class, function () {
-            if (AppVersion::atLeast(7.0)) {
-                return new Laravel7ExceptionHandler();
-            }
-
-            return new PreLaravel7ExceptionHandler();
+            return new ThrowingExceptionHandler();
         });
     }
 
@@ -179,7 +198,7 @@ GRAPHQL;
     protected function buildSchemaWithPlaceholderQuery(string $schema): Schema
     {
         return $this->buildSchema(
-            $schema.self::PLACEHOLDER_QUERY
+            $schema . self::PLACEHOLDER_QUERY
         );
     }
 
@@ -190,25 +209,26 @@ GRAPHQL;
     {
         $this->schema = $schema;
 
-        return $this->app
-            ->make(GraphQL::class)
-            ->prepSchema();
+        $schemaBuilder = $this->app->make(SchemaBuilder::class);
+        assert($schemaBuilder instanceof SchemaBuilder);
+
+        return $schemaBuilder->schema();
     }
 
     /**
      * Get a fully qualified reference to a method that is defined on the test class.
      */
-    protected function qualifyTestResolver(string $method = 'resolve'): string
+    protected function qualifyTestResolver(string $method): string
     {
-        return addslashes(static::class).'@'.$method;
+        return addslashes(static::class) . '@' . $method;
     }
 
-    /**
-     * Construct a command tester.
-     */
     protected function commandTester(Command $command): CommandTester
     {
         $command->setLaravel($this->app);
+        $command->setApplication($this->app->make(ConsoleApplication::class, [
+            'version' => $this->app->version(),
+        ]));
 
         return new CommandTester($command);
     }

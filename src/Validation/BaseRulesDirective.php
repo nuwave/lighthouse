@@ -4,8 +4,10 @@ namespace Nuwave\Lighthouse\Validation;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Illuminate\Container\Container;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
@@ -22,7 +24,7 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
         // resolve any given rule where a corresponding class exists.
         foreach ($rules as $key => $rule) {
             if (class_exists($rule)) {
-                $rules[$key] = app($rule);
+                $rules[$key] = Container::getInstance()->make($rule);
             }
         }
 
@@ -32,7 +34,7 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
     public function messages(): array
     {
         $messages = $this->directiveArgValue('messages');
-        if ($messages === null) {
+        if (null === $messages) {
             return [];
         }
 
@@ -64,7 +66,7 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
         DocumentAST &$documentAST,
         InputValueDefinitionNode &$argDefinition,
         FieldDefinitionNode &$parentField,
-        ObjectTypeDefinitionNode &$parentType
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType
     ) {
         $this->validateRulesArg();
         $this->validateMessageArg();
@@ -78,7 +80,7 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
             $this->invalidApplyArgument($rules);
         }
 
-        if (count($rules) === 0) {
+        if (0 === count($rules)) {
             $this->invalidApplyArgument($rules);
         }
 
@@ -92,7 +94,7 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
     protected function validateMessageArg(): void
     {
         $messages = $this->directiveArgValue('messages');
-        if ($messages === null) {
+        if (null === $messages) {
             return;
         }
 
@@ -130,7 +132,8 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
     }
 
     /**
-     * @param  mixed  $messages Whatever faulty value was given for messages
+     * @param  mixed  $messages  Whatever faulty value was given for messages
+     *
      * @throws DefinitionException
      */
     protected function invalidMessageArgument($messages): void
@@ -142,7 +145,7 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
     }
 
     /**
-     * @param  mixed  $apply Any invalid value
+     * @param  mixed  $apply  Any invalid value
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */

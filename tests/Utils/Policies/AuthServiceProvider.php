@@ -2,11 +2,12 @@
 
 namespace Tests\Utils\Policies;
 
+use Illuminate\Foundation\Support\Providers\AuthServiceProvider as LaravelAuthServiceProvider;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class AuthServiceProvider extends \Illuminate\Foundation\Support\Providers\AuthServiceProvider
+final class AuthServiceProvider extends LaravelAuthServiceProvider
 {
     /**
      * @var array<class-string<\Illuminate\Database\Eloquent\Model>, class-string>

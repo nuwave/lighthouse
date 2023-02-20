@@ -2,55 +2,47 @@
 
 namespace Nuwave\Lighthouse\Tracing;
 
+use GraphQL\Language\Parser;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
 use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Events\StartExecution;
-use Nuwave\Lighthouse\Events\StartRequest;
-use Nuwave\Lighthouse\Schema\DirectiveLocator;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 
 class TracingServiceProvider extends ServiceProvider
 {
-    /**
-     * Bootstrap any application services.
-     */
-    public function boot(DirectiveLocator $directiveFactory, EventsDispatcher $eventsDispatcher): void
+    public function register(): void
+    {
+        $this->app->singleton(Tracing::class);
+    }
+
+    public function boot(EventsDispatcher $eventsDispatcher): void
     {
         $eventsDispatcher->listen(
             RegisterDirectiveNamespaces::class,
-            function (RegisterDirectiveNamespaces $registerDirectiveNamespaces): string {
+            static function (): string {
                 return __NAMESPACE__;
             }
         );
 
+        $tracingDirective = Parser::constDirective('@tracing');
         $eventsDispatcher->listen(
             ManipulateAST::class,
-            Tracing::class.'@handleManipulateAST'
-        );
-
-        $eventsDispatcher->listen(
-            StartRequest::class,
-            Tracing::class.'@handleStartRequest'
+            static function (ManipulateAST $manipulateAST) use ($tracingDirective): void {
+                ASTHelper::attachDirectiveToObjectTypeFields($manipulateAST->documentAST, $tracingDirective);
+            }
         );
 
         $eventsDispatcher->listen(
             StartExecution::class,
-            Tracing::class.'@handleStartExecution'
+            Tracing::class . '@handleStartExecution'
         );
 
         $eventsDispatcher->listen(
             BuildExtensionsResponse::class,
-            Tracing::class.'@handleBuildExtensionsResponse'
+            Tracing::class . '@handleBuildExtensionsResponse'
         );
-    }
-
-    /**
-     * Register any application services.
-     */
-    public function register(): void
-    {
-        $this->app->singleton(Tracing::class);
     }
 }

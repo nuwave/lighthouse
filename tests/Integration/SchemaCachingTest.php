@@ -3,28 +3,44 @@
 namespace Tests\Integration;
 
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
+use Illuminate\Filesystem\Filesystem;
+use Nuwave\Lighthouse\Exceptions\InvalidSchemaCacheContentsException;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Tests\TestCase;
+use Tests\TestsSchemaCache;
 use Tests\TestsSerialization;
 use Tests\Utils\Models\Comment;
 
-class SchemaCachingTest extends TestCase
+final class SchemaCachingTest extends TestCase
 {
     use TestsSerialization;
+    use TestsSchemaCache;
 
-    protected function getEnvironmentSetUp($app): void
+    public function setUp(): void
     {
-        parent::getEnvironmentSetUp($app);
+        parent::setUp();
 
-        /** @var \Illuminate\Contracts\Config\Repository $config */
-        $config = $app->make(ConfigRepository::class);
-        $config->set('lighthouse.cache.enable', true);
-
-        $this->useSerializingArrayStore($app);
+        $this->setUpSchemaCache();
+        $this->useSerializingArrayStore();
     }
 
-    public function testSchemaCachingWithUnionType(): void
+    protected function tearDown(): void
     {
+        $this->tearDownSchemaCache();
+
+        parent::tearDown();
+    }
+
+    /**
+     * @dataProvider cacheVersions
+     */
+    public function testSchemaCachingWithUnionType(int $cacheVersion): void
+    {
+        $config = $this->app->make(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
+
+        $config->set('lighthouse.cache.version', $cacheVersion);
+
         $this->schema = /** @lang GraphQL */ '
         type Query {
             foo: Foo @mock
@@ -63,11 +79,33 @@ class SchemaCachingTest extends TestCase
         ]);
     }
 
+    public function testInvalidSchemaCacheContents(): void
+    {
+        $config = $this->app->make(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
+
+        $config->set('lighthouse.cache.version', 2);
+
+        $filesystem = $this->app->make(Filesystem::class);
+        assert($filesystem instanceof Filesystem);
+
+        $path = $config->get('lighthouse.cache.path');
+        $filesystem->put($path, '');
+
+        $this->expectExceptionObject(new InvalidSchemaCacheContentsException($path, 1));
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo
+        }
+        ');
+    }
+
     protected function cacheSchema(): void
     {
         /** @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder $astBuilder */
-        $astBuilder = app(ASTBuilder::class);
+        $astBuilder = $this->app->make(ASTBuilder::class);
         $astBuilder->documentAST();
+
         $this->app->forgetInstance(ASTBuilder::class);
     }
 }

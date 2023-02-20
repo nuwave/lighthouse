@@ -2,6 +2,10 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
@@ -23,10 +27,11 @@ class NestedOneToMany implements ArgResolver
      */
     public function __invoke($parent, $args): void
     {
-        /** @var \Illuminate\Database\Eloquent\Relations\HasMany|\Illuminate\Database\Eloquent\Relations\MorphMany $relation */
         $relation = $parent->{$this->relationName}();
+        assert($relation instanceof HasMany || $relation instanceof MorphMany);
 
         static::createUpdateUpsert($args, $relation);
+        static::connectDisconnect($args, $relation);
 
         if ($args->has('delete')) {
             $relation->getRelated()::destroy(
@@ -35,9 +40,6 @@ class NestedOneToMany implements ArgResolver
         }
     }
 
-    /**
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
-     */
     public static function createUpdateUpsert(ArgumentSet $args, Relation $relation): void
     {
         if ($args->has('create')) {
@@ -64,6 +66,40 @@ class NestedOneToMany implements ArgResolver
             foreach ($args->arguments['upsert']->value as $childArgs) {
                 // @phpstan-ignore-next-line Relation&Builder mixin not recognized
                 $upsertModel($relation->make(), $childArgs);
+            }
+        }
+    }
+
+    public static function connectDisconnect(ArgumentSet $args, HasOneOrMany $relation): void
+    {
+        if ($args->has('connect')) {
+            // @phpstan-ignore-next-line Relation&Builder mixin not recognized
+            $children = $relation
+                ->make()
+                ->whereIn(
+                    $relation->make()->getKeyName(),
+                    $args->arguments['connect']->value
+                )
+                ->get();
+
+            // @phpstan-ignore-next-line Relation&Builder mixin not recognized
+            $relation->saveMany($children);
+        }
+
+        if ($args->has('disconnect')) {
+            // @phpstan-ignore-next-line Relation&Builder mixin not recognized
+            $children = $relation
+                ->make()
+                ->whereIn(
+                    $relation->make()->getKeyName(),
+                    $args->arguments['disconnect']->value
+                )
+                ->get();
+
+            foreach ($children as $child) {
+                assert($child instanceof Model);
+                $child->setAttribute($relation->getForeignKeyName(), null);
+                $child->save();
             }
         }
     }

@@ -6,7 +6,7 @@ use GraphQL\Error\Error;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Tests\TestCase;
 
-class ReportingErrorHandlerTest extends TestCase
+final class ReportingErrorHandlerTest extends TestCase
 {
     protected $schema = /** @lang GraphQL */ '
     type Query {
@@ -26,7 +26,7 @@ class ReportingErrorHandlerTest extends TestCase
             ->expects($this->atLeastOnce())
             ->method('report')
             ->with($exception);
-        app()->singleton(ExceptionHandler::class, function () use ($handler) {
+        $this->app->singleton(ExceptionHandler::class, function () use ($handler) {
             return $handler;
         });
 
@@ -49,7 +49,7 @@ class ReportingErrorHandlerTest extends TestCase
             ->expects($this->never())
             ->method('report')
             ->with($error);
-        app()->singleton(ExceptionHandler::class, function () use ($handler) {
+        $this->app->singleton(ExceptionHandler::class, function () use ($handler) {
             return $handler;
         });
 

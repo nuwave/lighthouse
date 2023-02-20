@@ -2,28 +2,31 @@
 
 namespace Nuwave\Lighthouse\Exceptions;
 
+use GraphQL\Error\ClientAware;
+use GraphQL\Error\ProvidesExtensions;
 use Illuminate\Auth\AuthenticationException as IlluminateAuthenticationException;
 
-class AuthenticationException extends IlluminateAuthenticationException implements RendersErrorsExtensions
+class AuthenticationException extends IlluminateAuthenticationException implements ClientAware, ProvidesExtensions
 {
     public const MESSAGE = 'Unauthenticated.';
-    public const CATEGORY = 'authentication';
 
     public function isClientSafe(): bool
     {
         return true;
     }
 
-    public function getCategory(): string
+    /**
+     * @return array{guards: array<string>}
+     */
+    public function getExtensions(): array
     {
-        return self::CATEGORY;
+        return [
+            'guards' => $this->guards,
+        ];
     }
 
-    /**
-     * @return array<string, array<string>>
-     */
-    public function extensionsContent(): array
+    public static function fromLaravel(IlluminateAuthenticationException $laravelException): self
     {
-        return ['guards' => $this->guards];
+        return new static($laravelException->getMessage(), $laravelException->guards());
     }
 }

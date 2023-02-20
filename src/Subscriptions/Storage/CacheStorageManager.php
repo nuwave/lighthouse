@@ -2,10 +2,8 @@
 
 namespace Nuwave\Lighthouse\Subscriptions\Storage;
 
-use Exception;
-use Illuminate\Cache\CacheManager;
+use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
@@ -40,17 +38,17 @@ class CacheStorageManager implements StoresSubscriptions
      */
     protected $ttl;
 
-    public function __construct(CacheManager $cacheManager, ConfigRepository $config)
+    public function __construct(CacheFactory $cacheFactory, ConfigRepository $config)
     {
         $storage = $config->get('lighthouse.subscriptions.storage') ?? 'file';
         if (! is_string($storage)) {
-            throw new Exception('Config setting lighthouse.subscriptions.storage must be a string or `null`, got: '.\Safe\json_encode($storage));
+            throw new \Exception('Config setting lighthouse.subscriptions.storage must be a string or `null`, got: ' . \Safe\json_encode($storage));
         }
-        $this->cache = $cacheManager->store($storage);
+        $this->cache = $cacheFactory->store($storage);
 
         $ttl = $config->get('lighthouse.subscriptions.storage_ttl');
         if (! is_null($ttl) && ! is_int($ttl)) {
-            throw new Exception('Config setting lighthouse.subscriptions.storage_ttl must be a int or `null`, got: '.\Safe\json_encode($ttl));
+            throw new \Exception('Config setting lighthouse.subscriptions.storage_ttl must be a int or `null`, got: ' . \Safe\json_encode($ttl));
         }
         $this->ttl = $ttl;
     }
@@ -62,15 +60,12 @@ class CacheStorageManager implements StoresSubscriptions
 
     public function subscribersByTopic(string $topic): Collection
     {
-        /** @var \Illuminate\Support\Collection<\Nuwave\Lighthouse\Subscriptions\Subscriber> $subscribers */
-        $subscribers = $this
+        return $this
             ->retrieveTopic(self::topicKey($topic))
             ->map(function (string $channel): ?Subscriber {
                 return $this->subscriberByChannel($channel);
             })
             ->filter();
-
-        return $subscribers;
     }
 
     public function storeSubscriber(Subscriber $subscriber, string $topic): void
@@ -79,11 +74,10 @@ class CacheStorageManager implements StoresSubscriptions
         $this->addSubscriberToTopic($subscriber);
 
         $channelKey = self::channelKey($subscriber->channel);
-        if ($this->ttl === null) {
+        if (null === $this->ttl) {
             $this->cache->forever($channelKey, $subscriber);
         } else {
-            // TODO: Change to just pass the ttl directly when support for Laravel <=5.7 is dropped
-            $this->cache->put($channelKey, $subscriber, Carbon::now()->addSeconds($this->ttl));
+            $this->cache->put($channelKey, $subscriber, $this->ttl);
         }
     }
 
@@ -91,7 +85,7 @@ class CacheStorageManager implements StoresSubscriptions
     {
         $subscriber = $this->cache->pull(self::channelKey($channel));
 
-        if ($subscriber !== null) {
+        if (null !== $subscriber) {
             $this->removeSubscriberFromTopic($subscriber);
         }
 
@@ -105,11 +99,10 @@ class CacheStorageManager implements StoresSubscriptions
      */
     protected function storeTopic(string $key, Collection $topic): void
     {
-        if ($this->ttl === null) {
+        if (null === $this->ttl) {
             $this->cache->forever($key, $topic);
         } else {
-            // TODO: Change to just pass the ttl directly when support for Laravel <=5.7 is dropped
-            $this->cache->put($key, $topic, Carbon::now()->addSeconds($this->ttl));
+            $this->cache->put($key, $topic, $this->ttl);
         }
     }
 
@@ -160,11 +153,11 @@ class CacheStorageManager implements StoresSubscriptions
 
     protected static function channelKey(string $channel): string
     {
-        return self::SUBSCRIBER_KEY.".{$channel}";
+        return self::SUBSCRIBER_KEY . ".{$channel}";
     }
 
     protected static function topicKey(string $topic): string
     {
-        return self::TOPIC_KEY.".{$topic}";
+        return self::TOPIC_KEY . ".{$topic}";
     }
 }

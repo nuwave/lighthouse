@@ -7,7 +7,7 @@ use Tests\TestCase;
 use Tests\TestsRedis;
 use Tests\TestsSubscriptions;
 
-class AuthorizeRequestsTest extends TestCase
+final class AuthorizeRequestsTest extends TestCase
 {
     use TestsRedis;
     use TestsSubscriptions;
@@ -21,16 +21,16 @@ class AuthorizeRequestsTest extends TestCase
     type Subscription {
         taskUpdated(id: ID!): Task
     }
-    '.self::PLACEHOLDER_QUERY;
+    ' . self::PLACEHOLDER_QUERY;
 
     public function testEchoClientAuthorizesSuccessfully(): void
     {
         $response = $this->querySubscription();
 
-        $channel = $response->json('extensions.lighthouse_subscriptions.channels.taskUpdated');
+        $channel = $response->json('extensions.lighthouse_subscriptions.channel');
         $this
             ->postJson('graphql/subscriptions/auth', [
-                'channel_name' => 'presence-'.$channel,
+                'channel_name' => $channel,
             ])
             ->assertSuccessful()
             ->assertJsonStructure([
@@ -40,14 +40,43 @@ class AuthorizeRequestsTest extends TestCase
             ]);
     }
 
+    public function testEchoClientAuthorizesPresenceChannelForBackwardCompatibility(): void
+    {
+        $response = $this->querySubscription();
+
+        $channel = $response->json('extensions.lighthouse_subscriptions.channel');
+        $this
+            ->postJson('graphql/subscriptions/auth', [
+                'channel_name' => 'presence-' . $channel,
+            ])
+            ->assertSuccessful()
+            ->assertJsonStructure([
+                'channel_data' => [
+                    'user_id', 'user_info',
+                ],
+            ]);
+    }
+
+    public function testEchoClientAuthorizationFailsOtherThanPresenceChannel(): void
+    {
+        $response = $this->querySubscription();
+
+        $channel = $response->json('extensions.lighthouse_subscriptions.channel');
+        $this
+            ->postJson('graphql/subscriptions/auth', [
+                'channel_name' => 'anything-before-' . $channel,
+            ])
+            ->assertForbidden();
+    }
+
     public function testEchoClientAuthorizeFails(): void
     {
         $response = $this->querySubscription();
 
-        $channel = $response->json('extensions.lighthouse_subscriptions.channels.taskUpdated');
+        $channel = $response->json('extensions.lighthouse_subscriptions.channel');
         $this
             ->postJson('graphql/subscriptions/auth', [
-                'channel_name' => 'presence-'.$channel.'plain-wrong',
+                'channel_name' => $channel . 'plain-wrong',
             ])
             ->assertForbidden();
     }
@@ -56,10 +85,10 @@ class AuthorizeRequestsTest extends TestCase
     {
         $response = $this->querySubscription();
 
-        $channel = $response->json('extensions.lighthouse_subscriptions.channels.taskUpdated');
+        $channel = $response->json('extensions.lighthouse_subscriptions.channel');
         $this
             ->postJson('graphql/subscriptions/auth', [
-                'channel_name' => 'presence-'.$channel,
+                'channel_name' => $channel,
             ])
             ->assertSuccessful()
             ->assertJsonStructure([
@@ -71,7 +100,7 @@ class AuthorizeRequestsTest extends TestCase
 
         $this
             ->postJson('graphql/subscriptions/auth', [
-                'channel_name' => 'presence-'.$channel,
+                'channel_name' => $channel,
             ])
             ->assertForbidden();
     }
@@ -79,7 +108,7 @@ class AuthorizeRequestsTest extends TestCase
     /**
      * @return \Illuminate\Testing\TestResponse
      */
-    private function querySubscription()
+    protected function querySubscription()
     {
         return $this->graphQL(/** @lang GraphQL */ '
         subscription {

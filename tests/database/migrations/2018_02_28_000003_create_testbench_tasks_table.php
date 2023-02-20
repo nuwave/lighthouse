@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTestbenchTasksTable extends Migration
+final class CreateTestbenchTasksTable extends Migration
 {
     public function up(): void
     {
@@ -14,6 +14,7 @@ class CreateTestbenchTasksTable extends Migration
             $table->string('guard')
                 ->nullable()
                 ->comment('The purpose of this property is to collide with a native model method name');
+            $table->unsignedInteger('difficulty')->nullable();
 
             $table->unsignedInteger('user_id')->nullable();
 

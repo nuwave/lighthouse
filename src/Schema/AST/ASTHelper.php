@@ -2,28 +2,35 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
-use Exception;
 use GraphQL\Error\SyntaxError;
 use GraphQL\Executor\Values;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\DirectiveNode;
+use GraphQL\Language\AST\EnumValueNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeExtensionNode;
+use GraphQL\Language\AST\ListTypeNode;
 use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
+use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeExtensionNode;
 use GraphQL\Language\AST\ValueNode;
 use GraphQL\Language\Parser;
 use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\EnumType;
+use GraphQL\Type\Definition\EnumValueDefinition;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Utils\AST;
+use Illuminate\Container\Container;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
+use Nuwave\Lighthouse\Schema\Directives\ModelDirective;
 use Nuwave\Lighthouse\Schema\Directives\NamespaceDirective;
 
 class ASTHelper
@@ -32,10 +39,12 @@ class ASTHelper
      * Merge two lists of AST nodes.
      *
      * @template TNode of \GraphQL\Language\AST\Node
+     *
      * @param  \GraphQL\Language\AST\NodeList<TNode>|array<TNode>  $original
      * @param  \GraphQL\Language\AST\NodeList<TNode>|array<TNode>  $addition
-     * @param  bool  $overwriteDuplicates  By default this function throws if a collision occurs.
+     * @param  bool  $overwriteDuplicates  By default, this function throws if a collision occurs.
      *                                     If set to true, the fields of the original list will be overwritten.
+     *
      * @return \GraphQL\Language\AST\NodeList<TNode>
      */
     public static function mergeUniqueNodeList($original, $addition, bool $overwriteDuplicates = false): NodeList
@@ -46,7 +55,10 @@ class ASTHelper
             ->all();
 
         $remainingDefinitions = (new Collection($original))
-            ->reject(function ($definition) use ($newNames, $overwriteDuplicates): bool {
+            ->reject(function (Node $definition) use ($newNames, $overwriteDuplicates): bool {
+                // @phpstan-ignore-next-line https://github.com/phpstan/phpstan/issues/8474
+                assert(property_exists($definition, 'name'));
+
                 $oldName = $definition->name->value;
                 $collisionOccurred = in_array($oldName, $newNames);
 
@@ -69,6 +81,19 @@ class ASTHelper
         $merged = (new NodeList($remainingDefinitions))->merge($addition);
 
         return $merged;
+    }
+
+    /**
+     * @template TNode of \GraphQL\Language\AST\Node
+     *
+     * @param  \GraphQL\Language\AST\NodeList<TNode>  $nodeList
+     * @param  TNode  $node
+     *
+     * @return \GraphQL\Language\AST\NodeList<TNode>
+     */
+    public static function prepend(NodeList $nodeList, Node $node): NodeList
+    {
+        return (new NodeList([$node]))->merge($nodeList);
     }
 
     public static function duplicateDefinition(string $oldName): string
@@ -97,45 +122,32 @@ class ASTHelper
             return $node;
         }
 
-        $type = data_get($node, 'type');
-
-        if (! $type) {
-            throw new DefinitionException(
-                "The node '$node->kind' does not have a type associated with it."
-            );
+        if (
+            $node instanceof NonNullTypeNode
+            || $node instanceof ListTypeNode
+            || $node instanceof FieldDefinitionNode
+            || $node instanceof InputValueDefinitionNode
+        ) {
+            return self::getUnderlyingNamedTypeNode($node->type);
         }
 
-        return self::getUnderlyingNamedTypeNode($type);
-    }
-
-    /**
-     * Does the given field have an argument of the given name?
-     */
-    public static function fieldHasArgument(FieldDefinitionNode $fieldDefinition, string $name): bool
-    {
-        return self::firstByName($fieldDefinition->arguments, $name) !== null;
-    }
-
-    /**
-     * Does the given directive have an argument of the given name?
-     */
-    public static function directiveHasArgument(DirectiveNode $directiveDefinition, string $name): bool
-    {
-        return self::firstByName($directiveDefinition->arguments, $name) !== null;
+        throw new DefinitionException(
+            "The node '{$node->kind}' does not have a type associated with it."
+        );
     }
 
     /**
      * Extract a named argument from a given directive node.
      *
-     * @param  mixed  $default Is returned if the directive does not have the argument.
-     * @return mixed The value given to the directive.
+     * @param  mixed  $default  is returned if the directive does not have the argument
+     *
+     * @return mixed the value given to the directive
      */
     public static function directiveArgValue(DirectiveNode $directive, string $name, $default = null)
     {
-        /** @var \GraphQL\Language\AST\ArgumentNode|null $arg */
         $arg = self::firstByName($directive->arguments, $name);
 
-        return $arg !== null
+        return null !== $arg
             ? AST::valueFromASTUntyped($arg->value)
             : $default;
     }
@@ -145,17 +157,18 @@ class ASTHelper
      *
      * @param  \GraphQL\Language\AST\ValueNode&\GraphQL\Language\AST\Node  $defaultValue
      * @param  \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\InputType  $argumentType
-     * @return mixed The plain PHP value.
+     *
+     * @return mixed the plain PHP value
      */
     public static function defaultValueForArgument(ValueNode $defaultValue, Type $argumentType)
     {
         // webonyx/graphql-php expects the internal value here, whereas the
         // SDL uses the ENUM's name, so we run the conversion here
         if ($argumentType instanceof EnumType) {
-            /** @var \GraphQL\Language\AST\EnumValueNode $defaultValue */
+            assert($defaultValue instanceof EnumValueNode);
 
-            /** @var \GraphQL\Type\Definition\EnumValueDefinition $internalValue */
             $internalValue = $argumentType->getValue($defaultValue->value);
+            assert($internalValue instanceof EnumValueDefinition);
 
             return $internalValue->value;
         }
@@ -171,8 +184,9 @@ class ASTHelper
      */
     public static function directiveDefinition(Node $definitionNode, string $name): ?DirectiveNode
     {
+        // @phpstan-ignore-next-line https://github.com/phpstan/phpstan/issues/8474
         if (! property_exists($definitionNode, 'directives')) {
-            throw new Exception('Expected Node class with property `directives`, got: '.get_class($definitionNode));
+            throw new \Exception('Expected Node class with property `directives`, got: ' . get_class($definitionNode));
         }
         /** @var \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\DirectiveNode> $directives */
         $directives = $definitionNode->directives;
@@ -185,24 +199,28 @@ class ASTHelper
      */
     public static function hasDirective(Node $definitionNode, string $name): bool
     {
-        return self::directiveDefinition($definitionNode, $name) !== null;
+        return null !== self::directiveDefinition($definitionNode, $name);
     }
 
     /**
      * Out of a list of nodes, get the first that matches the given name.
      *
      * @template TNode of \GraphQL\Language\AST\Node
-     * @param  iterable<TNode> $nodes
+     *
+     * @param  iterable<TNode>  $nodes
+     *
      * @return TNode|null
      */
-    public static function firstByName($nodes, string $name): ?Node
+    public static function firstByName(iterable $nodes, string $name): ?Node
     {
         foreach ($nodes as $node) {
+            // @phpstan-ignore-next-line https://github.com/phpstan/phpstan/issues/8474
             if (! property_exists($node, 'name')) {
-                throw new Exception('Expected a Node with a name property, got: '.get_class($node));
+                throw new \Exception('Expected a Node with a name property, got: ' . get_class($node));
             }
 
             if ($node->name->value === $name) {
+                // @phpstan-ignore-next-line Method Nuwave\Lighthouse\Schema\AST\ASTHelper::firstByName() should return TNode of GraphQL\Language\AST\Node|null but returns TNode of GraphQL\Language\AST\Node.
                 return $node;
             }
         }
@@ -211,33 +229,27 @@ class ASTHelper
     }
 
     /**
-     * Directives might have an additional namespace associated with them, set via the "@namespace" directive.
+     * Directives might have an additional namespace associated with them, @see \Nuwave\Lighthouse\Schema\Directives\NamespaceDirective.
      */
-    public static function getNamespaceForDirective(Node $definitionNode, string $directiveName): string
+    public static function namespaceForDirective(Node $definitionNode, string $directiveName): ?string
     {
         $namespaceDirective = static::directiveDefinition($definitionNode, NamespaceDirective::NAME);
 
-        return $namespaceDirective !== null
-            // The namespace directive can contain an argument with the name of the
-            // current directive, in which case it applies here
-            ? static::directiveArgValue($namespaceDirective, $directiveName, '')
-            // Default to an empty namespace if the namespace directive does not exist
-            : '';
+        return null !== $namespaceDirective
+            ? static::directiveArgValue($namespaceDirective, $directiveName)
+            : null;
     }
 
     /**
      * Attach directive to all registered object type fields.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
      */
     public static function attachDirectiveToObjectTypeFields(DocumentAST $documentAST, DirectiveNode $directive): void
     {
         foreach ($documentAST->types as $typeDefinition) {
             if ($typeDefinition instanceof ObjectTypeDefinitionNode) {
-                /** @var iterable<\GraphQL\Language\AST\FieldDefinitionNode> $fieldDefinitions */
-                $fieldDefinitions = $typeDefinition->fields;
-                foreach ($fieldDefinitions as $fieldDefinition) {
-                    $fieldDefinition->directives [] = $directive;
+                foreach ($typeDefinition->fields as $fieldDefinition) {
+                    assert($fieldDefinition instanceof FieldDefinitionNode);
+                    $fieldDefinition->directives = static::prepend($fieldDefinition->directives, $directive);
                 }
             }
         }
@@ -248,35 +260,24 @@ class ASTHelper
      */
     public static function typeImplementsInterface(ObjectTypeDefinitionNode $type, string $interfaceName): bool
     {
-        return self::firstByName($type->interfaces, $interfaceName) !== null;
+        return null !== self::firstByName($type->interfaces, $interfaceName);
     }
 
     /**
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\ObjectTypeExtensionNode|mixed  $objectType
-     *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
-    public static function addDirectiveToFields(DirectiveNode $directiveNode, &$objectType): void
+    public static function addDirectiveToFields(DirectiveNode $directiveNode, ObjectTypeDefinitionNode|ObjectTypeExtensionNode|InterfaceTypeDefinitionNode|InterfaceTypeExtensionNode &$typeWithFields): void
     {
         $name = $directiveNode->name->value;
 
-        if (
-            ! $objectType instanceof ObjectTypeDefinitionNode
-            && ! $objectType instanceof ObjectTypeExtensionNode
-        ) {
-            throw new DefinitionException(
-                "The @{$name} directive may only be placed on fields or object types."
-            );
-        }
+        $directiveLocator = Container::getInstance()->make(DirectiveLocator::class);
+        assert($directiveLocator instanceof DirectiveLocator);
 
-        /** @var \Nuwave\Lighthouse\Schema\DirectiveLocator $directiveLocator */
-        $directiveLocator = app(DirectiveLocator::class);
         $directive = $directiveLocator->resolve($name);
         $directiveDefinition = self::extractDirectiveDefinition($directive::definition());
 
-        /** @var iterable<\GraphQL\Language\AST\FieldDefinitionNode> $fieldDefinitions */
-        $fieldDefinitions = $objectType->fields;
-        foreach ($fieldDefinitions as $fieldDefinition) {
+        foreach ($typeWithFields->fields as $fieldDefinition) {
+            assert($fieldDefinition instanceof FieldDefinitionNode);
             // If the field already has the same directive defined, and it is not
             // a repeatable directive, skip over it.
             // Field directives are more specific than those defined on a type.
@@ -287,7 +288,7 @@ class ASTHelper
                 continue;
             }
 
-            $fieldDefinition->directives [] = $directiveNode;
+            $fieldDefinition->directives = static::prepend($fieldDefinition->directives, $directiveNode);
         }
     }
 
@@ -303,17 +304,18 @@ class ASTHelper
     public static function qualifiedArgType(
         InputValueDefinitionNode &$argDefinition,
         FieldDefinitionNode &$parentField,
-        ObjectTypeDefinitionNode &$parentType
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType
     ): string {
         return Str::studly($parentType->name->value)
-            .Str::studly($parentField->name->value)
-            .Str::studly($argDefinition->name->value);
+            . Str::studly($parentField->name->value)
+            . Str::studly($argDefinition->name->value);
     }
 
     /**
      * Given a collection of directives, returns the string value for the deprecation reason.
      *
      * @param  \GraphQL\Language\AST\EnumValueDefinitionNode|\GraphQL\Language\AST\FieldDefinitionNode  $node
+     *
      * @return string
      */
     public static function deprecationReason(Node $node): ?string
@@ -345,7 +347,7 @@ class ASTHelper
         $directive = null;
         foreach ($document->definitions as $definitionNode) {
             if ($definitionNode instanceof DirectiveDefinitionNode) {
-                if ($directive !== null) {
+                if (null !== $directive) {
                     throw new DefinitionException(
                         "Found multiple directives while trying to extract a single directive from this definition:\n\n{$definitionString}"
                     );
@@ -355,12 +357,63 @@ class ASTHelper
             }
         }
 
-        if ($directive === null) {
+        if (null === $directive) {
             throw new DefinitionException(
                 "Found no directive while trying to extract a single directive from this definition:\n\n{$definitionString}"
             );
         }
 
         return $directive;
+    }
+
+    /**
+     * @return \GraphQL\Language\AST\Node&\GraphQL\Language\AST\TypeDefinitionNode
+     */
+    public static function underlyingType(FieldDefinitionNode $field): Node
+    {
+        $typeName = static::getUnderlyingTypeName($field);
+
+        $standardTypes = Type::getStandardTypes();
+        if (isset($standardTypes[$typeName])) {
+            return Parser::scalarTypeDefinition("scalar {$typeName}");
+        }
+
+        $astBuilder = Container::getInstance()->make(ASTBuilder::class);
+        assert($astBuilder instanceof ASTBuilder);
+
+        $documentAST = $astBuilder->documentAST();
+
+        $type = $documentAST->types[$typeName] ?? null;
+        if (null === $type) {
+            throw new DefinitionException("Type '{$typeName}' on '{$field->name->value}' can not be found in the schema.'");
+        }
+
+        return $type;
+    }
+
+    /**
+     * Take a guess at the name of the model associated with the given node.
+     */
+    public static function modelName(Node $definitionNode): ?string
+    {
+        if ($definitionNode instanceof FieldDefinitionNode) {
+            $definitionNode = static::underlyingType($definitionNode);
+        }
+
+        if ($definitionNode instanceof ObjectTypeDefinitionNode || $definitionNode instanceof InterfaceTypeDefinitionNode) {
+            return ModelDirective::modelClass($definitionNode)
+                ?? $definitionNode->name->value;
+        }
+
+        return null;
+    }
+
+    public static function internalFieldName(FieldDefinitionNode $field): string
+    {
+        $renameDirectiveNode = static::directiveDefinition($field, 'rename');
+
+        return $renameDirectiveNode
+            ? static::directiveArgValue($renameDirectiveNode, 'attribute')
+            : $field->name->value;
     }
 }
