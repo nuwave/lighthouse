@@ -26,12 +26,11 @@ final class ContextFactoryTest extends TestCase
 
     public function testGenerateCustomContext(): void
     {
-        $this->mockResolver(
-            function ($root, array $args, GraphQLContext $context): string {
-                /** @var FooContext $context */
-                return $context->foo();
-            }
-        );
+        $this->mockResolver(function ($root, array $args, GraphQLContext $context): string {
+            assert($context instanceof FooContext);
+
+            return $context->foo();
+        });
 
         $this->schema = /** @lang GraphQL */ '
         type Query {

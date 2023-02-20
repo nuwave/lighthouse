@@ -123,11 +123,9 @@ final class ClearCacheDirectiveTest extends TestCase
 
     public function testClearCacheForTypeWithIDByField(): void
     {
-        $this->mockResolver(function (): array {
-            return [
-                'bar' => 2,
-            ];
-        });
+        $this->mockResolver([
+            'bar' => 2,
+        ]);
 
         $this->schema = /** @lang GraphQL */ '
         type Foo {
@@ -161,17 +159,15 @@ final class ClearCacheDirectiveTest extends TestCase
 
     public function testClearCacheForMultipleTypesWithIDByField(): void
     {
-        $this->mockResolver(function (): array {
-            return [
-                [
-                    'bar' => 1,
-                ],
-                null,
-                [
-                    'bar' => 2,
-                ],
-            ];
-        });
+        $this->mockResolver(fn (): array => [
+            [
+                'bar' => 1,
+            ],
+            null,
+            [
+                'bar' => 2,
+            ],
+        ]);
 
         $this->schema = /** @lang GraphQL */ '
         type Foo {
@@ -209,13 +205,11 @@ final class ClearCacheDirectiveTest extends TestCase
 
     public function testClearCacheForTypeWithIDByFieldNestedPath(): void
     {
-        $this->mockResolver(function (): array {
-            return [
-                'bar' => [
-                    'baz' => 3,
-                ],
-            ];
-        });
+        $this->mockResolver([
+            'bar' => [
+                'baz' => 3,
+            ],
+        ]);
 
         $this->schema = /** @lang GraphQL */ '
         type Bar {

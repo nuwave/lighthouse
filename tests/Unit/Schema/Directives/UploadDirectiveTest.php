@@ -15,7 +15,7 @@ final class UploadDirectiveTest extends TestCase
         config(['filesystems.default' => 'uploadDisk']);
 
         $filePath = null;
-        $this->mockResolver(static function ($root, array $args) use (&$filePath): ?string {
+        $this->mockResolver(static function ($_, array $args) use (&$filePath): ?string {
             return $filePath = $args['file'];
         });
 
@@ -60,7 +60,7 @@ final class UploadDirectiveTest extends TestCase
         Storage::fake('uploadDisk');
 
         $filePath = null;
-        $this->mockResolver(static function ($root, array $args) use (&$filePath): ?string {
+        $this->mockResolver(static function ($_, array $args) use (&$filePath): ?string {
             return $filePath = $args['file'];
         });
 
@@ -102,7 +102,7 @@ final class UploadDirectiveTest extends TestCase
         Storage::fake('uploadDisk');
 
         $filePath = null;
-        $this->mockResolver(static function ($root, array $args) use (&$filePath): ?string {
+        $this->mockResolver(static function ($_, array $args) use (&$filePath): ?string {
             return $filePath = $args['file'];
         });
 
@@ -144,7 +144,7 @@ final class UploadDirectiveTest extends TestCase
         Storage::fake('uploadDisk');
 
         $filePath = null;
-        $this->mockResolver(static function ($root, array $args) use (&$filePath): ?string {
+        $this->mockResolver(static function ($_, array $args) use (&$filePath): ?string {
             return $filePath = $args['file'];
         });
 
@@ -185,7 +185,7 @@ final class UploadDirectiveTest extends TestCase
     public function testUploadArgumentWhereValueIsNull(): void
     {
         $filePath = null;
-        $this->mockResolver(static function ($root, array $args) use (&$filePath): ?string {
+        $this->mockResolver(static function ($_, array $args) use (&$filePath): ?string {
             return $filePath = $args['file'];
         });
 

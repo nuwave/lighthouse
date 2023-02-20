@@ -14,8 +14,7 @@ final class DropDirectiveTest extends TestCase
                 [
                     'bar' => 'something',
                 ]
-            )
-        ;
+            );
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
