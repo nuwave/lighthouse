@@ -32,7 +32,7 @@ class CanDirective extends BaseDirective implements FieldMiddleware, FieldManipu
 {
     public function __construct(
         protected Gate $gate
-    ){}
+    ) {}
 
     public static function definition(): string
     {

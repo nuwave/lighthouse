@@ -10,7 +10,7 @@ class MockDirective extends BaseDirective implements FieldResolver
 {
     public function __construct(
         protected MockResolverService $mockResolverService
-    ){}
+    ) {}
 
     /**
      * SDL definition of the directive.
