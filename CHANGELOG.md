@@ -30,6 +30,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Replace `Illuminate\Database\DatabaseManager` with `Illuminate\Database\ConnectionResolverInterface` in `RelationDirective`
 - Replace `DirectiveLocator::beforeLast` with `Str::beforeLast`
 - Default `subscriptions.exclude_empty` to `true`
+- Allow `FieldManipulator` and `ArgManipulator` directives on interfaces https://github.com/nuwave/lighthouse/pull/1955
 
 ### Fixed
 

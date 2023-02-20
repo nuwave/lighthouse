@@ -4,9 +4,10 @@ namespace Nuwave\Lighthouse\Validation;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use Illuminate\Container\Container;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Illuminate\Container\Container;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
@@ -65,7 +66,7 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
         DocumentAST &$documentAST,
         InputValueDefinitionNode &$argDefinition,
         FieldDefinitionNode &$parentField,
-        ObjectTypeDefinitionNode &$parentType
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType
     ) {
         $this->validateRulesArg();
         $this->validateMessageArg();

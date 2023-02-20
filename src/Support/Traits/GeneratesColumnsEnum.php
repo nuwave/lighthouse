@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Support\Traits;
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
@@ -45,7 +46,7 @@ trait GeneratesColumnsEnum
         DocumentAST &$documentAST,
         InputValueDefinitionNode &$argDefinition,
         FieldDefinitionNode &$parentField,
-        ObjectTypeDefinitionNode &$parentType
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType
     ): string {
         $columnsEnum = $this->directiveArgValue('columnsEnum');
         if (! is_null($columnsEnum)) {
@@ -76,7 +77,7 @@ trait GeneratesColumnsEnum
     protected function createAllowedColumnsEnum(
         InputValueDefinitionNode &$argDefinition,
         FieldDefinitionNode &$parentField,
-        ObjectTypeDefinitionNode &$parentType,
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
         array $allowedColumns,
         string $allowedColumnsEnumName
     ): EnumTypeDefinitionNode {

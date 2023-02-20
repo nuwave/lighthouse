@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\WhereConditions;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
 use Illuminate\Container\Container;
@@ -35,7 +36,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
         DocumentAST &$documentAST,
         InputValueDefinitionNode &$argDefinition,
         FieldDefinitionNode &$parentField,
-        ObjectTypeDefinitionNode &$parentType
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType
     ): void {
         $this->validateMutuallyExclusiveArguments(['columns', 'columnsEnum']);
 
