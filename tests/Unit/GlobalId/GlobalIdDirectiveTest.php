@@ -42,7 +42,7 @@ final class GlobalIdDirectiveTest extends TestCase
 
     public function testNullableArgument(): void
     {
-        $this->mockResolver(fn($_, array $args): ?string => $args['bar'] ?? null);
+        $this->mockResolver(fn ($_, array $args): ?string => $args['bar'] ?? null);
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -94,7 +94,7 @@ final class GlobalIdDirectiveTest extends TestCase
 
     public function testDecodesGlobalIdOnInput(): void
     {
-        $this->mockResolver(static fn($_, array $args): array => $args['input']['bar']);
+        $this->mockResolver(static fn ($_, array $args): array => $args['input']['bar']);
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -127,7 +127,7 @@ final class GlobalIdDirectiveTest extends TestCase
 
     public function testDecodesGlobalIdInDifferentWays(): void
     {
-        $this->mockResolver(static fn($_, array $args): array => $args);
+        $this->mockResolver(static fn ($_, array $args): array => $args);
 
         $this->schema = /** @lang GraphQL */ '
         type Query {

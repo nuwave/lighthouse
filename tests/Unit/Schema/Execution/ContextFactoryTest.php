@@ -28,6 +28,7 @@ final class ContextFactoryTest extends TestCase
     {
         $this->mockResolver(function ($root, array $args, GraphQLContext $context): string {
             assert($context instanceof FooContext);
+
             return $context->foo();
         });
 

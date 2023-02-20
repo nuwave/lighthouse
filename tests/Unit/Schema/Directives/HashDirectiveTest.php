@@ -18,7 +18,7 @@ final class HashDirectiveTest extends TestCase
         }
         ';
 
-        $this->mockResolver(fn($_, array $args): array => $args);
+        $this->mockResolver(fn ($_, array $args): array => $args);
 
         $password = $this
             ->graphQL(/** @lang GraphQL */ '
@@ -54,7 +54,7 @@ final class HashDirectiveTest extends TestCase
         }
         ';
 
-        $this->mockResolver(static fn($_, array $args): array => $args['input']);
+        $this->mockResolver(static fn ($_, array $args): array => $args['input']);
 
         $result = $this->graphQL(/** @lang GraphQL */ '
         {
@@ -131,7 +131,7 @@ final class HashDirectiveTest extends TestCase
         }
         ';
 
-        $this->mockResolver(fn($_, array $args): array => $args['input']);
+        $this->mockResolver(fn ($_, array $args): array => $args['input']);
 
         $result = $this->graphQL(/** @lang GraphQL */ '
         {

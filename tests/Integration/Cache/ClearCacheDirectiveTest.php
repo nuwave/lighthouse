@@ -159,7 +159,7 @@ final class ClearCacheDirectiveTest extends TestCase
 
     public function testClearCacheForMultipleTypesWithIDByField(): void
     {
-        $this->mockResolver(fn(): array => [
+        $this->mockResolver(fn (): array => [
             [
                 'bar' => 1,
             ],

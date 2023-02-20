@@ -14,7 +14,7 @@ final class TrimDirectiveTest extends TestCase
         }
         ';
 
-        $this->mockResolver(fn($_, array $args): string => $args['bar']);
+        $this->mockResolver(fn ($_, array $args): string => $args['bar']);
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -39,7 +39,7 @@ final class TrimDirectiveTest extends TestCase
         }
         ';
 
-        $this->mockResolver(fn($_, array $args): string => $args['bar']);
+        $this->mockResolver(fn ($_, array $args): string => $args['bar']);
 
         $this->graphQL(/** @lang GraphQL */ '
         {

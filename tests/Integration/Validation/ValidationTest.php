@@ -244,7 +244,7 @@ final class ValidationTest extends TestCase
 
     public function testSanitizeValidateTransform(): void
     {
-        $this->mockResolver(fn($_, array $args): string => $args['password']);
+        $this->mockResolver(fn ($_, array $args): string => $args['password']);
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
