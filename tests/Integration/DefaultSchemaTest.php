@@ -5,6 +5,7 @@ namespace Tests\Integration;
 use Nuwave\Lighthouse\Console\ValidateSchemaCommand;
 use Nuwave\Lighthouse\LighthouseServiceProvider;
 use Nuwave\Lighthouse\Pagination\PaginationServiceProvider;
+use Nuwave\Lighthouse\Testing\TestingServiceProvider;
 use Nuwave\Lighthouse\Validation\ValidationServiceProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
@@ -29,8 +30,9 @@ final class DefaultSchemaTest extends DBTestCase
     {
         return [
             LighthouseServiceProvider::class,
-            ValidationServiceProvider::class,
             PaginationServiceProvider::class,
+            TestingServiceProvider::class,
+            ValidationServiceProvider::class,
         ];
     }
 
