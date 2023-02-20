@@ -157,18 +157,6 @@ class Subscriber
     }
 
     /**
-     * Set root data.
-     *
-     * @deprecated set the attribute directly
-     */
-    public function setRoot($root): self
-    {
-        $this->root = $root;
-
-        return $this;
-    }
-
-    /**
      * Generate a unique private channel name.
      */
     public static function uniqueChannelName(): string

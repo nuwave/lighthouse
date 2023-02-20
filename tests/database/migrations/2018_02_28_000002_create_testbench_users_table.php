@@ -11,7 +11,7 @@ final class CreateTestbenchUsersTable extends Migration
         Schema::create('users', function (Blueprint $table): void {
             // Mostly following https://github.com/laravel/laravel/blob/master/database/migrations/2014_10_12_000000_create_users_table.php
             // but marking some fields nullable to simplify tests
-            $table->increments('id'); // TODO use id() in later Laravel
+            $table->id();
             $table->string('name')->nullable();
             $table->string('email')->unique()->nullable();
             $table->timestamp('email_verified_at')->nullable();

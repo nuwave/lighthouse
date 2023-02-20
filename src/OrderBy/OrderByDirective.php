@@ -122,8 +122,7 @@ GRAPHQL;
                     throw new DefinitionException('Can not order by relations on non-Eloquent builders, got: ' . get_class($builder));
                 }
 
-                // TODO use array_key_first() in PHP 7.3
-                $relation = Arr::first(array_keys($orderByClause));
+                $relation = array_key_first($orderByClause);
                 $relationSnake = Str::snake($relation);
 
                 $relationValues = Arr::first($orderByClause);

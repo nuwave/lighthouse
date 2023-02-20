@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 use GraphQL\Error\DebugFlag;
 use GraphQL\Type\Schema;
 use Illuminate\Console\Application as ConsoleApplication;
@@ -31,6 +32,7 @@ use Tests\Utils\Policies\AuthServiceProvider;
 
 abstract class TestCase extends BaseTestCase
 {
+    use ArraySubsetAsserts;
     use MakesGraphQLRequests;
     use MocksResolvers;
     use UsesTestSchema;
@@ -92,8 +94,8 @@ GRAPHQL;
 
     protected function getEnvironmentSetUp($app): void
     {
-        /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = $app->make(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
 
         $config->set('lighthouse.namespaces', [
             'models' => [

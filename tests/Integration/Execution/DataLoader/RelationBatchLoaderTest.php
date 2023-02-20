@@ -2,13 +2,9 @@
 
 namespace Tests\Integration\Execution\DataLoader;
 
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Facades\Cache;
 use Nuwave\Lighthouse\Cache\CacheKeyAndTagsGenerator;
-use Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Tests\DBTestCase;
-use Tests\Utils\BatchLoaders\UserLoader;
 use Tests\Utils\Models\AlternateConnection;
 use Tests\Utils\Models\Comment;
 use Tests\Utils\Models\NullConnection;
@@ -342,84 +338,6 @@ final class RelationBatchLoaderTest extends DBTestCase
             }
             ');
         });
-    }
-
-    public function testResolveFieldsByCustomBatchLoader(): void
-    {
-        $this->schema = /** @lang GraphQL */ '
-        type Task {
-            name: String
-        }
-        type User {
-            name: String
-            email: String
-            tasks: [Task] @hasMany
-        }
-
-        type Query {
-            user(id: ID!): User @mock(key: "one")
-            manyUsers(ids: [ID!]!): [User!]! @mock(key: "many")
-        }
-        ';
-
-        $users = factory(User::class, 3)
-            ->create()
-            ->each(function (User $user): void {
-                factory(Task::class, 3)->create([
-                    'user_id' => $user->getKey(),
-                ]);
-            });
-
-        $this->mockResolver(
-            function ($root, array $args, GraphQLContext $context, ResolveInfo $info) {
-                $loader = BatchLoaderRegistry::instance($info->path, function (): UserLoader {
-                    return new UserLoader();
-                });
-
-                return $loader->load($args['id']);
-            },
-            'one'
-        );
-        $this->mockResolver(
-            function ($root, array $args, GraphQLContext $context, ResolveInfo $info) {
-                $loader = BatchLoaderRegistry::instance($info->path, function (): UserLoader {
-                    return new UserLoader();
-                });
-
-                return $loader->loadMany($args['ids']);
-            },
-            'many'
-        );
-
-        $query = /** @lang GraphQL */ '
-        query User($id: ID!, $ids: [ID!]!) {
-            user(id: $id) {
-                email
-                tasks {
-                    name
-                }
-            }
-            manyUsers(ids: $ids) {
-                email
-                tasks {
-                    name
-                }
-            }
-        }
-        ';
-
-        $this
-            ->postGraphQL([
-                'query' => $query,
-                'variables' => [
-                    'id' => $users[0]->getKey(),
-                    'ids' => [$users[1]->getKey(), $users[2]->getKey()],
-                ],
-            ])
-            ->assertJsonCount(2, 'data.manyUsers')
-            ->assertJsonCount(3, 'data.manyUsers.0.tasks')
-            ->assertJsonCount(3, 'data.manyUsers.1.tasks')
-            ->assertJsonCount(3, 'data.user.tasks');
     }
 
     public function testTwoBatchLoadedQueriesWithDifferentResults(): void

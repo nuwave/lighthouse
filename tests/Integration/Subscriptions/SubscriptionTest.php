@@ -10,14 +10,11 @@ use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
 use Nuwave\Lighthouse\Subscriptions\Storage\CacheStorageManager;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
-use Tests\DBTestCase;
+use Tests\TestCase;
 use Tests\TestsSubscriptions;
 use Tests\Utils\Models\User;
 
-/**
- * TODO extends TestCase when depending on Laravel 5.8+.
- */
-final class SubscriptionTest extends DBTestCase
+final class SubscriptionTest extends TestCase
 {
     use TestsSubscriptions;
 

@@ -6,7 +6,7 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Illuminate\Database\DatabaseManager;
+use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -34,13 +34,11 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
     protected $lighthouseConfig;
 
     /**
-     * TODO use Illuminate\Database\ConnectionResolverInterface when we drop support for Laravel < 6.
-     *
-     * @var \Illuminate\Database\DatabaseManager
+     * @var \Illuminate\Database\ConnectionResolverInterface
      */
     protected $database;
 
-    public function __construct(ConfigRepository $configRepository, DatabaseManager $database)
+    public function __construct(ConfigRepository $configRepository, ConnectionResolverInterface $database)
     {
         $this->lighthouseConfig = $configRepository->get('lighthouse');
         $this->database = $database;
@@ -65,11 +63,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
                 && $relation instanceof BelongsTo
                 && [] === $args
             ) {
-                $foreignKeyName = method_exists($relation, 'getForeignKeyName')
-                    ? $relation->getForeignKeyName()
-                    // @phpstan-ignore-next-line TODO remove once we drop old Laravel
-                    : $relation->getForeignKey();
-                $id = $parent->getAttribute($foreignKeyName);
+                $id = $parent->getAttribute($relation->getForeignKeyName());
 
                 return null === $id
                     ? null

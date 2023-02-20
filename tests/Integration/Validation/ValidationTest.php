@@ -20,8 +20,8 @@ final class ValidationTest extends TestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = $app->make(ConfigRepository::class);
+        assert($config instanceof ConfigRepository);
 
         // Ensure we test for the result the end user receives
         $config->set('app.debug', false);
