@@ -326,17 +326,19 @@ GRAPHQL;
                 fields {
                     name
                     type {
-                        name
-                        kind
+                        ofType {
+                            name
+                            kind
+                        }
                     }
                 }
             }
         }
         ');
 
-        $this->assertEquals('HasPosts', $result->json('data.__type.name'));
-        $this->assertEquals('INTERFACE', $result->json('data.__type.kind'));
-        $this->assertEquals('PostPaginator', $result->json('data.__type.fields.0.type.name'));
+        $this->assertSame('HasPosts', $result->json('data.__type.name'));
+        $this->assertSame('INTERFACE', $result->json('data.__type.kind'));
+        $this->assertSame('PostPaginator', $result->json('data.__type.fields.0.type.ofType.name'));
     }
 
     /**
