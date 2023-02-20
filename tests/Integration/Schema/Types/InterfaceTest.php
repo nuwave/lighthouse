@@ -293,7 +293,7 @@ GRAPHQL;
         $this->assertCount(2, $interface['possibleTypes']);
     }
 
-    public function testInterfaceManipulation()
+    public function testInterfaceManipulation(): void
     {
         $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         interface HasPosts {
