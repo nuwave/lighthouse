@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Execution\Arguments;
 
+use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Execution\Arguments\Argument;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
@@ -178,21 +180,20 @@ final class ArgumentSetFactoryTest extends TestCase
      */
     protected function rootQueryArgumentSet(array $args): ArgumentSet
     {
-        /** @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder $astBuilder */
         $astBuilder = $this->app->make(ASTBuilder::class);
+        assert($astBuilder instanceof ASTBuilder);
         $documentAST = $astBuilder->documentAST();
 
-        /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
         $queryType = $documentAST->types[RootType::QUERY];
+        assert($queryType instanceof ObjectTypeDefinitionNode);
 
-        /** @var array<\GraphQL\Language\AST\FieldDefinitionNode> $fields */
         $fields = $queryType->fields;
 
-        /** @var \GraphQL\Language\AST\FieldDefinitionNode $fooField */
         $fooField = ASTHelper::firstByName($fields, 'foo');
+        assert($fooField instanceof FieldDefinitionNode);
 
-        /** @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory $factory */
         $factory = $this->app->make(ArgumentSetFactory::class);
+        assert($factory instanceof ArgumentSetFactory);
 
         return $factory->wrapArgs($fooField, $args);
     }

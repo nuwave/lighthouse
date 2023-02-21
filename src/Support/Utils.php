@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Support;
 
-use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;

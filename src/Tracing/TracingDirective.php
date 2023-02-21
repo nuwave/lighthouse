@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Tracing;
 
-use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Execution\Resolved;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
@@ -11,15 +11,9 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class TracingDirective extends BaseDirective implements FieldMiddleware
 {
-    /**
-     * @var \Nuwave\Lighthouse\Tracing\Tracing
-     */
-    protected $tracing;
-
-    public function __construct(Tracing $tracing)
-    {
-        $this->tracing = $tracing;
-    }
+    public function __construct(
+        protected Tracing $tracing
+    ) {}
 
     public static function definition(): string
     {
@@ -32,16 +26,11 @@ directive @tracing on FIELD_DEFINITION
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue): void
     {
-        // Make sure this middleware is applied last
-        $fieldValue = $next($fieldValue);
-
-        $previousResolver = $fieldValue->getResolver();
-
-        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
+        $fieldValue->wrapResolver(fn (callable $resolver) => function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
             $start = $this->tracing->timestamp();
-            $result = $previousResolver($root, $args, $context, $resolveInfo);
+            $result = $resolver($root, $args, $context, $resolveInfo);
             $end = $this->tracing->timestamp();
 
             Resolved::handle($result, function () use ($resolveInfo, $start, $end): void {
@@ -50,7 +39,5 @@ GRAPHQL;
 
             return $result;
         });
-
-        return $fieldValue;
     }
 }

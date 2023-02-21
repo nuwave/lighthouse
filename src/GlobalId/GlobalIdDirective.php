@@ -62,19 +62,15 @@ enum GlobalIdDecode {
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue): void
     {
         $type = $fieldValue->getParentName();
 
-        $fieldValue->resultHandler(function ($result) use ($type) {
-            if (null === $result) {
-                return null;
-            }
-
-            return $this->globalId->encode($type, $result);
-        });
-
-        return $next($fieldValue);
+        $fieldValue->resultHandler(
+            fn ($result): ?string => null === $result
+            ? null
+            : $this->globalId->encode($type, $result)
+        );
     }
 
     /**

@@ -2,6 +2,8 @@
 
 namespace Nuwave\Lighthouse\Execution\BatchLoader;
 
+use Nuwave\Lighthouse\Execution\Utils\FieldPath;
+
 abstract class BatchLoaderRegistry
 {
     /**
@@ -26,7 +28,7 @@ abstract class BatchLoaderRegistry
     public static function instance(array $pathToField, callable $makeInstance): object
     {
         // The path to the field serves as the unique key for the instance
-        $instanceKey = static::instanceKey($pathToField);
+        $instanceKey = FieldPath::withoutLists($pathToField);
 
         if (! isset(self::$instances[$instanceKey])) {
             return self::$instances[$instanceKey] = $makeInstance();
@@ -45,29 +47,5 @@ abstract class BatchLoaderRegistry
     public static function forgetInstances(): void
     {
         self::$instances = [];
-    }
-
-    /**
-     * Generate a unique key for the instance, using the path in the query.
-     *
-     * @param  array<int|string>  $path
-     */
-    protected static function instanceKey(array $path): string
-    {
-        $significantPathSegments = array_filter(
-            $path,
-            static function ($segment): bool {
-                // Ignore numeric path entries, as those signify a list of fields.
-                // Combining the queries for lists is the very purpose of the
-                // batch loader, so they must not be included.
-                return ! is_numeric($segment);
-            }
-        );
-
-        // Using . as the separator would combine relations in nested fields with
-        // higher up relations using dot notation, matching the field path.
-        // We might optimize this in the future to enable batching them anyway,
-        // but employ this solution for now, as it preserves correctness.
-        return implode('|', $significantPathSegments);
     }
 }

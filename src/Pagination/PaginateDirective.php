@@ -126,9 +126,9 @@ GRAPHQL;
         );
     }
 
-    public function resolveField(FieldValue $fieldValue): FieldValue
+    public function resolveField(FieldValue $fieldValue): callable
     {
-        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Paginator {
+        return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Paginator {
             if ($this->directiveHasArgument('resolver')) {
                 // This is done only for validation
                 PaginationArgs::extractArgs($args, $this->paginationType(), $this->paginateMaxCount());
@@ -170,9 +170,7 @@ GRAPHQL;
             $paginationArgs->type = $this->optimalPaginationType($resolveInfo);
 
             return $paginationArgs->applyToBuilder($query);
-        });
-
-        return $fieldValue;
+        };
     }
 
     protected function optimalPaginationType(ResolveInfo $resolveInfo): PaginationType

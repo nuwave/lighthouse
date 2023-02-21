@@ -2,6 +2,8 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
+use Illuminate\Support\Collection;
+
 class ArgumentSet
 {
     /**
@@ -9,14 +11,14 @@ class ArgumentSet
      *
      * @var array<string, \Nuwave\Lighthouse\Execution\Arguments\Argument>
      */
-    public $arguments = [];
+    public array $arguments = [];
 
     /**
      * An associative array of arguments that were not given.
      *
      * @var array<string, \Nuwave\Lighthouse\Execution\Arguments\Argument>
      */
-    public $undefined = [];
+    public array $undefined = [];
 
     /**
      * A list of directives.
@@ -27,7 +29,7 @@ class ArgumentSet
      *
      * @var \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive>
      */
-    public $directives;
+    public Collection $directives;
 
     /**
      * Get a plain array representation of this ArgumentSet.

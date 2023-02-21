@@ -31,9 +31,9 @@ directive @first(
 GRAPHQL;
     }
 
-    public function resolveField(FieldValue $fieldValue): FieldValue
+    public function resolveField(FieldValue $fieldValue): callable
     {
-        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ?Model {
+        return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ?Model {
             return $resolveInfo
                 ->enhanceBuilder(
                     $this->getModelClass()::query(),
@@ -44,8 +44,6 @@ GRAPHQL;
                     $resolveInfo
                 )
                 ->first();
-        });
-
-        return $fieldValue;
+        };
     }
 }

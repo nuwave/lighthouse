@@ -5,7 +5,6 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Eloquent\Model;
@@ -16,6 +15,7 @@ use Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry;
 use Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader;
 use Nuwave\Lighthouse\Execution\ModelsLoader\PaginatedModelsLoader;
 use Nuwave\Lighthouse\Execution\ModelsLoader\SimpleModelsLoader;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Nuwave\Lighthouse\Pagination\PaginationManipulator;
 use Nuwave\Lighthouse\Pagination\PaginationType;
@@ -45,11 +45,11 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
         $this->database = $database;
     }
 
-    public function resolveField(FieldValue $fieldValue): FieldValue
+    public function resolveField(FieldValue $fieldValue): callable
     {
-        $fieldValue->setResolver(function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
-            $relationName = $this->relation();
+        $relationName = $this->relation();
 
+        return function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($relationName) {
             $decorateBuilder = $this->makeBuilderDecorator($parent, $args, $context, $resolveInfo);
             $paginationArgs = $this->paginationArgs($args);
 
@@ -96,9 +96,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
             return null !== $paginationArgs
                 ? $paginationArgs->applyToBuilder($relation)
                 : $relation->getResults();
-        });
-
-        return $fieldValue;
+        };
     }
 
     public function manipulateFieldDefinition(

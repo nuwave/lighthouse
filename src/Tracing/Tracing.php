@@ -2,11 +2,11 @@
 
 namespace Nuwave\Lighthouse\Tracing;
 
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Carbon;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
 use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Execution\ExtensionsResponse;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 
 /**
  * See https://github.com/apollographql/apollo-tracing#response-format.

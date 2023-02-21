@@ -31,6 +31,9 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Replace `DirectiveLocator::beforeLast` with `Str::beforeLast`
 - Default `subscriptions.exclude_empty` to `true`
 - Allow `FieldManipulator` and `ArgManipulator` directives on interfaces https://github.com/nuwave/lighthouse/pull/1955
+- Apply argument transformation only once per field https://github.com/nuwave/lighthouse/pull/1706
+- Expect `FieldResolver::resolveField()` to return resolver function directly https://github.com/nuwave/lighthouse/pull/1706
+- Simplify `FieldMiddleware` directive interface https://github.com/nuwave/lighthouse/pull/1706
 
 ### Fixed
 
@@ -68,6 +71,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove `Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions::subscriberByRequest()`
 - Remove deprecated methods from `FieldValue`
 - Remove deprecated `GraphQL::executeQuery()` and `GraphQL::prepSchema()`
+- Remove `@field` directive argument `args` https://github.com/nuwave/lighthouse/pull/1706
 
 ## v5.70.3
 

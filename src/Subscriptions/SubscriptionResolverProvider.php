@@ -2,10 +2,10 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Container\Container;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
@@ -33,7 +33,7 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      *
-     * @return \Closure(mixed, array<string, mixed>, \Nuwave\Lighthouse\Support\Contracts\GraphQLContext, \GraphQL\Type\Definition\ResolveInfo): mixed
+     * @return \Closure(mixed, array<string, mixed>, \Nuwave\Lighthouse\Support\Contracts\GraphQLContext, \Nuwave\Lighthouse\Execution\ResolveInfo): mixed
      */
     public function provideSubscriptionResolver(FieldValue $fieldValue): \Closure
     {

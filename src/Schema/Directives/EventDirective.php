@@ -36,7 +36,7 @@ directive @event(
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue): void
     {
         $eventClassName = $this->namespaceClassName(
             $this->directiveArgValue('dispatch')
@@ -49,7 +49,5 @@ GRAPHQL;
 
             return $result;
         });
-
-        return $next($fieldValue);
     }
 }
