@@ -63,7 +63,7 @@ GRAPHQL;
 
     protected function validator(): Validator
     {
-        if (null === $this->validator) {
+        if (! isset($this->validator)) {
             // We precomputed and validated the full class name at schema build time
             $validatorClass = $this->directiveArgValue('class');
 
