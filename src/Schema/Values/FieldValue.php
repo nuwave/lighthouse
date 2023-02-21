@@ -11,7 +11,8 @@ use Nuwave\Lighthouse\Execution\Utils\FieldPath;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 /**
- * @phpstan-type BaseResolver callable(mixed, array<string, mixed>, \Nuwave\Lighthouse\Support\Contracts\GraphQLContext, \GraphQL\Type\Definition\ResolveInfo): mixed
+ * @phpstan-import-type FieldResolver from \GraphQL\Executor\Executor as FieldResolverFn
+ *
  * @phpstan-type Resolver callable(mixed, array<string, mixed>, \Nuwave\Lighthouse\Support\Contracts\GraphQLContext, \Nuwave\Lighthouse\Execution\ResolveInfo): mixed
  * @phpstan-type ResolverWrapper callable(Resolver): Resolver
  * @phpstan-type ArgumentSetTransformer callable(\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet, \GraphQL\Type\Definition\ResolveInfo): \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet
@@ -29,15 +30,6 @@ class FieldValue
      * @var array<int, ArgumentSetTransformer>
      */
     protected array $argumentSetTransformers = [];
-
-    /**
-     * The actual field resolver.
-     *
-     * Lazily initialized through setResolver().
-     *
-     * @var Resolver
-     */
-    protected $resolver;
 
     /**
      * @var array<int, ResolverWrapper>
@@ -85,20 +77,6 @@ class FieldValue
     }
 
     /**
-     * Overwrite the current/default resolver.
-     *
-     * @param  Resolver  $resolver
-     *
-     * @return $this
-     */
-    public function setResolver(callable $resolver): self
-    {
-        $this->resolver = $resolver;
-
-        return $this;
-    }
-
-    /**
      * Wrap the previous resolver with another resolver.
      *
      * @param  callable(Resolver): Resolver  $resolverWrapper
@@ -136,8 +114,8 @@ class FieldValue
      */
     public function resultHandler(callable $handle): void
     {
-        $this->wrapResolver(fn (callable $previousResolver) => function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver, $handle): mixed {
-            $resolved = $previousResolver($root, $args, $context, $resolveInfo);
+        $this->wrapResolver(fn (callable $resolver) => function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $handle): mixed {
+            $resolved = $resolver($root, $args, $context, $resolveInfo);
 
             if ($resolved instanceof Deferred) {
                 return $resolved->then(static function ($result) use ($handle, $args, $context, $resolveInfo) {
@@ -162,17 +140,21 @@ class FieldValue
     }
 
     /**
-     * @return BaseResolver
+     * Apply wrappers and transformation to the innermost resolver function.
+     *
+     * @param  Resolver  $resolver
+     *
+     * @return FieldResolverFn
      */
-    public function finishResolver(): callable
+    public function finishResolver(callable $resolver): callable
     {
         // We expect the wrapped resolvers to run in order, but nesting them causes the last
         // applied wrapper to be run first. Thus, we reverse the wrappers before applying them.
         foreach (array_reverse($this->resolverWrappers) as $wrapper) {
-            $this->resolver = $wrapper($this->resolver);
+            $resolver = $wrapper($resolver);
         }
 
-        return function ($root, array $args, GraphQLContext $context, BaseResolveInfo $baseResolveInfo): mixed {
+        return function ($root, array $args, GraphQLContext $context, BaseResolveInfo $baseResolveInfo) use ($resolver): mixed {
             $path = FieldPath::withoutLists($baseResolveInfo->path);
 
             if (! isset(self::$transformedResolveArgs[$path])) {
@@ -191,7 +173,7 @@ class FieldValue
             $resolveInfo = new ResolveInfo($baseResolveInfo, $argumentSet);
             $resolveInfo->argumentSet = $argumentSet;
 
-            return ($this->resolver)($root, $args, $context, $resolveInfo);
+            return ($resolver)($root, $args, $context, $resolveInfo);
         };
     }
 }

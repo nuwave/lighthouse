@@ -28,9 +28,9 @@ GRAPHQL;
 
     public function handleField(FieldValue $fieldValue): void
     {
-        $fieldValue->wrapResolver(fn (callable $previousResolver) => function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
+        $fieldValue->wrapResolver(fn (callable $resolver) => function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
             $start = $this->tracing->timestamp();
-            $result = $previousResolver($root, $args, $context, $resolveInfo);
+            $result = $resolver($root, $args, $context, $resolveInfo);
             $end = $this->tracing->timestamp();
 
             Resolved::handle($result, function () use ($resolveInfo, $start, $end): void {

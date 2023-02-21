@@ -49,9 +49,9 @@ directive @all(
 GRAPHQL;
     }
 
-    public function resolveField(FieldValue $fieldValue): FieldValue
+    public function resolveField(FieldValue $fieldValue): callable
     {
-        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Collection {
+        return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Collection {
             if ($this->directiveHasArgument('builder')) {
                 $builderResolver = $this->getResolverFromArgument('builder');
 
@@ -74,9 +74,7 @@ GRAPHQL;
                     $resolveInfo
                 )
                 ->get();
-        });
-
-        return $fieldValue;
+        };
     }
 
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType)

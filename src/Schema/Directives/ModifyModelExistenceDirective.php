@@ -24,11 +24,11 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
         protected TransactionalMutations $transactionalMutations
     ) {}
 
-    public function resolveField(FieldValue $fieldValue): FieldValue
+    public function resolveField(FieldValue $fieldValue): callable
     {
         $expectsList = $this->expectsList($fieldValue->getField()->type);
 
-        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($expectsList) {
+        return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($expectsList) {
             $builder = $this->getModelClass()::query();
             $scopes = $this->directiveArgValue('scopes', []);
 
@@ -55,9 +55,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
             return $expectsList
                 ? $modelOrModels
                 : $modelOrModels->first();
-        });
-
-        return $fieldValue;
+        };
     }
 
     public static function couldNotModify(Model $model): Error

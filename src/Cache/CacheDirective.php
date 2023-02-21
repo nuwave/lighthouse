@@ -51,7 +51,7 @@ GRAPHQL;
         $maxAge = $this->directiveArgValue('maxAge');
         $isPrivate = $this->directiveArgValue('private', false);
 
-        $fieldValue->wrapResolver(fn (callable $previousResolver) => function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($rootCacheKey, $shouldUseTags, $previousResolver, $maxAge, $isPrivate) {
+        $fieldValue->wrapResolver(fn (callable $resolver) => function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($rootCacheKey, $shouldUseTags, $resolver, $maxAge, $isPrivate) {
             $parentName = $resolveInfo->parentType->name;
             $rootID = null !== $root && null !== $rootCacheKey
                 ? data_get($root, $rootCacheKey)
@@ -108,7 +108,7 @@ GRAPHQL;
             // an object with a `rawValue` key prior the implementation change. A possible workaround is to choose a
             // less collision-probable key instead of `rawValue` (e.g. "lighthouse:rawValue").
 
-            $resolved = $previousResolver($root, $args, $context, $resolveInfo);
+            $resolved = $resolver($root, $args, $context, $resolveInfo);
 
             $storeInCache = $maxAge
                 ? static function ($result) use ($cacheKey, $maxAge, $cache): void {

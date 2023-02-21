@@ -30,15 +30,13 @@ directive @mock(
 GRAPHQL;
     }
 
-    public function resolveField(FieldValue $fieldValue): FieldValue
+    public function resolveField(FieldValue $fieldValue): callable
     {
-        $fieldValue->setResolver(function (): mixed {
+        return function (): mixed {
             $key = $this->directiveArgValue('key', 'default');
             $resolver = $this->mockResolverService->get($key);
 
             return $resolver(...func_get_args());
-        });
-
-        return $fieldValue;
+        };
     }
 }

@@ -38,7 +38,7 @@ class FieldFactory
     ) {}
 
     /**
-     * Convert a FieldValue to an executable FieldDefinition.
+     * Convert a FieldValue to a config for an executable FieldDefinition.
      *
      * @return FieldDefinitionConfig
      */
@@ -48,25 +48,21 @@ class FieldFactory
 
         // Directives have the first priority for defining a resolver for a field
         $resolverDirective = $this->directiveLocator->exclusiveOfType($fieldDefinitionNode, FieldResolver::class);
-        if ($resolverDirective instanceof FieldResolver) {
-            $resolverDirective->resolveField($fieldValue);
-        } else {
-            $fieldValue->setResolver(static::defaultResolver($fieldValue));
-        }
+        $resolver = $resolverDirective instanceof FieldResolver
+            ? $resolverDirective->resolveField($fieldValue)
+            : $this->defaultResolver($fieldValue);
 
         foreach ($this->fieldMiddleware($fieldDefinitionNode) as $fieldMiddleware) {
             $fieldMiddleware->handleField($fieldValue);
         }
 
-        // To see what is allowed here, look at the validation rules in
-        // GraphQL\Type\Definition\FieldDefinition::getDefinition()
         return [
             'name' => $fieldDefinitionNode->name->value,
             'type' => $this->type($fieldDefinitionNode),
             'args' => $this->argumentFactory->toTypeMap(
                 $fieldValue->getField()->arguments
             ),
-            'resolve' => $fieldValue->finishResolver(),
+            'resolve' => $fieldValue->finishResolver($resolver),
             'description' => $fieldDefinitionNode->description->value ?? null,
             'complexity' => $this->complexity($fieldValue),
             'deprecationReason' => ASTHelper::deprecationReason($fieldDefinitionNode),
@@ -129,7 +125,7 @@ class FieldFactory
     /**
      * @return FieldResolverFn
      */
-    public static function defaultResolver(FieldValue $fieldValue): callable
+    protected function defaultResolver(FieldValue $fieldValue): callable
     {
         if (RootType::SUBSCRIPTION === $fieldValue->getParentName()) {
             $providesSubscriptionResolver = Container::getInstance()->make(ProvidesSubscriptionResolver::class);

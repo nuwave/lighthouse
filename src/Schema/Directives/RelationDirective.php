@@ -45,9 +45,9 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
         $this->database = $database;
     }
 
-    public function resolveField(FieldValue $fieldValue): FieldValue
+    public function resolveField(FieldValue $fieldValue): callable
     {
-        $fieldValue->setResolver(function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
+        return function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
             $relationName = $this->relation();
 
             $decorateBuilder = $this->makeBuilderDecorator($parent, $args, $context, $resolveInfo);
@@ -96,9 +96,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
             return null !== $paginationArgs
                 ? $paginationArgs->applyToBuilder($relation)
                 : $relation->getResults();
-        });
-
-        return $fieldValue;
+        };
     }
 
     public function manipulateFieldDefinition(

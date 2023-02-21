@@ -25,15 +25,13 @@ directive @rename(
 GRAPHQL;
     }
 
-    public function resolveField(FieldValue $fieldValue): FieldValue
+    public function resolveField(FieldValue $fieldValue): callable
     {
         $attribute = $this->attributeArgValue();
 
-        $fieldValue->setResolver(function ($rootValue) use ($attribute) {
+        return function ($rootValue) use ($attribute): mixed {
             return data_get($rootValue, $attribute);
-        });
-
-        return $fieldValue;
+        };
     }
 
     /**

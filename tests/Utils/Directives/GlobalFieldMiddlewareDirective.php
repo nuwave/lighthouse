@@ -22,7 +22,6 @@ GRAPHQL;
             fn (): callable
             // Must not crash
             => fn (): bool => $this->definitionNode instanceof FieldDefinitionNode
-                // Must not crash
                 && null === $this->directiveArgValue('random')
         );
     }

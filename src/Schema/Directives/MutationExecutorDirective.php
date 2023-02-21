@@ -26,9 +26,9 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
         $this->transactionalMutations = $transactionalMutations;
     }
 
-    public function resolveField(FieldValue $fieldValue): FieldValue
+    public function resolveField(FieldValue $fieldValue): callable
     {
-        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Model {
+        return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Model {
             $modelClass = $this->getModelClass();
             $model = new $modelClass();
 
@@ -41,9 +41,7 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
                 },
                 $model->getConnectionName()
             );
-        });
-
-        return $fieldValue;
+        };
     }
 
     /**

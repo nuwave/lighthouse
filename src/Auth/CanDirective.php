@@ -115,13 +115,13 @@ GRAPHQL;
         $ability = $this->directiveArgValue('ability');
         $resolved = $this->directiveArgValue('resolved');
 
-        $fieldValue->wrapResolver(fn (callable $previousResolver) => function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver, $ability, $resolved) {
+        $fieldValue->wrapResolver(fn (callable $resolver) => function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $ability, $resolved) {
             $gate = $this->gate->forUser($context->user());
             $checkArguments = $this->buildCheckArguments($args);
 
             if ($resolved) {
                 return Resolved::handle(
-                    $previousResolver($root, $args, $context, $resolveInfo),
+                    $resolver($root, $args, $context, $resolveInfo),
                     function ($modelLike) use ($gate, $ability, $checkArguments) {
                         $modelOrModels = $modelLike instanceof Paginator
                             ? $modelLike->items()
@@ -140,7 +140,7 @@ GRAPHQL;
                 $this->authorize($gate, $ability, $model, $checkArguments);
             }
 
-            return $previousResolver($root, $args, $context, $resolveInfo);
+            return $resolver($root, $args, $context, $resolveInfo);
         });
     }
 

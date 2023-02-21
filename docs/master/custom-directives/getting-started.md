@@ -76,9 +76,9 @@ final class UpperCaseDirective extends BaseDirective implements FieldMiddleware
      */
     public function handleField(FieldValue $fieldValue): void
     {
-        $fieldValue->wrapResolver(fn (callable $previousResolver) => function ($root, array $args, GraphQLContext $context, ResolveInfo $info) use ($previousResolver): string {
+        $fieldValue->wrapResolver(fn (callable $resolver) => function ($root, array $args, GraphQLContext $context, ResolveInfo $info) use ($resolver): string {
             // Call the resolver, passing along the resolver arguments
-            $result = $previousResolver($root, $args, $context, $info);
+            $result = $resolver($root, $args, $context, $info);
             assert(is_string($result));
 
             return strtoupper($result);

@@ -39,10 +39,8 @@ GRAPHQL;
     {
         $fieldType = $fieldValue->getField()->type;
 
-        $fieldValue->wrapResolver(fn (callable $previousResolver) => function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver, $fieldType) {
-            $wrappedResolver = function () use ($previousResolver, $root, $args, $context, $resolveInfo) {
-                return $previousResolver($root, $args, $context, $resolveInfo);
-            };
+        $fieldValue->wrapResolver(fn (callable $resolver) => function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $fieldType) {
+            $wrappedResolver = fn (): mixed => $resolver($root, $args, $context, $resolveInfo);
             $path = implode('.', $resolveInfo->path);
 
             if ($this->shouldDefer($fieldType, $resolveInfo)) {

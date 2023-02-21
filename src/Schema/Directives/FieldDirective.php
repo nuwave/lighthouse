@@ -33,7 +33,7 @@ directive @field(
 GRAPHQL;
     }
 
-    public function resolveField(FieldValue $fieldValue): FieldValue
+    public function resolveField(FieldValue $fieldValue): callable
     {
         [$className, $methodName] = $this->getMethodArgumentParts('resolver');
 
@@ -46,15 +46,13 @@ GRAPHQL;
 
         $additionalData = $this->directiveArgValue('args');
 
-        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $additionalData) {
+        return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $additionalData) {
             return $resolver(
                 $root,
                 array_merge($args, ['directive' => $additionalData]),
                 $context,
                 $resolveInfo
             );
-        });
-
-        return $fieldValue;
+        };
     }
 }
