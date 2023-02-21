@@ -24,11 +24,6 @@ directive @field(
   If you pass only a class name, the method name defaults to `__invoke`.
   """
   resolver: String!
-
-  """
-  Supply additional data to the resolver.
-  """
-  args: [String!]
 ) on FIELD_DEFINITION
 GRAPHQL;
     }
@@ -42,17 +37,6 @@ GRAPHQL;
             RootType::defaultNamespaces($fieldValue->getParentName())
         );
 
-        $resolver = Utils::constructResolver($namespacedClassName, $methodName);
-
-        $additionalData = $this->directiveArgValue('args');
-
-        return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $additionalData) {
-            return $resolver(
-                $root,
-                array_merge($args, ['directive' => $additionalData]),
-                $context,
-                $resolveInfo
-            );
-        };
+        return Utils::constructResolver($namespacedClassName, $methodName);
     }
 }

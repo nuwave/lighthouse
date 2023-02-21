@@ -1074,11 +1074,6 @@ directive @field(
   If you pass only a class name, the method name defaults to `__invoke`.
   """
   resolver: String!
-
-  """
-  Supply additional data to the resolver.
-  """
-  args: [String!]
 ) on FIELD_DEFINITION
 ```
 
