@@ -105,7 +105,6 @@ final class TypeRegistryTest extends TestCase
         $scalarType = $this->typeRegistry->handle($scalarNode);
         assert($scalarType instanceof ScalarType);
 
-        $this->assertInstanceOf(ScalarType::class, $scalarType);
         $this->assertSame('SomeEmail', $scalarType->name);
     }
 
@@ -144,7 +143,6 @@ final class TypeRegistryTest extends TestCase
         $interfaceType = $this->typeRegistry->handle($interfaceNode);
         assert($interfaceType instanceof InterfaceType);
 
-        $this->assertInstanceOf(InterfaceType::class, $interfaceType);
         $this->assertSame('Nameable', $interfaceType->name);
     }
 

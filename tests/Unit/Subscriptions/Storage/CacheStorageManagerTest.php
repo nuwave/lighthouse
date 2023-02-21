@@ -13,10 +13,7 @@ final class CacheStorageManagerTest extends TestCase
 {
     use TestsSubscriptions;
 
-    /**
-     * @var \Nuwave\Lighthouse\Subscriptions\Storage\CacheStorageManager
-     */
-    protected $storage;
+    protected CacheStorageManager $storage;
 
     public function setUp(): void
     {

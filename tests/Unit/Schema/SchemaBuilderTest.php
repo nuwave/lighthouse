@@ -117,7 +117,6 @@ final class SchemaBuilderTest extends TestCase
         $this->assertSame('Foo', $foo->name);
 
         $bar = $foo->getField('bar');
-        assert($bar instanceof FieldDefinition);
         $this->assertSame('bar attribute of Foo', $bar->description);
 
         $baz = $bar->getArg('baz');
