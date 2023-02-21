@@ -37,11 +37,8 @@ abstract class WithRelationDirective extends BaseDirective implements FieldMiddl
     {
         $relationBatchLoader = BatchLoaderRegistry::instance(
             $this->qualifyPath($args, $resolveInfo),
-            function () use ($parent, $args, $context, $resolveInfo): RelationBatchLoader {
-                return new RelationBatchLoader($this->modelsLoader($parent, $args, $context, $resolveInfo));
-            }
+            fn (): RelationBatchLoader => new RelationBatchLoader($this->modelsLoader($parent, $args, $context, $resolveInfo))
         );
-        assert($relationBatchLoader instanceof RelationBatchLoader);
 
         return $relationBatchLoader->load($parent);
     }

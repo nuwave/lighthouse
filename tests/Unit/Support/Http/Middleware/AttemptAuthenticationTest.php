@@ -20,15 +20,11 @@ final class AttemptAuthenticationTest extends TestCase
         parent::getEnvironmentSetUp($app);
 
         $authManager = $app->make(AuthManager::class);
-        assert($authManager instanceof AuthManager);
-
         $authManager->viaRequest('foo', function () {
             return $this->user;
         });
 
         $config = $app->make(ConfigRepository::class);
-        assert($config instanceof ConfigRepository);
-
         $config->set('lighthouse.route.middleware', [
             AttemptAuthentication::class,
         ]);

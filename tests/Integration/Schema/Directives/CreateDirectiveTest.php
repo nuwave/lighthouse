@@ -112,7 +112,6 @@ final class CreateDirectiveTest extends DBTestCase
         factory(Task::class)->create(['name' => 'Uniq']);
 
         $config = $this->app->make(ConfigRepository::class);
-        assert($config instanceof ConfigRepository);
         $config->set('app.debug', false);
 
         $this->schema .= /** @lang GraphQL */ '
@@ -180,7 +179,6 @@ final class CreateDirectiveTest extends DBTestCase
         factory(Task::class)->create(['name' => 'Uniq']);
 
         $config = $this->app->make(ConfigRepository::class);
-        assert($config instanceof ConfigRepository);
         $config->set('app.debug', false);
         $config->set('lighthouse.transactional_mutations', false);
 

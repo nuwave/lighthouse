@@ -31,14 +31,11 @@ class SubscriptionServiceProvider extends ServiceProvider
         $this->app->singleton(SubscriptionRegistry::class);
         $this->app->singleton(StoresSubscriptions::class, static function (Container $app): StoresSubscriptions {
             $configRepository = $app->make(ConfigRepository::class);
-            assert($configRepository instanceof ConfigRepository);
 
-            switch ($configRepository->get('lighthouse.subscriptions.storage')) {
-                case 'redis':
-                    return $app->make(RedisStorageManager::class);
-                default:
-                    return $app->make(CacheStorageManager::class);
-            }
+            return match ($configRepository->get('lighthouse.subscriptions.storage')) {
+                'redis' => $app->make(RedisStorageManager::class),
+                default => $app->make(CacheStorageManager::class),
+            };
         });
 
         $this->app->bind(ContextSerializer::class, Serializer::class);
@@ -72,7 +69,7 @@ class SubscriptionServiceProvider extends ServiceProvider
 
         // If authentication is used, we can log in subscribers when broadcasting an update
         if ($this->app->bound(AuthManager::class)) {
-            config([
+            $configRepository->set([
                 'auth.guards.' . SubscriptionGuard::GUARD_NAME => [
                     'driver' => SubscriptionGuard::GUARD_NAME,
                 ],

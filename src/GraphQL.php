@@ -218,8 +218,6 @@ class GraphQL
         }
 
         $cacheFactory = Container::getInstance()->make(CacheFactory::class);
-        assert($cacheFactory instanceof CacheFactory);
-
         $store = $cacheFactory->store($cacheConfig['store']);
 
         return $store->remember(
@@ -335,8 +333,6 @@ class GraphQL
         }
 
         $cacheFactory = Container::getInstance()->make(CacheFactory::class);
-        assert($cacheFactory instanceof CacheFactory);
-
         $store = $cacheFactory->store($cacheConfig['store']);
 
         $document = $store->get("lighthouse:query:{$sha256hash}");

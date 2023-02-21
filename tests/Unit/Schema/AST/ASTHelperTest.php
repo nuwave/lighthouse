@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Schema\AST;
 
-use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use GraphQL\Language\Parser;
@@ -160,22 +159,18 @@ final class ASTHelperTest extends TestCase
 
     public function testExtractDirectiveDefinition(): void
     {
-        $this->assertInstanceOf(
-            DirectiveDefinitionNode::class,
-            ASTHelper::extractDirectiveDefinition(/** @lang GraphQL */ 'directive @foo on OBJECT')
-        );
+        $directive = ASTHelper::extractDirectiveDefinition(/** @lang GraphQL */ 'directive @foo on OBJECT');
+        $this->assertSame('foo', $directive->name->value);
     }
 
     public function testExtractDirectiveDefinitionAllowsAuxiliaryTypes(): void
     {
-        $this->assertInstanceOf(
-            DirectiveDefinitionNode::class,
-            ASTHelper::extractDirectiveDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
+        $directive = ASTHelper::extractDirectiveDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
 directive @foo on OBJECT
 scalar Bar
 GRAPHQL
-            )
         );
+        $this->assertSame('foo', $directive->name->value);
     }
 
     public function testThrowsOnSyntaxError(): void

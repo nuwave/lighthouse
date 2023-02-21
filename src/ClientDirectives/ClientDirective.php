@@ -66,8 +66,6 @@ class ClientDirective
         }
 
         $schemaBuilder = Container::getInstance()->make(SchemaBuilder::class);
-        assert($schemaBuilder instanceof SchemaBuilder);
-
         $schema = $schemaBuilder->schema();
 
         $definition = $schema->getDirective($this->name);

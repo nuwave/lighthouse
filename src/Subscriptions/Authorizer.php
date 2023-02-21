@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Subscriptions;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionExceptionHandler;
@@ -57,7 +56,6 @@ class Authorizer implements AuthorizesSubscriptions
             }
 
             foreach ($subscriptions as $subscription) {
-                assert($subscription instanceof GraphQLSubscription);
                 if (! $subscription->authorize($subscriber, $request)) {
                     $this->storage->deleteSubscriber($subscriber->channel);
 

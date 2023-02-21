@@ -222,8 +222,6 @@ final class ValidatorDirectiveTest extends TestCase
         ';
 
         $encoder = $this->app->make(GlobalId::class);
-        assert($encoder instanceof GlobalId);
-
         $globalId = $encoder->encode('asdf', '123');
 
         $this

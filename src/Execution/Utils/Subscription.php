@@ -20,19 +20,12 @@ class Subscription
         // Ensure we have a schema and registered subscription fields
         // in the event we are calling this method in code.
         $schemaBuilder = Container::getInstance()->make(SchemaBuilder::class);
-        assert($schemaBuilder instanceof SchemaBuilder);
-
         $schemaBuilder->schema();
 
         $registry = Container::getInstance()->make(SubscriptionRegistry::class);
-        assert($registry instanceof SubscriptionRegistry);
-
         if (! $registry->has($subscriptionField)) {
             throw new \InvalidArgumentException("No subscription field registered for {$subscriptionField}");
         }
-
-        $broadcaster = Container::getInstance()->make(BroadcastsSubscriptions::class);
-        assert($broadcaster instanceof BroadcastsSubscriptions);
 
         // Default to the configuration setting if not specified
         if (null === $shouldQueue) {
@@ -40,6 +33,7 @@ class Subscription
         }
 
         $subscription = $registry->subscription($subscriptionField);
+        $broadcaster = Container::getInstance()->make(BroadcastsSubscriptions::class);
 
         try {
             if ($shouldQueue) {
@@ -49,8 +43,6 @@ class Subscription
             }
         } catch (\Throwable $e) {
             $exceptionHandler = Container::getInstance()->make(SubscriptionExceptionHandler::class);
-            assert($exceptionHandler instanceof SubscriptionExceptionHandler);
-
             $exceptionHandler->handleBroadcastError($e);
         }
     }

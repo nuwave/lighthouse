@@ -90,13 +90,10 @@ GRAPHQL;
                         $this->qualifyPath($args, $resolveInfo),
                         ['count']
                     ),
-                    function () use ($parent, $args, $context, $resolveInfo): RelationBatchLoader {
-                        return new RelationBatchLoader(
-                            new CountModelsLoader($this->relation(), $this->makeBuilderDecorator($parent, $args, $context, $resolveInfo))
-                        );
-                    }
+                    fn (): RelationBatchLoader => new RelationBatchLoader(
+                        new CountModelsLoader($this->relation(), $this->makeBuilderDecorator($parent, $args, $context, $resolveInfo))
+                    )
                 );
-                assert($relationBatchLoader instanceof RelationBatchLoader);
 
                 return $relationBatchLoader->load($parent);
             };

@@ -545,7 +545,6 @@ GRAPHQL
         );
 
         $task = Task::findOrFail(1);
-        assert($task instanceof Task);
         $this->assertNull($task->user, 'Must disconnect the parent relationship.');
     }
 

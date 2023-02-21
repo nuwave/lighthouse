@@ -19,8 +19,6 @@ final class RegisterDirectiveNamespacesTest extends TestCase
     protected function getEnvironmentSetUp($app): void
     {
         $dispatcher = $app->make(EventsDispatcher::class);
-        assert($dispatcher instanceof EventsDispatcher);
-
         $dispatcher->listen(
             RegisterDirectiveNamespaces::class,
             function (): array {

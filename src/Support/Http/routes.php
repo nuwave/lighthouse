@@ -7,8 +7,6 @@ use Nuwave\Lighthouse\Support\Http\Controllers\GraphQLController;
 $container = Container::getInstance();
 
 $config = $container->make(ConfigRepository::class);
-assert($config instanceof ConfigRepository);
-
 if ($routeConfig = $config->get('lighthouse.route')) {
     /**
      * Not using assert() as only one of those classes will actually be installed.

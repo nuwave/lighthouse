@@ -141,6 +141,7 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->loadRoutesFrom(__DIR__ . '/Support/Http/routes.php');
 
         $exceptionHandler = $this->app->make(ExceptionHandlerContract::class);
+        // @phpstan-ignore-next-line larastan overly eager assumes this will always be a concrete instance
         if ($exceptionHandler instanceof ExceptionHandler) {
             $exceptionHandler->renderable(
                 function (ClientAware $error) {
@@ -159,11 +160,10 @@ class LighthouseServiceProvider extends ServiceProvider
                     }
 
                     $graphQL = $this->app->make(GraphQL::class);
-                    assert($graphQL instanceof GraphQL);
-
                     $executionResult = new ExecutionResult(null, [$error]);
+                    $serializableResult = $graphQL->serializable($executionResult);
 
-                    return new JsonResponse($graphQL->serializable($executionResult));
+                    return new JsonResponse($serializableResult);
                 }
             );
         }
