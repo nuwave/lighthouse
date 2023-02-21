@@ -66,13 +66,11 @@ GRAPHQL;
     {
         $type = $fieldValue->getParentName();
 
-        $fieldValue->resultHandler(function ($result) use ($type): ?string {
-            if (null === $result) {
-                return null;
-            }
-
-            return $this->globalId->encode($type, $result);
-        });
+        $fieldValue->resultHandler(
+            fn ($result): ?string => null === $result
+            ? null
+            : $this->globalId->encode($type, $result)
+        );
     }
 
     /**

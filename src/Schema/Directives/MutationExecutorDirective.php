@@ -28,8 +28,9 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
 
     public function resolveField(FieldValue $fieldValue): callable
     {
-        return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Model {
-            $modelClass = $this->getModelClass();
+        $modelClass = $this->getModelClass();
+
+        return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelClass): Model {
             $model = new $modelClass();
 
             return $this->transactionalMutations->execute(

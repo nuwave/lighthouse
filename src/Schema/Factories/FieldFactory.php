@@ -5,7 +5,6 @@ namespace Nuwave\Lighthouse\Schema\Factories;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
@@ -30,7 +29,6 @@ use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 class FieldFactory
 {
     public function __construct(
-        protected Pipeline $pipeline,
         protected ConfigRepository $config,
         protected DirectiveLocator $directiveLocator,
         protected ArgumentFactory $argumentFactory,

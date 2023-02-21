@@ -23,11 +23,11 @@ abstract class WithRelationDirective extends BaseDirective implements FieldMiddl
 
     public function handleField(FieldValue $fieldValue): void
     {
-        $fieldValue->wrapResolver(fn (callable $resolver) => function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
-            return $this
+        $fieldValue->wrapResolver(
+            fn (callable $resolver) => fn (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) => $this
                 ->loadRelation($parent, $args, $context, $resolveInfo)
-                ->then(static fn () => $resolver($parent, $args, $context, $resolveInfo));
-        });
+                ->then(static fn () => $resolver($parent, $args, $context, $resolveInfo))
+        );
     }
 
     /**

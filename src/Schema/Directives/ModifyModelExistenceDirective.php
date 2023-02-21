@@ -27,10 +27,11 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
     public function resolveField(FieldValue $fieldValue): callable
     {
         $expectsList = $this->expectsList($fieldValue->getField()->type);
+        $modelClass = $this->getModelClass();
+        $scopes = $this->directiveArgValue('scopes', []);
 
-        return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($expectsList) {
-            $builder = $this->getModelClass()::query();
-            $scopes = $this->directiveArgValue('scopes', []);
+        return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelClass, $scopes, $expectsList) {
+            $builder = $modelClass::query();
 
             if (! $resolveInfo->wouldEnhanceBuilder($builder, $scopes, $root, $args, $context, $resolveInfo)) {
                 throw self::wouldModifyAll();

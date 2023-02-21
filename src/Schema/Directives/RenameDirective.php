@@ -29,9 +29,7 @@ GRAPHQL;
     {
         $attribute = $this->attributeArgValue();
 
-        return function ($rootValue) use ($attribute): mixed {
-            return data_get($rootValue, $attribute);
-        };
+        return fn (mixed $root): mixed => data_get($root, $attribute);
     }
 
     /**
