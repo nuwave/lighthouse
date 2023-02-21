@@ -37,8 +37,6 @@ final class SchemaCachingTest extends TestCase
     public function testSchemaCachingWithUnionType(int $cacheVersion): void
     {
         $config = $this->app->make(ConfigRepository::class);
-        assert($config instanceof ConfigRepository);
-
         $config->set('lighthouse.cache.version', $cacheVersion);
 
         $this->schema = /** @lang GraphQL */ '
@@ -82,13 +80,9 @@ final class SchemaCachingTest extends TestCase
     public function testInvalidSchemaCacheContents(): void
     {
         $config = $this->app->make(ConfigRepository::class);
-        assert($config instanceof ConfigRepository);
-
         $config->set('lighthouse.cache.version', 2);
 
         $filesystem = $this->app->make(Filesystem::class);
-        assert($filesystem instanceof Filesystem);
-
         $path = $config->get('lighthouse.cache.path');
         $filesystem->put($path, '');
 

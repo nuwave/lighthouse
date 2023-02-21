@@ -18,8 +18,6 @@ final class GlobalErrorRendererTest extends TestCase
         parent::getEnvironmentSetUp($app);
 
         $config = $app->make(ConfigRepository::class);
-        assert($config instanceof ConfigRepository);
-
         $config->set('lighthouse.route.middleware', [
             function () {
                 throw new WithExtensionsException(self::MESSAGE, self::EXTENSIONS_CONTENT);

@@ -139,7 +139,6 @@ class ASTCache
     protected function store(): CacheRepository
     {
         $cacheFactory = Container::getInstance()->make(CacheFactory::class);
-        assert($cacheFactory instanceof CacheFactory);
 
         return $cacheFactory->store($this->store);
     }

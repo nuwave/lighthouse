@@ -131,7 +131,6 @@ class ASTBuilder
                 $this->directiveLocator->associatedOfType($typeDefinition, TypeManipulator::class)
                 as $typeManipulator
             ) {
-                assert($typeManipulator instanceof TypeManipulator);
                 $typeManipulator->manipulateTypeDefinition($this->documentAST, $typeDefinition);
             }
         }
@@ -150,7 +149,6 @@ class ASTBuilder
                     $this->directiveLocator->associatedOfType($typeExtension, TypeExtensionManipulator::class)
                     as $typeExtensionManipulator
                 ) {
-                    assert($typeExtensionManipulator instanceof TypeExtensionManipulator);
                     $typeExtensionManipulator->manipulateTypeExtension($this->documentAST, $typeExtension);
                 }
 
@@ -259,7 +257,6 @@ class ASTBuilder
                         $this->directiveLocator->associatedOfType($fieldDefinition, FieldManipulator::class)
                         as $fieldManipulator
                     ) {
-                        assert($fieldManipulator instanceof FieldManipulator);
                         $fieldManipulator->manipulateFieldDefinition($this->documentAST, $fieldDefinition, $typeDefinition);
                     }
                 }
@@ -280,7 +277,6 @@ class ASTBuilder
                             $this->directiveLocator->associatedOfType($argumentDefinition, ArgManipulator::class)
                             as $argManipulator
                         ) {
-                            assert($argManipulator instanceof ArgManipulator);
                             $argManipulator->manipulateArgDefinition(
                                 $this->documentAST,
                                 $argumentDefinition,

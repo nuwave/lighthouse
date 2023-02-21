@@ -14,7 +14,6 @@ final class MakesGraphQLRequestsTest extends TestCase
         parent::getEnvironmentSetUp($app);
 
         $config = $app->make(ConfigRepository::class);
-        assert($config instanceof ConfigRepository);
         $config->set('lighthouse.route.prefix', 'prefix');
     }
 

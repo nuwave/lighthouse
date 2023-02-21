@@ -17,8 +17,6 @@ final class IdeHelperCommandTest extends TestCase
         parent::getEnvironmentSetUp($app);
 
         $config = $app->make(ConfigRepository::class);
-        assert($config instanceof ConfigRepository);
-
         $config->set('lighthouse.namespaces.directives', [
             // Contains an overwritten UnionDirective
             'Tests\\Console',
@@ -33,7 +31,6 @@ final class IdeHelperCommandTest extends TestCase
     public function testGeneratesIdeHelperFiles(): void
     {
         $typeRegistry = $this->app->make(TypeRegistry::class);
-        assert($typeRegistry instanceof TypeRegistry);
 
         $programmaticType = new EnumType([
             'name' => 'Foo',

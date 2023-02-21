@@ -22,15 +22,12 @@ final class RouteRegistrationTest extends TestCase
         parent::getEnvironmentSetUp($app);
 
         $config = $app->make(ConfigRepository::class);
-        assert($config instanceof ConfigRepository);
         $config->set('lighthouse.route.prefix', 'foo');
     }
 
     public function testRegisterRouteWithCustomConfig(): void
     {
         $router = $this->app->make(Router::class);
-        assert($router instanceof Router);
-
         $routes = $router->getRoutes();
 
         $graphqlRoute = $routes->getByName('graphql');

@@ -27,40 +27,33 @@ final class ResolverProviderTest extends TestCase
     public function testGetsTheWebonyxDefaultResolverForNonRootFields(): void
     {
         $fieldValue = $this->constructFieldValue('nonExisting: Int', 'NonRoot');
+        $this->resolverProvider->provideResolver($fieldValue);
 
-        $this->assertInstanceOf(
-            \Closure::class,
-            $this->resolverProvider->provideResolver($fieldValue)
-        );
+        self::expectNotToPerformAssertions();
     }
 
     public function testGetsTheConventionBasedDefaultResolverForRootFields(): void
     {
         $fieldValue = $this->constructFieldValue('foo: Int');
+        $this->resolverProvider->provideResolver($fieldValue);
 
-        $this->assertInstanceOf(
-            \Closure::class,
-            $this->resolverProvider->provideResolver($fieldValue)
-        );
+        self::expectNotToPerformAssertions();
     }
 
     public function testLooksAtMultipleNamespacesWhenLookingForDefaultFieldResolvers(): void
     {
         $fieldValue = $this->constructFieldValue('baz: Int');
+        $this->resolverProvider->provideResolver($fieldValue);
 
-        $this->assertInstanceOf(
-            \Closure::class,
-            $this->resolverProvider->provideResolver($fieldValue)
-        );
+        self::expectNotToPerformAssertions();
     }
 
     public function testThrowsIfRootFieldHasNoResolver(): void
     {
-        $this->expectException(DefinitionException::class);
+        $fieldValue = $this->constructFieldValue('noFieldClass: Int');
 
-        $this->resolverProvider->provideResolver(
-            $this->constructFieldValue('noFieldClass: Int')
-        );
+        $this->expectException(DefinitionException::class);
+        $this->resolverProvider->provideResolver($fieldValue);
     }
 
     protected function constructFieldValue(string $fieldDefinition, string $parentTypeName = RootType::QUERY): FieldValue

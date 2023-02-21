@@ -2,7 +2,11 @@
 
 namespace Tests\Unit\Schema\AST;
 
+use GraphQL\Language\AST\EnumTypeDefinitionNode;
+use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\NodeKind;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
@@ -41,13 +45,10 @@ final class ASTBuilderTest extends TestCase
         ';
         $documentAST = $this->astBuilder->documentAST();
 
-        /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
         $queryType = $documentAST->types[RootType::QUERY];
+        assert($queryType instanceof ObjectTypeDefinitionNode);
 
-        $fields = $queryType->fields;
-        $this->assertNotNull($fields);
-        /** @var array<\GraphQL\Language\AST\FieldDefinitionNode> $fields */
-        $this->assertCount(3, $fields);
+        $this->assertCount(3, $queryType->fields);
     }
 
     public function testAllowsExtendingUndefinedRootTypes(): void
@@ -67,29 +68,20 @@ final class ASTBuilderTest extends TestCase
         ';
         $documentAST = $this->astBuilder->documentAST();
 
-        /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
         $queryType = $documentAST->types[RootType::QUERY];
+        assert($queryType instanceof ObjectTypeDefinitionNode);
 
-        $queryFields = $queryType->fields;
-        $this->assertNotNull($queryFields);
-        /** @var array<\GraphQL\Language\AST\FieldDefinitionNode> $queryFields */
-        $this->assertCount(1, $queryFields);
+        $this->assertCount(1, $queryType->fields);
 
-        /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $mutationType */
         $mutationType = $documentAST->types[RootType::MUTATION];
+        assert($mutationType instanceof ObjectTypeDefinitionNode);
 
-        $mutationFields = $mutationType->fields;
-        $this->assertNotNull($mutationFields);
-        /** @var array<\GraphQL\Language\AST\FieldDefinitionNode> $mutationFields */
-        $this->assertCount(1, $mutationFields);
+        $this->assertCount(1, $mutationType->fields);
 
-        /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $subscriptionType */
         $subscriptionType = $documentAST->types[RootType::SUBSCRIPTION];
+        assert($subscriptionType instanceof ObjectTypeDefinitionNode);
 
-        $subscriptionFields = $subscriptionType->fields;
-        $this->assertNotNull($subscriptionFields);
-        /** @var array<\GraphQL\Language\AST\FieldDefinitionNode> $subscriptionFields */
-        $this->assertCount(1, $subscriptionFields);
+        $this->assertCount(1, $subscriptionType->fields);
     }
 
     public function testMergeInputExtensionFields(): void
@@ -109,13 +101,10 @@ final class ASTBuilderTest extends TestCase
         ';
         $documentAST = $this->astBuilder->documentAST();
 
-        /** @var \GraphQL\Language\AST\InputObjectTypeDefinitionNode $inputs */
         $inputs = $documentAST->types['Inputs'];
+        assert($inputs instanceof InputObjectTypeDefinitionNode);
 
-        $fields = $inputs->fields;
-        $this->assertNotNull($fields);
-        /** @var array<\GraphQL\Language\AST\InputValueDefinitionNode> $fields */
-        $this->assertCount(3, $fields);
+        $this->assertCount(3, $inputs->fields);
     }
 
     public function testMergeInterfaceExtensionFields(): void
@@ -135,13 +124,10 @@ final class ASTBuilderTest extends TestCase
         ';
         $documentAST = $this->astBuilder->documentAST();
 
-        /** @var \GraphQL\Language\AST\InterfaceTypeDefinitionNode $named */
         $named = $documentAST->types['Named'];
+        assert($named instanceof InterfaceTypeDefinitionNode);
 
-        $fields = $named->fields;
-        $this->assertNotNull($fields);
-        /** @var array<\GraphQL\Language\AST\FieldDefinitionNode> $fields */
-        $this->assertCount(3, $fields);
+        $this->assertCount(3, $named->fields);
     }
 
     public function testMergeEnumExtensionFields(): void
@@ -162,13 +148,10 @@ final class ASTBuilderTest extends TestCase
         ';
         $documentAST = $this->astBuilder->documentAST();
 
-        /** @var \GraphQL\Language\AST\EnumTypeDefinitionNode $myEnum */
         $myEnum = $documentAST->types['MyEnum'];
+        assert($myEnum instanceof EnumTypeDefinitionNode);
 
-        $values = $myEnum->values;
-        $this->assertNotNull($values);
-        /** @var \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\EnumValueDefinitionNode> $values */
-        $this->assertCount(4, $values);
+        $this->assertCount(4, $myEnum->values);
     }
 
     public function testDoesNotAllowExtendingUndefinedTypes(): void
@@ -183,8 +166,7 @@ final class ASTBuilderTest extends TestCase
         }
         ';
 
-        $this->expectException(DefinitionException::class);
-        $this->expectExceptionMessage('Could not find a base definition Foo of kind ' . NodeKind::OBJECT_TYPE_EXTENSION . ' to extend.');
+        $this->expectExceptionObject(new DefinitionException('Could not find a base definition Foo of kind ' . NodeKind::OBJECT_TYPE_EXTENSION . ' to extend.'));
         $this->astBuilder->documentAST();
     }
 
@@ -200,8 +182,7 @@ final class ASTBuilderTest extends TestCase
         }
         ';
 
-        $this->expectException(DefinitionException::class);
-        $this->expectExceptionMessage(ASTHelper::duplicateDefinition('foo'));
+        $this->expectExceptionObject(new DefinitionException(ASTHelper::duplicateDefinition('foo')));
         $this->astBuilder->documentAST();
     }
 
@@ -217,8 +198,7 @@ final class ASTBuilderTest extends TestCase
         }
         ';
 
-        $this->expectException(DefinitionException::class);
-        $this->expectExceptionMessage(ASTHelper::duplicateDefinition('foo'));
+        $this->expectExceptionObject(new DefinitionException(ASTHelper::duplicateDefinition('foo')));
         $this->astBuilder->documentAST();
     }
 
@@ -234,8 +214,7 @@ final class ASTBuilderTest extends TestCase
         }
         ';
 
-        $this->expectException(DefinitionException::class);
-        $this->expectException(DefinitionException::class);
+        $this->expectExceptionObject(new DefinitionException(ASTHelper::duplicateDefinition('foo')));
         $this->astBuilder->documentAST();
     }
 
@@ -253,8 +232,7 @@ final class ASTBuilderTest extends TestCase
         }
         ';
 
-        $this->expectException(DefinitionException::class);
-        $this->expectExceptionMessage(ASTHelper::duplicateDefinition('TWO'));
+        $this->expectExceptionObject(new DefinitionException(ASTHelper::duplicateDefinition('TWO')));
         $this->astBuilder->documentAST();
     }
 
@@ -270,8 +248,7 @@ final class ASTBuilderTest extends TestCase
         }
         ';
 
-        $this->expectException(DefinitionException::class);
-        $this->expectExceptionMessage('The type extension Foo of kind ' . NodeKind::INTERFACE_TYPE_EXTENSION . ' can not extend a definition of kind ' . NodeKind::OBJECT_TYPE_DEFINITION . '.');
+        $this->expectExceptionObject(new DefinitionException('The type extension Foo of kind ' . NodeKind::INTERFACE_TYPE_EXTENSION . ' can not extend a definition of kind ' . NodeKind::OBJECT_TYPE_DEFINITION . '.'));
         $this->astBuilder->documentAST();
     }
 
@@ -296,8 +273,8 @@ final class ASTBuilderTest extends TestCase
         ';
         $documentAST = $this->astBuilder->documentAST();
 
-        /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $userType */
         $userType = $documentAST->types['User'];
+        assert($userType instanceof ObjectTypeDefinitionNode);
 
         $interfaces = new Collection($userType->interfaces);
         $this->assertCount(2, $interfaces);

@@ -168,7 +168,6 @@ final class LimitDirectiveTest extends DBTestCase
             ');
 
         $cache = $this->app->make(CacheRepository::class);
-        assert($cache instanceof CacheRepository);
 
         $data = $cache->get(
             (new CacheKeyAndTagsGenerator())->key(null, false, 'User', $user2->id, 'tasks', ['limit' => 1], ['user', $user2->id, 'tasks'])

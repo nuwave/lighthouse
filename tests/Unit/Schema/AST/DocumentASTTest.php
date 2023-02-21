@@ -3,7 +3,6 @@
 namespace Tests\Unit\Schema\AST;
 
 use GraphQL\Language\AST\DirectiveDefinitionNode;
-use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
@@ -93,14 +92,13 @@ final class DocumentASTTest extends TestCase
         directive @foo on FIELD
         ');
 
-        /** @var \Nuwave\Lighthouse\Schema\AST\DocumentAST $reserialized */
         $reserialized = unserialize(
             serialize($documentAST)
         );
+        assert($reserialized instanceof DocumentAST);
 
         $queryType = $reserialized->types[RootType::QUERY];
         $this->assertInstanceOf(ObjectTypeDefinitionNode::class, $queryType);
-        $this->assertInstanceOf(FieldDefinitionNode::class, $queryType->fields[0]);
 
         $this->assertInstanceOf(DirectiveDefinitionNode::class, $reserialized->directives['foo']);
 

@@ -27,7 +27,6 @@ class ResolverProvider implements ProvidesResolver
 
             $resolver = Container::getInstance()->make($resolverClass);
             assert(is_object($resolver));
-            /** @var object $resolver PHPStan thinks it is *NEVER* with Laravel 9 */
 
             return \Closure::fromCallable([$resolver, '__invoke']);
         }

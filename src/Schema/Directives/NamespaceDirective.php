@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeExtensionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
@@ -40,7 +39,6 @@ GRAPHQL;
     protected function addNamespacesToFields(&$objectType): void
     {
         $namespaceDirective = $this->directiveNode->cloneDeep();
-        assert($namespaceDirective instanceof DirectiveNode);
 
         foreach ($objectType->fields as $fieldDefinition) {
             $existingNamespaces = ASTHelper::directiveDefinition($fieldDefinition, self::NAME);

@@ -15,14 +15,14 @@ final class PaginatedRelationLoaderTest extends DBTestCase
 {
     public function testLoadRelationshipsWithLimitsOnCollection(): void
     {
-        /** @var \Tests\Utils\Models\User $user1 */
         $user1 = factory(User::class)->create();
+        assert($user1 instanceof User);
         $user1->tasks()->saveMany(
             factory(Task::class, 5)->make()
         );
 
-        /** @var \Tests\Utils\Models\User $user2 */
         $user2 = factory(User::class)->create();
+        assert($user2 instanceof User);
         $user2->tasks()->saveMany(
             factory(Task::class, 2)->make()
         );
@@ -36,35 +36,34 @@ final class PaginatedRelationLoaderTest extends DBTestCase
             $this->makePaginationArgs($pageSize)
         ))->load($users);
 
-        /** @var \Tests\Utils\Models\User $firstUser */
         $firstUser = $users[0];
-        /** @var \Illuminate\Pagination\LengthAwarePaginator<\Tests\Utils\Models\Task> $tasksPaginator */
+        assert($firstUser instanceof User);
         $tasksPaginator = $firstUser->tasks;
-        $this->assertInstanceOf(LengthAwarePaginator::class, $tasksPaginator);
+        assert($tasksPaginator instanceof LengthAwarePaginator);
         $this->assertCount($pageSize, $tasksPaginator);
-        /** @var \Tests\Utils\Models\Task $firstTask */
         $firstTask = $tasksPaginator[0];
+        assert($firstTask instanceof Task);
         $this->assertEquals($firstUser->getKey(), $firstTask->user_id);
 
-        /** @var \Tests\Utils\Models\User $secondUser */
         $secondUser = $users[1];
+        assert($secondUser instanceof User);
         $this->assertCount(2, $secondUser->tasks);
-        /** @var \Tests\Utils\Models\Task $secondTask */
         $secondTask = $secondUser->tasks[0];
+        assert($secondTask instanceof Task);
         $this->assertEquals($secondUser->getKey(), $secondTask->user_id);
     }
 
     public function testLoadCountOnCollection(): void
     {
-        /** @var \Tests\Utils\Models\User $user1 */
         $user1 = factory(User::class)->create();
+        assert($user1 instanceof User);
         $firstTasksCount = 1;
         $user1->tasks()->saveMany(
             factory(Task::class, $firstTasksCount)->make()
         );
 
-        /** @var \Tests\Utils\Models\User $user2 */
         $user2 = factory(User::class)->create();
+        assert($user2 instanceof User);
         $secondTasksCount = 3;
         $user2->tasks()->saveMany(
             factory(Task::class, $secondTasksCount)->make()
@@ -79,19 +78,19 @@ final class PaginatedRelationLoaderTest extends DBTestCase
             $this->makePaginationArgs(10)
         ))->load($users);
 
-        /** @var \Tests\Utils\Models\User $firstUser */
         $firstUser = $users[0];
+        assert($firstUser instanceof User);
         $this->assertSame($firstTasksCount, $firstUser->getAttributes()['tasks_count'] ?? null);
 
-        /** @var \Tests\Utils\Models\User $secondUser */
         $secondUser = $users[1];
+        assert($secondUser instanceof User);
         $this->assertSame($secondTasksCount, $secondUser->getAttributes()['tasks_count'] ?? null);
     }
 
     public function testLoadsMultipleRelations(): void
     {
-        /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
+        assert($user instanceof User);
 
         $user->tasks()->saveMany(
             factory(Task::class, 2)->make()
@@ -116,8 +115,8 @@ final class PaginatedRelationLoaderTest extends DBTestCase
             $this->makePaginationArgs(4)
         ))->load($users);
 
-        /** @var \Tests\Utils\Models\User $firstUser */
         $firstUser = $users[0];
+        assert($firstUser instanceof User);
 
         $this->assertTrue($firstUser->relationLoaded('tasks'));
         $this->assertTrue($firstUser->relationLoaded('posts'));
@@ -125,8 +124,8 @@ final class PaginatedRelationLoaderTest extends DBTestCase
 
     public function testHandleSoftDeletes(): void
     {
-        /** @var \Tests\Utils\Models\User $user1 */
         $user1 = factory(User::class)->create();
+        assert($user1 instanceof User);
 
         $tasksUser1 = 3;
         $user1->tasks()->saveMany(
@@ -137,8 +136,8 @@ final class PaginatedRelationLoaderTest extends DBTestCase
         $user1->tasks()->save($softDeletedTaskUser1);
         $softDeletedTaskUser1->delete();
 
-        /** @var \Tests\Utils\Models\User $user2 */
         $user2 = factory(User::class)->create();
+        assert($user2 instanceof User);
 
         $tasksUser2 = 4;
         $user2->tasks()->saveMany(
@@ -158,21 +157,21 @@ final class PaginatedRelationLoaderTest extends DBTestCase
             $this->makePaginationArgs(4)
         ))->load($users);
 
-        /** @var \Tests\Utils\Models\User $firstUser */
         $firstUser = $users[0];
+        assert($firstUser instanceof User);
         $this->assertTrue($firstUser->relationLoaded('tasks'));
         $this->assertCount($tasksUser1, $firstUser->tasks);
 
-        /** @var \Tests\Utils\Models\User $secondUser */
         $secondUser = $users[1];
+        assert($secondUser instanceof User);
         $this->assertTrue($secondUser->relationLoaded('tasks'));
         $this->assertCount($tasksUser2, $secondUser->tasks);
     }
 
     public function testGetsPolymorphicRelationship(): void
     {
-        /** @var Task $task */
         $task = factory(Task::class)->create();
+        assert($task instanceof Task);
         $task->tags()->saveMany(
             factory(Tag::class, 3)->make()
         );
@@ -189,8 +188,8 @@ final class PaginatedRelationLoaderTest extends DBTestCase
             $this->makePaginationArgs($first)
         ))->load($tasks);
 
-        /** @var \Tests\Utils\Models\Task $firstTask */
         $firstTask = $tasks[0];
+        assert($firstTask instanceof Task);
         $this->assertCount($first, $firstTask->tags);
     }
 

@@ -39,10 +39,9 @@ final class SubscriberTest extends TestCase
         $topic = 'topic';
         $subscriber->topic = $topic;
 
-        /** @var \Nuwave\Lighthouse\Subscriptions\Subscriber $serialized */
         $serialized = unserialize(serialize($subscriber));
 
-        $this->assertInstanceOf(Subscriber::class, $serialized);
+        assert($serialized instanceof Subscriber);
         $this->assertSame($args, $serialized->args);
         $this->assertNotNull($serialized->channel);
         $this->assertSame($topic, $serialized->topic);

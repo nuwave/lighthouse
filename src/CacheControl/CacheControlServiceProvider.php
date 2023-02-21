@@ -36,10 +36,8 @@ class CacheControlServiceProvider extends ServiceProvider
         $dispatcher->listen(
             StartExecution::class,
             function (StartExecution $startExecution) {
-                $cacheControl = $this->app->make(CacheControl::class);
-                assert($cacheControl instanceof CacheControl);
-
                 $typeInfo = new TypeInfo($startExecution->schema);
+                $cacheControl = $this->app->make(CacheControl::class);
 
                 Visitor::visit($startExecution->query, Visitor::visitWithTypeInfo($typeInfo, [
                     NodeKind::FIELD => function (FieldNode $_) use ($typeInfo, $cacheControl): void {
@@ -89,7 +87,6 @@ class CacheControlServiceProvider extends ServiceProvider
             EndRequest::class,
             function (EndRequest $request): void {
                 $cacheControl = $this->app->make(CacheControl::class);
-                assert($cacheControl instanceof CacheControl);
 
                 $maxAge = $cacheControl->maxAge();
                 $response = $request->response;
