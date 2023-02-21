@@ -14,23 +14,13 @@ use Nuwave\Lighthouse\Schema\RootType;
 class TypeValue
 {
     /**
-     * The underlying type definition node.
-     *
-     * @var \GraphQL\Language\AST\TypeDefinitionNode
-     */
-    protected $typeDefinition;
-
-    /**
      * Cache key for this type.
-     *
-     * @var string
      */
-    protected $cacheKey;
+    protected string $cacheKey;
 
-    public function __construct(TypeDefinitionNode $typeDefinition)
-    {
-        $this->typeDefinition = $typeDefinition;
-    }
+    public function __construct(
+        protected TypeDefinitionNode $typeDefinition
+    ) {}
 
     /**
      * Get the name of the node.

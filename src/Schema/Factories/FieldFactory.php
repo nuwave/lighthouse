@@ -3,13 +3,10 @@
 namespace Nuwave\Lighthouse\Schema\Factories;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Type\Definition\ResolveInfo as BaseResolveInfo;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
-use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -20,7 +17,6 @@ use Nuwave\Lighthouse\Support\Contracts\ComplexityResolverDirective;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 
@@ -32,47 +28,15 @@ use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
  */
 class FieldFactory
 {
-    /**
-     * @var \Illuminate\Pipeline\Pipeline
-     */
-    protected $pipeline;
-
-    /**
-     * @var \Illuminate\Contracts\Config\Repository
-     */
-    protected $config;
-
-    /**
-     * @var \Nuwave\Lighthouse\Schema\DirectiveLocator
-     */
-    protected $directiveLocator;
-
-    /**
-     * @var \Nuwave\Lighthouse\Schema\Factories\ArgumentFactory
-     */
-    protected $argumentFactory;
-
-    /**
-     * @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory
-     */
-    protected $argumentSetFactory;
-
     public function __construct(
-        Pipeline $pipeline,
-        ConfigRepository $config,
-        DirectiveLocator $directiveLocator,
-        ArgumentFactory $argumentFactory,
-        ArgumentSetFactory $argumentSetFactory
-    ) {
-        $this->pipeline = $pipeline;
-        $this->config = $config;
-        $this->directiveLocator = $directiveLocator;
-        $this->argumentFactory = $argumentFactory;
-        $this->argumentSetFactory = $argumentSetFactory;
-    }
+        protected ConfigRepository $config,
+        protected DirectiveLocator $directiveLocator,
+        protected ArgumentFactory $argumentFactory,
+        protected ArgumentSetFactory $argumentSetFactory
+    ) {}
 
     /**
-     * Convert a FieldValue to an executable FieldDefinition.
+     * Convert a FieldValue to a config for an executable FieldDefinition.
      *
      * @return FieldDefinitionConfig
      */
@@ -82,60 +46,47 @@ class FieldFactory
 
         // Directives have the first priority for defining a resolver for a field
         $resolverDirective = $this->directiveLocator->exclusiveOfType($fieldDefinitionNode, FieldResolver::class);
-        if ($resolverDirective instanceof FieldResolver) {
-            $fieldValue = $resolverDirective->resolveField($fieldValue);
-        } else {
-            $fieldValue->setResolver(static::defaultResolver($fieldValue));
+        $resolver = $resolverDirective instanceof FieldResolver
+            ? $resolverDirective->resolveField($fieldValue)
+            : $this->defaultResolver($fieldValue);
+
+        foreach ($this->fieldMiddleware($fieldDefinitionNode) as $fieldMiddleware) {
+            $fieldMiddleware->handleField($fieldValue);
         }
 
-        // Middleware resolve in reversed order
-
-        $globalFieldMiddleware = (new Collection($this->config->get('lighthouse.field_middleware')))
-            ->reverse()
-            ->map(function (string $middlewareDirective): Directive {
-                return Container::getInstance()->make($middlewareDirective);
-            })
-            ->each(function (Directive $directive) use ($fieldDefinitionNode): void {
-                if ($directive instanceof BaseDirective) {
-                    $directive->definitionNode = $fieldDefinitionNode;
-                }
-            });
-
-        $fieldMiddleware = $this->directiveLocator
-            ->associatedOfType($fieldDefinitionNode, FieldMiddleware::class)
-            ->reverse();
-
-        $resolverWithMiddleware = $this->pipeline
-            ->send($fieldValue)
-            ->through(array_merge($fieldMiddleware->all(), $globalFieldMiddleware->all()))
-            ->via('handleField')
-            ->thenReturn()
-            ->getResolver();
-
-        $resolver = function ($root, array $args, GraphQLContext $context, BaseResolveInfo $resolveInfo) use ($resolverWithMiddleware) {
-            $wrappedResolveInfo = new ResolveInfo(
-                $resolveInfo,
-                $this->argumentSetFactory->fromResolveInfo($args, $resolveInfo)
-            );
-
-            return $resolverWithMiddleware($root, $args, $context, $wrappedResolveInfo);
-        };
-        $fieldValue->setResolver($resolver);
-
-        // To see what is allowed here, look at the validation rules in
-        // GraphQL\Type\Definition\FieldDefinition::getDefinition()
         return [
             'name' => $fieldDefinitionNode->name->value,
             'type' => $this->type($fieldDefinitionNode),
             'args' => $this->argumentFactory->toTypeMap(
                 $fieldValue->getField()->arguments
             ),
-            'resolve' => $resolver,
+            'resolve' => $fieldValue->finishResolver($resolver),
             'description' => $fieldDefinitionNode->description->value ?? null,
             'complexity' => $this->complexity($fieldValue),
             'deprecationReason' => ASTHelper::deprecationReason($fieldDefinitionNode),
             'astNode' => $fieldDefinitionNode,
         ];
+    }
+
+    /**
+     * @return array<\Nuwave\Lighthouse\Support\Contracts\FieldMiddleware>
+     */
+    protected function fieldMiddleware(FieldDefinitionNode $fieldDefinitionNode): array
+    {
+        $globalFieldMiddleware = (new Collection($this->config->get('lighthouse.field_middleware')))
+            ->map(fn (string $middlewareDirective): Directive => Container::getInstance()->make($middlewareDirective))
+            ->each(function (Directive $directive) use ($fieldDefinitionNode): void {
+                if ($directive instanceof BaseDirective) {
+                    $directive->definitionNode = $fieldDefinitionNode;
+                }
+            })
+            ->all();
+
+        $directiveFieldMiddleware = $this->directiveLocator
+            ->associatedOfType($fieldDefinitionNode, FieldMiddleware::class)
+            ->all();
+
+        return array_merge($globalFieldMiddleware, $directiveFieldMiddleware);
     }
 
     /**
@@ -172,7 +123,7 @@ class FieldFactory
     /**
      * @return FieldResolverFn
      */
-    public static function defaultResolver(FieldValue $fieldValue): callable
+    protected function defaultResolver(FieldValue $fieldValue): callable
     {
         if (RootType::SUBSCRIPTION === $fieldValue->getParentName()) {
             $providesSubscriptionResolver = Container::getInstance()->make(ProvidesSubscriptionResolver::class);

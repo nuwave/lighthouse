@@ -36,9 +36,9 @@ directive @auth(
 GRAPHQL;
     }
 
-    public function resolveField(FieldValue $fieldValue): FieldValue
+    public function resolveField(FieldValue $fieldValue): callable
     {
-        $fieldValue->setResolver(function (): ?Authenticatable {
+        return function (): ?Authenticatable {
             $guard = $this->directiveArgValue('guard', AuthServiceProvider::guard());
             assert(is_string($guard) || is_null($guard));
 
@@ -47,8 +47,6 @@ GRAPHQL;
                 ->authFactory
                 ->guard($guard)
                 ->user();
-        });
-
-        return $fieldValue;
+        };
     }
 }

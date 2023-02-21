@@ -3,10 +3,8 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
-use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Utils;
 
 class SpreadDirective extends BaseDirective implements FieldMiddleware
@@ -22,22 +20,9 @@ directive @spread on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, \Closure $next)
+    public function handleField(FieldValue $fieldValue): void
     {
-        $resolver = $fieldValue->getResolver();
-
-        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
-            $resolveInfo->argumentSet = $this->spread($resolveInfo->argumentSet);
-
-            return $resolver(
-                $root,
-                $resolveInfo->argumentSet->toArray(),
-                $context,
-                $resolveInfo
-            );
-        });
-
-        return $next($fieldValue);
+        $fieldValue->addArgumentSetTransformer(fn (ArgumentSet $argumentSet): ArgumentSet => $this->spread($argumentSet));
     }
 
     /**
@@ -49,6 +34,7 @@ GRAPHQL;
     {
         $next = new ArgumentSet();
         $next->directives = $original->directives;
+        $next->undefined = $original->undefined;
 
         foreach ($original->arguments as $name => $argument) {
             // Recurse down first, as that resolves the more deeply nested spreads first

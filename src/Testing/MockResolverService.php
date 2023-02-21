@@ -7,7 +7,7 @@ class MockResolverService
     /**
      * @var array<string, callable>
      */
-    protected $mocks;
+    protected array $mocks = [];
 
     /**
      * Register a mock resolver that will be called through this resolver.
@@ -22,6 +22,7 @@ class MockResolverService
      */
     public function get(string $key): callable
     {
-        return $this->mocks[$key];
+        return $this->mocks[$key]
+            ?? throw new \Exception("No mock was registered for key: {$key}.");
     }
 }

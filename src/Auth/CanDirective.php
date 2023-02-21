@@ -30,15 +30,9 @@ use Nuwave\Lighthouse\Support\Utils;
 
 class CanDirective extends BaseDirective implements FieldMiddleware, FieldManipulator
 {
-    /**
-     * @var \Illuminate\Contracts\Auth\Access\Gate
-     */
-    protected $gate;
-
-    public function __construct(Gate $gate)
-    {
-        $this->gate = $gate;
-    }
+    public function __construct(
+        protected Gate $gate
+    ) {}
 
     public static function definition(): string
     {
@@ -116,19 +110,18 @@ GRAPHQL;
     /**
      * Ensure the user is authorized to access this field.
      */
-    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue): void
     {
-        $previousResolver = $fieldValue->getResolver();
         $ability = $this->directiveArgValue('ability');
         $resolved = $this->directiveArgValue('resolved');
 
-        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver, $ability, $resolved) {
+        $fieldValue->wrapResolver(fn (callable $resolver) => function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $ability, $resolved) {
             $gate = $this->gate->forUser($context->user());
             $checkArguments = $this->buildCheckArguments($args);
 
             if ($resolved) {
                 return Resolved::handle(
-                    $previousResolver($root, $args, $context, $resolveInfo),
+                    $resolver($root, $args, $context, $resolveInfo),
                     function ($modelLike) use ($gate, $ability, $checkArguments) {
                         $modelOrModels = $modelLike instanceof Paginator
                             ? $modelLike->items()
@@ -147,10 +140,8 @@ GRAPHQL;
                 $this->authorize($gate, $ability, $model, $checkArguments);
             }
 
-            return $previousResolver($root, $args, $context, $resolveInfo);
+            return $resolver($root, $args, $context, $resolveInfo);
         });
-
-        return $next($fieldValue);
     }
 
     /**

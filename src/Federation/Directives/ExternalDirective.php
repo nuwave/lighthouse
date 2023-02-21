@@ -27,17 +27,15 @@ directive @external on FIELD_DEFINITION
 GRAPHQL;
     }
 
-    public function resolveField(FieldValue $fieldValue): FieldValue
+    public function resolveField(FieldValue $fieldValue): callable
     {
         $defaultFieldResolver = Executor::getDefaultFieldResolver();
 
-        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($defaultFieldResolver) {
+        return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($defaultFieldResolver) {
             // The parent might just hold a foreign key to the external object, in which case we just return that.
             return is_scalar($root)
                 ? $root
                 : $defaultFieldResolver($root, $args, $context, $resolveInfo);
-        });
-
-        return $fieldValue;
+        };
     }
 }

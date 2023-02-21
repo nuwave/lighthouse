@@ -57,7 +57,7 @@ GRAPHQL;
      *
      * @return CountModelsLoader
      */
-    protected function modelsLoader($parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ModelsLoader
+    protected function modelsLoader(mixed $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ModelsLoader
     {
         return new CountModelsLoader(
             $this->relation(),

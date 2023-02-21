@@ -2,7 +2,7 @@
 
 namespace Nuwave\Lighthouse\Federation\Resolvers;
 
-use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Federation\FederationPrinter;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 

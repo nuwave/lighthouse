@@ -8,15 +8,9 @@ use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
 
 class HashDirective extends BaseDirective implements ArgTransformerDirective, ArgDirective
 {
-    /**
-     * @var \Illuminate\Contracts\Hashing\Hasher
-     */
-    protected $hasher;
-
-    public function __construct(Hasher $hasher)
-    {
-        $this->hasher = $hasher;
-    }
+    public function __construct(
+        protected Hasher $hasher
+    ) {}
 
     public static function definition(): string
     {

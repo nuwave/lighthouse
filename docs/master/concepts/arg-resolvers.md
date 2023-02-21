@@ -142,11 +142,11 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class CreateDirective extends BaseDirective implements FieldResolver
+final class CreateDirective extends BaseDirective implements FieldResolver
 {
-    public function resolveField(FieldValue $fieldValue): FieldValue
+    public function resolveField(FieldValue $fieldValue): callable
     {
-        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Model {
+        return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Model {
             // Wrap the operation and let Lighthouse take care of splitting the input
             $nestedSave = new ResolveNested(function($model, $args) {
                 $model->fill($args->toArray());
@@ -158,9 +158,7 @@ class CreateDirective extends BaseDirective implements FieldResolver
             $model = new $modelClass;
 
             return $nestedSave($model, $resolveInfo->argumentSet);
-        });
-
-        return $fieldValue;
+        };
     }
 }
 ```

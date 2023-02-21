@@ -32,9 +32,9 @@ directive @find(
 GRAPHQL;
     }
 
-    public function resolveField(FieldValue $fieldValue): FieldValue
+    public function resolveField(FieldValue $fieldValue): callable
     {
-        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ?Model {
+        return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ?Model {
             $results = $resolveInfo
                 ->enhanceBuilder(
                     $this->getModelClass()::query(),
@@ -51,8 +51,6 @@ GRAPHQL;
             }
 
             return $results->first();
-        });
-
-        return $fieldValue;
+        };
     }
 }

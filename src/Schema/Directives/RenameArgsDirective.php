@@ -3,11 +3,9 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
-use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Utils;
 
 class RenameArgsDirective extends BaseDirective implements FieldMiddleware
@@ -22,26 +20,12 @@ directive @renameArgs on FIELD_DEFINITION
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, \Closure $next)
+    public function handleField(FieldValue $fieldValue): void
     {
-        $resolver = $fieldValue->getResolver();
-
-        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
-            $argumentSet = $resolveInfo->argumentSet;
-            $this->rename($argumentSet);
-
-            return $resolver(
-                $root,
-                $argumentSet->toArray(),
-                $context,
-                $resolveInfo
-            );
-        });
-
-        return $next($fieldValue);
+        $fieldValue->addArgumentSetTransformer(fn (ArgumentSet $argumentSet): ArgumentSet => $this->rename($argumentSet));
     }
 
-    protected function rename(ArgumentSet &$argumentSet): void
+    protected function rename(ArgumentSet &$argumentSet): ArgumentSet
     {
         foreach ($argumentSet->arguments as $name => $argument) {
             // Recursively apply the renaming to nested inputs.
@@ -65,5 +49,7 @@ GRAPHQL;
                 unset($argumentSet->arguments[$name]);
             }
         }
+
+        return $argumentSet;
     }
 }

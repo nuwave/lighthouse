@@ -28,6 +28,7 @@ use Nuwave\Lighthouse\Events\StartOperationOrOperations;
 use Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry;
 use Nuwave\Lighthouse\Execution\ErrorPool;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules;
 use Nuwave\Lighthouse\Support\Utils as LighthouseUtils;
@@ -358,6 +359,7 @@ class GraphQL
     protected function cleanUpAfterExecution(): void
     {
         BatchLoaderRegistry::forgetInstances();
+        FieldValue::clear();
         $this->errorPool->clear();
     }
 

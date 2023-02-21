@@ -37,17 +37,15 @@ GRAPHQL;
         ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType
     ): void {
         $argType = ASTHelper::getUnderlyingTypeName($argDefinition->type);
-        if (Type::INT !== $argType) {
-            throw new DefinitionException(
-                "The {$this->name()} directive must only be used on arguments of type " . Type::INT
-                . ", got {$argType} on {$parentField->name->value}.{$this->nodeName()}."
-            );
+        $expectedArgType = Type::INT;
+        if ($expectedArgType !== $argType) {
+            throw new DefinitionException("The {$this->name()} directive must only be used on arguments of type {$expectedArgType}, got {$parentField->name->value}.{$this->nodeName()} of type {$argType}.");
         }
 
         $parentField->directives[] = $this->directiveNode;
     }
 
-    public function handleField(FieldValue $fieldValue, \Closure $next)
+    public function handleField(FieldValue $fieldValue): void
     {
         $fieldValue->resultHandler(static function (?iterable $result, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ?iterable {
             if (null === $result) {
@@ -84,7 +82,5 @@ GRAPHQL;
 
             return $limited;
         });
-
-        return $next($fieldValue);
     }
 }

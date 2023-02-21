@@ -150,13 +150,68 @@ the new behaviour before upgrading by setting `unbox_bensampo_enum_enum_instance
 public function scopeByType(Builder $builder, AOrB $aOrB): Builder
 ```
 
+### Return resolver from `FieldResolver::resolveField()`
+
+Instead of calling `FieldValue::setResolver()`, directly return the resolver function.
+
+```diff
+use Nuwave\Lighthouse\Execution\ResolveInfo;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+
+final class MyDirective extends BaseDirective implements FieldResolver
+{
+-   public function resolveField(FieldValue $fieldValue): FieldValue
+-   {
+-       $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): int {
+-           return 42;
+-       });
+-       return $fieldValue;
++   public function resolveField(FieldValue $fieldValue): callable
++   {
++       return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): int {
++           return 42;
++       };
+    }
+}
+```
+
+### Simplify wrapping resolvers in `FieldMiddleware` directives
+
+Wrapping resolvers is very common in `FieldMiddleware` directives and is now simplified.
+
+```diff
+use Nuwave\Lighthouse\Execution\ResolveInfo;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+
+final class MyDirective extends BaseDirective implements FieldMiddleware
+{
+-   public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
+-   {
+-       $previousResolver = $fieldValue->getResolver();
+-       $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
+-           return $previousResolver($root, $args, $context, $resolveInfo);
+-       });
+-       return $next($fieldValue);
++   public function handleField(FieldValue $fieldValue): void
++   {
++       $fieldValue->wrapResolver(fn (callable $previousResolver) => function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
++           return $previousResolver($root, $args, $context, $resolveInfo);
++       });
+    }
+}
+```
+
 ### Adopt `FieldBuilderDirective::handleFieldBuilder()` signature
 
 Lighthouse now passes the typical 4 resolver arguments to `FieldBuilderDirective::handleFieldBuilder()`.
 Custom directives the implement `FieldBuilderDirective` now have to accept those extra arguments.
 
 ```diff
-+ use GraphQL\Type\Definition\ResolveInfo;
++ use Nuwave\Lighthouse\Execution\ResolveInfo
 + use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 final class MyDirective extends BaseDirective implements FieldBuilderDirective
@@ -172,7 +227,7 @@ final class MyDirective extends BaseDirective implements FieldBuilderDirective
 You must now call `ResolveInfo::enhanceBuilder()` and pass the resolver arguments.
 
 ```diff
-use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 // Some resolver function or directive middleware

@@ -31,24 +31,16 @@ directive @lazyLoad(
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue): void
     {
         $relations = $this->directiveArgValue('relations');
 
-        $fieldValue->resultHandler(
-            /**
-             * @param EloquentCollection|LengthAwarePaginator  $items
-             *
-             * @return EloquentCollection|LengthAwarePaginator
-             */
-            static function ($items) use ($relations) {
-                $items->load($relations);
+        $fieldValue->resultHandler(static function (EloquentCollection|LengthAwarePaginator $items) use ($relations): EloquentCollection|LengthAwarePaginator {
+            // @phpstan-ignore-next-line LengthAwarePaginator forwards calls to EloquentCollection
+            $items->load($relations);
 
-                return $items;
-            }
-        );
-
-        return $next($fieldValue);
+            return $items;
+        });
     }
 
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType)
