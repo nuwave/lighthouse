@@ -100,12 +100,11 @@ GRAPHQL;
         $modelArg = $this->directiveArgValue('model');
         if (is_string($modelArg)) {
             return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg) {
-                $query = $this->namespaceModelClass($modelArg)::query();
-                assert($query instanceof EloquentBuilder);
+                $builder = $this->namespaceModelClass($modelArg)::query();
 
-                $this->makeBuilderDecorator($root, $args, $context, $resolveInfo)($query);
+                $this->makeBuilderDecorator($root, $args, $context, $resolveInfo)($builder);
 
-                return $query->{$this->function()}($this->column());
+                return $builder->{$this->function()}($this->column());
             };
         }
 
@@ -117,18 +116,15 @@ GRAPHQL;
                         $this->qualifyPath($args, $resolveInfo),
                         [$this->function(), $this->column()]
                     ),
-                    function () use ($parent, $args, $context, $resolveInfo): RelationBatchLoader {
-                        return new RelationBatchLoader(
-                            new AggregateModelsLoader(
-                                $this->relation(),
-                                $this->column(),
-                                $this->function(),
-                                $this->makeBuilderDecorator($parent, $args, $context, $resolveInfo)
-                            )
-                        );
-                    }
+                    fn (): RelationBatchLoader => new RelationBatchLoader(
+                        new AggregateModelsLoader(
+                            $this->relation(),
+                            $this->column(),
+                            $this->function(),
+                            $this->makeBuilderDecorator($parent, $args, $context, $resolveInfo)
+                        )
+                    )
                 );
-                assert($relationBatchLoader instanceof RelationBatchLoader);
 
                 return $relationBatchLoader->load($parent);
             };
@@ -138,7 +134,6 @@ GRAPHQL;
         if (is_string($modelArg)) {
             return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg) {
                 $query = $this->namespaceModelClass($modelArg)::query();
-                assert($query instanceof EloquentBuilder);
 
                 $this->makeBuilderDecorator($root, $args, $context, $resolveInfo)($query);
 

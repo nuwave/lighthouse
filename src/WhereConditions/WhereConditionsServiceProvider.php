@@ -36,7 +36,6 @@ class WhereConditionsServiceProvider extends ServiceProvider
             ManipulateAST::class,
             function (ManipulateAST $manipulateAST): void {
                 $operator = $this->app->make(Operator::class);
-                assert($operator instanceof Operator);
 
                 $manipulateAST->documentAST
                     ->setTypeDefinition(
@@ -71,7 +70,6 @@ class WhereConditionsServiceProvider extends ServiceProvider
         $hasRelationInputName = $name . self::DEFAULT_WHERE_RELATION_CONDITIONS;
 
         $operator = Container::getInstance()->make(Operator::class);
-        assert($operator instanceof Operator);
 
         $operatorName = Parser::enumTypeDefinition(
             $operator->enumDefinition()
@@ -111,7 +109,6 @@ GRAPHQL
         $defaultHasAmount = self::DEFAULT_HAS_AMOUNT;
 
         $operator = Container::getInstance()->make(Operator::class);
-        assert($operator instanceof Operator);
 
         $operatorName = Parser::enumTypeDefinition(
             $operator->enumDefinition()

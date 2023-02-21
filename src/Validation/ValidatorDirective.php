@@ -25,10 +25,7 @@ class ValidatorDirective extends BaseDirective implements ArgDirective, Argument
 {
     use HasArgumentValue;
 
-    /**
-     * @var \Nuwave\Lighthouse\Validation\Validator|null
-     */
-    protected $validator;
+    protected ?Validator $validator;
 
     public static function definition(): string
     {
@@ -71,9 +68,6 @@ GRAPHQL;
             $validatorClass = $this->directiveArgValue('class');
 
             $validator = Container::getInstance()->make($validatorClass);
-            /** @var \Nuwave\Lighthouse\Validation\Validator $validator PHPStan thinks it is *NEVER* with Laravel 9 */
-            assert($validator instanceof Validator);
-
             assert($this->argumentValue instanceof ArgumentSet, 'this directive can only be defined on a field or input');
             $validator->setArgs($this->argumentValue);
 

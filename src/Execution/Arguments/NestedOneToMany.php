@@ -97,7 +97,6 @@ class NestedOneToMany implements ArgResolver
                 ->get();
 
             foreach ($children as $child) {
-                assert($child instanceof Model);
                 $child->setAttribute($relation->getForeignKeyName(), null);
                 $child->save();
             }

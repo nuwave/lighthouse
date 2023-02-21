@@ -191,7 +191,6 @@ class EntityResolverProvider
 
         return function (array $representation) use ($keyFieldsSelections, $modelClass, $definition): ?Model {
             $builder = $modelClass::query();
-            assert($builder instanceof Builder);
 
             $this->constrainKeys($builder, $keyFieldsSelections, $representation, $definition);
 

@@ -57,7 +57,6 @@ class Authorizer implements AuthorizesSubscriptions
             }
 
             foreach ($subscriptions as $subscription) {
-                assert($subscription instanceof GraphQLSubscription);
                 if (! $subscription->authorize($subscriber, $request)) {
                     $this->storage->deleteSubscriber($subscriber->channel);
 

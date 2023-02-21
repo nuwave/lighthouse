@@ -45,8 +45,6 @@ class ArgumentFactory
     public function convert(InputValueDefinitionNode $definitionNode): array
     {
         $definitionNodeConverter = Container::getInstance()->make(ExecutableTypeNodeConverter::class);
-        assert($definitionNodeConverter instanceof ExecutableTypeNodeConverter);
-
         $type = $definitionNodeConverter->convert($definitionNode->type);
         assert($type instanceof Type && $type instanceof InputType);
 

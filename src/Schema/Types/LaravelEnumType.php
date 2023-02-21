@@ -16,12 +16,12 @@ class LaravelEnumType extends EnumType
     /**
      * @var class-string<\BenSampo\Enum\Enum>
      */
-    protected $enumClass;
+    protected string $enumClass;
 
     /**
      * @var \ReflectionClass<\BenSampo\Enum\Enum>
      */
-    protected $reflection;
+    protected \ReflectionClass $reflection;
 
     /**
      * Create a GraphQL enum from a Laravel enum type.
@@ -35,6 +35,7 @@ class LaravelEnumType extends EnumType
             throw self::classDoesNotExist($enumClass);
         }
 
+        // @phpstan-ignore-next-line not necessary with full static validation
         if (! is_subclass_of($enumClass, Enum::class)) {
             throw self::classMustExtendBenSampoEnumEnum($enumClass);
         }
@@ -83,10 +84,7 @@ class LaravelEnumType extends EnumType
 
     protected function deprecationReason(Enum $enum): ?string
     {
-        $key = $enum->key;
-        assert(is_string($key));
-
-        $constant = $this->reflection->getReflectionConstant($key);
+        $constant = $this->reflection->getReflectionConstant($enum->key);
         assert($constant instanceof \ReflectionClassConstant, 'Enum keys are derived from the constant names');
 
         $docComment = $constant->getDocComment();
@@ -122,6 +120,7 @@ class LaravelEnumType extends EnumType
      */
     protected function enumClassDescription(string $enumClass): ?string
     {
+        // @phpstan-ignore-next-line only in some versions
         return method_exists($enumClass, 'getClassDescription')
             // @phpstan-ignore-next-line proven to exist by the line above
             ? $enumClass::getClassDescription()

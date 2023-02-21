@@ -40,7 +40,6 @@ GRAPHQL;
     protected function addNamespacesToFields(&$objectType): void
     {
         $namespaceDirective = $this->directiveNode->cloneDeep();
-        assert($namespaceDirective instanceof DirectiveNode);
 
         foreach ($objectType->fields as $fieldDefinition) {
             $existingNamespaces = ASTHelper::directiveDefinition($fieldDefinition, self::NAME);

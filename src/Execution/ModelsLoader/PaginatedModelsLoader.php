@@ -96,7 +96,6 @@ class PaginatedModelsLoader implements ModelsLoader
         );
 
         $relatedModels = $mergedRelationQuery->get();
-        assert($relatedModels instanceof EloquentCollection);
 
         return $relatedModels->unique(function (Model $relatedModel): string {
             // Compare all attributes because there might not be a unique primary key
@@ -123,10 +122,7 @@ class PaginatedModelsLoader implements ModelsLoader
         $anyModelInstance = $parents->first();
         assert($anyModelInstance instanceof Model);
 
-        $newModelQuery = $anyModelInstance->newModelQuery();
-        assert($newModelQuery instanceof EloquentBuilder);
-
-        return $newModelQuery;
+        return $anyModelInstance->newModelQuery();
     }
 
     /**

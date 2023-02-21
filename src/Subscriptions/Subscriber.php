@@ -103,13 +103,10 @@ class Subscriber
         }
         $this->socket_id = $xSocketID;
 
-        $operation = $resolveInfo->operation;
-        assert($operation instanceof OperationDefinitionNode, 'Must be here, since webonyx/graphql-php validated the subscription.');
-
         $this->query = new DocumentNode([
             'definitions' => new NodeList(array_merge(
                 $resolveInfo->fragments,
-                [$operation]
+                [$resolveInfo->operation]
             )),
         ]);
     }

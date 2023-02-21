@@ -78,15 +78,11 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
             ) {
                 $relationBatchLoader = BatchLoaderRegistry::instance(
                     $this->qualifyPath($args, $resolveInfo),
-                    function () use ($relationName, $decorateBuilder, $paginationArgs): RelationBatchLoader {
-                        $modelsLoader = null !== $paginationArgs
-                            ? new PaginatedModelsLoader($relationName, $decorateBuilder, $paginationArgs)
-                            : new SimpleModelsLoader($relationName, $decorateBuilder);
-
-                        return new RelationBatchLoader($modelsLoader);
-                    }
+                    fn(): RelationBatchLoader => new RelationBatchLoader(
+                        $paginationArgs === null
+                            ? new SimpleModelsLoader($relationName, $decorateBuilder)
+                            : new PaginatedModelsLoader($relationName, $decorateBuilder, $paginationArgs))
                 );
-                assert($relationBatchLoader instanceof RelationBatchLoader);
 
                 return $relationBatchLoader->load($parent);
             }

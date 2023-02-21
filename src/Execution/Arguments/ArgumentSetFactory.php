@@ -56,22 +56,16 @@ class ArgumentSetFactory
     /**
      * Wrap client-given args with type information.
      *
-     * @param  \GraphQL\Language\AST\FieldDefinitionNode|\GraphQL\Language\AST\InputObjectTypeDefinitionNode  $definition
      * @param  array<mixed>  $args
      */
-    public function wrapArgs(Node $definition, array $args): ArgumentSet
+    public function wrapArgs(FieldDefinitionNode|InputObjectTypeDefinitionNode $definition, array $args): ArgumentSet
     {
         $argumentSet = new ArgumentSet();
         $argumentSet->directives = $this->directiveLocator->associated($definition);
 
-        if ($definition instanceof FieldDefinitionNode) {
-            $argDefinitions = $definition->arguments;
-        } elseif ($definition instanceof InputObjectTypeDefinitionNode) {
-            $argDefinitions = $definition->fields;
-        } else {
-            throw new \InvalidArgumentException('Got unexpected node of type ' . get_class($definition));
-        }
-
+        $argDefinitions = $definition instanceof FieldDefinitionNode
+            ? $definition->arguments
+            : $definition->fields;
         $argumentDefinitionMap = $this->makeDefinitionMap($argDefinitions);
 
         foreach ($argumentDefinitionMap as $name => $definition) {

@@ -65,9 +65,6 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
         assert(is_subclass_of($className, GraphQLSubscription::class));
 
         $subscription = Container::getInstance()->make($className);
-        /** @var \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription $subscription PHPStan thinks it is *NEVER* with Laravel 9 */
-        assert($subscription instanceof GraphQLSubscription);
-
         // Subscriptions can only be placed on a single field on the root
         // query, so there is no need to consider the field path
         $this->subscriptionRegistry->register(

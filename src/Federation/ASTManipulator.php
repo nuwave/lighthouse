@@ -53,7 +53,6 @@ class ASTManipulator
             }
 
             foreach ($type->directives as $directive) {
-                assert($directive instanceof DirectiveNode);
                 if ('key' === $directive->name->value) {
                     $entities[] = $type->name->value;
                     break;
