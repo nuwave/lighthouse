@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Federation;
 
-use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Events\ManipulateAST;

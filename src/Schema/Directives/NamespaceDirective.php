@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeExtensionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;

@@ -8,7 +8,6 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\SelectionSetNode;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Container\Container;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
