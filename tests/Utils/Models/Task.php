@@ -54,6 +54,9 @@ final class Task extends Model
         });
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Tests\Utils\Models\Activity>
+     */
     public function activity(): MorphMany
     {
         return $this->morphMany(Activity::class, 'content');
@@ -89,6 +92,11 @@ final class Task extends Model
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * @param \Illuminate\Database\Eloquent\Builder<self> $query
+     *
+     * @return \Illuminate\Database\Eloquent\Builder<self>
+     */
     public function scopeCompleted(EloquentBuilder $query): EloquentBuilder
     {
         return $query->whereNotNull('completed_at');

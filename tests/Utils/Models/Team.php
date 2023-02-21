@@ -22,6 +22,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  */
 final class Team extends Authenticatable
 {
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\User>
+     */
     public function users(): HasMany
     {
         return $this->hasMany(User::class);
