@@ -76,7 +76,6 @@ final class CacheDirectiveTest extends DBTestCase
         ';
 
         $schemaValidator = $this->app->make(SchemaValidator::class);
-        assert($schemaValidator instanceof SchemaValidator);
 
         $schemaValidator->validate();
 

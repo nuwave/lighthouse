@@ -27,9 +27,7 @@ final class CacheStorageManagerTest extends TestCase
      */
     protected function subscriber(string $queryString): Subscriber
     {
-        /** @var \Nuwave\Lighthouse\Subscriptions\Subscriber $subscriber */
         $subscriber = $this->createMock(Subscriber::class);
-
         $subscriber->channel = Subscriber::uniqueChannelName();
         $subscriber->query = Parser::parse($queryString);
 

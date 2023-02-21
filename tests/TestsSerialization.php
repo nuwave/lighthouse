@@ -46,7 +46,6 @@ trait TestsSerialization
     protected function useSerializingArrayStore(): void
     {
         $config = Container::getInstance()->make(ConfigRepository::class);
-        assert($config instanceof ConfigRepository);
         $config->set('cache.stores.array.serialize', true);
     }
 }

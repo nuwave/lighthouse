@@ -5,7 +5,6 @@ namespace Tests\Unit\Execution\Arguments;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\Type;
-use Nuwave\Lighthouse\Execution\Arguments\Argument;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
 use Nuwave\Lighthouse\Execution\Arguments\ListType;
@@ -32,7 +31,6 @@ final class ArgumentSetFactoryTest extends TestCase
         $this->assertCount(1, $argumentSet->arguments);
 
         $bar = $argumentSet->arguments['bar'];
-        $this->assertInstanceOf(Argument::class, $bar);
         $this->assertSame(123, $bar->value);
     }
 
@@ -51,7 +49,6 @@ final class ArgumentSetFactoryTest extends TestCase
         $this->assertCount(1, $argumentSet->arguments);
 
         $bar = $argumentSet->arguments['bar'];
-        $this->assertInstanceOf(Argument::class, $bar);
         $this->assertNull($bar->value);
     }
 
@@ -101,34 +98,27 @@ final class ArgumentSetFactoryTest extends TestCase
 
         $this->assertCount(1, $argumentSet->arguments);
 
-        /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument $bar */
         $bar = $argumentSet->arguments['bar'];
-        $this->assertInstanceOf(Argument::class, $bar);
         $this->assertSame($barValue, $bar->value);
 
-        /** @var \Nuwave\Lighthouse\Execution\Arguments\ListType $firstLevel */
         $firstLevel = $bar->type;
-        $this->assertInstanceOf(ListType::class, $firstLevel);
+        assert($firstLevel instanceof ListType);
         $this->assertFalse($firstLevel->nonNull);
 
-        /** @var \Nuwave\Lighthouse\Execution\Arguments\ListType $secondLevel */
         $secondLevel = $firstLevel->type;
-        $this->assertInstanceOf(ListType::class, $secondLevel);
+        assert($secondLevel instanceof ListType);
         $this->assertTrue($secondLevel->nonNull);
 
-        /** @var \Nuwave\Lighthouse\Execution\Arguments\ListType $thirdLevel */
         $thirdLevel = $secondLevel->type;
-        $this->assertInstanceOf(ListType::class, $thirdLevel);
+        assert($thirdLevel instanceof ListType);
         $this->assertFalse($thirdLevel->nonNull);
 
-        /** @var \Nuwave\Lighthouse\Execution\Arguments\ListType $fourthLevel */
         $fourthLevel = $thirdLevel->type;
-        $this->assertInstanceOf(ListType::class, $fourthLevel);
+        assert($fourthLevel instanceof ListType);
         $this->assertTrue($fourthLevel->nonNull);
 
-        /** @var \Nuwave\Lighthouse\Execution\Arguments\NamedType $finalLevel */
         $finalLevel = $fourthLevel->type;
-        $this->assertInstanceOf(NamedType::class, $finalLevel);
+        assert($finalLevel instanceof NamedType);
         $this->assertSame(Type::INT, $finalLevel->name);
         $this->assertFalse($finalLevel->nonNull);
     }
@@ -152,7 +142,6 @@ final class ArgumentSetFactoryTest extends TestCase
         $this->assertCount(1, $argumentSet->arguments);
 
         $bar = $argumentSet->arguments['bar'];
-        $this->assertInstanceOf(Argument::class, $bar);
         $this->assertNull($bar->value);
     }
 
@@ -171,7 +160,6 @@ final class ArgumentSetFactoryTest extends TestCase
         $this->assertCount(1, $argumentSet->argumentsWithUndefined());
 
         $bar = $argumentSet->argumentsWithUndefined()['bar'];
-        $this->assertInstanceOf(Argument::class, $bar);
         $this->assertNull($bar->value);
     }
 
@@ -181,7 +169,6 @@ final class ArgumentSetFactoryTest extends TestCase
     protected function rootQueryArgumentSet(array $args): ArgumentSet
     {
         $astBuilder = $this->app->make(ASTBuilder::class);
-        assert($astBuilder instanceof ASTBuilder);
         $documentAST = $astBuilder->documentAST();
 
         $queryType = $documentAST->types[RootType::QUERY];
@@ -193,7 +180,6 @@ final class ArgumentSetFactoryTest extends TestCase
         assert($fooField instanceof FieldDefinitionNode);
 
         $factory = $this->app->make(ArgumentSetFactory::class);
-        assert($factory instanceof ArgumentSetFactory);
 
         return $factory->wrapArgs($fooField, $args);
     }

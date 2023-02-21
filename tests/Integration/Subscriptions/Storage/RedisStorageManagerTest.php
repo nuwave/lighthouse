@@ -78,7 +78,6 @@ final class RedisStorageManagerTest extends TestCase
     public function testSubscribersByTopic(): void
     {
         $storage = $this->app->make(RedisStorageManager::class);
-        assert($storage instanceof RedisStorageManager);
 
         $this->querySubscription();
         $this->querySubscription();
@@ -100,7 +99,6 @@ final class RedisStorageManagerTest extends TestCase
     public function testSocketIDStoredOnSubscribe(): void
     {
         $storage = $this->app->make(RedisStorageManager::class);
-        assert($storage instanceof RedisStorageManager);
 
         $this->querySubscription('taskCreated', [
             'X-Socket-ID' => '1234.1234',

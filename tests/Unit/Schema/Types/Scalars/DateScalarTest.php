@@ -85,7 +85,7 @@ abstract class DateScalarTest extends TestCase
         );
         $parsed = $this->scalarInstance()->parseLiteral($dateLiteral);
 
-        $this->assertInstanceOf(IlluminateCarbon::class, $parsed);
+        $this->assertTrue($parsed->isValid());
     }
 
     public function testThrowsIfParseLiteralNonString(): void

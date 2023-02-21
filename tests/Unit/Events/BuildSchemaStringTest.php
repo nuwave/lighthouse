@@ -11,8 +11,6 @@ final class BuildSchemaStringTest extends TestCase
     public function testInjectsSourceSchemaIntoEvent(): void
     {
         $dispatcher = $this->app->make(EventDispatcher::class);
-        assert($dispatcher instanceof EventDispatcher);
-
         $dispatcher->listen(
             BuildSchemaString::class,
             function (BuildSchemaString $buildSchemaString): void {
@@ -26,8 +24,6 @@ final class BuildSchemaStringTest extends TestCase
     public function testAddAdditionalSchemaThroughEvent(): void
     {
         $dispatcher = $this->app->make(EventDispatcher::class);
-        assert($dispatcher instanceof EventDispatcher);
-
         $dispatcher->listen(
             BuildSchemaString::class,
             function (): string {

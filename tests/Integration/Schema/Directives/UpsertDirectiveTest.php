@@ -201,7 +201,6 @@ GRAPHQL;
     public static function resolveType(): Type
     {
         $typeRegistry = Container::getInstance()->make(TypeRegistry::class);
-        assert($typeRegistry instanceof TypeRegistry);
 
         return $typeRegistry->get('Admin');
     }
