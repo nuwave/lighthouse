@@ -31,7 +31,7 @@ class SimplePaginatorField
      *
      * @param  \Illuminate\Pagination\Paginator<mixed>  $root
      *
-     * @return \Illuminate\Support\Collection<mixed>
+     * @return \Illuminate\Support\Collection<int, mixed>
      */
     public function dataResolver(Paginator $root): Collection
     {

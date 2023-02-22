@@ -59,28 +59,28 @@ class DirectiveCommand extends LighthouseGeneratorCommand
     /**
      * The required imports.
      *
-     * @var \Illuminate\Support\Collection<string>
+     * @var \Illuminate\Support\Collection<int, string>
      */
     protected $imports;
 
     /**
      * The implemented interfaces.
      *
-     * @var \Illuminate\Support\Collection<class-string>
+     * @var \Illuminate\Support\Collection<int, string>
      */
     protected $implements;
 
     /**
      * The possible locations.
      *
-     * @var \Illuminate\Support\Collection<string>
+     * @var \Illuminate\Support\Collection<int, string>
      */
     protected $locations;
 
     /**
      * The method stubs.
      *
-     * @var \Illuminate\Support\Collection<string>
+     * @var \Illuminate\Support\Collection<int, string>
      */
     protected $methods;
 

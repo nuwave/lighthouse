@@ -33,11 +33,13 @@ class ResolveInfo extends BaseResolveInfo
     /**
      * Apply ArgBuilderDirectives and scopes to the builder.
      *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation|\Laravel\Scout\Builder  $builder
+     * @template TModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<TModel>|\Illuminate\Database\Eloquent\Relations\Relation<TModel>|\Laravel\Scout\Builder  $builder
      * @param  array<string>  $scopes
      * @param  array<string, mixed>  $args
      *
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation|\Laravel\Scout\Builder
+     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<TModel>|\Illuminate\Database\Eloquent\Relations\Relation<TModel>|\Laravel\Scout\Builder
      */
     public function enhanceBuilder(object $builder, array $scopes, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo, \Closure $directiveFilter = null): object
     {
@@ -61,7 +63,7 @@ class ResolveInfo extends BaseResolveInfo
     /**
      * Would the builder be enhanced in any way?
      *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation|\Laravel\Scout\Builder  $builder
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>|\Laravel\Scout\Builder  $builder
      * @param  array<string>  $scopes
      * @param  array<string, mixed>  $args
      */
@@ -78,7 +80,7 @@ class ResolveInfo extends BaseResolveInfo
     /**
      * Recursively apply the ArgBuilderDirectives onto the builder.
      *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>  $builder
      * @param  (\Closure(\Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective): bool)|null  $directiveFilter
      */
     protected static function applyArgBuilderDirectives(ArgumentSet $argumentSet, object &$builder, \Closure $directiveFilter = null): void
@@ -91,9 +93,11 @@ class ResolveInfo extends BaseResolveInfo
                 ->filter(Utils::instanceofMatcher(ArgBuilderDirective::class));
 
             if (null !== $directiveFilter) {
+                // @phpstan-ignore-next-line PHPStan does not get this list is filtered for ArgBuilderDirective
                 $filteredDirectives = $filteredDirectives->filter($directiveFilter);
             }
 
+            // @phpstan-ignore-next-line PHPStan does not get this list is filtered for ArgBuilderDirective
             $filteredDirectives->each(static function (ArgBuilderDirective $argBuilderDirective) use (&$builder, $value): void {
                 $builder = $argBuilderDirective->handleBuilder($builder, $value);
             });
@@ -112,7 +116,7 @@ class ResolveInfo extends BaseResolveInfo
     /**
      * Would there be any ArgBuilderDirectives to apply to the builder?
      *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>  $builder
      * @param  (\Closure(\Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective): bool)|null  $directiveFilter
      */
     protected static function wouldApplyArgBuilderDirectives(ArgumentSet $argumentSet, object &$builder, \Closure $directiveFilter = null): bool
@@ -123,6 +127,7 @@ class ResolveInfo extends BaseResolveInfo
                 ->filter(Utils::instanceofMatcher(ArgBuilderDirective::class));
 
             if (null !== $directiveFilter) {
+                // @phpstan-ignore-next-line PHPStan does not get this list is filtered for ArgBuilderDirective
                 $filteredDirectives = $filteredDirectives->filter($directiveFilter);
             }
 
@@ -153,7 +158,7 @@ class ResolveInfo extends BaseResolveInfo
     /**
      * Apply the FieldBuilderDirectives onto the builder.
      *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>  $builder
      * @param  array<string, mixed>  $args
      */
     protected static function applyFieldBuilderDirectives(object &$builder, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): void
@@ -173,7 +178,7 @@ class ResolveInfo extends BaseResolveInfo
     }
 
     /**
-     * @return Collection<\Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective>
+     * @return Collection<int, \Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective>
      */
     protected static function fieldBuilderDirectives(ResolveInfo $resolveInfo): Collection
     {

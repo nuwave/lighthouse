@@ -8,10 +8,13 @@ use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 class NestedBelongsTo implements ArgResolver
 {
     /**
-     * @var \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @var \Illuminate\Database\Eloquent\Relations\BelongsTo<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model>
      */
     protected $relation;
 
+    /**
+     * @param  \Illuminate\Database\Eloquent\Relations\BelongsTo<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model>  $relation
+     */
     public function __construct(BelongsTo $relation)
     {
         $this->relation = $relation;
@@ -63,6 +66,9 @@ class NestedBelongsTo implements ArgResolver
         self::disconnectOrDelete($this->relation, $args);
     }
 
+    /**
+     * @param  \Illuminate\Database\Eloquent\Relations\BelongsTo<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model>  $relation
+     */
     public static function disconnectOrDelete(BelongsTo $relation, ArgumentSet $args): void
     {
         // We proceed with disconnecting/deleting only if the given $values is truthy.

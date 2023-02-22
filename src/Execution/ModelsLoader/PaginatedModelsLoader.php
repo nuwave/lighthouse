@@ -55,6 +55,11 @@ class PaginatedModelsLoader implements ModelsLoader
         return $model->getRelation($this->relation);
     }
 
+    /**
+     * @param  \Illuminate\Database\Eloquent\Collection<int, \Illuminate\Database\Eloquent\Model>  $parents
+     *
+     * @return \Illuminate\Database\Eloquent\Collection<int, \Illuminate\Database\Eloquent\Model>
+     */
     protected function loadRelatedModels(EloquentCollection $parents): EloquentCollection
     {
         $relations = $parents
@@ -106,6 +111,10 @@ class PaginatedModelsLoader implements ModelsLoader
 
     /**
      * Use the underlying model to instantiate a relation by name.
+     *
+     * @param  \Illuminate\Database\Eloquent\Collection<int, \Illuminate\Database\Eloquent\Model>  $parents
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>
      */
     protected function relationInstance(EloquentCollection $parents): Relation
     {
@@ -116,6 +125,10 @@ class PaginatedModelsLoader implements ModelsLoader
 
     /**
      * Return a fresh instance of a query builder for the underlying model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Collection<int, \Illuminate\Database\Eloquent\Model>  $parents
+     *
+     * @return \Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>
      */
     protected function newModelQuery(EloquentCollection $parents): EloquentBuilder
     {
@@ -128,7 +141,8 @@ class PaginatedModelsLoader implements ModelsLoader
     /**
      * Ensure the pivot relation is hydrated too, if it exists.
      *
-     * @param  \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>  $relatedModels
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>  $relation
+     * @param  \Illuminate\Database\Eloquent\Collection<int, \Illuminate\Database\Eloquent\Model>  $relatedModels
      */
     protected function hydratePivotRelation(Relation $relation, EloquentCollection $relatedModels): void
     {
@@ -145,7 +159,7 @@ class PaginatedModelsLoader implements ModelsLoader
      *
      * This is necessary because we load models in a non-standard way in @see loadRelatedModels()
      *
-     * @param  \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>  $models
+     * @param  \Illuminate\Database\Eloquent\Collection<int, \Illuminate\Database\Eloquent\Model>  $models
      */
     protected function loadDefaultWith(EloquentCollection $models): void
     {
@@ -153,7 +167,6 @@ class PaginatedModelsLoader implements ModelsLoader
         if (null === $model) {
             return;
         }
-        assert($model instanceof Model);
 
         $unloadedWiths = array_filter(
             Utils::accessProtected($model, 'with'),
@@ -169,6 +182,9 @@ class PaginatedModelsLoader implements ModelsLoader
 
     /**
      * Associate the collection of all fetched relationModels back with their parents.
+     *
+     * @param  \Illuminate\Database\Eloquent\Collection<int, \Illuminate\Database\Eloquent\Model>  $parents
+     * @param  \Illuminate\Database\Eloquent\Collection<int, \Illuminate\Database\Eloquent\Model>  $relatedModels
      */
     protected function associateRelationModels(EloquentCollection $parents, EloquentCollection $relatedModels): void
     {
@@ -181,6 +197,9 @@ class PaginatedModelsLoader implements ModelsLoader
             );
     }
 
+    /**
+     * @param  \Illuminate\Database\Eloquent\Collection<int, \Illuminate\Database\Eloquent\Model>  $parents
+     */
     protected function convertRelationToPaginator(EloquentCollection $parents): void
     {
         $first = $this->paginationArgs->first;

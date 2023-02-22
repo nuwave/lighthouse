@@ -9,6 +9,10 @@ interface ModelsLoader
 {
     /**
      * Load the result onto the given parent models.
+     *
+     * @template TModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Collection<int, TModel>  $parents
      */
     public function load(EloquentCollection $parents): void;
 

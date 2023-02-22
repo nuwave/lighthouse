@@ -53,7 +53,7 @@ class RedisStorageManager implements StoresSubscriptions
     }
 
     /**
-     * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Subscriptions\Subscriber>
+     * @return \Illuminate\Support\Collection<int, \Nuwave\Lighthouse\Subscriptions\Subscriber>
      */
     public function subscribersByTopic(string $topic): Collection
     {

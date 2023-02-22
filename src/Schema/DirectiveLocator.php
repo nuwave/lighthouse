@@ -206,7 +206,7 @@ class DirectiveLocator
     /**
      * Get all directives that are associated with an AST node.
      *
-     * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive>
+     * @return \Illuminate\Support\Collection<int, \Nuwave\Lighthouse\Support\Contracts\Directive>
      */
     public function associated(Node $node): Collection
     {
@@ -235,14 +235,14 @@ class DirectiveLocator
      *
      * @param  class-string<TDirective>  $directiveClass
      *
-     * @return \Illuminate\Support\Collection<TDirective>
+     * @return \Illuminate\Support\Collection<int, TDirective>
      */
     public function associatedOfType(Node $node, string $directiveClass): Collection
     {
         /**
          * Ensured by instanceofMatcher.
          *
-         * @var \Illuminate\Support\Collection<TDirective> $associatedOfType
+         * @var \Illuminate\Support\Collection<int, TDirective> $associatedOfType
          */
         $associatedOfType = $this
             ->associated($node)

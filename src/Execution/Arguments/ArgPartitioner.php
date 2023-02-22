@@ -90,12 +90,15 @@ class ArgPartitioner
 
     /**
      * Attach a nested argument resolver to an argument.
+     *
+     * @param  \ReflectionClass<\Illuminate\Database\Eloquent\Model>  $model
      */
     protected static function attachNestedArgResolver(string $name, Argument &$argument, ?\ReflectionClass $model): void
     {
         $resolverDirective = $argument->directives->first(
             Utils::instanceofMatcher(ArgResolver::class)
         );
+        assert($resolverDirective instanceof ArgResolver || null === $resolverDirective);
 
         if ($resolverDirective) {
             $argument->resolver = $resolverDirective;
@@ -170,6 +173,8 @@ class ArgPartitioner
 
     /**
      * Does a method on the model return a relation of the given class?
+     *
+     * @param  \ReflectionClass<\Illuminate\Database\Eloquent\Model>  $modelReflection
      */
     public static function methodReturnsRelation(
         \ReflectionClass $modelReflection,

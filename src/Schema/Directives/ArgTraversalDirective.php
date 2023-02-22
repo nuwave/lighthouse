@@ -49,6 +49,7 @@ abstract class ArgTraversalDirective extends BaseDirective implements FieldMiddl
 
     /**
      * @param  mixed  $value  The client given value
+     * @param  \Illuminate\Support\Collection<int, \Nuwave\Lighthouse\Support\Contracts\Directive>  $directivesForArgument
      *
      * @return mixed The transformed value
      */
