@@ -2,7 +2,7 @@
 
 namespace Nuwave\Lighthouse\Federation\Resolvers;
 
-use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Federation\BatchedEntityResolver;
 use Nuwave\Lighthouse\Federation\EntityResolverProvider;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;

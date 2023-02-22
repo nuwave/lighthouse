@@ -14,25 +14,12 @@ use Pusher\Pusher;
 
 class PusherBroadcaster implements Broadcaster
 {
-    /**
-     * @var \Pusher\Pusher
-     */
-    protected $pusher;
+    protected StoresSubscriptions $storage;
 
-    /**
-     * @var \Illuminate\Contracts\Debug\ExceptionHandler
-     */
-    protected $exceptionHandler;
-
-    /**
-     * @var \Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions
-     */
-    protected $storage;
-
-    public function __construct(Pusher $pusher, ExceptionHandler $exceptionHandler)
-    {
-        $this->pusher = $pusher;
-        $this->exceptionHandler = $exceptionHandler;
+    public function __construct(
+        protected Pusher $pusher,
+        protected ExceptionHandler $exceptionHandler,
+    ) {
         $this->storage = Container::getInstance()->make(StoresSubscriptions::class);
     }
 

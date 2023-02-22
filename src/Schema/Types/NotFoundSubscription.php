@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Types;
 
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Http\Request;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 

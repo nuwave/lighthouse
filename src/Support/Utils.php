@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Support;
 
-use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
@@ -60,7 +59,6 @@ class Utils
 
         $resolver = Container::getInstance()->make($className);
         assert(is_object($resolver));
-        /** @var object $resolver PHPStan thinks it is *NEVER* with Laravel 9 */
 
         return \Closure::fromCallable([$resolver, $methodName]);
     }

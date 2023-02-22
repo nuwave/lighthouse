@@ -70,7 +70,7 @@ and it will display additional error output.
 namespace App\GraphQL\Queries;
 
 use App\Exceptions\CustomException;
-use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class SomeField
@@ -126,13 +126,12 @@ An error handler class must implement [`\Nuwave\Lighthouse\Execution\ErrorHandle
 ```php
 namespace App\GraphQL;
 
-use Closure;
 use GraphQL\Error\Error;
 use Nuwave\Lighthouse\Execution\ErrorHandler;
 
 final class CountErrorHandler implements ErrorHandler
 {
-    public function __invoke(?Error $error, Closure $next): ?array
+    public function __invoke(?Error $error, \Closure $next): ?array
     {
         // You can discard errors by returning null
         if ($this->shouldBeDiscarded($error)) {

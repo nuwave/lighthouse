@@ -181,8 +181,7 @@ It assumes a simple role system where a `User` has a single attribute `$role`.
 ```php
 namespace App\GraphQL\Directives;
 
-use Closure;
-use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -206,11 +205,9 @@ directive @canAccess(
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue): void
     {
-        $originalResolver = $fieldValue->getResolver();
-
-        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($originalResolver) {
+        $fieldValue->wrapResolver(fn (callable $resolver) => function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
             $requiredRole = $this->directiveArgValue('requiredRole');
             // Throw in case of an invalid schema definition to remind the developer
             if ($requiredRole === null) {
@@ -227,10 +224,8 @@ GRAPHQL;
                 return null;
             }
 
-            return $originalResolver($root, $args, $context, $resolveInfo);
+            return $resolver($root, $args, $context, $resolveInfo);
         });
-
-        return $next($fieldValue);
     }
 }
 ```

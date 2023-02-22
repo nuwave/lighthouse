@@ -162,7 +162,6 @@ trait MakesGraphQLRequestsLumen
     protected function introspectByName(string $path, string $name): ?array
     {
         $this->introspect();
-        assert($this->introspectionResult instanceof TestResponse);
 
         $content = $this->introspectionResult->getContent();
         assert(is_string($content));
@@ -186,9 +185,9 @@ trait MakesGraphQLRequestsLumen
     protected function graphQLEndpointUrl(): string
     {
         $config = Container::getInstance()->make(ConfigRepository::class);
-        assert($config instanceof ConfigRepository);
+        $routeName = $config->get('lighthouse.route.name');
 
-        return route($config->get('lighthouse.route.name'));
+        return route($routeName);
     }
 
     /**
@@ -242,8 +241,6 @@ trait MakesGraphQLRequestsLumen
     protected function rethrowGraphQLErrors(): void
     {
         $config = Container::getInstance()->make(ConfigRepository::class);
-        assert($config instanceof ConfigRepository);
-
         $config->set('lighthouse.error_handlers', [RethrowingErrorHandler::class]);
     }
 }

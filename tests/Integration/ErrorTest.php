@@ -97,7 +97,6 @@ final class ErrorTest extends TestCase
     public function testRethrowsInternalExceptions(): void
     {
         $config = $this->app->make(ConfigRepository::class);
-        assert($config instanceof ConfigRepository);
         $config->set('lighthouse.debug', DebugFlag::INCLUDE_DEBUG_MESSAGE);
 
         $this->mockResolver()
@@ -172,7 +171,6 @@ final class ErrorTest extends TestCase
     public function testAssertGraphQLDebugMessage(): void
     {
         $config = $this->app->make(ConfigRepository::class);
-        assert($config instanceof ConfigRepository);
         $config->set('lighthouse.debug', DebugFlag::INCLUDE_DEBUG_MESSAGE);
 
         $message = 'foo';
@@ -224,7 +222,6 @@ final class ErrorTest extends TestCase
     public function testAssertGraphQLErrorNonClientSafe(): void
     {
         $config = $this->app->make(ConfigRepository::class);
-        assert($config instanceof ConfigRepository);
         $config->set('lighthouse.debug', DebugFlag::INCLUDE_DEBUG_MESSAGE);
 
         $exception = new \Exception('foo');

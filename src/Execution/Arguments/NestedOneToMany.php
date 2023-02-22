@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -97,7 +96,6 @@ class NestedOneToMany implements ArgResolver
                 ->get();
 
             foreach ($children as $child) {
-                assert($child instanceof Model);
                 $child->setAttribute($relation->getForeignKeyName(), null);
                 $child->save();
             }

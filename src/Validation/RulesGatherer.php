@@ -23,21 +23,21 @@ class RulesGatherer
      *
      * @var array<string, mixed>
      */
-    public $rules = [];
+    public array $rules = [];
 
     /**
      * The gathered messages.
      *
      * @var array<string, mixed>
      */
-    public $messages = [];
+    public array $messages = [];
 
     /**
      * The gathered attributes.
      *
      * @var array<string, string>
      */
-    public $attributes = [];
+    public array $attributes = [];
 
     public function __construct(ArgumentSet $argumentSet)
     {
@@ -51,8 +51,7 @@ class RulesGatherer
     {
         $this->gatherRulesForArgumentSet($argumentSet, $argumentSet->directives, $argumentPath);
 
-        $argumentsWithUndefined = $argumentSet->argumentsWithUndefined();
-        foreach ($argumentsWithUndefined as $name => $argument) {
+        foreach ($argumentSet->argumentsWithUndefined() as $name => $argument) {
             $nestedPath = array_merge($argumentPath, [$name]);
 
             $directivesForArray = $argument->directives->filter(

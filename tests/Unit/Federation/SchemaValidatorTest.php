@@ -41,10 +41,8 @@ final class SchemaValidatorTest extends TestCase
         ');
 
         $validator = $this->app->make(SchemaValidator::class);
-        assert($validator instanceof SchemaValidator);
-
         $validator->handle(new ValidateSchema($schema));
-        $this->assertTrue(true);
+        self::expectNotToPerformAssertions();
     }
 
     public function testValidatesUsesFieldNodes(): void
@@ -56,8 +54,6 @@ final class SchemaValidatorTest extends TestCase
         ');
 
         $validator = $this->app->make(SchemaValidator::class);
-        assert($validator instanceof SchemaValidator);
-
         $this->expectException(FederationException::class);
         $validator->handle(new ValidateSchema($schema));
     }
@@ -71,8 +67,6 @@ final class SchemaValidatorTest extends TestCase
         ');
 
         $validator = $this->app->make(SchemaValidator::class);
-        assert($validator instanceof SchemaValidator);
-
         $this->expectException(FederationException::class);
         $validator->handle(new ValidateSchema($schema));
     }
@@ -91,10 +85,8 @@ final class SchemaValidatorTest extends TestCase
         ');
 
         $validator = $this->app->make(SchemaValidator::class);
-        assert($validator instanceof SchemaValidator);
-
         $validator->handle(new ValidateSchema($schema));
-        $this->assertTrue(true);
+        self::expectNotToPerformAssertions();
     }
 
     public function testValidatesNestedMissingExternal(): void
@@ -111,8 +103,6 @@ final class SchemaValidatorTest extends TestCase
         ');
 
         $validator = $this->app->make(SchemaValidator::class);
-        assert($validator instanceof SchemaValidator);
-
         $this->expectException(FederationException::class);
         $validator->handle(new ValidateSchema($schema));
     }

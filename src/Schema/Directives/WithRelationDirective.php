@@ -17,24 +17,17 @@ abstract class WithRelationDirective extends BaseDirective implements FieldMiddl
     use RelationDirectiveHelpers;
 
     /**
-     * @param  mixed  $parent the parent node
      * @param  array<string, mixed>  $args
      */
-    abstract protected function modelsLoader($parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ModelsLoader;
+    abstract protected function modelsLoader(mixed $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ModelsLoader;
 
-    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue): void
     {
-        $previousResolver = $fieldValue->getResolver();
-
-        $fieldValue->setResolver(function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
-            return $this
+        $fieldValue->wrapResolver(
+            fn (callable $resolver) => fn (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) => $this
                 ->loadRelation($parent, $args, $context, $resolveInfo)
-                ->then(static function () use ($previousResolver, $parent, $args, $context, $resolveInfo) {
-                    return $previousResolver($parent, $args, $context, $resolveInfo);
-                });
-        });
-
-        return $next($fieldValue);
+                ->then(static fn () => $resolver($parent, $args, $context, $resolveInfo))
+        );
     }
 
     /**
@@ -44,11 +37,8 @@ abstract class WithRelationDirective extends BaseDirective implements FieldMiddl
     {
         $relationBatchLoader = BatchLoaderRegistry::instance(
             $this->qualifyPath($args, $resolveInfo),
-            function () use ($parent, $args, $context, $resolveInfo): RelationBatchLoader {
-                return new RelationBatchLoader($this->modelsLoader($parent, $args, $context, $resolveInfo));
-            }
+            fn (): RelationBatchLoader => new RelationBatchLoader($this->modelsLoader($parent, $args, $context, $resolveInfo))
         );
-        assert($relationBatchLoader instanceof RelationBatchLoader);
 
         return $relationBatchLoader->load($parent);
     }

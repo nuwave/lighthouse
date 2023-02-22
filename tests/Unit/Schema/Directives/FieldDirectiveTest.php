@@ -46,25 +46,6 @@ final class FieldDirectiveTest extends TestCase
         ]);
     }
 
-    public function testResolveFieldWithMergedArgs(): void
-    {
-        $this->schema = /** @lang GraphQL */ '
-        type Query {
-            bar: String! @field(resolver: "Tests\\\Utils\\\Resolvers\\\Foo@baz" args: ["foo.baz"])
-        }
-        ';
-
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            bar
-        }
-        ')->assertJson([
-            'data' => [
-                'bar' => 'foo.baz',
-            ],
-        ]);
-    }
-
     public function testUsesDefaultFieldNamespace(): void
     {
         $this->schema = /** @lang GraphQL */ '

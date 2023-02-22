@@ -4,11 +4,9 @@ namespace Nuwave\Lighthouse\Cache;
 
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Support\Arr;
-use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class ClearCacheDirective extends BaseDirective implements FieldMiddleware
 {
@@ -70,34 +68,30 @@ input ClearCacheIdSource {
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue): void
     {
-        $fieldValue->resultHandler(
-            function ($result, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
-                $type = $this->directiveArgValue('type');
-                $idSource = $this->directiveArgValue('idSource');
-                $field = $this->directiveArgValue('field');
+        $fieldValue->resultHandler(function ($result, array $args): mixed {
+            $type = $this->directiveArgValue('type');
+            $idSource = $this->directiveArgValue('idSource');
+            $field = $this->directiveArgValue('field');
 
-                if (isset($idSource['argument'])) {
-                    $idOrIds = Arr::get($args, $idSource['argument']);
-                } elseif (isset($idSource['field'])) {
-                    $idOrIds = data_get($result, $idSource['field']);
-                } else {
-                    $idOrIds = [null];
-                }
-
-                foreach ((array) $idOrIds as $id) {
-                    $tag = is_string($field)
-                        ? $this->cacheKeyAndTags->fieldTag($type, $id, $field)
-                        : $this->cacheKeyAndTags->parentTag($type, $id);
-
-                    $this->cacheRepository->tags([$tag])->flush();
-                }
-
-                return $result;
+            if (isset($idSource['argument'])) {
+                $idOrIds = Arr::get($args, $idSource['argument']);
+            } elseif (isset($idSource['field'])) {
+                $idOrIds = data_get($result, $idSource['field']);
+            } else {
+                $idOrIds = [null];
             }
-        );
 
-        return $next($fieldValue);
+            foreach ((array) $idOrIds as $id) {
+                $tag = is_string($field)
+                    ? $this->cacheKeyAndTags->fieldTag($type, $id, $field)
+                    : $this->cacheKeyAndTags->parentTag($type, $id);
+
+                $this->cacheRepository->tags([$tag])->flush();
+            }
+
+            return $result;
+        });
     }
 }

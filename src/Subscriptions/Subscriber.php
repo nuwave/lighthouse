@@ -4,11 +4,10 @@ namespace Nuwave\Lighthouse\Subscriptions;
 
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\AST\NodeList;
-use GraphQL\Language\AST\OperationDefinitionNode;
-use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Utils\AST;
 use Illuminate\Container\Container;
 use Illuminate\Support\Str;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
@@ -103,13 +102,10 @@ class Subscriber
         }
         $this->socket_id = $xSocketID;
 
-        $operation = $resolveInfo->operation;
-        assert($operation instanceof OperationDefinitionNode, 'Must be here, since webonyx/graphql-php validated the subscription.');
-
         $this->query = new DocumentNode([
             'definitions' => new NodeList(array_merge(
                 $resolveInfo->fragments,
-                [$operation]
+                [$resolveInfo->operation]
             )),
         ]);
     }

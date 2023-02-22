@@ -95,67 +95,56 @@ enum AggregateFunction {
 GRAPHQL;
     }
 
-    public function resolveField(FieldValue $fieldValue): FieldValue
+    public function resolveField(FieldValue $fieldValue): callable
     {
         $modelArg = $this->directiveArgValue('model');
         if (is_string($modelArg)) {
-            $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg) {
-                $query = $this->namespaceModelClass($modelArg)::query();
-                assert($query instanceof EloquentBuilder);
+            return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg) {
+                $builder = $this->namespaceModelClass($modelArg)::query();
 
-                $this->makeBuilderDecorator($root, $args, $context, $resolveInfo)($query);
+                $this->makeBuilderDecorator($root, $args, $context, $resolveInfo)($builder);
 
-                return $query->{$this->function()}($this->column());
-            });
-
-            return $fieldValue;
+                return $builder->{$this->function()}($this->column());
+            };
         }
 
         $relation = $this->directiveArgValue('relation');
         if (is_string($relation)) {
-            $fieldValue->setResolver(function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
+            return function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
                 $relationBatchLoader = BatchLoaderRegistry::instance(
                     array_merge(
                         $this->qualifyPath($args, $resolveInfo),
                         [$this->function(), $this->column()]
                     ),
-                    function () use ($parent, $args, $context, $resolveInfo): RelationBatchLoader {
-                        return new RelationBatchLoader(
-                            new AggregateModelsLoader(
-                                $this->relation(),
-                                $this->column(),
-                                $this->function(),
-                                $this->makeBuilderDecorator($parent, $args, $context, $resolveInfo)
-                            )
-                        );
-                    }
+                    fn (): RelationBatchLoader => new RelationBatchLoader(
+                        new AggregateModelsLoader(
+                            $this->relation(),
+                            $this->column(),
+                            $this->function(),
+                            $this->makeBuilderDecorator($parent, $args, $context, $resolveInfo)
+                        )
+                    )
                 );
-                assert($relationBatchLoader instanceof RelationBatchLoader);
 
                 return $relationBatchLoader->load($parent);
-            });
-
-            return $fieldValue;
+            };
         }
 
         $modelArg = $this->directiveArgValue('model');
         if (is_string($modelArg)) {
-            $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg) {
+            return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg) {
                 $query = $this->namespaceModelClass($modelArg)::query();
-                assert($query instanceof EloquentBuilder);
 
                 $this->makeBuilderDecorator($root, $args, $context, $resolveInfo)($query);
 
                 return $query->{$this->function()}($this->column());
-            });
-
-            return $fieldValue;
+            };
         }
 
         if ($this->directiveHasArgument('builder')) {
             $builderResolver = $this->getResolverFromArgument('builder');
 
-            $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($builderResolver) {
+            return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($builderResolver) {
                 $query = $builderResolver($root, $args, $context, $resolveInfo);
 
                 assert(
@@ -166,9 +155,7 @@ GRAPHQL;
                 $this->makeBuilderDecorator($root, $args, $context, $resolveInfo)($query);
 
                 return $query->{$this->function()}($this->column());
-            });
-
-            return $fieldValue;
+            };
         }
 
         throw new DefinitionException("One of the arguments `model`, `relation` or `builder` must be assigned to the '{$this->name()}' directive on '{$this->nodeName()}'.");

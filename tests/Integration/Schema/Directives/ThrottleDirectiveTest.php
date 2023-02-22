@@ -37,14 +37,10 @@ final class ThrottleDirectiveTest extends TestCase
         }
         ';
 
-        /** @var \Illuminate\Cache\RateLimiter $rateLimiter */
         $rateLimiter = $this->app->make(RateLimiter::class);
-        $this->assertTrue(method_exists($rateLimiter, 'for'));
         $rateLimiter->for(
             'test',
-            static function (): Response {
-                return response('Custom response...', 429);
-            }
+            static fn (): Response => response('Custom response...', 429)
         );
 
         $this->expectException(DirectiveException::class);
@@ -63,15 +59,10 @@ final class ThrottleDirectiveTest extends TestCase
         }
         ';
 
-        /** @var \Illuminate\Cache\RateLimiter $rateLimiter */
         $rateLimiter = $this->app->make(RateLimiter::class);
-        $this->assertTrue(method_exists($rateLimiter, 'for'));
         $rateLimiter->for(
             'test',
-            static function () {
-                // @phpstan-ignore-next-line phpstan ignores markTestSkipped
-                return Limit::perMinute(1);
-            }
+            static fn () => Limit::perMinute(1)
         );
 
         $this->graphQL(/** @lang GraphQL */ '

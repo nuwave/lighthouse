@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Federation;
 
-use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Events\ManipulateAST;
@@ -53,7 +52,6 @@ class ASTManipulator
             }
 
             foreach ($type->directives as $directive) {
-                assert($directive instanceof DirectiveNode);
                 if ('key' === $directive->name->value) {
                     $entities[] = $type->name->value;
                     break;

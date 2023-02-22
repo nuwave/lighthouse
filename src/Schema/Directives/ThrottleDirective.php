@@ -5,7 +5,6 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RateLimiting\Unlimited;
 use Illuminate\Http\Request;
@@ -13,6 +12,7 @@ use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Exceptions\RateLimitException;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
@@ -68,26 +68,22 @@ directive @throttle(
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue): void
     {
         /** @var array<int, array{key: string, maxAttempts: int, decayMinutes: float}> $limits */
         $limits = [];
 
         $name = $this->directiveArgValue('name');
         if (null !== $name) {
-            // @phpstan-ignore-next-line won't be executed on Laravel < 8
             $limiter = $this->limiter->limiter($name);
 
             $limiterResponse = $limiter($this->request);
-            // @phpstan-ignore-next-line won't be executed on Laravel < 8
             if ($limiterResponse instanceof Unlimited) {
-                return $next($fieldValue);
+                return;
             }
 
             if ($limiterResponse instanceof Response) {
-                throw new DirectiveException(
-                    "Expected named limiter {$name} to return an array, got instance of " . get_class($limiterResponse)
-                );
+                throw new DirectiveException("Expected named limiter {$name} to return an array, got instance of " . get_class($limiterResponse));
             }
 
             foreach (Arr::wrap($limiterResponse) as $limit) {
@@ -105,9 +101,7 @@ GRAPHQL;
             ];
         }
 
-        $resolver = $fieldValue->getResolver();
-
-        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $limits) {
+        $fieldValue->wrapResolver(fn (callable $resolver) => function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $limits) {
             foreach ($limits as $limit) {
                 $this->handleLimit(
                     $limit['key'],
@@ -119,8 +113,6 @@ GRAPHQL;
 
             return $resolver($root, $args, $context, $resolveInfo);
         });
-
-        return $next($fieldValue);
     }
 
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType): void

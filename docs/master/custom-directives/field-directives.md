@@ -20,8 +20,7 @@ as well as the outgoing result of resolving the field.
 ```php
 namespace App\GraphQL\Directives;
 
-use Closure;
-use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
@@ -36,14 +35,12 @@ directive @example on FIELD_DEFINITION
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue): void
     {
-        $resolver = $fieldValue->getResolver();
-
         // If you have any work to do that does not require the resolver arguments, do it here.
         // This code is executed only once per field, whereas the resolver can be called often.
 
-        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
+        $fieldValue->wrapResolver(fn (callable $resolver) => function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
             // Do something before the resolver, e.g. validate $args, check authentication
 
             // Call the actual resolver
@@ -53,11 +50,6 @@ GRAPHQL;
 
             return $result;
         });
-
-        // Keep the chain of adding field middleware going by calling the next handler.
-        // Calling this before or after ->setResolver() allows you to control the
-        // order in which middleware is wrapped around the field.
-        return $next($fieldValue);
     }
 }
 ```

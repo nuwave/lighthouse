@@ -99,9 +99,7 @@ function (User $user, array $args, GraphQLContext $context, ResolveInfo $resolve
     // Will always return the same instance, stored under the path users.posts
     $userPostsBatchLoader = BatchLoaderRegistry::instance(
         $resolveInfo->path,
-        function (): UserPostsBatchLoader {
-            return new UserPostsBatchLoader();
-        }
+        fn (): UserPostsBatchLoader => new UserPostsBatchLoader(),
     );
 
     // Promise to return the posts for the root resource and defer resolving them

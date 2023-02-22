@@ -88,8 +88,8 @@ final class LimitDirectiveTest extends DBTestCase
     {
         $users = factory(User::class, 2)->create();
 
-        /** @var \Tests\Utils\Models\User $user */
         foreach ($users as $user) {
+            assert($user instanceof User);
             $user->tasks()->saveMany(
                 factory(Task::class, 2)->make()
             );
@@ -168,7 +168,6 @@ final class LimitDirectiveTest extends DBTestCase
             ');
 
         $cache = $this->app->make(CacheRepository::class);
-        assert($cache instanceof CacheRepository);
 
         $data = $cache->get(
             (new CacheKeyAndTagsGenerator())->key(null, false, 'User', $user2->id, 'tasks', ['limit' => 1], ['user', $user2->id, 'tasks'])

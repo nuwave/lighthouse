@@ -17,10 +17,7 @@ final class CacheCommandTest extends TestCase
     use TestsSerialization;
     use TestsSchemaCache;
 
-    /**
-     * @var \Illuminate\Contracts\Config\Repository
-     */
-    protected $config;
+    protected ConfigRepository $config;
 
     public function setUp(): void
     {
@@ -48,7 +45,6 @@ final class CacheCommandTest extends TestCase
         $key = $this->config->get('lighthouse.cache.key');
 
         $cache = $this->app->make(CacheRepository::class);
-        assert($cache instanceof CacheRepository);
         $this->assertFalse($cache->has($key));
 
         $this->commandTester(new CacheCommand())->execute([]);
@@ -62,22 +58,22 @@ final class CacheCommandTest extends TestCase
         $this->config->set('lighthouse.cache.version', 2);
 
         $filesystem = $this->app->make(Filesystem::class);
-        assert($filesystem instanceof Filesystem);
-
         $path = $this->schemaCachePath();
         $this->assertFalse($filesystem->exists($path));
 
         $this->commandTester(new CacheCommand())->execute([]);
 
         $this->assertTrue($filesystem->exists($path));
-        $this->assertInstanceOf(DocumentAST::class, DocumentAST::fromArray(require $path));
+        DocumentAST::fromArray(require $path);
     }
 
     public function testCacheVersionUnknown(): void
     {
         $this->config->set('lighthouse.cache.version', 3);
 
+        $commandTester = $this->commandTester(new CacheCommand());
+
         $this->expectException(UnknownCacheVersionException::class);
-        $this->commandTester(new CacheCommand())->execute([]);
+        $commandTester->execute([]);
     }
 }

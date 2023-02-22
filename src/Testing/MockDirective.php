@@ -8,15 +8,9 @@ use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
 class MockDirective extends BaseDirective implements FieldResolver
 {
-    /**
-     * @var MockResolverService
-     */
-    protected $mockResolverService;
-
-    public function __construct(MockResolverService $mockResolverService)
-    {
-        $this->mockResolverService = $mockResolverService;
-    }
+    public function __construct(
+        protected MockResolverService $mockResolverService
+    ) {}
 
     /**
      * SDL definition of the directive.
@@ -36,15 +30,14 @@ directive @mock(
 GRAPHQL;
     }
 
-    public function resolveField(FieldValue $fieldValue): FieldValue
+    public function resolveField(FieldValue $fieldValue): callable
     {
-        $fieldValue->setResolver(function () {
-            $key = $this->directiveArgValue('key', 'default');
+        $key = $this->directiveArgValue('key', 'default');
+
+        return function () use ($key): mixed {
             $resolver = $this->mockResolverService->get($key);
 
             return $resolver(...func_get_args());
-        });
-
-        return $fieldValue;
+        };
     }
 }

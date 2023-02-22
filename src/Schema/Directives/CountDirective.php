@@ -5,12 +5,12 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry;
 use Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader;
 use Nuwave\Lighthouse\Execution\ModelsLoader\CountModelsLoader;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
@@ -59,11 +59,11 @@ directive @count(
 GRAPHQL;
     }
 
-    public function resolveField(FieldValue $fieldValue): FieldValue
+    public function resolveField(FieldValue $fieldValue): callable
     {
         $modelArg = $this->directiveArgValue('model');
         if (is_string($modelArg)) {
-            $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg): int {
+            return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg): int {
                 $query = $this
                     ->namespaceModelClass($modelArg)::query();
 
@@ -79,31 +79,24 @@ GRAPHQL;
                 }
 
                 return $query->count();
-            });
-
-            return $fieldValue;
+            };
         }
 
         $relation = $this->directiveArgValue('relation');
         if (is_string($relation)) {
-            $fieldValue->setResolver(function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
+            return function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
                 $relationBatchLoader = BatchLoaderRegistry::instance(
                     array_merge(
                         $this->qualifyPath($args, $resolveInfo),
                         ['count']
                     ),
-                    function () use ($parent, $args, $context, $resolveInfo): RelationBatchLoader {
-                        return new RelationBatchLoader(
-                            new CountModelsLoader($this->relation(), $this->makeBuilderDecorator($parent, $args, $context, $resolveInfo))
-                        );
-                    }
+                    fn (): RelationBatchLoader => new RelationBatchLoader(
+                        new CountModelsLoader($this->relation(), $this->makeBuilderDecorator($parent, $args, $context, $resolveInfo))
+                    )
                 );
-                assert($relationBatchLoader instanceof RelationBatchLoader);
 
                 return $relationBatchLoader->load($parent);
-            });
-
-            return $fieldValue;
+            };
         }
 
         throw new DefinitionException(

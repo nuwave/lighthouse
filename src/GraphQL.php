@@ -28,6 +28,7 @@ use Nuwave\Lighthouse\Events\StartOperationOrOperations;
 use Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry;
 use Nuwave\Lighthouse\Execution\ErrorPool;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules;
 use Nuwave\Lighthouse\Support\Utils as LighthouseUtils;
@@ -217,8 +218,6 @@ class GraphQL
         }
 
         $cacheFactory = Container::getInstance()->make(CacheFactory::class);
-        assert($cacheFactory instanceof CacheFactory);
-
         $store = $cacheFactory->store($cacheConfig['store']);
 
         return $store->remember(
@@ -334,8 +333,6 @@ class GraphQL
         }
 
         $cacheFactory = Container::getInstance()->make(CacheFactory::class);
-        assert($cacheFactory instanceof CacheFactory);
-
         $store = $cacheFactory->store($cacheConfig['store']);
 
         $document = $store->get("lighthouse:query:{$sha256hash}");
@@ -358,6 +355,7 @@ class GraphQL
     protected function cleanUpAfterExecution(): void
     {
         BatchLoaderRegistry::forgetInstances();
+        FieldValue::clear();
         $this->errorPool->clear();
     }
 

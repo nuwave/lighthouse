@@ -2,14 +2,14 @@
 
 namespace Nuwave\Lighthouse\Validation;
 
+use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Nuwave\Lighthouse\Exceptions\ValidationException;
-use Nuwave\Lighthouse\Execution\ResolveInfo;
+use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class ValidateDirective extends BaseDirective implements FieldMiddleware
 {
@@ -23,19 +23,14 @@ directive @validate on FIELD_DEFINITION
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue): void
     {
-        $resolver = $fieldValue->getResolver();
-
-        $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
-            $argumentSet = $resolveInfo->argumentSet;
+        $fieldValue->addArgumentSetTransformer(function (ArgumentSet $argumentSet, ResolveInfo $resolveInfo): ArgumentSet {
             $rulesGatherer = new RulesGatherer($argumentSet);
 
             $validationFactory = Container::getInstance()->make(ValidationFactory::class);
-            assert($validationFactory instanceof ValidationFactory);
-
             $validator = $validationFactory->make(
-                $args,
+                $argumentSet->toArray(),
                 $rulesGatherer->rules,
                 $rulesGatherer->messages,
                 $rulesGatherer->attributes
@@ -47,9 +42,7 @@ GRAPHQL;
                 throw new ValidationException("Validation failed for the field [{$path}].", $validator);
             }
 
-            return $resolver($root, $args, $context, $resolveInfo);
+            return $argumentSet;
         });
-
-        return $next($fieldValue);
     }
 }

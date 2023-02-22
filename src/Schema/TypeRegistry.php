@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
-use Closure;
 use GraphQL\Error\InvariantViolation;
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
@@ -535,7 +534,6 @@ class TypeRegistry
         if ($className) {
             $typeResolver = Container::getInstance()->make($className);
             assert(is_object($typeResolver));
-            /** @var object $typeResolver PHPStan thinks it is *NEVER* with Laravel 9 */
 
             return \Closure::fromCallable([$typeResolver, '__invoke']);
         }

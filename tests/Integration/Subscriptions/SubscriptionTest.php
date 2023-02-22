@@ -54,7 +54,6 @@ GRAPHQL;
         $response = $this->subscribe();
 
         $cache = $this->app->make(CacheStorageManager::class);
-        assert($cache instanceof CacheStorageManager);
 
         $subscriber = $cache->subscribersByTopic('ON_POST_CREATED')->first();
 
@@ -88,7 +87,6 @@ GRAPHQL;
         ]);
 
         $cache = $this->app->make(CacheStorageManager::class);
-        assert($cache instanceof CacheStorageManager);
 
         $subscribers = $cache->subscribersByTopic('ON_POST_CREATED');
         $this->assertCount(2, $subscribers);
@@ -111,7 +109,6 @@ GRAPHQL;
         ');
 
         $broadcastManager = $this->app->make(BroadcastManager::class);
-        assert($broadcastManager instanceof BroadcastManager);
 
         $log = $broadcastManager->driver();
         assert($log instanceof LogBroadcaster);
@@ -163,7 +160,6 @@ GRAPHQL;
     public function testWithoutExcludeEmpty(): void
     {
         $config = $this->app->make(ConfigRepository::class);
-        assert($config instanceof ConfigRepository);
 
         $config->set('lighthouse.subscriptions.exclude_empty', false);
         $config->set('lighthouse.subscriptions.version', 2);
@@ -192,8 +188,6 @@ GRAPHQL;
     public function testWithExcludeEmpty(): void
     {
         $config = $this->app->make(ConfigRepository::class);
-        assert($config instanceof ConfigRepository);
-
         $config->set('lighthouse.subscriptions.exclude_empty', true);
         $config->set('lighthouse.subscriptions.version', 2);
 
@@ -224,8 +218,6 @@ GRAPHQL;
         ');
 
         $authFactory = $this->app->make(AuthFactory::class);
-        assert($authFactory instanceof AuthFactory);
-
         $sessionGuard = $authFactory->guard();
         assert($sessionGuard instanceof SessionGuard);
         $sessionGuard->logout();
@@ -239,8 +231,6 @@ GRAPHQL;
         ');
 
         $broadcastManager = $this->app->make(BroadcastManager::class);
-        assert($broadcastManager instanceof BroadcastManager);
-
         $log = $broadcastManager->driver();
         assert($log instanceof LogBroadcaster);
 

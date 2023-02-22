@@ -2,8 +2,9 @@
 
 namespace Tests\Unit\Execution\Arguments;
 
+use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\Type;
-use Nuwave\Lighthouse\Execution\Arguments\Argument;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
 use Nuwave\Lighthouse\Execution\Arguments\ListType;
@@ -30,7 +31,6 @@ final class ArgumentSetFactoryTest extends TestCase
         $this->assertCount(1, $argumentSet->arguments);
 
         $bar = $argumentSet->arguments['bar'];
-        $this->assertInstanceOf(Argument::class, $bar);
         $this->assertSame(123, $bar->value);
     }
 
@@ -49,7 +49,6 @@ final class ArgumentSetFactoryTest extends TestCase
         $this->assertCount(1, $argumentSet->arguments);
 
         $bar = $argumentSet->arguments['bar'];
-        $this->assertInstanceOf(Argument::class, $bar);
         $this->assertNull($bar->value);
     }
 
@@ -99,34 +98,27 @@ final class ArgumentSetFactoryTest extends TestCase
 
         $this->assertCount(1, $argumentSet->arguments);
 
-        /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument $bar */
         $bar = $argumentSet->arguments['bar'];
-        $this->assertInstanceOf(Argument::class, $bar);
         $this->assertSame($barValue, $bar->value);
 
-        /** @var \Nuwave\Lighthouse\Execution\Arguments\ListType $firstLevel */
         $firstLevel = $bar->type;
-        $this->assertInstanceOf(ListType::class, $firstLevel);
+        assert($firstLevel instanceof ListType);
         $this->assertFalse($firstLevel->nonNull);
 
-        /** @var \Nuwave\Lighthouse\Execution\Arguments\ListType $secondLevel */
         $secondLevel = $firstLevel->type;
-        $this->assertInstanceOf(ListType::class, $secondLevel);
+        assert($secondLevel instanceof ListType);
         $this->assertTrue($secondLevel->nonNull);
 
-        /** @var \Nuwave\Lighthouse\Execution\Arguments\ListType $thirdLevel */
         $thirdLevel = $secondLevel->type;
-        $this->assertInstanceOf(ListType::class, $thirdLevel);
+        assert($thirdLevel instanceof ListType);
         $this->assertFalse($thirdLevel->nonNull);
 
-        /** @var \Nuwave\Lighthouse\Execution\Arguments\ListType $fourthLevel */
         $fourthLevel = $thirdLevel->type;
-        $this->assertInstanceOf(ListType::class, $fourthLevel);
+        assert($fourthLevel instanceof ListType);
         $this->assertTrue($fourthLevel->nonNull);
 
-        /** @var \Nuwave\Lighthouse\Execution\Arguments\NamedType $finalLevel */
         $finalLevel = $fourthLevel->type;
-        $this->assertInstanceOf(NamedType::class, $finalLevel);
+        assert($finalLevel instanceof NamedType);
         $this->assertSame(Type::INT, $finalLevel->name);
         $this->assertFalse($finalLevel->nonNull);
     }
@@ -150,7 +142,6 @@ final class ArgumentSetFactoryTest extends TestCase
         $this->assertCount(1, $argumentSet->arguments);
 
         $bar = $argumentSet->arguments['bar'];
-        $this->assertInstanceOf(Argument::class, $bar);
         $this->assertNull($bar->value);
     }
 
@@ -169,7 +160,6 @@ final class ArgumentSetFactoryTest extends TestCase
         $this->assertCount(1, $argumentSet->argumentsWithUndefined());
 
         $bar = $argumentSet->argumentsWithUndefined()['bar'];
-        $this->assertInstanceOf(Argument::class, $bar);
         $this->assertNull($bar->value);
     }
 
@@ -178,20 +168,17 @@ final class ArgumentSetFactoryTest extends TestCase
      */
     protected function rootQueryArgumentSet(array $args): ArgumentSet
     {
-        /** @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder $astBuilder */
         $astBuilder = $this->app->make(ASTBuilder::class);
         $documentAST = $astBuilder->documentAST();
 
-        /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
         $queryType = $documentAST->types[RootType::QUERY];
+        assert($queryType instanceof ObjectTypeDefinitionNode);
 
-        /** @var array<\GraphQL\Language\AST\FieldDefinitionNode> $fields */
         $fields = $queryType->fields;
 
-        /** @var \GraphQL\Language\AST\FieldDefinitionNode $fooField */
         $fooField = ASTHelper::firstByName($fields, 'foo');
+        assert($fooField instanceof FieldDefinitionNode);
 
-        /** @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory $factory */
         $factory = $this->app->make(ArgumentSetFactory::class);
 
         return $factory->wrapArgs($fooField, $args);

@@ -20,8 +20,6 @@ trait TestsRedis
         parent::getEnvironmentSetUp($app);
 
         $config = $app->make(ConfigRepository::class);
-        assert($config instanceof ConfigRepository);
-
         $config->set('database.redis.default', [
             'url' => env('LIGHTHOUSE_TEST_REDIS_URL'),
             'host' => env('LIGHTHOUSE_TEST_REDIS_HOST', 'redis'),
@@ -29,11 +27,9 @@ trait TestsRedis
             'port' => env('LIGHTHOUSE_TEST_REDIS_PORT', '6379'),
             'database' => env('LIGHTHOUSE_TEST_REDIS_DB', '0'),
         ]);
-
         $config->set('database.redis.options', [
             'prefix' => 'lighthouse-test-',
         ]);
-
         $config->set('lighthouse.subscriptions', [
             'version' => 1,
             'storage' => 'redis',

@@ -27,9 +27,9 @@ directive @method(
 GRAPHQL;
     }
 
-    public function resolveField(FieldValue $fieldValue): FieldValue
+    public function resolveField(FieldValue $fieldValue): callable
     {
-        $fieldValue->setResolver(function ($root, array $args) {
+        return function ($root, array $args) {
             $method = $this->directiveArgValue('name', $this->nodeName());
             assert(is_string($method));
 
@@ -40,8 +40,6 @@ GRAPHQL;
             }
 
             return $root->{$method}(...$orderedArgs);
-        });
-
-        return $fieldValue;
+        };
     }
 }

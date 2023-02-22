@@ -23,8 +23,6 @@ class AuthServiceProvider extends ServiceProvider
     public static function guard(): ?string
     {
         $config = Container::getInstance()->make(ConfigRepository::class);
-        assert($config instanceof ConfigRepository);
-
         $lighthouseGuard = $config->get('lighthouse.guard');
         $guards = $config->get('auth.guards');
 

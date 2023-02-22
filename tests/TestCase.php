@@ -97,8 +97,6 @@ GRAPHQL;
     protected function getEnvironmentSetUp($app): void
     {
         $config = $app->make(ConfigRepository::class);
-        assert($config instanceof ConfigRepository);
-
         $config->set('lighthouse.namespaces', [
             'models' => [
                 'Tests\\Utils\\Models',
@@ -212,7 +210,6 @@ GRAPHQL;
         $this->schema = $schema;
 
         $schemaBuilder = $this->app->make(SchemaBuilder::class);
-        assert($schemaBuilder instanceof SchemaBuilder);
 
         return $schemaBuilder->schema();
     }

@@ -2,9 +2,9 @@
 
 namespace Nuwave\Lighthouse\Auth;
 
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
