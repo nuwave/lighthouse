@@ -105,7 +105,7 @@ final class RedisStorageManagerTest extends TestCase
         ]);
 
         $createdSubscriber = $storage->subscribersByTopic('TASK_CREATED')->first();
-
+        self::assertNotNull($createdSubscriber);
         $this->assertSame('1234.1234', $createdSubscriber->socket_id);
     }
 

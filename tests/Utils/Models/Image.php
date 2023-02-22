@@ -24,6 +24,9 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  */
 final class Image extends Model
 {
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\MorphTo<Model, self>
+     */
     public function imageable(): MorphTo
     {
         return $this->morphTo();

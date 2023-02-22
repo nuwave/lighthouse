@@ -367,10 +367,16 @@ final class CountDirectiveDBTest extends DBTestCase
         /** @var User $user */
         $user = factory(User::class)->create();
 
-        /** @var Collection<Task> $tasks */
         $tasks = $user->tasks()->saveMany(
             factory(Task::class)->times(2)->make()
         );
+        assert($tasks instanceof Collection);
+
+        $task1 = $tasks[0];
+        assert($task1 instanceof Task);
+
+        $task2 = $tasks[1];
+        assert($task2 instanceof Task);
 
         $this->be($user);
 
@@ -403,10 +409,10 @@ final class CountDirectiveDBTest extends DBTestCase
                 'user' => [
                     'tasks' => [
                         [
-                            'id' => $tasks[0]->id,
+                            'id' => $task1->id,
                         ],
                         [
-                            'id' => $tasks[1]->id,
+                            'id' => $task2->id,
                         ],
                     ],
                     'taskCount' => 2,

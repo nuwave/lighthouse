@@ -342,11 +342,11 @@ GRAPHQL;
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\User|\Tests\Utils\Models\Team>
+     * @return \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\User|\Tests\Utils\Models\Team>
      */
     public static function fetchResults(): EloquentCollection
     {
-        /** @var \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\User|\Tests\Utils\Models\Team> $results */
+        /** @var \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\User|\Tests\Utils\Models\Team> $results */
         $results = new EloquentCollection();
 
         return $results
