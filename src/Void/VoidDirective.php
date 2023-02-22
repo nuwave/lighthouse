@@ -31,12 +31,9 @@ GRAPHQL;
         $fieldDefinition->type = Parser::typeReference(/** @lang GraphQL */ 'Unit!');
     }
 
-    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue): void
     {
-        $fieldValue->resultHandler(static function (): string {
-            return VoidServiceProvider::UNIT;
-        });
-
-        return $fieldValue;
+        // Just ignore whatever the original resolver is doing and always return a singular value
+        $fieldValue->resultHandler(static fn (): string => VoidServiceProvider::UNIT);
     }
 }
