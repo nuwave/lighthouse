@@ -53,7 +53,7 @@ abstract class IteratorTest extends TestCase
     }
 
     /**
-     * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Subscriptions\Subscriber>
+     * @return \Illuminate\Support\Collection<int, \Nuwave\Lighthouse\Subscriptions\Subscriber>
      */
     protected function subscribers(int $count): Collection
     {

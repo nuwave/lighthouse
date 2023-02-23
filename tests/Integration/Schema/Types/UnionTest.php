@@ -181,11 +181,11 @@ GRAPHQL;
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\User|\Tests\Utils\Models\Post>
+     * @return \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\User|\Tests\Utils\Models\Post>
      */
     public static function fetchResults(): EloquentCollection
     {
-        /** @var \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\User|\Tests\Utils\Models\Post> $results */
+        /** @var \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\User|\Tests\Utils\Models\Post> $results */
         $results = new EloquentCollection();
 
         return $results

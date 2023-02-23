@@ -28,7 +28,7 @@ final class MorphManyDirectiveTest extends DBTestCase
     protected $task;
 
     /**
-     * @var \Illuminate\Support\Collection<\Tests\Utils\Models\Image>
+     * @var \Illuminate\Support\Collection<int, \Tests\Utils\Models\Image>
      */
     protected $taskImages;
 
@@ -38,7 +38,7 @@ final class MorphManyDirectiveTest extends DBTestCase
     protected $post;
 
     /**
-     * @var \Illuminate\Support\Collection<\Tests\Utils\Models\Image>
+     * @var \Illuminate\Support\Collection<int, \Tests\Utils\Models\Image>
      */
     protected $postImages;
 

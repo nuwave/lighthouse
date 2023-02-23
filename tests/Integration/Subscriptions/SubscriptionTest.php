@@ -91,9 +91,15 @@ GRAPHQL;
         $subscribers = $cache->subscribersByTopic('ON_POST_CREATED');
         $this->assertCount(2, $subscribers);
 
+        $subscriber1 = $subscribers[0];
+        assert($subscriber1 instanceof Subscriber);
+
+        $subscriber2 = $subscribers[1];
+        assert($subscriber2 instanceof Subscriber);
+
         $response->assertExactJson([
-            $this->buildResponse('onPostCreated', $subscribers[0]->channel),
-            $this->buildResponse('onPostCreated', $subscribers[1]->channel),
+            $this->buildResponse('onPostCreated', $subscriber1->channel),
+            $this->buildResponse('onPostCreated', $subscriber2->channel),
         ]);
     }
 
@@ -140,6 +146,7 @@ GRAPHQL;
         $subscriber = $cache
             ->subscribersByTopic('ON_POST_CREATED')
             ->first();
+        self::assertNotNull($subscriber);
 
         $response->assertExactJson([
             'data' => [

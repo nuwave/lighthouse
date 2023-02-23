@@ -5,6 +5,7 @@ namespace Tests\Unit\Schema;
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Directives\FieldDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
@@ -76,7 +77,7 @@ final class DirectiveLocatorTest extends TestCase
             ->associated($fieldDefinition)
             ->first();
 
-        $this->assertFalse(property_exists($directive, 'definitionNode'));
+        self::assertNotInstanceOf(BaseDirective::class, $directive);
     }
 
     public function testThrowsIfDirectiveNameCanNotBeResolved(): void

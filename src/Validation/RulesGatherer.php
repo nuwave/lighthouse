@@ -77,7 +77,7 @@ class RulesGatherer
     }
 
     /**
-     * @param  \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive>  $directives
+     * @param  \Illuminate\Support\Collection<int, \Nuwave\Lighthouse\Support\Contracts\Directive>  $directives
      * @param  array<int|string>  $path
      */
     protected function gatherRulesForArgumentSet(ArgumentSet $argumentSet, Collection $directives, array $path): void
@@ -96,7 +96,7 @@ class RulesGatherer
 
     /**
      * @param  mixed  $value  Any argument value is possible
-     * @param  \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive>  $directives
+     * @param  \Illuminate\Support\Collection<int, \Nuwave\Lighthouse\Support\Contracts\Directive>  $directives
      * @param  array<int|string>  $path
      */
     protected function gatherRulesForArgument($value, Collection $directives, array $path): void
@@ -115,7 +115,7 @@ class RulesGatherer
 
     /**
      * @param  \Nuwave\Lighthouse\Execution\Arguments\Argument|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|mixed  $value
-     * @param  \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive>  $directives
+     * @param  \Illuminate\Support\Collection<int, \Nuwave\Lighthouse\Support\Contracts\Directive>  $directives
      * @param  array<int|string>  $path
      */
     protected function handleArgumentValue($value, Collection $directives, array $path): void

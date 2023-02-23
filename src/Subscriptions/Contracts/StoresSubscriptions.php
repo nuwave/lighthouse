@@ -16,7 +16,7 @@ interface StoresSubscriptions
     /**
      * Get all subscribers for a topic.
      *
-     * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Subscriptions\Subscriber>
+     * @return \Illuminate\Support\Collection<int, \Nuwave\Lighthouse\Subscriptions\Subscriber>
      */
     public function subscribersByTopic(string $topic);
 

@@ -30,6 +30,8 @@ use Nuwave\Lighthouse\Support\Utils;
  *     directives: array<int, array<string, mixed>>,
  *     classNameToObjectTypeName: ClassNameToObjectTypeName,
  * }
+ *
+ * @implements \Illuminate\Contracts\Support\Arrayable<string, mixed>
  */
 class DocumentAST implements Arrayable
 {

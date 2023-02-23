@@ -82,6 +82,12 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
 
     /**
      * Enhance the builder used to resolve the models.
+     *
+     * @template TModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<TModel>  $builder
+     *
+     * @return \Illuminate\Database\Eloquent\Builder<TModel>
      */
     abstract protected function enhanceBuilder(EloquentBuilder $builder): EloquentBuilder;
 

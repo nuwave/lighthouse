@@ -5,6 +5,9 @@ namespace Tests\Utils\LaravelEnums;
 use BenSampo\Enum\Contracts\LocalizedEnum;
 use BenSampo\Enum\Enum;
 
+/**
+ * @extends \BenSampo\Enum\Enum<string>
+ */
 final class LocalizedUserType extends Enum implements LocalizedEnum
 {
     public const Administrator = 'ADMINISTRATOR';

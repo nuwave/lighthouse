@@ -203,7 +203,8 @@ class EntityResolverProvider
     }
 
     /**
-     * @param  \Illuminate\Support\Collection<\GraphQL\Language\AST\SelectionSetNode>  $keyFieldsSelections
+     * @param  \Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>  $builder
+     * @param  \Illuminate\Support\Collection<int, \GraphQL\Language\AST\SelectionSetNode>  $keyFieldsSelections
      * @param  array<string, mixed>  $representation
      */
     protected function constrainKeys(EloquentBuilder $builder, Collection $keyFieldsSelections, array $representation, ObjectTypeDefinitionNode $definition): void
@@ -248,6 +249,7 @@ class EntityResolverProvider
     }
 
     /**
+     * @param  \Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>  $builder
      * @param  array<string, mixed>  $representation
      */
     protected function applySatisfiedSelection(EloquentBuilder $builder, SelectionSetNode $keyFields, array $representation, ObjectTypeDefinitionNode $definition): void
@@ -286,7 +288,7 @@ class EntityResolverProvider
     }
 
     /**
-     * @return \Illuminate\Support\Collection<\GraphQL\Language\AST\SelectionSetNode>
+     * @return \Illuminate\Support\Collection<int, \GraphQL\Language\AST\SelectionSetNode>
      */
     public function keyFieldsSelections(ObjectTypeDefinitionNode $definition): Collection
     {
@@ -298,7 +300,7 @@ class EntityResolverProvider
     }
 
     /**
-     * @param  \Illuminate\Support\Collection<\GraphQL\Language\AST\SelectionSetNode>  $keyFieldsSelections
+     * @param  \Illuminate\Support\Collection<int, \GraphQL\Language\AST\SelectionSetNode>  $keyFieldsSelections
      * @param  array<string, mixed>  $representation
      */
     public function firstSatisfiedKeyFields(Collection $keyFieldsSelections, array $representation): SelectionSetNode

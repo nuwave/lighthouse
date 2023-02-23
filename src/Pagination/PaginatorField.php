@@ -8,6 +8,8 @@ use Illuminate\Contracts\Pagination\Paginator;
 class PaginatorField
 {
     /**
+     * @param  \Illuminate\Contracts\Pagination\LengthAwarePaginator<mixed>  $paginator
+     *
      * @return array<string, mixed>
      */
     public function paginatorInfoResolver(LengthAwarePaginator $paginator): array
@@ -25,7 +27,9 @@ class PaginatorField
     }
 
     /**
-     * @return array<mixed>
+     * @param  \Illuminate\Contracts\Pagination\Paginator<mixed>  $paginator
+     *
+     * @return array<int, mixed>
      */
     public function dataResolver(Paginator $paginator): array
     {

@@ -30,7 +30,7 @@ trait RelationDirectiveHelpers
     /**
      * @param  array<string, mixed>  $args
      *
-     * @return \Closure(QueryBuilder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation): void
+     * @return \Closure(QueryBuilder|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>): void
      */
     protected function makeBuilderDecorator($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): \Closure
     {

@@ -179,6 +179,9 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
         return $this->directiveArgValue('defaultCount', $this->lighthouseConfig['pagination']['default_count']);
     }
 
+    /**
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>  $relation
+     */
     protected function isSameConnection(Relation $relation): bool
     {
         $default = $this->database->getDefaultConnection();

@@ -24,11 +24,17 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
  */
 final class Employee extends Model
 {
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\MorphOne<\Tests\Utils\Models\User>
+     */
     public function user(): MorphOne
     {
         return $this->morphOne(User::class, 'person');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Tests\Utils\Models\Color>
+     */
     public function colors(): MorphMany
     {
         return $this->morphMany(Color::class, 'creator');

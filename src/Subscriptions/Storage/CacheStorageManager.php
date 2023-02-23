@@ -95,7 +95,7 @@ class CacheStorageManager implements StoresSubscriptions
     /**
      * Store a topic (list of channels) in the cache.
      *
-     * @param  \Illuminate\Support\Collection<string>  $topic
+     * @param  \Illuminate\Support\Collection<int, string>  $topic
      */
     protected function storeTopic(string $key, Collection $topic): void
     {
@@ -109,7 +109,7 @@ class CacheStorageManager implements StoresSubscriptions
     /**
      * Retrieve a topic (list of channels) from the cache.
      *
-     * @return \Illuminate\Support\Collection<string>
+     * @return \Illuminate\Support\Collection<int, string>
      */
     protected function retrieveTopic(string $key): Collection
     {

@@ -641,6 +641,9 @@ GRAPHQL
         ')->assertGraphQLErrorMessage('Expected value of type "Int!", found null.');
     }
 
+    /**
+     * @return \Illuminate\Pagination\LengthAwarePaginator<array<string, int>>
+     */
     public static function returnPaginatedDataInsteadOfBuilder(): LengthAwarePaginator
     {
         return new LengthAwarePaginator([
