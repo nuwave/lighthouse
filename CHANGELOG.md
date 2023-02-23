@@ -34,6 +34,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Apply argument transformation only once per field https://github.com/nuwave/lighthouse/pull/1706
 - Expect `FieldResolver::resolveField()` to return resolver function directly https://github.com/nuwave/lighthouse/pull/1706
 - Simplify `FieldMiddleware` directive interface https://github.com/nuwave/lighthouse/pull/1706
+- Rename configuration option `schema.register` to `schema_path`
+- Restructure cache related configuration options
 
 ### Fixed
 

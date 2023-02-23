@@ -402,7 +402,7 @@ final class CacheDirectiveTest extends DBTestCase
 
     public function testAttachTagsToCache(): void
     {
-        config(['lighthouse.cache.tags' => true]);
+        config(['lighthouse.cache_directive_tags' => true]);
 
         $user = factory(User::class)->create();
         factory(Post::class, 3)->create([

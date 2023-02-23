@@ -174,7 +174,7 @@ GRAPHQL;
             'entities_resolver_namespace' => 'Tests\\Utils\\Entities',
         ]);
 
-        $config->set('lighthouse.cache.enable', false);
+        $config->set('lighthouse.schema_cache.enable', false);
     }
 
     /**

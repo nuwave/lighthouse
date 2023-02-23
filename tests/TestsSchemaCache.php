@@ -10,8 +10,8 @@ trait TestsSchemaCache
     protected function setUpSchemaCache(): void
     {
         $config = $this->app->make(ConfigRepository::class);
-        $config->set('lighthouse.cache.enable', true);
-        $config->set('lighthouse.cache.path', $this->schemaCachePath());
+        $config->set('lighthouse.schema_cache.enable', true);
+        $config->set('lighthouse.schema_cache.path', $this->schemaCachePath());
     }
 
     protected function schemaCachePath(): string

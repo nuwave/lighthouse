@@ -24,40 +24,22 @@ use Nuwave\Lighthouse\Exceptions\UnknownCacheVersionException;
  */
 class ASTCache
 {
-    /**
-     * @var bool
-     */
-    protected $enable;
+    protected bool $enable;
 
-    /**
-     * @var 1|2
-     */
-    protected $version;
+    protected int $version;
 
-    /**
-     * @var string|null
-     */
-    protected $store;
+    protected string|null $store;
 
-    /**
-     * @var string
-     */
-    protected $key;
+    protected string $key;
 
-    /**
-     * @var int|null
-     */
-    protected $ttl;
+    protected int|null $ttl;
 
-    /**
-     * @var string
-     */
-    protected $path;
+    protected string $path;
 
     public function __construct(ConfigRepository $config)
     {
         /** @var CacheConfig $cacheConfig */
-        $cacheConfig = $config->get('lighthouse.cache');
+        $cacheConfig = $config->get('lighthouse.schema_cache');
 
         $this->enable = $cacheConfig['enable'];
 

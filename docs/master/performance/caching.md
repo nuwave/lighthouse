@@ -36,12 +36,15 @@ To enable this feature, you need to use a cache store that supports [cache tags]
 and enable cache tags in `config/lighthouse.php`:
 
 ```php
-    'cache' => [
-        /*
-         * Should the `@cache` directive use a tagged cache?
-         */
-        'tags' => true,
-    ],
+    /*
+    |--------------------------------------------------------------------------
+    | Cache Directive Tags
+    |--------------------------------------------------------------------------
+    |
+    | Should the `@cache` directive use a tagged cache?
+    |
+    */
+    'cache_directive_tags' => true,
 ```
 
 Now, you can place the [@clearCache](../api-reference/directives.md#clearcache) directive on

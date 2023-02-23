@@ -21,8 +21,8 @@ atomically updates both the cache file and the dependencies, e.g. K8s.
 In order to speed up responses during development, change this setting to be always on:
 
 ```php
-'cache' => [
-    'enable' => env('LIGHTHOUSE_CACHE_ENABLE', true),
+'schema_cache' => [
+    'enable' => env('LIGHTHOUSE_SCHEMA_CACHE_ENABLE', true),
 ],
 ```
 
@@ -31,9 +31,9 @@ In order to speed up responses during development, change this setting to be alw
 If you use [OPcache](https://www.php.net/manual/en/book.opcache.php), set cache version to `2` in `config/lighthouse.php`.
 
 ```php
-'cache' => [
-    'enable' => env('LIGHTHOUSE_CACHE_ENABLE', true),
-    'version' => env('LIGHTHOUSE_CACHE_VERSION', 2),
+'schema_cache' => [
+    'enable' => env('LIGHTHOUSE_SCHEMA_CACHE_ENABLE', true),
+    'version' => env('LIGHTHOUSE_SCHEMA_CACHE_VERSION', 2),
 ],
 ```
 
