@@ -36,10 +36,10 @@ final class ClearCacheCommandTest extends TestCase
 
     public function testClearsCacheVersion1(): void
     {
-        $this->config->set('lighthouse.cache.version', 1);
-        $this->config->set('lighthouse.cache.ttl', 60);
+        $this->config->set('lighthouse.schema_cache.version', 1);
+        $this->config->set('lighthouse.schema_cache.ttl', 60);
 
-        $key = $this->config->get('lighthouse.cache.key');
+        $key = $this->config->get('lighthouse.schema_cache.key');
 
         $cache = $this->app->make(CacheRepository::class);
 
@@ -52,7 +52,7 @@ final class ClearCacheCommandTest extends TestCase
 
     public function testClearsCacheVersion2(): void
     {
-        $this->config->set('lighthouse.cache.version', 2);
+        $this->config->set('lighthouse.schema_cache.version', 2);
 
         $filesystem = $this->app->make(Filesystem::class);
         $path = $this->schemaCachePath();
@@ -65,7 +65,7 @@ final class ClearCacheCommandTest extends TestCase
 
     public function testCacheVersionUnknown(): void
     {
-        $this->config->set('lighthouse.cache.version', 3);
+        $this->config->set('lighthouse.schema_cache.version', 3);
 
         $this->expectException(UnknownCacheVersionException::class);
         $this->commandTester(new ClearCacheCommand())->execute([]);

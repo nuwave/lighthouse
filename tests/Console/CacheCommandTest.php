@@ -38,11 +38,11 @@ final class CacheCommandTest extends TestCase
 
     public function testCacheVersion1(): void
     {
-        $this->config->set('lighthouse.cache.version', 1);
-        $this->config->set('lighthouse.cache.ttl', 60);
-        $this->config->set('lighthouse.cache.store', 'array');
+        $this->config->set('lighthouse.schema_cache.version', 1);
+        $this->config->set('lighthouse.schema_cache.ttl', 60);
+        $this->config->set('lighthouse.schema_cache.store', 'array');
 
-        $key = $this->config->get('lighthouse.cache.key');
+        $key = $this->config->get('lighthouse.schema_cache.key');
 
         $cache = $this->app->make(CacheRepository::class);
         $this->assertFalse($cache->has($key));
@@ -55,7 +55,7 @@ final class CacheCommandTest extends TestCase
 
     public function testCacheVersion2(): void
     {
-        $this->config->set('lighthouse.cache.version', 2);
+        $this->config->set('lighthouse.schema_cache.version', 2);
 
         $filesystem = $this->app->make(Filesystem::class);
         $path = $this->schemaCachePath();
@@ -69,7 +69,7 @@ final class CacheCommandTest extends TestCase
 
     public function testCacheVersionUnknown(): void
     {
-        $this->config->set('lighthouse.cache.version', 3);
+        $this->config->set('lighthouse.schema_cache.version', 3);
 
         $commandTester = $this->commandTester(new CacheCommand());
 

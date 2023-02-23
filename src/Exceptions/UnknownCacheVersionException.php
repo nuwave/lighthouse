@@ -9,6 +9,6 @@ class UnknownCacheVersionException extends \Exception
      */
     public function __construct($version)
     {
-        parent::__construct("Expected lighthouse.cache.version to be 1 or 2, got: {$version}.");
+        parent::__construct("Expected lighthouse.schema_cache.version to be 1 or 2, got: {$version}.");
     }
 }
