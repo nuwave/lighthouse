@@ -369,7 +369,6 @@ final class DeferTest extends TestCase
         ';
 
         $defer = $this->app->make(Defer::class);
-        assert($defer instanceof Defer);
 
         // Set max execution time to now so we immediately resolve deferred fields
         $defer->setMaxExecutionTime(microtime(true));
@@ -426,7 +425,6 @@ final class DeferTest extends TestCase
         ';
 
         $defer = $this->app->make(Defer::class);
-        assert($defer instanceof Defer);
 
         $defer->setMaxNestedFields(1);
 

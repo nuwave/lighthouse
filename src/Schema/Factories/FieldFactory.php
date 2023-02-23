@@ -96,7 +96,6 @@ class FieldFactory
     {
         return static function () use ($fieldDefinition) {
             $typeNodeConverter = Container::getInstance()->make(ExecutableTypeNodeConverter::class);
-            assert($typeNodeConverter instanceof ExecutableTypeNodeConverter);
 
             return $typeNodeConverter->convert($fieldDefinition->type);
         };
@@ -112,12 +111,9 @@ class FieldFactory
             ComplexityResolverDirective::class
         );
 
-        if (null === $complexityDirective) {
-            return null;
-        }
-        assert($complexityDirective instanceof ComplexityResolverDirective);
-
-        return $complexityDirective->complexityResolver($fieldValue);
+        return $complexityDirective instanceof ComplexityResolverDirective
+            ? $complexityDirective->complexityResolver($fieldValue)
+            : null;
     }
 
     /**
@@ -126,15 +122,14 @@ class FieldFactory
     protected function defaultResolver(FieldValue $fieldValue): callable
     {
         if (RootType::SUBSCRIPTION === $fieldValue->getParentName()) {
+            /** @var \Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver $providesSubscriptionResolver */
             $providesSubscriptionResolver = Container::getInstance()->make(ProvidesSubscriptionResolver::class);
-            assert($providesSubscriptionResolver instanceof ProvidesSubscriptionResolver);
 
-            // @phpstan-ignore-next-line Call to method provideSubscriptionResolver() on an unknown class Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver@anonymous
             return $providesSubscriptionResolver->provideSubscriptionResolver($fieldValue);
         }
 
+        /** @var \Nuwave\Lighthouse\Support\Contracts\ProvidesResolver $providesResolver */
         $providesResolver = Container::getInstance()->make(ProvidesResolver::class);
-        assert($providesResolver instanceof ProvidesResolver);
 
         return $providesResolver->provideResolver($fieldValue);
     }

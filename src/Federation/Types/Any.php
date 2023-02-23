@@ -62,7 +62,6 @@ DESCRIPTION;
         }
 
         $entityResolverProvider = Container::getInstance()->make(EntityResolverProvider::class);
-        assert($entityResolverProvider instanceof EntityResolverProvider);
 
         // Representations must contain at least the fields defined in the fieldset of a @key directive on the base type.
         $definition = $entityResolverProvider->typeDefinition($typename);

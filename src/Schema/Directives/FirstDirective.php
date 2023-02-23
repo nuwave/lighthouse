@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -34,16 +35,17 @@ GRAPHQL;
     public function resolveField(FieldValue $fieldValue): callable
     {
         return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ?Model {
-            return $resolveInfo
-                ->enhanceBuilder(
-                    $this->getModelClass()::query(),
-                    $this->directiveArgValue('scopes', []),
-                    $root,
-                    $args,
-                    $context,
-                    $resolveInfo
-                )
-                ->first();
+            $builder = $resolveInfo->enhanceBuilder(
+                $this->getModelClass()::query(),
+                $this->directiveArgValue('scopes', []),
+                $root,
+                $args,
+                $context,
+                $resolveInfo
+            );
+            assert($builder instanceof EloquentBuilder);
+
+            return $builder->first();
         };
     }
 }

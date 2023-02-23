@@ -54,8 +54,6 @@ trait MocksResolvers
     protected function registerMockResolver(callable $mock, string $key): void
     {
         $mockResolverService = Container::getInstance()->make(MockResolverService::class);
-        assert($mockResolverService instanceof MockResolverService);
-
         $mockResolverService->register($mock, $key);
     }
 }

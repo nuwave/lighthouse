@@ -29,8 +29,6 @@ GRAPHQL;
             $rulesGatherer = new RulesGatherer($argumentSet);
 
             $validationFactory = Container::getInstance()->make(ValidationFactory::class);
-            assert($validationFactory instanceof ValidationFactory);
-
             $validator = $validationFactory->make(
                 $argumentSet->toArray(),
                 $rulesGatherer->rules,

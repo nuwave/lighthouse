@@ -248,7 +248,6 @@ class ASTHelper
         foreach ($documentAST->types as $typeDefinition) {
             if ($typeDefinition instanceof ObjectTypeDefinitionNode) {
                 foreach ($typeDefinition->fields as $fieldDefinition) {
-                    assert($fieldDefinition instanceof FieldDefinitionNode);
                     $fieldDefinition->directives = static::prepend($fieldDefinition->directives, $directive);
                 }
             }
@@ -271,13 +270,10 @@ class ASTHelper
         $name = $directiveNode->name->value;
 
         $directiveLocator = Container::getInstance()->make(DirectiveLocator::class);
-        assert($directiveLocator instanceof DirectiveLocator);
-
         $directive = $directiveLocator->resolve($name);
         $directiveDefinition = self::extractDirectiveDefinition($directive::definition());
 
         foreach ($typeWithFields->fields as $fieldDefinition) {
-            assert($fieldDefinition instanceof FieldDefinitionNode);
             // If the field already has the same directive defined, and it is not
             // a repeatable directive, skip over it.
             // Field directives are more specific than those defined on a type.
@@ -379,8 +375,6 @@ class ASTHelper
         }
 
         $astBuilder = Container::getInstance()->make(ASTBuilder::class);
-        assert($astBuilder instanceof ASTBuilder);
-
         $documentAST = $astBuilder->documentAST();
 
         $type = $documentAST->types[$typeName] ?? null;

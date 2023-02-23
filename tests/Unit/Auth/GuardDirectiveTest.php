@@ -110,15 +110,12 @@ final class GuardDirectiveTest extends TestCase
     public function testMultiGuardWithAuthorization(): void
     {
         $config = $this->app->make(ConfigRepository::class);
-        assert($config instanceof ConfigRepository);
-
         $config->set('auth.providers', array_merge($config->get('auth.providers'), [
             'teams' => [
                 'driver' => 'eloquent',
                 'model' => Team::class,
             ],
         ]));
-
         $config->set('auth.guards', array_merge($config->get('auth.guards'), [
             'team' => [
                 'driver' => 'session',
@@ -131,7 +128,6 @@ final class GuardDirectiveTest extends TestCase
         $team->name = 'Test';
 
         $auth = $this->app->make(AuthFactory::class);
-        assert($auth instanceof AuthFactory);
         $auth->guard('team')->setUser($team);
 
         $this->mockResolver($team);

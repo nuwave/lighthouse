@@ -10,8 +10,6 @@ trait TestsSchemaCache
     protected function setUpSchemaCache(): void
     {
         $config = $this->app->make(ConfigRepository::class);
-        assert($config instanceof ConfigRepository);
-
         $config->set('lighthouse.cache.enable', true);
         $config->set('lighthouse.cache.path', $this->schemaCachePath());
     }
@@ -24,8 +22,6 @@ trait TestsSchemaCache
     protected function tearDownSchemaCache(): void
     {
         $filesystem = $this->app->make(Filesystem::class);
-        assert($filesystem instanceof Filesystem);
-
         $filesystem->delete($this->schemaCachePath());
     }
 

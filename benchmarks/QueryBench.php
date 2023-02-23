@@ -12,16 +12,15 @@ abstract class QueryBench extends TestCase
 {
     /**
      * Cached graphQL endpoint.
-     *
-     * @var string
      */
-    protected $graphQLEndpoint;
+    protected string $graphQLEndpoint;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->graphQLEndpoint = route(config('lighthouse.route.name'));
+        $routeName = config('lighthouse.route.name');
+        $this->graphQLEndpoint = route($routeName);
     }
 
     /**
@@ -42,7 +41,6 @@ abstract class QueryBench extends TestCase
         parent::getEnvironmentSetUp($app);
 
         $config = $app->make(ConfigRepository::class);
-        assert($config instanceof ConfigRepository);
         $config->set('lighthouse.field_middleware', []);
     }
 }

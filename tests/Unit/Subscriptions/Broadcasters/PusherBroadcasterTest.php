@@ -60,8 +60,6 @@ final class PusherBroadcasterTest extends TestCase
     private function broadcast(Subscriber $subscriber): void
     {
         $broadcastManager = $this->app->make(BroadcastManager::class);
-        assert($broadcastManager instanceof BroadcastManager);
-
         $pusherBroadcaster = $broadcastManager->driver('pusher');
         assert($pusherBroadcaster instanceof PusherBroadcaster);
 

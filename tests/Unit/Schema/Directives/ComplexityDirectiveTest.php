@@ -132,7 +132,6 @@ GRAPHQL;
     protected function setMaxQueryComplexity(int $max): void
     {
         $config = $this->app->make(ConfigRepository::class);
-        assert($config instanceof ConfigRepository);
         $config->set('lighthouse.security.max_query_complexity', $max);
     }
 }

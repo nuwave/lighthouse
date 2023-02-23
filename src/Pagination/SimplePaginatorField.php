@@ -35,9 +35,6 @@ class SimplePaginatorField
      */
     public function dataResolver(Paginator $root): Collection
     {
-        $values = $root->values();
-        assert($values instanceof Collection, 'The return type `static` refers to the wrong class because it is a proxied method call.');
-
-        return $values;
+        return $root->values();
     }
 }
