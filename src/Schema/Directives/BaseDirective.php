@@ -21,6 +21,8 @@ use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Utils;
 
 /**
+ * A useful base class for directives.
+ *
  * @api
  */
 abstract class BaseDirective implements Directive

@@ -35,6 +35,8 @@ use Nuwave\Lighthouse\Support\Utils as LighthouseUtils;
 /**
  * The main entrypoint to GraphQL execution.
  *
+ * @api
+ *
  * @phpstan-import-type ErrorsHandler from \GraphQL\Executor\ExecutionResult
  */
 class GraphQL
