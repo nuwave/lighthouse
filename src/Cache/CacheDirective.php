@@ -129,7 +129,7 @@ GRAPHQL;
      */
     protected function shouldUseTags(): bool
     {
-        return config('lighthouse.cache.tags', false)
+        return config('lighthouse.cache_directive_tags', false)
             && method_exists($this->cacheRepository->getStore(), 'tags');
     }
 }

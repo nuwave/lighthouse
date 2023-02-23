@@ -61,7 +61,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Schema Location
+    | Schema Path
     |--------------------------------------------------------------------------
     |
     | Path to your .graphql schema file.
@@ -69,9 +69,7 @@ return [
     |
     */
 
-    'schema' => [
-        'register' => base_path('graphql/schema.graphql'),
-    ],
+    'schema_path' => base_path('graphql/schema.graphql'),
 
     /*
     |--------------------------------------------------------------------------
@@ -84,48 +82,53 @@ return [
     |
     */
 
-    'cache' => [
+    'schema_cache' => [
         /*
          * Setting to true enables schema caching.
          */
-        'enable' => env('LIGHTHOUSE_CACHE_ENABLE', 'local' !== env('APP_ENV')),
+        'enable' => env('LIGHTHOUSE_SCHEMA_CACHE_ENABLE', 'local' !== env('APP_ENV')),
 
         /*
          * Allowed values:
          * - 1: uses the store, key and ttl config values to store the schema as a string in the given cache store.
          * - 2: uses the path config value to store the schema in a PHP file allowing OPcache to pick it up.
          */
-        'version' => env('LIGHTHOUSE_CACHE_VERSION', 1),
+        'version' => env('LIGHTHOUSE_SCHEMA_CACHE_VERSION', 1),
 
         /*
          * Allows using a specific cache store, uses the app's default if set to null.
          * Only relevant if version is set to 1.
          */
-        'store' => env('LIGHTHOUSE_CACHE_STORE', null),
+        'store' => env('LIGHTHOUSE_SCHEMA_CACHE_STORE', null),
 
         /*
          * The name of the cache item for the schema cache.
          * Only relevant if version is set to 1.
          */
-        'key' => env('LIGHTHOUSE_CACHE_KEY', 'lighthouse-schema'),
+        'key' => env('LIGHTHOUSE_SCHEMA_CACHE_KEY', 'lighthouse-schema'),
 
         /*
          * Duration in seconds the schema should remain cached, null means forever.
          * Only relevant if version is set to 1.
          */
-        'ttl' => env('LIGHTHOUSE_CACHE_TTL', null),
+        'ttl' => env('LIGHTHOUSE_SCHEMA_CACHE_TTL', null),
 
         /*
          * File path to store the lighthouse schema.
          * Only relevant if version is set to 2.
          */
-        'path' => env('LIGHTHOUSE_CACHE_PATH', base_path('bootstrap/cache/lighthouse-schema.php')),
-
-        /*
-         * Should the `@cache` directive use a tagged cache?
-         */
-        'tags' => false,
+        'path' => env('LIGHTHOUSE_SCHEMA_CACHE_PATH', base_path('bootstrap/cache/lighthouse-schema.php')),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Cache Directive Tags
+    |--------------------------------------------------------------------------
+    |
+    | Should the `@cache` directive use a tagged cache?
+    |
+    */
+    'cache_directive_tags' => false,
 
     /*
     |--------------------------------------------------------------------------

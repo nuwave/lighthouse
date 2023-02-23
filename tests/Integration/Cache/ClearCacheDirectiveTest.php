@@ -7,16 +7,13 @@ use Tests\TestCase;
 
 final class ClearCacheDirectiveTest extends TestCase
 {
-    /**
-     * @var \Illuminate\Contracts\Cache\Repository
-     */
-    protected $cache;
+    protected CacheRepository $cache;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        config(['lighthouse.cache.tags' => true]);
+        config(['lighthouse.cache_directive_tags' => true]);
 
         $this->cache = $this->app->make(CacheRepository::class);
     }
