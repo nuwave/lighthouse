@@ -11,15 +11,9 @@ use Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules;
 
 class ValidationRulesProvider implements ProvidesValidationRules
 {
-    /**
-     * @var \Illuminate\Contracts\Config\Repository
-     */
-    protected $configRepository;
-
-    public function __construct(ConfigRepository $configRepository)
-    {
-        $this->configRepository = $configRepository;
-    }
+    public function __construct(
+        protected ConfigRepository $configRepository
+    ) {}
 
     public function validationRules(): ?array
     {

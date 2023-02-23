@@ -12,7 +12,6 @@ use GraphQL\Language\Parser;
 use GraphQL\Server\Helper as GraphQLHelper;
 use GraphQL\Server\OperationParams;
 use GraphQL\Server\RequestError;
-use GraphQL\Type\Schema;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
@@ -36,45 +35,12 @@ use Nuwave\Lighthouse\Support\Utils as LighthouseUtils;
 /**
  * The main entrypoint to GraphQL execution.
  *
+ * @api
+ *
  * @phpstan-import-type ErrorsHandler from \GraphQL\Executor\ExecutionResult
  */
 class GraphQL
 {
-    /**
-     * @var \Nuwave\Lighthouse\Schema\SchemaBuilder
-     */
-    protected $schemaBuilder;
-
-    /**
-     * @var \Illuminate\Pipeline\Pipeline
-     */
-    protected $pipeline;
-
-    /**
-     * @var \Illuminate\Contracts\Events\Dispatcher
-     */
-    protected $eventDispatcher;
-
-    /**
-     * @var \Nuwave\Lighthouse\Execution\ErrorPool
-     */
-    protected $errorPool;
-
-    /**
-     * @var \Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules
-     */
-    protected $providesValidationRules;
-
-    /**
-     * @var \GraphQL\Server\Helper
-     */
-    protected $graphQLHelper;
-
-    /**
-     * @var \Illuminate\Contracts\Config\Repository
-     */
-    protected $configRepository;
-
     /**
      * Lazily initialized.
      *
@@ -83,31 +49,25 @@ class GraphQL
     protected $errorsHandler;
 
     public function __construct(
-        SchemaBuilder $schemaBuilder,
-        Pipeline $pipeline,
-        EventDispatcher $eventDispatcher,
-        ErrorPool $errorPool,
-        ProvidesValidationRules $providesValidationRules,
-        GraphQLHelper $graphQLHelper,
-        ConfigRepository $configRepository
-    ) {
-        $this->schemaBuilder = $schemaBuilder;
-        $this->pipeline = $pipeline;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->errorPool = $errorPool;
-        $this->providesValidationRules = $providesValidationRules;
-        $this->graphQLHelper = $graphQLHelper;
-        $this->configRepository = $configRepository;
-    }
+        protected SchemaBuilder $schemaBuilder,
+        protected Pipeline $pipeline,
+        protected EventDispatcher $eventDispatcher,
+        protected ErrorPool $errorPool,
+        protected ProvidesValidationRules $providesValidationRules,
+        protected GraphQLHelper $graphQLHelper,
+        protected ConfigRepository $configRepository
+    ) {}
 
     /**
      * Run one or more GraphQL operations against the schema.
+     *
+     * @api
      *
      * @param  \GraphQL\Server\OperationParams|array<int, \GraphQL\Server\OperationParams>  $operationOrOperations
      *
      * @return array<string, mixed>|array<int, array<string, mixed>>
      */
-    public function executeOperationOrOperations($operationOrOperations, GraphQLContext $context): array
+    public function executeOperationOrOperations(OperationParams|array $operationOrOperations, GraphQLContext $context): array
     {
         $this->eventDispatcher->dispatch(
             new StartOperationOrOperations($operationOrOperations)
@@ -132,6 +92,8 @@ class GraphQL
 
     /**
      * Run a single GraphQL operation against the schema and get a result.
+     *
+     * @api
      *
      * @return array<string, mixed>
      */
@@ -183,14 +145,15 @@ class GraphQL
     /**
      * Parses query and executes it.
      *
+     * @api
+     *
      * @param array<string, mixed>|null $variables
-     * @param mixed|null $rootValue
      */
     public function parseAndExecuteQuery(
         string $query,
         GraphQLContext $context,
         ?array $variables = [],
-        $rootValue = null,
+        mixed $rootValue = null,
         ?string $operationName = null
     ): ExecutionResult {
         try {
@@ -204,6 +167,8 @@ class GraphQL
 
     /**
      * Parse the given query string into a DocumentNode.
+     *
+     * @api
      *
      * Caches the parsed result if the query cache is enabled in the configuration.
      *
@@ -232,18 +197,19 @@ class GraphQL
     /**
      * Execute a GraphQL query on the Lighthouse schema and return the raw result.
      *
+     * @api
+     *
      * To render the @see \GraphQL\Executor\ExecutionResult
      * you will probably want to call `->toArray($debug)` on it,
      * with $debug being a combination of flags in @see \GraphQL\Error\DebugFlag
      *
      * @param array<string, mixed>|null $variables
-     * @param mixed|null $rootValue
      */
     public function executeParsedQuery(
         DocumentNode $query,
         GraphQLContext $context,
         ?array $variables = [],
-        $rootValue = null,
+        mixed $rootValue = null,
         ?string $operationName = null
     ): ExecutionResult {
         // Building the executable schema might take a while to do,
@@ -297,6 +263,8 @@ class GraphQL
 
     /**
      * Convert the result to a serializable array.
+     *
+     * @api
      *
      * @return array<string, mixed>
      */

@@ -5,6 +5,11 @@ namespace Nuwave\Lighthouse\Support\Contracts;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
 
+/**
+ * Singleton accesible in all resolvers.
+ *
+ * @api
+ */
 interface GraphQLContext
 {
     /**

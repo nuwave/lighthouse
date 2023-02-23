@@ -33,36 +33,22 @@ use Nuwave\Lighthouse\Support\Contracts\TypeMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\TypeResolver;
 use Nuwave\Lighthouse\Support\Utils;
 
+/**
+ * Holds programmatic type definitions.
+ *
+ * @api
+ */
 class TypeRegistry
 {
     /**
-     * @var \Illuminate\Pipeline\Pipeline
+     * Lazily initialized.
      */
-    protected $pipeline;
-
-    /**
-     * @var \Nuwave\Lighthouse\Schema\DirectiveLocator
-     */
-    protected $directiveLocator;
-
-    /**
-     * @var \Nuwave\Lighthouse\Schema\Factories\ArgumentFactory
-     */
-    protected $argumentFactory;
+    protected FieldFactory $fieldFactory;
 
     /**
      * Lazily initialized.
-     *
-     * @var \Nuwave\Lighthouse\Schema\Factories\FieldFactory
      */
-    protected $fieldFactory;
-
-    /**
-     * Lazily initialized.
-     *
-     * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST
-     */
-    protected $documentAST;
+    protected DocumentAST $documentAST;
 
     /**
      * Map from type names to resolved types.
@@ -72,23 +58,26 @@ class TypeRegistry
      *
      * @var array<string, (\GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType)|null>
      */
-    protected $types = [];
+    protected array $types = [];
 
     /**
      * Map from type names to lazily resolved types.
      *
      * @var array<string, callable(): \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType>
      */
-    protected $lazyTypes = [];
+    protected array $lazyTypes = [];
 
     public function __construct(
-        Pipeline $pipeline,
-        DirectiveLocator $directiveLocator,
-        ArgumentFactory $argumentFactory
-    ) {
-        $this->pipeline = $pipeline;
-        $this->directiveLocator = $directiveLocator;
-        $this->argumentFactory = $argumentFactory;
+        protected Pipeline $pipeline,
+        protected DirectiveLocator $directiveLocator,
+        protected ArgumentFactory $argumentFactory
+    ) {}
+
+    public function setDocumentAST(DocumentAST $documentAST): self
+    {
+        $this->documentAST = $documentAST;
+
+        return $this;
     }
 
     public static function failedToLoadType(string $name): DefinitionException
@@ -111,15 +100,10 @@ class TypeRegistry
         return new DefinitionException("Expected to map {$fqcn} to a single possible type, got: [{$ambiguousMapping}].");
     }
 
-    public function setDocumentAST(DocumentAST $documentAST): self
-    {
-        $this->documentAST = $documentAST;
-
-        return $this;
-    }
-
     /**
      * Get the given GraphQL type by name.
+     *
+     * @api
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException if the type is not found or invalid
      *
@@ -138,6 +122,8 @@ class TypeRegistry
 
     /**
      * Search the given GraphQL type by name.
+     *
+     * @api
      *
      * @return (\GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType)|null
      */
@@ -165,6 +151,8 @@ class TypeRegistry
 
     /**
      * Is a type with the given name present?
+     *
+     * @api
      */
     public function has(string $name): bool
     {
@@ -173,6 +161,8 @@ class TypeRegistry
 
     /**
      * Register an executable GraphQL type.
+     *
+     * @api
      *
      * @param  \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType  $type
      */
@@ -191,6 +181,8 @@ class TypeRegistry
     /**
      * Register an executable GraphQL type lazily.
      *
+     * @api
+     *
      * @param callable(): \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType $type
      */
     public function registerLazy(string $name, callable $type): self
@@ -207,6 +199,8 @@ class TypeRegistry
     /**
      * Register a type, overwriting if it exists already.
      *
+     * @api
+     *
      * @param  \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType  $type
      */
     public function overwrite(Type $type): self
@@ -218,6 +212,8 @@ class TypeRegistry
 
     /**
      * Register a type lazily, overwriting if it exists already.
+     *
+     * @api
      *
      * @param callable(): \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType $type
      */
@@ -274,6 +270,8 @@ class TypeRegistry
     /**
      * Transform a definition node to an executable type.
      *
+     * Only public for testing.
+     *
      * @param  \GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node  $definition
      *
      * @return \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType
@@ -312,22 +310,15 @@ class TypeRegistry
      */
     protected function resolveType(TypeDefinitionNode $typeDefinition): Type
     {
-        switch (get_class($typeDefinition)) {
-            case EnumTypeDefinitionNode::class:
-                return $this->resolveEnumType($typeDefinition);
-            case ScalarTypeDefinitionNode::class:
-                return $this->resolveScalarType($typeDefinition);
-            case ObjectTypeDefinitionNode::class:
-                return $this->resolveObjectType($typeDefinition);
-            case InputObjectTypeDefinitionNode::class:
-                return $this->resolveInputObjectType($typeDefinition);
-            case InterfaceTypeDefinitionNode::class:
-                return $this->resolveInterfaceType($typeDefinition);
-            case UnionTypeDefinitionNode::class:
-                return $this->resolveUnionType($typeDefinition);
-            default:
-                throw new InvariantViolation("Unknown type for definition {$typeDefinition->getName()->value}.");
-        }
+        return match (true) {
+            $typeDefinition instanceof EnumTypeDefinitionNode => $this->resolveEnumType($typeDefinition),
+            $typeDefinition instanceof ScalarTypeDefinitionNode => $this->resolveScalarType($typeDefinition),
+            $typeDefinition instanceof ObjectTypeDefinitionNode => $this->resolveObjectType($typeDefinition),
+            $typeDefinition instanceof InputObjectTypeDefinitionNode => $this->resolveInputObjectType($typeDefinition),
+            $typeDefinition instanceof InterfaceTypeDefinitionNode => $this->resolveInterfaceType($typeDefinition),
+            $typeDefinition instanceof UnionTypeDefinitionNode => $this->resolveUnionType($typeDefinition),
+            default => throw new InvariantViolation("Unknown type for definition {$typeDefinition->getName()->value}."),
+        };
     }
 
     protected function resolveEnumType(EnumTypeDefinitionNode $enumDefinition): EnumType
@@ -363,29 +354,24 @@ class TypeRegistry
     {
         $scalarName = $scalarDefinition->name->value;
 
-        if (($directive = ASTHelper::directiveDefinition($scalarDefinition, 'scalar')) !== null) {
-            $className = ASTHelper::directiveArgValue($directive, 'class');
-        } else {
-            $className = $scalarName;
-        }
+        $scalarDirective = ASTHelper::directiveDefinition($scalarDefinition, 'scalar');
+        $className = null === $scalarDirective
+            ? $scalarName
+            : ASTHelper::directiveArgValue($scalarDirective, 'class');
 
         $namespacesToTry = (array) config('lighthouse.namespaces.scalars');
 
         $className = Utils::namespaceClassname(
             $className,
             $namespacesToTry,
-            function (string $className): bool {
-                return is_subclass_of($className, ScalarType::class);
-            }
+            fn (string $className): bool => is_subclass_of($className, ScalarType::class)
         );
         assert(is_null($className) || is_subclass_of($className, ScalarType::class));
 
         if (! $className) {
             $scalarClass = ScalarType::class;
             $consideredNamespaces = implode(', ', $namespacesToTry);
-            throw new DefinitionException(
-                "Failed to find class {$className} extends {$scalarClass} in namespaces [{$consideredNamespaces}] for the scalar {$scalarName}."
-            );
+            throw new DefinitionException("Failed to find class {$className} extends {$scalarClass} in namespaces [{$consideredNamespaces}] for the scalar {$scalarName}.");
         }
 
         return new $className([
@@ -418,11 +404,9 @@ class TypeRegistry
     /**
      * Returns a closure that lazy loads the fields for a constructed type.
      *
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\InterfaceTypeDefinitionNode  $typeDefinition
-     *
      * @return \Closure(): array<string, \Closure(): array<string, mixed>>
      */
-    protected function makeFieldsLoader($typeDefinition): \Closure
+    protected function makeFieldsLoader(ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode $typeDefinition): \Closure
     {
         return function () use ($typeDefinition): array {
             $fieldFactory = $this->fieldFactory();

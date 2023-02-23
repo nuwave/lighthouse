@@ -9,7 +9,6 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
-use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use GraphQL\Language\AST\UnionTypeDefinitionNode;
@@ -21,16 +20,19 @@ use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Utils;
 
+/**
+ * A useful base class for directives.
+ *
+ * @api
+ */
 abstract class BaseDirective implements Directive
 {
     /**
      * The AST node of the directive.
      *
      * May not be set if the directive is added programmatically.
-     *
-     * @var \GraphQL\Language\AST\DirectiveNode
      */
-    public $directiveNode;
+    public DirectiveNode $directiveNode;
 
     /**
      * The node the directive is defined on.
@@ -38,10 +40,8 @@ abstract class BaseDirective implements Directive
      * @see \GraphQL\Language\DirectiveLocation
      *
      * Intentionally leaving out the request definitions and the 'SCHEMA' location.
-     *
-     * @var ScalarTypeDefinitionNode|ObjectTypeDefinitionNode|FieldDefinitionNode|InputValueDefinitionNode|InterfaceTypeDefinitionNode|UnionTypeDefinitionNode|EnumTypeDefinitionNode|EnumValueDefinitionNode|InputObjectTypeDefinitionNode
      */
-    public $definitionNode;
+    public UnionTypeDefinitionNode|EnumTypeDefinitionNode|InputObjectTypeDefinitionNode|FieldDefinitionNode|InterfaceTypeDefinitionNode|InputValueDefinitionNode|ScalarTypeDefinitionNode|ObjectTypeDefinitionNode|EnumValueDefinitionNode $definitionNode;
 
     /**
      * Cached directive arguments.
@@ -50,22 +50,12 @@ abstract class BaseDirective implements Directive
      *
      * @var array<string, mixed>
      */
-    protected $directiveArgs;
-
-    /**
-     * Returns the name of the used directive.
-     */
-    public function name(): string
-    {
-        return DirectiveLocator::directiveName(static::class);
-    }
+    protected array $directiveArgs;
 
     /**
      * The hydrate function is called when retrieving a directive from the directive registry.
-     *
-     * @param  ScalarTypeDefinitionNode|ObjectTypeDefinitionNode|FieldDefinitionNode|InputValueDefinitionNode|InterfaceTypeDefinitionNode|UnionTypeDefinitionNode|EnumTypeDefinitionNode|EnumValueDefinitionNode|InputObjectTypeDefinitionNode  $definitionNode
      */
-    public function hydrate(DirectiveNode $directiveNode, Node $definitionNode): self
+    public function hydrate(DirectiveNode $directiveNode, ScalarTypeDefinitionNode|ObjectTypeDefinitionNode|FieldDefinitionNode|InputValueDefinitionNode|InterfaceTypeDefinitionNode|UnionTypeDefinitionNode|EnumTypeDefinitionNode|EnumValueDefinitionNode|InputObjectTypeDefinitionNode $definitionNode): self
     {
         $this->directiveNode = $directiveNode;
         $this->definitionNode = $definitionNode;
@@ -74,7 +64,29 @@ abstract class BaseDirective implements Directive
     }
 
     /**
+     * Returns the name of the used directive.
+     *
+     * @api
+     */
+    public function name(): string
+    {
+        return DirectiveLocator::directiveName(static::class);
+    }
+
+    /**
+     * The name of the node the directive is defined upon.
+     *
+     * @api
+     */
+    protected function nodeName(): string
+    {
+        return $this->definitionNode->name->value;
+    }
+
+    /**
      * Get a Closure that is defined through an argument on the directive.
+     *
+     * @api
      */
     public function getResolverFromArgument(string $argumentName): \Closure
     {
@@ -86,28 +98,9 @@ abstract class BaseDirective implements Directive
     }
 
     /**
-     * Loads directive argument values from AST and caches them in $directiveArgs.
-     */
-    protected function loadArgValues(): void
-    {
-        $this->directiveArgs = [];
-
-        // If the directive was added programmatically, it has no arguments
-        if (! isset($this->directiveNode)) {
-            return;
-        }
-
-        foreach ($this->directiveNode->arguments as $node) {
-            if (array_key_exists($node->name->value, $this->directiveArgs)) {
-                throw new DefinitionException("Directive {$this->directiveNode->name->value} has two arguments with the same name {$node->name->value}");
-            }
-
-            $this->directiveArgs[$node->name->value] = AST::valueFromASTUntyped($node->value);
-        }
-    }
-
-    /**
      * Does the current directive have an argument with the given name?
+     *
+     * @api
      */
     protected function directiveHasArgument(string $name): bool
     {
@@ -121,11 +114,13 @@ abstract class BaseDirective implements Directive
     /**
      * Get the value of an argument on the directive.
      *
+     * @api
+     *
      * @param  mixed  $default Use this over `??` to preserve explicit `null`
      *
      * @return mixed The argument value or the default
      */
-    protected function directiveArgValue(string $name, $default = null)
+    protected function directiveArgValue(string $name, mixed $default = null): mixed
     {
         if (! isset($this->directiveArgs)) {
             $this->loadArgValues();
@@ -137,15 +132,9 @@ abstract class BaseDirective implements Directive
     }
 
     /**
-     * The name of the node the directive is defined upon.
-     */
-    protected function nodeName(): string
-    {
-        return $this->definitionNode->name->value;
-    }
-
-    /**
      * Get the model class from the `model` argument of the field.
+     *
+     * @api
      *
      * @param  string  $argumentName  The default argument name "model" may be overwritten
      *
@@ -166,6 +155,8 @@ abstract class BaseDirective implements Directive
 
     /**
      * Find a class name in a set of given namespaces.
+     *
+     * @api
      *
      * @param  array<string>  $namespacesToTry
      * @param  callable(string $className): bool $determineMatch
@@ -212,6 +203,8 @@ abstract class BaseDirective implements Directive
     /**
      * Split a single method argument into its parts.
      *
+     * @api
+     *
      * A method argument is expected to contain a class and a method name, separated by an @ symbol.
      *
      * @example "App\My\Class@methodName"
@@ -249,6 +242,8 @@ abstract class BaseDirective implements Directive
     /**
      * Try adding the default model namespace and ensure the given class is a model.
      *
+     * @api
+     *
      * @return class-string<\Illuminate\Database\Eloquent\Model>
      */
     protected function namespaceModelClass(string $modelClassCandidate): string
@@ -268,6 +263,8 @@ abstract class BaseDirective implements Directive
     /**
      * Validate at most one of the given mutually exclusive arguments is used.
      *
+     * @api
+     *
      * @param array<string> $names
      */
     protected function validateMutuallyExclusiveArguments(array $names): void
@@ -278,6 +275,27 @@ abstract class BaseDirective implements Directive
             $namesString = implode(', ', $names);
             $givenString = implode(', ', $given);
             throw new DefinitionException("The arguments [{$namesString}] for @{$this->name()} are mutually exclusive, found [{$givenString}] on {$this->nodeName()}.");
+        }
+    }
+
+    /**
+     * Loads directive argument values from AST and caches them in $directiveArgs.
+     */
+    protected function loadArgValues(): void
+    {
+        $this->directiveArgs = [];
+
+        // If the directive was added programmatically, it has no arguments
+        if (! isset($this->directiveNode)) {
+            return;
+        }
+
+        foreach ($this->directiveNode->arguments as $node) {
+            if (array_key_exists($node->name->value, $this->directiveArgs)) {
+                throw new DefinitionException("Directive {$this->directiveNode->name->value} has two arguments with the same name {$node->name->value}");
+            }
+
+            $this->directiveArgs[$node->name->value] = AST::valueFromASTUntyped($node->value);
         }
     }
 }
