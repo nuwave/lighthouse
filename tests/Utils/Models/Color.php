@@ -28,11 +28,17 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  */
 final class Color extends Model
 {
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\Product>
+     */
     public function products(): HasMany
     {
         return $this->hasMany(Product::class);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\MorphTo<Model, self>
+     */
     public function creator(): MorphTo
     {
         return $this->morphTo();

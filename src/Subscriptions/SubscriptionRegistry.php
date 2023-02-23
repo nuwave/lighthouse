@@ -118,7 +118,7 @@ class SubscriptionRegistry
     /**
      * Get registered subscriptions.
      *
-     * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Schema\Types\GraphQLSubscription>
+     * @return \Illuminate\Support\Collection<int, \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription>
      */
     public function subscriptions(Subscriber $subscriber): Collection
     {

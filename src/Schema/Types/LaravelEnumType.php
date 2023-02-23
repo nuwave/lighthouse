@@ -8,25 +8,28 @@ use GraphQL\Type\Definition\EnumType;
 
 /**
  * A convenience wrapper for registering enums programmatically.
+ *
+ * @template TValue
+ * @template TEnum of \BenSampo\Enum\Enum<TValue>
  */
 class LaravelEnumType extends EnumType
 {
     public const DEPRECATED_PHPDOC_TAG = '@deprecated';
 
     /**
-     * @var class-string<\BenSampo\Enum\Enum>
+     * @var class-string<TEnum>
      */
     protected string $enumClass;
 
     /**
-     * @var \ReflectionClass<\BenSampo\Enum\Enum>
+     * @var \ReflectionClass<TEnum>
      */
     protected \ReflectionClass $reflection;
 
     /**
      * Create a GraphQL enum from a Laravel enum type.
      *
-     * @param  class-string<\BenSampo\Enum\Enum>  $enumClass
+     * @param  class-string<TEnum>  $enumClass
      * @param  string|null  $name  The name the enum will have in the schema, defaults to the basename of the given class
      */
     public function __construct(string $enumClass, ?string $name = null)
@@ -75,6 +78,9 @@ class LaravelEnumType extends EnumType
         return new \InvalidArgumentException("Class {$enumClass} must extend {$baseClass}.");
     }
 
+    /**
+     * @param  \BenSampo\Enum\Enum<mixed>  $value
+     */
     public static function enumMustHaveKey(Enum $value): \InvalidArgumentException
     {
         $class = get_class($value);
@@ -82,6 +88,9 @@ class LaravelEnumType extends EnumType
         return new \InvalidArgumentException("Enum of class {$class} must have key.");
     }
 
+    /**
+     * @param  TEnum  $enum
+     */
     protected function deprecationReason(Enum $enum): ?string
     {
         $constant = $this->reflection->getReflectionConstant($enum->key);
@@ -116,7 +125,7 @@ class LaravelEnumType extends EnumType
     /**
      * TODO remove check and inline when requiring bensampo/laravel-enum:6.
      *
-     * @param  class-string<\BenSampo\Enum\Enum>  $enumClass
+     * @param  class-string<\BenSampo\Enum\Enum<mixed>>  $enumClass
      */
     protected function enumClassDescription(string $enumClass): ?string
     {
@@ -127,6 +136,9 @@ class LaravelEnumType extends EnumType
             : null;
     }
 
+    /**
+     * @param  TEnum  $enum
+     */
     protected function enumValueDescription(Enum $enum): ?string
     {
         return $enum->description;

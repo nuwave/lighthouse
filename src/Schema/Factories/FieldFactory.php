@@ -86,6 +86,7 @@ class FieldFactory
             ->associatedOfType($fieldDefinitionNode, FieldMiddleware::class)
             ->all();
 
+        // @phpstan-ignore-next-line PHPStan does not get this list is filtered for FieldMiddleware
         return array_merge($globalFieldMiddleware, $directiveFieldMiddleware);
     }
 

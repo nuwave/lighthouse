@@ -27,7 +27,7 @@ class ArgumentSet
      * - the field the arguments are a part of
      * - the parent argument when in a tree of nested inputs.
      *
-     * @var \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive>
+     * @var \Illuminate\Support\Collection<int, \Nuwave\Lighthouse\Support\Contracts\Directive>
      */
     public Collection $directives;
 

@@ -4,6 +4,9 @@ namespace Tests\Utils\LaravelEnums;
 
 use BenSampo\Enum\Enum;
 
+/**
+ * @extends \BenSampo\Enum\Enum<string>
+ */
 final class PartiallyDeprecated extends Enum
 {
     public const NOT = 'NOT';

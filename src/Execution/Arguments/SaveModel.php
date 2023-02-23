@@ -13,10 +13,13 @@ use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 class SaveModel implements ArgResolver
 {
     /**
-     * @var \Illuminate\Database\Eloquent\Relations\Relation|null
+     * @var \Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>|null
      */
     protected $parentRelation;
 
+    /**
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>|null  $parentRelation
+     */
     public function __construct(?Relation $parentRelation = null)
     {
         $this->parentRelation = $parentRelation;

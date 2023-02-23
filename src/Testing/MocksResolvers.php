@@ -15,6 +15,8 @@ trait MocksResolvers
      * Create and register a PHPUnit mock to be called through the `@mock` directive.
      *
      * @param  callable|mixed|null  $resolverOrValue
+     *
+     * @return \PHPUnit\Framework\MockObject\Builder\InvocationMocker<\stdClass>
      */
     protected function mockResolver($resolverOrValue = null, string $key = 'default'): InvocationMocker
     {
@@ -33,6 +35,8 @@ trait MocksResolvers
      * Register a resolver for `@mock`.
      *
      * @param  \PHPUnit\Framework\MockObject\Rule\InvocationOrder  $invocationOrder
+     *
+     * @return \PHPUnit\Framework\MockObject\Builder\InvocationMocker<\stdClass>
      */
     protected function mockResolverExpects(object $invocationOrder, string $key = 'default'): InvocationMocker
     {

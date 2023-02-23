@@ -23,7 +23,7 @@ class Argument
     /**
      * A list of directives associated with that argument.
      *
-     * @var \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive>
+     * @var \Illuminate\Support\Collection<int, \Nuwave\Lighthouse\Support\Contracts\Directive>
      */
     public $directives;
 

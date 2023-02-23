@@ -54,48 +54,77 @@ final class Task extends Model
         });
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Tests\Utils\Models\Activity>
+     */
     public function activity(): MorphMany
     {
         return $this->morphMany(Activity::class, 'content');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\MorphOne<\Tests\Utils\Models\Image>
+     */
     public function image(): MorphOne
     {
         return $this->morphOne(Image::class, 'imageable');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Tests\Utils\Models\Image>
+     */
     public function images(): MorphMany
     {
         return $this->morphMany(Image::class, 'imageable');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\Tests\Utils\Models\Post>
+     */
     public function post(): HasOne
     {
         return $this->hasOne(Post::class);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\Tests\Utils\Models\Comment>
+     */
     public function postComments(): HasManyThrough
     {
         return $this->hasManyThrough(Comment::class, Post::class);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany<\Tests\Utils\Models\Tag>
+     */
     public function tags(): MorphToMany
     {
         return $this->morphToMany(Tag::class, 'taggable');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\User, self>
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * @param  \Illuminate\Database\Eloquent\Builder<self> $query
+     *
+     * @return \Illuminate\Database\Eloquent\Builder<self>
+     */
     public function scopeCompleted(EloquentBuilder $query): EloquentBuilder
     {
         return $query->whereNotNull('completed_at');
     }
 
     /**
-     * @param  array<string, int>  $args
+     * @param  \Illuminate\Database\Eloquent\Builder<self> $query
+     * @param  array<string, int>    $args
+     *
+     * @return \Illuminate\Database\Eloquent\Builder<self>
      */
     public function scopeFoo(EloquentBuilder $query, array $args): EloquentBuilder
     {
@@ -103,7 +132,10 @@ final class Task extends Model
     }
 
     /**
-     * @param  iterable<string>  $tags
+     * @param  \Illuminate\Database\Eloquent\Builder<self> $query
+     * @param  iterable<string>      $tags
+     *
+     * @return \Illuminate\Database\Eloquent\Builder<self>
      */
     public function scopeWhereTags(EloquentBuilder $query, iterable $tags): EloquentBuilder
     {

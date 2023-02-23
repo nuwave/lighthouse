@@ -5,6 +5,8 @@ namespace Tests\Utils\LaravelEnums;
 use BenSampo\Enum\Enum;
 
 /**
+ * @extends \BenSampo\Enum\Enum<string>
+ *
  * @method static static A()
  * @method static static B()
  */

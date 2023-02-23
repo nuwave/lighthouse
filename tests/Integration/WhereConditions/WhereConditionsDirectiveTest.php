@@ -960,7 +960,8 @@ GRAPHQL;
     }
 
     /**
-     * @param array<string, mixed> $conditions
+     * @param  \Illuminate\Database\Eloquent\Builder<\Tests\Utils\Models\User>  $builder
+     * @param  array<string, mixed>  $conditions
      */
     public static function handler(EloquentBuilder $builder, array $conditions): void
     {

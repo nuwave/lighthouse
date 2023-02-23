@@ -22,11 +22,17 @@ final class Category extends Model
 {
     protected $primaryKey = 'category_id';
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<self, self>
+     */
     public function parent(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'parent_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Tests\Utils\Models\Post>
+     */
     public function posts(): BelongsToMany
     {
         return $this->belongsToMany(Post::class, 'category_post', 'post_id', 'category_id');

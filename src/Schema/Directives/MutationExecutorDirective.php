@@ -71,6 +71,7 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
 
     /**
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>  $args
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>|null  $parentRelation
      *
      * @return \Illuminate\Database\Eloquent\Model|array<\Illuminate\Database\Eloquent\Model>
      */
@@ -88,6 +89,8 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
 
     /**
      * Prepare the execution function for a mutation on a model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>|null  $parentRelation
      */
     abstract protected function makeExecutionFunction(?Relation $parentRelation = null): callable;
 }

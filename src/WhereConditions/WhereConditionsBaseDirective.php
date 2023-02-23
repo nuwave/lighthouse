@@ -20,7 +20,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
     use GeneratesColumnsEnum;
 
     /**
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder  the builder used to resolve the field
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>  $builder  the builder used to resolve the field
      * @param  array<string, mixed>  $value  the client given value of the argument
      */
     protected function handle($builder, array $value): void

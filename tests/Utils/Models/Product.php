@@ -34,6 +34,9 @@ final class Product extends Model
 
     public $incrementing = false;
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\Color, self>
+     */
     public function color(): BelongsTo
     {
         return $this->belongsTo(Color::class);

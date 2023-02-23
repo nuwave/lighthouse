@@ -20,8 +20,11 @@ class WhereConditionsHandler
     }
 
     /**
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
+     * @template TModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<TModel>  $builder
      * @param  array<string, mixed>  $whereConditions
+     * @param  TModel|null  $model
      */
     public function __invoke(
         object $builder,
