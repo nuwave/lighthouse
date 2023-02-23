@@ -355,7 +355,7 @@ class TypeRegistry
         $scalarName = $scalarDefinition->name->value;
 
         $scalarDirective = ASTHelper::directiveDefinition($scalarDefinition, 'scalar');
-        $className = $scalarDirective === null
+        $className = null === $scalarDirective
             ? $scalarName
             : ASTHelper::directiveArgValue($scalarDirective, 'class');
 
@@ -364,7 +364,7 @@ class TypeRegistry
         $className = Utils::namespaceClassname(
             $className,
             $namespacesToTry,
-            fn(string $className): bool => is_subclass_of($className, ScalarType::class)
+            fn (string $className): bool => is_subclass_of($className, ScalarType::class)
         );
         assert(is_null($className) || is_subclass_of($className, ScalarType::class));
 
@@ -570,9 +570,9 @@ class TypeRegistry
             $typeResolver = $unionDirective->getResolverFromArgument('resolveType');
         } else {
             $typeResolver = $this->typeResolverFromClass(
-                    $nodeName,
-                    (array) config('lighthouse.namespaces.unions')
-                )
+                $nodeName,
+                (array) config('lighthouse.namespaces.unions')
+            )
                 ?: $this->typeResolverFallback(
                     $this->possibleUnionTypes($unionDefinition)
                 );
