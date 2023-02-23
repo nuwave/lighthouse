@@ -9,12 +9,12 @@ interface FieldBuilderDirective extends Directive
     /**
      * Add additional constraints to the builder.
      *
-     * @template TModel of \Illuminate\Database\Eloquent\Model
+     * TODO try adding a generic type parameter for the type of model when PHPStan handles it better
      *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<TModel>  $builder  the builder used to resolve the field
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>  $builder  the builder used to resolve the field
      * @param  array<string, mixed>  $args  the arguments that were passed into the field
      *
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<TModel> the modified builder
+     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model> the modified builder
      */
     public function handleFieldBuilder(object $builder, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): object;
 }
