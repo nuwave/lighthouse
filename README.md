@@ -43,6 +43,15 @@ at that point in the git history: `https://github.com/nuwave/lighthouse/tree/<SP
 - Have an idea? [Propose a feature](https://github.com/nuwave/lighthouse/issues/new?template=feature_proposal.md)
 - Want to improve Lighthouse? [Read our contribution guidelines](https://github.com/nuwave/lighthouse/blob/master/CONTRIBUTING.md)
 
+## Versioning
+
+Lighthouse follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+Updating between minor versions will not require changes to PHP code or the GraphQL schema
+and cause no breaking behavioural changes for consumers of the GraphQL API.
+However, only code elements marked with `@api` will remain compatible - all other code in
+Lighthouse is considered internal and is thus subject to change.
+
 ## Changelog
 
 All notable changes to this project are documented in [`CHANGELOG.md`](CHANGELOG.md).
