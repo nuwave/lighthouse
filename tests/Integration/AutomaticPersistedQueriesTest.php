@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Tests\TestCase;

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Types\Scalars;
 
@@ -6,6 +6,7 @@ use Carbon\Carbon as CarbonCarbon;
 use Carbon\CarbonImmutable;
 use GraphQL\Error\Error;
 use GraphQL\Error\InvariantViolation;
+use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Utils\Utils;
@@ -28,11 +29,9 @@ abstract class DateScalar extends ScalarType
     }
 
     /**
-     * Parse a externally provided variable value into a Carbon instance.
-     *
-     * @param  string  $value
+     * Parse an externally provided variable value into a Carbon instance.
      */
-    public function parseValue($value): IlluminateCarbon
+    public function parseValue(mixed $value): IlluminateCarbon
     {
         return $this->tryParsingDate($value, Error::class);
     }
@@ -40,12 +39,11 @@ abstract class DateScalar extends ScalarType
     /**
      * Parse a literal provided as part of a GraphQL query string into a Carbon instance.
      *
-     * @param  \GraphQL\Language\AST\Node  $valueNode
      * @param  array<string, mixed>|null  $variables
      *
      * @throws \GraphQL\Error\Error
      */
-    public function parseLiteral($valueNode, ?array $variables = null): IlluminateCarbon
+    public function parseLiteral(Node $valueNode, ?array $variables = null): IlluminateCarbon
     {
         if (! $valueNode instanceof StringValueNode) {
             throw new Error(
@@ -65,7 +63,7 @@ abstract class DateScalar extends ScalarType
      *
      * @throws \GraphQL\Error\InvariantViolation|\GraphQL\Error\Error
      */
-    protected function tryParsingDate($value, string $exceptionClass): IlluminateCarbon
+    protected function tryParsingDate(mixed $value, string $exceptionClass): IlluminateCarbon
     {
         try {
             if (
@@ -111,5 +109,5 @@ abstract class DateScalar extends ScalarType
      *
      * @param  mixed  $value  a possibly faulty client value
      */
-    abstract protected function parse($value): IlluminateCarbon;
+    abstract protected function parse(mixed $value): IlluminateCarbon;
 }

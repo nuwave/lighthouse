@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Types\Scalars;
 
@@ -14,7 +14,7 @@ class DateTimeUtc extends DateScalar
         return $carbon->toJSON();
     }
 
-    protected function parse($value): Carbon
+    protected function parse(mixed $value): Carbon
     {
         // @phpstan-ignore-next-line We know the format to be good, so this can never return `false`
         return Carbon::createFromIsoFormat('YYYY-MM-DDTHH:mm:ss.SSSSSSZ', $value);

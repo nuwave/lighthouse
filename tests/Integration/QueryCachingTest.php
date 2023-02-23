@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 use Illuminate\Cache\Events\CacheHit;
 use Illuminate\Cache\Events\CacheMissed;

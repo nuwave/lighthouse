@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;

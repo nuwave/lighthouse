@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\GlobalId;
 
@@ -9,10 +9,7 @@ use Tests\Utils\Models\User;
 
 final class NodeDirectiveDBTest extends DBTestCase
 {
-    /**
-     * @var \Nuwave\Lighthouse\GlobalId\GlobalId
-     */
-    private $globalIdResolver;
+    private GlobalId $globalIdResolver;
 
     public function setUp(): void
     {
@@ -168,7 +165,7 @@ final class NodeDirectiveDBTest extends DBTestCase
     /**
      * @return array<mixed>
      */
-    public static function resolveNode(int $id): array
+    public static function resolveNode(int|string $id): array
     {
         return self::TEST_TUPLES[$id];
     }
