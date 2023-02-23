@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 use Faker\Generator as Faker;
 use Tests\Utils\Models\Post;
