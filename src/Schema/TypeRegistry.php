@@ -310,13 +310,13 @@ class TypeRegistry
      */
     protected function resolveType(TypeDefinitionNode $typeDefinition): Type
     {
-        return match (get_class($typeDefinition)) {
-            EnumTypeDefinitionNode::class => $this->resolveEnumType($typeDefinition),
-            ScalarTypeDefinitionNode::class => $this->resolveScalarType($typeDefinition),
-            ObjectTypeDefinitionNode::class => $this->resolveObjectType($typeDefinition),
-            InputObjectTypeDefinitionNode::class => $this->resolveInputObjectType($typeDefinition),
-            InterfaceTypeDefinitionNode::class => $this->resolveInterfaceType($typeDefinition),
-            UnionTypeDefinitionNode::class => $this->resolveUnionType($typeDefinition),
+        return match (true) {
+            $typeDefinition instanceof EnumTypeDefinitionNode => $this->resolveEnumType($typeDefinition),
+            $typeDefinition instanceof ScalarTypeDefinitionNode => $this->resolveScalarType($typeDefinition),
+            $typeDefinition instanceof ObjectTypeDefinitionNode => $this->resolveObjectType($typeDefinition),
+            $typeDefinition instanceof InputObjectTypeDefinitionNode => $this->resolveInputObjectType($typeDefinition),
+            $typeDefinition instanceof InterfaceTypeDefinitionNode => $this->resolveInterfaceType($typeDefinition),
+            $typeDefinition instanceof UnionTypeDefinitionNode => $this->resolveUnionType($typeDefinition),
             default => throw new InvariantViolation("Unknown type for definition {$typeDefinition->getName()->value}."),
         };
     }
