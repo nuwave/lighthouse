@@ -22,7 +22,7 @@ class DetectDeprecatedUsage extends ValidationRule
     /**
      * @var array<string, \Nuwave\Lighthouse\Deprecation\DeprecatedUsage>
      */
-    protected $deprecations = [];
+    protected array $deprecations = [];
 
     /**
      * @var DeprecationHandler
@@ -47,8 +47,9 @@ class DetectDeprecatedUsage extends ValidationRule
 
     public function getVisitor(QueryValidationContext $context): array
     {
+        // @phpstan-ignore-next-line NodeVisitor does not know about the mapping between node kind and node type
         return [
-            NodeKind::FIELD => function (FieldNode $node) use ($context): void {
+            NodeKind::FIELD => function (FieldNode $_) use ($context): void {
                 $field = $context->getFieldDef();
                 if (null === $field) {
                     return;
@@ -90,10 +91,7 @@ class DetectDeprecatedUsage extends ValidationRule
 
     protected function registerDeprecation(string $element, string $reason): void
     {
-        if (! isset($this->deprecations[$element])) {
-            $this->deprecations[$element] = new DeprecatedUsage($reason);
-        }
-
-        ++$this->deprecations[$element]->count;
+        $usage = $this->deprecations[$element] ??= new DeprecatedUsage($reason);
+        ++$usage->count;
     }
 }
