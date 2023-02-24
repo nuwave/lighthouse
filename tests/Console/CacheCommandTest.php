@@ -2,15 +2,11 @@
 
 namespace Tests\Console;
 
-use Illuminate\Contracts\Cache\Repository as CacheRepository;
-use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Filesystem\Filesystem;
 use Nuwave\Lighthouse\Console\CacheCommand;
-use Nuwave\Lighthouse\Exceptions\UnknownCacheVersionException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Tests\TestCase;
 use Tests\TestsSchemaCache;
-use Tests\TestsSerialization;
 
 final class CacheCommandTest extends TestCase
 {

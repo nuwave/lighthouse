@@ -2,11 +2,8 @@
 
 namespace Tests\Console;
 
-use Illuminate\Cache\Repository as CacheRepository;
-use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Filesystem\Filesystem;
 use Nuwave\Lighthouse\Console\ClearCacheCommand;
-use Nuwave\Lighthouse\Exceptions\UnknownCacheVersionException;
 use Tests\TestCase;
 use Tests\TestsSchemaCache;
 

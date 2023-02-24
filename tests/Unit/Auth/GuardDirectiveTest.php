@@ -107,6 +107,40 @@ final class GuardDirectiveTest extends TestCase
             ->assertGraphQLErrorMessage(AuthenticationException::MESSAGE);
     }
 
+    public function testGuardAppliesToFieldsOnExtendTypeOnly(): void
+    {
+        $value = 42;
+        $this->mockResolver($value);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            unguarded: Int! @mock
+        }
+
+        extend type Query @guard {
+            guarded: Int! @mock
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+            {
+                guarded
+            }
+            ')
+            ->assertGraphQLErrorMessage(AuthenticationException::MESSAGE);
+
+        $this->graphQL(/** @lang GraphQL */ '
+            {
+                unguarded
+            }
+            ')
+            ->assertExactJson([
+                'data' => [
+                    'unguarded' => $value,
+                ],
+            ]);
+    }
+
     public function testMultiGuardWithAuthorization(): void
     {
         $config = $this->app->make(ConfigRepository::class);
