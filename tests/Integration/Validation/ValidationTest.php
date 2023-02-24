@@ -345,9 +345,13 @@ final class ValidationTest extends TestCase
                 ? 'The bar field must be at least 2 characters.'
                 : 'The bar must be at least 2 characters.');
 
-        $message = AppVersion::atLeast(8.32)
-            ? 'The bar must not be greater than 3 characters.'
-            : 'The bar may not be greater than 3 characters.';
+        $message = 'The bar may not be greater than 3 characters.';
+
+        if (AppVersion::atLeast(10.0)) {
+            $message = 'The bar field must not be greater than 3 characters.';
+        } elseif (AppVersion::atLeast(8.32)) {
+            $message = 'The bar must not be greater than 3 characters.';
+        }
 
         $this
             ->graphQL(/** @lang GraphQL */ '
@@ -355,9 +359,7 @@ final class ValidationTest extends TestCase
                 foo(bar: "fasdf")
             }
             ')
-            ->assertGraphQLValidationError('bar', AppVersion::atLeast(10.0)
-                ? 'The bar field must not be greater than 3 characters.'
-                : 'The bar must not be greater than 3 characters.');
+            ->assertGraphQLValidationError('bar', $message);
     }
 
     public function testSingleFieldReferencesAreQualified(): void
