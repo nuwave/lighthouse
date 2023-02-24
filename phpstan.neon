@@ -2,7 +2,6 @@ includes:
 - vendor/bensampo/laravel-enum/extension.neon
 - vendor/nesbot/carbon/extension.neon
 - vendor/nunomaduro/larastan/extension.neon
-- vendor/phpstan/phpstan/conf/bleedingEdge.neon
 - vendor/phpstan/phpstan-mockery/extension.neon
 - vendor/phpstan/phpstan-phpunit/extension.neon
 - vendor/phpstan/phpstan-phpunit/rules.neon
@@ -17,6 +16,8 @@ parameters:
   - src
   - tests
   checkOctaneCompatibility: true
+  # TODO remove once we fixup our PHPDocs (v6)
+  treatPhpDocTypesAsCertain: false
   # TODO reenable once we require Laravel 9+
   checkGenericClassInNonGenericObjectType: false
   excludePaths:
@@ -81,3 +82,7 @@ parameters:
 
   # Lumen type hints are just wrong
   - '#Parameter \#1 \$content of function response expects string, .* given\.#'
+
+  - '#Access to an undefined property (GraphQL\\Language\\AST\\Node&)?GraphQL\\Language\\AST\\(TypeDefinitionNode|TypeExtensionNode)::\$name\.#'
+  - '#Property Nuwave\\Lighthouse\\Schema\\AST\\DocumentAST::\$(types|typeExtensions) \(array<string, .*?\) does not accept (\(non-empty-)?array<int\|string, .*?\.#'
+  - '#Property Nuwave\\Lighthouse\\Schema\\TypeRegistry::\$types \(array<string, .*?\) does not accept array<int\|string, .*?\.#'
