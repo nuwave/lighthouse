@@ -137,7 +137,7 @@ final class GuardDirectiveTest extends TestCase
             ->assertExactJson([
                 'data' => [
                     'unguarded' => $value,
-                ]
+                ],
             ]);
     }
 
