@@ -2,9 +2,9 @@
 
 namespace Tests\Integration\Validation;
 
+use Nuwave\Lighthouse\Support\AppVersion;
 use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 use Tests\TestCase;
-use Tests\Utils\Validators\EmailCustomAttributeValidator;
 use Tests\Utils\Validators\EmailCustomMessageValidator;
 
 final class ValidatorDirectiveTest extends TestCase
@@ -31,7 +31,9 @@ final class ValidatorDirectiveTest extends TestCase
                 )
             }
             ')
-            ->assertGraphQLValidationError('input.rules', 'The input.rules must be a valid email address.');
+            ->assertGraphQLValidationError('input.rules', AppVersion::atLeast(10.0)
+                ? 'The input.rules field must be a valid email address.'
+                : 'The input.rules must be a valid email address.');
     }
 
     public function testUsesValidatorTwiceNested(): void
@@ -60,8 +62,12 @@ final class ValidatorDirectiveTest extends TestCase
                 )
             }
             ')
-            ->assertGraphQLValidationError('input.email', 'The input.email must be a valid email address.')
-            ->assertGraphQLValidationError('input.self.email', 'The input.self.email must be a valid email address.');
+            ->assertGraphQLValidationError('input.email', AppVersion::atLeast(10.0)
+                ? 'The input.email field must be a valid email address.'
+                : 'The input.email must be a valid email address.')
+            ->assertGraphQLValidationError('input.self.email', AppVersion::atLeast(10.0)
+                ? 'The input.self.email field must be a valid email address.'
+                : 'The input.self.email must be a valid email address.');
     }
 
     public function testUsesSpecifiedValidatorClassWithoutNamespace(): void
@@ -86,7 +92,9 @@ final class ValidatorDirectiveTest extends TestCase
                 )
             }
             ')
-            ->assertGraphQLValidationError('input.rules', 'The input.rules must be a valid email address.');
+            ->assertGraphQLValidationError('input.rules', AppVersion::atLeast(10.0)
+                ? 'The input.rules field must be a valid email address.'
+                : 'The input.rules must be a valid email address.');
     }
 
     public function testUsesSpecifiedValidatorClassWithFullNamespace(): void
@@ -111,7 +119,9 @@ final class ValidatorDirectiveTest extends TestCase
                 )
             }
             ')
-            ->assertGraphQLValidationError('input.rules', 'The input.rules must be a valid email address.');
+            ->assertGraphQLValidationError('input.rules', AppVersion::atLeast(10.0)
+                ? 'The input.rules field must be a valid email address.'
+                : 'The input.rules must be a valid email address.');
     }
 
     public function testNestedInputsRulesReceiveParameters(): void
@@ -142,7 +152,9 @@ final class ValidatorDirectiveTest extends TestCase
                 )
             }
             ')
-            ->assertGraphQLValidationError('input.foo.0.bar', 'The input.foo.0.bar must contain 2 items.');
+            ->assertGraphQLValidationError('input.foo.0.bar', AppVersion::atLeast(10.0)
+                ? 'The input.foo.0.bar field must contain 2 items.'
+                : 'The input.foo.0.bar must contain 2 items.');
     }
 
     public function testCustomMessage(): void
@@ -192,7 +204,9 @@ final class ValidatorDirectiveTest extends TestCase
                 )
             }
             ')
-            ->assertGraphQLValidationError('input.email', EmailCustomAttributeValidator::MESSAGE);
+            ->assertGraphQLValidationError('input.email', AppVersion::atLeast(10.0)
+                ? 'The email address field must be a valid email address.'
+                : 'The email address must be a valid email address.');
     }
 
     public function testWithGlobalId(): void
@@ -243,7 +257,9 @@ final class ValidatorDirectiveTest extends TestCase
                 )
             }
             ')
-            ->assertGraphQLValidationError('email', 'The email must be a valid email address.');
+            ->assertGraphQLValidationError('email', AppVersion::atLeast(10.0)
+                ? 'The email field must be a valid email address.'
+                : 'The email must be a valid email address.');
     }
 
     public function testFieldValidatorConventionOnExtendedType(): void
@@ -266,7 +282,9 @@ final class ValidatorDirectiveTest extends TestCase
                 )
             }
             ')
-            ->assertGraphQLValidationError('email', 'The email must be a valid email address.');
+            ->assertGraphQLValidationError('email', AppVersion::atLeast(10.0)
+                ? 'The email field must be a valid email address.'
+                : 'The email must be a valid email address.');
     }
 
     public function testExplicitValidatorOnField(): void
@@ -285,7 +303,9 @@ final class ValidatorDirectiveTest extends TestCase
                 )
             }
             ')
-            ->assertGraphQLValidationError('email', 'The email must be a valid email address.');
+            ->assertGraphQLValidationError('email', AppVersion::atLeast(10.0)
+                ? 'The email field must be a valid email address.'
+                : 'The email must be a valid email address.');
     }
 
     public function testArgumentReferencesAreQualified(): void

@@ -400,7 +400,7 @@ class TypeRegistry
      *
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\InterfaceTypeDefinitionNode  $typeDefinition
      *
-     * @return \Closure(): array<string, Closure(): array<string, mixed>>
+     * @return \Closure(): array<string, \Closure(): array<string, mixed>>
      */
     protected function makeFieldsLoader($typeDefinition): \Closure
     {
