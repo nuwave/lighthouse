@@ -24,17 +24,4 @@ trait TestsSchemaCache
         $filesystem = $this->app->make(Filesystem::class);
         $filesystem->delete($this->schemaCachePath());
     }
-
-    /**
-     * Data provider for the different cache versions.
-     *
-     * @return array<int, array{int}>
-     */
-    public static function cacheVersions(): array
-    {
-        return [
-            [1],
-            [2],
-        ];
-    }
 }

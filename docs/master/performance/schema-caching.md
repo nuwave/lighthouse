@@ -13,8 +13,8 @@ using the [cache](../api-reference/commands.md#cache) artisan command:
     php artisan lighthouse:cache
 
 The structure of the serialized schema can change between Lighthouse releases.
-In order to prevent errors, use cache version 2 and a deployment method that
-atomically updates both the cache file and the dependencies, e.g. K8s.
+In order to prevent errors, use a deployment method that atomically updates
+both the cache file and the dependencies, e.g. K8s.
 
 ## Development
 
@@ -25,16 +25,3 @@ In order to speed up responses during development, change this setting to be alw
     'enable' => env('LIGHTHOUSE_SCHEMA_CACHE_ENABLE', true),
 ],
 ```
-
-## Leverage OPcache
-
-If you use [OPcache](https://www.php.net/manual/en/book.opcache.php), set cache version to `2` in `config/lighthouse.php`.
-
-```php
-'schema_cache' => [
-    'enable' => env('LIGHTHOUSE_SCHEMA_CACHE_ENABLE', true),
-    'version' => env('LIGHTHOUSE_SCHEMA_CACHE_VERSION', 2),
-],
-```
-
-This will store the compiled schema as a PHP file on your disk, allowing OPcache to pick it up.
