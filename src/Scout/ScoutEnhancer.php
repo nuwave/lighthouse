@@ -142,14 +142,14 @@ class ScoutEnhancer
 
         if (! $this->builder instanceof EloquentBuilder) {
             $eloquentBuilderClass = EloquentBuilder::class;
-            $thisBuilderClass = get_class($this->builder);
+            $thisBuilderClass = $this->builder::class;
             throw new ScoutException("Can only get Model from {$eloquentBuilderClass}, got: {$thisBuilderClass}.");
         }
         $model = $this->builder->getModel();
 
         $searchableTraitClass = Searchable::class;
         if (! Utils::classUsesTrait($model, $searchableTraitClass)) {
-            $modelClass = get_class($model);
+            $modelClass = $model::class;
             throw new ScoutException("Model class {$modelClass} does not implement trait {$searchableTraitClass}.");
         }
 

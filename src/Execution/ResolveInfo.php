@@ -3,7 +3,11 @@
 namespace Nuwave\Lighthouse\Execution;
 
 use GraphQL\Type\Definition\ResolveInfo as BaseResolveInfo;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Collection;
+use Laravel\Scout\Builder as ScoutBuilder;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Scout\ScoutEnhancer;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
@@ -41,7 +45,7 @@ class ResolveInfo extends BaseResolveInfo
      *
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<TModel>|\Illuminate\Database\Eloquent\Relations\Relation<TModel>|\Laravel\Scout\Builder
      */
-    public function enhanceBuilder(object $builder, array $scopes, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo, \Closure $directiveFilter = null): object
+    public function enhanceBuilder(QueryBuilder|EloquentBuilder|Relation|ScoutBuilder $builder, array $scopes, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo, \Closure $directiveFilter = null): QueryBuilder|EloquentBuilder|Relation|ScoutBuilder
     {
         $argumentSet = $resolveInfo->argumentSet;
 
@@ -67,7 +71,7 @@ class ResolveInfo extends BaseResolveInfo
      * @param  array<string>  $scopes
      * @param  array<string, mixed>  $args
      */
-    public function wouldEnhanceBuilder(object $builder, array $scopes, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo, \Closure $directiveFilter = null): bool
+    public function wouldEnhanceBuilder(QueryBuilder|EloquentBuilder|Relation|ScoutBuilder $builder, array $scopes, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo, \Closure $directiveFilter = null): bool
     {
         $argumentSet = $resolveInfo->argumentSet;
 
@@ -83,7 +87,7 @@ class ResolveInfo extends BaseResolveInfo
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>  $builder
      * @param  (\Closure(\Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective): bool)|null  $directiveFilter
      */
-    protected static function applyArgBuilderDirectives(ArgumentSet $argumentSet, object &$builder, \Closure $directiveFilter = null): void
+    protected static function applyArgBuilderDirectives(ArgumentSet $argumentSet, QueryBuilder|EloquentBuilder &$builder, \Closure $directiveFilter = null): void
     {
         foreach ($argumentSet->arguments as $argument) {
             $value = $argument->toPlain();
@@ -119,7 +123,7 @@ class ResolveInfo extends BaseResolveInfo
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>  $builder
      * @param  (\Closure(\Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective): bool)|null  $directiveFilter
      */
-    protected static function wouldApplyArgBuilderDirectives(ArgumentSet $argumentSet, object &$builder, \Closure $directiveFilter = null): bool
+    protected static function wouldApplyArgBuilderDirectives(ArgumentSet $argumentSet, QueryBuilder|EloquentBuilder &$builder, \Closure $directiveFilter = null): bool
     {
         foreach ($argumentSet->arguments as $argument) {
             $filteredDirectives = $argument
@@ -161,7 +165,7 @@ class ResolveInfo extends BaseResolveInfo
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>  $builder
      * @param  array<string, mixed>  $args
      */
-    protected static function applyFieldBuilderDirectives(object &$builder, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): void
+    protected static function applyFieldBuilderDirectives(QueryBuilder|EloquentBuilder &$builder, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): void
     {
         foreach (self::fieldBuilderDirectives($resolveInfo) as $fieldBuilderDirective) {
             $builder = $fieldBuilderDirective->handleFieldBuilder($builder, $root, $args, $context, $resolveInfo);

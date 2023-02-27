@@ -7,7 +7,6 @@ use GraphQL\Language\Printer;
 use GraphQL\Type\Definition\FieldDefinition;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\Type;
 use GraphQL\Utils\SchemaPrinter as GraphQLSchemaPrinter;
 
 class SchemaPrinter extends GraphQLSchemaPrinter
@@ -61,10 +60,9 @@ class SchemaPrinter extends GraphQLSchemaPrinter
     }
 
     /**
-     * @param  \GraphQL\Type\Definition\ObjectType|\GraphQL\Type\Definition\InterfaceType  $type
      * @param  array<string, mixed>  $options
      */
-    protected static function printObjectLike(string $kind, Type $type, array $options): string
+    protected static function printObjectLike(string $kind, ObjectType|InterfaceType $type, array $options): string
     {
         $interfaces = $type->getInterfaces();
         $implementedInterfaces = [] !== $interfaces

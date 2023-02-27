@@ -170,23 +170,18 @@ class SubscriptionRegistry
         }
 
         $version = $subscriptionsConfig['version'] ?? 1;
-        switch ((int) $version) {
-            case 1:
-                $content = [
-                    'version' => 1,
-                    'channel' => $channel,
-                    'channels' => $this->subscribers,
-                ];
-                break;
-            case 2:
-                $content = [
-                    'version' => 2,
-                    'channel' => $channel,
-                ];
-                break;
-            default:
-                throw new DefinitionException("Expected lighthouse.subscriptions.version to be 1 or 2, got: {$version}");
-        }
+        $content = match ((int) $version) {
+            1 => [
+                'version' => 1,
+                'channel' => $channel,
+                'channels' => $this->subscribers,
+            ],
+            2 => [
+                'version' => 2,
+                'channel' => $channel,
+            ],
+            default => throw new DefinitionException("Expected lighthouse.subscriptions.version to be 1 or 2, got: {$version}"),
+        };
 
         return new ExtensionsResponse('lighthouse_subscriptions', $content);
     }
