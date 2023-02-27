@@ -69,7 +69,6 @@ abstract class DateScalar extends ScalarType
             if (
                 is_object($value)
                 // We want to know if we have exactly a Carbon\Carbon, not a subclass thereof
-                // @noRector Rector\CodeQuality\Rector\Identical\GetClassToInstanceOfRector
                 && (
                     CarbonCarbon::class === get_class($value)
                     || CarbonImmutable::class === get_class($value)
