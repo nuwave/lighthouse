@@ -64,7 +64,7 @@
         "phpunit/phpunit": "^9.5.24",
         "predis/predis": "^1.1 || ^2.1",
         "pusher/pusher-php-server": "^5 || ^6 || ^7.0.2",
-        "rector/rector": "^0.12.23",
+        "rector/rector": "^0.15.18",
         "thecodingmachine/phpstan-safe-rule": "^1.2"
     },
     "suggest": {
