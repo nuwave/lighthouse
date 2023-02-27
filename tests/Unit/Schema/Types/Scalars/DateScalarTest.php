@@ -25,7 +25,9 @@ abstract class DateScalarTest extends TestCase
         $dateScalar->serialize($value);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('invalidDateValues')]
+    /**
+     * @dataProvider invalidDateValues
+     */
     public function testThrowsIfParseValueInvalidDate(mixed $value): void
     {
         $dateScalar = $this->scalarInstance();
