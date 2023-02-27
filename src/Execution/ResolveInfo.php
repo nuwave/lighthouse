@@ -74,7 +74,7 @@ class ResolveInfo extends BaseResolveInfo
         return (new ScoutEnhancer($argumentSet, $builder))->wouldEnhanceBuilder()
             || self::wouldApplyArgBuilderDirectives($argumentSet, $builder, $directiveFilter)
             || self::wouldApplyFieldBuilderDirectives($resolveInfo)
-            || count($scopes) > 0;
+            || $scopes !== [];
     }
 
     /**

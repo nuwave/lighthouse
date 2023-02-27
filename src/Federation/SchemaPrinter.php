@@ -67,7 +67,7 @@ class SchemaPrinter extends GraphQLSchemaPrinter
     protected static function printObjectLike(string $kind, Type $type, array $options): string
     {
         $interfaces = $type->getInterfaces();
-        $implementedInterfaces = count($interfaces) > 0
+        $implementedInterfaces = $interfaces !== []
             ? ' implements ' . implode(
                 ' & ',
                 array_map(
@@ -97,7 +97,7 @@ GRAPHQL;
      */
     public static function printDirectives(array $directives): string
     {
-        if (0 === count($directives)) {
+        if ([] === $directives) {
             return '';
         }
 

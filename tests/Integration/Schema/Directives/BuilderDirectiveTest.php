@@ -41,7 +41,7 @@ final class BuilderDirectiveTest extends DBTestCase
         $this->app->instance(__CLASS__, $mock);
         $mock->shouldReceive('limit')
             ->once()
-            ->withArgs(function (Builder $builder, $value, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
+            ->withArgs(function (Builder $builder, $value, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): bool {
                 $this->assertSame(1, $value);
                 $this->assertSame([
                     'arg1' => 'Hello',
@@ -75,7 +75,7 @@ final class BuilderDirectiveTest extends DBTestCase
     {
         $mock = \Mockery::mock($this);
         app()->instance(__CLASS__, $mock);
-        $mock->shouldReceive('limit')->once()->withArgs(function (Builder $builder, $value, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
+        $mock->shouldReceive('limit')->once()->withArgs(function (Builder $builder, $value, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): bool {
             $this->assertIsNumeric($value);
             $this->assertSame(1, $value);
             $this->assertSame([], $args);
