@@ -48,7 +48,7 @@ GRAPHQL;
     /**
      * @param  array<string, mixed>|null  $value
      */
-    public function handleBuilder(QueryBuilder|EloquentBuilder|Relation$builder, $value): QueryBuilder|EloquentBuilder|Relation
+    public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, $value): QueryBuilder|EloquentBuilder|Relation
     {
         if (null === $value) {
             return $builder;

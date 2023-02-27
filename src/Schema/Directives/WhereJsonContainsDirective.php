@@ -25,7 +25,7 @@ directive @whereJsonContains(
 GRAPHQL;
     }
 
-    public function handleBuilder(QueryBuilder|EloquentBuilder|Relation$builder, $value): QueryBuilder|EloquentBuilder|Relation
+    public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, $value): QueryBuilder|EloquentBuilder|Relation
     {
         return $builder->whereJsonContains(
             $this->directiveArgValue('key', $this->nodeName()),

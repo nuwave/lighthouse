@@ -26,10 +26,10 @@ directive @trashed on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 GRAPHQL;
     }
 
-    public function handleBuilder(QueryBuilder|EloquentBuilder|Relation$builder, $value): QueryBuilder|EloquentBuilder|Relation
+    public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, $value): QueryBuilder|EloquentBuilder|Relation
     {
         if (! $builder instanceof EloquentBuilder) {
-            $notEloquentBuilder = get_class($builder);
+            $notEloquentBuilder = $builder::class;
             throw new \Exception("Can not get model from builder of class: {$notEloquentBuilder}");
         }
 
@@ -40,20 +40,12 @@ GRAPHQL;
             return $builder;
         }
 
-        /** @see \Illuminate\Database\Eloquent\SoftDeletes */
-        switch ($value) {
-            case 'with':
-                // @phpstan-ignore-next-line because it involves mixins
-                return $builder->withTrashed();
-            case 'only':
-                // @phpstan-ignore-next-line because it involves mixins
-                return $builder->onlyTrashed();
-            case 'without':
-                // @phpstan-ignore-next-line because it involves mixins
-                return $builder->withoutTrashed();
-            default:
-                throw new Error("Unexpected value for Trashed filter: {$value}");
-        }
+        return match ($value) {
+            'with' => $builder->withTrashed(),
+            'only' => $builder->onlyTrashed(),
+            'without' => $builder->withoutTrashed(),
+            default => throw new Error("Unexpected value for Trashed filter: {$value}"),
+        };
     }
 
     public function handleScoutBuilder(ScoutBuilder $builder, $value): ScoutBuilder
@@ -65,20 +57,17 @@ GRAPHQL;
             return $builder;
         }
 
-        switch ($value) {
-            case 'with':
-                return $builder->withTrashed();
-            case 'only':
-                return $builder->onlyTrashed();
-            default:
-                throw new Error("Unexpected value for Trashed filter: {$value}");
-        }
+        return match ($value) {
+            'with' => $builder->withTrashed(),
+            'only' => $builder->onlyTrashed(),
+            default => throw new Error("Unexpected value for Trashed filter: {$value}"),
+        };
     }
 
     protected function assertModelUsesSoftDeletes(Model $model): void
     {
         SoftDeletesServiceProvider::assertModelUsesSoftDeletes(
-            get_class($model),
+            $model::class,
             self::MODEL_MUST_USE_SOFT_DELETES
         );
     }

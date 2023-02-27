@@ -84,7 +84,7 @@ class ResolveInfo extends BaseResolveInfo
     /**
      * Recursively apply the ArgBuilderDirectives onto the builder.
      *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation  $builder
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>  $builder
      * @param  (\Closure(\Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective): bool)|null  $directiveFilter
      */
     protected static function applyArgBuilderDirectives(ArgumentSet $argumentSet, QueryBuilder|EloquentBuilder|Relation &$builder, \Closure $directiveFilter = null): void
@@ -162,7 +162,7 @@ class ResolveInfo extends BaseResolveInfo
     /**
      * Apply the FieldBuilderDirectives onto the builder.
      *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation  $builder
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>  $builder
      * @param  array<string, mixed>  $args
      */
     protected static function applyFieldBuilderDirectives(QueryBuilder|EloquentBuilder|Relation &$builder, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): void

@@ -42,7 +42,7 @@ scalar BuilderValue
 GRAPHQL;
     }
 
-    public function handleBuilder(QueryBuilder|EloquentBuilder|Relation$builder, $value): QueryBuilder|EloquentBuilder|Relation
+    public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, $value): QueryBuilder|EloquentBuilder|Relation
     {
         $resolver = $this->resolver();
 

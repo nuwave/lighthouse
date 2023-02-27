@@ -50,7 +50,7 @@ scalar WhereValue
 GRAPHQL;
     }
 
-    public function handleBuilder(QueryBuilder|EloquentBuilder|Relation$builder, $value): QueryBuilder|EloquentBuilder|Relation
+    public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, $value): QueryBuilder|EloquentBuilder|Relation
     {
         // Allow users to overwrite the default "where" clause, e.g. "whereYear"
         $clause = $this->directiveArgValue('clause', 'where');

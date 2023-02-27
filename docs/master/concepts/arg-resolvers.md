@@ -172,6 +172,7 @@ We can extend our previous implementation of [@create](../api-reference/directiv
 ```php
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
@@ -189,8 +190,8 @@ class CreateDirective extends BaseDirective implements FieldResolver, ArgResolve
     {
         $relationName = $this->getRelationName();
 
-        /** @var \Illuminate\Database\Eloquent\Relations\Relation $relation */
         $relation = $parent->{$relationName}();
+        assert($relation instanceof Relation);
         $related = $relation->make();
 
         return array_map(

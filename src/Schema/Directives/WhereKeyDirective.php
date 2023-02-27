@@ -39,10 +39,10 @@ scalar WhereKeyValue
 GRAPHQL;
     }
 
-    public function handleBuilder(QueryBuilder|EloquentBuilder|Relation$builder, $value): QueryBuilder|EloquentBuilder|Relation
+    public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, $value): QueryBuilder|EloquentBuilder|Relation
     {
         if (! $builder instanceof EloquentBuilder) {
-            $notEloquentBuilder = get_class($builder);
+            $notEloquentBuilder = $builder::class;
             throw new DefinitionException("The {$this->name()} directive only works with queries that use an Eloquent builder, got: {$notEloquentBuilder}.");
         }
 
