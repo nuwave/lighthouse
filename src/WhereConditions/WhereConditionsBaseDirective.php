@@ -8,6 +8,9 @@ use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
 use Illuminate\Container\Container;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -20,10 +23,10 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
     use GeneratesColumnsEnum;
 
     /**
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>  $builder  the builder used to resolve the field
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>  $builder  the builder used to resolve the field
      * @param  array<string, mixed>  $value  the client given value of the argument
      */
-    protected function handle($builder, array $value): void
+    protected function handle(QueryBuilder|EloquentBuilder|Relation $builder, array $value): void
     {
         $handler = $this->directiveHasArgument('handler')
             ? $this->getResolverFromArgument('handler')

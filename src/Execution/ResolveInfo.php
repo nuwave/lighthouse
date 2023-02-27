@@ -120,7 +120,7 @@ class ResolveInfo extends BaseResolveInfo
     /**
      * Would there be any ArgBuilderDirectives to apply to the builder?
      *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation  $builder
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>  $builder
      * @param  (\Closure(\Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective): bool)|null  $directiveFilter
      */
     protected static function wouldApplyArgBuilderDirectives(ArgumentSet $argumentSet, QueryBuilder|EloquentBuilder|Relation &$builder, \Closure $directiveFilter = null): bool

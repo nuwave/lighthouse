@@ -41,8 +41,11 @@ GRAPHQL;
         }
 
         return match ($value) {
+            // @phpstan-ignore-next-line mixin not understood
             'with' => $builder->withTrashed(),
+            // @phpstan-ignore-next-line mixin not understood
             'only' => $builder->onlyTrashed(),
+            // @phpstan-ignore-next-line mixin not understood
             'without' => $builder->withoutTrashed(),
             default => throw new Error("Unexpected value for Trashed filter: {$value}"),
         };
