@@ -259,7 +259,9 @@ final class RulesDirectiveTest extends TestCase
             ]);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('invalidApplyArguments')]
+    /**
+     * @dataProvider invalidApplyArguments
+     */
     public function testValidateApplyArgument(string $applyArgument): void
     {
         $this->expectException(DefinitionException::class);
@@ -283,7 +285,9 @@ final class RulesDirectiveTest extends TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('invalidMessageArguments')]
+    /**
+     * @dataProvider invalidMessageArguments
+     */
     public function testValidateMessageArgument(string $messageArgument): void
     {
         $this->expectException(DefinitionException::class);

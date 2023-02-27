@@ -6,7 +6,6 @@ use Rector\Config\RectorConfig;
 use Rector\PHPUnit\Set\PHPUnitSetList;
 
 return static function (RectorConfig $rectorConfig): void {
-    $rectorConfig->import(PHPUnitSetList::ANNOTATIONS_TO_ATTRIBUTES);
     $rectorConfig->import(PHPUnitSetList::PHPUNIT_90);
     $rectorConfig->import(PHPUnitSetList::PHPUNIT_91);
     $rectorConfig->import(PHPUnitSetList::PHPUNIT_CODE_QUALITY);

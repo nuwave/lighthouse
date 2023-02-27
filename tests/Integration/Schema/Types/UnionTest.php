@@ -11,7 +11,9 @@ use Tests\Utils\Models\User;
 
 final class UnionTest extends DBTestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('withAndWithoutCustomTypeResolver')]
+    /**
+     * @dataProvider withAndWithoutCustomTypeResolver
+     */
     public function testResolveUnionTypes(string $schema, string $query): void
     {
         // This creates a user with it

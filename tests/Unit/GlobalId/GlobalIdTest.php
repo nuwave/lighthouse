@@ -42,7 +42,9 @@ final class GlobalIdTest extends TestCase
         $this->assertSame('User', $this->globalIdResolver->decodeType($globalId));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideInvalidGlobalIds')]
+    /**
+     * @dataProvider provideInvalidGlobalIds
+     */
     public function testThrowsOnInvalidGlobalIds(string $invalidGlobalId): void
     {
         $this->expectException(GlobalIdException::class);

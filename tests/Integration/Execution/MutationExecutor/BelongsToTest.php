@@ -502,7 +502,9 @@ GRAPHQL
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
+    /**
+     * @dataProvider existingModelMutations
+     */
     public function testUpdateAndDisconnectBelongsTo(string $action): void
     {
         $task = factory(Task::class)->create();
@@ -594,7 +596,9 @@ GRAPHQL
         );
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
+    /**
+     * @dataProvider existingModelMutations
+     */
     public function testUpdateAndDeleteBelongsTo(string $action): void
     {
         $user = factory(User::class)->create();
@@ -685,7 +689,9 @@ GRAPHQL
         );
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
+    /**
+     * @dataProvider existingModelMutations
+     */
     public function testDoesNotDeleteOrDisconnectOnFalsyValues(string $action): void
     {
         $user = factory(User::class)->create();

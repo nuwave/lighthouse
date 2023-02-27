@@ -220,7 +220,9 @@ GRAPHQL
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
+    /**
+     * @dataProvider existingModelMutations
+     */
     public function testUpdateWithNewMorphOne(string $action): void
     {
         factory(Task::class)->create();
@@ -256,7 +258,9 @@ GRAPHQL
         ]);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
+    /**
+     * @dataProvider existingModelMutations
+     */
     public function testUpdateWithUpsertMorphOne(string $action): void
     {
         factory(Task::class)->create();
@@ -293,7 +297,9 @@ GRAPHQL
         ]);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
+    /**
+     * @dataProvider existingModelMutations
+     */
     public function testUpdateAndUpdateMorphOne(string $action): void
     {
         factory(Task::class)
@@ -335,7 +341,9 @@ GRAPHQL
         ]);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
+    /**
+     * @dataProvider existingModelMutations
+     */
     public function testUpdateAndDeleteMorphOne(string $action): void
     {
         factory(Task::class)

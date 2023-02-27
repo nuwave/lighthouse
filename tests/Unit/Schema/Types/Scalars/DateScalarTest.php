@@ -14,7 +14,9 @@ use Tests\TestCase;
 
 abstract class DateScalarTest extends TestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('invalidDateValues')]
+    /**
+     * @dataProvider invalidDateValues
+     */
     public function testThrowsIfSerializingInvalidDates(mixed $value): void
     {
         $dateScalar = $this->scalarInstance();
@@ -61,7 +63,9 @@ abstract class DateScalarTest extends TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('validDates')]
+    /**
+     * @dataProvider validDates
+     */
     public function testParsesValueString(string $date): void
     {
         $this->assertTrue(
@@ -69,7 +73,9 @@ abstract class DateScalarTest extends TestCase
         );
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('validDates')]
+    /**
+     * @dataProvider validDates
+     */
     public function testParsesLiteral(string $date): void
     {
         $dateLiteral = new StringValueNode(
@@ -97,7 +103,9 @@ abstract class DateScalarTest extends TestCase
         self::expectNotToPerformAssertions();
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('canonicalizeDates')]
+    /**
+     * @dataProvider canonicalizeDates
+     */
     public function testCanonicalizesValidDateString(string $date, string $canonical): void
     {
         $result = $this->scalarInstance()->serialize($date);

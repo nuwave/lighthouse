@@ -322,7 +322,9 @@ final class HasManyTest extends DBTestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
+    /**
+     * @dataProvider existingModelMutations
+     */
     public function testCreateHasMany(string $action): void
     {
         factory(User::class)->create();
@@ -363,7 +365,9 @@ GRAPHQL
         ]);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
+    /**
+     * @dataProvider existingModelMutations
+     */
     public function testUpdateHasMany(string $action): void
     {
         /** @var \Tests\Utils\Models\User $user */
@@ -411,7 +415,9 @@ GRAPHQL
         ]);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
+    /**
+     * @dataProvider existingModelMutations
+     */
     public function testUpsertHasMany(string $action): void
     {
         /** @var \Tests\Utils\Models\User $user */
@@ -459,7 +465,9 @@ GRAPHQL
         ]);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
+    /**
+     * @dataProvider existingModelMutations
+     */
     public function testDeleteHasMany(string $action): void
     {
         /** @var \Tests\Utils\Models\User $user */
@@ -499,7 +507,9 @@ GRAPHQL
         ]);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
+    /**
+     * @dataProvider existingModelMutations
+     */
     public function testConnectHasMany(string $action): void
     {
         /** @var \Tests\Utils\Models\User $user */
@@ -554,7 +564,9 @@ GRAPHQL
         ]);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
+    /**
+     * @dataProvider existingModelMutations
+     */
     public function testDisconnectHasMany(string $action): void
     {
         $user = factory(User::class)->create();

@@ -561,7 +561,9 @@ GRAPHQL
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
+    /**
+     * @dataProvider existingModelMutations
+     */
     public function testUpdateWithBelongsToMany(string $action): void
     {
         factory(Role::class)
@@ -623,7 +625,9 @@ GRAPHQL
         $this->assertSame('is_user', $role->name);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
+    /**
+     * @dataProvider existingModelMutations
+     */
     public function testDeleteWithBelongsToMany(string $action): void
     {
         factory(Role::class)
@@ -675,7 +679,9 @@ GRAPHQL
         $this->assertNotNull(User::find(2));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
+    /**
+     * @dataProvider existingModelMutations
+     */
     public function testConnectWithBelongsToMany(string $action): void
     {
         factory(User::class)->create();
@@ -723,7 +729,9 @@ GRAPHQL
         $this->assertCount(2, $role->users()->get());
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
+    /**
+     * @dataProvider existingModelMutations
+     */
     public function testSyncWithBelongsToMany(string $action): void
     {
         factory(User::class)->create();
@@ -771,7 +779,9 @@ GRAPHQL
         $this->assertCount(2, $role->users()->get());
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
+    /**
+     * @dataProvider existingModelMutations
+     */
     public function testDisconnectWithBelongsToMany(string $action): void
     {
         factory(Role::class)
@@ -892,7 +902,9 @@ GRAPHQL
         ]);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
+    /**
+     * @dataProvider existingModelMutations
+     */
     public function testDisconnectAllRelatedModelsOnEmptySync(string $action): void
     {
         /** @var User $user */
