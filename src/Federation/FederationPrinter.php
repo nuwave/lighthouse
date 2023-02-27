@@ -65,7 +65,7 @@ class FederationPrinter
                 return ! in_array($field->name, static::FEDERATION_FIELDS);
             }
         );
-        $newQueryType = count($queryFieldsWithoutFederation) > 0
+        $newQueryType = [] !== $queryFieldsWithoutFederation
             ? new ObjectType([
                 'name' => RootType::QUERY,
                 'fields' => $queryFieldsWithoutFederation,

@@ -101,7 +101,7 @@ class GraphQL
     {
         $errors = $this->graphQLHelper->validateOperationParams($params);
 
-        if (count($errors) > 0) {
+        if ([] !== $errors) {
             $errors = array_map(
                 static function (RequestError $err): Error {
                     return Error::createLocatedError($err);

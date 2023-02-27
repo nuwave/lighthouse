@@ -1,27 +1,43 @@
 <?php declare(strict_types=1);
 
 use Rector\CodeQuality\Rector\Array_\CallableThisArrayToAnonymousFunctionRector;
+use Rector\CodeQuality\Rector\Concat\JoinStringConcatRector;
+use Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector;
+use Rector\CodeQuality\Rector\Identical\GetClassToInstanceOfRector;
+use Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector;
 use Rector\CodeQuality\Rector\Isset_\IssetOnPropertyObjectToPropertyExistsRector;
 use Rector\Config\RectorConfig;
+use Rector\Php71\Rector\FuncCall\RemoveExtraParametersRector;
 use Rector\PHPUnit\Set\PHPUnitSetList;
+use Rector\Set\ValueObject\SetList;
 
 return static function (RectorConfig $rectorConfig): void {
-    $rectorConfig->import(PHPUnitSetList::PHPUNIT_90);
-    $rectorConfig->import(PHPUnitSetList::PHPUNIT_91);
-    $rectorConfig->import(PHPUnitSetList::PHPUNIT_CODE_QUALITY);
-    $rectorConfig->import(PHPUnitSetList::PHPUNIT_EXCEPTION);
-    $rectorConfig->import(PHPUnitSetList::PHPUNIT_SPECIFIC_METHOD);
-    $rectorConfig->import(PHPUnitSetList::PHPUNIT_YIELD_DATA_PROVIDER);
-    $rectorConfig->import(PHPUnitSetList::REMOVE_MOCKS);
-
+    $rectorConfig->sets([
+        SetList::CODE_QUALITY,
+    ]);
+    $rectorConfig->sets([
+        PHPUnitSetList::PHPUNIT_90,
+        PHPUnitSetList::PHPUNIT_91,
+        PHPUnitSetList::PHPUNIT_CODE_QUALITY,
+        PHPUnitSetList::PHPUNIT_EXCEPTION,
+        PHPUnitSetList::PHPUNIT_SPECIFIC_METHOD,
+        PHPUnitSetList::PHPUNIT_YIELD_DATA_PROVIDER,
+        PHPUnitSetList::REMOVE_MOCKS,
+    ]);
     $rectorConfig->skip([
-        // Does not fit autoloading standards
-        __DIR__ . '/tests/database/migrations',
-
-        // It is shorter and more efficient
-        CallableThisArrayToAnonymousFunctionRector::class,
-
-        // isset() is nice when moving towards typed properties
-        IssetOnPropertyObjectToPropertyExistsRector::class,
+        __DIR__ . '/tests/database/migrations', // Does not fit autoloading standards
+        CallableThisArrayToAnonymousFunctionRector::class, // Callable in array form is shorter and more efficient
+        IssetOnPropertyObjectToPropertyExistsRector::class, // isset() is nice when moving towards typed properties
+        FlipTypeControlToUseExclusiveTypeRector::class, // Unnecessarily complex with PHPStan
+        JoinStringConcatRector::class => [
+            __DIR__ . '/tests/Integration/OrderBy/OrderByDirectiveTest.php', // Improves clarity
+        ],
+        RemoveExtraParametersRector::class => [
+            __DIR__ . '/src/Testing/TestResponseMixin.php', // mixins are weird
+        ],
+        GetClassToInstanceOfRector::class => [
+            __DIR__ . '/src/Schema/Types/Scalars/DateScalar.php', // We need to compare exact classes, not subclasses
+        ],
+        ExplicitBoolCompareRector::class,
     ]);
 };

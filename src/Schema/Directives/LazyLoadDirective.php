@@ -46,7 +46,7 @@ GRAPHQL;
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType)
     {
         $relations = $this->directiveArgValue('relations');
-        if (! is_array($relations) || 0 === count($relations)) {
+        if (! is_array($relations) || [] === $relations) {
             throw new DefinitionException(
                 "Must specify non-empty list of relations in `@{$this->name()}` directive on `{$parentType->name->value}.{$fieldDefinition->name->value}`."
             );

@@ -161,7 +161,7 @@ class SubscriptionRegistry
     {
         $subscriptionsConfig = $this->configRepository->get('lighthouse.subscriptions');
 
-        $channel = count($this->subscribers) > 0
+        $channel = [] !== $this->subscribers
             ? reset($this->subscribers)
             : null;
 

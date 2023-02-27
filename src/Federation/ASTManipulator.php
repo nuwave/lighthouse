@@ -59,7 +59,7 @@ class ASTManipulator
             }
         }
 
-        if (0 === count($entities)) {
+        if ([] === $entities) {
             throw new FederationException('There must be at least one type using the @key directive when federation is enabled.');
         }
 
