@@ -502,9 +502,7 @@ GRAPHQL
         ];
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
     public function testUpdateAndDisconnectBelongsTo(string $action): void
     {
         $task = factory(Task::class)->create();
@@ -596,9 +594,7 @@ GRAPHQL
         );
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
     public function testUpdateAndDeleteBelongsTo(string $action): void
     {
         $user = factory(User::class)->create();
@@ -689,9 +685,7 @@ GRAPHQL
         );
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
     public function testDoesNotDeleteOrDisconnectOnFalsyValues(string $action): void
     {
         $user = factory(User::class)->create();
@@ -904,7 +898,7 @@ GRAPHQL
 
         // The first User has the first Role.
         $role = Role::firstOrFail();
-        $this->assertEquals([1], $role->users()->pluck('users.id')->toArray());
+        $this->assertSame([1], $role->users()->pluck('users.id')->toArray());
 
         // Create another User.
         factory(User::class)->create();
@@ -947,7 +941,7 @@ GRAPHQL
             ],
         ]);
 
-        $this->assertEquals([2], $role->users()->pluck('users.id')->toArray());
+        $this->assertSame([2], $role->users()->pluck('users.id')->toArray());
     }
 
     public function testCreateMultipleBelongsToThatDontExistYet(): void

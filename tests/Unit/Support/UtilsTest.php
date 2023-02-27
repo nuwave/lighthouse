@@ -7,9 +7,7 @@ use Tests\TestCase;
 
 final class UtilsTest extends TestCase
 {
-    /**
-     * @dataProvider nameToEnumValueName
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('nameToEnumValueName')]
     public function testToEnumValueName(string $name, string $enumValueName): void
     {
         $this->assertSame(

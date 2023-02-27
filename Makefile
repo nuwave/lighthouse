@@ -20,7 +20,10 @@ up: ## Bring up the docker-compose stack
 	docker-compose up -d
 
 .PHONY: fix
-fix: up ## Fix code style
+fix: rector php-cs-fixer ## Automatic code fixes
+
+.PHONY: php-cs-fixer
+php-cs-fixer: up ## Fix code style
 	${dcphp} vendor/bin/php-cs-fixer fix
 
 .PHONY: stan
@@ -37,7 +40,7 @@ bench: up ## Run benchmarks
 
 .PHONY: rector
 rector: up ## Automatic code fixes with Rector
-	${dcphp} vendor/bin/rector process src/ tests/
+	${dcphp} vendor/bin/rector process src tests
 
 vendor: up composer.json ## Install composer dependencies
 	${dcphp} composer update

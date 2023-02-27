@@ -62,9 +62,7 @@ final class CacheControlDirectiveTest extends DBTestCase
         ')->assertHeader('Cache-Control', 'max-age=5, private');
     }
 
-    /**
-     * @dataProvider rootScalarDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('rootScalarDataProvider')]
     public function testRootScalar(string $query, string $expectedHeaderString): void
     {
         $this->mockResolver(1);
@@ -137,9 +135,7 @@ final class CacheControlDirectiveTest extends DBTestCase
         ')->assertHeader('Cache-Control', 'no-cache, private');
     }
 
-    /**
-     * @dataProvider argumentsDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('argumentsDataProvider')]
     public function testDirectiveArguments(string $directive, string $expectedHeaderString): void
     {
         $this->mockResolver([
@@ -182,9 +178,7 @@ final class CacheControlDirectiveTest extends DBTestCase
         ];
     }
 
-    /**
-     * @dataProvider nestedQueryDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('nestedQueryDataProvider')]
     public function testUseDirectiveNested(string $query, string $expectedHeaderString): void
     {
         $this->schema = /** @lang GraphQL */ '

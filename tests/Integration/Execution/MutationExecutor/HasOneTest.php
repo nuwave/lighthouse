@@ -261,9 +261,7 @@ GRAPHQL
         ];
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
     public function testUpdateWithNewHasOne(string $action): void
     {
         factory(Task::class)->create();
@@ -302,9 +300,7 @@ GRAPHQL
         ]);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
     public function testUpdateAndUpdateHasOne(string $action): void
     {
         factory(Task::class)
@@ -349,9 +345,7 @@ GRAPHQL
         ]);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
     public function testUpdateAndUpsertHasOne(string $action): void
     {
         factory(Task::class)
@@ -396,9 +390,7 @@ GRAPHQL
         ]);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
     public function testUpdateAndDeleteHasOne(string $action): void
     {
         factory(Task::class)

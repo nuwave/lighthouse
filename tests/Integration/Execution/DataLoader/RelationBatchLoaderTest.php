@@ -70,9 +70,7 @@ final class RelationBatchLoaderTest extends DBTestCase
             ->assertJsonCount($tasksPerUser, '1.data.user.tasks');
     }
 
-    /**
-     * @dataProvider batchloadRelationsSetting
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('batchloadRelationsSetting')]
     public function testBatchloadRelations(bool $batchloadRelations, int $expectedQueryCount): void
     {
         $this->schema = /** @lang GraphQL */ '

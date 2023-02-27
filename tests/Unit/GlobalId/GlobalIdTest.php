@@ -42,9 +42,7 @@ final class GlobalIdTest extends TestCase
         $this->assertSame('User', $this->globalIdResolver->decodeType($globalId));
     }
 
-    /**
-     * @dataProvider provideInvalidGlobalIds
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideInvalidGlobalIds')]
     public function testThrowsOnInvalidGlobalIds(string $invalidGlobalId): void
     {
         $this->expectException(GlobalIdException::class);
@@ -52,15 +50,13 @@ final class GlobalIdTest extends TestCase
     }
 
     /**
-     * @return array<int, array{0: string}>
+     * @return iterable<array{string}>
      */
-    public static function provideInvalidGlobalIds(): array
+    public static function provideInvalidGlobalIds(): iterable
     {
-        return [
-            ['foo'],
-            ['foo:bar:baz'],
-            ['foo::baz'],
-            [':::'],
-        ];
+        yield ['foo'];
+        yield ['foo:bar:baz'];
+        yield ['foo::baz'];
+        yield [':::'];
     }
 }

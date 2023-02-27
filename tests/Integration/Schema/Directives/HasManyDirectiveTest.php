@@ -431,9 +431,7 @@ final class HasManyDirectiveTest extends DBTestCase
         ')->assertJsonCount(2, 'data.user.tasks');
     }
 
-    /**
-     * @dataProvider batchloadRelations
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('batchloadRelations')]
     public function testQueryHasManyPaginator(bool $batchloadRelations): void
     {
         config(['lighthouse.batchload_relations' => $batchloadRelations]);

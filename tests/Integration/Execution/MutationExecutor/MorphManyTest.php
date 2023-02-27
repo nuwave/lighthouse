@@ -267,9 +267,7 @@ final class MorphManyTest extends DBTestCase
         ];
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
     public function testUpdateWithNewMorphMany(string $action): void
     {
         factory(Task::class)->create();
@@ -308,9 +306,7 @@ GRAPHQL
         ]);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
     public function testUpdateAndUpdateMorphMany(string $action): void
     {
         factory(Task::class)
@@ -355,9 +351,7 @@ GRAPHQL
         ]);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
     public function testUpdateAndUpsertMorphMany(string $action): void
     {
         factory(Task::class)
@@ -402,9 +396,7 @@ GRAPHQL
         ]);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
     public function testUpdateAndDeleteMorphMany(string $action): void
     {
         factory(Task::class)
@@ -442,9 +434,7 @@ GRAPHQL
         ]);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
     public function testUpdateAndConnectMorphMany(string $action): void
     {
         $task = factory(Task::class)->create();
@@ -490,9 +480,7 @@ GRAPHQL
             ]);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
     public function testUpdateAndDisconnectMorphMany(string $action): void
     {
         /** @var \Tests\Utils\Models\Task $task */
@@ -540,9 +528,7 @@ GRAPHQL
         $this->assertNull($image->refresh()->imageable);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
     public function testDisconnectModelEventsMorphMany(string $action): void
     {
         /** @var \Tests\Utils\Models\Task $task */

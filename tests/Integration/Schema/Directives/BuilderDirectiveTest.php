@@ -77,8 +77,8 @@ final class BuilderDirectiveTest extends DBTestCase
         app()->instance(__CLASS__, $mock);
         $mock->shouldReceive('limit')->once()->withArgs(function (Builder $builder, $value, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
             $this->assertIsNumeric($value);
-            $this->assertEquals(1, $value);
-            $this->assertEquals([], $args);
+            $this->assertSame(1, $value);
+            $this->assertSame([], $args);
 
             return true;
         })->andReturn(User::query());

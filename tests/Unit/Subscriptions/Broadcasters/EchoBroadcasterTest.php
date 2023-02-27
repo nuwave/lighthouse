@@ -61,8 +61,8 @@ final class EchoBroadcasterTest extends TestCase
 
         $response = $redisBroadcaster->authorized($request);
         $data = \Safe\json_decode($response->content());
-        $this->assertEquals(md5('abcdef'), $data->channel_data->user_id);
-        $this->assertEquals(200, $response->status());
+        $this->assertSame(md5('abcdef'), $data->channel_data->user_id);
+        $this->assertSame(200, $response->status());
     }
 
     public function testUnauthorized(): void
@@ -71,6 +71,6 @@ final class EchoBroadcasterTest extends TestCase
         $redisBroadcaster = new EchoBroadcaster($broadcastManager);
 
         $response = $redisBroadcaster->unauthorized(new Request());
-        $this->assertEquals(403, $response->getStatusCode());
+        $this->assertSame(403, $response->getStatusCode());
     }
 }

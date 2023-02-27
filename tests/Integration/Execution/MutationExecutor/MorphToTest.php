@@ -188,9 +188,7 @@ final class MorphToTest extends DBTestCase
         ];
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
     public function testDisconnectsMorphTo(string $action): void
     {
         /** @var \Tests\Utils\Models\Task $task */
@@ -229,9 +227,7 @@ GRAPHQL
         ]);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
     public function testDeletesMorphTo(string $action): void
     {
         /** @var \Tests\Utils\Models\Task $task */

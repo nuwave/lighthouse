@@ -58,9 +58,7 @@ final class EnsureXHRTest extends TestCase
         $this->assertSame($response, $result);
     }
 
-    /**
-     * @dataProvider formContentTypes
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('formContentTypes')]
     public function testForbidFormContentType(string $contentType): void
     {
         $middleware = new EnsureXHR();

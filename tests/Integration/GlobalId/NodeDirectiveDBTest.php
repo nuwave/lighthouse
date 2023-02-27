@@ -170,9 +170,7 @@ final class NodeDirectiveDBTest extends DBTestCase
         return self::TEST_TUPLES[$id];
     }
 
-    /**
-     * @dataProvider modelNodeDirectiveStyles
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('modelNodeDirectiveStyles')]
     public function testResolveModelsNodes(string $directiveDefinition): void
     {
         $this->schema .= /** @lang GraphQL */ "

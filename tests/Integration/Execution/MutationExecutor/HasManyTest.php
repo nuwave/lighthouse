@@ -322,9 +322,7 @@ final class HasManyTest extends DBTestCase
         ];
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
     public function testCreateHasMany(string $action): void
     {
         factory(User::class)->create();
@@ -365,9 +363,7 @@ GRAPHQL
         ]);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
     public function testUpdateHasMany(string $action): void
     {
         /** @var \Tests\Utils\Models\User $user */
@@ -415,9 +411,7 @@ GRAPHQL
         ]);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
     public function testUpsertHasMany(string $action): void
     {
         /** @var \Tests\Utils\Models\User $user */
@@ -465,9 +459,7 @@ GRAPHQL
         ]);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
     public function testDeleteHasMany(string $action): void
     {
         /** @var \Tests\Utils\Models\User $user */
@@ -507,9 +499,7 @@ GRAPHQL
         ]);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
     public function testConnectHasMany(string $action): void
     {
         /** @var \Tests\Utils\Models\User $user */
@@ -564,9 +554,7 @@ GRAPHQL
         ]);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('existingModelMutations')]
     public function testDisconnectHasMany(string $action): void
     {
         $user = factory(User::class)->create();
@@ -697,7 +685,7 @@ GRAPHQL
 
         // The first User has the first Role.
         $role = Role::firstOrFail();
-        $this->assertEquals([1], $role->users()->pluck('users.id')->toArray());
+        $this->assertSame([1], $role->users()->pluck('users.id')->toArray());
 
         // Create another User.
         factory(User::class)->create();
@@ -735,7 +723,7 @@ GRAPHQL
             ],
         ]);
 
-        $this->assertEquals([2], $role->users()->pluck('users.id')->toArray());
+        $this->assertSame([2], $role->users()->pluck('users.id')->toArray());
     }
 
     public function testConnectModelWithCustomKey(): void

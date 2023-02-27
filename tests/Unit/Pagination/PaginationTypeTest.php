@@ -9,10 +9,9 @@ use Tests\TestCase;
 final class PaginationTypeTest extends TestCase
 {
     /**
-     * @dataProvider invalidPaginationTypes
-     *
      * @param string $type An invalid type
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('invalidPaginationTypes')]
     public function testThrowsExceptionForUnsupportedTypes(string $type): void
     {
         self::expectExceptionObject(new DefinitionException("Found invalid pagination type: {$type}"));

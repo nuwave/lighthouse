@@ -52,7 +52,7 @@ final class UploadDirectiveTest extends TestCase
             ],
         ]);
 
-        $this->assertEquals('private', Storage::getVisibility($filePath));
+        $this->assertSame('private', Storage::getVisibility($filePath));
     }
 
     public function testUploadArgumentWithDiskParameter(): void
@@ -179,7 +179,7 @@ final class UploadDirectiveTest extends TestCase
             ],
         ]);
 
-        $this->assertEquals('public', Storage::getVisibility($filePath));
+        $this->assertSame('public', Storage::getVisibility($filePath));
     }
 
     public function testUploadArgumentWhereValueIsNull(): void
