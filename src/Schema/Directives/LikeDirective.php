@@ -2,6 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective;
@@ -46,7 +49,7 @@ directive @like(
 GRAPHQL;
     }
 
-    public function handleBuilder($builder, $value): object
+    public function handleBuilder(QueryBuilder|EloquentBuilder|Relation$builder, $value): QueryBuilder|EloquentBuilder|Relation
     {
         if (null === $value) {
             return $builder;
@@ -64,7 +67,7 @@ GRAPHQL;
         );
     }
 
-    public function handleFieldBuilder(object $builder, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): object
+    public function handleFieldBuilder(QueryBuilder|EloquentBuilder|Relation $builder, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): QueryBuilder|EloquentBuilder|Relation
     {
         return $this->handleBuilder(
             $builder,

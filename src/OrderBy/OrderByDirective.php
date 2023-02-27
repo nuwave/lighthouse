@@ -8,6 +8,8 @@ use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
@@ -112,7 +114,7 @@ GRAPHQL;
     /**
      * @param  array<array<string, mixed>>  $value
      */
-    public function handleBuilder($builder, $value): object
+    public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, $value): QueryBuilder|EloquentBuilder|Relation
     {
         foreach ($value as $orderByClause) {
             $order = Arr::pull($orderByClause, 'order');
@@ -259,7 +261,7 @@ GRAPHQL;
         }
     }
 
-    public function handleFieldBuilder(object $builder, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): object
+    public function handleFieldBuilder(QueryBuilder|EloquentBuilder|Relation $builder, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): QueryBuilder|EloquentBuilder|Relation
     {
         return $builder->orderBy(
             $this->directiveArgValue('column'),
