@@ -59,7 +59,7 @@ class ScoutEnhancer
 
     public function hasSearchArguments(): bool
     {
-        return $this->searchArguments !== [];
+        return [] !== $this->searchArguments;
     }
 
     public function canEnhanceBuilder(): bool
@@ -136,7 +136,7 @@ class ScoutEnhancer
         }
         $searchArgument = $this->searchArguments[0];
 
-        if ($this->argumentsWithOnlyArgBuilders !== []) {
+        if ([] !== $this->argumentsWithOnlyArgBuilders) {
             throw new ScoutException('Found arg builder arguments that do not work with @search.');
         }
 

@@ -67,7 +67,7 @@ class SchemaPrinter extends GraphQLSchemaPrinter
     protected static function printObjectLike(string $kind, Type $type, array $options): string
     {
         $interfaces = $type->getInterfaces();
-        $implementedInterfaces = $interfaces !== []
+        $implementedInterfaces = [] !== $interfaces
             ? ' implements ' . implode(
                 ' & ',
                 array_map(
