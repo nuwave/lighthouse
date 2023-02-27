@@ -37,7 +37,7 @@ bench: up ## Run benchmarks
 
 .PHONY: rector
 rector: up ## Automatic code fixes with Rector
-	${dcphp} rector process -v src/ tests/
+	${dcphp} vendor/bin/rector process src/ tests/
 
 vendor: up composer.json ## Install composer dependencies
 	${dcphp} composer update
