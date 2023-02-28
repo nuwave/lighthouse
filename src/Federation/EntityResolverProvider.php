@@ -6,6 +6,7 @@ use GraphQL\Error\Error;
 use GraphQL\Language\AST\FieldNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\SelectionSetNode;
+use GraphQL\Type\Schema;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
@@ -28,57 +29,30 @@ use Nuwave\Lighthouse\Support\Utils;
  */
 class EntityResolverProvider
 {
-    /**
-     * @var \GraphQL\Type\Schema
-     */
-    protected $schema;
-
-    /**
-     * @var \Nuwave\Lighthouse\Schema\DirectiveLocator
-     */
-    protected $directiveLocator;
-
-    /**
-     * @var \Illuminate\Contracts\Config\Repository
-     */
-    protected $configRepository;
-
-    /**
-     * @var \Illuminate\Contracts\Container\Container
-     */
-    protected $container;
+    protected Schema $schema;
 
     /**
      * Maps from __typename to definitions.
      *
      * @var array<string, \GraphQL\Language\AST\ObjectTypeDefinitionNode>
      */
-    protected $definitions;
+    protected array $definitions;
 
     /**
      * Maps from __typename to resolver.
      *
      * @var array<string, SingleEntityResolverFn|BatchedEntityResolver>
      */
-    protected $resolvers;
-
-    /**
-     * @var \Nuwave\Lighthouse\GlobalId\GlobalId
-     */
-    protected $globalId;
+    protected array $resolvers;
 
     public function __construct(
         SchemaBuilder $schemaBuilder,
-        DirectiveLocator $directiveLocator,
-        ConfigRepository $configRepository,
-        Container $container,
-        GlobalId $globalId,
+        protected DirectiveLocator $directiveLocator,
+        protected ConfigRepository $configRepository,
+        protected Container $container,
+        protected GlobalId $globalId,
     ) {
         $this->schema = $schemaBuilder->schema();
-        $this->directiveLocator = $directiveLocator;
-        $this->configRepository = $configRepository;
-        $this->container = $container;
-        $this->globalId = $globalId;
     }
 
     public static function missingResolver(string $typename): string

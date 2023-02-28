@@ -8,7 +8,7 @@ use Tests\Utils\Queries\Foo;
 
 final class FileUploadTest extends TestCase
 {
-    protected $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ '
     scalar Upload @scalar(class: "Nuwave\\\\Lighthouse\\\\Schema\\\\Types\\\\Scalars\\\\Upload")
 
     type Mutation {

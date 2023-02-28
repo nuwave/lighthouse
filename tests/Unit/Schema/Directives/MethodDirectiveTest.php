@@ -7,7 +7,7 @@ use Tests\TestCase;
 
 final class MethodDirectiveTest extends TestCase
 {
-    protected $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ '
     type Query {
         foo: Foo @mock
     }

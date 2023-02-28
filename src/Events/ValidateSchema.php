@@ -11,15 +11,10 @@ use GraphQL\Type\Schema;
  */
 class ValidateSchema
 {
-    /**
-     * The final schema to validate.
-     *
-     * @var \GraphQL\Type\Schema
-     */
-    public $schema;
-
-    public function __construct(Schema $schema)
-    {
-        $this->schema = $schema;
-    }
+    public function __construct(
+        /**
+         * The final schema to validate.
+         */
+        public Schema $schema,
+    ) {}
 }
