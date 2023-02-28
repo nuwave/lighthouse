@@ -69,9 +69,7 @@ class SchemaPrinter extends GraphQLSchemaPrinter
             ? ' implements ' . implode(
                 ' & ',
                 array_map(
-                    static function (InterfaceType $interface): string {
-                        return $interface->name;
-                    },
+                    static fn (InterfaceType $interface): string => $interface->name,
                     $interfaces
                 )
             )
@@ -103,9 +101,7 @@ GRAPHQL;
             . implode(
                 ' ',
                 array_map(
-                    static function (DirectiveNode $directive): string {
-                        return Printer::doPrint($directive);
-                    },
+                    static fn (DirectiveNode $directive): string => Printer::doPrint($directive),
                     $directives
                 )
             );
