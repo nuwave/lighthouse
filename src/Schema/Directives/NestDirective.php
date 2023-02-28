@@ -31,9 +31,7 @@ GRAPHQL;
         $resolveNested = new ResolveNested();
 
         return Utils::mapEach(
-            static function (ArgumentSet $argumentSet) use ($resolveNested, $root) {
-                return $resolveNested($root, $argumentSet);
-            },
+            static fn (ArgumentSet $argumentSet) => $resolveNested($root, $argumentSet),
             $args
         );
     }

@@ -21,12 +21,10 @@ final class RegisterDirectiveNamespacesTest extends TestCase
         $dispatcher = $app->make(EventsDispatcher::class);
         $dispatcher->listen(
             RegisterDirectiveNamespaces::class,
-            function (): array {
-                return [
-                    'Tests\\Utils\\Directives',
-                    'Tests\\Integration\\Events',
-                ];
-            }
+            fn (): array => [
+                'Tests\\Utils\\Directives',
+                'Tests\\Integration\\Events',
+            ]
         );
 
         $this->directiveLocator = $app->make(DirectiveLocator::class);

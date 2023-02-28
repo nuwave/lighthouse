@@ -2,14 +2,15 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
+use Illuminate\Contracts\Routing\Registrar;
+use Laravel\Lumen\Routing\Router;
+
 class SubscriptionRouter
 {
     /**
      * Register the routes for pusher based subscriptions.
-     *
-     * @param  \Illuminate\Contracts\Routing\Registrar|\Laravel\Lumen\Routing\Router  $router
      */
-    public function pusher($router): void
+    public function pusher(Registrar|Router $router): void
     {
         $router->post('graphql/subscriptions/auth', [
             'as' => 'lighthouse.subscriptions.auth',
@@ -22,10 +23,7 @@ class SubscriptionRouter
         ]);
     }
 
-    /**
-     * @param  \Illuminate\Contracts\Routing\Registrar|\Laravel\Lumen\Routing\Router  $router
-     */
-    public function echoRoutes($router): void
+    public function echoRoutes(Registrar|Router $router): void
     {
         $router->post('graphql/subscriptions/auth', [
             'as' => 'lighthouse.subscriptions.auth',

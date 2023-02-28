@@ -10,5 +10,5 @@ interface ArgResolver
      *
      * @return mixed|null May return the modified $root
      */
-    public function __invoke($root, $value);
+    public function __invoke(mixed $root, mixed $value): mixed;
 }

@@ -72,9 +72,7 @@ class RelationBatchLoader
             /**
              * @return class-string<\Illuminate\Database\Eloquent\Model>
              */
-            static function (Model $model): string {
-                return get_class($model);
-            },
+            static fn (Model $model): string => $model::class,
             true
         );
 

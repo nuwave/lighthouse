@@ -22,9 +22,7 @@ class TracingServiceProvider extends ServiceProvider
     {
         $eventsDispatcher->listen(
             RegisterDirectiveNamespaces::class,
-            static function (): string {
-                return __NAMESPACE__;
-            }
+            static fn (): string => __NAMESPACE__
         );
 
         $tracingDirective = Parser::constDirective('@tracing');

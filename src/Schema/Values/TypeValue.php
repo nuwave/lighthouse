@@ -51,8 +51,7 @@ class TypeValue
             $typeDefinition = $this->typeDefinition;
             if (! $typeDefinition instanceof ObjectTypeDefinitionNode) {
                 $expected = ObjectTypeDefinitionNode::class;
-                $actual = get_class($typeDefinition);
-
+                $actual = $typeDefinition::class;
                 throw new DefinitionException("Can only determine cacheKey for types of {$expected}, but type {$typeName} is {$actual}.");
             }
 

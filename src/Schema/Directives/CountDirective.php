@@ -86,10 +86,7 @@ GRAPHQL;
         if (is_string($relation)) {
             return function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
                 $relationBatchLoader = BatchLoaderRegistry::instance(
-                    array_merge(
-                        $this->qualifyPath($args, $resolveInfo),
-                        ['count']
-                    ),
+                    [...$this->qualifyPath($args, $resolveInfo), 'count'],
                     fn (): RelationBatchLoader => new RelationBatchLoader(
                         new CountModelsLoader($this->relation(), $this->makeBuilderDecorator($parent, $args, $context, $resolveInfo))
                     )

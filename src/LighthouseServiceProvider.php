@@ -88,22 +88,18 @@ class LighthouseServiceProvider extends ServiceProvider
 
         $this->app->bind(CreatesResponse::class, SingleResponse::class);
 
-        $this->app->singleton(SchemaSourceProvider::class, static function (): SchemaStitcher {
-            return new SchemaStitcher(
-                config('lighthouse.schema_path', '')
-            );
-        });
+        $this->app->singleton(SchemaSourceProvider::class, static fn (): SchemaStitcher => new SchemaStitcher(
+            config('lighthouse.schema_path', '')
+        ));
 
         $this->app->bind(ProvidesResolver::class, ResolverProvider::class);
-        $this->app->bind(ProvidesSubscriptionResolver::class, static function (): ProvidesSubscriptionResolver {
-            return new class() implements ProvidesSubscriptionResolver {
-                public function provideSubscriptionResolver(FieldValue $fieldValue): \Closure
-                {
-                    throw new \Exception(
-                        'Add the SubscriptionServiceProvider to your config/app.php to enable subscriptions.'
-                    );
-                }
-            };
+        $this->app->bind(ProvidesSubscriptionResolver::class, static fn (): ProvidesSubscriptionResolver => new class() implements ProvidesSubscriptionResolver {
+            public function provideSubscriptionResolver(FieldValue $fieldValue): \Closure
+            {
+                throw new \Exception(
+                    'Add the SubscriptionServiceProvider to your config/app.php to enable subscriptions.'
+                );
+            }
         });
 
         $this->app->bind(ProvidesValidationRules::class, ValidationRulesProvider::class);
@@ -121,7 +117,7 @@ class LighthouseServiceProvider extends ServiceProvider
             }
 
             throw new \Exception(
-                'Could not correctly determine Laravel framework flavor, got ' . get_class($app) . '.'
+                'Could not correctly determine Laravel framework flavor, got ' . $app::class . '.'
             );
         });
 

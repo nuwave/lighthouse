@@ -5,8 +5,6 @@ use Tests\Utils\Models\Employee;
 
 /* @var \Illuminate\Database\Eloquent\Factory $factory */
 
-$factory->define(Employee::class, function (Faker $faker): array {
-    return [
-        'position' => $faker->word,
-    ];
-});
+$factory->define(Employee::class, fn (Faker $faker): array => [
+    'position' => $faker->word,
+]);

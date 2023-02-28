@@ -112,9 +112,7 @@ GRAPHQL
         );
 
         $this->mockResolver()
-            ->with(null, new Callback(function (array $args): bool {
-                return $args['bar'] instanceof AOrB;
-            }));
+            ->with(null, new Callback(fn (array $args): bool => $args['bar'] instanceof AOrB));
 
         $this->graphQL(/** @lang GraphQL */ '
         {

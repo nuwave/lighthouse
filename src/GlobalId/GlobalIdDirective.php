@@ -88,16 +88,12 @@ GRAPHQL;
 
         $decode = $this->directiveArgValue('decode');
         if (null !== $decode) {
-            switch ($decode) {
-                case 'TYPE':
-                    return $this->globalId->decodeType($argumentValue);
-                case 'ID':
-                    return $this->globalId->decodeID($argumentValue);
-                case 'ARRAY':
-                    return $this->globalId->decode($argumentValue);
-                default:
-                    throw new DefinitionException("The decode argument of the @{$this->name()} directive can only be TYPE, ARRAY or ID, got {$decode}.");
-            }
+            return match ($decode) {
+                'TYPE' => $this->globalId->decodeType($argumentValue),
+                'ID' => $this->globalId->decodeID($argumentValue),
+                'ARRAY' => $this->globalId->decode($argumentValue),
+                default => throw new DefinitionException("The decode argument of the @{$this->name()} directive can only be TYPE, ARRAY or ID, got {$decode}."),
+            };
         }
 
         return $this->globalId->decode($argumentValue);

@@ -99,7 +99,7 @@ class RulesGatherer
      * @param  \Illuminate\Support\Collection<int, \Nuwave\Lighthouse\Support\Contracts\Directive>  $directives
      * @param  array<int|string>  $path
      */
-    protected function gatherRulesForArgument($value, Collection $directives, array $path): void
+    protected function gatherRulesForArgument(mixed $value, Collection $directives, array $path): void
     {
         foreach ($directives as $directive) {
             if ($directive instanceof ArgumentValidation) {
@@ -133,9 +133,7 @@ class RulesGatherer
     protected function extractValidationForArgumentSet(ArgumentSetValidation $directive, array $argumentPath): void
     {
         $qualifiedRulesList = array_map(
-            function (array $rules) use ($argumentPath): array {
-                return $this->qualifyArgumentReferences($rules, $argumentPath);
-            },
+            fn (array $rules): array => $this->qualifyArgumentReferences($rules, $argumentPath),
             $directive->rules()
         );
 
@@ -277,9 +275,7 @@ class RulesGatherer
                 'RequiredWithoutAll',
             ])) {
                 $args = array_map(
-                    static function (string $field) use ($argumentPath): string {
-                        return implode('.', array_merge($argumentPath, [$field]));
-                    },
+                    static fn (string $field): string => implode('.', array_merge($argumentPath, [$field])),
                     $args
                 );
             }
@@ -293,7 +289,7 @@ class RulesGatherer
             ])) {
                 try {
                     Carbon::parse($args[0]);
-                } catch (\Throwable $argumentIsNotADate) {
+                } catch (\Throwable) {
                     $args[0] = implode('.', array_merge($argumentPath, [$args[0]]));
                 }
             }

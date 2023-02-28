@@ -15,7 +15,7 @@ class ModelKey
         return implode(
             ':',
             array_merge(
-                [get_class($model)],
+                [$model::class],
                 // Might be one or more keys
                 (array) $model->getKey()
             )

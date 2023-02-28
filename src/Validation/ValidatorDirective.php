@@ -25,7 +25,7 @@ class ValidatorDirective extends BaseDirective implements ArgDirective, Argument
 {
     use HasArgumentValue;
 
-    protected ?Validator $validator;
+    protected ?Validator $validator = null;
 
     public static function definition(): string
     {
@@ -137,9 +137,7 @@ GRAPHQL;
         $validatorClassName = $this->namespaceClassName(
             $classCandidate,
             (array) config('lighthouse.namespaces.validators'),
-            function (string $classCandidate): bool {
-                return is_subclass_of($classCandidate, Validator::class);
-            }
+            fn (string $classCandidate): bool => is_subclass_of($classCandidate, Validator::class)
         );
         assert(is_subclass_of($validatorClassName, Validator::class));
 

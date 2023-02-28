@@ -19,9 +19,7 @@ class FederationServiceProvider extends ServiceProvider
     {
         $eventsDispatcher->listen(
             RegisterDirectiveNamespaces::class,
-            static function (): string {
-                return __NAMESPACE__ . '\\Directives';
-            }
+            static fn (): string => __NAMESPACE__ . '\\Directives'
         );
 
         $eventsDispatcher->listen(ManipulateAST::class, ASTManipulator::class);

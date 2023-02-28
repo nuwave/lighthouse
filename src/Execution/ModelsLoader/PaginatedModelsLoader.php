@@ -91,22 +91,20 @@ class PaginatedModelsLoader implements ModelsLoader
 
         // Use ->getQuery() to respect model scopes, such as soft deletes
         $mergedRelationQuery = $relations->reduce(
-            static function (EloquentBuilder $builder, Relation $relation): EloquentBuilder {
-                return $builder->unionAll(
-                    // @phpstan-ignore-next-line Laravel can deal with an EloquentBuilder just fine
-                    $relation->getQuery()
-                );
-            },
+            static fn (EloquentBuilder $builder, Relation $relation): EloquentBuilder => $builder->unionAll(
+                // @phpstan-ignore-next-line Laravel can deal with an EloquentBuilder just fine
+                $relation->getQuery()
+            ),
             $firstRelation->getQuery()
         );
 
         $relatedModels = $mergedRelationQuery->get();
 
-        return $relatedModels->unique(function (Model $relatedModel): string {
+        return $relatedModels->unique(
             // Compare all attributes because there might not be a unique primary key
             // or there could be differing pivot attributes.
-            return $relatedModel->toJson();
-        });
+            fn (Model $relatedModel): string => $relatedModel->toJson()
+        );
     }
 
     /**
@@ -170,9 +168,7 @@ class PaginatedModelsLoader implements ModelsLoader
 
         $unloadedWiths = array_filter(
             Utils::accessProtected($model, 'with'),
-            static function (string $relation) use ($model): bool {
-                return ! $model->relationLoaded($relation);
-            }
+            static fn (string $relation): bool => ! $model->relationLoaded($relation)
         );
 
         if (count($unloadedWiths) > 0) {

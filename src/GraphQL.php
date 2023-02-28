@@ -77,9 +77,7 @@ class GraphQL
             /**
              * @return array<string, mixed>
              */
-            function (OperationParams $operationParams) use ($context): array {
-                return $this->executeOperation($operationParams, $context);
-            },
+            fn (OperationParams $operationParams): array => $this->executeOperation($operationParams, $context),
             $operationOrOperations
         );
 
@@ -103,9 +101,7 @@ class GraphQL
 
         if ([] !== $errors) {
             $errors = array_map(
-                static function (RequestError $err): Error {
-                    return Error::createLocatedError($err);
-                },
+                static fn (RequestError $err): Error => Error::createLocatedError($err),
                 $errors
             );
 
@@ -188,9 +184,7 @@ class GraphQL
         return $store->remember(
             'lighthouse:query:' . hash('sha256', $query),
             $cacheConfig['ttl'],
-            static function () use ($query): DocumentNode {
-                return Parser::parse($query);
-            }
+            static fn (): DocumentNode => Parser::parse($query)
         );
     }
 
@@ -343,16 +337,14 @@ class GraphQL
                 }
 
                 return (new Collection($errors))
-                    ->map(function (Error $error) use ($handlers, $formatter): ?array {
-                        return $this->pipeline
-                            ->send($error)
-                            ->through($handlers)
-                            ->then(
-                                fn (?Error $error): ?array => null === $error
-                                ? null
-                                : $formatter($error)
-                            );
-                    })
+                    ->map(fn (Error $error): ?array => $this->pipeline
+                        ->send($error)
+                        ->through($handlers)
+                        ->then(
+                            fn (?Error $error): ?array => null === $error
+                            ? null
+                            : $formatter($error)
+                        ))
                     ->filter()
                     ->all();
             };

@@ -53,14 +53,12 @@ class LaravelEnumType extends EnumType
                 /**
                  * @return array<string, mixed> Used to construct a \GraphQL\Type\Definition\EnumValueDefinition
                  */
-                function (Enum $enum): array {
-                    return [
-                        'name' => $enum->key,
-                        'value' => $enum,
-                        'description' => $this->enumValueDescription($enum),
-                        'deprecationReason' => $this->deprecationReason($enum),
-                    ];
-                },
+                fn (Enum $enum): array => [
+                    'name' => $enum->key,
+                    'value' => $enum,
+                    'description' => $this->enumValueDescription($enum),
+                    'deprecationReason' => $this->deprecationReason($enum),
+                ],
                 $enumClass::getInstances()
             ),
         ]);
@@ -83,7 +81,7 @@ class LaravelEnumType extends EnumType
      */
     public static function enumMustHaveKey(Enum $value): \InvalidArgumentException
     {
-        $class = get_class($value);
+        $class = $value::class;
 
         return new \InvalidArgumentException("Enum of class {$class} must have key.");
     }

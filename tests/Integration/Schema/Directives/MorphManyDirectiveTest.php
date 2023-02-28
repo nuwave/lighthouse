@@ -140,22 +140,18 @@ final class MorphManyDirectiveTest extends DBTestCase
                     'id' => $this->post->id,
                     'title' => $this->post->title,
                     'images' => $this->postImages
-                        ->map(function (Image $image) {
-                            return [
-                                'id' => $image->id,
-                            ];
-                        })
+                        ->map(fn (Image $image) => [
+                            'id' => $image->id,
+                        ])
                         ->toArray(),
                 ],
                 'task' => [
                     'id' => $this->task->id,
                     'name' => $this->task->name,
                     'images' => $this->taskImages
-                        ->map(function (Image $image) {
-                            return [
-                                'id' => $image->id,
-                            ];
-                        })
+                        ->map(fn (Image $image) => [
+                            'id' => $image->id,
+                        ])
                         ->toArray(),
                 ],
             ],
@@ -208,11 +204,9 @@ final class MorphManyDirectiveTest extends DBTestCase
                     'title' => $this->post->title,
                     'imagesPaginated' => [
                         'data' => $this->postImages
-                            ->map(function (Image $image) {
-                                return [
-                                    'id' => $image->id,
-                                ];
-                            })
+                            ->map(fn (Image $image) => [
+                                'id' => $image->id,
+                            ])
                             ->toArray(),
                     ],
                 ],

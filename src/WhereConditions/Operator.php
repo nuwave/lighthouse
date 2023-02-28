@@ -37,5 +37,5 @@ interface Operator
      *
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<TModel>
      */
-    public function applyConditions($builder, array $whereConditions, string $boolean);
+    public function applyConditions(\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder, array $whereConditions, string $boolean): \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder;
 }

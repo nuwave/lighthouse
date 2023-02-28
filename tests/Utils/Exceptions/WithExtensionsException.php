@@ -11,18 +11,11 @@ use GraphQL\Error\ProvidesExtensions;
 final class WithExtensionsException extends \Exception implements ClientAware, ProvidesExtensions
 {
     /**
-     * @var ExtensionsContent
-     */
-    protected $extensionsContent;
-
-    /**
      * @param  ExtensionsContent  $extensionsContent
      */
-    public function __construct(string $message, array $extensionsContent)
+    public function __construct(string $message, protected array $extensionsContent)
     {
         parent::__construct($message);
-
-        $this->extensionsContent = $extensionsContent;
     }
 
     public function isClientSafe(): bool

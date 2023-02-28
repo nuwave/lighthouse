@@ -11,5 +11,5 @@ interface ArgTransformerDirective extends Directive
      *
      * @return mixed the transformed value
      */
-    public function transform($argumentValue);
+    public function transform(mixed $argumentValue): mixed;
 }

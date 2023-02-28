@@ -10,18 +10,16 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 class Context implements GraphQLContext
 {
     /**
-     * An instance of the incoming HTTP request.
-     */
-    public Request $request;
-
-    /**
      * An instance of the currently authenticated user.
      */
     public ?Authenticatable $user;
 
-    public function __construct(Request $request)
-    {
-        $this->request = $request;
+    public function __construct(
+        /**
+         * An instance of the incoming HTTP request.
+         */
+        public Request $request,
+    ) {
         $this->user = $request->user(AuthServiceProvider::guard());
     }
 

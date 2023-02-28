@@ -24,16 +24,14 @@ final class ThrottleDirectiveTest extends TestCase
         $rateLimiter->expects(self::atLeast(1))
             ->method('limiter')
             ->with('test')
-            ->willReturn(static function (): array {
-                return [
-                    // @phpstan-ignore-next-line phpstan ignores markTestSkipped
-                    Limit::perMinute(1),
-                    // @phpstan-ignore-next-line phpstan ignores markTestSkipped
-                    Limit::perMinute(2)->by('another_key'),
-                    // / @phpstan-ignore-next-line phpstan ignores markTestSkipped
-                    Limit::perMinute(3),
-                ];
-            });
+            ->willReturn(static fn (): array => [
+                // @phpstan-ignore-next-line phpstan ignores markTestSkipped
+                Limit::perMinute(1),
+                // @phpstan-ignore-next-line phpstan ignores markTestSkipped
+                Limit::perMinute(2)->by('another_key'),
+                // / @phpstan-ignore-next-line phpstan ignores markTestSkipped
+                Limit::perMinute(3),
+            ]);
 
         $rateLimiter->expects(self::exactly(3))
             ->method('tooManyAttempts')
@@ -46,9 +44,7 @@ final class ThrottleDirectiveTest extends TestCase
         $rateLimiter->expects(self::exactly(3))
             ->method('hit');
 
-        $this->app->singleton(RateLimiter::class, static function () use ($rateLimiter): RateLimiter {
-            return $rateLimiter;
-        });
+        $this->app->singleton(RateLimiter::class, static fn (): RateLimiter => $rateLimiter);
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -76,9 +72,7 @@ final class ThrottleDirectiveTest extends TestCase
         $rateLimiter->expects(self::atLeast(1))
             ->method('limiter')
             ->with('test')
-            ->willReturn(static function () {
-                return Limit::none();
-            });
+            ->willReturn(static fn () => Limit::none());
 
         $rateLimiter->expects(self::never())
             ->method('tooManyAttempts');
@@ -86,9 +80,7 @@ final class ThrottleDirectiveTest extends TestCase
         $rateLimiter->expects(self::never())
             ->method('hit');
 
-        $this->app->singleton(RateLimiter::class, static function () use ($rateLimiter): RateLimiter {
-            return $rateLimiter;
-        });
+        $this->app->singleton(RateLimiter::class, static fn (): RateLimiter => $rateLimiter);
 
         $this->graphQL(/** @lang GraphQL */ '
         {

@@ -57,9 +57,7 @@ class SchemaBuilder
 
         // Use lazy type loading to prevent unnecessary work
         $config->setTypeLoader(
-            function (string $name): ?Type {
-                return $this->typeRegistry->search($name);
-            }
+            fn (string $name): ?Type => $this->typeRegistry->search($name)
         );
 
         // Enables introspection to list all types in the schema
@@ -67,9 +65,7 @@ class SchemaBuilder
             /**
              * @return array<string, \GraphQL\Type\Definition\Type>
              */
-            function (): array {
-                return $this->typeRegistry->possibleTypes();
-            }
+            fn (): array => $this->typeRegistry->possibleTypes()
         );
 
         // There is no way to resolve directives lazily, so we convert them eagerly

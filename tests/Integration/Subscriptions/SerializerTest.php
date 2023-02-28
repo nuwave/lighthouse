@@ -22,9 +22,7 @@ final class SerializerTest extends DBTestCase
         );
 
         $request = new Request();
-        $request->setUserResolver(static function () use ($user) {
-            return $user;
-        });
+        $request->setUserResolver(static fn () => $user);
 
         $context = $contextFactory->generate($request);
 

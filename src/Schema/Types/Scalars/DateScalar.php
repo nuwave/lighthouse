@@ -70,8 +70,8 @@ abstract class DateScalar extends ScalarType
                 is_object($value)
                 // We want to know if we have exactly a Carbon\Carbon, not a subclass thereof
                 && (
-                    CarbonCarbon::class === get_class($value)
-                    || CarbonImmutable::class === get_class($value)
+                    CarbonCarbon::class === $value::class
+                    || CarbonImmutable::class === $value::class
                 )
             ) {
                 assert($value instanceof CarbonCarbon || $value instanceof CarbonImmutable);

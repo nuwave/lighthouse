@@ -25,11 +25,9 @@ GRAPHQL;
     public function sanitize($argumentValue)
     {
         return Utils::mapEachRecursive(
-            function ($value) {
-                return $value instanceof ArgumentSet
-                    ? $this->transformArgumentSet($value)
-                    : $this->transformLeaf($value);
-            },
+            fn (mixed $value): mixed => $value instanceof ArgumentSet
+                ? $this->transformArgumentSet($value)
+                : $this->transformLeaf($value),
             $argumentValue
         );
     }
@@ -60,7 +58,7 @@ GRAPHQL;
      *
      * @return mixed The transformed value
      */
-    protected function transformLeaf($value)
+    protected function transformLeaf(mixed $value): mixed
     {
         if ('' === $value) {
             return null;

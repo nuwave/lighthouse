@@ -442,9 +442,7 @@ final class ValidationTest extends TestCase
             return $reference === $value;
         }, 'The :attribute must be equal to :other.');
 
-        ValidatorFactory::replacer('equal_field', function (string $message, string $attribute, string $rule, array $parameters) {
-            return str_replace(':other', implode(', ', $parameters), $message);
-        });
+        ValidatorFactory::replacer('equal_field', fn (string $message, string $attribute, string $rule, array $parameters) => str_replace(':other', implode(', ', $parameters), $message));
 
         $this->schema = /** @lang GraphQL */ '
         type Query {

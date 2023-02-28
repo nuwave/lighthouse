@@ -23,19 +23,12 @@ class PaginationType
      */
     public function __construct(string $paginationType)
     {
-        switch ($paginationType) {
-            case self::PAGINATOR:
-                $this->type = self::PAGINATOR;
-                break;
-            case self::SIMPLE:
-                $this->type = self::SIMPLE;
-                break;
-            case self::CONNECTION:
-                $this->type = self::CONNECTION;
-                break;
-            default:
-                throw new DefinitionException("Found invalid pagination type: {$paginationType}");
-        }
+        $this->type = match ($paginationType) {
+            self::PAGINATOR => self::PAGINATOR,
+            self::SIMPLE => self::SIMPLE,
+            self::CONNECTION => self::CONNECTION,
+            default => throw new DefinitionException("Found invalid pagination type: {$paginationType}"),
+        };
     }
 
     public function isPaginator(): bool
@@ -55,14 +48,10 @@ class PaginationType
 
     public function infoFieldName(): string
     {
-        switch ($this->type) {
-            case self::PAGINATOR:
-            case self::SIMPLE:
-                return 'paginatorInfo';
-            case self::CONNECTION:
-                return 'pageInfo';
-            default:
-                throw new \Exception("infoFieldName is not implemented for pagination type: {$this->type}.");
-        }
+        return match ($this->type) {
+            self::PAGINATOR, self::SIMPLE => 'paginatorInfo',
+            self::CONNECTION => 'pageInfo',
+            default => throw new \Exception("infoFieldName is not implemented for pagination type: {$this->type}."),
+        };
     }
 }

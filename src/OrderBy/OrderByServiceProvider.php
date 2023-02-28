@@ -20,9 +20,7 @@ class OrderByServiceProvider extends ServiceProvider
     {
         $dispatcher->listen(
             RegisterDirectiveNamespaces::class,
-            static function (): string {
-                return __NAMESPACE__;
-            }
+            static fn (): string => __NAMESPACE__
         );
 
         $dispatcher->listen(

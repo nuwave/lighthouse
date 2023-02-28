@@ -64,11 +64,8 @@ class Tracing
 
     /**
      * Record resolver execution time.
-     *
-     * @param  float|int  $start
-     * @param  float|int  $end
      */
-    public function record(ResolveInfo $resolveInfo, $start, $end): void
+    public function record(ResolveInfo $resolveInfo, float|int $start, float|int $end): void
     {
         $this->resolverTraces[] = [
             'path' => $resolveInfo->path,
@@ -84,10 +81,8 @@ class Tracing
      * Get the system's highest resolution of time possible.
      *
      * This is either in seconds with microsecond precision (float) or nanoseconds (int).
-     *
-     * @return float|int
      */
-    public function timestamp()
+    public function timestamp(): float|int
     {
         return $this->platformSupportsNanoseconds()
             ? hrtime(true)
@@ -96,11 +91,8 @@ class Tracing
 
     /**
      * Diff the time results to each other and convert to nanoseconds if needed.
-     *
-     * @param  float|int  $start
-     * @param  float|int  $end
      */
-    protected function diffTimeInNanoseconds($start, $end): int
+    protected function diffTimeInNanoseconds(float|int $start, float|int $end): int
     {
         if ($this->platformSupportsNanoseconds()) {
             return (int) ($end - $start);

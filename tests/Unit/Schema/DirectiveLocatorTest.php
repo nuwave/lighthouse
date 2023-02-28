@@ -70,7 +70,7 @@ final class DirectiveLocatorTest extends TestCase
             }
         };
 
-        $this->directiveLocator->setResolved('foo', get_class($directive));
+        $this->directiveLocator->setResolved('foo', $directive::class);
 
         $directive = $this
             ->directiveLocator

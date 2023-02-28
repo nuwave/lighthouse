@@ -62,9 +62,7 @@ GRAPHQL;
         if ($this->directiveHasArgument('resolver')) {
             $resolver = $this->getResolverFromArgument('resolver');
         } else {
-            $resolver = function (int|string $id): ?Model {
-                return $this->getModelClass()::find($id);
-            };
+            $resolver = fn (int|string $id): ?Model => $this->getModelClass()::find($id);
         }
 
         $this->nodeRegistry->registerNode(

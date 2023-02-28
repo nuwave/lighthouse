@@ -27,9 +27,7 @@ final class CustomDefaultResolverTest extends TestCase
 
         $previous = Executor::getDefaultFieldResolver();
 
-        Executor::setDefaultFieldResolver(function (): int {
-            return self::CUSTOM_RESOLVER_RESULT;
-        });
+        Executor::setDefaultFieldResolver(fn (): int => self::CUSTOM_RESOLVER_RESULT);
 
         $this->graphQL(/** @lang GraphQL */ '
         {

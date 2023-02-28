@@ -118,9 +118,7 @@ class FieldValue
             $resolved = $resolver($root, $args, $context, $resolveInfo);
 
             if ($resolved instanceof Deferred) {
-                return $resolved->then(static function ($result) use ($handle, $args, $context, $resolveInfo) {
-                    return $handle($result, $args, $context, $resolveInfo);
-                });
+                return $resolved->then(static fn (mixed $result): mixed => $handle($result, $args, $context, $resolveInfo));
             }
 
             return $handle($resolved, $args, $context, $resolveInfo);

@@ -414,11 +414,9 @@ class TypeRegistry
             $fields = [];
 
             foreach ($typeDefinition->fields as $fieldDefinition) {
-                $fields[$fieldDefinition->name->value] = static function () use ($fieldFactory, $typeValue, $fieldDefinition): array {
-                    return $fieldFactory->handle(
-                        new FieldValue($typeValue, $fieldDefinition)
-                    );
-                };
+                $fields[$fieldDefinition->name->value] = static fn (): array => $fieldFactory->handle(
+                    new FieldValue($typeValue, $fieldDefinition)
+                );
             }
 
             return $fields;
@@ -430,9 +428,7 @@ class TypeRegistry
         /**
          * @return array<string, array<string, mixed>>
          */
-        $fields = function () use ($inputDefinition): array {
-            return $this->argumentFactory->toTypeMap($inputDefinition->fields);
-        };
+        $fields = fn (): array => $this->argumentFactory->toTypeMap($inputDefinition->fields);
 
         return new InputObjectType([
             'name' => $inputDefinition->name->value,
@@ -510,9 +506,7 @@ class TypeRegistry
         $className = Utils::namespaceClassname(
             $nodeName,
             $namespaces,
-            function (string $className): bool {
-                return method_exists($className, '__invoke');
-            }
+            fn (string $className): bool => method_exists($className, '__invoke')
         );
 
         if ($className) {
@@ -541,7 +535,7 @@ class TypeRegistry
             }
 
             if (is_object($root)) {
-                $fqcn = get_class($root);
+                $fqcn = $root::class;
                 $explicitSchemaMapping = $this->documentAST->classNameToObjectTypeNames[$fqcn] ?? null;
                 if (null !== $explicitSchemaMapping) {
                     $actuallyPossibleTypes = array_intersect($possibleTypes, $explicitSchemaMapping);

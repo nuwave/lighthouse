@@ -71,7 +71,7 @@ class Utils
      *
      * @return mixed value of object's protected member
      */
-    public static function accessProtected($object, string $memberName)
+    public static function accessProtected(mixed $object, string $memberName): mixed
     {
         $property = new \ReflectionProperty($object, $memberName);
         $property->setAccessible(true);
@@ -88,7 +88,7 @@ class Utils
      *
      * @return mixed result of calling the method
      */
-    public static function callProtected($object, string $methodName, array ...$args)
+    public static function callProtected(mixed $object, string $methodName, array ...$args): mixed
     {
         $property = new \ReflectionMethod($object, $methodName);
         $property->setAccessible(true);
@@ -122,9 +122,7 @@ class Utils
     public static function mapEachRecursive(\Closure $callback, $valueOrValues)
     {
         if (is_array($valueOrValues)) {
-            return array_map(function ($value) use ($callback) {
-                return static::mapEachRecursive($callback, $value);
-            }, $valueOrValues);
+            return array_map(fn ($value) => static::mapEachRecursive($callback, $value), $valueOrValues);
         }
 
         return $callback($valueOrValues);
@@ -170,9 +168,7 @@ class Utils
      */
     public static function instanceofMatcher(string $classLike): \Closure
     {
-        return function ($object) use ($classLike): bool {
-            return $object instanceof $classLike;
-        };
+        return fn (mixed $object): bool => $object instanceof $classLike;
     }
 
     /**

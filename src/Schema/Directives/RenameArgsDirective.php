@@ -40,9 +40,7 @@ GRAPHQL;
                 $argument->value
             );
 
-            $maybeRenameDirective = $argument->directives->first(function (Directive $directive): bool {
-                return $directive instanceof RenameDirective;
-            });
+            $maybeRenameDirective = $argument->directives->first(fn (Directive $directive): bool => $directive instanceof RenameDirective);
 
             if ($maybeRenameDirective instanceof RenameDirective) {
                 $argumentSet->arguments[$maybeRenameDirective->attributeArgValue()] = $argument;

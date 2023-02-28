@@ -14,13 +14,11 @@ final class ContextFactoryTest extends TestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        $app->singleton(CreatesContext::class, function (): CreatesContext {
-            return new class() implements CreatesContext {
-                public function generate(Request $request): GraphQLContext
-                {
-                    return new FooContext($request);
-                }
-            };
+        $app->singleton(CreatesContext::class, fn (): CreatesContext => new class() implements CreatesContext {
+            public function generate(Request $request): GraphQLContext
+            {
+                return new FooContext($request);
+            }
         });
     }
 

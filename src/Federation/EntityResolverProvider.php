@@ -152,9 +152,7 @@ class EntityResolverProvider
         $modelClass = Utils::namespaceClassname(
             $model,
             (array) $this->configRepository->get('lighthouse.namespaces.models'),
-            static function (string $classCandidate): bool {
-                return is_subclass_of($classCandidate, Model::class);
-            }
+            static fn (string $classCandidate): bool => is_subclass_of($classCandidate, Model::class)
         );
         if (null === $modelClass) {
             return null;
@@ -268,9 +266,7 @@ class EntityResolverProvider
     {
         return $this->directiveLocator
             ->associatedOfType($definition, KeyDirective::class)
-            ->map(static function (KeyDirective $keyDirective): SelectionSetNode {
-                return $keyDirective->fields();
-            });
+            ->map(static fn (KeyDirective $keyDirective): SelectionSetNode => $keyDirective->fields());
     }
 
     /**
@@ -280,9 +276,7 @@ class EntityResolverProvider
     public function firstSatisfiedKeyFields(Collection $keyFieldsSelections, array $representation): SelectionSetNode
     {
         $satisfiedKeyFields = $keyFieldsSelections->first(
-            function (SelectionSetNode $keyFields) use ($representation): bool {
-                return $this->satisfiesKeyFields($keyFields, $representation);
-            }
+            fn (SelectionSetNode $keyFields): bool => $this->satisfiesKeyFields($keyFields, $representation)
         );
 
         if (null === $satisfiedKeyFields) {

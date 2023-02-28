@@ -116,9 +116,7 @@ class DocumentAST implements Arrayable
                     $modelClass = Utils::namespaceClassName(
                         $modelName,
                         $namespacesToTry,
-                        static function (string $classCandidate): bool {
-                            return is_subclass_of($classCandidate, Model::class);
-                        }
+                        static fn (string $classCandidate): bool => is_subclass_of($classCandidate, Model::class)
                     );
 
                     if (null === $modelClass) {
@@ -139,7 +137,7 @@ class DocumentAST implements Arrayable
             } elseif ($definition instanceof DirectiveDefinitionNode) {
                 $instance->directives[$definition->name->value] = $definition;
             } else {
-                throw new \Exception('Unknown definition type: ' . get_class($definition));
+                throw new \Exception('Unknown definition type: ' . $definition::class);
             }
         }
 

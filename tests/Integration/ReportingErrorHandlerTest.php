@@ -26,9 +26,7 @@ final class ReportingErrorHandlerTest extends TestCase
             ->expects($this->atLeastOnce())
             ->method('report')
             ->with($exception);
-        $this->app->singleton(ExceptionHandler::class, function () use ($handler) {
-            return $handler;
-        });
+        $this->app->singleton(ExceptionHandler::class, fn () => $handler);
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -49,9 +47,7 @@ final class ReportingErrorHandlerTest extends TestCase
             ->expects($this->never())
             ->method('report')
             ->with($error);
-        $this->app->singleton(ExceptionHandler::class, function () use ($handler) {
-            return $handler;
-        });
+        $this->app->singleton(ExceptionHandler::class, fn () => $handler);
 
         $this->graphQL(/** @lang GraphQL */ '
         {

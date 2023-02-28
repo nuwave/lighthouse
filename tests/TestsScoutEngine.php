@@ -21,9 +21,7 @@ trait TestsScoutEngine
     public function setUpScoutEngine(): void
     {
         $this->engineManager = \Mockery::mock(EngineManager::class);
-        $this->app->singleton(EngineManager::class, function (): MockInterface {
-            return $this->engineManager;
-        });
+        $this->app->singleton(EngineManager::class, fn (): MockInterface => $this->engineManager);
 
         $this->engine = \Mockery::mock(NullEngine::class)
             ->makePartial();

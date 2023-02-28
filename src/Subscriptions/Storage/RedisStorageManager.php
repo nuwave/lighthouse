@@ -83,7 +83,7 @@ class RedisStorageManager implements StoresSubscriptions
                 // Other entries may contain invalid values
                 try {
                     return unserialize($subscriber);
-                } catch (\ErrorException $e) {
+                } catch (\ErrorException) {
                     return null;
                 }
             })

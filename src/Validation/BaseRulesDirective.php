@@ -136,7 +136,7 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
      *
      * @throws DefinitionException
      */
-    protected function invalidMessageArgument($messages): void
+    protected function invalidMessageArgument(mixed $messages): void
     {
         $encoded = \Safe\json_encode($messages);
         throw new DefinitionException(
@@ -149,7 +149,7 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
-    protected function invalidApplyArgument($apply): void
+    protected function invalidApplyArgument(mixed $apply): void
     {
         $encoded = \Safe\json_encode($apply);
         throw new DefinitionException(

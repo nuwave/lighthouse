@@ -83,7 +83,7 @@ GRAPHQL;
             }
 
             if ($limiterResponse instanceof Response) {
-                throw new DirectiveException("Expected named limiter {$name} to return an array, got instance of " . get_class($limiterResponse));
+                throw new DirectiveException("Expected named limiter {$name} to return an array, got instance of " . $limiterResponse::class);
             }
 
             foreach (Arr::wrap($limiterResponse) as $limit) {

@@ -31,11 +31,9 @@ GRAPHQL;
     public function sanitize($argumentValue)
     {
         return Utils::mapEach(
-            function ($value) {
-                return $value instanceof ArgumentSet
-                    ? $this->transformArgumentSet($value)
-                    : $this->transformLeaf($value);
-            },
+            fn (mixed $value): mixed => $value instanceof ArgumentSet
+                ? $this->transformArgumentSet($value)
+                : $this->transformLeaf($value),
             $argumentValue
         );
     }
@@ -59,7 +57,7 @@ GRAPHQL;
      *
      * @return mixed The transformed value
      */
-    protected function transformLeaf($value)
+    protected function transformLeaf(mixed $value): mixed
     {
         if (is_string($value)) {
             return trim($value);

@@ -22,12 +22,9 @@ use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
  */
 class GuardDirective extends BaseDirective implements FieldMiddleware, TypeManipulator, TypeExtensionManipulator
 {
-    protected AuthFactory $auth;
-
-    public function __construct(AuthFactory $auth)
-    {
-        $this->auth = $auth;
-    }
+    public function __construct(
+        protected AuthFactory $auth
+    ) {}
 
     public static function definition(): string
     {
