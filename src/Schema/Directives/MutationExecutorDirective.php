@@ -51,7 +51,7 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
      *
      * @return \Illuminate\Database\Eloquent\Model|array<\Illuminate\Database\Eloquent\Model>
      */
-    public function __invoke($parent, $args)
+    public function __invoke($parent, $args): mixed
     {
         $relationName = $this->directiveArgValue(
             'relation',

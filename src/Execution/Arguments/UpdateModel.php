@@ -27,7 +27,7 @@ class UpdateModel implements ArgResolver
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
      */
-    public function __invoke($model, $args)
+    public function __invoke($model, $args): mixed
     {
         $id = Arr::pull($args->arguments, 'id')
             ?? Arr::pull($args->arguments, $model->getKeyName())

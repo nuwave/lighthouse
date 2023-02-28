@@ -23,7 +23,7 @@ class UpsertModel implements ArgResolver
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
      */
-    public function __invoke($model, $args)
+    public function __invoke($model, $args): mixed
     {
         // TODO consider Laravel native ->upsert(), available from 8.10
         $id = $args->arguments['id']
