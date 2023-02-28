@@ -287,6 +287,15 @@ abstract class TestCase extends BaseTestCase
 }
 ```
 
+### Schema caching v1 removal
+
+Schema caching now uses v2 only. That means, the schema cache will be
+written to a php file that OPCache will pick up instead of being written
+to the configured cache driver. This significantly reduces memory usage.
+
+If you had previously depended on the presence of the schema in your
+cache, then you will need to change your code.
+
 ## v4 to v5
 
 ### Update PHP, Laravel and PHPUnit
@@ -679,14 +688,3 @@ If you use complex where condition directives, such as `@whereConditions`,
 upgrade `mll-lab/graphql-php-scalars` to v4:
 
     composer require mll-lab/graphql-php-scalars:^4
-
-### Schema caching v1 removal
-
-**Likelihood Of Impact: Low**
-
-Schema caching now uses v2 only. That means, the schema cache will be
-written to a php file that OPCache will pick up instead of being written
-to the configured cache driver. This significantly reduces memory usage.
-
-If you had previously depended on the presence of the schema in your
-cache, then you will need to change your code.
