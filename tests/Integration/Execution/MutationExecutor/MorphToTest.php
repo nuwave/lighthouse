@@ -8,7 +8,7 @@ use Tests\Utils\Models\Task;
 
 final class MorphToTest extends DBTestCase
 {
-    protected $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ '
     type Task {
         id: ID
         name: String

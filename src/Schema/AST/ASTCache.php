@@ -3,12 +3,9 @@
 namespace Nuwave\Lighthouse\Schema\AST;
 
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Cache\Factory as CacheFactory;
-use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Filesystem\Filesystem;
 use Nuwave\Lighthouse\Exceptions\InvalidSchemaCacheContentsException;
-use Nuwave\Lighthouse\Exceptions\UnknownCacheVersionException;
 
 /**
  * @phpstan-type CacheConfig array{

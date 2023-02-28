@@ -7,7 +7,7 @@ use Tests\TestCase;
 
 final class DeferIncludeSkipTest extends TestCase
 {
-    protected $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ '
     directive @include(if: Boolean!) on FIELD
     directive @skip(if: Boolean!) on FIELD
     ' . self::PLACEHOLDER_QUERY;

@@ -12,7 +12,7 @@ final class AuthorizeRequestsTest extends TestCase
     use TestsRedis;
     use TestsSubscriptions;
 
-    protected $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ '
     type Task {
         id: ID!
         name: String!

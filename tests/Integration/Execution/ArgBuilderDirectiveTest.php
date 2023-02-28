@@ -8,7 +8,7 @@ use Tests\Utils\Models\User;
 
 final class ArgBuilderDirectiveTest extends DBTestCase
 {
-    protected $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ '
     type User {
         id: ID!
         name: String

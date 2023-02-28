@@ -27,8 +27,6 @@ GRAPHQL;
 
     /**
      * Apply the @spread directive and return a new, modified ArgumentSet.
-     *
-     * @noRector \Rector\DeadCode\Rector\ClassMethod\RemoveDeadRecursiveClassMethodRector
      */
     protected function spread(ArgumentSet $original): ArgumentSet
     {

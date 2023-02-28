@@ -39,7 +39,8 @@ class CacheControlServiceProvider extends ServiceProvider
                 $typeInfo = new TypeInfo($startExecution->schema);
                 $cacheControl = $this->app->make(CacheControl::class);
 
-                Visitor::visit($startExecution->query, Visitor::visitWithTypeInfo($typeInfo, [
+                // @phpstan-ignore-next-line NodeVisitor does not know about the mapping between node kind and node type
+                $visitorWithTypeInfo = Visitor::visitWithTypeInfo($typeInfo, [
                     NodeKind::FIELD => function (FieldNode $_) use ($typeInfo, $cacheControl): void {
                         $field = $typeInfo->getFieldDef();
                         if (null === $field) {
@@ -79,7 +80,8 @@ class CacheControlServiceProvider extends ServiceProvider
                             }
                         }
                     },
-                ]));
+                ]);
+                Visitor::visit($startExecution->query, $visitorWithTypeInfo);
             }
         );
 

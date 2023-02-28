@@ -4,7 +4,7 @@ namespace Benchmarks;
 
 class HugeResponseBench extends QueryBench
 {
-    protected $schema = /** @lang GraphQL */ <<<'GRAPHQL'
+    protected string $schema = /** @lang GraphQL */ <<<'GRAPHQL'
 type Query {
   parent: Parent
     @field(resolver: "Benchmarks\\HugeResponseBench@resolve")

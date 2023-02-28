@@ -9,7 +9,7 @@ use Tests\Utils\Models\User;
 
 final class FieldBuilderDirectiveTest extends DBTestCase
 {
-    protected $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ '
     type Post {
         id: Int!
     }

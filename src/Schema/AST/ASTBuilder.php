@@ -36,51 +36,22 @@ class ASTBuilder
     ];
 
     /**
-     * @var \Nuwave\Lighthouse\Schema\DirectiveLocator
-     */
-    protected $directiveLocator;
-
-    /**
-     * @var \Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider
-     */
-    protected $schemaSourceProvider;
-
-    /**
-     * @var \Illuminate\Contracts\Events\Dispatcher
-     */
-    protected $eventsDispatcher;
-
-    /**
-     * @var \Nuwave\Lighthouse\Schema\AST\ASTCache
-     */
-    protected $astCache;
-
-    /**
      * Initialized lazily in $this->documentAST().
-     *
-     * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
-    protected $documentAST;
+    protected DocumentAST $documentAST;
 
     public function __construct(
-        DirectiveLocator $directiveLocator,
-        SchemaSourceProvider $schemaSourceProvider,
-        EventsDispatcher $eventsDispatcher,
-        ASTCache $astCache
-    ) {
-        $this->directiveLocator = $directiveLocator;
-        $this->schemaSourceProvider = $schemaSourceProvider;
-        $this->eventsDispatcher = $eventsDispatcher;
-        $this->astCache = $astCache;
-    }
+        protected DirectiveLocator $directiveLocator,
+        protected SchemaSourceProvider $schemaSourceProvider,
+        protected EventsDispatcher $eventsDispatcher,
+        protected ASTCache $astCache
+    ) {}
 
     public function documentAST(): DocumentAST
     {
         if (! isset($this->documentAST)) {
             return $this->documentAST = $this->astCache->isEnabled()
-                ? $this->astCache->fromCacheOrBuild(function (): DocumentAST {
-                    return $this->build();
-                })
+                ? $this->astCache->fromCacheOrBuild(fn (): DocumentAST => $this->build())
                 : $this->build();
         }
 

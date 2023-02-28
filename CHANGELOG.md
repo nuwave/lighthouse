@@ -47,7 +47,6 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Add method `TypeRegistry::search()` that maybe finds a type with a given name
 - Decode fields with directive `@globalId` in federation model entity resolver
-- Support Laravel 10 https://github.com/nuwave/lighthouse/pull/2287
 - Add `GraphQLContext:: setUser(?Authenticatable $user): void`
 - Add directive `@whereKey` to filter Models by their primary key https://github.com/nuwave/lighthouse/pull/2289
 - Allow directive `@where` on fields https://github.com/nuwave/lighthouse/pull/2306
@@ -75,6 +74,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove deprecated `GraphQL::executeQuery()` and `GraphQL::prepSchema()`
 - Remove `@field` directive argument `args` https://github.com/nuwave/lighthouse/pull/1706
 - Remove schema caching v1 https://github.com/nuwave/lighthouse/pull/2321
+
+## v5.71.0
+
+### Added
+
+- Support Laravel 10
 
 ## v5.70.3
 

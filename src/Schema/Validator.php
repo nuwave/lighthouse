@@ -10,44 +10,13 @@ use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 
 class Validator
 {
-    /**
-     * @var \Nuwave\Lighthouse\Schema\AST\ASTCache
-     */
-    protected $cache;
-
-    /**
-     * @var \Illuminate\Contracts\Events\Dispatcher
-     */
-    protected $eventsDispatcher;
-
-    /**
-     * @var \Nuwave\Lighthouse\Schema\SchemaBuilder
-     */
-    protected $schemaBuilder;
-
-    /**
-     * @var \Nuwave\Lighthouse\Schema\DirectiveLocator
-     */
-    protected $directiveLocator;
-
-    /**
-     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
-     */
-    protected $typeRegistry;
-
     public function __construct(
-        ASTCache $cache,
-        EventsDispatcher $eventsDispatcher,
-        SchemaBuilder $schemaBuilder,
-        DirectiveLocator $directiveLocator,
-        TypeRegistry $typeRegistry
-    ) {
-        $this->cache = $cache;
-        $this->eventsDispatcher = $eventsDispatcher;
-        $this->schemaBuilder = $schemaBuilder;
-        $this->directiveLocator = $directiveLocator;
-        $this->typeRegistry = $typeRegistry;
-    }
+        protected ASTCache $cache,
+        protected EventsDispatcher $eventsDispatcher,
+        protected SchemaBuilder $schemaBuilder,
+        protected DirectiveLocator $directiveLocator,
+        protected TypeRegistry $typeRegistry
+    ) {}
 
     public function validate(): void
     {

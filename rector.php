@@ -1,40 +1,43 @@
 <?php declare(strict_types=1);
 
 use Rector\CodeQuality\Rector\Array_\CallableThisArrayToAnonymousFunctionRector;
-use Rector\CodeQuality\Rector\ClassMethod\DateTimeToDateTimeInterfaceRector;
+use Rector\CodeQuality\Rector\Concat\JoinStringConcatRector;
+use Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector;
+use Rector\CodeQuality\Rector\Identical\GetClassToInstanceOfRector;
+use Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector;
 use Rector\CodeQuality\Rector\Isset_\IssetOnPropertyObjectToPropertyExistsRector;
-use Rector\Core\Configuration\Option;
+use Rector\Config\RectorConfig;
+use Rector\Php71\Rector\FuncCall\RemoveExtraParametersRector;
 use Rector\PHPUnit\Set\PHPUnitSetList;
 use Rector\Set\ValueObject\SetList;
-use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
-return static function (ContainerConfigurator $containerConfigurator): void {
-    $containerConfigurator->import(SetList::CODE_QUALITY);
-    $containerConfigurator->import(SetList::DEAD_CODE);
-
-    $containerConfigurator->import(PHPUnitSetList::PHPUNIT_EXCEPTION);
-    $containerConfigurator->import(PHPUnitSetList::PHPUNIT_SPECIFIC_METHOD);
-    $containerConfigurator->import(PHPUnitSetList::PHPUNIT_YIELD_DATA_PROVIDER);
-
-    $parameters = $containerConfigurator->parameters();
-    $parameters->set(Option::SKIP, [
-        // Does not fit autoloading standards
-        __DIR__ . '/tests/database/migrations',
-
-        // References PreLaravel7ExceptionHandler which is not compatible with newer Laravel
-        __DIR__ . '/tests/TestCase.php',
-        __DIR__ . '/tests/PreLaravel7ExceptionHandler.php',
-
-        // Gets stuck on WhereConditionsBaseDirective for some reason
-        __DIR__ . '/src/WhereConditions',
-
-        // It is shorter and more efficient
-        CallableThisArrayToAnonymousFunctionRector::class,
-
-        // isset() is nice when moving towards typed properties
-        IssetOnPropertyObjectToPropertyExistsRector::class,
-
-        // We just want Carbon
-        DateTimeToDateTimeInterfaceRector::class,
+return static function (RectorConfig $rectorConfig): void {
+    $rectorConfig->sets([
+        SetList::CODE_QUALITY,
+    ]);
+    $rectorConfig->sets([
+        PHPUnitSetList::PHPUNIT_90,
+        PHPUnitSetList::PHPUNIT_91,
+        PHPUnitSetList::PHPUNIT_CODE_QUALITY,
+        PHPUnitSetList::PHPUNIT_EXCEPTION,
+        PHPUnitSetList::PHPUNIT_SPECIFIC_METHOD,
+        PHPUnitSetList::PHPUNIT_YIELD_DATA_PROVIDER,
+        PHPUnitSetList::REMOVE_MOCKS,
+    ]);
+    $rectorConfig->skip([
+        __DIR__ . '/tests/database/migrations', // Does not fit autoloading standards
+        CallableThisArrayToAnonymousFunctionRector::class, // Callable in array form is shorter and more efficient
+        IssetOnPropertyObjectToPropertyExistsRector::class, // isset() is nice when moving towards typed properties
+        FlipTypeControlToUseExclusiveTypeRector::class, // Unnecessarily complex with PHPStan
+        JoinStringConcatRector::class => [
+            __DIR__ . '/tests/Integration/OrderBy/OrderByDirectiveTest.php', // Improves clarity
+        ],
+        RemoveExtraParametersRector::class => [
+            __DIR__ . '/src/Testing/TestResponseMixin.php', // mixins are weird
+        ],
+        GetClassToInstanceOfRector::class => [
+            __DIR__ . '/src/Schema/Types/Scalars/DateScalar.php', // We need to compare exact classes, not subclasses
+        ],
+        ExplicitBoolCompareRector::class,
     ]);
 };

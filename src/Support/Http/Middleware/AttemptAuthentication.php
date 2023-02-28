@@ -38,7 +38,7 @@ class AttemptAuthentication
      */
     protected function attemptAuthentication(array $guards): void
     {
-        if (empty($guards)) {
+        if ([] === $guards) {
             $guards = [AuthServiceProvider::guard()];
         }
 

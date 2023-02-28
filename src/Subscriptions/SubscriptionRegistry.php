@@ -21,46 +21,25 @@ use Nuwave\Lighthouse\Support\Utils;
 class SubscriptionRegistry
 {
     /**
-     * @var \Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer
-     */
-    protected $serializer;
-
-    /**
-     * @var \Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions
-     */
-    protected $storage;
-
-    /**
-     * @var \Nuwave\Lighthouse\Schema\SchemaBuilder
-     */
-    protected $schemaBuilder;
-
-    /**
-     * @var \Illuminate\Contracts\Config\Repository
-     */
-    protected $configRepository;
-
-    /**
      * A map from operation names to channel names.
      *
      * @var array<string, string>
      */
-    protected $subscribers = [];
+    protected array $subscribers = [];
 
     /**
      * Active subscription fields of the schema.
      *
      * @var array<string, \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription>
      */
-    protected $subscriptions = [];
+    protected array $subscriptions = [];
 
-    public function __construct(ContextSerializer $serializer, StoresSubscriptions $storage, SchemaBuilder $schemaBuilder, ConfigRepository $configRepository)
-    {
-        $this->serializer = $serializer;
-        $this->storage = $storage;
-        $this->schemaBuilder = $schemaBuilder;
-        $this->configRepository = $configRepository;
-    }
+    public function __construct(
+        protected ContextSerializer $serializer,
+        protected StoresSubscriptions $storage,
+        protected SchemaBuilder $schemaBuilder,
+        protected ConfigRepository $configRepository
+    ) {}
 
     /**
      * Add subscription to registry.
@@ -161,7 +140,7 @@ class SubscriptionRegistry
     {
         $subscriptionsConfig = $this->configRepository->get('lighthouse.subscriptions');
 
-        $channel = count($this->subscribers) > 0
+        $channel = [] !== $this->subscribers
             ? reset($this->subscribers)
             : null;
 

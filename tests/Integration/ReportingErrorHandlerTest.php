@@ -8,7 +8,7 @@ use Tests\TestCase;
 
 final class ReportingErrorHandlerTest extends TestCase
 {
-    protected $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ '
     type Query {
         foo: ID @mock
     }
