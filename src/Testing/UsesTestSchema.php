@@ -9,10 +9,8 @@ trait UsesTestSchema
 {
     /**
      * The schema that Lighthouse will use.
-     *
-     * @var string
      */
-    protected $schema;
+    protected string $schema;
 
     protected function setUpTestSchema(): void
     {
