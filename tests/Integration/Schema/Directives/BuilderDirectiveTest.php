@@ -2,7 +2,8 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Tests\DBTestCase;
@@ -41,7 +42,7 @@ final class BuilderDirectiveTest extends DBTestCase
         $this->app->instance(__CLASS__, $mock);
         $mock->shouldReceive('limit')
             ->once()
-            ->withArgs(function (Builder $builder, $value, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): bool {
+            ->withArgs(function (EloquentBuilder $builder, $value, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): bool {
                 $this->assertSame(1, $value);
                 $this->assertSame([
                     'arg1' => 'Hello',
@@ -75,7 +76,7 @@ final class BuilderDirectiveTest extends DBTestCase
     {
         $mock = \Mockery::mock($this);
         app()->instance(__CLASS__, $mock);
-        $mock->shouldReceive('limit')->once()->withArgs(function (Builder $builder, $value, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): bool {
+        $mock->shouldReceive('limit')->once()->withArgs(function (EloquentBuilder $builder, $value, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): bool {
             $this->assertIsNumeric($value);
             $this->assertSame(1, $value);
             $this->assertSame([], $args);
@@ -153,7 +154,7 @@ final class BuilderDirectiveTest extends DBTestCase
      *
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<\Tests\Utils\Models\User>
      */
-    public static function limit(object $builder, ?int $value): object
+    public static function limit(QueryBuilder|EloquentBuilder $builder, ?int $value): QueryBuilder|EloquentBuilder
     {
         return $builder->limit($value ?? 2);
     }

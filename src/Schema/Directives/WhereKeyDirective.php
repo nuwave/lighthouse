@@ -6,6 +6,8 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
@@ -37,10 +39,10 @@ scalar WhereKeyValue
 GRAPHQL;
     }
 
-    public function handleBuilder($builder, $value): object
+    public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, $value): QueryBuilder|EloquentBuilder|Relation
     {
         if (! $builder instanceof EloquentBuilder) {
-            $notEloquentBuilder = get_class($builder);
+            $notEloquentBuilder = $builder::class;
             throw new DefinitionException("The {$this->name()} directive only works with queries that use an Eloquent builder, got: {$notEloquentBuilder}.");
         }
 
@@ -54,7 +56,7 @@ GRAPHQL;
         }
     }
 
-    public function handleFieldBuilder(object $builder, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): object
+    public function handleFieldBuilder(QueryBuilder|EloquentBuilder|Relation $builder, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): QueryBuilder|EloquentBuilder|Relation
     {
         return $this->handleBuilder(
             $builder,

@@ -102,7 +102,7 @@ class ResponseStream extends Stream implements CanStreamResponse
     {
         try {
             $flush();
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             // buffer error, do nothing...
         }
     }

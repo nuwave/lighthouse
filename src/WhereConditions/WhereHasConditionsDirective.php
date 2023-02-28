@@ -3,6 +3,8 @@
 namespace Nuwave\Lighthouse\WhereConditions;
 
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Str;
 
 class WhereHasConditionsDirective extends WhereConditionsBaseDirective
@@ -57,14 +59,14 @@ GRAPHQL;
     /**
      * @param  array<string, mixed>|null  $value  The client given conditions
      */
-    public function handleBuilder($builder, $value): object
+    public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, $value): QueryBuilder|EloquentBuilder|Relation
     {
         if (null === $value) {
             return $builder;
         }
 
         if (! $builder instanceof EloquentBuilder) {
-            throw new \Exception('Can not get model from builder of class: ' . get_class($builder));
+            throw new \Exception('Can not get model from builder of class: ' . $builder::class);
         }
 
         $this->handle(
