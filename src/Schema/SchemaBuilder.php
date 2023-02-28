@@ -13,36 +13,18 @@ use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 
 class SchemaBuilder
 {
-    /**
-     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
-     */
-    protected $typeRegistry;
+    protected Schema $schema;
 
-    /**
-     * @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder
-     */
-    protected $astBuilder;
-
-    /**
-     * @var \GraphQL\Type\Schema
-     */
-    protected $schema;
-
-    public function __construct(TypeRegistry $typeRegistry, ASTBuilder $astBuilder)
-    {
-        $this->typeRegistry = $typeRegistry;
-        $this->astBuilder = $astBuilder;
-    }
+    public function __construct(
+        protected TypeRegistry $typeRegistry,
+        protected ASTBuilder $astBuilder
+    ) {}
 
     public function schema(): Schema
     {
-        if (! isset($this->schema)) {
-            return $this->schema = $this->build(
-                $this->astBuilder->documentAST()
-            );
-        }
-
-        return $this->schema;
+        return $this->schema ??= $this->build(
+            $this->astBuilder->documentAST()
+        );
     }
 
     /**

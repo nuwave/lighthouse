@@ -60,9 +60,7 @@ GRAPHQL;
 
         // This default is only valid for testing Lighthouse itself and thus
         // is not defined in the reusable test trait.
-        if (! isset($this->schema)) {
-            $this->schema = self::PLACEHOLDER_QUERY;
-        }
+        $this->schema ??= self::PLACEHOLDER_QUERY;
 
         $this->setUpTestSchema();
     }
@@ -185,9 +183,7 @@ GRAPHQL;
      */
     protected function resolveApplicationExceptionHandler($app): void
     {
-        $app->singleton(ExceptionHandler::class, function () {
-            return new ThrowingExceptionHandler();
-        });
+        $app->singleton(ExceptionHandler::class, fn () => new ThrowingExceptionHandler());
     }
 
     /**

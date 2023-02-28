@@ -8,7 +8,7 @@ use Tests\Utils\Queries\Foo;
 
 final class GraphQLTest extends TestCase
 {
-    protected $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ '
     type Query {
         foo: Int
         bar: String

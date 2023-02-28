@@ -7,7 +7,7 @@ use Tests\Utils\Models\Tag;
 
 final class MorphToManyTest extends DBTestCase
 {
-    protected $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ '
     type Mutation {
         createTask(input: CreateTaskInput! @spread): Task @create
         upsertTask(input: UpsertTaskInput! @spread): Task @upsert

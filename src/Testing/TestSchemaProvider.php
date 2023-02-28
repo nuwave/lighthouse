@@ -6,10 +6,7 @@ use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 
 class TestSchemaProvider implements SchemaSourceProvider
 {
-    /**
-     * @var string
-     */
-    protected $schema = '';
+    protected string $schema = '';
 
     /**
      * @param  string  $schema  May be changed after instantiation, so it is passed as a reference

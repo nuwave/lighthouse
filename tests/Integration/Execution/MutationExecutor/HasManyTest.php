@@ -10,7 +10,7 @@ use Tests\Utils\Models\User;
 
 final class HasManyTest extends DBTestCase
 {
-    protected $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ '
     type Task {
         id: ID!
         name: String!

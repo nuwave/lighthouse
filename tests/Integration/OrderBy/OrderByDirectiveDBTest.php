@@ -10,7 +10,7 @@ use Tests\Utils\Models\User;
 
 final class OrderByDirectiveDBTest extends DBTestCase
 {
-    protected $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ '
     type Query {
         users(
             orderBy: _ @orderBy
