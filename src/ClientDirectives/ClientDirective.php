@@ -17,7 +17,7 @@ use Nuwave\Lighthouse\Schema\SchemaBuilder;
  */
 class ClientDirective
 {
-    protected ?Directive $definition;
+    protected Directive $definition;
 
     public function __construct(
         protected string $name

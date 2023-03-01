@@ -104,7 +104,7 @@ class ArgumentSetFactory
      *
      * @return array|mixed|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet
      */
-    protected function wrapWithType($valueOrValues, ListType|NamedType $type)
+    protected function wrapWithType(mixed $valueOrValues, ListType|NamedType $type)
     {
         // No need to recurse down further if the value is null
         if (null === $valueOrValues) {
