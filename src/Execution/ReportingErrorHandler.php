@@ -10,15 +10,9 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
  */
 class ReportingErrorHandler implements ErrorHandler
 {
-    /**
-     * @var \Illuminate\Contracts\Debug\ExceptionHandler
-     */
-    protected $exceptionHandler;
-
-    public function __construct(ExceptionHandler $exceptionHandler)
-    {
-        $this->exceptionHandler = $exceptionHandler;
-    }
+    public function __construct(
+        protected ExceptionHandler $exceptionHandler
+    ) {}
 
     public function __invoke(?Error $error, \Closure $next): ?array
     {
@@ -34,7 +28,6 @@ class ReportingErrorHandler implements ErrorHandler
 
         $previous = $error->getPrevious();
         if (null !== $previous) {
-            // @phpstan-ignore-next-line Laravel versions prior to 7 are limited to accepting \Exception
             $this->exceptionHandler->report($previous);
         }
 
