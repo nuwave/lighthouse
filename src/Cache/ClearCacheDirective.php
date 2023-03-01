@@ -12,8 +12,8 @@ class ClearCacheDirective extends BaseDirective implements FieldMiddleware
 {
     public function __construct(
         protected CacheRepository $cacheRepository,
-        protected CacheKeyAndTags $cacheKeyAndTags)
-    {}
+        protected CacheKeyAndTags $cacheKeyAndTags
+    ) {}
 
     public static function definition(): string
     {

@@ -18,9 +18,6 @@ class PaginationType
      */
     protected string $type;
 
-    /**
-     * @param 'PAGINATOR'|'SIMPLE'|'CONNECTION' $paginationType
-     */
     public function __construct(string $paginationType)
     {
         $this->type = match ($paginationType) {

@@ -14,7 +14,8 @@ class Serializer implements ContextSerializer
     use SerializesAndRestoresModelIdentifiers;
 
     public function __construct(
-        protected CreatesContext $createsContext) {}
+        protected CreatesContext $createsContext
+    ) {}
 
     public function serialize(GraphQLContext $context): string
     {

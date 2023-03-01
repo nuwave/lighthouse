@@ -12,7 +12,8 @@ use Nuwave\Lighthouse\Subscriptions\Subscriber;
 class EchoBroadcaster implements Broadcaster
 {
     public function __construct(
-        protected BroadcastManager $broadcaster) {}
+        protected BroadcastManager $broadcaster
+    ) {}
 
     public function broadcast(Subscriber $subscriber, mixed $data): void
     {

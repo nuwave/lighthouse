@@ -44,7 +44,8 @@ class DirectiveLocator
     protected array $resolvedClassnames = [];
 
     public function __construct(
-        protected EventsDispatcher $eventsDispatcher) {}
+        protected EventsDispatcher $eventsDispatcher
+    ) {}
 
     /**
      * A list of namespaces with directives in descending priority.

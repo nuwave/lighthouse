@@ -12,8 +12,7 @@ class TransactionalMutations
     public function __construct(
         protected DatabaseManager $databaseManager,
         ConfigRepository $configRepository
-    )
-    {
+    ) {
         $this->shouldTransact = $configRepository->get('lighthouse.transactional_mutations');
     }
 

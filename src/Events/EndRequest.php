@@ -25,8 +25,7 @@ class EndRequest
          * The response that is about to be sent to the client.
          */
         public Response $response
-    )
-    {
+    ) {
         $this->moment = Carbon::now();
     }
 }

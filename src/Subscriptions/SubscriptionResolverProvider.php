@@ -19,7 +19,8 @@ use Nuwave\Lighthouse\Support\Utils;
 class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
 {
     public function __construct(
-        protected SubscriptionRegistry $subscriptionRegistry) {}
+        protected SubscriptionRegistry $subscriptionRegistry
+    ) {}
 
     /**
      * Provide a resolver for a subscription field in case no resolver directive is defined.

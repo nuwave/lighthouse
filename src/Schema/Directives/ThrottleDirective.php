@@ -23,8 +23,8 @@ class ThrottleDirective extends BaseDirective implements FieldMiddleware, FieldM
 {
     public function __construct(
         protected RateLimiter $limiter,
-        protected Request     $request)
-    {}
+        protected Request $request
+    ) {}
 
     public static function definition(): string
     {
@@ -107,8 +107,8 @@ GRAPHQL;
     {
         $name = $this->directiveArgValue('name');
         if (null !== $name) {
+            // @phpstan-ignore-next-line $limiter may be null although it's not specified in limiter() PHPDoc
             $this->limiter->limiter($name)
-                // @phpstan-ignore-next-line $limiter may be null although it's not specified in limiter() PHPDoc
                 ?? throw new DefinitionException("Named limiter {$name} is not found.");
         }
     }

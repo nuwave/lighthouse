@@ -10,7 +10,8 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
 class WhereConditionsHandler
 {
     public function __construct(
-        protected Operator $operator) {}
+        protected Operator $operator
+    ) {}
 
     /**
      * @template TModel of \Illuminate\Database\Eloquent\Model

@@ -7,7 +7,8 @@ use Illuminate\Routing\Router;
 class LaravelMiddlewareAdapter implements MiddlewareAdapter
 {
     public function __construct(
-        protected Router $router) {}
+        protected Router $router
+    ) {}
 
     public function getMiddleware(): array
     {

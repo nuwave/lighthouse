@@ -25,8 +25,7 @@ class StartRequest
          * The request sent from the client.
          */
         public Request $request
-    )
-    {
+    ) {
         $this->moment = Carbon::now();
     }
 }

@@ -53,8 +53,7 @@ class Defer implements CreatesResponse
         protected CanStreamResponse $stream,
         protected GraphQL $graphQL,
         ConfigRepository $config
-    )
-    {
+    ) {
         $executionTime = $config->get('lighthouse.defer.max_execution_ms', 0);
         if ($executionTime > 0) {
             $this->maxExecutionTime = microtime(true) + $executionTime * 1000;
