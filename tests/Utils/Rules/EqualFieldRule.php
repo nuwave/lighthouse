@@ -7,7 +7,7 @@ use Nuwave\Lighthouse\Support\Contracts\WithReferenceRule;
 
 final class EqualFieldRule implements Rule, WithReferenceRule
 {
-    private ?string $argumentPath = null;
+    private string $argumentPath;
 
     public function passes($attribute, $value): bool
     {

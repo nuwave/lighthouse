@@ -51,7 +51,7 @@ GRAPHQL;
         };
     }
 
-    public function handleScoutBuilder(ScoutBuilder $builder, $value): ScoutBuilder
+    public function handleScoutBuilder(ScoutBuilder $builder, mixed $value): ScoutBuilder
     {
         $model = $builder->model;
         $this->assertModelUsesSoftDeletes($model);

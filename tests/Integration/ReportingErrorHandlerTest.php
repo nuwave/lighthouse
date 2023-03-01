@@ -17,9 +17,7 @@ final class ReportingErrorHandlerTest extends TestCase
     public function testReportsNonClientSafeErrors(): void
     {
         $exception = new \Exception('some internal error that was unexpected');
-        $this->mockResolver(function () use ($exception) {
-            throw $exception;
-        });
+        $this->mockResolver(fn () => throw $exception);
 
         $handler = $this->createMock(ExceptionHandler::class);
         $handler
@@ -38,9 +36,7 @@ final class ReportingErrorHandlerTest extends TestCase
     public function testDoesNotReportClientSafeErrors(): void
     {
         $error = new Error('an expected error that is shown to clients');
-        $this->mockResolver(function () use ($error) {
-            throw $error;
-        });
+        $this->mockResolver(fn () => throw $error);
 
         $handler = $this->createMock(ExceptionHandler::class);
         $handler
