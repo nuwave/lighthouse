@@ -17,14 +17,11 @@ use Nuwave\Lighthouse\Schema\SchemaBuilder;
  */
 class ClientDirective
 {
-    protected string $name;
-
     protected ?Directive $definition;
 
-    public function __construct(string $name)
-    {
-        $this->name = $name;
-    }
+    public function __construct(
+        protected string $name
+    ) {}
 
     /**
      * Get the given values for a client directive.

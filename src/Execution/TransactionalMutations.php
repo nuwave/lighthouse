@@ -7,13 +7,13 @@ use Illuminate\Database\DatabaseManager;
 
 class TransactionalMutations
 {
-    protected DatabaseManager $databaseManager;
-
     protected bool $shouldTransact;
 
-    public function __construct(DatabaseManager $databaseManager, ConfigRepository $configRepository)
+    public function __construct(
+        protected DatabaseManager $databaseManager,
+        ConfigRepository $configRepository
+    )
     {
-        $this->databaseManager = $databaseManager;
         $this->shouldTransact = $configRepository->get('lighthouse.transactional_mutations');
     }
 

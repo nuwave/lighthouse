@@ -12,13 +12,10 @@ use GraphQL\Executor\ExecutionResult;
  */
 class ManipulateResult
 {
-    /**
-     * The result of resolving an individual query.
-     */
-    public ExecutionResult $result;
-
-    public function __construct(ExecutionResult &$result)
-    {
-        $this->result = $result;
-    }
+    public function __construct(
+        /**
+         * The result of resolving an individual query.
+         */
+        public ExecutionResult &$result
+    ) {}
 }

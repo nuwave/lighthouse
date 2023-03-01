@@ -9,13 +9,10 @@ class DeprecatedUsage
      */
     public int $count = 0;
 
-    /**
-     * Why is the element deprecated?
-     */
-    public string $reason;
-
-    public function __construct(string $reason)
-    {
-        $this->reason = $reason;
-    }
+    public function __construct(
+        /**
+         * Why is the element deprecated?
+         */
+        public string $reason
+    ) {}
 }

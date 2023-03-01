@@ -11,12 +11,8 @@ use Nuwave\Lighthouse\Schema\AST\TypeNodeConverter;
 
 class DirectiveFactory
 {
-    protected TypeNodeConverter $typeNodeConverter;
-
-    public function __construct(TypeNodeConverter $typeNodeConverter)
-    {
-        $this->typeNodeConverter = $typeNodeConverter;
-    }
+    public function __construct(
+        protected TypeNodeConverter $typeNodeConverter) {}
 
     /**
      * Transform node to type.

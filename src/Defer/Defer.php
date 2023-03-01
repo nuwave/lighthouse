@@ -12,10 +12,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class Defer implements CreatesResponse
 {
-    protected CanStreamResponse $stream;
-
-    protected GraphQL $graphQL;
-
     protected StartExecution $startExecution;
 
     /**
@@ -53,11 +49,12 @@ class Defer implements CreatesResponse
 
     protected int $maxNestedFields = 0;
 
-    public function __construct(CanStreamResponse $stream, GraphQL $graphQL, ConfigRepository $config)
+    public function __construct(
+        protected CanStreamResponse $stream,
+        protected GraphQL $graphQL,
+        ConfigRepository $config
+    )
     {
-        $this->stream = $stream;
-        $this->graphQL = $graphQL;
-
         $executionTime = $config->get('lighthouse.defer.max_execution_ms', 0);
         if ($executionTime > 0) {
             $this->maxExecutionTime = microtime(true) + $executionTime * 1000;

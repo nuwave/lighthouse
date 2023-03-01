@@ -9,12 +9,8 @@ use Nuwave\Lighthouse\Schema\AST\TypeNodeConverter;
 
 class ExecutableTypeNodeConverter extends TypeNodeConverter
 {
-    protected TypeRegistry $typeRegistry;
-
-    public function __construct(TypeRegistry $typeRegistry)
-    {
-        $this->typeRegistry = $typeRegistry;
-    }
+    public function __construct(
+        protected TypeRegistry $typeRegistry) {}
 
     /**
      * @param \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NullableType $type

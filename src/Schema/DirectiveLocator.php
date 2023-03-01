@@ -43,12 +43,8 @@ class DirectiveLocator
      */
     protected array $resolvedClassnames = [];
 
-    protected EventsDispatcher $eventsDispatcher;
-
-    public function __construct(EventsDispatcher $eventsDispatcher)
-    {
-        $this->eventsDispatcher = $eventsDispatcher;
-    }
+    public function __construct(
+        protected EventsDispatcher $eventsDispatcher) {}
 
     /**
      * A list of namespaces with directives in descending priority.

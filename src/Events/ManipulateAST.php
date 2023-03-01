@@ -14,13 +14,10 @@ use Nuwave\Lighthouse\Schema\AST\DocumentAST;
  */
 class ManipulateAST
 {
-    /**
-     * The AST that can be manipulated.
-     */
-    public DocumentAST $documentAST;
-
-    public function __construct(DocumentAST &$documentAST)
-    {
-        $this->documentAST = $documentAST;
-    }
+    public function __construct(
+        /**
+         * The AST that can be manipulated.
+         */
+        public DocumentAST &$documentAST
+    ) {}
 }

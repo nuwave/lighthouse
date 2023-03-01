@@ -7,18 +7,12 @@ use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
 class NestedBelongsTo implements ArgResolver
 {
-    /**
-     * @var \Illuminate\Database\Eloquent\Relations\BelongsTo<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model>
-     */
-    protected BelongsTo $relation;
-
-    /**
-     * @param  \Illuminate\Database\Eloquent\Relations\BelongsTo<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model>  $relation
-     */
-    public function __construct(BelongsTo $relation)
-    {
-        $this->relation = $relation;
-    }
+    public function __construct(
+        /**
+         * @var  \Illuminate\Database\Eloquent\Relations\BelongsTo<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model>  $relation
+         */
+        protected BelongsTo $relation
+    ) {}
 
     /**
      * @param  \Illuminate\Database\Eloquent\Model  $parent

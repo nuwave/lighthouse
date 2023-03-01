@@ -10,21 +10,11 @@ use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionExceptionHandler;
 
 class Authorizer implements AuthorizesSubscriptions
 {
-    protected StoresSubscriptions $storage;
-
-    protected SubscriptionRegistry $registry;
-
-    protected SubscriptionExceptionHandler $exceptionHandler;
-
     public function __construct(
-        StoresSubscriptions $storage,
-        SubscriptionRegistry $registry,
-        SubscriptionExceptionHandler $exceptionHandler
-    ) {
-        $this->storage = $storage;
-        $this->registry = $registry;
-        $this->exceptionHandler = $exceptionHandler;
-    }
+        protected StoresSubscriptions          $storage,
+        protected SubscriptionRegistry         $registry,
+        protected SubscriptionExceptionHandler $exceptionHandler)
+    {}
 
     public function authorize(Request $request): bool
     {

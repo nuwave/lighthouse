@@ -51,37 +51,28 @@ class Subscriber
     public mixed $root;
 
     /**
-     * The args passed to the subscription query.
-     *
-     * @var array<string, mixed>
-     */
-    public array $args;
-
-    /**
      * The variables passed to the subscription query.
      *
      * @var array<string, mixed>
      */
     public array $variables;
 
-    /**
-     * The context passed to the query.
-     */
-    public GraphQLContext $context;
-
-    /**
-     * @param  array<string, mixed>  $args
-     */
     public function __construct(
-        array $args,
-        GraphQLContext $context,
+        /**
+         * The args passed to the subscription query.
+         *
+         * @var array<string, mixed> $args
+         */
+        public array $args,
+        /**
+         * The context passed to the query.
+         */
+        public GraphQLContext $context,
         ResolveInfo $resolveInfo
     ) {
         $this->fieldName = $resolveInfo->fieldName;
         $this->channel = self::uniqueChannelName();
-        $this->args = $args;
         $this->variables = $resolveInfo->variableValues;
-        $this->context = $context;
 
         $xSocketID = request()->header('X-Socket-ID');
         // @phpstan-ignore-next-line

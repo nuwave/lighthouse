@@ -17,13 +17,6 @@ use Nuwave\Lighthouse\Support\Utils;
  */
 class ScoutEnhancer
 {
-    protected ArgumentSet $argumentSet;
-
-    /**
-     * @var \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<TModel>|\Illuminate\Database\Eloquent\Relations\Relation<TModel>|\Laravel\Scout\Builder
-     */
-    protected QueryBuilder|EloquentBuilder|Relation|ScoutBuilder $builder;
-
     /**
      * Provide the actual search value.
      *
@@ -45,14 +38,13 @@ class ScoutEnhancer
      */
     protected array $argumentsWithScoutBuilderDirectives = [];
 
-    /**
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<TModel>|\Illuminate\Database\Eloquent\Relations\Relation<TModel>|\Laravel\Scout\Builder $builder
-     */
-    public function __construct(ArgumentSet $argumentSet, QueryBuilder|EloquentBuilder|Relation|ScoutBuilder $builder)
+    public function __construct(
+        protected ArgumentSet $argumentSet,
+        /**
+         * @var \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<TModel>|\Illuminate\Database\Eloquent\Relations\Relation<TModel>|\Laravel\Scout\Builder $builder
+         */
+        protected QueryBuilder|EloquentBuilder|Relation|ScoutBuilder $builder)
     {
-        $this->argumentSet = $argumentSet;
-        $this->builder = $builder;
-
         $this->gather($this->argumentSet);
     }
 

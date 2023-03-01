@@ -16,18 +16,17 @@ use Illuminate\Support\Carbon;
 class StartRequest
 {
     /**
-     * The request sent from the client.
-     */
-    public Request $request;
-
-    /**
      * The point in time when the request started.
      */
     public Carbon $moment;
 
-    public function __construct(Request $request)
+    public function __construct(
+        /**
+         * The request sent from the client.
+         */
+        public Request $request
+    )
     {
-        $this->request = $request;
         $this->moment = Carbon::now();
     }
 }

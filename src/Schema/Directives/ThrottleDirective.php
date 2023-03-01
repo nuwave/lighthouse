@@ -21,15 +21,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ThrottleDirective extends BaseDirective implements FieldMiddleware, FieldManipulator
 {
-    protected RateLimiter $limiter;
-
-    protected Request $request;
-
-    public function __construct(RateLimiter $limiter, Request $request)
-    {
-        $this->limiter = $limiter;
-        $this->request = $request;
-    }
+    public function __construct(
+        protected RateLimiter $limiter,
+        protected Request     $request)
+    {}
 
     public static function definition(): string
     {

@@ -10,12 +10,9 @@ use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
 class NestedOneToMany implements ArgResolver
 {
-    protected string $relationName;
-
-    public function __construct(string $relationName)
-    {
-        $this->relationName = $relationName;
-    }
+    public function __construct(
+        protected string $relationName
+    ) {}
 
     /**
      * @param  \Illuminate\Database\Eloquent\Model  $parent

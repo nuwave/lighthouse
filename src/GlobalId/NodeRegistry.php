@@ -11,8 +11,6 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class NodeRegistry
 {
-    protected TypeRegistry $typeRegistry;
-
     /**
      * A map from type names to resolver functions.
      *
@@ -29,10 +27,9 @@ class NodeRegistry
      */
     protected string $currentType;
 
-    public function __construct(TypeRegistry $typeRegistry)
-    {
-        $this->typeRegistry = $typeRegistry;
-    }
+    public function __construct(
+        protected TypeRegistry $typeRegistry
+    ) {}
 
     /**
      * @param  string  $typeName  The name of the ObjectType that can be resolved with the Node interface

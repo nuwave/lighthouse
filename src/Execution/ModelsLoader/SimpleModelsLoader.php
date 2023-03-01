@@ -7,14 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class SimpleModelsLoader implements ModelsLoader
 {
-    protected string $relation;
-
-    protected \Closure $decorateBuilder;
-
-    public function __construct(string $relation, \Closure $decorateBuilder)
+    public function __construct(
+        protected string $relation,
+        protected \Closure         $decorateBuilder)
     {
-        $this->relation = $relation;
-        $this->decorateBuilder = $decorateBuilder;
     }
 
     public function load(EloquentCollection $parents): void

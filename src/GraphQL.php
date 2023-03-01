@@ -336,9 +336,10 @@ class GraphQL
                     ->map(fn (Error $error): ?array => $this->pipeline
                         ->send($error)
                         ->through($handlers)
-                        ->then(fn (?Error $error): ?array => null === $error
-                            ? null
-                            : $formatter($error)
+                        ->then(
+                            fn (?Error $error): ?array => null === $error
+                                ? null
+                                : $formatter($error)
                         ))
                     ->filter()
                     ->all();

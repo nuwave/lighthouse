@@ -11,18 +11,16 @@ use Illuminate\Support\Carbon;
 class EndExecution
 {
     /**
-     * The result of resolving a single operation.
-     */
-    public ExecutionResult $result;
-
-    /**
      * The point in time when the result was ready.
      */
     public Carbon $moment;
 
-    public function __construct(ExecutionResult $result)
+    public function __construct(/**
+     * The result of resolving a single operation.
+     */
+    public ExecutionResult $result
+    )
     {
-        $this->result = $result;
         $this->moment = Carbon::now();
     }
 }

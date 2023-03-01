@@ -10,12 +10,9 @@ use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
 class AuthDirective extends BaseDirective implements FieldResolver
 {
-    protected AuthFactory $authFactory;
-
-    public function __construct(AuthFactory $authFactory)
-    {
-        $this->authFactory = $authFactory;
-    }
+    public function __construct(
+        protected AuthFactory $authFactory
+    ) {}
 
     public static function definition(): string
     {

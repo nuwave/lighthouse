@@ -18,7 +18,6 @@ class PaginationArgs
         public PaginationType $type,
     ) {}
 
-
     /**
      * Create a new instance from user given args.
      *

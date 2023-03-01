@@ -10,8 +10,6 @@ use Nuwave\Lighthouse\Execution\Utils\ModelKey;
 
 class RelationBatchLoader
 {
-    protected ModelsLoader $modelsLoader;
-
     /**
      * Map from unique model keys to model instances.
      *
@@ -31,10 +29,9 @@ class RelationBatchLoader
      */
     protected bool $hasResolved = false;
 
-    public function __construct(ModelsLoader $modelsLoader)
-    {
-        $this->modelsLoader = $modelsLoader;
-    }
+    public function __construct(
+        protected ModelsLoader $modelsLoader
+    ) {}
 
     /**
      * Schedule loading a relation off of a concrete model.
