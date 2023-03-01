@@ -212,7 +212,7 @@ final class BaseDirectiveTest extends TestCase
         };
 
         $directive->hydrate(
-            $fieldDefinition->directives[0],
+            $fieldDefinition->directives->get(0),
             $fieldDefinition
         );
 
