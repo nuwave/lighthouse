@@ -41,7 +41,7 @@ class Argument
      *
      * @return mixed the plain PHP value
      */
-    public function toPlain()
+    public function toPlain(): mixed
     {
         return static::toPlainRecursive($this->value);
     }
@@ -51,10 +51,7 @@ class Argument
         return static::namedTypeRecursive($this->type);
     }
 
-    /**
-     * @param \Nuwave\Lighthouse\Execution\Arguments\ListType|\Nuwave\Lighthouse\Execution\Arguments\NamedType|null $type
-     */
-    protected static function namedTypeRecursive($type): ?NamedType
+    protected static function namedTypeRecursive(ListType|NamedType|null $type): ?NamedType
     {
         if ($type instanceof ListType) {
             return static::namedTypeRecursive($type->type);
@@ -70,7 +67,7 @@ class Argument
      *
      * @return mixed|array<mixed>
      */
-    protected static function toPlainRecursive($value)
+    protected static function toPlainRecursive(mixed $value): mixed
     {
         if ($value instanceof ArgumentSet) {
             return $value->toArray();

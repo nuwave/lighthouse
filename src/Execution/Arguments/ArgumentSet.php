@@ -58,7 +58,7 @@ class ArgumentSet
             return false;
         }
 
-        return null !== $argument->value;
+        return isset($argument->value);
     }
 
     /**

@@ -5,6 +5,7 @@ namespace Tests\Integration\Execution\DataLoader;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Nuwave\Lighthouse\Execution\ModelsLoader\PaginatedModelsLoader;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
+use Nuwave\Lighthouse\Pagination\PaginationType;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Tag;
@@ -195,7 +196,7 @@ final class PaginatedRelationLoaderTest extends DBTestCase
 
     protected function makePaginationArgs(int $first): PaginationArgs
     {
-        $paginatorArgs = new PaginationArgs();
+        $paginatorArgs = new PaginationArgs(1, $first, new PaginationType('SIMPLE'));
         $paginatorArgs->first = $first;
 
         return $paginatorArgs;

@@ -7,7 +7,7 @@ class DeprecatedUsage
     /**
      * How often was the element used?
      */
-    public int $count;
+    public int $count = 0;
 
     /**
      * Why is the element deprecated?

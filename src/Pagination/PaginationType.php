@@ -19,7 +19,7 @@ class PaginationType
     protected string $type;
 
     /**
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
+     * @param 'PAGINATOR'|'SIMPLE'|'CONNECTION' $paginationType
      */
     public function __construct(string $paginationType)
     {
