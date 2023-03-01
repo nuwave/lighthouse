@@ -39,7 +39,7 @@ trait MakesGraphQLRequests
      * @param  array<string, mixed>  $variables  The variables to include in the query
      * @param  array<string, mixed>  $extraParams  Extra parameters to add to the JSON payload
      * @param  array<string, mixed>  $headers  HTTP headers to pass to the POST request
-     * @param  array<string, string>  $routeParams  Route params to pass to the Laravel route
+     * @param  array<string, string>  $routeParams  Parameters to pass to the Laravel route
      */
     protected function graphQL(
         string $query,
