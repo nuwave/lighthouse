@@ -11,15 +11,9 @@ use Nuwave\Lighthouse\Subscriptions\Subscriber;
 
 class EchoBroadcaster implements Broadcaster
 {
-    /**
-     * @var \Illuminate\Broadcasting\BroadcastManager
-     */
-    protected $broadcaster;
-
-    public function __construct(BroadcastManager $broadcaster)
-    {
-        $this->broadcaster = $broadcaster;
-    }
+    public function __construct(
+        protected BroadcastManager $broadcaster
+    ) {}
 
     public function broadcast(Subscriber $subscriber, mixed $data): void
     {

@@ -3,6 +3,8 @@
 namespace Nuwave\Lighthouse\Scout;
 
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Laravel\Scout\Builder as ScoutBuilder;
 use Laravel\Scout\Searchable;
 use Nuwave\Lighthouse\Execution\Arguments\Argument;
@@ -16,44 +18,33 @@ use Nuwave\Lighthouse\Support\Utils;
 class ScoutEnhancer
 {
     /**
-     * @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet
-     */
-    protected $argumentSet;
-
-    /**
-     * @var \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<TModel>|\Illuminate\Database\Eloquent\Relations\Relation<TModel>|\Laravel\Scout\Builder
-     */
-    protected $builder;
-
-    /**
      * Provide the actual search value.
      *
      * @var array<Argument>
      */
-    protected $searchArguments = [];
+    protected array $searchArguments = [];
 
     /**
      * Should not be there when @search is used.
      *
      * @var array<Argument>
      */
-    protected $argumentsWithOnlyArgBuilders = [];
+    protected array $argumentsWithOnlyArgBuilders = [];
 
     /**
      * Can enhance the scout builders.
      *
      * @var array<Argument>
      */
-    protected $argumentsWithScoutBuilderDirectives = [];
+    protected array $argumentsWithScoutBuilderDirectives = [];
 
-    /**
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<TModel>|\Illuminate\Database\Eloquent\Relations\Relation<TModel>|\Laravel\Scout\Builder  $builder
-     */
-    public function __construct(ArgumentSet $argumentSet, object $builder)
-    {
-        $this->argumentSet = $argumentSet;
-        $this->builder = $builder;
-
+    public function __construct(
+        protected ArgumentSet $argumentSet,
+        /**
+         * @var \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<TModel>|\Illuminate\Database\Eloquent\Relations\Relation<TModel>|\Laravel\Scout\Builder $builder
+         */
+        protected QueryBuilder|EloquentBuilder|Relation|ScoutBuilder $builder
+    ) {
         $this->gather($this->argumentSet);
     }
 

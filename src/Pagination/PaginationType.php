@@ -14,13 +14,10 @@ class PaginationType
     public const CONNECTION = 'CONNECTION';
 
     /**
-     * @var string One of the constant values in this class
+     * One of the constant values in this class.
      */
-    protected $type;
+    protected string $type;
 
-    /**
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
-     */
     public function __construct(string $paginationType)
     {
         $this->type = match ($paginationType) {

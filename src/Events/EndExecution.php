@@ -11,22 +11,16 @@ use Illuminate\Support\Carbon;
 class EndExecution
 {
     /**
-     * The result of resolving a single operation.
-     *
-     * @var \GraphQL\Executor\ExecutionResult
-     */
-    public $result;
-
-    /**
      * The point in time when the result was ready.
-     *
-     * @var \Illuminate\Support\Carbon
      */
-    public $moment;
+    public Carbon $moment;
 
-    public function __construct(ExecutionResult $result)
-    {
-        $this->result = $result;
+    public function __construct(
+        /**
+         * The result of resolving a single operation.
+         */
+        public ExecutionResult $result
+    ) {
         $this->moment = Carbon::now();
     }
 }

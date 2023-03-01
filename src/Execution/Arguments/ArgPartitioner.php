@@ -32,7 +32,7 @@ class ArgPartitioner
 
         return static::partition(
             $argumentSet,
-            static fn (string $name, Argument $argument): bool => null !== $argument->resolver
+            static fn (string $name, Argument $argument): bool => isset($argument->resolver)
         );
     }
 

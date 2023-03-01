@@ -13,30 +13,25 @@ use Nuwave\Lighthouse\Exceptions\InvalidDriverException;
 abstract class DriverManager
 {
     /**
-     * The application instance.
-     *
-     * @var \Illuminate\Container\Container
-     */
-    protected $app;
-
-    /**
      * The array of resolved drivers.
      *
      * @var array<string, object>
      */
-    protected $drivers = [];
+    protected array $drivers = [];
 
     /**
      * The registered custom driver creators.
      *
      * @var array<string, \Closure>
      */
-    protected $customCreators = [];
+    protected array $customCreators = [];
 
-    public function __construct(Application $app)
-    {
-        $this->app = $app;
-    }
+    public function __construct(
+        /**
+         * The application instance.
+         */
+        protected Application $app
+    ) {}
 
     /**
      * Get a driver instance by name.

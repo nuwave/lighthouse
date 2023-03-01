@@ -18,7 +18,7 @@ abstract class TypeNodeConverter
      *
      * @return mixed the executable type
      */
-    public function convert(TypeNode $node)
+    public function convert(TypeNode $node): mixed
     {
         return $this->convertWrappedTypeNode($node);
     }
@@ -31,7 +31,7 @@ abstract class TypeNodeConverter
      *
      * @return mixed the wrapped type
      */
-    protected function convertWrappedTypeNode(TypeNode $node, array $wrappers = [])
+    protected function convertWrappedTypeNode(TypeNode $node, array $wrappers = []): mixed
     {
         // Recursively unwrap the type and save the wrappers
         $nodeKind = $node->kind;
@@ -73,7 +73,7 @@ abstract class TypeNodeConverter
      *
      * @return mixed the type wrapped with non-null
      */
-    abstract protected function nonNull($type);
+    abstract protected function nonNull(mixed $type): mixed;
 
     /**
      * Wrap or mark the type as a list.
@@ -82,12 +82,12 @@ abstract class TypeNodeConverter
      *
      * @return mixed the type wrapped as a list
      */
-    abstract protected function listOf($type);
+    abstract protected function listOf(mixed $type): mixed;
 
     /**
      * Get the named type for the given node name.
      *
      * @return mixed representation of the type with the given name
      */
-    abstract protected function namedType(string $nodeName);
+    abstract protected function namedType(string $nodeName): mixed;
 }

@@ -18,15 +18,9 @@ use Nuwave\Lighthouse\Schema\DirectiveLocator;
 
 class SchemaValidator
 {
-    /**
-     * @var \Nuwave\Lighthouse\Schema\DirectiveLocator
-     */
-    protected $directiveLocator;
-
-    public function __construct(DirectiveLocator $directiveLocator)
-    {
-        $this->directiveLocator = $directiveLocator;
-    }
+    public function __construct(
+        protected DirectiveLocator $directiveLocator
+    ) {}
 
     public function handle(ValidateSchema $validateSchema): void
     {
@@ -70,10 +64,8 @@ class SchemaValidator
                 throw new FederationException($i->getMessage(), $i->getCode(), $i);
             }
 
-            $fieldASTNode = $field->astNode;
-            if (null === $fieldASTNode) {
-                throw new FederationException("Missing AST node for {$type->name}.{$field->name}.");
-            }
+            $fieldASTNode = $field->astNode
+                ?? throw new FederationException("Missing AST node for {$type->name}.{$field->name}.");
 
             if (
                 ASTHelper::hasDirective($typeAST, ExtendsDirective::NAME)
@@ -90,10 +82,8 @@ class SchemaValidator
                     throw new FederationException("Expected type of field {$type->name}.{$field->name} with subselection to be object type, got: {$notObjectType}.");
                 }
 
-                $fieldTypeASTNode = $fieldType->astNode;
-                if (null === $fieldTypeASTNode) {
-                    throw new FederationException("Missing AST node for {$fieldType->name}.");
-                }
+                $fieldTypeASTNode = $fieldType->astNode
+                    ?? throw new FederationException("Missing AST node for {$fieldType->name}.");
 
                 $this->validateKeySelectionSet($nestedSelection, $fieldType, $fieldTypeASTNode);
             }

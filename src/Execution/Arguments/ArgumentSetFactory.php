@@ -8,33 +8,19 @@ use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
 
 class ArgumentSetFactory
 {
-    /**
-     * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST
-     */
-    protected $documentAST;
-
-    /**
-     * @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentTypeNodeConverter
-     */
-    protected $argumentTypeNodeConverter;
-
-    /**
-     * @var \Nuwave\Lighthouse\Schema\DirectiveLocator
-     */
-    protected $directiveLocator;
+    protected DocumentAST $documentAST;
 
     public function __construct(
         ASTBuilder $astBuilder,
-        ArgumentTypeNodeConverter $argumentTypeNodeConverter,
-        DirectiveLocator $directiveLocator
+        protected ArgumentTypeNodeConverter $argumentTypeNodeConverter,
+        protected DirectiveLocator $directiveLocator
     ) {
         $this->documentAST = $astBuilder->documentAST();
-        $this->argumentTypeNodeConverter = $argumentTypeNodeConverter;
-        $this->directiveLocator = $directiveLocator;
     }
 
     /**
@@ -118,7 +104,7 @@ class ArgumentSetFactory
      *
      * @return array|mixed|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet
      */
-    protected function wrapWithType($valueOrValues, ListType|NamedType $type)
+    protected function wrapWithType(mixed $valueOrValues, ListType|NamedType $type)
     {
         // No need to recurse down further if the value is null
         if (null === $valueOrValues) {
@@ -149,8 +135,8 @@ class ArgumentSetFactory
     protected function wrapWithNamedType(mixed $value, NamedType $namedType)
     {
         // This might be null if the type is
-        // - created outside of the schema string
-        // - one of the built in types
+        // - created outside the schema string
+        // - one of the built-in types
         $typeDef = $this->documentAST->types[$namedType->name] ?? null;
 
         // We recurse down only if the type is an Input

@@ -20,10 +20,8 @@ class ResolverProvider implements ProvidesResolver
     public function provideResolver(FieldValue $fieldValue): \Closure
     {
         if (RootType::isRootType($fieldValue->getParentName())) {
-            $resolverClass = $this->findResolverClass($fieldValue, '__invoke');
-            if (null === $resolverClass) {
-                $this->throwMissingResolver($fieldValue);
-            }
+            $resolverClass = $this->findResolverClass($fieldValue, '__invoke')
+                ?? $this->throwMissingResolver($fieldValue);
 
             $resolver = Container::getInstance()->make($resolverClass);
             assert(is_object($resolver));

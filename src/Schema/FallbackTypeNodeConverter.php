@@ -10,29 +10,23 @@ use Nuwave\Lighthouse\Schema\AST\TypeNodeConverter;
 
 class FallbackTypeNodeConverter extends TypeNodeConverter
 {
-    /**
-     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
-     */
-    protected $typeRegistry;
+    public function __construct(
+        protected TypeRegistry $typeRegistry
+    ) {}
 
-    public function __construct(TypeRegistry $typeRegistry)
-    {
-        $this->typeRegistry = $typeRegistry;
-    }
-
-    protected function nonNull($type): NonNull
+    protected function nonNull(mixed $type): NonNull
     {
         return Type::nonNull($type);
     }
 
     /**
+     * @template T of Type
+     *
      * @param T|callable():T $type
      *
      * @return ListOfType<T>
-     *
-     * @template T of Type
      */
-    protected function listOf($type): ListOfType
+    protected function listOf(mixed $type): ListOfType
     {
         return Type::listOf($type);
     }
@@ -51,6 +45,8 @@ class FallbackTypeNodeConverter extends TypeNodeConverter
                 },
             ]);
             $this->typeRegistry->register($dummyType);
+
+            return $dummyType;
         }
 
         return $this->typeRegistry->get($nodeName);

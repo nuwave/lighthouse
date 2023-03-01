@@ -18,10 +18,8 @@ class Subscriber
      *
      * This has to be unique for each subscriber, because each of them can send a different
      * query and must receive a response that is specifically tailored towards that.
-     *
-     * @var string
      */
-    public $channel;
+    public string $channel;
 
     /**
      * X-Socket-ID header passed on the subscription query.
@@ -30,17 +28,13 @@ class Subscriber
 
     /**
      * The topic subscribed to.
-     *
-     * @var string
      */
-    public $topic;
+    public string $topic;
 
     /**
      * The contents of the query.
-     *
-     * @var \GraphQL\Language\AST\DocumentNode
      */
-    public $query;
+    public DocumentNode $query;
 
     /**
      * The name of the queried field.
@@ -48,52 +42,37 @@ class Subscriber
      * Guaranteed be be unique because of
      *
      * @see \GraphQL\Validator\Rules\SingleFieldSubscription
-     *
-     * @var string
      */
-    public $fieldName;
+    public string $fieldName;
 
     /**
      * The root element of the query.
-     *
-     * @var mixed can be anything
      */
-    public $root;
-
-    /**
-     * The args passed to the subscription query.
-     *
-     * @var array<string, mixed>
-     */
-    public $args;
+    public mixed $root;
 
     /**
      * The variables passed to the subscription query.
      *
      * @var array<string, mixed>
      */
-    public $variables;
+    public array $variables;
 
-    /**
-     * The context passed to the query.
-     *
-     * @var \Nuwave\Lighthouse\Support\Contracts\GraphQLContext
-     */
-    public $context;
-
-    /**
-     * @param  array<string, mixed>  $args
-     */
     public function __construct(
-        array $args,
-        GraphQLContext $context,
+        /**
+         * The args passed to the subscription query.
+         *
+         * @var array<string, mixed> $args
+         */
+        public array $args,
+        /**
+         * The context passed to the query.
+         */
+        public GraphQLContext $context,
         ResolveInfo $resolveInfo
     ) {
         $this->fieldName = $resolveInfo->fieldName;
         $this->channel = self::uniqueChannelName();
-        $this->args = $args;
         $this->variables = $resolveInfo->variableValues;
-        $this->context = $context;
 
         $xSocketID = request()->header('X-Socket-ID');
         // @phpstan-ignore-next-line

@@ -13,15 +13,9 @@ class Serializer implements ContextSerializer
 {
     use SerializesAndRestoresModelIdentifiers;
 
-    /**
-     * @var \Nuwave\Lighthouse\Support\Contracts\CreatesContext
-     */
-    protected $createsContext;
-
-    public function __construct(CreatesContext $createsContext)
-    {
-        $this->createsContext = $createsContext;
-    }
+    public function __construct(
+        protected CreatesContext $createsContext
+    ) {}
 
     public function serialize(GraphQLContext $context): string
     {

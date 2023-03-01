@@ -25,7 +25,7 @@ access, decorate them with [@guard](../api-reference/directives.md#guard) as nee
 
 If you want to guard all your fields against unauthenticated access, you can simply add
 Laravel's build-in auth middleware. Beware that this approach does not allow any GraphQL
-operations for guest users, so you will have to handle login outside of GraphQL.
+operations for guest users, so you will have to handle login outside GraphQL.
 
 ```php
 'middleware' => [

@@ -46,7 +46,7 @@ class DocumentAST implements Arrayable
      *
      * @var \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node>|array<string, \GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node>
      */
-    public $types = [];
+    public array|NodeList $types = [];
 
     /**
      * The type extensions within the parsed document.
@@ -56,7 +56,7 @@ class DocumentAST implements Arrayable
      *
      * @var array<string, array<int, \GraphQL\Language\AST\TypeExtensionNode&\GraphQL\Language\AST\Node>>
      */
-    public $typeExtensions = [];
+    public array $typeExtensions = [];
 
     /**
      * Client directive definitions.
@@ -65,7 +65,7 @@ class DocumentAST implements Arrayable
      *
      * @var \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\DirectiveDefinitionNode>|array<string, \GraphQL\Language\AST\DirectiveDefinitionNode>
      */
-    public $directives = [];
+    public array|NodeList $directives = [];
 
     /**
      * A map from class names to their respective object types.
@@ -76,7 +76,7 @@ class DocumentAST implements Arrayable
      *
      * @var ClassNameToObjectTypeName
      */
-    public $classNameToObjectTypeNames = [];
+    public array $classNameToObjectTypeNames = [];
 
     /**
      * Create a new DocumentAST instance from a schema.
@@ -121,9 +121,7 @@ class DocumentAST implements Arrayable
 
                     if (null === $modelClass) {
                         $consideredNamespaces = implode(', ', $namespacesToTry);
-                        throw new DefinitionException(
-                            "Failed to find a model class {$modelName} in namespaces [{$consideredNamespaces}] referenced in @model on type {$name}."
-                        );
+                        throw new DefinitionException("Failed to find a model class {$modelName} in namespaces [{$consideredNamespaces}] referenced in @model on type {$name}.");
                     }
 
                     // It might be valid to have multiple types that correspond to a single model

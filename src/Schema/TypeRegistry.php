@@ -111,13 +111,8 @@ class TypeRegistry
      */
     public function get(string $name): Type
     {
-        $type = $this->search($name);
-
-        if (null === $type) {
-            throw self::failedToLoadType($name);
-        }
-
-        return $type;
+        return $this->search($name)
+            ?? throw self::failedToLoadType($name);
     }
 
     /**
