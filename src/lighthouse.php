@@ -45,9 +45,6 @@ return [
         // 'domain' => '',
         // 'where' => [],
 
-        //'test' => [
-        //    'params' => []
-        //]
     ],
 
     /*
