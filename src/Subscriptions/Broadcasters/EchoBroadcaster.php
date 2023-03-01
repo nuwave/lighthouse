@@ -21,7 +21,7 @@ class EchoBroadcaster implements Broadcaster
         $this->broadcaster = $broadcaster;
     }
 
-    public function broadcast(Subscriber $subscriber, $data): void
+    public function broadcast(Subscriber $subscriber, mixed $data): void
     {
         $this->broadcaster->event(
             new EchoSubscriptionEvent($subscriber->channel, $data)
