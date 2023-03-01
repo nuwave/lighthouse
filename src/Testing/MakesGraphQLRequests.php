@@ -39,12 +39,14 @@ trait MakesGraphQLRequests
      * @param  array<string, mixed>  $variables  The variables to include in the query
      * @param  array<string, mixed>  $extraParams  Extra parameters to add to the JSON payload
      * @param  array<string, mixed>  $headers  HTTP headers to pass to the POST request
+     * @param  array<string, string>  $routeParams  Route params to pass to the Laravel route
      */
     protected function graphQL(
         string $query,
         array $variables = [],
         array $extraParams = [],
-        array $headers = []
+        array $headers = [],
+        array $routeParams = []
     ): TestResponse {
         $params = ['query' => $query];
 
@@ -54,7 +56,7 @@ trait MakesGraphQLRequests
 
         $params += $extraParams;
 
-        return $this->postGraphQL($params, $headers);
+        return $this->postGraphQL($params, $headers, $routeParams);
     }
 
     /**
@@ -65,11 +67,12 @@ trait MakesGraphQLRequests
      *
      * @param  array<mixed, mixed>  $data  JSON-serializable payload
      * @param  array<string, string>  $headers  HTTP headers to pass to the POST request
+     * @param  array<string, string>  $routeParams  Route params to pass to the Laravel route
      */
-    protected function postGraphQL(array $data, array $headers = []): TestResponse
+    protected function postGraphQL(array $data, array $headers = [], array $routeParams = []): TestResponse
     {
         return $this->postJson(
-            $this->graphQLEndpointUrl(),
+            $this->graphQLEndpointUrl($routeParams),
             $data,
             $headers
         );
@@ -85,12 +88,14 @@ trait MakesGraphQLRequests
      * @param  array<array<int, string>>  $map
      * @param  array<\Illuminate\Http\UploadedFile>|array<array<mixed>>  $files
      * @param  array<string, string>  $headers  Will be merged with Content-Type: multipart/form-data
+     * @param  array<string, string>  $routeParams  Route params to pass to the Laravel route
      */
     protected function multipartGraphQL(
         array $operations,
         array $map,
         array $files,
-        array $headers = []
+        array $headers = [],
+        array $routeParams = []
     ): TestResponse {
         $parameters = [
             'operations' => \Safe\json_encode($operations),
@@ -99,7 +104,7 @@ trait MakesGraphQLRequests
 
         return $this->call(
             'POST',
-            $this->graphQLEndpointUrl(),
+            $this->graphQLEndpointUrl($routeParams),
             $parameters,
             [],
             $files,
@@ -157,13 +162,19 @@ trait MakesGraphQLRequests
 
     /**
      * Return the full URL to the GraphQL endpoint.
+     *
+     * @param  array<string, string>  $routeParams  Route params to pass to the Laravel route
      */
-    protected function graphQLEndpointUrl(): string
+    protected function graphQLEndpointUrl(array $routeParams = []): string
     {
         $config = Container::getInstance()->make(ConfigRepository::class);
         $routeName = $config->get('lighthouse.route.name');
+        $mergedRouteParams = array_merge(
+            $config->get('lighthouse.route.test.params') ?? [],
+            $routeParams
+        );
 
-        return route($routeName);
+        return route($routeName, $mergedRouteParams);
     }
 
     /**
