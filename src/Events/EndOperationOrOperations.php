@@ -11,7 +11,7 @@ class EndOperationOrOperations
         /**
          * The result of either a single or multiple operations.
          *
-         * @var  array<string, mixed>|array<int, array<string, mixed>>  $resultOrResults
+         * @var array<string, mixed>|array<int, array<string, mixed>> $resultOrResults
          */
         public array $resultOrResults
     ) {}

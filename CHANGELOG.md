@@ -698,7 +698,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Added
 
 - Allow specifying headers in `MakesGraphQLRequests` and `MakesGraphQLRequestsLumen` test helpers
-- Render `GraphQL\Error\ClientAware` exceptions outside of GraphQL context with extensions content
+- Render `GraphQL\Error\ClientAware` exceptions outside GraphQL context with extensions content
 
 ### Fixed
 

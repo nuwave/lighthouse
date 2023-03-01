@@ -38,7 +38,7 @@ class Hello
 }
 ```
 
-The easiest way to create such a class is to use the built in `artisan` commands
+The easiest way to create such a class is to use the built-in `artisan` commands
 `lighthouse:query` and `lighthouse:mutation`. They both take a single argument:
 the name of the field you want to generate.
 

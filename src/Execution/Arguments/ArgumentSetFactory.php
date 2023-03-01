@@ -135,8 +135,8 @@ class ArgumentSetFactory
     protected function wrapWithNamedType(mixed $value, NamedType $namedType)
     {
         // This might be null if the type is
-        // - created outside of the schema string
-        // - one of the built in types
+        // - created outside the schema string
+        // - one of the built-in types
         $typeDef = $this->documentAST->types[$namedType->name] ?? null;
 
         // We recurse down only if the type is an Input
