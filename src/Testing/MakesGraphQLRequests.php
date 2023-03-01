@@ -67,7 +67,7 @@ trait MakesGraphQLRequests
      *
      * @param  array<mixed, mixed>  $data  JSON-serializable payload
      * @param  array<string, string>  $headers  HTTP headers to pass to the POST request
-     * @param  array<string, string>  $routeParams  Route params to pass to the route
+     * @param  array<string, string>  $routeParams  Parameters to pass to the route
      */
     protected function postGraphQL(array $data, array $headers = [], array $routeParams = []): TestResponse
     {
@@ -88,7 +88,7 @@ trait MakesGraphQLRequests
      * @param  array<array<int, string>>  $map
      * @param  array<\Illuminate\Http\UploadedFile>|array<array<mixed>>  $files
      * @param  array<string, string>  $headers  Will be merged with Content-Type: multipart/form-data
-     * @param  array<string, string>  $routeParams  Route params to pass to the route
+     * @param  array<string, string>  $routeParams  Parameters to pass to the route
      */
     protected function multipartGraphQL(
         array $operations,
@@ -163,7 +163,7 @@ trait MakesGraphQLRequests
     /**
      * Return the full URL to the GraphQL endpoint.
      *
-     * @param  array<string, string>  $routeParams  Route params to pass to the route
+     * @param  array<string, string>  $routeParams  Parameters to pass to the route
      */
     protected function graphQLEndpointUrl(array $routeParams = []): string
     {
