@@ -6,6 +6,9 @@ use Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector;
 use Rector\CodeQuality\Rector\Identical\GetClassToInstanceOfRector;
 use Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector;
 use Rector\CodeQuality\Rector\Isset_\IssetOnPropertyObjectToPropertyExistsRector;
+use Rector\CodingStyle\Rector\ClassConst\VarConstantCommentRector;
+use Rector\CodingStyle\Rector\ClassMethod\UnSpreadOperatorRector;
+use Rector\CodingStyle\Rector\Encapsed\EncapsedStringsToSprintfRector;
 use Rector\Config\RectorConfig;
 use Rector\Php71\Rector\FuncCall\RemoveExtraParametersRector;
 use Rector\PHPUnit\Set\PHPUnitSetList;
@@ -14,6 +17,7 @@ use Rector\Set\ValueObject\SetList;
 return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->sets([
         SetList::CODE_QUALITY,
+        SetList::CODING_STYLE,
         SetList::PHP_72,
         SetList::PHP_73,
         SetList::PHP_74,
@@ -42,6 +46,9 @@ return static function (RectorConfig $rectorConfig): void {
         GetClassToInstanceOfRector::class => [
             __DIR__ . '/src/Schema/Types/Scalars/DateScalar.php', // We need to compare exact classes, not subclasses
         ],
-        ExplicitBoolCompareRector::class,
+        ExplicitBoolCompareRector::class, // if($truthy) is fine and very readable
+        EncapsedStringsToSprintfRector::class, // unreadable, slow, error prone
+        VarConstantCommentRector::class, // Noisy
+        UnSpreadOperatorRector::class, // Breaks some public APIs
     ]);
 };

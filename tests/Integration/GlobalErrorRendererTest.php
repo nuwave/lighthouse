@@ -11,6 +11,7 @@ use Tests\Utils\Exceptions\WithExtensionsException;
 final class GlobalErrorRendererTest extends TestCase
 {
     public const MESSAGE = 'foo';
+
     public const EXTENSIONS_CONTENT = ['bar' => 'baz'];
 
     protected function getEnvironmentSetUp($app): void
@@ -19,7 +20,7 @@ final class GlobalErrorRendererTest extends TestCase
 
         $config = $app->make(ConfigRepository::class);
         $config->set('lighthouse.route.middleware', [
-            function () {
+            static function () {
                 throw new WithExtensionsException(self::MESSAGE, self::EXTENSIONS_CONTENT);
             },
         ]);

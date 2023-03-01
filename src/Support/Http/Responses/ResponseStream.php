@@ -23,7 +23,7 @@ class ResponseStream extends Stream implements CanStreamResponse
             foreach ($paths as $i => $path) {
                 $chunk['data'] = Arr::get($data, "data.{$path}");
                 $chunk['path'] = (new Collection(explode('.', $path)))
-                    ->map(fn ($partial) => is_numeric($partial)
+                    ->map(static fn ($partial) => is_numeric($partial)
                         ? (int) $partial
                         : $partial)
                     ->all();

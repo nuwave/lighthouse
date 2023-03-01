@@ -36,7 +36,9 @@ use Nuwave\Lighthouse\Support\Utils;
 class DocumentAST implements Arrayable
 {
     public const TYPES = 'types';
+
     public const DIRECTIVES = 'directives';
+
     public const CLASS_NAME_TO_OBJECT_TYPE_NAME = 'classNameToObjectTypeName';
 
     /**

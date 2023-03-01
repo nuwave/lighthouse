@@ -106,11 +106,11 @@ class SubscriptionRegistry
                 Utils::instanceofMatcher(OperationDefinitionNode::class)
             )
             // @phpstan-ignore-next-line type of $node was narrowed by the preceding filter
-            ->filter(fn (OperationDefinitionNode $node): bool => 'subscription' === $node->operation)
+            ->filter(static fn (OperationDefinitionNode $node): bool => 'subscription' === $node->operation)
             // @phpstan-ignore-next-line type of $node was narrowed by the preceding filter
-            ->map(fn (OperationDefinitionNode $node): array => (new Collection($node->selectionSet->selections))
+            ->map(static fn (OperationDefinitionNode $node): array => (new Collection($node->selectionSet->selections))
                 // @phpstan-ignore-next-line subscriptions must only have a single field
-                ->map(fn (FieldNode $field): string => $field->name->value)
+                ->map(static fn (FieldNode $field): string => $field->name->value)
                 ->all())
             ->collapse()
             ->map(function (string $subscriptionField): GraphQLSubscription {

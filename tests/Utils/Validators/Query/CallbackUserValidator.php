@@ -14,7 +14,7 @@ final class CallbackUserValidator extends Validator
             'id' => [
                 'required',
                 Rule::exists('users', 'id')
-                    ->where(function (Builder $query): void {
+                    ->where(static function (Builder $query): void {
                         $query->where('name', 'Admin');
                     }),
             ],

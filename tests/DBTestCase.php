@@ -10,16 +10,15 @@ abstract class DBTestCase extends TestCase
     use AssertsQueryCounts;
 
     public const DEFAULT_CONNECTION = 'mysql';
+
     public const ALTERNATE_CONNECTION = 'alternate';
 
     /**
      * Indicates if migrations ran.
-     *
-     * @var bool
      */
-    protected static $migrated = false;
+    protected static bool $migrated = false;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 

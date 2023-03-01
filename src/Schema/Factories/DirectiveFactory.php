@@ -31,7 +31,7 @@ class DirectiveFactory
                 'type' => $argumentType,
             ];
 
-            if ($defaultValue = $argument->defaultValue) {
+            if (($defaultValue = $argument->defaultValue) !== null) {
                 $argumentConfig += [
                     'defaultValue' => ASTHelper::defaultValueForArgument($defaultValue, $argumentType),
                 ];

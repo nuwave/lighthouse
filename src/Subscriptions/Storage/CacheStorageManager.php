@@ -41,12 +41,14 @@ class CacheStorageManager implements StoresSubscriptions
         if (! is_string($storage)) {
             throw new \Exception('Config setting lighthouse.subscriptions.storage must be a string or `null`, got: ' . \Safe\json_encode($storage));
         }
+
         $this->cache = $cacheFactory->store($storage);
 
         $ttl = $config->get('lighthouse.subscriptions.storage_ttl');
         if (! is_null($ttl) && ! is_int($ttl)) {
             throw new \Exception('Config setting lighthouse.subscriptions.storage_ttl must be a int or `null`, got: ' . \Safe\json_encode($ttl));
         }
+
         $this->ttl = $ttl;
     }
 
@@ -133,7 +135,7 @@ class CacheStorageManager implements StoresSubscriptions
 
         $topicWithoutSubscriber = $this
             ->retrieveTopic($topicKey)
-            ->reject(fn (string $channel): bool => self::channelKey($channel) === $channelKeyToRemove);
+            ->reject(static fn (string $channel): bool => self::channelKey($channel) === $channelKeyToRemove);
 
         if ($topicWithoutSubscriber->isEmpty()) {
             $this->cache->forget($topicKey);

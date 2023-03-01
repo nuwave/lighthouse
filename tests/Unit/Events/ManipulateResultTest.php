@@ -13,7 +13,7 @@ final class ManipulateResultTest extends TestCase
     {
         Event::listen(
             ManipulateResult::class,
-            function (ManipulateResult $manipulateResult): void {
+            static function (ManipulateResult $manipulateResult): void {
                 $manipulateResult->result->data = [
                     'foo' => Foo::THE_ANSWER + 1,
                 ];

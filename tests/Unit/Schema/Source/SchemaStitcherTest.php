@@ -9,10 +9,12 @@ use Tests\TestCase;
 final class SchemaStitcherTest extends TestCase
 {
     public const SCHEMA_PATH = __DIR__ . '/schema/';
+
     public const ROOT_SCHEMA_FILENAME = 'root-schema';
+
     public const ROOT_SCHEMA_PATH = self::SCHEMA_PATH . self::ROOT_SCHEMA_FILENAME;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 

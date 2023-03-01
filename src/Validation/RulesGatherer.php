@@ -217,6 +217,7 @@ class RulesGatherer
                 if ($rule instanceof WithReferenceRule) {
                     $rule->setArgumentPath($argumentPath);
                 }
+
                 continue;
             }
 

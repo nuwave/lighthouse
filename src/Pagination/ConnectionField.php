@@ -64,9 +64,8 @@ class ConnectionField
 
         $values = new Collection(array_values($paginator->items()));
 
-        return $values->map(function ($item, int $index) use ($returnTypeFields, $firstItem): array {
+        return $values->map(static function ($item, int $index) use ($returnTypeFields, $firstItem): array {
             $data = [];
-
             foreach ($returnTypeFields as $field) {
                 switch ($field->name) {
                     case 'cursor':

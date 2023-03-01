@@ -411,7 +411,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         }
 
         $roleIDs = $roles
-            ->map(fn (Role $role): array => ['id' => (string) $role->id])
+            ->map(static fn (Role $role): array => ['id' => (string) $role->id])
             ->all();
 
         $this->graphQL(/** @lang GraphQL */ '
@@ -428,7 +428,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'users' => $users
-                    ->map(fn (User $user): array => [
+                    ->map(static fn (User $user): array => [
                         'id' => (string) $user->id,
                         'roles' => [
                             'data' => $roleIDs,

@@ -10,7 +10,9 @@ use Nuwave\Lighthouse\Exceptions\DefinitionException;
 class PaginationType
 {
     public const PAGINATOR = 'PAGINATOR';
+
     public const SIMPLE = 'SIMPLE';
+
     public const CONNECTION = 'CONNECTION';
 
     /**

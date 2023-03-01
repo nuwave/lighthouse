@@ -14,7 +14,7 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
         }
         ';
 
-        $this->mockResolver(fn ($_, array $args): ?string => $args['bar']);
+        $this->mockResolver(static fn ($_, array $args): ?string => $args['bar']);
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -35,7 +35,7 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
         }
         ';
 
-        $this->mockResolver(fn ($_, array $args): ?array => $args['bar']);
+        $this->mockResolver(static fn ($_, array $args): ?array => $args['bar']);
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -147,7 +147,7 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
         }
         ';
 
-        $this->mockResolver(fn ($_, array $args): ?string => $args['bar']);
+        $this->mockResolver(static fn ($_, array $args): ?string => $args['bar']);
 
         $this->graphQL(/** @lang GraphQL */ '
         {

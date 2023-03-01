@@ -12,12 +12,12 @@ class SyncIterator implements SubscriptionIterator
         $subscribers->each(static function ($item) use ($handleSubscriber, $handleError): void {
             try {
                 $handleSubscriber($item);
-            } catch (\Exception $e) {
+            } catch (\Exception $exception) {
                 if (null === $handleError) {
-                    throw $e;
+                    throw $exception;
                 }
 
-                $handleError($e);
+                $handleError($exception);
             }
         });
     }

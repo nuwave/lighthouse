@@ -5,10 +5,10 @@ use Tests\Utils\Models\Color;
 use Tests\Utils\Models\Product;
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
-$factory->define(Product::class, fn (Faker $faker): array => [
+$factory->define(Product::class, static fn (Faker $faker): array => [
     // @phpstan-ignore-next-line Call to an undefined method Faker\Generator::ean13().
     'barcode' => $faker->ean13(),
     'uuid' => $faker->uuid,
-    'color_id' => fn () => factory(Color::class)->create()->getKey(),
+    'color_id' => static fn () => factory(Color::class)->create()->getKey(),
     'name' => $faker->name,
 ]);

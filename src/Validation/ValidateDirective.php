@@ -25,9 +25,8 @@ GRAPHQL;
 
     public function handleField(FieldValue $fieldValue): void
     {
-        $fieldValue->addArgumentSetTransformer(function (ArgumentSet $argumentSet, ResolveInfo $resolveInfo): ArgumentSet {
+        $fieldValue->addArgumentSetTransformer(static function (ArgumentSet $argumentSet, ResolveInfo $resolveInfo): ArgumentSet {
             $rulesGatherer = new RulesGatherer($argumentSet);
-
             $validationFactory = Container::getInstance()->make(ValidationFactory::class);
             $validator = $validationFactory->make(
                 $argumentSet->toArray(),
@@ -35,7 +34,6 @@ GRAPHQL;
                 $rulesGatherer->messages,
                 $rulesGatherer->attributes
             );
-
             if ($validator->fails()) {
                 $path = implode('.', $resolveInfo->path);
 

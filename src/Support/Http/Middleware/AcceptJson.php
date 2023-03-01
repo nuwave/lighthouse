@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 class AcceptJson
 {
     public const ACCEPT = 'Accept';
+
     public const APPLICATION_JSON = 'application/json';
 
     public function handle(Request $request, \Closure $next): mixed

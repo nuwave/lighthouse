@@ -97,6 +97,7 @@ class DirectiveLocator
                 if (! is_a($class, Directive::class, true)) {
                     continue;
                 }
+
                 $name = self::directiveName($class);
 
                 // The directive was already found, so we do not add it twice
@@ -158,6 +159,7 @@ class DirectiveLocator
                 if (! is_a($directiveClass, Directive::class, true)) {
                     throw new DirectiveException("Class {$directiveClass} must implement the interface " . Directive::class);
                 }
+
                 $this->resolvedClassnames[$directiveName] = $directiveClass;
 
                 return $directiveClass;
@@ -264,24 +266,23 @@ class DirectiveLocator
         $directives = $this->associatedOfType($node, $directiveClass);
 
         if ($directives->count() > 1) {
+            // @phpstan-ignore-next-line https://github.com/phpstan/phpstan/issues/8474
+            if (! property_exists($node, 'name')) {
+                $unnamedNode = $node::class;
+                throw new \Exception("Expected Node class with property `name`, got: {$unnamedNode}.");
+            }
+
             $directiveNames = $directives
-                ->map(function (Directive $directive): string {
+                ->map(static function (Directive $directive): string {
                     $definition = ASTHelper::extractDirectiveDefinition(
                         $directive::definition()
                     );
 
-                    return '@' . $definition->name->value;
+                    return "@{$definition->name->value}";
                 })
                 ->implode(', ');
 
-            // @phpstan-ignore-next-line https://github.com/phpstan/phpstan/issues/8474
-            if (! property_exists($node, 'name')) {
-                throw new \Exception('Expected Node class with property `name`, got: ' . $node::class);
-            }
-
-            throw new DirectiveException(
-                "Node {$node->name->value} can only have one directive of type {$directiveClass} but found [{$directiveNames}]."
-            );
+            throw new DirectiveException("Node {$node->name->value} can only have one directive of type {$directiveClass} but found [{$directiveNames}].");
         }
 
         return $directives->first();

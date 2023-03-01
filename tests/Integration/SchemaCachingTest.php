@@ -16,7 +16,7 @@ final class SchemaCachingTest extends TestCase
     use TestsSerialization;
     use TestsSchemaCache;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 

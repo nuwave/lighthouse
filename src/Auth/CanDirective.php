@@ -204,8 +204,8 @@ GRAPHQL;
                 assert($enhancedBuilder instanceof EloquentBuilder);
 
                 $modelOrModels = $enhancedBuilder->findOrFail($findValue);
-            } catch (ModelNotFoundException $exception) {
-                throw new Error($exception->getMessage());
+            } catch (ModelNotFoundException $modelNotFoundException) {
+                throw new Error($modelNotFoundException->getMessage());
             }
 
             if ($modelOrModels instanceof Model) {
@@ -237,9 +237,8 @@ GRAPHQL;
         array_unshift($arguments, $model);
 
         Utils::applyEach(
-            function ($ability) use ($gate, $arguments) {
+            static function ($ability) use ($gate, $arguments) {
                 $response = $gate->inspect($ability, $arguments);
-
                 if ($response->denied()) {
                     throw new AuthorizationException($response->message(), $response->code());
                 }

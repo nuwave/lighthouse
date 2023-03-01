@@ -13,8 +13,11 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 class LikeDirective extends BaseDirective implements ArgBuilderDirective, FieldBuilderDirective
 {
     public const ESCAPE = '\\';
+
     public const PERCENTAGE = '%';
+
     public const UNDERSCORE = '_';
+
     public const PLACEHOLDER = '{}';
 
     public static function definition(): string

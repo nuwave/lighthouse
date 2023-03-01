@@ -17,14 +17,14 @@ final class ReportingErrorHandlerTest extends TestCase
     public function testReportsNonClientSafeErrors(): void
     {
         $exception = new \Exception('some internal error that was unexpected');
-        $this->mockResolver(fn () => throw $exception);
+        $this->mockResolver(static fn () => throw $exception);
 
         $handler = $this->createMock(ExceptionHandler::class);
         $handler
             ->expects($this->atLeastOnce())
             ->method('report')
             ->with($exception);
-        $this->app->singleton(ExceptionHandler::class, fn () => $handler);
+        $this->app->singleton(ExceptionHandler::class, static fn () => $handler);
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -36,14 +36,14 @@ final class ReportingErrorHandlerTest extends TestCase
     public function testDoesNotReportClientSafeErrors(): void
     {
         $error = new Error('an expected error that is shown to clients');
-        $this->mockResolver(fn () => throw $error);
+        $this->mockResolver(static fn () => throw $error);
 
         $handler = $this->createMock(ExceptionHandler::class);
         $handler
             ->expects($this->never())
             ->method('report')
             ->with($error);
-        $this->app->singleton(ExceptionHandler::class, fn () => $handler);
+        $this->app->singleton(ExceptionHandler::class, static fn () => $handler);
 
         $this->graphQL(/** @lang GraphQL */ '
         {

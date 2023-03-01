@@ -74,8 +74,8 @@ class FieldFactory
     protected function fieldMiddleware(FieldDefinitionNode $fieldDefinitionNode): array
     {
         $globalFieldMiddleware = (new Collection($this->config->get('lighthouse.field_middleware')))
-            ->map(fn (string $middlewareDirective): Directive => Container::getInstance()->make($middlewareDirective))
-            ->each(function (Directive $directive) use ($fieldDefinitionNode): void {
+            ->map(static fn (string $middlewareDirective): Directive => Container::getInstance()->make($middlewareDirective))
+            ->each(static function (Directive $directive) use ($fieldDefinitionNode): void {
                 if ($directive instanceof BaseDirective) {
                     $directive->definitionNode = $fieldDefinitionNode;
                 }

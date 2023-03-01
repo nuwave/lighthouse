@@ -17,7 +17,7 @@ final class ResolverProviderTest extends TestCase
      */
     protected $resolverProvider;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 

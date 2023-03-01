@@ -31,7 +31,7 @@ class ArgumentSetFactory
     public function fromResolveInfo(array $args, ResolveInfo $resolveInfo): ArgumentSet
     {
         $definition = $resolveInfo->fieldDefinition->astNode;
-        if (! $definition) {
+        if (null === $definition) {
             throw new DefinitionException('Can not handle programmatic object types due to missing AST.');
         }
 

@@ -14,7 +14,7 @@ final class ContextFactoryTest extends TestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        $app->singleton(CreatesContext::class, fn (): CreatesContext => new class() implements CreatesContext {
+        $app->singleton(CreatesContext::class, static fn (): CreatesContext => new class() implements CreatesContext {
             public function generate(Request $request): GraphQLContext
             {
                 return new FooContext($request);
@@ -24,7 +24,7 @@ final class ContextFactoryTest extends TestCase
 
     public function testGenerateCustomContext(): void
     {
-        $this->mockResolver(function ($root, array $args, GraphQLContext $context): string {
+        $this->mockResolver(static function ($root, array $args, GraphQLContext $context): string {
             assert($context instanceof FooContext);
 
             return $context->foo();

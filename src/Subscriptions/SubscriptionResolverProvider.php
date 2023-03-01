@@ -44,16 +44,17 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
         $className = Utils::namespaceClassname(
             $className,
             $namespacesToTry,
-            fn (string $class): bool => is_subclass_of($class, GraphQLSubscription::class)
+            static fn (string $class): bool => is_subclass_of($class, GraphQLSubscription::class)
         );
 
-        if (! $className) {
+        if (null === $className) {
             $subscriptionClass = GraphQLSubscription::class;
             $consideredNamespaces = implode(', ', $namespacesToTry);
             throw new DefinitionException(
                 "Failed to find class {$className} extends {$subscriptionClass} in namespaces [{$consideredNamespaces}] for the subscription field {$fieldName}"
             );
         }
+
         assert(is_subclass_of($className, GraphQLSubscription::class));
 
         $subscription = Container::getInstance()->make($className);

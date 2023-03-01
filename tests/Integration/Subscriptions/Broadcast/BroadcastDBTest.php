@@ -32,7 +32,7 @@ final class BroadcastDBTest extends DBTestCase
     }
     ';
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 

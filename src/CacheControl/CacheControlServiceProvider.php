@@ -39,16 +39,14 @@ class CacheControlServiceProvider extends ServiceProvider
 
                 // @phpstan-ignore-next-line NodeVisitor does not know about the mapping between node kind and node type
                 $visitorWithTypeInfo = Visitor::visitWithTypeInfo($typeInfo, [
-                    NodeKind::FIELD => function (FieldNode $_) use ($typeInfo, $cacheControl): void {
+                    NodeKind::FIELD => static function (FieldNode $_) use ($typeInfo, $cacheControl): void {
                         $field = $typeInfo->getFieldDef();
                         if (null === $field) {
                             return;
                         }
-
                         $cacheControlDirective = isset($field->astNode)
                             ? ASTHelper::directiveDefinition($field->astNode, 'cacheControl')
                             : null;
-
                         if (null !== $cacheControlDirective) {
                             if (! ASTHelper::directiveArgValue($cacheControlDirective, 'inheritMaxAge')) {
                                 $cacheControl->addMaxAge(

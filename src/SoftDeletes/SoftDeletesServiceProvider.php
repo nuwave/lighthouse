@@ -33,7 +33,7 @@ class SoftDeletesServiceProvider extends ServiceProvider
     {
         $dispatcher->listen(
             ManipulateAST::class,
-            function (ManipulateAST $manipulateAST): void {
+            static function (ManipulateAST $manipulateAST): void {
                 $manipulateAST->documentAST
                     ->setTypeDefinition(
                         Parser::enumTypeDefinition('

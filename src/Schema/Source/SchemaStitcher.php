@@ -36,22 +36,20 @@ class SchemaStitcher implements SchemaSourceProvider
     protected static function gatherSchemaImportsRecursively(string $path): string
     {
         return (new Collection(\Safe\file($path)))
-            ->map(function (string $line) use ($path): string {
+            ->map(static function (string $line) use ($path): string {
                 if (! Str::startsWith(trim($line), '#import ')) {
                     return rtrim($line, PHP_EOL) . PHP_EOL;
                 }
-
                 $importFileName = trim(Str::after($line, '#import '));
                 $importFilePath = dirname($path) . '/' . $importFileName;
-
                 if (! Str::contains($importFileName, '*')) {
                     try {
                         $realpath = \Safe\realpath($importFilePath);
-                    } catch (FilesystemException $exception) {
+                    } catch (FilesystemException $filesystemException) {
                         throw new FileNotFoundException(
                             "Did not find GraphQL schema import at {$importFilePath}.",
-                            $exception->getCode(),
-                            $exception
+                            $filesystemException->getCode(),
+                            $filesystemException
                         );
                     }
 
@@ -59,7 +57,7 @@ class SchemaStitcher implements SchemaSourceProvider
                 }
 
                 return (new Collection(\Safe\glob($importFilePath)))
-                    ->map(fn (string $file): string => self::gatherSchemaImportsRecursively($file))
+                    ->map(static fn (string $file): string => self::gatherSchemaImportsRecursively($file))
                     ->implode('');
             })
             ->implode('');

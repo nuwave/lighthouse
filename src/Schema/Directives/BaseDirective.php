@@ -56,7 +56,7 @@ abstract class BaseDirective implements Directive
      *
      * @var array<string, mixed>
      */
-    protected array $directiveArgs;
+    protected array $directiveArgs = [];
 
     /**
      * The hydrate function is called when retrieving a directive from the directive registry.
@@ -186,7 +186,7 @@ abstract class BaseDirective implements Directive
             array_unshift($namespacesToTry, $namespaceForDirective);
         }
 
-        if (! $determineMatch) {
+        if (null === $determineMatch) {
             $determineMatch = 'class_exists';
         }
 
@@ -196,7 +196,7 @@ abstract class BaseDirective implements Directive
             $determineMatch
         );
 
-        if (! $className) {
+        if (null === $className) {
             $consideredNamespaces = implode(', ', $namespacesToTry);
             throw new DefinitionException(
                 "Failed to find class {$classCandidate} in namespaces [{$consideredNamespaces}] for directive @{$this->name()}."
@@ -236,10 +236,12 @@ abstract class BaseDirective implements Directive
                 "Directive '{$this->name()}' must have an argument '{$argumentName}' in the form 'ClassName@methodName' or 'ClassName'"
             );
         }
+
         /** @var array{0: string, 1?: string} $argumentParts */
         if (empty($argumentParts[1])) {
             $argumentParts[1] = '__invoke';
         }
+
         /** @var array{0: string, 1: string} $argumentParts */
 
         return $argumentParts;

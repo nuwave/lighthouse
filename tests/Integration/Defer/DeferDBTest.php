@@ -140,7 +140,7 @@ final class DeferDBTest extends DBTestCase
         $this->assertCount(5, $deferredUsers['user.company.users']['data']);
         $this->assertSame(
             $users
-                ->map(fn (User $user): array => ['email' => $user->email])
+                ->map(static fn (User $user): array => ['email' => $user->email])
                 ->values()
                 ->all(),
             $deferredUsers['user.company.users']['data']
@@ -152,7 +152,7 @@ final class DeferDBTest extends DBTestCase
         /** @var \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\Company> $companies */
         $companies = factory(Company::class, 2)
             ->create()
-            ->each(function (Company $company): void {
+            ->each(static function (Company $company): void {
                 factory(User::class, 3)->create([
                     'company_id' => $company->getKey(),
                 ]);
@@ -217,7 +217,7 @@ final class DeferDBTest extends DBTestCase
             $this->assertSame(
                 $company->users
                     // @phpstan-ignore-next-line type of model is known
-                    ->map(fn (User $user): array => [
+                    ->map(static fn (User $user): array => [
                         'email' => $user->email,
                         'company' => null,
                     ])

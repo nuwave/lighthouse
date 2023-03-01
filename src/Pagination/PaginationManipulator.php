@@ -234,6 +234,7 @@ GRAPHQL
         if ($maxCount) {
             $description .= " Maximum allowed value: {$maxCount}.";
         }
+
         $description .= "\"\n";
 
         $definition = 'first: Int!';

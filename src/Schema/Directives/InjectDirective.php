@@ -46,9 +46,8 @@ GRAPHQL;
             throw new DefinitionException("The `inject` directive on {$fieldValue->getParentName()} [{$fieldValue->getFieldName()}] must have a `name` argument");
         }
 
-        $fieldValue->wrapResolver(fn (callable $resolver) => function ($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($contextAttributeName, $argumentName, $resolver) {
+        $fieldValue->wrapResolver(static fn (callable $resolver) => static function ($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($contextAttributeName, $argumentName, $resolver) {
             $valueFromContext = data_get($context, $contextAttributeName);
-
             $argumentSet = $resolveInfo->argumentSet;
             $argumentSet->addValue($argumentName, $valueFromContext);
 

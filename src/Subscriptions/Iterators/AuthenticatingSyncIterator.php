@@ -46,12 +46,12 @@ class AuthenticatingSyncIterator implements SubscriptionIterator
 
                 try {
                     $handleSubscriber($item);
-                } catch (\Exception $e) {
+                } catch (\Exception $exception) {
                     if (null === $handleError) {
-                        throw $e;
+                        throw $exception;
                     }
 
-                    $handleError($e);
+                    $handleError($exception);
                 } finally {
                     // Unset the authenticated user after each iteration to restore the guard to its unauthenticated state
                     $guard->reset();

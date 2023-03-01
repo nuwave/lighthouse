@@ -17,6 +17,6 @@ GRAPHQL;
 
     public function handleField(FieldValue $fieldValue): void
     {
-        $fieldValue->wrapResolver(fn (): callable => fn ($root, array $args): array => $args);
+        $fieldValue->wrapResolver(static fn (): callable => static fn ($root, array $args): array => $args);
     }
 }

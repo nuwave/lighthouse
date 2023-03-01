@@ -28,7 +28,7 @@ GRAPHQL;
     protected function drop(ArgumentSet &$argumentSet): ArgumentSet
     {
         foreach ($argumentSet->arguments as $name => $argument) {
-            $maybeDropDirective = $argument->directives->first(fn (Directive $directive): bool => $directive instanceof DropDirective);
+            $maybeDropDirective = $argument->directives->first(static fn (Directive $directive): bool => $directive instanceof DropDirective);
 
             if ($maybeDropDirective instanceof DropDirective) {
                 unset($argumentSet->arguments[$name]);

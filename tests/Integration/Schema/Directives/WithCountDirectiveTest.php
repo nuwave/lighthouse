@@ -24,7 +24,7 @@ final class WithCountDirectiveTest extends DBTestCase
         ';
 
         factory(User::class, 3)->create()
-            ->each(function ($user) {
+            ->each(static function ($user) {
                 factory(Task::class, 3)->create([
                     'user_id' => $user->getKey(),
                 ]);

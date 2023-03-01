@@ -214,7 +214,7 @@ final class WithDirectiveTest extends DBTestCase
                             '__typename' => 'Post',
                             'id' => "{$post1->id}",
                             'images' => $post1->images()->get()
-                                ->map(fn (Image $image) => ['id' => "{$image->id}"]),
+                                ->map(static fn (Image $image) => ['id' => "{$image->id}"]),
                         ],
                     ],
                     [
@@ -223,7 +223,7 @@ final class WithDirectiveTest extends DBTestCase
                             '__typename' => 'Post',
                             'id' => "{$post2->id}",
                             'images' => $post2->images()->get()
-                                ->map(fn (Image $image) => ['id' => "{$image->id}"]),
+                                ->map(static fn (Image $image) => ['id' => "{$image->id}"]),
                         ],
                     ],
                     [
@@ -299,7 +299,7 @@ final class WithDirectiveTest extends DBTestCase
 
     public function testEagerLoadsMultipleNestedRelationsAtOnce(): void
     {
-        $this->markTestSkipped('Not working due to the current naive usage of \Illuminate\Database\Eloquent\Collection::load() in \Nuwave\Lighthouse\Execution\ModelsLoader\SimpleModelsLoader::load().');
+        $this->markTestSkipped('Not working due to the current naive usage of ' . \Illuminate\Database\Eloquent\Collection::class . '::load() in ' . \Nuwave\Lighthouse\Execution\ModelsLoader\SimpleModelsLoader::class . '::load().');
 
         // @phpstan-ignore-next-line unreachable due to markTestSkipped
         $this->schema = /** @lang GraphQL */ '

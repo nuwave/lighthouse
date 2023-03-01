@@ -13,7 +13,9 @@ use Nuwave\Lighthouse\Schema\SchemaBuilder;
 class PrintSchemaCommand extends Command
 {
     public const GRAPHQL_FILENAME = 'lighthouse-schema.graphql';
+
     public const GRAPHQL_FEDERATION_FILENAME = 'lighthouse-schema-federation.graphql';
+
     public const JSON_FILENAME = 'lighthouse-schema.json';
 
     protected $signature = <<<'SIGNATURE'

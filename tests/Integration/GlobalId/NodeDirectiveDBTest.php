@@ -11,7 +11,7 @@ final class NodeDirectiveDBTest extends DBTestCase
 {
     private GlobalId $globalIdResolver;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 

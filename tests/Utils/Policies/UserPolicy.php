@@ -8,6 +8,7 @@ use Tests\Utils\Models\User;
 final class UserPolicy
 {
     public const SUPER_ADMIN = 'super admin';
+
     public const ADMIN = 'admin';
 
     public const SUPER_ADMINS_ONLY_MESSAGE = 'Only super admins allowed';

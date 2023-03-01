@@ -30,7 +30,7 @@ final class MorphOneDirectiveTest extends DBTestCase
      */
     protected $image;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 

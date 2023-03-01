@@ -60,8 +60,8 @@ class SchemaValidator
             try {
                 // Throws if the field is not defined
                 $field = $type->getField($selection->name->value);
-            } catch (InvariantViolation $i) {
-                throw new FederationException($i->getMessage(), $i->getCode(), $i);
+            } catch (InvariantViolation $invariantViolation) {
+                throw new FederationException($invariantViolation->getMessage(), $invariantViolation->getCode(), $invariantViolation);
             }
 
             $fieldASTNode = $field->astNode

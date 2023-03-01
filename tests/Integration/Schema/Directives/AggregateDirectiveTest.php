@@ -102,7 +102,7 @@ final class AggregateDirectiveTest extends DBTestCase
 
         factory(User::class, 3)
             ->create()
-            ->each(function (User $user, int $index): void {
+            ->each(static function (User $user, int $index): void {
                 $task = factory(Task::class)->make();
                 assert($task instanceof Task);
                 $task->difficulty = $index;

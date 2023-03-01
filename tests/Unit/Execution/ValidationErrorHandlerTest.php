@@ -18,7 +18,7 @@ final class ValidationErrorHandlerTest extends TestCase
         $original = new Error('foo', null, null, [], null, $validationException);
 
         $error = null;
-        $next = function (Error $e) use (&$error) {
+        $next = static function (Error $e) use (&$error) {
             $error = $e;
         };
 

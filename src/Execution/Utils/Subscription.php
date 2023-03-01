@@ -41,9 +41,9 @@ class Subscription
             } else {
                 $broadcaster->broadcast($subscription, $subscriptionField, $root);
             }
-        } catch (\Throwable $e) {
+        } catch (\Throwable $throwable) {
             $exceptionHandler = Container::getInstance()->make(SubscriptionExceptionHandler::class);
-            $exceptionHandler->handleBroadcastError($e);
+            $exceptionHandler->handleBroadcastError($throwable);
         }
     }
 }

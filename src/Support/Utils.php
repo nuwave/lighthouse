@@ -122,7 +122,7 @@ class Utils
     public static function mapEachRecursive(\Closure $callback, $valueOrValues)
     {
         if (is_array($valueOrValues)) {
-            return array_map(fn ($value) => static::mapEachRecursive($callback, $value), $valueOrValues);
+            return array_map(static fn ($value) => static::mapEachRecursive($callback, $value), $valueOrValues);
         }
 
         return $callback($valueOrValues);
@@ -168,7 +168,7 @@ class Utils
      */
     public static function instanceofMatcher(string $classLike): \Closure
     {
-        return fn (mixed $object): bool => $object instanceof $classLike;
+        return static fn (mixed $object): bool => $object instanceof $classLike;
     }
 
     /**

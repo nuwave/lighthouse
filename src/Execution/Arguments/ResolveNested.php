@@ -33,7 +33,7 @@ class ResolveNested implements ArgResolver
         [$nestedArgs, $regularArgs] = ($this->argPartitioner)($args, $root);
         assert($nestedArgs instanceof ArgumentSet);
 
-        if ($this->previous) {
+        if (null !== $this->previous) {
             $root = ($this->previous)($root, $regularArgs);
         }
 

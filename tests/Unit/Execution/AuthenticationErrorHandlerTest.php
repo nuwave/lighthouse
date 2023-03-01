@@ -18,7 +18,7 @@ final class AuthenticationErrorHandlerTest extends TestCase
         $original = new Error('foo', null, null, [], null, $authenticationException);
 
         $error = null;
-        $next = function (Error $e) use (&$error) {
+        $next = static function (Error $e) use (&$error) {
             $error = $e;
         };
 

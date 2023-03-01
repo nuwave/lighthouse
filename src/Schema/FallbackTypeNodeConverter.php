@@ -41,8 +41,7 @@ class FallbackTypeNodeConverter extends TypeNodeConverter
         if (! $this->typeRegistry->has($nodeName)) {
             $dummyType = new CustomScalarType([
                 'name' => $nodeName,
-                'serialize' => function () {
-                },
+                'serialize' => static function () {},
             ]);
             $this->typeRegistry->register($dummyType);
 

@@ -107,7 +107,7 @@ final class User extends Authenticatable
 
     public function scopeCompanyName(EloquentBuilder $query, array $args): EloquentBuilder
     {
-        return $query->whereHas('company', function (EloquentBuilder $q) use ($args): void {
+        return $query->whereHas('company', static function (EloquentBuilder $q) use ($args): void {
             $q->where('name', $args['company']);
         });
     }

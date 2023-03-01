@@ -137,7 +137,7 @@ GRAPHQL;
         $validatorClassName = $this->namespaceClassName(
             $classCandidate,
             (array) config('lighthouse.namespaces.validators'),
-            fn (string $classCandidate): bool => is_subclass_of($classCandidate, Validator::class)
+            static fn (string $classCandidate): bool => is_subclass_of($classCandidate, Validator::class)
         );
         assert(is_subclass_of($validatorClassName, Validator::class));
 

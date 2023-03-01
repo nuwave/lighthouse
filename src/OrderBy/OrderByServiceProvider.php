@@ -25,7 +25,7 @@ class OrderByServiceProvider extends ServiceProvider
 
         $dispatcher->listen(
             ManipulateAST::class,
-            function (ManipulateAST $manipulateAST): void {
+            static function (ManipulateAST $manipulateAST): void {
                 $documentAST = $manipulateAST->documentAST;
                 $documentAST->setTypeDefinition(
                     Parser::enumTypeDefinition(/* @lang GraphQL */ '

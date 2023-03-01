@@ -80,7 +80,7 @@ GRAPHQL;
             $value = $cache->get($cacheKey);
             if (null !== $value) {
                 // Deferring the result will allow nested deferred resolves to be bundled together, see https://github.com/nuwave/lighthouse/pull/2270#discussion_r1072414584.
-                return new Deferred(fn () => $value);
+                return new Deferred(static fn () => $value);
             }
 
             // In Laravel cache, null is considered a non-existent value, see https://laravel.com/docs/9.x/cache#checking-for-item-existence:

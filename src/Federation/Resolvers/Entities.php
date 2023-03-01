@@ -30,7 +30,7 @@ class Entities
         $representations = $args['representations'];
         $representationHashes = array_map('serialize', $representations);
 
-        $assignResultsByHash = function ($result, string $hash) use ($representationHashes, &$results): void {
+        $assignResultsByHash = static function ($result, string $hash) use ($representationHashes, &$results): void {
             foreach ($representationHashes as $index => $h) {
                 if ($hash === $h) {
                     $results[$index] = $result;

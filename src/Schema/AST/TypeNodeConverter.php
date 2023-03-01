@@ -45,6 +45,7 @@ abstract class TypeNodeConverter
                 $wrappers
             );
         }
+
         assert($node instanceof NamedTypeNode);
 
         // Re-wrap the type by applying the wrappers in the reversed order

@@ -34,7 +34,7 @@ final class RelationBatchLoaderTest extends DBTestCase
         $tasksPerUser = 3;
         $users = factory(User::class, $userCount)
             ->create()
-            ->each(function (User $user) use ($tasksPerUser): void {
+            ->each(static function (User $user) use ($tasksPerUser): void {
                 $user->tasks()->saveMany(
                     factory(Task::class, $tasksPerUser)->make()
                 );
@@ -93,7 +93,7 @@ final class RelationBatchLoaderTest extends DBTestCase
         $tasksPerUser = 3;
         factory(User::class, $userCount)
             ->create()
-            ->each(function (User $user) use ($tasksPerUser): void {
+            ->each(static function (User $user) use ($tasksPerUser): void {
                 $user->tasks()->saveMany(
                     factory(Task::class, $tasksPerUser)->make()
                 );
@@ -138,7 +138,7 @@ final class RelationBatchLoaderTest extends DBTestCase
         $alternateConnectionsPerUser = 3;
         factory(User::class, $userCount)
             ->create()
-            ->each(function (User $user) use ($alternateConnectionsPerUser): void {
+            ->each(static function (User $user) use ($alternateConnectionsPerUser): void {
                 $user->alternateConnections()->saveMany(
                     factory(AlternateConnection::class, $alternateConnectionsPerUser)->make()
                 );
@@ -183,7 +183,7 @@ final class RelationBatchLoaderTest extends DBTestCase
         $usersPerNullConnection = 3;
         factory(NullConnection::class, $nullConnectionsCount)
             ->create()
-            ->each(function (NullConnection $nullConnection) use ($usersPerNullConnection): void {
+            ->each(static function (NullConnection $nullConnection) use ($usersPerNullConnection): void {
                 $nullConnection->users()->saveMany(
                     factory(User::class, $usersPerNullConnection)->make()
                 );
@@ -358,7 +358,7 @@ final class RelationBatchLoaderTest extends DBTestCase
 
         factory(User::class, 2)
             ->create()
-            ->each(function (User $user): void {
+            ->each(static function (User $user): void {
                 $user->tasks()->saveMany(
                     factory(Task::class, 3)->make()
                 );
