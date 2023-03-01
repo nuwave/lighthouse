@@ -44,6 +44,7 @@ class CacheControlServiceProvider extends ServiceProvider
                         if (null === $field) {
                             return;
                         }
+
                         $cacheControlDirective = isset($field->astNode)
                             ? ASTHelper::directiveDefinition($field->astNode, 'cacheControl')
                             : null;

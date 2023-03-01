@@ -75,6 +75,7 @@ class RedisStorageManager implements StoresSubscriptions
                 if (null === $subscriber) {
                     return null;
                 }
+
                 // Other entries may contain invalid values
                 try {
                     return unserialize($subscriber);

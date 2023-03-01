@@ -40,6 +40,7 @@ class SchemaStitcher implements SchemaSourceProvider
                 if (! Str::startsWith(trim($line), '#import ')) {
                     return rtrim($line, PHP_EOL) . PHP_EOL;
                 }
+
                 $importFileName = trim(Str::after($line, '#import '));
                 $importFilePath = dirname($path) . '/' . $importFileName;
                 if (! Str::contains($importFileName, '*')) {
