@@ -8,8 +8,6 @@ interface CreatesContext
 {
     /**
      * Generate GraphQL context.
-     *
-     * @return \Nuwave\Lighthouse\Support\Contracts\GraphQLContext
      */
-    public function generate(Request $request);
+    public function generate(Request $request): GraphQLContext;
 }
