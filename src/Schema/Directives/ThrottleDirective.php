@@ -112,11 +112,9 @@ GRAPHQL;
     {
         $name = $this->directiveArgValue('name');
         if (null !== $name) {
-            $limiter = $this->limiter->limiter($name);
-            // @phpstan-ignore-next-line $limiter may be null although it's not specified in limiter() PHPDoc
-            if (null === $limiter) {
-                throw new DefinitionException("Named limiter {$name} is not found.");
-            }
+            $this->limiter->limiter($name)
+                // @phpstan-ignore-next-line $limiter may be null although it's not specified in limiter() PHPDoc
+                ?? throw new DefinitionException("Named limiter {$name} is not found.");
         }
     }
 

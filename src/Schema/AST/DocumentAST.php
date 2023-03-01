@@ -121,9 +121,7 @@ class DocumentAST implements Arrayable
 
                     if (null === $modelClass) {
                         $consideredNamespaces = implode(', ', $namespacesToTry);
-                        throw new DefinitionException(
-                            "Failed to find a model class {$modelName} in namespaces [{$consideredNamespaces}] referenced in @model on type {$name}."
-                        );
+                        throw new DefinitionException("Failed to find a model class {$modelName} in namespaces [{$consideredNamespaces}] referenced in @model on type {$name}.");
                     }
 
                     // It might be valid to have multiple types that correspond to a single model

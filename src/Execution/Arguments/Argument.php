@@ -27,7 +27,7 @@ class Argument
     public Collection $directives;
 
     /**
-     * An argument may have a resolver that handles it's given value.
+     * An argument may have a resolver that handles its given value.
      */
     public ?ArgResolver $resolver;
 

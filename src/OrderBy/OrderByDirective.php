@@ -122,7 +122,8 @@ GRAPHQL;
 
             if (null === $column) {
                 if (! $builder instanceof EloquentBuilder) {
-                    throw new DefinitionException('Can not order by relations on non-Eloquent builders, got: ' . $builder::class);
+                    $notEloquentBuilder = $builder::class;
+                    throw new DefinitionException("Can not order by relations on non-Eloquent builders, got: {$notEloquentBuilder}.");
                 }
 
                 $relation = array_key_first($orderByClause);

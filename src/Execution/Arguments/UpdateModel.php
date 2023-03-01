@@ -31,11 +31,7 @@ class UpdateModel implements ArgResolver
     {
         $id = Arr::pull($args->arguments, 'id')
             ?? Arr::pull($args->arguments, $model->getKeyName())
-            ?? null;
-
-        if (null === $id) {
-            throw new Error(self::MISSING_PRIMARY_KEY_FOR_UPDATE);
-        }
+            ?? throw new Error(self::MISSING_PRIMARY_KEY_FOR_UPDATE);
         assert($id instanceof Argument);
 
         $model = $model->newQuery()->findOrFail($id->value);
