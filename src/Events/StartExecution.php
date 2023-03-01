@@ -19,9 +19,6 @@ class StartExecution
      */
     public Carbon $moment;
 
-    /**
-     * @param  array<string, mixed>|null  $variables
-     */
     public function __construct(
         /**
          * The parsed schema.
