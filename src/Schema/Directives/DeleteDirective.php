@@ -106,7 +106,7 @@ GRAPHQL;
         InputValueDefinitionNode &$argDefinition,
         FieldDefinitionNode &$parentField,
         ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType
-    ) {
+    ): void {
         if (! $this->directiveArgValue('relation')) {
             throw new DefinitionException('The @delete directive requires "relation" to be set when used as an argument resolver.');
         }

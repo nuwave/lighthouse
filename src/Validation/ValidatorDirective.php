@@ -77,7 +77,7 @@ GRAPHQL;
         return $this->validator;
     }
 
-    public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition)
+    public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition): void
     {
         if (! $typeDefinition instanceof InputObjectTypeDefinitionNode) {
             throw new DefinitionException("Can not use @validator on non input type {$typeDefinition->getName()->value}.");
@@ -93,7 +93,7 @@ GRAPHQL;
         DocumentAST &$documentAST,
         FieldDefinitionNode &$fieldDefinition,
         ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType
-    ) {
+    ): void {
         $this->setFullClassnameOnDirective(
             $fieldDefinition,
             $this->directiveArgValue(

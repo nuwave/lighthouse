@@ -12,13 +12,11 @@ interface ArgManipulator extends Directive
 {
     /**
      * Manipulate the AST.
-     *
-     * @return void
      */
     public function manipulateArgDefinition(
         DocumentAST &$documentAST,
         InputValueDefinitionNode &$argDefinition,
         FieldDefinitionNode &$parentField,
         ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType
-    );
+    ): void;
 }

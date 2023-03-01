@@ -57,7 +57,7 @@ GRAPHQL;
         );
     }
 
-    public function handleScoutBuilder(ScoutBuilder $builder, $value): ScoutBuilder
+    public function handleScoutBuilder(ScoutBuilder $builder, mixed $value): ScoutBuilder
     {
         return $builder->where(
             $this->directiveArgValue('key', $this->nodeName()),
@@ -65,7 +65,7 @@ GRAPHQL;
         );
     }
 
-    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType)
+    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType): void
     {
         if (! $this->directiveHasArgument('value')) {
             throw new DefinitionException("Must provide the argument `value` when using {$this->name()} on field `{$parentType->name->value}.{$fieldDefinition->name->value}`.");

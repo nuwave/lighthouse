@@ -28,7 +28,7 @@ GRAPHQL;
     /**
      * Remove whitespace from the beginning and end of a given input.
      */
-    public function sanitize($argumentValue)
+    public function sanitize(mixed $argumentValue): mixed
     {
         return Utils::mapEach(
             fn (mixed $value): mixed => $value instanceof ArgumentSet

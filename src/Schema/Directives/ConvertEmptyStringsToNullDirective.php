@@ -22,7 +22,7 @@ directive @convertEmptyStringsToNull on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINI
 GRAPHQL;
     }
 
-    public function sanitize($argumentValue)
+    public function sanitize(mixed $argumentValue): mixed
     {
         return Utils::mapEachRecursive(
             fn (mixed $value): mixed => $value instanceof ArgumentSet

@@ -76,11 +76,9 @@ GRAPHQL;
     /**
      * Decodes a global id given as an argument.
      *
-     * @param  string|null  $argumentValue
-     *
      * @return string|array{0: string, 1: string}|null
      */
-    public function sanitize($argumentValue)
+    public function sanitize(mixed $argumentValue): string|array|null
     {
         if (null === $argumentValue) {
             return null;

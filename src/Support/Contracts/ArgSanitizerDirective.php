@@ -11,5 +11,5 @@ interface ArgSanitizerDirective extends Directive
      *
      * @return mixed the sanitized value
      */
-    public function sanitize($argumentValue);
+    public function sanitize(mixed $argumentValue): mixed;
 }

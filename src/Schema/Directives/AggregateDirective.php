@@ -173,7 +173,7 @@ GRAPHQL;
         return $this->directiveArgValue('column');
     }
 
-    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType)
+    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType): void
     {
         $this->validateMutuallyExclusiveArguments(['relation', 'model', 'builder']);
     }
