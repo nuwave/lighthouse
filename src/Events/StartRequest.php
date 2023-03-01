@@ -17,17 +17,13 @@ class StartRequest
 {
     /**
      * The request sent from the client.
-     *
-     * @var \Illuminate\Http\Request
      */
-    public $request;
+    public Request $request;
 
     /**
      * The point in time when the request started.
-     *
-     * @var \Illuminate\Support\Carbon
      */
-    public $moment;
+    public Carbon $moment;
 
     public function __construct(Request $request)
     {

@@ -6,17 +6,13 @@ class NamedType
 {
     /**
      * The name of the type as defined in the schema.
-     *
-     * @var string
      */
-    public $name;
+    public string $name;
 
     /**
      * Is this type defined to be non-nullable?
-     *
-     * @var bool
      */
-    public $nonNull = false;
+    public bool $nonNull = false;
 
     public function __construct(string $name)
     {

@@ -14,15 +14,9 @@ use Nuwave\Lighthouse\Subscriptions\SubscriptionGuard;
  */
 class AuthenticatingSyncIterator implements SubscriptionIterator
 {
-    /**
-     * @var \Illuminate\Contracts\Config\Repository
-     */
-    protected $configRepository;
+    protected ConfigRepository $configRepository;
 
-    /**
-     * @var \Illuminate\Contracts\Auth\Factory
-     */
-    protected $authFactory;
+    protected AuthFactory $authFactory;
 
     public function __construct(ConfigRepository $configRepository, AuthFactory $authFactory)
     {

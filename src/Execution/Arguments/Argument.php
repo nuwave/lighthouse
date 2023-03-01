@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
 use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
 class Argument
 {
@@ -11,28 +12,24 @@ class Argument
      *
      * @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>|mixed|array<mixed>
      */
-    public $value;
+    public mixed $value;
 
     /**
      * The type of the argument.
-     *
-     * @var \Nuwave\Lighthouse\Execution\Arguments\ListType|\Nuwave\Lighthouse\Execution\Arguments\NamedType|null
      */
-    public $type;
+    public ListType|NamedType|null $type;
 
     /**
      * A list of directives associated with that argument.
      *
      * @var \Illuminate\Support\Collection<int, \Nuwave\Lighthouse\Support\Contracts\Directive>
      */
-    public $directives;
+    public Collection $directives;
 
     /**
      * An argument may have a resolver that handles it's given value.
-     *
-     * @var \Nuwave\Lighthouse\Support\Contracts\ArgResolver|null
      */
-    public $resolver;
+    public ?ArgResolver $resolver;
 
     public function __construct()
     {

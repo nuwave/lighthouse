@@ -13,10 +13,7 @@ class Serializer implements ContextSerializer
 {
     use SerializesAndRestoresModelIdentifiers;
 
-    /**
-     * @var \Nuwave\Lighthouse\Support\Contracts\CreatesContext
-     */
-    protected $createsContext;
+    protected CreatesContext $createsContext;
 
     public function __construct(CreatesContext $createsContext)
     {

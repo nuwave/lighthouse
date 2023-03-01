@@ -8,10 +8,7 @@ use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
 class EventDirective extends BaseDirective implements FieldMiddleware
 {
-    /**
-     * @var \Illuminate\Contracts\Events\Dispatcher
-     */
-    protected $eventsDispatcher;
+    protected EventsDispatcher $eventsDispatcher;
 
     public function __construct(EventsDispatcher $eventsDispatcher)
     {

@@ -9,10 +9,7 @@ use Safe\Exceptions\FilesystemException;
 
 class SchemaStitcher implements SchemaSourceProvider
 {
-    /**
-     * @var string
-     */
-    protected $rootSchemaPath;
+    protected string $rootSchemaPath;
 
     public function __construct(string $rootSchemaPath)
     {

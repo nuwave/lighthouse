@@ -16,10 +16,7 @@ use Nuwave\Lighthouse\Support\Utils;
 
 abstract class MutationExecutorDirective extends BaseDirective implements FieldResolver, ArgResolver
 {
-    /**
-     * @var \Nuwave\Lighthouse\Execution\TransactionalMutations
-     */
-    protected $transactionalMutations;
+    protected TransactionalMutations $transactionalMutations;
 
     public function __construct(TransactionalMutations $transactionalMutations)
     {

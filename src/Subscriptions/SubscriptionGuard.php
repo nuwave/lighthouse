@@ -12,13 +12,6 @@ class SubscriptionGuard implements Guard
 
     public const GUARD_NAME = 'lighthouse_subscriptions';
 
-    /**
-     * The currently authenticated user.
-     *
-     * @var \Illuminate\Contracts\Auth\Authenticatable|null
-     */
-    protected $user;
-
     public function user(): ?Authenticatable
     {
         return $this->user;

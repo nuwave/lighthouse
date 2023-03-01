@@ -16,10 +16,8 @@ class ManipulateAST
 {
     /**
      * The AST that can be manipulated.
-     *
-     * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
-    public $documentAST;
+    public DocumentAST $documentAST;
 
     public function __construct(DocumentAST &$documentAST)
     {

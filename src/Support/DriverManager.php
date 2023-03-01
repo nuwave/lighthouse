@@ -14,24 +14,22 @@ abstract class DriverManager
 {
     /**
      * The application instance.
-     *
-     * @var \Illuminate\Container\Container
      */
-    protected $app;
+    protected Application $app;
 
     /**
      * The array of resolved drivers.
      *
      * @var array<string, object>
      */
-    protected $drivers = [];
+    protected array $drivers = [];
 
     /**
      * The registered custom driver creators.
      *
      * @var array<string, \Closure>
      */
-    protected $customCreators = [];
+    protected array $customCreators = [];
 
     public function __construct(Application $app)
     {

@@ -13,10 +13,8 @@ class BuildSchemaString
 {
     /**
      * The root schema that was defined by the user.
-     *
-     * @var string
      */
-    public $userSchema;
+    public string $userSchema;
 
     public function __construct(string $userSchema)
     {

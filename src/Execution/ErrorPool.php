@@ -11,7 +11,7 @@ class ErrorPool
      *
      * @var array<int, \Throwable>
      */
-    protected $throwables = [];
+    protected array $throwables = [];
 
     /**
      * Stores an error that will be added to the result.

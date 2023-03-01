@@ -17,15 +17,9 @@ use Nuwave\Lighthouse\Schema\SchemaBuilder;
  */
 class ClientDirective
 {
-    /**
-     * @var string
-     */
-    protected $name;
+    protected string $name;
 
-    /**
-     * @var \GraphQL\Type\Definition\Directive|null
-     */
-    protected $definition;
+    protected ?Directive $definition;
 
     public function __construct(string $name)
     {
@@ -61,18 +55,14 @@ class ClientDirective
      */
     protected function definition(): Directive
     {
-        if (null !== $this->definition) {
-            return $this->definition;
+        if (! isset($this->definition)) {
+            $schemaBuilder = Container::getInstance()->make(SchemaBuilder::class);
+            $schema = $schemaBuilder->schema();
+
+            return $this->definition = $schema->getDirective($this->name)
+                ?? throw new DefinitionException("Missing a schema definition for the client directive {$this->name}.");
         }
 
-        $schemaBuilder = Container::getInstance()->make(SchemaBuilder::class);
-        $schema = $schemaBuilder->schema();
-
-        $definition = $schema->getDirective($this->name);
-        if (! $definition instanceof Directive) {
-            throw new DefinitionException("Missing a schema definition for the client directive {$this->name}");
-        }
-
-        return $this->definition = $definition;
+        return $this->definition;
     }
 }

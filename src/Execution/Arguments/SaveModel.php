@@ -15,7 +15,7 @@ class SaveModel implements ArgResolver
     /**
      * @var \Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>|null
      */
-    protected $parentRelation;
+    protected ?Relation $parentRelation;
 
     /**
      * @param  \Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>|null  $parentRelation

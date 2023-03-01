@@ -17,17 +17,13 @@ class EndRequest
 {
     /**
      * The response that is about to be sent to the client.
-     *
-     * @var \Symfony\Component\HttpFoundation\Response
      */
-    public $response;
+    public Response $response;
 
     /**
      * The point in time when the response was ready.
-     *
-     * @var \Illuminate\Support\Carbon
      */
-    public $moment;
+    public Carbon $moment;
 
     public function __construct(Response $response)
     {

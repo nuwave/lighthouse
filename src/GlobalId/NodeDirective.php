@@ -17,10 +17,7 @@ use Nuwave\Lighthouse\Support\Contracts\TypeMiddleware;
 
 class NodeDirective extends BaseDirective implements TypeMiddleware, TypeManipulator
 {
-    /**
-     * @var \Nuwave\Lighthouse\GlobalId\NodeRegistry
-     */
-    protected $nodeRegistry;
+    protected NodeRegistry $nodeRegistry;
 
     public function __construct(NodeRegistry $nodeRegistry)
     {

@@ -10,10 +10,8 @@ abstract class Validator implements ArgumentSetValidation
 {
     /**
      * The slice of incoming arguments to validate.
-     *
-     * @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet
      */
-    protected $args;
+    protected ArgumentSet $args;
 
     public function messages(): array
     {

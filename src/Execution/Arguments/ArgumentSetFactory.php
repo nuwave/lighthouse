@@ -8,24 +8,16 @@ use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
 
 class ArgumentSetFactory
 {
-    /**
-     * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST
-     */
-    protected $documentAST;
+    protected DocumentAST $documentAST;
 
-    /**
-     * @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentTypeNodeConverter
-     */
-    protected $argumentTypeNodeConverter;
+    protected ArgumentTypeNodeConverter $argumentTypeNodeConverter;
 
-    /**
-     * @var \Nuwave\Lighthouse\Schema\DirectiveLocator
-     */
-    protected $directiveLocator;
+    protected DirectiveLocator $directiveLocator;
 
     public function __construct(
         ASTBuilder $astBuilder,

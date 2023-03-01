@@ -7,10 +7,7 @@ use Nuwave\Lighthouse\Support\Utils;
 
 class LumenMiddlewareAdapter implements MiddlewareAdapter
 {
-    /**
-     * @var \Laravel\Lumen\Application
-     */
-    protected $app;
+    protected Application $app;
 
     public function __construct()
     {

@@ -21,15 +21,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ThrottleDirective extends BaseDirective implements FieldMiddleware, FieldManipulator
 {
-    /**
-     * @var \Illuminate\Cache\RateLimiter
-     */
-    protected $limiter;
+    protected RateLimiter $limiter;
 
-    /**
-     * @var \Illuminate\Http\Request
-     */
-    protected $request;
+    protected Request $request;
 
     public function __construct(RateLimiter $limiter, Request $request)
     {

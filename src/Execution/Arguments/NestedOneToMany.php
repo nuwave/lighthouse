@@ -10,10 +10,7 @@ use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
 class NestedOneToMany implements ArgResolver
 {
-    /**
-     * @var string
-     */
-    protected $relationName;
+    protected string $relationName;
 
     public function __construct(string $relationName)
     {

@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Subscriptions\Storage;
 
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
+use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
@@ -26,17 +27,13 @@ class CacheStorageManager implements StoresSubscriptions
 
     /**
      * The cache to store channels and topics.
-     *
-     * @var \Illuminate\Contracts\Cache\Repository
      */
-    protected $cache;
+    protected CacheRepository $cache;
 
     /**
      * The time to live for items in the cache.
-     *
-     * @var int|null
      */
-    protected $ttl;
+    protected int|null $ttl;
 
     public function __construct(CacheFactory $cacheFactory, ConfigRepository $config)
     {

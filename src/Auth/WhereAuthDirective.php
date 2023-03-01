@@ -13,10 +13,7 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class WhereAuthDirective extends BaseDirective implements FieldBuilderDirective
 {
-    /**
-     * @var \Illuminate\Contracts\Auth\Factory
-     */
-    protected $authFactory;
+    protected AuthFactory $authFactory;
 
     public function __construct(AuthFactory $authFactory)
     {

@@ -32,12 +32,9 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
     /**
      * @var array<string, mixed>
      */
-    protected $lighthouseConfig;
+    protected array $lighthouseConfig;
 
-    /**
-     * @var \Illuminate\Database\ConnectionResolverInterface
-     */
-    protected $database;
+    protected ConnectionResolverInterface $database;
 
     public function __construct(ConfigRepository $configRepository, ConnectionResolverInterface $database)
     {

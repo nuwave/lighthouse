@@ -13,10 +13,7 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgSan
 {
     public const NAME = 'globalId';
 
-    /**
-     * @var \Nuwave\Lighthouse\GlobalId\GlobalId
-     */
-    protected $globalId;
+    protected GlobalId $globalId;
 
     public function __construct(GlobalId $globalId)
     {

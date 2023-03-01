@@ -10,15 +10,9 @@ use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
 class ClearCacheDirective extends BaseDirective implements FieldMiddleware
 {
-    /**
-     * @var \Illuminate\Contracts\Cache\Repository
-     */
-    protected $cacheRepository;
+    protected CacheRepository $cacheRepository;
 
-    /**
-     * @var \Nuwave\Lighthouse\Cache\CacheKeyAndTags
-     */
-    protected $cacheKeyAndTags;
+    protected CacheKeyAndTags $cacheKeyAndTags;
 
     public function __construct(CacheRepository $cacheRepository, CacheKeyAndTags $cacheKeyAndTags)
     {

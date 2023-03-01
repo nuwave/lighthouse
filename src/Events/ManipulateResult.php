@@ -14,10 +14,8 @@ class ManipulateResult
 {
     /**
      * The result of resolving an individual query.
-     *
-     * @var \GraphQL\Executor\ExecutionResult
      */
-    public $result;
+    public ExecutionResult $result;
 
     public function __construct(ExecutionResult &$result)
     {

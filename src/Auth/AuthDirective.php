@@ -10,10 +10,7 @@ use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
 class AuthDirective extends BaseDirective implements FieldResolver
 {
-    /**
-     * @var \Illuminate\Contracts\Auth\Factory
-     */
-    protected $authFactory;
+    protected AuthFactory $authFactory;
 
     public function __construct(AuthFactory $authFactory)
     {

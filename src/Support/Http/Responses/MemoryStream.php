@@ -10,7 +10,7 @@ class MemoryStream extends Stream implements CanStreamResponse
     /**
      * @var array<int, mixed>
      */
-    public $chunks = [];
+    public array $chunks = [];
 
     public function stream(array $data, array $paths, bool $isFinalChunk): void
     {

@@ -10,7 +10,7 @@ class NestedMorphTo implements ArgResolver
     /**
      * @var \Illuminate\Database\Eloquent\Relations\MorphTo<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model>
      */
-    protected $relation;
+    protected MorphTo $relation;
 
     /**
      * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model>  $relation

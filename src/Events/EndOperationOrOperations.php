@@ -12,7 +12,7 @@ class EndOperationOrOperations
      *
      * @var array<string, mixed>|array<int, array<string, mixed>>
      */
-    public $resultOrResults;
+    public array $resultOrResults;
 
     /**
      * @param  array<string, mixed>|array<int, array<string, mixed>>  $resultOrResults

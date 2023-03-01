@@ -18,10 +18,7 @@ use Nuwave\Lighthouse\Support\Utils;
 
 class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
 {
-    /**
-     * @var \Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry
-     */
-    protected $subscriptionRegistry;
+    protected SubscriptionRegistry $subscriptionRegistry;
 
     public function __construct(SubscriptionRegistry $subscriptionRegistry)
     {

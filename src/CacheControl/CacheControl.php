@@ -6,17 +6,13 @@ class CacheControl
 {
     /**
      * Maximum age.
-     *
-     * @var int|null
      */
-    public $maxAge = null;
+    public ?int $maxAge = null;
 
     /**
      * Is the result public?
-     *
-     * @var bool
      */
-    protected $public = true;
+    protected bool $public = true;
 
     public function addMaxAge(int $maxAge): void
     {

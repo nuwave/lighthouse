@@ -9,10 +9,7 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
 
 class WhereConditionsHandler
 {
-    /**
-     * @var \Nuwave\Lighthouse\WhereConditions\Operator
-     */
-    protected $operator;
+    protected Operator $operator;
 
     public function __construct(Operator $operator)
     {

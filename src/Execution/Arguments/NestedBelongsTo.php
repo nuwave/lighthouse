@@ -10,7 +10,7 @@ class NestedBelongsTo implements ArgResolver
     /**
      * @var \Illuminate\Database\Eloquent\Relations\BelongsTo<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model>
      */
-    protected $relation;
+    protected BelongsTo $relation;
 
     /**
      * @param  \Illuminate\Database\Eloquent\Relations\BelongsTo<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model>  $relation

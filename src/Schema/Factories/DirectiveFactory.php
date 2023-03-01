@@ -11,10 +11,7 @@ use Nuwave\Lighthouse\Schema\AST\TypeNodeConverter;
 
 class DirectiveFactory
 {
-    /**
-     * @var \Nuwave\Lighthouse\Schema\AST\TypeNodeConverter
-     */
-    protected $typeNodeConverter;
+    protected TypeNodeConverter $typeNodeConverter;
 
     public function __construct(TypeNodeConverter $typeNodeConverter)
     {

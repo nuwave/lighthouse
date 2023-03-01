@@ -15,14 +15,14 @@ class LogBroadcaster implements Broadcaster
      *
      * @var array<string, mixed>
      */
-    protected $config = [];
+    protected array $config = [];
 
     /**
      * A map from channel names to data.
      *
      * @var array<string, mixed>
      */
-    protected $broadcasts = [];
+    protected array $broadcasts = [];
 
     /**
      * @param  array<string, mixed>  $config

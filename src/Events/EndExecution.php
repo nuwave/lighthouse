@@ -12,17 +12,13 @@ class EndExecution
 {
     /**
      * The result of resolving a single operation.
-     *
-     * @var \GraphQL\Executor\ExecutionResult
      */
-    public $result;
+    public ExecutionResult $result;
 
     /**
      * The point in time when the result was ready.
-     *
-     * @var \Illuminate\Support\Carbon
      */
-    public $moment;
+    public Carbon $moment;
 
     public function __construct(ExecutionResult $result)
     {

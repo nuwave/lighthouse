@@ -6,10 +6,7 @@ use Illuminate\Routing\Router;
 
 class LaravelMiddlewareAdapter implements MiddlewareAdapter
 {
-    /**
-     * @var \Illuminate\Routing\Router
-     */
-    protected $router;
+    protected Router $router;
 
     public function __construct(Router $router)
     {

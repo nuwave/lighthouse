@@ -6,17 +6,13 @@ class DeprecatedUsage
 {
     /**
      * How often was the element used?
-     *
-     * @var int
      */
-    public $count;
+    public int $count;
 
     /**
      * Why is the element deprecated?
-     *
-     * @var string
      */
-    public $reason;
+    public string $reason;
 
     public function __construct(string $reason)
     {

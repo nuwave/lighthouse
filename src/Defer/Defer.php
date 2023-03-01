@@ -12,65 +12,46 @@ use Symfony\Component\HttpFoundation\Response;
 
 class Defer implements CreatesResponse
 {
-    /**
-     * @var \Nuwave\Lighthouse\Support\Contracts\CanStreamResponse
-     */
-    protected $stream;
+    protected CanStreamResponse $stream;
 
-    /**
-     * @var \Nuwave\Lighthouse\GraphQL
-     */
-    protected $graphQL;
+    protected GraphQL $graphQL;
 
-    /**
-     * @var \Nuwave\Lighthouse\Events\StartExecution
-     */
-    protected $startExecution;
+    protected StartExecution $startExecution;
 
     /**
      * A map from paths to deferred resolvers.
      *
      * @var array<string, \Closure(): mixed>
      */
-    protected $deferred = [];
+    protected array $deferred = [];
 
     /**
      * Paths resolved during the current nesting of defers.
      *
      * @var array<int, mixed>
      */
-    protected $resolved = [];
+    protected array $resolved = [];
 
     /**
      * The entire result of resolving the query up until the current nesting.
      *
      * @var array<string, mixed>
      */
-    protected $result = [];
+    protected array $result = [];
 
     /**
      * Should further deferring happen?
-     *
-     * @var bool
      */
-    protected $shouldDeferFurther = true;
+    protected bool $shouldDeferFurther = true;
 
     /**
      * Are we currently streaming deferred results?
-     *
-     * @var bool
      */
-    protected $isStreaming = false;
+    protected bool $isStreaming = false;
 
-    /**
-     * @var float|int
-     */
-    protected $maxExecutionTime = 0;
+    protected int|float $maxExecutionTime = 0;
 
-    /**
-     * @var int
-     */
-    protected $maxNestedFields = 0;
+    protected int $maxNestedFields = 0;
 
     public function __construct(CanStreamResponse $stream, GraphQL $graphQL, ConfigRepository $config)
     {

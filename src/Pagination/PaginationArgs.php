@@ -12,20 +12,11 @@ use Laravel\Scout\Builder as ScoutBuilder;
 
 class PaginationArgs
 {
-    /**
-     * @var int
-     */
-    public $page;
+    public int $page;
 
-    /**
-     * @var int
-     */
-    public $first;
+    public int $first;
 
-    /**
-     * @var \Nuwave\Lighthouse\Pagination\PaginationType
-     */
-    public $type;
+    public PaginationType $type;
 
     /**
      * Create a new instance from user given args.

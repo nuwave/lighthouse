@@ -7,15 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class SimpleModelsLoader implements ModelsLoader
 {
-    /**
-     * @var string
-     */
-    protected $relation;
+    protected string $relation;
 
-    /**
-     * @var \Closure
-     */
-    protected $decorateBuilder;
+    protected \Closure $decorateBuilder;
 
     public function __construct(string $relation, \Closure $decorateBuilder)
     {

@@ -11,10 +11,7 @@ use Nuwave\Lighthouse\Subscriptions\Subscriber;
 
 class EchoBroadcaster implements Broadcaster
 {
-    /**
-     * @var \Illuminate\Broadcasting\BroadcastManager
-     */
-    protected $broadcaster;
+    protected BroadcastManager $broadcaster;
 
     public function __construct(BroadcastManager $broadcaster)
     {

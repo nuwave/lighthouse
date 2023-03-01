@@ -7,15 +7,9 @@ use Illuminate\Database\DatabaseManager;
 
 class TransactionalMutations
 {
-    /**
-     * @var \Illuminate\Database\DatabaseManager
-     */
-    protected $databaseManager;
+    protected DatabaseManager $databaseManager;
 
-    /**
-     * @var bool
-     */
-    protected $shouldTransact;
+    protected bool $shouldTransact;
 
     public function __construct(DatabaseManager $databaseManager, ConfigRepository $configRepository)
     {
