@@ -45,8 +45,8 @@ class Authorizer implements AuthorizesSubscriptions
             }
 
             return true;
-        } catch (\Exception $e) {
-            $this->exceptionHandler->handleAuthError($e);
+        } catch (\Exception $exception) {
+            $this->exceptionHandler->handleAuthError($exception);
 
             return false;
         }

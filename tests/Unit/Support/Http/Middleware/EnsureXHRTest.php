@@ -30,6 +30,7 @@ final class EnsureXHRTest extends TestCase
 
         $request = new Request();
         $request->setMethod('POST');
+
         $request->headers->set('content-type', 'multipart/form-data');
         $request->request->set('_method', 'PUT');
         $request->enableHttpMethodParameterOverride();
@@ -67,6 +68,7 @@ final class EnsureXHRTest extends TestCase
 
         $request = new Request();
         $request->setMethod('POST');
+
         $request->headers->set('content-type', $contentType);
 
         $this->expectException(BadRequestHttpException::class);
@@ -110,6 +112,7 @@ final class EnsureXHRTest extends TestCase
 
         $request = new Request();
         $request->setMethod('POST');
+
         $request->headers->set('X-Requested-With', 'XMLHttpRequest');
 
         $response = new Response();
@@ -128,6 +131,7 @@ final class EnsureXHRTest extends TestCase
 
         $request = new Request();
         $request->setMethod('POST');
+
         $request->headers->set('X-Requested-With', 'InvalidValue');
 
         $this->expectException(BadRequestHttpException::class);
@@ -143,6 +147,7 @@ final class EnsureXHRTest extends TestCase
 
         $request = new Request();
         $request->setMethod('POST');
+
         $request->headers->set('content-type', 'application/json');
 
         $response = new Response();

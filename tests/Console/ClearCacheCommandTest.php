@@ -11,7 +11,7 @@ final class ClearCacheCommandTest extends TestCase
 {
     use TestsSchemaCache;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 

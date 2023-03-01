@@ -75,6 +75,7 @@ GRAPHQL;
                 if (0 === $limit) {
                     break;
                 }
+
                 --$limit;
 
                 $limited[] = $value;

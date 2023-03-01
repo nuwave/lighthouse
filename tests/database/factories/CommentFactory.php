@@ -6,8 +6,8 @@ use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
-$factory->define(Comment::class, fn (Faker $faker): array => [
+$factory->define(Comment::class, static fn (Faker $faker): array => [
     'comment' => $faker->sentence,
-    'user_id' => fn () => factory(User::class)->create()->getKey(),
-    'post_id' => fn () => factory(Post::class)->create()->getKey(),
+    'user_id' => static fn () => factory(User::class)->create()->getKey(),
+    'post_id' => static fn () => factory(Post::class)->create()->getKey(),
 ]);

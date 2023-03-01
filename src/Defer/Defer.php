@@ -83,7 +83,7 @@ class Defer implements CreatesResponse
 
         // If we have been here before, now is the time to resolve this field
         $deferredResolver = $this->deferred[$path] ?? null;
-        if ($deferredResolver) {
+        if (null !== $deferredResolver) {
             return $this->resolve($deferredResolver, $path);
         }
 

@@ -91,9 +91,9 @@ abstract class DateScalar extends ScalarType
             }
 
             return $this->parse($value);
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
             throw new $exceptionClass(
-                Utils::printSafeJson($e->getMessage())
+                Utils::printSafeJson($exception->getMessage())
             );
         }
     }

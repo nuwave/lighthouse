@@ -38,6 +38,7 @@ trait RelationDirectiveHelpers
             if ($builder instanceof Relation) {
                 $builder = $builder->getQuery();
             }
+
             assert($builder instanceof QueryBuilder || $builder instanceof EloquentBuilder);
 
             $resolveInfo->enhanceBuilder(

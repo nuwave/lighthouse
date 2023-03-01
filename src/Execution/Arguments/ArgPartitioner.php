@@ -94,7 +94,7 @@ class ArgPartitioner
         );
         assert($resolverDirective instanceof ArgResolver || null === $resolverDirective);
 
-        if ($resolverDirective) {
+        if (null !== $resolverDirective) {
             $argument->resolver = $resolverDirective;
 
             return;

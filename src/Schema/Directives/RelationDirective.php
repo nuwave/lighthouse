@@ -32,7 +32,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
     /**
      * @var array<string, mixed>
      */
-    protected array $lighthouseConfig;
+    protected array $lighthouseConfig = [];
 
     public function __construct(
         protected ConnectionResolverInterface $database,
@@ -74,7 +74,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
             ) {
                 $relationBatchLoader = BatchLoaderRegistry::instance(
                     $this->qualifyPath($args, $resolveInfo),
-                    fn (): RelationBatchLoader => new RelationBatchLoader(
+                    static fn (): RelationBatchLoader => new RelationBatchLoader(
                         null === $paginationArgs
                             ? new SimpleModelsLoader($relationName, $decorateBuilder)
                             : new PaginatedModelsLoader($relationName, $decorateBuilder, $paginationArgs)

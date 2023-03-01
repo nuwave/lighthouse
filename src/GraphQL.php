@@ -337,7 +337,7 @@ class GraphQL
                         ->send($error)
                         ->through($handlers)
                         ->then(
-                            fn (?Error $error): ?array => null === $error
+                            static fn (?Error $error): ?array => null === $error
                                 ? null
                                 : $formatter($error)
                         ))

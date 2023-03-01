@@ -27,7 +27,7 @@ class ErrorPool
     public function errors(): array
     {
         return array_map(
-            function (\Throwable $throwable): Error {
+            static function (\Throwable $throwable): Error {
                 if ($throwable instanceof Error) {
                     return $throwable;
                 }

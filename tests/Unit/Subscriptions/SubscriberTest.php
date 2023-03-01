@@ -31,6 +31,7 @@ final class SubscriberTest extends TestCase
         $resolveInfo = $this->createMock(ResolveInfo::class);
         $fieldName = 'baz';
         $resolveInfo->fieldName = $fieldName;
+
         $resolveInfo->operation = new OperationDefinitionNode([]);
         $resolveInfo->fragments = [];
         $context = new Context(new Request());

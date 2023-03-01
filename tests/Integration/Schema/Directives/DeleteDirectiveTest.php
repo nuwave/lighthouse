@@ -484,7 +484,7 @@ final class DeleteDirectiveTest extends DBTestCase
 
     public function testDeletingReturnsFalseTriggersException(): void
     {
-        User::deleting(fn (): bool => false);
+        User::deleting(static fn (): bool => false);
 
         $user = factory(User::class)->create();
         assert($user instanceof User);

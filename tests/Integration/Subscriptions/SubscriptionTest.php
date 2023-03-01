@@ -18,12 +18,12 @@ final class SubscriptionTest extends TestCase
 {
     use TestsSubscriptions;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->mockResolverExpects($this->any())
-            ->willReturnCallback(fn ($root, array $args): array => $args);
+            ->willReturnCallback(static fn ($root, array $args): array => $args);
 
         $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Post {

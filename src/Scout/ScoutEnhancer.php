@@ -125,6 +125,7 @@ class ScoutEnhancer
         if (count($this->searchArguments) > 1) {
             throw new ScoutException('Found more than 1 argument with @search.');
         }
+
         $searchArgument = $this->searchArguments[0];
 
         if ([] !== $this->argumentsWithOnlyArgBuilders) {
@@ -136,6 +137,7 @@ class ScoutEnhancer
             $thisBuilderClass = $this->builder::class;
             throw new ScoutException("Can only get Model from {$eloquentBuilderClass}, got: {$thisBuilderClass}.");
         }
+
         $model = $this->builder->getModel();
 
         $searchableTraitClass = Searchable::class;

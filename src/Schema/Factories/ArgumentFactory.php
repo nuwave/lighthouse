@@ -55,7 +55,7 @@ class ArgumentFactory
             'astNode' => $definitionNode,
         ];
 
-        if ($defaultValue = $definitionNode->defaultValue) {
+        if (($defaultValue = $definitionNode->defaultValue) !== null) {
             $config += [
                 'defaultValue' => ASTHelper::defaultValueForArgument($defaultValue, $type),
             ];

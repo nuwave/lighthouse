@@ -14,7 +14,7 @@ final class AcceptJsonTest extends TestCase
 
         $request = $acceptJson->handle(
             new Request(),
-            fn (Request $request): Request => $request
+            static fn (Request $request): Request => $request
         );
 
         $this->assertSame(

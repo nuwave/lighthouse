@@ -379,7 +379,7 @@ final class CacheDirectiveTest extends DBTestCase
         ';
 
         $dbQueryCountForPost = 0;
-        DB::listen(function (QueryExecuted $query) use (&$dbQueryCountForPost): void {
+        DB::listen(static function (QueryExecuted $query) use (&$dbQueryCountForPost): void {
             if (Str::contains($query->sql, 'select * from `posts`')) {
                 ++$dbQueryCountForPost;
             }
@@ -443,7 +443,7 @@ final class CacheDirectiveTest extends DBTestCase
         ';
 
         $dbQueryCountForPost = 0;
-        DB::listen(function (QueryExecuted $query) use (&$dbQueryCountForPost): void {
+        DB::listen(static function (QueryExecuted $query) use (&$dbQueryCountForPost): void {
             if (Str::contains($query->sql, 'select * from `posts`')) {
                 ++$dbQueryCountForPost;
             }

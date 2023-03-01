@@ -149,6 +149,7 @@ class ASTBuilder
                 );
             }
         }
+
         assert($extendedObjectLikeType instanceof ObjectTypeDefinitionNode || $extendedObjectLikeType instanceof InputObjectTypeDefinitionNode || $extendedObjectLikeType instanceof InterfaceTypeDefinitionNode);
 
         $this->assertExtensionMatchesDefinition($typeExtension, $extendedObjectLikeType);

@@ -11,7 +11,7 @@ use Tests\TestCase;
 
 final class DeferTest extends TestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -691,7 +691,7 @@ final class DeferTest extends TestCase
         ]);
 
         $this->mockResolver(
-            function () {
+            static function () {
                 throw new Error('deferred_exception');
             },
             'throw'

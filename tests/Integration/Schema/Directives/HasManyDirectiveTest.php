@@ -324,6 +324,7 @@ final class HasManyDirectiveTest extends DBTestCase
             $post->user()->associate($user);
             $post->save();
         }
+
         $this->assertCount(2, $user->posts);
 
         $roles = factory(Role::class, 3)->make();
@@ -331,6 +332,7 @@ final class HasManyDirectiveTest extends DBTestCase
             assert($role instanceof Role);
             $user->roles()->save($role);
         }
+
         $this->assertCount(3, $user->roles);
 
         $this

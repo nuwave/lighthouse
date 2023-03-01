@@ -101,6 +101,7 @@ GRAPHQL;
                 if (! is_a($class, Directive::class, true)) {
                     continue;
                 }
+
                 $name = DirectiveLocator::directiveName($class);
 
                 // The directive was already found, so we do not add it twice
@@ -167,7 +168,7 @@ GRAPHQL;
         $schema = implode(
             "\n\n",
             array_map(
-                fn (Type $type): string => SchemaPrinter::printType($type),
+                static fn (Type $type): string => SchemaPrinter::printType($type),
                 $programmaticTypes
             )
         );

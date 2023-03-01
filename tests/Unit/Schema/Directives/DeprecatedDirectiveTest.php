@@ -55,6 +55,7 @@ final class DeprecatedDirectiveTest extends TestCase
         );
 
         $withoutDeprecatedIntrospection->assertJsonCount(1, 'data.__schema.queryType.fields');
+
         $types = $withoutDeprecatedIntrospection->json('data.__schema.types');
         $foo = Arr::first($types, static fn (array $type): bool => 'Foo' === $type['name']);
         $this->assertCount(1, $foo['enumValues']);
@@ -68,7 +69,7 @@ final class DeprecatedDirectiveTest extends TestCase
 
         $deprecatedFields = Arr::where(
             $includeDeprecatedIntrospection->json('data.__schema.queryType.fields'),
-            fn (array $field): bool => $field['isDeprecated']
+            static fn (array $field): bool => $field['isDeprecated']
         );
         $this->assertCount(2, $deprecatedFields);
         $this->assertSame(

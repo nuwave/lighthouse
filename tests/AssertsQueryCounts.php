@@ -15,14 +15,14 @@ trait AssertsQueryCounts
 {
     protected function countQueries(?int &$count): void
     {
-        DB::listen(function () use (&$count): void {
+        DB::listen(static function () use (&$count): void {
             ++$count;
         });
     }
 
     protected function assertNoQueriesExecuted(\Closure $closure = null): void
     {
-        if ($closure) {
+        if (null !== $closure) {
             self::trackQueries();
 
             $closure();
@@ -30,14 +30,14 @@ trait AssertsQueryCounts
 
         $this->assertQueryCountMatches(0);
 
-        if ($closure) {
+        if (null !== $closure) {
             DB::flushQueryLog();
         }
     }
 
     protected function assertQueryCountMatches(int $count, \Closure $closure = null): void
     {
-        if ($closure) {
+        if (null !== $closure) {
             self::trackQueries();
 
             $closure();
@@ -45,14 +45,14 @@ trait AssertsQueryCounts
 
         $this->assertEquals($count, self::getQueryCount());
 
-        if ($closure) {
+        if (null !== $closure) {
             DB::flushQueryLog();
         }
     }
 
     protected function assertQueryCountLessThan(int $count, \Closure $closure = null): void
     {
-        if ($closure) {
+        if (null !== $closure) {
             self::trackQueries();
 
             $closure();
@@ -60,14 +60,14 @@ trait AssertsQueryCounts
 
         $this->assertLessThan($count, self::getQueryCount());
 
-        if ($closure) {
+        if (null !== $closure) {
             DB::flushQueryLog();
         }
     }
 
     protected function assertQueryCountGreaterThan(int $count, \Closure $closure = null): void
     {
-        if ($closure) {
+        if (null !== $closure) {
             self::trackQueries();
 
             $closure();
@@ -75,7 +75,7 @@ trait AssertsQueryCounts
 
         $this->assertGreaterThan($count, self::getQueryCount());
 
-        if ($closure) {
+        if (null !== $closure) {
             DB::flushQueryLog();
         }
     }

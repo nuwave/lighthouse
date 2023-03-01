@@ -55,7 +55,7 @@ class Subscriber
      *
      * @var array<string, mixed>
      */
-    public array $variables;
+    public array $variables = [];
 
     public function __construct(
         /**
@@ -79,6 +79,7 @@ class Subscriber
         if (is_array($xSocketID)) {
             throw new \Exception('X-Socket-ID must be a string or null.');
         }
+
         $this->socket_id = $xSocketID;
 
         $this->query = new DocumentNode([

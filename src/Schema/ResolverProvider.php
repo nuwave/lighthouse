@@ -42,7 +42,7 @@ class ResolverProvider implements ProvidesResolver
         return Utils::namespaceClassname(
             Str::studly($fieldValue->getFieldName()),
             RootType::defaultNamespaces($fieldValue->getParentName()),
-            fn (string $class): bool => method_exists($class, $methodName)
+            static fn (string $class): bool => method_exists($class, $methodName)
         );
     }
 

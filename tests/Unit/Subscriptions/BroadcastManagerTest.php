@@ -22,7 +22,7 @@ final class BroadcastManagerTest extends TestCase
      */
     protected $broadcastManager;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -63,7 +63,7 @@ final class BroadcastManagerTest extends TestCase
             }
         };
 
-        $this->broadcastManager->extend('foo', function ($app, array $config) use (&$broadcasterConfig, $broadcaster): Broadcaster {
+        $this->broadcastManager->extend('foo', static function ($app, array $config) use (&$broadcasterConfig, $broadcaster): Broadcaster {
             $broadcasterConfig = $config;
 
             return $broadcaster;
@@ -78,7 +78,7 @@ final class BroadcastManagerTest extends TestCase
 
     public function testThrowsIfDriverDoesNotImplementInterface(): void
     {
-        $this->broadcastManager->extend('foo', fn () => new class() {
+        $this->broadcastManager->extend('foo', static fn () => new class() {
         });
 
         $this->expectException(InvalidDriverException::class);

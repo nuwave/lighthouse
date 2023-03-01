@@ -9,7 +9,7 @@ final class ClearCacheDirectiveTest extends TestCase
 {
     protected CacheRepository $cache;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -156,7 +156,7 @@ final class ClearCacheDirectiveTest extends TestCase
 
     public function testClearCacheForMultipleTypesWithIDByField(): void
     {
-        $this->mockResolver(fn (): array => [
+        $this->mockResolver(static fn (): array => [
             [
                 'bar' => 1,
             ],

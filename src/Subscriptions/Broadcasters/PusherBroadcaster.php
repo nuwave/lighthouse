@@ -64,8 +64,8 @@ class PusherBroadcaster implements Broadcaster
                     'result' => $data,
                 ]
             );
-        } catch (ApiErrorException $e) {
-            $this->exceptionHandler->report($e);
+        } catch (ApiErrorException $apiErrorException) {
+            $this->exceptionHandler->report($apiErrorException);
         }
     }
 }

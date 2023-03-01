@@ -264,7 +264,7 @@ final class AllDirectiveTest extends DBTestCase
         assert($post instanceof Post);
 
         $this->engine->shouldReceive('map')
-            ->withArgs(fn (ScoutBuilder $builder): bool => $builder->wheres === ['id' => "{$post->id}"]
+            ->withArgs(static fn (ScoutBuilder $builder): bool => $builder->wheres === ['id' => "{$post->id}"]
                 && self::LIMIT_FROM_CUSTOM_SCOUT_BUILDER === $builder->limit)
             ->andReturn(new EloquentCollection([$post]))
             ->once();

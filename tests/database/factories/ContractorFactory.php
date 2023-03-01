@@ -5,6 +5,6 @@ use Tests\Utils\Models\Contractor;
 
 /* @var \Illuminate\Database\Eloquent\Factory $factory */
 
-$factory->define(Contractor::class, fn (Faker $faker): array => [
+$factory->define(Contractor::class, static fn (Faker $faker): array => [
     'position' => $faker->word,
 ]);

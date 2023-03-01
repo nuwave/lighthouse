@@ -11,6 +11,7 @@ use BenSampo\Enum\Enum;
 final class LocalizedUserType extends Enum implements LocalizedEnum
 {
     public const Administrator = 'ADMINISTRATOR';
+
     public const Moderator = 'MODERATOR';
 
     public static function getDescription($value): string

@@ -18,7 +18,7 @@ final class LaravelEnumTypeTest extends TestCase
      */
     protected $typeRegistry;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -112,7 +112,7 @@ GRAPHQL
         );
 
         $this->mockResolver()
-            ->with(null, new Callback(fn (array $args): bool => $args['bar'] instanceof AOrB));
+            ->with(null, new Callback(static fn (array $args): bool => $args['bar'] instanceof AOrB));
 
         $this->graphQL(/** @lang GraphQL */ '
         {

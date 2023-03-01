@@ -54,7 +54,7 @@ type Query {
 
 GRAPHQL;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -183,7 +183,7 @@ GRAPHQL;
      */
     protected function resolveApplicationExceptionHandler($app): void
     {
-        $app->singleton(ExceptionHandler::class, fn () => new ThrowingExceptionHandler());
+        $app->singleton(ExceptionHandler::class, static fn () => new ThrowingExceptionHandler());
     }
 
     /**

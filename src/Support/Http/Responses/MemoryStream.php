@@ -28,6 +28,7 @@ class MemoryStream extends Stream implements CanStreamResponse
 
                 $chunk[$path] = $response;
             }
+
             $this->chunks[] = $chunk;
         }
     }

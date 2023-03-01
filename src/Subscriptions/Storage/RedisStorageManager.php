@@ -70,7 +70,7 @@ class RedisStorageManager implements StoresSubscriptions
 
         return (new Collection($subscribers))
             ->filter()
-            ->map(function (?string $subscriber): ?Subscriber {
+            ->map(static function (?string $subscriber): ?Subscriber {
                 // Some entries may be expired
                 if (null === $subscriber) {
                     return null;
@@ -113,6 +113,7 @@ class RedisStorageManager implements StoresSubscriptions
             $setCommand = 'setex';
             array_splice($setArguments, 1, 0, [$this->ttl]);
         }
+
         $this->connection->command($setCommand, $setArguments);
     }
 

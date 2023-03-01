@@ -7,6 +7,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 class CacheKeyAndTagsGenerator implements CacheKeyAndTags
 {
     public const PREFIX = 'lighthouse';
+
     public const SEPARATOR = ':';
 
     /**

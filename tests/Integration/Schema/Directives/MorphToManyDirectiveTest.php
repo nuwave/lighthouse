@@ -24,7 +24,7 @@ final class MorphToManyDirectiveTest extends DBTestCase
      */
     protected $postTags;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -78,7 +78,7 @@ final class MorphToManyDirectiveTest extends DBTestCase
             'data' => [
                 'post' => [
                     'id' => $this->post->id,
-                    'tags' => $this->postTags->map(fn (Tag $tag) => [
+                    'tags' => $this->postTags->map(static fn (Tag $tag) => [
                         'id' => $tag->id,
                         'name' => $tag->name,
                     ])->toArray(),
@@ -130,7 +130,7 @@ final class MorphToManyDirectiveTest extends DBTestCase
                 'post' => [
                     'id' => $this->post->id,
                     'tags' => [
-                        'edges' => $this->postTags->map(fn (Tag $tag) => [
+                        'edges' => $this->postTags->map(static fn (Tag $tag) => [
                             'node' => [
                                 'id' => $tag->id,
                                 'name' => $tag->name,
@@ -183,7 +183,7 @@ final class MorphToManyDirectiveTest extends DBTestCase
             'data' => [
                 'post' => [
                     'id' => $this->post->id,
-                    'customTags' => $this->postTags->map(fn (Tag $tag) => [
+                    'customTags' => $this->postTags->map(static fn (Tag $tag) => [
                         'id' => $tag->id,
                         'name' => $tag->name,
                     ])->toArray(),
@@ -201,7 +201,7 @@ final class MorphToManyDirectiveTest extends DBTestCase
             'user_id' => $user->id,
         ]);
         /** @var \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\Tag> $postTags */
-        $postTags = factory(Tag::class, 3)->create()->map(function (Tag $tag) use ($post) {
+        $postTags = factory(Tag::class, 3)->create()->map(static function (Tag $tag) use ($post) {
             $post->tags()->attach($tag);
 
             return $tag;
@@ -211,7 +211,7 @@ final class MorphToManyDirectiveTest extends DBTestCase
             'user_id' => $user->id,
         ]);
         /** @var \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\Tag> $taskTags */
-        $taskTags = factory(Tag::class, 3)->create()->map(function (Tag $tag) use ($task) {
+        $taskTags = factory(Tag::class, 3)->create()->map(static function (Tag $tag) use ($task) {
             $task->tags()->attach($tag);
 
             return $tag;
@@ -300,7 +300,7 @@ final class MorphToManyDirectiveTest extends DBTestCase
                             'id' => $post->id,
                             'tags' => $postTags
                                 // @phpstan-ignore-next-line model type is known
-                                ->map(fn (Tag $tag): array => [
+                                ->map(static fn (Tag $tag): array => [
                                     'id' => $tag->id,
                                     'name' => $tag->name,
                                 ])
@@ -312,7 +312,7 @@ final class MorphToManyDirectiveTest extends DBTestCase
                             'id' => $task->id,
                             'tags' => $taskTags
                                 // @phpstan-ignore-next-line model type is known
-                                ->map(fn (Tag $tag): array => [
+                                ->map(static fn (Tag $tag): array => [
                                     'id' => $tag->id,
                                     'title' => $tag->name,
                                 ])

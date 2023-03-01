@@ -14,7 +14,7 @@ final class GlobalIdDirectiveTest extends TestCase
      */
     protected $globalId;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -42,7 +42,7 @@ final class GlobalIdDirectiveTest extends TestCase
 
     public function testNullableArgument(): void
     {
-        $this->mockResolver(fn ($_, array $args): ?string => $args['bar'] ?? null);
+        $this->mockResolver(static fn ($_, array $args): ?string => $args['bar'] ?? null);
 
         $this->schema = /** @lang GraphQL */ '
         type Query {

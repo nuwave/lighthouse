@@ -555,7 +555,7 @@ GRAPHQL
         $actionInput = ucfirst($action) . 'TaskInput';
 
         $calledImageSaving = 0;
-        Image::saving(function () use (&$calledImageSaving): void {
+        Image::saving(static function () use (&$calledImageSaving): void {
             ++$calledImageSaving;
         });
 

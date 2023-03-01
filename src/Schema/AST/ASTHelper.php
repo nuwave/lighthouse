@@ -56,13 +56,11 @@ class ASTHelper
             ->all();
 
         $remainingDefinitions = (new Collection($original))
-            ->reject(function (Node $definition) use ($newNames, $overwriteDuplicates): bool {
+            ->reject(static function (Node $definition) use ($newNames, $overwriteDuplicates): bool {
                 // @phpstan-ignore-next-line https://github.com/phpstan/phpstan/issues/8474
                 assert(property_exists($definition, 'name'));
-
                 $oldName = $definition->name->value;
                 $collisionOccurred = in_array($oldName, $newNames);
-
                 if ($collisionOccurred && ! $overwriteDuplicates) {
                     throw new DefinitionException(
                         static::duplicateDefinition($oldName)
@@ -189,6 +187,7 @@ class ASTHelper
         if (! property_exists($definitionNode, 'directives')) {
             throw new \Exception('Expected Node class with property `directives`, got: ' . $definitionNode::class);
         }
+
         /** @var \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\DirectiveNode> $directives */
         $directives = $definitionNode->directives;
 
@@ -328,11 +327,11 @@ class ASTHelper
     {
         try {
             $document = Parser::parse($definitionString);
-        } catch (SyntaxError $error) {
+        } catch (SyntaxError $syntaxError) {
             throw new DefinitionException(
                 "Encountered syntax error while parsing this directive definition::\n\n{$definitionString}",
-                $error->getCode(),
-                $error
+                $syntaxError->getCode(),
+                $syntaxError
             );
         }
 

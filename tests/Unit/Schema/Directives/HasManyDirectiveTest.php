@@ -45,7 +45,7 @@ final class HasManyDirectiveTest extends DBTestCase
         /** @var array<string, mixed> $user */
         $tasks = Arr::first(
             $user['fields'],
-            fn (array $field): bool => 'tasks' === $field['name']
+            static fn (array $field): bool => 'tasks' === $field['name']
         );
         $this->assertSame(
             $expectedConnectionName,

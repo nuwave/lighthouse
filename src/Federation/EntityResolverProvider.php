@@ -236,7 +236,7 @@ class EntityResolverProvider
     private function hasFieldWithDirective(ObjectTypeDefinitionNode $definition, string $fieldName, string $directiveName): bool
     {
         $field = ASTHelper::firstByName($definition->fields, $fieldName);
-        if (! $field) {
+        if (null === $field) {
             return false;
         }
 

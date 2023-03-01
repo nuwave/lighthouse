@@ -14,9 +14,9 @@ final class DeprecationTest extends TestCase
     /**
      * @var array<string, DeprecatedUsage>
      */
-    protected array $deprecations;
+    protected array $deprecations = [];
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -27,7 +27,8 @@ final class DeprecationTest extends TestCase
 
     protected function tearDown(): void
     {
-        DocumentValidator::removeRule(new DetectDeprecatedUsage(function (): void {}));
+        DocumentValidator::removeRule(new DetectDeprecatedUsage(static function (): void {
+        }));
 
         parent::tearDown();
     }

@@ -359,11 +359,11 @@ class TypeRegistry
         $className = Utils::namespaceClassname(
             $className,
             $namespacesToTry,
-            fn (string $className): bool => is_subclass_of($className, ScalarType::class)
+            static fn (string $className): bool => is_subclass_of($className, ScalarType::class)
         );
         assert(is_null($className) || is_subclass_of($className, ScalarType::class));
 
-        if (! $className) {
+        if (null === $className) {
             $scalarClass = ScalarType::class;
             $consideredNamespaces = implode(', ', $namespacesToTry);
             throw new DefinitionException("Failed to find class {$className} extends {$scalarClass} in namespaces [{$consideredNamespaces}] for the scalar {$scalarName}.");
@@ -501,10 +501,10 @@ class TypeRegistry
         $className = Utils::namespaceClassname(
             $nodeName,
             $namespaces,
-            fn (string $className): bool => method_exists($className, '__invoke')
+            static fn (string $className): bool => method_exists($className, '__invoke')
         );
 
-        if ($className) {
+        if (null !== $className) {
             $typeResolver = Container::getInstance()->make($className);
             assert(is_object($typeResolver));
 

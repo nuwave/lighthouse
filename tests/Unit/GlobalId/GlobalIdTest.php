@@ -13,7 +13,7 @@ final class GlobalIdTest extends TestCase
      */
     protected $globalIdResolver;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
