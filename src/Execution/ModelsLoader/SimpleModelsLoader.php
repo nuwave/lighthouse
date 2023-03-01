@@ -33,7 +33,7 @@ class SimpleModelsLoader implements ModelsLoader
      *
      * @return mixed the model's relation
      */
-    public function extract(Model $model)
+    public function extract(Model $model): mixed
     {
         // Dot notation may be used to eager load nested relations
         $parts = explode('.', $this->relation);

@@ -15,27 +15,11 @@ use Nuwave\Lighthouse\Support\Utils;
 
 class PaginatedModelsLoader implements ModelsLoader
 {
-    /**
-     * @var string
-     */
-    protected $relation;
-
-    /**
-     * @var \Closure
-     */
-    protected $decorateBuilder;
-
-    /**
-     * @var \Nuwave\Lighthouse\Pagination\PaginationArgs
-     */
-    protected $paginationArgs;
-
-    public function __construct(string $relation, \Closure $decorateBuilder, PaginationArgs $paginationArgs)
-    {
-        $this->relation = $relation;
-        $this->decorateBuilder = $decorateBuilder;
-        $this->paginationArgs = $paginationArgs;
-    }
+    public function __construct(
+        protected string $relation,
+        protected \Closure $decorateBuilder,
+        protected PaginationArgs $paginationArgs
+    ) {}
 
     public function load(EloquentCollection $parents): void
     {
@@ -50,7 +34,7 @@ class PaginatedModelsLoader implements ModelsLoader
         $this->convertRelationToPaginator($parents);
     }
 
-    public function extract(Model $model)
+    public function extract(Model $model): mixed
     {
         return $model->getRelation($this->relation);
     }
