@@ -6,6 +6,7 @@ use Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector;
 use Rector\CodeQuality\Rector\Identical\GetClassToInstanceOfRector;
 use Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector;
 use Rector\CodeQuality\Rector\Isset_\IssetOnPropertyObjectToPropertyExistsRector;
+use Rector\CodingStyle\Rector\Class_\AddArrayDefaultToArrayPropertyRector;
 use Rector\CodingStyle\Rector\ClassConst\VarConstantCommentRector;
 use Rector\CodingStyle\Rector\ClassMethod\UnSpreadOperatorRector;
 use Rector\CodingStyle\Rector\Encapsed\EncapsedStringsToSprintfRector;
@@ -50,5 +51,6 @@ return static function (RectorConfig $rectorConfig): void {
         EncapsedStringsToSprintfRector::class, // unreadable, slow, error prone
         VarConstantCommentRector::class, // Noisy
         UnSpreadOperatorRector::class, // Breaks some public APIs
+        AddArrayDefaultToArrayPropertyRector::class, // Break lazy initialization
     ]);
 };
