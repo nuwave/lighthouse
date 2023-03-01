@@ -2,9 +2,7 @@
 
 namespace Nuwave\Lighthouse\Support\Http\Middleware;
 
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Always set the Accept: application/json header.
@@ -18,7 +16,7 @@ class AcceptJson
     public const ACCEPT = 'Accept';
     public const APPLICATION_JSON = 'application/json';
 
-    public function handle(Request $request, \Closure $next): Response|JsonResponse
+    public function handle(Request $request, \Closure $next): mixed
     {
         $request->headers->set(self::ACCEPT, self::APPLICATION_JSON);
 

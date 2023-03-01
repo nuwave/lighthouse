@@ -11,22 +11,11 @@ use Nuwave\Lighthouse\Auth\AuthServiceProvider;
  */
 class AttemptAuthentication
 {
-    /**
-     * @var \Illuminate\Contracts\Auth\Factory
-     */
-    protected $authFactory;
+    public function __construct(
+        protected AuthFactory $authFactory
+    ) {}
 
-    public function __construct(AuthFactory $authFactory)
-    {
-        $this->authFactory = $authFactory;
-    }
-
-    /**
-     * @param  string  ...$guards
-     *
-     * @return mixed Any kind of response
-     */
-    public function handle(Request $request, \Closure $next, ...$guards)
+    public function handle(Request $request, \Closure $next, string ...$guards): mixed
     {
         $this->attemptAuthentication($guards);
 
@@ -34,7 +23,7 @@ class AttemptAuthentication
     }
 
     /**
-     * @param  array<string>  ...$guards
+     * @param  array<string>  $guards
      */
     protected function attemptAuthentication(array $guards): void
     {

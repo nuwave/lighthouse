@@ -4,7 +4,7 @@ namespace Tests\Unit\Federation;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Schema;
-use Nuwave\Lighthouse\Exceptions\FederationException;
+use Nuwave\Lighthouse\Federation\FederationException;
 use Nuwave\Lighthouse\Federation\FederationServiceProvider;
 use Tests\TestCase;
 

@@ -2,10 +2,8 @@
 
 namespace Nuwave\Lighthouse\Support\Http\Middleware;
 
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
@@ -25,7 +23,7 @@ class EnsureXHR
         'text/plain',
     ];
 
-    public function handle(Request $request, \Closure $next): Response|JsonResponse
+    public function handle(Request $request, \Closure $next): mixed
     {
         $method = $request->getRealMethod();
 

@@ -10,27 +10,16 @@ use Psr\Log\LoggerInterface;
  */
 class LogGraphQLQueries
 {
-    public const MESSAGE = 'Received GraphQL query';
+    public const MESSAGE = 'Received GraphQL query.';
 
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    protected $logger;
+    public function __construct(
+        protected LoggerInterface $logger
+    ) {}
 
-    public function __construct(LoggerInterface $logger)
+    public function handle(Request $request, \Closure $next): mixed
     {
-        $this->logger = $logger;
-    }
-
-    /**
-     * @return mixed Any kind of response
-     */
-    public function handle(Request $request, \Closure $next)
-    {
-        $this->logger->info(
-            self::MESSAGE,
-            $request->json()->all()
-        );
+        $jsonParameters = $request->json()->all();
+        $this->logger->info(self::MESSAGE, $jsonParameters);
 
         return $next($request);
     }

@@ -10,7 +10,6 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Utils\Utils;
 use Nuwave\Lighthouse\Events\ValidateSchema;
-use Nuwave\Lighthouse\Exceptions\FederationException;
 use Nuwave\Lighthouse\Federation\Directives\ExtendsDirective;
 use Nuwave\Lighthouse\Federation\Directives\ExternalDirective;
 use Nuwave\Lighthouse\Federation\Directives\KeyDirective;
@@ -55,7 +54,7 @@ class SchemaValidator
     }
 
     /**
-     * @throws \Nuwave\Lighthouse\Exceptions\FederationException
+     * @throws \Nuwave\Lighthouse\Federation\FederationException
      */
     protected function validateKeySelectionSet(SelectionSetNode $selectionSet, ObjectType $type, ObjectTypeDefinitionNode $typeAST): void
     {

@@ -13,7 +13,7 @@ use GraphQL\Utils\AST;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Exceptions\ParseException;
+use Nuwave\Lighthouse\Exceptions\SchemaSyntaxErrorException;
 use Nuwave\Lighthouse\Schema\Directives\ModelDirective;
 use Nuwave\Lighthouse\Support\Utils;
 
@@ -81,7 +81,7 @@ class DocumentAST implements Arrayable
     /**
      * Create a new DocumentAST instance from a schema.
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\ParseException
+     * @throws \Nuwave\Lighthouse\Exceptions\SchemaSyntaxErrorException
      */
     public static function fromSource(string $schema): self
     {
@@ -94,7 +94,7 @@ class DocumentAST implements Arrayable
         } catch (SyntaxError $syntaxError) {
             // Throw our own error class instead, since otherwise a schema definition
             // error would get rendered to the Client.
-            throw new ParseException($syntaxError);
+            throw new SchemaSyntaxErrorException($syntaxError);
         }
 
         $instance = new static();
