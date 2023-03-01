@@ -3,6 +3,8 @@
 namespace Nuwave\Lighthouse\WhereConditions;
 
 use GraphQL\Error\Error;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 
 class SQLOperator implements Operator
 {
@@ -71,7 +73,7 @@ GRAPHQL;
         return 'GTE';
     }
 
-    public function applyConditions($builder, array $whereConditions, string $boolean)
+    public function applyConditions(QueryBuilder|EloquentBuilder $builder, array $whereConditions, string $boolean): QueryBuilder|EloquentBuilder
     {
         $column = $whereConditions['column'];
 
