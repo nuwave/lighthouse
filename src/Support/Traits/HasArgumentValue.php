@@ -2,25 +2,19 @@
 
 namespace Nuwave\Lighthouse\Support\Traits;
 
+use Nuwave\Lighthouse\Execution\Arguments\Argument;
+use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
+
 trait HasArgumentValue
 {
-    /**
-     * @var \Nuwave\Lighthouse\Execution\Arguments\Argument|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet
-     */
-    protected $argumentValue;
+    protected Argument|ArgumentSet $argumentValue;
 
-    /**
-     * @return \Nuwave\Lighthouse\Execution\Arguments\Argument|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet
-     */
-    public function argumentValue()
+    public function argumentValue(): Argument|ArgumentSet
     {
         return $this->argumentValue;
     }
 
-    /**
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\Argument|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $argument
-     */
-    public function setArgumentValue($argument): self
+    public function setArgumentValue(Argument|ArgumentSet $argument): self
     {
         $this->argumentValue = $argument;
 

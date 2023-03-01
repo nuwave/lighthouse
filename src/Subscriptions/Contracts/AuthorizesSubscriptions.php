@@ -8,8 +8,6 @@ interface AuthorizesSubscriptions
 {
     /**
      * Is the subscription request authorized?
-     *
-     * @return bool
      */
-    public function authorize(Request $request);
+    public function authorize(Request $request): bool;
 }

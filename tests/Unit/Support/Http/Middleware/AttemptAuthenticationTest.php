@@ -20,9 +20,7 @@ final class AttemptAuthenticationTest extends TestCase
         parent::getEnvironmentSetUp($app);
 
         $authManager = $app->make(AuthManager::class);
-        $authManager->viaRequest('foo', function () {
-            return $this->user;
-        });
+        $authManager->viaRequest('foo', fn () => $this->user);
 
         $config = $app->make(ConfigRepository::class);
         $config->set('lighthouse.route.middleware', [
@@ -41,9 +39,7 @@ final class AttemptAuthenticationTest extends TestCase
             ->with(
                 null,
                 [],
-                new Callback(function (Context $context) {
-                    return null === $this->user;
-                })
+                new Callback(fn (Context $context) => null === $this->user)
             );
 
         $this->schema = /** @lang GraphQL */ '
@@ -67,9 +63,7 @@ final class AttemptAuthenticationTest extends TestCase
             ->with(
                 null,
                 [],
-                new Callback(function (Context $context) {
-                    return $this->user === $context->user();
-                })
+                new Callback(fn (Context $context) => $this->user === $context->user())
             );
 
         $this->schema = /** @lang GraphQL */ '

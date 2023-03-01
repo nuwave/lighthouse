@@ -6,15 +6,11 @@ interface SubscriptionExceptionHandler
 {
     /**
      * Handle authentication error.
-     *
-     * @return void
      */
-    public function handleAuthError(\Throwable $e);
+    public function handleAuthError(\Throwable $e): void;
 
     /**
      * Handle broadcast error.
-     *
-     * @return void
      */
-    public function handleBroadcastError(\Throwable $e);
+    public function handleBroadcastError(\Throwable $e): void;
 }

@@ -62,9 +62,7 @@ GRAPHQL;
         if ($this->directiveHasArgument('resolver')) {
             $resolver = $this->getResolverFromArgument('resolver');
         } else {
-            $resolver = function (int|string $id): ?Model {
-                return $this->getModelClass()::find($id);
-            };
+            $resolver = fn (int|string $id): ?Model => $this->getModelClass()::find($id);
         }
 
         $this->nodeRegistry->registerNode(
@@ -85,9 +83,7 @@ GRAPHQL;
         $this->validateMutuallyExclusiveArguments(['model', 'resolver']);
 
         if (! $typeDefinition instanceof ObjectTypeDefinitionNode) {
-            throw new DefinitionException(
-                "The {$this->name()} directive must only be used on object type definitions, not on {$typeDefinition->kind} {$typeDefinition->getName()->value}."
-            );
+            throw new DefinitionException("The {$this->name()} directive must only be used on object type definitions, not on {$typeDefinition->kind} {$typeDefinition->getName()->value}.");
         }
 
         $namedTypeNode = Parser::parseType(GlobalIdServiceProvider::NODE, ['noLocation' => true]);

@@ -9,8 +9,6 @@ interface TypeExtensionManipulator extends Directive
 {
     /**
      * Apply manipulations from a type extension node.
-     *
-     * @return void
      */
-    public function manipulateTypeExtension(DocumentAST &$documentAST, TypeExtensionNode &$typeExtension);
+    public function manipulateTypeExtension(DocumentAST &$documentAST, TypeExtensionNode &$typeExtension): void;
 }

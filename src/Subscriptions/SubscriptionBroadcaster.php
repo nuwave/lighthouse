@@ -74,9 +74,7 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
 
         $subscribers = $this->subscriptionStorage
             ->subscribersByTopic($topic)
-            ->filter(function (Subscriber $subscriber) use ($subscription, $root): bool {
-                return $subscription->filter($subscriber, $root);
-            });
+            ->filter(fn (Subscriber $subscriber): bool => $subscription->filter($subscriber, $root));
 
         $this->subscriptionIterator->process(
             $subscribers,

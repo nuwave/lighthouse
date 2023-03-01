@@ -49,7 +49,7 @@ GRAPHQL;
         return $resolver($builder, $value, $this->definitionNode);
     }
 
-    public function handleScoutBuilder(ScoutBuilder $builder, $value): ScoutBuilder
+    public function handleScoutBuilder(ScoutBuilder $builder, mixed $value): ScoutBuilder
     {
         $resolver = $this->resolver();
 

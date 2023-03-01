@@ -6,6 +6,7 @@ use GraphQL\Error\SyntaxError;
 use GraphQL\Executor\Values;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\DirectiveNode;
+use GraphQL\Language\AST\EnumValueDefinitionNode;
 use GraphQL\Language\AST\EnumValueNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
@@ -47,7 +48,7 @@ class ASTHelper
      *
      * @return \GraphQL\Language\AST\NodeList<TNode>
      */
-    public static function mergeUniqueNodeList($original, $addition, bool $overwriteDuplicates = false): NodeList
+    public static function mergeUniqueNodeList(NodeList|array $original, NodeList|array $addition, bool $overwriteDuplicates = false): NodeList
     {
         $newNames = (new Collection($addition))
             ->pluck('name.value')
@@ -143,7 +144,7 @@ class ASTHelper
      *
      * @return mixed the value given to the directive
      */
-    public static function directiveArgValue(DirectiveNode $directive, string $name, $default = null)
+    public static function directiveArgValue(DirectiveNode $directive, string $name, mixed $default = null)
     {
         $arg = self::firstByName($directive->arguments, $name);
 
@@ -186,7 +187,7 @@ class ASTHelper
     {
         // @phpstan-ignore-next-line https://github.com/phpstan/phpstan/issues/8474
         if (! property_exists($definitionNode, 'directives')) {
-            throw new \Exception('Expected Node class with property `directives`, got: ' . get_class($definitionNode));
+            throw new \Exception('Expected Node class with property `directives`, got: ' . $definitionNode::class);
         }
         /** @var \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\DirectiveNode> $directives */
         $directives = $definitionNode->directives;
@@ -216,7 +217,7 @@ class ASTHelper
         foreach ($nodes as $node) {
             // @phpstan-ignore-next-line https://github.com/phpstan/phpstan/issues/8474
             if (! property_exists($node, 'name')) {
-                throw new \Exception('Expected a Node with a name property, got: ' . get_class($node));
+                throw new \Exception('Expected a Node with a name property, got: ' . $node::class);
             }
 
             if ($node->name->value === $name) {
@@ -309,12 +310,8 @@ class ASTHelper
 
     /**
      * Given a collection of directives, returns the string value for the deprecation reason.
-     *
-     * @param  \GraphQL\Language\AST\EnumValueDefinitionNode|\GraphQL\Language\AST\FieldDefinitionNode  $node
-     *
-     * @return string
      */
-    public static function deprecationReason(Node $node): ?string
+    public static function deprecationReason(EnumValueDefinitionNode|FieldDefinitionNode $node): ?string
     {
         $deprecated = Values::getDirectiveValues(
             Directive::deprecatedDirective(),

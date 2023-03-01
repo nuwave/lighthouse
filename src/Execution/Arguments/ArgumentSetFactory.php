@@ -98,10 +98,8 @@ class ArgumentSetFactory
 
     /**
      * Wrap a single client-given argument with type information.
-     *
-     * @param  mixed  $value  the client given value
      */
-    protected function wrapInArgument($value, InputValueDefinitionNode $definition): Argument
+    protected function wrapInArgument(mixed $value, InputValueDefinitionNode $definition): Argument
     {
         $type = $this->argumentTypeNodeConverter->convert($definition->type);
 
@@ -117,11 +115,10 @@ class ArgumentSetFactory
      * Wrap a client-given value with information from a type.
      *
      * @param  mixed|array<mixed>  $valueOrValues
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ListType|\Nuwave\Lighthouse\Execution\Arguments\NamedType  $type
      *
      * @return array|mixed|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet
      */
-    protected function wrapWithType($valueOrValues, $type)
+    protected function wrapWithType($valueOrValues, ListType|NamedType $type)
     {
         // No need to recurse down further if the value is null
         if (null === $valueOrValues) {
@@ -147,11 +144,9 @@ class ArgumentSetFactory
     /**
      * Wrap a client-given value with information from a named type.
      *
-     * @param  mixed  $value  the client given value
-     *
      * @return \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|mixed
      */
-    protected function wrapWithNamedType($value, NamedType $namedType)
+    protected function wrapWithNamedType(mixed $value, NamedType $namedType)
     {
         // This might be null if the type is
         // - created outside of the schema string

@@ -10,7 +10,6 @@ use Illuminate\Cache\RateLimiting\Unlimited;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Exceptions\RateLimitException;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
@@ -83,7 +82,7 @@ GRAPHQL;
             }
 
             if ($limiterResponse instanceof Response) {
-                throw new DirectiveException("Expected named limiter {$name} to return an array, got instance of " . get_class($limiterResponse));
+                throw new DefinitionException("Expected named limiter {$name} to return an array, got instance of " . $limiterResponse::class);
             }
 
             foreach (Arr::wrap($limiterResponse) as $limit) {

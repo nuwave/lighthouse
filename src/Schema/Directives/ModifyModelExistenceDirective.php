@@ -61,7 +61,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
 
     public static function couldNotModify(Model $model): Error
     {
-        $modelClass = get_class($model);
+        $modelClass = $model::class;
 
         return new Error("Could not modify model {$modelClass} with ID {$model->getKey()}.");
     }

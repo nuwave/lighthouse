@@ -12,5 +12,5 @@ interface CanStreamResponse
      *
      * @return void This function is expected to emit a stream as a side effect
      */
-    public function stream(array $data, array $paths, bool $isFinalChunk);
+    public function stream(array $data, array $paths, bool $isFinalChunk): void;
 }

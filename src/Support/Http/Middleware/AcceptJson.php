@@ -16,10 +16,7 @@ class AcceptJson
     public const ACCEPT = 'Accept';
     public const APPLICATION_JSON = 'application/json';
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\Response|\Illuminate\Http\JsonResponse
-     */
-    public function handle(Request $request, \Closure $next)
+    public function handle(Request $request, \Closure $next): mixed
     {
         $request->headers->set(self::ACCEPT, self::APPLICATION_JSON);
 

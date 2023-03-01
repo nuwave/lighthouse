@@ -10,8 +10,6 @@ use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeExtensionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeExtensionNode;
-use GraphQL\Language\AST\TypeDefinitionNode;
-use GraphQL\Language\AST\TypeExtensionNode;
 use GraphQL\Language\Parser;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Support\Arr;
@@ -138,10 +136,7 @@ class ASTBuilder
         }
     }
 
-    /**
-     * @param  \GraphQL\Language\AST\ObjectTypeExtensionNode|\GraphQL\Language\AST\InputObjectTypeExtensionNode|\GraphQL\Language\AST\InterfaceTypeExtensionNode  $typeExtension
-     */
-    protected function extendObjectLikeType(string $typeName, TypeExtensionNode $typeExtension): void
+    protected function extendObjectLikeType(string $typeName, ObjectTypeExtensionNode|InputObjectTypeExtensionNode|InterfaceTypeExtensionNode $typeExtension): void
     {
         $extendedObjectLikeType = $this->documentAST->types[$typeName] ?? null;
         if (null === $extendedObjectLikeType) {
@@ -193,26 +188,18 @@ class ASTBuilder
         );
     }
 
-    /**
-     * @param  \GraphQL\Language\AST\ObjectTypeExtensionNode|\GraphQL\Language\AST\InputObjectTypeExtensionNode|\GraphQL\Language\AST\InterfaceTypeExtensionNode|\GraphQL\Language\AST\EnumTypeExtensionNode  $typeExtension
-     */
-    protected function missingBaseDefinition(string $typeName, TypeExtensionNode $typeExtension): string
+    protected function missingBaseDefinition(string $typeName, ObjectTypeExtensionNode|InputObjectTypeExtensionNode|InterfaceTypeExtensionNode|EnumTypeExtensionNode $typeExtension): string
     {
         return "Could not find a base definition {$typeName} of kind {$typeExtension->kind} to extend.";
     }
 
     /**
-     * @param  \GraphQL\Language\AST\ObjectTypeExtensionNode|\GraphQL\Language\AST\InputObjectTypeExtensionNode|\GraphQL\Language\AST\InterfaceTypeExtensionNode|\GraphQL\Language\AST\EnumTypeExtensionNode  $extension
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\InputObjectTypeDefinitionNode|\GraphQL\Language\AST\InterfaceTypeDefinitionNode|\GraphQL\Language\AST\EnumTypeDefinitionNode  $definition
-     *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
-    protected function assertExtensionMatchesDefinition(TypeExtensionNode $extension, TypeDefinitionNode $definition): void
+    protected function assertExtensionMatchesDefinition(ObjectTypeExtensionNode|InputObjectTypeExtensionNode|InterfaceTypeExtensionNode|EnumTypeExtensionNode $extension, ObjectTypeDefinitionNode|InputObjectTypeDefinitionNode|InterfaceTypeDefinitionNode|EnumTypeDefinitionNode $definition): void
     {
-        if (static::EXTENSION_TO_DEFINITION_CLASS[get_class($extension)] !== get_class($definition)) {
-            throw new DefinitionException(
-                "The type extension {$extension->name->value} of kind {$extension->kind} can not extend a definition of kind {$definition->kind}."
-            );
+        if (static::EXTENSION_TO_DEFINITION_CLASS[$extension::class] !== $definition::class) {
+            throw new DefinitionException("The type extension {$extension->name->value} of kind {$extension->kind} can not extend a definition of kind {$definition->kind}.");
         }
     }
 

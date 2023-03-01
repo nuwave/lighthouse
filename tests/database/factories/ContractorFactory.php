@@ -5,8 +5,6 @@ use Tests\Utils\Models\Contractor;
 
 /* @var \Illuminate\Database\Eloquent\Factory $factory */
 
-$factory->define(Contractor::class, function (Faker $faker): array {
-    return [
-        'position' => $faker->word,
-    ];
-});
+$factory->define(Contractor::class, fn (Faker $faker): array => [
+    'position' => $faker->word,
+]);

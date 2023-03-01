@@ -65,10 +65,8 @@ class ArgumentSet
      * Add a value at the dot-separated path.
      *
      * Works just like @see \Illuminate\Support\Arr::add().
-     *
-     * @param  mixed  $value  any value to inject
      */
-    public function addValue(string $path, $value): self
+    public function addValue(string $path, mixed $value): self
     {
         $argumentSet = $this;
         $keys = explode('.', $path);

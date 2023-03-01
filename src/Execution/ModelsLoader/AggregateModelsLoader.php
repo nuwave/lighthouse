@@ -8,33 +8,12 @@ use Illuminate\Support\Str;
 
 class AggregateModelsLoader implements ModelsLoader
 {
-    /**
-     * @var string
-     */
-    protected $relation;
-
-    /**
-     * @var string
-     */
-    protected $column;
-
-    /**
-     * @var string
-     */
-    protected $function;
-
-    /**
-     * @var \Closure
-     */
-    protected $decorateBuilder;
-
-    public function __construct(string $relation, string $column, string $function, \Closure $decorateBuilder)
-    {
-        $this->relation = $relation;
-        $this->column = $column;
-        $this->function = $function;
-        $this->decorateBuilder = $decorateBuilder;
-    }
+    public function __construct(
+        protected string $relation,
+        protected string $column,
+        protected string $function,
+        protected \Closure $decorateBuilder
+    ) {}
 
     public function load(EloquentCollection $parents): void
     {
@@ -42,7 +21,7 @@ class AggregateModelsLoader implements ModelsLoader
         $parents->loadAggregate([$this->relation => $this->decorateBuilder], $this->column, $this->function);
     }
 
-    public function extract(Model $model)
+    public function extract(Model $model): mixed
     {
         /**
          * This is the name that Eloquent gives to the attribute that contains the aggregate.

@@ -43,22 +43,22 @@ final class BroadcastManagerTest extends TestCase
         $broadcasterConfig = [];
 
         $broadcaster = new class() implements Broadcaster {
-            public function authorized(Request $request)
+            public function authorized(Request $request): Response
             {
                 return new Response();
             }
 
-            public function unauthorized(Request $request)
+            public function unauthorized(Request $request): Response
             {
                 return new Response();
             }
 
-            public function hook(Request $request)
+            public function hook(Request $request): Response
             {
                 return new Response();
             }
 
-            public function broadcast(Subscriber $subscriber, $data)
+            public function broadcast(Subscriber $subscriber, mixed $data): void
             {
             }
         };
@@ -78,9 +78,7 @@ final class BroadcastManagerTest extends TestCase
 
     public function testThrowsIfDriverDoesNotImplementInterface(): void
     {
-        $this->broadcastManager->extend('foo', function () {
-            return new class() {
-            };
+        $this->broadcastManager->extend('foo', fn () => new class() {
         });
 
         $this->expectException(InvalidDriverException::class);

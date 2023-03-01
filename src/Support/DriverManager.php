@@ -149,7 +149,7 @@ abstract class DriverManager
         $interface = $this->interface();
 
         if (! (new \ReflectionClass($driver))->implementsInterface($interface)) {
-            throw new InvalidDriverException(get_class($driver) . " does not implement {$interface}");
+            throw new InvalidDriverException($driver::class . " does not implement {$interface}");
         }
 
         return $driver;

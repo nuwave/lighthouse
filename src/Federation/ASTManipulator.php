@@ -5,7 +5,6 @@ namespace Nuwave\Lighthouse\Federation;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Events\ManipulateAST;
-use Nuwave\Lighthouse\Exceptions\FederationException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\RootType;
 
@@ -39,7 +38,7 @@ class ASTManipulator
     /**
      * Combine object types with @key into the _Entity union.
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\FederationException
+     * @throws \Nuwave\Lighthouse\Federation\FederationException
      */
     protected function addEntityUnion(DocumentAST &$documentAST): void
     {

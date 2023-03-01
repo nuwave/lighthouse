@@ -53,7 +53,7 @@ class PusherBroadcaster implements Broadcaster
         return new JsonResponse(['message' => 'okay']);
     }
 
-    public function broadcast(Subscriber $subscriber, $data): void
+    public function broadcast(Subscriber $subscriber, mixed $data): void
     {
         try {
             $this->pusher->trigger(

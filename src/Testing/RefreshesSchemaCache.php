@@ -43,7 +43,7 @@ trait RefreshesSchemaCache
 
                 // Since we are the single process that has an exclusive lock, we have to write the cache
                 $this->artisan('lighthouse:cache');
-            } catch (FilesystemException $e) {
+            } catch (FilesystemException) {
                 // If no exclusive lock is available, block until the first process is done and wrote the cache
                 \Safe\flock($lockFile, LOCK_SH);
             }

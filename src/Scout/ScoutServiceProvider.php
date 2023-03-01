@@ -12,9 +12,7 @@ class ScoutServiceProvider extends ServiceProvider
     {
         $dispatcher->listen(
             RegisterDirectiveNamespaces::class,
-            function (RegisterDirectiveNamespaces $registerDirectiveNamespaces): string {
-                return __NAMESPACE__;
-            }
+            fn (RegisterDirectiveNamespaces $registerDirectiveNamespaces): string => __NAMESPACE__
         );
     }
 }

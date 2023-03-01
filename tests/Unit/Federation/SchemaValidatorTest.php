@@ -4,7 +4,7 @@ namespace Tests\Unit\Federation;
 
 use Nuwave\Lighthouse\Console\ValidateSchemaCommand;
 use Nuwave\Lighthouse\Events\ValidateSchema;
-use Nuwave\Lighthouse\Exceptions\FederationException;
+use Nuwave\Lighthouse\Federation\FederationException;
 use Nuwave\Lighthouse\Federation\FederationServiceProvider;
 use Nuwave\Lighthouse\Federation\SchemaValidator;
 use Tests\TestCase;

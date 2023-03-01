@@ -11,12 +11,13 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Changed
 
+- Use the strongest possible native types over PHPDocs
+- Use `declare(strict_types=1)`
 - Add validation support to `Paginator` with `resolver` mode
 - Pass resolver arguments to `FieldBuilderDirective::handleFieldBuilder()` https://github.com/nuwave/lighthouse/pull/2234
 - Expected resolver arguments in `ResolveInfo::enhanceBuilder()`
 - Pass the path array to `CacheKeyAndTags::key()` https://github.com/nuwave/lighthouse/pull/2176
 - Require implementations of `BatchedEntityResolver` to maintain the keys given in `array $representations` https://github.com/nuwave/lighthouse/pull/2286
-- Use the strongest possible native types over PHPDocs
 - Require filter directives such as `@whereKey` in `@delete`, `@forceDelete` and `@restore` https://github.com/nuwave/lighthouse/pull/2289
 - Subscriptions can now be filtered via `$subscriber->socket_id` and `request()->header('X-Socket-ID')` https://github.com/nuwave/lighthouse/pull/2298
 - Make pagination argument `first` non-nullable

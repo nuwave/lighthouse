@@ -78,12 +78,10 @@ final class MorphToManyDirectiveTest extends DBTestCase
             'data' => [
                 'post' => [
                     'id' => $this->post->id,
-                    'tags' => $this->postTags->map(function (Tag $tag) {
-                        return [
-                            'id' => $tag->id,
-                            'name' => $tag->name,
-                        ];
-                    })->toArray(),
+                    'tags' => $this->postTags->map(fn (Tag $tag) => [
+                        'id' => $tag->id,
+                        'name' => $tag->name,
+                    ])->toArray(),
                 ],
             ],
         ]);
@@ -132,14 +130,12 @@ final class MorphToManyDirectiveTest extends DBTestCase
                 'post' => [
                     'id' => $this->post->id,
                     'tags' => [
-                        'edges' => $this->postTags->map(function (Tag $tag) {
-                            return [
-                                'node' => [
-                                    'id' => $tag->id,
-                                    'name' => $tag->name,
-                                ],
-                            ];
-                        })->toArray(),
+                        'edges' => $this->postTags->map(fn (Tag $tag) => [
+                            'node' => [
+                                'id' => $tag->id,
+                                'name' => $tag->name,
+                            ],
+                        ])->toArray(),
                     ],
                 ],
             ],
@@ -187,12 +183,10 @@ final class MorphToManyDirectiveTest extends DBTestCase
             'data' => [
                 'post' => [
                     'id' => $this->post->id,
-                    'customTags' => $this->postTags->map(function (Tag $tag) {
-                        return [
-                            'id' => $tag->id,
-                            'name' => $tag->name,
-                        ];
-                    })->toArray(),
+                    'customTags' => $this->postTags->map(fn (Tag $tag) => [
+                        'id' => $tag->id,
+                        'name' => $tag->name,
+                    ])->toArray(),
                 ],
             ],
         ]);
@@ -306,12 +300,10 @@ final class MorphToManyDirectiveTest extends DBTestCase
                             'id' => $post->id,
                             'tags' => $postTags
                                 // @phpstan-ignore-next-line model type is known
-                                ->map(function (Tag $tag): array {
-                                    return [
-                                        'id' => $tag->id,
-                                        'name' => $tag->name,
-                                    ];
-                                })
+                                ->map(fn (Tag $tag): array => [
+                                    'id' => $tag->id,
+                                    'name' => $tag->name,
+                                ])
                                 ->all(),
                         ],
                     ],
@@ -320,12 +312,10 @@ final class MorphToManyDirectiveTest extends DBTestCase
                             'id' => $task->id,
                             'tags' => $taskTags
                                 // @phpstan-ignore-next-line model type is known
-                                ->map(function (Tag $tag): array {
-                                    return [
-                                        'id' => $tag->id,
-                                        'title' => $tag->name,
-                                    ];
-                                })
+                                ->map(fn (Tag $tag): array => [
+                                    'id' => $tag->id,
+                                    'title' => $tag->name,
+                                ])
                                 ->toArray(),
                         ],
                     ],

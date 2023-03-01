@@ -50,9 +50,7 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
         $className = Utils::namespaceClassname(
             $className,
             $namespacesToTry,
-            function (string $class): bool {
-                return is_subclass_of($class, GraphQLSubscription::class);
-            }
+            fn (string $class): bool => is_subclass_of($class, GraphQLSubscription::class)
         );
 
         if (! $className) {

@@ -31,11 +31,9 @@ GRAPHQL;
     {
         $defaultFieldResolver = Executor::getDefaultFieldResolver();
 
-        return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($defaultFieldResolver) {
-            // The parent might just hold a foreign key to the external object, in which case we just return that.
-            return is_scalar($root)
-                ? $root
-                : $defaultFieldResolver($root, $args, $context, $resolveInfo);
-        };
+        // The parent might just hold a foreign key to the external object, in which case we just return that.
+        return fn ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) => is_scalar($root)
+            ? $root
+            : $defaultFieldResolver($root, $args, $context, $resolveInfo);
     }
 }

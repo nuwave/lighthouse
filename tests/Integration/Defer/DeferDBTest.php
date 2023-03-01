@@ -140,9 +140,7 @@ final class DeferDBTest extends DBTestCase
         $this->assertCount(5, $deferredUsers['user.company.users']['data']);
         $this->assertSame(
             $users
-                ->map(function (User $user): array {
-                    return ['email' => $user->email];
-                })
+                ->map(fn (User $user): array => ['email' => $user->email])
                 ->values()
                 ->all(),
             $deferredUsers['user.company.users']['data']
@@ -219,12 +217,10 @@ final class DeferDBTest extends DBTestCase
             $this->assertSame(
                 $company->users
                     // @phpstan-ignore-next-line type of model is known
-                    ->map(function (User $user): array {
-                        return [
-                            'email' => $user->email,
-                            'company' => null,
-                        ];
-                    })
+                    ->map(fn (User $user): array => [
+                        'email' => $user->email,
+                        'company' => null,
+                    ])
                     ->all(),
                 $deferredUsers[$key]['data']
             );

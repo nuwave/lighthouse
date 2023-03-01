@@ -9,10 +9,8 @@ interface GlobalId
 {
     /**
      * Glue together a type and an id to create a global id.
-     *
-     * @param  string|int  $id
      */
-    public function encode(string $type, $id): string;
+    public function encode(string $type, int|string $id): string;
 
     /**
      * Split a global id into the type and the id it contains.

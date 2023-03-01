@@ -173,9 +173,7 @@ trait MakesGraphQLRequestsLumen
 
         return Arr::first(
             $results,
-            static function (array $result) use ($name): bool {
-                return $result['name'] === $name;
-            }
+            static fn (array $result): bool => $result['name'] === $name
         );
     }
 
@@ -230,9 +228,10 @@ trait MakesGraphQLRequestsLumen
     {
         $this->deferStream = new MemoryStream();
 
-        Container::getInstance()->singleton(CanStreamResponse::class, function (): MemoryStream {
-            return $this->deferStream;
-        });
+        Container::getInstance()->singleton(
+            CanStreamResponse::class,
+            fn (): MemoryStream => $this->deferStream
+        );
     }
 
     /**

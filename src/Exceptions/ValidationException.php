@@ -11,16 +11,11 @@ class ValidationException extends \Exception implements ClientAware, ProvidesExt
 {
     public const KEY = 'validation';
 
-    /**
-     * @var \Illuminate\Contracts\Validation\Validator
-     */
-    protected $validator;
-
-    public function __construct(string $message, Validator $validator)
-    {
+    public function __construct(
+        string $message,
+        protected Validator $validator
+    ) {
         parent::__construct($message);
-
-        $this->validator = $validator;
     }
 
     public static function fromLaravel(LaravelValidationException $laravelException): self

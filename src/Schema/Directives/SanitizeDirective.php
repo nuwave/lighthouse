@@ -17,7 +17,7 @@ directive @sanitize on FIELD_DEFINITION
 GRAPHQL;
     }
 
-    protected function applyDirective(Directive $directive, $value)
+    protected function applyDirective(Directive $directive, mixed $value): mixed
     {
         if ($directive instanceof ArgSanitizerDirective) {
             return $directive->sanitize($value);

@@ -23,10 +23,7 @@ class EnsureXHR
         'text/plain',
     ];
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\Response|\Illuminate\Http\JsonResponse
-     */
-    public function handle(Request $request, \Closure $next)
+    public function handle(Request $request, \Closure $next): mixed
     {
         $method = $request->getRealMethod();
 

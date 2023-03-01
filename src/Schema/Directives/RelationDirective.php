@@ -116,7 +116,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
             try {
                 $modelClass = $this->namespaceModelClass($relatedModelName);
                 $paginationManipulator->setModelClass($modelClass);
-            } catch (DefinitionException $e) {
+            } catch (DefinitionException) {
                 /** @see \Tests\Integration\Schema\Directives\HasManyDirectiveTest::testDoesNotRequireModelClassForPaginatedHasMany() */
             }
         }

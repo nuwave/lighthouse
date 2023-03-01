@@ -4,27 +4,22 @@ namespace Nuwave\Lighthouse\Subscriptions\Contracts;
 
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
+use Symfony\Component\HttpFoundation\Response;
 
 interface BroadcastsSubscriptions
 {
     /**
      * Push subscription data to subscribers.
-     *
-     * @return void
      */
-    public function broadcast(GraphQLSubscription $subscription, string $fieldName, $root);
+    public function broadcast(GraphQLSubscription $subscription, string $fieldName, mixed $root): void;
 
     /**
      * Queue pushing subscription data to subscribers.
-     *
-     * @return void
      */
-    public function queueBroadcast(GraphQLSubscription $subscription, string $fieldName, $root);
+    public function queueBroadcast(GraphQLSubscription $subscription, string $fieldName, mixed $root): void;
 
     /**
      * Authorize the subscription.
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function authorize(Request $request);
+    public function authorize(Request $request): Response;
 }

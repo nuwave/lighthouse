@@ -6,7 +6,6 @@ use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Response;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Exceptions\RateLimitException;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
@@ -43,7 +42,7 @@ final class ThrottleDirectiveTest extends TestCase
             static fn (): Response => response('Custom response...', 429)
         );
 
-        $this->expectException(DirectiveException::class);
+        $this->expectException(DefinitionException::class);
         $this->graphQL(/** @lang GraphQL */ '
         {
             foo

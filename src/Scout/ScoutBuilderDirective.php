@@ -11,5 +11,5 @@ interface ScoutBuilderDirective
      *
      * @param  mixed  $value  Any client given value
      */
-    public function handleScoutBuilder(ScoutBuilder $builder, $value): ScoutBuilder;
+    public function handleScoutBuilder(ScoutBuilder $builder, mixed $value): ScoutBuilder;
 }

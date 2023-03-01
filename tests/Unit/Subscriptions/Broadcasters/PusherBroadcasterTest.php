@@ -23,9 +23,7 @@ final class PusherBroadcasterTest extends TestCase
             ->expects($this->atLeast(1))
             ->method('log');
 
-        $this->app->bind(LoggerInterface::class, static function () use ($logger): LoggerInterface {
-            return $logger;
-        });
+        $this->app->bind(LoggerInterface::class, static fn (): LoggerInterface => $logger);
 
         $config = $this->app->make(ConfigRepository::class);
         $config->set('broadcasting.connections.pusher.log', true);
@@ -44,9 +42,7 @@ final class PusherBroadcasterTest extends TestCase
             ->expects($this->never())
             ->method('log');
 
-        $this->app->bind(LoggerInterface::class, static function () use ($logger): LoggerInterface {
-            return $logger;
-        });
+        $this->app->bind(LoggerInterface::class, static fn (): LoggerInterface => $logger);
 
         $config = $this->app->make(ConfigRepository::class);
         $config->set('broadcasting.connections.pusher.log', false);

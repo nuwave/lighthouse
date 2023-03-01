@@ -7,22 +7,14 @@ use Nuwave\Lighthouse\Schema\TypeRegistry;
 
 final class CustomStuff
 {
-    /**
-     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
-     */
-    private $typeRegistry;
-
-    public function __construct(TypeRegistry $typeRegistry)
-    {
-        $this->typeRegistry = $typeRegistry;
-    }
+    public function __construct(private TypeRegistry $typeRegistry) {}
 
     /**
      * Decide which GraphQL type a resolved value has.
      *
      * @param  mixed  $rootValue  The value that was resolved by the field. Usually an Eloquent model.
      */
-    public function resolveType($rootValue): Type
+    public function resolveType(mixed $rootValue): Type
     {
         return $this->typeRegistry->get(
             // Add prefix

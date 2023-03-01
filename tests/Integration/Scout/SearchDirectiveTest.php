@@ -80,9 +80,7 @@ final class SearchDirectiveTest extends DBTestCase
 
         $this->engine
             ->shouldReceive('map')
-            ->withArgs(function (ScoutBuilder $builder) use ($id): bool {
-                return $builder->wheres === ['id' => $id];
-            })
+            ->withArgs(fn (ScoutBuilder $builder): bool => $builder->wheres === ['id' => $id])
             ->andReturn(new EloquentCollection())
             ->once();
 
@@ -120,9 +118,7 @@ final class SearchDirectiveTest extends DBTestCase
 
         $this->engine
             ->shouldReceive('map')
-            ->withArgs(function (ScoutBuilder $builder) use ($id): bool {
-                return $builder->wheres === ['from_custom_builder' => $id];
-            })
+            ->withArgs(fn (ScoutBuilder $builder): bool => $builder->wheres === ['from_custom_builder' => $id])
             ->andReturn(new EloquentCollection())
             ->once();
 
@@ -170,9 +166,7 @@ final class SearchDirectiveTest extends DBTestCase
     {
         $this->engine
             ->shouldReceive('map')
-            ->withArgs(function (ScoutBuilder $builder): bool {
-                return $builder->wheres === ['__soft_deleted' => 1];
-            })
+            ->withArgs(fn (ScoutBuilder $builder): bool => $builder->wheres === ['__soft_deleted' => 1])
             ->andReturn(new EloquentCollection())
             ->once();
 
@@ -220,9 +214,7 @@ final class SearchDirectiveTest extends DBTestCase
 
         $this->engine
             ->shouldReceive('map')
-            ->withArgs(function (ScoutBuilder $builder) use ($myIndex): bool {
-                return $builder->index === $myIndex;
-            })
+            ->withArgs(fn (ScoutBuilder $builder): bool => $builder->index === $myIndex)
             ->andReturn(
                 new EloquentCollection([$postA, $postB])
             )

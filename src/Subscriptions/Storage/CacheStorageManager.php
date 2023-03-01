@@ -62,9 +62,7 @@ class CacheStorageManager implements StoresSubscriptions
     {
         return $this
             ->retrieveTopic(self::topicKey($topic))
-            ->map(function (string $channel): ?Subscriber {
-                return $this->subscriberByChannel($channel);
-            })
+            ->map(fn (string $channel): ?Subscriber => $this->subscriberByChannel($channel))
             ->filter();
     }
 
@@ -138,9 +136,7 @@ class CacheStorageManager implements StoresSubscriptions
 
         $topicWithoutSubscriber = $this
             ->retrieveTopic($topicKey)
-            ->reject(function (string $channel) use ($channelKeyToRemove): bool {
-                return self::channelKey($channel) === $channelKeyToRemove;
-            });
+            ->reject(fn (string $channel): bool => self::channelKey($channel) === $channelKeyToRemove);
 
         if ($topicWithoutSubscriber->isEmpty()) {
             $this->cache->forget($topicKey);

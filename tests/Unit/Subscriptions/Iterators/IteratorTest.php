@@ -57,9 +57,7 @@ abstract class IteratorTest extends TestCase
      */
     protected function subscribers(int $count): Collection
     {
-        return Collection::times($count, function (): Subscriber {
-            return $this->generateSubscriber();
-        });
+        return Collection::times($count, fn (): Subscriber => $this->generateSubscriber());
     }
 
     public function generateSubscriber(): Subscriber

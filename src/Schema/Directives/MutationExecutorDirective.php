@@ -51,7 +51,7 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
      *
      * @return \Illuminate\Database\Eloquent\Model|array<\Illuminate\Database\Eloquent\Model>
      */
-    public function __invoke($parent, $args)
+    public function __invoke($parent, $args): mixed
     {
         $relationName = $this->directiveArgValue(
             'relation',
@@ -75,14 +75,12 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
      *
      * @return \Illuminate\Database\Eloquent\Model|array<\Illuminate\Database\Eloquent\Model>
      */
-    protected function executeMutation(Model $model, $args, ?Relation $parentRelation = null)
+    protected function executeMutation(Model $model, ArgumentSet|array $args, ?Relation $parentRelation = null): Model|array
     {
         $update = new ResolveNested($this->makeExecutionFunction($parentRelation));
 
         return Utils::mapEach(
-            static function (ArgumentSet $argumentSet) use ($update, $model) {
-                return $update($model->newInstance(), $argumentSet);
-            },
+            static fn (ArgumentSet $argumentSet) => $update($model->newInstance(), $argumentSet),
             $args
         );
     }

@@ -25,7 +25,7 @@ class ValidatorDirective extends BaseDirective implements ArgDirective, Argument
 {
     use HasArgumentValue;
 
-    protected ?Validator $validator;
+    protected ?Validator $validator = null;
 
     public static function definition(): string
     {
@@ -77,7 +77,7 @@ GRAPHQL;
         return $this->validator;
     }
 
-    public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition)
+    public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition): void
     {
         if (! $typeDefinition instanceof InputObjectTypeDefinitionNode) {
             throw new DefinitionException("Can not use @validator on non input type {$typeDefinition->getName()->value}.");
@@ -93,7 +93,7 @@ GRAPHQL;
         DocumentAST &$documentAST,
         FieldDefinitionNode &$fieldDefinition,
         ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType
-    ) {
+    ): void {
         $this->setFullClassnameOnDirective(
             $fieldDefinition,
             $this->directiveArgValue(
@@ -137,9 +137,7 @@ GRAPHQL;
         $validatorClassName = $this->namespaceClassName(
             $classCandidate,
             (array) config('lighthouse.namespaces.validators'),
-            function (string $classCandidate): bool {
-                return is_subclass_of($classCandidate, Validator::class);
-            }
+            fn (string $classCandidate): bool => is_subclass_of($classCandidate, Validator::class)
         );
         assert(is_subclass_of($validatorClassName, Validator::class));
 

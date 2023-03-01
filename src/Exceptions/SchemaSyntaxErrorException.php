@@ -6,7 +6,7 @@ use GraphQL\Error\ClientAware;
 use GraphQL\Error\SyntaxError;
 use GraphQL\Language\Source;
 
-class ParseException extends \Exception implements ClientAware
+class SchemaSyntaxErrorException extends \Exception implements ClientAware
 {
     public function __construct(SyntaxError $error)
     {

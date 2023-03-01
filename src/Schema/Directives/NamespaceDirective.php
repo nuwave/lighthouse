@@ -33,10 +33,7 @@ directive @namespace repeatable on FIELD_DEFINITION | OBJECT
 GRAPHQL;
     }
 
-    /**
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\ObjectTypeExtensionNode  $objectType
-     */
-    protected function addNamespacesToFields(&$objectType): void
+    protected function addNamespacesToFields(ObjectTypeDefinitionNode|ObjectTypeExtensionNode &$objectType): void
     {
         $namespaceDirective = $this->directiveNode->cloneDeep();
 

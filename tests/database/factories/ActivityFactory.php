@@ -4,10 +4,8 @@ use Faker\Generator as Faker;
 use Tests\Utils\Models\Activity;
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
-$factory->define(Activity::class, function (Faker $faker): array {
-    return [
-        'user_id' => '',
-        'content_id' => '',
-        'content_type' => '',
-    ];
-});
+$factory->define(Activity::class, fn (Faker $faker): array => [
+    'user_id' => '',
+    'content_id' => '',
+    'content_type' => '',
+]);

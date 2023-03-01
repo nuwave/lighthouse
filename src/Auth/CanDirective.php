@@ -232,7 +232,7 @@ GRAPHQL;
      *
      * @throws \Nuwave\Lighthouse\Exceptions\AuthorizationException
      */
-    protected function authorize(Gate $gate, $ability, $model, array $arguments): void
+    protected function authorize(Gate $gate, string|array $ability, $model, array $arguments): void
     {
         // The signature of the second argument `$arguments` of `Gate::check`
         // should be [modelClassName, additionalArg, additionalArg...]
@@ -273,7 +273,7 @@ GRAPHQL;
         return $checkArguments;
     }
 
-    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType)
+    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType): void
     {
         $this->validateMutuallyExclusiveArguments(['resolved', 'query', 'find']);
 

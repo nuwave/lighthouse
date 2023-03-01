@@ -6,7 +6,7 @@ use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Exceptions\ParseException;
+use Nuwave\Lighthouse\Exceptions\SchemaSyntaxErrorException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\RootType;
 use Tests\TestCase;
@@ -30,7 +30,7 @@ final class DocumentASTTest extends TestCase
 
     public function testThrowsOnInvalidSchema(): void
     {
-        $this->expectException(ParseException::class);
+        $this->expectException(SchemaSyntaxErrorException::class);
         $this->expectExceptionMessage('Syntax Error: Expected Name, found !, near: ');
 
         DocumentAST::fromSource(/** @lang GraphQL */ '

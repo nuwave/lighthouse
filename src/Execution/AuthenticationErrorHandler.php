@@ -21,7 +21,6 @@ class AuthenticationErrorHandler implements ErrorHandler
         if ($underlyingException instanceof LaravelAuthenticationException) {
             return $next(new Error(
                 $error->getMessage(),
-                // @phpstan-ignore-next-line graphql-php and phpstan disagree with themselves
                 $error->getNodes(),
                 $error->getSource(),
                 $error->getPositions(),

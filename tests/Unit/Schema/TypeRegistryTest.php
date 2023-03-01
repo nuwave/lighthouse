@@ -251,12 +251,10 @@ final class TypeRegistryTest extends TestCase
     public function testThrowsWhenRegisteringExistingTypeLazily(): void
     {
         $name = 'Foo';
-        $makeType = static function () use ($name): ObjectType {
-            return new ObjectType([
-                'name' => $name,
-                'fields' => [],
-            ]);
-        };
+        $makeType = static fn (): ObjectType => new ObjectType([
+            'name' => $name,
+            'fields' => [],
+        ]);
         $this->typeRegistry->registerLazy($name, $makeType);
 
         $this->expectExceptionObject(
@@ -273,9 +271,7 @@ final class TypeRegistryTest extends TestCase
             'name' => $name,
             'fields' => [],
         ]);
-        $makeType = static function () use ($type): ObjectType {
-            return $type;
-        };
+        $makeType = static fn (): ObjectType => $type;
         $this->typeRegistry->registerLazy($name, $makeType);
 
         $this->assertSame($type, $this->typeRegistry->get($name));
@@ -284,9 +280,7 @@ final class TypeRegistryTest extends TestCase
             'name' => $name,
             'fields' => [],
         ]);
-        $makeType2 = static function () use ($type2): ObjectType {
-            return $type2;
-        };
+        $makeType2 = static fn (): ObjectType => $type2;
         $this->typeRegistry->overwriteLazy($name, $makeType2);
 
         $this->assertSame($type2, $this->typeRegistry->get($name));
@@ -301,9 +295,7 @@ final class TypeRegistryTest extends TestCase
         ]);
         $this->typeRegistry->registerLazy(
             $name,
-            static function () use ($type): ObjectType {
-                return $type;
-            }
+            static fn (): ObjectType => $type
         );
 
         $this->assertSame($type, $this->typeRegistry->get($name));
@@ -327,12 +319,10 @@ final class TypeRegistryTest extends TestCase
         $lazyTypeName = 'Bar';
         $this->typeRegistry->registerLazy(
             $lazyTypeName,
-            static function () use ($lazyTypeName): ObjectType {
-                return new ObjectType([
-                    'name' => $lazyTypeName,
-                    'fields' => [],
-                ]);
-            }
+            static fn (): ObjectType => new ObjectType([
+                'name' => $lazyTypeName,
+                'fields' => [],
+            ])
         );
 
         $resolvedTypes = $this->typeRegistry->resolvedTypes();
@@ -365,12 +355,10 @@ final class TypeRegistryTest extends TestCase
         $lazyTypeName = 'Bar';
         $this->typeRegistry->registerLazy(
             $lazyTypeName,
-            static function () use ($lazyTypeName): ObjectType {
-                return new ObjectType([
-                    'name' => $lazyTypeName,
-                    'fields' => [],
-                ]);
-            }
+            static fn (): ObjectType => new ObjectType([
+                'name' => $lazyTypeName,
+                'fields' => [],
+            ])
         );
 
         $documentType = $this->typeRegistry->get($documentTypeName);

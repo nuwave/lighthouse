@@ -22,9 +22,7 @@ abstract class Stream
 
         $errorsMatchingPath = array_filter(
             $errors,
-            function (array $error) use ($path): bool {
-                return Str::startsWith(implode('.', $error['path']), $path);
-            }
+            fn (array $error): bool => Str::startsWith(implode('.', $error['path']), $path)
         );
 
         return array_values($errorsMatchingPath);

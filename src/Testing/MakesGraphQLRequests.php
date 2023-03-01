@@ -206,9 +206,10 @@ trait MakesGraphQLRequests
     {
         $this->deferStream = new MemoryStream();
 
-        Container::getInstance()->singleton(CanStreamResponse::class, function (): MemoryStream {
-            return $this->deferStream;
-        });
+        Container::getInstance()->singleton(
+            CanStreamResponse::class,
+            fn (): MemoryStream => $this->deferStream
+        );
     }
 
     /**

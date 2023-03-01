@@ -32,9 +32,7 @@ class ArgPartitioner
 
         return static::partition(
             $argumentSet,
-            static function (string $name, Argument $argument): bool {
-                return null !== $argument->resolver;
-            }
+            static fn (string $name, Argument $argument): bool => null !== $argument->resolver
         );
     }
 
@@ -72,17 +70,13 @@ class ArgPartitioner
 
         [$relations, $remaining] = static::partition(
             $argumentSet,
-            static function (string $name) use ($modelReflection, $relationClass): bool {
-                return static::methodReturnsRelation($modelReflection, $name, $relationClass);
-            }
+            static fn (string $name): bool => static::methodReturnsRelation($modelReflection, $name, $relationClass)
         );
 
         $nonNullRelations = new ArgumentSet();
         $nonNullRelations->arguments = array_filter(
             $relations->arguments,
-            static function (Argument $argument): bool {
-                return null !== $argument->value;
-            }
+            static fn (Argument $argument): bool => null !== $argument->value
         );
 
         return [$nonNullRelations, $remaining];
@@ -107,9 +101,7 @@ class ArgPartitioner
         }
 
         if (isset($model)) {
-            $isRelation = static function (string $relationClass) use ($model, $name): bool {
-                return static::methodReturnsRelation($model, $name, $relationClass);
-            };
+            $isRelation = static fn (string $relationClass): bool => static::methodReturnsRelation($model, $name, $relationClass);
 
             if (
                 $isRelation(HasOne::class)

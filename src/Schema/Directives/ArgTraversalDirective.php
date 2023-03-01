@@ -53,7 +53,7 @@ abstract class ArgTraversalDirective extends BaseDirective implements FieldMiddl
      *
      * @return mixed The transformed value
      */
-    protected function transform($value, Collection $directivesForArgument)
+    protected function transform(mixed $value, Collection $directivesForArgument): mixed
     {
         foreach ($directivesForArgument as $directive) {
             $value = $this->applyDirective($directive, $value);
@@ -67,5 +67,5 @@ abstract class ArgTraversalDirective extends BaseDirective implements FieldMiddl
      *
      * @return mixed The transformed value
      */
-    abstract protected function applyDirective(Directive $directive, $value);
+    abstract protected function applyDirective(Directive $directive, mixed $value): mixed;
 }

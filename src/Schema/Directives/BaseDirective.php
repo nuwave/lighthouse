@@ -257,9 +257,7 @@ abstract class BaseDirective implements Directive
         $modelClass = $this->namespaceClassName(
             $modelClassCandidate,
             (array) config('lighthouse.namespaces.models'),
-            static function (string $classCandidate): bool {
-                return is_subclass_of($classCandidate, Model::class);
-            }
+            static fn (string $classCandidate): bool => is_subclass_of($classCandidate, Model::class)
         );
         assert(is_subclass_of($modelClass, Model::class));
 

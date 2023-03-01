@@ -26,13 +26,11 @@ final class BuildSchemaStringTest extends TestCase
         $dispatcher = $this->app->make(EventDispatcher::class);
         $dispatcher->listen(
             BuildSchemaString::class,
-            function (): string {
-                return /** @lang GraphQL */ "
+            fn (): string => "
                 extend type Query {
                     sayHello: String @field(resolver: \"{$this->qualifyTestResolver('resolveSayHello')}\")
                 }
-                ";
-            }
+                "
         );
 
         $this->schema = /** @lang GraphQL */ "

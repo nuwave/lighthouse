@@ -167,9 +167,7 @@ GRAPHQL;
         $schema = implode(
             "\n\n",
             array_map(
-                function (Type $type): string {
-                    return SchemaPrinter::printType($type);
-                },
+                fn (Type $type): string => SchemaPrinter::printType($type),
                 $programmaticTypes
             )
         );

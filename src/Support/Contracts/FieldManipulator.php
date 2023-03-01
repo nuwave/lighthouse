@@ -11,12 +11,10 @@ interface FieldManipulator extends Directive
 {
     /**
      * Manipulate the AST based on a field definition.
-     *
-     * @return void
      */
     public function manipulateFieldDefinition(
         DocumentAST &$documentAST,
         FieldDefinitionNode &$fieldDefinition,
         ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType
-    );
+    ): void;
 }

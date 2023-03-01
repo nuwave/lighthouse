@@ -56,9 +56,7 @@ final class AuthenticatingSyncIteratorTest extends IteratorTest
         /** @var \Illuminate\Auth\AuthManager $authManager */
         $authManager = $this->app->make(AuthManager::class);
 
-        $authManager->extend(SubscriptionGuard::GUARD_NAME, static function () use ($guard) {
-            return $guard;
-        });
+        $authManager->extend(SubscriptionGuard::GUARD_NAME, static fn () => $guard);
 
         $processedItems = [];
         $authenticatedUsers = [];
@@ -81,15 +79,7 @@ final class AuthenticatingSyncIteratorTest extends IteratorTest
 
 final class AuthenticatingSyncIteratorAuthenticatableStub implements Authenticatable
 {
-    /**
-     * @var int
-     */
-    private $id;
-
-    public function __construct(int $id)
-    {
-        $this->id = $id;
-    }
+    public function __construct(private int $id) {}
 
     public function getAuthIdentifierName()
     {

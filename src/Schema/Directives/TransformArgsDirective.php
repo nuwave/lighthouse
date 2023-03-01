@@ -17,7 +17,7 @@ directive @transformArgs on FIELD_DEFINITION
 GRAPHQL;
     }
 
-    protected function applyDirective(Directive $directive, $value)
+    protected function applyDirective(Directive $directive, mixed $value): mixed
     {
         if ($directive instanceof ArgTransformerDirective) {
             return $directive->transform($value);

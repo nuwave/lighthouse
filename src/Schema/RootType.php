@@ -25,15 +25,11 @@ class RootType
      */
     public static function defaultNamespaces(string $typeName): array
     {
-        switch ($typeName) {
-            case static::QUERY:
-                return (array) config('lighthouse.namespaces.queries');
-            case static::MUTATION:
-                return (array) config('lighthouse.namespaces.mutations');
-            case static::SUBSCRIPTION:
-                return (array) config('lighthouse.namespaces.subscriptions');
-            default:
-                return [];
-        }
+        return match ($typeName) {
+            static::QUERY => (array) config('lighthouse.namespaces.queries'),
+            static::MUTATION => (array) config('lighthouse.namespaces.mutations'),
+            static::SUBSCRIPTION => (array) config('lighthouse.namespaces.subscriptions'),
+            default => [],
+        };
     }
 }

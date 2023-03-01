@@ -52,7 +52,7 @@ final class EnsureXHRTest extends TestCase
 
         $result = $middleware->handle(
             $request,
-            static function () use ($response): Response { return $response; }
+            static fn (): Response => $response
         );
 
         $this->assertSame($response, $result);
@@ -116,7 +116,7 @@ final class EnsureXHRTest extends TestCase
 
         $result = $middleware->handle(
             $request,
-            static function () use ($response): Response { return $response; }
+            static fn (): Response => $response
         );
 
         $this->assertSame($response, $result);
@@ -149,7 +149,7 @@ final class EnsureXHRTest extends TestCase
 
         $result = $middleware->handle(
             $request,
-            static function () use ($response): Response { return $response; }
+            static fn (): Response => $response
         );
 
         $this->assertSame($response, $result);

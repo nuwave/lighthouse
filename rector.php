@@ -14,6 +14,8 @@ use Rector\Set\ValueObject\SetList;
 return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->sets([
         SetList::CODE_QUALITY,
+        SetList::PHP_72,
+        SetList::PHP_73,
         SetList::PHP_74,
         SetList::PHP_80,
     ]);

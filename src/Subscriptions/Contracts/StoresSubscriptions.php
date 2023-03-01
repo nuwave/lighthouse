@@ -2,35 +2,30 @@
 
 namespace Nuwave\Lighthouse\Subscriptions\Contracts;
 
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 
 interface StoresSubscriptions
 {
     /**
      * Find a subscriber by its channel key.
-     *
-     * @return \Nuwave\Lighthouse\Subscriptions\Subscriber|null
      */
-    public function subscriberByChannel(string $channel);
+    public function subscriberByChannel(string $channel): ?Subscriber;
 
     /**
      * Get all subscribers for a topic.
      *
-     * @return \Illuminate\Support\Collection<int, \Nuwave\Lighthouse\Subscriptions\Subscriber>
+     * @return Collection<int, \Nuwave\Lighthouse\Subscriptions\Subscriber>
      */
-    public function subscribersByTopic(string $topic);
+    public function subscribersByTopic(string $topic): Collection;
 
     /**
      * Store subscriber for a topic.
-     *
-     * @return void
      */
-    public function storeSubscriber(Subscriber $subscriber, string $topic);
+    public function storeSubscriber(Subscriber $subscriber, string $topic): void;
 
     /**
      * Delete subscriber by its channel key.
-     *
-     * @return \Nuwave\Lighthouse\Subscriptions\Subscriber|null
      */
-    public function deleteSubscriber(string $channel);
+    public function deleteSubscriber(string $channel): ?Subscriber;
 }

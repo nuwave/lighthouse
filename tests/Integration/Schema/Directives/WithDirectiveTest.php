@@ -214,9 +214,7 @@ final class WithDirectiveTest extends DBTestCase
                             '__typename' => 'Post',
                             'id' => "{$post1->id}",
                             'images' => $post1->images()->get()
-                                ->map(function (Image $image) {
-                                    return ['id' => "{$image->id}"];
-                                }),
+                                ->map(fn (Image $image) => ['id' => "{$image->id}"]),
                         ],
                     ],
                     [
@@ -225,9 +223,7 @@ final class WithDirectiveTest extends DBTestCase
                             '__typename' => 'Post',
                             'id' => "{$post2->id}",
                             'images' => $post2->images()->get()
-                                ->map(function (Image $image) {
-                                    return ['id' => "{$image->id}"];
-                                }),
+                                ->map(fn (Image $image) => ['id' => "{$image->id}"]),
                         ],
                     ],
                     [
@@ -236,9 +232,7 @@ final class WithDirectiveTest extends DBTestCase
                             '__typename' => 'Task',
                             'id' => "{$task->id}",
                             'images' => $task->images()->get()
-                                ->map(static function (Image $image): array {
-                                    return ['id' => "{$image->id}"];
-                                }),
+                                ->map(static fn (Image $image): array => ['id' => "{$image->id}"]),
                         ],
                     ],
                 ],

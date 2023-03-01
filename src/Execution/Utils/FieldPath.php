@@ -13,12 +13,10 @@ class FieldPath
     {
         $significantPathSegments = array_filter(
             $path,
-            static function ($segment): bool {
-                // Ignore numeric path entries, as those signify a list of fields.
-                // Combining the queries for lists is the very purpose of the
-                // batch loader, so they must not be included.
-                return ! is_numeric($segment);
-            }
+            // Ignore numeric path entries, as those signify a list of fields.
+            // Combining the queries for lists is the very purpose of the
+            // batch loader, so they must not be included.
+            static fn ($segment): bool => ! is_numeric($segment)
         );
 
         // Using . as the separator would combine relations in nested fields with

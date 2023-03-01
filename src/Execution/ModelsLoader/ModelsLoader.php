@@ -21,5 +21,5 @@ interface ModelsLoader
      *
      * @return mixed Whatever was loaded
      */
-    public function extract(Model $model);
+    public function extract(Model $model): mixed;
 }

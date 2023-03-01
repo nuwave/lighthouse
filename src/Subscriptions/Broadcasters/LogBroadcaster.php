@@ -53,7 +53,7 @@ class LogBroadcaster implements Broadcaster
         ], 200);
     }
 
-    public function broadcast(Subscriber $subscriber, $data): void
+    public function broadcast(Subscriber $subscriber, mixed $data): void
     {
         $this->broadcasts[$subscriber->channel] = $data;
     }
