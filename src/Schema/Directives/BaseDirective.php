@@ -56,7 +56,7 @@ abstract class BaseDirective implements Directive
      *
      * @var array<string, mixed>
      */
-    protected array $directiveArgs = [];
+    protected array $directiveArgs;
 
     /**
      * The hydrate function is called when retrieving a directive from the directive registry.

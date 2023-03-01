@@ -34,14 +34,14 @@ class EntityResolverProvider
      *
      * @var array<string, \GraphQL\Language\AST\ObjectTypeDefinitionNode>
      */
-    protected array $definitions = [];
+    protected array $definitions;
 
     /**
      * Maps from __typename to resolver.
      *
      * @var array<string, SingleEntityResolverFn|BatchedEntityResolver>
      */
-    protected array $resolvers = [];
+    protected array $resolvers;
 
     public function __construct(
         SchemaBuilder $schemaBuilder,
