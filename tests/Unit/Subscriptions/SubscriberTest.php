@@ -36,14 +36,17 @@ final class SubscriberTest extends TestCase
         $context = new Context(new Request());
 
         $subscriber = new Subscriber($args, $context, $resolveInfo);
+
         $topic = 'topic';
         $subscriber->topic = $topic;
+
+        $channel = $subscriber->channel;
 
         $serialized = unserialize(serialize($subscriber));
 
         assert($serialized instanceof Subscriber);
         $this->assertSame($args, $serialized->args);
-        $this->assertNotNull($serialized->channel);
+        $this->assertSame($channel, $serialized->channel);
         $this->assertSame($topic, $serialized->topic);
         $this->assertSame($fieldName, $serialized->fieldName);
     }

@@ -43,7 +43,7 @@ class Subscriber
      *
      * @see \GraphQL\Validator\Rules\SingleFieldSubscription
      */
-    public mixed $fieldName;
+    public string $fieldName;
 
     /**
      * The root element of the query.

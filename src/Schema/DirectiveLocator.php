@@ -57,7 +57,7 @@ class DirectiveLocator
      */
     public function namespaces(): array
     {
-        if (null === $this->directiveNamespaces) {
+        if (! isset($this->directiveNamespaces)) {
             $this->directiveNamespaces
                 // When looking for a directive by name, the namespaces are tried in order
                 = (new Collection([
