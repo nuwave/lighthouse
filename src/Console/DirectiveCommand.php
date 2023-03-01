@@ -49,40 +49,27 @@ class DirectiveCommand extends LighthouseGeneratorCommand
 
     protected $description = 'Create a class for a custom schema directive.';
 
-    /**
-     * The type of class being generated.
-     *
-     * @var string
-     */
     protected $type = 'Directive';
 
     /**
-     * The required imports.
-     *
      * @var \Illuminate\Support\Collection<int, string>
      */
-    protected $imports;
+    protected Collection $requiredImports;
 
     /**
-     * The implemented interfaces.
-     *
      * @var \Illuminate\Support\Collection<int, string>
      */
-    protected $implements;
+    protected Collection $implementedInterfaces;
 
     /**
-     * The possible locations.
-     *
      * @var \Illuminate\Support\Collection<int, string>
      */
-    protected $locations;
+    protected Collection $possibleLocations;
 
     /**
-     * The method stubs.
-     *
      * @var \Illuminate\Support\Collection<int, string>
      */
-    protected $methods;
+    protected Collection $methodStubs;
 
     protected function getNameInput(): string
     {
@@ -101,10 +88,10 @@ class DirectiveCommand extends LighthouseGeneratorCommand
      */
     protected function buildClass($name): string
     {
-        $this->imports = new Collection();
-        $this->implements = new Collection();
-        $this->locations = new Collection();
-        $this->methods = new Collection();
+        $this->requiredImports = new Collection();
+        $this->implementedInterfaces = new Collection();
+        $this->possibleLocations = new Collection();
+        $this->methodStubs = new Collection();
 
         $stub = parent::buildClass($name);
 
@@ -150,7 +137,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
 
         $stub = str_replace(
             '{{ imports }}',
-            $this->imports
+            $this->requiredImports
                 ->filter()
                 ->unique()
                 ->implode("\n"),
@@ -166,19 +153,19 @@ class DirectiveCommand extends LighthouseGeneratorCommand
 
         $stub = str_replace(
             '{{ locations }}',
-            $this->locations->implode(' | '),
+            $this->possibleLocations->implode(' | '),
             $stub
         );
 
         $stub = str_replace(
             '{{ methods }}',
-            $this->methods->implode("\n"),
+            $this->methodStubs->implode("\n"),
             $stub
         );
 
         return str_replace(
             '{{ implements }}',
-            $this->implements->implode(', '),
+            $this->implementedInterfaces->implode(', '),
             $stub
         );
     }
@@ -237,22 +224,22 @@ class DirectiveCommand extends LighthouseGeneratorCommand
     protected function implementInterface(string $interface): void
     {
         $shortName = $this->shortName($interface);
-        $this->implements->push($shortName);
+        $this->implementedInterfaces->push($shortName);
 
-        $this->imports->push("use {$interface};");
+        $this->requiredImports->push("use {$interface};");
         if ($imports = $this->interfaceImports($shortName)) {
             $imports = explode("\n", $imports);
-            $this->imports->push(...$imports);
+            $this->requiredImports->push(...$imports);
         }
 
         if ($methods = $this->interfaceMethods($shortName)) {
-            $this->methods->push($methods);
+            $this->methodStubs->push($methods);
         }
     }
 
     private function addLocation(string $location): void
     {
-        $this->locations->push($location);
+        $this->possibleLocations->push($location);
     }
 
     protected function getStub(): string

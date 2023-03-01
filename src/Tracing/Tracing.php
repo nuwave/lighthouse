@@ -15,26 +15,22 @@ class Tracing
 {
     /**
      * The point in time when the request was initially started.
-     *
-     * @var \Illuminate\Support\Carbon
      */
-    protected $executionStartAbsolute;
+    protected Carbon $executionStartAbsolute;
 
     /**
      * The precise point in time when the request was initially started.
      *
      * This is either in seconds with microsecond precision (float) or nanoseconds (int).
-     *
-     * @var float|int
      */
-    protected $executionStartPrecise;
+    protected int|float $executionStartPrecise;
 
     /**
      * Trace entries for a single query execution.
      *
      * @var array<int, array<string, mixed>>
      */
-    protected $resolverTraces = [];
+    protected array $resolverTraces = [];
 
     public function handleStartExecution(StartExecution $startExecution): void
     {

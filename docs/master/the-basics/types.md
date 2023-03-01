@@ -27,7 +27,7 @@ type Query {
 ## Scalar
 
 Scalar types are the most basic elements of a GraphQL schema. There are a
-few built in scalars, such as `String` or `Int`.
+few built-in scalars, such as `String` or `Int`.
 
 Lighthouse provides some scalars that work well with Laravel out of the box,
 read about them in the [API reference for scalars](../api-reference/scalars.md).

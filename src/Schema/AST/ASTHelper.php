@@ -341,9 +341,7 @@ class ASTHelper
         foreach ($document->definitions as $definitionNode) {
             if ($definitionNode instanceof DirectiveDefinitionNode) {
                 if (null !== $directive) {
-                    throw new DefinitionException(
-                        "Found multiple directives while trying to extract a single directive from this definition:\n\n{$definitionString}"
-                    );
+                    throw new DefinitionException("Found multiple directives while trying to extract a single directive from this definition:\n\n{$definitionString}");
                 }
 
                 $directive = $definitionNode;
@@ -351,9 +349,7 @@ class ASTHelper
         }
 
         if (null === $directive) {
-            throw new DefinitionException(
-                "Found no directive while trying to extract a single directive from this definition:\n\n{$definitionString}"
-            );
+            throw new DefinitionException("Found no directive while trying to extract a single directive from this definition:\n\n{$definitionString}");
         }
 
         return $directive;
@@ -374,12 +370,8 @@ class ASTHelper
         $astBuilder = Container::getInstance()->make(ASTBuilder::class);
         $documentAST = $astBuilder->documentAST();
 
-        $type = $documentAST->types[$typeName] ?? null;
-        if (null === $type) {
-            throw new DefinitionException("Type '{$typeName}' on '{$field->name->value}' can not be found in the schema.'");
-        }
-
-        return $type;
+        return $documentAST->types[$typeName]
+            ?? throw new DefinitionException("Type '{$typeName}' on '{$field->name->value}' can not be found in the schema.'");
     }
 
     /**

@@ -8,15 +8,9 @@ use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
 class NestedManyToMany implements ArgResolver
 {
-    /**
-     * @var string
-     */
-    protected $relationName;
-
-    public function __construct(string $relationName)
-    {
-        $this->relationName = $relationName;
-    }
+    public function __construct(
+        protected string $relationName
+    ) {}
 
     /**
      * @param  \Illuminate\Database\Eloquent\Model  $parent

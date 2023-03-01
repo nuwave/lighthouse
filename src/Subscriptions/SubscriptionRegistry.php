@@ -161,12 +161,7 @@ class SubscriptionRegistry
 
     protected function subscriptionType(): ObjectType
     {
-        $subscriptionType = $this->schemaBuilder->schema()->getSubscriptionType();
-
-        if (null === $subscriptionType) {
-            throw new DefinitionException('Schema is missing subscription root type.');
-        }
-
-        return $subscriptionType;
+        return $this->schemaBuilder->schema()->getSubscriptionType()
+            ?? throw new DefinitionException('Schema is missing subscription root type.');
     }
 }

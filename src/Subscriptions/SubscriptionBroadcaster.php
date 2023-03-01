@@ -14,51 +14,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SubscriptionBroadcaster implements BroadcastsSubscriptions
 {
-    /**
-     * @var \Nuwave\Lighthouse\GraphQL
-     */
-    protected $graphQL;
-
-    /**
-     * @var \Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions
-     */
-    protected $subscriptionAuthorizer;
-
-    /**
-     * @var \Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions
-     */
-    protected $subscriptionStorage;
-
-    /**
-     * @var \Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator
-     */
-    protected $subscriptionIterator;
-
-    /**
-     * @var \Nuwave\Lighthouse\Subscriptions\BroadcastManager
-     */
-    protected $broadcastManager;
-
-    /**
-     * @var \Illuminate\Contracts\Bus\Dispatcher
-     */
-    protected $busDispatcher;
-
     public function __construct(
-        GraphQL $graphQL,
-        AuthorizesSubscriptions $subscriptionAuthorizer,
-        StoresSubscriptions $subscriptionStorage,
-        SubscriptionIterator $subscriptionIterator,
-        BroadcastManager $broadcastManager,
-        BusDispatcher $busDispatcher
-    ) {
-        $this->graphQL = $graphQL;
-        $this->subscriptionAuthorizer = $subscriptionAuthorizer;
-        $this->subscriptionStorage = $subscriptionStorage;
-        $this->subscriptionIterator = $subscriptionIterator;
-        $this->broadcastManager = $broadcastManager;
-        $this->busDispatcher = $busDispatcher;
-    }
+        protected GraphQL $graphQL,
+        protected AuthorizesSubscriptions $subscriptionAuthorizer,
+        protected StoresSubscriptions $subscriptionStorage,
+        protected SubscriptionIterator $subscriptionIterator,
+        protected BroadcastManager $broadcastManager,
+        protected BusDispatcher $busDispatcher
+    ) {}
 
     public function queueBroadcast(GraphQLSubscription $subscription, string $fieldName, $root): void
     {

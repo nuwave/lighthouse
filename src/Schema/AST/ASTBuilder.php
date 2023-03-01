@@ -172,12 +172,8 @@ class ASTBuilder
 
     protected function extendEnumType(string $typeName, EnumTypeExtensionNode $typeExtension): void
     {
-        $extendedEnum = $this->documentAST->types[$typeName] ?? null;
-        if (null === $extendedEnum) {
-            throw new DefinitionException(
-                $this->missingBaseDefinition($typeName, $typeExtension)
-            );
-        }
+        $extendedEnum = $this->documentAST->types[$typeName]
+            ?? throw new DefinitionException($this->missingBaseDefinition($typeName, $typeExtension));
         assert($extendedEnum instanceof EnumTypeDefinitionNode);
 
         $this->assertExtensionMatchesDefinition($typeExtension, $extendedEnum);

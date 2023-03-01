@@ -9,8 +9,6 @@ Lighthouse dispatches the following order of events during a request.
 ### StartRequest
 
 ```php
-namespace Nuwave\Lighthouse\Events;
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -25,22 +23,16 @@ use Illuminate\Support\Carbon;
 class StartRequest
 {
     /**
-     * The request sent from the client.
-     *
-     * @var \Illuminate\Http\Request
-     */
-    public $request;
-
-    /**
      * The point in time when the request started.
-     *
-     * @var \Illuminate\Support\Carbon
      */
-    public $moment;
+    public Carbon $moment;
 
-    public function __construct(Request $request)
-    {
-        $this->request = $request;
+    public function __construct(
+        /**
+         * The request sent from the client.
+         */
+        public Request $request
+    ) {
         $this->moment = Carbon::now();
     }
 }
@@ -49,8 +41,6 @@ class StartRequest
 ### StartOperationOrOperations
 
 ```php
-namespace Nuwave\Lighthouse\Events;
-
 use GraphQL\Server\OperationParams;
 
 /**
@@ -58,9 +48,6 @@ use GraphQL\Server\OperationParams;
  */
 class StartOperationOrOperations
 {
-    /**
-     * @param  \GraphQL\Server\OperationParams|array<int, \GraphQL\Server\OperationParams>  $operationOrOperations
-     */
     public function __construct(
         /**
          * One or multiple parsed GraphQL operations.
@@ -75,56 +62,45 @@ class StartOperationOrOperations
 ### BuildSchemaString
 
 ```php
-namespace Nuwave\Lighthouse\Events;
-
 /**
  * Fires before building the AST from the user-defined schema string.
  *
- * Listeners may return a schema string,
- * which is added to the user schema.
+ * Listeners may return a schema string, which is added to the user schema.
  *
  * Only fires once if schema caching is active.
  */
 class BuildSchemaString
 {
-    /**
-     * The root schema that was defined by the user.
-     *
-     * @var string
-     */
-    public $userSchema;
-
-    public function __construct(string $userSchema)
-    {
-        $this->userSchema = $userSchema;
-    }
+    public function __construct(
+        /**
+         * The root schema that was defined by the user.
+         */
+        public string $userSchema
+    ) {}
 }
 ```
 
 ### RegisterDirectiveNamespaces
 
 ```php
-namespace Nuwave\Lighthouse\Events;
-
 /**
  * Fires when the directive factory is constructed.
  *
- * Listeners may return one or more strings that are used as the base
- * namespace for locating directives.
+ * Listeners may return namespaces in the form of either:
+ * - a single string
+ * - an iterable of multiple strings
+ * The returned namespaces will be used as the search base for locating directives.
  *
  * @see \Nuwave\Lighthouse\Schema\DirectiveLocator::namespaces()
  */
 class RegisterDirectiveNamespaces
 {
-    //
 }
 ```
 
 ### ManipulateAST
 
 ```php
-namespace Nuwave\Lighthouse\Events;
-
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 
 /**
@@ -137,25 +113,18 @@ use Nuwave\Lighthouse\Schema\AST\DocumentAST;
  */
 class ManipulateAST
 {
-    /**
-     * The AST that can be manipulated.
-     *
-     * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST
-     */
-    public $documentAST;
-
-    public function __construct(DocumentAST &$documentAST)
-    {
-        $this->documentAST = $documentAST;
-    }
+    public function __construct(
+        /**
+         * The AST that can be manipulated.
+         */
+        public DocumentAST &$documentAST
+    ) {}
 }
 ```
 
 ### StartExecution
 
 ```php
-namespace Nuwave\Lighthouse\Events;
-
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Type\Schema;
 use Illuminate\Support\Carbon;
@@ -173,9 +142,6 @@ class StartExecution
      */
     public Carbon $moment;
 
-    /**
-     * @param  array<string, mixed>|null  $variables
-     */
     public function __construct(
         /**
          * The parsed schema.
@@ -208,8 +174,6 @@ class StartExecution
 ### BuildExtensionsResponse
 
 ```php
-namespace Nuwave\Lighthouse\Events;
-
 /**
  * Fires after a query was resolved.
  *
@@ -218,7 +182,6 @@ namespace Nuwave\Lighthouse\Events;
  */
 class BuildExtensionsResponse
 {
-    //
 }
 ```
 
@@ -226,54 +189,26 @@ class BuildExtensionsResponse
 namespace Nuwave\Lighthouse\Execution;
 
 /**
- * May be returned from listeners of @see \Nuwave\Lighthouse\Events\BuildExtensionsResponse
+ * May be returned from listeners of @see \Nuwave\Lighthouse\Events\BuildExtensionsResponse.
  */
 class ExtensionsResponse
 {
-    /**
-     * Will be used as the key in the response map.
-     *
-     * @var string
-     */
-    protected $key;
-
-    /**
-     * @var mixed JSON-encodable content of the extension.
-     */
-    protected $content;
-
-    /**
-     * @param  mixed  $content JSON-encodable content
-     */
-    public function __construct(string $key, $content)
-    {
-        $this->key = $key;
-        $this->content = $content;
-    }
-
-    /**
-     * Return the key of the extension.
-     */
-    public function key(): string
-    {
-        return $this->key;
-    }
-
-    /**
-     * @return mixed JSON-encodable content of the extension.
-     */
-    public function content()
-    {
-        return $this->content;
-    }
+    public function __construct(
+        /**
+         * Will be used as the key in the response map.
+         */
+        public string $key,
+        /**
+         * JSON-encodable content of the extension.
+         */
+        public mixed $content,
+    ) {}
 }
 ```
 
 ### ManipulateResult
 
 ```php
-namespace Nuwave\Lighthouse\Events;
-
 use GraphQL\Executor\ExecutionResult;
 
 /**
@@ -284,25 +219,18 @@ use GraphQL\Executor\ExecutionResult;
  */
 class ManipulateResult
 {
-    /**
-     * The result of resolving an individual query.
-     *
-     * @var \GraphQL\Executor\ExecutionResult
-     */
-    public $result;
-
-    public function __construct(ExecutionResult &$result)
-    {
-        $this->result = $result;
-    }
+    public function __construct(
+        /**
+         * The result of resolving an individual query.
+         */
+        public ExecutionResult &$result
+    ) {}
 }
 ```
 
 ### EndExecution
 
 ```php
-namespace Nuwave\Lighthouse\Events;
-
 use GraphQL\Executor\ExecutionResult;
 use Illuminate\Support\Carbon;
 
@@ -312,22 +240,16 @@ use Illuminate\Support\Carbon;
 class EndExecution
 {
     /**
-     * The result of resolving a single operation.
-     *
-     * @var \GraphQL\Executor\ExecutionResult
-     */
-    public $result;
-
-    /**
      * The point in time when the result was ready.
-     *
-     * @var \Illuminate\Support\Carbon
      */
-    public $moment;
+    public Carbon $moment;
 
-    public function __construct(ExecutionResult $result)
-    {
-        $this->result = $result;
+    public function __construct(
+        /**
+         * The result of resolving a single operation.
+         */
+        public ExecutionResult $result
+    ) {
         $this->moment = Carbon::now();
     }
 }
@@ -336,35 +258,25 @@ class EndExecution
 ### EndOperationOrOperations
 
 ```php
-namespace Nuwave\Lighthouse\Events;
-
 /**
- * Fires after resolving a single or multiple operations.
+ * Fires after resolving all operations.
  */
 class EndOperationOrOperations
 {
-    /**
-     * Single or multiple operation results.
-     *
-     * @var array<string, mixed>|array<int, array<string, mixed>>
-     */
-    public $results;
-
-    /**
-     * @param  array<string, mixed>|array<int, array<string, mixed>>  $results
-     */
-    public function __construct(array $results)
-    {
-        $this->results = $results;
-    }
+    public function __construct(
+        /**
+         * The result of either a single or multiple operations.
+         *
+         * @var array<string, mixed>|array<int, array<string, mixed>> $resultOrResults
+         */
+        public array $resultOrResults
+    ) {}
 }
 ```
 
 ### EndRequest
 
 ```php
-namespace Nuwave\Lighthouse\Events;
-
 use Illuminate\Support\Carbon;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -379,22 +291,16 @@ use Symfony\Component\HttpFoundation\Response;
 class EndRequest
 {
     /**
-     * The response that is about to be sent to the client.
-     *
-     * @var \Symfony\Component\HttpFoundation\Response
-     */
-    public $response;
-
-    /**
      * The point in time when the response was ready.
-     *
-     * @var \Illuminate\Support\Carbon
      */
-    public $moment;
+    public Carbon $moment;
 
-    public function __construct(Response $response)
-    {
-        $this->response = $response;
+    public function __construct(
+        /**
+         * The response that is about to be sent to the client.
+         */
+        public Response $response
+    ) {
         $this->moment = Carbon::now();
     }
 }
@@ -402,13 +308,11 @@ class EndRequest
 
 ## Non-lifecycle Events
 
-The following events happen outside of the execution lifecycle.
+The following events happen outside the execution lifecycle.
 
 ### ValidateSchema
 
 ```php
-namespace Nuwave\Lighthouse\Events;
-
 use GraphQL\Type\Schema;
 
 /**

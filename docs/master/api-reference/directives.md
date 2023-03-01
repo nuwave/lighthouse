@@ -3767,7 +3767,7 @@ type Mutation {
 
 ```graphql
 """
-Verify that a column's value lies outside of two values.
+Verify that a column's value lies outside two values.
 
 The type of the input value this is defined upon should be
 an `input` object with two fields.

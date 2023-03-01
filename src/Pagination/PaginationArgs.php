@@ -12,20 +12,11 @@ use Laravel\Scout\Builder as ScoutBuilder;
 
 class PaginationArgs
 {
-    /**
-     * @var int
-     */
-    public $page;
-
-    /**
-     * @var int
-     */
-    public $first;
-
-    /**
-     * @var \Nuwave\Lighthouse\Pagination\PaginationType
-     */
-    public $type;
+    public function __construct(
+        public int $page,
+        public int $first,
+        public PaginationType $type,
+    ) {}
 
     /**
      * Create a new instance from user given args.
@@ -36,39 +27,32 @@ class PaginationArgs
      */
     public static function extractArgs(array $args, PaginationType $paginationType, ?int $paginateMaxCount): self
     {
-        $instance = new static();
-
-        $instance->type = $paginationType;
-
-        if ($paginationType->isConnection()) {
-            $instance->first = $args['first'];
-            $instance->page = self::calculateCurrentPage(
-                $instance->first,
+        $first = $args['first'];
+        $page = $paginationType->isConnection()
+            ? self::calculateCurrentPage(
+                $first,
                 Cursor::decode($args)
-            );
-        } else {
+            )
             // Handles cases "paginate" and "simple", which both take the same args.
-            $instance->first = $args['first'];
-            $instance->page = Arr::get($args, 'page', 1);
-        }
+            : Arr::get($args, 'page', 1);
 
-        if ($instance->first < 0) {
+        if ($first < 0) {
             throw new Error(
-                self::requestedLessThanZeroItems($instance->first)
+                self::requestedLessThanZeroItems($first)
             );
         }
 
         // Make sure the maximum pagination count is not exceeded
         if (
             null !== $paginateMaxCount
-            && $instance->first > $paginateMaxCount
+            && $first > $paginateMaxCount
         ) {
             throw new Error(
-                self::requestedTooManyItems($paginateMaxCount, $instance->first)
+                self::requestedTooManyItems($paginateMaxCount, $first)
             );
         }
 
-        return $instance;
+        return new static($page, $first, $paginationType);
     }
 
     public static function requestedLessThanZeroItems(int $amount): string

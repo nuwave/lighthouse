@@ -11,26 +11,20 @@ use Nuwave\Lighthouse\Subscriptions\Subscriber;
 class LogBroadcaster implements Broadcaster
 {
     /**
-     * The user-defined configuration options.
-     *
-     * @var array<string, mixed>
-     */
-    protected $config = [];
-
-    /**
      * A map from channel names to data.
      *
      * @var array<string, mixed>
      */
-    protected $broadcasts = [];
+    protected array $broadcasts = [];
 
-    /**
-     * @param  array<string, mixed>  $config
-     */
-    public function __construct(array $config = [])
-    {
-        $this->config = $config;
-    }
+    public function __construct(
+        /**
+         * The user-defined configuration options.
+         *
+         * @var array<string, mixed> $config
+         */
+        protected array $config = []
+    ) {}
 
     public function authorized(Request $request): JsonResponse
     {

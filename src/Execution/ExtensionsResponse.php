@@ -11,26 +11,10 @@ class ExtensionsResponse
         /**
          * Will be used as the key in the response map.
          */
-        protected string $key,
+        public string $key,
         /**
          * JSON-encodable content of the extension.
          */
-        protected mixed $content,
+        public mixed $content,
     ) {}
-
-    /**
-     * Return the key of the extension.
-     */
-    public function key(): string
-    {
-        return $this->key;
-    }
-
-    /**
-     * @return mixed JSON-encodable content of the extension
-     */
-    public function content()
-    {
-        return $this->content;
-    }
 }

@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
 use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
 class Argument
 {
@@ -11,28 +12,24 @@ class Argument
      *
      * @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>|mixed|array<mixed>
      */
-    public $value;
+    public mixed $value;
 
     /**
      * The type of the argument.
-     *
-     * @var \Nuwave\Lighthouse\Execution\Arguments\ListType|\Nuwave\Lighthouse\Execution\Arguments\NamedType|null
      */
-    public $type;
+    public ListType|NamedType $type;
 
     /**
      * A list of directives associated with that argument.
      *
      * @var \Illuminate\Support\Collection<int, \Nuwave\Lighthouse\Support\Contracts\Directive>
      */
-    public $directives;
+    public Collection $directives;
 
     /**
-     * An argument may have a resolver that handles it's given value.
-     *
-     * @var \Nuwave\Lighthouse\Support\Contracts\ArgResolver|null
+     * An argument may have a resolver that handles its given value.
      */
-    public $resolver;
+    public ?ArgResolver $resolver = null;
 
     public function __construct()
     {
@@ -44,7 +41,7 @@ class Argument
      *
      * @return mixed the plain PHP value
      */
-    public function toPlain()
+    public function toPlain(): mixed
     {
         return static::toPlainRecursive($this->value);
     }
@@ -54,10 +51,7 @@ class Argument
         return static::namedTypeRecursive($this->type);
     }
 
-    /**
-     * @param \Nuwave\Lighthouse\Execution\Arguments\ListType|\Nuwave\Lighthouse\Execution\Arguments\NamedType|null $type
-     */
-    protected static function namedTypeRecursive($type): ?NamedType
+    protected static function namedTypeRecursive(ListType|NamedType|null $type): ?NamedType
     {
         if ($type instanceof ListType) {
             return static::namedTypeRecursive($type->type);
@@ -73,7 +67,7 @@ class Argument
      *
      * @return mixed|array<mixed>
      */
-    protected static function toPlainRecursive($value)
+    protected static function toPlainRecursive(mixed $value): mixed
     {
         if ($value instanceof ArgumentSet) {
             return $value->toArray();

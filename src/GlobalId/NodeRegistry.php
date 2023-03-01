@@ -12,16 +12,11 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 class NodeRegistry
 {
     /**
-     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
-     */
-    protected $typeRegistry;
-
-    /**
      * A map from type names to resolver functions.
      *
      * @var array<string, \Closure>
      */
-    protected $nodeResolver = [];
+    protected array $nodeResolver = [];
 
     /**
      * The stashed current type.
@@ -29,15 +24,12 @@ class NodeRegistry
      * Since PHP resolves the fields synchronously and one after another,
      * we can safely stash just this one value. Should the need arise, this
      * can probably be a map from the unique field path to the type.
-     *
-     * @var string
      */
-    protected $currentType;
+    protected string $currentType;
 
-    public function __construct(TypeRegistry $typeRegistry)
-    {
-        $this->typeRegistry = $typeRegistry;
-    }
+    public function __construct(
+        protected TypeRegistry $typeRegistry
+    ) {}
 
     /**
      * @param  string  $typeName  The name of the ObjectType that can be resolved with the Node interface

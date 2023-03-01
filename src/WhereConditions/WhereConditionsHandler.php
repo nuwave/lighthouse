@@ -9,15 +9,9 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
 
 class WhereConditionsHandler
 {
-    /**
-     * @var \Nuwave\Lighthouse\WhereConditions\Operator
-     */
-    protected $operator;
-
-    public function __construct(Operator $operator)
-    {
-        $this->operator = $operator;
-    }
+    public function __construct(
+        protected Operator $operator
+    ) {}
 
     /**
      * @template TModel of \Illuminate\Database\Eloquent\Model

@@ -167,10 +167,8 @@ GRAPHQL;
         }
 
         if ($find = $this->directiveArgValue('find')) {
-            $findValue = Arr::get($args, $find);
-            if (null === $findValue) {
-                throw self::missingKeyToFindModel($find);
-            }
+            $findValue = Arr::get($args, $find)
+                ?? throw self::missingKeyToFindModel($find);
 
             $queryBuilder = $this->getModelClass()::query();
 

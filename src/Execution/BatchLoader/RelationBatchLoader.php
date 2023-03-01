@@ -11,35 +11,27 @@ use Nuwave\Lighthouse\Execution\Utils\ModelKey;
 class RelationBatchLoader
 {
     /**
-     * @var \Nuwave\Lighthouse\Execution\ModelsLoader\ModelsLoader
-     */
-    protected $modelsLoader;
-
-    /**
      * Map from unique model keys to model instances.
      *
      * @var array<string, \Illuminate\Database\Eloquent\Model>
      */
-    protected $parents = [];
+    protected array $parents = [];
 
     /**
      * Map from unique model keys to the results of batch loading.
      *
      * @var array<string, mixed>
      */
-    protected $results = [];
+    protected array $results = [];
 
     /**
      * Marks when the actual batch loading happened.
-     *
-     * @var bool
      */
-    protected $hasResolved = false;
+    protected bool $hasResolved = false;
 
-    public function __construct(ModelsLoader $modelsLoader)
-    {
-        $this->modelsLoader = $modelsLoader;
-    }
+    public function __construct(
+        protected ModelsLoader $modelsLoader
+    ) {}
 
     /**
      * Schedule loading a relation off of a concrete model.

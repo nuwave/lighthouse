@@ -28,7 +28,7 @@ class DirectiveLocator
      *
      * @var array<int, string>
      */
-    protected $directiveNamespaces;
+    protected array $directiveNamespaces;
 
     /**
      * A map from short directive names to full class names.
@@ -41,17 +41,11 @@ class DirectiveLocator
      *
      * @var array<string, class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>>
      */
-    protected $resolvedClassnames = [];
+    protected array $resolvedClassnames = [];
 
-    /**
-     * @var \Illuminate\Contracts\Events\Dispatcher
-     */
-    protected $eventsDispatcher;
-
-    public function __construct(EventsDispatcher $eventsDispatcher)
-    {
-        $this->eventsDispatcher = $eventsDispatcher;
-    }
+    public function __construct(
+        protected EventsDispatcher $eventsDispatcher
+    ) {}
 
     /**
      * A list of namespaces with directives in descending priority.
@@ -60,7 +54,7 @@ class DirectiveLocator
      */
     public function namespaces(): array
     {
-        if (null === $this->directiveNamespaces) {
+        if (! isset($this->directiveNamespaces)) {
             $this->directiveNamespaces
                 // When looking for a directive by name, the namespaces are tried in order
                 = (new Collection([

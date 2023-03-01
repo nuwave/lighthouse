@@ -16,17 +16,13 @@ trait RefreshesSchemaCache
      *
      * Static variables persist during the execution of a single process.
      * In parallel testing each process has a separate instance of this class.
-     *
-     * @var bool
      */
-    protected static $schemaCacheWasRefreshed = false;
+    protected static bool $schemaCacheWasRefreshed = false;
 
     /**
      * Path to the file used for coordinating exactly-one semantics.
-     *
-     * @var string
      */
-    protected static $lockFilePath = __DIR__ . '/schema-cache-refreshing';
+    protected static string $lockFilePath = __DIR__ . '/schema-cache-refreshing';
 
     protected function bootRefreshesSchemaCache(): void
     {

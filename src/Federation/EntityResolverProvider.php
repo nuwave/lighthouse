@@ -12,7 +12,6 @@ use Illuminate\Contracts\Container\Container;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Federation\Directives\KeyDirective;
 use Nuwave\Lighthouse\GlobalId\GlobalId;
 use Nuwave\Lighthouse\GlobalId\GlobalIdDirective;
@@ -75,11 +74,7 @@ class EntityResolverProvider
 
         $resolver = $this->resolverFromClass($typename)
             ?? $this->resolverFromModel($typename)
-            ?? null;
-
-        if (null === $resolver) {
-            throw new Error(self::missingResolver($typename));
-        }
+            ?? throw new Error(self::missingResolver($typename));
 
         $this->resolvers[$typename] = $resolver;
 
@@ -92,20 +87,11 @@ class EntityResolverProvider
             return $this->definitions[$typename];
         }
 
-        $type = null;
-        try {
-            $type = $this->schema->getType($typename);
-        } catch (DefinitionException) {
-            // Signalizes the type is unknown, handled by the null check below
-        }
-        if (null === $type) {
-            throw new Error(self::unknownTypename($typename));
-        }
+        $type = $this->schema->getType($typename)
+            ?? throw new Error(self::unknownTypename($typename));
 
-        $definition = $type->astNode();
-        if (null === $definition) {
-            throw new FederationException("Must provide AST definition for type `{$typename}`.");
-        }
+        $definition = $type->astNode()
+            ?? throw new FederationException("Must provide AST definition for type `{$typename}`.");
 
         if (! $definition instanceof ObjectTypeDefinitionNode) {
             throw new Error("Expected __typename `{$typename}` to be ObjectTypeDefinition, got {$definition->kind}.");
@@ -126,7 +112,6 @@ class EntityResolverProvider
             (array) config('lighthouse.federation.entities_resolver_namespace'),
             'class_exists'
         );
-
         if (null === $resolverClass) {
             return null;
         }
@@ -274,14 +259,7 @@ class EntityResolverProvider
      */
     public function firstSatisfiedKeyFields(Collection $keyFieldsSelections, array $representation): SelectionSetNode
     {
-        $satisfiedKeyFields = $keyFieldsSelections->first(
-            fn (SelectionSetNode $keyFields): bool => $this->satisfiesKeyFields($keyFields, $representation)
-        );
-
-        if (null === $satisfiedKeyFields) {
-            throw new Error('Representation does not satisfy any set of uniquely identifying keys: ' . \Safe\json_encode($representation));
-        }
-
-        return $satisfiedKeyFields;
+        return $keyFieldsSelections->first(fn (SelectionSetNode $keyFields): bool => $this->satisfiesKeyFields($keyFields, $representation))
+            ?? throw new Error('Representation does not satisfy any set of uniquely identifying keys: ' . \Safe\json_encode($representation));
     }
 }

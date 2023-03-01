@@ -16,22 +16,16 @@ use Symfony\Component\HttpFoundation\Response;
 class EndRequest
 {
     /**
-     * The response that is about to be sent to the client.
-     *
-     * @var \Symfony\Component\HttpFoundation\Response
-     */
-    public $response;
-
-    /**
      * The point in time when the response was ready.
-     *
-     * @var \Illuminate\Support\Carbon
      */
-    public $moment;
+    public Carbon $moment;
 
-    public function __construct(Response $response)
-    {
-        $this->response = $response;
+    public function __construct(
+        /**
+         * The response that is about to be sent to the client.
+         */
+        public Response $response
+    ) {
         $this->moment = Carbon::now();
     }
 }

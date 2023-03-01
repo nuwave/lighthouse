@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Subscriptions\Storage;
 
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Redis\Factory as RedisFactory;
+use Illuminate\Redis\Connections\Connection as RedisConnection;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
@@ -25,17 +26,12 @@ class RedisStorageManager implements StoresSubscriptions
 
     public const SUBSCRIBER_KEY = 'graphql.subscriber';
 
-    /**
-     * @var \Illuminate\Redis\Connections\Connection
-     */
-    protected $connection;
+    protected RedisConnection $connection;
 
     /**
      * The time to live in seconds for items in the cache.
-     *
-     * @var int|null
      */
-    protected $ttl;
+    protected int|null $ttl;
 
     public function __construct(ConfigRepository $config, RedisFactory $redis)
     {

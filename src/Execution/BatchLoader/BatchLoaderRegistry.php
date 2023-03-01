@@ -11,7 +11,7 @@ abstract class BatchLoaderRegistry
      *
      * @var array<string, object>
      */
-    protected static $instances = [];
+    protected static array $instances = [];
 
     /**
      * Return an instance of a BatchLoader for a specific field.

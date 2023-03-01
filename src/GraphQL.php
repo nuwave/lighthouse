@@ -233,7 +233,7 @@ class GraphQL
 
         foreach ($extensionsResponses as $extensionsResponse) {
             if (null !== $extensionsResponse) {
-                $result->extensions[$extensionsResponse->key()] = $extensionsResponse->content();
+                $result->extensions[$extensionsResponse->key] = $extensionsResponse->content;
             }
         }
 
@@ -297,10 +297,9 @@ class GraphQL
         $cacheFactory = Container::getInstance()->make(CacheFactory::class);
         $store = $cacheFactory->store($cacheConfig['store']);
 
-        $document = $store->get("lighthouse:query:{$sha256hash}");
-        if (null === $document) {
+        return $store->get("lighthouse:query:{$sha256hash}")
             // https://github.com/apollographql/apollo-server/blob/37a5c862261806817a1d71852c4e1d9cdb59eab2/packages/apollo-server-errors/src/index.ts#L230-L239
-            throw new Error(
+            ?? throw new Error(
                 'PersistedQueryNotFound',
                 null,
                 null,
@@ -309,9 +308,6 @@ class GraphQL
                 null,
                 ['code' => 'PERSISTED_QUERY_NOT_FOUND']
             );
-        }
-
-        return $document;
     }
 
     protected function cleanUpAfterExecution(): void
@@ -342,8 +338,8 @@ class GraphQL
                         ->through($handlers)
                         ->then(
                             fn (?Error $error): ?array => null === $error
-                            ? null
-                            : $formatter($error)
+                                ? null
+                                : $formatter($error)
                         ))
                     ->filter()
                     ->all();

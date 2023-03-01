@@ -21,21 +21,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ThrottleDirective extends BaseDirective implements FieldMiddleware, FieldManipulator
 {
-    /**
-     * @var \Illuminate\Cache\RateLimiter
-     */
-    protected $limiter;
-
-    /**
-     * @var \Illuminate\Http\Request
-     */
-    protected $request;
-
-    public function __construct(RateLimiter $limiter, Request $request)
-    {
-        $this->limiter = $limiter;
-        $this->request = $request;
-    }
+    public function __construct(
+        protected RateLimiter $limiter,
+        protected Request $request
+    ) {}
 
     public static function definition(): string
     {
@@ -118,11 +107,9 @@ GRAPHQL;
     {
         $name = $this->directiveArgValue('name');
         if (null !== $name) {
-            $limiter = $this->limiter->limiter($name);
             // @phpstan-ignore-next-line $limiter may be null although it's not specified in limiter() PHPDoc
-            if (null === $limiter) {
-                throw new DefinitionException("Named limiter {$name} is not found.");
-            }
+            $this->limiter->limiter($name)
+                ?? throw new DefinitionException("Named limiter {$name} is not found.");
         }
     }
 

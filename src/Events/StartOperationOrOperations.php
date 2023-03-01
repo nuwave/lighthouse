@@ -9,9 +9,6 @@ use GraphQL\Server\OperationParams;
  */
 class StartOperationOrOperations
 {
-    /**
-     * @param  \GraphQL\Server\OperationParams|array<int, \GraphQL\Server\OperationParams>  $operationOrOperations
-     */
     public function __construct(
         /**
          * One or multiple parsed GraphQL operations.
