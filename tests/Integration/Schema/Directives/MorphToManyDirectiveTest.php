@@ -2,7 +2,6 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Collection;
 use Tests\DBTestCase;
@@ -203,6 +202,7 @@ final class MorphToManyDirectiveTest extends DBTestCase
         /** @var \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\Tag> $postTags */
         $postTags = factory(Tag::class, 3)->create()->map(static function (Tag $tag) use ($post) {
             $post->tags()->attach($tag);
+
             return $tag;
         });
 
@@ -214,6 +214,7 @@ final class MorphToManyDirectiveTest extends DBTestCase
         /** @var \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\Tag> $taskTags */
         $taskTags = factory(Tag::class, 3)->create()->map(static function (Tag $tag) use ($task) {
             $task->tags()->attach($tag);
+
             return $tag;
         });
 
