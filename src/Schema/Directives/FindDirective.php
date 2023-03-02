@@ -34,7 +34,7 @@ GRAPHQL;
 
     public function resolveField(FieldValue $fieldValue): callable
     {
-        return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ?Model {
+        return function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ?Model {
             $results = $resolveInfo
                 ->enhanceBuilder(
                     $this->getModelClass()::query(),

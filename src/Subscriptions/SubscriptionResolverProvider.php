@@ -65,7 +65,7 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
             $fieldName
         );
 
-        return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($subscription, $fieldName) {
+        return function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($subscription, $fieldName) {
             if ($root instanceof Subscriber) {
                 return $subscription->resolve($root->root, $args, $context, $resolveInfo);
             }

@@ -146,7 +146,7 @@ final class CreateDirective extends BaseDirective implements FieldResolver
 {
     public function resolveField(FieldValue $fieldValue): callable
     {
-        return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Model {
+        return function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Model {
             // Wrap the operation and let Lighthouse take care of splitting the input
             $nestedSave = new ResolveNested(function($model, $args) {
                 $model->fill($args->toArray());

@@ -128,7 +128,7 @@ GRAPHQL;
 
     public function resolveField(FieldValue $fieldValue): callable
     {
-        return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Paginator {
+        return function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Paginator {
             if ($this->directiveHasArgument('resolver')) {
                 // This is done only for validation
                 PaginationArgs::extractArgs($args, $this->paginationType(), $this->paginateMaxCount());

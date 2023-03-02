@@ -1765,31 +1765,20 @@ use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class Commentable
+final class Commentable
 {
-    /**
-     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
-     */
-    protected $typeRegistry;
-
-    public function __construct(TypeRegistry $typeRegistry)
-    {
-        $this->typeRegistry = $typeRegistry;
-    }
+    public function __construct(
+        private TypeRegistry $typeRegistry
+    ) {}
 
     /**
      * Decide which GraphQL type a resolved value has.
      *
-     * @param  mixed  $rootValue  The value that was resolved by the field. Usually an Eloquent model.
-     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
-     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
-     * @return \GraphQL\Type\Definition\Type
+     * @param  mixed  $root  The value that was resolved by the field. Usually an Eloquent model.
      */
-    public function resolveType($rootValue, GraphQLContext $context, ResolveInfo $resolveInfo): Type
+    public function resolveType(mixed $root, GraphQLContext $context, ResolveInfo $resolveInfo): Type
     {
-        // Default to getting a type with the same name as the passed in root value
         // TODO implement your own resolver logic - if the default is fine, just delete this class
-        return $this->typeRegistry->get(class_basename($rootValue));
     }
 }
 ```
@@ -3379,31 +3368,20 @@ use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class Person
+final class Person
 {
-    /**
-     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
-     */
-    protected $typeRegistry;
-
-    public function __construct(TypeRegistry $typeRegistry)
-    {
-        $this->typeRegistry = $typeRegistry;
-    }
+    public function __construct(
+        private TypeRegistry $typeRegistry
+    ) {}
 
     /**
      * Decide which GraphQL type a resolved value has.
      *
-     * @param  mixed  $rootValue The value that was resolved by the field. Usually an Eloquent model.
-     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
-     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
-     * @return \GraphQL\Type\Definition\Type
+     * @param  mixed  $root The value that was resolved by the field. Usually an Eloquent model.
      */
-    public function resolveType($rootValue, GraphQLContext $context, ResolveInfo $resolveInfo): Type
+    public function resolveType(mixed $root, GraphQLContext $context, ResolveInfo $resolveInfo): Type
     {
-        // Default to getting a type with the same name as the passed in root value
         // TODO implement your own resolver logic - if the default is fine, just delete this class
-        return $this->typeRegistry->get(class_basename($rootValue));
     }
 }
 ```

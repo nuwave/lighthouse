@@ -115,7 +115,7 @@ GRAPHQL;
         $ability = $this->directiveArgValue('ability');
         $resolved = $this->directiveArgValue('resolved');
 
-        $fieldValue->wrapResolver(fn (callable $resolver) => function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $ability, $resolved) {
+        $fieldValue->wrapResolver(fn (callable $resolver) => function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $ability, $resolved) {
             $gate = $this->gate->forUser($context->user());
             $checkArguments = $this->buildCheckArguments($args);
 

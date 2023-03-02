@@ -97,7 +97,7 @@ GRAPHQL;
     {
         $modelArg = $this->directiveArgValue('model');
         if (is_string($modelArg)) {
-            return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg) {
+            return function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg) {
                 $builder = $this->namespaceModelClass($modelArg)::query();
 
                 $this->makeBuilderDecorator($root, $args, $context, $resolveInfo)($builder);
@@ -130,7 +130,7 @@ GRAPHQL;
 
         $modelArg = $this->directiveArgValue('model');
         if (is_string($modelArg)) {
-            return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg) {
+            return function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg) {
                 $query = $this->namespaceModelClass($modelArg)::query();
 
                 $this->makeBuilderDecorator($root, $args, $context, $resolveInfo)($query);
@@ -142,7 +142,7 @@ GRAPHQL;
         if ($this->directiveHasArgument('builder')) {
             $builderResolver = $this->getResolverFromArgument('builder');
 
-            return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($builderResolver) {
+            return function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($builderResolver) {
                 $query = $builderResolver($root, $args, $context, $resolveInfo);
 
                 assert(

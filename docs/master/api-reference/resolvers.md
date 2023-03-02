@@ -8,10 +8,10 @@ Resolvers are always called with the same 4 arguments:
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-function ($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
+function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
 ```
 
-1. `$rootValue`: The result that was returned from the parent field.
+1. `mixed $root`: The result that was returned from the parent field.
    When resolving a field that sits on one of the root types (`Query`, `Mutation`) this is `null`.
 2. `array $args`: The arguments that were passed into the field.
    For example, for a field call like `user(name: "Bob")` it would be `['name' => 'Bob']`

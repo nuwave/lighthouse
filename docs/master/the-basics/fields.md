@@ -87,9 +87,9 @@ arguments that are passed to the query.
 ```php
 namespace App\GraphQL\Queries;
 
-class Greet
+final class Greet
 {
-    public function __invoke($rootValue, array $args): string
+    public function __invoke(mixed $root, array $args): string
     {
         return "Hello, {$args['name']}!";
     }

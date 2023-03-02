@@ -207,7 +207,7 @@ GRAPHQL;
 
     public function handleField(FieldValue $fieldValue): void
     {
-        $fieldValue->wrapResolver(fn (callable $resolver) => function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
+        $fieldValue->wrapResolver(fn (callable $resolver) => function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
             $requiredRole = $this->directiveArgValue('requiredRole');
             // Throw in case of an invalid schema definition to remind the developer
             if ($requiredRole === null) {

@@ -164,13 +164,13 @@ final class MyDirective extends BaseDirective implements FieldResolver
 {
 -   public function resolveField(FieldValue $fieldValue): FieldValue
 -   {
--       $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): int {
+-       $fieldValue->setResolver(function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): int {
 -           return 42;
 -       });
 -       return $fieldValue;
 +   public function resolveField(FieldValue $fieldValue): callable
 +   {
-+       return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): int {
++       return function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): int {
 +           return 42;
 +       };
     }
@@ -192,13 +192,13 @@ final class MyDirective extends BaseDirective implements FieldMiddleware
 -   public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
 -   {
 -       $previousResolver = $fieldValue->getResolver();
--       $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
+-       $fieldValue->setResolver(function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
 -           return $previousResolver($root, $args, $context, $resolveInfo);
 -       });
 -       return $next($fieldValue);
 +   public function handleField(FieldValue $fieldValue): void
 +   {
-+       $fieldValue->wrapResolver(fn (callable $previousResolver) => function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
++       $fieldValue->wrapResolver(fn (callable $previousResolver) => function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
 +           return $previousResolver($root, $args, $context, $resolveInfo);
 +       });
     }
@@ -231,7 +231,7 @@ use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 // Some resolver function or directive middleware
-function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
+function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
 -   $resolveInfo->argumentSet->enhanceBuilder($builder, $scopes, $directiveFilter);
 +   $resolveInfo->enhanceBuilder($builder, $scopes, $root, $args, $context, $resolveInfo, $directiveFilter);
 ```

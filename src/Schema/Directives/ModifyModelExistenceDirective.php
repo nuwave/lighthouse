@@ -30,7 +30,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
         $modelClass = $this->getModelClass();
         $scopes = $this->directiveArgValue('scopes', []);
 
-        return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelClass, $scopes, $expectsList) {
+        return function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelClass, $scopes, $expectsList) {
             $builder = $modelClass::query();
 
             if (! $resolveInfo->wouldEnhanceBuilder($builder, $scopes, $root, $args, $context, $resolveInfo)) {
