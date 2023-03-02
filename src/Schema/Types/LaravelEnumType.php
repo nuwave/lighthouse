@@ -93,9 +93,6 @@ class LaravelEnumType extends EnumType
         return new \InvalidArgumentException("Enum of class {$class} must have key.");
     }
 
-    /**
-     * @param  TEnum  $enum
-     */
     protected function deprecationReason(string $key): ?string
     {
         $constant = $this->reflection->getReflectionConstant($key);
