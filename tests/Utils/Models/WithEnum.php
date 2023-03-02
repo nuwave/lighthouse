@@ -23,13 +23,14 @@ final class WithEnum extends Model
 {
     public $timestamps = false;
 
-    /**
-     * @var array<string, class-string<\BenSampo\Enum\Enum>>
-     */
-    protected $enumCasts = [
+    protected $casts = [
         'type' => AOrB::class,
     ];
 
+    /**
+     * @param \Illuminate\Database\Eloquent\Builder<self> $builder
+     * @return \Illuminate\Database\Eloquent\Builder<self>
+     */
     public function scopeByType(EloquentBuilder $builder, AOrB $aOrB): EloquentBuilder
     {
         return $builder->where('type', $aOrB);
