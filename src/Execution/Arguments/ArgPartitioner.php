@@ -85,7 +85,7 @@ class ArgPartitioner
     /**
      * Attach a nested argument resolver to an argument.
      *
-     * @param ReflectionClass<\Illuminate\Database\Eloquent\Model>|null $model
+     * @param \ReflectionClass<\Illuminate\Database\Eloquent\Model>|null $model
      */
     protected static function attachNestedArgResolver(string $name, Argument &$argument, ?\ReflectionClass $model): void
     {

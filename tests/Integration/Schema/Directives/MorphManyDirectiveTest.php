@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
@@ -70,7 +71,7 @@ final class MorphManyDirectiveTest extends DBTestCase
         ]);
         $this->postImages = Collection::times(
             $this->faker()->numberBetween(1, 10),
-            fn (): Model => $this->post
+            fn (): Post => $this->post
                 ->images()
                 ->save(
                     factory(Image::class)->create()

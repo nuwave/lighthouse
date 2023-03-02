@@ -12,7 +12,7 @@ final class FooClosureValidator extends Validator
     }
 
     /**
-     * @return array{foo: array<(Closure(string $attribute, mixed $value, \Closure $fail): void)>}
+     * @return array{foo: array<\Closure(string $attribute, mixed $value, \Closure $fail): void>}
      */
     public function rules(): array
     {
