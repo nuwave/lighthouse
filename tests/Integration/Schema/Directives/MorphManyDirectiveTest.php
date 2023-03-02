@@ -2,7 +2,6 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
