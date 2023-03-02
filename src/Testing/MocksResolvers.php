@@ -47,6 +47,7 @@ trait MocksResolvers
 
         $this->registerMockResolver($mock, $key);
 
+        // @phpstan-ignore-next-line generic type mismatch
         return $mock
             ->expects($invocationOrder)
             ->method('__invoke');

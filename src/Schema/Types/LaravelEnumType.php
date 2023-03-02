@@ -53,12 +53,19 @@ class LaravelEnumType extends EnumType
                 /**
                  * @return array<string, mixed> Used to construct a \GraphQL\Type\Definition\EnumValueDefinition
                  */
-                fn (Enum $enum): array => [
-                    'name' => $enum->key,
-                    'value' => $enum,
-                    'description' => $this->enumValueDescription($enum),
-                    'deprecationReason' => $this->deprecationReason($enum),
-                ],
+                function (Enum $enum): array {
+                    $key = $enum->key;
+                    if (! $key) {
+                        throw static::enumMustHaveKey($enum);
+                    }
+
+                    return [
+                        'name' => $key,
+                        'value' => $enum,
+                        'description' => $this->enumValueDescription($enum),
+                        'deprecationReason' => $this->deprecationReason($key),
+                    ];
+                },
                 $enumClass::getInstances()
             ),
         ]);
@@ -89,9 +96,9 @@ class LaravelEnumType extends EnumType
     /**
      * @param  TEnum  $enum
      */
-    protected function deprecationReason(Enum $enum): ?string
+    protected function deprecationReason(string $key): ?string
     {
-        $constant = $this->reflection->getReflectionConstant($enum->key);
+        $constant = $this->reflection->getReflectionConstant($key);
         assert($constant instanceof \ReflectionClassConstant, 'Enum keys are derived from the constant names');
 
         $docComment = $constant->getDocComment();

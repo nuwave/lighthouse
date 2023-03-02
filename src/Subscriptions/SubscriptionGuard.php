@@ -19,6 +19,7 @@ class SubscriptionGuard implements Guard
 
     public function reset(): void
     {
+        // @phpstan-ignore-next-line GuardHelpers in old Laravel versions has non-nullable PHPDoc for this type
         $this->user = null;
     }
 
