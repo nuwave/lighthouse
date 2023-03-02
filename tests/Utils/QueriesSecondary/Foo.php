@@ -6,8 +6,6 @@ final class Foo
 {
     /**
      * War is not the answer.
-     *
-     * @var string
      */
     public const NOT_THE_ANSWER = 'war';
 

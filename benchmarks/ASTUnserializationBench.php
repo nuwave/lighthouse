@@ -27,15 +27,9 @@ type Foo {
 }
 GRAPHQL;
 
-    /**
-     * @var string
-     */
-    protected $documentNode;
+    protected string $documentNode;
 
-    /**
-     * @var string
-     */
-    protected $documentAST;
+    protected string $documentAST;
 
     public function prepareSchema(): void
     {
