@@ -76,7 +76,6 @@ class PaginatedModelsLoader implements ModelsLoader
         // Use ->getQuery() to respect model scopes, such as soft deletes
         $mergedRelationQuery = $relations->reduce(
             static fn (EloquentBuilder $builder, Relation $relation): EloquentBuilder => $builder->unionAll(
-                // @phpstan-ignore-next-line Laravel can deal with an EloquentBuilder just fine
                 $relation->getQuery()
             ),
             $firstRelation->getQuery()

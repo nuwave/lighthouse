@@ -4,6 +4,7 @@ namespace Tests;
 
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Facades\DB;
+use Mattiasgeniar\PhpunitQueryCountAssertions\AssertsQueryCounts;
 
 abstract class DBTestCase extends TestCase
 {
@@ -66,5 +67,12 @@ abstract class DBTestCase extends TestCase
             'port' => env('LIGHTHOUSE_TEST_DB_PORT', '3306'),
             'unix_socket' => env('LIGHTHOUSE_TEST_DB_UNIX_SOCKET', null),
         ];
+    }
+
+    protected function countQueries(?int &$count): void
+    {
+        DB::listen(static function () use (&$count): void {
+            ++$count;
+        });
     }
 }

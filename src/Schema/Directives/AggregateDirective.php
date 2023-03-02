@@ -28,8 +28,6 @@ class AggregateDirective extends BaseDirective implements FieldResolver, FieldMa
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Returns an aggregate of a column in a given relationship or model.
-
-Requires Laravel 8+.
 """
 directive @aggregate(
   """

@@ -42,12 +42,11 @@ final class Product extends Model
         return $this->belongsTo(Color::class);
     }
 
-    // By default Laravel does not support composite keys
-    // So, you will need to override some getKey() method
-    // Usually this is placed on traits
-    // This is not related to Lighthouse
-
     /**
+     * By default, Laravel does not support composite keys.
+     * So, you will need to override the getKey() method.
+     * Usually this is placed on traits, this is not related to Lighthouse.
+     *
      * @return array<string, mixed>
      */
     public function getKey(): array

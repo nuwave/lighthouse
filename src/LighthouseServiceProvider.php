@@ -105,7 +105,6 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->app->bind(ProvidesValidationRules::class, ValidationRulesProvider::class);
 
         $this->app->singleton(MiddlewareAdapter::class, static function (Container $app): MiddlewareAdapter {
-            // prefer using fully-qualified class names here when referring to Laravel-only or Lumen-only classes
             if ($app instanceof LaravelApplication) {
                 return new LaravelMiddlewareAdapter(
                     $app->get(Router::class)
@@ -116,9 +115,8 @@ class LighthouseServiceProvider extends ServiceProvider
                 return new LumenMiddlewareAdapter();
             }
 
-            throw new \Exception(
-                'Could not correctly determine Laravel framework flavor, got ' . $app::class . '.'
-            );
+            $notLaravelOrLumen = $app::class;
+            throw new \Exception("Could not correctly determine Laravel framework flavor, got {$notLaravelOrLumen}.");
         });
 
         $this->commands(self::COMMANDS);

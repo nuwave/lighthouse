@@ -125,14 +125,9 @@ return [
         'store' => env('LIGHTHOUSE_QUERY_CACHE_STORE', null),
 
         /*
-         * Duration in seconds (minutes for Laravel pre-5.8) the query should remain cached, null means forever.
+         * Duration in seconds the query should remain cached, null means forever.
          */
-        'ttl' => env(
-            'LIGHTHOUSE_QUERY_CACHE_TTL',
-            \Nuwave\Lighthouse\Support\AppVersion::atLeast(5.8)
-                ? 24 * 60 * 60 // 1 day in seconds
-                : 24 * 60 // 1 day in minutes
-        ),
+        'ttl' => env('LIGHTHOUSE_QUERY_CACHE_TTL', 24 * 60 * 60),
     ],
 
     /*
