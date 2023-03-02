@@ -42,7 +42,6 @@ GRAPHQL;
     {
         assert($builder instanceof EloquentBuilder);
 
-        // @phpstan-ignore-next-line Mixins are magic
         return $builder->whereHas(
             $this->directiveArgValue('relation'),
             function (object $query): void {

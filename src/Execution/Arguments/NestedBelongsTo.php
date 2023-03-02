@@ -22,9 +22,7 @@ class NestedBelongsTo implements ArgResolver
     {
         if ($args->has('create')) {
             $saveModel = new ResolveNested(new SaveModel($this->relation));
-
             $related = $saveModel(
-                // @phpstan-ignore-next-line Unrecognized mixin
                 $this->relation->make(),
                 $args->arguments['create']->value
             );
@@ -37,9 +35,7 @@ class NestedBelongsTo implements ArgResolver
 
         if ($args->has('update')) {
             $updateModel = new ResolveNested(new UpdateModel(new SaveModel($this->relation)));
-
             $related = $updateModel(
-                // @phpstan-ignore-next-line Unrecognized mixin
                 $this->relation->make(),
                 $args->arguments['update']->value
             );
@@ -48,9 +44,7 @@ class NestedBelongsTo implements ArgResolver
 
         if ($args->has('upsert')) {
             $upsertModel = new ResolveNested(new UpsertModel(new SaveModel($this->relation)));
-
             $related = $upsertModel(
-                // @phpstan-ignore-next-line Unrecognized mixin
                 $this->relation->make(),
                 $args->arguments['upsert']->value
             );
@@ -81,7 +75,6 @@ class NestedBelongsTo implements ArgResolver
             && $args->arguments['delete']->value
         ) {
             $relation->dissociate();
-            // @phpstan-ignore-next-line Unrecognized mixin
             $relation->delete();
         }
     }

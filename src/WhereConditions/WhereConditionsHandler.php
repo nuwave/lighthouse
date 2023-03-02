@@ -60,14 +60,11 @@ class WhereConditionsHandler
                 $hasRelationConditions['amount'],
                 $hasRelationConditions['condition'] ?? null
             );
-
-            // @phpstan-ignore-next-line Simply wrong, maybe from Larastan?
             $builder->addNestedWhereQuery($nestedBuilder, $boolean);
         }
 
         if ($column = $whereConditions['column'] ?? null) {
             $this->assertValidColumnReference($column);
-
             $this->operator->applyConditions($builder, $whereConditions, $boolean);
         }
     }

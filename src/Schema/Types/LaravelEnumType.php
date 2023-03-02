@@ -129,7 +129,6 @@ class LaravelEnumType extends EnumType
     {
         // @phpstan-ignore-next-line only in some versions
         return method_exists($enumClass, 'getClassDescription')
-            // @phpstan-ignore-next-line proven to exist by the line above
             ? $enumClass::getClassDescription()
             : null;
     }

@@ -45,8 +45,6 @@ GRAPHQL;
 
     protected function modifyExistence(Model $model): bool
     {
-        /** @see \Illuminate\Database\Eloquent\SoftDeletes */
-        // @phpstan-ignore-next-line because it involves mixins
         return (bool) $model->forceDelete();
     }
 

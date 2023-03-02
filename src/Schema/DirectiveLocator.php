@@ -206,7 +206,6 @@ class DirectiveLocator
      */
     public function associated(Node $node): Collection
     {
-        // @phpstan-ignore-next-line https://github.com/phpstan/phpstan/issues/8474
         if (! property_exists($node, 'directives')) {
             throw new \Exception('Expected Node class with property `directives`, got: ' . $node::class);
         }
@@ -266,7 +265,6 @@ class DirectiveLocator
         $directives = $this->associatedOfType($node, $directiveClass);
 
         if ($directives->count() > 1) {
-            // @phpstan-ignore-next-line https://github.com/phpstan/phpstan/issues/8474
             if (! property_exists($node, 'name')) {
                 $unnamedNode = $node::class;
                 throw new \Exception("Expected Node class with property `name`, got: {$unnamedNode}.");

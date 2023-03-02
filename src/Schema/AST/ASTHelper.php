@@ -57,7 +57,6 @@ class ASTHelper
 
         $remainingDefinitions = (new Collection($original))
             ->reject(static function (Node $definition) use ($newNames, $overwriteDuplicates): bool {
-                // @phpstan-ignore-next-line https://github.com/phpstan/phpstan/issues/8474
                 assert(property_exists($definition, 'name'));
                 $oldName = $definition->name->value;
                 $collisionOccurred = in_array($oldName, $newNames);
@@ -172,7 +171,6 @@ class ASTHelper
             return $internalValue->value;
         }
 
-        // @phpstan-ignore-next-line any ValueNode is fine
         return AST::valueFromAST($defaultValue, $argumentType);
     }
 
@@ -183,7 +181,6 @@ class ASTHelper
      */
     public static function directiveDefinition(Node $definitionNode, string $name): ?DirectiveNode
     {
-        // @phpstan-ignore-next-line https://github.com/phpstan/phpstan/issues/8474
         if (! property_exists($definitionNode, 'directives')) {
             throw new \Exception('Expected Node class with property `directives`, got: ' . $definitionNode::class);
         }
@@ -214,13 +211,11 @@ class ASTHelper
     public static function firstByName(iterable $nodes, string $name): ?Node
     {
         foreach ($nodes as $node) {
-            // @phpstan-ignore-next-line https://github.com/phpstan/phpstan/issues/8474
             if (! property_exists($node, 'name')) {
                 throw new \Exception('Expected a Node with a name property, got: ' . $node::class);
             }
 
             if ($node->name->value === $name) {
-                // @phpstan-ignore-next-line Method Nuwave\Lighthouse\Schema\AST\ASTHelper::firstByName() should return TNode of GraphQL\Language\AST\Node|null but returns TNode of GraphQL\Language\AST\Node.
                 return $node;
             }
         }

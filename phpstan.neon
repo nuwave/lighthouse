@@ -18,20 +18,8 @@ parameters:
   - tests
   checkOctaneCompatibility: true
   excludePaths:
-  # Indirectly refers to \App\User (maybe through larastan?)
-  - tests/Utils/Models/User.php
-
   # Intentionally wrong
   - tests/Utils/Models/WithoutRelationClassImport.php
-
-  # Breaking changes in bensampo/laravel-enum
-  - tests/Integration/Schema/Types/LaravelEnumTypeDBTest.php
-  - tests/Integration/Schema/Types/PreLaravel9LaravelEnumTypeDBTest.php
-  - tests/Utils/Models/WithEnum.php
-  - tests/Utils/Models/PreLaravel9WithEnum.php
-
-  # As long as we support multiple Laravel versions at once, there will be some dead spots
-  reportUnmatchedIgnoredErrors: false
 
   ignoreErrors:
   # PHPStan does not get it
@@ -41,8 +29,6 @@ parameters:
   - '#Parameter \#1 \$response of static method Nuwave\\Lighthouse\\Testing\\TestResponseUtils::extractValidationErrors\(\) expects Illuminate\\Testing\\TestResponse, \$this\(Nuwave\\Lighthouse\\Testing\\TestResponseMixin\) given\.#'
   - path: tests/database/factories/*
     message: '#Variable \$factory might not be defined#'
-  - '#Function factory invoked with 2 parameters, 0 required\.#'
-  - '#Function factory invoked with 1 parameter, 0 required\.#'
 
   # Mixins are magical
   - path: src/Testing/TestResponseMixin.php
@@ -51,8 +37,6 @@ parameters:
     message: '#Method Nuwave\\Lighthouse\\Testing\\TestResponseMixin::assertGraphQLDebugMessage\(\) invoked with 1 parameter, 0 required\.#'
   - path: src/Testing/TestResponseMixin.php
     message: '#Anonymous function should return Illuminate\\Testing\\TestResponse but returns .*#'
-  - path: tests/*
-    message: '#Call to an undefined method Illuminate\\Testing\\TestResponse::.*#'
 
   # Relation forwards calls to Builder
   - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Builder<Illuminate\\Database\\Eloquent\\Model>|Illuminate\\Database\\Eloquent\\Relations\\Relation<Illuminate\\Database\\Eloquent\\Model>|Illuminate\\Database\\Query\\Builder::(orderBy|where|whereIn|whereNotIn|whereBetween|whereJsonContains|whereNotBetween)\(\)\.#'
@@ -61,18 +45,11 @@ parameters:
   - path: tests/Unit/Schema/Directives/BaseDirectiveTest.php
     message: '#Call to protected method getModelClass\(\) of class Nuwave\\Lighthouse\\Schema\\Directives\\BaseDirective\.#'
 
-  # This class or an equivalent of it will be present in a Laravel install
-  - '#.* unknown class App\\User\.#'
-
   # This is a library, so it should be extendable
   - '#Unsafe usage of new static.*#'
 
   # This really has no type in root resolvers
   - '#Method .* has parameter \$root with no type specified\.#'
-  - '#Method .* has parameter \$root with no typehint specified\.#'
-
-  # PHPStan and PHPUnit disagree with themselves
-  - '#Unable to resolve the template type ExpectedType in call to method PHPUnit\\Framework\\Assert::assertSame\(\)#'
 
   # Ease transition for non-nullable properties towards native types https://github.com/phpstan/phpstan/issues/5150
   - '#Property .* in isset\(\) is not nullable\.#'

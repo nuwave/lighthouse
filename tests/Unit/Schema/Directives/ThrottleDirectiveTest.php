@@ -20,16 +20,12 @@ final class ThrottleDirectiveTest extends TestCase
         $queriedKeys = [];
 
         $rateLimiter = $this->createMock(RateLimiter::class);
-        // @phpstan-ignore-next-line phpstan ignores markTestSkipped
         $rateLimiter->expects(self::atLeast(1))
             ->method('limiter')
             ->with('test')
             ->willReturn(static fn (): array => [
-                // @phpstan-ignore-next-line phpstan ignores markTestSkipped
                 Limit::perMinute(1),
-                // @phpstan-ignore-next-line phpstan ignores markTestSkipped
                 Limit::perMinute(2)->by('another_key'),
-                // / @phpstan-ignore-next-line phpstan ignores markTestSkipped
                 Limit::perMinute(3),
             ]);
 

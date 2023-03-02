@@ -135,7 +135,6 @@ class FederationPrinter
 
         return SchemaPrinter::doPrint(
             new Schema($config),
-            // @phpstan-ignore-next-line We extended the SchemaPrinter to allow for this option
             ['printDirectives' => $printDirectives]
         );
     }
