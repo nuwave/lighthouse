@@ -70,7 +70,7 @@ final class MorphManyDirectiveTest extends DBTestCase
         ]);
         $this->postImages = Collection::times(
             $this->faker()->numberBetween(1, 10),
-            fn(): Model => $this->post
+            fn (): Model => $this->post
                 ->images()
                 ->save(
                     factory(Image::class)->create()

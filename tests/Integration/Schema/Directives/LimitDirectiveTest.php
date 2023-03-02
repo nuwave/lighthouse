@@ -48,6 +48,7 @@ final class LimitDirectiveTest extends DBTestCase
 
     /**
      * TODO support this and add INPUT_FIELD_DEFINITION back as an allowed location.
+     *
      * @return never
      */
     public function testLimitOnInputField(): void
