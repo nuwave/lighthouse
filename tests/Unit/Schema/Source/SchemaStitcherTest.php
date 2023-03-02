@@ -18,7 +18,8 @@ final class SchemaStitcherTest extends TestCase
     {
         parent::setUp();
 
-        // @phpstan-ignore-next-line using the Safe variant crashes PHPStan (uses the short `-p` because `--parent` is not available on macOS)
+        // uses the short `-p` because `--parent` is not available on macOS
+        // @phpstan-ignore-next-line using the Safe variant crashes PHPStan
         exec('mkdir -p ' . self::SCHEMA_PATH);
     }
 
