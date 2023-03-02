@@ -14,6 +14,7 @@ final class CustomStuff
     public function resolveType(mixed $root): Type
     {
         $classBasename = class_basename($root);
+
         return $this->typeRegistry->get("Custom{$classBasename}");
     }
 }
