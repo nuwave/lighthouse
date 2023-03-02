@@ -138,10 +138,8 @@ class ASTHelper
      * Extract a named argument from a given directive node.
      *
      * @param  mixed  $default  is returned if the directive does not have the argument
-     *
-     * @return mixed the value given to the directive
      */
-    public static function directiveArgValue(DirectiveNode $directive, string $name, mixed $default = null)
+    public static function directiveArgValue(DirectiveNode $directive, string $name, mixed $default = null): mixed
     {
         $arg = self::firstByName($directive->arguments, $name);
 
@@ -155,10 +153,8 @@ class ASTHelper
      *
      * @param  \GraphQL\Language\AST\ValueNode&\GraphQL\Language\AST\Node  $defaultValue
      * @param  \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\InputType  $argumentType
-     *
-     * @return mixed the plain PHP value
      */
-    public static function defaultValueForArgument(ValueNode $defaultValue, Type $argumentType)
+    public static function defaultValueForArgument(ValueNode $defaultValue, Type $argumentType): mixed
     {
         // webonyx/graphql-php expects the internal value here, whereas the
         // SDL uses the ENUM's name, so we run the conversion here

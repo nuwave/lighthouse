@@ -38,8 +38,6 @@ class Argument
 
     /**
      * Get the plain PHP value of this argument.
-     *
-     * @return mixed the plain PHP value
      */
     public function toPlain(): mixed
     {

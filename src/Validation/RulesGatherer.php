@@ -95,7 +95,7 @@ class RulesGatherer
     }
 
     /**
-     * @param  mixed  $value  Any argument value is possible
+     * @param  mixed  $value  any argument value is possible
      * @param  \Illuminate\Support\Collection<int, \Nuwave\Lighthouse\Support\Contracts\Directive>  $directives
      * @param  array<int|string>  $path
      */

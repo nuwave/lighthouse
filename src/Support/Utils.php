@@ -68,8 +68,6 @@ class Utils
      *
      * @param  mixed  $object  object with protected member
      * @param  string  $memberName  name of object's protected member
-     *
-     * @return mixed value of object's protected member
      */
     public static function accessProtected(mixed $object, string $memberName): mixed
     {
@@ -85,8 +83,6 @@ class Utils
      * @param  mixed  $object  object with protected method
      * @param  string  $methodName  name of object's protected method
      * @param  array<mixed>  ...$args  zero or more parameters to be passed to the method
-     *
-     * @return mixed result of calling the method
      */
     public static function callProtected(mixed $object, string $methodName, array ...$args): mixed
     {
@@ -103,7 +99,7 @@ class Utils
      *
      * @return mixed|array<mixed>
      */
-    public static function mapEach(\Closure $callback, $valueOrValues)
+    public static function mapEach(\Closure $callback, mixed $valueOrValues): mixed
     {
         if (is_array($valueOrValues)) {
             return array_map($callback, $valueOrValues);
@@ -119,7 +115,7 @@ class Utils
      *
      * @return mixed|array<mixed>
      */
-    public static function mapEachRecursive(\Closure $callback, $valueOrValues)
+    public static function mapEachRecursive(\Closure $callback, mixed $valueOrValues): mixed
     {
         if (is_array($valueOrValues)) {
             return array_map(static fn ($value) => static::mapEachRecursive($callback, $value), $valueOrValues);

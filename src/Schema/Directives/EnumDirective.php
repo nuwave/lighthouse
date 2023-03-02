@@ -28,10 +28,8 @@ GRAPHQL;
 
     /**
      * Get the internal value of the enum key.
-     *
-     * @return mixed|null
      */
-    public function value()
+    public function value(): mixed
     {
         return $this->directiveArgValue('value');
     }

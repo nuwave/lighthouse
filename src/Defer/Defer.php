@@ -74,7 +74,7 @@ class Defer implements CreatesResponse
      *
      * @return mixed the data if it is already available
      */
-    public function defer(\Closure $resolver, string $path)
+    public function defer(\Closure $resolver, string $path): mixed
     {
         $data = $this->getData($path);
         if (null !== $data) {
@@ -96,20 +96,15 @@ class Defer implements CreatesResponse
         return null;
     }
 
-    /**
-     * @return mixed The data at the path
-     */
-    protected function getData(string $path)
+    protected function getData(string $path): mixed
     {
         return Arr::get($this->result, "data.{$path}");
     }
 
     /**
      * @param  \Closure(): mixed  $resolver
-     *
-     * @return mixed The loaded data
      */
-    protected function resolve(\Closure $resolver, string $path)
+    protected function resolve(\Closure $resolver, string $path): mixed
     {
         unset($this->deferred[$path]);
         $this->resolved[] = $path;
@@ -119,10 +114,8 @@ class Defer implements CreatesResponse
 
     /**
      * @param  \Closure(): mixed  $originalResolver
-     *
-     * @return mixed The loaded data
      */
-    public function findOrResolve(\Closure $originalResolver, string $path)
+    public function findOrResolve(\Closure $originalResolver, string $path): mixed
     {
         if ($this->hasData($path)) {
             return $this->getData($path);

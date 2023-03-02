@@ -154,32 +154,24 @@ abstract class DriverManager
      * Dynamically call the default driver instance.
      *
      * @param  array<mixed>  $parameters
-     *
-     * @return mixed whatever the driver returned
      */
-    public function __call(string $method, array $parameters)
+    public function __call(string $method, array $parameters): mixed
     {
         return $this->driver()->$method(...$parameters);
     }
 
     /**
      * Get configuration key.
-     *
-     * @return string
      */
-    abstract protected function configKey();
+    abstract protected function configKey(): string;
 
     /**
      * Get configuration driver key.
-     *
-     * @return string
      */
-    abstract protected function driverKey();
+    abstract protected function driverKey(): string;
 
     /**
      * The interface the driver should implement.
-     *
-     * @return string
      */
-    abstract protected function interface();
+    abstract protected function interface(): string;
 }
