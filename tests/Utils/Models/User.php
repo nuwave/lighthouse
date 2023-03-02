@@ -139,6 +139,7 @@ final class User extends Authenticatable
     /**
      * @param \Illuminate\Database\Eloquent\Builder<self> $query
      * @param array{company: string} $args
+     *
      * @return \Illuminate\Database\Eloquent\Builder<self>
      */
     public function scopeCompanyName(EloquentBuilder $query, array $args): EloquentBuilder
@@ -149,6 +150,7 @@ final class User extends Authenticatable
 
     /**
      * @param \Illuminate\Database\Eloquent\Builder<self> $query
+     *
      * @return \Illuminate\Database\Eloquent\Builder<self>
      */
     public function scopeNamed(EloquentBuilder $query): EloquentBuilder

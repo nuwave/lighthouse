@@ -29,6 +29,7 @@ final class WithEnum extends Model
 
     /**
      * @param \Illuminate\Database\Eloquent\Builder<self> $builder
+     *
      * @return \Illuminate\Database\Eloquent\Builder<self>
      */
     public function scopeByType(EloquentBuilder $builder, AOrB $aOrB): EloquentBuilder
