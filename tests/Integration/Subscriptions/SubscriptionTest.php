@@ -6,6 +6,7 @@ use Illuminate\Auth\SessionGuard;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Arr;
+use Illuminate\Testing\TestResponse;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
 use Nuwave\Lighthouse\Subscriptions\Storage\CacheStorageManager;
@@ -254,10 +255,7 @@ GRAPHQL;
         );
     }
 
-    /**
-     * @return \Illuminate\Testing\TestResponse
-     */
-    protected function subscribe()
+    protected function subscribe(): TestResponse
     {
         return $this->graphQL(/** @lang GraphQL */ '
             subscription OnPostCreated {

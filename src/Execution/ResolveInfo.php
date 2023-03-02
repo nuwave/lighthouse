@@ -107,7 +107,7 @@ class ResolveInfo extends BaseResolveInfo
             });
 
             Utils::applyEach(
-                static function ($value) use (&$builder, $directiveFilter) {
+                static function ($value) use (&$builder, $directiveFilter): void {
                     if ($value instanceof ArgumentSet) {
                         self::applyArgBuilderDirectives($value, $builder, $directiveFilter);
                     }

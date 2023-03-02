@@ -89,7 +89,7 @@ GRAPHQL;
             ];
         }
 
-        $fieldValue->wrapResolver(fn (callable $resolver) => function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $limits) {
+        $fieldValue->wrapResolver(fn (callable $resolver): \Closure => function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $limits) {
             foreach ($limits as $limit) {
                 $this->handleLimit(
                     $limit['key'],

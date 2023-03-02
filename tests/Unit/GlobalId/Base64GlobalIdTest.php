@@ -6,40 +6,37 @@ use Nuwave\Lighthouse\GlobalId\Base64GlobalId;
 use Nuwave\Lighthouse\GlobalId\GlobalIdException;
 use Tests\TestCase;
 
-final class GlobalIdTest extends TestCase
+final class Base64GlobalIdTest extends TestCase
 {
-    /**
-     * @var \Nuwave\Lighthouse\GlobalId\Base64GlobalId
-     */
-    protected $globalIdResolver;
+    protected Base64GlobalId $base64GlobalId;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->globalIdResolver = new Base64GlobalId();
+        $this->base64GlobalId = new Base64GlobalId();
     }
 
     public function testHandleGlobalIds(): void
     {
-        $globalId = $this->globalIdResolver->encode('User', 'asdf');
-        $idParts = $this->globalIdResolver->decode($globalId);
+        $globalId = $this->base64GlobalId->encode('User', 'asdf');
+        $idParts = $this->base64GlobalId->decode($globalId);
 
         $this->assertSame(['User', 'asdf'], $idParts);
     }
 
     public function testDecodeJustTheId(): void
     {
-        $globalId = $this->globalIdResolver->encode('User', 123);
+        $globalId = $this->base64GlobalId->encode('User', 123);
 
-        $this->assertSame('123', $this->globalIdResolver->decodeID($globalId));
+        $this->assertSame('123', $this->base64GlobalId->decodeID($globalId));
     }
 
     public function testDecodeJustTheType(): void
     {
-        $globalId = $this->globalIdResolver->encode('User', 123);
+        $globalId = $this->base64GlobalId->encode('User', 123);
 
-        $this->assertSame('User', $this->globalIdResolver->decodeType($globalId));
+        $this->assertSame('User', $this->base64GlobalId->decodeType($globalId));
     }
 
     /**
@@ -48,7 +45,7 @@ final class GlobalIdTest extends TestCase
     public function testThrowsOnInvalidGlobalIds(string $invalidGlobalId): void
     {
         $this->expectException(GlobalIdException::class);
-        $this->globalIdResolver->decode($invalidGlobalId);
+        $this->base64GlobalId->decode($invalidGlobalId);
     }
 
     /**

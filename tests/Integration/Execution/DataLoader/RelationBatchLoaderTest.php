@@ -421,6 +421,9 @@ final class RelationBatchLoaderTest extends DBTestCase
             ]);
     }
 
+    /**
+     * @return never
+     */
     public function testCombineEagerLoadsThatAreTheSameRecursively(): void
     {
         $this->schema = /** @lang GraphQL */ '

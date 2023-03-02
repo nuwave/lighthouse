@@ -8,6 +8,9 @@ final class EmailCustomMessageValidator extends Validator
 {
     public const MESSAGE = 'this is a custom error message';
 
+    /**
+     * @return array{email: array<string>}
+     */
     public function rules(): array
     {
         return [

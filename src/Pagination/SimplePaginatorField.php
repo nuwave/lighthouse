@@ -12,7 +12,14 @@ class SimplePaginatorField
      *
      * @param  \Illuminate\Pagination\Paginator<mixed>  $root
      *
-     * @return array<string, mixed>
+     * @return array{
+     *     count: int,
+     *     currentPage: int,
+     *     firstItem: int,
+     *     lastItem: int,
+     *     perPage: int,
+     *     hasMorePages: bool,
+     * }
      */
     public function paginatorInfoResolver(Paginator $root): array
     {

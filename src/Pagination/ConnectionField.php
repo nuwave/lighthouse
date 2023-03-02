@@ -16,7 +16,16 @@ class ConnectionField
     /**
      * @param  \Illuminate\Contracts\Pagination\LengthAwarePaginator<mixed>  $paginator
      *
-     * @return array<string, mixed>
+     * @return array{
+     *     hasNextPage: bool,
+     *     hasPreviousPage: bool,
+     *     startCursor: string|null,
+     *     endCursor: string|null,
+     *     total: int,
+     *     count: int,
+     *     currentPage: int,
+     *     lastPage: int,
+     * }
      */
     public function pageInfoResolver(LengthAwarePaginator $paginator): array
     {

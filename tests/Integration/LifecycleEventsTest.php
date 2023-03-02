@@ -26,7 +26,7 @@ final class LifecycleEventsTest extends TestCase
         /** @var array<int, object> $events */
         $events = [];
 
-        $eventsDispatcher->listen('*', static function (string $name, array $payload) use (&$events) {
+        $eventsDispatcher->listen('*', static function (string $name, array $payload) use (&$events): void {
             if (Str::startsWith($name, 'Nuwave\\Lighthouse')) {
                 // We only fire class-based events, so the payload
                 // always holds exactly a single class instance.

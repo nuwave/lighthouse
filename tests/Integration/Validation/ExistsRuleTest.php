@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Validation;
 
+use Illuminate\Testing\TestResponse;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
@@ -43,10 +44,7 @@ final class ExistsRuleTest extends DBTestCase
             ->assertGraphQLValidationError('id', 'The selected id is invalid.');
     }
 
-    /**
-     * @return \Illuminate\Testing\TestResponse
-     */
-    protected function macroUser(User $user)
+    protected function macroUser(User $user): TestResponse
     {
         return $this->graphQL(/** @lang GraphQL */ '
         query ($id: ID!) {
@@ -59,10 +57,7 @@ final class ExistsRuleTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @return \Illuminate\Testing\TestResponse
-     */
-    protected function callbackUser(User $user)
+    protected function callbackUser(User $user): TestResponse
     {
         return $this->graphQL(/** @lang GraphQL */ '
         query ($id: ID!) {

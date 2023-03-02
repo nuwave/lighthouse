@@ -18,7 +18,7 @@ final class AuthorizationErrorHandlerTest extends TestCase
         $original = new Error('foo', null, null, [], null, $authorizationException);
 
         $error = null;
-        $next = static function (Error $e) use (&$error) {
+        $next = static function (Error $e) use (&$error): void {
             $error = $e;
         };
 

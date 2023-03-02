@@ -436,13 +436,13 @@ final class ValidationTest extends TestCase
 
     public function testCustomValidationWithReferencesAreQualified(): void
     {
-        ValidatorFactory::extendDependent('equal_field', static function ($attribute, $value, $parameters, Validator $validator) {
+        ValidatorFactory::extendDependent('equal_field', static function ($attribute, $value, $parameters, Validator $validator): bool {
             $reference = Arr::get($validator->getData(), $parameters[0]);
 
             return $reference === $value;
         }, 'The :attribute must be equal to :other.');
 
-        ValidatorFactory::replacer('equal_field', static fn (string $message, string $attribute, string $rule, array $parameters) => str_replace(':other', implode(', ', $parameters), $message));
+        ValidatorFactory::replacer('equal_field', static fn (string $message, string $attribute, string $rule, array $parameters): string => str_replace(':other', implode(', ', $parameters), $message));
 
         $this->schema = /** @lang GraphQL */ '
         type Query {

@@ -75,10 +75,12 @@ final class MorphToManyDirectiveTest extends DBTestCase
             'data' => [
                 'post' => [
                     'id' => $this->post->id,
-                    'tags' => $this->postTags->map(static fn (Tag $tag) => [
-                        'id' => $tag->id,
-                        'name' => $tag->name,
-                    ])->toArray(),
+                    'tags' => $this->postTags
+                        ->map(static fn (Tag $tag): array => [
+                            'id' => $tag->id,
+                            'name' => $tag->name,
+                        ])
+                        ->toArray(),
                 ],
             ],
         ]);
@@ -127,12 +129,14 @@ final class MorphToManyDirectiveTest extends DBTestCase
                 'post' => [
                     'id' => $this->post->id,
                     'tags' => [
-                        'edges' => $this->postTags->map(static fn (Tag $tag) => [
-                            'node' => [
-                                'id' => $tag->id,
-                                'name' => $tag->name,
-                            ],
-                        ])->toArray(),
+                        'edges' => $this->postTags
+                            ->map(static fn (Tag $tag): array => [
+                                'node' => [
+                                    'id' => $tag->id,
+                                    'name' => $tag->name,
+                                ],
+                            ])
+                            ->toArray(),
                     ],
                 ],
             ],
@@ -180,10 +184,12 @@ final class MorphToManyDirectiveTest extends DBTestCase
             'data' => [
                 'post' => [
                     'id' => $this->post->id,
-                    'customTags' => $this->postTags->map(static fn (Tag $tag) => [
-                        'id' => $tag->id,
-                        'name' => $tag->name,
-                    ])->toArray(),
+                    'customTags' => $this->postTags
+                        ->map(static fn (Tag $tag): array => [
+                            'id' => $tag->id,
+                            'name' => $tag->name,
+                        ])
+                        ->toArray(),
                 ],
             ],
         ]);
@@ -200,11 +206,13 @@ final class MorphToManyDirectiveTest extends DBTestCase
         $post->save();
 
         /** @var \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\Tag> $postTags */
-        $postTags = factory(Tag::class, 3)->create()->map(static function (Tag $tag) use ($post) {
-            $post->tags()->attach($tag);
+        $postTags = factory(Tag::class, 3)
+            ->create()
+            ->map(static function (Tag $tag) use ($post): Tag {
+                $post->tags()->attach($tag);
 
-            return $tag;
-        });
+                return $tag;
+            });
 
         $task = factory(Task::class)->make();
         assert($task instanceof Task);
@@ -212,11 +220,13 @@ final class MorphToManyDirectiveTest extends DBTestCase
         $task->save();
 
         /** @var \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\Tag> $taskTags */
-        $taskTags = factory(Tag::class, 3)->create()->map(static function (Tag $tag) use ($task) {
-            $task->tags()->attach($tag);
+        $taskTags = factory(Tag::class, 3)
+            ->create()
+            ->map(static function (Tag $tag) use ($task): Tag {
+                $task->tags()->attach($tag);
 
-            return $tag;
-        });
+                return $tag;
+            });
 
         $this->schema = /** @lang GraphQL */ '
         interface Tag @interface(resolveType: "' . $this->qualifyTestResolver('resolveType') . '") {

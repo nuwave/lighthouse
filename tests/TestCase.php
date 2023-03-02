@@ -183,7 +183,7 @@ GRAPHQL;
      */
     protected function resolveApplicationExceptionHandler($app): void
     {
-        $app->singleton(ExceptionHandler::class, static fn () => new ThrowingExceptionHandler());
+        $app->singleton(ExceptionHandler::class, static fn (): ThrowingExceptionHandler => new ThrowingExceptionHandler());
     }
 
     /**

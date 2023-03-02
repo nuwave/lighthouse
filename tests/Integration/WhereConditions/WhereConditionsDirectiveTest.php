@@ -339,9 +339,12 @@ final class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testHasMixed(): void
     {
-        factory(User::class, 9)->create()->each(static function ($user) {
-            $user->posts()->saveMany(factory(Post::class, 2)->create());
-        });
+        factory(User::class, 9)
+            ->create()
+            ->each(static function (User $user): void {
+                $posts = factory(Post::class, 2)->create();
+                $user->posts()->saveMany($posts);
+            });
 
         $commentOne = new Comment();
         $commentOne->post_id = 3;
@@ -423,9 +426,12 @@ final class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testHasRelation(): void
     {
-        factory(User::class, 5)->create()->each(static function ($user) {
-            $user->posts()->saveMany(factory(Post::class, 2)->create());
-        });
+        factory(User::class, 5)
+            ->create()
+            ->each(static function (User $user): void {
+                $posts = factory(Post::class, 2)->create();
+                $user->posts()->saveMany($posts);
+            });
 
         $commentOne = new Comment();
         $commentOne->user_id = 1;
@@ -467,9 +473,12 @@ final class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testHasAmount(): void
     {
-        factory(User::class, 5)->create()->each(static function ($user) {
-            $user->posts()->saveMany(factory(Post::class, 2)->create());
-        });
+        factory(User::class, 5)
+            ->create()
+            ->each(static function (User $user): void {
+                $posts = factory(Post::class, 2)->create();
+                $user->posts()->saveMany($posts);
+            });
 
         for ($i = 0; $i < 5; ++$i) {
             $commentBatchOne = new Comment();
@@ -513,9 +522,12 @@ final class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testHasOperator(): void
     {
-        factory(User::class, 5)->create()->each(static function ($user) {
-            $user->posts()->saveMany(factory(Post::class, 2)->create());
-        });
+        factory(User::class, 5)
+            ->create()
+            ->each(static function (User $user): void {
+                $posts = factory(Post::class, 2)->create();
+                $user->posts()->saveMany($posts);
+            });
 
         for ($i = 0; $i < 5; ++$i) {
             $commentBatchOne = new Comment();
@@ -560,9 +572,12 @@ final class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testHasCondition(): void
     {
-        factory(User::class, 5)->create()->each(static function ($user) {
-            $user->posts()->saveMany(factory(Post::class, 2)->create());
-        });
+        factory(User::class, 5)
+            ->create()
+            ->each(static function (User $user): void {
+                $posts = factory(Post::class, 2)->create();
+                $user->posts()->saveMany($posts);
+            });
 
         $commentOne = new Comment();
         $commentOne->user_id = 1;
@@ -605,9 +620,12 @@ final class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testHasRecursive(): void
     {
-        factory(User::class, 7)->create()->each(static function ($user) {
-            $user->posts()->saveMany(factory(Post::class, 2)->create());
-        });
+        factory(User::class, 7)
+            ->create()
+            ->each(static function (User $user): void {
+                $posts = factory(Post::class, 2)->create();
+                $user->posts()->saveMany($posts);
+            });
 
         $commentOne = new Comment();
         $commentOne->user_id = 1;
@@ -651,9 +669,12 @@ final class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testHasNested(): void
     {
-        factory(User::class, 5)->create()->each(static function ($user) {
-            $user->posts()->saveMany(factory(Post::class, 2)->create());
-        });
+        factory(User::class, 5)
+            ->create()
+            ->each(static function (User $user): void {
+                $posts = factory(Post::class, 2)->create();
+                $user->posts()->saveMany($posts);
+            });
 
         $commentOne = new Comment();
         $commentOne->user_id = 3;

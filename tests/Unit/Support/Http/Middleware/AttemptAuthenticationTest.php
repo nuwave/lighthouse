@@ -12,15 +12,14 @@ use Tests\Utils\Models\User;
 
 final class AttemptAuthenticationTest extends TestCase
 {
-    /** @var \Tests\Utils\Models\User|null */
-    public $user;
+    public ?User $user = null;
 
     protected function getEnvironmentSetUp($app): void
     {
         parent::getEnvironmentSetUp($app);
 
         $authManager = $app->make(AuthManager::class);
-        $authManager->viaRequest('foo', fn () => $this->user);
+        $authManager->viaRequest('foo', fn (): ?User => $this->user);
 
         $config = $app->make(ConfigRepository::class);
         $config->set('lighthouse.route.middleware', [
@@ -39,7 +38,7 @@ final class AttemptAuthenticationTest extends TestCase
             ->with(
                 null,
                 [],
-                new Callback(fn (Context $context) => null === $this->user)
+                new Callback(fn (Context $context): bool => null === $this->user)
             );
 
         $this->schema = /** @lang GraphQL */ '
@@ -63,7 +62,7 @@ final class AttemptAuthenticationTest extends TestCase
             ->with(
                 null,
                 [],
-                new Callback(fn (Context $context) => $this->user === $context->user())
+                new Callback(fn (Context $context): bool => $this->user === $context->user())
             );
 
         $this->schema = /** @lang GraphQL */ '

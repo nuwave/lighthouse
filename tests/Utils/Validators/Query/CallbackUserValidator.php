@@ -8,15 +8,16 @@ use Nuwave\Lighthouse\Validation\Validator;
 
 final class CallbackUserValidator extends Validator
 {
+    /**
+     * @return array{id: array<\Illuminate\Validation\Rules\Exists|string>}
+     */
     public function rules(): array
     {
         return [
             'id' => [
                 'required',
                 Rule::exists('users', 'id')
-                    ->where(static function (Builder $query): void {
-                        $query->where('name', 'Admin');
-                    }),
+                    ->where(static fn (Builder $query): Builder => $query->where('name', 'Admin')),
             ],
         ];
     }

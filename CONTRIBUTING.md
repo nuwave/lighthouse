@@ -212,15 +212,12 @@ class Foo
 {
     /**
      * Some attribute.
-     *
-     * @var string
      */
-    protected $bar;
+    protected string $bar;
 
     /**
      * Use $this for fluent setters when we expect the exact same object back.
      *
-     * @param  string  $bar
      * @return $this
      */
     public function setBar(string $bar): self

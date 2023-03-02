@@ -14,7 +14,7 @@ final class LocalizedUserType extends Enum implements LocalizedEnum
 
     public const Moderator = 'MODERATOR';
 
-    public static function getDescription($value): string
+    public static function getDescription(mixed $value): string
     {
         if (self::Moderator === $value) {
             return 'Localize Moderator';

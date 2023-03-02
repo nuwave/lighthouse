@@ -13,15 +13,11 @@ class CacheStorageManager implements StoresSubscriptions
 {
     /**
      * The cache key for topics.
-     *
-     * @var string
      */
     public const TOPIC_KEY = 'graphql.topic';
 
     /**
      * The cache key for subscribers.
-     *
-     * @var string
      */
     public const SUBSCRIBER_KEY = 'graphql.subscriber';
 

@@ -691,9 +691,7 @@ final class DeferTest extends TestCase
         ]);
 
         $this->mockResolver(
-            static function () {
-                throw new Error('deferred_exception');
-            },
+            static fn () => throw new Error('deferred_exception'),
             'throw'
         );
 

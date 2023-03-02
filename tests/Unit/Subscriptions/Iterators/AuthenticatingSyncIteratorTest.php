@@ -33,8 +33,8 @@ final class AuthenticatingSyncIteratorTest extends IteratorTest
                 return $subscriber;
             });
 
-        $guard = \Mockery::mock(SubscriptionGuard::class, static function (MockInterface $mock) use ($subscribers) {
-            $subscribers->each(static function (Subscriber $subscriber) use ($mock) {
+        $guard = \Mockery::mock(SubscriptionGuard::class, static function (MockInterface $mock) use ($subscribers): void {
+            $subscribers->each(static function (Subscriber $subscriber) use ($mock): void {
                 $user = $subscriber->context->user();
 
                 $mock
@@ -56,7 +56,7 @@ final class AuthenticatingSyncIteratorTest extends IteratorTest
         /** @var \Illuminate\Auth\AuthManager $authManager */
         $authManager = $this->app->make(AuthManager::class);
 
-        $authManager->extend(SubscriptionGuard::GUARD_NAME, static fn () => $guard);
+        $authManager->extend(SubscriptionGuard::GUARD_NAME, static fn (): SubscriptionGuard => $guard);
 
         $processedItems = [];
         $authenticatedUsers = [];
@@ -101,7 +101,7 @@ final class AuthenticatingSyncIteratorAuthenticatableStub implements Authenticat
         return '';
     }
 
-    public function setRememberToken($value)
+    public function setRememberToken($value): void
     {
     }
 

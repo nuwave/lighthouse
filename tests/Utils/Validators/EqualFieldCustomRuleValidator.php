@@ -7,6 +7,9 @@ use Tests\Utils\Rules\EqualFieldRule;
 
 final class EqualFieldCustomRuleValidator extends Validator
 {
+    /**
+     * @return array{bar: array<\Tests\Utils\Rules\EqualFieldRule>}
+     */
     public function rules(): array
     {
         return [
