@@ -288,7 +288,7 @@ final class AggregateDirectiveTest extends DBTestCase
     /**
      * @param array{difficulty: int, exclude: int} $args
      */
-    public function builder($root, array $args): Builder
+    public function builder(mixed $root, array $args): Builder
     {
         return DB::table('tasks')
             ->where('id', '!=', $args['exclude']);

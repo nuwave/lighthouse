@@ -151,7 +151,7 @@ GRAPHQL;
      *
      * @return iterable<\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>>
      */
-    protected function modelsToCheck($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): iterable
+    protected function modelsToCheck(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): iterable
     {
         if ($this->directiveArgValue('query')) {
             return $resolveInfo

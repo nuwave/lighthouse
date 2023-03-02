@@ -94,7 +94,7 @@ use App\User;
 
 class CreateUser
 {
-    public function __invoke($root, array $args): User
+    public function __invoke(mixed $root, array $args): User
     {
         return User::create([
             // This will be the trimmed value of the `name` argument

@@ -28,7 +28,7 @@ class ResolveNested implements ArgResolver
     /**
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
      */
-    public function __invoke($root, $args): mixed
+    public function __invoke(mixed $root, $args): mixed
     {
         [$nestedArgs, $regularArgs] = ($this->argPartitioner)($args, $root);
         assert($nestedArgs instanceof ArgumentSet);

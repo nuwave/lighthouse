@@ -59,7 +59,7 @@ mutation CreateTaskWithNotes {
 We might resolve that mutation by writing a resolver function that handles all input at once.
 
 ```php
-function createTaskWithNotes($root, array $args): \App\Models\Task {
+function createTaskWithNotes(mixed $root, array $args): \App\Models\Task {
     // Pull and remove notes from the args array
     $notes = \Illuminate\Support\Arr::pull($args, 'notes');
 
@@ -91,7 +91,7 @@ a part of the given input arguments. The execution engine should traverse the gi
 input and take care of calling the appropriate functions with their respective arguments.
 
 ```php
-function createTask($root, array $args): \App\Models\Task {
+function createTask(mixed $root, array $args): \App\Models\Task {
     return \App\Models\Task::create($args);
 }
 

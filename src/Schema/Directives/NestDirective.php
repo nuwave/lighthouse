@@ -23,10 +23,9 @@ GRAPHQL;
     /**
      * Delegate to nested arg resolvers.
      *
-     * @param  mixed  $root  the result of the parent resolver
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>  $args  the slice of arguments that belongs to this nested resolver
      */
-    public function __invoke($root, $args): mixed
+    public function __invoke(mixed $root, $args): mixed
     {
         $resolveNested = new ResolveNested();
 

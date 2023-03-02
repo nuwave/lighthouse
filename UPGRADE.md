@@ -478,7 +478,7 @@ type User {
 The method will have to change like this:
 
 ```diff
--public function purchasedItemsCount($root, array $args)
+-public function purchasedItemsCount(mixed $root, array $args)
 +public function purchasedItemsCount(int $year, ?bool $includeReturns)
 ```
 

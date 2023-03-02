@@ -2783,7 +2783,7 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class Blog
 {
-    public function statistics($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Builder
+    public function statistics(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Builder
     {
         return DB::table('posts')
             ->leftJoinSub(...)
@@ -2819,7 +2819,7 @@ final class Posts
      * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context Shared between all fields.
      * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo Metadata for advanced query resolution.
      */
-    public function __invoke($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): LengthAwarePaginator
+    public function __invoke(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): LengthAwarePaginator
     {
         //...apply your logic
         return new LengthAwarePaginator([

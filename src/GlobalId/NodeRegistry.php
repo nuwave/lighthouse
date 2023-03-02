@@ -56,7 +56,7 @@ class NodeRegistry
      *
      * @return mixed the result of calling the resolver
      */
-    public function resolve($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
+    public function resolve(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
     {
         [$decodedType, $decodedId] = $args['id'];
 

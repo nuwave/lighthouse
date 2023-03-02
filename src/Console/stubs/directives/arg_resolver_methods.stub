@@ -3,7 +3,7 @@
      * @param  mixed|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>  $value  The slice of arguments that belongs to this nested resolver.
      * @return mixed
      */
-    public function __invoke($root, $value)
+    public function __invoke(mixed $root, $value)
     {
         // TODO implement the arg resolver
     }
