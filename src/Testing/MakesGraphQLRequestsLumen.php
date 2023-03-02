@@ -39,12 +39,14 @@ trait MakesGraphQLRequestsLumen
      * @param  array<string, mixed>  $variables  The variables to include in the query
      * @param  array<string, mixed>  $extraParams  Extra parameters to add to the JSON payload
      * @param  array<string, mixed>  $headers  HTTP headers to pass to the POST request
+     * @param  array<string, string>  $routeParams  Parameters to pass to the route
      */
     protected function graphQL(
         string $query,
         array $variables = [],
         array $extraParams = [],
-        array $headers = []
+        array $headers = [],
+        array $routeParams = []
     ): self {
         $params = ['query' => $query];
 
@@ -53,7 +55,7 @@ trait MakesGraphQLRequestsLumen
         }
 
         $params += $extraParams;
-        $this->postGraphQL($params);
+        $this->postGraphQL($params, $headers, $routeParams);
 
         return $this;
     }
@@ -66,11 +68,12 @@ trait MakesGraphQLRequestsLumen
      *
      * @param  array<mixed, mixed>  $data  JSON-serializable payload
      * @param  array<string, string>  $headers  HTTP headers to pass to the POST request
+     * @param  array<string, string>  $routeParams  Parameters to pass to the route
      */
-    protected function postGraphQL(array $data, array $headers = []): self
+    protected function postGraphQL(array $data, array $headers = [], array $routeParams = []): self
     {
         $this->post(
-            $this->graphQLEndpointUrl(),
+            $this->graphQLEndpointUrl($routeParams),
             $data,
             $headers
         );
@@ -88,6 +91,7 @@ trait MakesGraphQLRequestsLumen
      * @param  array<array<int, string>>  $map
      * @param  array<\Illuminate\Http\UploadedFile>|array<array<mixed>>  $files
      * @param  array<string, string>  $headers  Will be merged with Content-Type: multipart/form-data
+     * @param  array<string, string>  $routeParams  Parameters to pass to the route
      *
      * @return $this
      */
@@ -95,7 +99,8 @@ trait MakesGraphQLRequestsLumen
         array $operations,
         array $map,
         array $files,
-        array $headers = []
+        array $headers = [],
+        array $routeParams = []
     ): self {
         $parameters = [
             'operations' => \Safe\json_encode($operations),
@@ -104,7 +109,7 @@ trait MakesGraphQLRequestsLumen
 
         $this->call(
             'POST',
-            $this->graphQLEndpointUrl(),
+            $this->graphQLEndpointUrl($routeParams),
             $parameters,
             [],
             $files,
@@ -179,13 +184,14 @@ trait MakesGraphQLRequestsLumen
 
     /**
      * Return the full URL to the GraphQL endpoint.
+     * @param  array<string, string>  $routeParams  Parameters to pass to the route
      */
-    protected function graphQLEndpointUrl(): string
+    protected function graphQLEndpointUrl(array $routeParams = []): string
     {
         $config = Container::getInstance()->make(ConfigRepository::class);
         $routeName = $config->get('lighthouse.route.name');
 
-        return route($routeName);
+        return route($routeName, $routeParams);
     }
 
     /**
