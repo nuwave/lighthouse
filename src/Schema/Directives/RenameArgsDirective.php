@@ -32,7 +32,7 @@ GRAPHQL;
             // We look for further ArgumentSet instances, they
             // might be contained within an array.
             Utils::applyEach(
-                function ($value) {
+                function ($value): void {
                     if ($value instanceof ArgumentSet) {
                         $this->rename($value);
                     }

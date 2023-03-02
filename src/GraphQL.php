@@ -38,6 +38,7 @@ use Nuwave\Lighthouse\Support\Utils as LighthouseUtils;
  * @api
  *
  * @phpstan-import-type ErrorsHandler from \GraphQL\Executor\ExecutionResult
+ * @phpstan-import-type SerializableResult from \GraphQL\Executor\ExecutionResult
  */
 class GraphQL
 {
@@ -260,7 +261,7 @@ class GraphQL
      *
      * @api
      *
-     * @return array<string, mixed>
+     * @return SerializableResult
      */
     public function serializable(ExecutionResult $result): array
     {

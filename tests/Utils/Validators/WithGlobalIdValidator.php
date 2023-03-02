@@ -6,6 +6,9 @@ use Nuwave\Lighthouse\Validation\Validator;
 
 final class WithGlobalIdValidator extends Validator
 {
+    /**
+     * @return array{id: array<string>}
+     */
     public function rules(): array
     {
         return [

@@ -132,6 +132,9 @@ final class DeprecationTest extends TestCase
         $this->assertSame(Directive::DEFAULT_DEPRECATION_REASON, $deprecatedUsage->reason);
     }
 
+    /**
+     * @return never
+     */
     public function testDetectsDeprecatedEnumValueUsageInVariables(): void
     {
         $this->schema = /** @lang GraphQL */ '
@@ -160,6 +163,9 @@ final class DeprecationTest extends TestCase
         $this->markTestIncomplete('Not implemented yet');
     }
 
+    /**
+     * @return never
+     */
     public function testDetectsDeprecatedEnumValueUsageInResults(): void
     {
         $this->mockResolver('B');

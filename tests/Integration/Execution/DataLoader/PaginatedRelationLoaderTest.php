@@ -32,8 +32,7 @@ final class PaginatedRelationLoaderTest extends DBTestCase
         $users = User::all();
         (new PaginatedModelsLoader(
             'tasks',
-            static function () {
-            },
+            static function (): void {},
             $this->makePaginationArgs($pageSize)
         ))->load($users);
 
@@ -74,8 +73,7 @@ final class PaginatedRelationLoaderTest extends DBTestCase
 
         (new PaginatedModelsLoader(
             'tasks',
-            static function () {
-            },
+            static function (): void {},
             $this->makePaginationArgs(10)
         ))->load($users);
 
@@ -104,15 +102,13 @@ final class PaginatedRelationLoaderTest extends DBTestCase
 
         (new PaginatedModelsLoader(
             'tasks',
-            static function () {
-            },
+            static function (): void {},
             $this->makePaginationArgs(4)
         ))->load($users);
 
         (new PaginatedModelsLoader(
             'posts',
-            static function () {
-            },
+            static function (): void {},
             $this->makePaginationArgs(4)
         ))->load($users);
 
@@ -153,8 +149,7 @@ final class PaginatedRelationLoaderTest extends DBTestCase
 
         (new PaginatedModelsLoader(
             'tasks',
-            static function () {
-            },
+            static function (): void {},
             $this->makePaginationArgs(4)
         ))->load($users);
 
@@ -184,8 +179,7 @@ final class PaginatedRelationLoaderTest extends DBTestCase
 
         (new PaginatedModelsLoader(
             'tags',
-            static function () {
-            },
+            static function (): void {},
             $this->makePaginationArgs($first)
         ))->load($tasks);
 

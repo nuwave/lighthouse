@@ -134,26 +134,24 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
     /**
      * @param  mixed  $messages  whatever faulty value was given for messages
      *
-     * @throws DefinitionException
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
+     * @return never
      */
     protected function invalidMessageArgument(mixed $messages): void
     {
         $encoded = \Safe\json_encode($messages);
-        throw new DefinitionException(
-            "The `messages` argument of @`{$this->name()}` on `{$this->nodeName()} must be a list of input values with the string keys `rule` and `message`, got: {$encoded}"
-        );
+        throw new DefinitionException("The `messages` argument of @`{$this->name()}` on `{$this->nodeName()} must be a list of input values with the string keys `rule` and `message`, got: {$encoded}");
     }
 
     /**
      * @param  mixed  $apply  any invalid value
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
+     * @return never
      */
     protected function invalidApplyArgument(mixed $apply): void
     {
         $encoded = \Safe\json_encode($apply);
-        throw new DefinitionException(
-            "The `apply` argument of @`{$this->name()}` on `{$this->nodeName()}` has to be a list of strings, got: {$encoded}"
-        );
+        throw new DefinitionException("The `apply` argument of @`{$this->name()}` on `{$this->nodeName()}` has to be a list of strings, got: {$encoded}");
     }
 }

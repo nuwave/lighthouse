@@ -11,6 +11,9 @@ final class FooClosureValidator extends Validator
         return 'The ' . $attribute . ' field must have a value of "foo".';
     }
 
+    /**
+     * @return array{foo: array<(Closure(string $attribute, mixed $value, \Closure $fail): void)>}
+     */
     public function rules(): array
     {
         return [

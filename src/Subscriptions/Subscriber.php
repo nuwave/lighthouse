@@ -91,7 +91,16 @@ class Subscriber
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array{
+     *     socket_id: string|null,
+     *     channel: string,
+     *     topic: string,
+     *     query: string,
+     *     field_name: string,
+     *     args: array<string, mixed>,
+     *     variables: array<string, mixed>,
+     *     context: string,
+     * }
      */
     public function __serialize(): array
     {

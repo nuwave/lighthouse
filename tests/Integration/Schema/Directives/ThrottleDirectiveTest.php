@@ -61,7 +61,7 @@ final class ThrottleDirectiveTest extends TestCase
         $rateLimiter = $this->app->make(RateLimiter::class);
         $rateLimiter->for(
             'test',
-            static fn () => Limit::perMinute(1)
+            static fn (): Limit => Limit::perMinute(1)
         );
 
         $this->graphQL(/** @lang GraphQL */ '

@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Subscriptions\EchoBroadcaster;
 
+use Illuminate\Testing\TestResponse;
 use Nuwave\Lighthouse\Subscriptions\Storage\RedisStorageManager;
 use Tests\TestCase;
 use Tests\TestsRedis;
@@ -105,10 +106,7 @@ final class AuthorizeRequestsTest extends TestCase
             ->assertForbidden();
     }
 
-    /**
-     * @return \Illuminate\Testing\TestResponse
-     */
-    protected function querySubscription()
+    protected function querySubscription(): TestResponse
     {
         return $this->graphQL(/** @lang GraphQL */ '
         subscription {

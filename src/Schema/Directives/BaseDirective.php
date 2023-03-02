@@ -165,7 +165,7 @@ abstract class BaseDirective implements Directive
      * @api
      *
      * @param  array<string>  $namespacesToTry
-     * @param  callable(string $className): bool $determineMatch
+     * @param  (callable(string $className): bool)|null  $determineMatch
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      *
@@ -174,7 +174,7 @@ abstract class BaseDirective implements Directive
     protected function namespaceClassName(
         string $classCandidate,
         array $namespacesToTry = [],
-        callable $determineMatch = null
+        ?callable $determineMatch = null
     ): string {
         $namespaceForDirective = ASTHelper::namespaceForDirective(
             $this->definitionNode,
@@ -190,17 +190,11 @@ abstract class BaseDirective implements Directive
             $determineMatch = 'class_exists';
         }
 
-        $className = Utils::namespaceClassname(
-            $classCandidate,
-            $namespacesToTry,
-            $determineMatch
-        );
+        $className = Utils::namespaceClassname($classCandidate, $namespacesToTry, $determineMatch);
 
         if (null === $className) {
             $consideredNamespaces = implode(', ', $namespacesToTry);
-            throw new DefinitionException(
-                "Failed to find class {$classCandidate} in namespaces [{$consideredNamespaces}] for directive @{$this->name()}."
-            );
+            throw new DefinitionException("Failed to find class {$classCandidate} in namespaces [{$consideredNamespaces}] for directive @{$this->name()}.");
         }
 
         return $className;

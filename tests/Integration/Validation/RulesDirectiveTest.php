@@ -51,6 +51,9 @@ final class RulesDirectiveTest extends TestCase
             ->assertGraphQLValidationKeys(['required']);
     }
 
+    /**
+     * @return never
+     */
     public function testDifferentDates(): void
     {
         $this->markTestSkipped('Not working right now, not sure how it can be fixed.');

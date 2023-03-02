@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use GraphQL\Deferred;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
@@ -84,7 +85,7 @@ GRAPHQL;
 
         $relation = $this->directiveArgValue('relation');
         if (is_string($relation)) {
-            return function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
+            return function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Deferred {
                 $relationBatchLoader = BatchLoaderRegistry::instance(
                     [...$this->qualifyPath($args, $resolveInfo), 'count'],
                     fn (): RelationBatchLoader => new RelationBatchLoader(
@@ -96,9 +97,7 @@ GRAPHQL;
             };
         }
 
-        throw new DefinitionException(
-            "A `model` or `relation` argument must be assigned to the '{$this->name()}' directive on '{$this->nodeName()}'."
-        );
+        throw new DefinitionException("A `model` or `relation` argument must be assigned to the '{$this->name()}' directive on '{$this->nodeName()}'.");
     }
 
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType): void

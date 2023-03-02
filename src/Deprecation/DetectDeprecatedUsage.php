@@ -45,6 +45,13 @@ class DetectDeprecatedUsage extends ValidationRule
         DocumentValidator::addRule(new static($deprecationHandler));
     }
 
+    /**
+     * @return array{
+     *     Field: Closure(\GraphQL\Language\AST\FieldNode $_): void,
+     *     EnumValue: Closure(\GraphQL\Language\AST\EnumValueNode $node): void,
+     *     OperationDefinition: array{leave: Closure(): void},
+     * }
+     */
     public function getVisitor(QueryValidationContext $context): array
     {
         // @phpstan-ignore-next-line NodeVisitor does not know about the mapping between node kind and node type

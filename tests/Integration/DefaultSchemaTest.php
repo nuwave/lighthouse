@@ -2,6 +2,7 @@
 
 namespace Tests\Integration;
 
+use Illuminate\Testing\TestResponse;
 use Nuwave\Lighthouse\Console\ValidateSchemaCommand;
 use Nuwave\Lighthouse\LighthouseServiceProvider;
 use Nuwave\Lighthouse\Pagination\PaginationServiceProvider;
@@ -153,10 +154,7 @@ final class DefaultSchemaTest extends DBTestCase
             ->assertJsonCount(0, 'data.users.data');
     }
 
-    /**
-     * @return \Illuminate\Testing\TestResponse
-     */
-    protected function usersByName(string $name)
+    protected function usersByName(string $name): TestResponse
     {
         return $this->graphQL(/** @lang GraphQL */ '
             query ($name: String!) {

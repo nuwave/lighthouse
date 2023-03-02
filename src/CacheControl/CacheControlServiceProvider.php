@@ -33,7 +33,7 @@ class CacheControlServiceProvider extends ServiceProvider
 
         $dispatcher->listen(
             StartExecution::class,
-            function (StartExecution $startExecution) {
+            function (StartExecution $startExecution): void {
                 $typeInfo = new TypeInfo($startExecution->schema);
                 $cacheControl = $this->app->make(CacheControl::class);
 

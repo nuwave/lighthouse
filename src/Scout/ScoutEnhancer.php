@@ -110,7 +110,7 @@ class ScoutEnhancer
             }
 
             Utils::applyEach(
-                function ($value) {
+                function ($value): void {
                     if ($value instanceof ArgumentSet) {
                         $this->gather($value);
                     }

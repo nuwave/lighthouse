@@ -41,7 +41,7 @@ GRAPHQL;
     {
         $fieldType = $fieldValue->getField()->type;
 
-        $fieldValue->wrapResolver(fn (callable $resolver) => function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $fieldType) {
+        $fieldValue->wrapResolver(fn (callable $resolver): \Closure => function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $fieldType) {
             $wrappedResolver = static fn (): mixed => $resolver($root, $args, $context, $resolveInfo);
             $path = implode('.', $resolveInfo->path);
 

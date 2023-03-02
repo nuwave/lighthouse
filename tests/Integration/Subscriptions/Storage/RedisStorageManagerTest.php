@@ -3,6 +3,7 @@
 namespace Tests\Integration\Subscriptions\Storage;
 
 use Illuminate\Support\Facades\Redis;
+use Illuminate\Testing\TestResponse;
 use Nuwave\Lighthouse\Subscriptions\Storage\RedisStorageManager;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Tests\TestCase;
@@ -111,10 +112,8 @@ final class RedisStorageManagerTest extends TestCase
 
     /**
      * @param array<string, mixed> $headers
-     *
-     * @return \Illuminate\Testing\TestResponse
      */
-    protected function querySubscription(string $topic = /** @lang GraphQL */ 'taskUpdated(id: 123)', array $headers = [])
+    protected function querySubscription(string $topic = /** @lang GraphQL */ 'taskUpdated(id: 123)', array $headers = []): TestResponse
     {
         return $this->graphQL(/** @lang GraphQL */ "
         subscription {

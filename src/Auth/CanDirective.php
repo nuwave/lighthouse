@@ -115,7 +115,7 @@ GRAPHQL;
         $ability = $this->directiveArgValue('ability');
         $resolved = $this->directiveArgValue('resolved');
 
-        $fieldValue->wrapResolver(fn (callable $resolver) => function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $ability, $resolved) {
+        $fieldValue->wrapResolver(fn (callable $resolver): \Closure => function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $ability, $resolved) {
             $gate = $this->gate->forUser($context->user());
             $checkArguments = $this->buildCheckArguments($args);
 
@@ -237,7 +237,7 @@ GRAPHQL;
         array_unshift($arguments, $model);
 
         Utils::applyEach(
-            static function ($ability) use ($gate, $arguments) {
+            static function ($ability) use ($gate, $arguments): void {
                 $response = $gate->inspect($ability, $arguments);
                 if ($response->denied()) {
                     throw new AuthorizationException($response->message(), $response->code());

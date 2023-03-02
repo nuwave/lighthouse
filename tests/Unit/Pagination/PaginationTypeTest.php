@@ -23,7 +23,7 @@ final class PaginationTypeTest extends TestCase
     /**
      * @return iterable<array{string}>
      */
-    public static function invalidPaginationTypes(): iterable
+    public static function invalidPaginationTypes(): \Iterator
     {
         yield ['paginator'];
         yield ['simple'];

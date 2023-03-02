@@ -78,8 +78,7 @@ final class BroadcastManagerTest extends TestCase
 
     public function testThrowsIfDriverDoesNotImplementInterface(): void
     {
-        $this->broadcastManager->extend('foo', static fn () => new class() {
-        });
+        $this->broadcastManager->extend('foo', static fn (): object => new class() {});
 
         $this->expectException(InvalidDriverException::class);
 

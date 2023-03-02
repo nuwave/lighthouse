@@ -20,9 +20,7 @@ final class GlobalErrorRendererTest extends TestCase
 
         $config = $app->make(ConfigRepository::class);
         $config->set('lighthouse.route.middleware', [
-            static function () {
-                throw new WithExtensionsException(self::MESSAGE, self::EXTENSIONS_CONTENT);
-            },
+            static fn () => throw new WithExtensionsException(self::MESSAGE, self::EXTENSIONS_CONTENT)
         ]);
     }
 

@@ -30,7 +30,7 @@ GRAPHQL;
         $resolveNested = new ResolveNested();
 
         return Utils::mapEach(
-            static fn (ArgumentSet $argumentSet) => $resolveNested($root, $argumentSet),
+            static fn (ArgumentSet $argumentSet): mixed => $resolveNested($root, $argumentSet),
             $args
         );
     }

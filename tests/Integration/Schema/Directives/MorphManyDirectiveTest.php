@@ -70,19 +70,12 @@ final class MorphManyDirectiveTest extends DBTestCase
         ]);
         $this->postImages = Collection::times(
             $this->faker()->numberBetween(1, 10),
-            function () {
-                $image = $this->post
-                    ->images()
-                    ->save(
-                        factory(Image::class)->create()
-                    );
-
-                if (false === $image) {
-                    throw new \Exception('Failed to save Image');
-                }
-
-                return $image;
-            }
+            fn(): Model => $this->post
+                ->images()
+                ->save(
+                    factory(Image::class)->create()
+                )
+                ?: throw new \Exception('Failed to save Image')
         );
     }
 
@@ -140,7 +133,7 @@ final class MorphManyDirectiveTest extends DBTestCase
                     'id' => $this->post->id,
                     'title' => $this->post->title,
                     'images' => $this->postImages
-                        ->map(static fn (Image $image) => [
+                        ->map(static fn (Image $image): array => [
                             'id' => $image->id,
                         ])
                         ->toArray(),
@@ -149,7 +142,7 @@ final class MorphManyDirectiveTest extends DBTestCase
                     'id' => $this->task->id,
                     'name' => $this->task->name,
                     'images' => $this->taskImages
-                        ->map(static fn (Image $image) => [
+                        ->map(static fn (Image $image): array => [
                             'id' => $image->id,
                         ])
                         ->toArray(),
@@ -204,7 +197,7 @@ final class MorphManyDirectiveTest extends DBTestCase
                     'title' => $this->post->title,
                     'imagesPaginated' => [
                         'data' => $this->postImages
-                            ->map(static fn (Image $image) => [
+                            ->map(static fn (Image $image): array => [
                                 'id' => $image->id,
                             ])
                             ->toArray(),

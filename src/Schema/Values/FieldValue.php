@@ -114,7 +114,7 @@ class FieldValue
      */
     public function resultHandler(callable $handle): void
     {
-        $this->wrapResolver(static fn (callable $resolver) => static function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $handle): mixed {
+        $this->wrapResolver(static fn (callable $resolver): \Closure => static function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $handle): mixed {
             $resolved = $resolver($root, $args, $context, $resolveInfo);
             if ($resolved instanceof Deferred) {
                 return $resolved->then(static fn (mixed $result): mixed => $handle($result, $args, $context, $resolveInfo));

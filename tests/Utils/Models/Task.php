@@ -139,9 +139,7 @@ final class Task extends Model
      */
     public function scopeWhereTags(EloquentBuilder $query, iterable $tags): EloquentBuilder
     {
-        return $query->whereHas('tags', static function (EloquentBuilder $query) use ($tags) {
-            $query->whereIn('name', $tags);
-        });
+        return $query->whereHas('tags', static fn (EloquentBuilder $query): EloquentBuilder => $query->whereIn('name', $tags));
     }
 
     public function userLoaded(): bool

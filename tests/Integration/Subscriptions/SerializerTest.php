@@ -34,7 +34,7 @@ final class SerializerTest extends DBTestCase
 
         $retrievedFromDatabase = false;
 
-        User::retrieved(static function () use (&$retrievedFromDatabase) {
+        User::retrieved(static function () use (&$retrievedFromDatabase): void {
             $retrievedFromDatabase = true;
         });
 

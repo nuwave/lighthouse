@@ -10,7 +10,16 @@ class PaginatorField
     /**
      * @param  \Illuminate\Contracts\Pagination\LengthAwarePaginator<mixed>  $paginator
      *
-     * @return array<string, mixed>
+     * @return array{
+     *     count: int,
+     *     currentPage: int,
+     *     firstItem: int,
+     *     hasMorePages: bool,
+     *     lastItem: int,
+     *     lastPage: int,
+     *     perPage: int,
+     *     total: int,
+     * }
      */
     public function paginatorInfoResolver(LengthAwarePaginator $paginator): array
     {

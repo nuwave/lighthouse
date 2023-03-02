@@ -138,7 +138,7 @@ class LighthouseServiceProvider extends ServiceProvider
         // @phpstan-ignore-next-line larastan overly eager assumes this will always be a concrete instance
         if ($exceptionHandler instanceof ExceptionHandler) {
             $exceptionHandler->renderable(
-                function (ClientAware $error) {
+                function (ClientAware $error): JsonResponse {
                     assert($error instanceof \Throwable);
 
                     if (! $error instanceof Error) {

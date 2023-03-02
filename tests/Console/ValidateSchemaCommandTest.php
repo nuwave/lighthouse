@@ -36,6 +36,9 @@ final class ValidateSchemaCommandTest extends TestCase
         $tester->execute([]);
     }
 
+    /**
+     * @return never
+     */
     public function testFailsValidationDirectiveInWrongLocation(): void
     {
         $this->markTestSkipped('This validation needs to be in the upstream webonyx/graphql-php validation');
