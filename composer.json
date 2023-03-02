@@ -51,6 +51,7 @@
         "laravel/legacy-factories": "^1.1.1",
         "laravel/lumen-framework": "^9 || ^10 || dev-master",
         "laravel/scout": "^8 || ^9 || ^10",
+        "mattiasgeniar/phpunit-query-count-assertions": "^1.1",
         "mll-lab/graphql-php-scalars": "^6",
         "mll-lab/php-cs-fixer-config": "^5",
         "mockery/mockery": "^1.5",

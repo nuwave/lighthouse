@@ -93,7 +93,7 @@ GRAPHQL;
             $args[] = $operator;
         } else {
             // We utilize the fact that the operators are named after Laravel's condition
-            // methods so we can simply append the name, e.g. whereNull, whereNotBetween
+            // methods, so we can simply append the name, e.g. whereNull, whereNotBetween
             $method .= $operator;
         }
 

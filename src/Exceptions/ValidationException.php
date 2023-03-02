@@ -20,10 +20,7 @@ class ValidationException extends \Exception implements ClientAware, ProvidesExt
 
     public static function fromLaravel(LaravelValidationException $laravelException): self
     {
-        return new static(
-            $laravelException->getMessage(),
-            $laravelException->validator
-        );
+        return new static($laravelException->getMessage(), $laravelException->validator);
     }
 
     /**

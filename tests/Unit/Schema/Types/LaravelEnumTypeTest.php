@@ -13,10 +13,7 @@ use Tests\Utils\LaravelEnums\PartiallyDeprecated;
 
 final class LaravelEnumTypeTest extends TestCase
 {
-    /**
-     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
-     */
-    protected $typeRegistry;
+    protected TypeRegistry $typeRegistry;
 
     protected function setUp(): void
     {

@@ -17,7 +17,6 @@ class AggregateModelsLoader implements ModelsLoader
 
     public function load(EloquentCollection $parents): void
     {
-        // @phpstan-ignore-next-line Only present in Laravel 8+
         $parents->loadAggregate([$this->relation => $this->decorateBuilder], $this->column, $this->function);
     }
 

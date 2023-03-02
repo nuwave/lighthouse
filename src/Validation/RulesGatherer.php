@@ -248,7 +248,7 @@ class RulesGatherer
             }
 
             // Those rule lists are a subset of https://github.com/illuminate/validation/blob/8079fd53dee983e7c52d1819ae3b98c71a64fbc0/Validator.php#L206-L236
-            // using the docs to know which ones reference other fields: https://laravel.com/docs/8.x/validation#available-validation-rules
+            // using the docs to know which ones reference other fields: https://laravel.com/docs/validation#available-validation-rules.
             // We do not handle the Exclude* rules, those mutate the input and are not supported.
 
             // Rules where the first argument is a field reference
