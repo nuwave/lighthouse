@@ -16,7 +16,7 @@ env:
 
 jobs:
   static-analysis:
-    name: PHPStan on PHP ${{ matrix.php-version }} with Laravel ${{ matrix.laravel-version }}
+    name: PHPStan on PHP ${{ matrix.php-version }} with Laravel ${{ matrix.laravel-version }} and ${{ matrix.composer.name }} dependencies
     runs-on: ubuntu-latest
 
     strategy:
@@ -29,6 +29,11 @@ jobs:
         laravel-version:
           - "^9"
           - "^10"
+        composer:
+          - name: lowest
+            arg: "--prefer-lowest --prefer-stable"
+          - name: highest
+            arg: "" # No args added as highest is default
         exclude:
           - php-version: "8.0"
             laravel-version: "^10"
@@ -46,13 +51,19 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.composer/cache
-          key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}
-          restore-keys: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-
+          key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-os-${{ matrix.os }}-composer-${{ matrix.composer.name }}
 
       - name: "Remove conflicting dependencies that are not needed here"
         run: composer remove --dev phpbench/phpbench rector/rector --no-update
 
-      - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
+      - run: >
+          composer require
+          illuminate/contracts:${{ matrix.laravel-version }}
+          --no-interaction
+          --prefer-dist
+          --no-progress
+          --update-with-all-dependencies
+          ${{ matrix.composer.arg }}
 
       - run: vendor/bin/phpstan
 
@@ -76,8 +87,7 @@ jobs:
           - name: lowest
             arg: "--prefer-lowest --prefer-stable"
           - name: highest
-            # No args added as highest is default
-            arg: ""
+            arg: "" # No args added as highest is default
         exclude:
           - php-version: "8.0"
             laravel-version: "^10"
