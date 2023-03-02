@@ -12,7 +12,7 @@ use Tests\Utils\Models\User;
 
 final class AttemptAuthenticationTest extends TestCase
 {
-    public ?User $user;
+    public ?User $user = null;
 
     protected function getEnvironmentSetUp($app): void
     {

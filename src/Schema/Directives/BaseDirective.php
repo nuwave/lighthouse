@@ -122,7 +122,7 @@ abstract class BaseDirective implements Directive
      *
      * @api
      *
-     * @param  mixed  $default Use this over `??` to preserve explicit `null`
+     * @param  mixed  $default  Use this over `??` to preserve explicit `null`
      *
      * @return mixed The argument value or the default
      */

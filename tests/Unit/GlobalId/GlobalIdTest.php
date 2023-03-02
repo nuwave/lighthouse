@@ -54,7 +54,7 @@ final class GlobalIdTest extends TestCase
     /**
      * @return iterable<array{string}>
      */
-    public static function provideInvalidGlobalIds(): iterable
+    public static function provideInvalidGlobalIds(): \Iterator
     {
         yield ['foo'];
         yield ['foo:bar:baz'];

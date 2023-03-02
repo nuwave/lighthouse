@@ -137,7 +137,7 @@ class ASTHelper
     /**
      * Extract a named argument from a given directive node.
      *
-     * @param  mixed  $default is returned if the directive does not have the argument
+     * @param mixed $default is returned if the directive does not have the argument
      */
     public static function directiveArgValue(DirectiveNode $directive, string $name, mixed $default = null): mixed
     {

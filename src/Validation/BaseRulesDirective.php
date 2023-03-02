@@ -80,7 +80,7 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
             $this->invalidApplyArgument($rules);
         }
 
-        if (0 === count($rules)) {
+        if ([] === $rules) {
             $this->invalidApplyArgument($rules);
         }
 
