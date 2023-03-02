@@ -25,8 +25,9 @@ abstract class QueryBench extends TestCase
 
     /**
      * Return the full URL to the GraphQL endpoint.
+     * @param  array<string, string>  $routeParams  Parameters to pass to the route
      */
-    protected function graphQLEndpointUrl(): string
+    protected function graphQLEndpointUrl(array $routeParams = []): string
     {
         return $this->graphQLEndpoint;
     }
