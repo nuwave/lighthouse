@@ -58,6 +58,7 @@ final class User extends Authenticatable
      */
     protected $connection = DBTestCase::DEFAULT_CONNECTION;
 
+    // @phpstan-ignore-next-line iterable type missing in Laravel 9.0.0
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];

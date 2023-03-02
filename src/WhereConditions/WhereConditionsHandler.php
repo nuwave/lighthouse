@@ -31,6 +31,7 @@ class WhereConditionsHandler
         }
 
         if ($andConnectedConditions = $whereConditions['AND'] ?? null) {
+            // // @phpstan-ignore-next-line forwarding to Builder
             $builder->whereNested(
                 function ($builder) use ($andConnectedConditions, $model): void {
                     foreach ($andConnectedConditions as $condition) {
@@ -42,6 +43,7 @@ class WhereConditionsHandler
         }
 
         if ($orConnectedConditions = $whereConditions['OR'] ?? null) {
+            // // @phpstan-ignore-next-line forwarding to Builder
             $builder->whereNested(
                 function ($builder) use ($orConnectedConditions, $model): void {
                     foreach ($orConnectedConditions as $condition) {
@@ -60,6 +62,7 @@ class WhereConditionsHandler
                 $hasRelationConditions['amount'],
                 $hasRelationConditions['condition'] ?? null
             );
+            // // @phpstan-ignore-next-line forwarding to Builder
             $builder->addNestedWhereQuery($nestedBuilder, $boolean);
         }
 
