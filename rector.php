@@ -14,6 +14,8 @@ use Rector\Config\RectorConfig;
 use Rector\Php71\Rector\FuncCall\RemoveExtraParametersRector;
 use Rector\PHPUnit\Set\PHPUnitSetList;
 use Rector\Set\ValueObject\SetList;
+use Rector\TypeDeclaration\Rector\ClassMethod\ArrayShapeFromConstantArrayReturnRector;
+use Rector\TypeDeclaration\Rector\FunctionLike\AddReturnTypeDeclarationFromYieldsRector;
 
 return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->sets([
@@ -53,5 +55,7 @@ return static function (RectorConfig $rectorConfig): void {
         VarConstantCommentRector::class, // Noisy
         UnSpreadOperatorRector::class, // Breaks some public APIs
         AddArrayDefaultToArrayPropertyRector::class, // Break lazy initialization
+        AddReturnTypeDeclarationFromYieldsRector::class, // iterable is fine
+        ArrayShapeFromConstantArrayReturnRector::class, // Sometimes too specific in methods that can be overridden
     ]);
 };
