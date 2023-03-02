@@ -29,7 +29,7 @@ In this case, our field is a query and is called `hello`, so we need to define o
 ```php
 namespace App\GraphQL\Queries;
 
-class Hello
+final class Hello
 {
     public function __invoke(): string
     {

@@ -212,7 +212,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Post extends Model
+final class Post extends Model
 {
     public function author(): BelongsTo
     {
@@ -310,7 +310,7 @@ type User {
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class User extends Model
+final class User extends Model
 {
     public function roles(): BelongsToMany
     {
@@ -347,7 +347,7 @@ a column `meta`.
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class User extends Model
+final class User extends Model
 {
     public function roles(): BelongsToMany
     {
@@ -356,7 +356,7 @@ class User extends Model
     }
 }
 
-class Role extends Model
+final class Role extends Model
 {
     public function users(): BelongsToMany
     {
@@ -505,7 +505,7 @@ final class MyClass
     /**
      * @param  array<string, mixed>  $args
      */
-    public function minimumHighscore(Builder $builder, ?int $minimumHighscore, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Builder
+    public function minimumHighscore(Builder $builder, ?int $minimumHighscore, mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Builder
     {
         if (! $minimumHighscore) return $builder;
         return $builder->whereHas('game', static fn (Builder $builder): Builder => $builder->where('score', '>', $minimumHighscore));
@@ -1323,7 +1323,7 @@ type Mutation {
 The event class must accept an `Order` in the constructor:
 
 ```php
-class PlacedOrder
+final class PlacedOrder
 {
     public function __construct(Order $order) { ... }
 }
@@ -2781,7 +2781,7 @@ use Illuminate\Database\Query\Builder;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class Blog
+final class Blog
 {
     public function statistics(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Builder
     {
@@ -3064,7 +3064,7 @@ The scope will be passed the value of the client-given argument:
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
-class Post extends Model
+final class Post extends Model
 {
     public function scopeTrending(Builder $query, bool $trending): Builder { ... }
 }

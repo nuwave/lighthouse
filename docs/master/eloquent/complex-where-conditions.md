@@ -365,7 +365,7 @@ namespace App\GraphQL;
 
 use Nuwave\Lighthouse\WhereConditions\Operator;
 
-class CustomSQLOperator implements Operator { ... }
+final class CustomSQLOperator implements Operator { ... }
 ```
 
 An `Operator` has two responsibilities:
@@ -382,7 +382,7 @@ use App\GraphQL\CustomSQLOperator;
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\WhereConditions\Operator;
 
-class GraphQLServiceProvider extends ServiceProvider
+final class GraphQLServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
@@ -428,12 +428,14 @@ the passed conditions:
 ```php
 namespace App;
 
-class MyCustomHandler {
+use Illuminate\Database\Eloquent\Builder;
+
+final class MyCustomHandler
+{
     /**
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
      * @param  array<string, mixed>  $whereConditions
      */
-    public function __invoke(object $builder, array $whereConditions): void
+    public function __invoke(Builder $builder, array $whereConditions): void
     {
         // TODO make calls to $builder depending on $whereConditions
     }

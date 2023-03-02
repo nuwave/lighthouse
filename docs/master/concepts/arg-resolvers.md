@@ -177,7 +177,7 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
-class CreateDirective extends BaseDirective implements FieldResolver, ArgResolver
+final class CreateDirective extends BaseDirective implements FieldResolver, ArgResolver
 {
     public function resolveField(FieldValue $fieldValue): FieldValue { ... }
 

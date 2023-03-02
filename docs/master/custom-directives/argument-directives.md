@@ -50,7 +50,7 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgSanitizerDirective;
 
-class TrimDirective extends BaseDirective implements ArgSanitizerDirective, ArgDirective
+final class TrimDirective extends BaseDirective implements ArgSanitizerDirective, ArgDirective
 {
     public static function definition(): string
     {
@@ -92,7 +92,7 @@ namespace App\GraphQL\Mutations;
 
 use App\User;
 
-class CreateUser
+final class CreateUser
 {
     public function __invoke(mixed $root, array $args): User
     {
@@ -150,7 +150,7 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 
-class EqDirective extends BaseDirective implements ArgBuilderDirective, ArgDirective
+final class EqDirective extends BaseDirective implements ArgBuilderDirective, ArgDirective
 {
     public static function definition(): string
     {
@@ -233,13 +233,8 @@ use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 
-class ModelArgsDirective extends BaseDirective implements ArgManipulator
+final class ModelArgsDirective extends BaseDirective implements ArgManipulator
 {
-    /**
-     * SDL definition of the directive.
-     *
-     * @return string
-     */
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'

@@ -26,7 +26,7 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class ExampleDirective extends BaseDirective implements FieldMiddleware
+final class ExampleDirective extends BaseDirective implements FieldMiddleware
 {
     public static function definition(): string
     {

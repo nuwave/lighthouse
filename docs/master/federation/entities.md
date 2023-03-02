@@ -28,7 +28,7 @@ the array form of the representation.
 ```php
 namespace App\GraphQL\Entities;
 
-class Foo
+final class Foo
 {
     /**
      * @param  array{__typename: string, id: int}  $representation

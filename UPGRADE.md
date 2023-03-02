@@ -217,7 +217,7 @@ Custom directives the implement `FieldBuilderDirective` now have to accept those
 final class MyDirective extends BaseDirective implements FieldBuilderDirective
 {
 -    public function handleFieldBuilder(object $builder): object;
-+    public function handleFieldBuilder(object $builder, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): object;
++    public function handleFieldBuilder(object $builder, mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): object;
 }
 ```
 

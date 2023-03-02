@@ -24,7 +24,7 @@ abstract class `\Nuwave\Lighthouse\Schema\Directives\BaseDirective`.
 ```php
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 
-class UpperCaseDirective extends BaseDirective
+final class UpperCaseDirective extends BaseDirective
 {
     /**
      * Formal directive specification in schema definition language (SDL).

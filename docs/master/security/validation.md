@@ -164,7 +164,7 @@ namespace App\GraphQL\Validators;
 use Illuminate\Validation\Rule;
 use Nuwave\Lighthouse\Validation\Validator;
 
-class UpdateUserInputValidator extends Validator
+final class UpdateUserInputValidator extends Validator
 {
     public function rules(): array
     {
@@ -308,7 +308,7 @@ of the interface `\Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules` 
 ```php
 use Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules;
 
-class MyCustomRulesProvider implements ProvidesValidationRules {}
+final class MyCustomRulesProvider implements ProvidesValidationRules {}
 
 $this->app->bind(ProvidesValidationRules::class, MyCustomRulesProvider::class);
 ```

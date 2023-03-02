@@ -12,7 +12,7 @@ Add the `UsesTestSchema` trait to your base test class, call `setUpTestSchema()`
 ```php
 use Nuwave\Lighthouse\Testing\UsesTestSchema;
 
-class MyCustomDirectiveTest extends TestCase
+final class MyCustomDirectiveTest extends TestCase
 {
     use UsesTestSchema;
 
@@ -50,7 +50,7 @@ namespace Tests;
 
 use Nuwave\Lighthouse\Testing\MocksResolvers;
 
-class ReverseDirectiveTest extends TestCase
+final class ReverseDirectiveTest extends TestCase
 {
     use MocksResolvers;
 }

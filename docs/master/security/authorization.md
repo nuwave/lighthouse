@@ -77,7 +77,7 @@ type Mutation {
 The `create` ability that is referenced in the example above is backed by a Laravel policy:
 
 ```php
-class PostPolicy
+final class PostPolicy
 {
     public function create(User $user): bool
     {
@@ -104,7 +104,7 @@ type Query {
 ```
 
 ```php
-class PostPolicy
+final class PostPolicy
 {
     public function view(User $user, Post $post): bool
     {
@@ -125,7 +125,7 @@ type Mutation {
 ```
 
 ```php
-class PostPolicy
+final class PostPolicy
 {
     public function create(User $user, array $args): bool
     {
@@ -144,7 +144,7 @@ type Mutation {
 ```
 
 ```php
-class PostPolicy
+final class PostPolicy
 {
     public function create(User $user, array $injected): bool
     {
@@ -157,7 +157,7 @@ When you combine both ways of passing arguments, the policy will be passed the `
 the second parameter and the static `args` as the third parameter:
 
 ```php
-class PostPolicy
+final class PostPolicy
 {
     public function create($user, array $injectedArgs, array $staticArgs): bool { ... }
 }
@@ -188,7 +188,7 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class CanAccessDirective extends BaseDirective implements FieldMiddleware
+final class CanAccessDirective extends BaseDirective implements FieldMiddleware
 {
     public static function definition(): string
     {
