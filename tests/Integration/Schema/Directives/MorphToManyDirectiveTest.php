@@ -323,9 +323,9 @@ final class MorphToManyDirectiveTest extends DBTestCase
         ]);
     }
 
-    public static function resolveType($root): string
+    public static function resolveType(Tag $root): string
     {
-        return $root->posts()->count()
+        return $root->posts()->exists()
             ? 'PostTag'
             : 'TaskTag';
     }

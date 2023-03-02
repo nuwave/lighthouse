@@ -56,7 +56,7 @@ GRAPHQL;
         return $resolver($builder, $value, $this->definitionNode);
     }
 
-    public function handleFieldBuilder(QueryBuilder|EloquentBuilder|Relation $builder, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): QueryBuilder|EloquentBuilder|Relation
+    public function handleFieldBuilder(QueryBuilder|EloquentBuilder|Relation $builder, mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): QueryBuilder|EloquentBuilder|Relation
     {
         $resolver = $this->resolver();
 

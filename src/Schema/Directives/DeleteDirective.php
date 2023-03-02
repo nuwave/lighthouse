@@ -89,6 +89,7 @@ GRAPHQL;
                     $relation->dissociate();
                     $relation->getParent()->save();
                 }
+
                 $relation->delete();
             }
         } else {

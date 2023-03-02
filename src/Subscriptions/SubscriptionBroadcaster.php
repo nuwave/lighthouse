@@ -23,7 +23,7 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
         protected BusDispatcher $busDispatcher
     ) {}
 
-    public function queueBroadcast(GraphQLSubscription $subscription, string $fieldName, $root): void
+    public function queueBroadcast(GraphQLSubscription $subscription, string $fieldName, mixed $root): void
     {
         $broadcastSubscriptionJob = new BroadcastSubscriptionJob($subscription, $fieldName, $root);
         $broadcastSubscriptionJob->onQueue(config('lighthouse.subscriptions.broadcasts_queue_name'));
@@ -31,7 +31,7 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
         $this->busDispatcher->dispatch($broadcastSubscriptionJob);
     }
 
-    public function broadcast(GraphQLSubscription $subscription, string $fieldName, $root): void
+    public function broadcast(GraphQLSubscription $subscription, string $fieldName, mixed $root): void
     {
         $topic = $subscription->decodeTopic($fieldName, $root);
 
