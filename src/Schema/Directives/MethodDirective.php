@@ -29,7 +29,7 @@ GRAPHQL;
 
     public function resolveField(FieldValue $fieldValue): callable
     {
-        return function ($root, array $args) {
+        return function (mixed $root, array $args) {
             $method = $this->directiveArgValue('name', $this->nodeName());
             assert(is_string($method));
 

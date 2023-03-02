@@ -26,7 +26,7 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class ExampleDirective extends BaseDirective implements FieldMiddleware
+final class ExampleDirective extends BaseDirective implements FieldMiddleware
 {
     public static function definition(): string
     {
@@ -40,7 +40,7 @@ GRAPHQL;
         // If you have any work to do that does not require the resolver arguments, do it here.
         // This code is executed only once per field, whereas the resolver can be called often.
 
-        $fieldValue->wrapResolver(fn (callable $resolver) => function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
+        $fieldValue->wrapResolver(fn (callable $resolver) => function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
             // Do something before the resolver, e.g. validate $args, check authentication
 
             // Call the actual resolver

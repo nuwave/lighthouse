@@ -16,9 +16,9 @@ final class DummyClass
     /**
      * Decide which GraphQL type a resolved value has.
      *
-     * @param  mixed  $rootValue The value that was resolved by the field. Usually an Eloquent model.
+     * @param  mixed  $root The value that was resolved by the field. Usually an Eloquent model.
      */
-    public function __invoke(mixed $rootValue, GraphQLContext $context, ResolveInfo $resolveInfo): Type
+    public function __invoke(mixed $root, GraphQLContext $context, ResolveInfo $resolveInfo): Type
     {
         // TODO implement custom resolver logic - if the default is fine, just delete this class
     }

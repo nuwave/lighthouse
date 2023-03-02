@@ -23,7 +23,7 @@ class Entities
      *
      * @return array<mixed>
      */
-    public function __invoke($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): array
+    public function __invoke(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): array
     {
         $results = [];
 

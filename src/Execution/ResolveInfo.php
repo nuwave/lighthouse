@@ -45,7 +45,7 @@ class ResolveInfo extends BaseResolveInfo
      *
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<TModel>|\Illuminate\Database\Eloquent\Relations\Relation<TModel>|\Laravel\Scout\Builder
      */
-    public function enhanceBuilder(QueryBuilder|EloquentBuilder|Relation|ScoutBuilder $builder, array $scopes, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo, \Closure $directiveFilter = null): QueryBuilder|EloquentBuilder|Relation|ScoutBuilder
+    public function enhanceBuilder(QueryBuilder|EloquentBuilder|Relation|ScoutBuilder $builder, array $scopes, mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo, \Closure $directiveFilter = null): QueryBuilder|EloquentBuilder|Relation|ScoutBuilder
     {
         $argumentSet = $resolveInfo->argumentSet;
 
@@ -71,7 +71,7 @@ class ResolveInfo extends BaseResolveInfo
      * @param  array<string>  $scopes
      * @param  array<string, mixed>  $args
      */
-    public function wouldEnhanceBuilder(QueryBuilder|EloquentBuilder|Relation|ScoutBuilder $builder, array $scopes, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo, \Closure $directiveFilter = null): bool
+    public function wouldEnhanceBuilder(QueryBuilder|EloquentBuilder|Relation|ScoutBuilder $builder, array $scopes, mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo, \Closure $directiveFilter = null): bool
     {
         $argumentSet = $resolveInfo->argumentSet;
 
@@ -165,7 +165,7 @@ class ResolveInfo extends BaseResolveInfo
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>  $builder
      * @param  array<string, mixed>  $args
      */
-    protected static function applyFieldBuilderDirectives(QueryBuilder|EloquentBuilder|Relation &$builder, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): void
+    protected static function applyFieldBuilderDirectives(QueryBuilder|EloquentBuilder|Relation &$builder, mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): void
     {
         foreach (self::fieldBuilderDirectives($resolveInfo) as $fieldBuilderDirective) {
             $builder = $fieldBuilderDirective->handleFieldBuilder($builder, $root, $args, $context, $resolveInfo);

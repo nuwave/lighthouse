@@ -59,7 +59,7 @@ mutation CreateTaskWithNotes {
 We might resolve that mutation by writing a resolver function that handles all input at once.
 
 ```php
-function createTaskWithNotes($root, array $args): \App\Models\Task {
+function createTaskWithNotes(mixed $root, array $args): \App\Models\Task {
     // Pull and remove notes from the args array
     $notes = \Illuminate\Support\Arr::pull($args, 'notes');
 
@@ -91,7 +91,7 @@ a part of the given input arguments. The execution engine should traverse the gi
 input and take care of calling the appropriate functions with their respective arguments.
 
 ```php
-function createTask($root, array $args): \App\Models\Task {
+function createTask(mixed $root, array $args): \App\Models\Task {
     return \App\Models\Task::create($args);
 }
 
@@ -146,7 +146,7 @@ final class CreateDirective extends BaseDirective implements FieldResolver
 {
     public function resolveField(FieldValue $fieldValue): callable
     {
-        return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Model {
+        return function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Model {
             // Wrap the operation and let Lighthouse take care of splitting the input
             $nestedSave = new ResolveNested(function($model, $args) {
                 $model->fill($args->toArray());
@@ -177,7 +177,7 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
-class CreateDirective extends BaseDirective implements FieldResolver, ArgResolver
+final class CreateDirective extends BaseDirective implements FieldResolver, ArgResolver
 {
     public function resolveField(FieldValue $fieldValue): FieldValue { ... }
 

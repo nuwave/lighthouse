@@ -11,7 +11,7 @@ can detect them.
 ```php
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Post extends Model
+final class Post extends Model
 {
     public function user(): BelongsTo // WORKS
     {

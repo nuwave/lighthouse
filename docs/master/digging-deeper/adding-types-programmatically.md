@@ -56,7 +56,7 @@ use Illuminate\Support\ServiceProvider;
 use GraphQL\Type\Definition\ObjectType;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 
-class GraphQLServiceProvider extends ServiceProvider
+final class GraphQLServiceProvider extends ServiceProvider
 {
     public function boot(TypeRegistry $typeRegistry): void
     {

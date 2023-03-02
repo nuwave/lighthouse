@@ -164,7 +164,9 @@ type Mutation {
 ```
 
 ```php
-class Login
+use App\Models\User;
+
+final class Login
 {
     /**
      * @param  null  $_
@@ -180,12 +182,8 @@ class Login
             throw new Error('Invalid credentials.');
         }
 
-        /**
-         * Since we successfully logged in, this can no longer be `null`.
-         *
-         * @var \App\Models\User $user
-         */
         $user = $guard->user();
+        assert($user instanceof User, 'Since we successfully logged in, this can no longer be `null`.');
 
         return $user;
     }
@@ -193,7 +191,7 @@ class Login
 ```
 
 ```php
-class Logout
+final class Logout
 {
     /**
      * @param  null  $_
@@ -205,7 +203,6 @@ class Logout
         // Laravel Sanctum: Auth::guard(config('sanctum.guard', 'web'))
         $guard = ?;
 
-        /** @var \App\Models\User|null $user */
         $user = $guard->user();
         $guard->logout();
 

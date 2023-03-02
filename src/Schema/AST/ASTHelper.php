@@ -57,7 +57,6 @@ class ASTHelper
 
         $remainingDefinitions = (new Collection($original))
             ->reject(static function (Node $definition) use ($newNames, $overwriteDuplicates): bool {
-                // @phpstan-ignore-next-line https://github.com/phpstan/phpstan/issues/8474
                 assert(property_exists($definition, 'name'));
                 $oldName = $definition->name->value;
                 $collisionOccurred = in_array($oldName, $newNames);
@@ -139,10 +138,8 @@ class ASTHelper
      * Extract a named argument from a given directive node.
      *
      * @param  mixed  $default  is returned if the directive does not have the argument
-     *
-     * @return mixed the value given to the directive
      */
-    public static function directiveArgValue(DirectiveNode $directive, string $name, mixed $default = null)
+    public static function directiveArgValue(DirectiveNode $directive, string $name, mixed $default = null): mixed
     {
         $arg = self::firstByName($directive->arguments, $name);
 
@@ -156,10 +153,8 @@ class ASTHelper
      *
      * @param  \GraphQL\Language\AST\ValueNode&\GraphQL\Language\AST\Node  $defaultValue
      * @param  \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\InputType  $argumentType
-     *
-     * @return mixed the plain PHP value
      */
-    public static function defaultValueForArgument(ValueNode $defaultValue, Type $argumentType)
+    public static function defaultValueForArgument(ValueNode $defaultValue, Type $argumentType): mixed
     {
         // webonyx/graphql-php expects the internal value here, whereas the
         // SDL uses the ENUM's name, so we run the conversion here
@@ -172,7 +167,6 @@ class ASTHelper
             return $internalValue->value;
         }
 
-        // @phpstan-ignore-next-line any ValueNode is fine
         return AST::valueFromAST($defaultValue, $argumentType);
     }
 
@@ -183,7 +177,6 @@ class ASTHelper
      */
     public static function directiveDefinition(Node $definitionNode, string $name): ?DirectiveNode
     {
-        // @phpstan-ignore-next-line https://github.com/phpstan/phpstan/issues/8474
         if (! property_exists($definitionNode, 'directives')) {
             throw new \Exception('Expected Node class with property `directives`, got: ' . $definitionNode::class);
         }
@@ -214,13 +207,11 @@ class ASTHelper
     public static function firstByName(iterable $nodes, string $name): ?Node
     {
         foreach ($nodes as $node) {
-            // @phpstan-ignore-next-line https://github.com/phpstan/phpstan/issues/8474
             if (! property_exists($node, 'name')) {
                 throw new \Exception('Expected a Node with a name property, got: ' . $node::class);
             }
 
             if ($node->name->value === $name) {
-                // @phpstan-ignore-next-line Method Nuwave\Lighthouse\Schema\AST\ASTHelper::firstByName() should return TNode of GraphQL\Language\AST\Node|null but returns TNode of GraphQL\Language\AST\Node.
                 return $node;
             }
         }

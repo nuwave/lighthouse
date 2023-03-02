@@ -36,7 +36,6 @@ GRAPHQL;
             $guard = $this->directiveArgValue('guard', AuthServiceProvider::guard());
             assert(is_string($guard) || is_null($guard));
 
-            // @phpstan-ignore-next-line phpstan does not know about App\User, which implements Authenticatable
             return $this
                 ->authFactory
                 ->guard($guard)

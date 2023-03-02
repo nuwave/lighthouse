@@ -35,10 +35,14 @@ use Tests\Integration\Execution\DataLoader\RelationBatchLoaderTest;
  * @property int|null $person_id
  * @property string|null $person_type
  *
+ * Virtual
+ * @property-read string|null $company_name
+ *
  * Relations
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\AlternateConnection> $alternateConnections
  * @property-read \Tests\Utils\Models\Company|null $company
  * @property-read \Tests\Utils\Models\Image|null $image
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\CustomPrimaryKey> $customPrimaryKeys
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Post> $posts
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Role> $roles
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\RoleUserPivot> $rolesPivot
@@ -54,30 +58,54 @@ final class User extends Authenticatable
      */
     protected $connection = DBTestCase::DEFAULT_CONNECTION;
 
+    // @phpstan-ignore-next-line iterable type missing in Laravel 9.0.0
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\AlternateConnection>
+     */
     public function alternateConnections(): HasMany
     {
         return $this->hasMany(AlternateConnection::class);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\Company, self>
+     */
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\CustomPrimaryKey>
+     */
+    public function customPrimaryKeys(): HasMany
+    {
+        return $this->hasMany(CustomPrimaryKey::class, 'user_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\MorphOne<\Tests\Utils\Models\Image>
+     */
     public function image(): MorphOne
     {
         return $this->morphOne(Image::class, 'imageable');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\Post>
+     */
     public function posts(): HasMany
     {
         return $this->hasMany(Post::class);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Tests\Utils\Models\Role>
+     */
     public function roles(): BelongsToMany
     {
         return $this
@@ -85,41 +113,55 @@ final class User extends Authenticatable
             ->withPivot('meta');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\RoleUserPivot>
+     */
     public function rolesPivot(): HasMany
     {
         return $this->hasMany(RoleUserPivot::class, 'user_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\Task>
+     */
     public function tasks(): HasMany
     {
         return $this->hasMany(Task::class);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\Team, self>
+     */
     public function team(): BelongsTo
     {
         return $this->belongsTo(Team::class);
     }
 
-    public function customPrimaryKeys(): HasMany
-    {
-        return $this->hasMany(CustomPrimaryKey::class, 'user_id');
-    }
-
+    /**
+     * @param \Illuminate\Database\Eloquent\Builder<self> $query
+     * @param array{company: string} $args
+     *
+     * @return \Illuminate\Database\Eloquent\Builder<self>
+     */
     public function scopeCompanyName(EloquentBuilder $query, array $args): EloquentBuilder
     {
-        return $query->whereHas('company', static function (EloquentBuilder $q) use ($args): void {
-            $q->where('name', $args['company']);
-        });
+        return $query->whereHas('company', static fn (EloquentBuilder $q): EloquentBuilder => $q
+            ->where('name', $args['company']));
     }
 
+    /**
+     * @param \Illuminate\Database\Eloquent\Builder<self> $query
+     *
+     * @return \Illuminate\Database\Eloquent\Builder<self>
+     */
     public function scopeNamed(EloquentBuilder $query): EloquentBuilder
     {
         return $query->whereNotNull('name');
     }
 
-    public function getCompanyNameAttribute(): string
+    public function getCompanyNameAttribute(): string|null
     {
-        return $this->company->name;
+        return $this->company?->name;
     }
 
     public function tasksLoaded(): bool

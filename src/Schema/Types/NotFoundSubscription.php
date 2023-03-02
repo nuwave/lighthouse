@@ -14,12 +14,12 @@ class NotFoundSubscription extends GraphQLSubscription
         return false;
     }
 
-    public function filter(Subscriber $subscriber, $root): bool
+    public function filter(Subscriber $subscriber, mixed $root): bool
     {
         return false;
     }
 
-    public function resolve($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): mixed
+    public function resolve(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): mixed
     {
         return null;
     }

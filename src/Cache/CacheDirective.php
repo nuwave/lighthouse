@@ -51,7 +51,7 @@ GRAPHQL;
         $maxAge = $this->directiveArgValue('maxAge');
         $isPrivate = $this->directiveArgValue('private', false);
 
-        $fieldValue->wrapResolver(fn (callable $resolver) => function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($rootCacheKey, $shouldUseTags, $resolver, $maxAge, $isPrivate) {
+        $fieldValue->wrapResolver(fn (callable $resolver) => function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($rootCacheKey, $shouldUseTags, $resolver, $maxAge, $isPrivate) {
             $parentName = $resolveInfo->parentType->name;
             $rootID = null !== $root && null !== $rootCacheKey
                 ? data_get($root, $rootCacheKey)

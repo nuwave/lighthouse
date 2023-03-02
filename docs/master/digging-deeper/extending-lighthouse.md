@@ -22,7 +22,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 
-class SomePackageServiceProvider extends ServiceProvider
+final class SomePackageServiceProvider extends ServiceProvider
 {
     public function boot(Dispatcher $dispatcher): void
     {
@@ -70,37 +70,17 @@ use Illuminate\Http\Request;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class MyContext implements GraphQLContext
+final class MyContext implements GraphQLContext
 {
-    /**
-     * An instance of the incoming HTTP request.
-     *
-     * @var \Illuminate\Http\Request
-     */
-    public $request;
+    public function __construct(
+        public Request $request
+    ) {}
 
-    public function __construct(Request $request)
-    {
-        $this->request = $request;
-    }
-
-    /**
-     * Get instance of request.
-     *
-     * @return \Illuminate\Http\Request
-     */
     public function request(): Request
     {
         return $this->request;
     }
 
-    /**
-     * Get instance of authenticated user.
-     *
-     * May be null since some fields may be accessible without authentication.
-     *
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
-     */
     public function user(): ?Authenticatable
     {
         // TODO implement yourself
@@ -118,14 +98,8 @@ use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class MyContextFactory implements CreatesContext
+final class MyContextFactory implements CreatesContext
 {
-    /**
-     * Generate GraphQL context.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Nuwave\Lighthouse\Support\Contracts\GraphQLContext
-     */
     public function generate(Request $request): GraphQLContext
     {
         return new MyContext($request);

@@ -143,7 +143,7 @@ to specify reusable query constraints.
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
-class User extends Model
+final class User extends Model
 {
     public function scopeVerified(Builder $query): Builder
     {

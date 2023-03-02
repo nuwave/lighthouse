@@ -149,7 +149,7 @@ class GraphQL
         string $query,
         GraphQLContext $context,
         ?array $variables = [],
-        mixed $rootValue = null,
+        mixed $root = null,
         ?string $operationName = null
     ): ExecutionResult {
         try {
@@ -158,7 +158,7 @@ class GraphQL
             return new ExecutionResult(null, [$syntaxError]);
         }
 
-        return $this->executeParsedQuery($parsedQuery, $context, $variables, $rootValue, $operationName);
+        return $this->executeParsedQuery($parsedQuery, $context, $variables, $root, $operationName);
     }
 
     /**
@@ -203,7 +203,7 @@ class GraphQL
         DocumentNode $query,
         GraphQLContext $context,
         ?array $variables = [],
-        mixed $rootValue = null,
+        mixed $root = null,
         ?string $operationName = null
     ): ExecutionResult {
         // Building the executable schema might take a while to do,
@@ -218,7 +218,7 @@ class GraphQL
         $result = GraphQLBase::executeQuery(
             $schema,
             $query,
-            $rootValue,
+            $root,
             $context,
             $variables,
             $operationName,

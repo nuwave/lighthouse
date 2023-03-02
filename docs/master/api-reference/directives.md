@@ -212,7 +212,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Post extends Model
+final class Post extends Model
 {
     public function author(): BelongsTo
     {
@@ -310,7 +310,7 @@ type User {
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class User extends Model
+final class User extends Model
 {
     public function roles(): BelongsToMany
     {
@@ -347,7 +347,7 @@ a column `meta`.
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class User extends Model
+final class User extends Model
 {
     public function roles(): BelongsToMany
     {
@@ -356,7 +356,7 @@ class User extends Model
     }
 }
 
-class Role extends Model
+final class Role extends Model
 {
     public function users(): BelongsToMany
     {
@@ -505,7 +505,7 @@ final class MyClass
     /**
      * @param  array<string, mixed>  $args
      */
-    public function minimumHighscore(Builder $builder, ?int $minimumHighscore, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Builder
+    public function minimumHighscore(Builder $builder, ?int $minimumHighscore, mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Builder
     {
         if (! $minimumHighscore) return $builder;
         return $builder->whereHas('game', static fn (Builder $builder): Builder => $builder->where('score', '>', $minimumHighscore));
@@ -1323,7 +1323,7 @@ type Mutation {
 The event class must accept an `Order` in the constructor:
 
 ```php
-class PlacedOrder
+final class PlacedOrder
 {
     public function __construct(Order $order) { ... }
 }
@@ -1765,31 +1765,20 @@ use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class Commentable
+final class Commentable
 {
-    /**
-     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
-     */
-    protected $typeRegistry;
-
-    public function __construct(TypeRegistry $typeRegistry)
-    {
-        $this->typeRegistry = $typeRegistry;
-    }
+    public function __construct(
+        private TypeRegistry $typeRegistry
+    ) {}
 
     /**
      * Decide which GraphQL type a resolved value has.
      *
-     * @param  mixed  $rootValue  The value that was resolved by the field. Usually an Eloquent model.
-     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
-     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
-     * @return \GraphQL\Type\Definition\Type
+     * @param  mixed  $root  The value that was resolved by the field. Usually an Eloquent model.
      */
-    public function resolveType($rootValue, GraphQLContext $context, ResolveInfo $resolveInfo): Type
+    public function resolveType(mixed $root, GraphQLContext $context, ResolveInfo $resolveInfo): Type
     {
-        // Default to getting a type with the same name as the passed in root value
         // TODO implement your own resolver logic - if the default is fine, just delete this class
-        return $this->typeRegistry->get(class_basename($rootValue));
     }
 }
 ```
@@ -2792,9 +2781,9 @@ use Illuminate\Database\Query\Builder;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class Blog
+final class Blog
 {
-    public function statistics($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Builder
+    public function statistics(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Builder
     {
         return DB::table('posts')
             ->leftJoinSub(...)
@@ -2830,7 +2819,7 @@ final class Posts
      * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context Shared between all fields.
      * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo Metadata for advanced query resolution.
      */
-    public function __invoke($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): LengthAwarePaginator
+    public function __invoke(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): LengthAwarePaginator
     {
         //...apply your logic
         return new LengthAwarePaginator([
@@ -3075,7 +3064,7 @@ The scope will be passed the value of the client-given argument:
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
-class Post extends Model
+final class Post extends Model
 {
     public function scopeTrending(Builder $query, bool $trending): Builder { ... }
 }
@@ -3379,31 +3368,20 @@ use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class Person
+final class Person
 {
-    /**
-     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
-     */
-    protected $typeRegistry;
-
-    public function __construct(TypeRegistry $typeRegistry)
-    {
-        $this->typeRegistry = $typeRegistry;
-    }
+    public function __construct(
+        private TypeRegistry $typeRegistry
+    ) {}
 
     /**
      * Decide which GraphQL type a resolved value has.
      *
-     * @param  mixed  $rootValue The value that was resolved by the field. Usually an Eloquent model.
-     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
-     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
-     * @return \GraphQL\Type\Definition\Type
+     * @param  mixed  $root The value that was resolved by the field. Usually an Eloquent model.
      */
-    public function resolveType($rootValue, GraphQLContext $context, ResolveInfo $resolveInfo): Type
+    public function resolveType(mixed $root, GraphQLContext $context, ResolveInfo $resolveInfo): Type
     {
-        // Default to getting a type with the same name as the passed in root value
         // TODO implement your own resolver logic - if the default is fine, just delete this class
-        return $this->typeRegistry->get(class_basename($rootValue));
     }
 }
 ```

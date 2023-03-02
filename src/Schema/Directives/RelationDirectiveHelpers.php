@@ -32,7 +32,7 @@ trait RelationDirectiveHelpers
      *
      * @return \Closure(QueryBuilder|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>): void
      */
-    protected function makeBuilderDecorator($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): \Closure
+    protected function makeBuilderDecorator(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): \Closure
     {
         return function (object $builder) use ($root, $args, $context, $resolveInfo): void {
             if ($builder instanceof Relation) {

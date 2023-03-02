@@ -50,7 +50,7 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgSanitizerDirective;
 
-class TrimDirective extends BaseDirective implements ArgSanitizerDirective, ArgDirective
+final class TrimDirective extends BaseDirective implements ArgSanitizerDirective, ArgDirective
 {
     public static function definition(): string
     {
@@ -92,9 +92,9 @@ namespace App\GraphQL\Mutations;
 
 use App\User;
 
-class CreateUser
+final class CreateUser
 {
-    public function __invoke($root, array $args): User
+    public function __invoke(mixed $root, array $args): User
     {
         return User::create([
             // This will be the trimmed value of the `name` argument
@@ -142,19 +142,22 @@ type User {
 Passing the `category` argument will select only the user's posts
 where the `category` column is equal to the value of the `category` argument.
 
-So let's take a look at the built-in [@eq](../api-reference/directives.md#eq) directive.
+So let's take a look at a simplified version of the built-in [@eq](../api-reference/directives.md#eq) directive.
 
 ```php
-namespace Nuwave\Lighthouse\Schema\Directives;
-
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
-use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 
-class EqDirective extends BaseDirective implements ArgBuilderDirective, ArgDirective
+class EqDirective extends BaseDirective implements ArgBuilderDirective
 {
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
+"""
+Add an equal conditional to a database query.
+"""
 directive @eq(
   """
   Specify the database column to compare.
@@ -167,12 +170,8 @@ GRAPHQL;
 
     /**
      * Apply a "WHERE = $value" clause.
-     *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @param  mixed  $value
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
-    public function handleBuilder($builder, $value): object
+    public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, $value): QueryBuilder|EloquentBuilder|Relation
     {
         return $builder->where(
             $this->directiveArgValue('key', $this->nodeName()),
@@ -233,13 +232,8 @@ use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 
-class ModelArgsDirective extends BaseDirective implements ArgManipulator
+final class ModelArgsDirective extends BaseDirective implements ArgManipulator
 {
-    /**
-     * SDL definition of the directive.
-     *
-     * @return string
-     */
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'

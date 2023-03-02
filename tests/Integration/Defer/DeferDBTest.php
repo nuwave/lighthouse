@@ -209,7 +209,6 @@ final class DeferDBTest extends DBTestCase
         $this->assertNull(Arr::get($deferredCompanies, 'data.companies.1.users'));
 
         $deferredUsers = $chunks[1];
-        // @phpstan-ignore-next-line type of model is known
         $companies->each(function (Company $company, int $i) use ($deferredUsers): void {
             $key = "companies.{$i}.users";
             $this->assertArrayHasKey($key, $deferredUsers);

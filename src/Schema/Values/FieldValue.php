@@ -114,7 +114,7 @@ class FieldValue
      */
     public function resultHandler(callable $handle): void
     {
-        $this->wrapResolver(static fn (callable $resolver) => static function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $handle): mixed {
+        $this->wrapResolver(static fn (callable $resolver) => static function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $handle): mixed {
             $resolved = $resolver($root, $args, $context, $resolveInfo);
             if ($resolved instanceof Deferred) {
                 return $resolved->then(static fn (mixed $result): mixed => $handle($result, $args, $context, $resolveInfo));
@@ -151,7 +151,7 @@ class FieldValue
             $resolver = $wrapper($resolver);
         }
 
-        return function ($root, array $args, GraphQLContext $context, BaseResolveInfo $baseResolveInfo) use ($resolver): mixed {
+        return function (mixed $root, array $args, GraphQLContext $context, BaseResolveInfo $baseResolveInfo) use ($resolver): mixed {
             $path = FieldPath::withoutLists($baseResolveInfo->path);
 
             if (! isset(self::$transformedResolveArgs[$path])) {

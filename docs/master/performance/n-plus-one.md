@@ -114,28 +114,26 @@ The following example illustrates some common patterns that may be found in a ba
 ```php
 use GraphQL\Deferred;
 
-class UserPostsBatchLoader
+final class UserPostsBatchLoader
 {
     /**
      * Map from user ids to users.
      *
      * @var array<int, \App\Models\User>
      */
-    protected $users = [];
+    protected array $users = [];
 
     /**
      * Map from user ids to posts.
      *
      * @var array<int, array<int, \App\Posts\Post>>
      */
-    protected $results = [];
+    protected array $results = [];
 
     /**
      * Marks when the actual batch loading happened.
-     *
-     * @var bool
      */
-    protected $hasResolved = false;
+    protected bool $hasResolved = false;
 
     /**
      * Queue loading of posts for the given user.

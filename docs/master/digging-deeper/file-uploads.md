@@ -36,16 +36,14 @@ The field from the previous example can be implemented like this:
 ```php
 namespace App\GraphQL\Mutations;
 
-class Upload
+final class Upload
 {
     /**
      * Upload a file, store it on the server and return the path.
      *
-     * @param  mixed  $root
      * @param  array<string, mixed>  $args
-     * @return string|null
      */
-    public function __invoke($root, array $args): ?string
+    public function __invoke(mixed $root, array $args): ?string
     {
         /** @var \Illuminate\Http\UploadedFile $file */
         $file = $args['file'];

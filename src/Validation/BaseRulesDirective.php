@@ -132,7 +132,7 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
     }
 
     /**
-     * @param  mixed  $messages  Whatever faulty value was given for messages
+     * @param  mixed  $messages  whatever faulty value was given for messages
      *
      * @throws DefinitionException
      */
@@ -145,7 +145,7 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
     }
 
     /**
-     * @param  mixed  $apply  Any invalid value
+     * @param  mixed  $apply  any invalid value
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */

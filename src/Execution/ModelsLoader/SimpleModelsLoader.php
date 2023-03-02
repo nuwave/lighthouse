@@ -17,11 +17,6 @@ class SimpleModelsLoader implements ModelsLoader
         $parents->load([$this->relation => $this->decorateBuilder]);
     }
 
-    /**
-     * Extract the relation that was loaded.
-     *
-     * @return mixed the model's relation
-     */
     public function extract(Model $model): mixed
     {
         // Dot notation may be used to eager load nested relations

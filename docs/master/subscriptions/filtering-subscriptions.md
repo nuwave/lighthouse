@@ -20,16 +20,9 @@ namespace App\GraphQL\Subscriptions;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 
-class PostUpdatedSubscription extends GraphQLSubscription
+final class PostUpdatedSubscription extends GraphQLSubscription
 {
-    /**
-     * Filter which subscribers should receive the subscription.
-     *
-     * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
-     * @param  mixed  $root
-     * @return bool
-     */
-    public function filter(Subscriber $subscriber, $root): bool
+    public function filter(Subscriber $subscriber, mixed $root): bool
     {
         // Clients arguments when subscribing
         $args = $subscriber->args;

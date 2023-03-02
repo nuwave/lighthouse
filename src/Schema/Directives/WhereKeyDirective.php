@@ -56,7 +56,7 @@ GRAPHQL;
         }
     }
 
-    public function handleFieldBuilder(QueryBuilder|EloquentBuilder|Relation $builder, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): QueryBuilder|EloquentBuilder|Relation
+    public function handleFieldBuilder(QueryBuilder|EloquentBuilder|Relation $builder, mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): QueryBuilder|EloquentBuilder|Relation
     {
         return $this->handleBuilder(
             $builder,

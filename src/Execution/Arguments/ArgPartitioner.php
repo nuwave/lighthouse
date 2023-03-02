@@ -20,7 +20,7 @@ class ArgPartitioner
      *
      * @return array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>
      */
-    public static function nestedArgResolvers(ArgumentSet $argumentSet, $root): array
+    public static function nestedArgResolvers(ArgumentSet $argumentSet, mixed $root): array
     {
         $model = $root instanceof Model
             ? new \ReflectionClass($root)

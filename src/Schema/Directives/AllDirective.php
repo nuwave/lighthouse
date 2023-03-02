@@ -51,7 +51,7 @@ GRAPHQL;
 
     public function resolveField(FieldValue $fieldValue): callable
     {
-        return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Collection {
+        return function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Collection {
             if ($this->directiveHasArgument('builder')) {
                 $builderResolver = $this->getResolverFromArgument('builder');
 

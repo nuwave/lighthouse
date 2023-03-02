@@ -14,15 +14,12 @@ final class MorphToManyDirectiveTest extends DBTestCase
 {
     use WithFaker;
 
-    /**
-     * @var \Tests\Utils\Models\Post
-     */
-    protected $post;
+    protected Post $post;
 
     /**
-     * @var \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\Tag>|\Illuminate\Support\Collection<int, \Tests\Utils\Models\Tag>
+     * @var \Illuminate\Support\Collection<int, \Tests\Utils\Models\Tag>
      */
-    protected $postTags;
+    protected Collection $postTags;
 
     protected function setUp(): void
     {
@@ -194,22 +191,26 @@ final class MorphToManyDirectiveTest extends DBTestCase
 
     public function testResolveMorphToManyUsingInterfaces(): void
     {
-        /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
-        /** @var \Tests\Utils\Models\Post $post */
-        $post = factory(Post::class)->create([
-            'user_id' => $user->id,
-        ]);
+        assert($user instanceof User);
+
+        $post = factory(Post::class)->make();
+        assert($post instanceof Post);
+        $post->user()->associate($user);
+        $post->save();
+
         /** @var \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\Tag> $postTags */
         $postTags = factory(Tag::class, 3)->create()->map(static function (Tag $tag) use ($post) {
             $post->tags()->attach($tag);
 
             return $tag;
         });
-        /** @var \Tests\Utils\Models\Task $task */
-        $task = factory(Task::class)->create([
-            'user_id' => $user->id,
-        ]);
+
+        $task = factory(Task::class)->make();
+        assert($task instanceof Task);
+        $task->user()->associate($user);
+        $task->save();
+
         /** @var \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\Tag> $taskTags */
         $taskTags = factory(Tag::class, 3)->create()->map(static function (Tag $tag) use ($task) {
             $task->tags()->attach($tag);
@@ -299,7 +300,6 @@ final class MorphToManyDirectiveTest extends DBTestCase
                         [
                             'id' => $post->id,
                             'tags' => $postTags
-                                // @phpstan-ignore-next-line model type is known
                                 ->map(static fn (Tag $tag): array => [
                                     'id' => $tag->id,
                                     'name' => $tag->name,
@@ -311,7 +311,6 @@ final class MorphToManyDirectiveTest extends DBTestCase
                         [
                             'id' => $task->id,
                             'tags' => $taskTags
-                                // @phpstan-ignore-next-line model type is known
                                 ->map(static fn (Tag $tag): array => [
                                     'id' => $tag->id,
                                     'title' => $tag->name,
@@ -324,8 +323,10 @@ final class MorphToManyDirectiveTest extends DBTestCase
         ]);
     }
 
-    public static function resolveType($root): string
+    public static function resolveType(Tag $root): string
     {
-        return $root->posts()->count() ? 'PostTag' : 'TaskTag';
+        return $root->posts()->exists()
+            ? 'PostTag'
+            : 'TaskTag';
     }
 }

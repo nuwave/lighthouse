@@ -18,8 +18,6 @@ interface ModelsLoader
 
     /**
      * Extract the result of loading from the given model.
-     *
-     * @return mixed Whatever was loaded
      */
     public function extract(Model $model): mixed;
 }

@@ -57,8 +57,6 @@ class PaginatedModelsLoader implements ModelsLoader
 
                 if ($relation instanceof BelongsToMany || $relation instanceof HasManyThrough) {
                     $select = Utils::callProtected($relation, 'shouldSelect', ['*']);
-
-                    // @phpstan-ignore-next-line Builder mixin is not understood
                     $relation->addSelect($select);
                 }
 

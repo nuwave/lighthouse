@@ -73,9 +73,9 @@ use App\Exceptions\CustomException;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class SomeField
+final class SomeField
 {
-    public function __invoke($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): string
+    public function __invoke(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): string
     {
         if ($this->errorConditionIsMet()) {
             throw new CustomException(

@@ -32,14 +32,12 @@ abstract class Validator implements ArgumentSetValidation
     }
 
     /**
-     * Retrieve the value of an argument.
+     * Retrieve the value of an argument or the default.
      *
      * @param  string  $key  the key of the argument, may use dot notation to get nested values
      * @param  mixed|null  $default  returned in case the argument is not present
-     *
-     * @return mixed the value of the argument or the default
      */
-    protected function arg(string $key, $default = null)
+    protected function arg(string $key, mixed $default = null): mixed
     {
         return Arr::get(
             $this->args->toArray(),
