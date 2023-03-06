@@ -25,42 +25,35 @@ class WhereConditionsServiceProvider extends ServiceProvider
 
     public function boot(Dispatcher $dispatcher): void
     {
-        $dispatcher->listen(
-            RegisterDirectiveNamespaces::class,
-            static fn (): string => __NAMESPACE__
-        );
+        $dispatcher->listen(RegisterDirectiveNamespaces::class, static fn (): string => __NAMESPACE__);
+        $dispatcher->listen(ManipulateAST::class, function (ManipulateAST $manipulateAST): void {
+            $operator = $this->app->make(Operator::class);
 
-        $dispatcher->listen(
-            ManipulateAST::class,
-            function (ManipulateAST $manipulateAST): void {
-                $operator = $this->app->make(Operator::class);
-
-                $manipulateAST->documentAST
-                    ->setTypeDefinition(
-                        static::createWhereConditionsInputType(
-                            static::DEFAULT_WHERE_CONDITIONS,
-                            'Dynamic WHERE conditions for queries.',
-                            'String'
-                        )
+            $manipulateAST->documentAST
+                ->setTypeDefinition(
+                    static::createWhereConditionsInputType(
+                        static::DEFAULT_WHERE_CONDITIONS,
+                        'Dynamic WHERE conditions for queries.',
+                        'String'
                     )
-                    ->setTypeDefinition(
-                        static::createHasConditionsInputType(
-                            static::DEFAULT_WHERE_CONDITIONS,
-                            'Dynamic HAS conditions for WHERE condition queries.'
-                        )
+                )
+                ->setTypeDefinition(
+                    static::createHasConditionsInputType(
+                        static::DEFAULT_WHERE_CONDITIONS,
+                        'Dynamic HAS conditions for WHERE condition queries.'
                     )
-                    ->setTypeDefinition(
-                        Parser::enumTypeDefinition(
-                            $operator->enumDefinition()
-                        )
+                )
+                ->setTypeDefinition(
+                    Parser::enumTypeDefinition(
+                        $operator->enumDefinition()
                     )
-                    ->setTypeDefinition(
-                        Parser::scalarTypeDefinition(/** @lang GraphQL */ '
-                            scalar Mixed @scalar(class: "MLL\\\GraphQLScalars\\\MixedScalar")
-                        ')
-                    );
-            }
-        );
+                )
+                ->setTypeDefinition(
+                    Parser::scalarTypeDefinition(/** @lang GraphQL */ '
+                        scalar Mixed @scalar(class: "MLL\\\GraphQLScalars\\\MixedScalar")
+                    ')
+                );
+        });
     }
 
     public static function createWhereConditionsInputType(string $name, string $description, string $columnType): InputObjectTypeDefinitionNode

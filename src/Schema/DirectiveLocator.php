@@ -58,14 +58,11 @@ class DirectiveLocator
             $this->directiveNamespaces
                 // When looking for a directive by name, the namespaces are tried in order
                 = (new Collection([
-                    // User defined directives (top priority)
+                    // User defined directives come first
                     config('lighthouse.namespaces.directives'),
 
-                    // Plugin developers defined directives
+                    // Built-in and plugin defined directives come next
                     $this->eventsDispatcher->dispatch(new RegisterDirectiveNamespaces()),
-
-                    // Lighthouse defined directives
-                    'Nuwave\\Lighthouse\\Schema\\Directives',
                 ]))
                 ->flatten()
                 ->filter()

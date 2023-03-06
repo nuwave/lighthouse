@@ -13,20 +13,13 @@ class PaginationServiceProvider extends ServiceProvider
 {
     public function boot(Dispatcher $dispatcher): void
     {
-        $dispatcher->listen(
-            ManipulateAST::class,
-            static function (ManipulateAST $manipulateAST): void {
-                $documentAST = $manipulateAST->documentAST;
-                $documentAST->setTypeDefinition(self::paginatorInfo());
-                $documentAST->setTypeDefinition(self::simplePaginatorInfo());
-                $documentAST->setTypeDefinition(self::pageInfo());
-            }
-        );
-
-        $dispatcher->listen(
-            RegisterDirectiveNamespaces::class,
-            static fn (): string => __NAMESPACE__
-        );
+        $dispatcher->listen(RegisterDirectiveNamespaces::class, static fn (): string => __NAMESPACE__);
+        $dispatcher->listen(ManipulateAST::class, static function (ManipulateAST $manipulateAST): void {
+            $documentAST = $manipulateAST->documentAST;
+            $documentAST->setTypeDefinition(self::paginatorInfo());
+            $documentAST->setTypeDefinition(self::simplePaginatorInfo());
+            $documentAST->setTypeDefinition(self::pageInfo());
+        });
     }
 
     protected static function paginatorInfo(): ObjectTypeDefinitionNode

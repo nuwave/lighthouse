@@ -31,31 +31,24 @@ class SoftDeletesServiceProvider extends ServiceProvider
 
     public function boot(Dispatcher $dispatcher): void
     {
-        $dispatcher->listen(
-            ManipulateAST::class,
-            static function (ManipulateAST $manipulateAST): void {
-                $manipulateAST->documentAST
-                    ->setTypeDefinition(
-                        Parser::enumTypeDefinition('
-                            "Specify if you want to include or exclude trashed results from a query."
-                            enum Trashed {
-                                "Only return trashed results."
-                                ONLY @enum(value: "only")
+        $dispatcher->listen(RegisterDirectiveNamespaces::class, static fn (): string => __NAMESPACE__);
+        $dispatcher->listen(ManipulateAST::class, static function (ManipulateAST $manipulateAST): void {
+            $manipulateAST->documentAST
+                ->setTypeDefinition(
+                    Parser::enumTypeDefinition('
+                        "Specify if you want to include or exclude trashed results from a query."
+                        enum Trashed {
+                            "Only return trashed results."
+                            ONLY @enum(value: "only")
 
-                                "Return both trashed and non-trashed results."
-                                WITH @enum(value: "with")
+                            "Return both trashed and non-trashed results."
+                            WITH @enum(value: "with")
 
-                                "Only return non-trashed results."
-                                WITHOUT @enum(value: "without")
-                            }
-                        ')
-                    );
-            }
-        );
-
-        $dispatcher->listen(
-            RegisterDirectiveNamespaces::class,
-            static fn (): string => __NAMESPACE__
-        );
+                            "Only return non-trashed results."
+                            WITHOUT @enum(value: "without")
+                        }
+                    ')
+                );
+        });
     }
 }

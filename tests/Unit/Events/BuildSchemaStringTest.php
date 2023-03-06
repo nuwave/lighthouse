@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Events;
 
-use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
+use Illuminate\Contracts\Events\Dispatcher;
 use Nuwave\Lighthouse\Events\BuildSchemaString;
 use Tests\TestCase;
 
@@ -10,28 +10,22 @@ final class BuildSchemaStringTest extends TestCase
 {
     public function testInjectsSourceSchemaIntoEvent(): void
     {
-        $dispatcher = $this->app->make(EventDispatcher::class);
-        $dispatcher->listen(
-            BuildSchemaString::class,
-            function (BuildSchemaString $buildSchemaString): void {
-                $this->assertSame(self::PLACEHOLDER_QUERY, $buildSchemaString->userSchema);
-            }
-        );
+        $dispatcher = $this->app->make(Dispatcher::class);
+        $dispatcher->listen(BuildSchemaString::class, function (BuildSchemaString $buildSchemaString): void {
+            $this->assertSame(self::PLACEHOLDER_QUERY, $buildSchemaString->userSchema);
+        });
 
         $this->buildSchema(self::PLACEHOLDER_QUERY);
     }
 
     public function testAddAdditionalSchemaThroughEvent(): void
     {
-        $dispatcher = $this->app->make(EventDispatcher::class);
-        $dispatcher->listen(
-            BuildSchemaString::class,
-            fn (): string => "
-                extend type Query {
-                    sayHello: String @field(resolver: \"{$this->qualifyTestResolver('resolveSayHello')}\")
-                }
-                "
-        );
+        $dispatcher = $this->app->make(Dispatcher::class);
+        $dispatcher->listen(BuildSchemaString::class, fn (): string => "
+            extend type Query {
+                sayHello: String @field(resolver: \"{$this->qualifyTestResolver('resolveSayHello')}\")
+            }
+        ");
 
         $this->schema = /** @lang GraphQL */ "
         type Query {
