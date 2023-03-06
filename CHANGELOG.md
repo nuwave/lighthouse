@@ -37,6 +37,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Simplify `FieldMiddleware` directive interface https://github.com/nuwave/lighthouse/pull/1706
 - Rename configuration option `schema.register` to `schema_path`
 - Restructure cache related configuration options
+- Register all non-user namespaces through `RegisterDirectiveNamespaces` event https://github.com/nuwave/lighthouse/pull/2337
 
 ### Fixed
 
