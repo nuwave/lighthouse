@@ -114,6 +114,7 @@ class PaginatedModelsLoader implements ModelsLoader
         $anyModelInstance = $parents->first();
         assert($anyModelInstance instanceof Model);
 
+        // @phpstan-ignore-next-line Laravel 9 defines this as Builder|Model
         return $anyModelInstance->newModelQuery();
     }
 
