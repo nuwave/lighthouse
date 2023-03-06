@@ -77,6 +77,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove deprecated `GraphQL::executeQuery()` and `GraphQL::prepSchema()`
 - Remove `@field` directive argument `args` https://github.com/nuwave/lighthouse/pull/1706
 - Remove schema caching v1 https://github.com/nuwave/lighthouse/pull/2321
+- Do not register `ScoutServiceProvider` by default
 
 ## v5.71.0
 
