@@ -58,4 +58,12 @@ return static function (RectorConfig $rectorConfig): void {
         AddReturnTypeDeclarationFromYieldsRector::class, // iterable is fine
         ArrayShapeFromConstantArrayReturnRector::class, // Sometimes too specific in methods that can be overridden
     ]);
+    $rectorConfig->paths([
+        __DIR__ . '/src',
+        __DIR__ . '/tests',
+        __DIR__ . '/.php-cs-fixer.php',
+        __DIR__ . '/_ide_helper.php',
+        __DIR__ . '/rector.php',
+    ]);
+    $rectorConfig->phpstanConfig(__DIR__ . '/phpstan.neon');
 };
