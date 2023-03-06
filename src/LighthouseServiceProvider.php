@@ -126,7 +126,7 @@ class LighthouseServiceProvider extends ServiceProvider
 
     public function boot(ConfigRepository $configRepository, Dispatcher $dispatcher): void
     {
-        $dispatcher->listen(RegisterDirectiveNamespaces::class, static fn (): string => __NAMESPACE__);
+        $dispatcher->listen(RegisterDirectiveNamespaces::class, static fn (): string => __NAMESPACE__ . '\\Schema\\Directives');
 
         $this->publishes([
             __DIR__ . '/lighthouse.php' => $this->app->configPath() . '/lighthouse.php',
