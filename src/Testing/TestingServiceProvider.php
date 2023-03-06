@@ -17,9 +17,6 @@ class TestingServiceProvider extends ServiceProvider
 
     public function boot(Dispatcher $dispatcher): void
     {
-        $dispatcher->listen(
-            RegisterDirectiveNamespaces::class,
-            static fn (): string => __NAMESPACE__
-        );
+        $dispatcher->listen(RegisterDirectiveNamespaces::class, static fn (): string => __NAMESPACE__);
     }
 }

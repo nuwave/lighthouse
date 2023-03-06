@@ -3092,8 +3092,17 @@ directive @search(
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
+Requires the installation of [Laravel Scout](https://laravel.com/docs/scout)
+and manual registration of the service provider in `config/app.php`:
+
+```php
+'providers' => [
+    \Nuwave\Lighthouse\Scout\ScoutServiceProvider::class,
+],
+```
+
 The `search()` method of the model is called with the value of the argument,
-using the driver you configured for [Laravel Scout](https://laravel.com/docs/scout).
+using the driver you configured for Scout.
 
 ```graphql
 type Query {
@@ -3102,7 +3111,7 @@ type Query {
 ```
 
 The [@search](#search) directive only works in combination with filter directives that
-implement `\Nuwave\Lighthouse\Scout\ScoutBuilderDirective`:
+implement the interface `Nuwave\Lighthouse\Scout\ScoutBuilderDirective`:
 
 - [@eq](#eq)
 - [@softDeletes](#softdeletes)

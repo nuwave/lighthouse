@@ -28,10 +28,8 @@ final class SomePackageServiceProvider extends ServiceProvider
     {
         $dispatcher->listen(
             RegisterDirectiveNamespaces::class,
-            function (RegisterDirectiveNamespaces $registerDirectiveNamespaces): string {
-                // May also return an iterable with multiple strings if needed
-                return 'SomeVendor\SomePackage\Directives';
-            }
+            // May also return an iterable with multiple strings if needed
+            static fn (): string => 'SomeVendor\SomePackage\Directives',
         );
     }
 ```

@@ -3,7 +3,7 @@
 namespace Nuwave\Lighthouse\Events;
 
 /**
- * Fires when the directive factory is constructed.
+ * Fires when the schema is constructed and the first directive is encountered.
  *
  * Listeners may return namespaces in the form of either:
  * - a single string

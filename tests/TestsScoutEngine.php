@@ -11,12 +11,12 @@ trait TestsScoutEngine
     /**
      * @var \Mockery\MockInterface&\Laravel\Scout\EngineManager
      */
-    protected $engineManager;
+    protected EngineManager $engineManager;
 
     /**
      * @var \Mockery\MockInterface&\Laravel\Scout\Engines\NullEngine
      */
-    protected $engine;
+    protected NullEngine $engine;
 
     public function setUpScoutEngine(): void
     {

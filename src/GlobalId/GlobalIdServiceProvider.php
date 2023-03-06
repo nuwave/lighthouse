@@ -24,24 +24,17 @@ class GlobalIdServiceProvider extends ServiceProvider
 
     public function boot(Dispatcher $dispatcher): void
     {
-        $dispatcher->listen(
-            ManipulateAST::class,
-            function (ManipulateAST $manipulateAST): void {
-                $documentAST = $manipulateAST->documentAST;
+        $dispatcher->listen(RegisterDirectiveNamespaces::class, static fn (): string => __NAMESPACE__);
+        $dispatcher->listen(ManipulateAST::class, function (ManipulateAST $manipulateAST): void {
+            $documentAST = $manipulateAST->documentAST;
 
-                // Only add the node type and node field if a type actually implements them.
-                // If we were to add it regardless, a validation error is thrown because an
-                // interface without implementations is pointless to have in the schema.
-                if ($this->hasTypeImplementingNodeInterface($documentAST)) {
-                    $this->addNodeSupport($documentAST);
-                }
+            // Only add the node type and node field if a type actually implements them.
+            // If we were to add it regardless, a validation error is thrown because an
+            // interface without implementations is pointless to have in the schema.
+            if ($this->hasTypeImplementingNodeInterface($documentAST)) {
+                $this->addNodeSupport($documentAST);
             }
-        );
-
-        $dispatcher->listen(
-            RegisterDirectiveNamespaces::class,
-            static fn (): string => __NAMESPACE__
-        );
+        });
     }
 
     protected function addNodeSupport(DocumentAST $documentAST): void

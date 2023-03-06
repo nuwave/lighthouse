@@ -21,22 +21,9 @@ class DeferServiceProvider extends ServiceProvider
 
     public function boot(Dispatcher $dispatcher): void
     {
-        $dispatcher->listen(
-            RegisterDirectiveNamespaces::class,
-            static fn (): string => __NAMESPACE__
-        );
-
-        $dispatcher->listen(
-            ManipulateAST::class,
-            function (ManipulateAST $manipulateAST): void {
-                $this->handleManipulateAST($manipulateAST);
-            }
-        );
-
-        $dispatcher->listen(
-            StartExecution::class,
-            Defer::class . '@handleStartExecution'
-        );
+        $dispatcher->listen(RegisterDirectiveNamespaces::class, static fn (): string => __NAMESPACE__);
+        $dispatcher->listen(ManipulateAST::class, fn (ManipulateAST $manipulateAST) => $this->handleManipulateAST($manipulateAST));
+        $dispatcher->listen(StartExecution::class, Defer::class . '@handleStartExecution');
     }
 
     /**

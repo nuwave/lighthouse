@@ -296,6 +296,17 @@ to the configured cache driver. This significantly reduces memory usage.
 If you had previously depended on the presence of the schema in your
 cache, then you will need to change your code.
 
+### Register `ScoutServiceProvider` if you use `@search`
+
+If you use the `@search` directive in your schema, you will now need to register the service provider
+in your `app/config.php`, it is no longer registered by default.
+
+```php
+'providers' => [
+    \Nuwave\Lighthouse\Scout\ScoutServiceProvider::class,
+],
+```
+
 ## v4 to v5
 
 ### Update PHP, Laravel and PHPUnit
