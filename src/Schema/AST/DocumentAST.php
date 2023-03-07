@@ -82,8 +82,6 @@ class DocumentAST implements Arrayable
 
     /**
      * Create a new DocumentAST instance from a schema.
-     *
-     * @throws \Nuwave\Lighthouse\Exceptions\SchemaSyntaxErrorException
      */
     public static function fromSource(string $schema): self
     {

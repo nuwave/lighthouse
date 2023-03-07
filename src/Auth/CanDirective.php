@@ -147,8 +147,6 @@ GRAPHQL;
     /**
      * @param  array<string, mixed>  $args
      *
-     * @throws \GraphQL\Error\Error
-     *
      * @return iterable<\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>>
      */
     protected function modelsToCheck(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): iterable
@@ -226,8 +224,6 @@ GRAPHQL;
     /**
      * @param  string|array<string>  $ability
      * @param  array<int, mixed>  $arguments
-     *
-     * @throws \Nuwave\Lighthouse\Exceptions\AuthorizationException
      */
     protected function authorize(Gate $gate, string|array $ability, string|Model|null $model, array $arguments): void
     {

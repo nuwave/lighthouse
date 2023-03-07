@@ -29,8 +29,6 @@ final class Email extends ScalarType
 
     /**
      * @param  \GraphQL\Language\AST\VariableNode|\GraphQL\Language\AST\NullValueNode|\GraphQL\Language\AST\IntValueNode|\GraphQL\Language\AST\FloatValueNode|\GraphQL\Language\AST\StringValueNode|\GraphQL\Language\AST\BooleanValueNode|\GraphQL\Language\AST\EnumValueNode|\GraphQL\Language\AST\ListValueNode|\GraphQL\Language\AST\ObjectValueNode  $valueNode
-     *
-     * @throws \GraphQL\Error\Error
      */
     public function parseLiteral($valueNode, ?array $variables = null): string
     {
@@ -39,7 +37,7 @@ final class Email extends ScalarType
         }
 
         if (! filter_var($valueNode->value, FILTER_VALIDATE_EMAIL)) {
-            throw new Error('Not a valid email', $valueNode);
+            throw new Error('Not a valid email.', $valueNode);
         }
 
         return $valueNode->value;

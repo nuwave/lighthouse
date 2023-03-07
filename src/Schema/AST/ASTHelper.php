@@ -111,8 +111,6 @@ class ASTHelper
 
     /**
      * Unwrap lists and non-nulls and get the named type within.
-     *
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public static function getUnderlyingNamedTypeNode(Node $node): NamedTypeNode
     {
@@ -129,9 +127,7 @@ class ASTHelper
             return self::getUnderlyingNamedTypeNode($node->type);
         }
 
-        throw new DefinitionException(
-            "The node '{$node->kind}' does not have a type associated with it."
-        );
+        throw new DefinitionException("The node '{$node->kind}' does not have a type associated with it.");
     }
 
     /**
@@ -253,9 +249,6 @@ class ASTHelper
         return null !== self::firstByName($type->interfaces, $interfaceName);
     }
 
-    /**
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
-     */
     public static function addDirectiveToFields(DirectiveNode $directiveNode, ObjectTypeDefinitionNode|ObjectTypeExtensionNode|InterfaceTypeDefinitionNode|InterfaceTypeExtensionNode &$typeWithFields): void
     {
         $name = $directiveNode->name->value;
@@ -311,9 +304,6 @@ class ASTHelper
         return $deprecated['reason'] ?? null;
     }
 
-    /**
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
-     */
     public static function extractDirectiveDefinition(string $definitionString): DirectiveDefinitionNode
     {
         try {

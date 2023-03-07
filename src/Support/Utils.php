@@ -48,8 +48,6 @@ class Utils
      *
      * @param  class-string  $className  this class is resolved through the container
      * @param  string  $methodName  the method that gets passed the arguments of the closure
-     *
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public static function constructResolver(string $className, string $methodName): \Closure
     {

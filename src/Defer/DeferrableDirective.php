@@ -54,9 +54,7 @@ GRAPHQL;
     }
 
     /**
-     * Determine if field should be deferred.
-     *
-     * @throws \GraphQL\Error\Error
+     * Determine if the field should be deferred.
      */
     protected function shouldDefer(TypeNode $fieldType, ResolveInfo $resolveInfo): bool
     {
@@ -81,19 +79,13 @@ GRAPHQL;
         }
 
         $skips = (new ClientDirective(Directive::SKIP_NAME))->forField($resolveInfo);
-        foreach ($skips as $skip) {
-            if ($skip === [Directive::IF_ARGUMENT_NAME => true]) {
-                return false;
-            }
+        if (in_array([Directive::IF_ARGUMENT_NAME => true], $skips, true)) {
+            return false;
         }
 
         $includes = (new ClientDirective(Directive::INCLUDE_NAME))->forField($resolveInfo);
 
-        return ! in_array(
-            [Directive::IF_ARGUMENT_NAME => false],
-            $includes,
-            true
-        );
+        return ! in_array([Directive::IF_ARGUMENT_NAME => false], $includes, true);
     }
 
     /**

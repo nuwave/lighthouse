@@ -168,8 +168,6 @@ class GraphQL
      * @api
      *
      * Caches the parsed result if the query cache is enabled in the configuration.
-     *
-     * @throws SyntaxError
      */
     public function parse(string $query): DocumentNode
     {
@@ -272,8 +270,6 @@ class GraphQL
 
     /**
      * Loads persisted query from the query cache.
-     *
-     * @throws Error if this feature is disabled or no query is found
      */
     protected function loadPersistedQuery(string $sha256hash): DocumentNode
     {

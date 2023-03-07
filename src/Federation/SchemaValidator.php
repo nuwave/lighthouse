@@ -47,9 +47,6 @@ class SchemaValidator
         }
     }
 
-    /**
-     * @throws \Nuwave\Lighthouse\Federation\FederationException
-     */
     protected function validateKeySelectionSet(SelectionSetNode $selectionSet, ObjectType $type, ObjectTypeDefinitionNode $typeAST): void
     {
         foreach ($selectionSet->selections as $selection) {

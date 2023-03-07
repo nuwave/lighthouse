@@ -127,9 +127,6 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
         );
     }
 
-    /**
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
-     */
     protected function edgeType(DocumentAST $documentAST): ?ObjectTypeDefinitionNode
     {
         if ($edgeTypeName = $this->directiveArgValue('edgeType')) {

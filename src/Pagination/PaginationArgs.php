@@ -22,8 +22,6 @@ class PaginationArgs
      * Create a new instance from user given args.
      *
      * @param  array<string, mixed>  $args
-     *
-     * @throws \GraphQL\Error\Error
      */
     public static function extractArgs(array $args, PaginationType $paginationType, ?int $paginateMaxCount): self
     {
