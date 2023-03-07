@@ -225,12 +225,11 @@ GRAPHQL;
 
     /**
      * @param  string|array<string>  $ability
-     * @param  string|\Illuminate\Database\Eloquent\Model|null  $model
      * @param  array<int, mixed>  $arguments
      *
      * @throws \Nuwave\Lighthouse\Exceptions\AuthorizationException
      */
-    protected function authorize(Gate $gate, string|array $ability, $model, array $arguments): void
+    protected function authorize(Gate $gate, string|array $ability, string|Model|null $model, array $arguments): void
     {
         // The signature of the second argument `$arguments` of `Gate::check`
         // should be [modelClassName, additionalArg, additionalArg...]
