@@ -60,9 +60,10 @@
         "nunomaduro/larastan": "^2.4.1",
         "orchestra/testbench": "^7.7 || ^8.8",
         "phpbench/phpbench": "^1.2.6",
+        "phpstan/extension-installer": "^1",
         "phpstan/phpstan": "^1.10.3",
-        "phpstan/phpstan-mockery": "~0.12 || ^1.1",
-        "phpstan/phpstan-phpunit": "~0.12 || ^1.1.1",
+        "phpstan/phpstan-mockery": "^1.1",
+        "phpstan/phpstan-phpunit": "^1.1.1",
         "phpunit/phpunit": "^9.6.4",
         "predis/predis": "^1.1 || ^2.1",
         "pusher/pusher-php-server": "^5 || ^6 || ^7.0.2",
@@ -93,7 +94,8 @@
         "allow-plugins": {
             "composer/package-versions-deprecated": true,
             "ergebnis/composer-normalize": true,
-            "kylekatarnls/update-helper": true
+            "kylekatarnls/update-helper": true,
+            "phpstan/extension-installer": true
         },
         "sort-packages": true
     },
