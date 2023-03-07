@@ -84,6 +84,7 @@ GRAPHQL;
         }
 
         $includes = (new ClientDirective(Directive::INCLUDE_NAME))->forField($resolveInfo);
+
         return ! in_array([Directive::IF_ARGUMENT_NAME => false], $includes, true);
     }
 
