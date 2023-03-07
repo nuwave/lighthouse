@@ -97,8 +97,6 @@ abstract class DriverManager
     /**
      * Resolve the given driver.
      *
-     * @throws \InvalidArgumentException
-     *
      * @return object the resolved driver
      */
     protected function resolve(string $name)
@@ -132,19 +130,14 @@ abstract class DriverManager
 
     /**
      * Validate driver implements the proper interface.
-     *
-     * @param  object  $driver
-     *
-     * @throws \Nuwave\Lighthouse\Exceptions\InvalidDriverException
-     *
-     * @return object
      */
-    protected function validateDriver($driver)
+    protected function validateDriver(object $driver): object
     {
         $interface = $this->interface();
 
-        if (! (new \ReflectionClass($driver))->implementsInterface($interface)) {
-            throw new InvalidDriverException($driver::class . " does not implement {$interface}");
+        if (! $driver instanceof $interface) {
+            $driverClass = $driver::class;
+            throw new InvalidDriverException("{$driverClass} does not implement {$interface}.");
         }
 
         return $driver;

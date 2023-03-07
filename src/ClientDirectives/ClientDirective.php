@@ -47,9 +47,6 @@ class ClientDirective
         return $arguments;
     }
 
-    /**
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
-     */
     protected function definition(): Directive
     {
         if (! isset($this->definition)) {

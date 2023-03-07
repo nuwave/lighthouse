@@ -40,16 +40,11 @@ abstract class DateScalar extends ScalarType
      * Parse a literal provided as part of a GraphQL query string into a Carbon instance.
      *
      * @param  array<string, mixed>|null  $variables
-     *
-     * @throws \GraphQL\Error\Error
      */
     public function parseLiteral(Node $valueNode, ?array $variables = null): IlluminateCarbon
     {
         if (! $valueNode instanceof StringValueNode) {
-            throw new Error(
-                "Query error: Can only parse strings, got {$valueNode->kind}",
-                $valueNode
-            );
+            throw new Error("Query error: Can only parse strings, got {$valueNode->kind}.", $valueNode);
         }
 
         return $this->tryParsingDate($valueNode->value, Error::class);
@@ -60,8 +55,6 @@ abstract class DateScalar extends ScalarType
      *
      * @param  mixed  $value  Any value that might be a Date
      * @param  class-string<\Exception>  $exceptionClass
-     *
-     * @throws \GraphQL\Error\InvariantViolation|\GraphQL\Error\Error
      */
     protected function tryParsingDate(mixed $value, string $exceptionClass): IlluminateCarbon
     {

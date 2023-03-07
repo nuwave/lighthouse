@@ -242,27 +242,6 @@ class Foo
 }
 ```
 
-### Annotating Exception Throwing
-
-Only annotate `@throws` for Exceptions that are thrown in the function itself.
-
-```php
-/**
- * @throws \Exception
- */
-function foo(){
-  throw Excection();
-}
-
-/**
- * No need to annotate the Exception here, even though
- * it is thrown indirectly.
- */
-function bar(){
-  foo();
-}
-```
-
 ## Code style
 
 We format the code automatically with [php-cs-fixer](https://github.com/friendsofphp/php-cs-fixer).

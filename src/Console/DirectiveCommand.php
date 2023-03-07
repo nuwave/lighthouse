@@ -81,11 +81,6 @@ class DirectiveCommand extends LighthouseGeneratorCommand
         return 'directives';
     }
 
-    /**
-     * @param  string  $name
-     *
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
-     */
     protected function buildClass($name): string
     {
         $this->requiredImports = new Collection();

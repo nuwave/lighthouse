@@ -69,8 +69,6 @@ GRAPHQL;
 
     /**
      * @param  \GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node  $typeDefinition
-     *
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition): void
     {

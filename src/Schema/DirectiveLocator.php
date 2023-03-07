@@ -138,8 +138,6 @@ class DirectiveLocator
     /**
      * Resolve the class for a given directive name.
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
-     *
      * @return class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>
      */
     public function resolve(string $directiveName): string
@@ -252,8 +250,6 @@ class DirectiveLocator
      * @template TDirective of \Nuwave\Lighthouse\Support\Contracts\Directive
      *
      * @param  class-string<TDirective>  $directiveClass
-     *
-     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      *
      * @return TDirective|null
      */

@@ -34,19 +34,10 @@ GRAPHQL;
 
     /**
      * Retrieves the attribute argument for the directive.
-     *
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public function attributeArgValue(): string
     {
-        $attribute = $this->directiveArgValue('attribute');
-
-        if (! $attribute) {
-            throw new DefinitionException(
-                "The @{$this->name()} directive requires an `attribute` argument."
-            );
-        }
-
-        return $attribute;
+        return $this->directiveArgValue('attribute')
+            ?: throw new DefinitionException("The @{$this->name()} directive requires an `attribute` argument.");
     }
 }

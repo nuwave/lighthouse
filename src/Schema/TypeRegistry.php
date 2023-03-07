@@ -105,8 +105,6 @@ class TypeRegistry
      *
      * @api
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException if the type is not found or invalid
-     *
      * @return \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType
      */
     public function get(string $name): Type
@@ -298,9 +296,6 @@ class TypeRegistry
      *
      * @param  \GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node  $typeDefinition
      *
-     * @throws \GraphQL\Error\InvariantViolation
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
-     *
      * @return \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType
      */
     protected function resolveType(TypeDefinitionNode $typeDefinition): Type
@@ -342,9 +337,6 @@ class TypeRegistry
         ]);
     }
 
-    /**
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
-     */
     protected function resolveScalarType(ScalarTypeDefinitionNode $scalarDefinition): ScalarType
     {
         $scalarName = $scalarDefinition->name->value;

@@ -190,9 +190,6 @@ class ASTBuilder
         return "Could not find a base definition {$typeName} of kind {$typeExtension->kind} to extend.";
     }
 
-    /**
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
-     */
     protected function assertExtensionMatchesDefinition(ObjectTypeExtensionNode|InputObjectTypeExtensionNode|InterfaceTypeExtensionNode|EnumTypeExtensionNode $extension, ObjectTypeDefinitionNode|InputObjectTypeDefinitionNode|InterfaceTypeDefinitionNode|EnumTypeDefinitionNode $definition): void
     {
         if (static::EXTENSION_TO_DEFINITION_CLASS[$extension::class] !== $definition::class) {

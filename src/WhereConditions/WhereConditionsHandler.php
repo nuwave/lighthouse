@@ -106,8 +106,6 @@ class WhereConditionsHandler
 
     /**
      * Ensure the column name is well formed to prevent SQL injection.
-     *
-     * @throws \GraphQL\Error\Error
      */
     protected function assertValidColumnReference(string $column): void
     {
@@ -116,9 +114,7 @@ class WhereConditionsHandler
         // - must contain only alphanumerics, digits, underscores, dots, hyphens or JSON references
         $match = \Safe\preg_match('/^(?![0-9.-])([A-Za-z0-9_.-]|->)*$/', $column);
         if (0 === $match) {
-            throw new Error(
-                self::invalidColumnName($column)
-            );
+            throw new Error(self::invalidColumnName($column));
         }
     }
 

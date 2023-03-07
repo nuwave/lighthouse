@@ -9,4 +9,8 @@ $finder = PhpCsFixer\Finder::create()
     ->ignoreDotFiles(true)
     ->ignoreVCS(true);
 
-return risky($finder);
+return risky($finder, [
+    'general_phpdoc_annotation_remove' => [
+        'annotations' => ['throws'],
+    ],
+]);

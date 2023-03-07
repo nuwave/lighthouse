@@ -18,8 +18,6 @@ class SoftDeletesServiceProvider extends ServiceProvider
      *
      * @param  class-string<\Illuminate\Database\Eloquent\Model>  $modelClass
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
-     *
      * @see \Illuminate\Database\Eloquent\SoftDeletes
      */
     public static function assertModelUsesSoftDeletes(string $modelClass, string $exceptionMessage): void

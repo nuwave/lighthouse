@@ -144,8 +144,6 @@ abstract class BaseDirective implements Directive
      *
      * @param  string  $argumentName  The default argument name "model" may be overwritten
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
-     *
      * @return class-string<\Illuminate\Database\Eloquent\Model>
      */
     protected function getModelClass(string $argumentName = 'model'): string
@@ -166,8 +164,6 @@ abstract class BaseDirective implements Directive
      *
      * @param  array<string>  $namespacesToTry
      * @param  (callable(string $className): bool)|null  $determineMatch
-     *
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      *
      * @return class-string
      */
@@ -210,8 +206,6 @@ abstract class BaseDirective implements Directive
      * @example "App\My\Class@methodName"
      *
      * This validates that exactly two non-empty parts are given, not that the method exists.
-     *
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      *
      * @return array{0: string, 1: string} Contains two entries: [string $className, string $methodName]
      */

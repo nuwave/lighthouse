@@ -37,8 +37,6 @@ class ASTManipulator
 
     /**
      * Combine object types with @key into the _Entity union.
-     *
-     * @throws \Nuwave\Lighthouse\Federation\FederationException
      */
     protected function addEntityUnion(DocumentAST &$documentAST): void
     {
