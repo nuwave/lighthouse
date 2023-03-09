@@ -4,6 +4,9 @@ namespace Nuwave\Lighthouse\Testing;
 
 use GraphQL\Error\ClientAware;
 use Illuminate\Testing\TestResponse;
+use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
+use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
+use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use PHPUnit\Framework\Assert;
 
 /**
@@ -110,6 +113,103 @@ class TestResponseMixin
                 $errors,
                 'Expected the GraphQL response to contain no errors, got: ' . \Safe\json_encode($errors)
             );
+
+            return $this;
+        };
+    }
+
+    public function assertGraphQLSubscriptionAuthorized(): \Closure
+    {
+        return function ($testClassInstance): TestResponse {
+            assert($testClassInstance instanceof \PHPUnit\Framework\TestCase);
+            Assert::assertTrue(method_exists($testClassInstance, 'postJson'));
+
+            $channel = $this->json('extensions.lighthouse_subscriptions.channel');
+
+            $testClassInstance
+                // @phpstan-ignore-next-line
+                ->postJson('graphql/subscriptions/auth', [
+                    'channel_name' => $channel,
+                ])->assertSuccessful()
+                ->assertJson([
+                    'message' => 'ok',
+                ]);
+
+            return $this;
+        };
+    }
+
+    public function assertGraphQLSubscriptionNotAuthorized(): \Closure
+    {
+        return function ($testClassInstance): TestResponse {
+            assert($testClassInstance instanceof \PHPUnit\Framework\TestCase);
+            Assert::assertTrue(method_exists($testClassInstance, 'postJson'));
+
+            $channel = $this->json('extensions.lighthouse_subscriptions.channel');
+
+            $testClassInstance
+                // @phpstan-ignore-next-line
+                ->postJson('graphql/subscriptions/auth', [
+                    'channel_name' => $channel,
+                ])->assertForbidden();
+
+            return $this;
+        };
+    }
+
+    public function getGraphQLSubscriptionMock(): \Closure
+    {
+        return function (): \Mockery\MockInterface {
+            $broadcastManager = app()->make(BroadcastManager::class);
+            assert($broadcastManager instanceof BroadcastManager);
+            $mock = $broadcastManager->driver();
+            assert($mock instanceof LogBroadcaster);
+            assert($mock instanceof \Mockery\MockInterface);
+
+            return $mock;
+        };
+    }
+
+    public function getGraphQLSubscriptionChannelName(): \Closure
+    {
+        return function (): string {
+            return $this->json('extensions.lighthouse_subscriptions.channel');
+        };
+    }
+
+    public function assertGraphQLBroadcasted(): \Closure
+    {
+        return function ($data): TestResponse {
+            $i = 0;
+            $channel = $this->json('extensions.lighthouse_subscriptions.channel');
+
+            // @phpstan-ignore-next-line
+            $this->getGraphQLSubscriptionMock()->shouldHaveReceived('broadcast', function (Subscriber $subscriber, $broadcastedData) use ($channel, $data, &$i) {
+                Assert::assertEquals($channel, $subscriber->channel, "Broadcast channel: {$channel} was not supposed to be called but it was called!");
+                Assert::assertEquals(array_values($broadcastedData['data'])[0], $data[$i++], 'Broadcasted data does not match your expected value');
+
+                return true;
+            });
+
+            return $this;
+        };
+    }
+
+    public function assertGraphQLNotBroadcasted(): \Closure
+    {
+        return function (): TestResponse {
+            $channel = $this->json('extensions.lighthouse_subscriptions.channel');
+
+            $broadcastManager = app()->make(BroadcastManager::class);
+            assert($broadcastManager instanceof BroadcastManager);
+            $mock = $broadcastManager->driver();
+            assert($mock instanceof LogBroadcaster);
+            assert($mock instanceof \Mockery\MockInterface);
+
+            // @phpstan-ignore-next-line
+            $this->getGraphQLSubscriptionMock()->shouldNotHaveReceived('broadcast', function (Subscriber $subscriber, $broadcastedData) use ($channel) {
+                return $channel !== $subscriber->channel;
+            });
 
             return $this;
         };

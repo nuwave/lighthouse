@@ -34,6 +34,7 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 +       $this->bootRefreshesSchemaCache();
++       $this->setupSubscriptionEnvironment();
     }
 }
 ```
@@ -72,6 +73,23 @@ public function testCreatePost(): void
     ', [
         'title' => 'Automatic testing proven to reduce stress levels in developers'
     ]);
+}
+```
+
+You can run a subscription query the same way. 
+
+```php
+public function testPostsSubscription(): void
+{
+    $response = $this->graphQL(/** @lang GraphQL */ '
+    {
+        subscription OnPostCreated {
+            onPostCreated {
+                title
+            }
+        }
+    }
+    ');
 }
 ```
 
@@ -138,6 +156,62 @@ public function testOrdersUsersByName(): void
         $names
     );
 }
+```
+
+### Subscription Assertions
+
+#### Testing Authorization
+
+Once you do your subscription query and get a `$response`, you can run the following assertions on it.
+
+If you want to make sure the current user is authorized to join a subscription you can use `assertGraphQLSubscriptionAuthorized`
+
+```php
+$response->assertGraphQLSubscriptionAuthorized($this);
+```
+
+If you want to make sure the current user is NOT authorized to join a subscription you can use `assertGraphQLSubscriptionNotAuthorized`
+
+```php
+$response->assertGraphQLSubscriptionNotAuthorized($this);
+```
+
+#### Testing Broadcast
+
+Once you do your subscription query and get a `$response`, you can run the following assertions on it.
+
+For asserting a broadcast you can use `assertGraphQLBroadcasted`
+
+```
+// any other way to broadcast would laso work
+Subscription::broadcast('postUpdated', ['title' => 'foo']);
+Subscription::broadcast('postUpdated', ['title' => 'bar']);
+ 
+$response->assertGraphQLBroadcasted([
+    ['title' => 'foo'],
+    ['title' => 'bar'],
+]);
+```
+
+For asserting that a broadcast never happened you can use `assertGraphQLNotBroadcasted`
+
+```
+// nothing that causes a broadcast to this channel
+ 
+$response->assertGraphQLNotBroadcasted();
+```
+
+If you need more control over your broadcast assertion you can use `getGraphQLSubscriptionMock` which returns a [spy](http://docs.mockery.io/en/latest/reference/spies.html) and `getGraphQLSubscriptionChannelName`
+
+```php
+$spy = $response->getGraphQLSubscriptionMock($this);
+
+$spy->shouldNotHaveReceived('broadcast');
+// or
+$spy->shouldNotHaveReceived('broadcast', function (Subscriber $subscriber, $broadcastedData) use ($response) {
+    $channel = $response->getGraphQLSubscriptionChannelName();
+    return $channel !== $subscriber->channel;
+});
 ```
 
 ### TestResponse Assertion Mixins

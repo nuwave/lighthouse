@@ -5,8 +5,11 @@ namespace Nuwave\Lighthouse\Testing;
 use GraphQL\Type\Introspection;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\Arr;
 use Illuminate\Testing\TestResponse;
+use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
+use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 use Nuwave\Lighthouse\Support\Http\Responses\MemoryStream;
 use PHPUnit\Framework\Assert;
@@ -226,5 +229,29 @@ trait MakesGraphQLRequests
     {
         $config = Container::getInstance()->make(ConfigRepository::class);
         $config->set('lighthouse.error_handlers', [RethrowingErrorHandler::class]);
+    }
+
+    protected function setupSubscriptionEnvironment(): void
+    {
+        config()->set('lighthouse.subscriptions.queue_broadcasts', false);
+        config()->set('lighthouse.subscriptions.storage', 'array');
+        config()->set('lighthouse.subscriptions.storage_ttl', null);
+
+        // binding an instance to the container so it can be spied on
+        app()->bind(LogBroadcaster::class, function () {
+            return new LogBroadcaster(config('lighthouse.subscriptions.broadcasters.log'));
+        });
+
+        assert($this->app instanceof Application);
+        $broadcastManager = $this->app->make(BroadcastManager::class);
+        assert($broadcastManager instanceof BroadcastManager);
+
+        // adding a custom driver which is a spied version of log driver
+        $broadcastManager->extend('mock', function ($app, $config) {
+            return $this->spy(LogBroadcaster::class)->makePartial();
+        });
+
+        // set the custom driver as the default driver
+        config()->set('lighthouse.subscriptions.broadcaster', 'mock');
     }
 }
