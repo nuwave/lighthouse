@@ -39,13 +39,13 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
         }
 
         $namespacesToTry = RootType::defaultNamespaces($fieldValue->getParentName());
-        $classNameFQN = Utils::namespaceClassname(
+        $namespacedClassName = Utils::namespaceClassname(
             $className,
             $namespacesToTry,
             static fn (string $class): bool => is_subclass_of($class, GraphQLSubscription::class)
         );
 
-        if (null === $classNameFQN) {
+        if (null === $namespacedClassName) {
             $subscriptionClass = GraphQLSubscription::class;
             $consideredNamespaces = implode(', ', $namespacesToTry);
             throw new DefinitionException(
@@ -53,9 +53,9 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
             );
         }
 
-        assert(is_subclass_of($classNameFQN, GraphQLSubscription::class));
+        assert(is_subclass_of($namespacedClassName, GraphQLSubscription::class));
 
-        $subscription = Container::getInstance()->make($classNameFQN);
+        $subscription = Container::getInstance()->make($namespacedClassName);
         // Subscriptions can only be placed on a single field on the root
         // query, so there is no need to consider the field path
         $this->subscriptionRegistry->register(
