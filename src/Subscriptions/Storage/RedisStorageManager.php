@@ -42,7 +42,7 @@ class RedisStorageManager implements StoresSubscriptions
         if ($ttl) {
             $ttl = (int) $ttl;
         }
-        $this->ttl = (int) $ttl;
+        $this->ttl = $ttl;
     }
 
     public function subscriberByChannel(string $channel): ?Subscriber
