@@ -48,16 +48,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Authentication Guard
+    | Authentication Guards
     |--------------------------------------------------------------------------
     |
-    | The guard to use for authenticating GraphQL requests, if needed.
+    | The guards to use for authenticating GraphQL requests, if needed.
     | Used in directives such as `@guard` or the `AttemptAuthentication` middleware.
-    | Falls back to the Laravel default if the defined guard is either `null` or not found.
+    | Falls back to the Laravel default if the defined guards is `null`.
     |
     */
 
-    'guard' => 'api',
+    'guards' => [
+        'api',
+    ],
 
     /*
     |--------------------------------------------------------------------------

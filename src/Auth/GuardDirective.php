@@ -50,7 +50,7 @@ GRAPHQL;
     public function handleField(FieldValue $fieldValue): void
     {
         $fieldValue->wrapResolver(fn (callable $resolver): \Closure => function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
-            $with = $this->directiveArgValue('with', (array) AuthServiceProvider::guard());
+            $with = $this->directiveArgValue('with',  AuthServiceProvider::guards());
             $context->setUser($this->authenticate($with));
 
             return $resolver($root, $args, $context, $resolveInfo);

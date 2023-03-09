@@ -33,7 +33,7 @@ GRAPHQL;
     public function resolveField(FieldValue $fieldValue): callable
     {
         return function (): ?Authenticatable {
-            $guard = $this->directiveArgValue('guard', AuthServiceProvider::guard());
+            $guard = $this->directiveArgValue('guard', current(AuthServiceProvider::guards()) ?: null);
             assert(is_string($guard) || is_null($guard));
 
             return $this

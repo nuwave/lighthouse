@@ -47,7 +47,7 @@ GRAPHQL;
             function (object $query): void {
                 assert($query instanceof EloquentBuilder);
 
-                $guard = $this->directiveArgValue('guard', AuthServiceProvider::guard());
+                $guard = $this->directiveArgValue('guard', current(AuthServiceProvider::guards()) ?: null);
 
                 $userId = $this
                     ->authFactory

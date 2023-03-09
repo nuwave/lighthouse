@@ -28,7 +28,7 @@ class AttemptAuthentication
     protected function attemptAuthentication(array $guards): void
     {
         if ([] === $guards) {
-            $guards = [AuthServiceProvider::guard()];
+            $guards = AuthServiceProvider::guards();
         }
 
         foreach ($guards as $guard) {

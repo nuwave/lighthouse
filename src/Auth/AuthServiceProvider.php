@@ -15,14 +15,21 @@ class AuthServiceProvider extends ServiceProvider
         $dispatcher->listen(RegisterDirectiveNamespaces::class, static fn (): string => __NAMESPACE__);
     }
 
-    public static function guard(): ?string
+    /**
+     * @return string[]
+     */
+    public static function guards(): array
     {
         $config = Container::getInstance()->make(ConfigRepository::class);
-        $lighthouseGuard = $config->get('lighthouse.guard');
         $guards = $config->get('auth.guards');
 
-        return isset($guards[$lighthouseGuard])
-            ? $lighthouseGuard
-            : $config->get('auth.defaults.guard');
+        $lighthouseGuards = array_filter(
+            (array) $config->get('lighthouse.guards', []),
+            static fn (string $guard): bool => isset($guards[$guard]),
+        );
+
+        return [] !== $lighthouseGuards
+            ? $lighthouseGuards
+            : [$config->get('auth.defaults.guard')];
     }
 }
