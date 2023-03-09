@@ -355,7 +355,7 @@ class TypeRegistry
         );
         assert(is_null($namespacedClassName) || is_subclass_of($namespacedClassName, ScalarType::class));
 
-        if (null === $className) {
+        if (null === $namespacedClassName) {
             $scalarClass = ScalarType::class;
             $consideredNamespaces = implode(', ', $namespacesToTry);
             throw new DefinitionException("Failed to find class {$className} extends {$scalarClass} in namespaces [{$consideredNamespaces}] for the scalar {$scalarName}.");

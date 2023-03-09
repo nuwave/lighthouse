@@ -48,9 +48,7 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
         if (null === $namespacedClassName) {
             $subscriptionClass = GraphQLSubscription::class;
             $consideredNamespaces = implode(', ', $namespacesToTry);
-            throw new DefinitionException(
-                "Failed to find class {$className} extends {$subscriptionClass} in namespaces [{$consideredNamespaces}] for the subscription field {$fieldName}"
-            );
+            throw new DefinitionException("Failed to find class {$className} extends {$subscriptionClass} in namespaces [{$consideredNamespaces}] for the subscription field {$fieldName}");
         }
 
         assert(is_subclass_of($namespacedClassName, GraphQLSubscription::class));
