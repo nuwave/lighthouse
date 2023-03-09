@@ -348,12 +348,12 @@ class TypeRegistry
 
         $namespacesToTry = (array) config('lighthouse.namespaces.scalars');
 
-        $className = Utils::namespaceClassname(
+        $classNameFQN = Utils::namespaceClassname(
             $className,
             $namespacesToTry,
             static fn (string $className): bool => is_subclass_of($className, ScalarType::class)
         );
-        assert(is_null($className) || is_subclass_of($className, ScalarType::class));
+        assert(is_null($classNameFQN) || is_subclass_of($classNameFQN, ScalarType::class));
 
         if (null === $className) {
             $scalarClass = ScalarType::class;
@@ -361,7 +361,7 @@ class TypeRegistry
             throw new DefinitionException("Failed to find class {$className} extends {$scalarClass} in namespaces [{$consideredNamespaces}] for the scalar {$scalarName}.");
         }
 
-        return new $className([
+        return new $classNameFQN([
             'name' => $scalarName,
             'description' => $scalarDefinition->description->value ?? null,
             'astNode' => $scalarDefinition,
