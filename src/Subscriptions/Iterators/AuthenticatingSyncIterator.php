@@ -25,7 +25,7 @@ class AuthenticatingSyncIterator implements SubscriptionIterator
         $previousGuardName = $this->configRepository->get('auth.defaults.guard');
 
         // Store the previous default Lighthouse guard name, so we can restore it after we're done
-        $defaultLighthouseGuardName = $this->configRepository->get('lighthouse.guards');
+        $defaultLighthouseGuardNames = $this->configRepository->get('lighthouse.guards');
 
         // Set our subscription guard as the default guard for Lighthouse
         $this->configRepository->set('lighthouse.guards', [SubscriptionGuard::GUARD_NAME]);
@@ -59,7 +59,7 @@ class AuthenticatingSyncIterator implements SubscriptionIterator
             });
         } finally {
             // Restore the previous default Lighthouse guard name
-            $this->configRepository->set('lighthouse.guards', [$defaultLighthouseGuardName]);
+            $this->configRepository->set('lighthouse.guards', $defaultLighthouseGuardNames);
 
             // Restore the previous default guard name
             $this->authFactory->shouldUse($previousGuardName);
