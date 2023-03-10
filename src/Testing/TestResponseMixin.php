@@ -166,9 +166,9 @@ class TestResponseMixin
         return function (): MockInterface {
             $broadcastManager = Container::getInstance()->make(BroadcastManager::class);
             assert($broadcastManager instanceof BroadcastManager);
+
             $mock = $broadcastManager->driver();
-            assert($mock instanceof LogBroadcaster);
-            assert($mock instanceof MockInterface);
+            assert($mock instanceof LogBroadcaster && $mock instanceof MockInterface);
 
             return $mock;
         };
