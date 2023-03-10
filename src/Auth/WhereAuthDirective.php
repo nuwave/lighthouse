@@ -30,10 +30,10 @@ directive @whereAuth(
   relation: String!
 
   """
-  Specify which guard to use, e.g. "api".
+  Specify which guards to use, e.g. ["api"].
   When not defined, the default from `lighthouse.php` is used.
   """
-  guard: String
+  guards: [String!]
 ) on FIELD_DEFINITION
 GRAPHQL;
     }
@@ -47,15 +47,29 @@ GRAPHQL;
             function (object $query): void {
                 assert($query instanceof EloquentBuilder);
 
-                $guard = $this->directiveArgValue('guard', current(AuthServiceProvider::guards()) ?: null);
-
-                $userId = $this
-                    ->authFactory
-                    ->guard($guard)
-                    ->id();
-
-                $query->whereKey($userId);
+                $guards = $this->directiveArgValue('guards', AuthServiceProvider::guards());
+                $query->whereKey($this->authenticatedUserId($guards));
             }
         );
+    }
+
+    /**
+     * Return the first logged-in user id to any of the given guards.
+     *
+     * @param  array<string|null>  $guards
+     */
+    protected function authenticatedUserId(array $guards): int|null|string
+    {
+        $userId = null;
+
+        foreach ($guards as $guard) {
+            $userId = $this->authFactory->guard($guard)->id();
+
+            if (isset($userId)) {
+                break;
+            }
+        }
+
+        return $userId;
     }
 }

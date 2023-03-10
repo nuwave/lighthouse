@@ -55,7 +55,7 @@ final class FieldBuilderDirectiveTest extends DBTestCase
                 @all
                 @whereAuth(
                     relation: "user"
-                    guard: "web"
+                    guards: ["web"]
                 )
         }
         ';

@@ -319,6 +319,17 @@ The `lighthouse.guard` configuration key was renamed to `lighthouse.guards` and 
 If `lighthouse.guards` configuration is missing,
 the default Laravel authentication guard will be used (`auth.defaults.guard`).
 
+### Update `@auth` and `@whereAuth` directives
+
+The `guard` attribute, on `@auth` and `@whereAuth` directives, has been renamed `guards` and expects an array.
+
+```diff
+- @auth(guard: "api")
++ @auth(guards: ["api"])
+- @whereAuth(guard: "api")
++ @whereAuth(guards: ["api"])
+```
+
 ## v4 to v5
 
 ### Update PHP, Laravel and PHPUnit
