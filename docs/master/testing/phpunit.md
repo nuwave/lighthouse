@@ -34,7 +34,7 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 +       $this->bootRefreshesSchemaCache();
-+       $this->setUpSubscriptionEnvironment();
++       $this->setUpSubscriptionEnvironment(); // Only if you are using subscriptions
     }
 }
 ```
