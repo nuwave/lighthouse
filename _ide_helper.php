@@ -92,7 +92,7 @@ class TestResponse
     }
 
     /**
-     * Assert current user is NOT authorized to join a subscription.
+     * Assert current user is authorized to join a subscription.
      *
      * @param  TestCase  $testClassInstance  you need to pass $this
      *
