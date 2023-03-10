@@ -14,7 +14,7 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 class WhereAuthDirective extends BaseDirective implements FieldBuilderDirective
 {
     public function __construct(
-        protected AuthFactory $authFactory
+        protected AuthFactory $authFactory,
     ) {}
 
     public static function definition(): string
@@ -49,7 +49,7 @@ GRAPHQL;
 
                 $guards = $this->directiveArgValue('guards', AuthServiceProvider::guards());
                 $query->whereKey($this->authenticatedUserId($guards));
-            }
+            },
         );
     }
 

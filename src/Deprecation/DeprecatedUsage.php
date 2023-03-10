@@ -13,6 +13,6 @@ class DeprecatedUsage
         /**
          * Why is the element deprecated?
          */
-        public string $reason
+        public string $reason,
     ) {}
 }

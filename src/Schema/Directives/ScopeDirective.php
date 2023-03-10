@@ -38,7 +38,7 @@ GRAPHQL;
             throw new DefinitionException(
                 $badMethodCallException->getMessage() . " in @{$this->name()} directive on {$this->nodeName()} argument.",
                 $badMethodCallException->getCode(),
-                $badMethodCallException->getPrevious()
+                $badMethodCallException->getPrevious(),
             );
         }
     }

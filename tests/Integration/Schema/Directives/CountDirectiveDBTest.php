@@ -225,7 +225,7 @@ final class CountDirectiveDBTest extends DBTestCase
 
         $post1->images()
             ->saveMany(
-                factory(Image::class, 3)->make()
+                factory(Image::class, 3)->make(),
             );
 
         /** @var \Tests\Utils\Models\Post $post2 */
@@ -239,7 +239,7 @@ final class CountDirectiveDBTest extends DBTestCase
 
         $post2->images()
             ->saveMany(
-                factory(Image::class, 2)->make()
+                factory(Image::class, 2)->make(),
             );
 
         $task = $post1->task;
@@ -251,7 +251,7 @@ final class CountDirectiveDBTest extends DBTestCase
 
         $task->images()
             ->saveMany(
-                factory(Image::class, 4)->make()
+                factory(Image::class, 4)->make(),
             );
 
         $this->graphQL(/** @lang GraphQL */ '
@@ -332,7 +332,7 @@ final class CountDirectiveDBTest extends DBTestCase
         $user = factory(User::class)->create();
 
         $user->tasks()->saveMany(
-            factory(Task::class)->times(4)->make()
+            factory(Task::class)->times(4)->make(),
         );
 
         $this->be($user);
@@ -368,7 +368,7 @@ final class CountDirectiveDBTest extends DBTestCase
         $user = factory(User::class)->create();
 
         $tasks = $user->tasks()->saveMany(
-            factory(Task::class)->times(2)->make()
+            factory(Task::class)->times(2)->make(),
         );
         assert($tasks instanceof Collection);
 

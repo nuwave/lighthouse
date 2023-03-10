@@ -46,7 +46,7 @@ trait MakesGraphQLRequests
         array $variables = [],
         array $extraParams = [],
         array $headers = [],
-        array $routeParams = []
+        array $routeParams = [],
     ): TestResponse {
         $params = ['query' => $query];
 
@@ -74,7 +74,7 @@ trait MakesGraphQLRequests
         return $this->postJson(
             $this->graphQLEndpointUrl($routeParams),
             $data,
-            $headers
+            $headers,
         );
     }
 
@@ -95,7 +95,7 @@ trait MakesGraphQLRequests
         array $map,
         array $files,
         array $headers = [],
-        array $routeParams = []
+        array $routeParams = [],
     ): TestResponse {
         $parameters = [
             'operations' => \Safe\json_encode($operations),
@@ -112,8 +112,8 @@ trait MakesGraphQLRequests
                 [
                     'Content-Type' => 'multipart/form-data',
                 ],
-                $headers
-            ))
+                $headers,
+            )),
         );
     }
 
@@ -156,7 +156,7 @@ trait MakesGraphQLRequests
     {
         return Arr::first(
             $this->introspect()->json($path),
-            static fn (array $result): bool => $result['name'] === $name
+            static fn (array $result): bool => $result['name'] === $name,
         );
     }
 
@@ -187,7 +187,7 @@ trait MakesGraphQLRequests
         string $query,
         array $variables = [],
         array $extraParams = [],
-        array $headers = []
+        array $headers = [],
     ): array {
         if (! isset($this->deferStream)) {
             $this->setUpDeferStream();
@@ -215,7 +215,7 @@ trait MakesGraphQLRequests
 
         Container::getInstance()->singleton(
             CanStreamResponse::class,
-            fn (): MemoryStream => $this->deferStream
+            fn (): MemoryStream => $this->deferStream,
         );
     }
 

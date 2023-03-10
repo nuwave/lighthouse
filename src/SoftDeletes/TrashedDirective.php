@@ -71,7 +71,7 @@ GRAPHQL;
     {
         SoftDeletesServiceProvider::assertModelUsesSoftDeletes(
             $model::class,
-            self::MODEL_MUST_USE_SOFT_DELETES
+            self::MODEL_MUST_USE_SOFT_DELETES,
         );
     }
 }

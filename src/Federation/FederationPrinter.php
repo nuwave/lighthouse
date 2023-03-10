@@ -61,7 +61,7 @@ class FederationPrinter
 
         $queryFieldsWithoutFederation = array_filter(
             $originalQueryType->getFields(),
-            static fn (FieldDefinition $field): bool => ! in_array($field->name, static::FEDERATION_FIELDS)
+            static fn (FieldDefinition $field): bool => ! in_array($field->name, static::FEDERATION_FIELDS),
         );
         $newQueryType = [] !== $queryFieldsWithoutFederation
             ? new ObjectType([
@@ -80,7 +80,7 @@ class FederationPrinter
 
         $config->setDirectives(array_filter(
             $schema->getDirectives(),
-            static fn (Directive $directive): bool => ! in_array($directive->name, static::FEDERATION_DIRECTIVES)
+            static fn (Directive $directive): bool => ! in_array($directive->name, static::FEDERATION_DIRECTIVES),
         ));
 
         $printDirectives = static function ($definition): string {
@@ -94,7 +94,7 @@ class FederationPrinter
                 || $definition instanceof EnumValueDefinition
                 || $definition instanceof Argument
                 || $definition instanceof FieldDefinition
-                || $definition instanceof InputObjectField
+                || $definition instanceof InputObjectField,
             );
 
             $astNode = $definition->astNode;
@@ -135,7 +135,7 @@ class FederationPrinter
 
         return SchemaPrinter::doPrint(
             new Schema($config),
-            ['printDirectives' => $printDirectives]
+            ['printDirectives' => $printDirectives],
         );
     }
 }

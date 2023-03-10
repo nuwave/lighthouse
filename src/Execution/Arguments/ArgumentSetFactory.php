@@ -18,7 +18,7 @@ class ArgumentSetFactory
     public function __construct(
         ASTBuilder $astBuilder,
         protected ArgumentTypeNodeConverter $argumentTypeNodeConverter,
-        protected DirectiveLocator $directiveLocator
+        protected DirectiveLocator $directiveLocator,
     ) {
         $this->documentAST = $astBuilder->documentAST();
     }

@@ -62,7 +62,7 @@ class ASTHelper
                 $collisionOccurred = in_array($oldName, $newNames);
                 if ($collisionOccurred && ! $overwriteDuplicates) {
                     throw new DefinitionException(
-                        static::duplicateDefinition($oldName)
+                        static::duplicateDefinition($oldName),
                     );
                 }
 
@@ -284,7 +284,7 @@ class ASTHelper
     public static function qualifiedArgType(
         InputValueDefinitionNode &$argDefinition,
         FieldDefinitionNode &$parentField,
-        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
     ): string {
         return Str::studly($parentType->name->value)
             . Str::studly($parentField->name->value)
@@ -298,7 +298,7 @@ class ASTHelper
     {
         $deprecated = Values::getDirectiveValues(
             Directive::deprecatedDirective(),
-            $node
+            $node,
         );
 
         return $deprecated['reason'] ?? null;
@@ -312,7 +312,7 @@ class ASTHelper
             throw new DefinitionException(
                 "Encountered syntax error while parsing this directive definition::\n\n{$definitionString}",
                 $syntaxError->getCode(),
-                $syntaxError
+                $syntaxError,
             );
         }
 

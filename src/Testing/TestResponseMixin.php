@@ -20,13 +20,13 @@ class TestResponseMixin
             Assert::assertArrayHasKey(
                 $key,
                 $validation,
-                "Expected the query to return validation errors for field `{$key}`."
+                "Expected the query to return validation errors for field `{$key}`.",
             );
 
             Assert::assertContains(
                 $message,
                 $validation[$key],
-                "Expected the query to return validation error message `{$message}` for field `{$key}`."
+                "Expected the query to return validation error message `{$message}` for field `{$key}`.",
             );
 
             return $this;
@@ -42,7 +42,7 @@ class TestResponseMixin
             Assert::assertSame(
                 $keys,
                 array_keys($validation),
-                'Expected the query to return validation errors for specific fields.'
+                'Expected the query to return validation errors for specific fields.',
             );
 
             return $this;
@@ -79,7 +79,7 @@ class TestResponseMixin
             Assert::assertContains(
                 $message,
                 $messages,
-                "Expected the GraphQL response to contain error message `{$message}`, got: " . \Safe\json_encode($messages)
+                "Expected the GraphQL response to contain error message `{$message}`, got: " . \Safe\json_encode($messages),
             );
 
             return $this;
@@ -95,7 +95,7 @@ class TestResponseMixin
             Assert::assertContains(
                 $message,
                 $messages,
-                "Expected the GraphQL response to contain debug message `{$message}`, got: " . \Safe\json_encode($messages)
+                "Expected the GraphQL response to contain debug message `{$message}`, got: " . \Safe\json_encode($messages),
             );
 
             return $this;
@@ -108,7 +108,7 @@ class TestResponseMixin
             $errors = $this->json('errors');
             Assert::assertNull(
                 $errors,
-                'Expected the GraphQL response to contain no errors, got: ' . \Safe\json_encode($errors)
+                'Expected the GraphQL response to contain no errors, got: ' . \Safe\json_encode($errors),
             );
 
             return $this;

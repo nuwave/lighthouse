@@ -16,7 +16,7 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
 {
     public function __construct(
         protected CacheRepository $cacheRepository,
-        protected CacheKeyAndTags $cacheKeyAndTags
+        protected CacheKeyAndTags $cacheKeyAndTags,
     ) {}
 
     public static function definition(): string
@@ -73,7 +73,7 @@ GRAPHQL;
                 $rootID,
                 $fieldName,
                 $args,
-                $path
+                $path,
             );
 
             // We found a matching value in the cache, so we can just return early without actually running the query.

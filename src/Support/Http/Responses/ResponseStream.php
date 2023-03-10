@@ -14,7 +14,7 @@ class ResponseStream extends Stream implements CanStreamResponse
     {
         if ([] === $paths) {
             $this->emit(
-                $this->chunk($data, $isFinalChunk)
+                $this->chunk($data, $isFinalChunk),
             );
         } else {
             $chunk = [];
@@ -36,7 +36,7 @@ class ResponseStream extends Stream implements CanStreamResponse
                 $terminating = $isFinalChunk && $i === $lastKey;
 
                 $this->emit(
-                    $this->chunk($chunk, $terminating)
+                    $this->chunk($chunk, $terminating),
                 );
             }
         }

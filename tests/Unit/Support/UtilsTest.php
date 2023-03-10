@@ -14,7 +14,7 @@ final class UtilsTest extends TestCase
     {
         $this->assertSame(
             $enumValueName,
-            Utils::toEnumValueName($name)
+            Utils::toEnumValueName($name),
         );
     }
 

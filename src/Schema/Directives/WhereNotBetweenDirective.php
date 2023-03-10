@@ -32,7 +32,7 @@ GRAPHQL;
     {
         return $builder->whereNotBetween(
             $this->directiveArgValue('key', $this->nodeName()),
-            $value
+            $value,
         );
     }
 }

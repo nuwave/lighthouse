@@ -17,7 +17,7 @@ final class TracingExtensionTest extends TestCase
     {
         return array_merge(
             parent::getPackageProviders($app),
-            [TracingServiceProvider::class]
+            [TracingServiceProvider::class],
         );
     }
 

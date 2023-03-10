@@ -15,7 +15,7 @@ final class DeferDBTest extends DBTestCase
     {
         return array_merge(
             parent::getPackageProviders($app),
-            [DeferServiceProvider::class]
+            [DeferServiceProvider::class],
         );
     }
 
@@ -143,7 +143,7 @@ final class DeferDBTest extends DBTestCase
                 ->map(static fn (User $user): array => ['email' => $user->email])
                 ->values()
                 ->all(),
-            $deferredUsers['user.company.users']['data']
+            $deferredUsers['user.company.users']['data'],
         );
     }
 
@@ -221,7 +221,7 @@ final class DeferDBTest extends DBTestCase
                         'company' => null,
                     ])
                     ->all(),
-                $deferredUsers[$key]['data']
+                $deferredUsers[$key]['data'],
             );
         });
 
@@ -235,7 +235,7 @@ final class DeferDBTest extends DBTestCase
 
             $this->assertContains(
                 $item['name'],
-                $companies->pluck('name')->all()
+                $companies->pluck('name')->all(),
             );
         });
     }

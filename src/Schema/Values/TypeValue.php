@@ -19,7 +19,7 @@ class TypeValue
     protected string $cacheKey;
 
     public function __construct(
-        protected TypeDefinitionNode $typeDefinition
+        protected TypeDefinitionNode $typeDefinition,
     ) {}
 
     /**

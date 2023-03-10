@@ -168,7 +168,7 @@ GRAPHQL;
             ->with(
                 \Mockery::type(ScoutBuilder::class),
                 $first,
-                $page
+                $page,
             )
             ->andReturn(new EloquentCollection([$post]))
             ->once();

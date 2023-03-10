@@ -76,7 +76,7 @@ abstract class DateScalar extends ScalarType
                     $value->hour,
                     $value->minute,
                     $value->second,
-                    $value->timezone
+                    $value->timezone,
                 );
                 assert($carbon instanceof IlluminateCarbon, 'Given we had a valid Carbon instance5 before, this can not fail.');
 
@@ -86,7 +86,7 @@ abstract class DateScalar extends ScalarType
             return $this->parse($value);
         } catch (\Exception $exception) {
             throw new $exceptionClass(
-                Utils::printSafeJson($exception->getMessage())
+                Utils::printSafeJson($exception->getMessage()),
             );
         }
     }

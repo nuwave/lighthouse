@@ -541,7 +541,7 @@ GRAPHQL
 
         $this->assertNotNull(
             User::find(1),
-            'Must not delete the second model.'
+            'Must not delete the second model.',
         );
 
         $task = Task::findOrFail(1);
@@ -554,7 +554,7 @@ GRAPHQL
         assert($user instanceof User);
 
         $task = $user->tasks()->save(
-            factory(Task::class)->make()
+            factory(Task::class)->make(),
         );
         assert($task instanceof Task);
 
@@ -586,13 +586,13 @@ GRAPHQL
 
         $this->assertTrue(
             User::findOrFail($user->id)->exists,
-            'Must not delete the second model.'
+            'Must not delete the second model.',
         );
 
         $task->refresh();
         $this->assertNull(
             $task->user_id,
-            'Must disconnect the parent relationship.'
+            'Must disconnect the parent relationship.',
         );
     }
 
@@ -605,7 +605,7 @@ GRAPHQL
         assert($user instanceof User);
 
         $task = $user->tasks()->save(
-            factory(Task::class)->make()
+            factory(Task::class)->make(),
         );
         assert($task instanceof Task);
 
@@ -638,13 +638,13 @@ GRAPHQL
 
         $this->assertNull(
             User::find($user->id),
-            'This model should be deleted.'
+            'This model should be deleted.',
         );
 
         $task->refresh();
         $this->assertNull(
             $task->user_id,
-            'Must disconnect the parent relationship.'
+            'Must disconnect the parent relationship.',
         );
     }
 
@@ -680,12 +680,12 @@ GRAPHQL
 
         $this->assertNotNull(
             User::find(1),
-            'This model should NOT be deleted.'
+            'This model should NOT be deleted.',
         );
 
         $this->assertNull(
             Task::findOrFail(1)->user,
-            'Must disconnect the parent relationship.'
+            'Must disconnect the parent relationship.',
         );
     }
 
@@ -698,7 +698,7 @@ GRAPHQL
         assert($user instanceof User);
 
         $task = $user->tasks()->save(
-            factory(Task::class)->make()
+            factory(Task::class)->make(),
         );
         assert($task instanceof Task);
 
@@ -740,7 +740,7 @@ GRAPHQL
         $this->assertSame(
             $user->id,
             $taskUser->id,
-            'The parent relationship remains untouched.'
+            'The parent relationship remains untouched.',
         );
     }
 

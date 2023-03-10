@@ -13,7 +13,7 @@ final class FederationEntitiesModelTest extends DBTestCase
     {
         return array_merge(
             parent::getPackageProviders($app),
-            [FederationServiceProvider::class]
+            [FederationServiceProvider::class],
         );
     }
 

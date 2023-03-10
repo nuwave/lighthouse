@@ -113,7 +113,7 @@ GRAPHQL;
             $this->getResolverFromArgument('builder');
         } else {
             $paginationManipulator->setModelClass(
-                $this->getModelClass()
+                $this->getModelClass(),
             );
         }
 
@@ -122,7 +122,7 @@ GRAPHQL;
             $fieldDefinition,
             $parentType,
             $this->defaultCount(),
-            $this->paginateMaxCount()
+            $this->paginateMaxCount(),
         );
     }
 
@@ -137,7 +137,7 @@ GRAPHQL;
 
                 assert(
                     $paginator instanceof Paginator,
-                    "The method referenced by the resolver argument of the @{$this->name()} directive on {$this->nodeName()} must return a Paginator."
+                    "The method referenced by the resolver argument of the @{$this->name()} directive on {$this->nodeName()} must return a Paginator.",
                 );
 
                 return $paginator;
@@ -150,7 +150,7 @@ GRAPHQL;
 
                 assert(
                     $query instanceof QueryBuilder || $query instanceof EloquentBuilder || $query instanceof ScoutBuilder || $query instanceof Relation,
-                    "The method referenced by the builder argument of the @{$this->name()} directive on {$this->nodeName()} must return a Builder or Relation."
+                    "The method referenced by the builder argument of the @{$this->name()} directive on {$this->nodeName()} must return a Builder or Relation.",
                 );
             } else {
                 $query = $this->getModelClass()::query();
@@ -162,7 +162,7 @@ GRAPHQL;
                 $root,
                 $args,
                 $context,
-                $resolveInfo
+                $resolveInfo,
             );
 
             $paginationArgs = PaginationArgs::extractArgs($args, $this->paginationType(), $this->paginateMaxCount());
@@ -194,7 +194,7 @@ GRAPHQL;
     protected function paginationType(): PaginationType
     {
         return new PaginationType(
-            $this->directiveArgValue('type', PaginationType::PAGINATOR)
+            $this->directiveArgValue('type', PaginationType::PAGINATOR),
         );
     }
 

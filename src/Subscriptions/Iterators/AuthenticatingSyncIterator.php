@@ -16,7 +16,7 @@ class AuthenticatingSyncIterator implements SubscriptionIterator
 {
     public function __construct(
         protected ConfigRepository $configRepository,
-        protected AuthFactory $authFactory
+        protected AuthFactory $authFactory,
     ) {}
 
     public function process(Collection $subscribers, \Closure $handleSubscriber, \Closure $handleError = null): void

@@ -14,12 +14,12 @@ final class AcceptJsonTest extends TestCase
 
         $request = $acceptJson->handle(
             new Request(),
-            static fn (Request $request): Request => $request
+            static fn (Request $request): Request => $request,
         );
 
         $this->assertSame(
             AcceptJson::APPLICATION_JSON,
-            $request->headers->get(AcceptJson::ACCEPT)
+            $request->headers->get(AcceptJson::ACCEPT),
         );
     }
 }

@@ -41,7 +41,7 @@ final class MorphOneDirectiveTest extends DBTestCase
         $this->image = $this->task
             ->images()
             ->save(
-                factory(Image::class)->create()
+                factory(Image::class)->create(),
             );
     }
 

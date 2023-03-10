@@ -21,7 +21,7 @@ class CacheKeyAndTagsGenerator implements CacheKeyAndTags
         int|string|null $id,
         string $fieldName,
         array $args,
-        array $path
+        array $path,
     ): string {
         $parts = [self::PREFIX];
 

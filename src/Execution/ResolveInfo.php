@@ -19,7 +19,7 @@ class ResolveInfo extends BaseResolveInfo
 {
     public function __construct(
         BaseResolveInfo $baseResolveInfo,
-        public ArgumentSet $argumentSet
+        public ArgumentSet $argumentSet,
     ) {
         parent::__construct(
             fieldDefinition: $baseResolveInfo->fieldDefinition,
@@ -30,7 +30,7 @@ class ResolveInfo extends BaseResolveInfo
             fragments: $baseResolveInfo->fragments,
             rootValue: $baseResolveInfo->rootValue,
             operation: $baseResolveInfo->operation,
-            variableValues: $baseResolveInfo->variableValues
+            variableValues: $baseResolveInfo->variableValues,
         );
     }
 
@@ -112,7 +112,7 @@ class ResolveInfo extends BaseResolveInfo
                         self::applyArgBuilderDirectives($value, $builder, $directiveFilter);
                     }
                 },
-                $argument->value
+                $argument->value,
             );
         }
     }

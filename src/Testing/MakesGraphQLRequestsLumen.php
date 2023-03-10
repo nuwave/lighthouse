@@ -46,7 +46,7 @@ trait MakesGraphQLRequestsLumen
         array $variables = [],
         array $extraParams = [],
         array $headers = [],
-        array $routeParams = []
+        array $routeParams = [],
     ): self {
         $params = ['query' => $query];
 
@@ -75,7 +75,7 @@ trait MakesGraphQLRequestsLumen
         $this->post(
             $this->graphQLEndpointUrl($routeParams),
             $data,
-            $headers
+            $headers,
         );
 
         return $this;
@@ -100,7 +100,7 @@ trait MakesGraphQLRequestsLumen
         array $map,
         array $files,
         array $headers = [],
-        array $routeParams = []
+        array $routeParams = [],
     ): self {
         $parameters = [
             'operations' => \Safe\json_encode($operations),
@@ -117,8 +117,8 @@ trait MakesGraphQLRequestsLumen
                 [
                     'Content-Type' => 'multipart/form-data',
                 ],
-                $headers
-            ))
+                $headers,
+            )),
         );
 
         return $this;
@@ -173,12 +173,12 @@ trait MakesGraphQLRequestsLumen
 
         $results = data_get(
             \Safe\json_decode($content, true),
-            $path
+            $path,
         );
 
         return Arr::first(
             $results,
-            static fn (array $result): bool => $result['name'] === $name
+            static fn (array $result): bool => $result['name'] === $name,
         );
     }
 
@@ -209,7 +209,7 @@ trait MakesGraphQLRequestsLumen
         string $query,
         array $variables = [],
         array $extraParams = [],
-        array $headers = []
+        array $headers = [],
     ): array {
         if (! isset($this->deferStream)) {
             $this->setUpDeferStream();
@@ -237,7 +237,7 @@ trait MakesGraphQLRequestsLumen
 
         Container::getInstance()->singleton(
             CanStreamResponse::class,
-            fn (): MemoryStream => $this->deferStream
+            fn (): MemoryStream => $this->deferStream,
         );
     }
 

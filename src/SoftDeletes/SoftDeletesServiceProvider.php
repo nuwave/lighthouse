@@ -45,7 +45,7 @@ class SoftDeletesServiceProvider extends ServiceProvider
                             "Only return non-trashed results."
                             WITHOUT @enum(value: "without")
                         }
-                    ')
+                    '),
                 );
         });
     }

@@ -12,7 +12,7 @@ trait TestsSubscriptions
             parent::getPackageProviders($app),
             [
                 SubscriptionServiceProvider::class,
-            ]
+            ],
         );
     }
 }

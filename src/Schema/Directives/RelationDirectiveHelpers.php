@@ -47,7 +47,7 @@ trait RelationDirectiveHelpers
                 $root,
                 $args,
                 $context,
-                $resolveInfo
+                $resolveInfo,
             );
         };
     }

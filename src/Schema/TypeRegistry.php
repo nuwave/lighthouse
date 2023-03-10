@@ -70,7 +70,7 @@ class TypeRegistry
     public function __construct(
         protected Pipeline $pipeline,
         protected DirectiveLocator $directiveLocator,
-        protected ArgumentFactory $argumentFactory
+        protected ArgumentFactory $argumentFactory,
     ) {}
 
     public function setDocumentAST(DocumentAST $documentAST): self
@@ -273,12 +273,12 @@ class TypeRegistry
     {
         return $this->pipeline
             ->send(
-                new TypeValue($definition)
+                new TypeValue($definition),
             )
             ->through(
                 $this->directiveLocator
                     ->associatedOfType($definition, TypeMiddleware::class)
-                    ->all()
+                    ->all(),
             )
             ->via('handleNode')
             ->then(function (TypeValue $value) use ($definition): Type {
@@ -351,7 +351,7 @@ class TypeRegistry
         $className = Utils::namespaceClassname(
             $className,
             $namespacesToTry,
-            static fn (string $className): bool => is_subclass_of($className, ScalarType::class)
+            static fn (string $className): bool => is_subclass_of($className, ScalarType::class),
         );
         assert(is_null($className) || is_subclass_of($className, ScalarType::class));
 
@@ -402,7 +402,7 @@ class TypeRegistry
 
             foreach ($typeDefinition->fields as $fieldDefinition) {
                 $fields[$fieldDefinition->name->value] = static fn (): array => $fieldFactory->handle(
-                    new FieldValue($typeValue, $fieldDefinition)
+                    new FieldValue($typeValue, $fieldDefinition),
                 );
             }
 
@@ -437,10 +437,10 @@ class TypeRegistry
             $typeResolver
                 = $this->typeResolverFromClass(
                     $nodeName,
-                    (array) config('lighthouse.namespaces.interfaces')
+                    (array) config('lighthouse.namespaces.interfaces'),
                 )
                 ?: $this->typeResolverFallback(
-                    $this->possibleImplementations($interfaceDefinition)
+                    $this->possibleImplementations($interfaceDefinition),
                 );
         }
 
@@ -493,7 +493,7 @@ class TypeRegistry
         $className = Utils::namespaceClassname(
             $nodeName,
             $namespaces,
-            static fn (string $className): bool => method_exists($className, '__invoke')
+            static fn (string $className): bool => method_exists($className, '__invoke'),
         );
 
         if (null !== $className) {
@@ -552,10 +552,10 @@ class TypeRegistry
         } else {
             $typeResolver = $this->typeResolverFromClass(
                 $nodeName,
-                (array) config('lighthouse.namespaces.unions')
+                (array) config('lighthouse.namespaces.unions'),
             )
                 ?: $this->typeResolverFallback(
-                    $this->possibleUnionTypes($unionDefinition)
+                    $this->possibleUnionTypes($unionDefinition),
                 );
         }
 

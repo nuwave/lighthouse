@@ -22,7 +22,7 @@ trait UsesTestSchema
                 }
 
                 return new TestSchemaProvider($this->schema);
-            }
+            },
         );
     }
 }

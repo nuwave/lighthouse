@@ -58,7 +58,7 @@ GRAPHQL;
                 $query = $builderResolver($root, $args, $context, $resolveInfo);
                 assert(
                     $query instanceof QueryBuilder || $query instanceof EloquentBuilder || $query instanceof ScoutBuilder || $query instanceof Relation,
-                    "The method referenced by the builder argument of the @{$this->name()} directive on {$this->nodeName()} must return a Builder or Relation."
+                    "The method referenced by the builder argument of the @{$this->name()} directive on {$this->nodeName()} must return a Builder or Relation.",
                 );
             } else {
                 $query = $this->getModelClass()::query();
@@ -71,7 +71,7 @@ GRAPHQL;
                     $root,
                     $args,
                     $context,
-                    $resolveInfo
+                    $resolveInfo,
                 )
                 ->get();
         };

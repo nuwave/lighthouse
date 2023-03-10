@@ -155,7 +155,7 @@ GRAPHQL;
         DocumentAST &$documentAST,
         InputValueDefinitionNode &$argDefinition,
         FieldDefinitionNode &$parentField,
-        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
     ): void {
         $this->validateMutuallyExclusiveArguments(['columns', 'columnsEnum']);
 
@@ -193,23 +193,23 @@ GRAPHQL;
                             $parentField,
                             $parentType,
                             $columns,
-                            $allowedRelationColumnsEnumName
-                        )
+                            $allowedRelationColumnsEnumName,
+                        ),
                     );
 
                     $documentAST->setTypeDefinition(
                         OrderByServiceProvider::createRelationAggregateFunctionForColumnInput(
                             $inputName,
                             "Aggregate specification for {$parentType->name->value}.{$parentField->name->value}.{$argDefinition->name->value}.{$relationName}.",
-                            $allowedRelationColumnsEnumName
-                        )
+                            $allowedRelationColumnsEnumName,
+                        ),
                     );
                 } else {
                     $documentAST->setTypeDefinition(
                         OrderByServiceProvider::createRelationAggregateFunctionInput(
                             $inputName,
-                            "Aggregate specification for {$parentType->name->value}.{$parentField->name->value}.{$argDefinition->name->value}.{$relationName}."
-                        )
+                            "Aggregate specification for {$parentType->name->value}.{$parentField->name->value}.{$argDefinition->name->value}.{$relationName}.",
+                        ),
                     );
                 }
             }
@@ -256,8 +256,8 @@ GRAPHQL;
                 OrderByServiceProvider::createOrderByClauseInput(
                     $restrictedOrderByName,
                     "Order by clause for {$parentType->name->value}.{$parentField->name->value}.{$argDefinition->name->value}.",
-                    $allowedColumnsTypeName
-                )
+                    $allowedColumnsTypeName,
+                ),
             );
         }
     }
@@ -266,7 +266,7 @@ GRAPHQL;
     {
         return $builder->orderBy(
             $this->directiveArgValue('column'),
-            $this->directiveArgValue('direction', 'ASC')
+            $this->directiveArgValue('direction', 'ASC'),
         );
     }
 

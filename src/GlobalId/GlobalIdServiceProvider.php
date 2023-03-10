@@ -51,7 +51,7 @@ interface {$node} @interface(resolveType: "Nuwave\\\Lighthouse\\\GlobalId\\\Node
   {$globalId}: ID!
 }
 GRAPHQL
-            )
+            ),
         );
 
         $queryType = $documentAST->types[RootType::QUERY];

@@ -30,7 +30,7 @@ GRAPHQL;
         return $builder->where(
             $this->directiveArgValue('key', $this->nodeName()),
             '<>',
-            $value
+            $value,
         );
     }
 }

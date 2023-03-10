@@ -18,7 +18,7 @@ final class SerializerTest extends DBTestCase
         $user = factory(User::class)->create();
 
         $serializer = new Serializer(
-            $contextFactory = new ContextFactory()
+            $contextFactory = new ContextFactory(),
         );
 
         $request = new Request();
@@ -39,7 +39,7 @@ final class SerializerTest extends DBTestCase
         });
 
         $unserialized = $serializer->unserialize(
-            $serializer->serialize($context)
+            $serializer->serialize($context),
         );
 
         $this->assertTrue($retrievedFromDatabase);

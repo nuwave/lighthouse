@@ -24,7 +24,7 @@ abstract class GraphQLSubscription
     public function encodeTopic(Subscriber $subscriber, string $fieldName): string
     {
         return strtoupper(
-            Str::snake($fieldName)
+            Str::snake($fieldName),
         );
     }
 
@@ -34,7 +34,7 @@ abstract class GraphQLSubscription
     public function decodeTopic(string $fieldName, mixed $root): string
     {
         return strtoupper(
-            Str::snake($fieldName)
+            Str::snake($fieldName),
         );
     }
 

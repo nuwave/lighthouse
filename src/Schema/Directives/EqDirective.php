@@ -53,7 +53,7 @@ GRAPHQL;
     {
         return $builder->where(
             $this->directiveArgValue('key', $this->nodeName()),
-            $value
+            $value,
         );
     }
 
@@ -61,7 +61,7 @@ GRAPHQL;
     {
         return $builder->where(
             $this->directiveArgValue('key', $this->nodeName()),
-            $value
+            $value,
         );
     }
 
@@ -80,7 +80,7 @@ GRAPHQL;
     {
         return $this->handleBuilder(
             $builder,
-            $this->directiveArgValue('value')
+            $this->directiveArgValue('value'),
         );
     }
 }

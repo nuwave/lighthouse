@@ -135,7 +135,7 @@ GRAPHQL;
             DebugFlag::INCLUDE_DEBUG_MESSAGE
             | DebugFlag::INCLUDE_TRACE
             // | Debug::RETHROW_INTERNAL_EXCEPTIONS
-            | DebugFlag::RETHROW_UNSAFE_EXCEPTIONS
+            | DebugFlag::RETHROW_UNSAFE_EXCEPTIONS,
         );
 
         $config->set('lighthouse.guards', null);
@@ -192,7 +192,7 @@ GRAPHQL;
     protected function buildSchemaWithPlaceholderQuery(string $schema): Schema
     {
         return $this->buildSchema(
-            $schema . self::PLACEHOLDER_QUERY
+            $schema . self::PLACEHOLDER_QUERY,
         );
     }
 

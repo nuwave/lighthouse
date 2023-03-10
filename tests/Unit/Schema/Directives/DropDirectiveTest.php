@@ -13,7 +13,7 @@ final class DropDirectiveTest extends TestCase
                 null,
                 [
                     'bar' => 'something',
-                ]
+                ],
             );
 
         $this->schema = /** @lang GraphQL */ '
@@ -41,7 +41,7 @@ final class DropDirectiveTest extends TestCase
                     'input' => [
                         ['bar' => 'something'],
                     ],
-                ]
+                ],
             );
 
         $this->schema = /** @lang GraphQL */ '

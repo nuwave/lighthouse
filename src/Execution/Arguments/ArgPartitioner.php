@@ -32,7 +32,7 @@ class ArgPartitioner
 
         return static::partition(
             $argumentSet,
-            static fn (string $name, Argument $argument): bool => isset($argument->resolver)
+            static fn (string $name, Argument $argument): bool => isset($argument->resolver),
         );
     }
 
@@ -64,19 +64,19 @@ class ArgPartitioner
     public static function relationMethods(
         ArgumentSet $argumentSet,
         Model $model,
-        string $relationClass
+        string $relationClass,
     ): array {
         $modelReflection = new \ReflectionClass($model);
 
         [$relations, $remaining] = static::partition(
             $argumentSet,
-            static fn (string $name): bool => static::methodReturnsRelation($modelReflection, $name, $relationClass)
+            static fn (string $name): bool => static::methodReturnsRelation($modelReflection, $name, $relationClass),
         );
 
         $nonNullRelations = new ArgumentSet();
         $nonNullRelations->arguments = array_filter(
             $relations->arguments,
-            static fn (Argument $argument): bool => null !== $argument->value
+            static fn (Argument $argument): bool => null !== $argument->value,
         );
 
         return [$nonNullRelations, $remaining];
@@ -90,7 +90,7 @@ class ArgPartitioner
     protected static function attachNestedArgResolver(string $name, Argument &$argument, ?\ReflectionClass $model): void
     {
         $resolverDirective = $argument->directives->first(
-            Utils::instanceofMatcher(ArgResolver::class)
+            Utils::instanceofMatcher(ArgResolver::class),
         );
         assert($resolverDirective instanceof ArgResolver || null === $resolverDirective);
 
@@ -171,7 +171,7 @@ class ArgPartitioner
     public static function methodReturnsRelation(
         \ReflectionClass $modelReflection,
         string $name,
-        string $relationClass
+        string $relationClass,
     ): bool {
         if (! $modelReflection->hasMethod($name)) {
             return false;

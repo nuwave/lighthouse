@@ -22,7 +22,7 @@ final class DeferTest extends TestCase
     {
         return array_merge(
             parent::getPackageProviders($app),
-            [DeferServiceProvider::class]
+            [DeferServiceProvider::class],
         );
     }
 
@@ -40,7 +40,7 @@ final class DeferTest extends TestCase
 
         $this->assertContains(
             'defer',
-            $introspection->json('data.__schema.directives.*.name')
+            $introspection->json('data.__schema.directives.*.name'),
         );
     }
 
@@ -93,7 +93,7 @@ final class DeferTest extends TestCase
                     ],
                 ],
             ],
-            $chunks
+            $chunks,
         );
     }
 
@@ -206,7 +206,7 @@ final class DeferTest extends TestCase
                     ],
                 ],
             ],
-            $chunks
+            $chunks,
         );
     }
 
@@ -493,7 +493,7 @@ final class DeferTest extends TestCase
         ]);
         $this->mockResolverExpects(
             $this->never(),
-            'skipped'
+            'skipped',
         );
 
         $this->schema = /** @lang GraphQL */ '
@@ -621,7 +621,7 @@ final class DeferTest extends TestCase
     public function testThrowsIfTryingToDeferRootMutationFields(): void
     {
         $this->mockResolverExpects(
-            $this->never()
+            $this->never(),
         );
 
         $this->schema = /** @lang GraphQL */ '
@@ -692,7 +692,7 @@ final class DeferTest extends TestCase
 
         $this->mockResolver(
             static fn () => throw new Error('deferred_exception'),
-            'throw'
+            'throw',
         );
 
         $this->schema = /** @lang GraphQL */ '

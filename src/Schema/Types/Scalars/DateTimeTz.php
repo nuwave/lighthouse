@@ -17,7 +17,7 @@ class DateTimeTz extends DateScalar
         return Carbon::createFromFormat(
             // https://www.php.net/manual/en/class.datetimeinterface.php#datetime.constants.iso8601
             Carbon::ATOM,
-            $value
+            $value,
         );
     }
 }

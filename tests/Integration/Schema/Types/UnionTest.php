@@ -19,7 +19,7 @@ final class UnionTest extends DBTestCase
         // This creates a user with it
         factory(Post::class)->create(
             // Prevent creating more users through nested factory
-            ['task_id' => 1]
+            ['task_id' => 1],
         );
 
         $this->schema = $schema;
@@ -43,7 +43,7 @@ final class UnionTest extends DBTestCase
         // This creates a user with it
         factory(Post::class)->create(
             // Prevent creating more users through nested factory
-            ['task_id' => 1]
+            ['task_id' => 1],
         );
 
         $this->schema = /** @lang GraphQL */ <<<GRAPHQL
@@ -96,7 +96,7 @@ GRAPHQL
         );
 
         $this->expectExceptionObject(new InvariantViolation(
-            'Union type Stuff can only include Object types, it cannot include String.'
+            'Union type Stuff can only include Object types, it cannot include String.',
         ));
         $schema->assertValid();
     }
@@ -106,7 +106,7 @@ GRAPHQL
         // This creates a user with it
         factory(Post::class)->create(
             // Prevent creating more users through nested factory
-            ['task_id' => 1]
+            ['task_id' => 1],
         );
 
         $this->schema = /** @lang GraphQL */ <<<GRAPHQL
@@ -126,7 +126,7 @@ GRAPHQL
 GRAPHQL;
 
         $this->expectExceptionObject(
-            TypeRegistry::unresolvableAbstractTypeMapping(User::class, ['Foo', 'Post'])
+            TypeRegistry::unresolvableAbstractTypeMapping(User::class, ['Foo', 'Post']),
         );
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -147,7 +147,7 @@ GRAPHQL;
         // This creates a user with it
         factory(Post::class)->create(
             // Prevent creating more users through nested factory
-            ['task_id' => 1]
+            ['task_id' => 1],
         );
 
         $this->schema = /** @lang GraphQL */ <<<GRAPHQL
@@ -167,7 +167,7 @@ GRAPHQL;
 GRAPHQL;
 
         $this->expectExceptionObject(
-            TypeRegistry::unresolvableAbstractTypeMapping(User::class, [])
+            TypeRegistry::unresolvableAbstractTypeMapping(User::class, []),
         );
         $this->graphQL(/** @lang GraphQL */ '
         {

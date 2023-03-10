@@ -16,7 +16,7 @@ final class DeferIncludeSkipTest extends TestCase
     {
         return array_merge(
             parent::getPackageProviders($app),
-            [DeferServiceProvider::class]
+            [DeferServiceProvider::class],
         );
     }
 

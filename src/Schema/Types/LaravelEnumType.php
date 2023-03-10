@@ -66,7 +66,7 @@ class LaravelEnumType extends EnumType
                         'deprecationReason' => $this->deprecationReason($key),
                     ];
                 },
-                $enumClass::getInstances()
+                $enumClass::getInstances(),
             ),
         ]);
     }

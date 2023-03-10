@@ -311,7 +311,7 @@ GRAPHQL
             ->create()
             ->post()
             ->save(
-                factory(Post::class)->create()
+                factory(Post::class)->create(),
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
@@ -358,7 +358,7 @@ GRAPHQL
             ->create()
             ->post()
             ->save(
-                factory(Post::class)->create()
+                factory(Post::class)->create(),
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
@@ -405,7 +405,7 @@ GRAPHQL
             ->create()
             ->post()
             ->save(
-                factory(Post::class)->create()
+                factory(Post::class)->create(),
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL

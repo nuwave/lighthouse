@@ -60,7 +60,7 @@ final class AggregateDirectiveTest extends DBTestCase
         $this->assertEqualsWithDelta(
             $tasks->avg('difficulty'),
             $response->json('data.avg'),
-            0.01
+            0.01,
         );
     }
 

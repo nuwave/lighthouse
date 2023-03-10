@@ -12,7 +12,7 @@ final class FederationSchemaTest extends TestCase
     {
         return array_merge(
             parent::getPackageProviders($app),
-            [FederationServiceProvider::class]
+            [FederationServiceProvider::class],
         );
     }
 

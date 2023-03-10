@@ -32,7 +32,7 @@ class FieldFactory
         protected ConfigRepository $config,
         protected DirectiveLocator $directiveLocator,
         protected ArgumentFactory $argumentFactory,
-        protected ArgumentSetFactory $argumentSetFactory
+        protected ArgumentSetFactory $argumentSetFactory,
     ) {}
 
     /**
@@ -58,7 +58,7 @@ class FieldFactory
             'name' => $fieldDefinitionNode->name->value,
             'type' => $this->type($fieldDefinitionNode),
             'args' => $this->argumentFactory->toTypeMap(
-                $fieldValue->getField()->arguments
+                $fieldValue->getField()->arguments,
             ),
             'resolve' => $fieldValue->finishResolver($resolver),
             'description' => $fieldDefinitionNode->description->value ?? null,
@@ -109,7 +109,7 @@ class FieldFactory
     {
         $complexityDirective = $this->directiveLocator->exclusiveOfType(
             $fieldValue->getField(),
-            ComplexityResolverDirective::class
+            ComplexityResolverDirective::class,
         );
 
         return $complexityDirective instanceof ComplexityResolverDirective

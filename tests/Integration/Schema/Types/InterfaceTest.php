@@ -170,7 +170,7 @@ GRAPHQL;
 GRAPHQL;
 
         $this->expectExceptionObject(
-            TypeRegistry::unresolvableAbstractTypeMapping(User::class, ['Foo', 'Team'])
+            TypeRegistry::unresolvableAbstractTypeMapping(User::class, ['Foo', 'Team']),
         );
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -205,7 +205,7 @@ GRAPHQL;
 GRAPHQL;
 
         $this->expectExceptionObject(
-            TypeRegistry::unresolvableAbstractTypeMapping(User::class, [])
+            TypeRegistry::unresolvableAbstractTypeMapping(User::class, []),
         );
         $this->graphQL(/** @lang GraphQL */ '
         {

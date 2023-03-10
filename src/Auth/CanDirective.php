@@ -31,7 +31,7 @@ use Nuwave\Lighthouse\Support\Utils;
 class CanDirective extends BaseDirective implements FieldMiddleware, FieldManipulator
 {
     public function __construct(
-        protected Gate $gate
+        protected Gate $gate,
     ) {}
 
     public static function definition(): string
@@ -132,7 +132,7 @@ GRAPHQL;
                         }, $modelOrModels);
 
                         return $modelLike;
-                    }
+                    },
                 );
             }
 
@@ -159,7 +159,7 @@ GRAPHQL;
                     $root,
                     $args,
                     $context,
-                    $resolveInfo
+                    $resolveInfo,
                 )
                 ->get();
         }
@@ -172,7 +172,7 @@ GRAPHQL;
 
             $argumentSetDirectives = $resolveInfo->argumentSet->directives;
             $directivesContainsForceDelete = $argumentSetDirectives->contains(
-                Utils::instanceofMatcher(ForceDeleteDirective::class)
+                Utils::instanceofMatcher(ForceDeleteDirective::class),
             );
             if ($directivesContainsForceDelete) {
                 /** @see \Illuminate\Database\Eloquent\SoftDeletes */
@@ -181,7 +181,7 @@ GRAPHQL;
             }
 
             $directivesContainsRestore = $argumentSetDirectives->contains(
-                Utils::instanceofMatcher(RestoreDirective::class)
+                Utils::instanceofMatcher(RestoreDirective::class),
             );
             if ($directivesContainsRestore) {
                 /** @see \Illuminate\Database\Eloquent\SoftDeletes */
@@ -197,7 +197,7 @@ GRAPHQL;
                     $args,
                     $context,
                     $resolveInfo,
-                    Utils::instanceofMatcher(TrashedDirective::class)
+                    Utils::instanceofMatcher(TrashedDirective::class),
                 );
                 assert($enhancedBuilder instanceof EloquentBuilder);
 
@@ -238,7 +238,7 @@ GRAPHQL;
                     throw new AuthorizationException($response->message(), $response->code());
                 }
             },
-            $ability
+            $ability,
         );
     }
 

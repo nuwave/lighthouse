@@ -56,7 +56,7 @@ class GraphQL
         protected ErrorPool $errorPool,
         protected ProvidesValidationRules $providesValidationRules,
         protected GraphQLHelper $graphQLHelper,
-        protected ConfigRepository $configRepository
+        protected ConfigRepository $configRepository,
     ) {}
 
     /**
@@ -71,7 +71,7 @@ class GraphQL
     public function executeOperationOrOperations(OperationParams|array $operationOrOperations, GraphQLContext $context): array
     {
         $this->eventDispatcher->dispatch(
-            new StartOperationOrOperations($operationOrOperations)
+            new StartOperationOrOperations($operationOrOperations),
         );
 
         $resultOrResults = LighthouseUtils::mapEach(
@@ -79,11 +79,11 @@ class GraphQL
              * @return array<string, mixed>
              */
             fn (OperationParams $operationParams): array => $this->executeOperation($operationParams, $context),
-            $operationOrOperations
+            $operationOrOperations,
         );
 
         $this->eventDispatcher->dispatch(
-            new EndOperationOrOperations($resultOrResults)
+            new EndOperationOrOperations($resultOrResults),
         );
 
         return $resultOrResults;
@@ -103,11 +103,11 @@ class GraphQL
         if ([] !== $errors) {
             $errors = array_map(
                 static fn (RequestError $err): Error => Error::createLocatedError($err),
-                $errors
+                $errors,
             );
 
             return $this->serializable(
-                new ExecutionResult(null, $errors)
+                new ExecutionResult(null, $errors),
             );
         }
 
@@ -118,7 +118,7 @@ class GraphQL
                 $context,
                 $params->variables,
                 null,
-                $params->operation
+                $params->operation,
             );
         } else {
             try {
@@ -127,11 +127,11 @@ class GraphQL
                     $context,
                     $params->variables,
                     null,
-                    $params->operation
+                    $params->operation,
                 );
             } catch (Error $error) {
                 return $this->serializable(
-                    new ExecutionResult(null, [$error])
+                    new ExecutionResult(null, [$error]),
                 );
             }
         }
@@ -151,7 +151,7 @@ class GraphQL
         GraphQLContext $context,
         ?array $variables = [],
         mixed $root = null,
-        ?string $operationName = null
+        ?string $operationName = null,
     ): ExecutionResult {
         try {
             $parsedQuery = $this->parse($query);
@@ -183,7 +183,7 @@ class GraphQL
         return $store->remember(
             'lighthouse:query:' . hash('sha256', $query),
             $cacheConfig['ttl'],
-            static fn (): DocumentNode => Parser::parse($query)
+            static fn (): DocumentNode => Parser::parse($query),
         );
     }
 
@@ -203,7 +203,7 @@ class GraphQL
         GraphQLContext $context,
         ?array $variables = [],
         mixed $root = null,
-        ?string $operationName = null
+        ?string $operationName = null,
     ): ExecutionResult {
         // Building the executable schema might take a while to do,
         // so we do it before we fire the StartExecution event.
@@ -211,7 +211,7 @@ class GraphQL
         $schema = $this->schemaBuilder->schema();
 
         $this->eventDispatcher->dispatch(
-            new StartExecution($schema, $query, $variables, $operationName, $context)
+            new StartExecution($schema, $query, $variables, $operationName, $context),
         );
 
         $result = GraphQLBase::executeQuery(
@@ -222,12 +222,12 @@ class GraphQL
             $variables,
             $operationName,
             null,
-            $this->providesValidationRules->validationRules()
+            $this->providesValidationRules->validationRules(),
         );
 
         /** @var array<\Nuwave\Lighthouse\Execution\ExtensionsResponse|null> $extensionsResponses */
         $extensionsResponses = (array) $this->eventDispatcher->dispatch(
-            new BuildExtensionsResponse()
+            new BuildExtensionsResponse(),
         );
 
         foreach ($extensionsResponses as $extensionsResponse) {
@@ -242,11 +242,11 @@ class GraphQL
 
         // Allow listeners to manipulate the result after each resolved query
         $this->eventDispatcher->dispatch(
-            new ManipulateResult($result)
+            new ManipulateResult($result),
         );
 
         $this->eventDispatcher->dispatch(
-            new EndExecution($result)
+            new EndExecution($result),
         );
 
         $this->cleanUpAfterExecution();
@@ -287,7 +287,7 @@ class GraphQL
                 [],
                 null,
                 null,
-                ['code' => 'PERSISTED_QUERY_NOT_SUPPORTED']
+                ['code' => 'PERSISTED_QUERY_NOT_SUPPORTED'],
             );
         }
 
@@ -303,7 +303,7 @@ class GraphQL
                 [],
                 null,
                 null,
-                ['code' => 'PERSISTED_QUERY_NOT_FOUND']
+                ['code' => 'PERSISTED_QUERY_NOT_FOUND'],
             );
     }
 
@@ -336,7 +336,7 @@ class GraphQL
                         ->then(
                             static fn (?Error $error): ?array => null === $error
                                 ? null
-                                : $formatter($error)
+                                : $formatter($error),
                         ))
                     ->filter()
                     ->all();

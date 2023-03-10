@@ -28,7 +28,7 @@ class OrderByServiceProvider extends ServiceProvider
                         "Sort records in descending order."
                         DESC
                     }
-                ')
+                '),
             );
             $documentAST->setTypeDefinition(
                 Parser::enumTypeDefinition(/* @lang GraphQL */ '
@@ -37,7 +37,7 @@ class OrderByServiceProvider extends ServiceProvider
                         "Amount of items."
                         COUNT @enum(value: "count")
                     }
-                ')
+                '),
             );
             $documentAST->setTypeDefinition(
                 Parser::enumTypeDefinition(/* @lang GraphQL */ '
@@ -58,14 +58,14 @@ class OrderByServiceProvider extends ServiceProvider
                         "Amount of items."
                         COUNT @enum(value: "count")
                     }
-                ')
+                '),
             );
             $documentAST->setTypeDefinition(
                 static::createOrderByClauseInput(
                     static::DEFAULT_ORDER_BY_CLAUSE,
                     'Allows ordering a list of records.',
-                    'String'
-                )
+                    'String',
+                ),
             );
         });
     }

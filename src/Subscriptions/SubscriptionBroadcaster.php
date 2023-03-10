@@ -20,7 +20,7 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
         protected StoresSubscriptions $subscriptionStorage,
         protected SubscriptionIterator $subscriptionIterator,
         protected BroadcastManager $broadcastManager,
-        protected BusDispatcher $busDispatcher
+        protected BusDispatcher $busDispatcher,
     ) {}
 
     public function queueBroadcast(GraphQLSubscription $subscription, string $fieldName, mixed $root): void
@@ -48,14 +48,14 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
                     $subscriber->query,
                     $subscriber->context,
                     $subscriber->variables,
-                    $subscriber
+                    $subscriber,
                 );
 
                 $this->broadcastManager->broadcast(
                     $subscriber,
-                    $this->graphQL->serializable($executionResult)
+                    $this->graphQL->serializable($executionResult),
                 );
-            }
+            },
         );
     }
 

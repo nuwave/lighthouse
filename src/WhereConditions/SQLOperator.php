@@ -102,7 +102,7 @@ GRAPHQL;
             // All other arities take a value to query against.
             if (! array_key_exists('value', $whereConditions)) {
                 throw new Error(
-                    self::missingValueForColumn($column)
+                    self::missingValueForColumn($column),
                 );
             }
 

@@ -396,7 +396,7 @@ final class CacheDirectiveTest extends DBTestCase
         $this->assertSame(1, $dbQueryCountForPost, 'This query should only run once and be cached on the second run.');
         $this->assertSame(
             $firstResponse->json(),
-            $cachedResponse->json()
+            $cachedResponse->json(),
         );
     }
 
@@ -462,7 +462,7 @@ final class CacheDirectiveTest extends DBTestCase
         $this->assertSame(1, $dbQueryCountForPost, 'This query should only run once and be cached on the second run.');
         $this->assertSame(
             $firstResponse->json(),
-            $cachedResponse->json()
+            $cachedResponse->json(),
         );
     }
 

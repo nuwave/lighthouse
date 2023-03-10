@@ -167,7 +167,7 @@ final class DefaultSchemaTest extends DBTestCase
             ',
             [
                 'name' => $name,
-            ]
+            ],
         );
     }
 }

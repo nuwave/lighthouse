@@ -11,7 +11,7 @@ use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 class NestedOneToMany implements ArgResolver
 {
     public function __construct(
-        protected string $relationName
+        protected string $relationName,
     ) {}
 
     /**
@@ -28,7 +28,7 @@ class NestedOneToMany implements ArgResolver
 
         if ($args->has('delete')) {
             $relation->getRelated()::destroy(
-                $args->arguments['delete']->toPlain()
+                $args->arguments['delete']->toPlain(),
             );
         }
     }
@@ -76,7 +76,7 @@ class NestedOneToMany implements ArgResolver
                 ->make()
                 ->whereIn(
                     $relation->make()->getKeyName(),
-                    $args->arguments['connect']->value
+                    $args->arguments['connect']->value,
                 )
                 ->get();
             $relation->saveMany($children);
@@ -87,7 +87,7 @@ class NestedOneToMany implements ArgResolver
                 ->make()
                 ->whereIn(
                     $relation->make()->getKeyName(),
-                    $args->arguments['disconnect']->value
+                    $args->arguments['disconnect']->value,
                 )
                 ->get();
             foreach ($children as $child) {

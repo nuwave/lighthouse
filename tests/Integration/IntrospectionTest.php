@@ -30,25 +30,25 @@ final class IntrospectionTest extends TestCase
         ';
 
         $this->assertNotNull(
-            $this->introspectType('Foo')
+            $this->introspectType('Foo'),
         );
         $this->assertNotNull(
-            $this->introspectType(RootType::QUERY)
+            $this->introspectType(RootType::QUERY),
         );
 
         $this->assertNull(
-            $this->introspectType('Bar')
+            $this->introspectType('Bar'),
         );
     }
 
     public function testFindsManuallyRegisteredTypes(): void
     {
         $this->typeRegistry->register(
-            new Email()
+            new Email(),
         );
 
         $this->assertNotNull(
-            $this->introspectType('Email')
+            $this->introspectType('Email'),
         );
     }
 }

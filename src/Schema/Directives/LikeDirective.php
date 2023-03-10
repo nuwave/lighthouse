@@ -66,7 +66,7 @@ GRAPHQL;
         return $builder->where(
             $this->directiveArgValue('key', $this->nodeName()),
             'LIKE',
-            $value
+            $value,
         );
     }
 
@@ -74,7 +74,7 @@ GRAPHQL;
     {
         return $this->handleBuilder(
             $builder,
-            $this->directiveArgValue('value')
+            $this->directiveArgValue('value'),
         );
     }
 
@@ -83,7 +83,7 @@ GRAPHQL;
         return str_replace(
             self::PLACEHOLDER,
             $this->escapeWildcards($value),
-            $wildcardsTemplate
+            $wildcardsTemplate,
         );
     }
 
@@ -92,7 +92,7 @@ GRAPHQL;
         return str_replace(
             [self::ESCAPE, self::PERCENTAGE, self::UNDERSCORE],
             [self::ESCAPE . self::ESCAPE, self::ESCAPE . self::PERCENTAGE, self::ESCAPE . self::UNDERSCORE],
-            $value
+            $value,
         );
     }
 }

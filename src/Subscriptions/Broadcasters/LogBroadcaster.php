@@ -23,7 +23,7 @@ class LogBroadcaster implements Broadcaster
          *
          * @var array<string, mixed> $config
          */
-        protected array $config = []
+        protected array $config = [],
     ) {}
 
     public function authorized(Request $request): JsonResponse

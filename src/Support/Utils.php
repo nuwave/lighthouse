@@ -149,7 +149,7 @@ class Utils
     {
         return in_array(
             $trait,
-            class_uses_recursive($class)
+            class_uses_recursive($class),
         );
     }
 

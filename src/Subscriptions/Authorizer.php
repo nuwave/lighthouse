@@ -13,7 +13,7 @@ class Authorizer implements AuthorizesSubscriptions
     public function __construct(
         protected StoresSubscriptions $storage,
         protected SubscriptionRegistry $registry,
-        protected SubscriptionExceptionHandler $exceptionHandler
+        protected SubscriptionExceptionHandler $exceptionHandler,
     ) {}
 
     public function authorize(Request $request): bool

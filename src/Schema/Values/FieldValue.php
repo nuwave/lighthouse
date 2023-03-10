@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Schema\Values;
 use GraphQL\Deferred;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo as BaseResolveInfo;
+use Illuminate\Container\Container;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Execution\Utils\FieldPath;
@@ -151,26 +152,26 @@ class FieldValue
             $resolver = $wrapper($resolver);
         }
 
-        return function (mixed $root, array $args, GraphQLContext $context, BaseResolveInfo $baseResolveInfo) use ($resolver): mixed {
+        return function (mixed $root, array $baseArgs, GraphQLContext $context, BaseResolveInfo $baseResolveInfo) use ($resolver): mixed {
             $path = FieldPath::withoutLists($baseResolveInfo->path);
 
             if (! isset(self::$transformedResolveArgs[$path])) {
-                $argumentSetFactory = app(ArgumentSetFactory::class);
+                $argumentSetFactory = Container::getInstance()->make(ArgumentSetFactory::class);
                 assert($argumentSetFactory instanceof ArgumentSetFactory);
-                $argumentSet = $argumentSetFactory->fromResolveInfo($args, $baseResolveInfo);
 
+                $argumentSet = $argumentSetFactory->fromResolveInfo($baseArgs, $baseResolveInfo);
                 foreach ($this->argumentSetTransformers as $transform) {
                     $argumentSet = $transform($argumentSet, $baseResolveInfo);
                 }
 
-                self::$transformedResolveArgs[$path] = [$argumentSet->toArray(), $argumentSet];
+                $args = $argumentSet->toArray();
+
+                self::$transformedResolveArgs[$path] = [$args, $argumentSet];
+            } else {
+                [$args, $argumentSet] = self::$transformedResolveArgs[$path];
             }
 
-            [$args, $argumentSet] = self::$transformedResolveArgs[$path];
-            $resolveInfo = new ResolveInfo($baseResolveInfo, $argumentSet);
-            $resolveInfo->argumentSet = $argumentSet;
-
-            return ($resolver)($root, $args, $context, $resolveInfo);
+            return ($resolver)($root, $args, $context, new ResolveInfo($baseResolveInfo, $argumentSet));
         };
     }
 }

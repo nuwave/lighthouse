@@ -10,7 +10,7 @@ class EchoSubscriptionEvent implements ShouldBroadcastNow
 {
     public function __construct(
         public string $channel,
-        public mixed $data
+        public mixed $data,
     ) {}
 
     public function broadcastOn(): Channel

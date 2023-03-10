@@ -38,7 +38,7 @@ final class AttemptAuthenticationTest extends TestCase
             ->with(
                 null,
                 [],
-                new Callback(fn (Context $context): bool => null === $this->user)
+                new Callback(fn (Context $context): bool => null === $this->user),
             );
 
         $this->schema = /** @lang GraphQL */ '
@@ -62,7 +62,7 @@ final class AttemptAuthenticationTest extends TestCase
             ->with(
                 null,
                 [],
-                new Callback(fn (Context $context): bool => $this->user === $context->user())
+                new Callback(fn (Context $context): bool => $this->user === $context->user()),
             );
 
         $this->schema = /** @lang GraphQL */ '
