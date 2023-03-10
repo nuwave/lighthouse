@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Subscriptions\Storage;
 
+use GraphQL\Utils\Utils;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Redis\Factory as RedisFactory;
 use Illuminate\Redis\Connections\Connection as RedisConnection;
@@ -76,7 +77,7 @@ class RedisStorageManager implements StoresSubscriptions
         // This is like using multiple get calls (getSubscriber uses the get command).
         $subscribers = $this->connection->command('mget', [$subscriberIds]);
 
-        return ( new Collection($subscribers) )
+        return (new Collection($subscribers))
             ->filter()
             ->map(static function (?string $subscriber): ?Subscriber {
                 // Some entries may be expired
