@@ -23,9 +23,7 @@ final class UserContextTest extends TestCase
         }
         ';
 
-        $this->mockResolver(function ($_, $args, $context) {
-            return $context->user();
-        });
+        $this->mockResolver(static fn ($_, $args, $context) => $context->user());
     }
 
     public function testResolveAuthenticatedUserUsingContext(): void

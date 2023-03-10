@@ -12,7 +12,7 @@ class Context implements GraphQLContext
     /**
      * An instance of the currently authenticated user.
      */
-    public ?Authenticatable $user = null;
+    public ?Authenticatable $user;
 
     public function __construct(
         /**
@@ -20,12 +20,12 @@ class Context implements GraphQLContext
          */
         public Request $request,
     ) {
+        $this->user = null;
+
         foreach (AuthServiceProvider::guards() as $guard) {
-            $user = $request->user($guard);
+            $this->user = $request->user($guard);
 
-            if (null !== $user) {
-                $this->user = $user;
-
+            if (isset($this->user)) {
                 break;
             }
         }

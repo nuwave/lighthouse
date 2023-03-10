@@ -53,13 +53,11 @@ return [
     |
     | The guards to use for authenticating GraphQL requests, if needed.
     | Used in directives such as `@guard` or the `AttemptAuthentication` middleware.
-    | Falls back to the Laravel default if the defined guards is `null`.
+    | Falls back to the Laravel default if `null`.
     |
     */
 
-    'guards' => [
-        'api',
-    ],
+    'guards' => ['api'],
 
     /*
     |--------------------------------------------------------------------------

@@ -16,7 +16,7 @@ class AuthServiceProvider extends ServiceProvider
     }
 
     /**
-     * @return string[]
+     * @return array<string>
      */
     public static function guards(): array
     {
