@@ -233,12 +233,13 @@ trait MakesGraphQLRequests
 
     protected function setUpSubscriptionEnvironment(): void
     {
-        $config = Container::getInstance()->make(ConfigRepository::class);
+        assert($this->app instanceof Application);
+
+        $config = $this->app->make(ConfigRepository::class);
         $config->set('lighthouse.subscriptions.queue_broadcasts', false);
         $config->set('lighthouse.subscriptions.storage', 'array');
         $config->set('lighthouse.subscriptions.storage_ttl', null);
 
-        assert($this->app instanceof Application);
         // binding an instance to the container so it can be spied on
         $this->app->bind(LogBroadcaster::class, fn ($config) => new LogBroadcaster($config->get('lighthouse.subscriptions.broadcasters.log')));
 
