@@ -12,7 +12,7 @@ final class OnPostCreated extends GraphQLSubscription
     public function authorize(Subscriber $subscriber, Request $request): bool
     {
         $user = $request->user();
-        if ($user && ($user instanceof User && 'fail_the_authorize_of_subscription' === $user->name)) {
+        if ($user && ($user instanceof User) && 'fail_the_authorize_of_subscription' === $user->name) {
             return false;
         }
 
