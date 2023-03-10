@@ -208,7 +208,7 @@ $spy = $response->graphQLSubscriptionMock($this);
 
 $spy->shouldNotHaveReceived('broadcast');
 // or
-$spy->shouldNotHaveReceived('broadcast', function (Subscriber $subscriber, $broadcastedData) use ($response) {
+$spy->shouldNotHaveReceived('broadcast', function (Subscriber $subscriber, $broadcastedData) use ($response): bool {
     $channel = $response->getGraphQLSubscriptionChannelName();
     return $channel !== $subscriber->channel;
 });
