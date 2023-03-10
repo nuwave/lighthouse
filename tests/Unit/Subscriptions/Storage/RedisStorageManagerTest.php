@@ -66,7 +66,7 @@ final class RedisStorageManagerTest extends TestCase
         $redisConnection = $this->createMock(RedisConnection::class);
         $redisFactory = $this->getRedisFactory($redisConnection);
 
-        $ttl = 1000;
+        $ttl = '1000';
         $config->method('get')->willReturn($ttl);
 
         $channel = 'private-lighthouse-foo';

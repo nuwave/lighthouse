@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Subscriptions\Storage;
 
+use GraphQL\Utils\Utils;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Redis\Factory as RedisFactory;
 use Illuminate\Redis\Connections\Connection as RedisConnection;
@@ -38,7 +39,15 @@ class RedisStorageManager implements StoresSubscriptions
         $this->connection = $redis->connection(
             $config->get('lighthouse.subscriptions.broadcasters.echo.connection') ?? 'default',
         );
-        $this->ttl = $config->get('lighthouse.subscriptions.storage_ttl');
+        $ttl = $config->get('lighthouse.subscriptions.storage_ttl');
+        if (is_int($ttl) || is_null($ttl)) {
+            $this->ttl = $ttl;
+        } elseif (is_string($ttl) && is_numeric($ttl)) {
+            $this->ttl = (int) $ttl;
+        } else {
+            $notIntOrNumericString = Utils::printSafe($ttl);
+            throw new \Exception("Expected config option lighthouse.subscriptions.storage_ttl to be an int, null or a numeric string, got: {$notIntOrNumericString}.");
+        }
     }
 
     public function subscriberByChannel(string $channel): ?Subscriber
