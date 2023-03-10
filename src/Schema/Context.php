@@ -12,7 +12,7 @@ class Context implements GraphQLContext
     /**
      * An instance of the currently authenticated user.
      */
-    public ?Authenticatable $user;
+    public ?Authenticatable $user = null;
 
     public function __construct(
         /**

@@ -307,6 +307,18 @@ in your `app/config.php`, it is no longer registered by default.
 ],
 ```
 
+### Update lighthouse.guard configuration
+
+The `lighthouse.guard` configuration key was renamed to `lighthouse.guards` and expects an array.
+
+```diff
+- 'guard' => 'api',
++ 'guards' => ['api'],
+```
+
+If `lighthouse.guards` configuration is missing,
+the default Laravel authentication guard will be used (`auth.defaults.guard`).
+
 ## v4 to v5
 
 ### Update PHP, Laravel and PHPUnit

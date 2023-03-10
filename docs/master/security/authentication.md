@@ -35,14 +35,15 @@ operations for guest users, so you will have to handle login outside GraphQL.
 
 ## Configure the guard
 
-You can configure a default guard to use for authenticating GraphQL requests in `lighthouse.php`.
+You can configure default guards to use for authenticating GraphQL requests in `lighthouse.php`.
 
 ```php
-    'guard' => 'api',
+    'guards' => ['api'],
 ```
 
 This setting is used whenever Lighthouse looks for an authenticated user, for example in directives
 such as [@guard](../api-reference/directives.md#guard), or when applying the `AttemptAuthentication` middleware.
+When multiple guards are configured, the first one that is authenticated will be used.
 
 Stateless guards are recommended for most use cases, such as the default `api` guard.
 
@@ -60,7 +61,7 @@ to `sanctum` and register Sanctum's `EnsureFrontendRequestsAreStateful` as the f
             // ... other middleware
         ],
     ],
-    'guard' => 'sanctum',
+    'guards' => ['sanctum'],
 ```
 
 Note that Sanctum requires you to send an CSRF token as [header](https://laravel.com/docs/csrf#csrf-x-csrf-token)
