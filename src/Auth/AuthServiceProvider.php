@@ -21,15 +21,7 @@ class AuthServiceProvider extends ServiceProvider
     public static function guards(): array
     {
         $config = Container::getInstance()->make(ConfigRepository::class);
-        $guards = $config->get('auth.guards');
 
-        $lighthouseGuards = array_filter(
-            (array) $config->get('lighthouse.guards', []),
-            static fn (string $guard): bool => isset($guards[$guard]),
-        );
-
-        return [] !== $lighthouseGuards
-            ? $lighthouseGuards
-            : [$config->get('auth.defaults.guard')];
+        return $config->get('lighthouse.guards') ?: [$config->get('auth.guards')];
     }
 }
