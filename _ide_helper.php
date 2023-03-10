@@ -11,7 +11,7 @@ class TestResponse
     /**
      * Assert the response contains an error with a matching message.
      *
-     * @param \Throwable $error the expected error
+     * @param  \Throwable  $error  the expected error
      *
      * @return $this
      */
@@ -23,7 +23,7 @@ class TestResponse
     /**
      * Assert the response contains an error with the given message.
      *
-     * @param string $message the expected error message
+     * @param  string  $message  the expected error message
      *
      * @return $this
      */
@@ -37,7 +37,7 @@ class TestResponse
      *
      * Requires the config `lighthouse.debug` to include the option \GraphQL\Error\DebugFlag::INCLUDE_DEBUG_MESSAGE.
      *
-     * @param string $message the expected debug message
+     * @param  string  $message  the expected debug message
      *
      * @return $this
      */
@@ -59,7 +59,7 @@ class TestResponse
     /**
      * Assert the returned result contains exactly the given validation keys.
      *
-     * @param array<string> $keys the validation keys the result should have
+     * @param  array<string>  $keys  the validation keys the result should have
      *
      * @return $this
      */
@@ -71,8 +71,8 @@ class TestResponse
     /**
      * Assert a given validation error is present in the response.
      *
-     * @param string $key the validation key that should be present
-     * @param string $message the expected validation message
+     * @param  string  $key  the validation key that should be present
+     * @param  string  $message  the expected validation message
      *
      * @return $this
      */
@@ -94,7 +94,7 @@ class TestResponse
     /**
      * Assert current user is NOT authorized to join a subscription.
      *
-     * @param TestCase $testClassInstance you need to pass $this
+     * @param  TestCase  $testClassInstance  you need to pass $this
      *
      * @return $this
      */
@@ -106,7 +106,7 @@ class TestResponse
     /**
      * Assert current user is NOT authorized to join a subscription.
      *
-     * @param TestCase $testClassInstance you need to pass $this
+     * @param  TestCase  $testClassInstance  you need to pass $this
      *
      * @return $this
      */
