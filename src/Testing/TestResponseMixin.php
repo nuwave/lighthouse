@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Testing;
 
-use Closure;
 use GraphQL\Error\ClientAware;
 use Illuminate\Container\Container;
 use Illuminate\Testing\TestResponse;
@@ -14,7 +13,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @mixin TestResponse
+ * @mixin \Illuminate\Testing\TestResponse
  */
 class TestResponseMixin
 {
@@ -174,7 +173,7 @@ class TestResponseMixin
         };
     }
 
-    public function getGraphQLSubscriptionChannelName(): \Closure
+    public function graphQLSubscriptionChannelName(): \Closure
     {
         return function (): string {
             return $this->json('extensions.lighthouse_subscriptions.channel');

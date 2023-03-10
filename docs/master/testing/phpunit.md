@@ -201,7 +201,7 @@ To assert a broadcast never happened:
 $response->assertGraphQLNotBroadcasted();
 ```
 
-If you need more control over your broadcast assertion you can use `graphQLSubscriptionMock` which returns a [spy](http://docs.mockery.io/en/latest/reference/spies.html) and `getGraphQLSubscriptionChannelName`
+If you need more control over your broadcast assertion you can use `graphQLSubscriptionMock` which returns a [spy](http://docs.mockery.io/en/latest/reference/spies.html) and `graphQLSubscriptionChannelName`
 
 ```php
 $spy = $response->graphQLSubscriptionMock($this);
@@ -209,7 +209,7 @@ $spy = $response->graphQLSubscriptionMock($this);
 $spy->shouldNotHaveReceived('broadcast');
 // or
 $spy->shouldNotHaveReceived('broadcast', function (Subscriber $subscriber, $broadcastedData) use ($response): bool {
-    $channel = $response->getGraphQLSubscriptionChannelName();
+    $channel = $response->graphQLSubscriptionChannelName();
     return $channel !== $subscriber->channel;
 });
 ```

@@ -7,6 +7,7 @@ use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Arr;
 use Illuminate\Testing\TestResponse;
+use Mockery\MockInterface;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
 use Nuwave\Lighthouse\Subscriptions\Storage\CacheStorageManager;
@@ -323,7 +324,7 @@ GRAPHQL;
         $response = $this->subscribe();
 
         $mock = $response->graphQLSubscriptionMock();
-        assert($mock instanceof \Mockery\MockInterface);
+        assert($mock instanceof MockInterface);
         $mock->shouldNotHaveReceived('broadcast');
     }
 
@@ -338,7 +339,7 @@ GRAPHQL;
     {
         $response = $this->subscribe();
 
-        $this->assertSame($response->getGraphQLSubscriptionChannelName(), $response->json('extensions.lighthouse_subscriptions.channel'));
+        $this->assertSame($response->graphQLSubscriptionChannelName(), $response->json('extensions.lighthouse_subscriptions.channel'));
     }
 
     protected function subscribe(): TestResponse

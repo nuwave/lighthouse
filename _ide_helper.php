@@ -2,12 +2,16 @@
 
 namespace Illuminate\Testing;
 
+use Mockery\MockInterface;
+use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
+use PHPUnit\Framework\TestCase;
+
 class TestResponse
 {
     /**
      * Assert the response contains an error with a matching message.
      *
-     * @param  \Throwable  $error  the expected error
+     * @param \Throwable $error the expected error
      *
      * @return $this
      */
@@ -19,7 +23,7 @@ class TestResponse
     /**
      * Assert the response contains an error with the given message.
      *
-     * @param  string  $message  the expected error message
+     * @param string $message the expected error message
      *
      * @return $this
      */
@@ -33,7 +37,7 @@ class TestResponse
      *
      * Requires the config `lighthouse.debug` to include the option \GraphQL\Error\DebugFlag::INCLUDE_DEBUG_MESSAGE.
      *
-     * @param  string  $message  the expected debug message
+     * @param string $message the expected debug message
      *
      * @return $this
      */
@@ -55,7 +59,7 @@ class TestResponse
     /**
      * Assert the returned result contains exactly the given validation keys.
      *
-     * @param  array<string>  $keys  the validation keys the result should have
+     * @param array<string> $keys the validation keys the result should have
      *
      * @return $this
      */
@@ -67,8 +71,8 @@ class TestResponse
     /**
      * Assert a given validation error is present in the response.
      *
-     * @param  string  $key  the validation key that should be present
-     * @param  string  $message  the expected validation message
+     * @param string $key the validation key that should be present
+     * @param string $message the expected validation message
      *
      * @return $this
      */
@@ -83,6 +87,69 @@ class TestResponse
      * @return $this
      */
     public function assertGraphQLValidationPasses(): self
+    {
+        return $this;
+    }
+
+    /**
+     * Assert current user is NOT authorized to join a subscription.
+     *
+     * @param TestCase $testClassInstance you need to pass $this
+     *
+     * @return $this
+     */
+    public function assertGraphQLSubscriptionAuthorized(TestCase $testClassInstance): self
+    {
+        return $this;
+    }
+
+    /**
+     * Assert current user is NOT authorized to join a subscription.
+     *
+     * @param TestCase $testClassInstance you need to pass $this
+     *
+     * @return $this
+     */
+    public function assertGraphQLSubscriptionNotAuthorized(TestCase $testClassInstance): self
+    {
+        return $this;
+    }
+
+    /**
+     * For cases where you need more control over your broadcast assertions.
+     *
+     * @see assertGraphQLBroadcasted
+     * @see assertGraphQLNotBroadcasted
+     */
+    public function graphQLSubscriptionMock(): MockInterface
+    {
+        return \Mockery::mock(new LogBroadcaster());
+    }
+
+    /**
+     * You can get the channel name from a subscription query.
+     */
+    public function graphQLSubscriptionChannelName(): string
+    {
+        return '';
+    }
+
+    /**
+     * Assert a subscription actually received a broadcast.
+     *
+     * @return $this
+     */
+    public function assertGraphQLBroadcasted(): self
+    {
+        return $this;
+    }
+
+    /**
+     * Assert a broadcast never happened.
+     *
+     * @return $this
+     */
+    public function assertGraphQLNotBroadcasted(): self
     {
         return $this;
     }
