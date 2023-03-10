@@ -159,7 +159,7 @@ directive @auth(
   Specify which guards to use, e.g. ["api"].
   When not defined, the default from `lighthouse.php` is used.
   """
-  guards: String
+  guards: [String!]
 ) on FIELD_DEFINITION
 ```
 
@@ -3632,7 +3632,7 @@ directive @whereAuth(
   Specify which guards to use, e.g. ["api"].
   When not defined, the default from `lighthouse.php` is used.
   """
-  guards: String
+  guards: [String!]
 ) on FIELD_DEFINITION
 ```
 
