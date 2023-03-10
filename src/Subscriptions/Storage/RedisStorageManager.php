@@ -6,7 +6,6 @@ use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Redis\Factory as RedisFactory;
 use Illuminate\Redis\Connections\Connection as RedisConnection;
 use Illuminate\Support\Collection;
-use Mockery\Exception;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 
@@ -45,7 +44,7 @@ class RedisStorageManager implements StoresSubscriptions
         } elseif (is_string($ttl) && is_numeric($ttl)) {
             $this->ttl = (int) $ttl;
         } else {
-            throw new Exception('ttl is not an integer');
+            throw new \ErrorException('ttl is not an integer');
         }
     }
 
