@@ -154,7 +154,8 @@ class TestResponseMixin
                 // @phpstan-ignore-next-line present in \Illuminate\Foundation\Testing\Concerns\MakesHttpRequests
                 ->postJson('graphql/subscriptions/auth', [
                     'channel_name' => $channel,
-                ])->assertForbidden();
+                ])
+                ->assertForbidden();
 
             return $this;
         };
