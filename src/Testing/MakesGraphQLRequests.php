@@ -241,7 +241,9 @@ trait MakesGraphQLRequests
         $config->set('lighthouse.subscriptions.storage_ttl', null);
 
         // binding an instance to the container so it can be spied on
-        $this->app->bind(LogBroadcaster::class, fn ($config) => new LogBroadcaster($config->get('lighthouse.subscriptions.broadcasters.log')));
+        $this->app->bind(LogBroadcaster::class, fn (ConfigRepository $config) => new LogBroadcaster(
+            $config->get('lighthouse.subscriptions.broadcasters.log')
+        ));
 
         $broadcastManager = $this->app->make(BroadcastManager::class);
         assert($broadcastManager instanceof BroadcastManager);
