@@ -46,7 +46,7 @@ class RedisStorageManager implements StoresSubscriptions
             $this->ttl = (int) $ttl;
         } else {
             $notIntOrNumericString = Utils::printSafe($ttl);
-            throw new \Exception("Expected config option lighthouse.subscriptions.storage_ttl to be an int or a numeric string, got: {$notIntOrNumericString}.");
+            throw new \Exception("Expected config option lighthouse.subscriptions.storage_ttl to be an int, null or a numeric string, got: {$notIntOrNumericString}.");
         }
     }
 
