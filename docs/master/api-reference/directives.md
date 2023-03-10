@@ -174,7 +174,7 @@ you can pass the guard name as the `guards` argument.
 
 ```graphql
 type Query {
-    me: User @auth(guards: ["api"])
+  me: User @auth(guards: ["api"])
 }
 ```
 
