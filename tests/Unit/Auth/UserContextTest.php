@@ -2,8 +2,10 @@
 
 namespace Tests\Unit\Auth;
 
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Tests\TestCase;
 use Tests\Utils\Models\User;
 
@@ -23,7 +25,7 @@ final class UserContextTest extends TestCase
         }
         ';
 
-        $this->mockResolver(static fn ($_, $args, $context) => $context->user());
+        $this->mockResolver(static fn ($_, array $args, GraphQLContext $context): ?Authenticatable => $context->user());
     }
 
     public function testResolveAuthenticatedUserUsingContext(): void
