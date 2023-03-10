@@ -61,7 +61,7 @@ GRAPHQL;
     {
         return new CountModelsLoader(
             $this->relation(),
-            $this->makeBuilderDecorator($parent, $args, $context, $resolveInfo)
+            $this->makeBuilderDecorator($parent, $args, $context, $resolveInfo),
         );
     }
 }

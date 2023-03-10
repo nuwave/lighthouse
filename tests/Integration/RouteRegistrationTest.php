@@ -35,7 +35,7 @@ final class RouteRegistrationTest extends TestCase
 
         $this->assertSame(
             ['GET', 'POST', 'HEAD'],
-            $graphqlRoute->methods()
+            $graphqlRoute->methods(),
         );
         $this->assertSame('foo', $graphqlRoute->getPrefix());
     }

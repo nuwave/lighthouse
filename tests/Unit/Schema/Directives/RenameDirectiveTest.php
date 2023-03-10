@@ -60,7 +60,7 @@ final class RenameDirectiveTest extends TestCase
         $this->mockResolver()
             ->with(
                 null,
-                ['bar' => 'something']
+                ['bar' => 'something'],
             );
 
         $this->schema = /** @lang GraphQL */ '
@@ -87,7 +87,7 @@ final class RenameDirectiveTest extends TestCase
                     'input' => [
                         ['bar' => 'something'],
                     ],
-                ]
+                ],
             );
 
         $this->schema = /** @lang GraphQL */ '

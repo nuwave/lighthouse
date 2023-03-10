@@ -23,7 +23,7 @@ class TracingServiceProvider extends ServiceProvider
         $dispatcher->listen(RegisterDirectiveNamespaces::class, static fn (): string => __NAMESPACE__);
         $dispatcher->listen(ManipulateAST::class, static fn (ManipulateAST $manipulateAST) => ASTHelper::attachDirectiveToObjectTypeFields(
             $manipulateAST->documentAST,
-            Parser::constDirective('@tracing')
+            Parser::constDirective('@tracing'),
         ));
         $dispatcher->listen(StartExecution::class, Tracing::class . '@handleStartExecution');
         $dispatcher->listen(BuildExtensionsResponse::class, Tracing::class . '@handleBuildExtensionsResponse');

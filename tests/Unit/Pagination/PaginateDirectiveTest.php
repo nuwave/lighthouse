@@ -49,7 +49,7 @@ type PageInfo {
 }
 GRAPHQL
             ,
-            $schemaString
+            $schemaString,
         );
 
         $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
@@ -81,7 +81,7 @@ type PaginatorInfo {
 }
 GRAPHQL
             ,
-            $schemaString
+            $schemaString,
         );
 
         $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
@@ -107,7 +107,7 @@ type SimplePaginatorInfo {
 }
 GRAPHQL
             ,
-            $schemaString
+            $schemaString,
         );
     }
 
@@ -136,7 +136,7 @@ type Query {
 }
 GRAPHQL
             ,
-            $schemaString
+            $schemaString,
         );
 
         $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
@@ -150,7 +150,7 @@ type UserPaginator {
 }
 GRAPHQL
             ,
-            $schemaString
+            $schemaString,
         );
     }
 
@@ -179,7 +179,7 @@ type Query {
 }
 GRAPHQL
             ,
-            $schemaString
+            $schemaString,
         );
 
         $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
@@ -193,7 +193,7 @@ type UserSimplePaginator {
 }
 GRAPHQL
             ,
-            $schemaString
+            $schemaString,
         );
     }
 
@@ -222,7 +222,7 @@ type Query {
 }
 GRAPHQL
             ,
-            $schemaString
+            $schemaString,
         );
 
         $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
@@ -236,7 +236,7 @@ type UserConnection {
 }
 GRAPHQL
             ,
-            $schemaString
+            $schemaString,
         );
 
         $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
@@ -250,7 +250,7 @@ type UserEdge {
 }
 GRAPHQL
             ,
-            $schemaString
+            $schemaString,
         );
     }
 
@@ -411,7 +411,7 @@ GRAPHQL
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(6, 10),
-            $result->json('errors.0.message')
+            $result->json('errors.0.message'),
         );
     }
 
@@ -443,7 +443,7 @@ GRAPHQL
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(6, 10),
-            $result->json('errors.0.message')
+            $result->json('errors.0.message'),
         );
     }
 
@@ -477,7 +477,7 @@ GRAPHQL
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(5, 10),
-            $resultFromDefaultPagination->json('errors.0.message')
+            $resultFromDefaultPagination->json('errors.0.message'),
         );
 
         $resultFromRelayPagination = $this->graphQL(/** @lang GraphQL */ '
@@ -495,7 +495,7 @@ GRAPHQL
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(5, 10),
-            $resultFromRelayPagination->json('errors.0.message')
+            $resultFromRelayPagination->json('errors.0.message'),
         );
 
         $resultFromSimplePagination = $this->graphQL(/** @lang GraphQL */ '
@@ -511,7 +511,7 @@ GRAPHQL
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(5, 10),
-            $resultFromSimplePagination->json('errors.0.message')
+            $resultFromSimplePagination->json('errors.0.message'),
         );
     }
 

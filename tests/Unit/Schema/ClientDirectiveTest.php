@@ -10,10 +10,10 @@ final class ClientDirectiveTest extends TestCase
     public function testReturnsDefaultDirectivesInIntrospection(): void
     {
         $this->assertNotNull(
-            $this->introspectDirective(Directive::SKIP_NAME)
+            $this->introspectDirective(Directive::SKIP_NAME),
         );
         $this->assertNotNull(
-            $this->introspectDirective(Directive::INCLUDE_NAME)
+            $this->introspectDirective(Directive::INCLUDE_NAME),
         );
     }
 
@@ -49,7 +49,7 @@ final class ClientDirectiveTest extends TestCase
                     'FIELD',
                 ],
             ],
-            $bar
+            $bar,
         );
     }
 }

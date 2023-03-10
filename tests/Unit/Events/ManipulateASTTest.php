@@ -19,7 +19,7 @@ final class ManipulateASTTest extends TestCase
 
         Event::listen(ManipulateAST::class, static function (ManipulateAST $manipulateAST): void {
             $manipulateAST->documentAST->setTypeDefinition(
-                Parser::objectTypeDefinition(self::PLACEHOLDER_QUERY)
+                Parser::objectTypeDefinition(self::PLACEHOLDER_QUERY),
             );
         });
 

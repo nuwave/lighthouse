@@ -68,7 +68,7 @@ GRAPHQL;
         $relationName = $this->directiveArgValue(
             'relation',
             // Use the name of the argument if no explicit relation name is given
-            $this->nodeName()
+            $this->nodeName(),
         );
         $relation = $parent->{$relationName}();
         assert($relation instanceof Relation);
@@ -104,7 +104,7 @@ GRAPHQL;
         DocumentAST &$documentAST,
         InputValueDefinitionNode &$argDefinition,
         FieldDefinitionNode &$parentField,
-        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
     ): void {
         if (! $this->directiveArgValue('relation')) {
             throw new DefinitionException('The @delete directive requires "relation" to be set when used as an argument resolver.');

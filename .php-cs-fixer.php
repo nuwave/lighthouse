@@ -13,4 +13,12 @@ return risky($finder, [
     'general_phpdoc_annotation_remove' => [
         'annotations' => ['throws'],
     ],
+    'trailing_comma_in_multiline' => [
+        'elements' => [
+            'arguments',
+            'arrays',
+            'match',
+            'parameters',
+        ]
+    ]
 ]);

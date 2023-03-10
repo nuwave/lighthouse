@@ -34,7 +34,7 @@ GRAPHQL;
         DocumentAST &$documentAST,
         InputValueDefinitionNode &$argDefinition,
         FieldDefinitionNode &$parentField,
-        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
     ): void {
         $argType = ASTHelper::getUnderlyingTypeName($argDefinition->type);
         $expectedArgType = Type::INT;
@@ -55,7 +55,7 @@ GRAPHQL;
             $limit = null;
             foreach ($resolveInfo->argumentSet->arguments as $argument) {
                 $argumentIsUsedToLimit = $argument->directives->contains(
-                    Utils::instanceofMatcher(self::class)
+                    Utils::instanceofMatcher(self::class),
                 );
 
                 if ($argumentIsUsedToLimit) {

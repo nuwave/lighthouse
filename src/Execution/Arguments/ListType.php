@@ -10,6 +10,6 @@ class ListType
     public bool $nonNull = false;
 
     public function __construct(
-        public ListType|NamedType $type
+        public ListType|NamedType $type,
     ) {}
 }

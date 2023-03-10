@@ -25,7 +25,7 @@ class BroadcastSubscriptionJob implements ShouldQueue
         /**
          * The root element to be passed when resolving the subscription.
          */
-        public mixed $root
+        public mixed $root,
     ) {}
 
     public function handle(BroadcastsSubscriptions $broadcaster): void

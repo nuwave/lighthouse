@@ -19,7 +19,7 @@ class EndExecution
         /**
          * The result of resolving a single operation.
          */
-        public ExecutionResult $result
+        public ExecutionResult $result,
     ) {
         $this->moment = Carbon::now();
     }

@@ -29,7 +29,7 @@ class PusherBroadcaster implements Broadcaster
         $socketId = $request->input('socket_id');
         $data = \Safe\json_decode(
             $this->pusher->socket_auth($channel, $socketId),
-            true
+            true,
         );
 
         return new JsonResponse($data, 200);
@@ -62,7 +62,7 @@ class PusherBroadcaster implements Broadcaster
                 [
                     'more' => true,
                     'result' => $data,
-                ]
+                ],
             );
         } catch (ApiErrorException $apiErrorException) {
             $this->exceptionHandler->report($apiErrorException);

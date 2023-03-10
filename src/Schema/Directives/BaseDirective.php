@@ -170,11 +170,11 @@ abstract class BaseDirective implements Directive
     protected function namespaceClassName(
         string $classCandidate,
         array $namespacesToTry = [],
-        ?callable $determineMatch = null
+        ?callable $determineMatch = null,
     ): string {
         $namespaceForDirective = ASTHelper::namespaceForDirective(
             $this->definitionNode,
-            $this->name()
+            $this->name(),
         );
 
         if (is_string($namespaceForDirective)) {
@@ -213,7 +213,7 @@ abstract class BaseDirective implements Directive
     {
         $argumentParts = explode(
             '@',
-            $this->directiveArgValue($argumentName)
+            $this->directiveArgValue($argumentName),
         );
 
         if (
@@ -221,7 +221,7 @@ abstract class BaseDirective implements Directive
             || empty($argumentParts[0])
         ) {
             throw new DefinitionException(
-                "Directive '{$this->name()}' must have an argument '{$argumentName}' in the form 'ClassName@methodName' or 'ClassName'"
+                "Directive '{$this->name()}' must have an argument '{$argumentName}' in the form 'ClassName@methodName' or 'ClassName'",
             );
         }
 
@@ -247,7 +247,7 @@ abstract class BaseDirective implements Directive
         $modelClass = $this->namespaceClassName(
             $modelClassCandidate,
             (array) config('lighthouse.namespaces.models'),
-            static fn (string $classCandidate): bool => is_subclass_of($classCandidate, Model::class)
+            static fn (string $classCandidate): bool => is_subclass_of($classCandidate, Model::class),
         );
         assert(is_subclass_of($modelClass, Model::class));
 

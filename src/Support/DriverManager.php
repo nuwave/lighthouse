@@ -30,7 +30,7 @@ abstract class DriverManager
         /**
          * The application instance.
          */
-        protected Application $app
+        protected Application $app,
     ) {}
 
     /**
@@ -80,7 +80,7 @@ abstract class DriverManager
     {
         return $this->app['config']->get(
             "{$this->configKey()}.{$name}",
-            ['driver' => $name]
+            ['driver' => $name],
         );
     }
 

@@ -15,6 +15,6 @@ class StartOperationOrOperations
          *
          * @var \GraphQL\Server\OperationParams|array<int, \GraphQL\Server\OperationParams>
          */
-        public OperationParams|array $operationOrOperations
+        public OperationParams|array $operationOrOperations,
     ) {}
 }

@@ -36,7 +36,7 @@ GRAPHQL;
 
         $namespacedClassName = $this->namespaceClassName(
             $className,
-            RootType::defaultNamespaces($fieldValue->getParentName())
+            RootType::defaultNamespaces($fieldValue->getParentName()),
         );
 
         return Utils::constructResolver($namespacedClassName, $methodName);

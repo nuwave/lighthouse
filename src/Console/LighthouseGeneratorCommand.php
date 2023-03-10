@@ -49,7 +49,7 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
     {
         if ([] === $namespaces) {
             throw new \InvalidArgumentException(
-                'A default namespace is required for code generation.'
+                'A default namespace is required for code generation.',
             );
         }
 

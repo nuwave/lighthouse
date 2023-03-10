@@ -13,6 +13,6 @@ class NamedType
         /**
          * The name of the type as defined in the schema.
          */
-        public string $name
+        public string $name,
     ) {}
 }

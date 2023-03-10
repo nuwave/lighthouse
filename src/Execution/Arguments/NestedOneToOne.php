@@ -9,7 +9,7 @@ use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 class NestedOneToOne implements ArgResolver
 {
     public function __construct(
-        protected string $relationName
+        protected string $relationName,
     ) {}
 
     /**
@@ -41,7 +41,7 @@ class NestedOneToOne implements ArgResolver
 
         if ($args->has('delete')) {
             $relation->getRelated()::destroy(
-                $args->arguments['delete']->toPlain()
+                $args->arguments['delete']->toPlain(),
             );
         }
     }

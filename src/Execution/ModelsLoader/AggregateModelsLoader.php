@@ -12,7 +12,7 @@ class AggregateModelsLoader implements ModelsLoader
         protected string $relation,
         protected string $column,
         protected string $function,
-        protected \Closure $decorateBuilder
+        protected \Closure $decorateBuilder,
     ) {}
 
     public function load(EloquentCollection $parents): void
@@ -28,7 +28,7 @@ class AggregateModelsLoader implements ModelsLoader
          * @see \Illuminate\Database\Eloquent\Concerns\QueriesRelationships::withAggregate()
          */
         $attribute = Str::snake(
-            \Safe\preg_replace('/[^[:alnum:][:space:]_]/u', '', "{$this->relation} {$this->function} {$this->column}")
+            \Safe\preg_replace('/[^[:alnum:][:space:]_]/u', '', "{$this->relation} {$this->function} {$this->column}"),
         );
 
         return $model->getAttribute($attribute);

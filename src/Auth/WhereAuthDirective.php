@@ -14,7 +14,7 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 class WhereAuthDirective extends BaseDirective implements FieldBuilderDirective
 {
     public function __construct(
-        protected AuthFactory $authFactory
+        protected AuthFactory $authFactory,
     ) {}
 
     public static function definition(): string
@@ -55,7 +55,7 @@ GRAPHQL;
                     ->id();
 
                 $query->whereKey($userId);
-            }
+            },
         );
     }
 }

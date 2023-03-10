@@ -208,7 +208,7 @@ final class TypeRegistryTest extends TestCase
         $nonExistingTypeName = 'ThisTypeDoesNotExist';
 
         $this->expectExceptionObject(
-            TypeRegistry::failedToLoadType($nonExistingTypeName)
+            TypeRegistry::failedToLoadType($nonExistingTypeName),
         );
         $this->typeRegistry->get($nonExistingTypeName);
     }
@@ -243,7 +243,7 @@ final class TypeRegistryTest extends TestCase
         $this->typeRegistry->register($type);
 
         $this->expectExceptionObject(
-            TypeRegistry::triedToRegisterPresentType($name)
+            TypeRegistry::triedToRegisterPresentType($name),
         );
         $this->typeRegistry->register($type);
     }
@@ -258,7 +258,7 @@ final class TypeRegistryTest extends TestCase
         $this->typeRegistry->registerLazy($name, $makeType);
 
         $this->expectExceptionObject(
-            TypeRegistry::triedToRegisterPresentType($name)
+            TypeRegistry::triedToRegisterPresentType($name),
         );
         $this->typeRegistry->registerLazy($name, $makeType);
     }
@@ -295,7 +295,7 @@ final class TypeRegistryTest extends TestCase
         ]);
         $this->typeRegistry->registerLazy(
             $name,
-            static fn (): ObjectType => $type
+            static fn (): ObjectType => $type,
         );
 
         $this->assertSame($type, $this->typeRegistry->get($name));
@@ -322,7 +322,7 @@ final class TypeRegistryTest extends TestCase
             static fn (): ObjectType => new ObjectType([
                 'name' => $lazyTypeName,
                 'fields' => [],
-            ])
+            ]),
         );
 
         $resolvedTypes = $this->typeRegistry->resolvedTypes();
@@ -358,7 +358,7 @@ final class TypeRegistryTest extends TestCase
             static fn (): ObjectType => new ObjectType([
                 'name' => $lazyTypeName,
                 'fields' => [],
-            ])
+            ]),
         );
 
         $documentType = $this->typeRegistry->get($documentTypeName);

@@ -20,7 +20,7 @@ final class EnsureXHRTest extends TestCase
         $this->expectException(BadRequestHttpException::class);
         $middleware->handle(
             $request,
-            static function (): void {}
+            static function (): void {},
         );
     }
 
@@ -38,7 +38,7 @@ final class EnsureXHRTest extends TestCase
         $this->expectException(BadRequestHttpException::class);
         $middleware->handle(
             $request,
-            static function (): void {}
+            static function (): void {},
         );
     }
 
@@ -53,7 +53,7 @@ final class EnsureXHRTest extends TestCase
 
         $result = $middleware->handle(
             $request,
-            static fn (): Response => $response
+            static fn (): Response => $response,
         );
 
         $this->assertSame($response, $result);
@@ -74,7 +74,7 @@ final class EnsureXHRTest extends TestCase
         $this->expectException(BadRequestHttpException::class);
         $middleware->handle(
             $request,
-            static function (): void {}
+            static function (): void {},
         );
     }
 
@@ -102,7 +102,7 @@ final class EnsureXHRTest extends TestCase
         $this->expectException(BadRequestHttpException::class);
         $middleware->handle(
             $request,
-            static function (): void {}
+            static function (): void {},
         );
     }
 
@@ -119,7 +119,7 @@ final class EnsureXHRTest extends TestCase
 
         $result = $middleware->handle(
             $request,
-            static fn (): Response => $response
+            static fn (): Response => $response,
         );
 
         $this->assertSame($response, $result);
@@ -137,7 +137,7 @@ final class EnsureXHRTest extends TestCase
         $this->expectException(BadRequestHttpException::class);
         $middleware->handle(
             $request,
-            static function (): void {}
+            static function (): void {},
         );
     }
 
@@ -154,7 +154,7 @@ final class EnsureXHRTest extends TestCase
 
         $result = $middleware->handle(
             $request,
-            static fn (): Response => $response
+            static fn (): Response => $response,
         );
 
         $this->assertSame($response, $result);

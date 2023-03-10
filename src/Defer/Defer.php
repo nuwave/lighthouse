@@ -52,7 +52,7 @@ class Defer implements CreatesResponse
     public function __construct(
         protected CanStreamResponse $stream,
         protected GraphQL $graphQL,
-        ConfigRepository $config
+        ConfigRepository $config,
     ) {
         $executionTime = $config->get('lighthouse.defer.max_execution_ms', 0);
         if ($executionTime > 0) {
@@ -172,7 +172,7 @@ class Defer implements CreatesResponse
             [
                 'X-Accel-Buffering' => 'no',
                 'Content-Type' => 'multipart/mixed; boundary="-"',
-            ]
+            ],
         );
     }
 
@@ -186,7 +186,7 @@ class Defer implements CreatesResponse
         $this->stream->stream(
             $this->result,
             $this->resolved,
-            ! $this->hasRemainingDeferred()
+            ! $this->hasRemainingDeferred(),
         );
     }
 
@@ -221,7 +221,7 @@ class Defer implements CreatesResponse
             $this->startExecution->context,
             $this->startExecution->variables,
             null,
-            $this->startExecution->operationName
+            $this->startExecution->operationName,
         );
 
         $this->result = $this->graphQL->serializable($executionResult);

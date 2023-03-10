@@ -68,7 +68,7 @@ final class AuthenticatingSyncIteratorTest extends IteratorTest
             static function (Subscriber $subscriber) use (&$processedItems, &$authenticatedUsers, $authManager): void {
                 $processedItems[] = $subscriber;
                 $authenticatedUsers[] = $authManager->user();
-            }
+            },
         );
 
         $this->assertCount($subscriberCount, $processedItems);

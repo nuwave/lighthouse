@@ -30,7 +30,7 @@ class RelationBatchLoader
     protected bool $hasResolved = false;
 
     public function __construct(
-        protected ModelsLoader $modelsLoader
+        protected ModelsLoader $modelsLoader,
     ) {}
 
     /**
@@ -65,7 +65,7 @@ class RelationBatchLoader
              * @return class-string<\Illuminate\Database\Eloquent\Model>
              */
             static fn (Model $model): string => $model::class,
-            true
+            true,
         );
 
         foreach ($parentsGroupedByClass as $parentsOfSameClass) {

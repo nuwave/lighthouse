@@ -66,7 +66,7 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
         DocumentAST &$documentAST,
         InputValueDefinitionNode &$argDefinition,
         FieldDefinitionNode &$parentField,
-        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
     ): void {
         $this->validateRulesArg();
         $this->validateMessageArg();

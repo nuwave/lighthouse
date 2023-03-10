@@ -22,7 +22,7 @@ final class SubscriptionTest extends TestCase
     {
         return array_merge(
             parent::getPackageProviders($app),
-            [SubscriptionServiceProvider::class]
+            [SubscriptionServiceProvider::class],
         );
     }
 
@@ -46,7 +46,7 @@ final class SubscriptionTest extends TestCase
             ->with(
                 $this->isInstanceOf(GraphQLSubscription::class),
                 $subscriptionField,
-                $root
+                $root,
             );
 
         Subscription::broadcast($subscriptionField, $root);

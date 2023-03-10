@@ -58,7 +58,7 @@ GRAPHQL;
                 'visibility' => $this->publicArgValue()
                     ? 'public'
                     : 'private',
-            ]
+            ],
         );
 
         if (false === $filepathInStorage) {

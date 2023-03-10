@@ -11,7 +11,7 @@ class NestedMorphTo implements ArgResolver
         /**
          * @var \Illuminate\Database\Eloquent\Relations\MorphTo<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model>  $relation
          */
-        protected MorphTo $relation
+        protected MorphTo $relation,
     ) {}
 
     /**
@@ -26,11 +26,11 @@ class NestedMorphTo implements ArgResolver
             $connectArgs = $args->arguments['connect']->value;
 
             $morphToModel = $this->relation->createModelByType(
-                (string) $connectArgs->arguments['type']->value
+                (string) $connectArgs->arguments['type']->value,
             );
             $morphToModel->setAttribute(
                 $morphToModel->getKeyName(),
-                $connectArgs->arguments['id']->value
+                $connectArgs->arguments['id']->value,
             );
 
             $this->relation->associate($morphToModel);

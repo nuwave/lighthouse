@@ -49,10 +49,10 @@ final class RedisStorageManagerTest extends TestCase
             ->withConsecutive(
                 ['get', [$prefixedChannel]],
                 ['del', [$prefixedChannel]],
-                ['srem', ['graphql.topic.' . $subscriber->topic, $channel]]
+                ['srem', ['graphql.topic.' . $subscriber->topic, $channel]],
             )
             ->willReturnOnConsecutiveCalls(
-                serialize($subscriber)
+                serialize($subscriber),
             );
 
         $manager = new RedisStorageManager($config, $redisFactory);
@@ -91,7 +91,7 @@ final class RedisStorageManagerTest extends TestCase
                     'graphql.subscriber.private-lighthouse-foo',
                     $ttl,
                     serialize($subscriberUnderTopic),
-                ]]
+                ]],
             );
 
         $manager = new RedisStorageManager($config, $redisFactory);
@@ -124,7 +124,7 @@ final class RedisStorageManagerTest extends TestCase
                 ['set', [
                     'graphql.subscriber.private-lighthouse-foo',
                     serialize($subscriberUnderTopic),
-                ]]
+                ]],
             );
 
         $manager = new RedisStorageManager($config, $redisFactory);
@@ -155,7 +155,7 @@ final class RedisStorageManagerTest extends TestCase
                     'graphql.subscriber.foo1',
                     'graphql.subscriber.foo2',
                     'graphql.subscriber.foo3',
-                ]]]
+                ]]],
             )
             ->willReturnOnConsecutiveCalls(
                 ['foo1', 'foo2', 'foo3'],
@@ -168,7 +168,7 @@ final class RedisStorageManagerTest extends TestCase
                     '(nil)',
                     // mget non-existing-entry
                     false,
-                ]
+                ],
             );
 
         $this->assertEquals(
@@ -176,7 +176,7 @@ final class RedisStorageManagerTest extends TestCase
             (new RedisStorageManager($config, $redisFactory))
                 ->subscribersByTopic($topic)
                 ->values()
-                ->all()
+                ->all(),
         );
     }
 

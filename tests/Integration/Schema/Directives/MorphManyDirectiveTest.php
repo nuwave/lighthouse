@@ -55,7 +55,7 @@ final class MorphManyDirectiveTest extends DBTestCase
             $image = $this->task
                 ->images()
                 ->save(
-                    factory(Image::class)->create()
+                    factory(Image::class)->create(),
                 );
 
             if (false === $image) {
@@ -73,9 +73,9 @@ final class MorphManyDirectiveTest extends DBTestCase
             fn (): Image => $this->post
                 ->images()
                 ->save(
-                    factory(Image::class)->create()
+                    factory(Image::class)->create(),
                 )
-                ?: throw new \Exception('Failed to save Image')
+                ?: throw new \Exception('Failed to save Image'),
         );
     }
 
@@ -246,7 +246,7 @@ final class MorphManyDirectiveTest extends DBTestCase
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(3, 10),
-            $result->json('errors.0.message')
+            $result->json('errors.0.message'),
         );
     }
 
@@ -288,7 +288,7 @@ final class MorphManyDirectiveTest extends DBTestCase
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(2, 10),
-            $result->json('errors.0.message')
+            $result->json('errors.0.message'),
         );
     }
 
@@ -540,7 +540,7 @@ final class MorphManyDirectiveTest extends DBTestCase
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(3, 10),
-            $result->json('errors.0.message')
+            $result->json('errors.0.message'),
         );
     }
 
@@ -584,7 +584,7 @@ final class MorphManyDirectiveTest extends DBTestCase
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(2, 10),
-            $result->json('errors.0.message')
+            $result->json('errors.0.message'),
         );
     }
 

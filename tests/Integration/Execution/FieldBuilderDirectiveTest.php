@@ -43,7 +43,7 @@ final class FieldBuilderDirectiveTest extends DBTestCase
 
         $this->assertSame(
             $ownedPosts->pluck('id')->all(),
-            $response->json('data.posts.*.id')
+            $response->json('data.posts.*.id'),
         );
     }
 
@@ -79,7 +79,7 @@ final class FieldBuilderDirectiveTest extends DBTestCase
 
         $this->assertSame(
             $ownedPosts->pluck('id')->all(),
-            $response->json('data.posts.*.id')
+            $response->json('data.posts.*.id'),
         );
     }
 }

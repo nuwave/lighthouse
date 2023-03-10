@@ -13,6 +13,6 @@ class EndOperationOrOperations
          *
          * @var array<string, mixed>|array<int, array<string, mixed>> $resultOrResults
          */
-        public array $resultOrResults
+        public array $resultOrResults,
     ) {}
 }

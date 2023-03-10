@@ -66,7 +66,7 @@ GRAPHQL;
     {
         return $this->handleBuilder(
             $builder,
-            $this->directiveArgValue('value')
+            $this->directiveArgValue('value'),
         );
     }
 }

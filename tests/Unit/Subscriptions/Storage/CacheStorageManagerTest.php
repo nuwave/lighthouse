@@ -41,7 +41,7 @@ final class CacheStorageManagerTest extends TestCase
 
         $this->assertSubscriberIsSame(
             $subscriber,
-            $this->storage->subscriberByChannel($subscriber->channel)
+            $this->storage->subscriberByChannel($subscriber->channel),
         );
     }
 
@@ -91,7 +91,7 @@ final class CacheStorageManagerTest extends TestCase
         /** @var \Nuwave\Lighthouse\Subscriptions\Subscriber $actual */
         $this->assertSame(
             AST::toArray($expected->query),
-            AST::toArray($actual->query)
+            AST::toArray($actual->query),
         );
     }
 }

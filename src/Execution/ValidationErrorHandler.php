@@ -25,7 +25,7 @@ class ValidationErrorHandler implements ErrorHandler
                 $error->getSource(),
                 $error->getPositions(),
                 $error->getPath(),
-                ValidationException::fromLaravel($underlyingException)
+                ValidationException::fromLaravel($underlyingException),
             ));
         }
 

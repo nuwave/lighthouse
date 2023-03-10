@@ -23,7 +23,7 @@ final class OrderByDirectiveTest extends TestCase
             'Query' // Parent
             . 'Foo' // Field
             . 'OrderBy' // Arg
-            . 'OrderByClause' // Suffix
+            . 'OrderByClause', // Suffix
         );
         $this->assertInstanceOf(InputObjectType::class, $input);
     }
@@ -50,7 +50,7 @@ final class OrderByDirectiveTest extends TestCase
             'Query' // Parent
             . 'Foo' // Field
             . 'OrderBy' // Arg
-            . 'RelationOrderByClause' // Suffix
+            . 'RelationOrderByClause', // Suffix
         );
         $this->assertInstanceOf(InputObjectType::class, $clause);
 
@@ -58,7 +58,7 @@ final class OrderByDirectiveTest extends TestCase
             'Query' // Parent
             . 'Foo' // Field
             . 'OrderBy' // Arg
-            . 'Foo' // Relation
+            . 'Foo', // Relation
         );
         $this->assertInstanceOf(InputObjectType::class, $foo);
 
@@ -66,7 +66,7 @@ final class OrderByDirectiveTest extends TestCase
             'Query' // Parent
             . 'Foo' // Field
             . 'OrderBy' // Arg
-            . 'Baz' // Relation
+            . 'Baz', // Relation
         );
         $this->assertInstanceOf(InputObjectType::class, $baz);
 
@@ -75,7 +75,7 @@ final class OrderByDirectiveTest extends TestCase
             . 'Foo' // Field
             . 'OrderBy' // Arg
             . 'Baz' // Relation
-            . 'Column' // Suffix
+            . 'Column', // Suffix
         );
         $this->assertInstanceOf(EnumType::class, $bazEnum);
     }

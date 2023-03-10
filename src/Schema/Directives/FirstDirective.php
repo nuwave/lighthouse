@@ -41,7 +41,7 @@ GRAPHQL;
                 $root,
                 $args,
                 $context,
-                $resolveInfo
+                $resolveInfo,
             );
             assert($builder instanceof EloquentBuilder);
 

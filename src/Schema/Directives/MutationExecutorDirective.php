@@ -17,7 +17,7 @@ use Nuwave\Lighthouse\Support\Utils;
 abstract class MutationExecutorDirective extends BaseDirective implements FieldResolver, ArgResolver
 {
     public function __construct(
-        protected TransactionalMutations $transactionalMutations
+        protected TransactionalMutations $transactionalMutations,
     ) {}
 
     public function resolveField(FieldValue $fieldValue): callable
@@ -34,7 +34,7 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
 
                     return $mutated->refresh();
                 },
-                $model->getConnectionName()
+                $model->getConnectionName(),
             );
         };
     }
@@ -50,7 +50,7 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
         $relationName = $this->directiveArgValue(
             'relation',
             // Use the name of the argument if no explicit relation name is given
-            $this->nodeName()
+            $this->nodeName(),
         );
 
         $relation = $parent->{$relationName}();
@@ -75,7 +75,7 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
 
         return Utils::mapEach(
             static fn (ArgumentSet $argumentSet): mixed => $update($model->newInstance(), $argumentSet),
-            $args
+            $args,
         );
     }
 

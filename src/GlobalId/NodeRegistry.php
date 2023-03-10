@@ -28,7 +28,7 @@ class NodeRegistry
     protected string $currentType;
 
     public function __construct(
-        protected TypeRegistry $typeRegistry
+        protected TypeRegistry $typeRegistry,
     ) {}
 
     /**

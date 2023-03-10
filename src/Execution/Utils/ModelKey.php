@@ -17,8 +17,8 @@ class ModelKey
             array_merge(
                 [$model::class],
                 // Might be one or more keys
-                (array) $model->getKey()
-            )
+                (array) $model->getKey(),
+            ),
         );
     }
 }

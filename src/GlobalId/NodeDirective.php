@@ -18,7 +18,7 @@ use Nuwave\Lighthouse\Support\Contracts\TypeMiddleware;
 class NodeDirective extends BaseDirective implements TypeMiddleware, TypeManipulator
 {
     public function __construct(
-        protected NodeRegistry $nodeRegistry
+        protected NodeRegistry $nodeRegistry,
     ) {}
 
     public static function definition(): string
@@ -61,7 +61,7 @@ GRAPHQL;
 
         $this->nodeRegistry->registerNode(
             $value->getTypeDefinitionName(),
-            $resolver
+            $resolver,
         );
 
         return $next($value);

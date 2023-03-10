@@ -306,7 +306,7 @@ GRAPHQL
             ->create()
             ->images()
             ->save(
-                factory(Image::class)->create()
+                factory(Image::class)->create(),
             );
 
         $this->graphQL(/** @lang GraphQL */ "
@@ -350,7 +350,7 @@ GRAPHQL
             ->create()
             ->images()
             ->save(
-                factory(Image::class)->create()
+                factory(Image::class)->create(),
             );
 
         $this->graphQL("

@@ -42,7 +42,7 @@ abstract class Validator implements ArgumentSetValidation
         return Arr::get(
             $this->args->toArray(),
             $key,
-            $default
+            $default,
         );
     }
 }

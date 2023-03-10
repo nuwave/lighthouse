@@ -11,7 +11,7 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
 class ReportingErrorHandler implements ErrorHandler
 {
     public function __construct(
-        protected ExceptionHandler $exceptionHandler
+        protected ExceptionHandler $exceptionHandler,
     ) {}
 
     public function __invoke(?Error $error, \Closure $next): ?array

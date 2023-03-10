@@ -55,14 +55,14 @@ final class IdeHelperCommandTest extends TestCase
         $this->assertStringContainsString(
             FieldDirective::definition(),
             $schemaDirectives,
-            'Generates definition for built-in directives'
+            'Generates definition for built-in directives',
         );
         $this->assertStringContainsString(FieldDirective::class, $schemaDirectives);
 
         $this->assertStringContainsString(
             UnionDirective::definition(),
             $schemaDirectives,
-            'Overwrites definitions through custom namespaces'
+            'Overwrites definitions through custom namespaces',
         );
         $this->assertStringContainsString(UnionDirective::class, $schemaDirectives);
 
@@ -75,7 +75,7 @@ final class IdeHelperCommandTest extends TestCase
         $this->assertStringContainsString(
             SchemaPrinter::printType($programmaticType),
             $programmaticTypes,
-            'Generates definitions for programmatically registered types'
+            'Generates definitions for programmatically registered types',
         );
 
         /*
@@ -86,7 +86,7 @@ final class IdeHelperCommandTest extends TestCase
 
         $this->assertStringContainsString(
             IdeHelperCommand::OPENING_PHP_TAG . IdeHelperCommand::GENERATED_NOTICE,
-            $ideHelper
+            $ideHelper,
         );
     }
 }

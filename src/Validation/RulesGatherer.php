@@ -55,12 +55,12 @@ class RulesGatherer
             $nestedPath = array_merge($argumentPath, [$name]);
 
             $directivesForArray = $argument->directives->filter(
-                Utils::instanceofMatcher(ArgDirectiveForArray::class)
+                Utils::instanceofMatcher(ArgDirectiveForArray::class),
             );
             $this->gatherRulesForArgument($argument, $directivesForArray, $nestedPath);
 
             $directivesForArgument = $argument->directives->filter(
-                Utils::instanceofMatcher(ArgDirective::class)
+                Utils::instanceofMatcher(ArgDirective::class),
             );
 
             if (
@@ -134,19 +134,19 @@ class RulesGatherer
     {
         $qualifiedRulesList = array_map(
             fn (array $rules): array => $this->qualifyArgumentReferences($rules, $argumentPath),
-            $directive->rules()
+            $directive->rules(),
         );
 
         $this->rules = array_merge_recursive(
             $this->rules,
-            $this->wrap($qualifiedRulesList, $argumentPath)
+            $this->wrap($qualifiedRulesList, $argumentPath),
         );
 
         $this->messages += $this->wrap($directive->messages(), $argumentPath);
 
         $this->attributes = array_merge(
             $this->attributes,
-            $this->wrap($directive->attributes(), $argumentPath)
+            $this->wrap($directive->attributes(), $argumentPath),
         );
     }
 
@@ -159,12 +159,12 @@ class RulesGatherer
             $directive->rules(),
             // The last element is the name of the argument the rule is defined upon.
             // We want the qualified path to start from the parent level.
-            array_slice($argumentPath, 0, -1)
+            array_slice($argumentPath, 0, -1),
         );
 
         $this->rules = array_merge_recursive(
             $this->rules,
-            [implode('.', $argumentPath) => $qualifiedRules]
+            [implode('.', $argumentPath) => $qualifiedRules],
         );
 
         $this->messages += $this->wrap($directive->messages(), $argumentPath);
@@ -173,7 +173,7 @@ class RulesGatherer
         if (null !== $attribute) {
             $this->attributes = array_merge(
                 $this->attributes,
-                [implode('.', $argumentPath) => $attribute]
+                [implode('.', $argumentPath) => $attribute],
             );
         }
     }
@@ -277,7 +277,7 @@ class RulesGatherer
             ])) {
                 $args = array_map(
                     static fn (string $field): string => implode('.', array_merge($argumentPath, [$field])),
-                    $args
+                    $args,
                 );
             }
 

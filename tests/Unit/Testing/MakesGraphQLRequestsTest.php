@@ -21,7 +21,7 @@ final class MakesGraphQLRequestsTest extends TestCase
     {
         $this->assertSame(
             'http://localhost/prefix/graphql',
-            $this->graphQLEndpointUrl()
+            $this->graphQLEndpointUrl(),
         );
     }
 
@@ -80,7 +80,7 @@ final class MakesGraphQLRequestsTest extends TestCase
             ',
             [],
             [],
-            [$key => $value]
+            [$key => $value],
         );
 
         $this->assertInstanceOf(Request::class, $request);

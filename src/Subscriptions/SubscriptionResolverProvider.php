@@ -19,7 +19,7 @@ use Nuwave\Lighthouse\Support\Utils;
 class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
 {
     public function __construct(
-        protected SubscriptionRegistry $subscriptionRegistry
+        protected SubscriptionRegistry $subscriptionRegistry,
     ) {}
 
     /**
@@ -42,14 +42,14 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
         $className = Utils::namespaceClassname(
             $className,
             $namespacesToTry,
-            static fn (string $class): bool => is_subclass_of($class, GraphQLSubscription::class)
+            static fn (string $class): bool => is_subclass_of($class, GraphQLSubscription::class),
         );
 
         if (null === $className) {
             $subscriptionClass = GraphQLSubscription::class;
             $consideredNamespaces = implode(', ', $namespacesToTry);
             throw new DefinitionException(
-                "Failed to find class {$className} extends {$subscriptionClass} in namespaces [{$consideredNamespaces}] for the subscription field {$fieldName}"
+                "Failed to find class {$className} extends {$subscriptionClass} in namespaces [{$consideredNamespaces}] for the subscription field {$fieldName}",
             );
         }
 
@@ -60,7 +60,7 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
         // query, so there is no need to consider the field path
         $this->subscriptionRegistry->register(
             $subscription,
-            $fieldName
+            $fieldName,
         );
 
         return function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($subscription, $fieldName) {
@@ -71,18 +71,18 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
             $subscriber = new Subscriber(
                 $args,
                 $context,
-                $resolveInfo
+                $resolveInfo,
             );
 
             if (! $subscription->can($subscriber)) {
                 throw new UnauthorizedSubscriber(
-                    'Unauthorized subscription request'
+                    'Unauthorized subscription request',
                 );
             }
 
             $this->subscriptionRegistry->subscriber(
                 $subscriber,
-                $subscription->encodeTopic($subscriber, $fieldName)
+                $subscription->encodeTopic($subscriber, $fieldName),
             );
 
             return null;

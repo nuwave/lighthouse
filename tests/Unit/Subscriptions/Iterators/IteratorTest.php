@@ -26,7 +26,7 @@ abstract class IteratorTest extends TestCase
             $this->subscribers($count),
             static function (Subscriber $subscriber) use (&$subscribers): void {
                 $subscribers[] = $subscriber;
-            }
+            },
         );
 
         $this->assertCount($count, $subscribers);
@@ -46,7 +46,7 @@ abstract class IteratorTest extends TestCase
             },
             static function (\Exception $e) use (&$exceptionThrown): void {
                 $exceptionThrown = $e;
-            }
+            },
         );
 
         $this->assertSame($exceptionToThrow, $exceptionThrown);

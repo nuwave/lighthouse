@@ -30,7 +30,7 @@ trait GeneratesColumnsEnum
 
         if ($hasColumns && $hasColumnsEnum) {
             throw new DefinitionException(
-                "The @{$this->name()} directive can only have one of the following arguments: `columns`, `columnsEnum`."
+                "The @{$this->name()} directive can only have one of the following arguments: `columns`, `columnsEnum`.",
             );
         }
 
@@ -46,7 +46,7 @@ trait GeneratesColumnsEnum
         DocumentAST &$documentAST,
         InputValueDefinitionNode &$argDefinition,
         FieldDefinitionNode &$parentField,
-        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
     ): string {
         $columnsEnum = $this->directiveArgValue('columnsEnum');
         if (! is_null($columnsEnum)) {
@@ -62,8 +62,8 @@ trait GeneratesColumnsEnum
                     $parentField,
                     $parentType,
                     $this->directiveArgValue('columns'),
-                    $allowedColumnsEnumName
-                )
+                    $allowedColumnsEnumName,
+                ),
             );
 
         return $allowedColumnsEnumName;
@@ -79,7 +79,7 @@ trait GeneratesColumnsEnum
         FieldDefinitionNode &$parentField,
         ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
         array $allowedColumns,
-        string $allowedColumnsEnumName
+        string $allowedColumnsEnumName,
     ): EnumTypeDefinitionNode {
         $enumValues = array_map(
             static function (string $columnName): string {
@@ -89,7 +89,7 @@ trait GeneratesColumnsEnum
 {$enumName} @enum(value: "{$columnName}")
 GRAPHQL;
             },
-            $allowedColumns
+            $allowedColumns,
         );
 
         $enumValuesString = implode("\n", $enumValues);

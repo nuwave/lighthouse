@@ -26,7 +26,7 @@ abstract class WithRelationDirective extends BaseDirective implements FieldMiddl
         $fieldValue->wrapResolver(
             fn (callable $resolver): \Closure => fn (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): \GraphQL\Executor\Promise\Adapter\SyncPromise => $this
                 ->loadRelation($parent, $args, $context, $resolveInfo)
-                ->then(static fn (): mixed => $resolver($parent, $args, $context, $resolveInfo))
+                ->then(static fn (): mixed => $resolver($parent, $args, $context, $resolveInfo)),
         );
     }
 
@@ -37,7 +37,7 @@ abstract class WithRelationDirective extends BaseDirective implements FieldMiddl
     {
         $relationBatchLoader = BatchLoaderRegistry::instance(
             $this->qualifyPath($args, $resolveInfo),
-            fn (): RelationBatchLoader => new RelationBatchLoader($this->modelsLoader($parent, $args, $context, $resolveInfo))
+            fn (): RelationBatchLoader => new RelationBatchLoader($this->modelsLoader($parent, $args, $context, $resolveInfo)),
         );
 
         return $relationBatchLoader->load($parent);

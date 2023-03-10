@@ -45,7 +45,7 @@ final class UploadDirectiveTest extends TestCase
                 ],
             ],
             ['0' => ['variables.file']],
-            ['0' => $file]
+            ['0' => $file],
         )->assertJson([
             'data' => [
                 'file' => $filePath,
@@ -88,7 +88,7 @@ final class UploadDirectiveTest extends TestCase
                 ],
             ],
             ['0' => ['variables.file']],
-            ['0' => $file]
+            ['0' => $file],
         )->assertJson([
             'data' => [
                 'file' => $filePath,
@@ -130,7 +130,7 @@ final class UploadDirectiveTest extends TestCase
                 ],
             ],
             ['0' => ['variables.file']],
-            ['0' => $file]
+            ['0' => $file],
         )->assertJson([
             'data' => [
                 'file' => $filePath,
@@ -172,7 +172,7 @@ final class UploadDirectiveTest extends TestCase
                 ],
             ],
             ['0' => ['variables.file']],
-            ['0' => $file]
+            ['0' => $file],
         )->assertJson([
             'data' => [
                 'file' => $filePath,
@@ -211,7 +211,7 @@ final class UploadDirectiveTest extends TestCase
                 ],
             ],
             ['0' => ['variables.file']],
-            ['0' => []]
+            ['0' => []],
         )->assertJson([
             'data' => [
                 'file' => $filePath,
@@ -249,7 +249,7 @@ final class UploadDirectiveTest extends TestCase
                 ],
             ],
             ['0' => ['variables.file']],
-            ['0' => $file]
+            ['0' => $file],
         );
     }
 
@@ -290,7 +290,7 @@ final class UploadDirectiveTest extends TestCase
                 ],
             ],
             ['0' => ['variables.file']],
-            ['0' => $file]
+            ['0' => $file],
         );
     }
 
