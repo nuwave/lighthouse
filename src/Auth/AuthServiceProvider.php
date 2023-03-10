@@ -22,6 +22,7 @@ class AuthServiceProvider extends ServiceProvider
     {
         $config = Container::getInstance()->make(ConfigRepository::class);
 
-        return $config->get('lighthouse.guards') ?: [$config->get('auth.guards')];
+        return $config->get('lighthouse.guards')
+            ?? [$config->get('auth.guards')];
     }
 }
