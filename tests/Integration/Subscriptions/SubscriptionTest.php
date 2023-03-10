@@ -25,13 +25,12 @@ final class SubscriptionTest extends TestCase
     {
         parent::setUp();
 
-        $this->setupSubscriptionEnvironment();
+        $this->setUpSubscriptionEnvironment();
 
         $this->mockResolverExpects($this->any())
             ->willReturnCallback(static fn (mixed $root, array $args): array => $args);
 
-        $this->schema /** @lang GraphQL */
-            = <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Post {
             title: String!
             body: String @guard
@@ -323,15 +322,15 @@ GRAPHQL;
     {
         $response = $this->subscribe();
 
-        // @phpstan-ignore-next-line
-        $response->getGraphQLSubscriptionMock($this)->shouldNotHaveReceived('broadcast');
+        $mock = $response->graphQLSubscriptionMock();
+        assert($mock instanceof \Mockery\MockInterface);
+        $mock->shouldNotHaveReceived('broadcast');
     }
 
     public function testGraphQLNotBroadcasted(): void
     {
         $response = $this->subscribe();
 
-        // @phpstan-ignore-next-line
         $response->assertGraphQLNotBroadcasted();
     }
 
@@ -339,7 +338,7 @@ GRAPHQL;
     {
         $response = $this->subscribe();
 
-        $this->assertEquals($response->getGraphQLSubscriptionChannelName(), $response->json('extensions.lighthouse_subscriptions.channel'));
+        $this->assertSame($response->getGraphQLSubscriptionChannelName(), $response->json('extensions.lighthouse_subscriptions.channel'));
     }
 
     protected function subscribe(): TestResponse

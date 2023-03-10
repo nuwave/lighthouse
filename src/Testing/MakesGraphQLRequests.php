@@ -231,27 +231,24 @@ trait MakesGraphQLRequests
         $config->set('lighthouse.error_handlers', [RethrowingErrorHandler::class]);
     }
 
-    protected function setupSubscriptionEnvironment(): void
+    protected function setUpSubscriptionEnvironment(): void
     {
-        config()->set('lighthouse.subscriptions.queue_broadcasts', false);
-        config()->set('lighthouse.subscriptions.storage', 'array');
-        config()->set('lighthouse.subscriptions.storage_ttl', null);
-
-        // binding an instance to the container so it can be spied on
-        app()->bind(LogBroadcaster::class, function () {
-            return new LogBroadcaster(config('lighthouse.subscriptions.broadcasters.log'));
-        });
+        $config = Container::getInstance()->make(ConfigRepository::class);
+        $config->set('lighthouse.subscriptions.queue_broadcasts', false);
+        $config->set('lighthouse.subscriptions.storage', 'array');
+        $config->set('lighthouse.subscriptions.storage_ttl', null);
 
         assert($this->app instanceof Application);
+        // binding an instance to the container so it can be spied on
+        $this->app->bind(LogBroadcaster::class, fn ($config) => new LogBroadcaster($config->get('lighthouse.subscriptions.broadcasters.log')));
+
         $broadcastManager = $this->app->make(BroadcastManager::class);
         assert($broadcastManager instanceof BroadcastManager);
 
         // adding a custom driver which is a spied version of log driver
-        $broadcastManager->extend('mock', function ($app, $config) {
-            return $this->spy(LogBroadcaster::class)->makePartial();
-        });
+        $broadcastManager->extend('mock', fn () => $this->spy(LogBroadcaster::class)->makePartial());
 
         // set the custom driver as the default driver
-        config()->set('lighthouse.subscriptions.broadcaster', 'mock');
+        $config->set('lighthouse.subscriptions.broadcaster', 'mock');
     }
 }
