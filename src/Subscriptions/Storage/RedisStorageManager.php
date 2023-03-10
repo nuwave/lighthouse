@@ -39,7 +39,7 @@ class RedisStorageManager implements StoresSubscriptions
             $config->get('lighthouse.subscriptions.broadcasters.echo.connection') ?? 'default'
         );
         $ttl = $config->get('lighthouse.subscriptions.storage_ttl');
-        if ($ttl) {
+        if (is_string($ttl)) {
             $ttl = (int) $ttl;
         }
         $this->ttl = $ttl;
