@@ -184,7 +184,7 @@ class TestResponseMixin
     {
         $response = $this;
 
-        return function ($data) use ($response): TestResponse {
+        return function (array $data) use ($response): TestResponse {
             $i = 0;
             $channel = $this->json('extensions.lighthouse_subscriptions.channel');
 

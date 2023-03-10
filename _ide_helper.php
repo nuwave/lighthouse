@@ -137,9 +137,11 @@ class TestResponse
     /**
      * Assert a subscription actually received a broadcast.
      *
+     * @param  array<mixed>[]  $data  the broadcast pattern that you are expecting
+     *
      * @return $this
      */
-    public function assertGraphQLBroadcasted(): self
+    public function assertGraphQLBroadcasted(array $data): self
     {
         return $this;
     }
