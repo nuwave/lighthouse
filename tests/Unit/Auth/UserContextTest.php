@@ -9,8 +9,7 @@ use Tests\Utils\Models\User;
 
 final class UserContextTest extends TestCase
 {
-
-    function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -73,7 +72,7 @@ final class UserContextTest extends TestCase
             'web' => [
                 'driver' => 'session',
                 'provider' => 'users',
-                ],
+            ],
             'api' => [
                 'driver' => 'session',
                 'provider' => 'users',
