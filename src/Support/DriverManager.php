@@ -9,6 +9,8 @@ use Nuwave\Lighthouse\Exceptions\InvalidDriverException;
  * NOTE: Implementation pulled from \Illuminate\Cache\CacheManager. Purpose is
  * to serve as a base class to easily generate a manager that creates drivers
  * with configuration options.
+ *
+ * @phpstan-type CustomCreator callable(\Illuminate\Container\Container $app, array<string, mixed> $config): object
  */
 abstract class DriverManager
 {
@@ -22,7 +24,7 @@ abstract class DriverManager
     /**
      * The registered custom driver creators.
      *
-     * @var array<string, \Closure>
+     * @var array<string, CustomCreator>
      */
     protected array $customCreators = [];
 
@@ -38,7 +40,7 @@ abstract class DriverManager
      *
      * @return object the driver instance
      */
-    public function driver(?string $name = null)
+    public function driver(?string $name = null): object
     {
         $name = $name ?: $this->getDefaultDriver();
 
@@ -50,9 +52,10 @@ abstract class DriverManager
      *
      * @return object the resolved driver
      */
-    protected function get(string $name)
+    protected function get(string $name): object
     {
-        return $this->drivers[$name] ?? $this->resolve($name);
+        return $this->drivers[$name]
+            ?? $this->resolve($name);
     }
 
     /**
@@ -86,8 +89,10 @@ abstract class DriverManager
 
     /**
      * Register a custom driver creator callback.
+     *
+     * @param  CustomCreator  $callback
      */
-    public function extend(string $driver, \Closure $callback): self
+    public function extend(string $driver, callable $callback): self
     {
         $this->customCreators[$driver] = $callback;
 
@@ -99,7 +104,7 @@ abstract class DriverManager
      *
      * @return object the resolved driver
      */
-    protected function resolve(string $name)
+    protected function resolve(string $name): object
     {
         $config = $this->getConfig($name);
 
@@ -123,7 +128,7 @@ abstract class DriverManager
      *
      * @return object the created driver
      */
-    protected function callCustomCreator(array $config)
+    protected function callCustomCreator(array $config): object
     {
         return $this->customCreators[$config['driver']]($this->app, $config);
     }

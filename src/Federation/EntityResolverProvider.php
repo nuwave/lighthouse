@@ -22,7 +22,7 @@ use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Support\Utils;
 
 /**
- * @phpstan-type SingleEntityResolverFn \Closure(array<string, mixed>): mixed
+ * @phpstan-type SingleEntityResolverFn callable(array<string, mixed>): mixed
  * @phpstan-type EntityResolver SingleEntityResolverFn|BatchedEntityResolver
  */
 class EntityResolverProvider
@@ -126,7 +126,7 @@ class EntityResolverProvider
     /**
      * @return SingleEntityResolverFn|null
      */
-    protected function resolverFromModel(string $typeName): ?\Closure
+    protected function resolverFromModel(string $typeName): ?callable
     {
         $definition = $this->typeDefinition($typeName);
 

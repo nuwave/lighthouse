@@ -94,9 +94,11 @@ class ResponseStream extends Stream implements CanStreamResponse
     /**
      * Flush buffer cache.
      *
-     * Note: We can run into exceptions when flushing the buffer, these should be safe to ignore.
+     * @param  callable(): mixed  $flush
+     *
+     * Note: We can run into exceptions when flushing the buffer, these should be safe to ignore
      */
-    protected function flush(\Closure $flush): void
+    protected function flush(callable $flush): void
     {
         try {
             $flush();

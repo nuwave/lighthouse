@@ -46,9 +46,9 @@ class ASTCache
     }
 
     /**
-     * @param \Closure(): DocumentAST $build
+     * @param  callable(): DocumentAST  $build
      */
-    public function fromCacheOrBuild(\Closure $build): DocumentAST
+    public function fromCacheOrBuild(callable $build): DocumentAST
     {
         if ($this->filesystem()->exists($this->path)) {
             $ast = require $this->path;

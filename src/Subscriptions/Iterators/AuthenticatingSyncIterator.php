@@ -21,7 +21,7 @@ class AuthenticatingSyncIterator implements SubscriptionIterator
 
     public function process(Collection $subscribers, \Closure $handleSubscriber, \Closure $handleError = null): void
     {
-        // Store the previous default guard name so we can restore it after we're done
+        // Store the previous default guard name, so we can restore it after we're done
         $previousGuardName = $this->configRepository->get('auth.defaults.guard');
 
         // Store the previous default Lighthouse guard name, so we can restore it after we're done
