@@ -238,7 +238,7 @@ function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolv
 
 ### Replace `Nuwave\Lighthouse\GraphQL::executeQuery()` usage
 
-Use `parseAndExecuteQuery()` for executing a string query or `executeParsedQuery()` for 
+Use `executeQueryString()` for executing a string query or `executeParsedQuery()` for 
 executing an already parsed `DocumentNode` instance.
 
 ### Removed error extension field `category`

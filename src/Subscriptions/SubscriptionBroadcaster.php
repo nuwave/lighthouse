@@ -44,17 +44,13 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
             function (Subscriber $subscriber) use ($root): void {
                 $subscriber->root = $root;
 
-                $executionResult = $this->graphQL->executeParsedQuery(
+                $result = $this->graphQL->executeParsedQuery(
                     $subscriber->query,
                     $subscriber->context,
                     $subscriber->variables,
                     $subscriber,
                 );
-
-                $this->broadcastManager->broadcast(
-                    $subscriber,
-                    $this->graphQL->serializable($executionResult),
-                );
+                $this->broadcastManager->broadcast($subscriber, $result);
             },
         );
     }
