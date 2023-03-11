@@ -18,7 +18,6 @@ use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\UnionType;
 use Illuminate\Container\Container;
-use Illuminate\Pipeline\Pipeline;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
@@ -68,7 +67,6 @@ class TypeRegistry
     protected array $lazyTypes = [];
 
     public function __construct(
-        protected Pipeline $pipeline,
         protected DirectiveLocator $directiveLocator,
         protected ArgumentFactory $argumentFactory,
     ) {}
@@ -271,24 +269,21 @@ class TypeRegistry
      */
     public function handle(TypeDefinitionNode $definition): Type
     {
-        return $this->pipeline
-            ->send(
-                new TypeValue($definition),
-            )
-            ->through(
-                $this->directiveLocator
-                    ->associatedOfType($definition, TypeMiddleware::class)
-                    ->all(),
-            )
-            ->via('handleNode')
-            ->then(function (TypeValue $value) use ($definition): Type {
-                $typeResolver = $this->directiveLocator->exclusiveOfType($definition, TypeResolver::class);
-                if ($typeResolver instanceof TypeResolver) {
-                    return $typeResolver->resolveNode($value);
-                }
+        $typeValue = new TypeValue($definition);
+        $typeMiddlewareDirectives = $this->directiveLocator
+            ->associatedOfType($definition, TypeMiddleware::class)
+            ->all();
+        foreach ($typeMiddlewareDirectives as $typeMiddlewareDirective) {
+            assert($typeMiddlewareDirective instanceof TypeMiddleware);
+            $typeMiddlewareDirective->handleNode($typeValue);
+        }
 
-                return $this->resolveType($definition);
-            });
+        $typeResolver = $this->directiveLocator->exclusiveOfType($definition, TypeResolver::class);
+        if ($typeResolver instanceof TypeResolver) {
+            return $typeResolver->resolveNode($typeValue);
+        }
+
+        return $this->resolveType($definition);
     }
 
     /**
