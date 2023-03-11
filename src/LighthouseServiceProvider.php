@@ -159,7 +159,7 @@ class LighthouseServiceProvider extends ServiceProvider
 
                     $graphQL = $this->app->make(GraphQL::class);
                     $executionResult = new ExecutionResult(null, [$error]);
-                    $serializableResult = $graphQL->serializable($executionResult);
+                    $serializableResult = $graphQL->toSerializableArray($executionResult);
 
                     return new JsonResponse($serializableResult);
                 },
