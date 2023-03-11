@@ -259,6 +259,20 @@ class GraphQL
     }
 
     /**
+     * Convert the result to a serializable array.
+     *
+     * @api
+     *
+     * @return SerializableResult
+     */
+    public function toSerializableArray(ExecutionResult $result): array
+    {
+        $result->setErrorsHandler($this->errorsHandler());
+
+        return $result->toArray($this->debugFlag());
+    }
+
+    /**
      * Loads persisted query from the query cache.
      */
     protected function loadPersistedQuery(string $sha256hash): DocumentNode
@@ -295,18 +309,6 @@ class GraphQL
                 null,
                 ['code' => 'PERSISTED_QUERY_NOT_FOUND'],
             );
-    }
-
-    /**
-     * Convert the result to a serializable array.
-     *
-     * @return SerializableResult
-     */
-    protected function toSerializableArray(ExecutionResult $result): array
-    {
-        $result->setErrorsHandler($this->errorsHandler());
-
-        return $result->toArray($this->debugFlag());
     }
 
     /**
