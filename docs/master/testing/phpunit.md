@@ -83,7 +83,7 @@ public function testPostsSubscription(): void
 {
     $response = $this->graphQL(/** @lang GraphQL */ '
     {
-        subscription OnPostCreated {
+        subscription {
             onPostCreated {
                 title
             }
