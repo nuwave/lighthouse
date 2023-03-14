@@ -48,28 +48,26 @@ GRAPHQL;
                 assert($query instanceof EloquentBuilder);
 
                 $guards = $this->directiveArgValue('guards', AuthServiceProvider::guards());
-                $query->whereKey($this->authenticatedUserId($guards));
+                $query->whereKey($this->authenticatedUserID($guards));
             },
         );
     }
 
     /**
-     * Return the first logged-in user id to any of the given guards.
+     * Return the ID of the first logged-in user to any of the given guards.
      *
      * @param  array<string|null>  $guards
      */
-    protected function authenticatedUserId(array $guards): int|null|string
+    protected function authenticatedUserID(array $guards): int|null|string
     {
-        $userId = null;
-
         foreach ($guards as $guard) {
-            $userId = $this->authFactory->guard($guard)->id();
-
-            if (isset($userId)) {
-                break;
+            $id = $this->authFactory->guard($guard)
+                ->id();
+            if ($id !== null) {
+                return $id;
             }
         }
 
-        return $userId;
+        return null;
     }
 }

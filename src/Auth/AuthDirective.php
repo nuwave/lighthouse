@@ -47,16 +47,14 @@ GRAPHQL;
      */
     protected function authenticatedUser(array $guards): ?Authenticatable
     {
-        $user = null;
-
         foreach ($guards as $guard) {
-            $user = $this->authFactory->guard($guard)->user();
-
-            if (isset($user)) {
-                break;
+            $user = $this->authFactory->guard($guard)
+                ->user();
+            if ($user !== null) {
+                return $user;
             }
         }
 
-        return $user;
+        return null;
     }
 }
