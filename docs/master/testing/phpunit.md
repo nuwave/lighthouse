@@ -180,7 +180,7 @@ $response->assertGraphQLSubscriptionNotAuthorized($this);
 
 Once you do your subscription query and get a `TestResponse $response`, you can run the following assertions on it.
 
-To assert a subscription actually received a broadcast:
+To assert the subscription actually received some broadcasts:
 
 ```
 // any other way to broadcast would also work
