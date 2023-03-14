@@ -321,7 +321,7 @@ the default Laravel authentication guard will be used (`auth.defaults.guard`).
 
 ### Update `@auth` and `@whereAuth` directives
 
-The `guard` attribute, on `@auth` and `@whereAuth` directives, has been renamed `guards` and expects an array.
+The `guard` argument on `@auth` and `@whereAuth` directives has been renamed to `guards` and now expects a list instead of a single string.
 
 ```diff
 - @auth(guard: "api")
