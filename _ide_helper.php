@@ -123,7 +123,7 @@ class TestResponse
      *
      * @return \Mockery\MockInterface&\Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster
      */
-    public function graphQLSubscriptionMock()
+    public function graphQLSubscriptionMock() // @phpstan-ignore-line invalid return type?
     {
         $mock = \Mockery::mock(Broadcaster::class);
         assert($mock instanceof Broadcaster && $mock instanceof MockInterface);
