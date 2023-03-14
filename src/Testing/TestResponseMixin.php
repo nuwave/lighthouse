@@ -124,7 +124,7 @@ class TestResponseMixin
     public function assertGraphQLSubscriptionAuthorized(): \Closure
     {
         return function (TestCase $testClassInstance): TestResponse {
-            Assert::assertTrue(method_exists($testClassInstance, 'postJson'));
+            Assert::assertTrue(method_exists($testClassInstance, 'postJson'), 'Expected the given $testClassInstance to use the trait Illuminate\\Foundation\\Testing\\Concerns\\MakesHttpRequests.');
 
             $channel = $this->json('extensions.lighthouse_subscriptions.channel');
 
