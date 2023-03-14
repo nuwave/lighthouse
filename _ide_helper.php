@@ -2,9 +2,7 @@
 
 namespace Illuminate\Testing;
 
-use Illuminate\Contracts\Broadcasting\Broadcaster;
-use Mockery\MockInterface;
-use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
+use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use PHPUnit\Framework\TestCase;
 
 class TestResponse
@@ -122,7 +120,7 @@ class TestResponse
      * @see assertGraphQLBroadcasted
      * @see assertGraphQLNotBroadcasted
      *
-     * @return \Mockery\MockInterface&\Illuminate\Contracts\Broadcasting\Broadcaster
+     * @return \Mockery\MockInterface&\Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster
      */
     public function graphQLSubscriptionMock(): Broadcaster
     {
