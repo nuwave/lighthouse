@@ -160,7 +160,7 @@ class TestResponseMixin
 
     public function graphQLSubscriptionMock(): \Closure
     {
-        return static function (): MockInterface {
+        return function (): MockInterface {
             $broadcastManager = Container::getInstance()->make(BroadcastManager::class);
             assert($broadcastManager instanceof BroadcastManager);
             $mock = $broadcastManager->driver();
