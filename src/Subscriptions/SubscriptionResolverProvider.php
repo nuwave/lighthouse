@@ -32,11 +32,9 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
         $fieldName = $fieldValue->getFieldName();
 
         $directive = ASTHelper::directiveDefinition($fieldValue->getField(), SubscriptionDirective::NAME);
-        if (null !== $directive) {
-            $className = ASTHelper::directiveArgValue($directive, 'class');
-        } else {
-            $className = Str::studly($fieldName);
-        }
+        $className = null === $directive
+            ? Str::studly($fieldName)
+            : ASTHelper::directiveArgValue($directive, 'class');
 
         $namespacesToTry = RootType::defaultNamespaces($fieldValue->getParentName());
         $namespacedClassName = Utils::namespaceClassname(
