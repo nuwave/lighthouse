@@ -193,7 +193,7 @@ $response->assertGraphQLBroadcasted([
 ]);
 ```
 
-To assert a broadcast never happened:
+To assert the subscription received no broadcasts:
 
 ```
 // nothing that causes a broadcast to this channel
