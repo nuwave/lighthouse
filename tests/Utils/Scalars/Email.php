@@ -3,6 +3,7 @@
 namespace Tests\Utils\Scalars;
 
 use GraphQL\Error\Error;
+use GraphQL\Language\AST\NodeKind;
 use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Utils\Utils;
@@ -21,7 +22,8 @@ final class Email extends ScalarType
     public function parseValue($value): string
     {
         if (! filter_var($value, FILTER_VALIDATE_EMAIL)) {
-            throw new Error('Cannot represent following value as email: ' . Utils::printSafeJson($value));
+            $notEmail = Utils::printSafeJson($value);
+            throw new Error("Cannot represent the following value as email: {$notEmail}.");
         }
 
         return $value;
@@ -33,7 +35,8 @@ final class Email extends ScalarType
     public function parseLiteral($valueNode, ?array $variables = null): string
     {
         if (! $valueNode instanceof StringValueNode) {
-            throw new Error('Query error: Can only parse strings got: ' . $valueNode->kind, $valueNode);
+            $expectedKind = NodeKind::STRING;
+            throw new Error("Expected {$expectedKind}, got: {$valueNode->kind}.", $valueNode);
         }
 
         if (! filter_var($valueNode->value, FILTER_VALIDATE_EMAIL)) {
