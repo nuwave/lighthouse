@@ -307,7 +307,7 @@ in your `app/config.php`, it is no longer registered by default.
 ],
 ```
 
-### Update lighthouse.guard configuration
+### Update `lighthouse.guard` configuration
 
 The `lighthouse.guard` configuration key was renamed to `lighthouse.guards` and expects an array.
 
