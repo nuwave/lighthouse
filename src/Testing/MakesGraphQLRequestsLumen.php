@@ -7,9 +7,9 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Arr;
 use Illuminate\Testing\TestResponse;
-use Laravel\Lumen\Application;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
+use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 use Nuwave\Lighthouse\Support\Http\Responses\MemoryStream;
 use PHPUnit\Framework\Assert;
@@ -255,19 +255,19 @@ trait MakesGraphQLRequestsLumen
 
     protected function setUpSubscriptionEnvironment(): void
     {
-        assert($this->app instanceof Application);
+        $app = Container::getInstance();
 
-        $config = $this->app->make(ConfigRepository::class);
+        $config = $app->make(ConfigRepository::class);
         $config->set('lighthouse.subscriptions.queue_broadcasts', false);
         $config->set('lighthouse.subscriptions.storage', 'array');
         $config->set('lighthouse.subscriptions.storage_ttl', null);
 
         // binding an instance to the container, so it can be spied on
-        $this->app->bind(LogBroadcaster::class, fn (ConfigRepository $config) => new LogBroadcaster(
+        $app->bind(Broadcaster::class, fn (ConfigRepository $config) => new LogBroadcaster(
             $config->get('lighthouse.subscriptions.broadcasters.log')
         ));
 
-        $broadcastManager = $this->app->make(BroadcastManager::class);
+        $broadcastManager = $app->make(BroadcastManager::class);
         assert($broadcastManager instanceof BroadcastManager);
 
         // adding a custom driver which is a spied version of log driver

@@ -10,6 +10,7 @@ use Mockery\LegacyMockInterface;
 use Mockery\MockInterface;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
+use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
@@ -165,7 +166,7 @@ class TestResponseMixin
             assert($broadcastManager instanceof BroadcastManager);
 
             $mock = $broadcastManager->driver();
-            assert($mock instanceof LogBroadcaster && $mock instanceof MockInterface);
+            assert($mock instanceof Broadcaster && $mock instanceof MockInterface);
 
             return $mock;
         };
