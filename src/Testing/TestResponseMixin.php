@@ -4,7 +4,9 @@ namespace Nuwave\Lighthouse\Testing;
 
 use GraphQL\Error\ClientAware;
 use Illuminate\Container\Container;
+use Illuminate\Support\Arr;
 use Illuminate\Testing\TestResponse;
+use Mockery\LegacyMockInterface;
 use Mockery\MockInterface;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
@@ -126,12 +128,10 @@ class TestResponseMixin
         return function (TestCase $testClassInstance): TestResponse {
             Assert::assertTrue(method_exists($testClassInstance, 'postJson'), 'Expected the given $testClassInstance to use the trait Illuminate\\Foundation\\Testing\\Concerns\\MakesHttpRequests.');
 
-            $channel = $this->json('extensions.lighthouse_subscriptions.channel');
-
             $testClassInstance
                 // @phpstan-ignore-next-line present in \Illuminate\Foundation\Testing\Concerns\MakesHttpRequests
                 ->postJson('graphql/subscriptions/auth', [
-                    'channel_name' => $channel,
+                    'channel_name' => $this->json('extensions.lighthouse_subscriptions.channel'),
                 ])
                 ->assertSuccessful()
                 ->assertExactJson([
@@ -145,14 +145,12 @@ class TestResponseMixin
     public function assertGraphQLSubscriptionNotAuthorized(): \Closure
     {
         return function (TestCase $testClassInstance): TestResponse {
-            Assert::assertTrue(method_exists($testClassInstance, 'postJson'));
-
-            $channel = $this->json('extensions.lighthouse_subscriptions.channel');
+            Assert::assertTrue(method_exists($testClassInstance, 'postJson'), 'Expected the given $testClassInstance to use the trait Illuminate\\Foundation\\Testing\\Concerns\\MakesHttpRequests.');
 
             $testClassInstance
                 // @phpstan-ignore-next-line present in \Illuminate\Foundation\Testing\Concerns\MakesHttpRequests
                 ->postJson('graphql/subscriptions/auth', [
-                    'channel_name' => $channel,
+                    'channel_name' => $this->json('extensions.lighthouse_subscriptions.channel'),
                 ])
                 ->assertForbidden();
 
@@ -182,27 +180,25 @@ class TestResponseMixin
 
     public function assertGraphQLBroadcasted(): \Closure
     {
-        $response = $this;
-
-        return function (array $data) use ($response): TestResponse {
-            $i = 0;
+        return function (array $data): TestResponse {
             $channel = $this->json('extensions.lighthouse_subscriptions.channel');
 
-            $mock = $response->graphQLSubscriptionMock()();
-            assert($mock instanceof MockInterface);
+            $mock = $this->graphQLSubscriptionMock();
+            assert($mock instanceof LegacyMockInterface); // @phpstan-ignore-line mixins are magical
 
-            $concatinatedBroadcastedData = [];
+            $broadcastedData = [];
+            $mock->shouldHaveReceived('broadcast', function (Subscriber $subscriber, $data) use ($channel, &$broadcastedData): bool {
+                Assert::assertIsArray($data);
+                Assert::assertArrayHasKey('data', $data);
 
-            // @phpstan-ignore-next-line phpstan doesn't see that Parameter #2 can accept Closure even though it's type-hinted at LegacyMockInterface
-            $mock->shouldHaveReceived('broadcast', function (Subscriber $subscriber, $broadcastedData) use ($channel, &$concatinatedBroadcastedData) {
                 if ($channel === $subscriber->channel) {
-                    $concatinatedBroadcastedData[] = Arr::first($broadcastedData['data']);
+                    $broadcastedData[] = Arr::first($data['data']);
                 }
 
                 return true;
             });
 
-            Assert::assertEquals($concatinatedBroadcastedData, $data, 'Broadcasted data pattern does not match your expected definition');
+            Assert::assertEquals($broadcastedData, $data, 'Broadcasted data pattern does not match your expected definition.');
 
             return $this;
         };
@@ -210,16 +206,13 @@ class TestResponseMixin
 
     public function assertGraphQLNotBroadcasted(): \Closure
     {
-        $response = $this;
-
-        return function () use ($response): TestResponse {
+        return function (): TestResponse {
             $channel = $this->json('extensions.lighthouse_subscriptions.channel');
 
-            $mock = $response->graphQLSubscriptionMock()();
-            assert($mock instanceof MockInterface);
+            $mock = $this->graphQLSubscriptionMock();
+            assert($mock instanceof LegacyMockInterface); // @phpstan-ignore-line mixins are magical
 
-            // @phpstan-ignore-next-line phpstan doesn't see that Parameter #2 can accept Closure even though it's type-hinted at LegacyMockInterface
-            $mock->shouldNotHaveReceived('broadcast', fn (Subscriber $subscriber, $broadcastedData) => $channel !== $subscriber->channel);
+            $mock->shouldNotHaveReceived('broadcast', fn (Subscriber $subscriber, $data): bool => $channel !== $subscriber->channel);
 
             return $this;
         };

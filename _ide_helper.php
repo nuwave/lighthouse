@@ -123,7 +123,7 @@ class TestResponse
      *
      * @return \Mockery\MockInterface&\Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster
      */
-    public function graphQLSubscriptionMock(): MockInterface
+    public function graphQLSubscriptionMock(): LogBroadcaster
     {
         return \Mockery::mock(new LogBroadcaster());
     }
