@@ -120,6 +120,8 @@ class TestResponse
      *
      * @see assertGraphQLBroadcasted
      * @see assertGraphQLNotBroadcasted
+     *
+     * @return \Mockery\MockInterface&\Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster
      */
     public function graphQLSubscriptionMock(): MockInterface
     {
