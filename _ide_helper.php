@@ -2,6 +2,10 @@
 
 namespace Illuminate\Testing;
 
+use Mockery\MockInterface;
+use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
+use PHPUnit\Framework\TestCase;
+
 class TestResponse
 {
     /**
@@ -83,6 +87,76 @@ class TestResponse
      * @return $this
      */
     public function assertGraphQLValidationPasses(): self
+    {
+        return $this;
+    }
+
+    /**
+     * Assert current user is authorized to join a subscription.
+     *
+     * @param  \PHPUnit\Framework\TestCase  $testClassInstance  usually $this when calling this from a test class
+     *
+     * @return $this
+     */
+    public function assertGraphQLSubscriptionAuthorized(TestCase $testClassInstance): self
+    {
+        return $this;
+    }
+
+    /**
+     * Assert current user is NOT authorized to join a subscription.
+     *
+     * @param  \PHPUnit\Framework\TestCase  $testClassInstance  usually $this when calling this from a test class
+     *
+     * @return $this
+     */
+    public function assertGraphQLSubscriptionNotAuthorized(TestCase $testClassInstance): self
+    {
+        return $this;
+    }
+
+    /**
+     * For cases where you need more control over your broadcast assertions.
+     *
+     * @see \Nuwave\Lighthouse\Testing\TestResponseMixin::assertGraphQLBroadcasted
+     * @see \Nuwave\Lighthouse\Testing\TestResponseMixin::assertGraphQLNotBroadcasted
+     *
+     * @return \Mockery\MockInterface&\Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster
+     */
+    public function graphQLSubscriptionMock() // @phpstan-ignore-line invalid return type?
+    {
+        $mock = \Mockery::mock(Broadcaster::class);
+        assert($mock instanceof Broadcaster && $mock instanceof MockInterface);
+
+        return $mock;
+    }
+
+    /**
+     * Get the channel name from a subscription query.
+     */
+    public function graphQLSubscriptionChannelName(): string
+    {
+        return '';
+    }
+
+    /**
+     * Assert the subscription received the given broadcasts.
+     *
+     * @param  array<int, array<string, mixed>>  $data  the broadcast pattern that you are expecting
+     *
+     * @return $this
+     */
+    public function assertGraphQLBroadcasted(array $data): self
+    {
+        return $this;
+    }
+
+    /**
+     * Assert the subscription received no broadcast.
+     *
+     * @return $this
+     */
+    public function assertGraphQLNotBroadcasted(): self
     {
         return $this;
     }

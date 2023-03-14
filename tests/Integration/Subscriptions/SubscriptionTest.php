@@ -7,21 +7,26 @@ use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Arr;
 use Illuminate\Testing\TestResponse;
+use Mockery\MockInterface;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
 use Nuwave\Lighthouse\Subscriptions\Storage\CacheStorageManager;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Tests\TestCase;
+use Tests\TestsRedis;
 use Tests\TestsSubscriptions;
 use Tests\Utils\Models\User;
 
 final class SubscriptionTest extends TestCase
 {
     use TestsSubscriptions;
+    use TestsRedis;
 
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->setUpSubscriptionEnvironment();
 
         $this->mockResolverExpects($this->any())
             ->willReturnCallback(static fn (mixed $root, array $args): array => $args);
@@ -253,6 +258,88 @@ GRAPHQL;
             ],
             Arr::first($broadcasts)['data'] ?? null,
         );
+    }
+
+    public function testGraphQLSubscriptionAuthorized(): void
+    {
+        $response = $this->subscribe();
+        $response->assertGraphQLSubscriptionAuthorized($this);
+    }
+
+    public function testGraphQLSubscriptionNotAuthorized(): void
+    {
+        $user = new User();
+        $user->name = 'fail_the_authorize_of_subscription';
+        $this->be($user);
+
+        $response = $this->subscribe();
+        $response->assertGraphQLSubscriptionNotAuthorized($this);
+    }
+
+    public function testGraphQLBroadcastedEvents(): void
+    {
+        $response = $this->subscribe();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            createPost(title: "foo", body: "bar") {
+                title
+            }
+        }
+        ');
+
+        $response->assertGraphQLBroadcasted([
+            ['title' => 'foo'],
+        ]);
+    }
+
+    public function testGraphQLBroadcastedEventsTwice(): void
+    {
+        $response = $this->subscribe();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            createPost(title: "foo", body: "bar") {
+                title
+            }
+        }
+        ');
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            createPost(title: "baz", body: "boom") {
+                title
+            }
+        }
+        ');
+
+        $response->assertGraphQLBroadcasted([
+            ['title' => 'foo'],
+            ['title' => 'baz'],
+        ]);
+    }
+
+    public function testGraphQLNotBroadcastedEventsViaSpy(): void
+    {
+        $response = $this->subscribe();
+
+        $mock = $response->graphQLSubscriptionMock();
+        assert($mock instanceof MockInterface);
+        $mock->shouldNotHaveReceived('broadcast');
+    }
+
+    public function testGraphQLNotBroadcasted(): void
+    {
+        $response = $this->subscribe();
+
+        $response->assertGraphQLNotBroadcasted();
+    }
+
+    public function testGraphQLChannelName(): void
+    {
+        $response = $this->subscribe();
+
+        $this->assertSame($response->graphQLSubscriptionChannelName(), $response->json('extensions.lighthouse_subscriptions.channel'));
     }
 
     protected function subscribe(): TestResponse

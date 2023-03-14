@@ -3,8 +3,16 @@
 namespace Nuwave\Lighthouse\Testing;
 
 use GraphQL\Error\ClientAware;
+use Illuminate\Container\Container;
+use Illuminate\Support\Arr;
 use Illuminate\Testing\TestResponse;
+use Mockery\LegacyMockInterface;
+use Mockery\MockInterface;
+use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
+use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
+use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @mixin \Illuminate\Testing\TestResponse
@@ -110,6 +118,97 @@ class TestResponseMixin
                 $errors,
                 'Expected the GraphQL response to contain no errors, got: ' . \Safe\json_encode($errors),
             );
+
+            return $this;
+        };
+    }
+
+    public function assertGraphQLSubscriptionAuthorized(): \Closure
+    {
+        return function (TestCase $testClassInstance): TestResponse {
+            Assert::assertTrue(method_exists($testClassInstance, 'postJson'), 'Expected the given $testClassInstance to use the trait Illuminate\\Foundation\\Testing\\Concerns\\MakesHttpRequests.');
+
+            $testClassInstance
+                // @phpstan-ignore-next-line present in \Illuminate\Foundation\Testing\Concerns\MakesHttpRequests
+                ->postJson('graphql/subscriptions/auth', [
+                    'channel_name' => $this->json('extensions.lighthouse_subscriptions.channel'),
+                ])
+                ->assertSuccessful()
+                ->assertExactJson([
+                    'message' => 'ok',
+                ]);
+
+            return $this;
+        };
+    }
+
+    public function assertGraphQLSubscriptionNotAuthorized(): \Closure
+    {
+        return function (TestCase $testClassInstance): TestResponse {
+            Assert::assertTrue(method_exists($testClassInstance, 'postJson'), 'Expected the given $testClassInstance to use the trait Illuminate\\Foundation\\Testing\\Concerns\\MakesHttpRequests.');
+
+            $testClassInstance
+                // @phpstan-ignore-next-line present in \Illuminate\Foundation\Testing\Concerns\MakesHttpRequests
+                ->postJson('graphql/subscriptions/auth', [
+                    'channel_name' => $this->json('extensions.lighthouse_subscriptions.channel'),
+                ])
+                ->assertForbidden();
+
+            return $this;
+        };
+    }
+
+    public function graphQLSubscriptionMock(): \Closure
+    {
+        return function (): MockInterface {
+            $broadcastManager = Container::getInstance()->make(BroadcastManager::class);
+            assert($broadcastManager instanceof BroadcastManager);
+            $mock = $broadcastManager->driver();
+            assert($mock instanceof Broadcaster && $mock instanceof MockInterface);
+
+            return $mock;
+        };
+    }
+
+    public function graphQLSubscriptionChannelName(): \Closure
+    {
+        return fn (): string => $this->json('extensions.lighthouse_subscriptions.channel');
+    }
+
+    public function assertGraphQLBroadcasted(): \Closure
+    {
+        return function (array $data): TestResponse {
+            $channel = $this->json('extensions.lighthouse_subscriptions.channel');
+
+            $mock = $this->graphQLSubscriptionMock();
+            assert($mock instanceof LegacyMockInterface); // @phpstan-ignore-line mixins are magical
+
+            $broadcastedData = [];
+            $mock->shouldHaveReceived('broadcast', static function (Subscriber $subscriber, $data) use ($channel, &$broadcastedData): bool {
+                Assert::assertIsArray($data);
+                Assert::assertArrayHasKey('data', $data);
+                if ($channel === $subscriber->channel) {
+                    $broadcastedData[] = Arr::first($data['data']);
+                }
+
+                return true;
+            });
+
+            Assert::assertEquals($broadcastedData, $data, 'Broadcasted data pattern does not match your expected definition.');
+
+            return $this;
+        };
+    }
+
+    public function assertGraphQLNotBroadcasted(): \Closure
+    {
+        return function (): TestResponse {
+            $channel = $this->json('extensions.lighthouse_subscriptions.channel');
+
+            $mock = $this->graphQLSubscriptionMock();
+            assert($mock instanceof LegacyMockInterface); // @phpstan-ignore-line mixins are magical
+
+            $mock->shouldNotHaveReceived('broadcast', static fn (Subscriber $subscriber, $data): bool => $channel !== $subscriber->channel);
 
             return $this;
         };
