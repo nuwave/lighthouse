@@ -2,6 +2,7 @@
 
 namespace Illuminate\Testing;
 
+use Mockery\MockInterface;
 use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use PHPUnit\Framework\TestCase;
 
@@ -122,9 +123,12 @@ class TestResponse
      *
      * @return \Mockery\MockInterface&\Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster
      */
-    public function graphQLSubscriptionMock(): Broadcaster
+    public function graphQLSubscriptionMock()
     {
-        return \Mockery::mock(Broadcaster::class);
+        $mock = \Mockery::mock(Broadcaster::class);
+        assert($mock instanceof Broadcaster && $mock instanceof MockInterface);
+
+        return $mock;
     }
 
     /**
