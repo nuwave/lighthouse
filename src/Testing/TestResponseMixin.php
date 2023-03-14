@@ -8,7 +8,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Testing\TestResponse;
 use Mockery\LegacyMockInterface;
 use Mockery\MockInterface;
-use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
 use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
@@ -161,10 +160,9 @@ class TestResponseMixin
 
     public function graphQLSubscriptionMock(): \Closure
     {
-        return function (): MockInterface {
+        return static function (): MockInterface {
             $broadcastManager = Container::getInstance()->make(BroadcastManager::class);
             assert($broadcastManager instanceof BroadcastManager);
-
             $mock = $broadcastManager->driver();
             assert($mock instanceof Broadcaster && $mock instanceof MockInterface);
 
@@ -174,9 +172,7 @@ class TestResponseMixin
 
     public function graphQLSubscriptionChannelName(): \Closure
     {
-        return function (): string {
-            return $this->json('extensions.lighthouse_subscriptions.channel');
-        };
+        return fn (): string => $this->json('extensions.lighthouse_subscriptions.channel');
     }
 
     public function assertGraphQLBroadcasted(): \Closure
@@ -188,10 +184,9 @@ class TestResponseMixin
             assert($mock instanceof LegacyMockInterface); // @phpstan-ignore-line mixins are magical
 
             $broadcastedData = [];
-            $mock->shouldHaveReceived('broadcast', function (Subscriber $subscriber, $data) use ($channel, &$broadcastedData): bool {
+            $mock->shouldHaveReceived('broadcast', static function (Subscriber $subscriber, $data) use ($channel, &$broadcastedData): bool {
                 Assert::assertIsArray($data);
                 Assert::assertArrayHasKey('data', $data);
-
                 if ($channel === $subscriber->channel) {
                     $broadcastedData[] = Arr::first($data['data']);
                 }
@@ -213,7 +208,7 @@ class TestResponseMixin
             $mock = $this->graphQLSubscriptionMock();
             assert($mock instanceof LegacyMockInterface); // @phpstan-ignore-line mixins are magical
 
-            $mock->shouldNotHaveReceived('broadcast', fn (Subscriber $subscriber, $data): bool => $channel !== $subscriber->channel);
+            $mock->shouldNotHaveReceived('broadcast', static fn (Subscriber $subscriber, $data): bool => $channel !== $subscriber->channel);
 
             return $this;
         };

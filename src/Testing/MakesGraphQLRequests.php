@@ -5,7 +5,6 @@ namespace Nuwave\Lighthouse\Testing;
 use GraphQL\Type\Introspection;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Arr;
 use Illuminate\Testing\TestResponse;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
@@ -243,8 +242,8 @@ trait MakesGraphQLRequests
         $config->set('lighthouse.subscriptions.storage_ttl', null);
 
         // binding an instance to the container, so it can be spied on
-        $app->bind(Broadcaster::class, fn (ConfigRepository $config) => new LogBroadcaster(
-            $config->get('lighthouse.subscriptions.broadcasters.log')
+        $app->bind(Broadcaster::class, static fn (ConfigRepository $config): \Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster => new LogBroadcaster(
+            $config->get('lighthouse.subscriptions.broadcasters.log'),
         ));
 
         $broadcastManager = $app->make(BroadcastManager::class);

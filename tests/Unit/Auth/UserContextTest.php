@@ -11,7 +11,7 @@ use Tests\Utils\Models\User;
 
 final class UserContextTest extends TestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
