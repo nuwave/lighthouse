@@ -34,7 +34,7 @@ final class MocksResolversTest extends TestCase
     public function testCustomExpects(): void
     {
         $this->mockResolverExpects(
-            $this->never()
+            $this->never(),
         );
     }
 }

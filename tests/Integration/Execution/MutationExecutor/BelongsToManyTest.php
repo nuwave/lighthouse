@@ -572,7 +572,7 @@ GRAPHQL
             ])
             ->users()
             ->attach(
-                factory(User::class, 2)->create()
+                factory(User::class, 2)->create(),
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
@@ -636,7 +636,7 @@ GRAPHQL
             ])
             ->users()
             ->attach(
-                factory(User::class, 2)->create()
+                factory(User::class, 2)->create(),
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
@@ -689,7 +689,7 @@ GRAPHQL
             ->create()
             ->users()
             ->attach(
-                factory(User::class)->create()
+                factory(User::class)->create(),
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
@@ -739,7 +739,7 @@ GRAPHQL
             ->create()
             ->users()
             ->attach(
-                factory(User::class)->create()
+                factory(User::class)->create(),
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
@@ -788,7 +788,7 @@ GRAPHQL
             ->create()
             ->users()
             ->attach(
-                factory(User::class, 2)->create()
+                factory(User::class, 2)->create(),
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
@@ -911,7 +911,7 @@ GRAPHQL
         $user = factory(User::class)->create();
         /** @var Role $role */
         $role = $user->roles()->save(
-            factory(Role::class)->make()
+            factory(Role::class)->make(),
         );
 
         $this->assertCount(1, $role->users);

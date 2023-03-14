@@ -22,12 +22,12 @@ abstract class ArgTraversalDirective extends BaseDirective implements FieldMiddl
     {
         foreach ($argumentSet->arguments as $argument) {
             $directivesForArray = $argument->directives->filter(
-                Utils::instanceofMatcher(ArgDirectiveForArray::class)
+                Utils::instanceofMatcher(ArgDirectiveForArray::class),
             );
             $argument->value = $this->transform($argument->value, $directivesForArray);
 
             $directivesForArgument = $argument->directives->filter(
-                Utils::instanceofMatcher(ArgDirective::class)
+                Utils::instanceofMatcher(ArgDirective::class),
             );
 
             $argument->value = Utils::mapEach(
@@ -40,7 +40,7 @@ abstract class ArgTraversalDirective extends BaseDirective implements FieldMiddl
 
                     return $this->transform($value, $directivesForArgument);
                 },
-                $argument->value
+                $argument->value,
             );
         }
 

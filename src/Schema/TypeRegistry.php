@@ -18,7 +18,6 @@ use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\UnionType;
 use Illuminate\Container\Container;
-use Illuminate\Pipeline\Pipeline;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
@@ -68,9 +67,8 @@ class TypeRegistry
     protected array $lazyTypes = [];
 
     public function __construct(
-        protected Pipeline $pipeline,
         protected DirectiveLocator $directiveLocator,
-        protected ArgumentFactory $argumentFactory
+        protected ArgumentFactory $argumentFactory,
     ) {}
 
     public function setDocumentAST(DocumentAST $documentAST): self
@@ -271,24 +269,21 @@ class TypeRegistry
      */
     public function handle(TypeDefinitionNode $definition): Type
     {
-        return $this->pipeline
-            ->send(
-                new TypeValue($definition)
-            )
-            ->through(
-                $this->directiveLocator
-                    ->associatedOfType($definition, TypeMiddleware::class)
-                    ->all()
-            )
-            ->via('handleNode')
-            ->then(function (TypeValue $value) use ($definition): Type {
-                $typeResolver = $this->directiveLocator->exclusiveOfType($definition, TypeResolver::class);
-                if ($typeResolver instanceof TypeResolver) {
-                    return $typeResolver->resolveNode($value);
-                }
+        $typeValue = new TypeValue($definition);
+        $typeMiddlewareDirectives = $this->directiveLocator
+            ->associatedOfType($definition, TypeMiddleware::class)
+            ->all();
+        foreach ($typeMiddlewareDirectives as $typeMiddlewareDirective) {
+            assert($typeMiddlewareDirective instanceof TypeMiddleware);
+            $typeMiddlewareDirective->handleNode($typeValue);
+        }
 
-                return $this->resolveType($definition);
-            });
+        $typeResolver = $this->directiveLocator->exclusiveOfType($definition, TypeResolver::class);
+        if ($typeResolver instanceof TypeResolver) {
+            return $typeResolver->resolveNode($typeValue);
+        }
+
+        return $this->resolveType($definition);
     }
 
     /**
@@ -348,20 +343,20 @@ class TypeRegistry
 
         $namespacesToTry = (array) config('lighthouse.namespaces.scalars');
 
-        $className = Utils::namespaceClassname(
+        $namespacedClassName = Utils::namespaceClassname(
             $className,
             $namespacesToTry,
-            static fn (string $className): bool => is_subclass_of($className, ScalarType::class)
+            static fn (string $className): bool => is_subclass_of($className, ScalarType::class),
         );
-        assert(is_null($className) || is_subclass_of($className, ScalarType::class));
+        assert(is_null($namespacedClassName) || is_subclass_of($namespacedClassName, ScalarType::class));
 
-        if (null === $className) {
+        if (null === $namespacedClassName) {
             $scalarClass = ScalarType::class;
             $consideredNamespaces = implode(', ', $namespacesToTry);
             throw new DefinitionException("Failed to find class {$className} extends {$scalarClass} in namespaces [{$consideredNamespaces}] for the scalar {$scalarName}.");
         }
 
-        return new $className([
+        return new $namespacedClassName([
             'name' => $scalarName,
             'description' => $scalarDefinition->description->value ?? null,
             'astNode' => $scalarDefinition,
@@ -402,7 +397,7 @@ class TypeRegistry
 
             foreach ($typeDefinition->fields as $fieldDefinition) {
                 $fields[$fieldDefinition->name->value] = static fn (): array => $fieldFactory->handle(
-                    new FieldValue($typeValue, $fieldDefinition)
+                    new FieldValue($typeValue, $fieldDefinition),
                 );
             }
 
@@ -437,10 +432,10 @@ class TypeRegistry
             $typeResolver
                 = $this->typeResolverFromClass(
                     $nodeName,
-                    (array) config('lighthouse.namespaces.interfaces')
+                    (array) config('lighthouse.namespaces.interfaces'),
                 )
                 ?: $this->typeResolverFallback(
-                    $this->possibleImplementations($interfaceDefinition)
+                    $this->possibleImplementations($interfaceDefinition),
                 );
         }
 
@@ -493,7 +488,7 @@ class TypeRegistry
         $className = Utils::namespaceClassname(
             $nodeName,
             $namespaces,
-            static fn (string $className): bool => method_exists($className, '__invoke')
+            static fn (string $className): bool => method_exists($className, '__invoke'),
         );
 
         if (null !== $className) {
@@ -552,10 +547,10 @@ class TypeRegistry
         } else {
             $typeResolver = $this->typeResolverFromClass(
                 $nodeName,
-                (array) config('lighthouse.namespaces.unions')
+                (array) config('lighthouse.namespaces.unions'),
             )
                 ?: $this->typeResolverFallback(
-                    $this->possibleUnionTypes($unionDefinition)
+                    $this->possibleUnionTypes($unionDefinition),
                 );
         }
 

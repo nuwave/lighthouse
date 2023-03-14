@@ -20,7 +20,15 @@ class Context implements GraphQLContext
          */
         public Request $request,
     ) {
-        $this->user = $request->user(AuthServiceProvider::guard());
+        $this->user = null;
+
+        foreach (AuthServiceProvider::guards() as $guard) {
+            $this->user = $request->user($guard);
+
+            if (isset($this->user)) {
+                break;
+            }
+        }
     }
 
     /**

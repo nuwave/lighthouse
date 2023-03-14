@@ -24,7 +24,7 @@ final class DocumentASTTest extends TestCase
 
         $this->assertInstanceOf(
             ObjectTypeDefinitionNode::class,
-            $documentAST->types[RootType::QUERY]
+            $documentAST->types[RootType::QUERY],
         );
     }
 
@@ -78,7 +78,7 @@ final class DocumentASTTest extends TestCase
 
         $this->assertSame(
             $overwrite,
-            $documentAST->types[RootType::QUERY]
+            $documentAST->types[RootType::QUERY],
         );
     }
 
@@ -93,7 +93,7 @@ final class DocumentASTTest extends TestCase
         ');
 
         $reserialized = unserialize(
-            serialize($documentAST)
+            serialize($documentAST),
         );
         assert($reserialized instanceof DocumentAST);
 

@@ -17,7 +17,7 @@ class Defer implements CreatesResponse
     /**
      * A map from paths to deferred resolvers.
      *
-     * @var array<string, \Closure(): mixed>
+     * @var array<string, callable(): mixed>
      */
     protected array $deferred = [];
 
@@ -52,7 +52,7 @@ class Defer implements CreatesResponse
     public function __construct(
         protected CanStreamResponse $stream,
         protected GraphQL $graphQL,
-        ConfigRepository $config
+        ConfigRepository $config,
     ) {
         $executionTime = $config->get('lighthouse.defer.max_execution_ms', 0);
         if ($executionTime > 0) {
@@ -70,11 +70,11 @@ class Defer implements CreatesResponse
     /**
      * Register deferred field.
      *
-     * @param  \Closure(): mixed  $resolver
+     * @param  callable(): mixed  $resolver
      *
      * @return mixed the data if it is already available
      */
-    public function defer(\Closure $resolver, string $path): mixed
+    public function defer(callable $resolver, string $path): mixed
     {
         $data = $this->getData($path);
         if (null !== $data) {
@@ -102,9 +102,9 @@ class Defer implements CreatesResponse
     }
 
     /**
-     * @param  \Closure(): mixed  $resolver
+     * @param  callable(): mixed  $resolver
      */
-    protected function resolve(\Closure $resolver, string $path): mixed
+    protected function resolve(callable $resolver, string $path): mixed
     {
         unset($this->deferred[$path]);
         $this->resolved[] = $path;
@@ -113,9 +113,9 @@ class Defer implements CreatesResponse
     }
 
     /**
-     * @param  \Closure(): mixed  $originalResolver
+     * @param  callable(): mixed  $originalResolver
      */
-    public function findOrResolve(\Closure $originalResolver, string $path): mixed
+    public function findOrResolve(callable $originalResolver, string $path): mixed
     {
         if ($this->hasData($path)) {
             return $this->getData($path);
@@ -172,7 +172,7 @@ class Defer implements CreatesResponse
             [
                 'X-Accel-Buffering' => 'no',
                 'Content-Type' => 'multipart/mixed; boundary="-"',
-            ]
+            ],
         );
     }
 
@@ -186,7 +186,7 @@ class Defer implements CreatesResponse
         $this->stream->stream(
             $this->result,
             $this->resolved,
-            ! $this->hasRemainingDeferred()
+            ! $this->hasRemainingDeferred(),
         );
     }
 
@@ -216,17 +216,14 @@ class Defer implements CreatesResponse
 
     protected function executeDeferred(): void
     {
-        $executionResult = $this->graphQL->executeParsedQuery(
+        $this->result = $this->graphQL->executeParsedQuery(
             $this->startExecution->query,
             $this->startExecution->context,
             $this->startExecution->variables,
             null,
-            $this->startExecution->operationName
+            $this->startExecution->operationName,
         );
-
-        $this->result = $this->graphQL->serializable($executionResult);
         $this->stream();
-
         $this->resolved = [];
     }
 

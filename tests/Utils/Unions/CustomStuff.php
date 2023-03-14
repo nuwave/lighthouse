@@ -8,7 +8,7 @@ use Nuwave\Lighthouse\Schema\TypeRegistry;
 final class CustomStuff
 {
     public function __construct(
-        private TypeRegistry $typeRegistry
+        private TypeRegistry $typeRegistry,
     ) {}
 
     public function resolveType(mixed $root): Type

@@ -15,7 +15,7 @@ class Validator
         protected EventsDispatcher $eventsDispatcher,
         protected SchemaBuilder $schemaBuilder,
         protected DirectiveLocator $directiveLocator,
-        protected TypeRegistry $typeRegistry
+        protected TypeRegistry $typeRegistry,
     ) {}
 
     public function validate(): void
@@ -28,7 +28,7 @@ class Validator
 
         // We add schema directive definitions only here, since it is very slow
         $directiveFactory = new DirectiveFactory(
-            new FallbackTypeNodeConverter($this->typeRegistry)
+            new FallbackTypeNodeConverter($this->typeRegistry),
         );
         foreach ($this->directiveLocator->definitions() as $directiveDefinition) {
             // TODO consider a solution that feels less hacky
@@ -42,7 +42,7 @@ class Validator
 
         // Allow plugins to do their own schema validations
         $this->eventsDispatcher->dispatch(
-            new ValidateSchema($schema)
+            new ValidateSchema($schema),
         );
     }
 }

@@ -54,7 +54,7 @@ class Tracing
                 'execution' => [
                     'resolvers' => $this->resolverTraces,
                 ],
-            ]
+            ],
         );
     }
 

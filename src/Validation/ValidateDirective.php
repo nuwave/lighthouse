@@ -32,7 +32,7 @@ GRAPHQL;
                 $argumentSet->toArray(),
                 $rulesGatherer->rules,
                 $rulesGatherer->messages,
-                $rulesGatherer->attributes
+                $rulesGatherer->attributes,
             );
             if ($validator->fails()) {
                 $path = implode('.', $resolveInfo->path);

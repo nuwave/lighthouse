@@ -29,7 +29,7 @@ GRAPHQL;
     {
         return $builder->whereNotIn(
             $this->directiveArgValue('key', $this->nodeName()),
-            $value
+            $value,
         );
     }
 }

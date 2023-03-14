@@ -16,6 +16,6 @@ class ManipulateResult
         /**
          * The result of resolving an individual query.
          */
-        public ExecutionResult &$result
+        public ExecutionResult &$result,
     ) {}
 }

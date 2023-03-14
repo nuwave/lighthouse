@@ -9,7 +9,7 @@ use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 class EventDirective extends BaseDirective implements FieldMiddleware
 {
     public function __construct(
-        protected EventsDispatcher $eventsDispatcher
+        protected EventsDispatcher $eventsDispatcher,
     ) {}
 
     public static function definition(): string
@@ -33,12 +33,12 @@ GRAPHQL;
     public function handleField(FieldValue $fieldValue): void
     {
         $eventClassName = $this->namespaceClassName(
-            $this->directiveArgValue('dispatch')
+            $this->directiveArgValue('dispatch'),
         );
 
         $fieldValue->resultHandler(function ($result) use ($eventClassName) {
             $this->eventsDispatcher->dispatch(
-                new $eventClassName($result)
+                new $eventClassName($result),
             );
 
             return $result;

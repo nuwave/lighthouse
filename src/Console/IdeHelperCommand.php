@@ -57,7 +57,7 @@ scalar _
 GRAPHQL;
 
         $directiveClasses = $this->scanForDirectives(
-            $directiveLocator->namespaces()
+            $directiveLocator->namespaces(),
         );
 
         foreach ($directiveClasses as $directiveClass) {
@@ -167,8 +167,8 @@ GRAPHQL;
             "\n\n",
             array_map(
                 static fn (Type $type): string => SchemaPrinter::printType($type),
-                $programmaticTypes
-            )
+                $programmaticTypes,
+            ),
         );
 
         \Safe\file_put_contents($filePath, self::GENERATED_NOTICE . $schema . "\n");
@@ -202,7 +202,7 @@ GRAPHQL;
             $phpContents,
             self::OPENING_PHP_TAG . self::GENERATED_NOTICE,
             0,
-            strlen(self::OPENING_PHP_TAG)
+            strlen(self::OPENING_PHP_TAG),
         );
     }
 }

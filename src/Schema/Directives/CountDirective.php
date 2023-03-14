@@ -89,8 +89,8 @@ GRAPHQL;
                 $relationBatchLoader = BatchLoaderRegistry::instance(
                     [...$this->qualifyPath($args, $resolveInfo), 'count'],
                     fn (): RelationBatchLoader => new RelationBatchLoader(
-                        new CountModelsLoader($this->relation(), $this->makeBuilderDecorator($parent, $args, $context, $resolveInfo))
-                    )
+                        new CountModelsLoader($this->relation(), $this->makeBuilderDecorator($parent, $args, $context, $resolveInfo)),
+                    ),
                 );
 
                 return $relationBatchLoader->load($parent);

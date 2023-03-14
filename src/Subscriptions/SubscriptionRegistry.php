@@ -38,7 +38,7 @@ class SubscriptionRegistry
         protected ContextSerializer $serializer,
         protected StoresSubscriptions $storage,
         protected SchemaBuilder $schemaBuilder,
-        protected ConfigRepository $configRepository
+        protected ConfigRepository $configRepository,
     ) {}
 
     /**
@@ -103,7 +103,7 @@ class SubscriptionRegistry
     {
         return (new Collection($subscriber->query->definitions))
             ->filter(
-                Utils::instanceofMatcher(OperationDefinitionNode::class)
+                Utils::instanceofMatcher(OperationDefinitionNode::class),
             )
             // @phpstan-ignore-next-line type of $node was narrowed by the preceding filter
             ->filter(static fn (OperationDefinitionNode $node): bool => 'subscription' === $node->operation)

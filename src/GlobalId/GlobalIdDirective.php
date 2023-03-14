@@ -14,7 +14,7 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgSan
     public const NAME = 'globalId';
 
     public function __construct(
-        protected GlobalId $globalId
+        protected GlobalId $globalId,
     ) {}
 
     public static function definition(): string
@@ -63,7 +63,7 @@ GRAPHQL;
         $fieldValue->resultHandler(
             fn ($result): ?string => null === $result
                 ? null
-                : $this->globalId->encode($type, $result)
+                : $this->globalId->encode($type, $result),
         );
     }
 

@@ -39,6 +39,6 @@ if ($routeConfig = $config->get('lighthouse.route')) {
     $router->addRoute(
         ['GET', 'POST'],
         $routeConfig['uri'] ?? 'graphql',
-        $action
+        $action,
     );
 }

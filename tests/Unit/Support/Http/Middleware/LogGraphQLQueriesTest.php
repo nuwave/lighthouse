@@ -42,7 +42,7 @@ GRAPHQL;
                 LogGraphQLQueries::MESSAGE,
                 [
                     'query' => $query,
-                ]
+                ],
             );
 
         $this->graphQL($query);

@@ -55,7 +55,7 @@ GRAPHQL;
                 $root,
                 $argumentSet->toArray(),
                 $context,
-                $resolveInfo
+                $resolveInfo,
             );
         });
     }

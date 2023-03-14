@@ -287,10 +287,10 @@ final class OrderByDirectiveDBTest extends DBTestCase
         $userB = factory(User::class)->create();
 
         $userA->tasks()->saveMany(
-            factory(Task::class, 1)->create()
+            factory(Task::class, 1)->create(),
         );
         $userB->tasks()->saveMany(
-            factory(Task::class, 2)->create()
+            factory(Task::class, 2)->create(),
         );
 
         $this->graphQL(/** @lang GraphQL */ '

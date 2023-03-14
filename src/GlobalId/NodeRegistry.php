@@ -9,12 +9,15 @@ use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
+/**
+ * @phpstan-type NodeResolverFn callable(mixed $id, \Nuwave\Lighthouse\Support\Contracts\GraphQLContext $context, \Nuwave\Lighthouse\Execution\ResolveInfo $resolveInfo): mixed
+ */
 class NodeRegistry
 {
     /**
      * A map from type names to resolver functions.
      *
-     * @var array<string, \Closure>
+     * @var array<string, NodeResolverFn>
      */
     protected array $nodeResolver = [];
 
@@ -28,21 +31,19 @@ class NodeRegistry
     protected string $currentType;
 
     public function __construct(
-        protected TypeRegistry $typeRegistry
+        protected TypeRegistry $typeRegistry,
     ) {}
 
     /**
      * @param  string  $typeName  The name of the ObjectType that can be resolved with the Node interface
+     * @param  NodeResolverFn  $resolver  A function that returns the actual value by ID
      *
      * @example "User"
-     *
-     * @param  \Closure  $resolve  A function that returns the actual value by ID
-     *
      * @example fn($id, GraphQLContext $context, ResolveInfo $resolveInfo) => $this->db->getUserById($id)
      */
-    public function registerNode(string $typeName, \Closure $resolve): self
+    public function registerNode(string $typeName, callable $resolver): self
     {
-        $this->nodeResolver[$typeName] = $resolve;
+        $this->nodeResolver[$typeName] = $resolver;
 
         return $this;
     }

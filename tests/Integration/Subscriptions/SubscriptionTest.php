@@ -63,7 +63,7 @@ GRAPHQL;
 
         $this->assertInstanceOf(Subscriber::class, $subscriber);
         $response->assertExactJson(
-            $this->buildResponse('onPostCreated', $subscriber->channel)
+            $this->buildResponse('onPostCreated', $subscriber->channel),
         );
     }
 
@@ -256,7 +256,7 @@ GRAPHQL;
                     'body' => 'bar',
                 ],
             ],
-            Arr::first($broadcasts)['data'] ?? null
+            Arr::first($broadcasts)['data'] ?? null,
         );
     }
 

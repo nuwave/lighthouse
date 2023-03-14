@@ -36,7 +36,7 @@ final class RelationBatchLoaderTest extends DBTestCase
             ->create()
             ->each(static function (User $user) use ($tasksPerUser): void {
                 $user->tasks()->saveMany(
-                    factory(Task::class, $tasksPerUser)->make()
+                    factory(Task::class, $tasksPerUser)->make(),
                 );
             });
 
@@ -95,7 +95,7 @@ final class RelationBatchLoaderTest extends DBTestCase
             ->create()
             ->each(static function (User $user) use ($tasksPerUser): void {
                 $user->tasks()->saveMany(
-                    factory(Task::class, $tasksPerUser)->make()
+                    factory(Task::class, $tasksPerUser)->make(),
                 );
             });
 
@@ -140,7 +140,7 @@ final class RelationBatchLoaderTest extends DBTestCase
             ->create()
             ->each(static function (User $user) use ($alternateConnectionsPerUser): void {
                 $user->alternateConnections()->saveMany(
-                    factory(AlternateConnection::class, $alternateConnectionsPerUser)->make()
+                    factory(AlternateConnection::class, $alternateConnectionsPerUser)->make(),
                 );
             });
 
@@ -185,7 +185,7 @@ final class RelationBatchLoaderTest extends DBTestCase
             ->create()
             ->each(static function (NullConnection $nullConnection) use ($usersPerNullConnection): void {
                 $nullConnection->users()->saveMany(
-                    factory(User::class, $usersPerNullConnection)->make()
+                    factory(User::class, $usersPerNullConnection)->make(),
                 );
             });
 
@@ -360,7 +360,7 @@ final class RelationBatchLoaderTest extends DBTestCase
             ->create()
             ->each(static function (User $user): void {
                 $user->tasks()->saveMany(
-                    factory(Task::class, 3)->make()
+                    factory(Task::class, 3)->make(),
                 );
             });
 
@@ -558,7 +558,7 @@ final class RelationBatchLoaderTest extends DBTestCase
         ');
 
         Cache::forget(
-            (new CacheKeyAndTagsGenerator())->key(null, false, 'Post', $post2->id, 'comments', [], ['posts', $post2->id, 'comments'])
+            (new CacheKeyAndTagsGenerator())->key(null, false, 'Post', $post2->id, 'comments', [], ['posts', $post2->id, 'comments']),
         );
 
         $secondRequest = $this->graphQL(/** @lang GraphQL */ '

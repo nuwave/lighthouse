@@ -50,7 +50,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
     {
         return array_merge(
             parent::getPackageProviders($app),
-            [WhereConditionsServiceProvider::class]
+            [WhereConditionsServiceProvider::class],
         );
     }
 
@@ -837,7 +837,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
                     ],
                 ],
             ],
-            $enum
+            $enum,
         );
     }
 

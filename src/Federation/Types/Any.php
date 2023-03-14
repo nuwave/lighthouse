@@ -81,7 +81,7 @@ DESCRIPTION;
     public function parseLiteral($valueNode, ?array $variables = null): array
     {
         return $this->parseValue(
-            AST::valueFromASTUntyped($valueNode)
+            AST::valueFromASTUntyped($valueNode),
         );
     }
 }

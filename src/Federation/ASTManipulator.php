@@ -25,13 +25,13 @@ class ASTManipulator
         $documentAST->setTypeDefinition(
             Parser::scalarTypeDefinition(/** @lang GraphQL */ '
             scalar _Any @scalar(class: "Nuwave\\\Lighthouse\\\Federation\\\Types\\\Any")
-            ')
+            '),
         );
 
         $documentAST->setTypeDefinition(
             Parser::scalarTypeDefinition(/** @lang GraphQL */ '
             scalar _FieldSet @scalar(class: "Nuwave\\\Lighthouse\\\Federation\\\Types\\\FieldSet")
-            ')
+            '),
         );
     }
 
@@ -64,7 +64,7 @@ class ASTManipulator
         $documentAST->setTypeDefinition(
             Parser::unionTypeDefinition(/** @lang GraphQL */ "
             union _Entity = {$entitiesString}
-            ")
+            "),
         );
     }
 
@@ -97,7 +97,7 @@ class ASTManipulator
             type _Service {
                 sdl: String
             }
-            ')
+            '),
         );
     }
 }

@@ -44,13 +44,13 @@ GRAPHQL;
 
                     return $value;
                 },
-                $argument->value
+                $argument->value,
             );
 
             if (
                 $argument->value instanceof ArgumentSet
                 && $argument->directives->contains(
-                    Utils::instanceofMatcher(static::class)
+                    Utils::instanceofMatcher(static::class),
                 )
             ) {
                 $next->arguments += $argument->value->arguments;

@@ -75,7 +75,7 @@ enum PartiallyDeprecated {
 }
 GRAPHQL
                 ,
-                SchemaPrinter::printType($enumType)
+                SchemaPrinter::printType($enumType),
             );
         } else {
             $this->assertSame(/** @lang GraphQL */ <<<GRAPHQL
@@ -91,7 +91,7 @@ enum PartiallyDeprecated {
 }
 GRAPHQL
                 ,
-                SchemaPrinter::printType($enumType)
+                SchemaPrinter::printType($enumType),
             );
         }
     }
@@ -105,7 +105,7 @@ GRAPHQL
         ';
 
         $this->typeRegistry->register(
-            new LaravelEnumType(AOrB::class)
+            new LaravelEnumType(AOrB::class),
         );
 
         $this->mockResolver()

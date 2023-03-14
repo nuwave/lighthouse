@@ -38,10 +38,10 @@ class ErrorPool
                     null,
                     [],
                     null,
-                    $throwable
+                    $throwable,
                 );
             },
-            $this->throwables
+            $this->throwables,
         );
     }
 

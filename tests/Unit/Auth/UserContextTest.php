@@ -2,29 +2,38 @@
 
 namespace Tests\Unit\Auth;
 
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Tests\TestCase;
 use Tests\Utils\Models\User;
 
-final class AuthDirectiveTest extends TestCase
+final class UserContextTest extends TestCase
 {
-    public function testResolveAuthenticatedUser(): void
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            name: String!
+        }
+
+        type Query {
+            user: User @mock
+        }
+        ';
+
+        $this->mockResolver(static fn ($_, array $args, GraphQLContext $context): ?Authenticatable => $context->user());
+    }
+
+    public function testResolveAuthenticatedUserUsingContext(): void
     {
         $user = new User();
         $user->name = 'foo';
         $this->be($user);
 
-        $this->schema = /** @lang GraphQL */ '
-        type User {
-            name: String!
-        }
-
-        type Query {
-            user: User! @auth
-        }
-        ';
-
         $this->graphQL(/** @lang GraphQL */ '
         {
             user {
@@ -40,24 +49,8 @@ final class AuthDirectiveTest extends TestCase
         ]);
     }
 
-    public function testResolveAuthenticatedUserWithGuardsArgument(): void
+    public function testResolveGuestUserUsingContext(): void
     {
-        $user = new User();
-        $user->name = 'foo';
-
-        $authFactory = $this->app->make(AuthFactory::class);
-        $authFactory->guard('web')->setUser($user);
-
-        $this->schema = /** @lang GraphQL */ '
-        type User {
-            name: String!
-        }
-
-        type Query {
-            user: User! @auth(guards: ["web"])
-        }
-        ';
-
         $this->graphQL(/** @lang GraphQL */ '
         {
             user {
@@ -66,14 +59,12 @@ final class AuthDirectiveTest extends TestCase
         }
         ')->assertJson([
             'data' => [
-                'user' => [
-                    'name' => $user->name,
-                ],
+                'user' => null,
             ],
         ]);
     }
 
-    public function testResolveAuthenticatedUserWithMultipleGuardsArgument(): void
+    public function testResolveAuthenticatedUserUsingContextWithMultipleGuards(): void
     {
         $config = $this->app->make(ConfigRepository::class);
 
@@ -88,21 +79,13 @@ final class AuthDirectiveTest extends TestCase
             ],
         ]));
 
+        $config->set('lighthouse.guards', ['web', 'api']);
+
         $user = new User();
         $user->name = 'foo';
 
         $authFactory = $this->app->make(AuthFactory::class);
         $authFactory->guard('api')->setUser($user);
-
-        $this->schema = /** @lang GraphQL */ '
-        type User {
-            name: String!
-        }
-
-        type Query {
-            user: User! @auth(guards: ["web", "api"])
-        }
-        ';
 
         $this->graphQL(/** @lang GraphQL */ '
         {

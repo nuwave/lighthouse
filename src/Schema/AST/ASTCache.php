@@ -25,7 +25,7 @@ class ASTCache
     {
         /** @var CacheConfig $cacheConfig */
         $cacheConfig = $config->get('lighthouse.schema_cache');
-        $this->enable = $cacheConfig['enable'];
+        $this->enable = (bool) $cacheConfig['enable'];
         $this->path = $cacheConfig['path'] ?? base_path('bootstrap/cache/lighthouse-schema.php');
     }
 
@@ -46,9 +46,9 @@ class ASTCache
     }
 
     /**
-     * @param \Closure(): DocumentAST $build
+     * @param  callable(): DocumentAST  $build
      */
-    public function fromCacheOrBuild(\Closure $build): DocumentAST
+    public function fromCacheOrBuild(callable $build): DocumentAST
     {
         if ($this->filesystem()->exists($this->path)) {
             $ast = require $this->path;

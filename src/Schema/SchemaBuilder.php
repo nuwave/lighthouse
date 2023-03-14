@@ -17,13 +17,13 @@ class SchemaBuilder
 
     public function __construct(
         protected TypeRegistry $typeRegistry,
-        protected ASTBuilder $astBuilder
+        protected ASTBuilder $astBuilder,
     ) {}
 
     public function schema(): Schema
     {
         return $this->schema ??= $this->build(
-            $this->astBuilder->documentAST()
+            $this->astBuilder->documentAST(),
         );
     }
 
@@ -57,7 +57,7 @@ class SchemaBuilder
 
         // Use lazy type loading to prevent unnecessary work
         $config->setTypeLoader(
-            fn (string $name): ?Type => $this->typeRegistry->search($name)
+            fn (string $name): ?Type => $this->typeRegistry->search($name),
         );
 
         // Enables introspection to list all types in the schema
@@ -65,12 +65,12 @@ class SchemaBuilder
             /**
              * @return array<string, \GraphQL\Type\Definition\Type>
              */
-            fn (): array => $this->typeRegistry->possibleTypes()
+            fn (): array => $this->typeRegistry->possibleTypes(),
         );
 
         // There is no way to resolve directives lazily, so we convert them eagerly
         $directiveFactory = new DirectiveFactory(
-            new ExecutableTypeNodeConverter($this->typeRegistry)
+            new ExecutableTypeNodeConverter($this->typeRegistry),
         );
 
         $directives = [];
@@ -79,7 +79,7 @@ class SchemaBuilder
         }
 
         $config->setDirectives(
-            array_merge(GraphQL::getStandardDirectives(), $directives)
+            array_merge(GraphQL::getStandardDirectives(), $directives),
         );
 
         return new Schema($config);

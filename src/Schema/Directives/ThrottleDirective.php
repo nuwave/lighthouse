@@ -23,7 +23,7 @@ class ThrottleDirective extends BaseDirective implements FieldMiddleware, FieldM
 {
     public function __construct(
         protected RateLimiter $limiter,
-        protected Request $request
+        protected Request $request,
     ) {}
 
     public static function definition(): string
@@ -95,7 +95,7 @@ GRAPHQL;
                     $limit['key'],
                     $limit['maxAttempts'],
                     $limit['decayMinutes'],
-                    "{$resolveInfo->parentType}.{$resolveInfo->fieldName}"
+                    "{$resolveInfo->parentType}.{$resolveInfo->fieldName}",
                 );
             }
 

@@ -37,12 +37,12 @@ GRAPHQL;
             Parser::parse(
                 self::SCHEMA,
                 // Ignore location since it only bloats the AST
-                ['noLocation' => true]
-            )
+                ['noLocation' => true],
+            ),
         );
 
         $this->documentAST = serialize(
-            DocumentAST::fromSource(self::SCHEMA)
+            DocumentAST::fromSource(self::SCHEMA),
         );
     }
 

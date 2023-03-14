@@ -447,7 +447,7 @@ final class HasManyDirectiveTest extends DBTestCase
         $user->tasks()->saveMany($tasks);
 
         $user->posts()->saveMany(
-            factory(Post::class, 3)->make()
+            factory(Post::class, 3)->make(),
         );
 
         $this->schema = /** @lang GraphQL */ '
@@ -725,7 +725,7 @@ final class HasManyDirectiveTest extends DBTestCase
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(3, 5),
-            $result->json('errors.0.message')
+            $result->json('errors.0.message'),
         );
     }
 
@@ -767,7 +767,7 @@ final class HasManyDirectiveTest extends DBTestCase
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(2, 3),
-            $result->json('errors.0.message')
+            $result->json('errors.0.message'),
         );
     }
 
@@ -811,7 +811,7 @@ final class HasManyDirectiveTest extends DBTestCase
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(2, 3),
-            $result->json('errors.0.message')
+            $result->json('errors.0.message'),
         );
     }
 

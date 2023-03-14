@@ -77,8 +77,8 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
                     static fn (): RelationBatchLoader => new RelationBatchLoader(
                         null === $paginationArgs
                             ? new SimpleModelsLoader($relationName, $decorateBuilder)
-                            : new PaginatedModelsLoader($relationName, $decorateBuilder, $paginationArgs)
-                    )
+                            : new PaginatedModelsLoader($relationName, $decorateBuilder, $paginationArgs),
+                    ),
                 );
 
                 return $relationBatchLoader->load($parent);
@@ -95,7 +95,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
     public function manipulateFieldDefinition(
         DocumentAST &$documentAST,
         FieldDefinitionNode &$fieldDefinition,
-        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
     ): void {
         $paginationType = $this->paginationType();
 
@@ -123,7 +123,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
             $parentType,
             $this->paginationDefaultCount(),
             $this->paginationMaxCount(),
-            $this->edgeType($documentAST)
+            $this->edgeType($documentAST),
         );
     }
 

@@ -42,7 +42,7 @@ GRAPHQL;
                             $this->drop($value);
                         }
                     },
-                    $argument->value
+                    $argument->value,
                 );
             }
         }

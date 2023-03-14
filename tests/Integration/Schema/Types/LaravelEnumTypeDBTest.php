@@ -36,7 +36,7 @@ final class LaravelEnumTypeDBTest extends DBTestCase
         ';
 
         $this->typeRegistry->register(
-            new LaravelEnumType(AOrB::class)
+            new LaravelEnumType(AOrB::class),
         );
 
         $typeA = [
@@ -76,7 +76,7 @@ final class LaravelEnumTypeDBTest extends DBTestCase
         ';
 
         $this->typeRegistry->register(
-            new LaravelEnumType(AOrB::class)
+            new LaravelEnumType(AOrB::class),
         );
 
         $encodedType = \Safe\json_encode([AOrB::A]);
@@ -115,7 +115,7 @@ final class LaravelEnumTypeDBTest extends DBTestCase
         ';
 
         $this->typeRegistry->register(
-            new LaravelEnumType(AOrB::class)
+            new LaravelEnumType(AOrB::class),
         );
 
         $a = AOrB::A();

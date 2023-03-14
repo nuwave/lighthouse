@@ -43,8 +43,8 @@ final class GraphQLTest extends TestCase
                             foo
                         }
                         ',
-                    ]
-                )
+                    ],
+                ),
             )
             ->assertExactJson([
                 'data' => [

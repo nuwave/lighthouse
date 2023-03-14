@@ -13,7 +13,7 @@ final class WithExtensionsException extends \Exception implements ClientAware, P
     public function __construct(
         string $message,
         /** @var ExtensionsContent $extensionsContent */
-        protected array $extensionsContent
+        protected array $extensionsContent,
     ) {
         parent::__construct($message);
     }

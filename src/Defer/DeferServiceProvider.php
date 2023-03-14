@@ -33,7 +33,7 @@ class DeferServiceProvider extends ServiceProvider
     {
         ASTHelper::attachDirectiveToObjectTypeFields(
             $manipulateAST->documentAST,
-            Parser::constDirective(/** @lang GraphQL */ '@deferrable')
+            Parser::constDirective(/** @lang GraphQL */ '@deferrable'),
         );
 
         $manipulateAST->documentAST->setDirectiveDefinition(
@@ -45,7 +45,7 @@ Must not be placed upon:
 - Mutation root fields
 """
 directive @defer(if: Boolean = true) on FIELD
-')
+'),
         );
     }
 }

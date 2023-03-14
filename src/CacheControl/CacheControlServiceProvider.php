@@ -45,7 +45,7 @@ class CacheControlServiceProvider extends ServiceProvider
                     if (null !== $cacheControlDirective) {
                         if (! ASTHelper::directiveArgValue($cacheControlDirective, 'inheritMaxAge')) {
                             $cacheControl->addMaxAge(
-                                ASTHelper::directiveArgValue($cacheControlDirective, 'maxAge') ?? 0
+                                ASTHelper::directiveArgValue($cacheControlDirective, 'maxAge') ?? 0,
                             );
                         }
 

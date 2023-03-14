@@ -36,7 +36,7 @@ final class HasManyDirectiveTest extends DBTestCase
         $expectedConnectionName = 'TaskEdgeConnection';
 
         $this->assertNotEmpty(
-            $this->introspectType($expectedConnectionName)
+            $this->introspectType($expectedConnectionName),
         );
 
         $user = $this->introspectType('User');
@@ -45,11 +45,11 @@ final class HasManyDirectiveTest extends DBTestCase
         /** @var array<string, mixed> $user */
         $tasks = Arr::first(
             $user['fields'],
-            static fn (array $field): bool => 'tasks' === $field['name']
+            static fn (array $field): bool => 'tasks' === $field['name'],
         );
         $this->assertSame(
             $expectedConnectionName,
-            $tasks['type']['ofType']['name']
+            $tasks['type']['ofType']['name'],
         );
     }
 

@@ -28,7 +28,7 @@ final class ValidationTest extends TestCase
     public function testRunsValidationBeforeCallingTheResolver(): void
     {
         $this->mockResolverExpects(
-            $this->never()
+            $this->never(),
         );
 
         $this->schema = /** @lang GraphQL */ '

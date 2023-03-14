@@ -11,7 +11,7 @@ use Nuwave\Lighthouse\Schema\AST\TypeNodeConverter;
 class FallbackTypeNodeConverter extends TypeNodeConverter
 {
     public function __construct(
-        protected TypeRegistry $typeRegistry
+        protected TypeRegistry $typeRegistry,
     ) {}
 
     protected function nonNull(mixed $type): NonNull

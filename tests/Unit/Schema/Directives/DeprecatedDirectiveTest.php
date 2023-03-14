@@ -51,7 +51,7 @@ final class DeprecatedDirectiveTest extends TestCase
             $introspectionQuery,
             [
                 'includeDeprecated' => false,
-            ]
+            ],
         );
 
         $withoutDeprecatedIntrospection->assertJsonCount(1, 'data.__schema.queryType.fields');
@@ -64,23 +64,23 @@ final class DeprecatedDirectiveTest extends TestCase
             $introspectionQuery,
             [
                 'includeDeprecated' => true,
-            ]
+            ],
         );
 
         $deprecatedFields = Arr::where(
             $includeDeprecatedIntrospection->json('data.__schema.queryType.fields'),
-            static fn (array $field): bool => $field['isDeprecated']
+            static fn (array $field): bool => $field['isDeprecated'],
         );
         $this->assertCount(2, $deprecatedFields);
         $this->assertSame(
             $reason,
             $deprecatedFields[0]['deprecationReason'],
-            'Should show user-defined deprecation reason.'
+            'Should show user-defined deprecation reason.',
         );
         $this->assertSame(
             Directive::DEFAULT_DEPRECATION_REASON,
             $deprecatedFields[1]['deprecationReason'],
-            'Should fallback to the default deprecation reason'
+            'Should fallback to the default deprecation reason',
         );
 
         $types = $includeDeprecatedIntrospection->json('data.__schema.types');

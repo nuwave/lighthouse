@@ -238,7 +238,7 @@ function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolv
 
 ### Replace `Nuwave\Lighthouse\GraphQL::executeQuery()` usage
 
-Use `parseAndExecuteQuery()` for executing a string query or `executeParsedQuery()` for 
+Use `executeQueryString()` for executing a string query or `executeParsedQuery()` for 
 executing an already parsed `DocumentNode` instance.
 
 ### Removed error extension field `category`
@@ -305,6 +305,29 @@ in your `app/config.php`, it is no longer registered by default.
 'providers' => [
     \Nuwave\Lighthouse\Scout\ScoutServiceProvider::class,
 ],
+```
+
+### Update `lighthouse.guard` configuration
+
+The `lighthouse.guard` configuration key was renamed to `lighthouse.guards` and expects an array.
+
+```diff
+- 'guard' => 'api',
++ 'guards' => ['api'],
+```
+
+If `lighthouse.guards` configuration is missing,
+the default Laravel authentication guard will be used (`auth.defaults.guard`).
+
+### Update `@auth` and `@whereAuth` directives
+
+The `guard` argument on `@auth` and `@whereAuth` directives has been renamed to `guards` and now expects a list instead of a single string.
+
+```diff
+- @auth(guard: "api")
++ @auth(guards: ["api"])
+- @whereAuth(guard: "api")
++ @whereAuth(guards: ["api"])
 ```
 
 ## v4 to v5

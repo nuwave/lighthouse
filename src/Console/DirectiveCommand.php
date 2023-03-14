@@ -136,32 +136,32 @@ class DirectiveCommand extends LighthouseGeneratorCommand
                 ->filter()
                 ->unique()
                 ->implode("\n"),
-            $stub
+            $stub,
         );
 
         $directiveName = parent::getNameInput();
         $stub = str_replace(
             '{{ name }}',
             lcfirst($directiveName),
-            $stub
+            $stub,
         );
 
         $stub = str_replace(
             '{{ locations }}',
             $this->possibleLocations->implode(' | '),
-            $stub
+            $stub,
         );
 
         $stub = str_replace(
             '{{ methods }}',
             $this->methodStubs->implode("\n"),
-            $stub
+            $stub,
         );
 
         return str_replace(
             '{{ implements }}',
             $this->implementedInterfaces->implode(', '),
-            $stub
+            $stub,
         );
     }
 
@@ -177,7 +177,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
             $availableInterfaces,
             null,
             null,
-            true
+            true,
         );
         assert(is_array($implementedInterfaces), 'Because we set $multiple = true');
 
@@ -196,7 +196,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
             $availableLocations,
             null,
             null,
-            true
+            true,
         );
         assert(is_array($usedLocations), 'Because we set $multiple = true');
 
@@ -245,14 +245,14 @@ class DirectiveCommand extends LighthouseGeneratorCommand
     protected function interfaceMethods(string $interface): ?string
     {
         return $this->getFileIfExists(
-            __DIR__ . '/stubs/directives/' . Str::snake($interface) . '_methods.stub'
+            __DIR__ . '/stubs/directives/' . Str::snake($interface) . '_methods.stub',
         );
     }
 
     protected function interfaceImports(string $interface): ?string
     {
         return $this->getFileIfExists(
-            __DIR__ . '/stubs/directives/' . Str::snake($interface) . '_imports.stub'
+            __DIR__ . '/stubs/directives/' . Str::snake($interface) . '_imports.stub',
         );
     }
 

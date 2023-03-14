@@ -16,7 +16,7 @@ class SaveModel implements ArgResolver
         /**
          * @var \Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>|null $parentRelation
          */
-        protected ?Relation $parentRelation = null
+        protected ?Relation $parentRelation = null,
     ) {}
 
     /**
@@ -29,13 +29,13 @@ class SaveModel implements ArgResolver
         [$morphTo, $remaining] = ArgPartitioner::relationMethods(
             $args,
             $model,
-            MorphTo::class
+            MorphTo::class,
         );
 
         [$belongsTo, $remaining] = ArgPartitioner::relationMethods(
             $remaining,
             $model,
-            BelongsTo::class
+            BelongsTo::class,
         );
 
         $argsToFill = $remaining->toArray();

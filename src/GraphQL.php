@@ -56,8 +56,104 @@ class GraphQL
         protected ErrorPool $errorPool,
         protected ProvidesValidationRules $providesValidationRules,
         protected GraphQLHelper $graphQLHelper,
-        protected ConfigRepository $configRepository
+        protected ConfigRepository $configRepository,
     ) {}
+
+    /**
+     * Parses query and executes it.
+     *
+     * @api
+     *
+     * @param array<string, mixed>|null $variables
+     *
+     * @return array<string, mixed>
+     */
+    public function executeQueryString(
+        string $query,
+        GraphQLContext $context,
+        ?array $variables = [],
+        mixed $root = null,
+        ?string $operationName = null,
+    ): array {
+        try {
+            $parsedQuery = $this->parse($query);
+        } catch (SyntaxError $syntaxError) {
+            return $this->toSerializableArray(
+                new ExecutionResult(null, [$syntaxError]),
+            );
+        }
+
+        return $this->executeParsedQuery($parsedQuery, $context, $variables, $root, $operationName);
+    }
+
+    /**
+     * Execute a GraphQL query on the Lighthouse schema and return the raw result.
+     *
+     * @api
+     *
+     * To render the @see \GraphQL\Executor\ExecutionResult
+     * you will probably want to call `->toArray($debug)` on it,
+     * with $debug being a combination of flags in @see \GraphQL\Error\DebugFlag
+     *
+     * @param array<string, mixed>|null $variables
+     *
+     * @return array<string, mixed>
+     */
+    public function executeParsedQuery(
+        DocumentNode $query,
+        GraphQLContext $context,
+        ?array $variables = [],
+        mixed $root = null,
+        ?string $operationName = null,
+    ): array {
+        // Building the executable schema might take a while to do,
+        // so we do it before we fire the StartExecution event.
+        // This allows tracking the time for batched queries independently.
+        $schema = $this->schemaBuilder->schema();
+
+        $this->eventDispatcher->dispatch(
+            new StartExecution($schema, $query, $variables, $operationName, $context),
+        );
+
+        $result = GraphQLBase::executeQuery(
+            $schema,
+            $query,
+            $root,
+            $context,
+            $variables,
+            $operationName,
+            null,
+            $this->providesValidationRules->validationRules(),
+        );
+
+        /** @var array<\Nuwave\Lighthouse\Execution\ExtensionsResponse|null> $extensionsResponses */
+        $extensionsResponses = (array) $this->eventDispatcher->dispatch(
+            new BuildExtensionsResponse(),
+        );
+
+        foreach ($extensionsResponses as $extensionsResponse) {
+            if (null !== $extensionsResponse) {
+                $result->extensions[$extensionsResponse->key] = $extensionsResponse->content;
+            }
+        }
+
+        foreach ($this->errorPool->errors() as $error) {
+            $result->errors[] = $error;
+        }
+
+        // Allow listeners to manipulate the result after each resolved query
+        $this->eventDispatcher->dispatch(
+            new ManipulateResult($result),
+        );
+
+        $this->eventDispatcher->dispatch(
+            new EndExecution($result),
+        );
+
+        $this->cleanUpAfterExecution();
+
+        return $this->toSerializableArray($result);
+    }
 
     /**
      * Run one or more GraphQL operations against the schema.
@@ -71,7 +167,7 @@ class GraphQL
     public function executeOperationOrOperations(OperationParams|array $operationOrOperations, GraphQLContext $context): array
     {
         $this->eventDispatcher->dispatch(
-            new StartOperationOrOperations($operationOrOperations)
+            new StartOperationOrOperations($operationOrOperations),
         );
 
         $resultOrResults = LighthouseUtils::mapEach(
@@ -79,11 +175,11 @@ class GraphQL
              * @return array<string, mixed>
              */
             fn (OperationParams $operationParams): array => $this->executeOperation($operationParams, $context),
-            $operationOrOperations
+            $operationOrOperations,
         );
 
         $this->eventDispatcher->dispatch(
-            new EndOperationOrOperations($resultOrResults)
+            new EndOperationOrOperations($resultOrResults),
         );
 
         return $resultOrResults;
@@ -103,71 +199,46 @@ class GraphQL
         if ([] !== $errors) {
             $errors = array_map(
                 static fn (RequestError $err): Error => Error::createLocatedError($err),
-                $errors
+                $errors,
             );
 
-            return $this->serializable(
-                new ExecutionResult(null, $errors)
+            return $this->toSerializableArray(
+                new ExecutionResult(null, $errors),
             );
         }
 
         $queryString = $params->query;
         if (is_string($queryString)) {
-            $result = $this->parseAndExecuteQuery(
+            return $this->executeQueryString(
                 $queryString,
                 $context,
                 $params->variables,
                 null,
-                $params->operation
+                $params->operation,
             );
-        } else {
-            try {
-                $result = $this->executeParsedQuery(
-                    $this->loadPersistedQuery($params->queryId),
-                    $context,
-                    $params->variables,
-                    null,
-                    $params->operation
-                );
-            } catch (Error $error) {
-                return $this->serializable(
-                    new ExecutionResult(null, [$error])
-                );
-            }
         }
 
-        return $this->serializable($result);
-    }
-
-    /**
-     * Parses query and executes it.
-     *
-     * @api
-     *
-     * @param array<string, mixed>|null $variables
-     */
-    public function parseAndExecuteQuery(
-        string $query,
-        GraphQLContext $context,
-        ?array $variables = [],
-        mixed $root = null,
-        ?string $operationName = null
-    ): ExecutionResult {
         try {
-            $parsedQuery = $this->parse($query);
-        } catch (SyntaxError $syntaxError) {
-            return new ExecutionResult(null, [$syntaxError]);
+            return $this->executeParsedQuery(
+                $this->loadPersistedQuery($params->queryId),
+                $context,
+                $params->variables,
+                null,
+                $params->operation,
+            );
+        } catch (Error $error) {
+            return $this->toSerializableArray(
+                new ExecutionResult(null, [$error]),
+            );
         }
-
-        return $this->executeParsedQuery($parsedQuery, $context, $variables, $root, $operationName);
     }
 
     /**
      * Parse the given query string into a DocumentNode.
      *
-     * @api
-     *
      * Caches the parsed result if the query cache is enabled in the configuration.
+     *
+     * @api
      */
     public function parse(string $query): DocumentNode
     {
@@ -183,75 +254,8 @@ class GraphQL
         return $store->remember(
             'lighthouse:query:' . hash('sha256', $query),
             $cacheConfig['ttl'],
-            static fn (): DocumentNode => Parser::parse($query)
+            static fn (): DocumentNode => Parser::parse($query),
         );
-    }
-
-    /**
-     * Execute a GraphQL query on the Lighthouse schema and return the raw result.
-     *
-     * @api
-     *
-     * To render the @see \GraphQL\Executor\ExecutionResult
-     * you will probably want to call `->toArray($debug)` on it,
-     * with $debug being a combination of flags in @see \GraphQL\Error\DebugFlag
-     *
-     * @param array<string, mixed>|null $variables
-     */
-    public function executeParsedQuery(
-        DocumentNode $query,
-        GraphQLContext $context,
-        ?array $variables = [],
-        mixed $root = null,
-        ?string $operationName = null
-    ): ExecutionResult {
-        // Building the executable schema might take a while to do,
-        // so we do it before we fire the StartExecution event.
-        // This allows tracking the time for batched queries independently.
-        $schema = $this->schemaBuilder->schema();
-
-        $this->eventDispatcher->dispatch(
-            new StartExecution($schema, $query, $variables, $operationName, $context)
-        );
-
-        $result = GraphQLBase::executeQuery(
-            $schema,
-            $query,
-            $root,
-            $context,
-            $variables,
-            $operationName,
-            null,
-            $this->providesValidationRules->validationRules()
-        );
-
-        /** @var array<\Nuwave\Lighthouse\Execution\ExtensionsResponse|null> $extensionsResponses */
-        $extensionsResponses = (array) $this->eventDispatcher->dispatch(
-            new BuildExtensionsResponse()
-        );
-
-        foreach ($extensionsResponses as $extensionsResponse) {
-            if (null !== $extensionsResponse) {
-                $result->extensions[$extensionsResponse->key] = $extensionsResponse->content;
-            }
-        }
-
-        foreach ($this->errorPool->errors() as $error) {
-            $result->errors[] = $error;
-        }
-
-        // Allow listeners to manipulate the result after each resolved query
-        $this->eventDispatcher->dispatch(
-            new ManipulateResult($result)
-        );
-
-        $this->eventDispatcher->dispatch(
-            new EndExecution($result)
-        );
-
-        $this->cleanUpAfterExecution();
-
-        return $result;
     }
 
     /**
@@ -261,7 +265,7 @@ class GraphQL
      *
      * @return SerializableResult
      */
-    public function serializable(ExecutionResult $result): array
+    public function toSerializableArray(ExecutionResult $result): array
     {
         $result->setErrorsHandler($this->errorsHandler());
 
@@ -287,7 +291,7 @@ class GraphQL
                 [],
                 null,
                 null,
-                ['code' => 'PERSISTED_QUERY_NOT_SUPPORTED']
+                ['code' => 'PERSISTED_QUERY_NOT_SUPPORTED'],
             );
         }
 
@@ -303,15 +307,8 @@ class GraphQL
                 [],
                 null,
                 null,
-                ['code' => 'PERSISTED_QUERY_NOT_FOUND']
+                ['code' => 'PERSISTED_QUERY_NOT_FOUND'],
             );
-    }
-
-    protected function cleanUpAfterExecution(): void
-    {
-        BatchLoaderRegistry::forgetInstances();
-        FieldValue::clear();
-        $this->errorPool->clear();
     }
 
     /**
@@ -336,7 +333,7 @@ class GraphQL
                         ->then(
                             static fn (?Error $error): ?array => null === $error
                                 ? null
-                                : $formatter($error)
+                                : $formatter($error),
                         ))
                     ->filter()
                     ->all();
@@ -354,5 +351,12 @@ class GraphQL
         return $this->configRepository->get('app.debug')
             ? (int) $this->configRepository->get('lighthouse.debug')
             : DebugFlag::NONE;
+    }
+
+    protected function cleanUpAfterExecution(): void
+    {
+        BatchLoaderRegistry::forgetInstances();
+        FieldValue::clear();
+        $this->errorPool->clear();
     }
 }

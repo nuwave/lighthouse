@@ -29,7 +29,7 @@ GRAPHQL;
     {
         return $builder->whereJsonContains(
             $this->directiveArgValue('key', $this->nodeName()),
-            $value
+            $value,
         );
     }
 }

@@ -37,7 +37,7 @@ GRAPHQL;
                         $this->rename($value);
                     }
                 },
-                $argument->value
+                $argument->value,
             );
 
             $maybeRenameDirective = $argument->directives->first(static fn (Directive $directive): bool => $directive instanceof RenameDirective);

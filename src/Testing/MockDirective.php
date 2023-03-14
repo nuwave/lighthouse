@@ -9,7 +9,7 @@ use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 class MockDirective extends BaseDirective implements FieldResolver
 {
     public function __construct(
-        protected MockResolverService $mockResolverService
+        protected MockResolverService $mockResolverService,
     ) {}
 
     /**
