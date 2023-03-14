@@ -9,7 +9,6 @@ use GraphQL\Error\InvariantViolation;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Type\Definition\ScalarType;
-use GraphQL\Utils\Utils;
 use Illuminate\Support\Carbon as IlluminateCarbon;
 
 abstract class DateScalar extends ScalarType
@@ -67,8 +66,6 @@ abstract class DateScalar extends ScalarType
                     || $value::class === CarbonImmutable::class
                 )
             ) {
-                assert($value instanceof CarbonCarbon || $value instanceof CarbonImmutable);
-
                 $carbon = IlluminateCarbon::create(
                     $value->year,
                     $value->month,
@@ -78,16 +75,14 @@ abstract class DateScalar extends ScalarType
                     $value->second,
                     $value->timezone,
                 );
-                assert($carbon instanceof IlluminateCarbon, 'Given we had a valid Carbon instance5 before, this can not fail.');
+                assert($carbon instanceof IlluminateCarbon, 'Given we had a valid Carbon instance before, this can not fail.');
 
                 return $carbon;
             }
 
             return $this->parse($value);
         } catch (\Exception $exception) {
-            throw new $exceptionClass(
-                Utils::printSafeJson($exception->getMessage()),
-            );
+            throw new $exceptionClass($exception->getMessage());
         }
     }
 

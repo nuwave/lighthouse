@@ -84,11 +84,9 @@ class TestResponseMixin
             $messages = $this->json('errors.*.message');
 
             Assert::assertIsArray($messages, 'Expected the GraphQL response to contain errors, got none.');
-            Assert::assertContains(
-                $message,
-                $messages,
-                "Expected the GraphQL response to contain error message `{$message}`, got: " . \Safe\json_encode($messages),
-            );
+
+            $messagesString = \Safe\json_encode($messages);
+            Assert::assertContains($message, $messages, "Expected the GraphQL response to contain error message \"{$message}\", got: {$messagesString}.");
 
             return $this;
         };
@@ -100,11 +98,9 @@ class TestResponseMixin
             $messages = $this->json('errors.*.extensions.debugMessage');
 
             Assert::assertIsArray($messages, 'Expected the GraphQL response to contain errors, got none.');
-            Assert::assertContains(
-                $message,
-                $messages,
-                "Expected the GraphQL response to contain debug message `{$message}`, got: " . \Safe\json_encode($messages),
-            );
+
+            $messagesString = \Safe\json_encode($messages);
+            Assert::assertContains($message, $messages, "Expected the GraphQL response to contain debug message \"{$message}\", got: {$messagesString}.");
 
             return $this;
         };
@@ -114,10 +110,8 @@ class TestResponseMixin
     {
         return function (): TestResponse {
             $errors = $this->json('errors');
-            Assert::assertNull(
-                $errors,
-                'Expected the GraphQL response to contain no errors, got: ' . \Safe\json_encode($errors),
-            );
+            $errorsString = \Safe\json_encode($errors);
+            Assert::assertNull($errors, "Expected the GraphQL response to contain no errors, got: {$errorsString}.");
 
             return $this;
         };

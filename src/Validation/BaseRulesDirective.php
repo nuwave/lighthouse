@@ -6,6 +6,7 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Utils\Utils;
 use Illuminate\Container\Container;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
@@ -138,8 +139,8 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
      */
     protected function invalidMessageArgument(mixed $messages): void
     {
-        $encoded = \Safe\json_encode($messages);
-        throw new DefinitionException("The `messages` argument of @`{$this->name()}` on `{$this->nodeName()} must be a list of input values with the string keys `rule` and `message`, got: {$encoded}");
+        $notListOfInputValues = Utils::printSafeJson($messages);
+        throw new DefinitionException("The `messages` argument of @`{$this->name()}` on `{$this->nodeName()} must be a list of input values with the string keys `rule` and `message`, got: {$notListOfInputValues}.");
     }
 
     /**
@@ -149,7 +150,7 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
      */
     protected function invalidApplyArgument(mixed $apply): void
     {
-        $encoded = \Safe\json_encode($apply);
-        throw new DefinitionException("The `apply` argument of @`{$this->name()}` on `{$this->nodeName()}` has to be a list of strings, got: {$encoded}");
+        $notListOfStrings = Utils::printSafeJson($apply);
+        throw new DefinitionException("The `apply` argument of @`{$this->name()}` on `{$this->nodeName()}` has to be a list of strings, got: {$notListOfStrings}.");
     }
 }

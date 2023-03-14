@@ -76,7 +76,7 @@ public function testCreatePost(): void
 }
 ```
 
-You can run a subscription query the same way. 
+You can run a subscription query the same way.
 
 ```php
 public function testPostsSubscription(): void
@@ -186,7 +186,7 @@ To assert the subscription actually received some broadcasts:
 // any other way to broadcast would also work
 Subscription::broadcast('postUpdated', ['title' => 'foo']);
 Subscription::broadcast('postUpdated', ['title' => 'bar']);
- 
+
 $response->assertGraphQLBroadcasted([
     ['title' => 'foo'],
     ['title' => 'bar'],
@@ -197,7 +197,7 @@ To assert the subscription received no broadcasts:
 
 ```
 // nothing that causes a broadcast to this channel
- 
+
 $response->assertGraphQLNotBroadcasted();
 ```
 

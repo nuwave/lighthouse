@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Subscriptions\Storage;
 
+use GraphQL\Utils\Utils;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
@@ -35,17 +36,21 @@ class CacheStorageManager implements StoresSubscriptions
     {
         $storage = $config->get('lighthouse.subscriptions.storage') ?? 'file';
         if (! is_string($storage)) {
-            throw new \Exception('Config setting lighthouse.subscriptions.storage must be a string or `null`, got: ' . \Safe\json_encode($storage));
+            $notStringOrNull = Utils::printSafe($storage);
+            throw new \Exception("Expected config option lighthouse.subscriptions.storage to be a string or null, got: {$notStringOrNull}.");
         }
 
         $this->cache = $cacheFactory->store($storage);
 
         $ttl = $config->get('lighthouse.subscriptions.storage_ttl');
-        if (! is_null($ttl) && ! is_int($ttl)) {
-            throw new \Exception('Config setting lighthouse.subscriptions.storage_ttl must be a int or `null`, got: ' . \Safe\json_encode($ttl));
+        if (is_int($ttl) || is_null($ttl)) {
+            $this->ttl = $ttl;
+        } elseif (is_string($ttl) && is_numeric($ttl)) {
+            $this->ttl = (int) $ttl;
+        } else {
+            $notIntOrNumericString = Utils::printSafe($ttl);
+            throw new \Exception("Expected config option lighthouse.subscriptions.storage_ttl to be an int, null or a numeric string, got: {$notIntOrNumericString}.");
         }
-
-        $this->ttl = $ttl;
     }
 
     public function subscriberByChannel(string $channel): ?Subscriber
