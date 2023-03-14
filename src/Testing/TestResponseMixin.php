@@ -86,7 +86,7 @@ class TestResponseMixin
             Assert::assertIsArray($messages, 'Expected the GraphQL response to contain errors, got none.');
 
             $messagesString = \Safe\json_encode($messages);
-            Assert::assertContains($message, $messages, "Expected the GraphQL response to contain error message \"{$message}\", got: {$messagesString}.",);
+            Assert::assertContains($message, $messages, "Expected the GraphQL response to contain error message \"{$message}\", got: {$messagesString}.");
 
             return $this;
         };
@@ -100,7 +100,7 @@ class TestResponseMixin
             Assert::assertIsArray($messages, 'Expected the GraphQL response to contain errors, got none.');
 
             $messagesString = \Safe\json_encode($messages);
-            Assert::assertContains($message, $messages, "Expected the GraphQL response to contain debug message \"{$message}\", got: {$messagesString}.",);
+            Assert::assertContains($message, $messages, "Expected the GraphQL response to contain debug message \"{$message}\", got: {$messagesString}.");
 
             return $this;
         };

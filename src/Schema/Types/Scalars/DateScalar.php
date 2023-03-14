@@ -9,7 +9,6 @@ use GraphQL\Error\InvariantViolation;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Type\Definition\ScalarType;
-use GraphQL\Utils\Utils;
 use Illuminate\Support\Carbon as IlluminateCarbon;
 
 abstract class DateScalar extends ScalarType

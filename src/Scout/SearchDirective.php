@@ -30,7 +30,7 @@ GRAPHQL;
         if ($within !== null) {
             if (! is_string($within)) {
                 $notString = Utils::printSafeJson($within);
-                throw new DefinitionException("Expected the value of the `within` argument of @{$this->name()} on {$this->nodeName()} to be a string, got: {$notString}.",);
+                throw new DefinitionException("Expected the value of the `within` argument of @{$this->name()} on {$this->nodeName()} to be a string, got: {$notString}.");
             }
 
             $builder->within($within);
