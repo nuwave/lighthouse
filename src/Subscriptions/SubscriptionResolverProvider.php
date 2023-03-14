@@ -39,45 +39,34 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
         }
 
         $namespacesToTry = RootType::defaultNamespaces($fieldValue->getParentName());
-        $className = Utils::namespaceClassname(
+        $namespacedClassName = Utils::namespaceClassname(
             $className,
             $namespacesToTry,
             static fn (string $class): bool => is_subclass_of($class, GraphQLSubscription::class),
         );
 
-        if (null === $className) {
+        if (null === $namespacedClassName) {
             $subscriptionClass = GraphQLSubscription::class;
             $consideredNamespaces = implode(', ', $namespacesToTry);
-            throw new DefinitionException(
-                "Failed to find class {$className} extends {$subscriptionClass} in namespaces [{$consideredNamespaces}] for the subscription field {$fieldName}",
-            );
+            throw new DefinitionException("Failed to find class {$className} extends {$subscriptionClass} in namespaces [{$consideredNamespaces}] for the subscription field {$fieldName}.");
         }
 
-        assert(is_subclass_of($className, GraphQLSubscription::class));
+        assert(is_subclass_of($namespacedClassName, GraphQLSubscription::class));
 
-        $subscription = Container::getInstance()->make($className);
+        $subscription = Container::getInstance()->make($namespacedClassName);
         // Subscriptions can only be placed on a single field on the root
         // query, so there is no need to consider the field path
-        $this->subscriptionRegistry->register(
-            $subscription,
-            $fieldName,
-        );
+        $this->subscriptionRegistry->register($subscription, $fieldName);
 
         return function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($subscription, $fieldName) {
             if ($root instanceof Subscriber) {
                 return $subscription->resolve($root->root, $args, $context, $resolveInfo);
             }
 
-            $subscriber = new Subscriber(
-                $args,
-                $context,
-                $resolveInfo,
-            );
+            $subscriber = new Subscriber($args, $context, $resolveInfo);
 
             if (! $subscription->can($subscriber)) {
-                throw new UnauthorizedSubscriber(
-                    'Unauthorized subscription request',
-                );
+                throw new UnauthorizedSubscriber('Unauthorized subscription request');
             }
 
             $this->subscriptionRegistry->subscriber(
