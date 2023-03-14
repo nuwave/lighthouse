@@ -43,7 +43,7 @@ GRAPHQL;
     /**
      * Return the first logged-in user to any of the given guards.
      *
-     * @param  array<string|null>  $guards
+     * @param  array<string>  $guards
      */
     protected function authenticatedUser(array $guards): ?Authenticatable
     {
