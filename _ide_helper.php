@@ -137,7 +137,7 @@ class TestResponse
     }
 
     /**
-     * Assert a subscription actually received a broadcast.
+     * Assert the subscription received the given broadcasts.
      *
      * @param  array<int, array<string, mixed>>  $data  the broadcast pattern that you are expecting
      *
