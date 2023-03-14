@@ -18,7 +18,7 @@ class RootType
                 static::QUERY,
                 static::MUTATION,
                 static::SUBSCRIPTION,
-            ]
+            ],
         );
     }
 

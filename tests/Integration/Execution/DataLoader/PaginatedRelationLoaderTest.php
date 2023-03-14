@@ -19,13 +19,13 @@ final class PaginatedRelationLoaderTest extends DBTestCase
         $user1 = factory(User::class)->create();
         assert($user1 instanceof User);
         $user1->tasks()->saveMany(
-            factory(Task::class, 5)->make()
+            factory(Task::class, 5)->make(),
         );
 
         $user2 = factory(User::class)->create();
         assert($user2 instanceof User);
         $user2->tasks()->saveMany(
-            factory(Task::class, 2)->make()
+            factory(Task::class, 2)->make(),
         );
 
         $pageSize = 3;
@@ -33,7 +33,7 @@ final class PaginatedRelationLoaderTest extends DBTestCase
         (new PaginatedModelsLoader(
             'tasks',
             static function (): void {},
-            $this->makePaginationArgs($pageSize)
+            $this->makePaginationArgs($pageSize),
         ))->load($users);
 
         $firstUser = $users[0];
@@ -59,14 +59,14 @@ final class PaginatedRelationLoaderTest extends DBTestCase
         assert($user1 instanceof User);
         $firstTasksCount = 1;
         $user1->tasks()->saveMany(
-            factory(Task::class, $firstTasksCount)->make()
+            factory(Task::class, $firstTasksCount)->make(),
         );
 
         $user2 = factory(User::class)->create();
         assert($user2 instanceof User);
         $secondTasksCount = 3;
         $user2->tasks()->saveMany(
-            factory(Task::class, $secondTasksCount)->make()
+            factory(Task::class, $secondTasksCount)->make(),
         );
 
         $users = User::all();
@@ -74,7 +74,7 @@ final class PaginatedRelationLoaderTest extends DBTestCase
         (new PaginatedModelsLoader(
             'tasks',
             static function (): void {},
-            $this->makePaginationArgs(10)
+            $this->makePaginationArgs(10),
         ))->load($users);
 
         $firstUser = $users[0];
@@ -92,10 +92,10 @@ final class PaginatedRelationLoaderTest extends DBTestCase
         assert($user instanceof User);
 
         $user->tasks()->saveMany(
-            factory(Task::class, 2)->make()
+            factory(Task::class, 2)->make(),
         );
         $user->posts()->saveMany(
-            factory(Post::class, 3)->make()
+            factory(Post::class, 3)->make(),
         );
 
         $users = User::all();
@@ -103,13 +103,13 @@ final class PaginatedRelationLoaderTest extends DBTestCase
         (new PaginatedModelsLoader(
             'tasks',
             static function (): void {},
-            $this->makePaginationArgs(4)
+            $this->makePaginationArgs(4),
         ))->load($users);
 
         (new PaginatedModelsLoader(
             'posts',
             static function (): void {},
-            $this->makePaginationArgs(4)
+            $this->makePaginationArgs(4),
         ))->load($users);
 
         $firstUser = $users[0];
@@ -126,7 +126,7 @@ final class PaginatedRelationLoaderTest extends DBTestCase
 
         $tasksUser1 = 3;
         $user1->tasks()->saveMany(
-            factory(Task::class, $tasksUser1)->make()
+            factory(Task::class, $tasksUser1)->make(),
         );
 
         $softDeletedTaskUser1 = factory(Task::class)->make();
@@ -138,7 +138,7 @@ final class PaginatedRelationLoaderTest extends DBTestCase
 
         $tasksUser2 = 4;
         $user2->tasks()->saveMany(
-            factory(Task::class, $tasksUser2)->make()
+            factory(Task::class, $tasksUser2)->make(),
         );
 
         $softDeletedTaskUser2 = factory(Task::class)->make();
@@ -150,7 +150,7 @@ final class PaginatedRelationLoaderTest extends DBTestCase
         (new PaginatedModelsLoader(
             'tasks',
             static function (): void {},
-            $this->makePaginationArgs(4)
+            $this->makePaginationArgs(4),
         ))->load($users);
 
         $firstUser = $users[0];
@@ -169,7 +169,7 @@ final class PaginatedRelationLoaderTest extends DBTestCase
         $task = factory(Task::class)->create();
         assert($task instanceof Task);
         $task->tags()->saveMany(
-            factory(Tag::class, 3)->make()
+            factory(Tag::class, 3)->make(),
         );
 
         $this->assertCount(3, $task->tags);
@@ -180,7 +180,7 @@ final class PaginatedRelationLoaderTest extends DBTestCase
         (new PaginatedModelsLoader(
             'tags',
             static function (): void {},
-            $this->makePaginationArgs($first)
+            $this->makePaginationArgs($first),
         ))->load($tasks);
 
         $firstTask = $tasks[0];

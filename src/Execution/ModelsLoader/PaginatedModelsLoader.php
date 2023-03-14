@@ -18,7 +18,7 @@ class PaginatedModelsLoader implements ModelsLoader
     public function __construct(
         protected string $relation,
         protected \Closure $decorateBuilder,
-        protected PaginationArgs $paginationArgs
+        protected PaginationArgs $paginationArgs,
     ) {}
 
     public function load(EloquentCollection $parents): void
@@ -74,9 +74,9 @@ class PaginatedModelsLoader implements ModelsLoader
         // Use ->getQuery() to respect model scopes, such as soft deletes
         $mergedRelationQuery = $relations->reduce(
             static fn (EloquentBuilder $builder, Relation $relation): EloquentBuilder => $builder->unionAll(
-                $relation->getQuery()
+                $relation->getQuery(),
             ),
-            $firstRelation->getQuery()
+            $firstRelation->getQuery(),
         );
 
         $relatedModels = $mergedRelationQuery->get();
@@ -84,7 +84,7 @@ class PaginatedModelsLoader implements ModelsLoader
         return $relatedModels->unique(
             // Compare all attributes because there might not be a unique primary key
             // or there could be differing pivot attributes.
-            static fn (Model $relatedModel): string => $relatedModel->toJson()
+            static fn (Model $relatedModel): string => $relatedModel->toJson(),
         );
     }
 
@@ -150,7 +150,7 @@ class PaginatedModelsLoader implements ModelsLoader
 
         $unloadedWiths = array_filter(
             Utils::accessProtected($model, 'with'),
-            static fn (string $relation): bool => ! $model->relationLoaded($relation)
+            static fn (string $relation): bool => ! $model->relationLoaded($relation),
         );
 
         if (count($unloadedWiths) > 0) {
@@ -171,7 +171,7 @@ class PaginatedModelsLoader implements ModelsLoader
             ->match(
                 $parents->all(),
                 $relatedModels,
-                $this->relation
+                $this->relation,
             );
     }
 

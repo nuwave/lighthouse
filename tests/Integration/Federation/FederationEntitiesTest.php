@@ -15,7 +15,7 @@ final class FederationEntitiesTest extends TestCase
     {
         return array_merge(
             parent::getPackageProviders($app),
-            [FederationServiceProvider::class]
+            [FederationServiceProvider::class],
         );
     }
 
@@ -196,7 +196,7 @@ final class FederationEntitiesTest extends TestCase
 
         $this->assertStringContainsString(
             EntityResolverProvider::unknownTypename('Unknown'),
-            $response->json('errors.0.message')
+            $response->json('errors.0.message'),
         );
     }
 
@@ -225,7 +225,7 @@ final class FederationEntitiesTest extends TestCase
 
         $this->assertStringContainsString(
             Any::isNotArray(),
-            $response->json('errors.0.message')
+            $response->json('errors.0.message'),
         );
     }
 
@@ -254,7 +254,7 @@ final class FederationEntitiesTest extends TestCase
 
         $this->assertStringContainsString(
             Any::typenameIsNotString(),
-            $response->json('errors.0.message')
+            $response->json('errors.0.message'),
         );
     }
 
@@ -286,7 +286,7 @@ final class FederationEntitiesTest extends TestCase
 
         $this->assertStringContainsString(
             Any::typenameIsInvalidName($isValidNameError),
-            $response->json('errors.0.message')
+            $response->json('errors.0.message'),
         );
     }
 
@@ -315,7 +315,7 @@ final class FederationEntitiesTest extends TestCase
 
         $this->assertStringContainsString(
             'Representation does not satisfy any set of uniquely identifying keys',
-            $response->json('errors.0.message')
+            $response->json('errors.0.message'),
         );
     }
 
@@ -347,7 +347,7 @@ final class FederationEntitiesTest extends TestCase
 
         $this->assertStringContainsString(
             EntityResolverProvider::missingResolver('MissingResolver'),
-            $response->json('errors.0.message')
+            $response->json('errors.0.message'),
         );
     }
 }

@@ -6,11 +6,21 @@ $finder = PhpCsFixer\Finder::create()
     ->notPath('vendor')
     ->in(__DIR__)
     ->name('*.php')
-    ->ignoreDotFiles(true)
+    ->ignoreDotFiles(false)
     ->ignoreVCS(true);
 
 return risky($finder, [
     'general_phpdoc_annotation_remove' => [
-        'annotations' => ['throws'],
+        'annotations' => [
+            'throws',
+        ],
+    ],
+    'trailing_comma_in_multiline' => [
+        'elements' => [
+            'arguments',
+            'arrays',
+            'match',
+            'parameters',
+        ],
     ],
 ]);

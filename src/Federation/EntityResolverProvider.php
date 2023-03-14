@@ -22,7 +22,7 @@ use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Support\Utils;
 
 /**
- * @phpstan-type SingleEntityResolverFn \Closure(array<string, mixed>): mixed
+ * @phpstan-type SingleEntityResolverFn callable(array<string, mixed>): mixed
  * @phpstan-type EntityResolver SingleEntityResolverFn|BatchedEntityResolver
  */
 class EntityResolverProvider
@@ -110,7 +110,7 @@ class EntityResolverProvider
         $resolverClass = Utils::namespaceClassname(
             $typename,
             (array) config('lighthouse.federation.entities_resolver_namespace'),
-            'class_exists'
+            'class_exists',
         );
         if (null === $resolverClass) {
             return null;
@@ -126,7 +126,7 @@ class EntityResolverProvider
     /**
      * @return SingleEntityResolverFn|null
      */
-    protected function resolverFromModel(string $typeName): ?\Closure
+    protected function resolverFromModel(string $typeName): ?callable
     {
         $definition = $this->typeDefinition($typeName);
 
@@ -136,7 +136,7 @@ class EntityResolverProvider
         $modelClass = Utils::namespaceClassname(
             $model,
             (array) $this->configRepository->get('lighthouse.namespaces.models'),
-            static fn (string $classCandidate): bool => is_subclass_of($classCandidate, Model::class)
+            static fn (string $classCandidate): bool => is_subclass_of($classCandidate, Model::class),
         );
         if (null === $modelClass) {
             return null;
@@ -169,7 +169,7 @@ class EntityResolverProvider
             $builder,
             $this->firstSatisfiedKeyFields($keyFieldsSelections, $representation),
             $representation,
-            $definition
+            $definition,
         );
     }
 
@@ -223,7 +223,7 @@ class EntityResolverProvider
                     $fieldName,
                     $this->hasFieldWithDirective($definition, $fieldName, GlobalIdDirective::NAME)
                         ? $this->globalId->decodeID($value)
-                        : $value
+                        : $value,
                 );
 
                 return;

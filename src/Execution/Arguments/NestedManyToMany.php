@@ -9,7 +9,7 @@ use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 class NestedManyToMany implements ArgResolver
 {
     public function __construct(
-        protected string $relationName
+        protected string $relationName,
     ) {}
 
     /**
@@ -23,13 +23,13 @@ class NestedManyToMany implements ArgResolver
 
         if ($args->has('sync')) {
             $relation->sync(
-                $this->generateRelationArray($args->arguments['sync'])
+                $this->generateRelationArray($args->arguments['sync']),
             );
         }
 
         if ($args->has('syncWithoutDetaching')) {
             $relation->syncWithoutDetaching(
-                $this->generateRelationArray($args->arguments['syncWithoutDetaching'])
+                $this->generateRelationArray($args->arguments['syncWithoutDetaching']),
             );
         }
 
@@ -44,13 +44,13 @@ class NestedManyToMany implements ArgResolver
 
         if ($args->has('connect')) {
             $relation->attach(
-                $this->generateRelationArray($args->arguments['connect'])
+                $this->generateRelationArray($args->arguments['connect']),
             );
         }
 
         if ($args->has('disconnect')) {
             $relation->detach(
-                $args->arguments['disconnect']->toPlain()
+                $args->arguments['disconnect']->toPlain(),
             );
         }
     }

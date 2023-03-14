@@ -15,6 +15,6 @@ interface FieldManipulator extends Directive
     public function manipulateFieldDefinition(
         DocumentAST &$documentAST,
         FieldDefinitionNode &$fieldDefinition,
-        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
     ): void;
 }

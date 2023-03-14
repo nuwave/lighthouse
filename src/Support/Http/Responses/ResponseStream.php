@@ -14,7 +14,7 @@ class ResponseStream extends Stream implements CanStreamResponse
     {
         if ([] === $paths) {
             $this->emit(
-                $this->chunk($data, $isFinalChunk)
+                $this->chunk($data, $isFinalChunk),
             );
         } else {
             $chunk = [];
@@ -36,7 +36,7 @@ class ResponseStream extends Stream implements CanStreamResponse
                 $terminating = $isFinalChunk && $i === $lastKey;
 
                 $this->emit(
-                    $this->chunk($chunk, $terminating)
+                    $this->chunk($chunk, $terminating),
                 );
             }
         }
@@ -94,9 +94,11 @@ class ResponseStream extends Stream implements CanStreamResponse
     /**
      * Flush buffer cache.
      *
-     * Note: We can run into exceptions when flushing the buffer, these should be safe to ignore.
+     * @param  callable(): mixed  $flush
+     *
+     * Note: We can run into exceptions when flushing the buffer, these should be safe to ignore
      */
-    protected function flush(\Closure $flush): void
+    protected function flush(callable $flush): void
     {
         try {
             $flush();

@@ -38,6 +38,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Rename configuration option `schema.register` to `schema_path`
 - Restructure cache related configuration options
 - Register all non-user namespaces through `RegisterDirectiveNamespaces` event https://github.com/nuwave/lighthouse/pull/2337
+- Guard default configuration options in `lighthouse.php` allows multiple guards https://github.com/nuwave/lighthouse/pull/2345
+- Make `@auth` and `@whereAuth` support multiple guards https://github.com/nuwave/lighthouse/pull/2345
 
 ### Fixed
 
@@ -79,7 +81,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove `@field` directive argument `args` https://github.com/nuwave/lighthouse/pull/1706
 - Remove schema caching v1 https://github.com/nuwave/lighthouse/pull/2321
 - Do not register `ScoutServiceProvider` by default
-- Removed alias/Facade `graphql`
+- Remove alias/Facade `graphql`
 
 ## v5.71.0
 

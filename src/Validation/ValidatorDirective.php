@@ -85,14 +85,14 @@ GRAPHQL;
 
         $this->setFullClassnameOnDirective(
             $typeDefinition,
-            $this->directiveArgValue('class', "{$typeDefinition->name->value}Validator")
+            $this->directiveArgValue('class', "{$typeDefinition->name->value}Validator"),
         );
     }
 
     public function manipulateFieldDefinition(
         DocumentAST &$documentAST,
         FieldDefinitionNode &$fieldDefinition,
-        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
     ): void {
         $this->setFullClassnameOnDirective(
             $fieldDefinition,
@@ -101,8 +101,8 @@ GRAPHQL;
                 $parentType->name->value
                     . '\\'
                     . ucfirst($fieldDefinition->name->value)
-                    . 'Validator'
-            )
+                    . 'Validator',
+            ),
         );
     }
 
@@ -123,7 +123,7 @@ GRAPHQL;
                 $directive->arguments = ASTHelper::mergeUniqueNodeList(
                     $directive->arguments,
                     [Parser::argument('class: "' . addslashes($validatorClass) . '"')],
-                    true
+                    true,
                 );
             }
         }
@@ -137,7 +137,7 @@ GRAPHQL;
         $validatorClassName = $this->namespaceClassName(
             $classCandidate,
             (array) config('lighthouse.namespaces.validators'),
-            static fn (string $classCandidate): bool => is_subclass_of($classCandidate, Validator::class)
+            static fn (string $classCandidate): bool => is_subclass_of($classCandidate, Validator::class),
         );
         assert(is_subclass_of($validatorClassName, Validator::class));
 

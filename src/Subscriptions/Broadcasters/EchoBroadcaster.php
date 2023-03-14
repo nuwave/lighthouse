@@ -12,13 +12,13 @@ use Nuwave\Lighthouse\Subscriptions\Subscriber;
 class EchoBroadcaster implements Broadcaster
 {
     public function __construct(
-        protected BroadcastManager $broadcaster
+        protected BroadcastManager $broadcaster,
     ) {}
 
     public function broadcast(Subscriber $subscriber, mixed $data): void
     {
         $this->broadcaster->event(
-            new EchoSubscriptionEvent($subscriber->channel, $data)
+            new EchoSubscriptionEvent($subscriber->channel, $data),
         );
     }
 
@@ -26,7 +26,7 @@ class EchoBroadcaster implements Broadcaster
     {
         $userId = md5(
             $request->input('channel_name')
-            . $request->input('socket_id')
+            . $request->input('socket_id'),
         );
 
         return new JsonResponse([

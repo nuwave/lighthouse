@@ -78,7 +78,7 @@ GRAPHQL;
                     'operator' => '>=',
                     'condition' => $value,
                 ],
-            ]
+            ],
         );
 
         return $builder;
@@ -95,7 +95,7 @@ GRAPHQL;
         // name follows a convention and contains the relation name
         if (is_null($relationName)) {
             $relationName = lcfirst(
-                Str::after($this->nodeName(), 'has')
+                Str::after($this->nodeName(), 'has'),
             );
         }
 

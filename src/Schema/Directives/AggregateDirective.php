@@ -113,16 +113,16 @@ GRAPHQL;
                 $relationBatchLoader = BatchLoaderRegistry::instance(
                     array_merge(
                         $this->qualifyPath($args, $resolveInfo),
-                        [$this->function(), $this->column()]
+                        [$this->function(), $this->column()],
                     ),
                     fn (): RelationBatchLoader => new RelationBatchLoader(
                         new AggregateModelsLoader(
                             $this->relation(),
                             $this->column(),
                             $this->function(),
-                            $this->makeBuilderDecorator($parent, $args, $context, $resolveInfo)
-                        )
-                    )
+                            $this->makeBuilderDecorator($parent, $args, $context, $resolveInfo),
+                        ),
+                    ),
                 );
 
                 return $relationBatchLoader->load($parent);
@@ -148,7 +148,7 @@ GRAPHQL;
 
                 assert(
                     $query instanceof QueryBuilder || $query instanceof EloquentBuilder,
-                    "The method referenced by the builder argument of the @{$this->name()} directive on {$this->nodeName()} must return a Builder."
+                    "The method referenced by the builder argument of the @{$this->name()} directive on {$this->nodeName()} must return a Builder.",
                 );
 
                 $this->makeBuilderDecorator($root, $args, $context, $resolveInfo)($query);
@@ -163,7 +163,7 @@ GRAPHQL;
     protected function function(): string
     {
         return strtolower(
-            $this->directiveArgValue('function')
+            $this->directiveArgValue('function'),
         );
     }
 

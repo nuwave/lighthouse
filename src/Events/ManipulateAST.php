@@ -18,6 +18,6 @@ class ManipulateAST
         /**
          * The AST that can be manipulated.
          */
-        public DocumentAST &$documentAST
+        public DocumentAST &$documentAST,
     ) {}
 }

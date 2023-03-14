@@ -17,7 +17,7 @@ final class ManipulateResultTest extends TestCase
                 $manipulateResult->result->data = [
                     'foo' => Foo::THE_ANSWER + 1,
                 ];
-            }
+            },
         );
 
         $this->graphQL('

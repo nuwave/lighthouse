@@ -38,7 +38,7 @@ abstract class TypeNodeConverter
 
             return $this->convertWrappedTypeNode(
                 $node->type,
-                $wrappers
+                $wrappers,
             );
         }
 
@@ -59,7 +59,7 @@ abstract class TypeNodeConverter
 
                     return $type;
                 },
-                $this->namedType($node->name->value)
+                $this->namedType($node->name->value),
             );
     }
 

@@ -12,7 +12,7 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 class TracingDirective extends BaseDirective implements FieldMiddleware
 {
     public function __construct(
-        protected Tracing $tracing
+        protected Tracing $tracing,
     ) {}
 
     public static function definition(): string

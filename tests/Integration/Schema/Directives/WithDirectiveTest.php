@@ -38,7 +38,7 @@ final class WithDirectiveTest extends DBTestCase
 
         // Sanity check
         $this->assertFalse(
-            $user->tasksLoaded()
+            $user->tasksLoaded(),
         );
 
         $this->graphQL(/** @lang GraphQL */ '
@@ -87,7 +87,7 @@ final class WithDirectiveTest extends DBTestCase
 
         // Sanity check
         $this->assertFalse(
-            $user->postsCommentsLoaded()
+            $user->postsCommentsLoaded(),
         );
 
         $this->graphQL(/** @lang GraphQL */ '
@@ -150,7 +150,7 @@ final class WithDirectiveTest extends DBTestCase
 
         $post1->images()
             ->saveMany(
-                factory(Image::class, 3)->make()
+                factory(Image::class, 3)->make(),
             );
 
         $post2 = factory(Post::class)->make();
@@ -166,7 +166,7 @@ final class WithDirectiveTest extends DBTestCase
 
         $post2->images()
             ->saveMany(
-                factory(Image::class, 2)->make()
+                factory(Image::class, 2)->make(),
             );
 
         $task = $post1->task;
@@ -179,7 +179,7 @@ final class WithDirectiveTest extends DBTestCase
 
         $task->images()
             ->saveMany(
-                factory(Image::class, 4)->make()
+                factory(Image::class, 4)->make(),
             );
 
         $this->graphQL(/** @lang GraphQL */ '
@@ -282,7 +282,7 @@ final class WithDirectiveTest extends DBTestCase
 
         // Sanity check
         $this->assertFalse(
-            $user->tasksAndPostsCommentsLoaded()
+            $user->tasksAndPostsCommentsLoaded(),
         );
 
         $this->graphQL(/** @lang GraphQL */ '
@@ -354,7 +354,7 @@ final class WithDirectiveTest extends DBTestCase
 
         // Sanity check
         $this->assertFalse(
-            $user->postTasksAndPostsCommentsLoaded()
+            $user->postTasksAndPostsCommentsLoaded(),
         );
 
         $this->graphQL(/** @lang GraphQL */ '

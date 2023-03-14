@@ -25,7 +25,7 @@ class AuthenticationErrorHandler implements ErrorHandler
                 $error->getSource(),
                 $error->getPositions(),
                 $error->getPath(),
-                AuthenticationException::fromLaravel($underlyingException)
+                AuthenticationException::fromLaravel($underlyingException),
             ));
         }
 

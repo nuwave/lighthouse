@@ -25,7 +25,7 @@ class AuthorizationErrorHandler implements ErrorHandler
                 $error->getSource(),
                 $error->getPositions(),
                 $error->getPath(),
-                AuthorizationException::fromLaravel($underlyingException)
+                AuthorizationException::fromLaravel($underlyingException),
             ));
         }
 

@@ -15,6 +15,6 @@ class BuildSchemaString
         /**
          * The root schema that was defined by the user.
          */
-        public string $userSchema
+        public string $userSchema,
     ) {}
 }

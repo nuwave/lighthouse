@@ -68,7 +68,7 @@ final class ResolverProviderTest extends TestCase
 
         return new FieldValue(
             $typeValue,
-            $queryType->fields[0]
+            $queryType->fields[0],
         );
     }
 }

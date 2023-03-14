@@ -31,7 +31,7 @@ GRAPHQL;
 
         return Utils::mapEach(
             static fn (ArgumentSet $argumentSet): mixed => $resolveNested($root, $argumentSet),
-            $args
+            $args,
         );
     }
 }

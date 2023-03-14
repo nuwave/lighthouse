@@ -11,7 +11,7 @@ use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 class AuthDirective extends BaseDirective implements FieldResolver
 {
     public function __construct(
-        protected AuthFactory $authFactory
+        protected AuthFactory $authFactory,
     ) {}
 
     public static function definition(): string
@@ -22,10 +22,10 @@ Return the currently authenticated user as the result of a query.
 """
 directive @auth(
   """
-  Specify which guard to use, e.g. "api".
+  Specify which guards to use, e.g. ["api"].
   When not defined, the default from `lighthouse.php` is used.
   """
-  guard: String
+  guards: [String!]
 ) on FIELD_DEFINITION
 GRAPHQL;
     }
@@ -33,13 +33,28 @@ GRAPHQL;
     public function resolveField(FieldValue $fieldValue): callable
     {
         return function (): ?Authenticatable {
-            $guard = $this->directiveArgValue('guard', AuthServiceProvider::guard());
-            assert(is_string($guard) || is_null($guard));
+            $guards = $this->directiveArgValue('guards', AuthServiceProvider::guards());
+            assert(is_array($guards));
 
-            return $this
-                ->authFactory
-                ->guard($guard)
-                ->user();
+            return $this->authenticatedUser($guards);
         };
+    }
+
+    /**
+     * Return the first logged-in user to any of the given guards.
+     *
+     * @param  array<string>  $guards
+     */
+    protected function authenticatedUser(array $guards): ?Authenticatable
+    {
+        foreach ($guards as $guard) {
+            $user = $this->authFactory->guard($guard)
+                ->user();
+            if (null !== $user) {
+                return $user;
+            }
+        }
+
+        return null;
     }
 }

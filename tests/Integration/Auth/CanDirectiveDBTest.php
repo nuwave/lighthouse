@@ -58,7 +58,7 @@ final class CanDirectiveDBTest extends DBTestCase
         $this->be($user);
 
         $this->mockResolverExpects(
-            $this->never()
+            $this->never(),
         );
 
         $this->schema = /** @lang GraphQL */ '
@@ -174,7 +174,7 @@ final class CanDirectiveDBTest extends DBTestCase
         $post->save();
 
         $this->mockResolverExpects(
-            $this->never()
+            $this->never(),
         );
 
         $this->schema = /** @lang GraphQL */ '
@@ -335,7 +335,7 @@ final class CanDirectiveDBTest extends DBTestCase
         $this->be($admin);
 
         $this->mockResolverExpects(
-            $this->never()
+            $this->never(),
         );
 
         $this->schema = /** @lang GraphQL */ '

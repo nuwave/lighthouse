@@ -20,10 +20,10 @@ class GraphQLController
         EventsDispatcher $eventsDispatcher,
         RequestParser $requestParser,
         CreatesResponse $createsResponse,
-        CreatesContext $createsContext
+        CreatesContext $createsContext,
     ): Response {
         $eventsDispatcher->dispatch(
-            new StartRequest($request)
+            new StartRequest($request),
         );
 
         $operationOrOperations = $requestParser->parseRequest($request);
@@ -34,7 +34,7 @@ class GraphQLController
         $response = $createsResponse->createResponse($result);
 
         $eventsDispatcher->dispatch(
-            new EndRequest($response)
+            new EndRequest($response),
         );
 
         return $response;

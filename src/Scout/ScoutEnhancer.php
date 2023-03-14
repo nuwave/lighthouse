@@ -43,7 +43,7 @@ class ScoutEnhancer
         /**
          * @var \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<TModel>|\Illuminate\Database\Eloquent\Relations\Relation<TModel>|\Laravel\Scout\Builder $builder
          */
-        protected QueryBuilder|EloquentBuilder|Relation|ScoutBuilder $builder
+        protected QueryBuilder|EloquentBuilder|Relation|ScoutBuilder $builder,
     ) {
         $this->gather($this->argumentSet);
     }
@@ -115,7 +115,7 @@ class ScoutEnhancer
                         $this->gather($value);
                     }
                 },
-                $argument->value
+                $argument->value,
             );
         }
     }

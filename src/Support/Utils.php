@@ -93,11 +93,12 @@ class Utils
     /**
      * Map a value or each value in an array.
      *
+     * @param  callable(mixed): mixed  $callback
      * @param  mixed|array<mixed>  $valueOrValues
      *
      * @return mixed|array<mixed>
      */
-    public static function mapEach(\Closure $callback, mixed $valueOrValues): mixed
+    public static function mapEach(callable $callback, mixed $valueOrValues): mixed
     {
         if (is_array($valueOrValues)) {
             return array_map($callback, $valueOrValues);
@@ -109,11 +110,12 @@ class Utils
     /**
      * Map a value or each value in an array.
      *
+     * @param  callable(mixed): mixed  $callback
      * @param  mixed|array<mixed>  $valueOrValues
      *
      * @return mixed|array<mixed>
      */
-    public static function mapEachRecursive(\Closure $callback, mixed $valueOrValues): mixed
+    public static function mapEachRecursive(callable $callback, mixed $valueOrValues): mixed
     {
         if (is_array($valueOrValues)) {
             return array_map(static fn ($value) => static::mapEachRecursive($callback, $value), $valueOrValues);
@@ -125,9 +127,10 @@ class Utils
     /**
      * Apply a callback to a value or each value in an iterable.
      *
+     * @param  callable(mixed): mixed  $callback
      * @param  mixed|iterable<mixed>  $valueOrValues
      */
-    public static function applyEach(\Closure $callback, $valueOrValues): void
+    public static function applyEach(callable $callback, $valueOrValues): void
     {
         if (is_iterable($valueOrValues)) {
             foreach ($valueOrValues as $value) {
@@ -149,7 +152,7 @@ class Utils
     {
         return in_array(
             $trait,
-            class_uses_recursive($class)
+            class_uses_recursive($class),
         );
     }
 

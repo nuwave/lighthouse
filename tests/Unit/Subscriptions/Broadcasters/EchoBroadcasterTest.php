@@ -38,7 +38,7 @@ final class EchoBroadcasterTest extends TestCase
         $broadcastManager->expects($this->once())
             ->method('event')
             ->with(new Callback(
-                static fn (EchoSubscriptionEvent $event): bool => 'private-test-123' === $event->broadcastOn()->name
+                static fn (EchoSubscriptionEvent $event): bool => 'private-test-123' === $event->broadcastOn()->name,
             ));
 
         $redisBroadcaster = new EchoBroadcaster($broadcastManager);

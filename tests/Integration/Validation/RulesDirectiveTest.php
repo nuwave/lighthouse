@@ -239,7 +239,7 @@ final class RulesDirectiveTest extends TestCase
         ';
 
         $this->mockResolverExpects(
-            $this->never()
+            $this->never(),
         );
 
         $this
@@ -250,7 +250,7 @@ final class RulesDirectiveTest extends TestCase
                     rulesForArray: []
                 )
             }
-            '
+            ',
             )
             ->assertJsonFragment([
                 'rules' => [

@@ -6,7 +6,6 @@ use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\Parser;
-use GraphQL\Type\Definition\Type;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
@@ -18,7 +17,7 @@ use Nuwave\Lighthouse\Support\Contracts\TypeMiddleware;
 class NodeDirective extends BaseDirective implements TypeMiddleware, TypeManipulator
 {
     public function __construct(
-        protected NodeRegistry $nodeRegistry
+        protected NodeRegistry $nodeRegistry,
     ) {}
 
     public static function definition(): string
@@ -51,20 +50,19 @@ directive @node(
 GRAPHQL;
     }
 
-    public function handleNode(TypeValue $value, \Closure $next): Type
+    public function handleNode(TypeValue $value): void
     {
         if ($this->directiveHasArgument('resolver')) {
             $resolver = $this->getResolverFromArgument('resolver');
         } else {
-            $resolver = fn (int|string $id): ?Model => $this->getModelClass()::find($id);
+            $modelClass = $this->getModelClass();
+            $resolver = static fn (int|string $id): ?Model => $modelClass::find($id);
         }
 
         $this->nodeRegistry->registerNode(
             $value->getTypeDefinitionName(),
-            $resolver
+            $resolver,
         );
-
-        return $next($value);
     }
 
     /**

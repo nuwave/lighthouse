@@ -38,8 +38,8 @@ class SchemaPrinter extends GraphQLSchemaPrinter
 
                     return $description;
                 },
-                $type->getFields()
-            )
+                $type->getFields(),
+            ),
         );
     }
 
@@ -70,8 +70,8 @@ class SchemaPrinter extends GraphQLSchemaPrinter
                 ' & ',
                 array_map(
                     static fn (InterfaceType $interface): string => $interface->name,
-                    $interfaces
-                )
+                    $interfaces,
+                ),
             )
             : '';
 
@@ -102,8 +102,8 @@ GRAPHQL;
                 ' ',
                 array_map(
                     static fn (DirectiveNode $directive): string => Printer::doPrint($directive),
-                    $directives
-                )
+                    $directives,
+                ),
             );
     }
 }

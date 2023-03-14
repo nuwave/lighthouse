@@ -29,14 +29,14 @@ class PaginationArgs
         $page = $paginationType->isConnection()
             ? self::calculateCurrentPage(
                 $first,
-                Cursor::decode($args)
+                Cursor::decode($args),
             )
             // Handles cases "paginate" and "simple", which both take the same args.
             : Arr::get($args, 'page', 1);
 
         if ($first < 0) {
             throw new Error(
-                self::requestedLessThanZeroItems($first)
+                self::requestedLessThanZeroItems($first),
             );
         }
 
@@ -46,7 +46,7 @@ class PaginationArgs
             && $first > $paginateMaxCount
         ) {
             throw new Error(
-                self::requestedTooManyItems($paginateMaxCount, $first)
+                self::requestedTooManyItems($paginateMaxCount, $first),
             );
         }
 

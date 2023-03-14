@@ -91,7 +91,7 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->app->bind(CreatesResponse::class, SingleResponse::class);
 
         $this->app->singleton(SchemaSourceProvider::class, static fn (): SchemaStitcher => new SchemaStitcher(
-            config('lighthouse.schema_path', '')
+            config('lighthouse.schema_path', ''),
         ));
 
         $this->app->bind(ProvidesResolver::class, ResolverProvider::class);
@@ -99,7 +99,7 @@ class LighthouseServiceProvider extends ServiceProvider
             public function provideSubscriptionResolver(FieldValue $fieldValue): \Closure
             {
                 throw new \Exception(
-                    'Add the SubscriptionServiceProvider to your config/app.php to enable subscriptions.'
+                    'Add the SubscriptionServiceProvider to your config/app.php to enable subscriptions.',
                 );
             }
         });
@@ -109,7 +109,7 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->app->singleton(MiddlewareAdapter::class, static function (Container $app): MiddlewareAdapter {
             if ($app instanceof LaravelApplication) {
                 return new LaravelMiddlewareAdapter(
-                    $app->get(Router::class)
+                    $app->get(Router::class),
                 );
             }
 
@@ -153,16 +153,16 @@ class LighthouseServiceProvider extends ServiceProvider
                             [],
                             null,
                             $error,
-                            $error instanceof ProvidesExtensions ? $error->getExtensions() : []
+                            $error instanceof ProvidesExtensions ? $error->getExtensions() : [],
                         );
                     }
 
                     $graphQL = $this->app->make(GraphQL::class);
                     $executionResult = new ExecutionResult(null, [$error]);
-                    $serializableResult = $graphQL->serializable($executionResult);
+                    $serializableResult = $graphQL->toSerializableArray($executionResult);
 
                     return new JsonResponse($serializableResult);
-                }
+                },
             );
         }
     }

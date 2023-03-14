@@ -68,7 +68,7 @@ class Subscriber
          * The context passed to the query.
          */
         public GraphQLContext $context,
-        ResolveInfo $resolveInfo
+        ResolveInfo $resolveInfo,
     ) {
         $this->fieldName = $resolveInfo->fieldName;
         $this->channel = self::uniqueChannelName();
@@ -85,7 +85,7 @@ class Subscriber
         $this->query = new DocumentNode([
             'definitions' => new NodeList(array_merge(
                 $resolveInfo->fragments,
-                [$resolveInfo->operation]
+                [$resolveInfo->operation],
             )),
         ]);
     }
@@ -100,7 +100,7 @@ class Subscriber
             'channel' => $this->channel,
             'topic' => $this->topic,
             'query' => serialize(
-                AST::toArray($this->query)
+                AST::toArray($this->query),
             ),
             'field_name' => $this->fieldName,
             'args' => $this->args,
@@ -118,7 +118,7 @@ class Subscriber
         $this->topic = $data['topic'];
 
         $documentNode = AST::fromArray(
-            unserialize($data['query'])
+            unserialize($data['query']),
         );
         assert($documentNode instanceof DocumentNode, 'We know the type since it is set during construction and serialized.');
 
@@ -128,7 +128,7 @@ class Subscriber
         $this->args = $data['args'];
         $this->variables = $data['variables'];
         $this->context = $this->contextSerializer()->unserialize(
-            $data['context']
+            $data['context'],
         );
     }
 

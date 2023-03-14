@@ -34,7 +34,7 @@ GRAPHQL;
     }
 
     public function __construct(
-        protected Defer $defer
+        protected Defer $defer,
     ) {}
 
     public function handleField(FieldValue $fieldValue): void

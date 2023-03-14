@@ -13,7 +13,7 @@ class LogGraphQLQueries
     public const MESSAGE = 'Received GraphQL query.';
 
     public function __construct(
-        protected LoggerInterface $logger
+        protected LoggerInterface $logger,
     ) {}
 
     public function handle(Request $request, \Closure $next): mixed

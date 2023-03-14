@@ -25,7 +25,7 @@ final class AttemptAuthenticationTest extends TestCase
         $config->set('lighthouse.route.middleware', [
             AttemptAuthentication::class,
         ]);
-        $config->set('lighthouse.guard', 'foo');
+        $config->set('lighthouse.guards', ['foo']);
         $config->set('auth.guards.foo', [
             'driver' => 'foo',
             'provider' => 'users',
@@ -38,7 +38,7 @@ final class AttemptAuthenticationTest extends TestCase
             ->with(
                 null,
                 [],
-                new Callback(fn (Context $context): bool => null === $this->user)
+                new Callback(fn (Context $context): bool => null === $this->user),
             );
 
         $this->schema = /** @lang GraphQL */ '
@@ -62,7 +62,7 @@ final class AttemptAuthenticationTest extends TestCase
             ->with(
                 null,
                 [],
-                new Callback(fn (Context $context): bool => $this->user === $context->user())
+                new Callback(fn (Context $context): bool => $this->user === $context->user()),
             );
 
         $this->schema = /** @lang GraphQL */ '

@@ -156,10 +156,10 @@ Return the currently authenticated user as the result of a query.
 """
 directive @auth(
   """
-  Specify which guard to use, e.g. "api".
+  Specify which guards to use, e.g. ["api"].
   When not defined, the default from `lighthouse.php` is used.
   """
-  guard: String
+  guards: [String!]
 ) on FIELD_DEFINITION
 ```
 
@@ -170,11 +170,21 @@ type Query {
 ```
 
 If you need to use a guard besides the default to resolve the authenticated user,
-you can pass the guard name as the `guard` argument
+you can pass the guard name as the `guards` argument.
 
 ```graphql
 type Query {
-  me: User @auth(guard: "api")
+  me: User @auth(guards: ["api"])
+}
+```
+
+When multiple guards are passed, the first one that returns a user is used.
+
+```graphql
+union Authenticable = Admin | User
+
+type Query {
+  me: Authenticable @auth(guards: ["api", "admin"])
 }
 ```
 
@@ -3619,10 +3629,10 @@ directive @whereAuth(
   relation: String!
 
   """
-  Specify which guard to use, e.g. "api".
+  Specify which guards to use, e.g. ["api"].
   When not defined, the default from `lighthouse.php` is used.
   """
-  guard: String
+  guards: [String!]
 ) on FIELD_DEFINITION
 ```
 

@@ -12,7 +12,7 @@ use Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules;
 class ValidationRulesProvider implements ProvidesValidationRules
 {
     public function __construct(
-        protected ConfigRepository $configRepository
+        protected ConfigRepository $configRepository,
     ) {}
 
     public function validationRules(): ?array

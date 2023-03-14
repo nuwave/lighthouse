@@ -34,7 +34,7 @@ GRAPHQL;
             fn (mixed $value): mixed => $value instanceof ArgumentSet
                 ? $this->transformArgumentSet($value)
                 : $this->transformLeaf($value),
-            $argumentValue
+            $argumentValue,
         );
     }
 

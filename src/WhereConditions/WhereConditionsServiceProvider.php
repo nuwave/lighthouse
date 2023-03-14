@@ -34,24 +34,24 @@ class WhereConditionsServiceProvider extends ServiceProvider
                     static::createWhereConditionsInputType(
                         static::DEFAULT_WHERE_CONDITIONS,
                         'Dynamic WHERE conditions for queries.',
-                        'String'
-                    )
+                        'String',
+                    ),
                 )
                 ->setTypeDefinition(
                     static::createHasConditionsInputType(
                         static::DEFAULT_WHERE_CONDITIONS,
-                        'Dynamic HAS conditions for WHERE condition queries.'
-                    )
+                        'Dynamic HAS conditions for WHERE condition queries.',
+                    ),
                 )
                 ->setTypeDefinition(
                     Parser::enumTypeDefinition(
-                        $operator->enumDefinition()
-                    )
+                        $operator->enumDefinition(),
+                    ),
                 )
                 ->setTypeDefinition(
                     Parser::scalarTypeDefinition(/** @lang GraphQL */ '
                         scalar Mixed @scalar(class: "MLL\\\GraphQLScalars\\\MixedScalar")
-                    ')
+                    '),
                 );
         });
     }
@@ -63,7 +63,7 @@ class WhereConditionsServiceProvider extends ServiceProvider
         $operator = Container::getInstance()->make(Operator::class);
 
         $operatorName = Parser::enumTypeDefinition(
-            $operator->enumDefinition()
+            $operator->enumDefinition(),
         )
             ->name
             ->value;
@@ -102,7 +102,7 @@ GRAPHQL
         $operator = Container::getInstance()->make(Operator::class);
 
         $operatorName = Parser::enumTypeDefinition(
-            $operator->enumDefinition()
+            $operator->enumDefinition(),
         )
             ->name
             ->value;

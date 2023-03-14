@@ -31,7 +31,7 @@ final class DirectiveLocatorTest extends TestCase
     {
         $this->assertInstanceOf(
             FieldDirective::class,
-            $this->directiveLocator->create('field')
+            $this->directiveLocator->create('field'),
         );
     }
 
@@ -49,7 +49,7 @@ final class DirectiveLocatorTest extends TestCase
 
         $this->assertSame(
             $fieldDefinition,
-            Utils::accessProtected($fieldDirective, 'definitionNode')
+            Utils::accessProtected($fieldDirective, 'definitionNode'),
         );
     }
 

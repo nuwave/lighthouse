@@ -15,7 +15,7 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 class Entities
 {
     public function __construct(
-        protected EntityResolverProvider $entityResolverProvider
+        protected EntityResolverProvider $entityResolverProvider,
     ) {}
 
     /**

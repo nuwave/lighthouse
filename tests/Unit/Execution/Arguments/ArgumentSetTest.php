@@ -42,7 +42,7 @@ final class ArgumentSetTest extends TestCase
             [
                 'foo' => $fooValue,
             ],
-            $argumentSet->toArray()
+            $argumentSet->toArray(),
         );
     }
 
@@ -67,7 +67,7 @@ final class ArgumentSetTest extends TestCase
                     'foo' => $fooValue,
                 ],
             ],
-            $argumentSet->toArray()
+            $argumentSet->toArray(),
         );
     }
 
@@ -97,7 +97,7 @@ final class ArgumentSetTest extends TestCase
                     ],
                 ],
             ],
-            $argumentSet->toArray()
+            $argumentSet->toArray(),
         );
     }
 

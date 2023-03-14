@@ -11,7 +11,7 @@ class NestedBelongsTo implements ArgResolver
         /**
          * @var \Illuminate\Database\Eloquent\Relations\BelongsTo<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model> $relation
          */
-        protected BelongsTo $relation
+        protected BelongsTo $relation,
     ) {}
 
     /**
@@ -24,7 +24,7 @@ class NestedBelongsTo implements ArgResolver
             $saveModel = new ResolveNested(new SaveModel($this->relation));
             $related = $saveModel(
                 $this->relation->make(),
-                $args->arguments['create']->value
+                $args->arguments['create']->value,
             );
             $this->relation->associate($related);
         }
@@ -37,7 +37,7 @@ class NestedBelongsTo implements ArgResolver
             $updateModel = new ResolveNested(new UpdateModel(new SaveModel($this->relation)));
             $related = $updateModel(
                 $this->relation->make(),
-                $args->arguments['update']->value
+                $args->arguments['update']->value,
             );
             $this->relation->associate($related);
         }
@@ -46,7 +46,7 @@ class NestedBelongsTo implements ArgResolver
             $upsertModel = new ResolveNested(new UpsertModel(new SaveModel($this->relation)));
             $related = $upsertModel(
                 $this->relation->make(),
-                $args->arguments['upsert']->value
+                $args->arguments['upsert']->value,
             );
             $this->relation->associate($related);
         }

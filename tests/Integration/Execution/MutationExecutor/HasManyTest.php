@@ -148,7 +148,7 @@ final class HasManyTest extends DBTestCase
                         ],
                     ],
                 ],
-            ]
+            ],
         )->assertJson([
             'data' => [
                 'createUser' => [
@@ -375,7 +375,7 @@ GRAPHQL
 
         $user->tasks()
             ->save(
-                factory(Task::class)->create()
+                factory(Task::class)->create(),
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
@@ -425,7 +425,7 @@ GRAPHQL
 
         $user->tasks()
             ->save(
-                factory(Task::class)->create()
+                factory(Task::class)->create(),
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
@@ -475,7 +475,7 @@ GRAPHQL
 
         $user->tasks()
             ->save(
-                factory(Task::class)->create()
+                factory(Task::class)->create(),
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
@@ -543,7 +543,7 @@ GRAPHQL
                         ],
                     ],
                 ],
-            ]
+            ],
         )->assertJson([
             'data' => [
                 "{$action}User" => [

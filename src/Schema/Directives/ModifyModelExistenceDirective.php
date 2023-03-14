@@ -22,7 +22,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
     public function __construct(
         protected GlobalId $globalId,
         protected ErrorPool $errorPool,
-        protected TransactionalMutations $transactionalMutations
+        protected TransactionalMutations $transactionalMutations,
     ) {}
 
     public function resolveField(FieldValue $fieldValue): callable
@@ -46,7 +46,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
             foreach ($modelOrModels as $model) {
                 $success = $this->transactionalMutations->execute(
                     fn (): bool => $this->modifyExistence($model),
-                    $model->getConnectionName()
+                    $model->getConnectionName(),
                 );
 
                 if (! $success) {

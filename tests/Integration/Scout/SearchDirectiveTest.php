@@ -37,7 +37,7 @@ final class SearchDirectiveTest extends DBTestCase
         $this->engine
             ->shouldReceive('map')
             ->andReturn(
-                new EloquentCollection([$postA, $postB])
+                new EloquentCollection([$postA, $postB]),
             );
 
         $this->schema = /** @lang GraphQL */ '
@@ -216,7 +216,7 @@ final class SearchDirectiveTest extends DBTestCase
             ->shouldReceive('map')
             ->withArgs(static fn (ScoutBuilder $builder): bool => $builder->index === $myIndex)
             ->andReturn(
-                new EloquentCollection([$postA, $postB])
+                new EloquentCollection([$postA, $postB]),
             )
             ->once();
 
@@ -370,7 +370,7 @@ final class SearchDirectiveTest extends DBTestCase
 
         $this->engine->shouldReceive('map')
             ->andReturn(
-                new EloquentCollection([$postA, $postB])
+                new EloquentCollection([$postA, $postB]),
             )
             ->once();
 
@@ -378,7 +378,7 @@ final class SearchDirectiveTest extends DBTestCase
             ->with(
                 \Mockery::any(),
                 \Mockery::any(),
-                \Mockery::not('page')
+                \Mockery::not('page'),
             )
             ->andReturn(new EloquentCollection([$postA, $postB]))
             ->once();

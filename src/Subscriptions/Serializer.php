@@ -14,7 +14,7 @@ class Serializer implements ContextSerializer
     use SerializesAndRestoresModelIdentifiers;
 
     public function __construct(
-        protected CreatesContext $createsContext
+        protected CreatesContext $createsContext,
     ) {}
 
     public function serialize(GraphQLContext $context): string
@@ -49,7 +49,7 @@ class Serializer implements ContextSerializer
             $rawRequest['cookies'],
             $rawRequest['files'],
             $rawRequest['server'],
-            $rawRequest['content']
+            $rawRequest['content'],
         );
 
         $request->setUserResolver(fn () => $this->getRestoredPropertyValue($rawUser));

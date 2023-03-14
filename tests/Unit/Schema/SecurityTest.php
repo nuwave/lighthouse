@@ -60,7 +60,7 @@ final class SecurityTest extends TestCase
             }
         }
         ')->assertGraphQLErrorMessage(
-            QueryComplexity::maxQueryComplexityErrorMessage(1, 2)
+            QueryComplexity::maxQueryComplexityErrorMessage(1, 2),
         );
     }
 
@@ -77,7 +77,7 @@ final class SecurityTest extends TestCase
             }
         }
         ')->assertGraphQLErrorMessage(
-            QueryDepth::maxQueryDepthErrorMessage(1, 2)
+            QueryDepth::maxQueryDepthErrorMessage(1, 2),
         );
     }
 
@@ -92,7 +92,7 @@ final class SecurityTest extends TestCase
             }
         }
         ')->assertGraphQLErrorMessage(
-            DisableIntrospection::introspectionDisabledMessage()
+            DisableIntrospection::introspectionDisabledMessage(),
         );
     }
 }

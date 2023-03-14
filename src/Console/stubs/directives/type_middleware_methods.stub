@@ -5,7 +5,7 @@
      * @param  \Closure  $next
      * @return \GraphQL\Type\Definition\Type
      */
-    public function handleNode(TypeValue $value, Closure $next)
+    public function handleNode(TypeValue $value, \Closure $next)
     {
         // TODO implement the type middleware
     }

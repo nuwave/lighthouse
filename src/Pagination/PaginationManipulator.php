@@ -26,7 +26,7 @@ class PaginationManipulator
     protected ?string $modelClass = null;
 
     public function __construct(
-        protected DocumentAST $documentAST
+        protected DocumentAST $documentAST,
     ) {}
 
     /**
@@ -53,7 +53,7 @@ class PaginationManipulator
         ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
         ?int $defaultCount = null,
         ?int $maxCount = null,
-        ?ObjectTypeDefinitionNode $edgeType = null
+        ?ObjectTypeDefinitionNode $edgeType = null,
     ): void {
         if ($paginationType->isConnection()) {
             $this->registerConnection($fieldDefinition, $parentType, $paginationType, $defaultCount, $maxCount, $edgeType);
@@ -70,7 +70,7 @@ class PaginationManipulator
         PaginationType $paginationType,
         ?int $defaultCount = null,
         ?int $maxCount = null,
-        ?ObjectTypeDefinitionNode $edgeType = null
+        ?ObjectTypeDefinitionNode $edgeType = null,
     ): void {
         $fieldTypeName = ASTHelper::getUnderlyingTypeName($fieldDefinition);
 
@@ -113,7 +113,7 @@ GRAPHQL
         $this->documentAST->setTypeDefinition($connectionEdge);
 
         $fieldDefinition->arguments[] = Parser::inputValueDefinition(
-            self::countArgument($defaultCount, $maxCount)
+            self::countArgument($defaultCount, $maxCount),
         );
         $fieldDefinition->arguments[] = Parser::inputValueDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
 "A cursor after which elements are returned."
@@ -134,7 +134,7 @@ GRAPHQL
         if (null !== $existingType) {
             if (! $existingType instanceof ObjectTypeDefinitionNode) {
                 throw new DefinitionException(
-                    "Expected object type for pagination wrapper {$typeName}, found {$objectType->kind} instead."
+                    "Expected object type for pagination wrapper {$typeName}, found {$objectType->kind} instead.",
                 );
             }
 
@@ -156,7 +156,7 @@ GRAPHQL
         ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
         PaginationType $paginationType,
         ?int $defaultCount = null,
-        ?int $maxCount = null
+        ?int $maxCount = null,
     ): void {
         $fieldTypeName = ASTHelper::getUnderlyingTypeName($fieldDefinition);
         $paginatorTypeName = "{$fieldTypeName}Paginator";
@@ -176,7 +176,7 @@ GRAPHQL
         $this->addPaginationWrapperType($paginatorType);
 
         $fieldDefinition->arguments[] = Parser::inputValueDefinition(
-            self::countArgument($defaultCount, $maxCount)
+            self::countArgument($defaultCount, $maxCount),
         );
         $fieldDefinition->arguments[] = Parser::inputValueDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
 "The offset from which items are returned."
@@ -193,7 +193,7 @@ GRAPHQL
         ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
         PaginationType $paginationType,
         ?int $defaultCount = null,
-        ?int $maxCount = null
+        ?int $maxCount = null,
     ): void {
         $fieldTypeName = ASTHelper::getUnderlyingTypeName($fieldDefinition);
         $paginatorTypeName = "{$fieldTypeName}SimplePaginator";
@@ -213,7 +213,7 @@ GRAPHQL
         $this->addPaginationWrapperType($paginatorType);
 
         $fieldDefinition->arguments[] = Parser::inputValueDefinition(
-            self::countArgument($defaultCount, $maxCount)
+            self::countArgument($defaultCount, $maxCount),
         );
         $fieldDefinition->arguments[] = Parser::inputValueDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
 "The offset from which items are returned."
@@ -250,7 +250,7 @@ GRAPHQL
         $typeNode = Parser::typeReference(/** @lang GraphQL */ "{$typeName}!");
         assert(
             $typeNode instanceof NonNullTypeNode,
-            'We do not wrap the typename in [], so this will never be a ListOfTypeNode.'
+            'We do not wrap the typename in [], so this will never be a ListOfTypeNode.',
         );
 
         return $typeNode;

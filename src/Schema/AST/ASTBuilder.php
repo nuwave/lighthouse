@@ -42,7 +42,7 @@ class ASTBuilder
         protected DirectiveLocator $directiveLocator,
         protected SchemaSourceProvider $schemaSourceProvider,
         protected EventsDispatcher $eventsDispatcher,
-        protected ASTCache $astCache
+        protected ASTCache $astCache,
     ) {}
 
     public function documentAST(): DocumentAST
@@ -64,14 +64,14 @@ class ASTBuilder
         // This can be used by plugins to hook into the schema building process
         // while still allowing the user to define their schema as usual.
         $additionalSchemas = (array) $this->eventsDispatcher->dispatch(
-            new BuildSchemaString($schemaString)
+            new BuildSchemaString($schemaString),
         );
 
         $this->documentAST = DocumentAST::fromSource(
             implode(
                 PHP_EOL,
-                Arr::prepend($additionalSchemas, $schemaString)
-            )
+                Arr::prepend($additionalSchemas, $schemaString),
+            ),
         );
 
         // Apply transformations from directives
@@ -84,7 +84,7 @@ class ASTBuilder
         // into the ManipulateAST event. This can be useful for extensions
         // that want to programmatically change the schema.
         $this->eventsDispatcher->dispatch(
-            new ManipulateAST($this->documentAST)
+            new ManipulateAST($this->documentAST),
         );
 
         return $this->documentAST;
@@ -145,7 +145,7 @@ class ASTBuilder
                 $this->documentAST->setTypeDefinition($extendedObjectLikeType);
             } else {
                 throw new DefinitionException(
-                    $this->missingBaseDefinition($typeName, $typeExtension)
+                    $this->missingBaseDefinition($typeName, $typeExtension),
                 );
             }
         }
@@ -159,14 +159,14 @@ class ASTBuilder
             // @phpstan-ignore-next-line
             $extendedObjectLikeType->fields,
             // @phpstan-ignore-next-line
-            $typeExtension->fields
+            $typeExtension->fields,
         );
 
         if ($extendedObjectLikeType instanceof ObjectTypeDefinitionNode) {
             assert($typeExtension instanceof ObjectTypeExtensionNode, 'We know this because we passed assertExtensionMatchesDefinition().');
             $extendedObjectLikeType->interfaces = ASTHelper::mergeUniqueNodeList(
                 $extendedObjectLikeType->interfaces,
-                $typeExtension->interfaces
+                $typeExtension->interfaces,
             );
         }
     }
@@ -181,7 +181,7 @@ class ASTBuilder
 
         $extendedEnum->values = ASTHelper::mergeUniqueNodeList(
             $extendedEnum->values,
-            $typeExtension->values
+            $typeExtension->values,
         );
     }
 
@@ -233,7 +233,7 @@ class ASTBuilder
                                 $this->documentAST,
                                 $argumentDefinition,
                                 $fieldDefinition,
-                                $typeDefinition
+                                $typeDefinition,
                             );
                         }
                     }

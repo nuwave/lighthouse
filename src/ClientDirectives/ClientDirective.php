@@ -20,7 +20,7 @@ class ClientDirective
     protected Directive $definition;
 
     public function __construct(
-        protected string $name
+        protected string $name,
     ) {}
 
     /**

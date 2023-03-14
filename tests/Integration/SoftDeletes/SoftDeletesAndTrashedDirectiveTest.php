@@ -246,12 +246,12 @@ final class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
 
         /** @var \Tests\Utils\Models\Task $taskToRemove */
         $taskToRemove = $user->tasks()->save(
-            factory(Task::class)->make()
+            factory(Task::class)->make(),
         );
         $taskToRemove->delete();
 
         $user->tasks()->saveMany(
-            factory(Task::class, 2)->make()
+            factory(Task::class, 2)->make(),
         );
 
         $this->schema = /** @lang GraphQL */ '

@@ -10,7 +10,7 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
 class WhereConditionsHandler
 {
     public function __construct(
-        protected Operator $operator
+        protected Operator $operator,
     ) {}
 
     /**
@@ -24,7 +24,7 @@ class WhereConditionsHandler
         object $builder,
         array $whereConditions,
         Model $model = null,
-        string $boolean = 'and'
+        string $boolean = 'and',
     ): void {
         if ($builder instanceof EloquentBuilder) {
             $model = $builder->getModel();
@@ -38,7 +38,7 @@ class WhereConditionsHandler
                         $this->__invoke($builder, $condition, $model);
                     }
                 },
-                $boolean
+                $boolean,
             );
         }
 
@@ -50,7 +50,7 @@ class WhereConditionsHandler
                         $this->__invoke($builder, $condition, $model, 'or');
                     }
                 },
-                $boolean
+                $boolean,
             );
         }
 
@@ -60,7 +60,7 @@ class WhereConditionsHandler
                 $hasRelationConditions['relation'],
                 $hasRelationConditions['operator'],
                 $hasRelationConditions['amount'],
-                $hasRelationConditions['condition'] ?? null
+                $hasRelationConditions['condition'] ?? null,
             );
             // // @phpstan-ignore-next-line forwarding to Builder
             $builder->addNestedWhereQuery($nestedBuilder, $boolean);
@@ -80,7 +80,7 @@ class WhereConditionsHandler
         string $relation,
         string $operator,
         int $amount,
-        ?array $condition = null
+        ?array $condition = null,
     ): QueryBuilder {
         return $model
             ->newQuery()
@@ -92,14 +92,14 @@ class WhereConditionsHandler
                             $builder,
                             $this->prefixConditionWithTableName(
                                 $condition,
-                                $builder->getModel()
+                                $builder->getModel(),
                             ),
-                            $builder->getModel()
+                            $builder->getModel(),
                         );
                     }
                     : null,
                 $operator,
-                $amount
+                $amount,
             )
             ->getQuery();
     }

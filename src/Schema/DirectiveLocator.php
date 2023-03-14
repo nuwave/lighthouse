@@ -44,7 +44,7 @@ class DirectiveLocator
     protected array $resolvedClassnames = [];
 
     public function __construct(
-        protected EventsDispatcher $eventsDispatcher
+        protected EventsDispatcher $eventsDispatcher,
     ) {}
 
     /**
@@ -180,7 +180,7 @@ class DirectiveLocator
         $baseName = basename(str_replace('\\', '/', $className));
 
         return lcfirst(
-            Str::beforeLast($baseName, 'Directive')
+            Str::beforeLast($baseName, 'Directive'),
         );
     }
 
@@ -266,7 +266,7 @@ class DirectiveLocator
             $directiveNames = $directives
                 ->map(static function (Directive $directive): string {
                     $definition = ASTHelper::extractDirectiveDefinition(
-                        $directive::definition()
+                        $directive::definition(),
                     );
 
                     return "@{$definition->name->value}";

@@ -19,7 +19,7 @@ use Nuwave\Lighthouse\Schema\DirectiveLocator;
 class SchemaValidator
 {
     public function __construct(
-        protected DirectiveLocator $directiveLocator
+        protected DirectiveLocator $directiveLocator,
     ) {}
 
     public function handle(ValidateSchema $validateSchema): void

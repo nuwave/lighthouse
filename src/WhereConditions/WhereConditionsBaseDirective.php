@@ -39,7 +39,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
         DocumentAST &$documentAST,
         InputValueDefinitionNode &$argDefinition,
         FieldDefinitionNode &$parentField,
-        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
     ): void {
         $this->validateMutuallyExclusiveArguments(['columns', 'columnsEnum']);
 
@@ -53,14 +53,14 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
                     WhereConditionsServiceProvider::createWhereConditionsInputType(
                         $restrictedWhereConditionsName,
                         "Dynamic WHERE conditions for the `{$argDefinition->name->value}` argument on the query `{$parentField->name->value}`.",
-                        $allowedColumnsEnumName
-                    )
+                        $allowedColumnsEnumName,
+                    ),
                 )
                 ->setTypeDefinition(
                     WhereConditionsServiceProvider::createHasConditionsInputType(
                         $restrictedWhereConditionsName,
-                        "Dynamic HAS conditions for WHERE conditions for the `{$argDefinition->name->value}` argument on the query `{$parentField->name->value}`."
-                    )
+                        "Dynamic HAS conditions for WHERE conditions for the `{$argDefinition->name->value}` argument on the query `{$parentField->name->value}`.",
+                    ),
                 );
         } else {
             $argDefinition->type = Parser::namedType(WhereConditionsServiceProvider::DEFAULT_WHERE_CONDITIONS);

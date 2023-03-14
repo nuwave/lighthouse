@@ -50,7 +50,7 @@ class BroadcastManager extends DriverManager
             $driverConfig['key'],
             $driverConfig['secret'],
             $driverConfig['app_id'],
-            $driverConfig['options'] ?? []
+            $driverConfig['options'] ?? [],
         );
 
         if ($driverConfig['log'] ?? false) {

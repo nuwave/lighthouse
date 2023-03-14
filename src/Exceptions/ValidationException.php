@@ -13,7 +13,7 @@ class ValidationException extends \Exception implements ClientAware, ProvidesExt
 
     public function __construct(
         string $message,
-        protected Validator $validator
+        protected Validator $validator,
     ) {
         parent::__construct($message);
     }
@@ -33,7 +33,7 @@ class ValidationException extends \Exception implements ClientAware, ProvidesExt
     public static function withMessages(array $messages): self
     {
         return static::fromLaravel(
-            LaravelValidationException::withMessages($messages)
+            LaravelValidationException::withMessages($messages),
         );
     }
 

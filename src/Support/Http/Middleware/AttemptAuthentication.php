@@ -12,7 +12,7 @@ use Nuwave\Lighthouse\Auth\AuthServiceProvider;
 class AttemptAuthentication
 {
     public function __construct(
-        protected AuthFactory $authFactory
+        protected AuthFactory $authFactory,
     ) {}
 
     public function handle(Request $request, \Closure $next, string ...$guards): mixed
@@ -28,7 +28,7 @@ class AttemptAuthentication
     protected function attemptAuthentication(array $guards): void
     {
         if ([] === $guards) {
-            $guards = [AuthServiceProvider::guard()];
+            $guards = AuthServiceProvider::guards();
         }
 
         foreach ($guards as $guard) {

@@ -84,7 +84,7 @@ final class WhereHasConditionsDirectiveTest extends DBTestCase
     {
         return array_merge(
             parent::getPackageProviders($app),
-            [WhereConditionsServiceProvider::class]
+            [WhereConditionsServiceProvider::class],
         );
     }
 

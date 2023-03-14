@@ -89,7 +89,7 @@ class DocumentAST implements Arrayable
             $documentNode = Parser::parse(
                 $schema,
                 // Ignore location since it only bloats the AST
-                ['noLocation' => true]
+                ['noLocation' => true],
             );
         } catch (SyntaxError $syntaxError) {
             // Throw our own error class instead, since otherwise a schema definition
@@ -116,7 +116,7 @@ class DocumentAST implements Arrayable
                     $modelClass = Utils::namespaceClassName(
                         $modelName,
                         $namespacesToTry,
-                        static fn (string $classCandidate): bool => is_subclass_of($classCandidate, Model::class)
+                        static fn (string $classCandidate): bool => is_subclass_of($classCandidate, Model::class),
                     );
 
                     if (null === $modelClass) {

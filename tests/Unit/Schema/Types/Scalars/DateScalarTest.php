@@ -39,14 +39,14 @@ abstract class DateScalarTest extends TestCase
     public function testConvertsCarbonCarbonToIlluminateSupportCarbon(): void
     {
         $this->assertTrue(
-            $this->scalarInstance()->parseValue(CarbonCarbon::now())->isValid()
+            $this->scalarInstance()->parseValue(CarbonCarbon::now())->isValid(),
         );
     }
 
     public function testConvertsCarbonCarbonImmutableToIlluminateSupportCarbon(): void
     {
         $this->assertTrue(
-            $this->scalarInstance()->parseValue(CarbonCarbonImmutable::now())->isValid()
+            $this->scalarInstance()->parseValue(CarbonCarbonImmutable::now())->isValid(),
         );
     }
 
@@ -71,7 +71,7 @@ abstract class DateScalarTest extends TestCase
     public function testParsesValueString(string $date): void
     {
         $this->assertTrue(
-            $this->scalarInstance()->parseValue($date)->isValid()
+            $this->scalarInstance()->parseValue($date)->isValid(),
         );
     }
 
@@ -81,7 +81,7 @@ abstract class DateScalarTest extends TestCase
     public function testParsesLiteral(string $date): void
     {
         $dateLiteral = new StringValueNode(
-            ['value' => $date]
+            ['value' => $date],
         );
         $parsed = $this->scalarInstance()->parseLiteral($dateLiteral);
 
@@ -93,7 +93,7 @@ abstract class DateScalarTest extends TestCase
         $this->expectException(Error::class);
 
         $this->scalarInstance()->parseLiteral(
-            new IntValueNode([])
+            new IntValueNode([]),
         );
     }
 

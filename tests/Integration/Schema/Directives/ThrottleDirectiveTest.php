@@ -39,7 +39,7 @@ final class ThrottleDirectiveTest extends TestCase
         $rateLimiter = $this->app->make(RateLimiter::class);
         $rateLimiter->for(
             'test',
-            static fn (): Response => response('Custom response...', 429)
+            static fn (): Response => response('Custom response...', 429),
         );
 
         $this->expectException(DefinitionException::class);
@@ -61,7 +61,7 @@ final class ThrottleDirectiveTest extends TestCase
         $rateLimiter = $this->app->make(RateLimiter::class);
         $rateLimiter->for(
             'test',
-            static fn (): Limit => Limit::perMinute(1)
+            static fn (): Limit => Limit::perMinute(1),
         );
 
         $this->graphQL(/** @lang GraphQL */ '
@@ -79,7 +79,7 @@ final class ThrottleDirectiveTest extends TestCase
             foo
         }
         ')->assertGraphQLError(
-            new RateLimitException('Query.foo')
+            new RateLimitException('Query.foo'),
         );
     }
 
@@ -106,7 +106,7 @@ final class ThrottleDirectiveTest extends TestCase
             foo
         }
         ')->assertGraphQLError(
-            new RateLimitException('Query.foo')
+            new RateLimitException('Query.foo'),
         );
     }
 }
