@@ -139,7 +139,7 @@ class TestResponse
     /**
      * Assert a subscription actually received a broadcast.
      *
-     * @param  array<mixed>[]  $data  the broadcast pattern that you are expecting
+     * @param  array<int, array<string, mixed>>  $data  the broadcast pattern that you are expecting
      *
      * @return $this
      */
