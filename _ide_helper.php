@@ -106,7 +106,7 @@ class TestResponse
     /**
      * Assert current user is NOT authorized to join a subscription.
      *
-     * @param  TestCase  $testClassInstance  you need to pass $this
+     * @param  \PHPUnit\Framework\TestCase  $testClassInstance  usually $this when calling this from a test class
      *
      * @return $this
      */
