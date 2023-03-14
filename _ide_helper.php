@@ -129,7 +129,7 @@ class TestResponse
     }
 
     /**
-     * You can get the channel name from a subscription query.
+     * Get the channel name from a subscription query.
      */
     public function graphQLSubscriptionChannelName(): string
     {
