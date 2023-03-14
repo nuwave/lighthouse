@@ -269,7 +269,7 @@ GRAPHQL;
     {
         $this->validateMutuallyExclusiveArguments(['resolved', 'query', 'find']);
 
-        if ($this->directiveHasArgument('resolved') && RootType::MUTATION === $parentType->name->value) {
+        if ($this->directiveHasArgument('resolved') && $parentType->name->value === RootType::MUTATION) {
             throw self::resolvedIsUnsafeInMutations($fieldDefinition->name->value);
         }
     }

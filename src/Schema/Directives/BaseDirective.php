@@ -182,13 +182,13 @@ abstract class BaseDirective implements Directive
             array_unshift($namespacesToTry, $namespaceForDirective);
         }
 
-        if (null === $determineMatch) {
+        if ($determineMatch === null) {
             $determineMatch = 'class_exists';
         }
 
         $className = Utils::namespaceClassname($classCandidate, $namespacesToTry, $determineMatch);
 
-        if (null === $className) {
+        if ($className === null) {
             $consideredNamespaces = implode(', ', $namespacesToTry);
             throw new DefinitionException("Failed to find class {$classCandidate} in namespaces [{$consideredNamespaces}] for directive @{$this->name()}.");
         }

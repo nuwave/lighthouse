@@ -12,7 +12,7 @@ class ResponseStream extends Stream implements CanStreamResponse
 
     public function stream(array $data, array $paths, bool $isFinalChunk): void
     {
-        if ([] === $paths) {
+        if ($paths === []) {
             $this->emit(
                 $this->chunk($data, $isFinalChunk),
             );

@@ -34,7 +34,7 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
     public function messages(): array
     {
         $messages = $this->directiveArgValue('messages');
-        if (null === $messages) {
+        if ($messages === null) {
             return [];
         }
 
@@ -80,7 +80,7 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
             $this->invalidApplyArgument($rules);
         }
 
-        if ([] === $rules) {
+        if ($rules === []) {
             $this->invalidApplyArgument($rules);
         }
 
@@ -94,7 +94,7 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
     protected function validateMessageArg(): void
     {
         $messages = $this->directiveArgValue('messages');
-        if (null === $messages) {
+        if ($messages === null) {
             return;
         }
 

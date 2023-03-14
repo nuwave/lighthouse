@@ -44,7 +44,7 @@ class TypeValue
             $typeName = $this->getTypeDefinitionName();
 
             // The Query type is exempt from requiring a cache key
-            if (RootType::QUERY === $typeName) {
+            if ($typeName === RootType::QUERY) {
                 return null;
             }
 
@@ -71,7 +71,7 @@ class TypeValue
                 if (
                     $fieldType instanceof NonNullTypeNode
                     && $fieldType->type instanceof NamedTypeNode
-                    && 'ID' === $fieldType->type->name->value
+                    && $fieldType->type->name->value === 'ID'
                 ) {
                     return $this->cacheKey = ASTHelper::internalFieldName($field);
                 }

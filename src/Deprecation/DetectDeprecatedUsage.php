@@ -51,12 +51,12 @@ class DetectDeprecatedUsage extends ValidationRule
         return [
             NodeKind::FIELD => function (FieldNode $_) use ($context): void {
                 $field = $context->getFieldDef();
-                if (null === $field) {
+                if ($field === null) {
                     return;
                 }
 
                 $deprecationReason = $field->deprecationReason;
-                if (null !== $deprecationReason) {
+                if ($deprecationReason !== null) {
                     $parent = $context->getParentType();
                     if (! $parent instanceof NamedType) {
                         return;
@@ -77,7 +77,7 @@ class DetectDeprecatedUsage extends ValidationRule
                 }
 
                 $deprecationReason = $value->deprecationReason;
-                if (null !== $deprecationReason) {
+                if ($deprecationReason !== null) {
                     $this->registerDeprecation("{$enum->name}.{$value->name}", $deprecationReason);
                 }
             },

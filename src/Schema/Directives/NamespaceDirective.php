@@ -39,7 +39,7 @@ GRAPHQL;
 
         foreach ($objectType->fields as $fieldDefinition) {
             $existingNamespaces = ASTHelper::directiveDefinition($fieldDefinition, self::NAME);
-            if (null !== $existingNamespaces) {
+            if ($existingNamespaces !== null) {
                 $namespaceDirective->arguments = $namespaceDirective->arguments->merge($existingNamespaces->arguments);
             }
 

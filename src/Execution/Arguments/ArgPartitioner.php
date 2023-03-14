@@ -76,7 +76,7 @@ class ArgPartitioner
         $nonNullRelations = new ArgumentSet();
         $nonNullRelations->arguments = array_filter(
             $relations->arguments,
-            static fn (Argument $argument): bool => null !== $argument->value,
+            static fn (Argument $argument): bool => $argument->value !== null,
         );
 
         return [$nonNullRelations, $remaining];
@@ -92,9 +92,9 @@ class ArgPartitioner
         $resolverDirective = $argument->directives->first(
             Utils::instanceofMatcher(ArgResolver::class),
         );
-        assert($resolverDirective instanceof ArgResolver || null === $resolverDirective);
+        assert($resolverDirective instanceof ArgResolver || $resolverDirective === null);
 
-        if (null !== $resolverDirective) {
+        if ($resolverDirective !== null) {
             $argument->resolver = $resolverDirective;
 
             return;

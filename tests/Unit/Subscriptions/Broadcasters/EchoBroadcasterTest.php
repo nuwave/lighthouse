@@ -21,9 +21,9 @@ final class EchoBroadcasterTest extends TestCase
         $broadcastManager = $this->createMock(BroadcastManager::class);
         $broadcastManager->expects($this->once())
             ->method('event')
-            ->with(new Callback(static fn (EchoSubscriptionEvent $event): bool => Broadcaster::EVENT_NAME === $event->broadcastAs()
-                && 'test-123' === $event->broadcastOn()->name
-                && 'foo' === $event->data));
+            ->with(new Callback(static fn (EchoSubscriptionEvent $event): bool => $event->broadcastAs() === Broadcaster::EVENT_NAME
+                && $event->broadcastOn()->name === 'test-123'
+                && $event->data === 'foo'));
 
         $redisBroadcaster = new EchoBroadcaster($broadcastManager);
         $subscriber = $this->createMock(Subscriber::class);
@@ -38,7 +38,7 @@ final class EchoBroadcasterTest extends TestCase
         $broadcastManager->expects($this->once())
             ->method('event')
             ->with(new Callback(
-                static fn (EchoSubscriptionEvent $event): bool => 'private-test-123' === $event->broadcastOn()->name,
+                static fn (EchoSubscriptionEvent $event): bool => $event->broadcastOn()->name === 'private-test-123',
             ));
 
         $redisBroadcaster = new EchoBroadcaster($broadcastManager);

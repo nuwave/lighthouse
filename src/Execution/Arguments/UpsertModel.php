@@ -30,12 +30,12 @@ class UpsertModel implements ArgResolver
             ?? $args->arguments[$model->getKeyName()]
             ?? null;
 
-        if (null !== $id) {
+        if ($id !== null) {
             $existingModel = $model
                 ->newQuery()
                 ->find($id->value);
 
-            if (null !== $existingModel) {
+            if ($existingModel !== null) {
                 $model = $existingModel;
             }
         }

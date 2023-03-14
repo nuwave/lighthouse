@@ -27,15 +27,15 @@ class EnsureXHR
     {
         $method = $request->getRealMethod();
 
-        if ('GET' === $method) {
+        if ($method === 'GET') {
             throw new BadRequestHttpException('GET requests are forbidden');
         }
 
-        if ('POST' !== $method) {
+        if ($method !== 'POST') {
             return $next($request);
         }
 
-        if ('XMLHttpRequest' === $request->header('X-Requested-With', '')) {
+        if ($request->header('X-Requested-With', '') === 'XMLHttpRequest') {
             return $next($request);
         }
 
@@ -46,7 +46,7 @@ class EnsureXHR
         }
 
         // @phpstan-ignore-next-line wrongly assumes $contentType to always be string
-        if (null === $contentType || '' === $contentType) {
+        if ($contentType === null || $contentType === '') {
             throw new BadRequestHttpException('Content-Type header must be set');
         }
 

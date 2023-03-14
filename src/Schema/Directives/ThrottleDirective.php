@@ -62,7 +62,7 @@ GRAPHQL;
         $limits = [];
 
         $name = $this->directiveArgValue('name');
-        if (null !== $name) {
+        if ($name !== null) {
             $limiter = $this->limiter->limiter($name);
 
             $limiterResponse = $limiter($this->request);
@@ -106,7 +106,7 @@ GRAPHQL;
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType): void
     {
         $name = $this->directiveArgValue('name');
-        if (null !== $name) {
+        if ($name !== null) {
             // @phpstan-ignore-next-line $limiter may be null although it's not specified in limiter() PHPDoc
             $this->limiter->limiter($name)
                 ?? throw new DefinitionException("Named limiter {$name} is not found.");

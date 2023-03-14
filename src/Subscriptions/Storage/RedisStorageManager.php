@@ -65,7 +65,7 @@ class RedisStorageManager implements StoresSubscriptions
         // As explained in storeSubscriber, we use redis sets to store the names of subscribers of a topic.
         // We can retrieve all members of a set using the command smembers.
         $subscriberIds = $this->connection->command('smembers', [$this->topicKey($topic)]);
-        if (0 === count($subscriberIds)) {
+        if (count($subscriberIds) === 0) {
             return new Collection();
         }
 
@@ -81,7 +81,7 @@ class RedisStorageManager implements StoresSubscriptions
             ->filter()
             ->map(static function (?string $subscriber): ?Subscriber {
                 // Some entries may be expired
-                if (null === $subscriber) {
+                if ($subscriber === null) {
                     return null;
                 }
 
@@ -108,7 +108,7 @@ class RedisStorageManager implements StoresSubscriptions
             $subscriber->channel,
         ]);
         // ...and refresh the ttl of this set as well.
-        if (null !== $this->ttl) {
+        if ($this->ttl !== null) {
             $this->connection->command('expire', [$topicKey, $this->ttl]);
         }
 
@@ -118,7 +118,7 @@ class RedisStorageManager implements StoresSubscriptions
             $this->channelKey($subscriber->channel),
             serialize($subscriber),
         ];
-        if (null !== $this->ttl) {
+        if ($this->ttl !== null) {
             $setCommand = 'setex';
             array_splice($setArguments, 1, 0, [$this->ttl]);
         }
@@ -131,7 +131,7 @@ class RedisStorageManager implements StoresSubscriptions
         $key = $this->channelKey($channel);
         $subscriber = $this->getSubscriber($key);
 
-        if (null !== $subscriber) {
+        if ($subscriber !== null) {
             // Like in storeSubscriber (but in reverse), we delete the subscriber...
             $this->connection->command('del', [$key]);
             // ...and remove it from the set of subscribers of this topic.

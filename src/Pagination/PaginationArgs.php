@@ -42,7 +42,7 @@ class PaginationArgs
 
         // Make sure the maximum pagination count is not exceeded
         if (
-            null !== $paginateMaxCount
+            $paginateMaxCount !== null
             && $first > $paginateMaxCount
         ) {
             throw new Error(

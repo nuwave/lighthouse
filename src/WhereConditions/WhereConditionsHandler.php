@@ -113,7 +113,7 @@ class WhereConditionsHandler
         // - must not start with a digit, dot or hyphen
         // - must contain only alphanumerics, digits, underscores, dots, hyphens or JSON references
         $match = \Safe\preg_match('/^(?![0-9.-])([A-Za-z0-9_.-]|->)*$/', $column);
-        if (0 === $match) {
+        if ($match === 0) {
             throw new Error(self::invalidColumnName($column));
         }
     }

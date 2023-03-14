@@ -49,11 +49,11 @@ abstract class TypeNodeConverter
             ->reverse()
             ->reduce(
                 function ($type, string $kind) {
-                    if (NodeKind::NON_NULL_TYPE === $kind) {
+                    if ($kind === NodeKind::NON_NULL_TYPE) {
                         return $this->nonNull($type);
                     }
 
-                    if (NodeKind::LIST_TYPE === $kind) {
+                    if ($kind === NodeKind::LIST_TYPE) {
                         return $this->listOf($type);
                     }
 

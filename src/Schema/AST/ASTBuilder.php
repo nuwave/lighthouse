@@ -139,7 +139,7 @@ class ASTBuilder
     protected function extendObjectLikeType(string $typeName, ObjectTypeExtensionNode|InputObjectTypeExtensionNode|InterfaceTypeExtensionNode $typeExtension): void
     {
         $extendedObjectLikeType = $this->documentAST->types[$typeName] ?? null;
-        if (null === $extendedObjectLikeType) {
+        if ($extendedObjectLikeType === null) {
             if (RootType::isRootType($typeName)) {
                 $extendedObjectLikeType = Parser::objectTypeDefinition(/** @lang GraphQL */ "type {$typeName}");
                 $this->documentAST->setTypeDefinition($extendedObjectLikeType);

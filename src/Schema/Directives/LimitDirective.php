@@ -48,7 +48,7 @@ GRAPHQL;
     public function handleField(FieldValue $fieldValue): void
     {
         $fieldValue->resultHandler(static function (?iterable $result, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ?iterable {
-            if (null === $result) {
+            if ($result === null) {
                 return null;
             }
 
@@ -72,7 +72,7 @@ GRAPHQL;
             $limited = [];
 
             foreach ($result as $value) {
-                if (0 === $limit) {
+                if ($limit === 0) {
                     break;
                 }
 

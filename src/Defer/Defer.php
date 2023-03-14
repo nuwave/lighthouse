@@ -77,13 +77,13 @@ class Defer implements CreatesResponse
     public function defer(callable $resolver, string $path): mixed
     {
         $data = $this->getData($path);
-        if (null !== $data) {
+        if ($data !== null) {
             return $data;
         }
 
         // If we have been here before, now is the time to resolve this field
         $deferredResolver = $this->deferred[$path] ?? null;
-        if (null !== $deferredResolver) {
+        if ($deferredResolver !== null) {
             return $this->resolve($deferredResolver, $path);
         }
 
@@ -178,7 +178,7 @@ class Defer implements CreatesResponse
 
     protected function hasRemainingDeferred(): bool
     {
-        return [] !== $this->deferred;
+        return $this->deferred !== [];
     }
 
     protected function stream(): void
@@ -195,7 +195,7 @@ class Defer implements CreatesResponse
      */
     protected function maxExecutionTimeReached(): bool
     {
-        if (0 === $this->maxExecutionTime) {
+        if ($this->maxExecutionTime === 0) {
             return false;
         }
 
@@ -207,7 +207,7 @@ class Defer implements CreatesResponse
      */
     protected function maxNestedFieldsResolved(int $nested): bool
     {
-        if (0 === $this->maxNestedFields) {
+        if ($this->maxNestedFields === 0) {
             return false;
         }
 

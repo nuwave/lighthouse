@@ -53,7 +53,7 @@ GRAPHQL;
 
         $fieldValue->wrapResolver(fn (callable $resolver): \Closure => function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($rootCacheKey, $shouldUseTags, $resolver, $maxAge, $isPrivate) {
             $parentName = $resolveInfo->parentType->name;
-            $rootID = null !== $root && null !== $rootCacheKey
+            $rootID = $root !== null && $rootCacheKey !== null
                 ? data_get($root, $rootCacheKey)
                 : null;
             $fieldName = $resolveInfo->fieldName;
@@ -78,7 +78,7 @@ GRAPHQL;
 
             // We found a matching value in the cache, so we can just return early without actually running the query.
             $value = $cache->get($cacheKey);
-            if (null !== $value) {
+            if ($value !== null) {
                 // Deferring the result will allow nested deferred resolves to be bundled together, see https://github.com/nuwave/lighthouse/pull/2270#discussion_r1072414584.
                 return new Deferred(static fn () => $value);
             }

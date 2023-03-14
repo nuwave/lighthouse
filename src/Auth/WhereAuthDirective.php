@@ -63,7 +63,7 @@ GRAPHQL;
         foreach ($guards as $guard) {
             $id = $this->authFactory->guard($guard)
                 ->id();
-            if (null !== $id) {
+            if ($id !== null) {
                 return $id;
             }
         }

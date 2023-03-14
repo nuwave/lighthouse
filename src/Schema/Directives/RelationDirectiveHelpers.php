@@ -63,7 +63,7 @@ trait RelationDirectiveHelpers
         $path = $resolveInfo->path;
 
         // In case we have no args, we can combine eager loads that are the same
-        if ([] === $args) {
+        if ($args === []) {
             array_pop($path);
         }
 

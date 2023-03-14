@@ -61,7 +61,7 @@ GRAPHQL;
      */
     public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, $value): QueryBuilder|EloquentBuilder|Relation
     {
-        if (null === $value) {
+        if ($value === null) {
             return $builder;
         }
 

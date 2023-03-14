@@ -36,7 +36,7 @@ class SchemaValidator
     protected function validateObjectType(ObjectType $type): void
     {
         $ast = $type->astNode;
-        if (null !== $ast) {
+        if ($ast !== null) {
             $directives = $this->directiveLocator->associated($ast);
 
             foreach ($directives as $directive) {
@@ -72,7 +72,7 @@ class SchemaValidator
             }
 
             $nestedSelection = $selection->selectionSet;
-            if (null !== $nestedSelection) {
+            if ($nestedSelection !== null) {
                 $fieldType = Type::getNamedType($field->getType());
                 if (! $fieldType instanceof ObjectType) {
                     $notObjectType = Utils::printSafe($fieldType);

@@ -16,7 +16,7 @@ class ReportingErrorHandler implements ErrorHandler
 
     public function __invoke(?Error $error, \Closure $next): ?array
     {
-        if (null === $error) {
+        if ($error === null) {
             return $next(null);
         }
 
@@ -27,7 +27,7 @@ class ReportingErrorHandler implements ErrorHandler
         }
 
         $previous = $error->getPrevious();
-        if (null !== $previous) {
+        if ($previous !== null) {
             $this->exceptionHandler->report($previous);
         }
 

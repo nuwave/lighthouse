@@ -170,7 +170,7 @@ class RulesGatherer
         $this->messages += $this->wrap($directive->messages(), $argumentPath);
 
         $attribute = $directive->attribute();
-        if (null !== $attribute) {
+        if ($attribute !== null) {
             $this->attributes = array_merge(
                 $this->attributes,
                 [implode('.', $argumentPath) => $attribute],
@@ -232,7 +232,7 @@ class RulesGatherer
             $name = $parsed[0];
             $args = $parsed[1];
 
-            if ('WithReference' === $name) {
+            if ($name === 'WithReference') {
                 $indexes = explode('_', $args[1]);
                 array_splice($args, 1, 1);
                 foreach ($indexes as $index) {

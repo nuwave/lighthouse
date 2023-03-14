@@ -108,7 +108,7 @@ class DocumentAST implements Arrayable
 
                 if ($definition instanceof ObjectTypeDefinitionNode) {
                     $modelName = ModelDirective::modelClass($definition);
-                    if (null === $modelName) {
+                    if ($modelName === null) {
                         continue;
                     }
 
@@ -119,7 +119,7 @@ class DocumentAST implements Arrayable
                         static fn (string $classCandidate): bool => is_subclass_of($classCandidate, Model::class),
                     );
 
-                    if (null === $modelClass) {
+                    if ($modelClass === null) {
                         $consideredNamespaces = implode(', ', $namespacesToTry);
                         throw new DefinitionException("Failed to find a model class {$modelName} in namespaces [{$consideredNamespaces}] referenced in @model on type {$name}.");
                     }

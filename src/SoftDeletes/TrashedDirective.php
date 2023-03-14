@@ -36,7 +36,7 @@ GRAPHQL;
         $model = $builder->getModel();
         $this->assertModelUsesSoftDeletes($model);
 
-        if (null === $value) {
+        if ($value === null) {
             return $builder;
         }
 
@@ -56,7 +56,7 @@ GRAPHQL;
         $model = $builder->model;
         $this->assertModelUsesSoftDeletes($model);
 
-        if (null === $value) {
+        if ($value === null) {
             return $builder;
         }
 

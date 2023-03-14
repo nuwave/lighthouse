@@ -42,8 +42,8 @@ GRAPHQL;
         foreach ($argumentSet->arguments as $argument) {
             $namedType = $argument->namedType();
             if (
-                null !== $namedType
-                && ScalarType::STRING === $namedType->name
+                $namedType !== null
+                && $namedType->name === ScalarType::STRING
                 && ! $namedType->nonNull
             ) {
                 $argument->value = $this->sanitize($argument->value);
@@ -60,7 +60,7 @@ GRAPHQL;
      */
     protected function transformLeaf(mixed $value): mixed
     {
-        if ('' === $value) {
+        if ($value === '') {
             return null;
         }
 

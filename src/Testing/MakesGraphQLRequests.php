@@ -53,7 +53,7 @@ trait MakesGraphQLRequests
     ): TestResponse {
         $params = ['query' => $query];
 
-        if ([] !== $variables) {
+        if ($variables !== []) {
             $params += ['variables' => $variables];
         }
 

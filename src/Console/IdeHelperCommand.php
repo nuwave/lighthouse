@@ -157,7 +157,7 @@ GRAPHQL;
 
         $filePath = static::programmaticTypesPath();
 
-        if ([] === $programmaticTypes && file_exists($filePath)) {
+        if ($programmaticTypes === [] && file_exists($filePath)) {
             \Safe\unlink($filePath);
 
             return;

@@ -15,12 +15,12 @@ final class UserPolicy
 
     public function adminOnly(User $user): bool
     {
-        return self::ADMIN === $user->name;
+        return $user->name === self::ADMIN;
     }
 
     public function superAdminOnly(User $user): Response
     {
-        if (self::SUPER_ADMIN === $user->name) {
+        if ($user->name === self::SUPER_ADMIN) {
             return Response::allow();
         }
 
@@ -34,7 +34,7 @@ final class UserPolicy
 
     public function guestOnly(User $viewer = null): bool
     {
-        return null === $viewer;
+        return $viewer === null;
     }
 
     public function view(User $viewer, User $queriedUser): bool

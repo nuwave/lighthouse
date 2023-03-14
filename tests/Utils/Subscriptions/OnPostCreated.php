@@ -15,7 +15,7 @@ final class OnPostCreated extends GraphQLSubscription
 
         return ! $user
             || ! $user instanceof User
-            || 'fail_the_authorize_of_subscription' !== $user->name;
+            || $user->name !== 'fail_the_authorize_of_subscription';
     }
 
     public function filter(Subscriber $subscriber, mixed $root): bool

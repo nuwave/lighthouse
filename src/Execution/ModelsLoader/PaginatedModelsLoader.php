@@ -144,7 +144,7 @@ class PaginatedModelsLoader implements ModelsLoader
     protected function loadDefaultWith(EloquentCollection $models): void
     {
         $model = $models->first();
-        if (null === $model) {
+        if ($model === null) {
             return;
         }
 
@@ -186,7 +186,7 @@ class PaginatedModelsLoader implements ModelsLoader
         foreach ($parents as $model) {
             $total = CountModelsLoader::extractCount($model, $this->relation);
 
-            $paginator = 0 === $first
+            $paginator = $first === 0
                 ? new ZeroPageLengthAwarePaginator($total, $page)
                 : new LengthAwarePaginator($model->getRelation($this->relation), $total, $first, $page);
 

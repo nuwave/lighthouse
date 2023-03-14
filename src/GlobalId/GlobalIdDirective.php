@@ -61,7 +61,7 @@ GRAPHQL;
         $type = $fieldValue->getParentName();
 
         $fieldValue->resultHandler(
-            fn ($result): ?string => null === $result
+            fn ($result): ?string => $result === null
                 ? null
                 : $this->globalId->encode($type, $result),
         );
@@ -74,12 +74,12 @@ GRAPHQL;
      */
     public function sanitize(mixed $argumentValue): string|array|null
     {
-        if (null === $argumentValue) {
+        if ($argumentValue === null) {
             return null;
         }
 
         $decode = $this->directiveArgValue('decode');
-        if (null !== $decode) {
+        if ($decode !== null) {
             return match ($decode) {
                 'TYPE' => $this->globalId->decodeType($argumentValue),
                 'ID' => $this->globalId->decodeID($argumentValue),

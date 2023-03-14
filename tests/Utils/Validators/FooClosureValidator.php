@@ -19,7 +19,7 @@ final class FooClosureValidator extends Validator
         return [
             'foo' => [
                 static function (string $attribute, $value, \Closure $fail): void {
-                    if ('foo' !== $value) {
+                    if ($value !== 'foo') {
                         $fail(self::notFoo($attribute));
                     }
                 },

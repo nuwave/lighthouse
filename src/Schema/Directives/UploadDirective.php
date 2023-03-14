@@ -39,7 +39,7 @@ GRAPHQL;
 
     public function transform($argumentValue): ?string
     {
-        if (null === $argumentValue) {
+        if ($argumentValue === null) {
             return null;
         }
 
@@ -61,7 +61,7 @@ GRAPHQL;
             ],
         );
 
-        if (false === $filepathInStorage) {
+        if ($filepathInStorage === false) {
             throw new CannotWriteFileException("Unable to upload `{$this->nodeName()}` file to `{$this->pathArgValue()}` via disk `{$this->diskArgValue()}`.");
         }
 

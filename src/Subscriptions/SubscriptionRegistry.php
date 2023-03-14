@@ -106,7 +106,7 @@ class SubscriptionRegistry
                 Utils::instanceofMatcher(OperationDefinitionNode::class),
             )
             // @phpstan-ignore-next-line type of $node was narrowed by the preceding filter
-            ->filter(static fn (OperationDefinitionNode $node): bool => 'subscription' === $node->operation)
+            ->filter(static fn (OperationDefinitionNode $node): bool => $node->operation === 'subscription')
             // @phpstan-ignore-next-line type of $node was narrowed by the preceding filter
             ->map(static fn (OperationDefinitionNode $node): array => (new Collection($node->selectionSet->selections))
                 // @phpstan-ignore-next-line subscriptions must only have a single field
@@ -134,11 +134,11 @@ class SubscriptionRegistry
     {
         $subscriptionsConfig = $this->configRepository->get('lighthouse.subscriptions');
 
-        $channel = [] !== $this->subscribers
+        $channel = $this->subscribers !== []
             ? reset($this->subscribers)
             : null;
 
-        if (null === $channel && ($subscriptionsConfig['exclude_empty'] ?? false)) {
+        if ($channel === null && ($subscriptionsConfig['exclude_empty'] ?? false)) {
             return null;
         }
 

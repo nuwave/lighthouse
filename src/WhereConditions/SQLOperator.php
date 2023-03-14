@@ -87,7 +87,7 @@ GRAPHQL;
         $operator = $whereConditions['operator'];
         $arity = $this->operatorArity($operator);
 
-        if (3 === $arity) {
+        if ($arity === 3) {
             // Usually, the operator is passed as the second argument to the condition
             // method, e.g. ->where('some_col', '=', $value)
             $args[] = $operator;

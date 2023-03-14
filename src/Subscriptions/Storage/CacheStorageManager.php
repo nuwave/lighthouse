@@ -67,7 +67,7 @@ class CacheStorageManager implements StoresSubscriptions
         $this->addSubscriberToTopic($subscriber);
 
         $channelKey = self::channelKey($subscriber->channel);
-        if (null === $this->ttl) {
+        if ($this->ttl === null) {
             $this->cache->forever($channelKey, $subscriber);
         } else {
             $this->cache->put($channelKey, $subscriber, $this->ttl);
@@ -78,7 +78,7 @@ class CacheStorageManager implements StoresSubscriptions
     {
         $subscriber = $this->cache->pull(self::channelKey($channel));
 
-        if (null !== $subscriber) {
+        if ($subscriber !== null) {
             $this->removeSubscriberFromTopic($subscriber);
         }
 
@@ -92,7 +92,7 @@ class CacheStorageManager implements StoresSubscriptions
      */
     protected function storeTopic(string $key, Collection $topic): void
     {
-        if (null === $this->ttl) {
+        if ($this->ttl === null) {
             $this->cache->forever($key, $topic);
         } else {
             $this->cache->put($key, $topic, $this->ttl);

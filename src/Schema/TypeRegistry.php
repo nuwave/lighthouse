@@ -337,7 +337,7 @@ class TypeRegistry
         $scalarName = $scalarDefinition->name->value;
 
         $scalarDirective = ASTHelper::directiveDefinition($scalarDefinition, 'scalar');
-        $className = null === $scalarDirective
+        $className = $scalarDirective === null
             ? $scalarName
             : ASTHelper::directiveArgValue($scalarDirective, 'class');
 
@@ -350,7 +350,7 @@ class TypeRegistry
         );
         assert(is_null($namespacedClassName) || is_subclass_of($namespacedClassName, ScalarType::class));
 
-        if (null === $namespacedClassName) {
+        if ($namespacedClassName === null) {
             $scalarClass = ScalarType::class;
             $consideredNamespaces = implode(', ', $namespacesToTry);
             throw new DefinitionException("Failed to find class {$className} extends {$scalarClass} in namespaces [{$consideredNamespaces}] for the scalar {$scalarName}.");
@@ -491,7 +491,7 @@ class TypeRegistry
             static fn (string $className): bool => method_exists($className, '__invoke'),
         );
 
-        if (null !== $className) {
+        if ($className !== null) {
             $typeResolver = Container::getInstance()->make($className);
             assert(is_object($typeResolver));
 
@@ -512,17 +512,17 @@ class TypeRegistry
     {
         return function ($root) use ($possibleTypes): Type {
             $explicitTypename = data_get($root, '__typename');
-            if (null !== $explicitTypename) {
+            if ($explicitTypename !== null) {
                 return $this->get($explicitTypename);
             }
 
             if (is_object($root)) {
                 $fqcn = $root::class;
                 $explicitSchemaMapping = $this->documentAST->classNameToObjectTypeNames[$fqcn] ?? null;
-                if (null !== $explicitSchemaMapping) {
+                if ($explicitSchemaMapping !== null) {
                     $actuallyPossibleTypes = array_intersect($possibleTypes, $explicitSchemaMapping);
 
-                    if (1 !== count($actuallyPossibleTypes)) {
+                    if (count($actuallyPossibleTypes) !== 1) {
                         throw self::unresolvableAbstractTypeMapping($fqcn, $actuallyPossibleTypes);
                     }
 

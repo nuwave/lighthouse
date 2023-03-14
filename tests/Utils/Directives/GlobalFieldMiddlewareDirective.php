@@ -22,7 +22,7 @@ GRAPHQL;
             fn (): callable
             // Must not crash
             => fn (): bool => $this->definitionNode instanceof FieldDefinitionNode
-                && null === $this->directiveArgValue('random'),
+                && $this->directiveArgValue('random') === null,
         );
     }
 }

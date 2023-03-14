@@ -26,7 +26,7 @@ class Subscription
         }
 
         // Default to the configuration setting if not specified
-        if (null === $shouldQueue) {
+        if ($shouldQueue === null) {
             $shouldQueue = config('lighthouse.subscriptions.queue_broadcasts', false);
         }
 

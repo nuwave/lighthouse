@@ -139,7 +139,7 @@ class ASTHelper
     {
         $arg = self::firstByName($directive->arguments, $name);
 
-        return null !== $arg
+        return $arg !== null
             ? AST::valueFromASTUntyped($arg->value)
             : $default;
     }
@@ -188,7 +188,7 @@ class ASTHelper
      */
     public static function hasDirective(Node $definitionNode, string $name): bool
     {
-        return null !== self::directiveDefinition($definitionNode, $name);
+        return self::directiveDefinition($definitionNode, $name) !== null;
     }
 
     /**
@@ -222,7 +222,7 @@ class ASTHelper
     {
         $namespaceDirective = static::directiveDefinition($definitionNode, NamespaceDirective::NAME);
 
-        return null !== $namespaceDirective
+        return $namespaceDirective !== null
             ? static::directiveArgValue($namespaceDirective, $directiveName)
             : null;
     }
@@ -246,7 +246,7 @@ class ASTHelper
      */
     public static function typeImplementsInterface(ObjectTypeDefinitionNode $type, string $interfaceName): bool
     {
-        return null !== self::firstByName($type->interfaces, $interfaceName);
+        return self::firstByName($type->interfaces, $interfaceName) !== null;
     }
 
     public static function addDirectiveToFields(DirectiveNode $directiveNode, ObjectTypeDefinitionNode|ObjectTypeExtensionNode|InterfaceTypeDefinitionNode|InterfaceTypeExtensionNode &$typeWithFields): void
@@ -320,7 +320,7 @@ class ASTHelper
         $directive = null;
         foreach ($document->definitions as $definitionNode) {
             if ($definitionNode instanceof DirectiveDefinitionNode) {
-                if (null !== $directive) {
+                if ($directive !== null) {
                     throw new DefinitionException("Found multiple directives while trying to extract a single directive from this definition:\n\n{$definitionString}");
                 }
 
@@ -328,7 +328,7 @@ class ASTHelper
             }
         }
 
-        if (null === $directive) {
+        if ($directive === null) {
             throw new DefinitionException("Found no directive while trying to extract a single directive from this definition:\n\n{$definitionString}");
         }
 

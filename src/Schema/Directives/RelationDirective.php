@@ -58,11 +58,11 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
                 $this->lighthouseConfig['shortcut_foreign_key_selection']
                 && ['id' => true] === $resolveInfo->getFieldSelection()
                 && $relation instanceof BelongsTo
-                && [] === $args
+                && $args === []
             ) {
                 $id = $parent->getAttribute($relation->getForeignKeyName());
 
-                return null === $id
+                return $id === null
                     ? null
                     : ['id' => $id];
             }
@@ -75,7 +75,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
                 $relationBatchLoader = BatchLoaderRegistry::instance(
                     $this->qualifyPath($args, $resolveInfo),
                     static fn (): RelationBatchLoader => new RelationBatchLoader(
-                        null === $paginationArgs
+                        $paginationArgs === null
                             ? new SimpleModelsLoader($relationName, $decorateBuilder)
                             : new PaginatedModelsLoader($relationName, $decorateBuilder, $paginationArgs),
                     ),
@@ -86,7 +86,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
 
             $decorateBuilder($relation);
 
-            return null !== $paginationArgs
+            return $paginationArgs !== null
                 ? $paginationArgs->applyToBuilder($relation)
                 : $relation->getResults();
         };
@@ -101,7 +101,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
 
         // We default to not changing the field if no pagination type is set explicitly.
         // This makes sense for relations, as there should not be too many entries.
-        if (null === $paginationType) {
+        if ($paginationType === null) {
             return;
         }
 
@@ -148,7 +148,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
     {
         $paginationType = $this->paginationType();
 
-        return null !== $paginationType
+        return $paginationType !== null
             ? PaginationArgs::extractArgs($args, $paginationType, $this->paginationMaxCount())
             : null;
     }
@@ -157,7 +157,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
     {
         $type = $this->directiveArgValue('type');
 
-        return null !== $type
+        return $type !== null
             ? new PaginationType($type)
             : null;
     }

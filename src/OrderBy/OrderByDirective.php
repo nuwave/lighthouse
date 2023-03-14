@@ -120,7 +120,7 @@ GRAPHQL;
             $order = Arr::pull($orderByClause, 'order');
             $column = Arr::pull($orderByClause, 'column');
 
-            if (null === $column) {
+            if ($column === null) {
                 if (! $builder instanceof EloquentBuilder) {
                     $notEloquentBuilder = $builder::class;
                     throw new DefinitionException("Can not order by relations on non-Eloquent builders, got: {$notEloquentBuilder}.");
@@ -132,7 +132,7 @@ GRAPHQL;
                 $relationValues = Arr::first($orderByClause);
 
                 $aggregate = $relationValues['aggregate'];
-                if ('count' === $aggregate) {
+                if ($aggregate === 'count') {
                     $builder->withCount($relation);
 
                     $column = "{$relationSnake}_count";
@@ -184,7 +184,7 @@ GRAPHQL;
                 $relationsInputs[$relationName] = $inputName;
 
                 $columns = $relation['columns'] ?? null;
-                if (null !== $columns) {
+                if ($columns !== null) {
                     $allowedRelationColumnsEnumName = "{$qualifiedOrderByPrefix}{$relationUpper}Column";
 
                     $documentAST->setTypeDefinition(

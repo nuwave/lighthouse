@@ -80,7 +80,7 @@ class ResolveInfo extends BaseResolveInfo
         return (new ScoutEnhancer($argumentSet, $builder))->wouldEnhanceBuilder()
             || self::wouldApplyArgBuilderDirectives($argumentSet, $builder, $directiveFilter)
             || self::wouldApplyFieldBuilderDirectives($resolveInfo)
-            || [] !== $scopes;
+            || $scopes !== [];
     }
 
     /**
@@ -98,7 +98,7 @@ class ResolveInfo extends BaseResolveInfo
                 ->directives
                 ->filter(Utils::instanceofMatcher(ArgBuilderDirective::class));
 
-            if (null !== $directiveFilter) {
+            if ($directiveFilter !== null) {
                 // @phpstan-ignore-next-line PHPStan does not get this list is filtered for ArgBuilderDirective
                 $filteredDirectives = $filteredDirectives->filter($directiveFilter);
             }
@@ -132,7 +132,7 @@ class ResolveInfo extends BaseResolveInfo
                 ->directives
                 ->filter(Utils::instanceofMatcher(ArgBuilderDirective::class));
 
-            if (null !== $directiveFilter) {
+            if ($directiveFilter !== null) {
                 // @phpstan-ignore-next-line PHPStan does not get this list is filtered for ArgBuilderDirective
                 $filteredDirectives = $filteredDirectives->filter($directiveFilter);
             }

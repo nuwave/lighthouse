@@ -63,7 +63,7 @@ class FederationPrinter
             $originalQueryType->getFields(),
             static fn (FieldDefinition $field): bool => ! in_array($field->name, static::FEDERATION_FIELDS),
         );
-        $newQueryType = [] !== $queryFieldsWithoutFederation
+        $newQueryType = $queryFieldsWithoutFederation !== []
             ? new ObjectType([
                 'name' => RootType::QUERY,
                 'fields' => $queryFieldsWithoutFederation,
@@ -104,8 +104,8 @@ class FederationPrinter
                 foreach ($astNode->directives as $directive) {
                     $name = $directive->name->value;
 
-                    if (KeyDirective::NAME === $name
-                        || ExtendsDirective::NAME === $name
+                    if ($name === KeyDirective::NAME
+                        || $name === ExtendsDirective::NAME
                     ) {
                         $federationDirectives[] = $directive;
                     }
@@ -119,9 +119,9 @@ class FederationPrinter
                 foreach ($astNode->directives as $directive) {
                     $name = $directive->name->value;
 
-                    if (ProvidesDirective::NAME === $name
-                        || RequiresDirective::NAME === $name
-                        || ExternalDirective::NAME === $name
+                    if ($name === ProvidesDirective::NAME
+                        || $name === RequiresDirective::NAME
+                        || $name === ExternalDirective::NAME
                     ) {
                         $federationDirectives[] = $directive;
                     }

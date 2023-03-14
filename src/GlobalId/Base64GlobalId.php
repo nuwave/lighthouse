@@ -25,7 +25,7 @@ class Base64GlobalId implements GlobalId
     {
         $parts = explode(':', \Safe\base64_decode($globalID));
 
-        if (2 !== count($parts)) {
+        if (count($parts) !== 2) {
             throw new GlobalIdException("Unexpectedly found more then 2 segments when decoding global id: {$globalID}.");
         }
 

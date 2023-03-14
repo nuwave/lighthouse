@@ -32,7 +32,7 @@ class Validator
         );
         foreach ($this->directiveLocator->definitions() as $directiveDefinition) {
             // TODO consider a solution that feels less hacky
-            if ('deprecated' !== $directiveDefinition->name->value) {
+            if ($directiveDefinition->name->value !== 'deprecated') {
                 $schemaConfig->directives[] = $directiveFactory->handle($directiveDefinition);
             }
         }

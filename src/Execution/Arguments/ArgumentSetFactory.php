@@ -105,7 +105,7 @@ class ArgumentSetFactory
     protected function wrapWithType(mixed $valueOrValues, ListType|NamedType $type)
     {
         // No need to recurse down further if the value is null
-        if (null === $valueOrValues) {
+        if ($valueOrValues === null) {
             return null;
         }
 

@@ -49,14 +49,14 @@ class ASTManipulator
             }
 
             foreach ($type->directives as $directive) {
-                if ('key' === $directive->name->value) {
+                if ($directive->name->value === 'key') {
                     $entities[] = $type->name->value;
                     break;
                 }
             }
         }
 
-        if ([] === $entities) {
+        if ($entities === []) {
             throw new FederationException('There must be at least one type using the @key directive when federation is enabled.');
         }
 

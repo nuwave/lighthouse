@@ -53,7 +53,7 @@ trait MakesGraphQLRequestsLumen
     ): self {
         $params = ['query' => $query];
 
-        if ([] !== $variables) {
+        if ($variables !== []) {
             $params += ['variables' => $variables];
         }
 

@@ -132,7 +132,7 @@ class GraphQL
         );
 
         foreach ($extensionsResponses as $extensionsResponse) {
-            if (null !== $extensionsResponse) {
+            if ($extensionsResponse !== null) {
                 $result->extensions[$extensionsResponse->key] = $extensionsResponse->content;
             }
         }
@@ -196,7 +196,7 @@ class GraphQL
     {
         $errors = $this->graphQLHelper->validateOperationParams($params);
 
-        if ([] !== $errors) {
+        if ($errors !== []) {
             $errors = array_map(
                 static fn (RequestError $err): Error => Error::createLocatedError($err),
                 $errors,
@@ -331,7 +331,7 @@ class GraphQL
                         ->send($error)
                         ->through($handlers)
                         ->then(
-                            static fn (?Error $error): ?array => null === $error
+                            static fn (?Error $error): ?array => $error === null
                                 ? null
                                 : $formatter($error),
                         ))

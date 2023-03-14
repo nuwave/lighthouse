@@ -25,7 +25,7 @@ class CacheKeyAndTagsGenerator implements CacheKeyAndTags
     ): string {
         $parts = [self::PREFIX];
 
-        if ($isPrivate && null !== $user) {
+        if ($isPrivate && $user !== null) {
             $parts[] = 'auth';
             $parts[] = $user->getAuthIdentifier();
         }

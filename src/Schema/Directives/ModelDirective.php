@@ -32,7 +32,7 @@ GRAPHQL;
     public static function modelClass(Node $node): ?string
     {
         $modelDirective = ASTHelper::directiveDefinition($node, self::NAME);
-        if (null !== $modelDirective) {
+        if ($modelDirective !== null) {
             return ASTHelper::directiveArgValue($modelDirective, 'class');
         }
 

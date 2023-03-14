@@ -112,7 +112,7 @@ class EntityResolverProvider
             (array) config('lighthouse.federation.entities_resolver_namespace'),
             'class_exists',
         );
-        if (null === $resolverClass) {
+        if ($resolverClass === null) {
             return null;
         }
 
@@ -138,7 +138,7 @@ class EntityResolverProvider
             (array) $this->configRepository->get('lighthouse.namespaces.models'),
             static fn (string $classCandidate): bool => is_subclass_of($classCandidate, Model::class),
         );
-        if (null === $modelClass) {
+        if ($modelClass === null) {
             return null;
         }
 
@@ -184,12 +184,12 @@ class EntityResolverProvider
 
             $fieldName = $field->name->value;
             $value = $representation[$fieldName] ?? null;
-            if (null === $value) {
+            if ($value === null) {
                 return false;
             }
 
             $subSelection = $field->selectionSet;
-            if (null !== $subSelection) {
+            if ($subSelection !== null) {
                 if (! is_array($value)) {
                     return false;
                 }
@@ -218,7 +218,7 @@ class EntityResolverProvider
             $value = $representation[$fieldName];
 
             $subSelection = $field->selectionSet;
-            if (null === $subSelection) {
+            if ($subSelection === null) {
                 $builder->where(
                     $fieldName,
                     $this->hasFieldWithDirective($definition, $fieldName, GlobalIdDirective::NAME)
@@ -236,7 +236,7 @@ class EntityResolverProvider
     private function hasFieldWithDirective(ObjectTypeDefinitionNode $definition, string $fieldName, string $directiveName): bool
     {
         $field = ASTHelper::firstByName($definition->fields, $fieldName);
-        if (null === $field) {
+        if ($field === null) {
             return false;
         }
 

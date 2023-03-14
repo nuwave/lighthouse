@@ -122,7 +122,7 @@ class FieldFactory
      */
     protected function defaultResolver(FieldValue $fieldValue): callable
     {
-        if (RootType::SUBSCRIPTION === $fieldValue->getParentName()) {
+        if ($fieldValue->getParentName() === RootType::SUBSCRIPTION) {
             /** @var \Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver $providesSubscriptionResolver */
             $providesSubscriptionResolver = Container::getInstance()->make(ProvidesSubscriptionResolver::class);
 

@@ -58,7 +58,7 @@ final class MorphManyDirectiveTest extends DBTestCase
                     factory(Image::class)->create(),
                 );
 
-            if (false === $image) {
+            if ($image === false) {
                 throw new \Exception('Failed to save Image');
             }
 

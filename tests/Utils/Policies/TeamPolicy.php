@@ -8,6 +8,6 @@ final class TeamPolicy
 {
     public function onlyTeams(?Team $user): bool
     {
-        return null !== $user;
+        return $user !== null;
     }
 }

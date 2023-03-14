@@ -67,7 +67,7 @@ GRAPHQL;
         foreach ($guards as $guard) {
             $user = $this->authFactory->guard($guard)->user();
 
-            if (null !== $user) {
+            if ($user !== null) {
                 // @phpstan-ignore-next-line passing null works fine here
                 $this->authFactory->shouldUse($guard);
 

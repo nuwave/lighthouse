@@ -74,7 +74,7 @@ class PaginationManipulator
     ): void {
         $fieldTypeName = ASTHelper::getUnderlyingTypeName($fieldDefinition);
 
-        if (null !== $edgeType) {
+        if ($edgeType !== null) {
             $connectionEdgeName = $edgeType->name->value;
             $connectionTypeName = "{$connectionEdgeName}Connection";
         } else {
@@ -131,7 +131,7 @@ GRAPHQL
 
         // Reuse existing types to preserve directives or other modifications made to it
         $existingType = $this->documentAST->types[$typeName] ?? null;
-        if (null !== $existingType) {
+        if ($existingType !== null) {
             if (! $existingType instanceof ObjectTypeDefinitionNode) {
                 throw new DefinitionException(
                     "Expected object type for pagination wrapper {$typeName}, found {$objectType->kind} instead.",

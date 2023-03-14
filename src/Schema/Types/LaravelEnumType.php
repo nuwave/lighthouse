@@ -99,7 +99,7 @@ class LaravelEnumType extends EnumType
         assert($constant instanceof \ReflectionClassConstant, 'Enum keys are derived from the constant names');
 
         $docComment = $constant->getDocComment();
-        if (false === $docComment) {
+        if ($docComment === false) {
             return null;
         }
 
@@ -110,13 +110,13 @@ class LaravelEnumType extends EnumType
         foreach ($lines as $line) {
             $parts = explode(self::DEPRECATED_PHPDOC_TAG, $line);
 
-            if (1 === count($parts)) {
+            if (count($parts) === 1) {
                 continue;
             }
 
             $reason = trim($parts[1]);
 
-            return '' === $reason
+            return $reason === ''
                 ? Directive::DEFAULT_DEPRECATION_REASON
                 : $reason;
         }

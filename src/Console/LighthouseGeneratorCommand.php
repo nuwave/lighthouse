@@ -47,13 +47,13 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
      */
     public static function commonNamespace(array $namespaces): string
     {
-        if ([] === $namespaces) {
+        if ($namespaces === []) {
             throw new \InvalidArgumentException(
                 'A default namespace is required for code generation.',
             );
         }
 
-        if (1 === count($namespaces)) {
+        if (count($namespaces) === 1) {
             return reset($namespaces);
         }
 
@@ -85,7 +85,7 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
 
         // We could not determine a common part of the configured namespaces,
         // so we just assume the user will prefer the first one in the list.
-        if ([] === $matching) {
+        if ($matching === []) {
             return $preferredNamespaceFallback;
         }
 

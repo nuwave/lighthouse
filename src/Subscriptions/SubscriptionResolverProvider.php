@@ -32,7 +32,7 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
         $fieldName = $fieldValue->getFieldName();
 
         $directive = ASTHelper::directiveDefinition($fieldValue->getField(), SubscriptionDirective::NAME);
-        $className = null === $directive
+        $className = $directive === null
             ? Str::studly($fieldName)
             : ASTHelper::directiveArgValue($directive, 'class');
 
@@ -43,7 +43,7 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
             static fn (string $class): bool => is_subclass_of($class, GraphQLSubscription::class),
         );
 
-        if (null === $namespacedClassName) {
+        if ($namespacedClassName === null) {
             $subscriptionClass = GraphQLSubscription::class;
             $consideredNamespaces = implode(', ', $namespacesToTry);
             throw new DefinitionException("Failed to find class {$className} extends {$subscriptionClass} in namespaces [{$consideredNamespaces}] for the subscription field {$fieldName}.");

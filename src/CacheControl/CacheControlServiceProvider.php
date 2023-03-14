@@ -35,21 +35,21 @@ class CacheControlServiceProvider extends ServiceProvider
             $visitorWithTypeInfo = Visitor::visitWithTypeInfo($typeInfo, [
                 NodeKind::FIELD => static function (FieldNode $_) use ($typeInfo, $cacheControl): void {
                     $field = $typeInfo->getFieldDef();
-                    if (null === $field) {
+                    if ($field === null) {
                         return;
                     }
 
                     $cacheControlDirective = isset($field->astNode)
                         ? ASTHelper::directiveDefinition($field->astNode, 'cacheControl')
                         : null;
-                    if (null !== $cacheControlDirective) {
+                    if ($cacheControlDirective !== null) {
                         if (! ASTHelper::directiveArgValue($cacheControlDirective, 'inheritMaxAge')) {
                             $cacheControl->addMaxAge(
                                 ASTHelper::directiveArgValue($cacheControlDirective, 'maxAge') ?? 0,
                             );
                         }
 
-                        if ('PRIVATE' === ASTHelper::directiveArgValue($cacheControlDirective, 'scope')) {
+                        if (ASTHelper::directiveArgValue($cacheControlDirective, 'scope') === 'PRIVATE') {
                             $cacheControl->setPrivate();
                         }
                     } else {

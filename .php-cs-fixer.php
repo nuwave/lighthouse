@@ -23,4 +23,9 @@ return risky($finder, [
             'parameters',
         ],
     ],
+    'yoda_style' => [
+        'equal' => false,
+        'identical' => false,
+        'less_and_greater' => false,
+    ],
 ]);
