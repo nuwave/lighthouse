@@ -118,8 +118,8 @@ class TestResponse
     /**
      * For cases where you need more control over your broadcast assertions.
      *
-     * @see assertGraphQLBroadcasted
-     * @see assertGraphQLNotBroadcasted
+     * @see \Nuwave\Lighthouse\Testing\TestResponseMixin::assertGraphQLBroadcasted
+     * @see \Nuwave\Lighthouse\Testing\TestResponseMixin::assertGraphQLNotBroadcasted
      *
      * @return \Mockery\MockInterface&\Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster
      */
