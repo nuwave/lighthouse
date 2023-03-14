@@ -196,7 +196,7 @@ class TestResponseMixin
             // @phpstan-ignore-next-line phpstan doesn't see that Parameter #2 can accept Closure even though it's type-hinted at LegacyMockInterface
             $mock->shouldHaveReceived('broadcast', function (Subscriber $subscriber, $broadcastedData) use ($channel, &$concatinatedBroadcastedData) {
                 if ($channel === $subscriber->channel) {
-                    $concatinatedBroadcastedData[] = array_values($broadcastedData['data'])[0];
+                    $concatinatedBroadcastedData[] = Arr::first($broadcastedData['data']);
                 }
 
                 return true;
