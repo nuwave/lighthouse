@@ -23,7 +23,7 @@ use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
 class GuardDirective extends BaseDirective implements FieldMiddleware, TypeManipulator, TypeExtensionManipulator
 {
     public function __construct(
-        protected AuthFactory $auth,
+        protected AuthFactory $authFactory,
     ) {}
 
     public static function definition(): string
@@ -50,8 +50,8 @@ GRAPHQL;
     public function handleField(FieldValue $fieldValue): void
     {
         $fieldValue->wrapResolver(fn (callable $resolver): \Closure => function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
-            $with = $this->directiveArgValue('with', (array) AuthServiceProvider::guard());
-            $context->setUser($this->authenticate($with));
+            $guards = $this->directiveArgValue('with', AuthServiceProvider::guards());
+            $context->setUser($this->authenticate($guards));
 
             return $resolver($root, $args, $context, $resolveInfo);
         });
@@ -65,11 +65,11 @@ GRAPHQL;
     protected function authenticate(array $guards): Authenticatable
     {
         foreach ($guards as $guard) {
-            $user = $this->auth->guard($guard)->user();
+            $user = $this->authFactory->guard($guard)->user();
 
             if (null !== $user) {
                 // @phpstan-ignore-next-line passing null works fine here
-                $this->auth->shouldUse($guard);
+                $this->authFactory->shouldUse($guard);
 
                 return $user;
             }

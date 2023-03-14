@@ -38,6 +38,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Rename configuration option `schema.register` to `schema_path`
 - Restructure cache related configuration options
 - Register all non-user namespaces through `RegisterDirectiveNamespaces` event https://github.com/nuwave/lighthouse/pull/2337
+- Guard default configuration options in `lighthouse.php` allows multiple guards https://github.com/nuwave/lighthouse/pull/2345
+- Make `@auth` and `@whereAuth` support multiple guards https://github.com/nuwave/lighthouse/pull/2345
 
 ### Fixed
 
