@@ -149,7 +149,7 @@ class TestResponse
     }
 
     /**
-     * Assert a broadcast never happened.
+     * Assert the subscription received no broadcast.
      *
      * @return $this
      */
