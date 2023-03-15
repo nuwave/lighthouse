@@ -215,3 +215,7 @@ root types `Query` or `Mutation`, you can use either the
 [@field](../api-reference/directives.md#field) or [@method](../api-reference/directives.md#method) directive.
 
 You may also [change the default resolver](../digging-deeper/extending-lighthouse.md#changing-the-default-resolver) if you need.
+
+## Resolver namespace resolution
+
+TODO

@@ -1095,9 +1095,8 @@ type Mutation {
 }
 ```
 
-If your field is defined on the root types `Query` or `Mutation`, you can take advantage
-of the default namespaces that are defined in the [configuration](../getting-started/configuration.md). The following
-will look for a class in `App\GraphQL\Queries` by default.
+You can take advantage of the default namespaces that are defined in the [configuration](../getting-started/configuration.md).
+The following will look for a class in `App\GraphQL\Queries` by default.
 
 ```graphql
 type Query {
