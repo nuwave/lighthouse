@@ -132,31 +132,18 @@ class SubscriptionRegistry
 
     public function handleBuildExtensionsResponse(BuildExtensionsResponse $buildExtensionsResponse): ?ExtensionsResponse
     {
-        $subscriptionsConfig = $this->configRepository->get('lighthouse.subscriptions');
-
         $channel = $this->subscribers !== []
             ? reset($this->subscribers)
             : null;
 
-        if ($channel === null && ($subscriptionsConfig['exclude_empty'] ?? false)) {
+        if ($channel === null && $this->configRepository->get('lighthouse.subscriptions.exclude_empty', false)) {
             return null;
         }
 
-        $version = $subscriptionsConfig['version'] ?? 1;
-        $content = match ((int) $version) {
-            1 => [
-                'version' => 1,
-                'channel' => $channel,
-                'channels' => $this->subscribers,
-            ],
-            2 => [
-                'version' => 2,
-                'channel' => $channel,
-            ],
-            default => throw new DefinitionException("Expected lighthouse.subscriptions.version to be 1 or 2, got: {$version}"),
-        };
-
-        return new ExtensionsResponse('lighthouse_subscriptions', $content);
+        return new ExtensionsResponse('lighthouse_subscriptions', [
+            'version' => 2,
+            'channel' => $channel,
+        ]);
     }
 
     protected function subscriptionType(): ObjectType

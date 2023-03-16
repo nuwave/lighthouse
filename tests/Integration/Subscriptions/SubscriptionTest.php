@@ -158,11 +158,8 @@ GRAPHQL;
             ],
             'extensions' => [
                 'lighthouse_subscriptions' => [
-                    'version' => 1,
+                    'version' => 2,
                     'channel' => $subscriber->channel,
-                    'channels' => [
-                        'onPostCreated' => $subscriber->channel,
-                    ],
                 ],
             ],
         ]);
@@ -173,7 +170,6 @@ GRAPHQL;
         $config = $this->app->make(ConfigRepository::class);
 
         $config->set('lighthouse.subscriptions.exclude_empty', false);
-        $config->set('lighthouse.subscriptions.version', 2);
 
         $this->subscribe();
 
@@ -200,7 +196,6 @@ GRAPHQL;
     {
         $config = $this->app->make(ConfigRepository::class);
         $config->set('lighthouse.subscriptions.exclude_empty', true);
-        $config->set('lighthouse.subscriptions.version', 2);
 
         $this->subscribe();
 
@@ -366,11 +361,8 @@ GRAPHQL;
             ],
             'extensions' => [
                 'lighthouse_subscriptions' => [
-                    'version' => 1,
+                    'version' => 2,
                     'channel' => $channel,
-                    'channels' => [
-                        $channelName => $channel,
-                    ],
                 ],
             ],
         ];
