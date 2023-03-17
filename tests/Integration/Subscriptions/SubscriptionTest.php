@@ -158,7 +158,6 @@ GRAPHQL;
             ],
             'extensions' => [
                 'lighthouse_subscriptions' => [
-                    'version' => 2,
                     'channel' => $subscriber->channel,
                 ],
             ],
@@ -185,7 +184,6 @@ GRAPHQL;
             ],
             'extensions' => [
                 'lighthouse_subscriptions' => [
-                    'version' => 2,
                     'channel' => null,
                 ],
             ],
@@ -361,7 +359,6 @@ GRAPHQL;
             ],
             'extensions' => [
                 'lighthouse_subscriptions' => [
-                    'version' => 2,
                     'channel' => $channel,
                 ],
             ],
