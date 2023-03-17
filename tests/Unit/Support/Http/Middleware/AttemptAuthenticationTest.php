@@ -4,7 +4,6 @@ namespace Tests\Unit\Support\Http\Middleware;
 
 use Illuminate\Auth\AuthManager;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Nuwave\Lighthouse\Schema\HttpGraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Http\Middleware\AttemptAuthentication;
 use PHPUnit\Framework\Constraint\Callback;
