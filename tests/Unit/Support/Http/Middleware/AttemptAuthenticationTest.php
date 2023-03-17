@@ -4,7 +4,8 @@ namespace Tests\Unit\Support\Http\Middleware;
 
 use Illuminate\Auth\AuthManager;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Nuwave\Lighthouse\Schema\Context;
+use Nuwave\Lighthouse\Schema\HttpGraphQLContext;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Http\Middleware\AttemptAuthentication;
 use PHPUnit\Framework\Constraint\Callback;
 use Tests\TestCase;
@@ -38,7 +39,7 @@ final class AttemptAuthenticationTest extends TestCase
             ->with(
                 null,
                 [],
-                new Callback(fn (Context $context): bool => $this->user === null),
+                new Callback(fn (GraphQLContext $context): bool => $this->user === null),
             );
 
         $this->schema = /** @lang GraphQL */ '
@@ -62,7 +63,7 @@ final class AttemptAuthenticationTest extends TestCase
             ->with(
                 null,
                 [],
-                new Callback(fn (Context $context): bool => $this->user === $context->user()),
+                new Callback(fn (GraphQLContext $context): bool => $this->user === $context->user()),
             );
 
         $this->schema = /** @lang GraphQL */ '

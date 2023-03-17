@@ -17,19 +17,16 @@ final class SerializerTest extends DBTestCase
     {
         $user = factory(User::class)->create();
 
-        $serializer = new Serializer(
-            $contextFactory = new ContextFactory(),
-        );
+        $contextFactory = new ContextFactory();
+        $serializer = new Serializer($contextFactory);
 
         $request = new Request();
         $request->setUserResolver(static fn () => $user);
 
         $context = $contextFactory->generate($request);
 
-        /** @var \Tests\Utils\Models\User|null $userFromContext */
         $userFromContext = $context->user();
         $this->assertNotNull($userFromContext);
-
         $this->assertSame($user, $userFromContext);
 
         $retrievedFromDatabase = false;
@@ -44,10 +41,8 @@ final class SerializerTest extends DBTestCase
 
         $this->assertTrue($retrievedFromDatabase);
 
-        /** @var \Tests\Utils\Models\User|null $unserializedUser */
         $unserializedUser = $unserialized->user();
         $this->assertNotNull($unserializedUser);
-
         $this->assertSame($user->getKey(), $unserializedUser->getKey());
     }
 }
