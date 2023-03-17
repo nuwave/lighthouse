@@ -2,7 +2,7 @@
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Nuwave\Lighthouse\Support\Http\Controllers\GraphQLController;
+use Nuwave\Lighthouse\Support\Http\GraphQLController;
 
 $container = Container::getInstance();
 

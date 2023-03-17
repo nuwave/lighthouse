@@ -24,20 +24,24 @@ class StartExecution
          * The parsed schema.
          */
         public Schema $schema,
+
         /**
          * The client given parsed query string.
          */
         public DocumentNode $query,
+
         /**
          * The client given variables, neither validated nor transformed.
          *
          * @var array<string, mixed>|null
          */
         public ?array $variables,
+
         /**
          * The client given operation name.
          */
         public ?string $operationName,
+
         /**
          * The context for the operation.
          */

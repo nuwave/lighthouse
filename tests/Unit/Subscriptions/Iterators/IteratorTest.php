@@ -7,7 +7,7 @@ use GraphQL\Language\AST\OperationDefinitionNode;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
-use Nuwave\Lighthouse\Schema\Context;
+use Nuwave\Lighthouse\Schema\HttpGraphQLContext;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Tests\TestCase;
@@ -70,6 +70,6 @@ abstract class IteratorTest extends TestCase
             ]),
         ]);
 
-        return new Subscriber([], new Context(new Request()), $resolveInfo);
+        return new Subscriber([], new HttpGraphQLContext(new Request()), $resolveInfo);
     }
 }
