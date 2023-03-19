@@ -402,12 +402,6 @@ return [
         ],
 
         /*
-         * Controls the format of the extensions response.
-         * Allowed values: 1, 2
-         */
-        'version' => env('LIGHTHOUSE_SUBSCRIPTION_VERSION', 1),
-
-        /*
          * Should the subscriptions extension be excluded when the response has no subscription channel?
          * This optimizes performance by sending less data, but clients must anticipate this appropriately.
          */

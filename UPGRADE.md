@@ -722,3 +722,23 @@ If you use complex where condition directives, such as `@whereConditions`,
 upgrade `mll-lab/graphql-php-scalars` to v4:
 
     composer require mll-lab/graphql-php-scalars:^4
+
+### Subscriptions version 1 removal 
+
+Subscriptions only use version 2 now. That means, the extensions content
+will not contain the `channels` and `version` key anymore.
+
+```diff
+{
+  "data": {...},
+  "extensions": {
+    "lighthouse_subscriptions": {
+-      "version": 1,
+      "channel": "channel-name",
+-      "channels": {
+-        "subscriptionName": "channel-name"
+-      }
+    }
+  }
+}
+```

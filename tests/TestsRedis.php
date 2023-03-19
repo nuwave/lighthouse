@@ -31,7 +31,6 @@ trait TestsRedis
             'prefix' => 'lighthouse-test-',
         ]);
         $config->set('lighthouse.subscriptions', [
-            'version' => 1,
             'storage' => 'redis',
             'broadcaster' => 'echo',
             'broadcasters' => [
