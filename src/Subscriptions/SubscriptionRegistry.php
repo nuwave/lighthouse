@@ -140,7 +140,9 @@ class SubscriptionRegistry
             return null;
         }
 
-        return new ExtensionsResponse('lighthouse_subscriptions', compact('channel'));
+        return new ExtensionsResponse('lighthouse_subscriptions', [
+            'channel' => $channel
+        ]);
     }
 
     protected function subscriptionType(): ObjectType
