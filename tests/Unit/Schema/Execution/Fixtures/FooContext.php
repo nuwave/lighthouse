@@ -11,20 +11,21 @@ final class FooContext implements GraphQLContext
 {
     public const FROM_FOO_CONTEXT = 'custom.context';
 
-    public function __construct(private Request $request) {}
+    public function __construct(
+    ) {}
 
-    public function user(): User
+    public function user(): ?User
     {
-        return new User();
+        return null;
     }
 
     public function setUser(?Authenticatable $user): void
     {
     }
 
-    public function request(): Request
+    public function request(): ?Request
     {
-        return $this->request;
+        return null;
     }
 
     public function foo(): string

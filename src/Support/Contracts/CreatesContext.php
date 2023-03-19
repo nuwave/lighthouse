@@ -9,5 +9,5 @@ interface CreatesContext
     /**
      * Generate GraphQL context.
      */
-    public function generate(Request $request): GraphQLContext;
+    public function generate(?Request $request): GraphQLContext;
 }
