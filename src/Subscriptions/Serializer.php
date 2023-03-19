@@ -22,15 +22,17 @@ class Serializer implements ContextSerializer
         $request = $context->request();
 
         return serialize([
-            'request' => [
-                'query' => $request->query->all(),
-                'request' => $request->request->all(),
-                'attributes' => $request->attributes->all(),
-                'cookies' => [],
-                'files' => [],
-                'server' => Arr::except($request->server->all(), ['HTTP_AUTHORIZATION']),
-                'content' => $request->getContent(),
-            ],
+            'request' => $request
+                ? [
+                    'query' => $request->query->all(),
+                    'request' => $request->request->all(),
+                    'attributes' => $request->attributes->all(),
+                    'cookies' => [],
+                    'files' => [],
+                    'server' => Arr::except($request->server->all(), ['HTTP_AUTHORIZATION']),
+                    'content' => $request->getContent(),
+                ]
+                : null,
             'user' => $this->getSerializedPropertyValue($context->user()),
         ]);
     }
@@ -42,17 +44,20 @@ class Serializer implements ContextSerializer
             'user' => $rawUser
         ] = unserialize($context);
 
-        $request = new Request(
-            $rawRequest['query'],
-            $rawRequest['request'],
-            $rawRequest['attributes'],
-            $rawRequest['cookies'],
-            $rawRequest['files'],
-            $rawRequest['server'],
-            $rawRequest['content'],
-        );
-
-        $request->setUserResolver(fn () => $this->getRestoredPropertyValue($rawUser));
+        if ($rawRequest) {
+            $request = new Request(
+                $rawRequest['query'],
+                $rawRequest['request'],
+                $rawRequest['attributes'],
+                $rawRequest['cookies'],
+                $rawRequest['files'],
+                $rawRequest['server'],
+                $rawRequest['content'],
+            );
+            $request->setUserResolver(fn () => $this->getRestoredPropertyValue($rawUser));
+        } else {
+            $request = null;
+        }
 
         return $this->createsContext->generate($request);
     }

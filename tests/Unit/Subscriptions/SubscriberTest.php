@@ -5,7 +5,7 @@ namespace Tests\Unit\Subscriptions;
 use GraphQL\Language\AST\OperationDefinitionNode;
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
-use Nuwave\Lighthouse\Schema\Context;
+use Nuwave\Lighthouse\Schema\HttpGraphQLContext;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Tests\TestCase;
 use Tests\TestsSerialization;
@@ -34,7 +34,7 @@ final class SubscriberTest extends TestCase
 
         $resolveInfo->operation = new OperationDefinitionNode([]);
         $resolveInfo->fragments = [];
-        $context = new Context(new Request());
+        $context = new HttpGraphQLContext(new Request());
 
         $subscriber = new Subscriber($args, $context, $resolveInfo);
 

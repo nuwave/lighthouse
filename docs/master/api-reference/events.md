@@ -18,7 +18,7 @@ use Illuminate\Support\Carbon;
  * Can be used for logging or for measuring and monitoring
  * the time a request takes to resolve.
  *
- * @see \Nuwave\Lighthouse\Support\Http\Controllers\GraphQLController
+ * @see \Nuwave\Lighthouse\Support\Http\GraphQLController
  */
 class StartRequest
 {
@@ -106,8 +106,7 @@ use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 /**
  * Fires after the AST was built but before the executable schema is built.
  *
- * Listeners may mutate the $documentAST and make programmatic
- * changes to the schema.
+ * Listeners may mutate the $documentAST and make programmatic changes to the schema.
  *
  * Only fires once if schema caching is active.
  */
@@ -147,20 +146,24 @@ class StartExecution
          * The parsed schema.
          */
         public Schema $schema,
+
         /**
          * The client given parsed query string.
          */
         public DocumentNode $query,
+
         /**
          * The client given variables, neither validated nor transformed.
          *
          * @var array<string, mixed>|null
          */
         public ?array $variables,
+
         /**
          * The client given operation name.
          */
         public ?string $operationName,
+
         /**
          * The context for the operation.
          */
@@ -286,7 +289,7 @@ use Symfony\Component\HttpFoundation\Response;
  * Can be used for logging or for measuring and monitoring
  * the time a request takes to resolve.
  *
- * @see \Nuwave\Lighthouse\Support\Http\Controllers\GraphQLController
+ * @see \Nuwave\Lighthouse\Support\Http\GraphQLController
  */
 class EndRequest
 {
