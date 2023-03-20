@@ -43,7 +43,7 @@ GRAPHQL;
         return $builder->whereNull(
             $this->directiveArgValue('key', $this->nodeName()),
             'and',
-            $value
+            $value,
         );
     }
 

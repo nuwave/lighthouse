@@ -45,9 +45,9 @@ final class WhereNullDirectiveTest extends DBTestCase
                         ],
                         [
                             'id' => $null->id,
-                        ]
-                    ]
-                ]
+                        ],
+                    ],
+                ],
             ]);
 
         $this
@@ -66,9 +66,9 @@ final class WhereNullDirectiveTest extends DBTestCase
                         ],
                         [
                             'id' => $null->id,
-                        ]
-                    ]
-                ]
+                        ],
+                    ],
+                ],
             ]);
 
         $this
@@ -84,9 +84,9 @@ final class WhereNullDirectiveTest extends DBTestCase
                     'users' => [
                         [
                             'id' => $null->id,
-                        ]
-                    ]
-                ]
+                        ],
+                    ],
+                ],
             ]);
 
         $this
@@ -102,9 +102,9 @@ final class WhereNullDirectiveTest extends DBTestCase
                     'users' => [
                         [
                             'id' => $notNull->id,
-                        ]
-                    ]
-                ]
+                        ],
+                    ],
+                ],
             ]);
     }
 }
