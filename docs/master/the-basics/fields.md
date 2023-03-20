@@ -211,11 +211,41 @@ This means that in most cases, you will only have to provide resolvers for the
 root fields and make sure they return data in the proper shape.
 
 If you need to implement custom resolvers for fields that are not on one of the
-root types `Query` or `Mutation`, you can use either the
-[@field](../api-reference/directives.md#field) or [@method](../api-reference/directives.md#method) directive.
+root types `Query` or `Mutation`, you can create a resolver class using the built-in `artisan` command `lighthouse:field`.
+For example, this is how you generate a class for the field `name` on type `User`:
 
-You may also [change the default resolver](../digging-deeper/extending-lighthouse.md#changing-the-default-resolver) if you need.
+    php artisan lighthouse:field User.name
 
-## Resolver namespace resolution
+## Resolver precedence
 
-TODO
+Lighthouse uses the following logic to locate field resolvers.
+
+First, it checks if the field definition in the schema is annotated with a [FieldResolver](../custom-directives/field-directives.md#fieldresolver)
+directive. If so, it uses the resolver that is provided by the directive.
+
+The interface [`\Nuwave\Lighthouse\Support\Contracts\ProvidesResolver`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ProvidesResolver.php)
+is expected to provide a resolver in case no resolver directive is defined for a field.
+When the field is defined on the root `Subscription` type, the [`Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ProvidesSubscriptionResolver.php)
+interface is used instead.
+
+The default implementation of those interfaces check if there is a class that matches the capitalized name of the field,
+and defines a method `__invoke`, in one of the configured default namespaces,
+depending on the parent type the field is a part of.
+
+| Parent type    | Namespaces config key                 |
+|----------------|---------------------------------------|
+| `Query`        | `lighthouse.namespaces.queries`       |
+| `Mutation`     | `lighthouse.namespaces.mutations`     |
+| `Subscription` | `lighthouse.namespaces.subscriptions` |
+| Any other type | `lighthouse.namespaces.types`         |
+
+For example, given `lighthouse.namespaces.queries` is defined as `'App\GraphQL\Queries'`
+and the field `Query.users`, Lighthouse would expect a resolver class `App\GraphQL\Queries\User`.
+If there are multiple namespaces, they are checked in order and the first found class is used.
+
+Non-root types are combined with the configured namespaces.
+For example, given `lighthouse.namespaces.types` is defined as `['App\GraphQL\Types', 'MyModule\GraphQL\Types']`
+and the field `User.name`, Lighthouse would look for the resolver class `App\GraphQL\Types\User\Name`, then `MyModule\GraphQL\Types\User\Name`.
+
+Resolvers for root fields are mandatory, Lighthouse will throw during schema validation if a root field has no resolver.
+Non-root fields fall back to [webonyx's default resolver](https://webonyx.github.io/graphql-php/data-fetching/#default-field-resolver).

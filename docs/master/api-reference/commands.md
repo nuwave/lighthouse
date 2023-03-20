@@ -1,7 +1,7 @@
 # Artisan Commands
 
-Lighthouse provides some convenient artisan commands. All of them
-are namespaced under `lighthouse`.
+Lighthouse provides some convenient artisan commands.
+All of them are namespaced under `lighthouse`.
 
 ## cache
 
@@ -22,6 +22,12 @@ Create a class for a custom schema directive.
     php artisan lighthouse:directive
 
 Use the `--type`, `--field` and `--argument` options to define where your directive can be used.
+
+## field
+
+Create a resolver class for a field on a non-root type.
+
+    php artisan lighthouse:field <parent>.<field>
 
 ## ide-helper
 
@@ -48,13 +54,13 @@ is to add this script to your `composer.json`:
 
 ## interface
 
-Create a class for a GraphQL interface type.
+Create a type resolver class for a GraphQL interface type.
 
     php artisan lighthouse:interface <name>
 
 ## mutation
 
-Create a class for a single field on the root Mutation type.
+Create a resolver class for a single field on the root Mutation type.
 
     php artisan lighthouse:mutation <name>
 
@@ -77,7 +83,7 @@ You can output your schema in JSON format by using the `--json` flag.
 
 ## query
 
-Create a class for a single field on the root Query type.
+Create a resolver class for a single field on the root Query type.
 
     php artisan lighthouse:query <name>
 
@@ -91,13 +97,13 @@ Create a class for a GraphQL scalar type.
 
 ## subscription
 
-Create a class for a single field on the root Subscription type.
+Create a resolver class for a single field on the root Subscription type.
 
     php artisan lighthouse:subscription <name>
 
 ## union
 
-Create a class for a GraphQL union type.
+Create a type resolver class for a GraphQL union type.
 
     php artisan lighthouse:union <name>
 
