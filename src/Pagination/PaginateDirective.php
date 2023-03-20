@@ -190,7 +190,7 @@ GRAPHQL;
 
         // If the page info is not requested, we can save a database query by using
         // the simple paginator - it does not query total counts.
-        if (!$hasCacheDirective && ! isset($resolveInfo->getFieldSelection()[$type->infoFieldName()])) {
+        if (! $hasCacheDirective && ! isset($resolveInfo->getFieldSelection()[$type->infoFieldName()])) {
             return new PaginationType(PaginationType::SIMPLE);
         }
 
