@@ -183,8 +183,8 @@ GRAPHQL;
             return $type;
         }
 
-        // The result will be cached with simple paginator type, however the schema allowed other pagination types.
-        // If pagination data queried in the next request, the cache does not contain the data and throws an exception.
+        // The result will be cached with a simple paginator type, however, the schema allowed other pagination types.
+        // If pagination data is queried in the next request, the cache does not contain the data and throws an exception.
         $hasCacheDirective = $resolveInfo->argumentSet->directives->contains(static fn ($value): bool => $value instanceof CacheDirective);
 
         // If the page info is not requested, we can save a database query by using
