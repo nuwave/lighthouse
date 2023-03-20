@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Laravel\Scout\Builder as ScoutBuilder;
+use Nuwave\Lighthouse\Cache\CacheDirective;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -182,9 +183,14 @@ GRAPHQL;
             return $type;
         }
 
+        // If it cached do not manipulate the paginator type.
+        $hasCacheDirective = $resolveInfo->argumentSet->directives->contains(function ($value) {
+            return $value instanceof CacheDirective;
+        });
+
         // If the page info is not requested, we can save a database query by using
         // the simple paginator - it does not query total counts.
-        if (! isset($resolveInfo->getFieldSelection()[$type->infoFieldName()])) {
+        if (!$hasCacheDirective && ! isset($resolveInfo->getFieldSelection()[$type->infoFieldName()])) {
             return new PaginationType(PaginationType::SIMPLE);
         }
 
