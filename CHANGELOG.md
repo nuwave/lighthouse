@@ -60,7 +60,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Allow passing route parameters in `MakeGraphQLRequests` test methods https://github.com/nuwave/lighthouse/pull/2333
 - Add subscription assertion methods in `MakesGraphQLRequests` and `TestResponseMixin` and docs in phpunit integration section https://github.com/nuwave/lighthouse/pull/2343
 - Allow `laragraph/utils:^2` https://github.com/nuwave/lighthouse/pull/2356
-- Add directives `@whereNull` and `@whereNotNull`
+- Add directives `@whereNull` and `@whereNotNull` https://github.com/nuwave/lighthouse/pull/2357
 
 ### Removed
 
