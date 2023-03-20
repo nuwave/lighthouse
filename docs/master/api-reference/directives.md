@@ -3829,17 +3829,17 @@ type Query {
 Filter the value is null.
 """
 directive @whereNull(
-    """
-    Specify the database column to compare.
-    Only required if database column has a different name than the attribute in your schema.
-    """
-    key: String
+  """
+  Specify the database column to compare.
+  Only required if database column has a different name than the attribute in your schema.
+  """
+  key: String
 
-    """
-    Should the value be null?
-    Exclusively required when this directive is used on a field.
-    """
-    value: Boolean
+  """
+  Should the value be null?
+  Exclusively required when this directive is used on a field.
+  """
+  value: Boolean
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 ```
 
