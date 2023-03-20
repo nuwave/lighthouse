@@ -48,6 +48,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Ensure `_entities` maintains order of representations in result https://github.com/nuwave/lighthouse/pull/2286
 - Allow combining `@can` with non-default `@guard` https://github.com/nuwave/lighthouse/pull/2276
 - Fix error message when failing to find class in namespace https://github.com/nuwave/lighthouse/pull/2342
+- Prevent regression to simple paginator type on fields using `@cache` directive https://github.com/nuwave/lighthouse/issues/2354
 
 ### Added
 

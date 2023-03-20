@@ -10,11 +10,13 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Laravel\Scout\Builder as ScoutBuilder;
+use Nuwave\Lighthouse\Cache\CacheDirective;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ComplexityResolverDirective;
+use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -177,13 +179,23 @@ GRAPHQL;
     {
         $type = $this->paginationType();
 
-        // Already the optimal type
+        // Already the most optimal type.
         if ($type->isSimple()) {
             return $type;
         }
 
-        // If the page info is not requested, we can save a database query by using
-        // the simple paginator - it does not query total counts.
+        // If the result may be used in a cache, we always want to retrieve and store the full pagination data.
+        // Even though the query that initially creates the cache may not need additional information such as
+        // the total counts, following queries may need them - and use the same cached value.
+        $hasCacheDirective = $resolveInfo->argumentSet
+            ->directives
+            ->contains(static fn (Directive $directive): bool => $directive instanceof CacheDirective);
+        if ($hasCacheDirective) {
+            return $type;
+        }
+
+        // If the page info is not requested, we can save a database query by using the simple paginator.
+        // In contrast to the full pagination, it does not query total counts.
         if (! isset($resolveInfo->getFieldSelection()[$type->infoFieldName()])) {
             return new PaginationType(PaginationType::SIMPLE);
         }
