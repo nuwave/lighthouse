@@ -61,6 +61,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Add subscription assertion methods in `MakesGraphQLRequests` and `TestResponseMixin` and docs in phpunit integration section https://github.com/nuwave/lighthouse/pull/2343
 - Allow `laragraph/utils:^2` https://github.com/nuwave/lighthouse/pull/2356
 - Add directives `@whereNull` and `@whereNotNull` https://github.com/nuwave/lighthouse/pull/2357
+- Add configurable namespace to allow custom non-root type field resolvers without FQN https://github.com/nuwave/lighthouse/pull/2351
 
 ### Removed
 

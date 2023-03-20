@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Pagination\PaginationManipulator;
-use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ComplexityResolverDirective;
 use Nuwave\Lighthouse\Support\Utils;
@@ -36,7 +35,7 @@ GRAPHQL;
 
         $namespacedClassName = $this->namespaceClassName(
             $className,
-            RootType::defaultNamespaces($fieldValue->getParentName()),
+            $fieldValue->parentNamespaces(),
         );
 
         return Utils::constructResolver($namespacedClassName, $methodName);

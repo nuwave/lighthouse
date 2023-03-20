@@ -21,17 +21,4 @@ class RootType
             ],
         );
     }
-
-    /**
-     * @return array<int, string>
-     */
-    public static function defaultNamespaces(string $typeName): array
-    {
-        return match ($typeName) {
-            static::QUERY => (array) config('lighthouse.namespaces.queries'),
-            static::MUTATION => (array) config('lighthouse.namespaces.mutations'),
-            static::SUBSCRIPTION => (array) config('lighthouse.namespaces.subscriptions'),
-            default => [],
-        };
-    }
 }

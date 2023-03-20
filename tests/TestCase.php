@@ -109,6 +109,9 @@ GRAPHQL;
             'subscriptions' => [
                 'Tests\\Utils\\Subscriptions',
             ],
+            'types' => [
+                'Tests\\Utils\\Types',
+            ],
             'interfaces' => [
                 'Tests\\Utils\\Interfaces',
                 'Tests\\Utils\\InterfacesSecondary',

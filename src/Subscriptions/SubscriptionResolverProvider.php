@@ -7,7 +7,6 @@ use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
-use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Subscriptions\Directives\SubscriptionDirective;
@@ -36,7 +35,7 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
             ? Str::studly($fieldName)
             : ASTHelper::directiveArgValue($directive, 'class');
 
-        $namespacesToTry = RootType::defaultNamespaces($fieldValue->getParentName());
+        $namespacesToTry = $fieldValue->parentNamespaces();
         $namespacedClassName = Utils::namespaceClassname(
             $className,
             $namespacesToTry,
