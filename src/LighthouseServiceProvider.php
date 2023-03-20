@@ -19,6 +19,7 @@ use Laravel\Lumen\Application as LumenApplication;
 use Nuwave\Lighthouse\Console\CacheCommand;
 use Nuwave\Lighthouse\Console\ClearCacheCommand;
 use Nuwave\Lighthouse\Console\DirectiveCommand;
+use Nuwave\Lighthouse\Console\FieldCommand;
 use Nuwave\Lighthouse\Console\IdeHelperCommand;
 use Nuwave\Lighthouse\Console\InterfaceCommand;
 use Nuwave\Lighthouse\Console\MutationCommand;
@@ -63,6 +64,7 @@ class LighthouseServiceProvider extends ServiceProvider
         CacheCommand::class,
         ClearCacheCommand::class,
         DirectiveCommand::class,
+        FieldCommand::class,
         IdeHelperCommand::class,
         InterfaceCommand::class,
         MutationCommand::class,
