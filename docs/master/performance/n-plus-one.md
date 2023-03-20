@@ -88,8 +88,8 @@ in the query tree, but nested under different indices. When looking at the query
 
 In order to combine them, you need to have a single stateful batch loader instance for `users.posts`.
 Use `Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry` to resolve such instances.
-The following code is the resolver for `User.posts` - it could point to it with [@field](../api-reference/directives.md#field),
-or be implemented in a custom directive.
+The following code is the resolver for `User.posts`.
+See [resolver precedence](../the-basics/fields.md#resolver-precedence) on how it could actually be assigned to a field.
 
 ```php
 use GraphQL\Deferred;

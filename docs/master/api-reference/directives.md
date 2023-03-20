@@ -1085,6 +1085,8 @@ directive @field(
 ) on FIELD_DEFINITION
 ```
 
+> This directive is unnecessary if you use the default namespaces, see [resolver precedence](../the-basics/fields.md#resolver-precedence).
+
 Pass a class and a method to the `resolver` argument and separate them with an `@` symbol.
 If you pass only a class name, the method name defaults to `__invoke`.
 
@@ -1095,7 +1097,7 @@ type Mutation {
 }
 ```
 
-You can take advantage of the default namespaces that are defined in the [configuration](../getting-started/configuration.md).
+You can take advantage of the default namespaces that are defined in the [configuration](../getting-started/configuration.md),
 The following will look for a class in `App\GraphQL\Queries` by default.
 
 ```graphql
