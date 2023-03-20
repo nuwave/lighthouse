@@ -59,11 +59,11 @@ final class ValidationTest extends TestCase
         ';
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 foo
             }
-            ')
+            GRAPHQL)
             ->assertExactJson([
                 'errors' => [
                     [
@@ -77,8 +77,8 @@ final class ValidationTest extends TestCase
                         ],
                         'locations' => [
                             [
-                                'line' => 3,
-                                'column' => 17,
+                                'line' => 2,
+                                'column' => 5,
                             ],
                         ],
                         'path' => ['foo'],

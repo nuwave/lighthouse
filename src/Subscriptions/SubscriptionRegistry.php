@@ -141,7 +141,7 @@ class SubscriptionRegistry
         }
 
         return new ExtensionsResponse('lighthouse_subscriptions', [
-            'channel' => $channel
+            'channel' => $channel,
         ]);
     }
 
