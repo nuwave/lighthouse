@@ -2,19 +2,28 @@
 
 namespace Tests\Integration;
 
+use Composer\InstalledVersions;
 use GraphQL\Error\DebugFlag;
 use GraphQL\Error\Error;
 use GraphQL\Error\FormattedError;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
+use Laragraph\Utils\BadRequestGraphQLException;
 use Tests\TestCase;
 
 final class ErrorTest extends TestCase
 {
     public function testRejectsEmptyRequest(): void
     {
-        $this->postGraphQL([])
-            ->assertStatus(200)
-            ->assertGraphQLErrorMessage('GraphQL Request must include at least one of those two parameters: "query" or "queryId"');
+        $version = (float) InstalledVersions::getVersion('laragraph/utils');
+
+        if ($version >= 2) {
+            $this->expectException(BadRequestGraphQLException::class);
+            $this->postGraphQL([]);
+        } else {
+            $this->postGraphQL([])
+                ->assertStatus(200)
+                ->assertGraphQLErrorMessage('GraphQL Request must include at least one of those two parameters: "query" or "queryId"');
+        }
     }
 
     public function testRejectsEmptyQuery(): void
