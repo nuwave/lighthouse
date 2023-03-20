@@ -233,7 +233,7 @@ and defines a method `__invoke`, in one of the configured default namespaces,
 depending on the parent type the field is a part of.
 
 | Parent type    | Namespaces config key                 |
-|----------------|---------------------------------------|
+| -------------- | ------------------------------------- |
 | `Query`        | `lighthouse.namespaces.queries`       |
 | `Mutation`     | `lighthouse.namespaces.mutations`     |
 | `Subscription` | `lighthouse.namespaces.subscriptions` |
