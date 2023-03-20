@@ -27,7 +27,7 @@ class FieldCommand extends FieldGeneratorCommand
         [$type, $field] = $this->nameParts();
         $namespaces = array_map(
             static fn (string $typesNamespace): string => "{$typesNamespace}\\{$type}",
-            (array) config("lighthouse.namespaces.{$this->namespaceConfigKey()}")
+            (array) config("lighthouse.namespaces.{$this->namespaceConfigKey()}"),
         );
 
         return static::commonNamespace($namespaces);
@@ -39,13 +39,14 @@ class FieldCommand extends FieldGeneratorCommand
     protected function nameParts(): array
     {
         $name = $this->argument('name');
-        if (!is_string($name)) {
+        if (! is_string($name)) {
             throw new \InvalidArgumentException('You must specify the name for the class to generate.');
         }
         $parts = explode('.', $name);
         if (count($parts) !== 2) {
             throw new \InvalidArgumentException("You must specify the name as Type.field, got: {$name}.");
         }
+
         return $parts;
     }
 }
