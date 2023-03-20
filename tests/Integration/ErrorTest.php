@@ -10,16 +10,16 @@ use Tests\TestCase;
 
 final class ErrorTest extends TestCase
 {
-    public function testMissingQuery(): void
+    public function testRejectsEmptyRequest(): void
     {
         $this->postGraphQL([])
             ->assertStatus(200)
             ->assertGraphQLErrorMessage('GraphQL Request must include at least one of those two parameters: "query" or "queryId"');
     }
 
-    public function testEmptyQuery(): void
+    public function testRejectsEmptyQuery(): void
     {
-        $this->graphQL(/** @lang GraphQL */ '')
+        $this->graphQL('')
             ->assertStatus(200)
             ->assertGraphQLErrorMessage('GraphQL Request must include at least one of those two parameters: "query" or "queryId"');
     }
@@ -47,20 +47,6 @@ final class ErrorTest extends TestCase
                 'variables' => '{}',
             ])
             ->assertStatus(200);
-    }
-
-    public function testRejectsEmptyRequest(): void
-    {
-        $this->postGraphQL([])
-            ->assertStatus(200)
-            ->assertGraphQLErrorMessage('GraphQL Request must include at least one of those two parameters: "query" or "queryId"');
-    }
-
-    public function testRejectsEmptyQuery(): void
-    {
-        $this->graphQL('')
-            ->assertStatus(200)
-            ->assertGraphQLErrorMessage('GraphQL Request must include at least one of those two parameters: "query" or "queryId"');
     }
 
     public function testHandlesErrorInResolver(): void
