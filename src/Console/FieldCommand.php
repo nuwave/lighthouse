@@ -46,6 +46,7 @@ class FieldCommand extends FieldGeneratorCommand
         if (count($parts) !== 2) {
             throw new \InvalidArgumentException("You must specify the name as Type.field, got: {$name}.");
         }
+        /** @var array{string, string} $parts */
 
         return $parts;
     }
