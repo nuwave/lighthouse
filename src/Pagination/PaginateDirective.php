@@ -184,13 +184,11 @@ GRAPHQL;
         }
 
         // If it cached do not manipulate the paginator type.
-        $hasCacheDirective = $resolveInfo->argumentSet->directives->contains(function ($value) {
-            return $value instanceof CacheDirective;
-        });
+        $hasCacheDirective = $resolveInfo->argumentSet->directives->contains(static fn ($value): bool => $value instanceof CacheDirective);
 
         // If the page info is not requested, we can save a database query by using
         // the simple paginator - it does not query total counts.
-        if (!$hasCacheDirective && ! isset($resolveInfo->getFieldSelection()[$type->infoFieldName()])) {
+        if (! $hasCacheDirective && ! isset($resolveInfo->getFieldSelection()[$type->infoFieldName()])) {
             return new PaginationType(PaginationType::SIMPLE);
         }
 

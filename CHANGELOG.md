@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 You can find and compare releases at the [GitHub release page](https://github.com/nuwave/lighthouse/releases).
 
 ## Unreleased
-
+- Fix the bug https://github.com/nuwave/lighthouse/issues/2354
 ### Changed
 
 - Use the strongest possible native types over PHPDocs
