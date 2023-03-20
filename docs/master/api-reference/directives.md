@@ -3791,6 +3791,66 @@ input DateRange {
 }
 ```
 
+## @whereNotNull
+
+```graphql
+"""
+Filter the value is not null.
+"""
+directive @whereNotNull(
+  """
+  Specify the database column to compare.
+  Only required if database column has a different name than the attribute in your schema.
+  """
+  key: String
+
+  """
+  Should the value not be null?
+  Exclusively required when this directive is used on a field.
+  """
+  value: Boolean
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+```
+
+> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
+> Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
+
+```graphql
+type Query {
+  posts(withTitle: Boolean @whereNotNull(key: "title")): [Post!]! @all
+}
+```
+
+## @whereNull
+
+```graphql
+"""
+Filter the value is null.
+"""
+directive @whereNull(
+  """
+  Specify the database column to compare.
+  Only required if database column has a different name than the attribute in your schema.
+  """
+  key: String
+
+  """
+  Should the value be null?
+  Exclusively required when this directive is used on a field.
+  """
+  value: Boolean
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+```
+
+> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
+> Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
+
+```graphql
+type Query {
+  posts(unpublished: Boolean @whereNull(key: "published_at")): [Post!]! @all
+}
+```
+
 ## @with
 
 ```graphql

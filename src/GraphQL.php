@@ -251,8 +251,10 @@ class GraphQL
         $cacheFactory = Container::getInstance()->make(CacheFactory::class);
         $store = $cacheFactory->store($cacheConfig['store']);
 
+        $sha256 = hash('sha256', $query);
+
         return $store->remember(
-            'lighthouse:query:' . hash('sha256', $query),
+            "lighthouse:query:{$sha256}",
             $cacheConfig['ttl'],
             static fn (): DocumentNode => Parser::parse($query),
         );
