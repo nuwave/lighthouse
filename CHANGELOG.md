@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 You can find and compare releases at the [GitHub release page](https://github.com/nuwave/lighthouse/releases).
 
 ## Unreleased
-- Prevent automatic paginator type change if cache directive exists (https://github.com/nuwave/lighthouse/issues/2354).
+
 ### Changed
 
 - Use the strongest possible native types over PHPDocs
@@ -48,6 +48,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Ensure `_entities` maintains order of representations in result https://github.com/nuwave/lighthouse/pull/2286
 - Allow combining `@can` with non-default `@guard` https://github.com/nuwave/lighthouse/pull/2276
 - Fix error message when failing to find class in namespace https://github.com/nuwave/lighthouse/pull/2342
+- Prevent regression to simple paginator type on fields using `@cache` directive https://github.com/nuwave/lighthouse/issues/2354
 
 ### Added
 
