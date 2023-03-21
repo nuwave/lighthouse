@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Tests\Unit\Support\Http\Middleware;
+namespace Tests\Unit\Http\Middleware;
 
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Nuwave\Lighthouse\Support\Http\Middleware\LogGraphQLQueries;
+use Nuwave\Lighthouse\Http\Middleware\LogGraphQLQueries;
 use Psr\Log\LoggerInterface;
 use Tests\TestCase;
 

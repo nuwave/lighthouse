@@ -6,6 +6,7 @@ use GraphQL\Type\Schema;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Nuwave\Lighthouse\Events\ValidateSchema;
 use Nuwave\Lighthouse\Schema\AST\ASTCache;
+use Nuwave\Lighthouse\Schema\AST\FallbackTypeNodeConverter;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 
 class Validator

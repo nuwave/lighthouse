@@ -15,7 +15,7 @@ required in a single request, it is convenient to attempt authentication once pe
 ```php
     'route' => [
         'middleware' => [
-            \Nuwave\Lighthouse\Support\Http\Middleware\AttemptAuthentication::class,
+            \Nuwave\Lighthouse\Http\Middleware\AttemptAuthentication::class,
         ],
     ],
 ```

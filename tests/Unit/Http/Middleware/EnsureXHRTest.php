@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Tests\Unit\Support\Http\Middleware;
+namespace Tests\Unit\Http\Middleware;
 
 use Illuminate\Http\Request;
-use Nuwave\Lighthouse\Support\Http\Middleware\EnsureXHR;
+use Nuwave\Lighthouse\Http\Middleware\EnsureXHR;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Tests\TestCase;

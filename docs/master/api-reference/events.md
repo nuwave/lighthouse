@@ -18,7 +18,7 @@ use Illuminate\Support\Carbon;
  * Can be used for logging or for measuring and monitoring
  * the time a request takes to resolve.
  *
- * @see \Nuwave\Lighthouse\Support\Http\GraphQLController
+ * @see \Nuwave\Lighthouse\Http\GraphQLController
  */
 class StartRequest
 {
@@ -289,7 +289,7 @@ use Symfony\Component\HttpFoundation\Response;
  * Can be used for logging or for measuring and monitoring
  * the time a request takes to resolve.
  *
- * @see \Nuwave\Lighthouse\Support\Http\GraphQLController
+ * @see \Nuwave\Lighthouse\Http\GraphQLController
  */
 class EndRequest
 {

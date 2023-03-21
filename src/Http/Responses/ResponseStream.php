@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Nuwave\Lighthouse\Support\Http\Responses;
+namespace Nuwave\Lighthouse\Http\Responses;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
