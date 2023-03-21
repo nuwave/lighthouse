@@ -7,11 +7,11 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Arr;
 use Illuminate\Testing\TestResponse;
+use Nuwave\Lighthouse\Http\Responses\MemoryStream;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
 use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
-use Nuwave\Lighthouse\Http\Responses\MemoryStream;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 

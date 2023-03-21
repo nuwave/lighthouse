@@ -31,6 +31,7 @@ use Nuwave\Lighthouse\Execution\ContextFactory;
 use Nuwave\Lighthouse\Execution\ErrorPool;
 use Nuwave\Lighthouse\Execution\SingleResponse;
 use Nuwave\Lighthouse\Execution\ValidationRulesProvider;
+use Nuwave\Lighthouse\Http\Responses\ResponseStream;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\ResolverProvider;
@@ -46,7 +47,6 @@ use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules;
-use Nuwave\Lighthouse\Http\Responses\ResponseStream;
 
 class LighthouseServiceProvider extends ServiceProvider
 {
