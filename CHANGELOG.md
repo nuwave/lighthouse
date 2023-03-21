@@ -41,7 +41,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Guard default configuration options in `lighthouse.php` allows multiple guards https://github.com/nuwave/lighthouse/pull/2345
 - Make `@auth` and `@whereAuth` support multiple guards https://github.com/nuwave/lighthouse/pull/2345
 - Make `Illuminate\Http\Request` optional in `Nuwave\Lighthouse\Support\Contracts\GraphQLContext` https://github.com/nuwave/lighthouse/pull/2353
-- Move namespace `Nuwave\Lighthouse\Support\Http` to `Nuwave\Lighthouse\Http`
+- Move namespace `Nuwave\Lighthouse\Support\Http` to `Nuwave\Lighthouse\Http` https://github.com/nuwave/lighthouse/pull/2358
 
 ### Fixed
 
@@ -90,7 +90,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Do not register `ScoutServiceProvider` by default
 - Remove alias/Facade `graphql`
 - Remove subscriptions version 1
-- Remove `MiddlewareAdapter`
+- Remove `MiddlewareAdapter` https://github.com/nuwave/lighthouse/pull/2358
 
 ## v5.71.0
 
