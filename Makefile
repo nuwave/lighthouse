@@ -30,6 +30,9 @@ php-cs-fixer: up ## Fix code style
 stan: up ## Runs static analysis
 	${dcphp} vendor/bin/phpstan
 
+.PHONY: audit
+	deno test --allow-net audit
+
 .PHONY: test
 test: up ## Runs tests with PHPUnit
 	${dcphp} vendor/bin/phpunit

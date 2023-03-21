@@ -1,0 +1,12 @@
+services:
+  php:
+    build:
+      context: .
+      dockerfile: php.dockerfile
+      args:
+        USER: $USER
+    volumes:
+      - ./:/workdir
+    security_opt:
+      - label:disable
+    tty: true
