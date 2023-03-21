@@ -5,7 +5,7 @@ WORKDIR /workdir
 COPY --from=composer /usr/bin/composer /usr/bin/composer
 
 RUN apt-get update && \
-    apt-get install -y \
+    apt-get install --yes \
         git \
         libzip-dev \
         zip \
