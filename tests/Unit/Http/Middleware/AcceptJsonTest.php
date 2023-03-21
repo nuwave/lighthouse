@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Tests\Unit\Support\Http\Middleware;
+namespace Tests\Unit\Http\Middleware;
 
 use Illuminate\Http\Request;
-use Nuwave\Lighthouse\Support\Http\Middleware\AcceptJson;
+use Nuwave\Lighthouse\Http\Middleware\AcceptJson;
 use Tests\TestCase;
 
 final class AcceptJsonTest extends TestCase

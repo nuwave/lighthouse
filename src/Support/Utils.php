@@ -130,7 +130,7 @@ class Utils
      * @param  callable(mixed): mixed  $callback
      * @param  mixed|iterable<mixed>  $valueOrValues
      */
-    public static function applyEach(callable $callback, $valueOrValues): void
+    public static function applyEach(callable $callback, mixed $valueOrValues): void
     {
         if (is_iterable($valueOrValues)) {
             foreach ($valueOrValues as $value) {
@@ -148,7 +148,7 @@ class Utils
      *
      * @param  object|class-string  $class
      */
-    public static function classUsesTrait($class, string $trait): bool
+    public static function classUsesTrait(object|string $class, string $trait): bool
     {
         return in_array(
             $trait,

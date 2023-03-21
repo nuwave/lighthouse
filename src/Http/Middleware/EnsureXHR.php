@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Nuwave\Lighthouse\Support\Http\Middleware;
+namespace Nuwave\Lighthouse\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;

@@ -11,7 +11,7 @@ use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
 use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
-use Nuwave\Lighthouse\Support\Http\Responses\MemoryStream;
+use Nuwave\Lighthouse\Http\Responses\MemoryStream;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
