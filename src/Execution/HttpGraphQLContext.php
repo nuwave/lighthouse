@@ -1,14 +1,13 @@
 <?php declare(strict_types=1);
 
-namespace Nuwave\Lighthouse\Schema;
+namespace Nuwave\Lighthouse\Execution;
 
 use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Auth\AuthServiceProvider;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class UserGraphQLContext implements GraphQLContext
+class HttpGraphQLContext implements GraphQLContext
 {
     /**
      * An instance of the currently authenticated user.
@@ -16,12 +15,15 @@ class UserGraphQLContext implements GraphQLContext
     public ?Authenticatable $user = null;
 
     public function __construct(
-        protected AuthFactory $authFactory,
+        /**
+         * An instance of the incoming HTTP request.
+         */
+        public Request $request,
     ) {
         foreach (AuthServiceProvider::guards() as $guard) {
-            $this->user = $this->authFactory->guard($guard)
-                ->user();
-            if ($this->user !== null) {
+            $this->user = $request->user($guard);
+
+            if (isset($this->user)) {
                 break;
             }
         }
@@ -39,6 +41,6 @@ class UserGraphQLContext implements GraphQLContext
 
     public function request(): ?Request
     {
-        return null;
+        return $this->request;
     }
 }

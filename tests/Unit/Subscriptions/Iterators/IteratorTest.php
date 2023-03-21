@@ -7,7 +7,7 @@ use GraphQL\Language\AST\OperationDefinitionNode;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
-use Nuwave\Lighthouse\Schema\HttpGraphQLContext;
+use Nuwave\Lighthouse\Execution\HttpGraphQLContext;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Tests\TestCase;

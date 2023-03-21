@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace Nuwave\Lighthouse\Schema;
+namespace Nuwave\Lighthouse\Schema\AST;
 
 use GraphQL\Type\Definition\ListOfType;
 use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\Type;
-use Nuwave\Lighthouse\Schema\AST\TypeNodeConverter;
+use Nuwave\Lighthouse\Schema\TypeRegistry;
 
 class ExecutableTypeNodeConverter extends TypeNodeConverter
 {

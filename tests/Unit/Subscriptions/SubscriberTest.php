@@ -5,7 +5,7 @@ namespace Tests\Unit\Subscriptions;
 use GraphQL\Language\AST\OperationDefinitionNode;
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
-use Nuwave\Lighthouse\Schema\HttpGraphQLContext;
+use Nuwave\Lighthouse\Execution\HttpGraphQLContext;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Tests\TestCase;
 use Tests\TestsSerialization;
