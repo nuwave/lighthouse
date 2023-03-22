@@ -1,10 +1,8 @@
 services:
   server:
     build:
-      context: .
-      dockerfile: server.dockerfile
-    volumes:
-      - ../:/workdir
+      context: ../
+      dockerfile: audit/server.dockerfile
     entrypoint: 'php artisan serve --host=0.0.0.0'
     healthcheck:
       test: curl -f http://localhost:8000/graphql?query=%7B__typename%7D || exit 1

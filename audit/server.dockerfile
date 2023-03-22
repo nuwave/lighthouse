@@ -16,5 +16,5 @@ RUN apt-get update && \
 
 RUN composer create-project laravel/laravel /app
 RUN composer require nuwave/lighthouse:dev-master
-COPY ../ /app/vendor/nuwave/lighthouse
+COPY . /app/vendor/nuwave/lighthouse
 RUN php artisan vendor:publish --tag=lighthouse-schema
