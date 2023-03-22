@@ -193,7 +193,6 @@ jobs:
       - run: |
           cd audit
           make setup
-          make serve &
           make audit
 
   benchmarks:
