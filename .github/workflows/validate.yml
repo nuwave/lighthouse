@@ -187,13 +187,16 @@ jobs:
   audit:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: audit
+
     steps:
       - uses: actions/checkout@v3
 
-      - run: |
-          cd audit
-          make setup
-          make audit
+      - run: make setup
+
+      - run: make audit
 
   benchmarks:
     runs-on: ubuntu-latest
