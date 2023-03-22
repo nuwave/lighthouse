@@ -1,6 +1,6 @@
 FROM php:8.1-cli
 
-WORKDIR /workdir
+WORKDIR /app
 
 COPY --from=composer /usr/bin/composer /usr/bin/composer
 
@@ -14,10 +14,7 @@ RUN apt-get update && \
         zip \
     && rm -rf /var/lib/apt/lists/*
 
-ARG USER_ID
-ARG GROUP_ID
-RUN if [ ${USER_ID:-0} -ne 0 ] && [ ${GROUP_ID:-0} -ne 0 ]; then \
-    groupadd --force --gid ${GROUP_ID} lighthouse &&\
-    useradd --no-log-init  --create-home --uid ${USER_ID} --gid ${GROUP_ID} lighthouse \
-;fi
-USER lighthouse
+RUN composer create-project laravel/laravel /app
+RUN composer require nuwave/lighthouse:dev-master
+COPY ../ /app/vendor/nuwave/lighthouse
+RUN php artisan vendor:publish --tag=lighthouse-schema
