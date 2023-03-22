@@ -17,7 +17,7 @@ build: ## Build the local Docker containers
 
 .PHONY: up
 up: ## Bring up the docker-compose stack
-	docker-compose up -d
+	docker-compose up --detach
 
 .PHONY: fix
 fix: rector php-cs-fixer ## Automatic code fixes
@@ -29,9 +29,6 @@ php-cs-fixer: up ## Fix code style
 .PHONY: stan
 stan: up ## Runs static analysis
 	${dcphp} vendor/bin/phpstan
-
-.PHONY: audit
-	deno test --allow-net audit
 
 .PHONY: test
 test: up ## Runs tests with PHPUnit

@@ -1,12 +1,16 @@
 services:
-  php:
+  server:
     build:
       context: .
-      dockerfile: php.dockerfile
-      args:
-        USER: $USER
+      dockerfile: server.dockerfile
+    volumes:
+      - ../:/workdir
+    tty: true
+  client:
+    build:
+      context: .
+      dockerfile: client.dockerfile
     volumes:
       - ./:/workdir
-    security_opt:
-      - label:disable
+    entrypoint: /bin/bash
     tty: true
