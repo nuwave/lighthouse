@@ -1,12 +1,12 @@
 <?php declare(strict_types=1);
 
-namespace Tests\Unit\Schema\Execution;
+namespace Tests\Unit\Execution;
 
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Tests\TestCase;
-use Tests\Unit\Schema\Execution\Fixtures\FooContext;
+use Tests\Unit\Execution\Fixtures\FooContext;
 
 final class CreatesContextTest extends TestCase
 {

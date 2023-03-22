@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Tests\Unit\Schema\Execution\Fixtures;
+namespace Tests\Unit\Execution\Fixtures;
 
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Auth\User;
@@ -10,9 +10,6 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 final class FooContext implements GraphQLContext
 {
     public const FROM_FOO_CONTEXT = 'custom.context';
-
-    public function __construct(
-    ) {}
 
     public function user(): ?User
     {
