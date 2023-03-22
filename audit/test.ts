@@ -13,9 +13,9 @@ for (
       const result = await audit.fn();
       // Clean up dangling resources
       console.log(result);
-      if ("response" in result) {
-        await result.response.body?.cancel();
-      }
+      // if ("response" in result) {
+      //   await result.response.body?.cancel();
+      // }
       if (result.status === "error") {
         throw result.reason;
       }
