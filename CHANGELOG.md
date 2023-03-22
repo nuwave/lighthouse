@@ -9,6 +9,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.0.0
+
 ### Changed
 
 - Use the strongest possible native types over PHPDocs
