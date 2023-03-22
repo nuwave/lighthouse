@@ -3,7 +3,6 @@ import { serverAudits } from "npm:graphql-http";
 for (
   const audit of serverAudits({
     url: "http://server:8000/graphql",
-    fetchFn: fetch,
   })
 ) {
   // if (audit.name !== 'MUST accept application/json and match the content-type') continue;
