@@ -77,9 +77,7 @@ GRAPHQL;
         foreach ($directiveClasses as $directiveClass) {
             $definitionString = $directiveClass::definition();
 
-            // Throws if the definition is invalid
-            $definitionNode = ASTHelper::extractDirectiveDefinition($definitionString);
-
+            $definitionNode = ASTHelper::extractDirectiveDefinition($definitionString); // Throws if the definition is invalid
             if ($omitBuiltIn && isset($builtInDirectives[$definitionNode->name->value])) {
                 continue;
             }
