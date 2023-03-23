@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.1.0
+
+### Added
+
+- Add option `--omit-built-in` to `lighthouse:ide-helper` to avoid duplicate built-in definitions https://github.com/nuwave/lighthouse/pull/2362
+
 ## v6.0.0
 
 ### Changed
