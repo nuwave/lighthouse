@@ -52,6 +52,9 @@ is to add this script to your `composer.json`:
     ],
 ```
 
+If the generated definitions conflict with those provided by your IDE, try `--omit-built-in` to avoid redefining
+built-in directives such as `@deprecated`.
+
 ## interface
 
 Create a type resolver class for a GraphQL interface type.
