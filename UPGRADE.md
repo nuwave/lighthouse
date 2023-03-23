@@ -243,7 +243,11 @@ executing an already parsed `DocumentNode` instance.
 
 ### Removed error extension field `category`
 
-See https://github.com/webonyx/graphql-php/blob/master/UPGRADE.md#breaking-removed-error-extension-field-category
+See https://github.com/webonyx/graphql-php/blob/master/UPGRADE.md#breaking-removed-error-extension-field-category.
+
+You can [leverage `GraphQL\Error\ProvidesExtensions`](https://lighthouse-php.com/master/digging-deeper/error-handling.html#additional-error-information)
+to restore `category` in your custom exceptions. Additionally, you may [implement a custom error handler](https://lighthouse-php.com/master/digging-deeper/error-handling.html#registering-error-handlers)
+that wraps well-known third-party exceptions with your own exception that adds an appropriate `category`.
 
 ### Use native interface for errors with extensions
 
