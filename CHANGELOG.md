@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.3.0
+
+### Added
+
+- Hydrate external fields for models resolved from representations in federation
+
 ## v6.2.1
 
 ### Fixed

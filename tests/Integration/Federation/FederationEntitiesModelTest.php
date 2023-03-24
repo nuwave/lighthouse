@@ -144,4 +144,45 @@ final class FederationEntitiesModelTest extends DBTestCase
             ],
         ]);
     }
+
+    public function testHydratesExternalFields(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type User @key(fields: "id") {
+          id: ID!
+          externallyProvided: String! @external
+        }
+        ';
+
+        $user = factory(User::class)->create();
+        assert($user instanceof User);
+
+        $userRepresentation = [
+            '__typename' => 'User',
+            'id' => (string) $user->id,
+            'externallyProvided' => 'some value that we know nothing about',
+        ];
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($representations: [_Any!]!) {
+            _entities(representations: $representations) {
+                __typename
+                ... on User {
+                    id
+                    externallyProvided
+                }
+            }
+        }
+        ', [
+            'representations' => [
+                $userRepresentation,
+            ],
+        ])->assertExactJson([
+            'data' => [
+                '_entities' => [
+                    $userRepresentation,
+                ],
+            ],
+        ]);
+    }
 }
