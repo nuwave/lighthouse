@@ -154,7 +154,12 @@ class EntityResolverProvider
                 throw new Error('The query returned more than one result.');
             }
 
-            return $results->first();
+            $model = $results->first();
+            if ($model) {
+                $this->hydrateExternalFields($model, $representation, $definition);
+            }
+
+            return $model;
         };
     }
 
@@ -261,5 +266,28 @@ class EntityResolverProvider
     {
         return $keyFieldsSelections->first(fn (SelectionSetNode $keyFields): bool => $this->satisfiesKeyFields($keyFields, $representation))
             ?? throw new Error('Representation does not satisfy any set of uniquely identifying keys: ' . \Safe\json_encode($representation));
+    }
+
+    /**
+     * @param array<string, mixed> $representation
+     */
+    protected function hydrateExternalFields(Model $model, array $representation, ObjectTypeDefinitionNode $definition): void
+    {
+        foreach ($definition->fields as $field) {
+            if (ASTHelper::hasDirective($field, 'external')) {
+                $fieldName = $field->name->value;
+                if (array_key_exists($fieldName, $representation)) {
+                    $value = $representation[$fieldName];
+                    if (ASTHelper::hasDirective($field, GlobalIdDirective::NAME)) {
+                        $value = $this->globalId->decodeID($value);
+                    }
+                    $model->setAttribute($fieldName, $value);
+                }
+            }
+            foreach ($field->directives as $directive) {
+                if ($directive->name->value === 'external') {
+                }
+            }
+        }
     }
 }

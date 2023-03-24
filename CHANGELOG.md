@@ -9,11 +9,17 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.3.0
+
+### Added
+
+- Hydrate external fields for models resolved from representations in federation https://github.com/nuwave/lighthouse/pull/2366
+
 ## v6.2.1
 
 ### Fixed
 
-- Fixed resolving composite object `@key` in default model entity resolver for federation
+- Fixed resolving composite object `@key` in default model entity resolver for federation https://github.com/nuwave/lighthouse/pull/2365
 
 ## v6.2.0
 
