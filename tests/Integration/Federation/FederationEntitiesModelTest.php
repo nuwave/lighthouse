@@ -5,6 +5,7 @@ namespace Tests\Integration\Federation;
 use Nuwave\Lighthouse\Federation\FederationServiceProvider;
 use Nuwave\Lighthouse\GlobalId\GlobalId;
 use Tests\DBTestCase;
+use Tests\Utils\Models\Company;
 use Tests\Utils\Models\User;
 
 final class FederationEntitiesModelTest extends DBTestCase
@@ -20,7 +21,7 @@ final class FederationEntitiesModelTest extends DBTestCase
     public function testCallsEntityResolverModel(): void
     {
         $this->schema = /** @lang GraphQL */ '
-        type User @model @key(fields: "id") {
+        type User @key(fields: "id") {
           id: ID! @external
         }
         ';
@@ -54,10 +55,63 @@ final class FederationEntitiesModelTest extends DBTestCase
         ]);
     }
 
+    public function testCallsNestedEntityResolverModel(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type User @key(fields: "company { id }") {
+          id: ID! @external
+          company: Company! @belongsTo
+        }
+
+        type Company {
+            id: ID!
+        }
+        ';
+
+        $company = factory(Company::class)->create();
+        assert($company instanceof Company);
+
+        $user = factory(User::class)->make();
+        assert($user instanceof User);
+        $user->company()->associate($company);
+        $user->save();
+
+        $userRepresentation = [
+            '__typename' => 'User',
+            'company' => [
+                'id' => (string) $company->id,
+            ],
+        ];
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($representations: [_Any!]!) {
+            _entities(representations: $representations) {
+                __typename
+                ... on User {
+                    id
+                }
+            }
+        }
+        ', [
+            'representations' => [
+                $userRepresentation,
+            ],
+        ])->assertExactJson([
+            'data' => [
+                '_entities' => [
+                    [
+                        '__typename' => 'User',
+                        'id' => (string) $user->id,
+                    ],
+                ],
+            ],
+        ]);
+    }
+
     public function testCallsEntityResolverModelWithGlobalId(): void
     {
         $this->schema = /** @lang GraphQL */ '
-        type User @model @key(fields: "id") {
+        type User @key(fields: "id") {
           id: ID! @external @globalId
         }
         ';

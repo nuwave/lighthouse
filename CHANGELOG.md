@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.2.1
+
+### Fixed
+
+- Fixed resolving composite object `@key` in default model entity resolver for federation
+
 ## v6.2.0
 
 ### Changed
