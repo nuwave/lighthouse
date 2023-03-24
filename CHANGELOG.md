@@ -9,9 +9,11 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.2.0
+
 ### Changed
 
-- Automatically setup `RefreshSchemaCache` trait.
+- Automatically set up test traits `RefreshSchemaCache` and `TestsSubscriptions`
 
 ## v6.1.0
 
