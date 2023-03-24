@@ -253,6 +253,10 @@ trait MakesGraphQLRequestsLumen
         $config->set('lighthouse.error_handlers', [RethrowingErrorHandler::class]);
     }
 
+    /**
+     * @deprecated use TestsSubscriptions
+     * TODO remove in the next major version
+     */
     protected function setUpSubscriptionEnvironment(): void
     {
         $app = Container::getInstance();

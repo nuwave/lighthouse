@@ -11,11 +11,11 @@ use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Tests\TestCase;
-use Tests\TestsSubscriptions;
+use Tests\EnablesSubscriptionServiceProvider;
 
 abstract class IteratorTest extends TestCase
 {
-    use TestsSubscriptions;
+    use EnablesSubscriptionServiceProvider;
 
     public function assertIteratesOverItemsWithCallback(SubscriptionIterator $iterator): void
     {

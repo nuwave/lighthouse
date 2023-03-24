@@ -9,12 +9,12 @@ use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Tests\TestCase;
 use Tests\TestsSerialization;
-use Tests\TestsSubscriptions;
+use Tests\EnablesSubscriptionServiceProvider;
 
 final class SubscriberTest extends TestCase
 {
     use TestsSerialization;
-    use TestsSubscriptions;
+    use EnablesSubscriptionServiceProvider;
 
     protected function getEnvironmentSetUp($app): void
     {

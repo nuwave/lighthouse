@@ -4,7 +4,7 @@ namespace Tests;
 
 use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
 
-trait TestsSubscriptions
+trait EnablesSubscriptionServiceProvider
 {
     protected function getPackageProviders($app): array
     {

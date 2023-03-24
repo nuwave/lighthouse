@@ -12,11 +12,11 @@ use Nuwave\Lighthouse\Subscriptions\SubscriptionBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
 use Tests\TestCase;
-use Tests\TestsSubscriptions;
+use Tests\EnablesSubscriptionServiceProvider;
 
 final class SubscriptionTest extends TestCase
 {
-    use TestsSubscriptions;
+    use EnablesSubscriptionServiceProvider;
 
     protected function getPackageProviders($app): array
     {

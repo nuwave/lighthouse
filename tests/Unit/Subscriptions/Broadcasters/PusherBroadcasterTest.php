@@ -8,11 +8,11 @@ use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Psr\Log\LoggerInterface;
 use Tests\TestCase;
-use Tests\TestsSubscriptions;
+use Tests\EnablesSubscriptionServiceProvider;
 
 final class PusherBroadcasterTest extends TestCase
 {
-    use TestsSubscriptions;
+    use EnablesSubscriptionServiceProvider;
 
     public function testPusherUsesLoggerInterface(): void
     {

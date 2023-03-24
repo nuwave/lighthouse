@@ -8,12 +8,12 @@ use Nuwave\Lighthouse\Subscriptions\Storage\RedisStorageManager;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Tests\TestCase;
 use Tests\TestsRedis;
-use Tests\TestsSubscriptions;
+use Tests\EnablesSubscriptionServiceProvider;
 
 final class RedisStorageManagerTest extends TestCase
 {
     use TestsRedis;
-    use TestsSubscriptions;
+    use EnablesSubscriptionServiceProvider;
 
     protected string $schema = /** @lang GraphQL */ '
     type Task {
