@@ -155,7 +155,7 @@ class EntityResolverProvider
             }
 
             $model = $results->first();
-            if ($model) {
+            if ($model !== null) {
                 $this->hydrateExternalFields($model, $representation, $definition);
             }
 
@@ -234,7 +234,10 @@ class EntityResolverProvider
                 return;
             }
 
-            $this->applySatisfiedSelection($builder, $subSelection, $value, $definition);
+            $builder->whereHas(
+                $fieldName,
+                fn (EloquentBuilder $nestedBuilder) => $this->applySatisfiedSelection($nestedBuilder, $subSelection, $value, $definition),
+            );
         }
     }
 
@@ -281,6 +284,7 @@ class EntityResolverProvider
                     if (ASTHelper::hasDirective($field, GlobalIdDirective::NAME)) {
                         $value = $this->globalId->decodeID($value);
                     }
+
                     $model->setAttribute($fieldName, $value);
                 }
             }

@@ -42,10 +42,12 @@ class FieldCommand extends FieldGeneratorCommand
         if (! is_string($name)) {
             throw new \InvalidArgumentException('You must specify the name for the class to generate.');
         }
+
         $parts = explode('.', $name);
         if (count($parts) !== 2) {
             throw new \InvalidArgumentException("You must specify the name as Type.field, got: {$name}.");
         }
+
         /** @var array{string, string} $parts */
 
         return $parts;

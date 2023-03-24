@@ -73,6 +73,7 @@ final class FederationEntitiesModelTest extends DBTestCase
 
         $user = factory(User::class)->make();
         assert($user instanceof User);
+        $user->id = $company->id + 1;
         $user->company()->associate($company);
         $user->save();
 
