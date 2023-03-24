@@ -34,7 +34,7 @@ abstract class TestCase extends BaseTestCase
 }
 ```
 
-If you want to test subscriptions, add the `TestsSubscriptions` trait: 
+If you want to test subscriptions, add the `TestsSubscriptions` trait:
 
 ```diff
 +use Nuwave\Lighthouse\Testing\TestsSubscriptions;
