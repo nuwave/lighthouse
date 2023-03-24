@@ -229,7 +229,7 @@ class EntityResolverProvider
                 return;
             }
 
-            $this->applySatisfiedSelection($builder, $subSelection, $representation, $definition);
+            $this->applySatisfiedSelection($builder, $subSelection, $value, $definition);
         }
     }
 
