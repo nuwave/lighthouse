@@ -1,4 +1,4 @@
-const versions = ["master", "5", "4", "3", "2"];
+const versions = ["master", "6", "5", "4", "3", "2"];
 const latest = versions[1];
 
 module.exports = {
