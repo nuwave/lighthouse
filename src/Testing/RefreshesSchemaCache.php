@@ -47,4 +47,9 @@ trait RefreshesSchemaCache
             self::$schemaCacheWasRefreshed = true;
         }
     }
+
+    protected function setUpRefreshesSchemaCache(): void
+    {
+        $this->bootRefreshesSchemaCache();
+    }
 }
