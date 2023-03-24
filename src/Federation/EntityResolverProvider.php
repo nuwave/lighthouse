@@ -283,7 +283,6 @@ class EntityResolverProvider
                     }
                     $model->setAttribute($fieldName, $value);
                 }
-
             }
             foreach ($field->directives as $directive) {
                 if ($directive->name->value === 'external') {
