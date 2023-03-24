@@ -274,12 +274,19 @@ class EntityResolverProvider
     protected function hydrateExternalFields(Model $model, array $representation, ObjectTypeDefinitionNode $definition): void
     {
         foreach ($definition->fields as $field) {
+            if (ASTHelper::hasDirective($field, 'external')) {
+                $fieldName = $field->name->value;
+                if (array_key_exists($fieldName, $representation)) {
+                    $value = $representation[$fieldName];
+                    if (ASTHelper::hasDirective($field, GlobalIdDirective::NAME)) {
+                        $value = $this->globalId->decodeID($value);
+                    }
+                    $model->setAttribute($fieldName, $value);
+                }
+
+            }
             foreach ($field->directives as $directive) {
                 if ($directive->name->value === 'external') {
-                    $fieldName = $field->name->value;
-                    if (isset($representation[$fieldName])) {
-                        $model->setAttribute($fieldName, $representation[$fieldName]);
-                    }
                 }
             }
         }
