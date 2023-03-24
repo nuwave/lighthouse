@@ -4,14 +4,14 @@ namespace Tests\Integration\Subscriptions\EchoBroadcaster;
 
 use Illuminate\Testing\TestResponse;
 use Nuwave\Lighthouse\Subscriptions\Storage\RedisStorageManager;
+use Tests\EnablesSubscriptionServiceProvider;
 use Tests\TestCase;
 use Tests\TestsRedis;
-use Tests\TestsSubscriptions;
 
 final class AuthorizeRequestsTest extends TestCase
 {
     use TestsRedis;
-    use TestsSubscriptions;
+    use EnablesSubscriptionServiceProvider;
 
     protected string $schema = /** @lang GraphQL */ '
     type Task {

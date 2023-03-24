@@ -7,6 +7,16 @@ This document provides guidance for upgrading between major versions of Lighthou
 The configuration options often change between major versions.
 Compare your `lighthouse.php` against the latest [default configuration](src/lighthouse.php).
 
+## v6 to v7
+
+### Leverage automatic test trait setup
+
+Methods you need to explicitly call to set up test traits were removed in favor of automatically set up test traits.
+Keep in mind they only work when your test class extends `Illuminate\Foundation\Testing\TestCase`.
+
+- Just remove calls to `Nuwave\Lighthouse\Testing\RefreshesSchemaCache::bootRefreshesSchemaCache()`.
+- Replace calls to `Nuwave\Lighthouse\Testing\MakesGraphQLRequests::setUpSubscriptionEnvironment()` with ` use Nuwave\Lighthouse\Testing\TestsSubscriptions`.
+
 ## v5 to v6
 
 ### `messages` on `@rules` and `@rulesForArray`

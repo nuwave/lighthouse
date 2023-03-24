@@ -4,8 +4,10 @@ Lighthouse makes it easy to add automated tests through [PHPUnit](https://phpuni
 
 ## Setup
 
-Lighthouse offers some useful test helpers that make it easy to call your API
-from within a PHPUnit test. Just add the `MakesGraphQLRequests` trait to your test class.
+Lighthouse offers some useful test helpers.
+Keep in mind they only work when your test class extends `Illuminate\Foundation\Testing\TestCase`.
+
+The `MakesGraphQLRequests` trait make it easy to call your API:
 
 ```diff
 +use Nuwave\Lighthouse\Testing\MakesGraphQLRequests;
@@ -18,8 +20,8 @@ abstract class TestCase extends BaseTestCase
 }
 ```
 
-Enabling the schema cache speeds up your tests. To ensure the schema is fresh
-before running tests, add the `RefreshesSchemaCache` trait to your test class and call it during set up.
+Enabling the schema cache speeds up your tests.
+To ensure the schema is fresh before running tests, add the `RefreshesSchemaCache` trait:
 
 ```diff
 +use Nuwave\Lighthouse\Testing\RefreshesSchemaCache;
@@ -29,13 +31,19 @@ abstract class TestCase extends BaseTestCase
 {
     use CreatesApplication;
 +   use RefreshesSchemaCache;
+}
+```
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-+       $this->bootRefreshesSchemaCache();
-+       $this->setUpSubscriptionEnvironment(); // Only if you are using subscriptions
-    }
+If you want to test subscriptions, add the `TestsSubscriptions` trait:
+
+```diff
++use Nuwave\Lighthouse\Testing\TestsSubscriptions;
+use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+
+abstract class TestCase extends BaseTestCase
+{
+    use CreatesApplication;
++   use TestsSubscriptions;
 }
 ```
 

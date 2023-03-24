@@ -7,14 +7,14 @@ use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Execution\HttpGraphQLContext;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
+use Tests\EnablesSubscriptionServiceProvider;
 use Tests\TestCase;
 use Tests\TestsSerialization;
-use Tests\TestsSubscriptions;
 
 final class SubscriberTest extends TestCase
 {
     use TestsSerialization;
-    use TestsSubscriptions;
+    use EnablesSubscriptionServiceProvider;
 
     protected function getEnvironmentSetUp($app): void
     {

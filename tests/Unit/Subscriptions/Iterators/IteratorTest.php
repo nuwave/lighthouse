@@ -10,12 +10,12 @@ use Nuwave\Lighthouse\Execution\HttpGraphQLContext;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
+use Tests\EnablesSubscriptionServiceProvider;
 use Tests\TestCase;
-use Tests\TestsSubscriptions;
 
 abstract class IteratorTest extends TestCase
 {
-    use TestsSubscriptions;
+    use EnablesSubscriptionServiceProvider;
 
     public function assertIteratesOverItemsWithCallback(SubscriptionIterator $iterator): void
     {
