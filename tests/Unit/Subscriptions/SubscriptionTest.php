@@ -11,8 +11,8 @@ use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
-use Tests\TestCase;
 use Tests\EnablesSubscriptionServiceProvider;
+use Tests\TestCase;
 
 final class SubscriptionTest extends TestCase
 {

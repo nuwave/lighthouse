@@ -6,8 +6,8 @@ use GraphQL\Language\Parser;
 use GraphQL\Utils\AST;
 use Nuwave\Lighthouse\Subscriptions\Storage\CacheStorageManager;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
-use Tests\TestCase;
 use Tests\EnablesSubscriptionServiceProvider;
+use Tests\TestCase;
 
 final class CacheStorageManagerTest extends TestCase
 {

@@ -4,9 +4,9 @@ namespace Tests\Integration\Subscriptions\EchoBroadcaster;
 
 use Illuminate\Testing\TestResponse;
 use Nuwave\Lighthouse\Subscriptions\Storage\RedisStorageManager;
+use Tests\EnablesSubscriptionServiceProvider;
 use Tests\TestCase;
 use Tests\TestsRedis;
-use Tests\EnablesSubscriptionServiceProvider;
 
 final class AuthorizeRequestsTest extends TestCase
 {

@@ -7,8 +7,8 @@ use Nuwave\Lighthouse\Subscriptions\Broadcasters\PusherBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Psr\Log\LoggerInterface;
-use Tests\TestCase;
 use Tests\EnablesSubscriptionServiceProvider;
+use Tests\TestCase;
 
 final class PusherBroadcasterTest extends TestCase
 {

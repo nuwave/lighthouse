@@ -7,9 +7,9 @@ use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Execution\HttpGraphQLContext;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
+use Tests\EnablesSubscriptionServiceProvider;
 use Tests\TestCase;
 use Tests\TestsSerialization;
-use Tests\EnablesSubscriptionServiceProvider;
 
 final class SubscriberTest extends TestCase
 {

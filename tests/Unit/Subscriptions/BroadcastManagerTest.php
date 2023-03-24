@@ -10,8 +10,8 @@ use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
 use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Symfony\Component\HttpFoundation\Response;
-use Tests\TestCase;
 use Tests\EnablesSubscriptionServiceProvider;
+use Tests\TestCase;
 
 final class BroadcastManagerTest extends TestCase
 {

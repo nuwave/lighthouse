@@ -6,9 +6,9 @@ use Illuminate\Support\Facades\Redis;
 use Illuminate\Testing\TestResponse;
 use Nuwave\Lighthouse\Subscriptions\Storage\RedisStorageManager;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
+use Tests\EnablesSubscriptionServiceProvider;
 use Tests\TestCase;
 use Tests\TestsRedis;
-use Tests\EnablesSubscriptionServiceProvider;
 
 final class RedisStorageManagerTest extends TestCase
 {

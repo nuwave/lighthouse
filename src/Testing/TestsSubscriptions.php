@@ -2,18 +2,11 @@
 
 namespace Nuwave\Lighthouse\Testing;
 
-use GraphQL\Type\Introspection;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Illuminate\Support\Arr;
-use Illuminate\Testing\TestResponse;
-use Nuwave\Lighthouse\Http\Responses\MemoryStream;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
 use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
-use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
-use PHPUnit\Framework\Assert;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * Sets up the environment for testing subscriptions.

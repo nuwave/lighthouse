@@ -10,8 +10,8 @@ use Nuwave\Lighthouse\Execution\HttpGraphQLContext;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
-use Tests\TestCase;
 use Tests\EnablesSubscriptionServiceProvider;
+use Tests\TestCase;
 
 abstract class IteratorTest extends TestCase
 {

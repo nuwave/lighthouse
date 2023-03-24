@@ -13,9 +13,9 @@ use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
 use Nuwave\Lighthouse\Subscriptions\Storage\CacheStorageManager;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Testing\TestsSubscriptions;
+use Tests\EnablesSubscriptionServiceProvider;
 use Tests\TestCase;
 use Tests\TestsRedis;
-use Tests\EnablesSubscriptionServiceProvider;
 use Tests\Utils\Models\User;
 
 final class SubscriptionTest extends TestCase

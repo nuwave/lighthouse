@@ -9,8 +9,8 @@ use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use Nuwave\Lighthouse\Subscriptions\Events\EchoSubscriptionEvent;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use PHPUnit\Framework\Constraint\Callback;
-use Tests\TestCase;
 use Tests\EnablesSubscriptionServiceProvider;
+use Tests\TestCase;
 
 final class EchoBroadcasterTest extends TestCase
 {
