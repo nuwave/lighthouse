@@ -3,15 +3,24 @@
 namespace Tests\Unit\Schema\AST;
 
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
+use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
+use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\NodeKind;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\AST\TypeDefinitionNode;
+use GraphQL\Language\Parser;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\RootType;
+use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
+use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
+use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
 use Tests\TestCase;
 
 final class ASTBuilderTest extends TestCase
@@ -280,5 +289,139 @@ final class ASTBuilderTest extends TestCase
         $this->assertCount(2, $interfaces);
         $this->assertTrue($interfaces->contains('name.value', 'Emailable'));
         $this->assertTrue($interfaces->contains('name.value', 'Nameable'));
+    }
+
+    public function testCompositeTypeDefinitionManipulatorDirective(): void
+    {
+        $directive = new class() extends BaseDirective implements TypeManipulator {
+            public static function definition(): string
+            {
+                return /** @lang GraphQL */ 'directive @foo on FIELD_DEFINITION';
+            }
+
+            public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition):void {
+                $typeDefinition->fields[0]->type = Parser::namedType('Int');
+            }
+        };
+    
+        $this->astBuilder->directiveLocator->setResolved('foo', $directive::class);
+
+        $compositeDirective = new class() extends BaseDirective implements TypeManipulator {
+            public static function definition(): string
+            {
+                return /** @lang GraphQL */ 'directive @composite on FIELD_DEFINITION';
+            }
+
+            public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition):void {
+                $typeDefinition->directives[] = Parser::directive('@foo');
+            }
+        };
+
+        $this->astBuilder->directiveLocator->setResolved('composite', $compositeDirective::class);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Foo @composite {
+            bar: String
+        }
+        ';
+        $documentAST = $this->astBuilder->documentAST();
+
+        $this->assertEquals($documentAST->types['Foo']->fields[0]->type->name->value, 'Int');
+    }
+
+    public function testCompositeFieldManipulatorDirective(): void
+    {
+        $directive = new class() extends BaseDirective implements FieldManipulator {
+            public static function definition(): string
+            {
+                return /** @lang GraphQL */ 'directive @foo on FIELD_DEFINITION';
+            }
+
+            public function manipulateFieldDefinition(
+                DocumentAST &$documentAST,
+                FieldDefinitionNode &$fieldDefinition,
+                ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
+            ):void {
+                $fieldDefinition->type = Parser::namedType('Int');
+            }
+        };
+    
+        $this->astBuilder->directiveLocator->setResolved('foo', $directive::class);
+
+        $compositeDirective = new class() extends BaseDirective implements FieldManipulator {
+            public static function definition(): string
+            {
+                return /** @lang GraphQL */ 'directive @composite on FIELD_DEFINITION';
+            }
+
+            public function manipulateFieldDefinition(
+                DocumentAST &$documentAST,
+                FieldDefinitionNode &$fieldDefinition,
+                ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
+            ):void {
+                $fieldDefinition->directives[] = Parser::directive('@foo');
+            }
+        };
+
+        $this->astBuilder->directiveLocator->setResolved('composite', $compositeDirective::class);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo: String @composite
+        }
+        ';
+        $documentAST = $this->astBuilder->documentAST();
+
+        $this->assertEquals($documentAST->types[RootType::QUERY]->fields[0]->type->name->value, 'Int');
+    }
+
+    public function testCompositeArgManipulatorDirective(): void
+    {
+        $directive = new class() extends BaseDirective implements ArgManipulator {
+            public static function definition(): string
+            {
+                return /** @lang GraphQL */ 'directive @foo on ARGUMENT_DEFINITION';
+            }
+
+            public function manipulateArgDefinition(
+                DocumentAST &$documentAST,
+                InputValueDefinitionNode &$argDefinition,
+                FieldDefinitionNode &$parentField,
+                ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
+            ): void
+            {
+                $argDefinition->type = Parser::namedType('Int');
+            }
+        };
+    
+        $this->astBuilder->directiveLocator->setResolved('foo', $directive::class);
+
+        $compositeDirective = new class() extends BaseDirective implements ArgManipulator {
+            public static function definition(): string
+            {
+                return /** @lang GraphQL */ 'directive @composite on ARGUMENT_DEFINITION';
+            }
+
+            public function manipulateArgDefinition(
+                DocumentAST &$documentAST,
+                InputValueDefinitionNode &$argDefinition,
+                FieldDefinitionNode &$parentField,
+                ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
+            ): void
+            {
+                $argDefinition->directives[] = Parser::directive('@foo');
+            }
+        };
+
+        $this->astBuilder->directiveLocator->setResolved('composite', $compositeDirective::class);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo( name: String @composite ): String
+        }
+        ';
+        $documentAST = $this->astBuilder->documentAST();
+
+        $this->assertEquals($documentAST->types[RootType::QUERY]->fields[0]->arguments[0]->type->name->value, 'Int');
     }
 }
