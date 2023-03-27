@@ -40,7 +40,7 @@ class ASTBuilder
     protected DocumentAST $documentAST;
 
     public function __construct(
-        protected DirectiveLocator $directiveLocator,
+        public DirectiveLocator $directiveLocator,
         protected SchemaSourceProvider $schemaSourceProvider,
         protected EventsDispatcher $eventsDispatcher,
         protected ASTCache $astCache,
@@ -101,7 +101,8 @@ class ASTBuilder
             $executedManipulators = [];
             while (
                 $typeManipulator = $this->directiveLocator->associatedOfType($typeDefinition, TypeManipulator::class)
-                    ->reject(fn (TypeManipulator $typeManipulator): bool => isset($executedManipulators[spl_object_id($typeManipulator->directiveNode)]))
+                    ->reject(fn (TypeManipulator $typeManipulator): bool => !($typeManipulator instanceof BaseDirective))
+                    ->reject(fn (BaseDirective $typeManipulator): bool => isset($executedManipulators[spl_object_id($typeManipulator->directiveNode)]))
                     ->first()
             ) { 
                 $typeManipulator->manipulateTypeDefinition($this->documentAST, $typeDefinition);
@@ -214,7 +215,8 @@ class ASTBuilder
                     $executedManipulators = [];
                     while (
                         $fieldManipulator = $this->directiveLocator->associatedOfType($fieldDefinition, FieldManipulator::class)
-                            ->reject(fn (FieldManipulator $typeManipulator): bool => isset($executedManipulators[spl_object_id($typeManipulator->directiveNode)]))
+                            ->reject(fn (FieldManipulator $fieldManipulator): bool => !($fieldManipulator instanceof BaseDirective))
+                            ->reject(fn (BaseDirective $fieldManipulator): bool => isset($executedManipulators[spl_object_id($fieldManipulator->directiveNode)]))
                             ->first()
                     ) {
                         $fieldManipulator->manipulateFieldDefinition($this->documentAST, $fieldDefinition, $typeDefinition);
@@ -237,8 +239,9 @@ class ASTBuilder
                         /** @var array<int, bool> $executedManipulators */
                         $executedManipulators = [];
                         while (
-                            $argManipulator = $this->directiveLocator->associatedOfType($fieldDefinition, ArgManipulator::class)
-                                ->reject(fn (ArgManipulator $typeManipulator): bool => isset($executedManipulators[spl_object_id($typeManipulator->directiveNode)]))
+                            $argManipulator = $this->directiveLocator->associatedOfType($argumentDefinition, ArgManipulator::class)
+                                ->reject(fn (ArgManipulator $argManipulator): bool => !($argManipulator instanceof BaseDirective))
+                                ->reject(fn (BaseDirective $argManipulator): bool => isset($executedManipulators[spl_object_id($argManipulator->directiveNode)]))
                                 ->first()
                         ) {
                             $argManipulator->manipulateArgDefinition(
