@@ -101,7 +101,7 @@ class ASTBuilder
             $executedManipulators = [];
             while (
                 $typeManipulator = $this->directiveLocator->associatedOfType($typeDefinition, TypeManipulator::class)
-                    ->filter(fn (BaseDirective $typeManipulator) => !isset($executedManipulators[spl_object_id($typeManipulator->directiveNode)]))
+                    ->reject(fn (TypeManipulator $typeManipulator): bool => isset($executedManipulators[spl_object_id($typeManipulator->directiveNode)]))
                     ->first()
             ) { 
                 $typeManipulator->manipulateTypeDefinition($this->documentAST, $typeDefinition);
@@ -214,7 +214,7 @@ class ASTBuilder
                     $executedManipulators = [];
                     while (
                         $fieldManipulator = $this->directiveLocator->associatedOfType($fieldDefinition, FieldManipulator::class)
-                            ->filter(fn (BaseDirective $fieldManipulator) => !isset($executedManipulators[spl_object_id($fieldManipulator->directiveNode)]))
+                            ->reject(fn (FieldManipulator $typeManipulator): bool => isset($executedManipulators[spl_object_id($typeManipulator->directiveNode)]))
                             ->first()
                     ) {
                         $fieldManipulator->manipulateFieldDefinition($this->documentAST, $fieldDefinition, $typeDefinition);
@@ -238,7 +238,7 @@ class ASTBuilder
                         $executedManipulators = [];
                         while (
                             $argManipulator = $this->directiveLocator->associatedOfType($fieldDefinition, ArgManipulator::class)
-                                ->filter(fn (BaseDirective $argManipulator) => !isset($executedManipulators[spl_object_id($argManipulator->directiveNode)]))
+                                ->reject(fn (ArgManipulator $typeManipulator): bool => isset($executedManipulators[spl_object_id($typeManipulator->directiveNode)]))
                                 ->first()
                         ) {
                             $argManipulator->manipulateArgDefinition(
