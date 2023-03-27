@@ -7,6 +7,8 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
+use GraphQL\Language\AST\NamedTypeNode;
+use GraphQL\Language\AST\NameNode;
 use GraphQL\Language\AST\NodeKind;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
@@ -301,7 +303,12 @@ final class ASTBuilderTest extends TestCase
             }
 
             public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition):void {
-                $typeDefinition->fields[0]->type = Parser::namedType('Int');
+                assert($typeDefinition instanceof ObjectTypeDefinitionNode);
+
+                $fieldDefinition = $typeDefinition->fields[0];
+                assert($fieldDefinition instanceof FieldDefinitionNode);
+
+                $fieldDefinition->type = Parser::namedType('Int');
             }
         };
     
@@ -314,6 +321,8 @@ final class ASTBuilderTest extends TestCase
             }
 
             public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition):void {
+                assert($typeDefinition instanceof ObjectTypeDefinitionNode);
+
                 $typeDefinition->directives[] = Parser::directive('@foo');
             }
         };
@@ -327,7 +336,16 @@ final class ASTBuilderTest extends TestCase
         ';
         $documentAST = $this->astBuilder->documentAST();
 
-        $this->assertEquals($documentAST->types['Foo']->fields[0]->type->name->value, 'Int');
+        $type = $documentAST->types['Foo'];
+        assert($type instanceof ObjectTypeDefinitionNode);
+
+        $fieldType = $type->fields[0];
+        assert($fieldType instanceof FieldDefinitionNode);
+
+        $typeType = $fieldType->type;
+        assert($typeType instanceof NamedTypeNode);
+
+        $this->assertEquals($typeType->name->value, 'Int');
     }
 
     public function testDynamicallyAddedFieldManipulatorDirective(): void
@@ -373,7 +391,16 @@ final class ASTBuilderTest extends TestCase
         ';
         $documentAST = $this->astBuilder->documentAST();
 
-        $this->assertEquals($documentAST->types[RootType::QUERY]->fields[0]->type->name->value, 'Int');
+        $queryType = $documentAST->types[RootType::QUERY];
+        assert($queryType instanceof ObjectTypeDefinitionNode);
+
+        $fieldType = $queryType->fields[0];
+        assert($fieldType instanceof FieldDefinitionNode);
+
+        $typeType = $fieldType->type;
+        assert($typeType instanceof NamedTypeNode);
+
+        $this->assertEquals($typeType->name->value, 'Int');
     }
 
     public function testDynamicallyAddedArgManipulatorDirective(): void
@@ -423,6 +450,18 @@ final class ASTBuilderTest extends TestCase
         ';
         $documentAST = $this->astBuilder->documentAST();
 
-        $this->assertEquals($documentAST->types[RootType::QUERY]->fields[0]->arguments[0]->type->name->value, 'Int');
+        $queryType = $documentAST->types[RootType::QUERY];
+        assert($queryType instanceof ObjectTypeDefinitionNode);
+
+        $fieldType = $queryType->fields[0];
+        assert($fieldType instanceof FieldDefinitionNode);
+
+        $argumentType = $fieldType->arguments[0];
+        assert($argumentType instanceof InputValueDefinitionNode);
+
+        $nameType = $argumentType->name;
+        assert($nameType instanceof NameNode);
+
+        $this->assertEquals($nameType->value, 'Int');
     }
 }
