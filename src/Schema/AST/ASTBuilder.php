@@ -17,6 +17,7 @@ use Nuwave\Lighthouse\Events\BuildSchemaString;
 use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
@@ -100,7 +101,7 @@ class ASTBuilder
             $executedManipulators = [];
             while (
                 $typeManipulator = $this->directiveLocator->associatedOfType($typeDefinition, TypeManipulator::class)
-                    ->filter(fn (TypeManipulator $typeManipulator) => !isset($executedManipulators[spl_object_id($typeManipulator->directiveNode)]))
+                    ->filter(fn (BaseDirective $typeManipulator) => !isset($executedManipulators[spl_object_id($typeManipulator->directiveNode)]))
                     ->first()
             ) { 
                 $typeManipulator->manipulateTypeDefinition($this->documentAST, $typeDefinition);
@@ -213,7 +214,7 @@ class ASTBuilder
                     $executedManipulators = [];
                     while (
                         $fieldManipulator = $this->directiveLocator->associatedOfType($fieldDefinition, FieldManipulator::class)
-                            ->filter(fn (FieldManipulator $fieldManipulator) => !isset($executedManipulators[spl_object_id($fieldManipulator->directiveNode)]))
+                            ->filter(fn (BaseDirective $fieldManipulator) => !isset($executedManipulators[spl_object_id($fieldManipulator->directiveNode)]))
                             ->first()
                     ) {
                         $fieldManipulator->manipulateFieldDefinition($this->documentAST, $fieldDefinition, $typeDefinition);
@@ -237,7 +238,7 @@ class ASTBuilder
                         $executedManipulators = [];
                         while (
                             $argManipulator = $this->directiveLocator->associatedOfType($fieldDefinition, ArgManipulator::class)
-                                ->filter(fn (ArgManipulator $argManipulator) => !isset($executedManipulators[spl_object_id($argManipulator->directiveNode)]))
+                                ->filter(fn (BaseDirective $argManipulator) => !isset($executedManipulators[spl_object_id($argManipulator->directiveNode)]))
                                 ->first()
                         ) {
                             $argManipulator->manipulateArgDefinition(
