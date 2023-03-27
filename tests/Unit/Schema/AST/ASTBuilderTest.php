@@ -292,7 +292,7 @@ final class ASTBuilderTest extends TestCase
         $this->assertTrue($interfaces->contains('name.value', 'Nameable'));
     }
 
-    public function testCompositeTypeDefinitionManipulatorDirective(): void
+    public function testDynamicallyAddedTypeDefinitionManipulatorDirective(): void
     {
         $directive = new class() extends BaseDirective implements TypeManipulator {
             public static function definition(): string
@@ -330,7 +330,7 @@ final class ASTBuilderTest extends TestCase
         $this->assertEquals($documentAST->types['Foo']->fields[0]->type->name->value, 'Int');
     }
 
-    public function testCompositeFieldManipulatorDirective(): void
+    public function testDynamicallyAddedFieldManipulatorDirective(): void
     {
         $directive = new class() extends BaseDirective implements FieldManipulator {
             public static function definition(): string
@@ -376,7 +376,7 @@ final class ASTBuilderTest extends TestCase
         $this->assertEquals($documentAST->types[RootType::QUERY]->fields[0]->type->name->value, 'Int');
     }
 
-    public function testCompositeArgManipulatorDirective(): void
+    public function testDynamicallyAddedArgManipulatorDirective(): void
     {
         $directive = new class() extends BaseDirective implements ArgManipulator {
             public static function definition(): string
