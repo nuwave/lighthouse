@@ -21,6 +21,7 @@ use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
+use Nuwave\Lighthouse\Support\Utils;
 use Tests\TestCase;
 
 final class ASTBuilderTest extends TestCase
@@ -304,9 +305,9 @@ final class ASTBuilderTest extends TestCase
             }
         };
     
-        $this->astBuilder->directiveLocator->setResolved('foo', $directive::class);
+        Utils::accessProtected($this->astBuilder, 'directiveLocator')->setResolved('foo', $directive::class);
 
-        $compositeDirective = new class() extends BaseDirective implements TypeManipulator {
+        $compositeDirective = new class() implements TypeManipulator {
             public static function definition(): string
             {
                 return /** @lang GraphQL */ 'directive @composite on FIELD_DEFINITION';
@@ -317,7 +318,7 @@ final class ASTBuilderTest extends TestCase
             }
         };
 
-        $this->astBuilder->directiveLocator->setResolved('composite', $compositeDirective::class);
+        Utils::accessProtected($this->astBuilder, 'directiveLocator')->setResolved('composite', $compositeDirective::class);
 
         $this->schema = /** @lang GraphQL */ '
         type Foo @composite {
@@ -346,9 +347,9 @@ final class ASTBuilderTest extends TestCase
             }
         };
     
-        $this->astBuilder->directiveLocator->setResolved('foo', $directive::class);
+        Utils::accessProtected($this->astBuilder, 'directiveLocator')->setResolved('foo', $directive::class);
 
-        $compositeDirective = new class() extends BaseDirective implements FieldManipulator {
+        $compositeDirective = new class() implements FieldManipulator {
             public static function definition(): string
             {
                 return /** @lang GraphQL */ 'directive @composite on FIELD_DEFINITION';
@@ -363,7 +364,7 @@ final class ASTBuilderTest extends TestCase
             }
         };
 
-        $this->astBuilder->directiveLocator->setResolved('composite', $compositeDirective::class);
+        Utils::accessProtected($this->astBuilder, 'directiveLocator')->setResolved('composite', $compositeDirective::class);
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -394,9 +395,9 @@ final class ASTBuilderTest extends TestCase
             }
         };
     
-        $this->astBuilder->directiveLocator->setResolved('foo', $directive::class);
+        Utils::accessProtected($this->astBuilder, 'directiveLocator')->setResolved('foo', $directive::class);
 
-        $compositeDirective = new class() extends BaseDirective implements ArgManipulator {
+        $compositeDirective = new class() implements ArgManipulator {
             public static function definition(): string
             {
                 return /** @lang GraphQL */ 'directive @composite on ARGUMENT_DEFINITION';
@@ -413,7 +414,7 @@ final class ASTBuilderTest extends TestCase
             }
         };
 
-        $this->astBuilder->directiveLocator->setResolved('composite', $compositeDirective::class);
+        Utils::accessProtected($this->astBuilder, 'directiveLocator')->setResolved('composite', $compositeDirective::class);
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
