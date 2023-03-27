@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Console;
 
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\Parser;
+use GraphQL\Type\Definition\Directive as DirectiveDefinition;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Utils\SchemaPrinter;
 use HaydenPierce\ClassFinder\ClassFinder;
@@ -13,7 +14,8 @@ use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
-use Nuwave\Lighthouse\Support\Contracts\Directive;
+use Nuwave\Lighthouse\Support\Contracts\Directive as DirectiveInterface;
+use Symfony\Component\Console\Input\InputOption;
 
 class IdeHelperCommand extends Command
 {
@@ -30,6 +32,16 @@ GRAPHQL;
     protected $name = 'lighthouse:ide-helper';
 
     protected $description = 'Create IDE helper files to improve type checking and autocompletion.';
+
+    /**
+     * @return array<int, array<int, mixed>>
+     */
+    protected function getOptions(): array
+    {
+        return [
+            ['omit-built-in', null, InputOption::VALUE_OPTIONAL, 'Do not include built-in definitions.'],
+        ];
+    }
 
     public function handle(): int
     {
@@ -60,13 +72,21 @@ GRAPHQL;
             $directiveLocator->namespaces(),
         );
 
+        $omitBuiltIn = $this->option('omit-built-in');
+        $builtInDirectives = DirectiveDefinition::getInternalDirectives();
         foreach ($directiveClasses as $directiveClass) {
-            $definition = $this->define($directiveClass);
+            $definitionString = $directiveClass::definition();
 
+            $definitionNode = ASTHelper::extractDirectiveDefinition($definitionString); // Throws if the definition is invalid
+            if ($omitBuiltIn && isset($builtInDirectives[$definitionNode->name->value])) {
+                continue;
+            }
+
+            $trimmedDefinition = trim($definitionString);
             $schema .= /** @lang GraphQL */ <<<GRAPHQL
 
 # Directive class: {$directiveClass}
-{$definition}
+{$trimmedDefinition}
 
 GRAPHQL;
         }
@@ -98,7 +118,7 @@ GRAPHQL;
                     continue;
                 }
 
-                if (! is_a($class, Directive::class, true)) {
+                if (! is_a($class, DirectiveInterface::class, true)) {
                     continue;
                 }
 

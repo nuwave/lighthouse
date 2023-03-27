@@ -9,6 +9,7 @@ use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\AST\ExecutableTypeNodeConverter;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 
 class SchemaBuilder

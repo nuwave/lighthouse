@@ -17,7 +17,7 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
     {
         $name = $this->argument('name');
         if (! is_string($name)) {
-            throw new \InvalidArgumentException('You must the name for the class to generate.');
+            throw new \InvalidArgumentException('You must specify the name for the class to generate.');
         }
 
         return ucfirst(trim($name));
@@ -28,7 +28,7 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
      */
     protected function getDefaultNamespace($rootNamespace): string
     {
-        $namespaces = config('lighthouse.namespaces.' . $this->namespaceConfigKey());
+        $namespaces = config("lighthouse.namespaces.{$this->namespaceConfigKey()}");
 
         return static::commonNamespace((array) $namespaces);
     }
@@ -48,9 +48,7 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
     public static function commonNamespace(array $namespaces): string
     {
         if ($namespaces === []) {
-            throw new \InvalidArgumentException(
-                'A default namespace is required for code generation.',
-            );
+            throw new \InvalidArgumentException('A default namespace is required for code generation.');
         }
 
         if (count($namespaces) === 1) {

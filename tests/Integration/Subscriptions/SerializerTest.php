@@ -6,12 +6,12 @@ use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Execution\ContextFactory;
 use Nuwave\Lighthouse\Subscriptions\Serializer;
 use Tests\DBTestCase;
-use Tests\TestsSubscriptions;
+use Tests\EnablesSubscriptionServiceProvider;
 use Tests\Utils\Models\User;
 
 final class SerializerTest extends DBTestCase
 {
-    use TestsSubscriptions;
+    use EnablesSubscriptionServiceProvider;
 
     public function testWillSerializeUserModelAndRetrieveItFromTheDatabaseWhenUnserializing(): void
     {

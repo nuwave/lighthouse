@@ -7,6 +7,16 @@ This document provides guidance for upgrading between major versions of Lighthou
 The configuration options often change between major versions.
 Compare your `lighthouse.php` against the latest [default configuration](src/lighthouse.php).
 
+## v6 to v7
+
+### Leverage automatic test trait setup
+
+Methods you need to explicitly call to set up test traits were removed in favor of automatically set up test traits.
+Keep in mind they only work when your test class extends `Illuminate\Foundation\Testing\TestCase`.
+
+- Just remove calls to `Nuwave\Lighthouse\Testing\RefreshesSchemaCache::bootRefreshesSchemaCache()`.
+- Replace calls to `Nuwave\Lighthouse\Testing\MakesGraphQLRequests::setUpSubscriptionEnvironment()` with ` use Nuwave\Lighthouse\Testing\TestsSubscriptions`.
+
 ## v5 to v6
 
 ### `messages` on `@rules` and `@rulesForArray`
@@ -243,7 +253,11 @@ executing an already parsed `DocumentNode` instance.
 
 ### Removed error extension field `category`
 
-See https://github.com/webonyx/graphql-php/blob/master/UPGRADE.md#breaking-removed-error-extension-field-category
+See https://github.com/webonyx/graphql-php/blob/master/UPGRADE.md#breaking-removed-error-extension-field-category.
+
+You can [leverage `GraphQL\Error\ProvidesExtensions`](https://lighthouse-php.com/master/digging-deeper/error-handling.html#additional-error-information)
+to restore `category` in your custom exceptions. Additionally, you may [implement a custom error handler](https://lighthouse-php.com/master/digging-deeper/error-handling.html#registering-error-handlers)
+that wraps well-known third-party exceptions with your own exception that adds an appropriate `category`.
 
 ### Use native interface for errors with extensions
 

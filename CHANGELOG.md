@@ -9,6 +9,38 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.3.1
+
+### Fixed
+
+- Leverage relations for resolving composite object `@key` in default model entity resolver for federation
+
+## v6.3.0
+
+### Added
+
+- Hydrate external fields for models resolved from representations in federation https://github.com/nuwave/lighthouse/pull/2366
+
+## v6.2.1
+
+### Fixed
+
+- Fixed resolving composite object `@key` in default model entity resolver for federation https://github.com/nuwave/lighthouse/pull/2365
+
+## v6.2.0
+
+### Changed
+
+- Automatically set up test traits `RefreshSchemaCache` and `TestsSubscriptions`
+
+## v6.1.0
+
+### Added
+
+- Add option `--omit-built-in` to `lighthouse:ide-helper` to avoid duplicate built-in definitions https://github.com/nuwave/lighthouse/pull/2362
+
+## v6.0.0
+
 ### Changed
 
 - Use the strongest possible native types over PHPDocs
@@ -41,6 +73,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Guard default configuration options in `lighthouse.php` allows multiple guards https://github.com/nuwave/lighthouse/pull/2345
 - Make `@auth` and `@whereAuth` support multiple guards https://github.com/nuwave/lighthouse/pull/2345
 - Make `Illuminate\Http\Request` optional in `Nuwave\Lighthouse\Support\Contracts\GraphQLContext` https://github.com/nuwave/lighthouse/pull/2353
+- Move namespace `Nuwave\Lighthouse\Support\Http` to `Nuwave\Lighthouse\Http` https://github.com/nuwave/lighthouse/pull/2358
 
 ### Fixed
 
@@ -48,6 +81,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Ensure `_entities` maintains order of representations in result https://github.com/nuwave/lighthouse/pull/2286
 - Allow combining `@can` with non-default `@guard` https://github.com/nuwave/lighthouse/pull/2276
 - Fix error message when failing to find class in namespace https://github.com/nuwave/lighthouse/pull/2342
+- Prevent regression to simple paginator type on fields using `@cache` directive https://github.com/nuwave/lighthouse/issues/2354
 
 ### Added
 
@@ -58,6 +92,9 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Allow directive `@where` on fields https://github.com/nuwave/lighthouse/pull/2306
 - Allow passing route parameters in `MakeGraphQLRequests` test methods https://github.com/nuwave/lighthouse/pull/2333
 - Add subscription assertion methods in `MakesGraphQLRequests` and `TestResponseMixin` and docs in phpunit integration section https://github.com/nuwave/lighthouse/pull/2343
+- Allow `laragraph/utils:^2` https://github.com/nuwave/lighthouse/pull/2356
+- Add directives `@whereNull` and `@whereNotNull` https://github.com/nuwave/lighthouse/pull/2357
+- Add configurable namespace to allow custom non-root type field resolvers without FQN https://github.com/nuwave/lighthouse/pull/2351
 
 ### Removed
 
@@ -85,6 +122,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Do not register `ScoutServiceProvider` by default
 - Remove alias/Facade `graphql`
 - Remove subscriptions version 1
+- Remove `MiddlewareAdapter` https://github.com/nuwave/lighthouse/pull/2358
 
 ## v5.71.0
 

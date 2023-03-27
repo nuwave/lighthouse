@@ -6,12 +6,12 @@ use Mockery\MockInterface;
 use Nuwave\Lighthouse\Execution\Utils\Subscription;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionBroadcaster;
 use Tests\DBTestCase;
-use Tests\TestsSubscriptions;
+use Tests\EnablesSubscriptionServiceProvider;
 use Tests\Utils\Models\Task;
 
 final class BroadcastDBTest extends DBTestCase
 {
-    use TestsSubscriptions;
+    use EnablesSubscriptionServiceProvider;
 
     protected string $schema = /** @lang GraphQL */ '
     type Task {

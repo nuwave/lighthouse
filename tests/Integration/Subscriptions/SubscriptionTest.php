@@ -12,13 +12,15 @@ use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
 use Nuwave\Lighthouse\Subscriptions\Storage\CacheStorageManager;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
+use Nuwave\Lighthouse\Testing\TestsSubscriptions;
+use Tests\EnablesSubscriptionServiceProvider;
 use Tests\TestCase;
 use Tests\TestsRedis;
-use Tests\TestsSubscriptions;
 use Tests\Utils\Models\User;
 
 final class SubscriptionTest extends TestCase
 {
+    use EnablesSubscriptionServiceProvider;
     use TestsSubscriptions;
     use TestsRedis;
 
@@ -26,7 +28,7 @@ final class SubscriptionTest extends TestCase
     {
         parent::setUp();
 
-        $this->setUpSubscriptionEnvironment();
+        $this->setUpTestsSubscriptions();
 
         $this->mockResolverExpects($this->any())
             ->willReturnCallback(static fn (mixed $root, array $args): array => $args);

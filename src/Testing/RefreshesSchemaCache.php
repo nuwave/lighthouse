@@ -24,7 +24,7 @@ trait RefreshesSchemaCache
      */
     protected static string $lockFilePath = __DIR__ . '/schema-cache-refreshing';
 
-    protected function bootRefreshesSchemaCache(): void
+    protected function setUpRefreshesSchemaCache(): void
     {
         if (! static::$schemaCacheWasRefreshed) {
             // We utilize the filesystem as shared mutable state to coordinate between processes,
@@ -46,5 +46,13 @@ trait RefreshesSchemaCache
 
             self::$schemaCacheWasRefreshed = true;
         }
+    }
+
+    /**
+     * @deprecated TODO leverage automatic test trait setup, this method will be removed in the next major version
+     */
+    protected function bootRefreshesSchemaCache(): void
+    {
+        $this->setUpRefreshesSchemaCache();
     }
 }

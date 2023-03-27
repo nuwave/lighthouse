@@ -5,8 +5,8 @@ namespace Tests\Unit\Schema\Factories;
 use GraphQL\Language\DirectiveLocation;
 use GraphQL\Language\Parser;
 use GraphQL\Type\Definition\Type;
+use Nuwave\Lighthouse\Schema\AST\FallbackTypeNodeConverter;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
-use Nuwave\Lighthouse\Schema\FallbackTypeNodeConverter;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\TestCase;
 

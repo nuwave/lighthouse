@@ -9,6 +9,7 @@ use Illuminate\Container\Container;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Execution\Utils\FieldPath;
+use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 /**
@@ -75,6 +76,24 @@ class FieldValue
     public function getParentName(): string
     {
         return $this->parent->getTypeDefinitionName();
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function parentNamespaces(): array
+    {
+        $parentName = $this->getParentName();
+
+        return match ($parentName) {
+            RootType::QUERY => (array) config('lighthouse.namespaces.queries'),
+            RootType::MUTATION => (array) config('lighthouse.namespaces.mutations'),
+            RootType::SUBSCRIPTION => (array) config('lighthouse.namespaces.subscriptions'),
+            default => array_map(
+                static fn (string $typesNamespace): string => "{$typesNamespace}\\{$parentName}",
+                (array) config('lighthouse.namespaces.types'),
+            ),
+        };
     }
 
     /**

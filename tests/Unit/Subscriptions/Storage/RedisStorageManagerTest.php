@@ -7,13 +7,13 @@ use Illuminate\Contracts\Redis\Factory as RedisFactory;
 use Illuminate\Redis\Connections\Connection as RedisConnection;
 use Nuwave\Lighthouse\Subscriptions\Storage\RedisStorageManager;
 use PHPUnit\Framework\MockObject\MockObject;
+use Tests\EnablesSubscriptionServiceProvider;
 use Tests\TestCase;
-use Tests\TestsSubscriptions;
 use Tests\Utils\Subscriptions\DummySubscriber;
 
 final class RedisStorageManagerTest extends TestCase
 {
-    use TestsSubscriptions;
+    use EnablesSubscriptionServiceProvider;
 
     public function testSubscriberByChannel(): void
     {

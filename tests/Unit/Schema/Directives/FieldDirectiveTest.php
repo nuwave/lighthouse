@@ -5,6 +5,7 @@ namespace Tests\Unit\Schema\Directives;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\TestCase;
 use Tests\Utils\Queries\FooBar;
+use Tests\Utils\Types\User\NonRootClassResolver;
 
 final class FieldDirectiveTest extends TestCase
 {
@@ -50,25 +51,6 @@ final class FieldDirectiveTest extends TestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            bar: String! @field(resolver: "FooBar@customResolve")
-        }
-        ';
-
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            bar
-        }
-        ')->assertJson([
-            'data' => [
-                'bar' => FooBar::CUSTOM_RESOLVE_RESULT,
-            ],
-        ]);
-    }
-
-    public function testUsesDefaultFieldNamespaceForInvokableClass(): void
-    {
-        $this->schema = /** @lang GraphQL */ '
-        type Query {
             baz: String! @field(resolver: "FooBar")
         }
         ';
@@ -80,6 +62,54 @@ final class FieldDirectiveTest extends TestCase
         ')->assertJson([
             'data' => [
                 'baz' => FooBar::INVOKE_RESULT,
+            ],
+        ]);
+    }
+
+    public function testUsesNonRootParentNamespace(): void
+    {
+        $this->mockResolver([]);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            user: User @mock
+        }
+
+        type User {
+            foo: String! @field(resolver: "NonRootClassResolver")
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            user {
+                foo
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'foo' => NonRootClassResolver::RESULT,
+                ],
+            ],
+        ]);
+    }
+
+    public function testUsesDefaultFieldNamespaceWithCustomMethodName(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            bar: String! @field(resolver: "FooBar@customResolve")
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            bar
+        }
+        ')->assertJson([
+            'data' => [
+                'bar' => FooBar::CUSTOM_RESOLVE_RESULT,
             ],
         ]);
     }

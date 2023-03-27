@@ -9,6 +9,7 @@ use Rector\CodeQuality\Rector\Isset_\IssetOnPropertyObjectToPropertyExistsRector
 use Rector\CodingStyle\Rector\Class_\AddArrayDefaultToArrayPropertyRector;
 use Rector\CodingStyle\Rector\ClassConst\VarConstantCommentRector;
 use Rector\CodingStyle\Rector\ClassMethod\UnSpreadOperatorRector;
+use Rector\CodingStyle\Rector\Closure\StaticClosureRector;
 use Rector\CodingStyle\Rector\Encapsed\EncapsedStringsToSprintfRector;
 use Rector\Config\RectorConfig;
 use Rector\Php71\Rector\FuncCall\RemoveExtraParametersRector;
@@ -45,6 +46,9 @@ return static function (RectorConfig $rectorConfig): void {
         ],
         RemoveExtraParametersRector::class => [
             __DIR__ . '/src/Testing/TestResponseMixin.php', // mixins are weird
+        ],
+        StaticClosureRector::class => [
+            __DIR__ . '/src/Testing/TestResponseMixin.php', // Cannot bind an instance to a static closure
         ],
         GetClassToInstanceOfRector::class => [
             __DIR__ . '/src/Schema/Types/Scalars/DateScalar.php', // We need to compare exact classes, not subclasses

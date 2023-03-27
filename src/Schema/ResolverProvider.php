@@ -17,19 +17,22 @@ class ResolverProvider implements ProvidesResolver
      */
     public function provideResolver(FieldValue $fieldValue): \Closure
     {
-        if (RootType::isRootType($fieldValue->getParentName())) {
-            $resolverClass = $this->findResolverClass($fieldValue, '__invoke')
-                ?? $this->throwMissingResolver($fieldValue);
+        $resolverClass = $this->findResolverClass($fieldValue, '__invoke');
 
-            $resolver = Container::getInstance()->make($resolverClass);
-            assert(is_object($resolver));
+        if ($resolverClass === null) {
+            if (RootType::isRootType($fieldValue->getParentName())) {
+                $this->throwMissingResolver($fieldValue);
+            }
 
-            return \Closure::fromCallable([$resolver, '__invoke']);
+            return \Closure::fromCallable(
+                Executor::getDefaultFieldResolver(),
+            );
         }
 
-        return \Closure::fromCallable(
-            Executor::getDefaultFieldResolver(),
-        );
+        $resolver = Container::getInstance()->make($resolverClass);
+        assert(is_object($resolver));
+
+        return \Closure::fromCallable([$resolver, '__invoke']);
     }
 
     /**
@@ -39,7 +42,7 @@ class ResolverProvider implements ProvidesResolver
     {
         return Utils::namespaceClassname(
             Str::studly($fieldValue->getFieldName()),
-            RootType::defaultNamespaces($fieldValue->getParentName()),
+            $fieldValue->parentNamespaces(),
             static fn (string $class): bool => method_exists($class, $methodName),
         );
     }
@@ -55,16 +58,14 @@ class ResolverProvider implements ProvidesResolver
         $fieldName = $fieldValue->getFieldName();
         $proposedResolverClass = ucfirst($fieldName);
 
-        throw new DefinitionException(
-            <<<MESSAGE
-Could not locate a field resolver for the {$parent}: {$fieldName}.
+        throw new DefinitionException(<<<MESSAGE
+        Could not locate a field resolver for the {$parent} field "{$fieldName}".
 
-Either add a resolver directive such as @all, @find or @create or add
-a resolver class through:
+        Either annotate the field with a resolver directive such as @all, @find or @create,
+        or create a resolver class through:
 
-php artisan lighthouse:{$parent} {$proposedResolverClass}
+        php artisan lighthouse:{$parent} {$proposedResolverClass}
 
-MESSAGE
-        );
+        MESSAGE);
     }
 }

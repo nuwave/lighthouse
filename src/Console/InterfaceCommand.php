@@ -6,7 +6,7 @@ class InterfaceCommand extends LighthouseGeneratorCommand
 {
     protected $name = 'lighthouse:interface';
 
-    protected $description = 'Create a class for a GraphQL interface type.';
+    protected $description = 'Create a type resolver class for a GraphQL interface type.';
 
     protected $type = 'Interface';
 

@@ -310,7 +310,7 @@ class ASTHelper
             $document = Parser::parse($definitionString);
         } catch (SyntaxError $syntaxError) {
             throw new DefinitionException(
-                "Encountered syntax error while parsing this directive definition::\n\n{$definitionString}",
+                "Encountered syntax error while parsing this directive definition:\n\n{$definitionString}",
                 $syntaxError->getCode(),
                 $syntaxError,
             );

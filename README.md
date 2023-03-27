@@ -8,7 +8,7 @@
 
 # Lighthouse
 
-[![Continuous Integration](https://github.com/nuwave/lighthouse/workflows/Continuous%20Integration/badge.svg)](https://github.com/nuwave/lighthouse/actions)
+[![Validate](https://github.com/nuwave/lighthouse/workflows/Validate/badge.svg)](https://github.com/nuwave/lighthouse/actions)
 [![Code Coverage](https://codecov.io/gh/nuwave/lighthouse/branch/master/graph/badge.svg)](https://codecov.io/gh/nuwave/lighthouse)
 [![PHPStan](https://img.shields.io/badge/PHPStan-enabled-brightgreen.svg?style=flat)](https://github.com/phpstan/phpstan)
 

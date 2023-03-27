@@ -917,4 +917,45 @@ GRAPHQL;
             ],
         ]);
     }
+
+    public function testPaginateWithCacheDirective(): void
+    {
+        $this->expectNotToPerformAssertions();
+        factory(User::class, 3)->create();
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID!
+        }
+
+        type Query {
+            users: [User!]! @paginate @cache
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users(first: 2) {
+                data {
+                    id
+                }
+            }
+        }
+        ');
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users(first: 2) {
+                paginatorInfo {
+                    count
+                    total
+                    currentPage
+                }
+                data {
+                    id
+                }
+            }
+        }
+        ');
+    }
 }
