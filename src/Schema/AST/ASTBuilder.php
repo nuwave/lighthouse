@@ -96,11 +96,14 @@ class ASTBuilder
     protected function applyTypeDefinitionManipulators(): void
     {
         foreach ($this->documentAST->types as $typeDefinition) {
-            foreach (
-                $this->directiveLocator->associatedOfType($typeDefinition, TypeManipulator::class)
-                as $typeManipulator
-            ) {
+            $executedManipulators = [];
+            while (
+                $typeManipulator = $this->directiveLocator->associatedOfType($typeDefinition, TypeManipulator::class)
+                    ->filter(fn ($typeManipulator) => !in_array(spl_object_hash($typeManipulator->directiveNode), $executedManipulators))
+                    ->first()
+            ) { 
                 $typeManipulator->manipulateTypeDefinition($this->documentAST, $typeDefinition);
+                $executedManipulators[] = spl_object_hash($typeManipulator->directiveNode);
             }
         }
     }
@@ -205,13 +208,14 @@ class ASTBuilder
         foreach ($this->documentAST->types as $typeDefinition) {
             if ($typeDefinition instanceof ObjectTypeDefinitionNode || $typeDefinition instanceof InterfaceTypeDefinitionNode) {
                 foreach ($typeDefinition->fields as $fieldDefinition) {
-                    $executedFieldManipulators = [];
+                    $executedManipulators = [];
                     while (
                         $fieldManipulator = $this->directiveLocator->associatedOfType($fieldDefinition, FieldManipulator::class)
-                            ->filter(fn ($fieldManipulator) => !in_array(spl_object_hash($fieldManipulator->directiveNode), $executedFieldManipulators))
+                            ->filter(fn ($fieldManipulator) => !in_array(spl_object_hash($fieldManipulator->directiveNode), $executedManipulators))
                             ->first()
                     ) {
                         $fieldManipulator->manipulateFieldDefinition($this->documentAST, $fieldDefinition, $typeDefinition);
+                        $executedManipulators[] = spl_object_hash($fieldManipulator->directiveNode);
                     }
                 }
             }
@@ -227,9 +231,11 @@ class ASTBuilder
             if ($typeDefinition instanceof ObjectTypeDefinitionNode || $typeDefinition instanceof InterfaceTypeDefinitionNode) {
                 foreach ($typeDefinition->fields as $fieldDefinition) {
                     foreach ($fieldDefinition->arguments as $argumentDefinition) {
-                        foreach (
-                            $this->directiveLocator->associatedOfType($argumentDefinition, ArgManipulator::class)
-                            as $argManipulator
+                        $executedManipulators = [];
+                        while (
+                            $argManipulator = $this->directiveLocator->associatedOfType($fieldDefinition, ArgManipulator::class)
+                                ->filter(fn ($argManipulator) => !in_array(spl_object_hash($argManipulator->directiveNode), $executedManipulators))
+                                ->first()
                         ) {
                             $argManipulator->manipulateArgDefinition(
                                 $this->documentAST,
@@ -237,6 +243,7 @@ class ASTBuilder
                                 $fieldDefinition,
                                 $typeDefinition,
                             );
+                            $executedManipulators[] = spl_object_hash($argManipulator->directiveNode);
                         }
                     }
                 }
