@@ -8,7 +8,6 @@ use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\NamedTypeNode;
-use GraphQL\Language\AST\NameNode;
 use GraphQL\Language\AST\NodeKind;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
@@ -459,9 +458,9 @@ final class ASTBuilderTest extends TestCase
         $argumentType = $fieldType->arguments[0];
         assert($argumentType instanceof InputValueDefinitionNode);
 
-        $nameType = $argumentType->name;
-        assert($nameType instanceof NameNode);
+        $typeType = $argumentType->type;
+        assert($typeType instanceof NamedTypeNode);
 
-        $this->assertEquals($nameType->value, 'Int');
+        $this->assertEquals($typeType->name->value, 'Int');
     }
 }
