@@ -205,6 +205,7 @@ class ASTBuilder
         foreach ($this->documentAST->types as $typeDefinition) {
             if ($typeDefinition instanceof ObjectTypeDefinitionNode || $typeDefinition instanceof InterfaceTypeDefinitionNode) {
                 foreach ($typeDefinition->fields as $fieldDefinition) {
+                    $executedFieldManipulators = [];
                     while (
                         $fieldManipulator = $this->directiveLocator->associatedOfType($fieldDefinition, FieldManipulator::class)
                             ->filter(fn ($fieldManipulator) => !in_array(spl_object_hash($fieldManipulator->directiveNode), $executedFieldManipulators))
