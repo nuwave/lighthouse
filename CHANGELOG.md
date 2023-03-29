@@ -13,7 +13,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
-- Allow customizing query complexity calculation of `@paginate` with argument `complexityResolver`
+- Allow customizing query complexity calculation of `@paginate` with argument `complexityResolver` https://github.com/nuwave/lighthouse/pull/2372
 
 ## v6.3.1
 
