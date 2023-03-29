@@ -77,6 +77,13 @@ directive @paginate(
   Setting this to `null` means the count is unrestricted.
   """
   maxCount: Int
+
+  """
+  Reference a function to customize the complexity score calculation.
+  Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
+  """
+  complexityResolver: String
 ) on FIELD_DEFINITION
 
 """
@@ -222,15 +229,15 @@ GRAPHQL;
 
     public function complexityResolver(FieldValue $fieldValue): callable
     {
+        if ($this->directiveHasArgument('complexityResolver')) {
+            return $this->getResolverFromArgument('complexityResolver');
+        }
+
         return static function (int $childrenComplexity, array $args): int {
             /**
-             * @see PaginationManipulator::countArgument().
+             * @see \Nuwave\Lighthouse\Pagination\PaginationManipulator::countArgument()
              */
-            $first = $args['first'] ?? null;
-
-            $expectedNumberOfChildren = is_int($first)
-                ? $first
-                : 1;
+            $expectedNumberOfChildren = $args['first'] ?? 1;
 
             return
                 // Default complexity for this field itself
