@@ -2496,6 +2496,13 @@ directive @paginate(
   Setting this to `null` means the count is unrestricted.
   """
   maxCount: Int
+
+  """
+  Reference a function to customize the complexity score calculation.
+  Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
+  """
+  complexityResolver: String
 ) on FIELD_DEFINITION
 
 """

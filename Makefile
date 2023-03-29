@@ -20,11 +20,19 @@ up: ## Bring up the docker-compose stack
 	docker-compose up -d
 
 .PHONY: fix
-fix: rector php-cs-fixer ## Automatic code fixes
+fix: rector php-cs-fixer prettier ## Automatic code fixes
+
+.PHONY: rector
+rector: up ## Automatic code fixes with Rector
+	${dcphp} vendor/bin/rector process
 
 .PHONY: php-cs-fixer
-php-cs-fixer: up ## Fix code style
+php-cs-fixer: up ## Format code with php-cs-fixer
 	${dcphp} vendor/bin/php-cs-fixer fix
+
+.PHONY: prettier
+prettier: up ## Format code with prettier
+	${dcnode} yarn run prettify
 
 .PHONY: stan
 stan: up ## Runs static analysis
@@ -37,10 +45,6 @@ test: up ## Runs tests with PHPUnit
 .PHONY: bench
 bench: up ## Run benchmarks
 	${dcphp} vendor/bin/phpbench run --report=aggregate
-
-.PHONY: rector
-rector: up ## Automatic code fixes with Rector
-	${dcphp} vendor/bin/rector process
 
 vendor: up composer.json ## Install composer dependencies
 	${dcphp} composer update
