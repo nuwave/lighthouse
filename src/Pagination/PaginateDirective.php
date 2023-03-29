@@ -229,6 +229,10 @@ GRAPHQL;
 
     public function complexityResolver(FieldValue $fieldValue): callable
     {
+        if ($this->directiveHasArgument('complexityResolver')) {
+            return $this->getResolverFromArgument('complexityResolver');
+        }
+
         return static function (int $childrenComplexity, array $args): int {
             /**
              * @see \Nuwave\Lighthouse\Pagination\PaginationManipulator::countArgument()

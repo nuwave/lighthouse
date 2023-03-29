@@ -719,7 +719,7 @@ GRAPHQL
         $complexity = 123;
         $this->graphQL(/* @lang GraphQL */ '
         query ($complexity: Int!) {
-            users(complexity: $complexity) {
+            users(first: 5, complexity: $complexity) {
                 data {
                     id
                 }
