@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.4.0
+
+### Added
+
+- Allow customizing query complexity calculation of `@paginate` with argument `complexityResolver`
+
 ## v6.3.1
 
 ### Fixed

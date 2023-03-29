@@ -7,6 +7,8 @@ use GraphQL\Type\Definition\Argument;
 use GraphQL\Type\Definition\FieldDefinition;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Utils\SchemaPrinter;
+use GraphQL\Validator\Rules\QueryComplexity;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
@@ -526,7 +528,7 @@ GRAPHQL
         }
 
         type Query {
-            users: [User!] @paginate(defaultCount: null)
+            users: [User!]! @paginate(defaultCount: null)
         }
         ';
 
@@ -552,7 +554,7 @@ GRAPHQL
         }
 
         type Query {
-            users: [User!] @paginate
+            users: [User!]! @paginate
         }
         ';
 
@@ -573,7 +575,7 @@ GRAPHQL
     {
         $schema = $this->buildSchema(/** @lang GraphQL */ "
             type Query {
-                users: [NotAnActualModelName!] @paginate(builder: \"{$this->qualifyTestResolver('testDoesNotRequireModelWhenUsingBuilder')}\")
+                users: [NotAnActualModelName!]! @paginate(builder: \"{$this->qualifyTestResolver('testDoesNotRequireModelWhenUsingBuilder')}\")
             }
 
             type NotAnActualModelName {
@@ -591,7 +593,7 @@ GRAPHQL
 
         $this->buildSchema(/** @lang GraphQL */ '
         type Query {
-            users: [Query!] @paginate(builder: "NonexistingClass@notFound")
+            users: [Query!]! @paginate(builder: "NonexistingClass@notFound")
         }
         ');
     }
@@ -600,8 +602,8 @@ GRAPHQL
     {
         $schema = $this->buildSchema(/** @lang GraphQL */ '
         type Query {
-            users: [User!] @paginate
-            users2: [User!] @paginate
+            users: [User!]! @paginate
+            users2: [User!]! @paginate
         }
 
         type User {
@@ -660,7 +662,7 @@ GRAPHQL
     {
         $this->buildSchema(/* @lang GraphQL */ "
         type Query {
-            users: [User] @paginate(resolver: \"{$this->qualifyTestResolver('returnPaginatedDataInsteadOfBuilder')}\")
+            users: [User!]! @paginate(resolver: \"{$this->qualifyTestResolver('returnPaginatedDataInsteadOfBuilder')}\")
         }
 
         type User {
@@ -697,5 +699,48 @@ GRAPHQL
             users: [Query!]! @paginate(resolver: "NonexistingClass@notFound")
         }
         ');
+    }
+
+    public function testCustomizeQueryComplexityResolver(): void
+    {
+        $max = 42;
+        $this->setMaxQueryComplexity($max);
+
+        $this->buildSchema(/* @lang GraphQL */ "
+        type Query {
+            users(complexity: Int!): [User!]! @paginate(complexityResolver: \"{$this->qualifyTestResolver('complexityResolver')}\")
+        }
+
+        type User {
+            id: ID
+        }
+        ");
+
+        $complexity = 123;
+        $this->graphQL(/* @lang GraphQL */ '
+        query ($complexity: Int!) {
+            users(complexity: $complexity) {
+                data {
+                    id
+                }
+            }
+        }
+        ', [
+            'complexity' => $complexity,
+        ])->assertGraphQLErrorMessage(QueryComplexity::maxQueryComplexityErrorMessage($max, $complexity));
+    }
+
+    /**
+     * @param  array{complexity: int} $args
+     */
+    public static function complexityResolver(int $childrenComplexity, array $args): int
+    {
+        return $args['complexity'];
+    }
+
+    protected function setMaxQueryComplexity(int $max): void
+    {
+        $config = $this->app->make(ConfigRepository::class);
+        $config->set('lighthouse.security.max_query_complexity', $max);
     }
 }
