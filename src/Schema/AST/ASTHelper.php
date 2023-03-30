@@ -409,45 +409,4 @@ class ASTHelper
 
         return $directiveInstance;
     }
-
-    /**
-     * Add a directive to a field definition dynamically.
-     *
-     * @api
-     */
-    public static function addDirectiveToFieldDefinition(
-        string $directiveSource,
-        DocumentAST &$documentAST,
-        FieldDefinitionNode &$fieldDefinition,
-        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
-    ): void {
-        $directiveInstance = self::addDirectiveToNode($directiveSource, $fieldDefinition);
-
-        if (!($directiveInstance instanceof FieldManipulator)) {
-            throw new DefinitionException("The dynamically added directive [{$directiveSource}] must implement the FieldManipulator interface.");
-        }
-
-        $directiveInstance->manipulateFieldDefinition($documentAST, $fieldDefinition, $parentType);
-    }
-
-    /**
-     * Add a directive to an arg definition dynamically.
-     *
-     * @api
-     */
-    public static function addDirectiveToArgDefinition(
-        string $directiveSource,
-        DocumentAST &$documentAST,
-        InputValueDefinitionNode &$argDefinition,
-        FieldDefinitionNode &$parentField,
-        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
-    ): void {
-        $directiveInstance = self::addDirectiveToNode($directiveSource, $argDefinition);
-
-        if (!($directiveInstance instanceof ArgManipulator)) {
-            throw new DefinitionException("The dynamically added directive [{$directiveSource}] must implement the ArgManipulator interface.");
-        }
-
-        $directiveInstance->manipulateArgDefinition($documentAST, $argDefinition, $parentField, $parentType);
-    }
 }
