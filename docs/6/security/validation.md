@@ -65,9 +65,9 @@ You can customize the error message for a particular argument.
 )
 ```
 
-### Custom Validation Attribute
+### Custom Validation Attributes
 
-You can customize the attribute for a validation message.
+You can customize the name of the attribute that will be included in the validation message.
 
 ```graphql
 type Mutation {
@@ -194,6 +194,17 @@ public function messages(): array
     return [
         'name.unique' => 'The chosen username is not available',
     ];
+}
+```
+
+### Custom Validation Attributes
+
+You can customize the name of attributes that will be included in the validation message.
+
+```php
+public function attributes(): array
+{
+    return ['name' => 'username'];
 }
 ```
 
