@@ -14,6 +14,7 @@ use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
@@ -259,7 +260,8 @@ GRAPHQL
             }
         };
 
-        Utils::accessProtected($astBuilder, 'directiveLocator')->setResolved('dynamic', $dynamicDirective::class);
+        $directiveLocator = $this->app->make(DirectiveLocator::class);
+        $directiveLocator->setResolved('dynamic', $dynamicDirective::class);
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -301,7 +303,8 @@ GRAPHQL
             }
         };
     
-        Utils::accessProtected($astBuilder, 'directiveLocator')->setResolved('foo', $directive::class);
+        $directiveLocator = $this->app->make(DirectiveLocator::class);
+        $directiveLocator->setResolved('foo', $directive::class);
 
         $dynamicDirective = new class() extends BaseDirective implements ArgManipulator {
             public static function definition(): string
@@ -320,7 +323,8 @@ GRAPHQL
             }
         };
 
-        Utils::accessProtected($astBuilder, 'directiveLocator')->setResolved('dynamic', $dynamicDirective::class);
+        $directiveLocator = $this->app->make(DirectiveLocator::class);
+        $directiveLocator->setResolved('dynamic', $dynamicDirective::class);
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
