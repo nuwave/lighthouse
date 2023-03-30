@@ -256,7 +256,11 @@ GRAPHQL
                 FieldDefinitionNode &$fieldDefinition,
                 ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
             ):void {
-                ASTHelper::addDirectiveToFieldDefinition('@foo', $documentAST, $fieldDefinition, $parentType);
+                $directiveInstance = ASTHelper::addDirectiveToNode('@foo', $fieldDefinition);
+
+                assert($directiveInstance instanceof FieldManipulator);
+          
+                $directiveInstance->manipulateFieldDefinition($documentAST, $fieldDefinition, $parentType);
             }
         };
 
@@ -319,7 +323,11 @@ GRAPHQL
                 ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
             ): void
             {
-                ASTHelper::addDirectiveToArgDefinition('@foo', $documentAST, $argDefinition, $parentField, $parentType);
+                $directiveInstance = ASTHelper::addDirectiveToNode('@foo', $argDefinition);
+
+                assert($directiveInstance instanceof ArgManipulator);
+          
+                $directiveInstance->manipulateArgDefinition($documentAST, $argDefinition, $parentField, $parentType);
             }
         };
 
