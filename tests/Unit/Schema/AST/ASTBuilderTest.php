@@ -313,23 +313,23 @@ final class ASTBuilderTest extends TestCase
     
         Utils::accessProtected($this->astBuilder, 'directiveLocator')->setResolved('foo', $directive::class);
 
-        $compositeDirective = new class() implements TypeManipulator {
+        $dynamicDirective = new class() extends BaseDirective implements TypeManipulator {
             public static function definition(): string
             {
-                return /** @lang GraphQL */ 'directive @composite on FIELD_DEFINITION';
+                return /** @lang GraphQL */ 'directive @dynamic on FIELD_DEFINITION';
             }
 
             public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition):void {
                 assert($typeDefinition instanceof ObjectTypeDefinitionNode);
 
-                $typeDefinition->directives[] = Parser::directive('@foo');
+                $this->addDirectiveToTypeDefinition('@foo', $documentAST, $typeDefinition);
             }
         };
 
-        Utils::accessProtected($this->astBuilder, 'directiveLocator')->setResolved('composite', $compositeDirective::class);
+        Utils::accessProtected($this->astBuilder, 'directiveLocator')->setResolved('dynamic', $dynamicDirective::class);
 
         $this->schema = /** @lang GraphQL */ '
-        type Foo @composite {
+        type Foo @dynamic {
             bar: String
         }
         ';
@@ -366,10 +366,10 @@ final class ASTBuilderTest extends TestCase
     
         Utils::accessProtected($this->astBuilder, 'directiveLocator')->setResolved('foo', $directive::class);
 
-        $compositeDirective = new class() implements FieldManipulator {
+        $dynamicDirective = new class() extends BaseDirective implements FieldManipulator {
             public static function definition(): string
             {
-                return /** @lang GraphQL */ 'directive @composite on FIELD_DEFINITION';
+                return /** @lang GraphQL */ 'directive @dynamic on FIELD_DEFINITION';
             }
 
             public function manipulateFieldDefinition(
@@ -377,15 +377,15 @@ final class ASTBuilderTest extends TestCase
                 FieldDefinitionNode &$fieldDefinition,
                 ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
             ):void {
-                $fieldDefinition->directives[] = Parser::directive('@foo');
+                $this->addDirectiveToFieldDefinition('@foo', $documentAST, $fieldDefinition, $parentType);
             }
         };
 
-        Utils::accessProtected($this->astBuilder, 'directiveLocator')->setResolved('composite', $compositeDirective::class);
+        Utils::accessProtected($this->astBuilder, 'directiveLocator')->setResolved('dynamic', $dynamicDirective::class);
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            foo: String @composite
+            foo: String @dynamic
         }
         ';
         $documentAST = $this->astBuilder->documentAST();
@@ -423,10 +423,10 @@ final class ASTBuilderTest extends TestCase
     
         Utils::accessProtected($this->astBuilder, 'directiveLocator')->setResolved('foo', $directive::class);
 
-        $compositeDirective = new class() implements ArgManipulator {
+        $dynamicDirective = new class() extends BaseDirective implements ArgManipulator {
             public static function definition(): string
             {
-                return /** @lang GraphQL */ 'directive @composite on ARGUMENT_DEFINITION';
+                return /** @lang GraphQL */ 'directive @dynamic on ARGUMENT_DEFINITION';
             }
 
             public function manipulateArgDefinition(
@@ -436,15 +436,15 @@ final class ASTBuilderTest extends TestCase
                 ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
             ): void
             {
-                $argDefinition->directives[] = Parser::directive('@foo');
+                $this->addDirectiveToArgDefinition('@foo', $documentAST, $argDefinition, $parentField, $parentType);
             }
         };
 
-        Utils::accessProtected($this->astBuilder, 'directiveLocator')->setResolved('composite', $compositeDirective::class);
+        Utils::accessProtected($this->astBuilder, 'directiveLocator')->setResolved('dynamic', $dynamicDirective::class);
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            foo( name: String @composite ): String
+            foo( name: String @dynamic ): String
         }
         ';
         $documentAST = $this->astBuilder->documentAST();

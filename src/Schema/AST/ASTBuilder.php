@@ -17,7 +17,6 @@ use Nuwave\Lighthouse\Events\BuildSchemaString;
 use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
@@ -97,16 +96,11 @@ class ASTBuilder
     protected function applyTypeDefinitionManipulators(): void
     {
         foreach ($this->documentAST->types as $typeDefinition) {
-            /** @var array<string, bool> $executedManipulators */
-            $executedManipulators = [];
-            while (
-                $typeManipulator = $this->directiveLocator->associatedOfType($typeDefinition, TypeManipulator::class)
-                ->reject(fn (TypeManipulator $typeManipulator): bool => isset($executedManipulators[$this->getManipulatorId($typeManipulator)]))
-                ->first()
-            ) { 
+            foreach (
+                $this->directiveLocator->associatedOfType($typeDefinition, TypeManipulator::class)
+                as $typeManipulator
+            ) {
                 $typeManipulator->manipulateTypeDefinition($this->documentAST, $typeDefinition);
-
-                $executedManipulators[$this->getManipulatorId($typeManipulator)] = true;
             }
         }
     }
@@ -211,17 +205,11 @@ class ASTBuilder
         foreach ($this->documentAST->types as $typeDefinition) {
             if ($typeDefinition instanceof ObjectTypeDefinitionNode || $typeDefinition instanceof InterfaceTypeDefinitionNode) {
                 foreach ($typeDefinition->fields as $fieldDefinition) {
-                    /** @var array<string, bool> $executedManipulators */
-                    $executedManipulators = [];
-
-                    while (
-                        $fieldManipulator = $this->directiveLocator->associatedOfType($fieldDefinition, FieldManipulator::class)
-                        ->reject(fn (FieldManipulator $fieldManipulator): bool => isset($executedManipulators[$this->getManipulatorId($fieldManipulator)]))
-                        ->first()
+                    foreach (
+                        $this->directiveLocator->associatedOfType($fieldDefinition, FieldManipulator::class)
+                        as $fieldManipulator
                     ) {
                         $fieldManipulator->manipulateFieldDefinition($this->documentAST, $fieldDefinition, $typeDefinition);
-
-                        $executedManipulators[$this->getManipulatorId($fieldManipulator)] = true;
                     }
                 }
             }
@@ -237,12 +225,9 @@ class ASTBuilder
             if ($typeDefinition instanceof ObjectTypeDefinitionNode || $typeDefinition instanceof InterfaceTypeDefinitionNode) {
                 foreach ($typeDefinition->fields as $fieldDefinition) {
                     foreach ($fieldDefinition->arguments as $argumentDefinition) {
-                        /** @var array<string, bool> $executedManipulators */
-                        $executedManipulators = [];
-                        while (
-                            $argManipulator = $this->directiveLocator->associatedOfType($argumentDefinition, ArgManipulator::class)
-                                ->reject(fn (ArgManipulator $argManipulator): bool => isset($executedManipulators[$this->getManipulatorId($argManipulator)]))
-                                ->first()
+                        foreach (
+                            $this->directiveLocator->associatedOfType($argumentDefinition, ArgManipulator::class)
+                            as $argManipulator
                         ) {
                             $argManipulator->manipulateArgDefinition(
                                 $this->documentAST,
@@ -250,24 +235,10 @@ class ASTBuilder
                                 $fieldDefinition,
                                 $typeDefinition,
                             );
-
-                            $executedManipulators[$this->getManipulatorId($argManipulator)] = true;
                         }
                     }
                 }
             }
         }
-    }
-
-    /**
-     * Return unique manipulator identifier.
-     */
-    protected function getManipulatorId(FieldManipulator|ArgManipulator|TypeManipulator $manipulator): string
-    {
-        if ($manipulator instanceof BaseDirective) {
-            return spl_object_hash($manipulator->directiveNode);
-        }
-
-        return get_class($manipulator);
     }
 }

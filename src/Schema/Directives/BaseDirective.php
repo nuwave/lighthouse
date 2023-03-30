@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
@@ -16,14 +18,21 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeExtensionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeExtensionNode;
+use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use GraphQL\Language\AST\UnionTypeExtensionNode;
+use GraphQL\Language\Parser;
 use GraphQL\Utils\AST;
+use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
+use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
+use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
+use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
 use Nuwave\Lighthouse\Support\Utils;
 
 /**
@@ -110,7 +119,7 @@ abstract class BaseDirective implements Directive
      */
     protected function directiveHasArgument(string $name): bool
     {
-        if (! isset($this->directiveArgs)) {
+        if (!isset($this->directiveArgs)) {
             $this->loadArgValues();
         }
 
@@ -128,7 +137,7 @@ abstract class BaseDirective implements Directive
      */
     protected function directiveArgValue(string $name, mixed $default = null): mixed
     {
-        if (! isset($this->directiveArgs)) {
+        if (!isset($this->directiveArgs)) {
             $this->loadArgValues();
         }
 
@@ -150,7 +159,7 @@ abstract class BaseDirective implements Directive
     {
         $model = $this->directiveArgValue($argumentName, ASTHelper::modelName($this->definitionNode));
 
-        if (! $model) {
+        if (!$model) {
             throw new DefinitionException("Could not determine a model name for the '@{$this->name()}' directive on '{$this->nodeName()}.");
         }
 
@@ -280,7 +289,7 @@ abstract class BaseDirective implements Directive
         $this->directiveArgs = [];
 
         // If the directive was added programmatically, it has no arguments
-        if (! isset($this->directiveNode)) {
+        if (!isset($this->directiveNode)) {
             return;
         }
 
@@ -291,5 +300,102 @@ abstract class BaseDirective implements Directive
 
             $this->directiveArgs[$node->name->value] = AST::valueFromASTUntyped($node->value);
         }
+    }
+
+    /**
+     * Get an instance of a directive.
+     *
+     * @api
+     */
+    public static function getDirectiveInstance(string $directiveSource, ScalarTypeDefinitionNode|ScalarTypeExtensionNode|ObjectTypeDefinitionNode|ObjectTypeExtensionNode|InterfaceTypeDefinitionNode|InterfaceTypeExtensionNode|UnionTypeDefinitionNode|UnionTypeExtensionNode|EnumTypeDefinitionNode|EnumTypeExtensionNode|InputObjectTypeDefinitionNode|InputObjectTypeExtensionNode|FieldDefinitionNode|InputValueDefinitionNode|EnumValueDefinitionNode $node): Directive
+    {
+        $directiveNode = Parser::directive($directiveSource);
+        $node->directives[] = $directiveNode;
+
+        $directiveLocator = Container::getInstance()->make(DirectiveLocator::class);
+        $directiveInstance = $directiveLocator->create($directiveNode->name->value);
+        if ($directiveInstance instanceof BaseDirective) {
+            $directiveInstance->hydrate($directiveNode, $node);
+        }
+
+        return $directiveInstance;
+    }
+
+    /**
+     * Add a directive to a type definition dynamically.
+     *
+     * @api
+     */
+    public static function addDirectiveToTypeDefinition(
+        string $directiveSource,
+        DocumentAST &$documentAST,
+        TypeDefinitionNode &$typeDefinition,
+    ): void {
+        if (!($typeDefinition instanceof ScalarTypeDefinitionNode ||
+            $typeDefinition instanceof ScalarTypeExtensionNode
+            || $typeDefinition instanceof ObjectTypeDefinitionNode
+            || $typeDefinition instanceof ObjectTypeExtensionNode
+            || $typeDefinition instanceof InterfaceTypeDefinitionNode
+            || $typeDefinition instanceof InterfaceTypeExtensionNode
+            || $typeDefinition instanceof UnionTypeDefinitionNode
+            || $typeDefinition instanceof UnionTypeExtensionNode
+            || $typeDefinition instanceof EnumTypeDefinitionNode
+            || $typeDefinition instanceof EnumTypeExtensionNode
+            || $typeDefinition instanceof InputObjectTypeDefinitionNode
+            || $typeDefinition instanceof InputObjectTypeExtensionNode
+            || $typeDefinition instanceof FieldDefinitionNode
+            || $typeDefinition instanceof InputValueDefinitionNode
+            || $typeDefinition instanceof EnumValueDefinitionNode)) {
+            throw new DefinitionException("The dynamically added directive [{$directiveSource}] can only be added to nodes that support directives.");
+        }
+
+        $directiveInstance = self::getDirectiveInstance($directiveSource, $typeDefinition);
+
+        if (!($directiveInstance instanceof TypeManipulator)) {
+            throw new DefinitionException("The dynamically added directive [{$directiveSource}] must implement the TypeManipulator interface.");
+        }
+
+        $directiveInstance->manipulateTypeDefinition($documentAST, $typeDefinition);
+    }
+
+    /**
+     * Add a directive to a field definition dynamically.
+     *
+     * @api
+     */
+    public static function addDirectiveToFieldDefinition(
+        string $directiveSource,
+        DocumentAST &$documentAST,
+        FieldDefinitionNode &$fieldDefinition,
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
+    ): void {
+        $directiveInstance = self::getDirectiveInstance($directiveSource, $fieldDefinition);
+
+        if (!($directiveInstance instanceof FieldManipulator)) {
+            throw new DefinitionException("The dynamically added directive [{$directiveSource}] must implement the FieldManipulator interface.");
+        }
+
+        $directiveInstance->manipulateFieldDefinition($documentAST, $fieldDefinition, $parentType);
+    }
+
+    /**
+     * Add a directive to an arg definition dynamically.
+     *
+     * @api
+     */
+    public static function addDirectiveToArgDefinition(
+        string $directiveSource,
+        DocumentAST &$documentAST,
+        InputValueDefinitionNode &$argDefinition,
+        FieldDefinitionNode &$parentField,
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
+    ): void {
+        $directiveInstance = self::getDirectiveInstance($directiveSource, $argDefinition);
+
+        if (!($directiveInstance instanceof ArgManipulator)) {
+            throw new DefinitionException("The dynamically added directive [{$directiveSource}] must implement the ArgManipulator interface.");
+        }
+
+        $directiveInstance->manipulateArgDefinition($documentAST, $argDefinition, $parentField, $parentType);
     }
 }
