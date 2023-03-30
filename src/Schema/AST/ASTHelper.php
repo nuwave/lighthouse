@@ -392,11 +392,11 @@ class ASTHelper
     }
 
     /**
-     * Get an instance of a directive.
+     * Adds a directive to a node.
      *
      * @api
      */
-    public static function getDirectiveInstance(string $directiveSource, ScalarTypeDefinitionNode|ScalarTypeExtensionNode|ObjectTypeDefinitionNode|ObjectTypeExtensionNode|InterfaceTypeDefinitionNode|InterfaceTypeExtensionNode|UnionTypeDefinitionNode|UnionTypeExtensionNode|EnumTypeDefinitionNode|EnumTypeExtensionNode|InputObjectTypeDefinitionNode|InputObjectTypeExtensionNode|FieldDefinitionNode|InputValueDefinitionNode|EnumValueDefinitionNode $node): \Nuwave\Lighthouse\Support\Contracts\Directive
+    public static function addDirectiveToNode(string $directiveSource, ScalarTypeDefinitionNode|ScalarTypeExtensionNode|ObjectTypeDefinitionNode|ObjectTypeExtensionNode|InterfaceTypeDefinitionNode|InterfaceTypeExtensionNode|UnionTypeDefinitionNode|UnionTypeExtensionNode|EnumTypeDefinitionNode|EnumTypeExtensionNode|InputObjectTypeDefinitionNode|InputObjectTypeExtensionNode|FieldDefinitionNode|InputValueDefinitionNode|EnumValueDefinitionNode $node): \Nuwave\Lighthouse\Support\Contracts\Directive
     {
         $directiveNode = Parser::directive($directiveSource);
         $node->directives[] = $directiveNode;
@@ -421,7 +421,7 @@ class ASTHelper
         FieldDefinitionNode &$fieldDefinition,
         ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
     ): void {
-        $directiveInstance = self::getDirectiveInstance($directiveSource, $fieldDefinition);
+        $directiveInstance = self::addDirectiveToNode($directiveSource, $fieldDefinition);
 
         if (!($directiveInstance instanceof FieldManipulator)) {
             throw new DefinitionException("The dynamically added directive [{$directiveSource}] must implement the FieldManipulator interface.");
@@ -442,7 +442,7 @@ class ASTHelper
         FieldDefinitionNode &$parentField,
         ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
     ): void {
-        $directiveInstance = self::getDirectiveInstance($directiveSource, $argDefinition);
+        $directiveInstance = self::addDirectiveToNode($directiveSource, $argDefinition);
 
         if (!($directiveInstance instanceof ArgManipulator)) {
             throw new DefinitionException("The dynamically added directive [{$directiveSource}] must implement the ArgManipulator interface.");
