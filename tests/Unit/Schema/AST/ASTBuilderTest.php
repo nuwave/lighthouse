@@ -293,60 +293,6 @@ final class ASTBuilderTest extends TestCase
         $this->assertTrue($interfaces->contains('name.value', 'Nameable'));
     }
 
-    public function testDynamicallyAddedTypeDefinitionManipulatorDirective(): void
-    {
-        $directive = new class() extends BaseDirective implements TypeManipulator {
-            public static function definition(): string
-            {
-                return /** @lang GraphQL */ 'directive @foo on FIELD_DEFINITION';
-            }
-
-            public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition):void {
-                assert($typeDefinition instanceof ObjectTypeDefinitionNode);
-
-                $fieldDefinition = $typeDefinition->fields[0];
-                assert($fieldDefinition instanceof FieldDefinitionNode);
-
-                $fieldDefinition->type = Parser::namedType('Int');
-            }
-        };
-    
-        Utils::accessProtected($this->astBuilder, 'directiveLocator')->setResolved('foo', $directive::class);
-
-        $dynamicDirective = new class() extends BaseDirective implements TypeManipulator {
-            public static function definition(): string
-            {
-                return /** @lang GraphQL */ 'directive @dynamic on FIELD_DEFINITION';
-            }
-
-            public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition):void {
-                assert($typeDefinition instanceof ObjectTypeDefinitionNode);
-
-                $this->addDirectiveToTypeDefinition('@foo', $documentAST, $typeDefinition);
-            }
-        };
-
-        Utils::accessProtected($this->astBuilder, 'directiveLocator')->setResolved('dynamic', $dynamicDirective::class);
-
-        $this->schema = /** @lang GraphQL */ '
-        type Foo @dynamic {
-            bar: String
-        }
-        ';
-        $documentAST = $this->astBuilder->documentAST();
-
-        $type = $documentAST->types['Foo'];
-        assert($type instanceof ObjectTypeDefinitionNode);
-
-        $fieldType = $type->fields[0];
-        assert($fieldType instanceof FieldDefinitionNode);
-
-        $typeType = $fieldType->type;
-        assert($typeType instanceof NamedTypeNode);
-
-        $this->assertEquals($typeType->name->value, 'Int');
-    }
-
     public function testDynamicallyAddedFieldManipulatorDirective(): void
     {
         $directive = new class() extends BaseDirective implements FieldManipulator {

@@ -322,43 +322,6 @@ abstract class BaseDirective implements Directive
     }
 
     /**
-     * Add a directive to a type definition dynamically.
-     *
-     * @api
-     */
-    public static function addDirectiveToTypeDefinition(
-        string $directiveSource,
-        DocumentAST &$documentAST,
-        TypeDefinitionNode &$typeDefinition,
-    ): void {
-        if (!($typeDefinition instanceof ScalarTypeDefinitionNode ||
-            $typeDefinition instanceof ScalarTypeExtensionNode
-            || $typeDefinition instanceof ObjectTypeDefinitionNode
-            || $typeDefinition instanceof ObjectTypeExtensionNode
-            || $typeDefinition instanceof InterfaceTypeDefinitionNode
-            || $typeDefinition instanceof InterfaceTypeExtensionNode
-            || $typeDefinition instanceof UnionTypeDefinitionNode
-            || $typeDefinition instanceof UnionTypeExtensionNode
-            || $typeDefinition instanceof EnumTypeDefinitionNode
-            || $typeDefinition instanceof EnumTypeExtensionNode
-            || $typeDefinition instanceof InputObjectTypeDefinitionNode
-            || $typeDefinition instanceof InputObjectTypeExtensionNode
-            || $typeDefinition instanceof FieldDefinitionNode
-            || $typeDefinition instanceof InputValueDefinitionNode
-            || $typeDefinition instanceof EnumValueDefinitionNode)) {
-            throw new DefinitionException("The dynamically added directive [{$directiveSource}] can only be added to nodes that support directives.");
-        }
-
-        $directiveInstance = self::getDirectiveInstance($directiveSource, $typeDefinition);
-
-        if (!($directiveInstance instanceof TypeManipulator)) {
-            throw new DefinitionException("The dynamically added directive [{$directiveSource}] must implement the TypeManipulator interface.");
-        }
-
-        $directiveInstance->manipulateTypeDefinition($documentAST, $typeDefinition);
-    }
-
-    /**
      * Add a directive to a field definition dynamically.
      *
      * @api
