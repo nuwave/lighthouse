@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
@@ -18,21 +16,14 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeExtensionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeExtensionNode;
-use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use GraphQL\Language\AST\UnionTypeExtensionNode;
-use GraphQL\Language\Parser;
 use GraphQL\Utils\AST;
-use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
-use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
-use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
-use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
-use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
 use Nuwave\Lighthouse\Support\Utils;
 
 /**
@@ -119,7 +110,7 @@ abstract class BaseDirective implements Directive
      */
     protected function directiveHasArgument(string $name): bool
     {
-        if (!isset($this->directiveArgs)) {
+        if (! isset($this->directiveArgs)) {
             $this->loadArgValues();
         }
 
@@ -137,7 +128,7 @@ abstract class BaseDirective implements Directive
      */
     protected function directiveArgValue(string $name, mixed $default = null): mixed
     {
-        if (!isset($this->directiveArgs)) {
+        if (! isset($this->directiveArgs)) {
             $this->loadArgValues();
         }
 
@@ -159,7 +150,7 @@ abstract class BaseDirective implements Directive
     {
         $model = $this->directiveArgValue($argumentName, ASTHelper::modelName($this->definitionNode));
 
-        if (!$model) {
+        if (! $model) {
             throw new DefinitionException("Could not determine a model name for the '@{$this->name()}' directive on '{$this->nodeName()}.");
         }
 
@@ -289,7 +280,7 @@ abstract class BaseDirective implements Directive
         $this->directiveArgs = [];
 
         // If the directive was added programmatically, it has no arguments
-        if (!isset($this->directiveNode)) {
+        if (! isset($this->directiveNode)) {
             return;
         }
 
