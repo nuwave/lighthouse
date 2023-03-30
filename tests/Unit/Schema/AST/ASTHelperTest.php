@@ -241,7 +241,8 @@ GRAPHQL
             }
         };
     
-        Utils::accessProtected($astBuilder, 'directiveLocator')->setResolved('foo', $directive::class);
+        $directiveLocator = $this->app->make(DirectiveLocator::class);
+        $directiveLocator->setResolved('foo', $directive::class);
 
         $dynamicDirective = new class() extends BaseDirective implements FieldManipulator {
             public static function definition(): string
