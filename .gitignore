@@ -6,6 +6,7 @@
 .idea
 .vscode
 phpunit.xml
+.gitpod.yml
 
 # Generated files
 .phpunit.result.cache

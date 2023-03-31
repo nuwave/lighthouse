@@ -6,9 +6,13 @@ use GraphQL\Error\SyntaxError;
 use GraphQL\Executor\Values;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\DirectiveNode;
+use GraphQL\Language\AST\EnumTypeDefinitionNode;
+use GraphQL\Language\AST\EnumTypeExtensionNode;
 use GraphQL\Language\AST\EnumValueDefinitionNode;
 use GraphQL\Language\AST\EnumValueNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
+use GraphQL\Language\AST\InputObjectTypeExtensionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeExtensionNode;
@@ -19,6 +23,10 @@ use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeExtensionNode;
+use GraphQL\Language\AST\ScalarTypeDefinitionNode;
+use GraphQL\Language\AST\ScalarTypeExtensionNode;
+use GraphQL\Language\AST\UnionTypeDefinitionNode;
+use GraphQL\Language\AST\UnionTypeExtensionNode;
 use GraphQL\Language\AST\ValueNode;
 use GraphQL\Language\Parser;
 use GraphQL\Type\Definition\Directive;
@@ -31,8 +39,11 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Directives\ModelDirective;
 use Nuwave\Lighthouse\Schema\Directives\NamespaceDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
+use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 
 class ASTHelper
 {
@@ -378,5 +389,24 @@ class ASTHelper
         return $renameDirectiveNode
             ? static::directiveArgValue($renameDirectiveNode, 'attribute')
             : $field->name->value;
+    }
+
+    /**
+     * Adds a directive to a node.
+     *
+     * @api
+     */
+    public static function addDirectiveToNode(string $directiveSource, ScalarTypeDefinitionNode|ScalarTypeExtensionNode|ObjectTypeDefinitionNode|ObjectTypeExtensionNode|InterfaceTypeDefinitionNode|InterfaceTypeExtensionNode|UnionTypeDefinitionNode|UnionTypeExtensionNode|EnumTypeDefinitionNode|EnumTypeExtensionNode|InputObjectTypeDefinitionNode|InputObjectTypeExtensionNode|FieldDefinitionNode|InputValueDefinitionNode|EnumValueDefinitionNode $node): \Nuwave\Lighthouse\Support\Contracts\Directive
+    {
+        $directiveNode = Parser::directive($directiveSource);
+        $node->directives[] = $directiveNode;
+
+        $directiveLocator = Container::getInstance()->make(DirectiveLocator::class);
+        $directiveInstance = $directiveLocator->create($directiveNode->name->value);
+        if ($directiveInstance instanceof BaseDirective) {
+            $directiveInstance->hydrate($directiveNode, $node);
+        }
+
+        return $directiveInstance;
     }
 }
