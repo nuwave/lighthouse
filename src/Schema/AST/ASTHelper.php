@@ -29,7 +29,7 @@ use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use GraphQL\Language\AST\UnionTypeExtensionNode;
 use GraphQL\Language\AST\ValueNode;
 use GraphQL\Language\Parser;
-use GraphQL\Type\Definition\Directive;
+use GraphQL\Type\Definition\Directive as DirectiveDefinition;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\EnumValueDefinition;
 use GraphQL\Type\Definition\Type;
@@ -42,8 +42,7 @@ use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Directives\ModelDirective;
 use Nuwave\Lighthouse\Schema\Directives\NamespaceDirective;
-use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
-use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
+use Nuwave\Lighthouse\Support\Contracts\Directive as DirectiveInterface;
 
 class ASTHelper
 {
@@ -308,7 +307,7 @@ class ASTHelper
     public static function deprecationReason(EnumValueDefinitionNode|FieldDefinitionNode $node): ?string
     {
         $deprecated = Values::getDirectiveValues(
-            Directive::deprecatedDirective(),
+            DirectiveDefinition::deprecatedDirective(),
             $node,
         );
 
@@ -392,11 +391,9 @@ class ASTHelper
     }
 
     /**
-     * Adds a directive to a node.
-     *
-     * @api
+     * Adds a directive to a node, instantiates and maybe hydrates it and returns the instance.
      */
-    public static function addDirectiveToNode(string $directiveSource, ScalarTypeDefinitionNode|ScalarTypeExtensionNode|ObjectTypeDefinitionNode|ObjectTypeExtensionNode|InterfaceTypeDefinitionNode|InterfaceTypeExtensionNode|UnionTypeDefinitionNode|UnionTypeExtensionNode|EnumTypeDefinitionNode|EnumTypeExtensionNode|InputObjectTypeDefinitionNode|InputObjectTypeExtensionNode|FieldDefinitionNode|InputValueDefinitionNode|EnumValueDefinitionNode $node): \Nuwave\Lighthouse\Support\Contracts\Directive
+    public static function addDirectiveToNode(string $directiveSource, ScalarTypeDefinitionNode|ScalarTypeExtensionNode|ObjectTypeDefinitionNode|ObjectTypeExtensionNode|InterfaceTypeDefinitionNode|InterfaceTypeExtensionNode|UnionTypeDefinitionNode|UnionTypeExtensionNode|EnumTypeDefinitionNode|EnumTypeExtensionNode|InputObjectTypeDefinitionNode|InputObjectTypeExtensionNode|FieldDefinitionNode|InputValueDefinitionNode|EnumValueDefinitionNode $node): DirectiveInterface
     {
         $directiveNode = Parser::directive($directiveSource);
         $node->directives[] = $directiveNode;

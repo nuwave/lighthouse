@@ -19,7 +19,6 @@ use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
-use Nuwave\Lighthouse\Support\Utils;
 use Tests\TestCase;
 
 final class ASTHelperTest extends TestCase
@@ -237,11 +236,11 @@ GRAPHQL
                 DocumentAST &$documentAST,
                 FieldDefinitionNode &$fieldDefinition,
                 ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
-            ):void {
+            ): void {
                 $fieldDefinition->type = Parser::namedType('Int');
             }
         };
-    
+
         $directiveLocator = $this->app->make(DirectiveLocator::class);
         $directiveLocator->setResolved('foo', $directive::class);
 
@@ -255,16 +254,14 @@ GRAPHQL
                 DocumentAST &$documentAST,
                 FieldDefinitionNode &$fieldDefinition,
                 ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
-            ):void {
+            ): void {
                 $directiveInstance = ASTHelper::addDirectiveToNode('@foo', $fieldDefinition);
-
                 assert($directiveInstance instanceof FieldManipulator);
-          
+
                 $directiveInstance->manipulateFieldDefinition($documentAST, $fieldDefinition, $parentType);
             }
         };
 
-        $directiveLocator = $this->app->make(DirectiveLocator::class);
         $directiveLocator->setResolved('dynamic', $dynamicDirective::class);
 
         $this->schema = /** @lang GraphQL */ '
@@ -283,13 +280,11 @@ GRAPHQL
         $typeType = $fieldType->type;
         assert($typeType instanceof NamedTypeNode);
 
-        $this->assertEquals($typeType->name->value, 'Int');
+        $this->assertSame($typeType->name->value, 'Int');
     }
 
     public function testDynamicallyAddedArgManipulatorDirective(): void
     {
-        $astBuilder = $this->app->make(ASTBuilder::class);
-        
         $directive = new class() extends BaseDirective implements ArgManipulator {
             public static function definition(): string
             {
@@ -301,12 +296,11 @@ GRAPHQL
                 InputValueDefinitionNode &$argDefinition,
                 FieldDefinitionNode &$parentField,
                 ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
-            ): void
-            {
+            ): void {
                 $argDefinition->type = Parser::namedType('Int');
             }
         };
-    
+
         $directiveLocator = $this->app->make(DirectiveLocator::class);
         $directiveLocator->setResolved('foo', $directive::class);
 
@@ -321,24 +315,23 @@ GRAPHQL
                 InputValueDefinitionNode &$argDefinition,
                 FieldDefinitionNode &$parentField,
                 ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
-            ): void
-            {
+            ): void {
                 $directiveInstance = ASTHelper::addDirectiveToNode('@foo', $argDefinition);
 
                 assert($directiveInstance instanceof ArgManipulator);
-          
+
                 $directiveInstance->manipulateArgDefinition($documentAST, $argDefinition, $parentField, $parentType);
             }
         };
 
-        $directiveLocator = $this->app->make(DirectiveLocator::class);
         $directiveLocator->setResolved('dynamic', $dynamicDirective::class);
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            foo( name: String @dynamic ): String
+            foo(name: String @dynamic): String
         }
         ';
+        $astBuilder = $this->app->make(ASTBuilder::class);
         $documentAST = $astBuilder->documentAST();
 
         $queryType = $documentAST->types[RootType::QUERY];
@@ -353,6 +346,6 @@ GRAPHQL
         $typeType = $argumentType->type;
         assert($typeType instanceof NamedTypeNode);
 
-        $this->assertEquals($typeType->name->value, 'Int');
+        $this->assertSame($typeType->name->value, 'Int');
     }
 }

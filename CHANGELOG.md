@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.5.0
+
+### Added
+
+- Add `Nuwave\Lighthouse\Schema\AST\ASTHelper::addDirectiveToNode()` to simplify dynamic addition of directives https://github.com/nuwave/lighthouse/pull/2369
+
 ## v6.4.0
 
 ### Added
