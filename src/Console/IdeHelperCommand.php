@@ -2,11 +2,11 @@
 
 namespace Nuwave\Lighthouse\Console;
 
-use GraphQL\Type\Introspection;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\Parser;
 use GraphQL\Type\Definition\Directive as DirectiveDefinition;
 use GraphQL\Type\Definition\Type;
+use GraphQL\Type\Introspection;
 use GraphQL\Utils\SchemaPrinter;
 use HaydenPierce\ClassFinder\ClassFinder;
 use Illuminate\Console\Command;
