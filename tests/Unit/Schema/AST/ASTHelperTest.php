@@ -3,11 +3,22 @@
 namespace Tests\Unit\Schema\AST;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\InputValueDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
+use GraphQL\Language\AST\NamedTypeNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use GraphQL\Language\Parser;
 use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\DirectiveLocator;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Schema\RootType;
+use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
+use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Tests\TestCase;
 
 final class ASTHelperTest extends TestCase
@@ -209,5 +220,132 @@ GRAPHQL
 
         $this->assertInstanceOf(ScalarTypeDefinitionNode::class, $type);
         $this->assertSame(Type::ID, $type->name->value);
+    }
+
+    public function testDynamicallyAddedFieldManipulatorDirective(): void
+    {
+        $astBuilder = $this->app->make(ASTBuilder::class);
+
+        $directive = new class() extends BaseDirective implements FieldManipulator {
+            public static function definition(): string
+            {
+                return /** @lang GraphQL */ 'directive @foo on FIELD_DEFINITION';
+            }
+
+            public function manipulateFieldDefinition(
+                DocumentAST &$documentAST,
+                FieldDefinitionNode &$fieldDefinition,
+                ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
+            ): void {
+                $fieldDefinition->type = Parser::namedType('Int');
+            }
+        };
+
+        $directiveLocator = $this->app->make(DirectiveLocator::class);
+        $directiveLocator->setResolved('foo', $directive::class);
+
+        $dynamicDirective = new class() extends BaseDirective implements FieldManipulator {
+            public static function definition(): string
+            {
+                return /** @lang GraphQL */ 'directive @dynamic on FIELD_DEFINITION';
+            }
+
+            public function manipulateFieldDefinition(
+                DocumentAST &$documentAST,
+                FieldDefinitionNode &$fieldDefinition,
+                ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
+            ): void {
+                $directiveInstance = ASTHelper::addDirectiveToNode('@foo', $fieldDefinition);
+                assert($directiveInstance instanceof FieldManipulator);
+
+                $directiveInstance->manipulateFieldDefinition($documentAST, $fieldDefinition, $parentType);
+            }
+        };
+
+        $directiveLocator->setResolved('dynamic', $dynamicDirective::class);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo: String @dynamic
+        }
+        ';
+        $documentAST = $astBuilder->documentAST();
+
+        $queryType = $documentAST->types[RootType::QUERY];
+        assert($queryType instanceof ObjectTypeDefinitionNode);
+
+        $fieldType = $queryType->fields[0];
+        assert($fieldType instanceof FieldDefinitionNode);
+
+        $typeType = $fieldType->type;
+        assert($typeType instanceof NamedTypeNode);
+
+        $this->assertSame($typeType->name->value, 'Int');
+    }
+
+    public function testDynamicallyAddedArgManipulatorDirective(): void
+    {
+        $directive = new class() extends BaseDirective implements ArgManipulator {
+            public static function definition(): string
+            {
+                return /** @lang GraphQL */ 'directive @foo on ARGUMENT_DEFINITION';
+            }
+
+            public function manipulateArgDefinition(
+                DocumentAST &$documentAST,
+                InputValueDefinitionNode &$argDefinition,
+                FieldDefinitionNode &$parentField,
+                ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
+            ): void {
+                $argDefinition->type = Parser::namedType('Int');
+            }
+        };
+
+        $directiveLocator = $this->app->make(DirectiveLocator::class);
+        $directiveLocator->setResolved('foo', $directive::class);
+
+        $dynamicDirective = new class() extends BaseDirective implements ArgManipulator {
+            public static function definition(): string
+            {
+                return /** @lang GraphQL */ 'directive @dynamic on ARGUMENT_DEFINITION';
+            }
+
+            public function manipulateArgDefinition(
+                DocumentAST &$documentAST,
+                InputValueDefinitionNode &$argDefinition,
+                FieldDefinitionNode &$parentField,
+                ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
+            ): void {
+                $directiveInstance = ASTHelper::addDirectiveToNode('@foo', $argDefinition);
+
+                assert($directiveInstance instanceof ArgManipulator);
+
+                $directiveInstance->manipulateArgDefinition($documentAST, $argDefinition, $parentField, $parentType);
+            }
+        };
+
+        $directiveLocator->setResolved('dynamic', $dynamicDirective::class);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(name: String @dynamic): String
+        }
+        ';
+        $astBuilder = $this->app->make(ASTBuilder::class);
+        $documentAST = $astBuilder->documentAST();
+
+        $queryType = $documentAST->types[RootType::QUERY];
+        assert($queryType instanceof ObjectTypeDefinitionNode);
+
+        $fieldType = $queryType->fields[0];
+        assert($fieldType instanceof FieldDefinitionNode);
+
+        $argumentType = $fieldType->arguments[0];
+        assert($argumentType instanceof InputValueDefinitionNode);
+
+        $typeType = $argumentType->type;
+        assert($typeType instanceof NamedTypeNode);
+
+        $this->assertSame($typeType->name->value, 'Int');
     }
 }
