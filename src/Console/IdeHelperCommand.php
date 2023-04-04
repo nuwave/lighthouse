@@ -6,6 +6,7 @@ use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\Parser;
 use GraphQL\Type\Definition\Directive as DirectiveDefinition;
 use GraphQL\Type\Definition\Type;
+use GraphQL\Type\Introspection;
 use GraphQL\Utils\SchemaPrinter;
 use HaydenPierce\ClassFinder\ClassFinder;
 use Illuminate\Console\Command;
@@ -39,7 +40,7 @@ GRAPHQL;
     protected function getOptions(): array
     {
         return [
-            ['omit-built-in', null, InputOption::VALUE_OPTIONAL, 'Do not include built-in definitions.'],
+            ['omit-built-in', null, InputOption::VALUE_NONE, 'Do not include built-in definitions.'],
         ];
     }
 
@@ -172,6 +173,10 @@ GRAPHQL;
         $astCache->clear();
 
         $allTypes = $schemaBuilder->schema()->getTypeMap();
+
+        if ($this->option('omit-built-in')) {
+            $sourceTypes = array_merge($sourceTypes, Type::getStandardTypes(), Introspection::getTypes());
+        }
 
         $programmaticTypes = array_diff_key($allTypes, $sourceTypes);
 
