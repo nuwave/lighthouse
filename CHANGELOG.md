@@ -9,6 +9,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.6.0
+
 ### Fixed
 
 - Correctly exclude all built-in types when calling `lighthouse:ide-helper` with `--omit-built-in` flag https://github.com/nuwave/lighthouse/pull/2376
