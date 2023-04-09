@@ -449,4 +449,14 @@ return [
          */
         'entities_resolver_namespace' => 'App\\GraphQL\\Entities',
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Print Schema Disk
+    |--------------------------------------------------------------------------
+    |
+    | Define what disk should be used when printing the schema to file.
+    |
+    */
+    'print_schema_disk' => env('LIGHTHOUSE_PRINT_SCHEMA_DISK', 'local'),
 ];
