@@ -10,7 +10,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ## Unreleased
 
 ### Added
-- Add the ability to specify the disk the schema will print too via the `--disk` option OR the config option `lighthouse.print_schema_disk`
+
+- Add the ability to specify the disk the artisan command `lighthouse:print-schema` will write to via the `--disk` option
 
 ## v6.6.0
 
