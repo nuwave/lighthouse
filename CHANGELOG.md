@@ -11,7 +11,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
-- Add the ability to specify the disk the artisan command `lighthouse:print-schema` will write to via the `--disk` option
+- Add the ability to specify the disk the artisan command `lighthouse:print-schema` will write to via the `--disk` option https://github.com/nuwave/lighthouse/pull/2379
 
 ## v6.6.0
 
