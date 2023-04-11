@@ -55,7 +55,7 @@ SIGNATURE;
         }
 
         if ($this->option('write')) {
-            $disk = $this->option('disk') ?: config('lighthouse.print_schema_disk');
+            $disk = $this->option('disk');
             $filesystemManager->disk($disk)->put($filename, $schemaString);
             $this->info("Wrote schema to disk ({$disk}) as {$filename}.");
         } else {
