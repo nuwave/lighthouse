@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\Http\Middleware;
 use Illuminate\Http\Request;
 
 /**
- * Always set the Accept: application/json header.
+ * Always set the `Accept: application/json` header.
  *
  * This makes it easier to do simple GET requests from clients
  * with limited HTTP configuration options and always receive
