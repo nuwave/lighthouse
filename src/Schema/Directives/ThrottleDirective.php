@@ -63,7 +63,8 @@ GRAPHQL;
 
         $name = $this->directiveArgValue('name');
         if ($name !== null) {
-            $limiter = $this->limiter->limiter($name);
+            $limiter = $this->limiter->limiter($name)
+                ?? throw new DefinitionException("Named limiter {$name} not found.");
 
             $limiterResponse = $limiter($this->request);
             if ($limiterResponse instanceof Unlimited) {
