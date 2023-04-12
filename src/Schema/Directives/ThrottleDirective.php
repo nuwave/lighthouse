@@ -63,6 +63,7 @@ GRAPHQL;
 
         $name = $this->directiveArgValue('name');
         if ($name !== null) {
+            // @phpstan-ignore-next-line limiter() can actually return null, some Laravel versions lie
             $limiter = $this->limiter->limiter($name)
                 ?? throw new DefinitionException("Named limiter {$name} not found.");
 
