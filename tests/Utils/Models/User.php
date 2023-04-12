@@ -180,7 +180,7 @@ final class User extends Authenticatable
             && $this
                 ->posts
                 ->first()
-                ->relationLoaded('comments');
+                ?->relationLoaded('comments');
     }
 
     public function tasksAndPostsCommentsLoaded(): bool
@@ -195,7 +195,7 @@ final class User extends Authenticatable
             && $this
                 ->posts
                 ->first()
-                ->relationLoaded('task');
+                ?->relationLoaded('task');
     }
 
     public function postTasksAndPostsCommentsLoaded(): bool
