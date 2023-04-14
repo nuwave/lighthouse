@@ -106,9 +106,7 @@ final class FederationEntitiesTest extends TestCase
         ]);
     }
 
-    /**
-     * https://github.com/apollographql/apollo-federation-subgraph-compatibility/issues/70.
-     */
+    /** https://github.com/apollographql/apollo-federation-subgraph-compatibility/issues/70. */
     public function testMaintainsOrderOfRepresentationsInResult(): void
     {
         $this->schema = /** @lang GraphQL */ '

@@ -50,9 +50,7 @@ use Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules;
 
 class LighthouseServiceProvider extends ServiceProvider
 {
-    /**
-     * @var array<int, class-string<\Illuminate\Console\Command>>
-     */
+    /** @var array<int, class-string<\Illuminate\Console\Command>> */
     public const COMMANDS = [
         CacheCommand::class,
         ClearCacheCommand::class,

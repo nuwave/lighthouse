@@ -122,9 +122,7 @@ GRAPHQL;
         });
     }
 
-    /**
-     * Check if tags should be used and are available.
-     */
+    /** Check if tags should be used and are available. */
     protected function shouldUseTags(): bool
     {
         return config('lighthouse.cache_directive_tags', false)

@@ -44,9 +44,7 @@ class RulesGatherer
         $this->gatherRulesRecursively($argumentSet, []);
     }
 
-    /**
-     * @param  array<int|string>  $argumentPath
-     */
+    /** @param  array<int|string>  $argumentPath */
     protected function gatherRulesRecursively(ArgumentSet $argumentSet, array $argumentPath): void
     {
         $this->gatherRulesForArgumentSet($argumentSet, $argumentSet->directives, $argumentPath);
@@ -127,9 +125,7 @@ class RulesGatherer
         }
     }
 
-    /**
-     * @param  array<int|string>  $argumentPath
-     */
+    /** @param  array<int|string>  $argumentPath */
     protected function extractValidationForArgumentSet(ArgumentSetValidation $directive, array $argumentPath): void
     {
         $qualifiedRulesList = array_map(
@@ -150,9 +146,7 @@ class RulesGatherer
         );
     }
 
-    /**
-     * @param  array<int|string>  $argumentPath
-     */
+    /** @param  array<int|string>  $argumentPath */
     protected function extractValidationForArgument(ArgumentValidation $directive, array $argumentPath): void
     {
         $qualifiedRules = $this->qualifyArgumentReferences(

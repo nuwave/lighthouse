@@ -22,9 +22,7 @@ final class CustomPrimaryKey extends Model
 
     public $timestamps = false;
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\User, self>
-     */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\User, self> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');

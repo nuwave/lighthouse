@@ -47,9 +47,7 @@ final class UserPolicy
         return $pass;
     }
 
-    /**
-     * @param  array<string, string>  $injectedArgs
-     */
+    /** @param  array<string, string>  $injectedArgs */
     public function injectArgs(User $viewer, array $injectedArgs): bool
     {
         return $injectedArgs === ['foo' => 'bar'];

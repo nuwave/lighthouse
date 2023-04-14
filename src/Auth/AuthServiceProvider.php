@@ -15,9 +15,7 @@ class AuthServiceProvider extends ServiceProvider
         $dispatcher->listen(RegisterDirectiveNamespaces::class, static fn (): string => __NAMESPACE__);
     }
 
-    /**
-     * @return array<string>
-     */
+    /** @return array<string> */
     public static function guards(): array
     {
         $config = Container::getInstance()->make(ConfigRepository::class);

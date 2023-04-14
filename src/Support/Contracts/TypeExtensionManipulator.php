@@ -7,8 +7,6 @@ use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 
 interface TypeExtensionManipulator extends Directive
 {
-    /**
-     * Apply manipulations from a type extension node.
-     */
+    /** Apply manipulations from a type extension node. */
     public function manipulateTypeExtension(DocumentAST &$documentAST, TypeExtensionNode &$typeExtension): void;
 }

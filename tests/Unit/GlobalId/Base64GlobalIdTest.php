@@ -39,18 +39,14 @@ final class Base64GlobalIdTest extends TestCase
         $this->assertSame('User', $this->base64GlobalId->decodeType($globalId));
     }
 
-    /**
-     * @dataProvider provideInvalidGlobalIds
-     */
+    /** @dataProvider provideInvalidGlobalIds */
     public function testThrowsOnInvalidGlobalIds(string $invalidGlobalId): void
     {
         $this->expectException(GlobalIdException::class);
         $this->base64GlobalId->decode($invalidGlobalId);
     }
 
-    /**
-     * @return iterable<array{string}>
-     */
+    /** @return iterable<array{string}> */
     public static function provideInvalidGlobalIds(): iterable
     {
         yield ['foo'];

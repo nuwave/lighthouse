@@ -12,19 +12,13 @@ use Nuwave\Lighthouse\Subscriptions\Subscriber;
 
 class CacheStorageManager implements StoresSubscriptions
 {
-    /**
-     * The cache key for topics.
-     */
+    /** The cache key for topics. */
     public const TOPIC_KEY = 'graphql.topic';
 
-    /**
-     * The cache key for subscribers.
-     */
+    /** The cache key for subscribers. */
     public const SUBSCRIBER_KEY = 'graphql.subscriber';
 
-    /**
-     * The cache to store channels and topics.
-     */
+    /** The cache to store channels and topics. */
     protected CacheRepository $cache;
 
     /**
@@ -114,9 +108,7 @@ class CacheStorageManager implements StoresSubscriptions
         return $this->cache->get($key, new Collection());
     }
 
-    /**
-     * Add the subscriber to the topic they subscribe to.
-     */
+    /** Add the subscriber to the topic they subscribe to. */
     protected function addSubscriberToTopic(Subscriber $subscriber): void
     {
         $topicKey = self::topicKey($subscriber->topic);
@@ -126,9 +118,7 @@ class CacheStorageManager implements StoresSubscriptions
         $this->storeTopic($topicKey, $topic);
     }
 
-    /**
-     * Remove the subscriber from the topic they are subscribed to.
-     */
+    /** Remove the subscriber from the topic they are subscribed to. */
     protected function removeSubscriberFromTopic(Subscriber $subscriber): void
     {
         $topicKey = self::topicKey($subscriber->topic);

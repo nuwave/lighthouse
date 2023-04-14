@@ -13,17 +13,13 @@ class ErrorPool
      */
     protected array $throwables = [];
 
-    /**
-     * Stores an error that will be added to the result.
-     */
+    /** Stores an error that will be added to the result. */
     public function record(\Throwable $throwable): void
     {
         $this->throwables[] = $throwable;
     }
 
-    /**
-     * @return array<\GraphQL\Error\Error>
-     */
+    /** @return array<\GraphQL\Error\Error> */
     public function errors(): array
     {
         return array_map(

@@ -41,9 +41,7 @@ GRAPHQL;
         return Utils::constructResolver($namespacedClassName, $methodName);
     }
 
-    /**
-     * @param  array<string, mixed>  $args
-     */
+    /** @param  array<string, mixed>  $args */
     public static function defaultComplexityResolver(int $childrenComplexity, array $args): int
     {
         /**

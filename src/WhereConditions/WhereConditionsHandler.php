@@ -72,9 +72,7 @@ class WhereConditionsHandler
         }
     }
 
-    /**
-     * @param  array<string, mixed>|null  $condition
-     */
+    /** @param  array<string, mixed>|null  $condition */
     public function handleHasCondition(
         Model $model,
         string $relation,
@@ -104,9 +102,7 @@ class WhereConditionsHandler
             ->getQuery();
     }
 
-    /**
-     * Ensure the column name is well formed to prevent SQL injection.
-     */
+    /** Ensure the column name is well formed to prevent SQL injection. */
     protected function assertValidColumnReference(string $column): void
     {
         // A valid column reference:

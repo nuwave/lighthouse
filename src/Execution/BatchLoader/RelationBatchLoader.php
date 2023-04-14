@@ -24,9 +24,7 @@ class RelationBatchLoader
      */
     protected array $results = [];
 
-    /**
-     * Marks when the actual batch loading happened.
-     */
+    /** Marks when the actual batch loading happened. */
     protected bool $hasResolved = false;
 
     public function __construct(

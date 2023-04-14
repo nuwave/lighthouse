@@ -19,9 +19,7 @@ interface GraphQLContext
      */
     public function user(): ?Authenticatable;
 
-    /**
-     * Set the authenticated user.
-     */
+    /** Set the authenticated user. */
     public function setUser(?Authenticatable $user): void;
 
     /**

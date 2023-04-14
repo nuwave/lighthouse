@@ -21,19 +21,13 @@ class Subscriber
      */
     public string $channel;
 
-    /**
-     * X-Socket-ID header passed on the subscription query.
-     */
+    /** X-Socket-ID header passed on the subscription query. */
     public ?string $socket_id;
 
-    /**
-     * The topic subscribed to.
-     */
+    /** The topic subscribed to. */
     public string $topic;
 
-    /**
-     * The contents of the query.
-     */
+    /** The contents of the query. */
     public DocumentNode $query;
 
     /**
@@ -45,9 +39,7 @@ class Subscriber
      */
     public string $fieldName;
 
-    /**
-     * The root element of the query.
-     */
+    /** The root element of the query. */
     public mixed $root;
 
     /**
@@ -90,9 +82,7 @@ class Subscriber
         ]);
     }
 
-    /**
-     * @return array<string, mixed>
-     */
+    /** @return array<string, mixed> */
     public function __serialize(): array
     {
         return [
@@ -109,9 +99,7 @@ class Subscriber
         ];
     }
 
-    /**
-     * @param  array<string, mixed>  $data
-     */
+    /** @param  array<string, mixed>  $data */
     public function __unserialize(array $data): void
     {
         $this->channel = $data['channel'];
@@ -132,9 +120,7 @@ class Subscriber
         );
     }
 
-    /**
-     * Generate a unique private channel name.
-     */
+    /** Generate a unique private channel name. */
     public static function uniqueChannelName(): string
     {
         return 'private-lighthouse-' . Str::random(32) . '-' . time();

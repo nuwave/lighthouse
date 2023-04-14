@@ -54,9 +54,7 @@ class NestedBelongsTo implements ArgResolver
         self::disconnectOrDelete($this->relation, $args);
     }
 
-    /**
-     * @param  \Illuminate\Database\Eloquent\Relations\BelongsTo<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model>  $relation
-     */
+    /** @param  \Illuminate\Database\Eloquent\Relations\BelongsTo<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model>  $relation */
     public static function disconnectOrDelete(BelongsTo $relation, ArgumentSet $args): void
     {
         // We proceed with disconnecting/deleting only if the given $values is truthy.

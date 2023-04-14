@@ -10,9 +10,7 @@ use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry;
 
 class Subscription
 {
-    /**
-     * Broadcast subscription to client(s).
-     */
+    /** Broadcast subscription to client(s). */
     public static function broadcast(string $subscriptionField, mixed $root, ?bool $shouldQueue = null): void
     {
         // Ensure we have a schema and registered subscription fields

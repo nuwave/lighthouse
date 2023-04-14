@@ -6,8 +6,6 @@ use Illuminate\Http\Request;
 
 interface AuthorizesSubscriptions
 {
-    /**
-     * Is the subscription request authorized?
-     */
+    /** Is the subscription request authorized? */
     public function authorize(Request $request): bool;
 }

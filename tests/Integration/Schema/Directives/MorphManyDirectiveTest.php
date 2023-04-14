@@ -22,24 +22,16 @@ final class MorphManyDirectiveTest extends DBTestCase
      */
     protected $user;
 
-    /**
-     * @var \Tests\Utils\Models\Task
-     */
+    /** @var \Tests\Utils\Models\Task */
     protected $task;
 
-    /**
-     * @var \Illuminate\Support\Collection<int, \Tests\Utils\Models\Image>
-     */
+    /** @var \Illuminate\Support\Collection<int, \Tests\Utils\Models\Image> */
     protected $taskImages;
 
-    /**
-     * @var \Tests\Utils\Models\Post
-     */
+    /** @var \Tests\Utils\Models\Post */
     protected $post;
 
-    /**
-     * @var \Illuminate\Support\Collection<int, \Tests\Utils\Models\Image>
-     */
+    /** @var \Illuminate\Support\Collection<int, \Tests\Utils\Models\Image> */
     protected $postImages;
 
     protected function setUp(): void

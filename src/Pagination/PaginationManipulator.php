@@ -225,9 +225,7 @@ GRAPHQL
         $parentType->fields = ASTHelper::mergeUniqueNodeList($parentType->fields, [$fieldDefinition], true);
     }
 
-    /**
-     * Build the count argument definition string, considering default and max values.
-     */
+    /** Build the count argument definition string, considering default and max values. */
     protected static function countArgument(?int $defaultCount = null, ?int $maxCount = null): string
     {
         $description = '"Limits number of fetched items.';

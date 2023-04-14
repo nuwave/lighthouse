@@ -68,9 +68,7 @@ class FieldFactory
         ];
     }
 
-    /**
-     * @return array<\Nuwave\Lighthouse\Support\Contracts\FieldMiddleware>
-     */
+    /** @return array<\Nuwave\Lighthouse\Support\Contracts\FieldMiddleware> */
     protected function fieldMiddleware(FieldDefinitionNode $fieldDefinitionNode): array
     {
         $globalFieldMiddleware = (new Collection($this->config->get('lighthouse.field_middleware')))
@@ -90,9 +88,7 @@ class FieldFactory
         return array_merge($globalFieldMiddleware, $directiveFieldMiddleware);
     }
 
-    /**
-     * @return \Closure(): (\GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\OutputType)
-     */
+    /** @return \Closure(): (\GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\OutputType) */
     protected function type(FieldDefinitionNode $fieldDefinition): \Closure
     {
         return static function () use ($fieldDefinition) {
@@ -102,9 +98,7 @@ class FieldFactory
         };
     }
 
-    /**
-     * @return ComplexityFn|null
-     */
+    /** @return ComplexityFn|null */
     protected function complexity(FieldValue $fieldValue): ?callable
     {
         $complexityDirective = $this->directiveLocator->exclusiveOfType(
@@ -117,9 +111,7 @@ class FieldFactory
             : null;
     }
 
-    /**
-     * @return FieldResolverFn
-     */
+    /** @return FieldResolverFn */
     protected function defaultResolver(FieldValue $fieldValue): callable
     {
         if ($fieldValue->getParentName() === RootType::SUBSCRIPTION) {

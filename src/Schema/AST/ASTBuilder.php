@@ -33,9 +33,7 @@ class ASTBuilder
         EnumTypeExtensionNode::class => EnumTypeDefinitionNode::class,
     ];
 
-    /**
-     * Initialized lazily in $this->documentAST().
-     */
+    /** Initialized lazily in $this->documentAST(). */
     protected DocumentAST $documentAST;
 
     public function __construct(
@@ -90,9 +88,7 @@ class ASTBuilder
         return $this->documentAST;
     }
 
-    /**
-     * Apply directives on type definitions that can manipulate the AST.
-     */
+    /** Apply directives on type definitions that can manipulate the AST. */
     protected function applyTypeDefinitionManipulators(): void
     {
         foreach ($this->documentAST->types as $typeDefinition) {
@@ -105,9 +101,7 @@ class ASTBuilder
         }
     }
 
-    /**
-     * Apply directives on type extensions that can manipulate the AST.
-     */
+    /** Apply directives on type extensions that can manipulate the AST. */
     protected function applyTypeExtensionManipulators(): void
     {
         foreach ($this->documentAST->typeExtensions as $typeName => $typeExtensionsList) {
@@ -197,9 +191,7 @@ class ASTBuilder
         }
     }
 
-    /**
-     * Apply directives on fields that can manipulate the AST.
-     */
+    /** Apply directives on fields that can manipulate the AST. */
     protected function applyFieldManipulators(): void
     {
         foreach ($this->documentAST->types as $typeDefinition) {
@@ -216,9 +208,7 @@ class ASTBuilder
         }
     }
 
-    /**
-     * Apply directives on args that can manipulate the AST.
-     */
+    /** Apply directives on args that can manipulate the AST. */
     protected function applyArgManipulators(): void
     {
         foreach ($this->documentAST->types as $typeDefinition) {

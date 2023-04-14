@@ -54,57 +54,43 @@ final class Task extends Model
         });
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Tests\Utils\Models\Activity>
-     */
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Tests\Utils\Models\Activity> */
     public function activity(): MorphMany
     {
         return $this->morphMany(Activity::class, 'content');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphOne<\Tests\Utils\Models\Image>
-     */
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphOne<\Tests\Utils\Models\Image> */
     public function image(): MorphOne
     {
         return $this->morphOne(Image::class, 'imageable');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Tests\Utils\Models\Image>
-     */
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Tests\Utils\Models\Image> */
     public function images(): MorphMany
     {
         return $this->morphMany(Image::class, 'imageable');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\Tests\Utils\Models\Post>
-     */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Tests\Utils\Models\Post> */
     public function post(): HasOne
     {
         return $this->hasOne(Post::class);
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\Tests\Utils\Models\Comment>
-     */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\Tests\Utils\Models\Comment> */
     public function postComments(): HasManyThrough
     {
         return $this->hasManyThrough(Comment::class, Post::class);
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany<\Tests\Utils\Models\Tag>
-     */
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphToMany<\Tests\Utils\Models\Tag> */
     public function tags(): MorphToMany
     {
         return $this->morphToMany(Tag::class, 'taggable');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\User, self>
-     */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\User, self> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

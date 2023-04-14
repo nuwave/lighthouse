@@ -26,9 +26,7 @@ class DeferServiceProvider extends ServiceProvider
         $dispatcher->listen(StartExecution::class, Defer::class . '@handleStartExecution');
     }
 
-    /**
-     * Set the tracing directive on all fields of the query to enable tracing them.
-     */
+    /** Set the tracing directive on all fields of the query to enable tracing them. */
     public function handleManipulateAST(ManipulateAST $manipulateAST): void
     {
         ASTHelper::attachDirectiveToObjectTypeFields(

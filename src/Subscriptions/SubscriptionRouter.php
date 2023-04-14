@@ -7,9 +7,7 @@ use Laravel\Lumen\Routing\Router;
 
 class SubscriptionRouter
 {
-    /**
-     * Register the routes for pusher based subscriptions.
-     */
+    /** Register the routes for pusher based subscriptions. */
     public function pusher(Registrar|Router $router): void
     {
         $router->post('graphql/subscriptions/auth', [

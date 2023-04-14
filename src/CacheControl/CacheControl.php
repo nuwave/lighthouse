@@ -4,14 +4,10 @@ namespace Nuwave\Lighthouse\CacheControl;
 
 class CacheControl
 {
-    /**
-     * Maximum age.
-     */
+    /** Maximum age. */
     public ?int $maxAge = null;
 
-    /**
-     * Is the result public?
-     */
+    /** Is the result public? */
     protected bool $public = true;
 
     public function addMaxAge(int $maxAge): void

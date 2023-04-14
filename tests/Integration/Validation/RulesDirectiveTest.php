@@ -51,9 +51,7 @@ final class RulesDirectiveTest extends TestCase
             ->assertGraphQLValidationKeys(['required']);
     }
 
-    /**
-     * @return never
-     */
+    /** @return never */
     public function testDifferentDates(): void
     {
         $this->markTestSkipped('Not working right now, not sure how it can be fixed.');
@@ -262,9 +260,7 @@ final class RulesDirectiveTest extends TestCase
             ]);
     }
 
-    /**
-     * @dataProvider invalidApplyArguments
-     */
+    /** @dataProvider invalidApplyArguments */
     public function testValidateApplyArgument(string $applyArgument): void
     {
         $this->expectException(DefinitionException::class);
@@ -275,9 +271,7 @@ final class RulesDirectiveTest extends TestCase
         ');
     }
 
-    /**
-     * @return array<array<int, string>>
-     */
+    /** @return array<array<int, string>> */
     public static function invalidApplyArguments(): array
     {
         return [
@@ -288,9 +282,7 @@ final class RulesDirectiveTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider invalidMessageArguments
-     */
+    /** @dataProvider invalidMessageArguments */
     public function testValidateMessageArgument(string $messageArgument): void
     {
         $this->expectException(DefinitionException::class);
@@ -301,9 +293,7 @@ final class RulesDirectiveTest extends TestCase
         ");
     }
 
-    /**
-     * @return array<array<int, string>>
-     */
+    /** @return array<array<int, string>> */
     public static function invalidMessageArguments(): array
     {
         return [

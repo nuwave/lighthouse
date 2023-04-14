@@ -34,9 +34,7 @@ class BroadcastManager extends DriverManager
         return Broadcaster::class;
     }
 
-    /**
-     * @param  array<string, mixed>  $config
-     */
+    /** @param  array<string, mixed>  $config */
     protected function createPusherDriver(array $config): PusherBroadcaster
     {
         $connection = $config['connection'] ?? 'pusher';
@@ -60,9 +58,7 @@ class BroadcastManager extends DriverManager
         return new PusherBroadcaster($pusher, $this->app->make(LaravelExceptionHandler::class));
     }
 
-    /**
-     * @param  array<string, mixed>  $config
-     */
+    /** @param  array<string, mixed>  $config */
     protected function createLogDriver(array $config): LogBroadcaster
     {
         return new LogBroadcaster($config);

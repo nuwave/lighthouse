@@ -7,9 +7,7 @@ use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 
 trait UsesTestSchema
 {
-    /**
-     * The schema that Lighthouse will use.
-     */
+    /** The schema that Lighthouse will use. */
     protected string $schema;
 
     protected function setUpTestSchema(): void

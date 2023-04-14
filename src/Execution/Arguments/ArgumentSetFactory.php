@@ -80,9 +80,7 @@ class ArgumentSetFactory
         return $argumentDefinitionMap;
     }
 
-    /**
-     * Wrap a single client-given argument with type information.
-     */
+    /** Wrap a single client-given argument with type information. */
     protected function wrapInArgument(mixed $value, InputValueDefinitionNode $definition): Argument
     {
         $type = $this->argumentTypeNodeConverter->convert($definition->type);

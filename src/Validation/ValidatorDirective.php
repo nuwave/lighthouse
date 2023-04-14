@@ -129,9 +129,7 @@ GRAPHQL;
         }
     }
 
-    /**
-     * @return class-string<\Nuwave\Lighthouse\Validation\Validator>
-     */
+    /** @return class-string<\Nuwave\Lighthouse\Validation\Validator> */
     protected function namespaceValidatorClass(string $classCandidate): string
     {
         $validatorClassName = $this->namespaceClassName(

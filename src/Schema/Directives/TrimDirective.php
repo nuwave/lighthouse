@@ -25,9 +25,7 @@ directive @trim on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITI
 GRAPHQL;
     }
 
-    /**
-     * Remove whitespace from the beginning and end of a given input.
-     */
+    /** Remove whitespace from the beginning and end of a given input. */
     public function sanitize(mixed $argumentValue): mixed
     {
         return Utils::mapEach(

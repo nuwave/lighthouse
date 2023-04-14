@@ -6,9 +6,7 @@ use Nuwave\Lighthouse\Validation\Validator;
 
 final class EmailCustomAttributeValidator extends Validator
 {
-    /**
-     * @return array{email: array<string>}
-     */
+    /** @return array{email: array<string>} */
     public function rules(): array
     {
         return [
@@ -16,9 +14,7 @@ final class EmailCustomAttributeValidator extends Validator
         ];
     }
 
-    /**
-     * @return array{email: string}
-     */
+    /** @return array{email: string} */
     public function attributes(): array
     {
         return ['email' => 'email address'];

@@ -35,14 +35,10 @@ class Defer implements CreatesResponse
      */
     protected array $result = [];
 
-    /**
-     * Should further deferring happen?
-     */
+    /** Should further deferring happen? */
     protected bool $shouldDeferFurther = true;
 
-    /**
-     * Are we currently streaming deferred results?
-     */
+    /** Are we currently streaming deferred results? */
     protected bool $isStreaming = false;
 
     protected int|float $maxExecutionTime = 0;
@@ -101,9 +97,7 @@ class Defer implements CreatesResponse
         return Arr::get($this->result, "data.{$path}");
     }
 
-    /**
-     * @param  callable(): mixed  $resolver
-     */
+    /** @param  callable(): mixed  $resolver */
     protected function resolve(callable $resolver, string $path): mixed
     {
         unset($this->deferred[$path]);
@@ -112,9 +106,7 @@ class Defer implements CreatesResponse
         return $resolver();
     }
 
-    /**
-     * @param  callable(): mixed  $originalResolver
-     */
+    /** @param  callable(): mixed  $originalResolver */
     public function findOrResolve(callable $originalResolver, string $path): mixed
     {
         if ($this->hasData($path)) {
@@ -190,9 +182,7 @@ class Defer implements CreatesResponse
         );
     }
 
-    /**
-     * Check if we reached the maximum execution time.
-     */
+    /** Check if we reached the maximum execution time. */
     protected function maxExecutionTimeReached(): bool
     {
         if ($this->maxExecutionTime === 0) {
@@ -202,9 +192,7 @@ class Defer implements CreatesResponse
         return $this->maxExecutionTime <= microtime(true);
     }
 
-    /**
-     * Check if the maximum number of nested field has been resolved.
-     */
+    /** Check if the maximum number of nested field has been resolved. */
     protected function maxNestedFieldsResolved(int $nested): bool
     {
         if ($this->maxNestedFields === 0) {

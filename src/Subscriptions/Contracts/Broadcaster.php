@@ -10,23 +10,15 @@ interface Broadcaster
 {
     public const EVENT_NAME = 'lighthouse-subscription';
 
-    /**
-     * Handle authorized subscription request.
-     */
+    /** Handle authorized subscription request. */
     public function authorized(Request $request): Response;
 
-    /**
-     * Handle unauthorized subscription request.
-     */
+    /** Handle unauthorized subscription request. */
     public function unauthorized(Request $request): Response;
 
-    /**
-     * Handle subscription web hook.
-     */
+    /** Handle subscription web hook. */
     public function hook(Request $request): Response;
 
-    /**
-     * Send data to subscriber.
-     */
+    /** Send data to subscriber. */
     public function broadcast(Subscriber $subscriber, mixed $data): void;
 }

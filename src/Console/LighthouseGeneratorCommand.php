@@ -23,9 +23,7 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
         return ucfirst(trim($name));
     }
 
-    /**
-     * @param  string  $rootNamespace
-     */
+    /** @param  string  $rootNamespace */
     protected function getDefaultNamespace($rootNamespace): string
     {
         $namespaces = config("lighthouse.namespaces.{$this->namespaceConfigKey()}");
@@ -33,9 +31,7 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
         return static::commonNamespace((array) $namespaces);
     }
 
-    /**
-     * Get the config key that holds the default namespaces for the class.
-     */
+    /** Get the config key that holds the default namespaces for the class. */
     abstract protected function namespaceConfigKey(): string;
 
     /**

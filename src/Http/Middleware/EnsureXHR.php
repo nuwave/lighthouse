@@ -14,9 +14,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
  */
 class EnsureXHR
 {
-    /**
-     * @see https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#attr-fs-enctype
-     */
+    /** @see https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#attr-fs-enctype */
     public const FORM_CONTENT_TYPES = [
         'application/x-www-form-urlencoded',
         'multipart/form-data',

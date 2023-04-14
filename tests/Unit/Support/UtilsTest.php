@@ -7,9 +7,7 @@ use Tests\TestCase;
 
 final class UtilsTest extends TestCase
 {
-    /**
-     * @dataProvider nameToEnumValueName
-     */
+    /** @dataProvider nameToEnumValueName */
     public function testToEnumValueName(string $name, string $enumValueName): void
     {
         $this->assertSame(
@@ -18,9 +16,7 @@ final class UtilsTest extends TestCase
         );
     }
 
-    /**
-     * @return iterable<array{string, string}>
-     */
+    /** @return iterable<array{string, string}> */
     public static function nameToEnumValueName(): iterable
     {
         yield ['column_name', 'COLUMN_NAME'];

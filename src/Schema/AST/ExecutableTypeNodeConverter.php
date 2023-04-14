@@ -13,9 +13,7 @@ class ExecutableTypeNodeConverter extends TypeNodeConverter
         protected TypeRegistry $typeRegistry,
     ) {}
 
-    /**
-     * @param \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NullableType $type
-     */
+    /** @param \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NullableType $type */
     protected function nonNull(mixed $type): NonNull
     {
         return Type::nonNull($type);

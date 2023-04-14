@@ -65,9 +65,7 @@ GRAPHQL;
         );
     }
 
-    /**
-     * @param  \GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node  $typeDefinition
-     */
+    /** @param  \GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node  $typeDefinition */
     public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition): void
     {
         $this->validateMutuallyExclusiveArguments(['model', 'resolver']);

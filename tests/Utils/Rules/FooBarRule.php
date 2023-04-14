@@ -19,9 +19,7 @@ final class FooBarRule implements Rule
         return false;
     }
 
-    /**
-     * Get the validation error message.
-     */
+    /** Get the validation error message. */
     public function message(): string
     {
         return self::MESSAGE;

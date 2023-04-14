@@ -45,9 +45,7 @@ directive @whereConditions(
 GRAPHQL;
     }
 
-    /**
-     * @param  array<string, mixed>|null  $value
-     */
+    /** @param  array<string, mixed>|null  $value */
     public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, $value): QueryBuilder|EloquentBuilder|Relation
     {
         if ($value === null) {

@@ -115,9 +115,7 @@ GRAPHQL;
         }
     }
 
-    /**
-     * Checks throttling limit and records this attempt.
-     */
+    /** Checks throttling limit and records this attempt. */
     protected function handleLimit(string $key, int $maxAttempts, float $decayMinutes, string $fieldReference): void
     {
         if ($this->limiter->tooManyAttempts($key, $maxAttempts)) {

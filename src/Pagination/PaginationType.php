@@ -15,9 +15,7 @@ class PaginationType
 
     public const CONNECTION = 'CONNECTION';
 
-    /**
-     * One of the constant values in this class.
-     */
+    /** One of the constant values in this class. */
     protected string $type;
 
     public function __construct(string $paginationType)

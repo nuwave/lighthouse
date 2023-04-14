@@ -12,9 +12,7 @@ use Nuwave\Lighthouse\Support\Utils;
 
 class ResolverProvider implements ProvidesResolver
 {
-    /**
-     * Provide a field resolver in case no resolver directive is defined for a field.
-     */
+    /** Provide a field resolver in case no resolver directive is defined for a field. */
     public function provideResolver(FieldValue $fieldValue): \Closure
     {
         $resolverClass = $this->findResolverClass($fieldValue, '__invoke');
@@ -35,9 +33,7 @@ class ResolverProvider implements ProvidesResolver
         return \Closure::fromCallable([$resolver, '__invoke']);
     }
 
-    /**
-     * @return class-string|null
-     */
+    /** @return class-string|null */
     protected function findResolverClass(FieldValue $fieldValue, string $methodName): ?string
     {
         return Utils::namespaceClassname(
@@ -47,9 +43,7 @@ class ResolverProvider implements ProvidesResolver
         );
     }
 
-    /**
-     * @return never
-     */
+    /** @return never */
     protected function throwMissingResolver(FieldValue $fieldValue): void
     {
         // Since we already know we are on the root type, this is either

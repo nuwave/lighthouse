@@ -11,9 +11,7 @@ class KeyDirective extends BaseDirective
 {
     public const NAME = 'key';
 
-    /**
-     * @see https://www.apollographql.com/docs/apollo-server/federation/federation-spec/#schema-modifications-glossary
-     */
+    /** @see https://www.apollographql.com/docs/apollo-server/federation/federation-spec/#schema-modifications-glossary */
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'GRAPHQL'

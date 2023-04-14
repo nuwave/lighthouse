@@ -14,9 +14,7 @@ use Tests\TestCase;
 
 abstract class DateScalarTest extends TestCase
 {
-    /**
-     * @dataProvider invalidDateValues
-     */
+    /** @dataProvider invalidDateValues */
     public function testThrowsIfSerializingInvalidDates(mixed $value): void
     {
         $dateScalar = $this->scalarInstance();
@@ -25,9 +23,7 @@ abstract class DateScalarTest extends TestCase
         $dateScalar->serialize($value);
     }
 
-    /**
-     * @dataProvider invalidDateValues
-     */
+    /** @dataProvider invalidDateValues */
     public function testThrowsIfParseValueInvalidDate(mixed $value): void
     {
         $dateScalar = $this->scalarInstance();
@@ -65,9 +61,7 @@ abstract class DateScalarTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider validDates
-     */
+    /** @dataProvider validDates */
     public function testParsesValueString(string $date): void
     {
         $this->assertTrue(
@@ -75,9 +69,7 @@ abstract class DateScalarTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider validDates
-     */
+    /** @dataProvider validDates */
     public function testParsesLiteral(string $date): void
     {
         $dateLiteral = new StringValueNode(
@@ -105,9 +97,7 @@ abstract class DateScalarTest extends TestCase
         self::expectNotToPerformAssertions();
     }
 
-    /**
-     * @dataProvider canonicalizeDates
-     */
+    /** @dataProvider canonicalizeDates */
     public function testCanonicalizesValidDateString(string $date, string $canonical): void
     {
         $result = $this->scalarInstance()->serialize($date);
@@ -115,9 +105,7 @@ abstract class DateScalarTest extends TestCase
         $this->assertSame($canonical, $result);
     }
 
-    /**
-     * The specific instance under test.
-     */
+    /** The specific instance under test. */
     abstract protected function scalarInstance(): DateScalar;
 
     /**

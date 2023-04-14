@@ -154,9 +154,7 @@ final class SearchDirectiveTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @param  array{id: int}  $value
-     */
+    /** @param  array{id: int}  $value */
     public static function customBuilderMethod(ScoutBuilder $builder, array $value): ScoutBuilder
     {
         return $builder->where('from_custom_builder', $value['id']);

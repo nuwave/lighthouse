@@ -27,9 +27,7 @@ abstract class DateScalar extends ScalarType
         return $this->format($value);
     }
 
-    /**
-     * Parse an externally provided variable value into a Carbon instance.
-     */
+    /** Parse an externally provided variable value into a Carbon instance. */
     public function parseValue(mixed $value): IlluminateCarbon
     {
         return $this->tryParsingDate($value, Error::class);
@@ -86,9 +84,7 @@ abstract class DateScalar extends ScalarType
         }
     }
 
-    /**
-     * Serialize the Carbon instance.
-     */
+    /** Serialize the Carbon instance. */
     abstract protected function format(IlluminateCarbon $carbon): string;
 
     /**

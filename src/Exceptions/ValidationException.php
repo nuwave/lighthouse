@@ -42,9 +42,7 @@ class ValidationException extends \Exception implements ClientAware, ProvidesExt
         return true;
     }
 
-    /**
-     * @return array{validation: array<string, array<int, string>>}
-     */
+    /** @return array{validation: array<string, array<int, string>>} */
     public function getExtensions(): array
     {
         return [

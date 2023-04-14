@@ -52,9 +52,7 @@ class LogBroadcaster implements Broadcaster
         $this->broadcasts[$subscriber->channel] = $data;
     }
 
-    /**
-     * @return mixed The data that is being broadcast
-     */
+    /** @return mixed The data that is being broadcast */
     public function broadcasts(?string $key = null): mixed
     {
         return Arr::get($this->broadcasts, $key);

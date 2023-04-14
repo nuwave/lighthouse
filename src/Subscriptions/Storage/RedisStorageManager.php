@@ -57,9 +57,7 @@ class RedisStorageManager implements StoresSubscriptions
         );
     }
 
-    /**
-     * @return \Illuminate\Support\Collection<int, \Nuwave\Lighthouse\Subscriptions\Subscriber>
-     */
+    /** @return \Illuminate\Support\Collection<int, \Nuwave\Lighthouse\Subscriptions\Subscriber> */
     public function subscribersByTopic(string $topic): Collection
     {
         // As explained in storeSubscriber, we use redis sets to store the names of subscribers of a topic.

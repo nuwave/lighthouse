@@ -9,9 +9,7 @@ final class Person
 {
     public function __construct(private TypeRegistry $typeRegistry) {}
 
-    /**
-     * @param  array<string, mixed>  $value
-     */
+    /** @param  array<string, mixed>  $value */
     public function resolveType(array $value): Type
     {
         $type = isset($value['id'])

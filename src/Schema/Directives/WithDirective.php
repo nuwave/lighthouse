@@ -44,9 +44,7 @@ GRAPHQL;
         }
     }
 
-    /**
-     * @return \Nuwave\Lighthouse\Execution\ModelsLoader\SimpleModelsLoader
-     */
+    /** @return \Nuwave\Lighthouse\Execution\ModelsLoader\SimpleModelsLoader */
     protected function modelsLoader(mixed $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ModelsLoader
     {
         return new SimpleModelsLoader(

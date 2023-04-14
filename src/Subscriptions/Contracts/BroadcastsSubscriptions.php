@@ -8,18 +8,12 @@ use Symfony\Component\HttpFoundation\Response;
 
 interface BroadcastsSubscriptions
 {
-    /**
-     * Push subscription data to subscribers.
-     */
+    /** Push subscription data to subscribers. */
     public function broadcast(GraphQLSubscription $subscription, string $fieldName, mixed $root): void;
 
-    /**
-     * Queue pushing subscription data to subscribers.
-     */
+    /** Queue pushing subscription data to subscribers. */
     public function queueBroadcast(GraphQLSubscription $subscription, string $fieldName, mixed $root): void;
 
-    /**
-     * Authorize the subscription.
-     */
+    /** Authorize the subscription. */
     public function authorize(Request $request): Response;
 }

@@ -209,9 +209,7 @@ GRAPHQL
         ]);
     }
 
-    /**
-     * @return array<array<string, string>>
-     */
+    /** @return array<array<string, string>> */
     public static function existingModelMutations(): array
     {
         return [
@@ -220,9 +218,7 @@ GRAPHQL
         ];
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    /** @dataProvider existingModelMutations */
     public function testUpdateWithNewMorphOne(string $action): void
     {
         factory(Task::class)->create();
@@ -258,9 +254,7 @@ GRAPHQL
         ]);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    /** @dataProvider existingModelMutations */
     public function testUpdateWithUpsertMorphOne(string $action): void
     {
         factory(Task::class)->create();
@@ -297,9 +291,7 @@ GRAPHQL
         ]);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    /** @dataProvider existingModelMutations */
     public function testUpdateAndUpdateMorphOne(string $action): void
     {
         factory(Task::class)
@@ -341,9 +333,7 @@ GRAPHQL
         ]);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    /** @dataProvider existingModelMutations */
     public function testUpdateAndDeleteMorphOne(string $action): void
     {
         factory(Task::class)

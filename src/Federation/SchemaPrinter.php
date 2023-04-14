@@ -43,25 +43,19 @@ class SchemaPrinter extends GraphQLSchemaPrinter
         );
     }
 
-    /**
-     * @param  array<string, mixed>  $options
-     */
+    /** @param  array<string, mixed>  $options */
     protected static function printObject(ObjectType $type, array $options): string
     {
         return static::printObjectLike('type', $type, $options);
     }
 
-    /**
-     * @param  array<string, mixed>  $options
-     */
+    /** @param  array<string, mixed>  $options */
     protected static function printInterface(InterfaceType $type, array $options): string
     {
         return static::printObjectLike('interface', $type, $options);
     }
 
-    /**
-     * @param  array<string, mixed>  $options
-     */
+    /** @param  array<string, mixed>  $options */
     protected static function printObjectLike(string $kind, ObjectType|InterfaceType $type, array $options): string
     {
         $interfaces = $type->getInterfaces();
@@ -88,9 +82,7 @@ class SchemaPrinter extends GraphQLSchemaPrinter
 GRAPHQL;
     }
 
-    /**
-     * @param  array<\GraphQL\Language\AST\DirectiveNode>  $directives
-     */
+    /** @param  array<\GraphQL\Language\AST\DirectiveNode>  $directives */
     public static function printDirectives(array $directives): string
     {
         if ($directives === []) {

@@ -29,9 +29,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
 {
     use RelationDirectiveHelpers;
 
-    /**
-     * @var array<string, mixed>
-     */
+    /** @var array<string, mixed> */
     protected array $lighthouseConfig = [];
 
     public function __construct(
@@ -141,9 +139,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
         return null;
     }
 
-    /**
-     * @param  array<string, mixed>  $args
-     */
+    /** @param  array<string, mixed>  $args */
     protected function paginationArgs(array $args): ?PaginationArgs
     {
         $paginationType = $this->paginationType();
@@ -172,9 +168,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
         return $this->directiveArgValue('defaultCount', $this->lighthouseConfig['pagination']['default_count']);
     }
 
-    /**
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>  $relation
-     */
+    /** @param  \Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>  $relation */
     protected function isSameConnection(Relation $relation): bool
     {
         $default = $this->database->getDefaultConnection();

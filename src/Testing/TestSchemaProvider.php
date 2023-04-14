@@ -8,9 +8,7 @@ class TestSchemaProvider implements SchemaSourceProvider
 {
     protected string $schema = '';
 
-    /**
-     * @param  string  $schema  May be changed after instantiation, so it is passed as a reference
-     */
+    /** @param  string  $schema  May be changed after instantiation, so it is passed as a reference */
     public function __construct(string &$schema)
     {
         $this->schema = &$schema;

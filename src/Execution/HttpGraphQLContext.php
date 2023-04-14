@@ -9,9 +9,7 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class HttpGraphQLContext implements GraphQLContext
 {
-    /**
-     * An instance of the currently authenticated user.
-     */
+    /** An instance of the currently authenticated user. */
     public ?Authenticatable $user = null;
 
     public function __construct(

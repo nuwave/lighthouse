@@ -30,9 +30,7 @@ trait MakesGraphQLRequestsLumen
      */
     protected TestResponse $introspectionResult;
 
-    /**
-     * Used to test deferred queries.
-     */
+    /** Used to test deferred queries. */
     protected MemoryStream $deferStream;
 
     /**
@@ -231,9 +229,7 @@ trait MakesGraphQLRequestsLumen
         return $this->deferStream->chunks;
     }
 
-    /**
-     * Set up the stream to make queries with `@defer`.
-     */
+    /** Set up the stream to make queries with `@defer`. */
     protected function setUpDeferStream(): void
     {
         $this->deferStream = new MemoryStream();
@@ -244,9 +240,7 @@ trait MakesGraphQLRequestsLumen
         );
     }
 
-    /**
-     * Configure an error handler that rethrows all errors passed to it.
-     */
+    /** Configure an error handler that rethrows all errors passed to it. */
     protected function rethrowGraphQLErrors(): void
     {
         $config = Container::getInstance()->make(ConfigRepository::class);

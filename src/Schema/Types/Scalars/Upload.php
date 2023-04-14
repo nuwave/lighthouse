@@ -10,17 +10,13 @@ use Illuminate\Http\UploadedFile;
 
 class Upload extends ScalarType
 {
-    /**
-     * This always throws, as the Upload scalar can only be used as an argument.
-     */
+    /** This always throws, as the Upload scalar can only be used as an argument. */
     public function serialize($value): void
     {
         throw new InvariantViolation('"Upload" cannot be serialized, it can only be used as an argument.');
     }
 
-    /**
-     * Parse an externally provided variable value into a Carbon instance.
-     */
+    /** Parse an externally provided variable value into a Carbon instance. */
     public function parseValue($value): UploadedFile
     {
         if (! $value instanceof UploadedFile) {

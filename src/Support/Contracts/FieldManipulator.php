@@ -9,9 +9,7 @@ use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 
 interface FieldManipulator extends Directive
 {
-    /**
-     * Manipulate the AST based on a field definition.
-     */
+    /** Manipulate the AST based on a field definition. */
     public function manipulateFieldDefinition(
         DocumentAST &$documentAST,
         FieldDefinitionNode &$fieldDefinition,

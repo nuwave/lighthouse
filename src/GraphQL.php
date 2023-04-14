@@ -274,9 +274,7 @@ class GraphQL
         return $result->toArray($this->debugFlag());
     }
 
-    /**
-     * Loads persisted query from the query cache.
-     */
+    /** Loads persisted query from the query cache. */
     protected function loadPersistedQuery(string $sha256hash): DocumentNode
     {
         $lighthouseConfig = $this->configRepository->get('lighthouse');
@@ -313,9 +311,7 @@ class GraphQL
             );
     }
 
-    /**
-     * @return ErrorsHandler
-     */
+    /** @return ErrorsHandler */
     protected function errorsHandler(): callable
     {
         if (! isset($this->errorsHandler)) {

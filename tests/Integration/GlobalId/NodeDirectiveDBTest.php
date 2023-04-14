@@ -18,9 +18,7 @@ final class NodeDirectiveDBTest extends DBTestCase
         $this->globalIdResolver = $this->app->make(GlobalId::class);
     }
 
-    /**
-     * @var array<int, array<string, mixed>>
-     */
+    /** @var array<int, array<string, mixed>> */
     private const TEST_TUPLES = [
         1 => [
             'id' => 1,
@@ -162,17 +160,13 @@ final class NodeDirectiveDBTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @return array<mixed>
-     */
+    /** @return array<mixed> */
     public static function resolveNode(int|string $id): array
     {
         return self::TEST_TUPLES[$id];
     }
 
-    /**
-     * @dataProvider modelNodeDirectiveStyles
-     */
+    /** @dataProvider modelNodeDirectiveStyles */
     public function testResolveModelsNodes(string $directiveDefinition): void
     {
         $this->schema .= /** @lang GraphQL */ "
@@ -205,9 +199,7 @@ final class NodeDirectiveDBTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @return array<array<string>>
-     */
+    /** @return array<array<string>> */
     public static function modelNodeDirectiveStyles(): array
     {
         return [

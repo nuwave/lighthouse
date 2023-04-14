@@ -51,24 +51,16 @@ class DirectiveCommand extends LighthouseGeneratorCommand
 
     protected $type = 'Directive';
 
-    /**
-     * @var \Illuminate\Support\Collection<int, string>
-     */
+    /** @var \Illuminate\Support\Collection<int, string> */
     protected Collection $requiredImports;
 
-    /**
-     * @var \Illuminate\Support\Collection<int, string>
-     */
+    /** @var \Illuminate\Support\Collection<int, string> */
     protected Collection $implementedInterfaces;
 
-    /**
-     * @var \Illuminate\Support\Collection<int, string>
-     */
+    /** @var \Illuminate\Support\Collection<int, string> */
     protected Collection $possibleLocations;
 
-    /**
-     * @var \Illuminate\Support\Collection<int, string>
-     */
+    /** @var \Illuminate\Support\Collection<int, string> */
     protected Collection $methodStubs;
 
     protected function getNameInput(): string
@@ -186,9 +178,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
         }
     }
 
-    /**
-     * @param  array<int, string>  $availableLocations
-     */
+    /** @param  array<int, string>  $availableLocations */
     public function askForLocations(array $availableLocations): void
     {
         $usedLocations = $this->choice(
@@ -205,17 +195,13 @@ class DirectiveCommand extends LighthouseGeneratorCommand
         }
     }
 
-    /**
-     * @param  class-string  $interface
-     */
+    /** @param  class-string  $interface */
     protected function shortName(string $interface): string
     {
         return Str::afterLast($interface, '\\');
     }
 
-    /**
-     * @param  class-string  $interface
-     */
+    /** @param  class-string  $interface */
     protected function implementInterface(string $interface): void
     {
         $shortName = $this->shortName($interface);
@@ -265,9 +251,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
         return $this->files->get($path);
     }
 
-    /**
-     * @return array<int, array<int, mixed>>
-     */
+    /** @return array<int, array<int, mixed>> */
     protected function getOptions(): array
     {
         return [

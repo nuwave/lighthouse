@@ -35,9 +35,7 @@ class ASTManipulator
         );
     }
 
-    /**
-     * Combine object types with @key into the _Entity union.
-     */
+    /** Combine object types with @key into the _Entity union. */
     protected function addEntityUnion(DocumentAST &$documentAST): void
     {
         /** @var array<int, string> $entities */

@@ -23,9 +23,7 @@ class SubscriptionGuard implements Guard
         $this->user = null;
     }
 
-    /**
-     * @param  array<mixed>  $credentials
-     */
+    /** @param  array<mixed>  $credentials */
     public function validate(array $credentials = []): bool
     {
         throw new \RuntimeException('The Lighthouse subscription guard cannot be used for credential based authentication.');
