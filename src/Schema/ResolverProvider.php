@@ -25,7 +25,7 @@ class ResolverProvider implements ProvidesResolver
 
             // Return any non-null value to continue nested field resolution
             // when the root Query type is returned as part of the result.
-            if (RootType::QUERY === ASTHelper::getUnderlyingTypeName($fieldValue->getField())) {
+            if (ASTHelper::getUnderlyingTypeName($fieldValue->getField()) === RootType::QUERY) {
                 return static fn () => true;
             }
 
