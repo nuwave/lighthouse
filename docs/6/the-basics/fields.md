@@ -260,12 +260,12 @@ For example, we have a mutation:
 
 ```graphql
 type Mutation {
-    likePost(id: Int!): LikePostResult
+  likePost(id: Int!): LikePostResult
 }
 
 type LikePostResult {
-    record: Post!
-    query: Query!
+  record: Post!
+  query: Query!
 }
 ```
 
@@ -279,9 +279,9 @@ final class LikePost
     public function __invoke(mixed $root, array $args): array
     {
         $postId = $args['id'];
-        
+
         // do the main work
-         
+
         return [
             'record' => $post,
         ];
@@ -289,22 +289,22 @@ final class LikePost
 }
 ```
 
-The client can run the mutation and then immediately in the response through the query field request any 
+The client can run the mutation and then immediately in the response through the query field request any
 data that is available in the API:
 
 ```graphql
 mutation {
-    likePost(id: 1) {
-        record {
-            id
-            likeCount
-        }
-        query {
-            lastActivePosts {
-                id
-                likeCount
-            }
-        }
+  likePost(id: 1) {
+    record {
+      id
+      likeCount
     }
+    query {
+      lastActivePosts {
+        id
+        likeCount
+      }
+    }
+  }
 }
 ```
