@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Simplify exposing root type `Query` in nested results
+
 ## v6.6.0
 
 ### Fixed
