@@ -27,6 +27,9 @@ GRAPHQL;
 
     protected function rename(ArgumentSet &$argumentSet): ArgumentSet
     {
+        /** @var array<int, string> */
+        $keys = [];
+
         foreach ($argumentSet->arguments as $name => $argument) {
             // Recursively apply the renaming to nested inputs.
             // We look for further ArgumentSet instances, they
@@ -43,10 +46,17 @@ GRAPHQL;
             $maybeRenameDirective = $argument->directives->first(static fn (Directive $directive): bool => $directive instanceof RenameDirective);
 
             if ($maybeRenameDirective instanceof RenameDirective) {
-                $argumentSet->arguments[$maybeRenameDirective->attributeArgValue()] = $argument;
+                $newName = $maybeRenameDirective->attributeArgValue();
+                $argumentSet->arguments[$newName] = $argument;
                 unset($argumentSet->arguments[$name]);
+                $keys[] = $newName;
+            } else {
+                $keys[] = $name;
             }
         }
+
+        // Keep order of arguments
+        $argumentSet->arguments = array_replace(array_flip($keys), $argumentSet->arguments);
 
         return $argumentSet;
     }
