@@ -55,6 +55,7 @@ SIGNATURE;
         }
 
         if ($this->option('write')) {
+            /** @var string|null $disk */
             $disk = $this->option('disk');
             $filesystemManager->disk($disk)->put($filename, $schemaString);
             $this->info("Wrote schema to disk ({$disk}) as {$filename}.");
