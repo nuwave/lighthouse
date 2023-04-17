@@ -7,6 +7,7 @@ use GraphQL\Language\Parser;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\ServiceProvider;
+use MLL\GraphQLScalars\MixedScalar;
 use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 
@@ -29,30 +30,31 @@ class WhereConditionsServiceProvider extends ServiceProvider
         $dispatcher->listen(ManipulateAST::class, function (ManipulateAST $manipulateAST): void {
             $operator = $this->app->make(Operator::class);
 
-            $manipulateAST->documentAST
-                ->setTypeDefinition(
-                    static::createWhereConditionsInputType(
-                        static::DEFAULT_WHERE_CONDITIONS,
-                        'Dynamic WHERE conditions for queries.',
-                        'String',
-                    ),
-                )
-                ->setTypeDefinition(
-                    static::createHasConditionsInputType(
-                        static::DEFAULT_WHERE_CONDITIONS,
-                        'Dynamic HAS conditions for WHERE condition queries.',
-                    ),
-                )
-                ->setTypeDefinition(
-                    Parser::enumTypeDefinition(
-                        $operator->enumDefinition(),
-                    ),
-                )
-                ->setTypeDefinition(
-                    Parser::scalarTypeDefinition(/** @lang GraphQL */ '
-                        scalar Mixed @scalar(class: "MLL\\\GraphQLScalars\\\MixedScalar")
-                    '),
-                );
+            $documentAST = $manipulateAST->documentAST;
+            $documentAST->setTypeDefinition(
+                static::createWhereConditionsInputType(
+                    static::DEFAULT_WHERE_CONDITIONS,
+                    'Dynamic WHERE conditions for queries.',
+                    'String',
+                ),
+            );
+            $documentAST->setTypeDefinition(
+                static::createHasConditionsInputType(
+                    static::DEFAULT_WHERE_CONDITIONS,
+                    'Dynamic HAS conditions for WHERE condition queries.',
+                ),
+            );
+            $documentAST->setTypeDefinition(
+                Parser::enumTypeDefinition(
+                    $operator->enumDefinition(),
+                ),
+            );
+            $mixedScalarClass = addslashes(MixedScalar::class);
+            $documentAST->setTypeDefinition(
+                Parser::scalarTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
+                    scalar Mixed @scalar(class: "{$mixedScalarClass}")
+                GRAPHQL),
+            );
         });
     }
 
