@@ -207,6 +207,7 @@ GRAPHQL;
     protected function qualifyTestResolver(string $method): string
     {
         $escapedClass = addslashes(static::class);
+
         return "{$escapedClass}@{$method}";
     }
 

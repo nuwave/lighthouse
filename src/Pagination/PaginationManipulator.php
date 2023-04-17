@@ -132,7 +132,7 @@ GRAPHQL
         $existingType = $this->documentAST->types[$typeName] ?? null;
         if ($existingType !== null) {
             if (! $existingType instanceof ObjectTypeDefinitionNode) {
-                throw new DefinitionException("Expected object type for pagination wrapper {$typeName}, found {$objectType->kind} instead.",);
+                throw new DefinitionException("Expected object type for pagination wrapper {$typeName}, found {$objectType->kind} instead.");
             }
 
             $objectType = $existingType;
