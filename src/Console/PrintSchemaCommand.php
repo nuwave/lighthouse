@@ -55,8 +55,13 @@ SIGNATURE;
         }
 
         if ($this->option('write')) {
-            /** @var string|null $disk */
             $disk = $this->option('disk');
+
+            if(is_array($disk) || is_bool($disk)){
+                $this->error('Invalid disk option. The disk must be a string or null.');
+                return;
+            }
+
             $filesystemManager->disk($disk)->put($filename, $schemaString);
             $this->info("Wrote schema to disk ({$disk}) as {$filename}.");
         } else {
