@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.6.1
+
+### Fixed
+
+- Add `Node` interface as soon as a type uses it with `@node` https://github.com/nuwave/lighthouse/pull/2387
+
 ## v6.6.0
 
 ### Fixed
