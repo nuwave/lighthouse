@@ -88,12 +88,12 @@ GRAPHQL;
 
         if (! isset($documentAST->types[self::NODE_INTERFACE_NAME])) {
             $nodeInterfaceName = self::NODE_INTERFACE_NAME;
-            $nodeRegistry = addslashes(NodeRegistry::class);
+            $nodeRegistryClass = addslashes(NodeRegistry::class);
 
             $documentAST->setTypeDefinition(
                 Parser::interfaceTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
                 "Any object implementing this type can be found by ID through `Query.node`."
-                interface {$nodeInterfaceName} @interface(resolveType: "{$nodeRegistry}@resolveType") {
+                interface {$nodeInterfaceName} @interface(resolveType: "{$nodeRegistryClass}@resolveType") {
                   "Global identifier that can be used to resolve any Node implementation."
                   {$globalIdFieldName}: ID!
                 }
@@ -105,7 +105,7 @@ GRAPHQL;
             assert($queryType instanceof ObjectTypeDefinitionNode);
 
             $queryType->fields[] = Parser::fieldDefinition(/** @lang GraphQL */ <<<GRAPHQL
-              node(id: ID! @globalId): Node @field(resolver: "{$nodeRegistry}@resolve")
+              node(id: ID! @globalId): Node @field(resolver: "{$nodeRegistryClass}@resolve")
             GRAPHQL
             );
         }
