@@ -86,7 +86,7 @@ GRAPHQL;
         $globalIdFieldName = $this->config->get('lighthouse.global_id_field');
         $typeDefinition->fields[] = Parser::fieldDefinition(/** @lang GraphQL */ "{$globalIdFieldName}: ID! @globalId");
 
-        if (! isset($documentAST[self::NODE_INTERFACE_NAME])) {
+        if (! isset($documentAST->types[self::NODE_INTERFACE_NAME])) {
             $nodeInterfaceName = self::NODE_INTERFACE_NAME;
             $nodeRegistry = addslashes(NodeRegistry::class);
 
