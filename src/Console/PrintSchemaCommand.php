@@ -6,6 +6,8 @@ use GraphQL\Type\Introspection;
 use GraphQL\Utils\SchemaPrinter;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Filesystem\Filesystem;
+use Illuminate\Filesystem\FilesystemManager;
+use Illuminate\Support\Facades\Storage;
 use Nuwave\Lighthouse\Federation\FederationPrinter;
 use Nuwave\Lighthouse\Schema\AST\ASTCache;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
@@ -21,13 +23,14 @@ class PrintSchemaCommand extends Command
     protected $signature = <<<'SIGNATURE'
 lighthouse:print-schema
 {--W|write : Write the output to a file}
+{--D|disk= : The disk to write the file to}
 {--json : Output JSON instead of GraphQL SDL}
 {--federation : Include federation directives and exclude federation spec additions, like _service.sdl}
 SIGNATURE;
 
     protected $description = 'Compile the GraphQL schema and print the result.';
 
-    public function handle(ASTCache $cache, Filesystem $storage, SchemaBuilder $schemaBuilder): void
+    public function handle(ASTCache $cache, FilesystemManager $filesystemManager, SchemaBuilder $schemaBuilder): void
     {
         // Clear the cache so this always gets the current schema
         $cache->clear();
@@ -52,8 +55,15 @@ SIGNATURE;
         }
 
         if ($this->option('write')) {
-            $storage->put($filename, $schemaString);
-            $this->info("Wrote schema to the default file storage (usually storage/app) as {$filename}.");
+            $disk = $this->option('disk');
+            if (! is_string($disk) && ! is_null($disk)) {
+                $diskType = gettype($disk);
+                $this->error("Expected option disk to be string or null, got: {$diskType}.");
+                return;
+            }
+
+            $filesystemManager->disk($disk)->put($filename, $schemaString);
+            $this->info("Wrote schema to disk ({$disk}) as {$filename}.");
         } else {
             $this->info($schemaString);
         }
