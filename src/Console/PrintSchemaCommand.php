@@ -56,9 +56,9 @@ SIGNATURE;
 
         if ($this->option('write')) {
             $disk = $this->option('disk');
-
-            if(is_array($disk) || is_bool($disk)){
-                $this->error('Invalid disk option. The disk must be a string or null.');
+            if (! is_string($disk) && ! is_null($disk)) {
+                $diskType = gettype($disk);
+                $this->error("Expected option disk to be string or null, got: {$diskType}.");
                 return;
             }
 
