@@ -9,7 +9,7 @@ help: ## Displays this list of targets with descriptions
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(firstword $(MAKEFILE_LIST)) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}'
 
 .PHONY: setup
-setup: build vendor ## Setup the local environment
+setup: build docs/node_modules vendor ## Setup the local environment
 
 .PHONY: build
 build: ## Build the local Docker containers
@@ -66,3 +66,6 @@ release: ## Prepare the docs for a new release
 .PHONY: docs
 docs: up ## Render the docs in a development server
 	${dcnode} yarn run start
+
+docs/node_modules: up docs/package.json docs/yarn.lock ## Install yarn dependencies
+	${dcnode} yarn

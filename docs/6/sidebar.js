@@ -14,6 +14,7 @@ module.exports = [
       "the-basics/types",
       "the-basics/fields",
       "the-basics/directives",
+      "the-basics/best-practices",
     ],
   },
   {
