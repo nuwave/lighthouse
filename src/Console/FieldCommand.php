@@ -33,9 +33,7 @@ class FieldCommand extends FieldGeneratorCommand
         return static::commonNamespace($namespaces);
     }
 
-    /**
-     * @return array{string, string}
-     */
+    /** @return array{string, string} */
     protected function nameParts(): array
     {
         $name = $this->argument('name');

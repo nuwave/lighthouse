@@ -58,17 +58,13 @@ abstract class DriverManager
             ?? $this->resolve($name);
     }
 
-    /**
-     * Get the default driver name.
-     */
+    /** Get the default driver name. */
     public function getDefaultDriver(): string
     {
         return $this->app['config'][$this->driverKey()];
     }
 
-    /**
-     * Set the default driver name.
-     */
+    /** Set the default driver name. */
     public function setDefaultDriver(string $name): void
     {
         $this->app['config'][$this->driverKey()] = $name;
@@ -133,9 +129,7 @@ abstract class DriverManager
         return $this->customCreators[$config['driver']]($this->app, $config);
     }
 
-    /**
-     * Validate driver implements the proper interface.
-     */
+    /** Validate driver implements the proper interface. */
     protected function validateDriver(object $driver): object
     {
         $interface = $this->interface();
@@ -158,18 +152,12 @@ abstract class DriverManager
         return $this->driver()->$method(...$parameters);
     }
 
-    /**
-     * Get configuration key.
-     */
+    /** Get configuration key. */
     abstract protected function configKey(): string;
 
-    /**
-     * Get configuration driver key.
-     */
+    /** Get configuration driver key. */
     abstract protected function driverKey(): string;
 
-    /**
-     * The interface the driver should implement.
-     */
+    /** The interface the driver should implement. */
     abstract protected function interface(): string;
 }

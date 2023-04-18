@@ -9,9 +9,7 @@ use Tests\TestCase;
 
 final class LogGraphQLQueriesTest extends TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&\Psr\Log\LoggerInterface
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject&\Psr\Log\LoggerInterface */
     protected $logger;
 
     protected function getEnvironmentSetUp($app): void

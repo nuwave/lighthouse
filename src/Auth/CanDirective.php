@@ -107,9 +107,7 @@ scalar CanArgs
 GRAPHQL;
     }
 
-    /**
-     * Ensure the user is authorized to access this field.
-     */
+    /** Ensure the user is authorized to access this field. */
     public function handleField(FieldValue $fieldValue): void
     {
         $ability = $this->directiveArgValue('ability');

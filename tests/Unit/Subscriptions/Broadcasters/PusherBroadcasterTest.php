@@ -53,9 +53,7 @@ final class PusherBroadcasterTest extends TestCase
         $this->broadcast($subscriber);
     }
 
-    /**
-     * @param \Nuwave\Lighthouse\Subscriptions\Subscriber&\PHPUnit\Framework\MockObject\MockObject $subscriber
-     */
+    /** @param \Nuwave\Lighthouse\Subscriptions\Subscriber&\PHPUnit\Framework\MockObject\MockObject $subscriber */
     private function broadcast(object $subscriber): void
     {
         $broadcastManager = $this->app->make(BroadcastManager::class);

@@ -63,18 +63,12 @@ abstract class TypeNodeConverter
             );
     }
 
-    /**
-     * Wrap or mark the type as non-null.
-     */
+    /** Wrap or mark the type as non-null. */
     abstract protected function nonNull(mixed $type): mixed;
 
-    /**
-     * Wrap or mark the type as a list.
-     */
+    /** Wrap or mark the type as a list. */
     abstract protected function listOf(mixed $type): mixed;
 
-    /**
-     * Get the named type for the given node name.
-     */
+    /** Get the named type for the given node name. */
     abstract protected function namedType(string $nodeName): mixed;
 }

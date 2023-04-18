@@ -80,9 +80,7 @@ class ResponseStream extends Stream implements CanStreamResponse
         return $this->boundary() . $chunk;
     }
 
-    /**
-     * Stream chunked data to client.
-     */
+    /** Stream chunked data to client. */
     protected function emit(string $chunk): void
     {
         echo $chunk;

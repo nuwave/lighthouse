@@ -6,9 +6,7 @@ use Nuwave\Lighthouse\Validation\Validator;
 
 final class FooInputValidator extends Validator
 {
-    /**
-     * @return array{email: array<string>}
-     */
+    /** @return array{email: array<string>} */
     public function rules(): array
     {
         return [

@@ -62,9 +62,7 @@ final class CacheControlDirectiveTest extends DBTestCase
         ')->assertHeader('Cache-Control', 'max-age=5, private');
     }
 
-    /**
-     * @dataProvider rootScalarDataProvider
-     */
+    /** @dataProvider rootScalarDataProvider */
     public function testRootScalar(string $query, string $expectedHeaderString): void
     {
         $this->mockResolver(1);
@@ -80,9 +78,7 @@ final class CacheControlDirectiveTest extends DBTestCase
             ->assertHeader('Cache-Control', $expectedHeaderString);
     }
 
-    /**
-     * @return array<int, array{string, string}>
-     */
+    /** @return array<int, array{string, string}> */
     public static function rootScalarDataProvider(): array
     {
         return [
@@ -137,9 +133,7 @@ final class CacheControlDirectiveTest extends DBTestCase
         ')->assertHeader('Cache-Control', 'no-cache, private');
     }
 
-    /**
-     * @dataProvider argumentsDataProvider
-     */
+    /** @dataProvider argumentsDataProvider */
     public function testDirectiveArguments(string $directive, string $expectedHeaderString): void
     {
         $this->mockResolver([
@@ -167,9 +161,7 @@ final class CacheControlDirectiveTest extends DBTestCase
         ')->assertHeader('Cache-Control', $expectedHeaderString);
     }
 
-    /**
-     * @return array<string, array{string, string}>
-     */
+    /** @return array<string, array{string, string}> */
     public static function argumentsDataProvider(): array
     {
         return [
@@ -182,9 +174,7 @@ final class CacheControlDirectiveTest extends DBTestCase
         ];
     }
 
-    /**
-     * @dataProvider nestedQueryDataProvider
-     */
+    /** @dataProvider nestedQueryDataProvider */
     public function testUseDirectiveNested(string $query, string $expectedHeaderString): void
     {
         $this->schema = /** @lang GraphQL */ '
@@ -234,9 +224,7 @@ final class CacheControlDirectiveTest extends DBTestCase
             ->assertHeader('Cache-Control', $expectedHeaderString);
     }
 
-    /**
-     * @return array<int, array{string, string}>
-     */
+    /** @return array<int, array{string, string}> */
     public static function nestedQueryDataProvider(): array
     {
         return [

@@ -14,9 +14,7 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
  */
 class StartExecution
 {
-    /**
-     * The point in time when the query execution started.
-     */
+    /** The point in time when the query execution started. */
     public Carbon $moment;
 
     public function __construct(

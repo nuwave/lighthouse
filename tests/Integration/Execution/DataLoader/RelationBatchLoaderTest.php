@@ -70,9 +70,7 @@ final class RelationBatchLoaderTest extends DBTestCase
             ->assertJsonCount($tasksPerUser, '1.data.user.tasks');
     }
 
-    /**
-     * @dataProvider batchloadRelationsSetting
-     */
+    /** @dataProvider batchloadRelationsSetting */
     public function testBatchloadRelations(bool $batchloadRelations, int $expectedQueryCount): void
     {
         $this->schema = /** @lang GraphQL */ '
@@ -208,9 +206,7 @@ final class RelationBatchLoaderTest extends DBTestCase
         });
     }
 
-    /**
-     * @return array<array<bool|int>>
-     */
+    /** @return array<array<bool|int>> */
     public static function batchloadRelationsSetting(): array
     {
         return [
@@ -421,9 +417,7 @@ final class RelationBatchLoaderTest extends DBTestCase
             ]);
     }
 
-    /**
-     * @return never
-     */
+    /** @return never */
     public function testCombineEagerLoadsThatAreTheSameRecursively(): void
     {
         $this->schema = /** @lang GraphQL */ '

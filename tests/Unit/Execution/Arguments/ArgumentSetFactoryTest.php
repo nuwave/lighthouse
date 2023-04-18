@@ -163,9 +163,7 @@ final class ArgumentSetFactoryTest extends TestCase
         $this->assertNull($bar->value);
     }
 
-    /**
-     * @param  array<string, mixed>  $args
-     */
+    /** @param  array<string, mixed>  $args */
     protected function rootQueryArgumentSet(array $args): ArgumentSet
     {
         $astBuilder = $this->app->make(ASTBuilder::class);

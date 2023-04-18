@@ -21,9 +21,7 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
  */
 class FieldValue
 {
-    /**
-     * @var array<string, array{0: array<string, mixed>, 1: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet}>
-     */
+    /** @var array<string, array{0: array<string, mixed>, 1: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet}> */
     protected static array $transformedResolveArgs = [];
 
     /**
@@ -33,9 +31,7 @@ class FieldValue
      */
     protected array $argumentSetTransformers = [];
 
-    /**
-     * @var array<int, ResolverWrapper>
-     */
+    /** @var array<int, ResolverWrapper> */
     protected array $resolverWrappers = [];
 
     public function __construct(
@@ -55,9 +51,7 @@ class FieldValue
         self::$transformedResolveArgs = [];
     }
 
-    /**
-     * Get the underlying AST definition for the field.
-     */
+    /** Get the underlying AST definition for the field. */
     public function getField(): FieldDefinitionNode
     {
         return $this->field;
@@ -78,9 +72,7 @@ class FieldValue
         return $this->parent->getTypeDefinitionName();
     }
 
-    /**
-     * @return array<int, string>
-     */
+    /** @return array<int, string> */
     public function parentNamespaces(): array
     {
         $parentName = $this->getParentName();

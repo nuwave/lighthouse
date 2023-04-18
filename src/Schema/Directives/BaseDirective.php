@@ -58,9 +58,7 @@ abstract class BaseDirective implements Directive
      */
     protected array $directiveArgs;
 
-    /**
-     * The hydrate function is called when retrieving a directive from the directive registry.
-     */
+    /** The hydrate function is called when retrieving a directive from the directive registry. */
     public function hydrate(DirectiveNode $directiveNode, ScalarTypeDefinitionNode|ScalarTypeExtensionNode|ObjectTypeDefinitionNode|ObjectTypeExtensionNode|InterfaceTypeDefinitionNode|InterfaceTypeExtensionNode|UnionTypeDefinitionNode|UnionTypeExtensionNode|EnumTypeDefinitionNode|EnumTypeExtensionNode|InputObjectTypeDefinitionNode|InputObjectTypeExtensionNode|FieldDefinitionNode|InputValueDefinitionNode|EnumValueDefinitionNode $definitionNode): self
     {
         $this->directiveNode = $directiveNode;
@@ -272,9 +270,7 @@ abstract class BaseDirective implements Directive
         }
     }
 
-    /**
-     * Loads directive argument values from AST and caches them in $directiveArgs.
-     */
+    /** Loads directive argument values from AST and caches them in $directiveArgs. */
     protected function loadArgValues(): void
     {
         $this->directiveArgs = [];

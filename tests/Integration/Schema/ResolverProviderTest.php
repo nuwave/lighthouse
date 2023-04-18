@@ -59,4 +59,48 @@ final class ResolverProviderTest extends TestCase
             ],
         ]);
     }
+
+    /** @see https://graphql-rules.com/rules/mutation-payload-query */
+    public function testRootQueryMutationPayload(): void
+    {
+        $fooResult = 1;
+        $this->mockResolver(['result' => $fooResult], 'foo');
+        $barResult = 2;
+        $this->mockResolver($barResult, 'bar');
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            bar: Int! @mock(key: "bar")
+        }
+
+        type Mutation {
+            foo: FooResult! @mock(key: "foo")
+        }
+
+        type FooResult {
+            result: Int!
+            query: Query!
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            foo {
+                result
+                query {
+                    bar
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'foo' => [
+                    'result' => $fooResult,
+                    'query' => [
+                        'bar' => $barResult,
+                    ],
+                ],
+            ],
+        ]);
+    }
 }

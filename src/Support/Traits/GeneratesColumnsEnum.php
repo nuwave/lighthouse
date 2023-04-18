@@ -20,9 +20,7 @@ use Nuwave\Lighthouse\Support\Utils;
  */
 trait GeneratesColumnsEnum
 {
-    /**
-     * Check whether the directive constrains allowed columns.
-     */
+    /** Check whether the directive constrains allowed columns. */
     protected function hasAllowedColumns(): bool
     {
         $hasColumns = ! is_null($this->directiveArgValue('columns'));

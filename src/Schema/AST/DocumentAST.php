@@ -80,9 +80,7 @@ class DocumentAST implements Arrayable
      */
     public array $classNameToObjectTypeNames = [];
 
-    /**
-     * Create a new DocumentAST instance from a schema.
-     */
+    /** Create a new DocumentAST instance from a schema. */
     public static function fromSource(string $schema): self
     {
         try {
@@ -204,25 +202,19 @@ class DocumentAST implements Arrayable
         return $documentAST;
     }
 
-    /**
-     * @return SerializableDocumentAST
-     */
+    /** @return SerializableDocumentAST */
     public function __serialize(): array
     {
         return $this->toArray();
     }
 
-    /**
-     * @param  SerializableDocumentAST  $data
-     */
+    /** @param  SerializableDocumentAST  $data */
     public function __unserialize(array $data): void
     {
         $this->hydrateFromArray($data);
     }
 
-    /**
-     * @param  SerializableDocumentAST  $ast
-     */
+    /** @param  SerializableDocumentAST  $ast */
     protected function hydrateFromArray(array $ast): void
     {
         [

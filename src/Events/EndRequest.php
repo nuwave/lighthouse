@@ -15,9 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class EndRequest
 {
-    /**
-     * The point in time when the response was ready.
-     */
+    /** The point in time when the response was ready. */
     public Carbon $moment;
 
     public function __construct(

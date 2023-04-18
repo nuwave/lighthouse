@@ -263,17 +263,13 @@ GRAPHQL;
         ]);
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Builder<\Tests\Utils\Models\User>
-     */
+    /** @return \Illuminate\Database\Eloquent\Builder<\Tests\Utils\Models\User> */
     public static function builder(): EloquentBuilder
     {
         return User::orderBy('id', 'DESC');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\Relation<\Tests\Utils\Models\Post>
-     */
+    /** @return \Illuminate\Database\Eloquent\Relations\Relation<\Tests\Utils\Models\Post> */
     public static function builderForRelation(User $parent): Relation
     {
         return $parent->posts()->orderBy('id', 'DESC');

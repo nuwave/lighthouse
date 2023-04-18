@@ -11,9 +11,7 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
  */
 interface Operator
 {
-    /**
-     * Return the GraphQL SDL definition of the operator enum.
-     */
+    /** Return the GraphQL SDL definition of the operator enum. */
     public function enumDefinition(): string;
 
     /**

@@ -17,9 +17,7 @@ final class BroadcastManagerTest extends TestCase
 {
     use EnablesSubscriptionServiceProvider;
 
-    /**
-     * @var \Nuwave\Lighthouse\Subscriptions\BroadcastManager
-     */
+    /** @var \Nuwave\Lighthouse\Subscriptions\BroadcastManager */
     protected $broadcastManager;
 
     protected function setUp(): void

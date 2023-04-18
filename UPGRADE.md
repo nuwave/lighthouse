@@ -17,6 +17,13 @@ Keep in mind they only work when your test class extends `Illuminate\Foundation\
 - Just remove calls to `Nuwave\Lighthouse\Testing\RefreshesSchemaCache::bootRefreshesSchemaCache()`.
 - Replace calls to `Nuwave\Lighthouse\Testing\MakesGraphQLRequests::setUpSubscriptionEnvironment()` with ` use Nuwave\Lighthouse\Testing\TestsSubscriptions`.
 
+### `EnsureXHR` is enabled in the default configuration
+
+The middleware `Nuwave\Lighthouse\Http\Middleware\EnsureXHR` is enabled in the default configuration.
+It will prevent the following type of HTTP requests:
+- `GET` requests
+- `POST` requests that can be created using HTML forms
+
 ## v5 to v6
 
 ### `messages` on `@rules` and `@rulesForArray`

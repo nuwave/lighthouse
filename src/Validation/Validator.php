@@ -8,9 +8,7 @@ use Nuwave\Lighthouse\Support\Contracts\ArgumentSetValidation;
 
 abstract class Validator implements ArgumentSetValidation
 {
-    /**
-     * The slice of incoming arguments to validate.
-     */
+    /** The slice of incoming arguments to validate. */
     protected ArgumentSet $args;
 
     public function messages(): array
@@ -23,9 +21,7 @@ abstract class Validator implements ArgumentSetValidation
         return [];
     }
 
-    /**
-     * Set the slice of args to validate.
-     */
+    /** Set the slice of args to validate. */
     public function setArgs(ArgumentSet $args): void
     {
         $this->args = $args;

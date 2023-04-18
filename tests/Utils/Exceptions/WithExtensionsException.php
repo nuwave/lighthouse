@@ -23,9 +23,7 @@ final class WithExtensionsException extends \Exception implements ClientAware, P
         return true;
     }
 
-    /**
-     * @return ExtensionsContent
-     */
+    /** @return ExtensionsContent */
     public function getExtensions(): array
     {
         return $this->extensionsContent;

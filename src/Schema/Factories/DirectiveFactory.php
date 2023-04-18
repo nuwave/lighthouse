@@ -15,9 +15,7 @@ class DirectiveFactory
         protected TypeNodeConverter $typeNodeConverter,
     ) {}
 
-    /**
-     * Transform node to type.
-     */
+    /** Transform node to type. */
     public function handle(DirectiveDefinitionNode $directive): Directive
     {
         $arguments = [];

@@ -20,9 +20,7 @@ final class PaginationTypeTest extends TestCase
         new PaginationType($type);
     }
 
-    /**
-     * @return iterable<array{string}>
-     */
+    /** @return iterable<array{string}> */
     public static function invalidPaginationTypes(): iterable
     {
         yield ['paginator'];

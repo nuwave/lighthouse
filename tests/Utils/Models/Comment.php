@@ -25,17 +25,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 final class Comment extends Model
 {
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\User, self>
-     */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\User, self> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\Post, self>
-     */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\Post, self> */
     public function post(): BelongsTo
     {
         return $this->belongsTo(Post::class);

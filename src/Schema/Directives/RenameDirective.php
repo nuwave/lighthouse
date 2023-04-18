@@ -32,9 +32,7 @@ GRAPHQL;
         return static fn (mixed $root): mixed => data_get($root, $attribute);
     }
 
-    /**
-     * Retrieves the attribute argument for the directive.
-     */
+    /** Retrieves the attribute argument for the directive. */
     public function attributeArgValue(): string
     {
         return $this->directiveArgValue('attribute')

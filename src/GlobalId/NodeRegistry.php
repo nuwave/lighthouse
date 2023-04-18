@@ -76,9 +76,7 @@ class NodeRegistry
         return $resolver($decodedId, $context, $resolveInfo);
     }
 
-    /**
-     * Get the Type for the stashed type.
-     */
+    /** Get the Type for the stashed type. */
     public function resolveType(): Type
     {
         return $this->typeRegistry->get($this->currentType);

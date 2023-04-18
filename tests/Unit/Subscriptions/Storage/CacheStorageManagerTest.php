@@ -22,9 +22,7 @@ final class CacheStorageManagerTest extends TestCase
         $this->storage = $this->app->make(CacheStorageManager::class);
     }
 
-    /**
-     * Construct a dummy subscriber for testing.
-     */
+    /** Construct a dummy subscriber for testing. */
     protected function subscriber(string $queryString): Subscriber
     {
         $subscriber = $this->createMock(Subscriber::class);

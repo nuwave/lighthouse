@@ -120,18 +120,19 @@ GRAPHQL;
         // @phpstan-ignore-next-line The passed in Node types all have the property $directives
         foreach ($definition->directives as $directive) {
             if ($directive->name->value === $this->name()) {
+                $validatorClassEscaped = addslashes($validatorClass);
                 $directive->arguments = ASTHelper::mergeUniqueNodeList(
                     $directive->arguments,
-                    [Parser::argument('class: "' . addslashes($validatorClass) . '"')],
+                    [Parser::argument(/** @lang GraphQL */ <<<GRAPHQL
+                        class: "{$validatorClassEscaped}"
+                    GRAPHQL)],
                     true,
                 );
             }
         }
     }
 
-    /**
-     * @return class-string<\Nuwave\Lighthouse\Validation\Validator>
-     */
+    /** @return class-string<\Nuwave\Lighthouse\Validation\Validator> */
     protected function namespaceValidatorClass(string $classCandidate): string
     {
         $validatorClassName = $this->namespaceClassName(

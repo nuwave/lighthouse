@@ -29,8 +29,6 @@ interface ArgumentValidation
      */
     public function messages(): array;
 
-    /**
-     * Specify a custom attribute name to use in the validation message.
-     */
+    /** Specify a custom attribute name to use in the validation message. */
     public function attribute(): ?string;
 }

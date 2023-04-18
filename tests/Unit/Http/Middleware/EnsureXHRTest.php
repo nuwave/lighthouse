@@ -59,9 +59,7 @@ final class EnsureXHRTest extends TestCase
         $this->assertSame($response, $result);
     }
 
-    /**
-     * @dataProvider formContentTypes
-     */
+    /** @dataProvider formContentTypes */
     public function testForbidFormContentType(string $contentType): void
     {
         $middleware = new EnsureXHR();
@@ -78,9 +76,7 @@ final class EnsureXHRTest extends TestCase
         );
     }
 
-    /**
-     * @return array{array{string}}
-     */
+    /** @return array{array{string}} */
     public static function formContentTypes(): array
     {
         return [

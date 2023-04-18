@@ -9,9 +9,7 @@ use Tests\Utils\Scalars\Email;
 
 final class IntrospectionTest extends TestCase
 {
-    /**
-     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
-     */
+    /** @var \Nuwave\Lighthouse\Schema\TypeRegistry */
     protected $typeRegistry;
 
     protected function setUp(): void

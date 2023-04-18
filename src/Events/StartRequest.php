@@ -15,9 +15,7 @@ use Illuminate\Support\Carbon;
  */
 class StartRequest
 {
-    /**
-     * The point in time when the request started.
-     */
+    /** The point in time when the request started. */
     public Carbon $moment;
 
     public function __construct(

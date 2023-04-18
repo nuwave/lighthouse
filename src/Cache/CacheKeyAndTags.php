@@ -14,13 +14,9 @@ interface CacheKeyAndTags
      */
     public function key(?Authenticatable $user, bool $isPrivate, string $parentName, int|string|null $id, string $fieldName, array $args, array $path): string;
 
-    /**
-     * Generate a tag for the parent.
-     */
+    /** Generate a tag for the parent. */
     public function parentTag(string $parentName, int|string|null $id): string;
 
-    /**
-     * Generate a tag for the field.
-     */
+    /** Generate a tag for the field. */
     public function fieldTag(string $parentName, int|string|null $id, string $fieldName): string;
 }

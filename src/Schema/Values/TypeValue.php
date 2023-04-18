@@ -13,26 +13,20 @@ use Nuwave\Lighthouse\Schema\RootType;
 
 class TypeValue
 {
-    /**
-     * Cache key for this type.
-     */
+    /** Cache key for this type. */
     protected string $cacheKey;
 
     public function __construct(
         protected TypeDefinitionNode $typeDefinition,
     ) {}
 
-    /**
-     * Get the name of the node.
-     */
+    /** Get the name of the node. */
     public function getTypeDefinitionName(): string
     {
         return $this->getTypeDefinition()->getName()->value;
     }
 
-    /**
-     * Get the underlying type definition.
-     */
+    /** Get the underlying type definition. */
     public function getTypeDefinition(): TypeDefinitionNode
     {
         return $this->typeDefinition;

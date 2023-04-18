@@ -8,14 +8,10 @@ use Mockery\MockInterface;
 
 trait TestsScoutEngine
 {
-    /**
-     * @var \Mockery\MockInterface&\Laravel\Scout\EngineManager
-     */
+    /** @var \Mockery\MockInterface&\Laravel\Scout\EngineManager */
     protected EngineManager $engineManager;
 
-    /**
-     * @var \Mockery\MockInterface&\Laravel\Scout\Engines\NullEngine
-     */
+    /** @var \Mockery\MockInterface&\Laravel\Scout\Engines\NullEngine */
     protected NullEngine $engine;
 
     public function setUpScoutEngine(): void

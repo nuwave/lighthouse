@@ -175,9 +175,7 @@ class PaginatedModelsLoader implements ModelsLoader
             );
     }
 
-    /**
-     * @param  \Illuminate\Database\Eloquent\Collection<int, \Illuminate\Database\Eloquent\Model>  $parents
-     */
+    /** @param  \Illuminate\Database\Eloquent\Collection<int, \Illuminate\Database\Eloquent\Model>  $parents */
     protected function convertRelationToPaginator(EloquentCollection $parents): void
     {
         $first = $this->paginationArgs->first;

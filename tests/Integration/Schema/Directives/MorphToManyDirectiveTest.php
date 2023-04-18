@@ -16,9 +16,7 @@ final class MorphToManyDirectiveTest extends DBTestCase
 
     protected Post $post;
 
-    /**
-     * @var \Illuminate\Support\Collection<int, \Tests\Utils\Models\Tag>
-     */
+    /** @var \Illuminate\Support\Collection<int, \Tests\Utils\Models\Tag> */
     protected Collection $postTags;
 
     protected function setUp(): void

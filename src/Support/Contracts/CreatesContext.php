@@ -6,8 +6,6 @@ use Illuminate\Http\Request;
 
 interface CreatesContext
 {
-    /**
-     * Generate GraphQL context.
-     */
+    /** Generate GraphQL context. */
     public function generate(?Request $request): GraphQLContext;
 }

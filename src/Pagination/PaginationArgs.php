@@ -63,9 +63,7 @@ class PaginationArgs
         return "Maximum number of {$maxCount} requested items exceeded, got {$actualCount}. Fetch smaller chunks.";
     }
 
-    /**
-     * Calculate the current page to inform the user about the pagination state.
-     */
+    /** Calculate the current page to inform the user about the pagination state. */
     protected static function calculateCurrentPage(int $first, int $after, int $defaultPage = 1): int
     {
         return $first && $after

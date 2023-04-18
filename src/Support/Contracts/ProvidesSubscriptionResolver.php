@@ -11,8 +11,6 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
  */
 interface ProvidesSubscriptionResolver
 {
-    /**
-     * This function is expected to call @see \Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry::register().
-     */
+    /** This function is expected to call @see \Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry::register(). */
     public function provideSubscriptionResolver(FieldValue $fieldValue): \Closure;
 }

@@ -26,9 +26,7 @@ class Argument
      */
     public Collection $directives;
 
-    /**
-     * An argument may have a resolver that handles its given value.
-     */
+    /** An argument may have a resolver that handles its given value. */
     public ?ArgResolver $resolver = null;
 
     public function __construct()
@@ -36,9 +34,7 @@ class Argument
         $this->directives = new Collection();
     }
 
-    /**
-     * Get the plain PHP value of this argument.
-     */
+    /** Get the plain PHP value of this argument. */
     public function toPlain(): mixed
     {
         return static::toPlainRecursive($this->value);

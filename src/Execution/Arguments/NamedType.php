@@ -4,9 +4,7 @@ namespace Nuwave\Lighthouse\Execution\Arguments;
 
 class NamedType
 {
-    /**
-     * Is this type defined to be non-nullable?
-     */
+    /** Is this type defined to be non-nullable? */
     public bool $nonNull = false;
 
     public function __construct(

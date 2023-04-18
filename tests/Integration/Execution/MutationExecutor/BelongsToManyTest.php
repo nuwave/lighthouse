@@ -550,9 +550,7 @@ GRAPHQL
         $this->assertSame('is_user', $role->name);
     }
 
-    /**
-     * @return array<array<string, string>>
-     */
+    /** @return array<array<string, string>> */
     public static function existingModelMutations(): array
     {
         return [
@@ -561,9 +559,7 @@ GRAPHQL
         ];
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    /** @dataProvider existingModelMutations */
     public function testUpdateWithBelongsToMany(string $action): void
     {
         factory(Role::class)
@@ -625,9 +621,7 @@ GRAPHQL
         $this->assertSame('is_user', $role->name);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    /** @dataProvider existingModelMutations */
     public function testDeleteWithBelongsToMany(string $action): void
     {
         factory(Role::class)
@@ -679,9 +673,7 @@ GRAPHQL
         $this->assertNotNull(User::find(2));
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    /** @dataProvider existingModelMutations */
     public function testConnectWithBelongsToMany(string $action): void
     {
         factory(User::class)->create();
@@ -729,9 +721,7 @@ GRAPHQL
         $this->assertCount(2, $role->users()->get());
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    /** @dataProvider existingModelMutations */
     public function testSyncWithBelongsToMany(string $action): void
     {
         factory(User::class)->create();
@@ -779,9 +769,7 @@ GRAPHQL
         $this->assertCount(2, $role->users()->get());
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    /** @dataProvider existingModelMutations */
     public function testDisconnectWithBelongsToMany(string $action): void
     {
         factory(Role::class)
@@ -902,9 +890,7 @@ GRAPHQL
         ]);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    /** @dataProvider existingModelMutations */
     public function testDisconnectAllRelatedModelsOnEmptySync(string $action): void
     {
         /** @var User $user */
