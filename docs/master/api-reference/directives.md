@@ -1492,7 +1492,6 @@ directive @hasMany(
 
   """
   Allows to resolve the relation as a paginated list.
-  Allowed values: `paginator`, `connection`.
   """
   type: HasManyType
 
@@ -1584,7 +1583,6 @@ directive @hasManyThrough(
 
   """
   Allows to resolve the relation as a paginated list.
-  Allowed values: `paginator`, `connection`.
   """
   type: HasManyThroughType
 
@@ -2608,9 +2606,9 @@ It can be queried like this:
 
 ### Pagination type
 
-The `type` of pagination defaults to `PAGINATOR`, but may also be set to
-`SIMPLE` (see [Simple Pagination](#simple-pagination)) or a Relay compliant
-`CONNECTION`.
+The `type` of pagination defaults to `PAGINATOR`,
+but may also be set to `SIMPLE` (see [Simple Pagination](#simple-pagination))
+or a Relay compliant `CONNECTION`.
 
 > Lighthouse does not support actual cursor-based pagination as of now, see https://github.com/nuwave/lighthouse/issues/311 for details.
 > Under the hood, the "cursor" is decoded into a page offset.
