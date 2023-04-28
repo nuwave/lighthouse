@@ -3,9 +3,9 @@
 namespace Nuwave\Lighthouse\WhereConditions;
 
 use GraphQL\Error\Error;
+use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Query\Builder as QueryBuilder;
 
 class WhereConditionsHandler
 {
@@ -79,7 +79,7 @@ class WhereConditionsHandler
         string $operator,
         int $amount,
         ?array $condition = null,
-    ): QueryBuilder {
+    ): Builder {
         return $model
             ->newQuery()
             ->whereHas(

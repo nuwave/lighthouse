@@ -3,7 +3,7 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
-use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Contracts\Database\Query\Builder;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Tests\DBTestCase;
@@ -152,12 +152,7 @@ final class BuilderDirectiveTest extends DBTestCase
         ')->assertJsonCount(2, 'data.users');
     }
 
-    /**
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<\Tests\Utils\Models\User>  $builder
-     *
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<\Tests\Utils\Models\User>
-     */
-    public static function limit(QueryBuilder|EloquentBuilder $builder, ?int $value): QueryBuilder|EloquentBuilder
+    public static function limit(Builder $builder, ?int $value): Builder
     {
         return $builder->limit($value ?? 2);
     }

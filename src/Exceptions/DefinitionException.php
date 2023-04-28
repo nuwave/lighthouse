@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Exceptions;
 
-use Exception;
 use GraphQL\Error\ClientAware;
 
 /**
