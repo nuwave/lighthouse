@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Nuwave\Lighthouse\Schema\Directives;
+namespace Nuwave\Lighthouse\Schema\Directives\Traits;
 
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
