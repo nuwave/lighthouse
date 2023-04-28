@@ -9,6 +9,10 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 trait HasBuilderArgument
 {
+    /**
+     * @param array<string, mixed> $args
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
+     */
     private function getBuilder(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Builder|ScoutBuilder
     {
         if (!$this->directiveHasArgument('builder')) {

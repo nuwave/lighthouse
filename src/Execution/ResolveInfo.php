@@ -35,8 +35,6 @@ class ResolveInfo extends BaseResolveInfo
     /**
      * Apply ArgBuilderDirectives and scopes to the builder.
      *
-     * @template TModel of \Illuminate\Database\Eloquent\Model
-     *
      * @param  \Illuminate\Contracts\Database\Query\Builder|\Laravel\Scout\Builder  $builder
      * @param  array<string>  $scopes
      * @param  array<string, mixed>  $args

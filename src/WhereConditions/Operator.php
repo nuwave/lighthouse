@@ -29,6 +29,8 @@ interface Operator
 
     /**
      * Apply the conditions to the query builder.
+     *
+     * @param array<string, mixed> $whereConditions
      */
     public function applyConditions(Builder $builder, array $whereConditions, string $boolean): Builder;
 }

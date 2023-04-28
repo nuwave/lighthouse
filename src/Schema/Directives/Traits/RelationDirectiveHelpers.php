@@ -23,6 +23,9 @@ trait RelationDirectiveHelpers
         return $this->directiveArgValue('relation', $this->nodeName());
     }
 
+    /**
+     * @param array<string, mixed> $args
+     */
     protected function makeBuilderDecorator(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): \Closure
     {
         return function (Builder $builder) use ($root, $args, $context, $resolveInfo): void {
