@@ -11,10 +11,10 @@ interface ArgBuilderDirective extends Directive
      *
      * TODO try adding a generic type parameter for the type of model when PHPStan handles it better
      *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>  $builder  the builder used to resolve the field
-     * @param  mixed  $value  the client given value of the argument
+     * @param Builder $builder the builder used to resolve the field
+     * @param mixed $value the client given value of the argument
      *
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model> the modified builder
+     * @return Builder the modified builder
      */
     public function handleBuilder(Builder $builder, mixed $value): Builder;
 }
