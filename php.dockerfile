@@ -19,9 +19,11 @@ RUN apt-get update && \
     && pecl install \
         xdebug \
         redis \
+        openswoole-22.0.0 \
     && docker-php-ext-enable \
         xdebug \
         redis \
+        openswoole \
     && echo 'memory_limit=-1' > /usr/local/etc/php/conf.d/lighthouse.ini
 
 ARG USER

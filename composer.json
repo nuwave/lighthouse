@@ -58,6 +58,8 @@
         "mockery/mockery": "^1.5",
         "nesbot/carbon": "^2.62.1",
         "nunomaduro/larastan": "^2.4.1",
+        "openswoole/core": "22.1.2",
+        "openswoole/ide-helper": "^22.0",
         "orchestra/testbench": "^7.7 || ^8.8",
         "phpbench/phpbench": "^1.2.6",
         "phpstan/extension-installer": "^1",

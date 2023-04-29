@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Execution\Utils;
 
 use Illuminate\Container\Container;
+use Illuminate\Support\Facades\Redis;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionExceptionHandler;
@@ -21,6 +22,11 @@ class Subscription
         $registry = Container::getInstance()->make(SubscriptionRegistry::class);
         if (! $registry->has($subscriptionField)) {
             throw new \InvalidArgumentException("No subscription field registered for {$subscriptionField}");
+        }
+
+        if (config('lighthouse.subscriptions.use_websockets', false)) {
+            Redis::publish('sub_prefix:' . $subscriptionField, serialize($root));
+            return;
         }
 
         // Default to the configuration setting if not specified
