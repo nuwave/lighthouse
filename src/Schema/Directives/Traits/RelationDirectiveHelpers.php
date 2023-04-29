@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Traits;
 
 use Illuminate\Contracts\Database\Query\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
@@ -29,6 +30,10 @@ trait RelationDirectiveHelpers
     protected function makeBuilderDecorator(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): \Closure
     {
         return function (Builder $builder) use ($root, $args, $context, $resolveInfo): void {
+            if ($builder instanceof Relation) {
+                $builder = $builder->getQuery();
+            }
+
             $resolveInfo->enhanceBuilder(
                 $builder,
                 $this->scopes(),

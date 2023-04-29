@@ -28,10 +28,6 @@ GRAPHQL;
 
     public function handleBuilder(Builder $builder, $value): Builder
     {
-        if ($builder instanceof Relation) {
-            $builder = $builder->getQuery();
-        }
-
         if (! $builder instanceof EloquentBuilder) {
             $notEloquentBuilder = $builder::class;
             throw new \Exception("Can not get model from builder of class: {$notEloquentBuilder}");
