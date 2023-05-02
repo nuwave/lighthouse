@@ -24,6 +24,16 @@ It will prevent the following type of HTTP requests:
 - `GET` requests
 - `POST` requests that can be created using HTML forms
 
+### Type hinting query builders
+
+Lighthouse now uses `Illuminate\Contracts\Database\Query\Builder` to type hint database query builders.
+If you implement `ArgBuilderDirective` or `FieldBuilderDirective`, you will have to change the signature of the `handleFieldBuilder` method accordingly:
+
+```diff
+- public function handleFieldBuilder(QueryBuilder|EloquentBuilder|Relation $builder, mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): QueryBuilder|EloquentBuilder|Relation;
++ public function handleFieldBuilder(Builder $builder, mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Builder;
+```
+
 ## v5 to v6
 
 ### `messages` on `@rules` and `@rulesForArray`
