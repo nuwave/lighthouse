@@ -23,6 +23,7 @@ use Nuwave\Lighthouse\Console\PrintSchemaCommand;
 use Nuwave\Lighthouse\Console\QueryCommand;
 use Nuwave\Lighthouse\Console\ScalarCommand;
 use Nuwave\Lighthouse\Console\SubscriptionCommand;
+use Nuwave\Lighthouse\Console\SubscriptionsServeCommand;
 use Nuwave\Lighthouse\Console\UnionCommand;
 use Nuwave\Lighthouse\Console\ValidateSchemaCommand;
 use Nuwave\Lighthouse\Console\ValidatorCommand;
@@ -63,6 +64,7 @@ class LighthouseServiceProvider extends ServiceProvider
         QueryCommand::class,
         ScalarCommand::class,
         SubscriptionCommand::class,
+        SubscriptionsServeCommand::class,
         UnionCommand::class,
         ValidateSchemaCommand::class,
         ValidatorCommand::class,
