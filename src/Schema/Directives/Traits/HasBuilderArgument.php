@@ -23,7 +23,7 @@ trait HasBuilderArgument
 
         assert(
             $builder instanceof Builder || $builder instanceof ScoutBuilder,
-            "The method referenced by the builder argument of the @{$this->name()} directive on {$this->nodeName()} must return a Builder or Relation.",
+            "The method referenced by the builder argument of the @{$this->name()} directive on {$this->nodeName()} must return a Scout Builder, Query Builder or Relation.",
         );
 
         return $builder;
