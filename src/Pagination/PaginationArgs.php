@@ -73,7 +73,6 @@ class PaginationArgs
     /**
      * Apply the args to a builder, constructing a paginator.
      *
-     * @param Builder|ScoutBuilder $builder
      * @return Paginator<Model>
      */
     public function applyToBuilder(Builder|ScoutBuilder $builder): Paginator

@@ -50,18 +50,16 @@ GRAPHQL;
 
     public function resolveField(FieldValue $fieldValue): callable
     {
-        return function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Collection {
-            return $resolveInfo
-                ->enhanceBuilder(
-                    $this->getBuilder($root, $args, $context, $resolveInfo),
-                    $this->directiveArgValue('scopes', []),
-                    $root,
-                    $args,
-                    $context,
-                    $resolveInfo,
-                )
-                ->get();
-        };
+        return fn (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Collection => $resolveInfo
+            ->enhanceBuilder(
+                $this->getBuilder($root, $args, $context, $resolveInfo),
+                $this->directiveArgValue('scopes', []),
+                $root,
+                $args,
+                $context,
+                $resolveInfo,
+            )
+            ->get();
     }
 
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType): void

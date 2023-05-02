@@ -57,6 +57,7 @@ SIGNATURE;
             if (! is_string($disk) && ! is_null($disk)) {
                 $diskType = gettype($disk);
                 $this->error("Expected option disk to be string or null, got: {$diskType}.");
+
                 return;
             }
 
