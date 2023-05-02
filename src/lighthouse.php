@@ -356,6 +356,8 @@ return [
     */
 
     'subscriptions' => [
+        'use_websockets' => env('LIGHTHOUSE_USE_WEBSOCKETS', false),
+
         /*
          * Determines if broadcasts should be queued by default.
          */
