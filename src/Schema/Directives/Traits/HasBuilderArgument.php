@@ -10,7 +10,7 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 trait HasBuilderArgument
 {
     /** @param array<string, mixed> $args */
-    private function getBuilder(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Builder|ScoutBuilder
+    private function makeBuilder(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Builder|ScoutBuilder
     {
         if (! $this->directiveHasArgument('builder')) {
             return $this->getModelClass()::query();

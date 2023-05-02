@@ -52,7 +52,7 @@ GRAPHQL;
     {
         return fn (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Collection => $resolveInfo
             ->enhanceBuilder(
-                $this->getBuilder($root, $args, $context, $resolveInfo),
+                $this->makeBuilder($root, $args, $context, $resolveInfo),
                 $this->directiveArgValue('scopes', []),
                 $root,
                 $args,

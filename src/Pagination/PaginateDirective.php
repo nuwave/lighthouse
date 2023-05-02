@@ -152,7 +152,7 @@ GRAPHQL;
             }
 
             $query = $resolveInfo->enhanceBuilder(
-                $this->getBuilder($root, $args, $context, $resolveInfo),
+                $this->makeBuilder($root, $args, $context, $resolveInfo),
                 $this->directiveArgValue('scopes', []),
                 $root,
                 $args,
