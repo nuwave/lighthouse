@@ -4,12 +4,13 @@ namespace Nuwave\Lighthouse\Schema\Directives\Traits;
 
 use Illuminate\Contracts\Database\Query\Builder;
 use Laravel\Scout\Builder as ScoutBuilder;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 trait HasBuilderArgument
 {
-    /** @param array<string, mixed> $args */
+    /** @param  array<string, mixed>  $args */
     private function makeBuilder(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Builder|ScoutBuilder
     {
         if (! $this->directiveHasArgument('builder')) {

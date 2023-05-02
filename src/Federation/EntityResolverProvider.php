@@ -261,7 +261,7 @@ class EntityResolverProvider
             ?? throw new Error('Representation does not satisfy any set of uniquely identifying keys: ' . \Safe\json_encode($representation));
     }
 
-    /** @param array<string, mixed> $representation */
+    /** @param  array<string, mixed>  $representation */
     protected function hydrateExternalFields(Model $model, array $representation, ObjectTypeDefinitionNode $definition): void
     {
         foreach ($definition->fields as $field) {

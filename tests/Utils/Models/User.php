@@ -120,8 +120,8 @@ final class User extends Authenticatable
     }
 
     /**
-     * @param \Illuminate\Database\Eloquent\Builder<self> $query
-     * @param array{company: string} $args
+     * @param  \Illuminate\Database\Eloquent\Builder<self>  $query
+     * @param  array{company: string} $args
      *
      * @return \Illuminate\Database\Eloquent\Builder<self>
      */
@@ -132,7 +132,7 @@ final class User extends Authenticatable
     }
 
     /**
-     * @param \Illuminate\Database\Eloquent\Builder<self> $query
+     * @param  \Illuminate\Database\Eloquent\Builder<self>  $query
      *
      * @return \Illuminate\Database\Eloquent\Builder<self>
      */

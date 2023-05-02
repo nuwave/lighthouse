@@ -120,7 +120,7 @@ abstract class BaseDirective implements Directive
      *
      * @api
      *
-     * @param mixed $default Use this over `??` to preserve explicit `null`
+     * @param  mixed  $default Use this over `??` to preserve explicit `null`
      *
      * @return mixed The argument value or the default
      */
@@ -257,7 +257,7 @@ abstract class BaseDirective implements Directive
      *
      * @api
      *
-     * @param array<string> $names
+     * @param  array<string>  $names
      */
     protected function validateMutuallyExclusiveArguments(array $names): void
     {

@@ -11,7 +11,7 @@ final class PaginationTypeTest extends TestCase
     /**
      * @dataProvider invalidPaginationTypes
      *
-     * @param string $type An invalid type
+     * @param  string  $type An invalid type
      */
     public function testThrowsExceptionForUnsupportedTypes(string $type): void
     {
