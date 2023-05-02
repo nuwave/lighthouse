@@ -19,13 +19,13 @@ trait HasBuilderArgument
 
         $builderResolver = $this->getResolverFromArgument('builder');
 
-        $query = $builderResolver($root, $args, $context, $resolveInfo);
+        $builder = $builderResolver($root, $args, $context, $resolveInfo);
 
         assert(
-            $query instanceof Builder || $query instanceof ScoutBuilder,
+            $builder instanceof Builder || $builder instanceof ScoutBuilder,
             "The method referenced by the builder argument of the @{$this->name()} directive on {$this->nodeName()} must return a Builder or Relation.",
         );
 
-        return $query;
+        return $builder;
     }
 }

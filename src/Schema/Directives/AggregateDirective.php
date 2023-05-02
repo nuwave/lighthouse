@@ -144,16 +144,16 @@ GRAPHQL;
             $builderResolver = $this->getResolverFromArgument('builder');
 
             return function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($builderResolver) {
-                $query = $builderResolver($root, $args, $context, $resolveInfo);
+                $builder = $builderResolver($root, $args, $context, $resolveInfo);
 
                 assert(
-                    $query instanceof Builder,
+                    $builder instanceof Builder,
                     "The method referenced by the builder argument of the @{$this->name()} directive on {$this->nodeName()} must return a Builder or Relation.",
                 );
 
-                $this->makeBuilderDecorator($root, $args, $context, $resolveInfo)($query);
+                $this->makeBuilderDecorator($root, $args, $context, $resolveInfo)($builder);
 
-                return $query->{$this->function()}($this->column());
+                return $builder->{$this->function()}($this->column());
             };
         }
 
