@@ -5,7 +5,6 @@ namespace Nuwave\Lighthouse\Pagination;
 use GraphQL\Error\Error;
 use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Contracts\Pagination\Paginator;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Laravel\Scout\Builder as ScoutBuilder;
 

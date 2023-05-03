@@ -111,10 +111,7 @@ GRAPHQL;
         if (is_string($relation)) {
             return function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Deferred {
                 $relationBatchLoader = BatchLoaderRegistry::instance(
-                    array_merge(
-                        $this->qualifyPath($args, $resolveInfo),
-                        [$this->function(), $this->column()],
-                    ),
+                    [...$this->qualifyPath($args, $resolveInfo), $this->function(), $this->column()],
                     fn (): RelationBatchLoader => new RelationBatchLoader(
                         new AggregateModelsLoader(
                             $this->relation(),

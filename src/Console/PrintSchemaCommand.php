@@ -54,7 +54,7 @@ SIGNATURE;
 
         if ($this->option('write')) {
             $disk = $this->option('disk');
-            if (! is_string($disk) && ! is_null($disk)) {
+            if (! is_string($disk) && ! is_null($disk)) { // @phpstan-ignore-line can be array
                 $diskType = gettype($disk);
                 $this->error("Expected option disk to be string or null, got: {$diskType}.");
 
