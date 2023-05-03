@@ -53,8 +53,7 @@ We also defined the inverse relationship from `Post` to `User` through the `auth
 
 ## What is Lighthouse?
 
-Lighthouse integrates with any Laravel project to make it easy to serve
-your own GraphQL server.
+Lighthouse integrates with any Laravel project to serve a GraphQL API.
 
 The process of building a GraphQL server with Lighthouse can be described in 3 steps:
 
@@ -305,6 +304,7 @@ We add two queries for retrieving posts to the root `Query` type:
 
 ```diff
 type Query {
+   ...
 +  posts: [Post!]! @all
 +  post(id: Int! @eq): Post @find
 }
@@ -374,11 +374,11 @@ You should get a list of all the posts in your database,
 together with all of its comments and the name of the author.
 
 Hopefully, this example showed you a glimpse of the power of GraphQL
-and how Lighthouse makes it easy to build your own server with Laravel.
+and how you can serve your own GraphQL API with Lighthouse.
 
 ## Next Steps
 
-The app you just built might use some more features.
+The app you just built might need some more features.
 Here are a few ideas on what you might add to learn more about Lighthouse.
 
 - [Add pagination to your fields](../master/api-reference/directives.md#paginate)
