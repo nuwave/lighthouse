@@ -15,8 +15,8 @@ class SimplePaginatorField
      * @return array{
      *     count: int,
      *     currentPage: int,
-     *     firstItem: int,
-     *     lastItem: int,
+     *     firstItem: int|null,
+     *     lastItem: int|null,
      *     perPage: int,
      *     hasMorePages: bool,
      * }
