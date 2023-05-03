@@ -5,9 +5,7 @@ namespace Nuwave\Lighthouse\Console;
 use GraphQL\Type\Introspection;
 use GraphQL\Utils\SchemaPrinter;
 use Illuminate\Console\Command;
-use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemManager;
-use Illuminate\Support\Facades\Storage;
 use Nuwave\Lighthouse\Federation\FederationPrinter;
 use Nuwave\Lighthouse\Schema\AST\ASTCache;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
@@ -59,6 +57,7 @@ SIGNATURE;
             if (! is_string($disk) && ! is_null($disk)) {
                 $diskType = gettype($disk);
                 $this->error("Expected option disk to be string or null, got: {$diskType}.");
+
                 return;
             }
 

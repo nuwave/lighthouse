@@ -25,13 +25,13 @@ class DetectDeprecatedUsage extends ValidationRule
     /** @var DeprecationHandler */
     protected $deprecationHandler;
 
-    /** @param DeprecationHandler $deprecationHandler */
+    /** @param  DeprecationHandler  $deprecationHandler */
     public function __construct(callable $deprecationHandler)
     {
         $this->deprecationHandler = $deprecationHandler;
     }
 
-    /** @param DeprecationHandler $deprecationHandler */
+    /** @param  DeprecationHandler  $deprecationHandler */
     public static function handle(callable $deprecationHandler): void
     {
         DocumentValidator::addRule(new static($deprecationHandler));

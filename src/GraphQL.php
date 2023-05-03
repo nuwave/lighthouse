@@ -64,7 +64,7 @@ class GraphQL
      *
      * @api
      *
-     * @param array<string, mixed>|null $variables
+     * @param  array<string, mixed>|null  $variables
      *
      * @return array<string, mixed>
      */
@@ -95,7 +95,7 @@ class GraphQL
      * you will probably want to call `->toArray($debug)` on it,
      * with $debug being a combination of flags in @see \GraphQL\Error\DebugFlag
      *
-     * @param array<string, mixed>|null $variables
+     * @param  array<string, mixed>|null  $variables
      *
      * @return array<string, mixed>
      */
