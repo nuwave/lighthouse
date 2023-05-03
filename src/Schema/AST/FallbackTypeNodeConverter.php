@@ -22,7 +22,7 @@ class FallbackTypeNodeConverter extends TypeNodeConverter
     /**
      * @template T of Type
      *
-     * @param T|callable():T $type
+     * @param  T|callable():T  $type
      *
      * @return ListOfType<T>
      */

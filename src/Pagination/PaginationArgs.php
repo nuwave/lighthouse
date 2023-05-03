@@ -78,7 +78,7 @@ class PaginationArgs
      *
      * @param  \Illuminate\Database\Query\Builder|\Laravel\Scout\Builder|\Illuminate\Database\Eloquent\Builder<TModel>|\Illuminate\Database\Eloquent\Relations\Relation<TModel>  $builder
      *
-     * @return Paginator<TModel>
+     * @return \Illuminate\Contracts\Pagination\Paginator<TModel>
      */
     public function applyToBuilder(QueryBuilder|ScoutBuilder|EloquentBuilder|Relation $builder): Paginator
     {

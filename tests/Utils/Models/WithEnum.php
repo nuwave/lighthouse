@@ -29,7 +29,7 @@ final class WithEnum extends Model
     ];
 
     /**
-     * @param \Illuminate\Database\Eloquent\Builder<self> $builder
+     * @param  \Illuminate\Database\Eloquent\Builder<self>  $builder
      *
      * @return \Illuminate\Database\Eloquent\Builder<self>
      */
