@@ -30,6 +30,11 @@ Lighthouse now uses `Illuminate\Contracts\Database\Query\Builder` to type hint d
 If you implement `ArgBuilderDirective` or `FieldBuilderDirective`, you will have to change the signature of the `handleFieldBuilder` method accordingly:
 
 ```diff
+- use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+- use Illuminate\Database\Eloquent\Relations\Relation;
+- use Illuminate\Database\Query\Builder as QueryBuilder;
++ use Illuminate\Contracts\Database\Query\Builder;
+
 - public function handleFieldBuilder(QueryBuilder|EloquentBuilder|Relation $builder, mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): QueryBuilder|EloquentBuilder|Relation;
 + public function handleFieldBuilder(Builder $builder, mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Builder;
 ```
