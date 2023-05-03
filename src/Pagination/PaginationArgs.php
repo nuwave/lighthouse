@@ -73,7 +73,7 @@ class PaginationArgs
     /**
      * Apply the args to a builder, constructing a paginator.
      *
-     * @return Paginator<Model>
+     * @return \Illuminate\Contracts\Pagination\Paginator<\Illuminate\Database\Eloquent\Model>
      */
     public function applyToBuilder(Builder|ScoutBuilder $builder): Paginator
     {
