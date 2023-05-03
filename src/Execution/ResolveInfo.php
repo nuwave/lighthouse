@@ -38,18 +38,18 @@ class ResolveInfo extends BaseResolveInfo
      * @param  array<string>  $scopes
      * @param  array<string, mixed>  $args
      * @param  (callable(\Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective): bool)|null  $directiveFilter
+     *
+     * @api
      */
-    public function enhanceBuilder(Builder|ScoutBuilder $builder, array $scopes, mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo, callable $directiveFilter = null): Builder|ScoutBuilder
+    public function enhanceBuilder(Builder|ScoutBuilder $builder, array $scopes, mixed $root, array $args, GraphQLContext $context, callable $directiveFilter = null): Builder|ScoutBuilder
     {
-        $argumentSet = $resolveInfo->argumentSet;
-
-        $scoutEnhancer = new ScoutEnhancer($argumentSet, $builder);
+        $scoutEnhancer = new ScoutEnhancer($this->argumentSet, $builder);
         if ($scoutEnhancer->canEnhanceBuilder()) {
             return $scoutEnhancer->enhanceBuilder();
         }
 
-        self::applyArgBuilderDirectives($argumentSet, $builder, $directiveFilter);
-        self::applyFieldBuilderDirectives($builder, $root, $args, $context, $resolveInfo);
+        self::applyArgBuilderDirectives($this->argumentSet, $builder, $directiveFilter);
+        self::applyFieldBuilderDirectives($builder, $root, $args, $context, $this);
 
         foreach ($scopes as $scope) {
             $builder->{$scope}($args);
@@ -65,14 +65,14 @@ class ResolveInfo extends BaseResolveInfo
      * @param  array<string>  $scopes
      * @param  array<string, mixed>  $args
      * @param  (callable(\Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective): bool)|null  $directiveFilter
+     *
+     * @api
      */
-    public function wouldEnhanceBuilder(Builder|ScoutBuilder $builder, array $scopes, mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo, callable $directiveFilter = null): bool
+    public function wouldEnhanceBuilder(Builder|ScoutBuilder $builder, array $scopes, mixed $root, array $args, GraphQLContext $context, callable $directiveFilter = null): bool
     {
-        $argumentSet = $resolveInfo->argumentSet;
-
-        return (new ScoutEnhancer($argumentSet, $builder))->wouldEnhanceBuilder()
-            || self::wouldApplyArgBuilderDirectives($argumentSet, $builder, $directiveFilter)
-            || self::wouldApplyFieldBuilderDirectives($resolveInfo)
+        return (new ScoutEnhancer($this->argumentSet, $builder))->wouldEnhanceBuilder()
+            || self::wouldApplyArgBuilderDirectives($this->argumentSet, $builder, $directiveFilter)
+            || self::wouldApplyFieldBuilderDirectives($this)
             || $scopes !== [];
     }
 
@@ -115,10 +115,9 @@ class ResolveInfo extends BaseResolveInfo
     /**
      * Would there be any ArgBuilderDirectives to apply to the builder?
      *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>  $builder
      * @param  (callable(\Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective): bool)|null  $directiveFilter
      */
-    protected static function wouldApplyArgBuilderDirectives(ArgumentSet $argumentSet, \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation &$builder, callable $directiveFilter = null): bool
+    protected static function wouldApplyArgBuilderDirectives(ArgumentSet $argumentSet, Builder &$builder, callable $directiveFilter = null): bool
     {
         foreach ($argumentSet->arguments as $argument) {
             $filteredDirectives = $argument
@@ -157,10 +156,9 @@ class ResolveInfo extends BaseResolveInfo
     /**
      * Apply the FieldBuilderDirectives onto the builder.
      *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>  $builder
      * @param  array<string, mixed>  $args
      */
-    protected static function applyFieldBuilderDirectives(\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation &$builder, mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): void
+    protected static function applyFieldBuilderDirectives(Builder &$builder, mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): void
     {
         foreach (self::fieldBuilderDirectives($resolveInfo) as $fieldBuilderDirective) {
             $builder = $fieldBuilderDirective->handleFieldBuilder($builder, $root, $args, $context, $resolveInfo);

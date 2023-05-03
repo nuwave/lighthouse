@@ -157,7 +157,6 @@ GRAPHQL;
                 $root,
                 $args,
                 $context,
-                $resolveInfo,
             );
 
             $paginationArgs = PaginationArgs::extractArgs($args, $this->paginationType(), $this->paginateMaxCount());
