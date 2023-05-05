@@ -2,11 +2,15 @@
 
 namespace Nuwave\Lighthouse\Console;
 
+use Fiber;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Str;
 use OpenSwoole\Constant as OpenSwooleConstant;
+use OpenSwoole\Coroutine as Co;
 use OpenSwoole\Http\Request;
+use OpenSwoole\Process;
+use OpenSwoole\Runtime;
 use OpenSwoole\Server as OpenSwooleServer;
 use OpenSwoole\WebSocket\Frame;
 use OpenSwoole\WebSocket\Server;
@@ -21,16 +25,27 @@ class SubscriptionsServeCommand extends Command
 
     public function handle()
     {
-        // todo wss
-        $server = new Server($this->option('host'), $this->option('port')/*, OpenSwooleServer::SIMPLE_MODE, OpenSwooleConstant::SOCK_TCP | OpenSwooleConstant::SSL */);
+        ini_set('default_socket_timeout', -1);
+        Co::set(['hook_flags' => Runtime::HOOK_ALL]);
+        Runtime::enableCoroutine();
+
+        $server = new Server($this->option('host'), $this->option('port'), OpenSwooleServer::SIMPLE_MODE, OpenSwooleConstant::SOCK_TCP/* | OpenSwooleConstant::SSL*/);
 
         $server->set([
             'websocket_subprotocol' => 'graphql-transport-ws',
+            'enable_coroutine' => true,
             // todo cert paths
         ]);
 
         $server->on('start', function (Server $server) {
             $this->info(sprintf('Started listening on %s://%s:%s', 'ws', $server->host, $server->port));
+            go(function () use ($server) {
+                Redis::psubscribe('sub_pref:*', $this->getSubscriptionHandler($server));
+                /*$redis = new \Redis();
+                $redis->connect('redis');
+                $redis->setOption(\Redis::OPT_READ_TIMEOUT, -1);
+                $redis->psubscribe(['sub_pref:*'], $this->getSubscriptionHandler($server));*/
+            });
         });
 
         $server->on('open', function (Server $server, Request $request) {
@@ -40,12 +55,13 @@ class SubscriptionsServeCommand extends Command
         $server->on('message', function (Server $server, Frame $frame) {
             $this->debug('Received message.', $frame);
             $payload = \Safe\json_decode($frame->data);
-            match($payload->type) {
+            match ($payload->type) {
                 'connection_init' => $this->handleConnectionInit($server, $frame, $payload),
+                'subscribe' => $this->handleSubscribe($server, $frame, $payload),
                 // todo ping pong
                 default => throw new \RuntimeException('Unknown message type: ' . $payload->type),
             };
-
+return;
             if ($payload->type === 'subscribe') {
                 $payload->id;
                 $server->disconnect($frame->fd, 4409, "Subscriber for {$operationId} already exists.");
@@ -70,9 +86,11 @@ class SubscriptionsServeCommand extends Command
             $this->info("connection disconnect: {$fd}");
         });
 
-        Redis::psubscribe('sub_prefix:*', $this->getSubscriptionHandler($server));
-
         $server->start();
+
+        // todo wss
+
+
     }
 
     private function debug(string $message, $data): void
@@ -113,5 +131,10 @@ class SubscriptionsServeCommand extends Command
                 ],
             ]));
         };
+    }
+
+    private function handleSubscribe(Server $server, Frame $frame, mixed $payload)
+    {
+        $this->info("subscribe {$frame->fd} with ". json_encode($payload));
     }
 }
