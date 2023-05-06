@@ -41,10 +41,9 @@ class SubscriptionsServeCommand extends Command
             $this->info(sprintf('Started listening on %s://%s:%s', 'ws', $server->host, $server->port));
             go(function () use ($server) {
                 Redis::psubscribe('sub_pref:*', $this->getSubscriptionHandler($server));
-                /*$redis = new \Redis();
-                $redis->connect('redis');
-                $redis->setOption(\Redis::OPT_READ_TIMEOUT, -1);
-                $redis->psubscribe(['sub_pref:*'], $this->getSubscriptionHandler($server));*/
+            });
+            go(function () use ($server) {
+                Process::signal(SIGINT, fn() => $server->shutdown());
             });
         });
 
