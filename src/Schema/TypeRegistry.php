@@ -168,7 +168,7 @@ class TypeRegistry
      *
      * @api
      *
-     * @param callable(): \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType $type
+     * @param  callable(): \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType  $type
      */
     public function registerLazy(string $name, callable $type): self
     {
@@ -200,7 +200,7 @@ class TypeRegistry
      *
      * @api
      *
-     * @param callable(): \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType $type
+     * @param  callable(): \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType  $type
      */
     public function overwriteLazy(string $name, callable $type): self
     {

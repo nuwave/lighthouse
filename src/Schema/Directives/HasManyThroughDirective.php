@@ -26,7 +26,6 @@ directive @hasManyThrough(
 
   """
   Allows to resolve the relation as a paginated list.
-  Allowed values: `paginator`, `connection`.
   """
   type: HasManyThroughType
 

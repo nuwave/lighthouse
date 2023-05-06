@@ -6,6 +6,7 @@ use GraphQL\Executor\Executor;
 use Illuminate\Container\Container;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Utils;
@@ -20,6 +21,12 @@ class ResolverProvider implements ProvidesResolver
         if ($resolverClass === null) {
             if (RootType::isRootType($fieldValue->getParentName())) {
                 $this->throwMissingResolver($fieldValue);
+            }
+
+            // Return any non-null value to continue nested field resolution
+            // when the root Query type is returned as part of the result.
+            if (ASTHelper::getUnderlyingTypeName($fieldValue->getField()) === RootType::QUERY) {
+                return static fn (): bool => true;
             }
 
             return \Closure::fromCallable(

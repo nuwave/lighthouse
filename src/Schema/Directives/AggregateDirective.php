@@ -111,10 +111,7 @@ GRAPHQL;
         if (is_string($relation)) {
             return function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Deferred {
                 $relationBatchLoader = BatchLoaderRegistry::instance(
-                    array_merge(
-                        $this->qualifyPath($args, $resolveInfo),
-                        [$this->function(), $this->column()],
-                    ),
+                    [...$this->qualifyPath($args, $resolveInfo), $this->function(), $this->column()],
                     fn (): RelationBatchLoader => new RelationBatchLoader(
                         new AggregateModelsLoader(
                             $this->relation(),
@@ -144,16 +141,16 @@ GRAPHQL;
             $builderResolver = $this->getResolverFromArgument('builder');
 
             return function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($builderResolver) {
-                $query = $builderResolver($root, $args, $context, $resolveInfo);
+                $builder = $builderResolver($root, $args, $context, $resolveInfo);
 
                 assert(
-                    $query instanceof QueryBuilder || $query instanceof EloquentBuilder,
+                    $builder instanceof QueryBuilder || $builder instanceof EloquentBuilder,
                     "The method referenced by the builder argument of the @{$this->name()} directive on {$this->nodeName()} must return a Builder.",
                 );
 
-                $this->makeBuilderDecorator($root, $args, $context, $resolveInfo)($query);
+                $this->makeBuilderDecorator($root, $args, $context, $resolveInfo)($builder);
 
-                return $query->{$this->function()}($this->column());
+                return $builder->{$this->function()}($this->column());
             };
         }
 
