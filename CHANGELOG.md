@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.8.1
+
+### Fixed
+
+- Fix `scalar.stub` return type
+
 ## v6.8.0
 
 ### Added
