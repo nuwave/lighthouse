@@ -1792,6 +1792,29 @@ final class Commentable
 }
 ```
 
+## @hide
+
+```graphql
+"""
+Hides field if environment is one of specified
+"""
+directive @hide(
+    """
+    Specify which environments must not use this field, e.g. ["prod"].
+    """
+    env: [String!]!
+) repeatable on FIELD_DEFINITION
+```
+
+This directive lets you exclude some parts of schema in different environments. For example, you might 
+remove debug information in `prod` environment:
+
+```graphql
+type Query {
+    debugInformation: String! @hide(env:["prod"])
+
+```
+
 ## @lazyLoad
 
 ```graphql
