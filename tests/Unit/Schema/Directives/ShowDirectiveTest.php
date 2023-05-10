@@ -43,7 +43,7 @@ final class ShowDirectiveTest extends TestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            hiddenField: String! @mock @show(env:["production"])
+            hiddenField: String! @mock @show(env: ["production"])
         }
         ';
 

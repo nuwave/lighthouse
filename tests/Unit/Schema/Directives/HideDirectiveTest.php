@@ -43,7 +43,7 @@ final class HideDirectiveTest extends TestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            hiddenField: String! @mock @hide(env:["production"])
+            hiddenField: String! @mock @hide(env: ["production"])
         }
         ';
 
@@ -68,7 +68,7 @@ final class HideDirectiveTest extends TestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            hiddenField: String! @mock @hide(env:["production"])
+            hiddenField: String! @mock @hide(env: ["production"])
         }
         ';
 
