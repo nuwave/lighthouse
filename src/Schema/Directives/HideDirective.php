@@ -21,7 +21,7 @@ class HideDirective extends BaseDirective implements FieldManipulator
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Hides field if environment is one of specified
+Excludes the annotated element from the schema conditionally.
 """
 directive @hide(
   """
@@ -46,8 +46,14 @@ GRAPHQL;
             return;
         }
 
-        $index = collect($parentType->fields)->search($fieldDefinition);
-        assert(is_int($index));
-        $parentType->fields->splice($index, 1);
+        $foundKey = null;
+        foreach ($parentType->fields as $key => $value){
+            if ($value === $fieldDefinition){
+                $foundKey = $key;
+                break;
+            }
+        }
+        assert(is_int($foundKey));
+        $parentType->fields->splice($foundKey, 1);
     }
 }

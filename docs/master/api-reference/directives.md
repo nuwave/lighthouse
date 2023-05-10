@@ -1796,7 +1796,7 @@ final class Commentable
 
 ```graphql
 """
-Hides field if environment is one of specified
+Excludes the annotated element from the schema conditionally.
 """
 directive @hide(
     """
@@ -3162,6 +3162,30 @@ However, in some situation a custom index might be needed, this can be achieved 
 ```graphql
 type Query {
   posts(search: String @search(within: "my.index")): [Post!]! @paginate
+}
+```
+
+## @show
+
+```graphql
+"""
+Includes the annotated element from the schema conditionally.
+"""
+directive @show(
+    """
+    Specify which environments may use this field, e.g. ["testing"].
+    Compared against the value returned from `app()->environment()`.
+    """
+    env: [String!]!
+) repeatable on FIELD_DEFINITION
+```
+
+This directive lets you include some parts of schema in different environments. For example, you might
+add a test field in `testing` environment:
+
+```graphql
+type Query {
+    testInformation: String! @show(env: ["testing"])
 }
 ```
 

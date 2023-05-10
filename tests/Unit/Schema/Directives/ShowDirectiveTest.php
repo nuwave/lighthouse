@@ -4,14 +4,14 @@ namespace Tests\Unit\Schema\Directives;
 
 use Tests\TestCase;
 
-final class HideDirectiveTest extends TestCase
+final class ShowDirectiveTest extends TestCase
 {
     public function testHiddenOnTestingEnv(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
             shownField: String! @mock
-            hiddenField: String! @mock @hide(env: ["testing"])
+            hiddenField: String! @mock @show(env: ["prod"])
         }
         ';
 
@@ -39,11 +39,11 @@ final class HideDirectiveTest extends TestCase
         $this->graphQL($query)->assertGraphQLErrorMessage('Cannot query field "hiddenField" on type "Query". Did you mean "shownField"?');
     }
 
-    public function testHiddenWhenManuallySettingEnv(): void
+    public function testShownOnAnotherEnv(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            hiddenField: String! @mock @hide(env:["prod"])
+            hiddenField: String! @mock @show(env:["prod"])
         }
         ';
 
@@ -60,30 +60,6 @@ final class HideDirectiveTest extends TestCase
         ';
 
         app()->instance('env', 'prod');
-        $this->graphQL($introspectionQuery)
-            ->assertJsonCount(0, 'data.__schema.queryType.fields');
-    }
-
-    public function testShownOnAnotherEnv(): void
-    {
-        $this->schema = /** @lang GraphQL */ '
-        type Query {
-            hiddenField: String! @mock @hide(env:["prod"])
-        }
-        ';
-
-        $introspectionQuery = /** @lang GraphQL */ '
-        {
-            __schema {
-                queryType {
-                    fields {
-                        name
-                    }
-                }
-            }
-        }
-        ';
-
         $this->graphQL($introspectionQuery)
             ->assertJsonCount(1, 'data.__schema.queryType.fields')
             ->assertJsonPath('data.__schema.queryType.fields.0.name', 'hiddenField');
