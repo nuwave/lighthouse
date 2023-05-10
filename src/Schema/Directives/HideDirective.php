@@ -13,7 +13,8 @@ class HideDirective extends BaseDirective implements FieldManipulator
 {
     protected string $env;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->env = Container::getInstance()->environment();
     }
 

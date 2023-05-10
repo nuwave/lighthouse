@@ -59,7 +59,7 @@ final class ShowDirectiveTest extends TestCase
         }
         ';
 
-        app()->instance('env', "production");
+        app()->instance('env', 'production');
         $this->graphQL($introspectionQuery)
             ->assertJsonCount(1, 'data.__schema.queryType.fields')
             ->assertJsonPath('data.__schema.queryType.fields.0.name', 'hiddenField');

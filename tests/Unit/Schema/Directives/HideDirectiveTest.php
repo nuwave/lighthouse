@@ -59,7 +59,7 @@ final class HideDirectiveTest extends TestCase
         }
         ';
 
-        app()->instance('env', "production");
+        app()->instance('env', 'production');
         $this->graphQL($introspectionQuery)
             ->assertJsonCount(0, 'data.__schema.queryType.fields');
     }
