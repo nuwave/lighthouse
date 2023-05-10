@@ -11,7 +11,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
-- `@hide` directive
+- `@hide` directive https://github.com/nuwave/lighthouse/pull/2392
 
 ## v6.8.1
 
