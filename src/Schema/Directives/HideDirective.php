@@ -47,7 +47,7 @@ GRAPHQL;
         }
 
         $index = collect($parentType->fields)->search($fieldDefinition);
-        assert($index !== false);
+        assert(is_int($index));
         $parentType->fields->splice($index, 1);
     }
 }
