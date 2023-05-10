@@ -651,7 +651,7 @@ Lighthouse will detect the relationship and attach, update or create it.
 ```
 
 It is also possible to use the `sync` operation to ensure only the given IDs
-will be contained withing the relation.
+will be contained within the relation.
 
 ```graphql
 mutation {
