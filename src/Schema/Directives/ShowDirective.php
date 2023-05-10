@@ -2,12 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
-
 class ShowDirective extends HideDirective
 {
     public static function definition(): string
@@ -25,9 +19,8 @@ directive @show(
 GRAPHQL;
     }
 
-    /** Should the annotated element be excluded from the schema? */
     protected function shouldHide(): bool
     {
-        return !parent::shouldHide();
+        return ! parent::shouldHide();
     }
 }

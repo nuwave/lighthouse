@@ -35,20 +35,16 @@ GRAPHQL;
     /** Should the annotated element be excluded from the schema? */
     protected function shouldHide(): bool
     {
-        $envs = $this->directiveArgValue('env');
-
-        return in_array($this->env, $envs);
+        return in_array($this->env, $this->directiveArgValue('env'));
     }
 
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType): void
     {
-        if (! $this->shouldHide()) {
-            return;
-        }
-
-        foreach ($parentType->fields as $key => $value) {
-            if ($value === $fieldDefinition) {
-                unset($key);
+        if ($this->shouldHide()) {
+            foreach ($parentType->fields as $key => $value) {
+                if ($value === $fieldDefinition) {
+                    unset($key);
+                }
             }
         }
     }
