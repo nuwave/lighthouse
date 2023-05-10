@@ -13,10 +13,6 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - `@hide` and `@show` directive https://github.com/nuwave/lighthouse/pull/2392
 
-### Fixed
-
-- Flush only working redis database during tests https://github.com/nuwave/lighthouse/pull/2395 
-
 ## v6.8.1
 
 ### Fixed
