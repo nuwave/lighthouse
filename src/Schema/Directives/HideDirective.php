@@ -32,7 +32,7 @@ directive @hide(
 GRAPHQL;
     }
 
-    /** Checks if the current field must be hidden. Can be overridden. */
+    /** Should the annotated element be excluded from the schema? */
     protected function shouldHide(): bool
     {
         $envs = $this->directiveArgValue('env');

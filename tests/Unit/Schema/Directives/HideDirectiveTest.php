@@ -4,14 +4,14 @@ namespace Tests\Unit\Schema\Directives;
 
 use Tests\TestCase;
 
-class HideDirectiveTest extends TestCase
+final class HideDirectiveTest extends TestCase
 {
     public function testHiddenOnTestingEnv(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
             shownField: String! @mock
-            hiddenField: String! @mock @hide(env:["testing"])
+            hiddenField: String! @mock @hide(env: ["testing"])
         }
         ';
 
@@ -28,11 +28,10 @@ class HideDirectiveTest extends TestCase
         ';
 
         $this->graphQL($introspectionQuery)
-            ->assertJsonCount(1, 'data.__schema.queryType.fields')
-            ->assertJsonPath('data.__schema.queryType.fields.0.name', 'shownField');
+            ->assertJsonPath('data.__schema.queryType.fields.*.name', ['shownField']);
 
         $query = /** @lang GraphQL */ '
-        query  {
+        {
             hiddenField
         }
         ';

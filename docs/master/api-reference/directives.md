@@ -1800,7 +1800,8 @@ Hides field if environment is one of specified
 """
 directive @hide(
     """
-    Specify which environments must not use this field, e.g. ["prod"].
+    Specify which environments exclude this element, e.g. `["prod"]`.
+    Compared against the value returned from `app()->environment()`.
     """
     env: [String!]!
 ) repeatable on FIELD_DEFINITION
@@ -1811,8 +1812,8 @@ remove debug information in `prod` environment:
 
 ```graphql
 type Query {
-    debugInformation: String! @hide(env:["prod"])
-
+    debugInformation: String! @hide(env: ["prod"])
+}
 ```
 
 ## @lazyLoad
