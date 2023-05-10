@@ -48,7 +48,6 @@ GRAPHQL;
 
         $index = collect($parentType->fields)->search($fieldDefinition);
         assert($index !== false);
-        $parentType->fields->offsetUnset($index);
-        $parentType->fields->reindex();
+        $parentType->fields->splice($index, 1);
     }
 }
