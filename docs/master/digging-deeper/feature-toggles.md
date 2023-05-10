@@ -12,7 +12,7 @@ For example, you might want to limit an experimental new field to test environme
 
 ```graphql
 type Query {
-    testInformation: String! @show(env: ["integration", "staging"])
+  testInformation: String! @show(env: ["integration", "staging"])
 }
 ```
 
@@ -21,7 +21,7 @@ In this case, [@hide](../api-reference/directives.md#hide) fits better:
 
 ```graphql
 type Query {
-    debugInformation: String! @hide(env: ["production"])
+  debugInformation: String! @hide(env: ["production"])
 }
 ```
 
@@ -30,4 +30,4 @@ type Query {
 [@show](../api-reference/directives.md#show) and [@hide](../api-reference/directives.md#hide) work by manipulating the schema.
 This means that when using their `env` option, the inclusion or exclusion of elements depends on the value
 of `app()->environment()` at the time the schema is built and not update on later environment changes.
-If you are pre-generating your schema cache, make sure to match the environment to your deployment target. 
+If you are pre-generating your schema cache, make sure to match the environment to your deployment target.

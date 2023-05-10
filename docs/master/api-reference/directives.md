@@ -1799,11 +1799,11 @@ final class Commentable
 Excludes the annotated element from the schema conditionally.
 """
 directive @hide(
-    """
-    Specify which environments exclude this element, e.g. `["production"]`.
-    Compared against the value returned from `app()->environment()`.
-    """
-    env: [String!]!
+  """
+  Specify which environments exclude this element, e.g. `["production"]`.
+  Compared against the value returned from `app()->environment()`.
+  """
+  env: [String!]!
 ) repeatable on FIELD_DEFINITION
 ```
 
@@ -3165,11 +3165,11 @@ type Query {
 Includes the annotated element from the schema conditionally.
 """
 directive @show(
-    """
-    Specify which environments include this element, e.g. ["testing"].
-    Compared against the value returned from `app()->environment()`.
-    """
-    env: [String!]!
+  """
+  Specify which environments include this element, e.g. ["testing"].
+  Compared against the value returned from `app()->environment()`.
+  """
+  env: [String!]!
 ) repeatable on FIELD_DEFINITION
 ```
 
