@@ -5,7 +5,6 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use Illuminate\Container\Container;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 
@@ -15,7 +14,8 @@ class HideDirective extends BaseDirective implements FieldManipulator
 
     public function __construct()
     {
-        $this->env = Container::getInstance()->environment();
+        // Use app() here because Illuminate\Container\Container::environment() is not defined
+        $this->env = app()->environment();
     }
 
     public static function definition(): string
