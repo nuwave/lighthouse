@@ -11,7 +11,7 @@ final class ShowDirectiveTest extends TestCase
         $this->schema = /** @lang GraphQL */ '
         type Query {
             shownField: String! @mock
-            hiddenField: String! @mock @show(env: ["prod"])
+            hiddenField: String! @mock @show(env: ["production"])
         }
         ';
 
@@ -43,7 +43,7 @@ final class ShowDirectiveTest extends TestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            hiddenField: String! @mock @show(env:["prod"])
+            hiddenField: String! @mock @show(env:["production"])
         }
         ';
 
@@ -59,7 +59,7 @@ final class ShowDirectiveTest extends TestCase
         }
         ';
 
-        app()->instance('env', 'prod');
+        app()->instance('env', "production");
         $this->graphQL($introspectionQuery)
             ->assertJsonCount(1, 'data.__schema.queryType.fields')
             ->assertJsonPath('data.__schema.queryType.fields.0.name', 'hiddenField');

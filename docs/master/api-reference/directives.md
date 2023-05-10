@@ -1800,21 +1800,14 @@ Excludes the annotated element from the schema conditionally.
 """
 directive @hide(
     """
-    Specify which environments exclude this element, e.g. `["prod"]`.
+    Specify which environments exclude this element, e.g. `["production"]`.
     Compared against the value returned from `app()->environment()`.
     """
     env: [String!]!
 ) repeatable on FIELD_DEFINITION
 ```
 
-This directive lets you exclude some parts of schema in different environments. For example, you might 
-remove debug information in `prod` environment:
-
-```graphql
-type Query {
-    debugInformation: String! @hide(env: ["prod"])
-}
-```
+See [feature toggles](../digging-deeper/feature-toggles.md).
 
 ## @lazyLoad
 
@@ -3180,14 +3173,7 @@ directive @show(
 ) repeatable on FIELD_DEFINITION
 ```
 
-This directive lets you include some parts of schema in different environments. For example, you might
-add a test field in `testing` environment:
-
-```graphql
-type Query {
-    testInformation: String! @show(env: ["testing"])
-}
-```
+See [feature toggles](../digging-deeper/feature-toggles.md).
 
 ## @softDeletes
 

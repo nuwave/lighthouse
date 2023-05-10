@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use Illuminate\Container\Container;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 
@@ -12,9 +13,8 @@ class HideDirective extends BaseDirective implements FieldManipulator
 {
     protected string $env;
 
-    public function __construct(
-    ) {
-        $this->env = app()->environment();
+    public function __construct() {
+        $this->env = Container::getInstance()->environment();
     }
 
     public static function definition(): string
@@ -25,7 +25,7 @@ Excludes the annotated element from the schema conditionally.
 """
 directive @hide(
   """
-  Specify which environments must not use this field, e.g. ["prod"].
+  Specify which environments must not use this field, e.g. ["production"].
   """
   env: [String!]!
 ) repeatable on FIELD_DEFINITION
@@ -46,14 +46,10 @@ GRAPHQL;
             return;
         }
 
-        $foundKey = null;
-        foreach ($parentType->fields as $key => $value){
-            if ($value === $fieldDefinition){
-                $foundKey = $key;
-                break;
+        foreach ($parentType->fields as $key => $value) {
+            if ($value === $fieldDefinition) {
+                unset($key);
             }
         }
-        assert(is_int($foundKey));
-        $parentType->fields->splice($foundKey, 1);
     }
 }
