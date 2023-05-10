@@ -1792,6 +1792,30 @@ final class Commentable
 }
 ```
 
+## @hide
+
+```graphql
+"""
+Excludes the annotated element from the schema conditionally.
+"""
+directive @hide(
+    """
+    Specify which environments exclude this element, e.g. `["prod"]`.
+    Compared against the value returned from `app()->environment()`.
+    """
+    env: [String!]!
+) repeatable on FIELD_DEFINITION
+```
+
+This directive lets you exclude some parts of schema in different environments. For example, you might 
+remove debug information in `prod` environment:
+
+```graphql
+type Query {
+    debugInformation: String! @hide(env: ["prod"])
+}
+```
+
 ## @lazyLoad
 
 ```graphql
@@ -3138,6 +3162,30 @@ However, in some situation a custom index might be needed, this can be achieved 
 ```graphql
 type Query {
   posts(search: String @search(within: "my.index")): [Post!]! @paginate
+}
+```
+
+## @show
+
+```graphql
+"""
+Includes the annotated element from the schema conditionally.
+"""
+directive @show(
+    """
+    Specify which environments include this element, e.g. ["testing"].
+    Compared against the value returned from `app()->environment()`.
+    """
+    env: [String!]!
+) repeatable on FIELD_DEFINITION
+```
+
+This directive lets you include some parts of schema in different environments. For example, you might
+add a test field in `testing` environment:
+
+```graphql
+type Query {
+    testInformation: String! @show(env: ["testing"])
 }
 ```
 
