@@ -42,11 +42,14 @@ GRAPHQL;
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType): void
     {
         if ($this->shouldHide()) {
+            $keyToRemove = null;
             foreach ($parentType->fields as $key => $value) {
                 if ($value === $fieldDefinition) {
-                    unset($key);
+                    $keyToRemove = $key;
+                    break;
                 }
             }
+            unset($parentType->fields[$keyToRemove]);
         }
     }
 }
