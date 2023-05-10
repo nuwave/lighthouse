@@ -10,7 +10,7 @@ trait TestsRedis
 {
     protected function tearDown(): void
     {
-        Redis::flushall();
+        Redis::flushdb();
 
         parent::tearDown();
     }
