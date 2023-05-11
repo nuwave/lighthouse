@@ -9,9 +9,11 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.9.0
+
 ### Added
 
-- `@hide` and `@show` directive https://github.com/nuwave/lighthouse/pull/2392
+- Add feature toggles via `@hide` and `@show` directive https://github.com/nuwave/lighthouse/pull/2392
 
 ## v6.8.1
 
