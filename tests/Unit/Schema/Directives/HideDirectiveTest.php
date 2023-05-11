@@ -43,7 +43,7 @@ final class HideDirectiveTest extends TestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            hiddenField: String! @mock @hide(env:["prod"])
+            hiddenField: String! @mock @hide(env: ["production"])
         }
         ';
 
@@ -59,7 +59,7 @@ final class HideDirectiveTest extends TestCase
         }
         ';
 
-        app()->instance('env', 'prod');
+        app()->instance('env', 'production');
         $this->graphQL($introspectionQuery)
             ->assertJsonCount(0, 'data.__schema.queryType.fields');
     }
@@ -68,7 +68,7 @@ final class HideDirectiveTest extends TestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            hiddenField: String! @mock @hide(env:["prod"])
+            hiddenField: String! @mock @hide(env: ["production"])
         }
         ';
 
