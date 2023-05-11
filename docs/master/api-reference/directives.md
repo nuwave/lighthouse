@@ -1799,20 +1799,20 @@ final class Commentable
 Excludes the annotated element from the schema conditionally.
 """
 directive @hide(
-    """
-    Specify which environments exclude this element, e.g. `["prod"]`.
-    Compared against the value returned from `app()->environment()`.
-    """
-    env: [String!]!
+  """
+  Specify which environments exclude this element, e.g. `["prod"]`.
+  Compared against the value returned from `app()->environment()`.
+  """
+  env: [String!]!
 ) repeatable on FIELD_DEFINITION
 ```
 
-This directive lets you exclude some parts of schema in different environments. For example, you might 
+This directive lets you exclude some parts of schema in different environments. For example, you might
 remove debug information in `prod` environment:
 
 ```graphql
 type Query {
-    debugInformation: String! @hide(env: ["prod"])
+  debugInformation: String! @hide(env: ["prod"])
 }
 ```
 
@@ -3172,11 +3172,11 @@ type Query {
 Includes the annotated element from the schema conditionally.
 """
 directive @show(
-    """
-    Specify which environments include this element, e.g. ["testing"].
-    Compared against the value returned from `app()->environment()`.
-    """
-    env: [String!]!
+  """
+  Specify which environments include this element, e.g. ["testing"].
+  Compared against the value returned from `app()->environment()`.
+  """
+  env: [String!]!
 ) repeatable on FIELD_DEFINITION
 ```
 
@@ -3185,7 +3185,7 @@ add a test field in `testing` environment:
 
 ```graphql
 type Query {
-    testInformation: String! @show(env: ["testing"])
+  testInformation: String! @show(env: ["testing"])
 }
 ```
 
