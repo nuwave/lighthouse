@@ -49,6 +49,7 @@ GRAPHQL;
                     break;
                 }
             }
+
             unset($parentType->fields[$keyToRemove]);
         }
     }
