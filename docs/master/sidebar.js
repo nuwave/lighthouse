@@ -60,6 +60,7 @@ module.exports = [
       "digging-deeper/file-uploads",
       "digging-deeper/client-directives",
       "digging-deeper/deprecation",
+      "digging-deeper/feature-toggles",
       "digging-deeper/extending-lighthouse",
     ],
   },
