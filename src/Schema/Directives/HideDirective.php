@@ -47,8 +47,8 @@ GRAPHQL;
         }
 
         $foundKey = null;
-        foreach ($parentType->fields as $key => $value){
-            if ($value === $fieldDefinition){
+        foreach ($parentType->fields as $key => $value) {
+            if ($value === $fieldDefinition) {
                 $foundKey = $key;
                 break;
             }
