@@ -28,12 +28,8 @@ abstract class BatchLoaderRegistry
         // The path to the field serves as the unique key for the instance
         $instanceKey = FieldPath::withoutLists($pathToField);
 
-        if (! isset(self::$instances[$instanceKey])) {
-            return self::$instances[$instanceKey] = $makeInstance();
-        }
-
         // @phpstan-ignore-next-line Method Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry::instance() should return TBatchLoader of object but returns object.
-        return self::$instances[$instanceKey];
+        return self::$instances[$instanceKey] ??= $makeInstance();
     }
 
     /**
