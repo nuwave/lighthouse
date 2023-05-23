@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.9.1
+
+### Fixed
+
+- Ensure built-in directives have the lowest priority in registration https://github.com/nuwave/lighthouse/pull/2403
+
 ## v6.9.0
 
 ### Added

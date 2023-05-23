@@ -15,8 +15,7 @@ use Tests\TestCase;
 
 final class DirectiveLocatorTest extends TestCase
 {
-    /** @var \Nuwave\Lighthouse\Schema\DirectiveLocator */
-    protected $directiveLocator;
+    private DirectiveLocator $directiveLocator;
 
     protected function setUp(): void
     {

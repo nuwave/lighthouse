@@ -33,7 +33,7 @@ class SchemaStitcher implements SchemaSourceProvider
     {
         return (new Collection(\Safe\file($path)))
             ->map(static function (string $line) use ($path): string {
-                if (! Str::startsWith(trim($line), '#import ')) {
+                if (! str_starts_with(trim($line), '#import ')) {
                     return rtrim($line, PHP_EOL) . PHP_EOL;
                 }
 
