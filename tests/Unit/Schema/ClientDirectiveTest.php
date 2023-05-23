@@ -29,6 +29,7 @@ final class ClientDirectiveTest extends TestCase
 
         $bar = $this->introspectDirective('bar');
 
+        $this->assertIsArray($bar);
         $this->assertArraySubset(
             [
                 'name' => 'bar',
