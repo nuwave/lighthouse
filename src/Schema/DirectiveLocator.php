@@ -66,9 +66,7 @@ class DirectiveLocator
             ->flatten()
             ->filter()
             // Ensure built-in directives come last
-            ->sortBy(static fn (string $namespace): int => str_starts_with($namespace, 'Nuwave\\Lighthouse')
-                ? 0
-                : 1)
+            ->sortBy(static fn (string $namespace): int => (int) str_starts_with($namespace, 'Nuwave\\Lighthouse'))
             ->all();
     }
 
