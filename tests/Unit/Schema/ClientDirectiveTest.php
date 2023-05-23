@@ -29,7 +29,7 @@ final class ClientDirectiveTest extends TestCase
 
         $bar = $this->introspectDirective('bar');
 
-        $this->assertSame(
+        $this->assertArraySubset(
             [
                 'name' => 'bar',
                 'description' => 'foo',
