@@ -38,7 +38,7 @@ abstract class DateScalar extends ScalarType
      *
      * @param  array<string, mixed>|null  $variables
      */
-    public function parseLiteral(Node $valueNode, ?array $variables = null): IlluminateCarbon
+    public function parseLiteral(Node $valueNode, array $variables = null): IlluminateCarbon
     {
         if (! $valueNode instanceof StringValueNode) {
             throw new Error("Query error: Can only parse strings, got {$valueNode->kind}.", $valueNode);

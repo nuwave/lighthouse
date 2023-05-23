@@ -31,7 +31,7 @@ directive @update(
 GRAPHQL;
     }
 
-    protected function makeExecutionFunction(?Relation $parentRelation = null): callable
+    protected function makeExecutionFunction(Relation $parentRelation = null): callable
     {
         return new UpdateModel(new SaveModel($parentRelation));
     }
