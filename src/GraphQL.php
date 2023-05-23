@@ -73,7 +73,7 @@ class GraphQL
         GraphQLContext $context,
         ?array $variables = [],
         mixed $root = null,
-        ?string $operationName = null,
+        string $operationName = null,
     ): array {
         try {
             $parsedQuery = $this->parse($query);
@@ -104,7 +104,7 @@ class GraphQL
         GraphQLContext $context,
         ?array $variables = [],
         mixed $root = null,
-        ?string $operationName = null,
+        string $operationName = null,
     ): array {
         // Building the executable schema might take a while to do,
         // so we do it before we fire the StartExecution event.
@@ -314,31 +314,27 @@ class GraphQL
     /** @return ErrorsHandler */
     protected function errorsHandler(): callable
     {
-        if (! isset($this->errorsHandler)) {
-            // @phpstan-ignore-next-line callable is not recognized correctly and can not be type-hinted to match
-            return $this->errorsHandler = function (array $errors, callable $formatter): array {
-                // User defined error handlers, implementing \Nuwave\Lighthouse\Execution\ErrorHandler
-                // This allows the user to register multiple handlers and pipe the errors through.
-                $handlers = [];
-                foreach ($this->configRepository->get('lighthouse.error_handlers', []) as $handlerClass) {
-                    $handlers[] = Container::getInstance()->make($handlerClass);
-                }
+        // @phpstan-ignore-next-line callable is not recognized correctly and can not be type-hinted to match
+        return $this->errorsHandler ??= function (array $errors, callable $formatter): array {
+            // User defined error handlers, implementing \Nuwave\Lighthouse\Execution\ErrorHandler
+            // This allows the user to register multiple handlers and pipe the errors through.
+            $handlers = [];
+            foreach ($this->configRepository->get('lighthouse.error_handlers', []) as $handlerClass) {
+                $handlers[] = Container::getInstance()->make($handlerClass);
+            }
 
-                return (new Collection($errors))
-                    ->map(fn (Error $error): ?array => $this->pipeline
-                        ->send($error)
-                        ->through($handlers)
-                        ->then(
-                            static fn (?Error $error): ?array => $error === null
-                                ? null
-                                : $formatter($error),
-                        ))
-                    ->filter()
-                    ->all();
-            };
-        }
-
-        return $this->errorsHandler;
+            return (new Collection($errors))
+                ->map(fn (Error $error): ?array => $this->pipeline
+                    ->send($error)
+                    ->through($handlers)
+                    ->then(
+                        static fn (?Error $error): ?array => $error === null
+                            ? null
+                            : $formatter($error),
+                    ))
+                ->filter()
+                ->all();
+        };
     }
 
     protected function debugFlag(): int

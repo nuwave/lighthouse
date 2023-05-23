@@ -78,7 +78,7 @@ class WhereConditionsHandler
         string $relation,
         string $operator,
         int $amount,
-        ?array $condition = null,
+        array $condition = null,
     ): QueryBuilder {
         return $model
             ->newQuery()

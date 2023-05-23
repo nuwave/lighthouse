@@ -54,22 +54,18 @@ class DirectiveLocator
      */
     public function namespaces(): array
     {
-        if (! isset($this->directiveNamespaces)) {
-            $this->directiveNamespaces
-                // When looking for a directive by name, the namespaces are tried in order
-                = (new Collection([
-                    // User defined directives come first
-                    config('lighthouse.namespaces.directives'),
+        return $this->directiveNamespaces
+            // When looking for a directive by name, the namespaces are tried in order
+            ??= (new Collection([
+                // User defined directives come first
+                config('lighthouse.namespaces.directives'),
 
-                    // Built-in and plugin defined directives come next
-                    $this->eventsDispatcher->dispatch(new RegisterDirectiveNamespaces()),
-                ]))
-                ->flatten()
-                ->filter()
-                ->all();
-        }
-
-        return $this->directiveNamespaces;
+                // Built-in and plugin defined directives come next
+                $this->eventsDispatcher->dispatch(new RegisterDirectiveNamespaces()),
+            ]))
+            ->flatten()
+            ->filter()
+            ->all();
     }
 
     /**

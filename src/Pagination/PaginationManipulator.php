@@ -51,9 +51,9 @@ class PaginationManipulator
         PaginationType $paginationType,
         FieldDefinitionNode &$fieldDefinition,
         ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
-        ?int $defaultCount = null,
-        ?int $maxCount = null,
-        ?ObjectTypeDefinitionNode $edgeType = null,
+        int $defaultCount = null,
+        int $maxCount = null,
+        ObjectTypeDefinitionNode $edgeType = null,
     ): void {
         if ($paginationType->isConnection()) {
             $this->registerConnection($fieldDefinition, $parentType, $paginationType, $defaultCount, $maxCount, $edgeType);
@@ -68,9 +68,9 @@ class PaginationManipulator
         FieldDefinitionNode &$fieldDefinition,
         ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
         PaginationType $paginationType,
-        ?int $defaultCount = null,
-        ?int $maxCount = null,
-        ?ObjectTypeDefinitionNode $edgeType = null,
+        int $defaultCount = null,
+        int $maxCount = null,
+        ObjectTypeDefinitionNode $edgeType = null,
     ): void {
         $fieldTypeName = ASTHelper::getUnderlyingTypeName($fieldDefinition);
 
@@ -155,8 +155,8 @@ GRAPHQL
         FieldDefinitionNode &$fieldDefinition,
         ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
         PaginationType $paginationType,
-        ?int $defaultCount = null,
-        ?int $maxCount = null,
+        int $defaultCount = null,
+        int $maxCount = null,
     ): void {
         $fieldTypeName = ASTHelper::getUnderlyingTypeName($fieldDefinition);
         $paginatorTypeName = "{$fieldTypeName}Paginator";
@@ -190,8 +190,8 @@ GRAPHQL
         FieldDefinitionNode &$fieldDefinition,
         ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
         PaginationType $paginationType,
-        ?int $defaultCount = null,
-        ?int $maxCount = null,
+        int $defaultCount = null,
+        int $maxCount = null,
     ): void {
         $fieldTypeName = ASTHelper::getUnderlyingTypeName($fieldDefinition);
         $paginatorTypeName = "{$fieldTypeName}SimplePaginator";
@@ -222,7 +222,7 @@ GRAPHQL
     }
 
     /** Build the count argument definition string, considering default and max values. */
-    protected static function countArgument(?int $defaultCount = null, ?int $maxCount = null): string
+    protected static function countArgument(int $defaultCount = null, int $maxCount = null): string
     {
         $description = '"Limits number of fetched items.';
         if ($maxCount) {

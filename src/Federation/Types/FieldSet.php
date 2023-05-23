@@ -18,7 +18,7 @@ class FieldSet extends ScalarType
     {
     }
 
-    public function parseLiteral(Node $valueNode, ?array $variables = null): void
+    public function parseLiteral(Node $valueNode, array $variables = null): void
     {
     }
 }

@@ -564,11 +564,8 @@ class TypeRegistry
 
     protected function fieldFactory(): FieldFactory
     {
-        if (! isset($this->fieldFactory)) {
-            $this->fieldFactory = Container::getInstance()->make(FieldFactory::class);
-        }
-
-        return $this->fieldFactory;
+        return $this->fieldFactory
+            ??= Container::getInstance()->make(FieldFactory::class);
     }
 
     /** @return list<string> */
