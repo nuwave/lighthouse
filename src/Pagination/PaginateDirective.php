@@ -6,14 +6,11 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Contracts\Pagination\Paginator;
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
-use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Database\Query\Builder as QueryBuilder;
-use Laravel\Scout\Builder as ScoutBuilder;
 use Nuwave\Lighthouse\Cache\CacheDirective;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Schema\Directives\Traits\HasBuilderArgument;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ComplexityResolverDirective;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
@@ -23,6 +20,8 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class PaginateDirective extends BaseDirective implements FieldResolver, FieldManipulator, ComplexityResolverDirective
 {
+    use HasBuilderArgument;
+
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
@@ -152,26 +151,12 @@ GRAPHQL;
                 return $paginator;
             }
 
-            if ($this->directiveHasArgument('builder')) {
-                $builderResolver = $this->getResolverFromArgument('builder');
-
-                $query = $builderResolver($root, $args, $context, $resolveInfo);
-
-                assert(
-                    $query instanceof QueryBuilder || $query instanceof EloquentBuilder || $query instanceof ScoutBuilder || $query instanceof Relation,
-                    "The method referenced by the builder argument of the @{$this->name()} directive on {$this->nodeName()} must return a Builder or Relation.",
-                );
-            } else {
-                $query = $this->getModelClass()::query();
-            }
-
             $query = $resolveInfo->enhanceBuilder(
-                $query,
+                $this->makeBuilder($root, $args, $context, $resolveInfo),
                 $this->directiveArgValue('scopes', []),
                 $root,
                 $args,
                 $context,
-                $resolveInfo,
             );
 
             $paginationArgs = PaginationArgs::extractArgs($args, $this->paginationType(), $this->paginateMaxCount());

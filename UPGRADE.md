@@ -24,6 +24,36 @@ It will prevent the following type of HTTP requests:
 - `GET` requests
 - `POST` requests that can be created using HTML forms
 
+### Type hinting query builders
+
+Lighthouse now uses `Illuminate\Contracts\Database\Query\Builder` to type hint database query builders.
+If you implement `ArgBuilderDirective` or `FieldBuilderDirective`, you will have to change the signature of the `handleFieldBuilder` method accordingly:
+
+```diff
+- use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+- use Illuminate\Database\Eloquent\Relations\Relation;
+- use Illuminate\Database\Query\Builder as QueryBuilder;
++ use Illuminate\Contracts\Database\Query\Builder;
+
+- public function handleFieldBuilder(QueryBuilder|EloquentBuilder|Relation $builder, mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): QueryBuilder|EloquentBuilder|Relation;
++ public function handleFieldBuilder(Builder $builder, mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Builder;
+```
+
+### Do not pass `ResolveInfo` to itself in `ResolveInfo::enhanceBuilder()`
+
+`ResolveInfo::enhanceBuilder()` no longer expects to be passed an instance of `ResolveInfo`,
+as it can access it via `$this`.
+
+```diff
+use Nuwave\Lighthouse\Execution\ResolveInfo;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+
+// Some resolver function or directive middleware
+function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
+-   $resolveInfo->enhanceBuilder($builder, $scopes, $root, $args, $context, $resolveInfo, $directiveFilter);
++   $resolveInfo->enhanceBuilder($builder, $scopes, $root, $args, $context, $directiveFilter);
+```
+
 ## v5 to v6
 
 ### `messages` on `@rules` and `@rulesForArray`

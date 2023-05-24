@@ -2,9 +2,7 @@
 
 namespace Nuwave\Lighthouse\Support\Contracts;
 
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
-use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Contracts\Database\Query\Builder;
 
 interface ArgBuilderDirective extends Directive
 {
@@ -13,10 +11,10 @@ interface ArgBuilderDirective extends Directive
      *
      * TODO try adding a generic type parameter for the type of model when PHPStan handles it better
      *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>  $builder  the builder used to resolve the field
-     * @param  mixed  $value  the client given value of the argument
+     * @param  \Illuminate\Contracts\Database\Query\Builder  $builder the builder used to resolve the field
+     * @param  mixed  $value the client given value of the argument
      *
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model> the modified builder
+     * @return \Illuminate\Contracts\Database\Query\Builder the modified builder
      */
-    public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, mixed $value): QueryBuilder|EloquentBuilder|Relation;
+    public function handleBuilder(Builder $builder, mixed $value): Builder;
 }

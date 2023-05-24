@@ -3,10 +3,8 @@
 namespace Nuwave\Lighthouse\Pagination;
 
 use GraphQL\Error\Error;
+use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Contracts\Pagination\Paginator;
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
-use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Arr;
 use Laravel\Scout\Builder as ScoutBuilder;
 
@@ -74,13 +72,9 @@ class PaginationArgs
     /**
      * Apply the args to a builder, constructing a paginator.
      *
-     * @template TModel of \Illuminate\Database\Eloquent\Model
-     *
-     * @param  \Illuminate\Database\Query\Builder|\Laravel\Scout\Builder|\Illuminate\Database\Eloquent\Builder<TModel>|\Illuminate\Database\Eloquent\Relations\Relation<TModel>  $builder
-     *
-     * @return \Illuminate\Contracts\Pagination\Paginator<TModel>
+     * @return \Illuminate\Contracts\Pagination\Paginator<\Illuminate\Database\Eloquent\Model>
      */
-    public function applyToBuilder(QueryBuilder|ScoutBuilder|EloquentBuilder|Relation $builder): Paginator
+    public function applyToBuilder(Builder|ScoutBuilder $builder): Paginator
     {
         $methodName = $this->type->isSimple()
             ? 'simplePaginate'

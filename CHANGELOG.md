@@ -9,6 +9,11 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Changed
+
+- Use common Builder interface https://github.com/nuwave/lighthouse/pull/2389
+- Do not pass `ResolveInfo` to itself in `ResolveInfo::enhanceBuilder()` https://github.com/nuwave/lighthouse/pull/2389
+
 ## v6.9.1
 
 ### Fixed
