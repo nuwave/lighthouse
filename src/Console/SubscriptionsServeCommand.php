@@ -6,6 +6,10 @@ use Fiber;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Str;
+use Nuwave\Lighthouse\GraphQL;
+use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry;
+use Nuwave\Lighthouse\Subscriptions\Websockets\WebsocketSubscriptionRegistry;
+use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use OpenSwoole\Constant as OpenSwooleConstant;
 use OpenSwoole\Coroutine as Co;
 use OpenSwoole\Http\Request;
@@ -21,7 +25,13 @@ class SubscriptionsServeCommand extends Command
 
     protected $description = 'Starts a websocket server for graphql-ws clients to connect to.';
 
-    protected $subscribers = [];
+    public function __construct(
+        /** @var WebsocketSubscriptionRegistry $subscriptionRegistry */
+        private SubscriptionRegistry $subscriptionRegistry
+    )
+    {
+        parent::__construct();
+    }
 
     public function handle()
     {
@@ -39,9 +49,9 @@ class SubscriptionsServeCommand extends Command
 
         $server->on('start', function (Server $server) {
             $this->info(sprintf('Started listening on %s://%s:%s', 'ws', $server->host, $server->port));
-            go(function () use ($server) {
+            /*go(function () use ($server) {
                 Redis::psubscribe('sub_pref:*', $this->getSubscriptionHandler($server));
-            });
+            });*/
             go(function () use ($server) {
                 Process::signal(SIGINT, fn() => $server->shutdown());
             });
@@ -56,7 +66,7 @@ class SubscriptionsServeCommand extends Command
             $payload = \Safe\json_decode($frame->data);
             match ($payload->type) {
                 'connection_init' => $this->handleConnectionInit($server, $frame, $payload),
-                'subscribe' => $this->handleSubscribe($server, $frame, $payload),
+                'subscribe' => $this->handleSubscribe($payload->id, $payload->payload),
                 // todo ping pong
                 default => throw new \RuntimeException('Unknown message type: ' . $payload->type),
             };
@@ -101,13 +111,13 @@ return;
 
     private function handleConnectionInit(Server $server, Frame $frame, object $payload)
     {
-        if (array_key_exists($frame->fd, $this->subscribers)) {
+        /*if (array_key_exists($frame->fd, $this->subscribers)) {
             $server->disconnect($frame->fd, 4429, 'Too many initialisation requests.');
             $this->debug('Disconnected client, because it already was connected.', $frame);
             return;
         }
         // todo authorization
-        $this->subscribers[$frame->fd] = null;
+        $this->subscribers[$frame->fd] = null;*/
         $server->push($frame->fd, \Safe\json_encode([
             'type' => 'connection_ack',
         ]));
@@ -132,8 +142,12 @@ return;
         };
     }
 
-    private function handleSubscribe(Server $server, Frame $frame, mixed $payload)
+    private function handleSubscribe(string $id, mixed $payload)
     {
-        $this->info("subscribe {$frame->fd} with ". json_encode($payload));
+        /** @var GraphQL $graphql */
+        $graphql = app(GraphQL::class);
+        $contextFactory = app(CreatesContext::class);
+        $this->subscriptionRegistry->setNextId($id);
+        $graphql->executeQueryString($payload->query, $contextFactory->generate(request()), $payload->variables ?? null, null, $payload->operationName ?? null);
     }
 }

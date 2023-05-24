@@ -6,6 +6,7 @@ use Illuminate\Auth\AuthManager;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
@@ -21,6 +22,7 @@ use Nuwave\Lighthouse\Subscriptions\Iterators\AuthenticatingSyncIterator;
 use Nuwave\Lighthouse\Subscriptions\Iterators\SyncIterator;
 use Nuwave\Lighthouse\Subscriptions\Storage\CacheStorageManager;
 use Nuwave\Lighthouse\Subscriptions\Storage\RedisStorageManager;
+use Nuwave\Lighthouse\Subscriptions\Websockets\WebsocketSubscriptionRegistry;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 
 class SubscriptionServiceProvider extends ServiceProvider
@@ -28,7 +30,15 @@ class SubscriptionServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(BroadcastManager::class);
-        $this->app->singleton(SubscriptionRegistry::class);
+        $this->app->singleton(SubscriptionRegistry::class, static function (Container $app) {
+            $configRepository = $app->make(ConfigRepository::class);
+
+            if ($configRepository->get('lighthouse.subscriptions.use_websockets', false)) {
+                return $app->make(WebsocketSubscriptionRegistry::class);
+            }
+
+            return $app->make(SubscriptionRegistry::class);
+        });
         $this->app->singleton(StoresSubscriptions::class, static function (Container $app): StoresSubscriptions {
             $configRepository = $app->make(ConfigRepository::class);
 
@@ -49,8 +59,10 @@ class SubscriptionServiceProvider extends ServiceProvider
     public function boot(Dispatcher $dispatcher, ConfigRepository $configRepository): void
     {
         $dispatcher->listen(RegisterDirectiveNamespaces::class, static fn (): string => __NAMESPACE__ . '\\Directives');
-        $dispatcher->listen(StartExecution::class, SubscriptionRegistry::class . '@handleStartExecution');
-        $dispatcher->listen(BuildExtensionsResponse::class, SubscriptionRegistry::class . '@handleBuildExtensionsResponse');
+        if (! $configRepository->get('lighthouse.subscriptions.use_websockets', false)) {
+            $dispatcher->listen(StartExecution::class, SubscriptionRegistry::class . '@handleStartExecution');
+            $dispatcher->listen(BuildExtensionsResponse::class, SubscriptionRegistry::class . '@handleBuildExtensionsResponse');
+        }
 
         $this->registerBroadcasterRoutes($configRepository);
 
