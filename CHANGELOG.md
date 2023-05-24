@@ -14,6 +14,24 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Use common Builder interface https://github.com/nuwave/lighthouse/pull/2389
 - Do not pass `ResolveInfo` to itself in `ResolveInfo::enhanceBuilder()` https://github.com/nuwave/lighthouse/pull/2389
 
+## v6.9.1
+
+### Fixed
+
+- Ensure built-in directives have the lowest priority in registration https://github.com/nuwave/lighthouse/pull/2403
+
+## v6.9.0
+
+### Added
+
+- Add feature toggles via `@hide` and `@show` directive https://github.com/nuwave/lighthouse/pull/2392
+
+## v6.8.1
+
+### Fixed
+
+- Fix `scalar.stub` return type
+
 ## v6.8.0
 
 ### Added

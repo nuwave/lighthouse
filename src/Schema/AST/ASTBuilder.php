@@ -45,13 +45,9 @@ class ASTBuilder
 
     public function documentAST(): DocumentAST
     {
-        if (! isset($this->documentAST)) {
-            return $this->documentAST = $this->astCache->isEnabled()
-                ? $this->astCache->fromCacheOrBuild(fn (): DocumentAST => $this->build())
-                : $this->build();
-        }
-
-        return $this->documentAST;
+        return $this->documentAST ??= $this->astCache->isEnabled()
+            ? $this->astCache->fromCacheOrBuild(fn (): DocumentAST => $this->build())
+            : $this->build();
     }
 
     public function build(): DocumentAST

@@ -28,7 +28,7 @@ class LaravelEnumType extends EnumType
      * @param  class-string<TEnum>  $enumClass
      * @param  string|null  $name  The name the enum will have in the schema, defaults to the basename of the given class
      */
-    public function __construct(string $enumClass, ?string $name = null)
+    public function __construct(string $enumClass, string $name = null)
     {
         if (! class_exists($enumClass)) {
             throw self::classDoesNotExist($enumClass);

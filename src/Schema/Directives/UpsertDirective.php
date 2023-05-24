@@ -31,7 +31,7 @@ directive @upsert(
 GRAPHQL;
     }
 
-    protected function makeExecutionFunction(?Relation $parentRelation = null): callable
+    protected function makeExecutionFunction(Relation $parentRelation = null): callable
     {
         return new UpsertModel(new SaveModel($parentRelation));
     }

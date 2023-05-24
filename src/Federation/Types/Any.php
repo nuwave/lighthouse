@@ -74,7 +74,7 @@ DESCRIPTION;
     }
 
     /** @return array{__typename: string} */
-    public function parseLiteral($valueNode, ?array $variables = null): array
+    public function parseLiteral($valueNode, array $variables = null): array
     {
         return $this->parseValue(
             AST::valueFromASTUntyped($valueNode),

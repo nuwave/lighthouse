@@ -3,7 +3,6 @@
 namespace Tests\Integration;
 
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
-use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
 use Nuwave\Lighthouse\Events\BuildSchemaString;
 use Nuwave\Lighthouse\Events\EndExecution;
@@ -27,7 +26,7 @@ final class LifecycleEventsTest extends TestCase
         $events = [];
 
         $eventsDispatcher->listen('*', static function (string $name, array $payload) use (&$events): void {
-            if (Str::startsWith($name, 'Nuwave\\Lighthouse')) {
+            if (str_starts_with($name, 'Nuwave\\Lighthouse')) {
                 // We only fire class-based events, so the payload
                 // always holds exactly a single class instance.
                 $events[] = $payload[0];

@@ -69,7 +69,7 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
      *
      * @return \Illuminate\Database\Eloquent\Model|array<\Illuminate\Database\Eloquent\Model>
      */
-    protected function executeMutation(Model $model, ArgumentSet|array $args, ?Relation $parentRelation = null): Model|array
+    protected function executeMutation(Model $model, ArgumentSet|array $args, Relation $parentRelation = null): Model|array
     {
         $update = new ResolveNested($this->makeExecutionFunction($parentRelation));
 
@@ -84,5 +84,5 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
      *
      * @param  \Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>|null  $parentRelation
      */
-    abstract protected function makeExecutionFunction(?Relation $parentRelation = null): callable;
+    abstract protected function makeExecutionFunction(Relation $parentRelation = null): callable;
 }

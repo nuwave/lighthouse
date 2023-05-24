@@ -53,7 +53,7 @@ class LogBroadcaster implements Broadcaster
     }
 
     /** @return mixed The data that is being broadcast */
-    public function broadcasts(?string $key = null): mixed
+    public function broadcasts(string $key = null): mixed
     {
         return Arr::get($this->broadcasts, $key);
     }
