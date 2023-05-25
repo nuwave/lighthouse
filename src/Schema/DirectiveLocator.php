@@ -80,10 +80,10 @@ class DirectiveLocator
         $directives = [];
 
         foreach ($this->namespaces() as $directiveNamespace) {
+            /** @var array<class-string> $classesInNamespace */
             $classesInNamespace = ClassFinder::getClassesInNamespace($directiveNamespace);
 
             foreach ($classesInNamespace as $class) {
-                assert(class_exists($class));
                 $reflection = new \ReflectionClass($class);
                 if (! $reflection->isInstantiable()) {
                     continue;
