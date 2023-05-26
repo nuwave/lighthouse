@@ -13,7 +13,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
-- Allow default model class resolution for `union` types
+- Allow default model class resolution for `union` types https://github.com/nuwave/lighthouse/pull/2406
 
 ## v6.9.2
 
