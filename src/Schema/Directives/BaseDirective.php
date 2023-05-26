@@ -146,11 +146,8 @@ abstract class BaseDirective implements Directive
      */
     protected function getModelClass(string $argumentName = 'model'): string
     {
-        $model = $this->directiveArgValue($argumentName, ASTHelper::modelName($this->definitionNode));
-
-        if (! $model) {
-            throw new DefinitionException("Could not determine a model name for the '@{$this->name()}' directive on '{$this->nodeName()}.");
-        }
+        $model = $this->directiveArgValue($argumentName, ASTHelper::modelName($this->definitionNode))
+            ?? throw new DefinitionException("Could not determine a model name for the '@{$this->name()}' directive on '{$this->nodeName()}'.");
 
         return $this->namespaceModelClass($model);
     }
