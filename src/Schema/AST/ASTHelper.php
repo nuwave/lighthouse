@@ -355,7 +355,10 @@ class ASTHelper
             $definitionNode = static::underlyingType($definitionNode);
         }
 
-        if ($definitionNode instanceof ObjectTypeDefinitionNode || $definitionNode instanceof InterfaceTypeDefinitionNode) {
+        if ($definitionNode instanceof ObjectTypeDefinitionNode
+            || $definitionNode instanceof InterfaceTypeDefinitionNode
+            || $definitionNode instanceof UnionTypeDefinitionNode
+        ) {
             return ModelDirective::modelClass($definitionNode)
                 ?? $definitionNode->name->value;
         }

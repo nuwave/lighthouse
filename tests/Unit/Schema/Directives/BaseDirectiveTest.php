@@ -39,7 +39,7 @@ final class BaseDirectiveTest extends TestCase
         );
     }
 
-    public function testDefaultsToFieldTypeForTheModelClass(): void
+    public function testDefaultsToFieldTypeForTheModelClassIfObject(): void
     {
         $this->schema .= /** @lang GraphQL */ '
         type User {
@@ -53,6 +53,56 @@ final class BaseDirectiveTest extends TestCase
             User::class,
             $directive->getModelClass(),
         );
+    }
+
+    public function testDefaultsToFieldTypeForTheModelClassIfInterface(): void
+    {
+        $this->schema .= /** @lang GraphQL */ '
+        interface User {
+            id: ID
+        }
+        ';
+
+        $directive = $this->constructFieldDirective('foo: User @dummy');
+
+        $this->assertSame(
+            User::class,
+            $directive->getModelClass(),
+        );
+    }
+
+    public function testDefaultsToFieldTypeForTheModelClassIfUnion(): void
+    {
+        $this->schema .= /** @lang GraphQL */ '
+        union User = Admin | Member
+
+        type Admin {
+            id: ID
+        }
+
+        type Member {
+            id: ID
+        }
+        ';
+
+        $directive = $this->constructFieldDirective('foo: User @dummy');
+
+        $this->assertSame(
+            User::class,
+            $directive->getModelClass(),
+        );
+    }
+
+    public function testDoesntDefaultToFieldTypeForTheModelClassIfScalar(): void
+    {
+        $this->schema .= /** @lang GraphQL */ '
+        scalar User
+        ';
+
+        $directive = $this->constructFieldDirective('foo: User @dummy');
+
+        $this->expectException(DefinitionException::class);
+        $directive->getModelClass();
     }
 
     public function testThrowsIfTheClassIsNotInTheSchema(): void

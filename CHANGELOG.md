@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.10.0
+
+### Added
+
+- Allow default model class resolution for `union` types
+
 ## v6.9.2
 
 ### Fixed
