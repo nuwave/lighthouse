@@ -9,7 +9,7 @@ use Nuwave\Lighthouse\Subscriptions\Iterators\AuthenticatingSyncIterator;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionGuard;
 
-final class AuthenticatingSyncIteratorTest extends IteratorTest
+final class AuthenticatingSyncIteratorTestBase extends IteratorTestBase
 {
     public function testIsWellBehavedIterator(): void
     {
