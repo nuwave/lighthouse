@@ -210,6 +210,7 @@ GRAPHQL;
             : '';
 
         $fetchResultsResolver = self::qualifyTestResolver('fetchResults');
+
         return [
 /** @lang GraphQL */ "
             union Stuff {$customResolver} = {$prefix}User | {$prefix}Post
