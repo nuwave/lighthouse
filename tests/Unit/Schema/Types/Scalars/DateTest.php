@@ -12,17 +12,13 @@ final class DateTest extends DateScalarTest
         return new Date();
     }
 
-    public function validDates(): iterable
+    public static function validDates(): iterable
     {
-        return [
-            ['2020-04-20'],
-        ];
+        yield ['2020-04-20'];
     }
 
-    public function canonicalizeDates(): iterable
+    public static function canonicalizeDates(): iterable
     {
-        return [
-            ['2020-4-20', '2020-04-20'],
-        ];
+        yield ['2020-4-20', '2020-04-20'];
     }
 }
