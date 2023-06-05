@@ -204,7 +204,7 @@ GRAPHQL;
     }
 
     /** Get a fully qualified reference to a method that is defined on the test class. */
-    protected function qualifyTestResolver(string $method): string
+    protected static function qualifyTestResolver(string $method): string
     {
         $escapedClass = addslashes(static::class);
 

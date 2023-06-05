@@ -190,18 +190,16 @@ GRAPHQL;
     }
 
     /** @return array<int, array<string>> */
-    public function withAndWithoutCustomTypeResolver(): array
+    public static function withAndWithoutCustomTypeResolver(): iterable
     {
-        return [
-            // This uses the default type resolver
-            $this->schemaAndQuery(false),
-            // This scenario requires a custom resolver, since the types User and Post do not match
-            $this->schemaAndQuery(true),
-        ];
+        // This uses the default type resolver
+        yield self::schemaAndQuery(false);
+        // This scenario requires a custom resolver, since the types User and Post do not match
+        yield self::schemaAndQuery(true);
     }
 
-    /** @return array<string> [string $schema, string $query] */
-    public function schemaAndQuery(bool $withCustomTypeResolver): array
+    /** @return array{string, string} */
+    public static function schemaAndQuery(bool $withCustomTypeResolver): array
     {
         $prefix = $withCustomTypeResolver
             ? 'Custom'
@@ -211,6 +209,7 @@ GRAPHQL;
             ? /** @lang GraphQL */ '@union(resolveType: "Tests\\\\Utils\\\\Unions\\\\CustomStuff@resolveType")'
             : '';
 
+        $fetchResultsResolver = self::qualifyTestResolver('fetchResults');
         return [
 /** @lang GraphQL */ "
             union Stuff {$customResolver} = {$prefix}User | {$prefix}Post
@@ -224,7 +223,7 @@ GRAPHQL;
             }
 
             type Query {
-                stuff: [Stuff!]! @field(resolver: \"{$this->qualifyTestResolver('fetchResults')}\")
+                stuff: [Stuff!]! @field(resolver: \"{$fetchResultsResolver}\")
             }
             ",
 /** @lang GraphQL */ "
