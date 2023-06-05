@@ -4,7 +4,7 @@ namespace Tests\Unit\Subscriptions\Iterators;
 
 use Nuwave\Lighthouse\Subscriptions\Iterators\SyncIterator;
 
-final class SyncIteratorTestBase extends IteratorTestBase
+final class SyncIteratorTest extends IteratorTestBase
 {
     public function testIsWellBehavedIterator(): void
     {
