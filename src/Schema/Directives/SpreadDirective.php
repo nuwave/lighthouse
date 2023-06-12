@@ -25,9 +25,7 @@ GRAPHQL;
         $fieldValue->addArgumentSetTransformer(fn (ArgumentSet $argumentSet): ArgumentSet => $this->spread($argumentSet));
     }
 
-    /**
-     * Apply the @spread directive and return a new, modified ArgumentSet.
-     */
+    /** Apply the @spread directive and return a new, modified ArgumentSet. */
     protected function spread(ArgumentSet $original): ArgumentSet
     {
         $next = new ArgumentSet();

@@ -6,14 +6,10 @@ use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
 class UpsertModel implements ArgResolver
 {
-    /**
-     * @var callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver
-     */
+    /** @var callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver */
     protected $previous;
 
-    /**
-     * @param  callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver  $previous
-     */
+    /** @param  callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver  $previous */
     public function __construct(callable $previous)
     {
         $this->previous = $previous;

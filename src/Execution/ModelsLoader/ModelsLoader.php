@@ -16,8 +16,6 @@ interface ModelsLoader
      */
     public function load(EloquentCollection $parents): void;
 
-    /**
-     * Extract the result of loading from the given model.
-     */
+    /** Extract the result of loading from the given model. */
     public function extract(Model $model): mixed;
 }

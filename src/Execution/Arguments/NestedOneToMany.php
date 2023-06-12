@@ -33,9 +33,7 @@ class NestedOneToMany implements ArgResolver
         }
     }
 
-    /**
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>  $relation
-     */
+    /** @param  \Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>  $relation */
     public static function createUpdateUpsert(ArgumentSet $args, Relation $relation): void
     {
         if ($args->has('create')) {
@@ -66,9 +64,7 @@ class NestedOneToMany implements ArgResolver
         }
     }
 
-    /**
-     * @param  \Illuminate\Database\Eloquent\Relations\HasOneOrMany<\Illuminate\Database\Eloquent\Model>  $relation
-     */
+    /** @param  \Illuminate\Database\Eloquent\Relations\HasOneOrMany<\Illuminate\Database\Eloquent\Model>  $relation */
     public static function connectDisconnect(ArgumentSet $args, HasOneOrMany $relation): void
     {
         if ($args->has('connect')) {

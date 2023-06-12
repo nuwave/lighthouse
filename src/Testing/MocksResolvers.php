@@ -53,9 +53,7 @@ trait MocksResolvers
             ->method('__invoke');
     }
 
-    /**
-     * Register a mock resolver that will be called through the `@mock` directive.
-     */
+    /** Register a mock resolver that will be called through the `@mock` directive. */
     protected function registerMockResolver(callable $mock, string $key): void
     {
         $mockResolverService = Container::getInstance()->make(MockResolverService::class);

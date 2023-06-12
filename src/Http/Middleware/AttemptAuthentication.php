@@ -22,9 +22,7 @@ class AttemptAuthentication
         return $next($request);
     }
 
-    /**
-     * @param  array<string>  $guards
-     */
+    /** @param  array<string>  $guards */
     protected function attemptAuthentication(array $guards): void
     {
         if ($guards === []) {

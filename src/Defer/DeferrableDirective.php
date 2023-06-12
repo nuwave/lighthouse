@@ -53,9 +53,7 @@ GRAPHQL;
         });
     }
 
-    /**
-     * Determine if the field should be deferred.
-     */
+    /** Determine if the field should be deferred. */
     protected function shouldDefer(TypeNode $fieldType, ResolveInfo $resolveInfo): bool
     {
         $defers = (new ClientDirective(self::DEFER_DIRECTIVE_NAME))->forField($resolveInfo);
@@ -88,9 +86,7 @@ GRAPHQL;
         return ! in_array([Directive::IF_ARGUMENT_NAME => false], $includes, true);
     }
 
-    /**
-     * @param  array<array<string, mixed>|null>  $defers
-     */
+    /** @param  array<array<string, mixed>|null>  $defers */
     protected function anyFieldHasDefer(array $defers): bool
     {
         foreach ($defers as $defer) {

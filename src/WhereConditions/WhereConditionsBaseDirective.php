@@ -67,8 +67,6 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
         }
     }
 
-    /**
-     * Get the suffix that will be added to generated input types.
-     */
+    /** Get the suffix that will be added to generated input types. */
     abstract protected function generatedInputSuffix(): string;
 }

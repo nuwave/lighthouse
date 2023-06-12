@@ -256,9 +256,7 @@ final class MorphManyTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @return array<array<string, string>>
-     */
+    /** @return array<array<string, string>> */
     public static function existingModelMutations(): array
     {
         return [
@@ -267,9 +265,7 @@ final class MorphManyTest extends DBTestCase
         ];
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    /** @dataProvider existingModelMutations */
     public function testUpdateWithNewMorphMany(string $action): void
     {
         factory(Task::class)->create();
@@ -308,9 +304,7 @@ GRAPHQL
         ]);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    /** @dataProvider existingModelMutations */
     public function testUpdateAndUpdateMorphMany(string $action): void
     {
         factory(Task::class)
@@ -355,9 +349,7 @@ GRAPHQL
         ]);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    /** @dataProvider existingModelMutations */
     public function testUpdateAndUpsertMorphMany(string $action): void
     {
         factory(Task::class)
@@ -402,9 +394,7 @@ GRAPHQL
         ]);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    /** @dataProvider existingModelMutations */
     public function testUpdateAndDeleteMorphMany(string $action): void
     {
         factory(Task::class)
@@ -442,9 +432,7 @@ GRAPHQL
         ]);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    /** @dataProvider existingModelMutations */
     public function testUpdateAndConnectMorphMany(string $action): void
     {
         $task = factory(Task::class)->create();
@@ -490,9 +478,7 @@ GRAPHQL
             ]);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    /** @dataProvider existingModelMutations */
     public function testUpdateAndDisconnectMorphMany(string $action): void
     {
         /** @var \Tests\Utils\Models\Task $task */
@@ -540,9 +526,7 @@ GRAPHQL
         $this->assertNull($image->refresh()->imageable);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    /** @dataProvider existingModelMutations */
     public function testDisconnectModelEventsMorphMany(string $action): void
     {
         /** @var \Tests\Utils\Models\Task $task */

@@ -10,9 +10,7 @@ use Illuminate\Support\Carbon;
  */
 class EndExecution
 {
-    /**
-     * The point in time when the result was ready.
-     */
+    /** The point in time when the result was ready. */
     public Carbon $moment;
 
     public function __construct(

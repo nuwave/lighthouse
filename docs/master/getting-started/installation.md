@@ -22,7 +22,7 @@ php artisan vendor:publish --tag=lighthouse-schema
 To use the included lighthouse config, copy it over to your config folder.
 
 ```bash
-mkdir -p config
+mkdir --parents config
 cp vendor/nuwave/lighthouse/src/lighthouse.php config/
 ```
 
@@ -47,7 +47,7 @@ To get you going right away in Lumen, copy over the included default schema.
 It uses pagination and validation, so you need to register the service providers.
 
 ```bash
-mkdir -p graphql
+mkdir --parents graphql
 cp vendor/nuwave/lighthouse/src/default-schema.graphql graphql/schema.graphql
 ```
 

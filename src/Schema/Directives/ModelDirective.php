@@ -26,9 +26,7 @@ directive @model(
 GRAPHQL;
     }
 
-    /**
-     * Attempt to get the model class name from this directive.
-     */
+    /** Attempt to get the model class name from this directive. */
     public static function modelClass(Node $node): ?string
     {
         $modelDirective = ASTHelper::directiveDefinition($node, self::NAME);

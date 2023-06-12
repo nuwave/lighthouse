@@ -111,9 +111,7 @@ input OrderByRelation {
 GRAPHQL;
     }
 
-    /**
-     * @param  array<array<string, mixed>>  $value
-     */
+    /** @param  array<array<string, mixed>>  $value */
     public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, $value): QueryBuilder|EloquentBuilder|Relation
     {
         foreach ($value as $orderByClause) {
@@ -270,9 +268,7 @@ GRAPHQL;
         );
     }
 
-    /**
-     * @param  array<string>  $otherOptions
-     */
+    /** @param  array<string>  $otherOptions */
     protected function mutuallyExclusiveRule(array $otherOptions): string
     {
         $optionsString = implode(',', $otherOptions);

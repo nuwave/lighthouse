@@ -16,14 +16,10 @@ class LaravelEnumType extends EnumType
 {
     public const DEPRECATED_PHPDOC_TAG = '@deprecated';
 
-    /**
-     * @var class-string<TEnum>
-     */
+    /** @var class-string<TEnum> */
     protected string $enumClass;
 
-    /**
-     * @var \ReflectionClass<TEnum>
-     */
+    /** @var \ReflectionClass<TEnum> */
     protected \ReflectionClass $reflection;
 
     /**
@@ -32,7 +28,7 @@ class LaravelEnumType extends EnumType
      * @param  class-string<TEnum>  $enumClass
      * @param  string|null  $name  The name the enum will have in the schema, defaults to the basename of the given class
      */
-    public function __construct(string $enumClass, ?string $name = null)
+    public function __construct(string $enumClass, string $name = null)
     {
         if (! class_exists($enumClass)) {
             throw self::classDoesNotExist($enumClass);
@@ -83,9 +79,7 @@ class LaravelEnumType extends EnumType
         return new \InvalidArgumentException("Class {$enumClass} must extend {$baseClass}.");
     }
 
-    /**
-     * @param  \BenSampo\Enum\Enum<mixed>  $value
-     */
+    /** @param  \BenSampo\Enum\Enum<mixed>  $value */
     public static function enumMustHaveKey(Enum $value): \InvalidArgumentException
     {
         $class = $value::class;
@@ -137,17 +131,13 @@ class LaravelEnumType extends EnumType
             : null;
     }
 
-    /**
-     * @param  TEnum  $enum
-     */
+    /** @param  TEnum  $enum */
     protected function enumValueDescription(Enum $enum): ?string
     {
         return $enum->description;
     }
 
-    /**
-     * Overwrite the native EnumType serialization, as this class does not hold plain values.
-     */
+    /** Overwrite the native EnumType serialization, as this class does not hold plain values. */
     public function serialize($value): string
     {
         if (! $value instanceof Enum) {

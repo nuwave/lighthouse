@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Pagination\PaginationManipulator;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ComplexityResolverDirective;
 use Nuwave\Lighthouse\Support\Utils;
@@ -41,9 +40,7 @@ GRAPHQL;
         return Utils::constructResolver($namespacedClassName, $methodName);
     }
 
-    /**
-     * @param  array<string, mixed>  $args
-     */
+    /** @param  array<string, mixed>  $args */
     public static function defaultComplexityResolver(int $childrenComplexity, array $args): int
     {
         /**

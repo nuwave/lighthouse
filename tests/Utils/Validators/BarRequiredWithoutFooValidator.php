@@ -6,9 +6,7 @@ use Nuwave\Lighthouse\Validation\Validator;
 
 final class BarRequiredWithoutFooValidator extends Validator
 {
-    /**
-     * @return array{bar: array<string>}
-     */
+    /** @return array{bar: array<string>} */
     public function rules(): array
     {
         return [

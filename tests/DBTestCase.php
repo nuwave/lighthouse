@@ -14,9 +14,7 @@ abstract class DBTestCase extends TestCase
 
     public const ALTERNATE_CONNECTION = 'alternate';
 
-    /**
-     * Indicates if migrations ran.
-     */
+    /** Indicates if migrations ran. */
     protected static bool $migrated = false;
 
     protected function setUp(): void
@@ -53,9 +51,7 @@ abstract class DBTestCase extends TestCase
         $config->set('database.connections.' . self::ALTERNATE_CONNECTION, $this->mysqlOptions());
     }
 
-    /**
-     * @return array<string, mixed>
-     */
+    /** @return array<string, mixed> */
     protected function mysqlOptions(): array
     {
         return [

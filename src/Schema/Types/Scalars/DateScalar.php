@@ -27,9 +27,7 @@ abstract class DateScalar extends ScalarType
         return $this->format($value);
     }
 
-    /**
-     * Parse an externally provided variable value into a Carbon instance.
-     */
+    /** Parse an externally provided variable value into a Carbon instance. */
     public function parseValue(mixed $value): IlluminateCarbon
     {
         return $this->tryParsingDate($value, Error::class);
@@ -40,7 +38,7 @@ abstract class DateScalar extends ScalarType
      *
      * @param  array<string, mixed>|null  $variables
      */
-    public function parseLiteral(Node $valueNode, ?array $variables = null): IlluminateCarbon
+    public function parseLiteral(Node $valueNode, array $variables = null): IlluminateCarbon
     {
         if (! $valueNode instanceof StringValueNode) {
             throw new Error("Query error: Can only parse strings, got {$valueNode->kind}.", $valueNode);
@@ -86,9 +84,7 @@ abstract class DateScalar extends ScalarType
         }
     }
 
-    /**
-     * Serialize the Carbon instance.
-     */
+    /** Serialize the Carbon instance. */
     abstract protected function format(IlluminateCarbon $carbon): string;
 
     /**

@@ -6,13 +6,9 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 interface ContextSerializer
 {
-    /**
-     * Serialize the context.
-     */
+    /** Serialize the context. */
     public function serialize(GraphQLContext $context): string;
 
-    /**
-     * Unserialize the context.
-     */
+    /** Unserialize the context. */
     public function unserialize(string $context): GraphQLContext;
 }

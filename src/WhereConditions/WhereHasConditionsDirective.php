@@ -56,9 +56,7 @@ directive @whereHasConditions(
 GRAPHQL;
     }
 
-    /**
-     * @param  array<string, mixed>|null  $value  The client given conditions
-     */
+    /** @param  array<string, mixed>|null  $value  The client given conditions */
     public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, $value): QueryBuilder|EloquentBuilder|Relation
     {
         if ($value === null) {
@@ -84,9 +82,7 @@ GRAPHQL;
         return $builder;
     }
 
-    /**
-     * Get the name of the Eloquent relationship that is used for the query.
-     */
+    /** Get the name of the Eloquent relationship that is used for the query. */
     protected function relationName(): string
     {
         $relationName = $this->directiveArgValue('relation');

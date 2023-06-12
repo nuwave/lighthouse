@@ -58,9 +58,7 @@ abstract class BaseDirective implements Directive
      */
     protected array $directiveArgs;
 
-    /**
-     * The hydrate function is called when retrieving a directive from the directive registry.
-     */
+    /** The hydrate function is called when retrieving a directive from the directive registry. */
     public function hydrate(DirectiveNode $directiveNode, ScalarTypeDefinitionNode|ScalarTypeExtensionNode|ObjectTypeDefinitionNode|ObjectTypeExtensionNode|InterfaceTypeDefinitionNode|InterfaceTypeExtensionNode|UnionTypeDefinitionNode|UnionTypeExtensionNode|EnumTypeDefinitionNode|EnumTypeExtensionNode|InputObjectTypeDefinitionNode|InputObjectTypeExtensionNode|FieldDefinitionNode|InputValueDefinitionNode|EnumValueDefinitionNode $definitionNode): self
     {
         $this->directiveNode = $directiveNode;
@@ -122,7 +120,7 @@ abstract class BaseDirective implements Directive
      *
      * @api
      *
-     * @param mixed $default Use this over `??` to preserve explicit `null`
+     * @param  mixed  $default Use this over `??` to preserve explicit `null`
      *
      * @return mixed The argument value or the default
      */
@@ -148,11 +146,8 @@ abstract class BaseDirective implements Directive
      */
     protected function getModelClass(string $argumentName = 'model'): string
     {
-        $model = $this->directiveArgValue($argumentName, ASTHelper::modelName($this->definitionNode));
-
-        if (! $model) {
-            throw new DefinitionException("Could not determine a model name for the '@{$this->name()}' directive on '{$this->nodeName()}.");
-        }
+        $model = $this->directiveArgValue($argumentName, ASTHelper::modelName($this->definitionNode))
+            ?? throw new DefinitionException("Could not determine a model name for the '@{$this->name()}' directive on '{$this->nodeName()}'.");
 
         return $this->namespaceModelClass($model);
     }
@@ -170,7 +165,7 @@ abstract class BaseDirective implements Directive
     protected function namespaceClassName(
         string $classCandidate,
         array $namespacesToTry = [],
-        ?callable $determineMatch = null,
+        callable $determineMatch = null,
     ): string {
         $namespaceForDirective = ASTHelper::namespaceForDirective(
             $this->definitionNode,
@@ -259,7 +254,7 @@ abstract class BaseDirective implements Directive
      *
      * @api
      *
-     * @param array<string> $names
+     * @param  array<string>  $names
      */
     protected function validateMutuallyExclusiveArguments(array $names): void
     {
@@ -272,9 +267,7 @@ abstract class BaseDirective implements Directive
         }
     }
 
-    /**
-     * Loads directive argument values from AST and caches them in $directiveArgs.
-     */
+    /** Loads directive argument values from AST and caches them in $directiveArgs. */
     protected function loadArgValues(): void
     {
         $this->directiveArgs = [];

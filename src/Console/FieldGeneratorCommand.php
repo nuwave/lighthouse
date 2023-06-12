@@ -15,9 +15,7 @@ abstract class FieldGeneratorCommand extends LighthouseGeneratorCommand
         return __DIR__ . "/stubs/{$stub}.stub";
     }
 
-    /**
-     * @return array<int, array<int, mixed>>
-     */
+    /** @return array<int, array<int, mixed>> */
     protected function getOptions(): array
     {
         return [

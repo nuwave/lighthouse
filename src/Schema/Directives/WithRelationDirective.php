@@ -16,9 +16,7 @@ abstract class WithRelationDirective extends BaseDirective implements FieldMiddl
 {
     use RelationDirectiveHelpers;
 
-    /**
-     * @param  array<string, mixed>  $args
-     */
+    /** @param  array<string, mixed>  $args */
     abstract protected function modelsLoader(mixed $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ModelsLoader;
 
     public function handleField(FieldValue $fieldValue): void
@@ -30,9 +28,7 @@ abstract class WithRelationDirective extends BaseDirective implements FieldMiddl
         );
     }
 
-    /**
-     * @param  array<string, mixed>  $args
-     */
+    /** @param  array<string, mixed>  $args */
     protected function loadRelation(Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Deferred
     {
         $relationBatchLoader = BatchLoaderRegistry::instance(

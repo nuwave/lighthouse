@@ -13,9 +13,7 @@ use Nuwave\Lighthouse\Execution\ResolveInfo;
  */
 class Tracing
 {
-    /**
-     * The point in time when the request was initially started.
-     */
+    /** The point in time when the request was initially started. */
     protected Carbon $executionStartAbsolute;
 
     /**
@@ -58,9 +56,7 @@ class Tracing
         );
     }
 
-    /**
-     * Record resolver execution time.
-     */
+    /** Record resolver execution time. */
     public function record(ResolveInfo $resolveInfo, float|int $start, float|int $end): void
     {
         $this->resolverTraces[] = [
@@ -85,9 +81,7 @@ class Tracing
             : microtime(true);
     }
 
-    /**
-     * Diff the time results to each other and convert to nanoseconds if needed.
-     */
+    /** Diff the time results to each other and convert to nanoseconds if needed. */
     protected function diffTimeInNanoseconds(float|int $start, float|int $end): int
     {
         if ($this->platformSupportsNanoseconds()) {
@@ -101,9 +95,7 @@ class Tracing
         return (int) (($end - $start) * 1000 * 1000 * 1000);
     }
 
-    /**
-     * Is the `hrtime` function available to get a nanosecond precision point in time?
-     */
+    /** Is the `hrtime` function available to get a nanosecond precision point in time? */
     protected function platformSupportsNanoseconds(): bool
     {
         return function_exists('hrtime');

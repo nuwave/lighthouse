@@ -63,7 +63,9 @@ GRAPHQL;
 
         $name = $this->directiveArgValue('name');
         if ($name !== null) {
-            $limiter = $this->limiter->limiter($name);
+            // @phpstan-ignore-next-line limiter() can actually return null, some Laravel versions lie
+            $limiter = $this->limiter->limiter($name)
+                ?? throw new DefinitionException("Named limiter {$name} not found.");
 
             $limiterResponse = $limiter($this->request);
             if ($limiterResponse instanceof Unlimited) {
@@ -113,9 +115,7 @@ GRAPHQL;
         }
     }
 
-    /**
-     * Checks throttling limit and records this attempt.
-     */
+    /** Checks throttling limit and records this attempt. */
     protected function handleLimit(string $key, int $maxAttempts, float $decayMinutes, string $fieldReference): void
     {
         if ($this->limiter->tooManyAttempts($key, $maxAttempts)) {

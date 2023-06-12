@@ -10,9 +10,7 @@ use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 
 interface ArgManipulator extends Directive
 {
-    /**
-     * Manipulate the AST.
-     */
+    /** Manipulate the AST. */
     public function manipulateArgDefinition(
         DocumentAST &$documentAST,
         InputValueDefinitionNode &$argDefinition,

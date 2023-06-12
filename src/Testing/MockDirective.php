@@ -12,9 +12,7 @@ class MockDirective extends BaseDirective implements FieldResolver
         protected MockResolverService $mockResolverService,
     ) {}
 
-    /**
-     * SDL definition of the directive.
-     */
+    /** SDL definition of the directive. */
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'

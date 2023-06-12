@@ -41,9 +41,7 @@ class SubscriptionRegistry
         protected ConfigRepository $configRepository,
     ) {}
 
-    /**
-     * Add subscription to registry.
-     */
+    /** Add subscription to registry. */
     public function register(GraphQLSubscription $subscription, string $field): self
     {
         $this->subscriptions[$field] = $subscription;
@@ -51,9 +49,7 @@ class SubscriptionRegistry
         return $this;
     }
 
-    /**
-     * Check if subscription is registered.
-     */
+    /** Check if subscription is registered. */
     public function has(string $key): bool
     {
         if (isset($this->subscriptions[$key])) {
@@ -63,9 +59,7 @@ class SubscriptionRegistry
         return $this->subscriptionType()->hasField($key);
     }
 
-    /**
-     * Get instance of subscription.
-     */
+    /** Get instance of subscription. */
     public function subscription(string $key): GraphQLSubscription
     {
         if (! isset($this->subscriptions[$key])) {
@@ -83,9 +77,7 @@ class SubscriptionRegistry
         return $this->subscriptions[$key];
     }
 
-    /**
-     * Add subscription to registry.
-     */
+    /** Add subscription to registry. */
     public function subscriber(Subscriber $subscriber, string $topic): self
     {
         $this->storage->storeSubscriber($subscriber, $topic);
@@ -122,9 +114,7 @@ class SubscriptionRegistry
             });
     }
 
-    /**
-     * Reset the collection of subscribers when a new execution starts.
-     */
+    /** Reset the collection of subscribers when a new execution starts. */
     public function handleStartExecution(StartExecution $startExecution): void
     {
         $this->subscribers = [];

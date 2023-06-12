@@ -643,9 +643,7 @@ GRAPHQL
         ')->assertGraphQLErrorMessage('Expected value of type "Int!", found null.');
     }
 
-    /**
-     * @return \Illuminate\Pagination\LengthAwarePaginator<array<string, int>>
-     */
+    /** @return \Illuminate\Pagination\LengthAwarePaginator<array<string, int>> */
     public static function returnPaginatedDataInsteadOfBuilder(): LengthAwarePaginator
     {
         return new LengthAwarePaginator([
@@ -730,9 +728,7 @@ GRAPHQL
         ])->assertGraphQLErrorMessage(QueryComplexity::maxQueryComplexityErrorMessage($max, $complexity));
     }
 
-    /**
-     * @param  array{complexity: int} $args
-     */
+    /** @param  array{complexity: int} $args */
     public static function complexityResolver(int $childrenComplexity, array $args): int
     {
         return $args['complexity'];

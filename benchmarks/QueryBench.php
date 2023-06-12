@@ -10,9 +10,7 @@ use Tests\TestCase;
  */
 abstract class QueryBench extends TestCase
 {
-    /**
-     * Cached graphQL endpoint.
-     */
+    /** Cached graphQL endpoint. */
     protected string $graphQLEndpoint;
 
     public function setUp(): void

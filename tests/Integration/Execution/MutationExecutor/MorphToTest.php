@@ -177,9 +177,7 @@ final class MorphToTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @return array<array<string, string>>
-     */
+    /** @return array<array<string, string>> */
     public static function existingModelMutations(): array
     {
         return [
@@ -188,9 +186,7 @@ final class MorphToTest extends DBTestCase
         ];
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    /** @dataProvider existingModelMutations */
     public function testDisconnectsMorphTo(string $action): void
     {
         /** @var \Tests\Utils\Models\Task $task */
@@ -229,9 +225,7 @@ GRAPHQL
         ]);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    /** @dataProvider existingModelMutations */
     public function testDeletesMorphTo(string $action): void
     {
         /** @var \Tests\Utils\Models\Task $task */

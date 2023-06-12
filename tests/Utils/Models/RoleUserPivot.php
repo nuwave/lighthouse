@@ -27,17 +27,13 @@ final class RoleUserPivot extends Model
 
     public $timestamps = false;
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\Role, self>
-     */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\Role, self> */
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class);
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\User, self>
-     */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\User, self> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

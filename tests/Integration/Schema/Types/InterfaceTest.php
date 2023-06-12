@@ -341,9 +341,7 @@ GRAPHQL;
         $this->assertSame('PostPaginator', $result->json('data.__type.fields.0.type.ofType.name'));
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\User|\Tests\Utils\Models\Team>
-     */
+    /** @return \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\User|\Tests\Utils\Models\Team> */
     public static function fetchResults(): EloquentCollection
     {
         /** @var \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\User|\Tests\Utils\Models\Team> $results */
@@ -361,9 +359,7 @@ GRAPHQL;
         return $typeRegistry->get('Guy');
     }
 
-    /**
-     * @return array<string, string>
-     */
+    /** @return array<string, string> */
     public static function fetchGuy(): array
     {
         return [

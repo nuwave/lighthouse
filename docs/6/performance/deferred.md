@@ -2,16 +2,10 @@
 
 **Experimental: not enabled by default, not guaranteed to be stable.**
 
-::: warning
-Currently the `@defer` directive requires Apollo Client in alpha.
-Track the state of the PR here: https://github.com/apollographql/apollo-client/pull/3686#issuecomment-555534519
-:::
-
 Deferring fields allows you to prioritize fetching data needed to render the most important content
 as fast as possible, and then loading the rest of the page in the background.
 
-Lighthouse adds support for the experimental `@defer` directive through an extension.
-Read more about it [here](https://www.apollographql.com/blog/introducing-defer-in-apollo-server-f6797c4e9d6e).
+Lighthouse adds support for [the `@defer` directive](https://github.com/graphql/graphql-wg/blob/main/rfcs/DeferStream.md) through an extension.
 
 ## Setup
 
@@ -25,8 +19,8 @@ Add the service provider to your `config/app.php`:
 
 ## Configuration
 
-Consider the configuration options in your `config/lighthouse.php` to prevent
-deferred queries from running to long.
+Consider the configuration options under `defer` in your `config/lighthouse.php`
+to prevent deferred queries from running to long.
 
 <br />
 

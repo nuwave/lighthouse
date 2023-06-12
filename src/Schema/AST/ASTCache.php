@@ -45,9 +45,7 @@ class ASTCache
         $this->filesystem()->delete($this->path);
     }
 
-    /**
-     * @param  callable(): DocumentAST  $build
-     */
+    /** @param  callable(): DocumentAST  $build */
     public function fromCacheOrBuild(callable $build): DocumentAST
     {
         if ($this->filesystem()->exists($this->path)) {

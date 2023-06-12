@@ -39,14 +39,10 @@ use Nuwave\Lighthouse\Support\Utils;
  */
 class TypeRegistry
 {
-    /**
-     * Lazily initialized.
-     */
+    /** Lazily initialized. */
     protected FieldFactory $fieldFactory;
 
-    /**
-     * Lazily initialized.
-     */
+    /** Lazily initialized. */
     protected DocumentAST $documentAST;
 
     /**
@@ -88,9 +84,7 @@ class TypeRegistry
         return new DefinitionException("Tried to register a type that is already present in the schema: {$name}. Use overwrite() to ignore existing types.");
     }
 
-    /**
-     * @param  array<string>  $possibleTypes
-     */
+    /** @param  array<string>  $possibleTypes */
     public static function unresolvableAbstractTypeMapping(string $fqcn, array $possibleTypes): DefinitionException
     {
         $ambiguousMapping = implode(', ', $possibleTypes);
@@ -174,7 +168,7 @@ class TypeRegistry
      *
      * @api
      *
-     * @param callable(): \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType $type
+     * @param  callable(): \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType  $type
      */
     public function registerLazy(string $name, callable $type): self
     {
@@ -206,7 +200,7 @@ class TypeRegistry
      *
      * @api
      *
-     * @param callable(): \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType $type
+     * @param  callable(): \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType  $type
      */
     public function overwriteLazy(string $name, callable $type): self
     {
@@ -458,9 +452,7 @@ class TypeRegistry
         ]);
     }
 
-    /**
-     * @return list<string>
-     */
+    /** @return list<string> */
     protected function possibleImplementations(InterfaceTypeDefinitionNode $interfaceTypeDefinitionNode): array
     {
         $name = $interfaceTypeDefinitionNode->name->value;
@@ -480,9 +472,7 @@ class TypeRegistry
         return $implementations;
     }
 
-    /**
-     * @param  array<string>  $namespaces
-     */
+    /** @param  array<string>  $namespaces */
     protected function typeResolverFromClass(string $nodeName, array $namespaces): ?\Closure
     {
         $className = Utils::namespaceClassname(
@@ -574,16 +564,11 @@ class TypeRegistry
 
     protected function fieldFactory(): FieldFactory
     {
-        if (! isset($this->fieldFactory)) {
-            $this->fieldFactory = Container::getInstance()->make(FieldFactory::class);
-        }
-
-        return $this->fieldFactory;
+        return $this->fieldFactory
+            ??= Container::getInstance()->make(FieldFactory::class);
     }
 
-    /**
-     * @return list<string>
-     */
+    /** @return list<string> */
     protected function possibleUnionTypes(UnionTypeDefinitionNode $unionDefinition): array
     {
         $types = [];

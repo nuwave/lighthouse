@@ -19,9 +19,7 @@ trait RefreshesSchemaCache
      */
     protected static bool $schemaCacheWasRefreshed = false;
 
-    /**
-     * Path to the file used for coordinating exactly-one semantics.
-     */
+    /** Path to the file used for coordinating exactly-one semantics. */
     protected static string $lockFilePath = __DIR__ . '/schema-cache-refreshing';
 
     protected function setUpRefreshesSchemaCache(): void
@@ -48,9 +46,7 @@ trait RefreshesSchemaCache
         }
     }
 
-    /**
-     * @deprecated TODO leverage automatic test trait setup, this method will be removed in the next major version
-     */
+    /** @deprecated TODO leverage automatic test trait setup, this method will be removed in the next major version */
     protected function bootRefreshesSchemaCache(): void
     {
         $this->setUpRefreshesSchemaCache();

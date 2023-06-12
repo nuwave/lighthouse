@@ -25,9 +25,7 @@ final class IdeHelperCommandTest extends TestCase
         ]);
     }
 
-    /**
-     * This test is pretty slow, so we put it all in one test method.
-     */
+    /** This test is pretty slow, so we put it all in one test method. */
     public function testGeneratesIdeHelperFiles(): void
     {
         $typeRegistry = $this->app->make(TypeRegistry::class);

@@ -25,9 +25,7 @@ final class Role extends Model
 {
     public $timestamps = false;
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Tests\Utils\Models\User>
-     */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Tests\Utils\Models\User> */
     public function users(): BelongsToMany
     {
         return $this
@@ -35,9 +33,7 @@ final class Role extends Model
             ->withPivot('meta');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\ACL, self>
-     */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\ACL, self> */
     public function acl(): BelongsTo
     {
         return $this->belongsTo(ACL::class);

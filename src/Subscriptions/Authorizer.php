@@ -59,7 +59,7 @@ class Authorizer implements AuthorizesSubscriptions
      */
     protected function sanitizeChannelName(string $channelName): string
     {
-        if (Str::startsWith($channelName, 'presence-')) {
+        if (str_starts_with($channelName, 'presence-')) {
             return Str::substr($channelName, 9);
         }
 

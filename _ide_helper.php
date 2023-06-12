@@ -131,9 +131,7 @@ class TestResponse
         return $mock;
     }
 
-    /**
-     * Get the channel name from a subscription query.
-     */
+    /** Get the channel name from a subscription query. */
     public function graphQLSubscriptionChannelName(): string
     {
         return '';

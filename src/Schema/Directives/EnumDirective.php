@@ -26,9 +26,7 @@ scalar EnumValue
 GRAPHQL;
     }
 
-    /**
-     * Get the internal value of the enum key.
-     */
+    /** Get the internal value of the enum key. */
     public function value(): mixed
     {
         return $this->directiveArgValue('value');

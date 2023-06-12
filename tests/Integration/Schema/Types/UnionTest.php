@@ -11,9 +11,7 @@ use Tests\Utils\Models\User;
 
 final class UnionTest extends DBTestCase
 {
-    /**
-     * @dataProvider withAndWithoutCustomTypeResolver
-     */
+    /** @dataProvider withAndWithoutCustomTypeResolver */
     public function testResolveUnionTypes(string $schema, string $query): void
     {
         // This creates a user with it
@@ -180,9 +178,7 @@ GRAPHQL;
         ');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\User|\Tests\Utils\Models\Post>
-     */
+    /** @return \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\User|\Tests\Utils\Models\Post> */
     public static function fetchResults(): EloquentCollection
     {
         /** @var \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\User|\Tests\Utils\Models\Post> $results */
@@ -193,9 +189,7 @@ GRAPHQL;
             ->concat(Post::all());
     }
 
-    /**
-     * @return array<int, array<string>>
-     */
+    /** @return array<int, array<string>> */
     public function withAndWithoutCustomTypeResolver(): array
     {
         return [
@@ -206,9 +200,7 @@ GRAPHQL;
         ];
     }
 
-    /**
-     * @return array<string> [string $schema, string $query]
-     */
+    /** @return array<string> [string $schema, string $query] */
     public function schemaAndQuery(bool $withCustomTypeResolver): array
     {
         $prefix = $withCustomTypeResolver

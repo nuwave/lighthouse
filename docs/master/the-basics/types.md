@@ -131,39 +131,32 @@ The PHP internal value of the field `ADMIN` will be `string('ADMIN')`.
 
 ### Native PHP definition
 
-If you want to reuse enum definitions or constants from PHP, you can also
-register a native PHP enum type [through the TypeRegistry](../digging-deeper/adding-types-programmatically.md#native-php-types).
-
-Just define an [EnumType](https://webonyx.github.io/graphql-php/type-definitions/enums) and register it:
+If you want to reuse enum definitions from PHP, you can [construct a `PhpEnumType`](https://webonyx.github.io/graphql-php/type-definitions/enums/#construction-from-php-enum)
+and [register it through the TypeRegistry](../digging-deeper/adding-types-programmatically.md#native-php-types):
 
 ```php
-use GraphQL\Type\Definition\EnumType;
+use GraphQL\Type\Definition\Deprecated;
+use GraphQL\Type\Definition\Description;
+use GraphQL\Type\Definition\PhpEnumType;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 
-$episodeEnum = new EnumType([
-    'name' => 'Episode',
-    'description' => 'One of the films in the Star Wars Trilogy',
-    'values' => [
-        'NEWHOPE' => [
-            'value' => 4,
-            'description' => 'Released in 1977.'
-        ],
-        'EMPIRE' => [
-            'value' => 5,
-            'description' => 'Released in 1980.'
-        ],
-        'JEDI' => [
-            'value' => 6,
-            'description' => 'Released in 1983.'
-        ],
-    ]
-]);
+#[Description(description: 'Sweet and juicy.')]
+enum Fruit
+{
+    #[Description(description: 'Rich in potassium.')]
+    case BANANA;
+
+    #[Deprecated(reason: 'Too sour.')]
+    case CITRON;
+}
 
 // This code should go in a service provider
 // Resolve TypeRegistry through the container, as it is a singleton
 $typeRegistry = app(TypeRegistry::class);
-$typeRegistry->register($episodeEnum);
+$typeRegistry->register(new PhpEnumType(Fruit::class));
 ```
+
+### bensampo/laravel-enum
 
 If you are using [bensampo/laravel-enum](https://github.com/BenSampo/laravel-enum)
 you can use `Nuwave\Lighthouse\Schema\Types\LaravelEnumType` to construct an enum type from it.
@@ -183,7 +176,7 @@ final class Color extends Enum
 }
 
 // Register through TypeRegistry::register()
-$userType = new LaravelEnumType(Color::class);
+$colorEnumType = new LaravelEnumType(Color::class);
 ```
 
 The generated enum will be named after the class and have values equivalent to the keys:

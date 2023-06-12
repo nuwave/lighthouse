@@ -7,9 +7,7 @@ use Nuwave\Lighthouse\Subscriptions\Subscriber;
 
 interface StoresSubscriptions
 {
-    /**
-     * Find a subscriber by its channel key.
-     */
+    /** Find a subscriber by its channel key. */
     public function subscriberByChannel(string $channel): ?Subscriber;
 
     /**
@@ -19,13 +17,9 @@ interface StoresSubscriptions
      */
     public function subscribersByTopic(string $topic): Collection;
 
-    /**
-     * Store subscriber for a topic.
-     */
+    /** Store subscriber for a topic. */
     public function storeSubscriber(Subscriber $subscriber, string $topic): void;
 
-    /**
-     * Delete subscriber by its channel key.
-     */
+    /** Delete subscriber by its channel key. */
     public function deleteSubscriber(string $channel): ?Subscriber;
 }

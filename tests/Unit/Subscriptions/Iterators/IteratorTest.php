@@ -52,9 +52,7 @@ abstract class IteratorTest extends TestCase
         $this->assertSame($exceptionToThrow, $exceptionThrown);
     }
 
-    /**
-     * @return \Illuminate\Support\Collection<int, \Nuwave\Lighthouse\Subscriptions\Subscriber>
-     */
+    /** @return \Illuminate\Support\Collection<int, \Nuwave\Lighthouse\Subscriptions\Subscriber> */
     protected function subscribers(int $count): Collection
     {
         return Collection::times($count, fn (): Subscriber => $this->generateSubscriber());

@@ -14,9 +14,7 @@ trait RelationDirectiveHelpers
 
     abstract protected function nodeName(): string;
 
-    /**
-     * @return array<int, string>
-     */
+    /** @return array<int, string> */
     protected function scopes(): array
     {
         return $this->directiveArgValue('scopes', []);

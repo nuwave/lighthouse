@@ -25,9 +25,7 @@ directive @hash on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 GRAPHQL;
     }
 
-    /**
-     * @param  string  $argumentValue
-     */
+    /** @param  string  $argumentValue */
     public function transform($argumentValue): string
     {
         return $this->hasher->make($argumentValue);

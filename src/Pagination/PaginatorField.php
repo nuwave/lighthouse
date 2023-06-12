@@ -13,9 +13,9 @@ class PaginatorField
      * @return array{
      *     count: int,
      *     currentPage: int,
-     *     firstItem: int,
+     *     firstItem: int|null,
      *     hasMorePages: bool,
-     *     lastItem: int,
+     *     lastItem: int|null,
      *     lastPage: int,
      *     perPage: int,
      *     total: int,

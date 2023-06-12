@@ -40,9 +40,7 @@ DESCRIPTION;
         return $value;
     }
 
-    /**
-     * @return array{__typename: string}
-     */
+    /** @return array{__typename: string} */
     public function parseValue($value): array
     {
         // We do as much validation as possible here, before entering resolvers
@@ -75,10 +73,8 @@ DESCRIPTION;
         return $value;
     }
 
-    /**
-     * @return array{__typename: string}
-     */
-    public function parseLiteral($valueNode, ?array $variables = null): array
+    /** @return array{__typename: string} */
+    public function parseLiteral($valueNode, array $variables = null): array
     {
         return $this->parseValue(
             AST::valueFromASTUntyped($valueNode),

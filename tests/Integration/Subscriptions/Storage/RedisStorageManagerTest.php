@@ -110,9 +110,7 @@ final class RedisStorageManagerTest extends TestCase
         $this->assertSame('1234.1234', $createdSubscriber->socket_id);
     }
 
-    /**
-     * @param array<string, mixed> $headers
-     */
+    /** @param  array<string, mixed>  $headers */
     protected function querySubscription(string $topic = /** @lang GraphQL */ 'taskUpdated(id: 123)', array $headers = []): TestResponse
     {
         return $this->graphQL(/** @lang GraphQL */ "

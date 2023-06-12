@@ -22,22 +22,18 @@ class SchemaStitcher implements SchemaSourceProvider
         $this->rootSchemaPath = $rootSchemaPath;
     }
 
-    /**
-     * Stitch together schema documents and return the result as a string.
-     */
+    /** Stitch together schema documents and return the result as a string. */
     public function getSchemaString(): string
     {
         return self::gatherSchemaImportsRecursively($this->rootSchemaPath);
     }
 
-    /**
-     * Get the schema, starting from a root schema, following the imports recursively.
-     */
+    /** Get the schema, starting from a root schema, following the imports recursively. */
     protected static function gatherSchemaImportsRecursively(string $path): string
     {
         return (new Collection(\Safe\file($path)))
             ->map(static function (string $line) use ($path): string {
-                if (! Str::startsWith(trim($line), '#import ')) {
+                if (! str_starts_with(trim($line), '#import ')) {
                     return rtrim($line, PHP_EOL) . PHP_EOL;
                 }
 

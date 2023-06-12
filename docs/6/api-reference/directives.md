@@ -1492,7 +1492,6 @@ directive @hasMany(
 
   """
   Allows to resolve the relation as a paginated list.
-  Allowed values: `paginator`, `connection`.
   """
   type: HasManyType
 
@@ -1584,7 +1583,6 @@ directive @hasManyThrough(
 
   """
   Allows to resolve the relation as a paginated list.
-  Allowed values: `paginator`, `connection`.
   """
   type: HasManyThroughType
 
@@ -1793,6 +1791,23 @@ final class Commentable
     }
 }
 ```
+
+## @hide
+
+```graphql
+"""
+Excludes the annotated element from the schema conditionally.
+"""
+directive @hide(
+  """
+  Specify which environments exclude this element, e.g. `["production"]`.
+  Compared against the value returned from `app()->environment()`.
+  """
+  env: [String!]!
+) repeatable on FIELD_DEFINITION
+```
+
+See [feature toggles](../digging-deeper/feature-toggles.md).
 
 ## @lazyLoad
 
@@ -2608,9 +2623,9 @@ It can be queried like this:
 
 ### Pagination type
 
-The `type` of pagination defaults to `PAGINATOR`, but may also be set to
-`SIMPLE` (see [Simple Pagination](#simple-pagination)) or a Relay compliant
-`CONNECTION`.
+The `type` of pagination defaults to `PAGINATOR`,
+but may also be set to `SIMPLE` (see [Simple Pagination](#simple-pagination))
+or a Relay compliant `CONNECTION`.
 
 > Lighthouse does not support actual cursor-based pagination as of now, see https://github.com/nuwave/lighthouse/issues/311 for details.
 > Under the hood, the "cursor" is decoded into a page offset.
@@ -3142,6 +3157,23 @@ type Query {
   posts(search: String @search(within: "my.index")): [Post!]! @paginate
 }
 ```
+
+## @show
+
+```graphql
+"""
+Includes the annotated element from the schema conditionally.
+"""
+directive @show(
+  """
+  Specify which environments include this element, e.g. ["testing"].
+  Compared against the value returned from `app()->environment()`.
+  """
+  env: [String!]!
+) repeatable on FIELD_DEFINITION
+```
+
+See [feature toggles](../digging-deeper/feature-toggles.md).
 
 ## @softDeletes
 

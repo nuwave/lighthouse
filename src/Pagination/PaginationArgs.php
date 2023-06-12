@@ -63,9 +63,7 @@ class PaginationArgs
         return "Maximum number of {$maxCount} requested items exceeded, got {$actualCount}. Fetch smaller chunks.";
     }
 
-    /**
-     * Calculate the current page to inform the user about the pagination state.
-     */
+    /** Calculate the current page to inform the user about the pagination state. */
     protected static function calculateCurrentPage(int $first, int $after, int $defaultPage = 1): int
     {
         return $first && $after
@@ -80,7 +78,7 @@ class PaginationArgs
      *
      * @param  \Illuminate\Database\Query\Builder|\Laravel\Scout\Builder|\Illuminate\Database\Eloquent\Builder<TModel>|\Illuminate\Database\Eloquent\Relations\Relation<TModel>  $builder
      *
-     * @return Paginator<TModel>
+     * @return \Illuminate\Contracts\Pagination\Paginator<TModel>
      */
     public function applyToBuilder(QueryBuilder|ScoutBuilder|EloquentBuilder|Relation $builder): Paginator
     {

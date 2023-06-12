@@ -109,9 +109,7 @@ class ASTHelper
         return "Duplicate definition {$oldName} found when merging.";
     }
 
-    /**
-     * Unwrap lists and non-nulls and get the name of the contained type.
-     */
+    /** Unwrap lists and non-nulls and get the name of the contained type. */
     public static function getUnderlyingTypeName(Node $definition): string
     {
         $namedType = self::getUnderlyingNamedTypeNode($definition);
@@ -119,9 +117,7 @@ class ASTHelper
         return $namedType->name->value;
     }
 
-    /**
-     * Unwrap lists and non-nulls and get the named type within.
-     */
+    /** Unwrap lists and non-nulls and get the named type within. */
     public static function getUnderlyingNamedTypeNode(Node $node): NamedTypeNode
     {
         if ($node instanceof NamedTypeNode) {
@@ -143,7 +139,7 @@ class ASTHelper
     /**
      * Extract a named argument from a given directive node.
      *
-     * @param mixed $default is returned if the directive does not have the argument
+     * @param  mixed  $default is returned if the directive does not have the argument
      */
     public static function directiveArgValue(DirectiveNode $directive, string $name, mixed $default = null): mixed
     {
@@ -193,9 +189,7 @@ class ASTHelper
         return self::firstByName($directives, $name);
     }
 
-    /**
-     * Check if a node has a directive with the given name on it.
-     */
+    /** Check if a node has a directive with the given name on it. */
     public static function hasDirective(Node $definitionNode, string $name): bool
     {
         return self::directiveDefinition($definitionNode, $name) !== null;
@@ -225,9 +219,7 @@ class ASTHelper
         return null;
     }
 
-    /**
-     * Directives might have an additional namespace associated with them, @see \Nuwave\Lighthouse\Schema\Directives\NamespaceDirective.
-     */
+    /** Directives might have an additional namespace associated with them, @see \Nuwave\Lighthouse\Schema\Directives\NamespaceDirective. */
     public static function namespaceForDirective(Node $definitionNode, string $directiveName): ?string
     {
         $namespaceDirective = static::directiveDefinition($definitionNode, NamespaceDirective::NAME);
@@ -237,9 +229,7 @@ class ASTHelper
             : null;
     }
 
-    /**
-     * Attach directive to all registered object type fields.
-     */
+    /** Attach directive to all registered object type fields. */
     public static function attachDirectiveToObjectTypeFields(DocumentAST $documentAST, DirectiveNode $directive): void
     {
         foreach ($documentAST->types as $typeDefinition) {
@@ -251,9 +241,7 @@ class ASTHelper
         }
     }
 
-    /**
-     * Checks the given type to see whether it implements the given interface.
-     */
+    /** Checks the given type to see whether it implements the given interface. */
     public static function typeImplementsInterface(ObjectTypeDefinitionNode $type, string $interfaceName): bool
     {
         return self::firstByName($type->interfaces, $interfaceName) !== null;
@@ -301,9 +289,7 @@ class ASTHelper
             . Str::studly($argDefinition->name->value);
     }
 
-    /**
-     * Given a collection of directives, returns the string value for the deprecation reason.
-     */
+    /** Given a collection of directives, returns the string value for the deprecation reason. */
     public static function deprecationReason(EnumValueDefinitionNode|FieldDefinitionNode $node): ?string
     {
         $deprecated = Values::getDirectiveValues(
@@ -345,9 +331,7 @@ class ASTHelper
         return $directive;
     }
 
-    /**
-     * @return \GraphQL\Language\AST\Node&\GraphQL\Language\AST\TypeDefinitionNode
-     */
+    /** @return \GraphQL\Language\AST\Node&\GraphQL\Language\AST\TypeDefinitionNode */
     public static function underlyingType(FieldDefinitionNode $field): Node
     {
         $typeName = static::getUnderlyingTypeName($field);
@@ -364,16 +348,17 @@ class ASTHelper
             ?? throw new DefinitionException("Type '{$typeName}' on '{$field->name->value}' can not be found in the schema.'");
     }
 
-    /**
-     * Take a guess at the name of the model associated with the given node.
-     */
+    /** Take a guess at the name of the model associated with the given node. */
     public static function modelName(Node $definitionNode): ?string
     {
         if ($definitionNode instanceof FieldDefinitionNode) {
             $definitionNode = static::underlyingType($definitionNode);
         }
 
-        if ($definitionNode instanceof ObjectTypeDefinitionNode || $definitionNode instanceof InterfaceTypeDefinitionNode) {
+        if ($definitionNode instanceof ObjectTypeDefinitionNode
+            || $definitionNode instanceof InterfaceTypeDefinitionNode
+            || $definitionNode instanceof UnionTypeDefinitionNode
+        ) {
             return ModelDirective::modelClass($definitionNode)
                 ?? $definitionNode->name->value;
         }
@@ -390,9 +375,7 @@ class ASTHelper
             : $field->name->value;
     }
 
-    /**
-     * Adds a directive to a node, instantiates and maybe hydrates it and returns the instance.
-     */
+    /** Adds a directive to a node, instantiates and maybe hydrates it and returns the instance. */
     public static function addDirectiveToNode(string $directiveSource, ScalarTypeDefinitionNode|ScalarTypeExtensionNode|ObjectTypeDefinitionNode|ObjectTypeExtensionNode|InterfaceTypeDefinitionNode|InterfaceTypeExtensionNode|UnionTypeDefinitionNode|UnionTypeExtensionNode|EnumTypeDefinitionNode|EnumTypeExtensionNode|InputObjectTypeDefinitionNode|InputObjectTypeExtensionNode|FieldDefinitionNode|InputValueDefinitionNode|EnumValueDefinitionNode $node): DirectiveInterface
     {
         $directiveNode = Parser::directive($directiveSource);

@@ -16,9 +16,7 @@ final class FileUploadTest extends TestCase
     }
     ' . self::PLACEHOLDER_QUERY;
 
-    /**
-     * https://github.com/jaydenseric/graphql-multipart-request-spec#single-file.
-     */
+    /** https://github.com/jaydenseric/graphql-multipart-request-spec#single-file. */
     public function testResolvesUploadViaMultipartRequest(): void
     {
         $operations = [
@@ -75,9 +73,7 @@ final class FileUploadTest extends TestCase
             ]);
     }
 
-    /**
-     * https://github.com/jaydenseric/graphql-multipart-request-spec#batching.
-     */
+    /** https://github.com/jaydenseric/graphql-multipart-request-spec#batching. */
     public function testResolvesUploadViaBatchedMultipartRequest(): void
     {
         $operations = [

@@ -47,9 +47,7 @@ class ArgumentSet
         return $plainArguments;
     }
 
-    /**
-     * Check if the ArgumentSet has a non-null value with the given key.
-     */
+    /** Check if the ArgumentSet has a non-null value with the given key. */
     public function has(string $key): bool
     {
         $argument = $this->arguments[$key] ?? null;

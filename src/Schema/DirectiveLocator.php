@@ -54,22 +54,20 @@ class DirectiveLocator
      */
     public function namespaces(): array
     {
-        if (! isset($this->directiveNamespaces)) {
-            $this->directiveNamespaces
-                // When looking for a directive by name, the namespaces are tried in order
-                = (new Collection([
-                    // User defined directives come first
-                    config('lighthouse.namespaces.directives'),
+        return $this->directiveNamespaces
+            // When looking for a directive by name, the namespaces are tried in order
+            ??= (new Collection([
+                // User defined directives come first
+                config('lighthouse.namespaces.directives'),
 
-                    // Built-in and plugin defined directives come next
-                    $this->eventsDispatcher->dispatch(new RegisterDirectiveNamespaces()),
-                ]))
-                ->flatten()
-                ->filter()
-                ->all();
-        }
-
-        return $this->directiveNamespaces;
+                // Built-in and plugin defined directives come next
+                $this->eventsDispatcher->dispatch(new RegisterDirectiveNamespaces()),
+            ]))
+            ->flatten()
+            ->filter()
+            // Ensure built-in directives come last
+            ->sortBy(static fn (string $namespace): int => (int) str_starts_with($namespace, 'Nuwave\\Lighthouse'))
+            ->all();
     }
 
     /**
@@ -95,14 +93,8 @@ class DirectiveLocator
                     continue;
                 }
 
-                $name = self::directiveName($class);
-
-                // The directive was already found, so we do not add it twice
-                if (isset($directives[$name])) {
-                    continue;
-                }
-
-                $directives[$name] = $class;
+                // Only add the first directive that was found
+                $directives[self::directiveName($class)] ??= $class;
             }
         }
 
@@ -125,9 +117,7 @@ class DirectiveLocator
         return $definitions;
     }
 
-    /**
-     * Create a directive by the given directive name.
-     */
+    /** Create a directive by the given directive name. */
     public function create(string $directiveName): Directive
     {
         $directiveClass = $this->resolve($directiveName);
@@ -142,21 +132,22 @@ class DirectiveLocator
      */
     public function resolve(string $directiveName): string
     {
-        // Bail to respect the priority of namespaces, the first resolved directive is kept
         if (array_key_exists($directiveName, $this->resolvedClassnames)) {
             return $this->resolvedClassnames[$directiveName];
         }
 
-        foreach ($this->namespaces() as $baseNamespace) {
-            $directiveClass = $baseNamespace . '\\' . static::className($directiveName);
+        foreach ($this->namespaces() as $directiveNamespace) {
+            $directiveClass = $directiveNamespace . '\\' . static::className($directiveName);
 
             if (class_exists($directiveClass)) {
-                if (! is_a($directiveClass, Directive::class, true)) {
-                    throw new DirectiveException("Class {$directiveClass} must implement the interface " . Directive::class);
+                $directiveInterface = Directive::class;
+                if (! is_a($directiveClass, $directiveInterface, true)) {
+                    throw new DirectiveException("Class {$directiveClass} must implement the interface {$directiveInterface}.");
                 }
 
                 $this->resolvedClassnames[$directiveName] = $directiveClass;
 
+                // Bail to respect the priority of namespaces, the first resolved directive is kept
                 return $directiveClass;
             }
         }
@@ -164,17 +155,13 @@ class DirectiveLocator
         throw new DirectiveException("No directive found for `{$directiveName}`");
     }
 
-    /**
-     * Returns the expected class name for a directive name.
-     */
+    /** Returns the expected class name for a directive name. */
     protected static function className(string $directiveName): string
     {
         return Str::studly($directiveName) . 'Directive';
     }
 
-    /**
-     * Returns the expected directive name for a class name.
-     */
+    /** Returns the expected directive name for a class name. */
     public static function directiveName(string $className): string
     {
         $baseName = basename(str_replace('\\', '/', $className));
@@ -184,9 +171,7 @@ class DirectiveLocator
         );
     }
 
-    /**
-     * @param  class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>  $directiveClass
-     */
+    /** @param  class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>  $directiveClass */
     public function setResolved(string $directiveName, string $directiveClass): self
     {
         $this->resolvedClassnames[$directiveName] = $directiveClass;

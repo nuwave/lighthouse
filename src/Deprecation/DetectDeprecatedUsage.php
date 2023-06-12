@@ -19,27 +19,19 @@ use GraphQL\Validator\Rules\ValidationRule;
  */
 class DetectDeprecatedUsage extends ValidationRule
 {
-    /**
-     * @var array<string, \Nuwave\Lighthouse\Deprecation\DeprecatedUsage>
-     */
+    /** @var array<string, \Nuwave\Lighthouse\Deprecation\DeprecatedUsage> */
     protected array $deprecations = [];
 
-    /**
-     * @var DeprecationHandler
-     */
+    /** @var DeprecationHandler */
     protected $deprecationHandler;
 
-    /**
-     * @param DeprecationHandler $deprecationHandler
-     */
+    /** @param  DeprecationHandler  $deprecationHandler */
     public function __construct(callable $deprecationHandler)
     {
         $this->deprecationHandler = $deprecationHandler;
     }
 
-    /**
-     * @param DeprecationHandler $deprecationHandler
-     */
+    /** @param  DeprecationHandler  $deprecationHandler */
     public static function handle(callable $deprecationHandler): void
     {
         DocumentValidator::addRule(new static($deprecationHandler));

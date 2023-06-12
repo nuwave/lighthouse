@@ -63,9 +63,7 @@ class EntityResolverProvider
         return "Unknown __typename `{$typename}`.";
     }
 
-    /**
-     * @return EntityResolver
-     */
+    /** @return EntityResolver */
     public function resolver(string $typename): callable
     {
         if (isset($this->resolvers[$typename])) {
@@ -102,9 +100,7 @@ class EntityResolverProvider
         return $definition;
     }
 
-    /**
-     * @return EntityResolver|null
-     */
+    /** @return EntityResolver|null */
     protected function resolverFromClass(string $typename): ?callable
     {
         $resolverClass = Utils::namespaceClassname(
@@ -123,9 +119,7 @@ class EntityResolverProvider
         return Utils::constructResolver($resolverClass, '__invoke');
     }
 
-    /**
-     * @return SingleEntityResolverFn|null
-     */
+    /** @return SingleEntityResolverFn|null */
     protected function resolverFromModel(string $typeName): ?callable
     {
         $definition = $this->typeDefinition($typeName);
@@ -178,9 +172,7 @@ class EntityResolverProvider
         );
     }
 
-    /**
-     * @param  array<string, mixed>  $representation
-     */
+    /** @param  array<string, mixed>  $representation */
     protected function satisfiesKeyFields(SelectionSetNode $keyFields, array $representation): bool
     {
         foreach ($keyFields->selections as $field) {
@@ -251,9 +243,7 @@ class EntityResolverProvider
         return ASTHelper::hasDirective($field, $directiveName);
     }
 
-    /**
-     * @return \Illuminate\Support\Collection<int, \GraphQL\Language\AST\SelectionSetNode>
-     */
+    /** @return \Illuminate\Support\Collection<int, \GraphQL\Language\AST\SelectionSetNode> */
     public function keyFieldsSelections(ObjectTypeDefinitionNode $definition): Collection
     {
         return $this->directiveLocator
@@ -271,9 +261,7 @@ class EntityResolverProvider
             ?? throw new Error('Representation does not satisfy any set of uniquely identifying keys: ' . \Safe\json_encode($representation));
     }
 
-    /**
-     * @param array<string, mixed> $representation
-     */
+    /** @param  array<string, mixed>  $representation */
     protected function hydrateExternalFields(Model $model, array $representation, ObjectTypeDefinitionNode $definition): void
     {
         foreach ($definition->fields as $field) {

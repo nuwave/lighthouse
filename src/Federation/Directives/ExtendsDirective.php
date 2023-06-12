@@ -8,9 +8,7 @@ class ExtendsDirective extends BaseDirective
 {
     public const NAME = 'extends';
 
-    /**
-     * @see https://www.apollographql.com/docs/apollo-server/federation/federation-spec/#schema-modifications-glossary
-     */
+    /** @see https://www.apollographql.com/docs/apollo-server/federation/federation-spec/#schema-modifications-glossary */
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'GRAPHQL'

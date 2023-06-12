@@ -6,15 +6,14 @@ use GraphQL\Executor\Executor;
 use Illuminate\Container\Container;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Utils;
 
 class ResolverProvider implements ProvidesResolver
 {
-    /**
-     * Provide a field resolver in case no resolver directive is defined for a field.
-     */
+    /** Provide a field resolver in case no resolver directive is defined for a field. */
     public function provideResolver(FieldValue $fieldValue): \Closure
     {
         $resolverClass = $this->findResolverClass($fieldValue, '__invoke');
@@ -22,6 +21,12 @@ class ResolverProvider implements ProvidesResolver
         if ($resolverClass === null) {
             if (RootType::isRootType($fieldValue->getParentName())) {
                 $this->throwMissingResolver($fieldValue);
+            }
+
+            // Return any non-null value to continue nested field resolution
+            // when the root Query type is returned as part of the result.
+            if (ASTHelper::getUnderlyingTypeName($fieldValue->getField()) === RootType::QUERY) {
+                return static fn (): bool => true;
             }
 
             return \Closure::fromCallable(
@@ -35,9 +40,7 @@ class ResolverProvider implements ProvidesResolver
         return \Closure::fromCallable([$resolver, '__invoke']);
     }
 
-    /**
-     * @return class-string|null
-     */
+    /** @return class-string|null */
     protected function findResolverClass(FieldValue $fieldValue, string $methodName): ?string
     {
         return Utils::namespaceClassname(
@@ -47,9 +50,7 @@ class ResolverProvider implements ProvidesResolver
         );
     }
 
-    /**
-     * @return never
-     */
+    /** @return never */
     protected function throwMissingResolver(FieldValue $fieldValue): void
     {
         // Since we already know we are on the root type, this is either

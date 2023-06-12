@@ -10,17 +10,13 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 abstract class GraphQLSubscription
 {
-    /**
-     * Check if subscriber is allowed to listen to this subscription.
-     */
+    /** Check if subscriber is allowed to listen to this subscription. */
     public function can(Subscriber $subscriber): bool
     {
         return true;
     }
 
-    /**
-     * Encode topic name.
-     */
+    /** Encode topic name. */
     public function encodeTopic(Subscriber $subscriber, string $fieldName): string
     {
         return strtoupper(
@@ -28,9 +24,7 @@ abstract class GraphQLSubscription
         );
     }
 
-    /**
-     * Decode topic name.
-     */
+    /** Decode topic name. */
     public function decodeTopic(string $fieldName, mixed $root): string
     {
         return strtoupper(
@@ -48,13 +42,9 @@ abstract class GraphQLSubscription
         return $root;
     }
 
-    /**
-     * Check if subscriber is allowed to listen to the subscription.
-     */
+    /** Check if subscriber is allowed to listen to the subscription. */
     abstract public function authorize(Subscriber $subscriber, Request $request): bool;
 
-    /**
-     * Filter which subscribers should receive the subscription.
-     */
+    /** Filter which subscribers should receive the subscription. */
     abstract public function filter(Subscriber $subscriber, mixed $root): bool;
 }

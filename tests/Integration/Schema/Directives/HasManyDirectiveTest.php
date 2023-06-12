@@ -433,9 +433,7 @@ final class HasManyDirectiveTest extends DBTestCase
         ')->assertJsonCount(2, 'data.user.tasks');
     }
 
-    /**
-     * @dataProvider batchloadRelations
-     */
+    /** @dataProvider batchloadRelations */
     public function testQueryHasManyPaginator(bool $batchloadRelations): void
     {
         config(['lighthouse.batchload_relations' => $batchloadRelations]);
@@ -1321,9 +1319,7 @@ final class HasManyDirectiveTest extends DBTestCase
         ')->assertJsonCount(3, 'data.user.foos.edges');
     }
 
-    /**
-     * @return array<int, array{0: bool}>
-     */
+    /** @return array<int, array{0: bool}> */
     public static function batchloadRelations(): array
     {
         return [

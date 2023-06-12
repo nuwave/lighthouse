@@ -14,6 +14,7 @@ module.exports = [
       "the-basics/types",
       "the-basics/fields",
       "the-basics/directives",
+      "the-basics/best-practices",
     ],
   },
   {
@@ -59,6 +60,7 @@ module.exports = [
       "digging-deeper/file-uploads",
       "digging-deeper/client-directives",
       "digging-deeper/deprecation",
+      "digging-deeper/feature-toggles",
       "digging-deeper/extending-lighthouse",
     ],
   },

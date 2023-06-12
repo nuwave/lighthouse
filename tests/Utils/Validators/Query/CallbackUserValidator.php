@@ -8,9 +8,7 @@ use Nuwave\Lighthouse\Validation\Validator;
 
 final class CallbackUserValidator extends Validator
 {
-    /**
-     * @return array{id: array<\Illuminate\Validation\Rules\Exists|string>}
-     */
+    /** @return array{id: array<\Illuminate\Validation\Rules\Exists|string>} */
     public function rules(): array
     {
         return [

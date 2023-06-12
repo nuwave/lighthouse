@@ -174,18 +174,14 @@ class ResolveInfo extends BaseResolveInfo
         }
     }
 
-    /**
-     * Would there be any FieldBuilderDirectives to apply to the builder?
-     */
+    /** Would there be any FieldBuilderDirectives to apply to the builder? */
     protected static function wouldApplyFieldBuilderDirectives(ResolveInfo $resolveInfo): bool
     {
         return self::fieldBuilderDirectives($resolveInfo)
             ->isNotEmpty();
     }
 
-    /**
-     * @return Collection<int, \Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective>
-     */
+    /** @return Collection<int, \Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective> */
     protected static function fieldBuilderDirectives(ResolveInfo $resolveInfo): Collection
     {
         // @phpstan-ignore-next-line filter is not understood

@@ -7,9 +7,7 @@ use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 
 class MemoryStream extends Stream implements CanStreamResponse
 {
-    /**
-     * @var array<int, mixed>
-     */
+    /** @var array<int, mixed> */
     public array $chunks = [];
 
     public function stream(array $data, array $paths, bool $isFinalChunk): void

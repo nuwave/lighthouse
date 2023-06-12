@@ -44,9 +44,7 @@ abstract class TestCase extends BaseTestCase
      */
     protected $app;
 
-    /**
-     * A dummy query type definition that is added to tests by default.
-     */
+    /** A dummy query type definition that is added to tests by default. */
     public const PLACEHOLDER_QUERY = /** @lang GraphQL */ <<<'GRAPHQL'
 type Query {
   foo: Int
@@ -65,9 +63,7 @@ GRAPHQL;
         $this->setUpTestSchema();
     }
 
-    /**
-     * @return array<class-string<\Illuminate\Support\ServiceProvider>>
-     */
+    /** @return array<class-string<\Illuminate\Support\ServiceProvider>> */
     protected function getPackageProviders($app): array
     {
         return [
@@ -189,9 +185,7 @@ GRAPHQL;
         $app->singleton(ExceptionHandler::class, static fn (): ThrowingExceptionHandler => new ThrowingExceptionHandler());
     }
 
-    /**
-     * Build an executable schema from a SDL string, adding on a default Query type.
-     */
+    /** Build an executable schema from a SDL string, adding on a default Query type. */
     protected function buildSchemaWithPlaceholderQuery(string $schema): Schema
     {
         return $this->buildSchema(
@@ -199,9 +193,7 @@ GRAPHQL;
         );
     }
 
-    /**
-     * Build an executable schema from an SDL string.
-     */
+    /** Build an executable schema from an SDL string. */
     protected function buildSchema(string $schema): Schema
     {
         $this->schema = $schema;
@@ -211,12 +203,12 @@ GRAPHQL;
         return $schemaBuilder->schema();
     }
 
-    /**
-     * Get a fully qualified reference to a method that is defined on the test class.
-     */
+    /** Get a fully qualified reference to a method that is defined on the test class. */
     protected function qualifyTestResolver(string $method): string
     {
-        return addslashes(static::class) . '@' . $method;
+        $escapedClass = addslashes(static::class);
+
+        return "{$escapedClass}@{$method}";
     }
 
     protected function commandTester(Command $command): CommandTester

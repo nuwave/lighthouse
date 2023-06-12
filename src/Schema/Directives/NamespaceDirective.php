@@ -47,9 +47,7 @@ GRAPHQL;
         }
     }
 
-    /**
-     * Apply manipulations from a type definition node.
-     */
+    /** Apply manipulations from a type definition node. */
     public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition): void
     {
         if ($typeDefinition instanceof ObjectTypeDefinitionNode) {
@@ -57,9 +55,7 @@ GRAPHQL;
         }
     }
 
-    /**
-     * Apply manipulations from a type definition node.
-     */
+    /** Apply manipulations from a type definition node. */
     public function manipulateTypeExtension(DocumentAST &$documentAST, TypeExtensionNode &$typeExtension): void
     {
         if ($typeExtension instanceof ObjectTypeExtensionNode) {

@@ -6,6 +6,7 @@ use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\Parser;
 use GraphQL\Type\Definition\Directive as DirectiveDefinition;
 use GraphQL\Type\Definition\Type;
+use GraphQL\Type\Introspection;
 use GraphQL\Utils\SchemaPrinter;
 use HaydenPierce\ClassFinder\ClassFinder;
 use Illuminate\Console\Command;
@@ -33,13 +34,11 @@ GRAPHQL;
 
     protected $description = 'Create IDE helper files to improve type checking and autocompletion.';
 
-    /**
-     * @return array<int, array<int, mixed>>
-     */
+    /** @return array<int, array<int, mixed>> */
     protected function getOptions(): array
     {
         return [
-            ['omit-built-in', null, InputOption::VALUE_OPTIONAL, 'Do not include built-in definitions.'],
+            ['omit-built-in', null, InputOption::VALUE_NONE, 'Do not include built-in definitions.'],
         ];
     }
 
@@ -54,9 +53,7 @@ GRAPHQL;
         return 0;
     }
 
-    /**
-     * Create and write schema directive definitions to a file.
-     */
+    /** Create and write schema directive definitions to a file. */
     public function schemaDirectiveDefinitions(DirectiveLocator $directiveLocator): void
     {
         $schema = /** @lang GraphQL */ <<<'GRAPHQL'
@@ -136,9 +133,7 @@ GRAPHQL;
         return $directives;
     }
 
-    /**
-     * @param  class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>  $directiveClass
-     */
+    /** @param  class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>  $directiveClass */
     protected function define(string $directiveClass): string
     {
         $definition = $directiveClass::definition();
@@ -172,6 +167,10 @@ GRAPHQL;
         $astCache->clear();
 
         $allTypes = $schemaBuilder->schema()->getTypeMap();
+
+        if ($this->option('omit-built-in')) {
+            $sourceTypes = array_merge($sourceTypes, Type::getStandardTypes(), Introspection::getTypes());
+        }
 
         $programmaticTypes = array_diff_key($allTypes, $sourceTypes);
 
