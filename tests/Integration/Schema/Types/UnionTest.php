@@ -192,10 +192,8 @@ GRAPHQL;
     /** @return array<int, array<string>> */
     public static function withAndWithoutCustomTypeResolver(): iterable
     {
-        // This uses the default type resolver
-        yield self::schemaAndQuery(false);
-        // This scenario requires a custom resolver, since the types User and Post do not match
-        yield self::schemaAndQuery(true);
+        yield 'default type resolver' => self::schemaAndQuery(false);
+        yield 'custom resolver, since the types User and Post do not match' => self::schemaAndQuery(true);
     }
 
     /** @return array{string, string} */
