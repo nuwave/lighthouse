@@ -18,13 +18,14 @@ final class RedisStorageManagerTest extends TestCase
     use EnablesSubscriptionServiceProvider;
 
     /**
-     * TODO remove when an official replacement for withConsecutive is available
+     * TODO remove when an official replacement for withConsecutive is available.
+     *
      * @see https://github.com/sebastianbergmann/phpunit/issues/4026#issuecomment-1418205424
      *
      * @param array<mixed> $firstCallArguments
      * @param array<mixed> ...$consecutiveCallsArguments
      *
-     * @return iterable<Callback<mixed>>
+     * @return iterable<callback<mixed>>
      */
     private static function withConsecutive(array $firstCallArguments, array ...$consecutiveCallsArguments): iterable
     {
@@ -35,19 +36,19 @@ final class RedisStorageManagerTest extends TestCase
         $allConsecutiveCallsArguments = [$firstCallArguments, ...$consecutiveCallsArguments];
 
         $numberOfArguments = count($firstCallArguments);
-        $argumentList      = [];
-        for ($argumentPosition = 0; $argumentPosition < $numberOfArguments; $argumentPosition++) {
+        $argumentList = [];
+        for ($argumentPosition = 0; $argumentPosition < $numberOfArguments; ++$argumentPosition) {
             $argumentList[$argumentPosition] = array_column($allConsecutiveCallsArguments, $argumentPosition);
         }
 
         $mockedMethodCall = 0;
-        $callbackCall     = 0;
+        $callbackCall = 0;
         foreach ($argumentList as $index => $argument) {
             yield new Callback(
                 static function (mixed $actualArgument) use ($argumentList, &$mockedMethodCall, &$callbackCall, $index, $numberOfArguments): bool {
                     $expected = $argumentList[$index][$mockedMethodCall] ?? null;
 
-                    $callbackCall++;
+                    ++$callbackCall;
                     $mockedMethodCall = (int) ($callbackCall / $numberOfArguments);
 
                     if ($expected instanceof Constraint) {
