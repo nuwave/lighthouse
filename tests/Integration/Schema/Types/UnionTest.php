@@ -189,7 +189,7 @@ GRAPHQL;
             ->concat(Post::all());
     }
 
-    /** @return array<int, array<string>> */
+    /** @return iterable<array{string, string}> */
     public static function withAndWithoutCustomTypeResolver(): iterable
     {
         yield 'default type resolver' => self::schemaAndQuery(false);
