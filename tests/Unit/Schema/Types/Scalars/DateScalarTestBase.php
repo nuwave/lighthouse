@@ -12,7 +12,7 @@ use Illuminate\Support\Carbon as IlluminateCarbon;
 use Nuwave\Lighthouse\Schema\Types\Scalars\DateScalar;
 use Tests\TestCase;
 
-abstract class DateScalarTest extends TestCase
+abstract class DateScalarTestBase extends TestCase
 {
     /** @dataProvider invalidDateValues */
     public function testThrowsIfSerializingInvalidDates(mixed $value): void
@@ -113,7 +113,7 @@ abstract class DateScalarTest extends TestCase
      *
      * @return iterable<array<string>>
      */
-    abstract public function validDates(): iterable;
+    abstract public static function validDates(): iterable;
 
     /**
      * Data provider with pairs of dates:
@@ -122,5 +122,5 @@ abstract class DateScalarTest extends TestCase
      *
      * @return iterable<array{string, string}>
      */
-    abstract public function canonicalizeDates(): iterable;
+    abstract public static function canonicalizeDates(): iterable;
 }
