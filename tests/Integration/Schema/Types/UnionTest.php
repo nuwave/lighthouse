@@ -190,14 +190,14 @@ GRAPHQL;
     }
 
     /** @return iterable<array{string, string}> */
-    public static function withAndWithoutCustomTypeResolver(): iterable
+    public function withAndWithoutCustomTypeResolver(): iterable
     {
-        yield 'default type resolver' => self::schemaAndQuery(false);
-        yield 'custom resolver, since the types User and Post do not match' => self::schemaAndQuery(true);
+        yield 'default type resolver' => $this->schemaAndQuery(false);
+        yield 'custom resolver, since the types User and Post do not match' => $this->schemaAndQuery(true);
     }
 
     /** @return array{string, string} */
-    public static function schemaAndQuery(bool $withCustomTypeResolver): array
+    public function schemaAndQuery(bool $withCustomTypeResolver): array
     {
         $prefix = $withCustomTypeResolver
             ? 'Custom'
