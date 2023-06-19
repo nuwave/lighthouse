@@ -26,11 +26,12 @@ use Nuwave\Lighthouse\Testing\MocksResolvers;
 use Nuwave\Lighthouse\Testing\TestingServiceProvider;
 use Nuwave\Lighthouse\Testing\UsesTestSchema;
 use Nuwave\Lighthouse\Validation\ValidationServiceProvider;
-use Orchestra\Testbench\TestCase as BaseTestCase;
+use Orchestra\Testbench\TestCase as TestbenchTestCase;
+use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use Tests\Utils\Policies\AuthServiceProvider;
 
-abstract class TestCase extends BaseTestCase
+abstract class TestCase extends TestbenchTestCase
 {
     use ArraySubsetAsserts;
     use MakesGraphQLRequests;
@@ -59,7 +60,6 @@ GRAPHQL;
         // This default is only valid for testing Lighthouse itself and thus
         // is not defined in the reusable test trait.
         $this->schema ??= self::PLACEHOLDER_QUERY;
-
         $this->setUpTestSchema();
     }
 
@@ -88,6 +88,11 @@ GRAPHQL;
 
     protected function getEnvironmentSetUp($app): void
     {
+        // https://laravel.com/docs/container#binding-primitives
+        $app->when(PHPUnitTestCase::class)
+            ->needs('$name')
+            ->give('TestName');
+
         $config = $app->make(ConfigRepository::class);
         $config->set('lighthouse.namespaces', [
             'models' => [
