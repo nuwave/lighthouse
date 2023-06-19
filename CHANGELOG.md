@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.10.1
+
+### Fixed
+
+- Guess type names of programmatically registered types for models
+
 ## v6.10.0
 
 ### Added

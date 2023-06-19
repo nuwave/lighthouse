@@ -331,8 +331,8 @@ class ASTHelper
         return $directive;
     }
 
-    /** @return \GraphQL\Language\AST\Node&\GraphQL\Language\AST\TypeDefinitionNode */
-    public static function underlyingType(FieldDefinitionNode $field): Node
+    /** @return (\GraphQL\Language\AST\Node&\GraphQL\Language\AST\TypeDefinitionNode)|null */
+    public static function underlyingType(FieldDefinitionNode $field): ?Node
     {
         $typeName = static::getUnderlyingTypeName($field);
 
@@ -344,23 +344,27 @@ class ASTHelper
         $astBuilder = Container::getInstance()->make(ASTBuilder::class);
         $documentAST = $astBuilder->documentAST();
 
-        return $documentAST->types[$typeName]
-            ?? throw new DefinitionException("Type '{$typeName}' on '{$field->name->value}' can not be found in the schema.'");
+        return $documentAST->types[$typeName] ?? null;
     }
 
     /** Take a guess at the name of the model associated with the given node. */
     public static function modelName(Node $definitionNode): ?string
     {
         if ($definitionNode instanceof FieldDefinitionNode) {
-            $definitionNode = static::underlyingType($definitionNode);
+            $modelDefinitionNode = static::underlyingType($definitionNode);
+            if ($modelDefinitionNode === null) {
+                return static::getUnderlyingTypeName($definitionNode);
+            }
+        } else {
+            $modelDefinitionNode = $definitionNode;
         }
 
-        if ($definitionNode instanceof ObjectTypeDefinitionNode
-            || $definitionNode instanceof InterfaceTypeDefinitionNode
-            || $definitionNode instanceof UnionTypeDefinitionNode
+        if ($modelDefinitionNode instanceof ObjectTypeDefinitionNode
+            || $modelDefinitionNode instanceof InterfaceTypeDefinitionNode
+            || $modelDefinitionNode instanceof UnionTypeDefinitionNode
         ) {
-            return ModelDirective::modelClass($definitionNode)
-                ?? $definitionNode->name->value;
+            return ModelDirective::modelClass($modelDefinitionNode)
+                ?? $modelDefinitionNode->name->value;
         }
 
         return null;
