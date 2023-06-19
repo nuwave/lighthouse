@@ -13,7 +13,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Fixed
 
-- Guess type names of programmatically registered types for models
+- Guess type names of programmatically registered types for models https://github.com/nuwave/lighthouse/pull/2415
 
 ## v6.10.0
 
