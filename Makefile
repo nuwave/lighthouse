@@ -17,7 +17,7 @@ build: ## Build the local Docker containers
 
 .PHONY: up
 up: ## Bring up the docker-compose stack
-	docker-compose up -d
+	docker-compose up --detach
 
 .PHONY: fix
 fix: rector php-cs-fixer prettier ## Automatic code fixes
