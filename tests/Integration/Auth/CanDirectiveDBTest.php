@@ -91,6 +91,39 @@ final class CanDirectiveDBTest extends DBTestCase
         ]);
     }
 
+    public function testFailsToFindSpecificModelWithFindOrFailFalse(): void
+    {
+        $user = new User();
+        $user->name = UserPolicy::ADMIN;
+        $this->be($user);
+
+        $this->mockResolver(null);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            user(id: ID @eq): User
+                @can(ability: "view", find: "id", findOrFail: false)
+                @mock
+        }
+
+        type User {
+            name: String!
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            user(id: "not-present") {
+                name
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'user' => null,
+            ],
+        ]);
+    }
+
     public function testThrowsIfFindValueIsNotGiven(): void
     {
         $user = new User();

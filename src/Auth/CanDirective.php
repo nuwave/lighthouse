@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\Resolved;
@@ -98,6 +99,11 @@ directive @can(
   Mutually exclusive with `resolved` and `query`.
   """
   find: String
+
+  """
+  Should the query fail when the models of `find` were not found?
+  """
+  findOrFail: Boolean! = true
 ) repeatable on FIELD_DEFINITION
 
 """
@@ -199,16 +205,14 @@ GRAPHQL;
                 );
                 assert($enhancedBuilder instanceof EloquentBuilder);
 
-                $modelOrModels = $enhancedBuilder->findOrFail($findValue);
+                $modelOrModels = $this->directiveArgValue('findOrFail', true)
+                    ? $enhancedBuilder->findOrFail($findValue)
+                    : $enhancedBuilder->find($findValue);
             } catch (ModelNotFoundException $modelNotFoundException) {
                 throw new Error($modelNotFoundException->getMessage());
             }
 
-            if ($modelOrModels instanceof Model) {
-                $modelOrModels = [$modelOrModels];
-            }
-
-            return $modelOrModels;
+            return Collection::wrap($modelOrModels);
         }
 
         return [$this->getModelClass()];
