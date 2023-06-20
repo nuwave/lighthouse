@@ -666,6 +666,11 @@ directive @can(
   Mutually exclusive with `resolved` and `query`.
   """
   find: String
+
+  """
+  Should the query fail when the models of `find` were not found?
+  """
+  findOrFail: Boolean! = true
 ) repeatable on FIELD_DEFINITION
 
 """

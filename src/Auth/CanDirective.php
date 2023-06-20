@@ -98,6 +98,11 @@ directive @can(
   Mutually exclusive with `resolved` and `query`.
   """
   find: String
+
+  """
+  Should the query fail when the models of `find` were not found?
+  """
+  findOrFail: Boolean! = true
 ) repeatable on FIELD_DEFINITION
 
 """
@@ -199,13 +204,19 @@ GRAPHQL;
                 );
                 assert($enhancedBuilder instanceof EloquentBuilder);
 
-                $modelOrModels = $enhancedBuilder->findOrFail($findValue);
+                $modelOrModels = $this->directiveArgValue('findOrFail', true)
+                    ? $enhancedBuilder->findOrFail($findValue)
+                    : $enhancedBuilder->find($findValue);
             } catch (ModelNotFoundException $modelNotFoundException) {
                 throw new Error($modelNotFoundException->getMessage());
             }
 
             if ($modelOrModels instanceof Model) {
-                $modelOrModels = [$modelOrModels];
+                return [$modelOrModels];
+            }
+
+            if ($modelOrModels === null) {
+                return [];
             }
 
             return $modelOrModels;
