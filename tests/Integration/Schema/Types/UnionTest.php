@@ -207,6 +207,8 @@ GRAPHQL;
             ? /** @lang GraphQL */ '@union(resolveType: "Tests\\\\Utils\\\\Unions\\\\CustomStuff@resolveType")'
             : '';
 
+        $fetchResultsResolver = self::qualifyTestResolver('fetchResults');
+
         return [
 /** @lang GraphQL */ "
             union Stuff {$customResolver} = {$prefix}User | {$prefix}Post
@@ -220,7 +222,7 @@ GRAPHQL;
             }
 
             type Query {
-                stuff: [Stuff!]! @field(resolver: \"{$this->qualifyTestResolver('fetchResults')}\")
+                stuff: [Stuff!]! @field(resolver: \"{$fetchResultsResolver}\")
             }
             ",
 /** @lang GraphQL */ "

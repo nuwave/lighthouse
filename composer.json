@@ -45,7 +45,7 @@
     "require-dev": {
         "algolia/algoliasearch-client-php": "^3 || ^4",
         "bensampo/laravel-enum": "^5 || ^6",
-        "dms/phpunit-arraysubset-asserts": "^0.4",
+        "dms/phpunit-arraysubset-asserts": "^0.4 || ^0.5",
         "ergebnis/composer-normalize": "^2.2.2",
         "fakerphp/faker": "^1.21",
         "laravel/framework": "^9 || ^10",
@@ -64,7 +64,7 @@
         "phpstan/phpstan": "^1.10.3",
         "phpstan/phpstan-mockery": "^1.1",
         "phpstan/phpstan-phpunit": "^1.1.1",
-        "phpunit/phpunit": "^9.6.4",
+        "phpunit/phpunit": "^9.6.4 || ^10",
         "predis/predis": "^1.1 || ^2.1",
         "pusher/pusher-php-server": "^5 || ^6 || ^7.0.2",
         "rector/rector": "^0.15.18",

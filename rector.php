@@ -2,6 +2,7 @@
 
 use Rector\CodeQuality\Rector\Array_\CallableThisArrayToAnonymousFunctionRector;
 use Rector\CodeQuality\Rector\Concat\JoinStringConcatRector;
+use Rector\CodeQuality\Rector\Foreach_\UnusedForeachValueToArrayKeysRector;
 use Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector;
 use Rector\CodeQuality\Rector\Identical\GetClassToInstanceOfRector;
 use Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector;
@@ -60,6 +61,7 @@ return static function (RectorConfig $rectorConfig): void {
         AddArrayDefaultToArrayPropertyRector::class, // Break lazy initialization
         AddReturnTypeDeclarationFromYieldsRector::class, // iterable is fine
         ArrayShapeFromConstantArrayReturnRector::class, // Sometimes too specific in methods that can be overridden
+        UnusedForeachValueToArrayKeysRector::class, // inefficient
     ]);
     $rectorConfig->paths([
         __DIR__ . '/src',
