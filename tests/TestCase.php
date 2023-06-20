@@ -61,6 +61,12 @@ GRAPHQL;
         // is not defined in the reusable test trait.
         $this->schema ??= self::PLACEHOLDER_QUERY;
         $this->setUpTestSchema();
+
+        // Using qualifyTestResolver() requires instantiation of the test class through the container.
+        // https://laravel.com/docs/container#binding-primitives
+        $this->app->when(static::class)
+            ->needs('$name')
+            ->give('TestName');
     }
 
     /** @return array<class-string<\Illuminate\Support\ServiceProvider>> */
@@ -88,11 +94,6 @@ GRAPHQL;
 
     protected function getEnvironmentSetUp($app): void
     {
-        // https://laravel.com/docs/container#binding-primitives
-        $app->when(PHPUnitTestCase::class)
-            ->needs('$name')
-            ->give('TestName');
-
         $config = $app->make(ConfigRepository::class);
         $config->set('lighthouse.namespaces', [
             'models' => [
