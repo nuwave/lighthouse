@@ -161,6 +161,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Decode fields with directive `@globalId` in federation model entity resolver
 - Add `GraphQLContext:: setUser(?Authenticatable $user): void`
 - Add directive `@whereKey` to filter Models by their primary key https://github.com/nuwave/lighthouse/pull/2289
+- Add directive `@void` to unify the definition of fields with no return value https://github.com/nuwave/lighthouse/pull/1992
 - Allow directive `@where` on fields https://github.com/nuwave/lighthouse/pull/2306
 - Allow passing route parameters in `MakeGraphQLRequests` test methods https://github.com/nuwave/lighthouse/pull/2333
 - Add subscription assertion methods in `MakesGraphQLRequests` and `TestResponseMixin` and docs in phpunit integration section https://github.com/nuwave/lighthouse/pull/2343
