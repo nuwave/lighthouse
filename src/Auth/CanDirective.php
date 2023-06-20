@@ -12,7 +12,6 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\Resolved;
@@ -212,7 +211,15 @@ GRAPHQL;
                 throw new Error($modelNotFoundException->getMessage());
             }
 
-            return Collection::wrap($modelOrModels);
+            if ($modelOrModels instanceof Model) {
+                return [$modelOrModels];
+            }
+
+            if ($modelOrModels === null) {
+                return [];
+            }
+
+            return $modelOrModels;
         }
 
         return [$this->getModelClass()];
