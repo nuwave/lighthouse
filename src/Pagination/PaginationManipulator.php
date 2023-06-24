@@ -72,8 +72,9 @@ class PaginationManipulator
         int $maxCount = null,
         ObjectTypeDefinitionNode $edgeType = null,
     ): void {
-        if (! isset($this->documentAST->types[self::pageInfo()->getName()->value])) {
-            $this->documentAST->setTypeDefinition(self::pageInfo());
+        $pageInfoNode = self::pageInfo();
+        if (! isset($this->documentAST->types[$pageInfoNode->getName()->value])) {
+            $this->documentAST->setTypeDefinition($pageInfoNode);
         }
 
         $fieldTypeName = ASTHelper::getUnderlyingTypeName($fieldDefinition);
@@ -162,8 +163,9 @@ GRAPHQL
         int $defaultCount = null,
         int $maxCount = null,
     ): void {
-        if (! isset($this->documentAST->types[self::paginatorInfo()->getName()->value])) {
-            $this->documentAST->setTypeDefinition(self::paginatorInfo());
+        $paginatorInfoNode = self::paginatorInfo();
+        if (! isset($this->documentAST->types[$paginatorInfoNode->getName()->value])) {
+            $this->documentAST->setTypeDefinition($paginatorInfoNode);
         }
 
         $fieldTypeName = ASTHelper::getUnderlyingTypeName($fieldDefinition);
@@ -201,8 +203,9 @@ GRAPHQL
         int $defaultCount = null,
         int $maxCount = null,
     ): void {
-        if (! isset($this->documentAST->types[self::simplePaginatorInfo()->getName()->value])) {
-            $this->documentAST->setTypeDefinition(self::simplePaginatorInfo());
+        $simplePaginatorInfoNode = self::simplePaginatorInfo();
+        if (! isset($this->documentAST->types[$simplePaginatorInfoNode->getName()->value])) {
+            $this->documentAST->setTypeDefinition($simplePaginatorInfoNode);
         }
 
         $fieldTypeName = ASTHelper::getUnderlyingTypeName($fieldDefinition);
