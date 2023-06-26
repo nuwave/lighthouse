@@ -25,8 +25,7 @@ final class DeprecationTest extends TestCase
 
     protected function tearDown(): void
     {
-        DocumentValidator::removeRule(new DetectDeprecatedUsage(static function (): void {
-        }));
+        DocumentValidator::removeRule(new DetectDeprecatedUsage(static function (): void {}));
 
         parent::tearDown();
     }

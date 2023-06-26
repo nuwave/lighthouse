@@ -62,9 +62,7 @@ final class DirectiveLocatorTest extends TestCase
                 return /** @lang GraphQL */ 'foo';
             }
 
-            public function handleField(FieldValue $fieldValue): void
-            {
-            }
+            public function handleField(FieldValue $fieldValue): void {}
         };
 
         $this->directiveLocator->setResolved('foo', $directive::class);
