@@ -11,7 +11,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Fixed
 
-- Add `PaginatorInfo`, `SimplePaginatorInfo`, `PageInfo` only as soon as they're required
+- Add `PaginatorInfo`, `SimplePaginatorInfo`, `PageInfo` only when required
 
 ## v6.11.0
 
