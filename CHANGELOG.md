@@ -9,9 +9,11 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
-### Fixed
+## v6.12.0
 
-- Add `PaginatorInfo`, `SimplePaginatorInfo`, `PageInfo` only when required
+### Changed
+
+- Add `PaginatorInfo`, `SimplePaginatorInfo`, `PageInfo` only when required https://github.com/nuwave/lighthouse/pull/2413
 
 ## v6.11.0
 
