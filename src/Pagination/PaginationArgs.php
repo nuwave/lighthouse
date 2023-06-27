@@ -134,6 +134,9 @@ class PaginationArgs
 
     protected function paginator($items, $total, $perPage, $currentPage, $options)
     {
+        if($this->first<0){
+            $perPage=-1;
+        }
         return Container::getInstance()->makeWith(LengthAwarePaginator::class, compact(
             'items', 'total', 'perPage', 'currentPage', 'options'
         ));
