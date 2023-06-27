@@ -3,9 +3,9 @@
 use function MLL\PhpCsFixerConfig\risky;
 
 $finder = PhpCsFixer\Finder::create()
-    ->notPath('vendor')
     ->in(__DIR__)
     ->name('*.php')
+    ->notPath('vendor')
     ->ignoreDotFiles(false)
     ->ignoreVCS(true);
 
@@ -22,10 +22,5 @@ return risky($finder, [
             'match',
             'parameters',
         ],
-    ],
-    'yoda_style' => [
-        'equal' => false,
-        'identical' => false,
-        'less_and_greater' => false,
     ],
 ]);
