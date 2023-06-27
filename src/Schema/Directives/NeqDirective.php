@@ -13,7 +13,7 @@ class NeqDirective extends BaseDirective implements ArgBuilderDirective
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Use the client given value to add an not-equal conditional to a database query.
+Use the client given value to add a not-equal conditional to a database query.
 """
 directive @neq(
   """

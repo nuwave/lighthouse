@@ -2233,7 +2233,7 @@ A [@namespace](#namespace) directive defined on a field directive wins in case o
 
 ```graphql
 """
-Use the client given value to add an not-equal conditional to a database query.
+Use the client given value to add a not-equal conditional to a database query.
 """
 directive @neq(
   """
