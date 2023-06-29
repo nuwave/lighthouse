@@ -22,8 +22,8 @@ final class RedisStorageManagerTest extends TestCase
      *
      * @see https://github.com/sebastianbergmann/phpunit/issues/4026#issuecomment-1418205424
      *
-     * @param array<mixed> $firstCallArguments
-     * @param array<mixed> ...$consecutiveCallsArguments
+     * @param  array<mixed>  $firstCallArguments
+     * @param  array<mixed>  ...$consecutiveCallsArguments
      *
      * @return iterable<callback<mixed>>
      */
