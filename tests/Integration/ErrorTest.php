@@ -61,7 +61,7 @@ final class ErrorTest extends TestCase
     public function testHandlesErrorInResolver(): void
     {
         $message = 'foo';
-        $this->mockResolver(static fn() => throw new Error($message));
+        $this->mockResolver(static fn () => throw new Error($message));
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -93,7 +93,7 @@ final class ErrorTest extends TestCase
         $config = $this->app->make(ConfigRepository::class);
         $config->set('lighthouse.debug', DebugFlag::INCLUDE_DEBUG_MESSAGE);
 
-        $this->mockResolver(static fn() => throw new \Exception('foo'));
+        $this->mockResolver(static fn () => throw new \Exception('foo'));
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -153,7 +153,7 @@ final class ErrorTest extends TestCase
         $this->mockResolver($successValue, 'success');
 
         $error = new \Exception('fail');
-        $this->mockResolver(static fn() => throw $error, 'fail');
+        $this->mockResolver(static fn () => throw $error, 'fail');
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -187,7 +187,7 @@ final class ErrorTest extends TestCase
         $this->mockResolver($successValue, 'success');
 
         $error = new \Exception('fail');
-        $this->mockResolver(static fn() => throw $error, 'fail');
+        $this->mockResolver(static fn () => throw $error, 'fail');
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -231,7 +231,7 @@ final class ErrorTest extends TestCase
 
         $message = 'foo';
 
-        $this->mockResolver(static fn() => throw new \Exception($message));
+        $this->mockResolver(static fn () => throw new \Exception($message));
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -255,7 +255,7 @@ final class ErrorTest extends TestCase
     {
         $error = new Error('foo');
 
-        $this->mockResolver(static fn() => throw $error);
+        $this->mockResolver(static fn () => throw $error);
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -280,7 +280,7 @@ final class ErrorTest extends TestCase
 
         $exception = new \Exception('foo');
 
-        $this->mockResolver(static fn() => throw $exception);
+        $this->mockResolver(static fn () => throw $exception);
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
