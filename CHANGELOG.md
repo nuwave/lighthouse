@@ -9,6 +9,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+- Added support to generate tests when genearting field classes.
+
 ## v6.12.0
 
 ### Changed
