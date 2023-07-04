@@ -28,48 +28,48 @@ abstract class FieldGeneratorCommand extends LighthouseGeneratorCommand
         ];
     }
 
-    protected function handleTestCreation($path)
+    protected function handleTestCreation($path): bool
     {
-        if (! $testType = $this->testType()) {
+        if (! $testFramework = $this->testFramework()) {
             return false;
         }
 
-        $stubPath = __DIR__."/stubs/tests/$testType.stub";
-        $stub = $this->files->get($stubPath);
+        $stub = $this->files->get(__DIR__ . "/stubs/tests/{$testFramework}.stub");
 
-        $name = Str::of($path)->after($this->laravel['path'])->beforeLast('.php');
-        $fieldName = $name->afterLast('/');
-        $type = $this->requestType();
+        // e.g. Mutations/MyMutation
+        $operationAndFieldName = Str::of($path)
+            ->after($this->laravel['path'])
+            ->beforeLast('.php');
 
-        // The fully qualified class name for the test, replacing slashes with backslashes for namespacing.
-        // This assumes that the generated class will be in 'Tests/Feature' namespace.
-        $className = $name->prepend('Tests/Feature')->replace('/', '\\')->append('Test');
+        // e.g. Tests\\Feature\\Mutations\\MyMutationTest
+        $className = $operationAndFieldName
+            ->replace('/', '\\')
+            ->prepend('Tests\\Feature')
+            ->append('Test');
 
-        $stub = $this->replaceNamespace($stub, $className)->replaceClass($stub, $className);
-
-        // Update the stub content with the correct field and type names
-        // - dummyField: the name of the field, in camelCase. e.g getUserName
-        // - dummy_field: the name of the field, in snake_case. e.g get_user_name
-        // - DummyField: the name of the field, in StudlyCase. e.g GetUserName
-        // - dummyType: the name of the type, in lowercase and singular. e.g query
+        $stub = $this->replaceNamespace($stub, $className)
+            ->replaceClass($stub, $className);
         $stub = Str::of($stub)
-            ->replace('dummyField', $fieldName->camel())
-            ->replace('dummy_field', $fieldName->snake())
-            ->replace('dummy field', $fieldName->snake()->replace('_', ' '))
-            ->replace('DummyField', $fieldName->studly())
-            ->replace('dummyType', Str::of($this->type)->lower()->singular())
-            ->replace('maybeMutation', $type);
+            ->replace('dummyField', $operationAndFieldName->afterLast('/'))
+            ->replace('dummyOperationPrefix', $this->operationPrefix());
 
-        $path = base_path($className->lcfirst()->replace('\\', '/')->append('.php')->toString());
+        // e.g. tests/Feature/Mutations/MyMutationTest.php
+        $classPath = $className->lcfirst()
+            ->replace('\\', '/')
+            ->append('.php')
+            ->toString();
 
+        // e.g. /home/myself/projects/foo/tests/Feature/Mutations/MyMutationTest.php
+        $path = base_path($classPath);
         $this->makeDirectory($path);
 
         $this->files->put($path, $stub);
-
         $this->info('Test created successfully.');
+
+        return true;
     }
 
-    protected function testType(): ?string
+    protected function testFramework(): ?string
     {
         return match (true) {
             $this->option('pest') => 'pest',
@@ -78,7 +78,7 @@ abstract class FieldGeneratorCommand extends LighthouseGeneratorCommand
         };
     }
 
-    protected function requestType(): string
+    protected function operationPrefix(): string
     {
         return match ($this->type) {
             RootType::MUTATION => 'mutation ',

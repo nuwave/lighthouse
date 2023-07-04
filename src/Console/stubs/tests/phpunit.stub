@@ -6,15 +6,18 @@ use Tests\TestCase;
 
 final class DummyClass extends TestCase
 {
-    public function test_dummy_field(): void
+    public function test_dummyField(): void
     {
-        $response = $this->graphQL(/** @lang GraphQL */ '
-            maybeMutation{
+        // TODO set up test data
+
+        $this->graphQL(/** @lang GraphQL */ '
+            dummyOperationPrefix{
                 dummyField
             }
         ')->assertJson([
             'data' => [
-                'dummyField' => null
+                // TODO specify expected result
+                'dummyField' => null,
             ],
         ]);
     }
