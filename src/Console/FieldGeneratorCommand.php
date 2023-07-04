@@ -28,6 +28,7 @@ abstract class FieldGeneratorCommand extends LighthouseGeneratorCommand
         ];
     }
 
+    /** @param string $path */
     protected function handleTestCreation($path): bool
     {
         if (! $testFramework = $this->testFramework()) {
@@ -38,7 +39,7 @@ abstract class FieldGeneratorCommand extends LighthouseGeneratorCommand
 
         // e.g. Mutations/MyMutation
         $operationAndFieldName = Str::of($path)
-            ->after($this->laravel['path'])
+            ->after($this->laravel->basePath())
             ->beforeLast('.php');
 
         // e.g. Tests\\Feature\\Mutations\\MyMutationTest
@@ -47,11 +48,12 @@ abstract class FieldGeneratorCommand extends LighthouseGeneratorCommand
             ->prepend('Tests\\Feature')
             ->append('Test');
 
-        $stub = $this->replaceNamespace($stub, $className)
-            ->replaceClass($stub, $className);
+        $stub = $this->replaceNamespace($stub, $className->toString())
+            ->replaceClass($stub, $className->toString());
         $stub = Str::of($stub)
-            ->replace('dummyField', $operationAndFieldName->afterLast('/'))
-            ->replace('dummyOperationPrefix', $this->operationPrefix());
+            ->replace('dummyField', $operationAndFieldName->afterLast('/')->toString())
+            ->replace('dummyOperationPrefix', $this->operationPrefix())
+            ->toString();
 
         // e.g. tests/Feature/Mutations/MyMutationTest.php
         $classPath = $className->lcfirst()
