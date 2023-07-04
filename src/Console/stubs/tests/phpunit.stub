@@ -4,18 +4,15 @@ namespace DummyNamespace;
 
 use Tests\TestCase;
 
-class DummyClass extends TestCase
+final class DummyClass extends TestCase
 {
-    /** @test */
-    public function it_can_use_dummy_field(): void
+    public function test_dummy_field(): void
     {
         $response = $this->graphQL(/** @lang GraphQL */ '
-            dummyType DummyField {
+            maybeMutation{
                 dummyField
             }
-        ');
-
-        $response->assertJson([
+        ')->assertJson([
             'data' => [
                 'dummyField' => null
             ],

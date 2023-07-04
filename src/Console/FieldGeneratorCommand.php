@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Console;
 
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Support\Str;
+use Nuwave\Lighthouse\Schema\RootType;
 use Symfony\Component\Console\Input\InputOption;
 
 abstract class FieldGeneratorCommand extends LighthouseGeneratorCommand
@@ -29,15 +30,16 @@ abstract class FieldGeneratorCommand extends LighthouseGeneratorCommand
 
     protected function handleTestCreation($path)
     {
-        if (! $this->option('test') && ! $this->option('pest')) {
+        if (! $testType = $this->testType()) {
             return false;
         }
 
-        $stubPath = __DIR__.'/stubs/test.stub';
+        $stubPath = __DIR__."/stubs/tests/$testType.stub";
         $stub = $this->files->get($stubPath);
 
         $name = Str::of($path)->after($this->laravel['path'])->beforeLast('.php');
-        $fielName = $name->afterLast('/');
+        $fieldName = $name->afterLast('/');
+        $type = $this->requestType();
 
         // The fully qualified class name for the test, replacing slashes with backslashes for namespacing.
         // This assumes that the generated class will be in 'Tests/Feature' namespace.
@@ -51,10 +53,12 @@ abstract class FieldGeneratorCommand extends LighthouseGeneratorCommand
         // - DummyField: the name of the field, in StudlyCase. e.g GetUserName
         // - dummyType: the name of the type, in lowercase and singular. e.g query
         $stub = Str::of($stub)
-            ->replace('dummyField', $fielName->camel())
-            ->replace('dummy_field', $fielName->snake())
-            ->replace('DummyField', $fielName->studly())
-            ->replace('dummyType', Str::of($this->type)->lower()->singular());
+            ->replace('dummyField', $fieldName->camel())
+            ->replace('dummy_field', $fieldName->snake())
+            ->replace('dummy field', $fieldName->snake()->replace('_', ' '))
+            ->replace('DummyField', $fieldName->studly())
+            ->replace('dummyType', Str::of($this->type)->lower()->singular())
+            ->replace('maybeMutation', $type);
 
         $path = base_path($className->lcfirst()->replace('\\', '/')->append('.php')->toString());
 
@@ -63,5 +67,22 @@ abstract class FieldGeneratorCommand extends LighthouseGeneratorCommand
         $this->files->put($path, $stub);
 
         $this->info('Test created successfully.');
+    }
+
+    protected function testType(): ?string
+    {
+        return match (true) {
+            $this->option('pest') => 'pest',
+            $this->option('test') => 'phpunit',
+            default => null,
+        };
+    }
+
+    protected function requestType(): string
+    {
+        return match ($this->type) {
+            RootType::MUTATION => 'mutation ',
+            default => '',
+        };
     }
 }

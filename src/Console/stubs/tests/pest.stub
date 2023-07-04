@@ -1,0 +1,15 @@
+<?php
+
+use Tests\TestCase;
+
+test('dummy field', function (): void  {
+    $response = graphQL(/** @lang GraphQL */ '
+        maybeMutation{
+            dummyField
+        }
+    ')->assertJson([
+        'data' => [
+            'dummyField' => null
+        ],
+    ]);
+});
