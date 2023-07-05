@@ -69,7 +69,7 @@ GRAPHQL;
         return $next;
     }
 
-    public function manipulateArgDefinition(DocumentAST &$documentAST, InputValueDefinitionNode &$argDefinition, FieldDefinitionNode &$parentField, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,): void
+    public function manipulateArgDefinition(DocumentAST &$documentAST, InputValueDefinitionNode &$argDefinition, FieldDefinitionNode &$parentField, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType): void
     {
         $type = $argDefinition->type instanceof NonNullTypeNode
             ? $argDefinition->type->type
