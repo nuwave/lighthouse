@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.13.0
+
+### Added
+
+- Validate arguments with list types do not use `@spread`
+
 ## v6.12.0
 
 ### Changed
