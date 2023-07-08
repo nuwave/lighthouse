@@ -40,6 +40,7 @@ abstract class FieldGeneratorCommand extends LighthouseGeneratorCommand
         // e.g. Mutations/MyMutation
         $operationAndFieldName = Str::of($path)
             ->after($this->laravel->basePath())
+            ->after('app')
             ->beforeLast('.php');
 
         // e.g. Tests\\Feature\\Mutations\\MyMutationTest
