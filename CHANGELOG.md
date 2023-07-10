@@ -13,6 +13,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Add support to generate tests when generating field classes https://github.com/nuwave/lighthouse/pull/2419/files
 
+## v6.13.0
+
+### Added
+
+- Validate arguments with list types do not use `@spread` https://github.com/nuwave/lighthouse/pull/2421
+
 ## v6.12.0
 
 ### Changed

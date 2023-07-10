@@ -1,6 +1,5 @@
 parameters:
-  # TODO level up to max
-  level: 8
+  level: 8 # TODO level up to max
   stubFiles:
   - _ide_helper.php
   paths:
@@ -8,13 +7,12 @@ parameters:
   - src
   - tests
   checkOctaneCompatibility: true
+  reportUnmatchedIgnoredErrors: false # As long as we support multiple Laravel versions at once, there will be some dead spots
+  # Install https://plugins.jetbrains.com/plugin/7677-awesome-console to make those links clickable
+  editorUrl: '%%relFile%%:%%line%%'
+  editorUrlTitle: '%%relFile%%:%%line%%'
   excludePaths:
-  # Intentionally wrong
-  - tests/Utils/Models/WithoutRelationClassImport.php
-
-  # As long as we support multiple Laravel versions at once, there will be some dead spots
-  reportUnmatchedIgnoredErrors: false
-
+  - tests/Utils/Models/WithoutRelationClassImport.php # Intentionally wrong
   ignoreErrors:
   # PHPStan does not get it
   - '#Parameter \#1 \$callback of static method Closure::fromCallable\(\) expects callable\(\): mixed, array{object, .*} given\.#'
