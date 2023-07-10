@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Add support to generate tests when generating field classes https://github.com/nuwave/lighthouse/pull/2419/files
+
 ## v6.13.0
 
 ### Added
