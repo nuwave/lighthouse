@@ -18,7 +18,7 @@ class Base64GlobalId implements GlobalId
 {
     public function encode(string $type, int|string $id): string
     {
-        return base64_encode($type . ':' . $id);
+        return base64_encode("{$type}:{$id}");
     }
 
     public function decode(string $globalID): array

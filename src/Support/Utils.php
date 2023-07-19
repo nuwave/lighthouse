@@ -31,7 +31,7 @@ class Utils
         }
 
         foreach ($namespacesToTry as $namespace) {
-            $className = $namespace . '\\' . $classCandidate;
+            $className = "{$namespace}\\{$classCandidate}";
 
             if ($determineMatch($className)) {
                 assert(class_exists($className));

@@ -135,7 +135,8 @@ GRAPHQL;
 
                     $column = "{$relationSnake}_count";
                 } else {
-                    $operator = 'with' . ucfirst($aggregate);
+                    $upperAggregate = ucfirst($aggregate);
+                    $operator = "with{$upperAggregate}";
                     $relationColumn = $relationValues['column'];
                     $builder->{$operator}($relation, $relationColumn);
 
@@ -247,8 +248,8 @@ GRAPHQL;
 
             $documentAST->setTypeDefinition(Parser::inputObjectTypeDefinition("{$inputMerged}}"));
         } else {
-            $restrictedOrderByName = $qualifiedOrderByPrefix . 'OrderByClause';
-            $argDefinition->type = Parser::typeReference('[' . $restrictedOrderByName . '!]');
+            $restrictedOrderByName = "{$qualifiedOrderByPrefix}OrderByClause";
+            $argDefinition->type = Parser::typeReference("[{$restrictedOrderByName}!]");
 
             $documentAST->setTypeDefinition(
                 OrderByServiceProvider::createOrderByClauseInput(

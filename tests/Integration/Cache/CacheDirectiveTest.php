@@ -363,8 +363,8 @@ final class CacheDirectiveTest extends DBTestCase
         ';
 
         $query = /** @lang GraphQL */ '
-        {
-            user(id: ' . $user->getKey() . ') {
+        query ($id: ID!) {
+            user(id: $id) {
                 id
                 name
                 posts(first: 3) {
@@ -383,13 +383,17 @@ final class CacheDirectiveTest extends DBTestCase
             }
         });
 
-        $firstResponse = $this->graphQL($query);
+        $firstResponse = $this->graphQL($query, [
+            'id' => $user->getKey(),
+        ]);
 
         $posts = $this->cache->get("lighthouse:User:{$user->getKey()}:posts:first:3");
         $this->assertInstanceOf(LengthAwarePaginator::class, $posts);
         $this->assertCount(3, $posts);
 
-        $cachedResponse = $this->graphQL($query);
+        $cachedResponse = $this->graphQL($query, [
+            'id' => $user->getKey(),
+        ]);
 
         $this->assertSame(1, $dbQueryCountForPost, 'This query should only run once and be cached on the second run.');
         $this->assertSame(
@@ -427,8 +431,8 @@ final class CacheDirectiveTest extends DBTestCase
         ';
 
         $query = /** @lang GraphQL */ '
-        {
-            user(id: ' . $user->getKey() . ') {
+        query ($id: ID!) {
+            user(id: $id) {
                 id
                 name
                 posts(first: 3) {
@@ -447,7 +451,9 @@ final class CacheDirectiveTest extends DBTestCase
             }
         });
 
-        $firstResponse = $this->graphQL($query);
+        $firstResponse = $this->graphQL($query, [
+            'id' => $user->getKey(),
+        ]);
 
         $posts = $this->cache
             ->tags($tags)
@@ -455,7 +461,9 @@ final class CacheDirectiveTest extends DBTestCase
         $this->assertInstanceOf(LengthAwarePaginator::class, $posts);
         $this->assertCount(3, $posts);
 
-        $cachedResponse = $this->graphQL($query);
+        $cachedResponse = $this->graphQL($query, [
+            'id' => $user->getKey(),
+        ]);
 
         $this->assertSame(1, $dbQueryCountForPost, 'This query should only run once and be cached on the second run.');
         $this->assertSame(

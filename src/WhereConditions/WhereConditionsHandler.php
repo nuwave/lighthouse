@@ -132,7 +132,7 @@ class WhereConditionsHandler
     protected function prefixConditionWithTableName(array $condition, Model $model): array
     {
         if (isset($condition['column'])) {
-            $condition['column'] = $model->getTable() . '.' . $condition['column'];
+            $condition['column'] = "{$model->getTable()}.{$condition['column']}";
         }
 
         return $condition;

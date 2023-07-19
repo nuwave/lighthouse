@@ -17,7 +17,9 @@ class SchemaSyntaxErrorException extends \Exception implements ClientAware
         if ($source instanceof Source && $positions !== []) {
             $position = $positions[0];
 
-            $message .= ', near: ' . substr($source->body, max(0, $position - 50), 100);
+            $from = max(0, $position - 50);
+            $surroundingCode = substr($source->body, $from, 100);
+            $message .= ", near: {$surroundingCode}";
         }
 
         parent::__construct($message);
