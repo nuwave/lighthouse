@@ -122,7 +122,7 @@ final class SearchDirectiveTest extends DBTestCase
             ->andReturn(new EloquentCollection())
             ->once();
 
-        $this->schema = /** @lang GraphQL */<<<GRAPHQL
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type Post {
             id: Int!
         }

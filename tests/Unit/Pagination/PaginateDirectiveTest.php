@@ -470,7 +470,7 @@ GRAPHQL
     {
         config(['lighthouse.pagination.max_count' => 5]);
 
-        $this->schema = /** @lang GraphQL */<<<GRAPHQL
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type User {
             id: ID!
             name: String!

@@ -13,7 +13,7 @@ final class BuilderDirectiveTest extends DBTestCase
 {
     public function testCallsCustomBuilderMethod(): void
     {
-        $this->schema = /** @lang GraphQL */<<<GRAPHQL
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type Query {
             users(
                 limit: Int @builder(method: "{$this->qualifyTestResolver('limit')}")
@@ -53,7 +53,7 @@ final class BuilderDirectiveTest extends DBTestCase
             })
             ->andReturn(User::query());
 
-        $this->schema = /** @lang GraphQL */<<<GRAPHQL
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type Query {
             users(arg1 : String, arg2 : String): [User!]! @all
                 @builder(method: "{$this->qualifyTestResolver('limit')}" value: 1)
@@ -88,7 +88,7 @@ final class BuilderDirectiveTest extends DBTestCase
             })
             ->andReturn(User::query());
 
-        $this->schema = /** @lang GraphQL */<<<GRAPHQL
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type Query {
             users(arg1 : String, arg2 : String): [User!]! @all
                 @builder(method: "{$this->qualifyTestResolver('limit')}" value: 1)
@@ -110,7 +110,7 @@ final class BuilderDirectiveTest extends DBTestCase
 
     public function testCallsCustomBuilderMethodOnFieldWithValue(): void
     {
-        $this->schema = /** @lang GraphQL */<<<GRAPHQL
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type Query {
             users: [User!]! @all
             @builder(method: "{$this->qualifyTestResolver('limit')}" value: 1)
@@ -134,7 +134,7 @@ final class BuilderDirectiveTest extends DBTestCase
 
     public function testCallsCustomBuilderMethodOnFieldWithoutValue(): void
     {
-        $this->schema = /** @lang GraphQL */<<<GRAPHQL
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type Query {
             users: [User!]! @all @builder(method: "{$this->qualifyTestResolver('limit')}")
         }

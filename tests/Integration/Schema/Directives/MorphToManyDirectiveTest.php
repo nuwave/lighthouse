@@ -226,7 +226,7 @@ final class MorphToManyDirectiveTest extends DBTestCase
                 return $tag;
             });
 
-        $this->schema = /** @lang GraphQL */<<<GRAPHQL
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         interface Tag @interface(resolveType: "{$this->qualifyTestResolver('resolveType')}") {
             id: ID!
         }

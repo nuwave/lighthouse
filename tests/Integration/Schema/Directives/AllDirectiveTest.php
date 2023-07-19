@@ -176,7 +176,7 @@ final class AllDirectiveTest extends DBTestCase
     {
         factory(User::class, 2)->create();
 
-        $this->schema = /** @lang GraphQL */<<<GRAPHQL
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type User {
             id: ID!
             name: String!
