@@ -302,7 +302,9 @@ final class WithDirectiveTest extends DBTestCase
 
     public function testEagerLoadsMultipleNestedRelationsAtOnce(): void
     {
-        $this->markTestSkipped('Not working due to the current naive usage of ' . \Illuminate\Database\Eloquent\Collection::class . '::load() in ' . \Nuwave\Lighthouse\Execution\ModelsLoader\SimpleModelsLoader::class . '::load().');
+        $eloquentCollection = \Illuminate\Database\Eloquent\Collection::class;
+        $simpleModelsLoader = \Nuwave\Lighthouse\Execution\ModelsLoader\SimpleModelsLoader::class;
+        $this->markTestSkipped("Not working due to the current naive usage of {$eloquentCollection}::load() in {$simpleModelsLoader}::load().");
 
         // @phpstan-ignore-next-line unreachable due to markTestSkipped
         $this->schema = /** @lang GraphQL */ '

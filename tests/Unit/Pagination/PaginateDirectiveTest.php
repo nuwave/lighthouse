@@ -470,16 +470,16 @@ GRAPHQL
     {
         config(['lighthouse.pagination.max_count' => 5]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type User {
             id: ID!
             name: String!
         }
 
         type Query {
-            users: [User!]! @paginate(maxCount: 6, resolver: "' . $this->qualifyTestResolver('returnPaginatedDataInsteadOfBuilder') . '")
+            users: [User!]! @paginate(maxCount: 6, resolver: "{$this->qualifyTestResolver('returnPaginatedDataInsteadOfBuilder')}")
         }
-        ';
+        GRAPHQL;
 
         $result = $this->graphQL(/** @lang GraphQL */ '
         {

@@ -8,7 +8,7 @@ final class FooClosureValidator extends Validator
 {
     public static function notFoo(string $attribute): string
     {
-        return 'The ' . $attribute . ' field must have a value of "foo".';
+        return "The {$attribute} field must have a value of \"foo\".";
     }
 
     /** @return array{foo: array<\Closure(string $attribute, mixed $value, \Closure $fail): void>} */

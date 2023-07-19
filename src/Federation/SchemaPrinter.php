@@ -89,13 +89,12 @@ GRAPHQL;
             return '';
         }
 
-        return ' '
-            . implode(
-                ' ',
-                array_map(
-                    static fn (DirectiveNode $directive): string => Printer::doPrint($directive),
-                    $directives,
-                ),
-            );
+        return ' ' . implode(
+            ' ',
+            array_map(
+                static fn (DirectiveNode $directive): string => Printer::doPrint($directive),
+                $directives,
+            ),
+        );
     }
 }

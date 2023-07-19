@@ -74,7 +74,7 @@ final class RedisStorageManagerTest extends TestCase
         $subscriber = new DummySubscriber($channel, 'test-topic');
         $redisConnection->expects($this->once())
             ->method('command')
-            ->with('get', ['graphql.subscriber.' . $channel])
+            ->with('get', ["graphql.subscriber.{$channel}"])
             ->willReturn(serialize($subscriber));
 
         $manager = new RedisStorageManager($config, $redisFactory);
@@ -90,14 +90,14 @@ final class RedisStorageManagerTest extends TestCase
         $redisFactory = $this->getRedisFactory($redisConnection);
 
         $channel = 'test-channel';
-        $prefixedChannel = 'graphql.subscriber.' . $channel;
+        $prefixedChannel = "graphql.subscriber.{$channel}";
         $subscriber = new DummySubscriber($channel, 'test-topic');
         $redisConnection->expects($this->exactly(3))
             ->method('command')
             ->with(...$this->withConsecutive(
                 ['get', [$prefixedChannel]],
                 ['del', [$prefixedChannel]],
-                ['srem', ['graphql.topic.' . $subscriber->topic, $channel]],
+                ['srem', ["graphql.topic.{$subscriber->topic}", $channel]],
             ))
             ->willReturnOnConsecutiveCalls(
                 serialize($subscriber),
