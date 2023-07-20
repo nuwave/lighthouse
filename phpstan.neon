@@ -11,6 +11,7 @@ parameters:
   # Install https://plugins.jetbrains.com/plugin/7677-awesome-console to make those links clickable
   editorUrl: '%%relFile%%:%%line%%'
   editorUrlTitle: '%%relFile%%:%%line%%'
+  tmpDir: phpstan-tmp-dir
   excludePaths:
   - tests/Utils/Models/WithoutRelationClassImport.php # Intentionally wrong
   ignoreErrors:
