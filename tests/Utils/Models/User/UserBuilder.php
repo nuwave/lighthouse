@@ -18,6 +18,6 @@ final class UserBuilder extends Builder
 
     public function named(): self
     {
-        return $this->whereNotNull('name');
+        return $this->whereNull('name', 'and', true);
     }
 }
