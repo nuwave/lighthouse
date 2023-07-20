@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Utils\Models\User;
 
@@ -7,9 +7,7 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 
 final class UserBuilder extends Builder
 {
-    /**
-     * @param  array{company: string} $args
-     */
+    /** @param  array{company: string} $args */
     public function companyName(array $args): self
     {
         return $this->where(fn (self $builder) => $builder
