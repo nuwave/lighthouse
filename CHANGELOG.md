@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Ensure `@scope` supports custom query builders
+
 ## v6.14.0
 
 ### Added

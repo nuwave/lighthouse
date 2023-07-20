@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Tests\DBTestCase;
 use Tests\Integration\Execution\DataLoader\RelationBatchLoaderTest;
+use Tests\Utils\Models\User\UserBuilder;
 
 /**
  * Account of a person who utilizes this application.
@@ -62,6 +63,11 @@ final class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function newEloquentBuilder($query): UserBuilder
+    {
+        return new UserBuilder($query);
+    }
 
     /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\AlternateConnection> */
     public function alternateConnections(): HasMany
@@ -117,28 +123,6 @@ final class User extends Authenticatable
     public function team(): BelongsTo
     {
         return $this->belongsTo(Team::class);
-    }
-
-    /**
-     * @param  \Illuminate\Database\Eloquent\Builder<self>  $query
-     * @param  array{company: string} $args
-     *
-     * @return \Illuminate\Database\Eloquent\Builder<self>
-     */
-    public function scopeCompanyName(EloquentBuilder $query, array $args): EloquentBuilder
-    {
-        return $query->whereHas('company', static fn (EloquentBuilder $q): EloquentBuilder => $q
-            ->where('name', $args['company']));
-    }
-
-    /**
-     * @param  \Illuminate\Database\Eloquent\Builder<self>  $query
-     *
-     * @return \Illuminate\Database\Eloquent\Builder<self>
-     */
-    public function scopeNamed(EloquentBuilder $query): EloquentBuilder
-    {
-        return $query->whereNotNull('name');
     }
 
     public function getCompanyNameAttribute(): string|null
