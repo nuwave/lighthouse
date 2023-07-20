@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.15.0
+
+### Added
+
+- Ensure `@scope` supports custom query builders https://github.com/nuwave/lighthouse/pull/2423
+
 ## v6.14.0
 
 ### Added

@@ -6,6 +6,7 @@ use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Tag;
 use Tests\Utils\Models\Task;
+use Tests\Utils\Models\User;
 
 final class ScopeDirectiveTest extends DBTestCase
 {
@@ -91,6 +92,68 @@ final class ScopeDirectiveTest extends DBTestCase
                 'tasks' => [
                     [
                         'id' => "{$taskWithTag->id}",
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testWorksWithCustomQueryBuilders(): void
+    {
+        $named = factory(User::class)->make();
+        assert($named instanceof User);
+        $named->name = 'foo';
+        $named->save();
+
+        $unnamed = factory(User::class)->make();
+        assert($unnamed instanceof User);
+        $unnamed->name = null;
+        $unnamed->save();
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            users(named: Boolean @scope): [User!]! @all
+        }
+
+        type User {
+            id: ID!
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($named: Boolean) {
+            users(named: $named) {
+                id
+            }
+        }
+        ', [
+            'named' => true,
+        ])->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => "{$named->id}",
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query {
+            users {
+                id
+            }
+        }
+        ', [
+            'named' => false,
+        ])->assertSimilarJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => "{$named->id}",
+                    ],
+                    [
+                        'id' => "{$unnamed->id}",
                     ],
                 ],
             ],
