@@ -68,6 +68,11 @@ final class User extends Authenticatable
         return new UserBuilder($query);
     }
 
+    public static function query(): UserBuilder
+    {
+        return parent::query(); // @phpstan-ignore-line this function is more of an assertion
+    }
+
     /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\AlternateConnection> */
     public function alternateConnections(): HasMany
     {

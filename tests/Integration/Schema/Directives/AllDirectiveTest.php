@@ -303,7 +303,8 @@ GRAPHQL;
     /** @return \Illuminate\Database\Eloquent\Builder<\Tests\Utils\Models\User> */
     public static function builder(): EloquentBuilder
     {
-        return User::orderBy('id', 'DESC');
+        return User::query()
+            ->orderBy('id', 'DESC');
     }
 
     /** @return \Illuminate\Database\Eloquent\Relations\Relation<\Tests\Utils\Models\Post> */
