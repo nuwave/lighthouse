@@ -9,10 +9,14 @@ class UpsertModel implements ArgResolver
     /** @var callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver */
     protected $previous;
 
+    /** @var array<string> */
+    protected array $identifyingColumns;
+
     /** @param  callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver  $previous */
-    public function __construct(callable $previous)
+    public function __construct(callable $previous, ?array $identifyingColumns)
     {
         $this->previous = $previous;
+        $this->identifyingColumns = $identifyingColumns ?? [];
     }
 
     /**
@@ -22,17 +26,36 @@ class UpsertModel implements ArgResolver
     public function __invoke($model, $args): mixed
     {
         // TODO consider Laravel native ->upsert(), available from 8.10
-        $id = $args->arguments['id']
-            ?? $args->arguments[$model->getKeyName()]
-            ?? null;
+        $existingModel = null;
 
-        if ($id !== null) {
+        if (!empty($this->identifyingColumns)) {
             $existingModel = $model
                 ->newQuery()
-                ->find($id->value);
+                ->firstWhere(
+                array_intersect_key(
+                        $args->toArray(),
+                        array_flip($this->identifyingColumns)
+                    )
+                );
 
             if ($existingModel !== null) {
                 $model = $existingModel;
+            }
+        }
+
+        if ($existingModel === null) {
+            $id = $args->arguments['id']
+                ?? $args->arguments[$model->getKeyName()]
+                ?? null;
+
+            if ($id !== null) {
+                $existingModel = $model
+                    ->newQuery()
+                    ->find($id->value);
+
+                if ($existingModel !== null) {
+                    $model = $existingModel;
+                }
             }
         }
 
