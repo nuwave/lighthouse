@@ -226,8 +226,8 @@ GRAPHQL;
         ')->assertJson([
             'data' => [
                 'upsertUser' => [
-                    'email' => "foo@te.st",
-                    'name' => "bar"
+                    'email' => 'foo@te.st',
+                    'name' => 'bar',
                 ],
             ],
         ]);
@@ -250,8 +250,8 @@ GRAPHQL;
         ')->assertJson([
             'data' => [
                 'upsertUser' => [
-                    'email' => "foo@te.st",
-                    'name' => "foo"
+                    'email' => 'foo@te.st',
+                    'name' => 'foo',
                 ],
             ],
         ]);
@@ -266,9 +266,9 @@ GRAPHQL;
     {
         $company = factory(Company::class)->create(['id' => 1]);
 
-        $this->schema .=
+        $this->schema
             /** @lang GraphQL */
-            '
+            .= '
         type User {
             id: ID!
             email: String!
@@ -295,12 +295,13 @@ GRAPHQL;
                 company_id
             }
         }
-        ')->assertJson([
+        ',
+        )->assertJson([
             'data' => [
                 'upsertUser' => [
-                    'email' => "foo@te.st",
-                    'name' => "bar",
-                    'company_id' => 1
+                    'email' => 'foo@te.st',
+                    'name' => 'bar',
+                    'company_id' => 1,
                 ],
             ],
         ]);
@@ -325,13 +326,13 @@ GRAPHQL;
                 company_id
             }
         }
-        '
+        ',
         )->assertJson([
             'data' => [
                 'upsertUser' => [
-                    'email' => "bar@te.st",
-                    'name' => "bar",
-                    'company_id' => $company->id
+                    'email' => 'bar@te.st',
+                    'name' => 'bar',
+                    'company_id' => $company->id,
                 ],
             ],
         ]);
