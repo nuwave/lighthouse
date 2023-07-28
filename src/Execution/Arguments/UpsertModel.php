@@ -28,14 +28,14 @@ class UpsertModel implements ArgResolver
         // TODO consider Laravel native ->upsert(), available from 8.10
         $existingModel = null;
 
-        if (!empty($this->identifyingColumns)) {
+        if (! empty($this->identifyingColumns)) {
             $existingModel = $model
                 ->newQuery()
                 ->firstWhere(
-                array_intersect_key(
+                    array_intersect_key(
                         $args->toArray(),
-                        array_flip($this->identifyingColumns)
-                    )
+                        array_flip($this->identifyingColumns),
+                    ),
                 );
 
             if ($existingModel !== null) {
