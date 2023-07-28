@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Add support for identifyingColumns on upserts
+
 ## v6.15.0
 
 ### Added
@@ -524,7 +528,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Fixed
 
-- Distinguish between client-safe and non-client-safe errors in `TestResponse::assertGraphQLError()` 
+- Distinguish between client-safe and non-client-safe errors in `TestResponse::assertGraphQLError()`
 
 ## v5.46.0
 
@@ -831,7 +835,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Fixed
 
-- Avoid PHP 8.1 deprecation warning by implementing `__serialize()` and `__unserialize()` https://github.com/nuwave/lighthouse/pull/1987 
+- Avoid PHP 8.1 deprecation warning by implementing `__serialize()` and `__unserialize()` https://github.com/nuwave/lighthouse/pull/1987
 
 ### Deprecated
 
@@ -1107,7 +1111,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Changed
 
-- Improve performance through [`graphql-php` lazy field definitions](https://github.com/webonyx/graphql-php/pull/861) https://github.com/nuwave/lighthouse/pull/1851 
+- Improve performance through [`graphql-php` lazy field definitions](https://github.com/webonyx/graphql-php/pull/861) https://github.com/nuwave/lighthouse/pull/1851
 - Load individual subscription fields lazily instead of loading them all eagerly https://github.com/nuwave/lighthouse/pull/1851
 - Require `webonyx/graphql-php:^14.7` https://github.com/nuwave/lighthouse/pull/1851
 
