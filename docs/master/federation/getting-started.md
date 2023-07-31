@@ -8,7 +8,7 @@ Read more about the core concepts and motivation in the [Apollo Federation docs]
 Lighthouse can act as a federation capable service as described in the [Apollo Federation specification](https://www.apollographql.com/docs/federation/federation-spec).
 It can not serve as a [federation gateway](https://www.apollographql.com/docs/federation/gateway).
 
-## Setup
+### Setup
 
 Add the service provider to your `config/app.php`:
 
@@ -17,9 +17,3 @@ Add the service provider to your `config/app.php`:
     \Nuwave\Lighthouse\Federation\FederationServiceProvider::class,
 ],
 ```
-
-## Extends
-
-You have to use `@extends` in place of `extend type` to annotate type references.
-This is because Lighthouse merges type extensions before the final schema is produced,
-thus they would not be preserved to appear in the federation schema SDL.
