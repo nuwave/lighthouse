@@ -9,10 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
-### Added
+### Changed
 
-- `ScoutEnhancer::enhanceBuilder()` will process all `ScoutBuilderDirective` attached to argument (only first was processed previously)
-- `ResolveInfo::enhanceBuilder()` will pass `$directiveFilter` into `ScoutEnhancer::enhanceBuilder()`
+- `ScoutEnhancer::enhanceBuilder()` will process not only the first but all `ScoutBuilderDirective` attached to argument https://github.com/nuwave/lighthouse/pull/2429
+- `ResolveInfo::enhanceBuilder()` will pass `$directiveFilter` into `ScoutEnhancer::enhanceBuilder()` https://github.com/nuwave/lighthouse/pull/2429
 
 ## v6.15.0
 
