@@ -42,7 +42,7 @@ class ResolveInfo extends BaseResolveInfo
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<TModel>|\Illuminate\Database\Eloquent\Relations\Relation<TModel>|\Laravel\Scout\Builder  $builder
      * @param  array<string>  $scopes
      * @param  array<string, mixed>  $args
-     * @param  (callable(\Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective): bool)|null  $directiveFilter
+     * @param  (callable(\Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective|\Nuwave\Lighthouse\Scout\ScoutBuilderDirective): bool)|null  $directiveFilter
      *
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<TModel>|\Illuminate\Database\Eloquent\Relations\Relation<TModel>|\Laravel\Scout\Builder
      */
@@ -52,7 +52,7 @@ class ResolveInfo extends BaseResolveInfo
 
         $scoutEnhancer = new ScoutEnhancer($argumentSet, $builder);
         if ($scoutEnhancer->canEnhanceBuilder()) {
-            return $scoutEnhancer->enhanceBuilder();
+            return $scoutEnhancer->enhanceBuilder($directiveFilter);
         }
 
         self::applyArgBuilderDirectives($argumentSet, $builder, $directiveFilter);

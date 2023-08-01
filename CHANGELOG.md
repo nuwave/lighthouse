@@ -9,6 +9,11 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- `ScoutEnhancer::enhanceBuilder()` will process all `ScoutBuilderDirective` attached to argument (only first was processed previously)
+- `ResolveInfo::enhanceBuilder()` will pass `$directiveFilter` into `ScoutEnhancer::enhanceBuilder()`
+
 ## v6.15.0
 
 ### Added
