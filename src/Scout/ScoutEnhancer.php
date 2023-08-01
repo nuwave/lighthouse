@@ -64,9 +64,7 @@ class ScoutEnhancer
         return $this->hasSearchArguments();
     }
 
-    /**
-     * @param (callable(\Nuwave\Lighthouse\Scout\ScoutBuilderDirective): bool)|null $directiveFilter
-     */
+    /** @param (callable(\Nuwave\Lighthouse\Scout\ScoutBuilderDirective): bool)|null $directiveFilter */
     public function enhanceBuilder(callable $directiveFilter = null): ScoutBuilder
     {
         $scoutBuilder = $this->builder instanceof ScoutBuilder
@@ -75,11 +73,11 @@ class ScoutEnhancer
 
         foreach ($this->argumentsWithScoutBuilderDirectives as $argument) {
             foreach ($argument->directives as $directive) {
-                if (!($directive instanceof ScoutBuilderDirective)) {
+                if (! ($directive instanceof ScoutBuilderDirective)) {
                     continue;
                 }
 
-                if ($directiveFilter !== null && !$directiveFilter($directive)) {
+                if ($directiveFilter !== null && ! $directiveFilter($directive)) {
                     continue;
                 }
 
