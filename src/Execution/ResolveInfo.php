@@ -94,19 +94,17 @@ class ResolveInfo extends BaseResolveInfo
         foreach ($argumentSet->arguments as $argument) {
             $value = $argument->toPlain();
 
-            $filteredDirectives = $argument
-                ->directives
-                ->filter(Utils::instanceofMatcher(ArgBuilderDirective::class));
+            foreach ($argument->directives as $directive) {
+                if (! ($directive instanceof ArgBuilderDirective)) {
+                    continue;
+                }
 
-            if ($directiveFilter !== null) {
-                // @phpstan-ignore-next-line PHPStan does not get this list is filtered for ArgBuilderDirective
-                $filteredDirectives = $filteredDirectives->filter($directiveFilter);
+                if ($directiveFilter !== null && ! $directiveFilter($directive)) {
+                    continue;
+                }
+
+                $builder = $directive->handleBuilder($builder, $value);
             }
-
-            // @phpstan-ignore-next-line PHPStan does not get this list is filtered for ArgBuilderDirective
-            $filteredDirectives->each(static function (ArgBuilderDirective $argBuilderDirective) use (&$builder, $value): void {
-                $builder = $argBuilderDirective->handleBuilder($builder, $value);
-            });
 
             Utils::applyEach(
                 static function ($value) use (&$builder, $directiveFilter): void {
