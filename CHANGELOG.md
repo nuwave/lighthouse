@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+
+- Reset cached values of arguments in `BaseDirective::hydrate()`
+
 ## v6.15.0
 
 ### Added
