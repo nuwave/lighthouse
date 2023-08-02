@@ -11,7 +11,7 @@ use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Tests\TestCase;
 use Tests\Utils\Models\User;
 
-class ScoutEnhancerTest extends TestCase
+final class ScoutEnhancerTest extends TestCase
 {
     public function testEnhanceBuilder(): void
     {
@@ -67,15 +67,12 @@ class ScoutEnhancerTest extends TestCase
         $argumentSet->arguments['argument'] = $argument;
         $builder = new ScoutBuilder(new User(), '*');
         $enhancer = new ScoutEnhancer($argumentSet, $builder);
+        $builder = $enhancer->enhanceBuilder(static fn (ScoutBuilderDirective $directive): bool => $directive !== $directiveIgnored);
 
-        $builder = $enhancer->enhanceBuilder(static function (ScoutBuilderDirective $directive) use ($directiveIgnored): bool {
-            return $directive !== $directiveIgnored;
-        });
-
-        self::assertEquals(
+        self::assertSame(
             [
-                'one' => $value,
                 'two' => $value,
+                'one' => $value,
             ],
             $builder->wheres,
         );
