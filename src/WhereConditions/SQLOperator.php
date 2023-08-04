@@ -111,7 +111,6 @@ GRAPHQL;
 
         // The condition methods always have the `$boolean` arg after the value
         $args[] = $boolean;
-        // dd($method, $args);
 
         return $builder->{$method}(...$args);
     }
