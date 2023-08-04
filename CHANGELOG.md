@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.16.2
+
+### Fixed
+
+- Fix `NOT_LIKE` operator in `@whereConditions` https://github.com/nuwave/lighthouse/pull/2432
+
 ## v6.16.1
 
 ### Fixed
