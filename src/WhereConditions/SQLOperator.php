@@ -8,9 +8,9 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
 
 class SQLOperator implements Operator
 {
-    public static function missingValueForColumn(string $column): string
+    public static function missingValueForColumn(string $column): Error
     {
-        return "Did not receive a value to match the WhereConditions for column {$column}.";
+        return new Error("Did not receive a value to match the WhereConditions for column {$column}.");
     }
 
     public function enumDefinition(): string
@@ -101,7 +101,7 @@ GRAPHQL;
             // The conditions with arity 1 require no args apart from the column name.
             // All other arities take a value to query against.
             if (! array_key_exists('value', $whereConditions)) {
-                throw new Error(self::missingValueForColumn($column));
+                throw self::missingValueForColumn($column);
             }
 
             $args[] = $whereConditions['value'];

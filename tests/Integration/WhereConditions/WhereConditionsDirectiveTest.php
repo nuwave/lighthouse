@@ -825,7 +825,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertGraphQLErrorMessage(SQLOperator::missingValueForColumn('no_value'));
+        ')->assertGraphQLError(SQLOperator::missingValueForColumn('no_value'));
     }
 
     public function testOnlyAllowsWhitelistedColumns(): void
