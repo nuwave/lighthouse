@@ -42,7 +42,7 @@ class ResolveInfo extends BaseResolveInfo
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<TModel>|\Illuminate\Database\Eloquent\Relations\Relation<TModel>|\Laravel\Scout\Builder  $builder
      * @param  array<string>  $scopes
      * @param  array<string, mixed>  $args
-     * @param  (callable(\Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective): bool)|null  $directiveFilter
+     * @param  (callable(\Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective|\Nuwave\Lighthouse\Scout\ScoutBuilderDirective): bool)|null  $directiveFilter
      *
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<TModel>|\Illuminate\Database\Eloquent\Relations\Relation<TModel>|\Laravel\Scout\Builder
      */
@@ -52,7 +52,7 @@ class ResolveInfo extends BaseResolveInfo
 
         $scoutEnhancer = new ScoutEnhancer($argumentSet, $builder);
         if ($scoutEnhancer->canEnhanceBuilder()) {
-            return $scoutEnhancer->enhanceBuilder();
+            return $scoutEnhancer->enhanceBuilder($directiveFilter);
         }
 
         self::applyArgBuilderDirectives($argumentSet, $builder, $directiveFilter);
@@ -94,19 +94,17 @@ class ResolveInfo extends BaseResolveInfo
         foreach ($argumentSet->arguments as $argument) {
             $value = $argument->toPlain();
 
-            $filteredDirectives = $argument
-                ->directives
-                ->filter(Utils::instanceofMatcher(ArgBuilderDirective::class));
+            foreach ($argument->directives as $directive) {
+                if (! ($directive instanceof ArgBuilderDirective)) {
+                    continue;
+                }
 
-            if ($directiveFilter !== null) {
-                // @phpstan-ignore-next-line PHPStan does not get this list is filtered for ArgBuilderDirective
-                $filteredDirectives = $filteredDirectives->filter($directiveFilter);
+                if ($directiveFilter !== null && ! $directiveFilter($directive)) {
+                    continue;
+                }
+
+                $builder = $directive->handleBuilder($builder, $value);
             }
-
-            // @phpstan-ignore-next-line PHPStan does not get this list is filtered for ArgBuilderDirective
-            $filteredDirectives->each(static function (ArgBuilderDirective $argBuilderDirective) use (&$builder, $value): void {
-                $builder = $argBuilderDirective->handleBuilder($builder, $value);
-            });
 
             Utils::applyEach(
                 static function ($value) use (&$builder, $directiveFilter): void {
