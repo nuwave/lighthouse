@@ -64,6 +64,8 @@ abstract class BaseDirective implements Directive
         $this->directiveNode = $directiveNode;
         $this->definitionNode = $definitionNode;
 
+        unset($this->directiveArgs);
+
         return $this;
     }
 

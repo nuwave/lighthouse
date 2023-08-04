@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.16.1
+
+### Fixed
+
+- Reset cached values of arguments in `BaseDirective::hydrate()` https://github.com/nuwave/lighthouse/pull/2430
+
 ## v6.16.0
 
 ### Changed
