@@ -9,6 +9,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.16.0
+
 ### Changed
 
 - `ScoutEnhancer::enhanceBuilder()` will process not only the first but all `ScoutBuilderDirective` attached to argument https://github.com/nuwave/lighthouse/pull/2429
