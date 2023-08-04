@@ -40,7 +40,7 @@ enum SQLOperator {
     LIKE @enum(value: "LIKE")
 
     "Negation of simple pattern matching (`NOT LIKE`)"
-    NOT_LIKE @enum(value: "NOT_LIKE")
+    NOT_LIKE @enum(value: "NOT LIKE")
 
     "Whether a value is within a set of values (`IN`)"
     IN @enum(value: "In")
@@ -111,6 +111,7 @@ GRAPHQL;
 
         // The condition methods always have the `$boolean` arg after the value
         $args[] = $boolean;
+        // dd($method, $args);
 
         return $builder->{$method}(...$args);
     }
