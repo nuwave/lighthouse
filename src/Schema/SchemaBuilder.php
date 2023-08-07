@@ -38,7 +38,7 @@ class SchemaBuilder
         $config->setQuery(fn (): Type => $this->typeRegistry->get(RootType::QUERY));
         $config->setMutation(fn (): ?Type => $this->typeRegistry->search(RootType::MUTATION));
         $config->setMutation(fn (): ?Type => $this->typeRegistry->search(RootType::SUBSCRIPTION));
-        $config->setTypeLoader(fn (string $name): ?Type => $this->typeRegistry->search($name),);
+        $config->setTypeLoader(fn (string $name): ?Type => $this->typeRegistry->search($name));
 
         // Enables introspection to list all types in the schema
         $config->setTypes(fn (): array => $this->typeRegistry->possibleTypes());
