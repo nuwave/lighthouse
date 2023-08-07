@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Schema;
 
 use GraphQL\GraphQL;
-use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
@@ -35,37 +34,14 @@ class SchemaBuilder
 
         $this->typeRegistry->setDocumentAST($documentAST);
 
-        // Always set Query since it is required
-        $query = $this->typeRegistry->get(RootType::QUERY);
-        assert($query instanceof ObjectType);
-        $config->setQuery($query);
-
-        // Mutation and Subscription are optional, so only add them
-        // if they are present in the schema
-        if (isset($documentAST->types[RootType::MUTATION])) {
-            $mutation = $this->typeRegistry->get(RootType::MUTATION);
-            assert($mutation instanceof ObjectType);
-            $config->setMutation($mutation);
-        }
-
-        if (isset($documentAST->types[RootType::SUBSCRIPTION])) {
-            $subscription = $this->typeRegistry->get(RootType::SUBSCRIPTION);
-            assert($subscription instanceof ObjectType);
-            $config->setSubscription($subscription);
-        }
-
         // Use lazy type loading to prevent unnecessary work
-        $config->setTypeLoader(
-            fn (string $name): ?Type => $this->typeRegistry->search($name),
-        );
+        $config->setQuery(fn (): Type => $this->typeRegistry->get(RootType::QUERY));
+        $config->setMutation(fn (): ?Type => $this->typeRegistry->search(RootType::MUTATION));
+        $config->setMutation(fn (): ?Type => $this->typeRegistry->search(RootType::SUBSCRIPTION));
+        $config->setTypeLoader(fn (string $name): ?Type => $this->typeRegistry->search($name),);
 
         // Enables introspection to list all types in the schema
-        $config->setTypes(
-            /**
-             * @return array<string, \GraphQL\Type\Definition\Type>
-             */
-            fn (): array => $this->typeRegistry->possibleTypes(),
-        );
+        $config->setTypes(fn (): array => $this->typeRegistry->possibleTypes());
 
         // There is no way to resolve directives lazily, so we convert them eagerly
         $directiveFactory = new DirectiveFactory(
