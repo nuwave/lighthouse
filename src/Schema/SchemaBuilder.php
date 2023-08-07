@@ -37,7 +37,7 @@ class SchemaBuilder
         // Use lazy type loading to prevent unnecessary work
         $config->setQuery(
             /** @return \GraphQL\Type\Definition\ObjectType */
-            fn (): Type => $this->typeRegistry->get(RootType::QUERY)
+            fn (): Type => $this->typeRegistry->get(RootType::QUERY),
         );
         $config->setMutation(fn (): ?Type => $this->typeRegistry->search(RootType::MUTATION));
         $config->setSubscription(fn (): ?Type => $this->typeRegistry->search(RootType::SUBSCRIPTION));
