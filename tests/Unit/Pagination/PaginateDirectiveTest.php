@@ -777,7 +777,7 @@ GRAPHQL
         ])->assertGraphQLErrorMessage(QueryComplexity::maxQueryComplexityErrorMessage($max, $complexity));
     }
 
-    /** @param  array{complexity: int} $args */
+    /** @param  array{complexity: int}  $args */
     public static function complexityResolver(int $childrenComplexity, array $args): int
     {
         return $args['complexity'];
