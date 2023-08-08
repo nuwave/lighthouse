@@ -34,24 +34,21 @@ class LaravelPhpdocAlignmentFixer implements FixerInterface
     public function fix(\SplFileInfo $file, Tokens $tokens): void
     {
         for ($index = $tokens->count() - 1; $index > 0; --$index) {
-            $token = $tokens[$index];
-            assert($token instanceof Token);
-
-            if (! $token->isGivenKind([\T_DOC_COMMENT])) {
+            if (! $tokens[$index]->isGivenKind([\T_DOC_COMMENT])) {
                 continue;
             }
 
             $newContent = preg_replace_callback(
                 '/(?P<tag>@param)\s+(?P<hint>(?:' . TypeExpression::REGEX_TYPES . ')?)\s+(?P<var>(?:&|\.{3})?\$\S+)/ux',
                 fn ($matches) => $matches['tag'] . '  ' . $matches['hint'] . '  ' . $matches['var'],
-                $token->getContent(),
+                $tokens[$index]->getContent(),
             );
 
-            if ($newContent == $token->getContent()) {
+            if ($newContent == $tokens[$index]->getContent()) {
                 continue;
             }
 
-            $token = new Token([T_DOC_COMMENT, $newContent]);
+            $tokens[$index] = new Token([T_DOC_COMMENT, $newContent]);
         }
     }
 

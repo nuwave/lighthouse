@@ -14,6 +14,7 @@ parameters:
   tmpDir: phpstan-tmp-dir
   excludePaths:
   - tests/Utils/Models/WithoutRelationClassImport.php # Intentionally wrong
+  - tests/LaravelPhpdocAlignmentFixer.php # Copied from laravel/pint
   ignoreErrors:
   # PHPStan does not get it
   - '#Parameter \#1 \$callback of static method Closure::fromCallable\(\) expects callable\(\): mixed, array{object, .*} given\.#'
