@@ -108,7 +108,7 @@ final class Task extends Model
 
     /**
      * @param  \Illuminate\Database\Eloquent\Builder<self>  $query
-     * @param  array<string, int>    $args
+     * @param  array<string, int>  $args
      *
      * @return \Illuminate\Database\Eloquent\Builder<self>
      */
@@ -119,7 +119,7 @@ final class Task extends Model
 
     /**
      * @param  \Illuminate\Database\Eloquent\Builder<self>  $query
-     * @param  iterable<string>      $tags
+     * @param  iterable<string>  $tags
      *
      * @return \Illuminate\Database\Eloquent\Builder<self>
      */

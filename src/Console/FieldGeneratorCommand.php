@@ -28,7 +28,7 @@ abstract class FieldGeneratorCommand extends LighthouseGeneratorCommand
         ];
     }
 
-    /** @param string $path */
+    /** @param  string  $path */
     protected function handleTestCreation($path): bool
     {
         if (! $testFramework = $this->testFramework()) {
