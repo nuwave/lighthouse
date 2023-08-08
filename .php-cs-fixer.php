@@ -1,5 +1,7 @@
 <?php declare(strict_types=1);
 
+use Tests\LaravelPhpdocAlignmentFixer;
+
 use function MLL\PhpCsFixerConfig\risky;
 
 $finder = PhpCsFixer\Finder::create()
@@ -23,4 +25,5 @@ return risky($finder, [
             'parameters',
         ],
     ],
-]);
+    'Laravel/laravel_phpdoc_alignment' => true,
+])->registerCustomFixers([new LaravelPhpdocAlignmentFixer()]);
