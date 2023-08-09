@@ -1,7 +1,8 @@
 # Entity representation
 
-In order for a subgraph to be able to return an entity from another subgraph, it is necessary to define in the first
-subgraph the representation of the required entity from those fields that are known to the first subgraph.
+To reference an entity that originates in another subgraph, first subgraph needs to define a stub of that entity to make
+its own schema valid. The stub includes just enough information for the subgraph to know how to uniquely identify a
+particular entity in another subgraph.
 Read more about the entity representation in the [Apollo Federation docs](https://www.apollographql.com/docs/federation/v1/entities/#entity-representations).
 
 A representation always consists of:
@@ -11,45 +12,45 @@ A representation always consists of:
 In this way, the resolver should return an array consisting of the `__typename` field, which corresponds to the entity's
 name, and the primary key that can identify the entity.
 
-### Example 1
+## Example 1
 
-In this example, the `review-service` has an entity called `Review`, which in turn has an entity called `Product`
-defined in a separate `product-service`. The relationship between the review and the product is one-to-one.
+In this example, subgraph for order service has an entity called `Order`, which in turn has an entity called `Receipt`
+defined in a separate subgraph for payment service. The relationship between `Order` and `Receipt` is one-to-one.
 
 ```graphql
-type Review {
-    score: Int!
-    product: Product! @field(resolver: "App\\GraphQL\\Resolvers\\Product")
+type Order {
+    id: Int!
+    receipt: Receipt! @field(resolver: "App\\GraphQL\\Resolvers\\Receipt")
 }
 
-type Product @key(fields: "uuid") @extends{
+type Receipt @key(fields: "uuid") @extends{
     uuid: String! @external
 }
 ```
 
-The resolver for the product in the `review-service` returns an array consisting of:
-- `__typename` - the entity name from the `product-service`;
-- `uuid` - the primary key of the product.
+The resolver for receipt in order service returns an array consisting of:
+- `__typename` - the entity name from the payment service;
+- `uuid` - the primary key of the receipt.
 
 ```php
 namespace App\GraphQL\Resolvers;
 
-final class Product
+final class Receipt
 {
     public function __invoke($model): array
     {
         return [
-            '__typename' => 'Product',
-            'uuid'       => $model->product_id,
+            '__typename' => 'Receipt',
+            'uuid' => $model->receipt_id,
         ];
     }
 }
 ```
 
-### Example 2
+## Example 2
 
-In this example, the `order-service` has an entity called `Order`, which in turn has an entity called `Product`
-defined in a separate `product-service`. The relationship between the review and the product is one-to-many.
+In this example, subgraph for order service has an entity called `Order`, which in turn has an entity called `Product`
+defined in a separate subgraph for product service. The relationship between `Order` and `Product` is one-to-many.
 
 ```graphql
 type Order {
@@ -62,8 +63,8 @@ type Product @key(fields: "uuid") @extends{
 }
 ```
 
-The resolver for the product in the `order-service` returns an array of arrays. Each sub-array consists of:
-- `__typename` - the entity name from the `product-service`;
+The resolver for product in order service returns an array of arrays. Each sub-array consists of:
+- `__typename` - the entity name from the product service;
 - `uuid` - the primary key of a specific product.
 
 ```php
@@ -73,13 +74,11 @@ final class Products
 {
     public function __invoke($model): array
     {
-        $products = [];
-
-        $model->products()->each(function ($product) use (&$products){
-            $products[] = ['__typename' => 'Product', 'uuid' => $product->id];
-        });
-
-        return $products;
+        return $model
+            ->products()
+            ->get()
+            ->map(fn($product) => ['__typename' => 'Product', 'uuid' => $product->id])
+            ->all();
     }
 }
 ```
