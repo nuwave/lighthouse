@@ -9,10 +9,30 @@ A representation always consists of:
 - A `__typename` field;
 - Values for the entity's primary key fields.
 
-In this way, the resolver should return an array consisting of the `__typename` field, which corresponds to the entity's
-name, and the primary key that can identify the entity.
+## Eloquent Model representation
 
-## Example 1
+If there is an Eloquent relationship between entities from different subgraphs, it's not mandatory to define an entity representation,
+Lighthouse will automatically determine the necessary information based on the relationship directive.
+
+```graphql
+type Post {
+    id: Int!
+    title: String!
+    comments: [Comment!]! @hasMany
+}
+
+type Comment @key(fields: "id") @extends{
+    id: Int! @external
+}
+```
+
+## Non-Eloquent representation
+
+If entities don't have an Eloquent relationship within the subgraph, it's necessary to specify a separate resolver that will return the required information.
+The resolver should return data containing information about the `__typename` field, which corresponds to the entity's name and the primary key
+that can identify the entity. Response type can be either an array or a collection as well as an object, the class name of which matches the expected `__typename`.
+
+### Example 1
 
 In this example, subgraph for order service has an entity called `Order`, which in turn has an entity called `Receipt`
 defined in a separate subgraph for payment service. The relationship between `Order` and `Receipt` is one-to-one.
@@ -47,7 +67,7 @@ final class Receipt
 }
 ```
 
-## Example 2
+### Example 2
 
 In this example, subgraph for order service has an entity called `Order`, which in turn has an entity called `Product`
 defined in a separate subgraph for product service. The relationship between `Order` and `Product` is one-to-many.
