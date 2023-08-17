@@ -1,8 +1,7 @@
 # Entity representation
 
-To reference an entity that originates in another subgraph, first subgraph needs to define a stub of that entity to make
-its own schema valid. The stub includes just enough information for the subgraph to know how to uniquely identify a
-particular entity in another subgraph.
+To reference an entity that originates in another subgraph, first subgraph needs to define a stub of that entity to make its own schema valid.
+The stub includes just enough information for the subgraph to know how to uniquely identify a particular entity in another subgraph.
 Read more about the entity representation in the [Apollo Federation docs](https://www.apollographql.com/docs/federation/v1/entities/#entity-representations).
 
 A representation always consists of:
@@ -11,26 +10,26 @@ A representation always consists of:
 
 ## Eloquent Model representation
 
-If there is an Eloquent relationship between entities from different subgraphs, it's not mandatory to define an entity representation,
+If there is an Eloquent relationship between entities from different subgraphs, it's not mandatory to define an entity representation.
 Lighthouse will automatically determine the necessary information based on the relationship directive.
 
 ```graphql
 type Post {
-    id: Int!
+    id: ID!
     title: String!
     comments: [Comment!]! @hasMany
 }
 
-type Comment @key(fields: "id") @extends{
-    id: Int! @external
+type Comment @extends @key(fields: "id") {
+    id: ID! @external
 }
 ```
 
 ## Non-Eloquent representation
 
 If entities don't have an Eloquent relationship within the subgraph, it's necessary to specify a separate resolver that will return the required information.
-The resolver should return data containing information about the `__typename` field, which corresponds to the entity's name and the primary key
-that can identify the entity. Response type can be either an array or a collection as well as an object, the class name of which matches the expected `__typename`.
+The resolver should return data containing information about the `__typename` field, which corresponds to the entity's name and the primary key that can identify the entity.
+The `__typename` can either be provided as an explicit field or implicitly by returning an object with a matching class name.
 
 ### Example 1
 
@@ -39,12 +38,12 @@ defined in a separate subgraph for payment service. The relationship between `Or
 
 ```graphql
 type Order {
-    id: Int!
-    receipt: Receipt! @field(resolver: "App\\GraphQL\\Resolvers\\Receipt")
+    id: ID!
+    receipt: Receipt!
 }
 
-type Receipt @key(fields: "uuid") @extends{
-    uuid: String! @external
+type Receipt @extends @key(fields: "uuid") {
+    uuid: ID! @external
 }
 ```
 
@@ -53,15 +52,15 @@ The resolver for receipt in order service returns an array consisting of:
 - `uuid` - the primary key of the receipt.
 
 ```php
-namespace App\GraphQL\Resolvers;
+namespace App\GraphQL\Types\Order;
 
 final class Receipt
 {
-    public function __invoke($model): array
+    public function __invoke($order): array
     {
         return [
             '__typename' => 'Receipt',
-            'uuid' => $model->receipt_id,
+            'uuid' => $order->receipt_id,
         ];
     }
 }
@@ -75,11 +74,11 @@ defined in a separate subgraph for product service. The relationship between `Or
 ```graphql
 type Order {
     sum: Int!
-    products: [Product!]! @field(resolver: "App\\GraphQL\\Resolvers\\Products")
+    products: [Product!]!
 }
 
-type Product @key(fields: "uuid") @extends{
-    uuid: String! @external
+type Product @extends @key(fields: "uuid") {
+    uuid: ID! @external
 }
 ```
 
@@ -88,17 +87,17 @@ The resolver for product in order service returns an array of arrays. Each sub-a
 - `uuid` - the primary key of a specific product.
 
 ```php
-namespace App\GraphQL\Resolvers;
+namespace App\GraphQL\Types\Order;
 
 final class Products
 {
-    public function __invoke($model): array
+    public function __invoke($order): iterable
     {
-        return $model
-            ->products()
-            ->get()
-            ->map(fn($product) => ['__typename' => 'Product', 'uuid' => $product->id])
-            ->all();
+        return ProductService::retrieveProductsForOrder($order)
+            ->map(fn (Product $product): array => [
+                '__typename' => 'Product',
+                'uuid' => $product->id,
+            ]);
     }
 }
 ```
