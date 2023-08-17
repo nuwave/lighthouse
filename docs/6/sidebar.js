@@ -47,6 +47,8 @@ module.exports = [
     children: [
       ["federation/getting-started", "Getting Started"],
       "federation/entities",
+      "federation/entity-representations",
+      "federation/reference-resolvers",
     ],
   },
   {

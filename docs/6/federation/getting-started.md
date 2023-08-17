@@ -17,9 +17,3 @@ Add the service provider to your `config/app.php`:
     \Nuwave\Lighthouse\Federation\FederationServiceProvider::class,
 ],
 ```
-
-## Extends
-
-You have to use `@extends` in place of `extend type` to annotate type references.
-This is because Lighthouse merges type extensions before the final schema is produced,
-thus they would not be preserved to appear in the federation schema SDL.
