@@ -13,7 +13,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
-- Improve stubs for PHP 8.2 and above
+- Improve stubs for PHP 8.2 and above https://github.com/nuwave/lighthouse/pull/2441
 
 ## v6.16.2
 
