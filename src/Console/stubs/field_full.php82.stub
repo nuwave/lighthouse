@@ -5,7 +5,7 @@ namespace DummyNamespace;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-final class DummyClass
+final readonly class DummyClass
 {
     /**
      * Return a value for the field.
@@ -16,7 +16,7 @@ final class DummyClass
      * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo Metadata for advanced query resolution.
      * @return mixed The result of resolving the field, matching what was promised in the schema
      */
-    public function __invoke(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): mixed
+    public function __invoke(null $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): mixed
     {
         // TODO implement the resolver
     }
