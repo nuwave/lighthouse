@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.17.0
+
+### Added
+
+- Improve stubs for PHP 8.2 and above
+
 ## v6.16.2
 
 ### Fixed
