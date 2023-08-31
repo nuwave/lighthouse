@@ -281,6 +281,40 @@ final class CanDirectiveTest extends TestCase
         ]);
     }
 
+    public function testChecksAgainstRootModel(): void
+    {
+        $this->be(new User());
+
+        $this->mockResolver(function (): User {
+            return $this->resolveUser();
+        });
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            user(foo: String): User!
+                @mock
+        }
+
+        type User {
+            name: String @can(ability:"view", rootModel: true)
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            user(foo: "bar"){
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'name' => 'foo',
+                ],
+            ],
+        ]);
+    }
+
     public function testInjectedArgsAndStaticArgs(): void
     {
         $this->be(new User());

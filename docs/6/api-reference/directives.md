@@ -621,7 +621,7 @@ directive @can(
   Check the policy against the model instances returned by the field resolver.
   Only use this if the field does not mutate data, it is run before checking.
 
-  Mutually exclusive with `query` and `find`.
+  Mutually exclusive with `query`, `find`, and `rootModel`.
   """
   resolved: Boolean! = false
 
@@ -648,7 +648,7 @@ directive @can(
   Query for specific model instances to check the policy against, using arguments
   with directives that add constraints to the query builder, such as `@eq`.
 
-  Mutually exclusive with `resolved` and `find`.
+  Mutually exclusive with `resolved`, `find`, and `rootModel`.
   """
   query: Boolean! = false
 
@@ -663,7 +663,7 @@ directive @can(
 
   You may pass the string in dot notation to use nested inputs.
 
-  Mutually exclusive with `resolved` and `query`.
+  Mutually exclusive with `resolved`, `query`, and `rootModel`.
   """
   find: String
 
@@ -671,6 +671,13 @@ directive @can(
   Should the query fail when the models of `find` were not found?
   """
   findOrFail: Boolean! = true
+
+  """
+  If your policy should check against the root value.
+
+  Mutually exclusive with `resolved`, `query`, and `find`.
+  """
+  rootModel: Boolean! = false
 ) repeatable on FIELD_DEFINITION
 
 """
