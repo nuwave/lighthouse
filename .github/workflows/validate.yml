@@ -141,7 +141,7 @@ jobs:
     strategy:
       matrix:
         php-version:
-          - 8.1
+          - 8.2
         laravel-version:
           - ^9
 
@@ -190,7 +190,7 @@ jobs:
     strategy:
       matrix:
         php-version:
-          - 8.1
+          - 8.2
         laravel-version:
           - ^9
 
