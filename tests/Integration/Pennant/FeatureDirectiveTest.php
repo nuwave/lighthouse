@@ -55,7 +55,7 @@ final class FeatureDirectiveTest extends TestCase
 
     public function testUnavailableWhenFeatureIsActive(): void
     {
-        Feature::define('new-api', fn () => true);
+        Feature::define('new-api', fn (): bool => true);
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type Query {
                 fieldWhenInactive: String!
@@ -76,8 +76,9 @@ final class FeatureDirectiveTest extends TestCase
 
     public function testAvailableWhenFeatureIsActive(): void
     {
-        Feature::define('new-api', fn () => true);
-        $this->mockResolver(fn (): string => 'active');
+        Feature::define('new-api', fn (): bool => true);
+        $fieldValue = 'active';
+        $this->mockResolver(fn (): string => $fieldValue);
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type Query {
                 fieldWhenActive: String!
@@ -96,15 +97,16 @@ final class FeatureDirectiveTest extends TestCase
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [
-                'fieldWhenActive' => 'active',
+                'fieldWhenActive' => $fieldValue,
             ],
         ]);
     }
 
     public function testAvailableWhenFeatureIsActiveWithDefaultFeatureState(): void
     {
-        Feature::define('new-api', fn () => true);
-        $this->mockResolver(fn (): string => 'active');
+        Feature::define('new-api', fn (): bool => true);
+        $fieldValue = 'active';
+        $this->mockResolver(fn (): string => $fieldValue);
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type Query {
                 fieldWhenActive: String!
@@ -123,14 +125,15 @@ final class FeatureDirectiveTest extends TestCase
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [
-                'fieldWhenActive' => 'active',
+                'fieldWhenActive' => $fieldValue,
             ],
         ]);
     }
 
     public function testAvailableWhenFeatureIsInactive(): void
     {
-        $this->mockResolver(fn (): string => 'inactive');
+        $fieldValue = 'inactive';
+        $this->mockResolver(fn (): string => $fieldValue);
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type Query {
                 fieldWhenInactive: String!
@@ -149,15 +152,13 @@ final class FeatureDirectiveTest extends TestCase
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [
-                'fieldWhenInactive' => 'inactive',
+                'fieldWhenInactive' => $fieldValue,
             ],
         ]);
     }
 
     private function assertCannotQueryFieldErrorMessage(TestResponse $response, string $expected): void
     {
-        $response->assertGraphQLErrorMessage(
-            "Cannot query field \"{$expected}\" on type \"Query\".",
-        );
+        $response->assertGraphQLErrorMessage("Cannot query field \"{$expected}\" on type \"Query\".");
     }
 }
