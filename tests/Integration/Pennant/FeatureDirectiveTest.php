@@ -24,7 +24,7 @@ final class FeatureDirectiveTest extends TestCase
             GRAPHQL;
 
         $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
-            query {
+            {
                 fieldWhenActive
             }
             GRAPHQL,
@@ -44,7 +44,7 @@ final class FeatureDirectiveTest extends TestCase
             GRAPHQL;
 
         $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
-            query {
+            {
                 fieldWhenActive
             }
             GRAPHQL,
@@ -65,7 +65,7 @@ final class FeatureDirectiveTest extends TestCase
             GRAPHQL;
 
         $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
-            query {
+            {
                 fieldWhenInactive
             }
             GRAPHQL,
@@ -87,7 +87,7 @@ final class FeatureDirectiveTest extends TestCase
             GRAPHQL;
 
         $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
-            query {
+            {
                 fieldWhenActive
             }
             GRAPHQL,
@@ -114,7 +114,7 @@ final class FeatureDirectiveTest extends TestCase
             GRAPHQL;
 
         $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
-            query {
+            {
                 fieldWhenActive
             }
             GRAPHQL,
@@ -140,7 +140,7 @@ final class FeatureDirectiveTest extends TestCase
             GRAPHQL;
 
         $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
-            query {
+            {
                 fieldWhenInactive
             }
             GRAPHQL,
