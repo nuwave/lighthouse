@@ -10,6 +10,7 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Redis\RedisServiceProvider;
+use Laravel\Pennant\PennantServiceProvider as LaravelPennantServiceProvider;
 use Laravel\Scout\ScoutServiceProvider as LaravelScoutServiceProvider;
 use Nuwave\Lighthouse\Auth\AuthServiceProvider as LighthouseAuthServiceProvider;
 use Nuwave\Lighthouse\Cache\CacheServiceProvider;
@@ -18,6 +19,7 @@ use Nuwave\Lighthouse\GlobalId\GlobalIdServiceProvider;
 use Nuwave\Lighthouse\LighthouseServiceProvider;
 use Nuwave\Lighthouse\OrderBy\OrderByServiceProvider;
 use Nuwave\Lighthouse\Pagination\PaginationServiceProvider;
+use Nuwave\Lighthouse\Pennant\PennantServiceProvider as LighthousePennantServiceProvider;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Scout\ScoutServiceProvider as LighthouseScoutServiceProvider;
 use Nuwave\Lighthouse\SoftDeletes\SoftDeletesServiceProvider;
@@ -74,6 +76,7 @@ GRAPHQL;
         return [
             AuthServiceProvider::class,
             LaravelScoutServiceProvider::class,
+            LaravelPennantServiceProvider::class,
             RedisServiceProvider::class,
 
             // Lighthouse's own
@@ -82,6 +85,7 @@ GRAPHQL;
             CacheServiceProvider::class,
             CacheControlServiceProvider::class,
             GlobalIdServiceProvider::class,
+            LighthousePennantServiceProvider::class,
             LighthouseScoutServiceProvider::class,
             OrderByServiceProvider::class,
             PaginationServiceProvider::class,
@@ -168,6 +172,8 @@ GRAPHQL;
         $config->set('database.redis.options', [
             'prefix' => 'lighthouse-test-',
         ]);
+
+        $config->set('pennant.default', 'array');
 
         // Defaults to "algolia", which is not needed in our test setup
         $config->set('scout.driver', null);
