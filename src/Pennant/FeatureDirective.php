@@ -24,7 +24,7 @@ directive @feature(
     """
     The name of the feature to be checked (can be a string or class name).
     """
-    name: String
+    name: String!
     
     """
     Specify what the state of the feature should be for the field to be applied.
