@@ -18,7 +18,7 @@ final class FeatureDirective extends HideDirective
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Conditionally add the annotated element to schema depending of the state of a feature using Laravel Pennant.
+Include the annotated element in the schema depending on a Laravel Pennant feature.
 """
 directive @feature(
     """
