@@ -1078,7 +1078,7 @@ type Mutation {
 
 ```graphql
 """
-Include or exclude the annotated element in or from the schema depending of the state of a feature using Laravel Pennant.
+Conditionally add the annotated element to schema depending of the state of a feature using Laravel Pennant.
 """
 directive @feature(
     """
