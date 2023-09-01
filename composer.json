@@ -51,7 +51,7 @@
         "laravel/framework": "^9 || ^10",
         "laravel/legacy-factories": "^1.1.1",
         "laravel/lumen-framework": "^9 || ^10 || dev-master",
-        "laravel/pennant": "^1.0",
+        "laravel/pennant": "^1",
         "laravel/scout": "^8 || ^9 || ^10",
         "mattiasgeniar/phpunit-query-count-assertions": "^1.1",
         "mll-lab/graphql-php-scalars": "^6",
