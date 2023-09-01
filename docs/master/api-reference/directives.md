@@ -1078,18 +1078,18 @@ type Mutation {
 
 ```graphql
 """
-Conditionally add the annotated element to schema depending of the state of a feature using Laravel Pennant.
+Include the annotated element in the schema depending on a Laravel Pennant feature.
 """
 directive @feature(
     """
     The name of the feature to be checked (can be a string or class name).
     """
-    name: String
-    
+    name: String!
+
     """
-    Specify what the state of the feature should be for the field to be applied.
+    Specify what the state of the feature should be for the field to be included.
     """
-    when: FeatureState = ACTIVE
+    when: FeatureState! = ACTIVE
 ) on FIELD_DEFINITION | OBJECT
 
 """
@@ -1100,7 +1100,7 @@ enum FeatureState {
     Indicates an active feature.
     """
     ACTIVE
-    
+
     """
     Indicates an inactive feature.
     """

@@ -27,7 +27,7 @@ directive @feature(
     name: String!
     
     """
-    Specify what the state of the feature should be for the field to be applied.
+    Specify what the state of the feature should be for the field to be included.
     """
     when: FeatureState! = ACTIVE
 ) on FIELD_DEFINITION | OBJECT
