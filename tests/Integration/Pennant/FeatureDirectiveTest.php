@@ -13,71 +13,82 @@ final class FeatureDirectiveTest extends TestCase
     use UsesTestSchema;
     use MocksResolvers;
 
-    /** @before */
-    public function setUpSchema(): void
-    {
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
-type Query {
-    fieldWhenFeatureInactive: String! 
-        @feature(name: "foo", when: INACTIVE)
-        @mock
-    fieldWhenFeatureActive: String!
-        @feature(name: "foo", when: ACTIVE)
-        @mock
-    fieldWhenFeatureActiveByDefault: String!
-        @feature(name: "foo")
-        @mock 
-}
-GRAPHQL;
-    }
-
-    /** @after */
-    public function unsetSchema(): void
-    {
-        unset($this->schema);
-    }
-
     public function testUnavailableWhenFeatureIsInactive(): void
     {
+        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+            type Query {
+                fieldWhenActive: String!
+                    @feature(name: "new-api", when: ACTIVE)
+                    @mock
+            }
+            GRAPHQL;
+
         $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
             query {
-                fieldWhenFeatureActive
-                fieldWhenFeatureActiveByDefault
+                fieldWhenActive
             }
             GRAPHQL,
         );
 
-        $this->assertCannotQueryFieldErrorMessage($response, 'fieldWhenFeatureActive', 'fieldWhenFeatureInactive');
-        $this->assertCannotQueryFieldErrorMessage(
-            $response,
-            'fieldWhenFeatureActiveByDefault',
-            'fieldWhenFeatureInactive',
+        $this->assertCannotQueryFieldErrorMessage($response, 'fieldWhenActive');
+    }
+
+    public function testUnavailableWhenFeatureIsInactiveWithDefaultFeatureState(): void
+    {
+        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+            type Query {
+                fieldWhenActive: String!
+                    @feature(name: "new-api")
+                    @mock
+            }
+            GRAPHQL;
+
+        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+            query {
+                fieldWhenActive
+            }
+            GRAPHQL,
         );
+
+        $this->assertCannotQueryFieldErrorMessage($response, 'fieldWhenActive');
     }
 
     public function testUnavailableWhenFeatureIsActive(): void
     {
-        Feature::define('foo', fn () => true);
+        Feature::define('new-api', fn () => true);
+        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+            type Query {
+                fieldWhenInactive: String!
+                    @feature(name: "new-api", when: INACTIVE)
+                    @mock
+            }
+            GRAPHQL;
 
         $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
             query {
-                fieldWhenFeatureInactive
+                fieldWhenInactive
             }
             GRAPHQL,
         );
 
-        $this->assertCannotQueryFieldErrorMessage($response, 'fieldWhenFeatureInactive', 'fieldWhenFeatureActive');
+        $this->assertCannotQueryFieldErrorMessage($response, 'fieldWhenInactive');
     }
 
     public function testAvailableWhenFeatureIsActive(): void
     {
-        Feature::define('foo', fn () => true);
+        Feature::define('new-api', fn () => true);
         $this->mockResolver(fn (): string => 'active');
+        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+            type Query {
+                fieldWhenActive: String!
+                    @feature(name: "new-api", when: ACTIVE)
+                    @mock
+            }
+            GRAPHQL;
 
         $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
             query {
-                fieldWhenFeatureActive
-                fieldWhenFeatureActiveByDefault
+                fieldWhenActive
             }
             GRAPHQL,
         );
@@ -85,8 +96,34 @@ GRAPHQL;
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [
-                'fieldWhenFeatureActive' => 'active',
-                'fieldWhenFeatureActiveByDefault' => 'active',
+                'fieldWhenActive' => 'active',
+            ],
+        ]);
+    }
+
+    public function testAvailableWhenFeatureIsActiveWithDefaultFeatureState(): void
+    {
+        Feature::define('new-api', fn () => true);
+        $this->mockResolver(fn (): string => 'active');
+        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+            type Query {
+                fieldWhenActive: String!
+                    @feature(name: "new-api")
+                    @mock
+            }
+            GRAPHQL;
+
+        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+            query {
+                fieldWhenActive
+            }
+            GRAPHQL,
+        );
+
+        $response->assertGraphQLErrorFree();
+        $response->assertJson([
+            'data' => [
+                'fieldWhenActive' => 'active',
             ],
         ]);
     }
@@ -94,10 +131,17 @@ GRAPHQL;
     public function testAvailableWhenFeatureIsInactive(): void
     {
         $this->mockResolver(fn (): string => 'inactive');
+        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+            type Query {
+                fieldWhenInactive: String!
+                    @feature(name: "new-api", when: INACTIVE)
+                    @mock
+            }
+            GRAPHQL;
 
         $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
             query {
-                fieldWhenFeatureInactive
+                fieldWhenInactive
             }
             GRAPHQL,
         );
@@ -105,18 +149,15 @@ GRAPHQL;
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [
-                'fieldWhenFeatureInactive' => 'inactive',
+                'fieldWhenInactive' => 'inactive',
             ],
         ]);
     }
 
-    private function assertCannotQueryFieldErrorMessage(
-        TestResponse $response,
-        string $expected,
-        string $suggested,
-    ): void {
+    private function assertCannotQueryFieldErrorMessage(TestResponse $response, string $expected): void
+    {
         $response->assertGraphQLErrorMessage(
-            "Cannot query field \"{$expected}\" on type \"Query\". Did you mean \"{$suggested}\"?",
+            "Cannot query field \"{$expected}\" on type \"Query\".",
         );
     }
 }
