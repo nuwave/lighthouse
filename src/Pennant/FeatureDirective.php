@@ -29,7 +29,7 @@ directive @feature(
     """
     Specify what the state of the feature should be for the field to be applied.
     """
-    when: FeatureState = ACTIVE
+    when: FeatureState! = ACTIVE
 ) on FIELD_DEFINITION | OBJECT
 
 """
