@@ -57,7 +57,7 @@ GRAPHQL;
         return match ($requiredFeatureState) {
             'ACTIVE' => $this->features->inactive($feature),
             'INACTIVE' => $this->features->active($feature),
-            default => throw new DefinitionException("Found invalid feature state: {$requiredFeatureState}"),
+            default => throw new DefinitionException("Expected FeatureState `ACTIVE` or `INACTIVE` for argument `when` of @{$this->name()} on {$this->nodeName()}, got `{$requiredFeatureState}`."),
         };
     }
 }
