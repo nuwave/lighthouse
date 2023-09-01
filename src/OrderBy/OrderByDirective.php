@@ -71,7 +71,7 @@ directive @orderBy(
 ) on ARGUMENT_DEFINITION | FIELD_DEFINITION
 
 """
-Options for the `direction` argument on `@orderBy`.
+Options for the `direction` argument of `@orderBy`.
 """
 enum OrderByDirection {
     """
@@ -86,7 +86,7 @@ enum OrderByDirection {
 }
 
 """
-Options for the `relations` argument on `@orderBy`.
+Options for the `relations` argument of `@orderBy`.
 """
 input OrderByRelation {
     """
