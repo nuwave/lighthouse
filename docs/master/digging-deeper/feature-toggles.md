@@ -49,7 +49,7 @@ type Query {
 ```
 
 When using [class based features](https://laravel.com/docs/pennant#class-based-features), 
-the classname should be used as value for the `name` argument:
+the fully qualified class name must be used as the value for the `name` argument:
 
 ```graphql
 type Query {
