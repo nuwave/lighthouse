@@ -52,14 +52,14 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
                 ->setTypeDefinition(
                     WhereConditionsServiceProvider::createWhereConditionsInputType(
                         $restrictedWhereConditionsName,
-                        "Dynamic WHERE conditions for the `{$argDefinition->name->value}` argument on the query `{$parentField->name->value}`.",
+                        "Dynamic WHERE conditions for the `{$argDefinition->name->value}` argument of the query `{$parentField->name->value}`.",
                         $allowedColumnsEnumName,
                     ),
                 )
                 ->setTypeDefinition(
                     WhereConditionsServiceProvider::createHasConditionsInputType(
                         $restrictedWhereConditionsName,
-                        "Dynamic HAS conditions for WHERE conditions for the `{$argDefinition->name->value}` argument on the query `{$parentField->name->value}`.",
+                        "Dynamic HAS conditions for WHERE conditions for the `{$argDefinition->name->value}` argument of the query `{$parentField->name->value}`.",
                     ),
                 );
         } else {

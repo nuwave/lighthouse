@@ -17,3 +17,11 @@ Add the service provider to your `config/app.php`:
     \Nuwave\Lighthouse\Federation\FederationServiceProvider::class,
 ],
 ```
+
+## Publishing Your Schema
+
+In order to generate a `.graphql` schema file suitable for publishing, use the `--federation` option of [`print-schema`](../api-reference/commands.md#print-schema).
+
+```sh
+php artisan lighthouse:print-schema --federation
+```
