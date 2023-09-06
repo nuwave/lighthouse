@@ -57,7 +57,7 @@ jobs:
         run: composer remove --dev --no-update phpbench/phpbench rector/rector
 
       - name: "Remove dependencies that only work on PHP 8.2 or higher"
-        if: matrix.php-version == "8.0" || matrix.php-version == "8.1"
+        if: matrix.php-version == '8.0' || matrix.php-version == '8.1'
         run: composer remove --dev --no-update laravel/pennant
 
       - run: >
@@ -129,7 +129,7 @@ jobs:
         run: composer remove --dev --no-update nunomaduro/larastan phpstan/phpstan-mockery phpbench/phpbench rector/rector
 
       - name: "Remove dependencies that only work on PHP 8.2 or higher"
-        if: matrix.php-version == "8.0" || matrix.php-version == "8.1"
+        if: matrix.php-version == '8.0' || matrix.php-version == '8.1'
         run: composer remove --dev --no-update laravel/pennant
 
       - run: >
