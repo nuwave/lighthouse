@@ -56,6 +56,10 @@ jobs:
       - name: "Remove conflicting dependencies that are not needed here"
         run: composer remove --dev --no-update phpbench/phpbench rector/rector
 
+      - name: "Remove dependencies that only work on PHP 8.2 or higher"
+        if: matrix.php-version == "8.0" || matrix.php-version == "8.1"
+        run: composer remove --dev --no-update laravel/pennant
+
       - run: >
           composer require
           illuminate/contracts:${{ matrix.laravel-version }}
@@ -123,6 +127,10 @@ jobs:
 
       - name: "Remove conflicting dependencies that are not needed here"
         run: composer remove --dev --no-update nunomaduro/larastan phpstan/phpstan-mockery phpbench/phpbench rector/rector
+
+      - name: "Remove dependencies that only work on PHP 8.2 or higher"
+        if: matrix.php-version == "8.0" || matrix.php-version == "8.1"
+        run: composer remove --dev --no-update laravel/pennant
 
       - run: >
           composer require
