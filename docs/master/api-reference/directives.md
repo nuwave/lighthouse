@@ -1074,6 +1074,49 @@ type Mutation {
 }
 ```
 
+## @feature
+
+```graphql
+"""
+Include the annotated element in the schema depending on a Laravel Pennant feature.
+"""
+directive @feature(
+    """
+    The name of the feature to be checked (can be a string or class name).
+    """
+    name: String!
+
+    """
+    Specify what the state of the feature should be for the field to be included.
+    """
+    when: FeatureState! = ACTIVE
+) on FIELD_DEFINITION | OBJECT
+
+"""
+Options for the `when` argument of `@feature`.
+"""
+enum FeatureState {
+    """
+    Indicates an active feature.
+    """
+    ACTIVE
+
+    """
+    Indicates an inactive feature.
+    """
+    INACTIVE
+}
+```
+
+Requires the installation of [Laravel Pennant](https://laravel.com/docs/pennant)
+and manual registration of the service provider in `config/app.php`:
+
+```php
+'providers' => [
+    \Nuwave\Lighthouse\Pennant\PennantServiceProvider::class,
+],
+```
+
 ## @field
 
 ```graphql

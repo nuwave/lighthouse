@@ -18,6 +18,7 @@ use Nuwave\Lighthouse\GlobalId\GlobalIdServiceProvider;
 use Nuwave\Lighthouse\LighthouseServiceProvider;
 use Nuwave\Lighthouse\OrderBy\OrderByServiceProvider;
 use Nuwave\Lighthouse\Pagination\PaginationServiceProvider;
+use Nuwave\Lighthouse\Pennant\PennantServiceProvider as LighthousePennantServiceProvider;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Scout\ScoutServiceProvider as LighthouseScoutServiceProvider;
 use Nuwave\Lighthouse\SoftDeletes\SoftDeletesServiceProvider;
@@ -168,6 +169,8 @@ GRAPHQL;
         $config->set('database.redis.options', [
             'prefix' => 'lighthouse-test-',
         ]);
+
+        $config->set('pennant.default', 'array');
 
         // Defaults to "algolia", which is not needed in our test setup
         $config->set('scout.driver', null);
