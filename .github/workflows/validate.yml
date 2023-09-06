@@ -200,7 +200,7 @@ jobs:
         php-version:
           - 8.2
         laravel-version:
-          - ^9
+          - ^10
 
     steps:
       - uses: actions/checkout@v3
