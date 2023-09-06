@@ -231,6 +231,7 @@ they do not grow too complex and can be composed freely.
 ### No Mutating Rules
 
 Validation rules that mutate the given input values are _not_ supported:
+
 - `exclude_if`
 - `exclude_unless`
 

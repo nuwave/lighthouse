@@ -1081,30 +1081,30 @@ type Mutation {
 Include the annotated element in the schema depending on a Laravel Pennant feature.
 """
 directive @feature(
-    """
-    The name of the feature to be checked (can be a string or class name).
-    """
-    name: String!
+  """
+  The name of the feature to be checked (can be a string or class name).
+  """
+  name: String!
 
-    """
-    Specify what the state of the feature should be for the field to be included.
-    """
-    when: FeatureState! = ACTIVE
+  """
+  Specify what the state of the feature should be for the field to be included.
+  """
+  when: FeatureState! = ACTIVE
 ) on FIELD_DEFINITION | OBJECT
 
 """
 Options for the `when` argument of `@feature`.
 """
 enum FeatureState {
-    """
-    Indicates an active feature.
-    """
-    ACTIVE
+  """
+  Indicates an active feature.
+  """
+  ACTIVE
 
-    """
-    Indicates an inactive feature.
-    """
-    INACTIVE
+  """
+  Indicates an inactive feature.
+  """
+  INACTIVE
 }
 ```
 
@@ -3130,11 +3130,11 @@ The scope method will receive the client-given value of the argument as the seco
 This also works with custom query builders, it simply calls its methods with the argument value.
 """
 directive @scope(
-    """
-    The name of the scope or method on the custom query builder.
-    Defaults to the name of the argument or input field.
-    """
-    name: String
+  """
+  The name of the scope or method on the custom query builder.
+  Defaults to the name of the argument or input field.
+  """
+  name: String
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 

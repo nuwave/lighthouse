@@ -5,6 +5,7 @@ The stub includes just enough information for the subgraph to know how to unique
 Read more about the entity representation in the [Apollo Federation docs](https://www.apollographql.com/docs/federation/v1/entities/#entity-representations).
 
 A representation always consists of:
+
 - A `__typename` field;
 - Values for the entity's primary key fields.
 
@@ -15,13 +16,13 @@ Lighthouse will automatically determine the necessary information based on the r
 
 ```graphql
 type Post {
-    id: ID!
-    title: String!
-    comments: [Comment!]! @hasMany
+  id: ID!
+  title: String!
+  comments: [Comment!]! @hasMany
 }
 
 type Comment @extends @key(fields: "id") {
-    id: ID! @external
+  id: ID! @external
 }
 ```
 
@@ -38,16 +39,17 @@ defined in a separate subgraph for payment service. The relationship between `Or
 
 ```graphql
 type Order {
-    id: ID!
-    receipt: Receipt!
+  id: ID!
+  receipt: Receipt!
 }
 
 type Receipt @extends @key(fields: "uuid") {
-    uuid: ID! @external
+  uuid: ID! @external
 }
 ```
 
 The resolver for receipt in order service returns an array consisting of:
+
 - `__typename` - the entity name from the payment service;
 - `uuid` - the primary key of the receipt.
 
@@ -73,16 +75,17 @@ defined in a separate subgraph for product service. The relationship between `Or
 
 ```graphql
 type Order {
-    sum: Int!
-    products: [Product!]!
+  sum: Int!
+  products: [Product!]!
 }
 
 type Product @extends @key(fields: "uuid") {
-    uuid: ID! @external
+  uuid: ID! @external
 }
 ```
 
 The resolver for product in order service returns an array of arrays. Each sub-array consists of:
+
 - `__typename` - the entity name from the product service;
 - `uuid` - the primary key of a specific product.
 

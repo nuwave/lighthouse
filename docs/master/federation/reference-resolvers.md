@@ -10,17 +10,17 @@ namespace configured in `lighthouse.federation.entities_resolver_namespace`.
 
 When you need to retrieve information from subgraphs, the gateway automatically generates a request to the corresponding
 endpoint of the subgraph. More details about this can be found in
-section [Query._entities of the Apollo Federation docs](https://www.apollographql.com/docs/federation/building-supergraphs/subgraphs-overview#query_entities).
+section [Query.\_entities of the Apollo Federation docs](https://www.apollographql.com/docs/federation/building-supergraphs/subgraphs-overview#query_entities).
 
 An example of such a request is shown below:
 
 ```graphql
 {
-    _entities(representations: [{ __typename: "Foo", id: 1 }]) {
-        ... on Foo {
-            id
-        }
+  _entities(representations: [{ __typename: "Foo", id: 1 }]) {
+    ... on Foo {
+      id
     }
+  }
 }
 ```
 
@@ -120,11 +120,11 @@ matches the type `__typename`, using the namespaces configured in `lighthouse.na
 
 ```graphql
 {
-    _entities(representations: [{ __typename: "Foo", bar: "asdf", baz: 42 }]) {
-        ... on Foo {
-            id
-        }
+  _entities(representations: [{ __typename: "Foo", bar: "asdf", baz: 42 }]) {
+    ... on Foo {
+      id
     }
+  }
 }
 ```
 

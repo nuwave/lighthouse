@@ -69,7 +69,7 @@ Create a type resolver class for a GraphQL interface type.
 
 ```sh
 php artisan lighthouse:interface <name>
-````
+```
 
 ## mutation
 
@@ -77,7 +77,7 @@ Create a resolver class for a single field on the root Mutation type.
 
 ```sh
 php artisan lighthouse:mutation <name>
-````
+```
 
 Use the option `--full` to include the seldom needed resolver arguments `$context` and `$resolveInfo`.
 

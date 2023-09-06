@@ -38,7 +38,7 @@ type Query {
 }
 ```
 
-In this case, `experimentalField` will only be included when the `new-api` feature is active. 
+In this case, `experimentalField` will only be included when the `new-api` feature is active.
 
 Another example would be to only include a field when the feature is inactive:
 
@@ -48,7 +48,7 @@ type Query {
 }
 ```
 
-When using [class based features](https://laravel.com/docs/pennant#class-based-features), 
+When using [class based features](https://laravel.com/docs/pennant#class-based-features),
 the fully qualified class name must be used as the value for the `name` argument:
 
 ```graphql
@@ -65,6 +65,6 @@ of `app()->environment()` at the time the schema is built and not update on late
 If you are pre-generating your schema cache, make sure to match the environment to your deployment target.
 
 The same goes for [@feature](../api-reference/directives.md#feature). Whether a field is included in the schema will be
-based on the state of a feature at the time the schema is built. In addition, if you are pre-generating your schema cache, 
-you will only be able to use features that support [nullable scopes](https://laravel.com/docs/pennant#nullable-scope), 
+based on the state of a feature at the time the schema is built. In addition, if you are pre-generating your schema cache,
+you will only be able to use features that support [nullable scopes](https://laravel.com/docs/pennant#nullable-scope),
 as there won't be an authenticated user to check the feature against.
