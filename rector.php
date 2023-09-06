@@ -9,6 +9,7 @@ use Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector;
 use Rector\CodeQuality\Rector\Isset_\IssetOnPropertyObjectToPropertyExistsRector;
 use Rector\CodingStyle\Rector\Class_\AddArrayDefaultToArrayPropertyRector;
 use Rector\CodingStyle\Rector\ClassConst\VarConstantCommentRector;
+use Rector\CodingStyle\Rector\ClassMethod\MakeInheritedMethodVisibilitySameAsParentRector;
 use Rector\CodingStyle\Rector\ClassMethod\UnSpreadOperatorRector;
 use Rector\CodingStyle\Rector\Closure\StaticClosureRector;
 use Rector\CodingStyle\Rector\Encapsed\EncapsedStringsToSprintfRector;
@@ -39,6 +40,7 @@ return static function (RectorConfig $rectorConfig): void {
     ]);
     $rectorConfig->skip([
         __DIR__ . '/tests/database/migrations', // Does not fit autoloading standards
+        __DIR__ . '/tests/LaravelPhpdocAlignmentFixer.php', // Copied from Laravel
         CallableThisArrayToAnonymousFunctionRector::class, // Callable in array form is shorter and more efficient
         IssetOnPropertyObjectToPropertyExistsRector::class, // isset() is nice when moving towards typed properties
         FlipTypeControlToUseExclusiveTypeRector::class, // Unnecessarily complex with PHPStan
@@ -53,6 +55,9 @@ return static function (RectorConfig $rectorConfig): void {
         ],
         GetClassToInstanceOfRector::class => [
             __DIR__ . '/src/Schema/Types/Scalars/DateScalar.php', // We need to compare exact classes, not subclasses
+        ],
+        MakeInheritedMethodVisibilitySameAsParentRector::class => [
+            __DIR__ . '/tests/Unit/Execution/ResolveInfoTest.php', // Makes method public on purpose
         ],
         ExplicitBoolCompareRector::class, // if($truthy) is fine and very readable
         EncapsedStringsToSprintfRector::class, // unreadable, slow, error prone

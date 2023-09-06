@@ -13,7 +13,7 @@ abstract class FieldGeneratorCommand extends LighthouseGeneratorCommand
 
     protected function getStub(): string
     {
-        if (version_compare(PHP_VERSION, '8.2.0', '>=')) {
+        if (PHP_VERSION_ID >= 80200) {
             return $this->option('full')
                 ? __DIR__ . '/stubs/field_full.php82.stub'
                 : __DIR__ . '/stubs/field_simple.php82.stub';

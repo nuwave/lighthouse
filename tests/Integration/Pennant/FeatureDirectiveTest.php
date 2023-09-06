@@ -82,7 +82,7 @@ final class FeatureDirectiveTest extends TestCase
 
     public function testUnavailableWhenFeatureIsActive(): void
     {
-        Feature::define('new-api', fn (): bool => true);
+        Feature::define('new-api', static fn (): bool => true);
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type Query {
                 fieldWhenInactive: String!
@@ -103,9 +103,9 @@ final class FeatureDirectiveTest extends TestCase
 
     public function testAvailableWhenFeatureIsActive(): void
     {
-        Feature::define('new-api', fn (): bool => true);
+        Feature::define('new-api', static fn (): bool => true);
         $fieldValue = 'active';
-        $this->mockResolver(fn (): string => $fieldValue);
+        $this->mockResolver(static fn (): string => $fieldValue);
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type Query {
                 fieldWhenActive: String!
@@ -131,9 +131,9 @@ final class FeatureDirectiveTest extends TestCase
 
     public function testAvailableWhenFeatureIsActiveWithDefaultFeatureState(): void
     {
-        Feature::define('new-api', fn (): bool => true);
+        Feature::define('new-api', static fn (): bool => true);
         $fieldValue = 'active';
-        $this->mockResolver(fn (): string => $fieldValue);
+        $this->mockResolver(static fn (): string => $fieldValue);
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type Query {
                 fieldWhenActive: String!
@@ -160,7 +160,7 @@ final class FeatureDirectiveTest extends TestCase
     public function testAvailableWhenFeatureIsInactive(): void
     {
         $fieldValue = 'inactive';
-        $this->mockResolver(fn (): string => $fieldValue);
+        $this->mockResolver(static fn (): string => $fieldValue);
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type Query {
                 fieldWhenInactive: String!
