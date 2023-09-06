@@ -6,6 +6,7 @@ use Illuminate\Testing\TestResponse;
 use Laravel\Pennant\Feature;
 use Laravel\Pennant\PennantServiceProvider as LaravelPennantServiceProvider;
 use Nuwave\Lighthouse\Pennant\PennantServiceProvider as LighthousePennantServiceProvider;
+use Nuwave\Lighthouse\Support\AppVersion;
 use Nuwave\Lighthouse\Testing\MocksResolvers;
 use Nuwave\Lighthouse\Testing\UsesTestSchema;
 use Tests\TestCase;
@@ -19,8 +20,8 @@ final class FeatureDirectiveTest extends TestCase
     {
         parent::setUp();
 
-        if (version_compare(PHP_VERSION, '8.2.0', '<')) {
-            $this->markTestSkipped('Requires laravel/pennant, which requires PHP 8.2');
+        if (AppVersion::below(10)) {
+            $this->markTestSkipped('Requires laravel/pennant, which requires Laravel 10');
         }
     }
 
