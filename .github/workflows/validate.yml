@@ -147,9 +147,9 @@ jobs:
     strategy:
       matrix:
         php-version:
-          - 8.2
+          - "8.2"
         laravel-version:
-          - ^9
+          - "^10"
 
     services:
       mysql:
@@ -196,9 +196,9 @@ jobs:
     strategy:
       matrix:
         php-version:
-          - 8.2
+          - "8.2"
         laravel-version:
-          - ^10
+          - "^10"
 
     steps:
       - uses: actions/checkout@v3
