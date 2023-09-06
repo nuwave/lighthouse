@@ -27,6 +27,10 @@ final class FeatureDirectiveTest extends TestCase
 
     protected function getPackageProviders($app): array
     {
+        if (AppVersion::below(10)) {
+            return parent::getPackageProviders($app);
+        }
+
         return array_merge(
             parent::getPackageProviders($app),
             [
