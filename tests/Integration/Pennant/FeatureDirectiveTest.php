@@ -13,6 +13,15 @@ final class FeatureDirectiveTest extends TestCase
     use UsesTestSchema;
     use MocksResolvers;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        if (version_compare(PHP_VERSION, '8.2.0', '<')) {
+            $this->markTestSkipped('Requires laravel/pennant, which requires PHP 8.2');
+        }
+    }
+
     public function testUnavailableWhenFeatureIsInactive(): void
     {
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
