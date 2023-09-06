@@ -9,6 +9,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.18.0
+
 ### Added
 
 - Add directive `@feature` to conditionally add annotated elements based on the state of a feature using [Laravel Pennant](https://github.com/laravel/pennant) https://github.com/nuwave/lighthouse/pull/2442 
