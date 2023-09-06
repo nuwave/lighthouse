@@ -15,6 +15,9 @@ parameters:
   excludePaths:
   - tests/Utils/Models/WithoutRelationClassImport.php # Intentionally wrong
   - tests/LaravelPhpdocAlignmentFixer.php # Copied from laravel/pint
+  # laravel/pennant requires Laravel 10
+  - src/Pennant
+  - tests/Integration/Pennant
   ignoreErrors:
   # PHPStan does not get it
   - '#Parameter \#1 \$callback of static method Closure::fromCallable\(\) expects callable\(\): mixed, array{object, .*} given\.#'
@@ -23,6 +26,7 @@ parameters:
   - '#Parameter \#1 \$response of static method Nuwave\\Lighthouse\\Testing\\TestResponseUtils::extractValidationErrors\(\) expects Illuminate\\Testing\\TestResponse, \$this\(Nuwave\\Lighthouse\\Testing\\TestResponseMixin\) given\.#'
   - path: tests/database/factories/*
     message: '#Variable \$factory might not be defined#'
+
 
   # Mixins are magical
   - path: src/Testing/TestResponseMixin.php

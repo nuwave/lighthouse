@@ -4,6 +4,8 @@ namespace Tests\Integration\Pennant;
 
 use Illuminate\Testing\TestResponse;
 use Laravel\Pennant\Feature;
+use Laravel\Pennant\PennantServiceProvider as LaravelPennantServiceProvider;
+use Nuwave\Lighthouse\Pennant\PennantServiceProvider as LighthousePennantServiceProvider;
 use Nuwave\Lighthouse\Testing\MocksResolvers;
 use Nuwave\Lighthouse\Testing\UsesTestSchema;
 use Tests\TestCase;
@@ -20,6 +22,17 @@ final class FeatureDirectiveTest extends TestCase
         if (version_compare(PHP_VERSION, '8.2.0', '<')) {
             $this->markTestSkipped('Requires laravel/pennant, which requires PHP 8.2');
         }
+    }
+
+    protected function getPackageProviders($app): array
+    {
+        return array_merge(
+            parent::getPackageProviders($app),
+            [
+                LaravelPennantServiceProvider::class,
+                LighthousePennantServiceProvider::class,
+            ],
+        );
     }
 
     public function testUnavailableWhenFeatureIsInactive(): void

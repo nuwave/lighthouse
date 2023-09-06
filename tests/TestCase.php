@@ -10,7 +10,6 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Redis\RedisServiceProvider;
-use Laravel\Pennant\PennantServiceProvider as LaravelPennantServiceProvider;
 use Laravel\Scout\ScoutServiceProvider as LaravelScoutServiceProvider;
 use Nuwave\Lighthouse\Auth\AuthServiceProvider as LighthouseAuthServiceProvider;
 use Nuwave\Lighthouse\Cache\CacheServiceProvider;
@@ -76,7 +75,6 @@ GRAPHQL;
         return [
             AuthServiceProvider::class,
             LaravelScoutServiceProvider::class,
-            LaravelPennantServiceProvider::class,
             RedisServiceProvider::class,
 
             // Lighthouse's own
@@ -85,7 +83,6 @@ GRAPHQL;
             CacheServiceProvider::class,
             CacheControlServiceProvider::class,
             GlobalIdServiceProvider::class,
-            LighthousePennantServiceProvider::class,
             LighthouseScoutServiceProvider::class,
             OrderByServiceProvider::class,
             PaginationServiceProvider::class,
