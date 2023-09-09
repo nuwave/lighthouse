@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.18.1
+
+### Fixed
+
+- Handle explicit `null` in `@in` directive
+
 ## v6.18.0
 
 ### Added
