@@ -13,7 +13,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Fixed
 
-- Handle explicit `null` in `@in` directive
+- Handle explicit `null` in `@in` directive https://github.com/nuwave/lighthouse/pull/2445
 
 ## v6.18.0
 
