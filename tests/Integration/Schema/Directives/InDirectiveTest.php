@@ -41,9 +41,9 @@ final class InDirectiveTest extends DBTestCase
                     'users' => [
                         [
                             'id' => $user1ID,
-                        ]
-                    ]
-                ]
+                        ],
+                    ],
+                ],
             ]);
     }
 
