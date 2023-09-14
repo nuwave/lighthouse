@@ -41,6 +41,12 @@ directive @where(
   Exclusively required when this directive is used on a field.
   """
   value: WhereValue
+
+  """
+  Wether null values should be ignored.
+  If set to true null values will be treated as if the argument is not present in the request.
+  """
+  ignoreNull: Boolean! = false
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 
 """
@@ -52,6 +58,10 @@ GRAPHQL;
 
     public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, $value): QueryBuilder|EloquentBuilder|Relation
     {
+        if ($value === null && $this->directiveArgValue('ignoreNull', false)) {
+            return $builder;
+        }
+
         // Allow users to overwrite the default "where" clause, e.g. "whereYear"
         $clause = $this->directiveArgValue('clause', 'where');
 
