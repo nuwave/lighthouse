@@ -31,14 +31,12 @@ final class WhereBetweenDirectiveTest extends DBTestCase
 
         $this
             ->graphQL(/** @lang GraphQL */'
-            query ($range: DateTimeRange) {
-                users(createdBetween: $range) {
+            {
+                users(createdBetween: null) {
                     id
                 }
             }
-            ', [
-                'range' => null,
-            ])
+            ')
             ->assertGraphQLErrorFree()
             ->assertJsonCount($users->count(), 'data.users');
     }
