@@ -31,14 +31,12 @@ final class WhereNotBetweenDirectiveTest extends DBTestCase
 
         $this
             ->graphQL(/** @lang GraphQL */'
-            query ($range: DateTimeRange) {
-                users(notCreatedBetween: $range) {
+            {
+                users(notCreatedBetween: null) {
                     id
                 }
             }
-            ', [
-                'range' => null,
-            ])
+            ')
             ->assertGraphQLErrorFree()
             ->assertJsonCount($users->count(), 'data.users');
     }
