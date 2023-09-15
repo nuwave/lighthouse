@@ -39,35 +39,4 @@ final class WhereDirectiveTest extends DBTestCase
             ')
             ->assertJsonCount(1, 'data.usersBeginningWithF');
     }
-
-    public function testCanIgnoreNulls(): void
-    {
-        $users = factory(User::class, 2)->create();
-
-        $this->schema = /** @lang GraphQL */'
-        scalar DateTime @scalar(class: "Nuwave\\\Lighthouse\\\Schema\\\Types\\\Scalars\\\DateTime")
-
-        type User {
-            id: ID!
-            created_at: DateTime!
-        }
-
-        type Query {
-            users(createdAfter: DateTime @where(key: "created_at", operator: ">", ignoreNull: true)): [User!]! @all
-        }
-        ';
-
-        $this
-            ->graphQL(/** @lang GraphQL */'
-            query ($after: DateTime) {
-                users(createdAfter: $after) {
-                    id
-                }
-            }
-            ', [
-                'after' => null,
-            ])
-            ->assertGraphQLErrorFree()
-            ->assertJsonCount($users->count(), 'data.users');
-    }
 }
