@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.18.2
+
+### Fixed
+
+- Handle explicit `null` in `@notIn`, `@whereBetween` and `@whereNotBetween` directives https://github.com/nuwave/lighthouse/pull/2446
+
 ## v6.18.1
 
 ### Fixed
