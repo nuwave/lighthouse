@@ -225,6 +225,8 @@ final class NodeDirectiveDBTest extends DBTestCase
 
         $this->schema .= /** @lang GraphQL */ '
         type Query {
+            # Nonsensical example, just done this way for ease of testing.
+            # Usually customization would have the purpose of adding middleware.
             node: Int! @mock
         }
 
