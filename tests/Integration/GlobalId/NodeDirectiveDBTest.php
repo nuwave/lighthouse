@@ -223,7 +223,7 @@ final class NodeDirectiveDBTest extends DBTestCase
         $result = 42;
         $this->mockResolver($result);
 
-        $this->schema .= /** @lang GraphQL */ "
+        $this->schema .= /** @lang GraphQL */ '
         type Query {
             node: Int! @mock
         }
@@ -231,13 +231,13 @@ final class NodeDirectiveDBTest extends DBTestCase
         type User @node {
             name: String!
         }
-        ";
+        ';
 
-        $this->graphQL(/** @lang GraphQL */ "
+        $this->graphQL(/** @lang GraphQL */ '
         {
             node
         }
-        ")->assertExactJson([
+        ')->assertExactJson([
             'data' => [
                 'node' => $result,
             ],
