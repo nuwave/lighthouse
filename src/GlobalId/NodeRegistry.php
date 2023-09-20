@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\GlobalId;
 
 use GraphQL\Error\Error;
 use GraphQL\Type\Definition\Type;
-use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -19,7 +18,7 @@ class NodeRegistry
      *
      * @var array<string, NodeResolverFn>
      */
-    protected array $nodeResolver = [];
+    protected array $nodeResolverFns = [];
 
     /**
      * The stashed current type.
@@ -43,7 +42,7 @@ class NodeRegistry
      */
     public function registerNode(string $typeName, callable $resolver): self
     {
-        $this->nodeResolver[$typeName] = $resolver;
+        $this->nodeResolverFns[$typeName] = $resolver;
 
         return $this;
     }
@@ -65,8 +64,9 @@ class NodeRegistry
             throw new Error("[{$decodedType}] is not a type and cannot be resolved.");
         }
 
+        $resolver = $this->nodeResolverFns[$decodedType] ?? null;
         // Check if we have a resolver registered for the given type
-        if (! $resolver = Arr::get($this->nodeResolver, $decodedType)) {
+        if (! $resolver) {
             throw new Error("[{$decodedType}] is not a registered node and cannot be resolved.");
         }
 

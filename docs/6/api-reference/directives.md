@@ -2360,6 +2360,18 @@ directive @node(
 ) on OBJECT
 ```
 
+When you use `@node` on a type, Lighthouse will add a field `node` to the root Query type.
+If you want to customize its description, change the resolver or add middleware, you can add it yourself like this:
+
+```graphql
+type Query {
+    "This description is up to you."
+    node(id: ID! @globalId): Node @field(resolver: "Nuwave\\Lighthouse\\GlobalId\\NodeRegistry@resolve")
+        @someMiddlewareDirective
+        @maybeAuthorization
+}
+```
+
 Lighthouse defaults to resolving types through the underlying model,
 for example by calling `User::find($id)`.
 
@@ -2381,7 +2393,8 @@ The `resolver` argument has to specify a function which will be passed the
 decoded `id` and resolves to a result.
 
 ```php
-public function byId($id): array {
+public function byId($id): array
+{
     return [
         'DE' => ['name' => 'Germany'],
         'MY' => ['name' => 'Malaysia'],
@@ -2391,8 +2404,8 @@ public function byId($id): array {
 
 [Read more](../digging-deeper/relay.md#global-object-identification).
 
-Behind the scenes, Lighthouse will decode the global id sent from the client
-to find the model by it's primary id in the database.
+Behind the scenes, Lighthouse will decode the global ID sent from the client
+to find the model by its primary key in the database.
 
 ## @notIn
 

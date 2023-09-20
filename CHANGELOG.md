@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.19.0
+
+### Added
+
+- Allow customizing the definition of the root `Query` field `node` added by `@node` https://github.com/nuwave/lighthouse/pull/2449
+
 ## v6.18.2
 
 ### Fixed

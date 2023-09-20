@@ -11,7 +11,7 @@ final class WhereBetweenDirectiveTest extends DBTestCase
     {
         $users = factory(User::class, 2)->create();
 
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         scalar DateTime @scalar(class: "Nuwave\\\Lighthouse\\\Schema\\\Types\\\Scalars\\\DateTime")
 
         type User {
@@ -30,7 +30,7 @@ final class WhereBetweenDirectiveTest extends DBTestCase
         ';
 
         $this
-            ->graphQL(/** @lang GraphQL */'
+            ->graphQL(/** @lang GraphQL */ '
             {
                 users(createdBetween: null) {
                     id
