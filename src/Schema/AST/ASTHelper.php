@@ -112,7 +112,7 @@ class ASTHelper
     /** Unwrap lists and non-nulls and get the name of the contained type. */
     public static function getUnderlyingTypeName(Node $definition): string
     {
-        $namedType = self::getUnderlyingNamedTypeNode($definition);
+        $namedType = static::getUnderlyingNamedTypeNode($definition);
 
         return $namedType->name->value;
     }
@@ -130,7 +130,7 @@ class ASTHelper
             || $node instanceof FieldDefinitionNode
             || $node instanceof InputValueDefinitionNode
         ) {
-            return self::getUnderlyingNamedTypeNode($node->type);
+            return static::getUnderlyingNamedTypeNode($node->type);
         }
 
         throw new DefinitionException("The node '{$node->kind}' does not have a type associated with it.");
@@ -143,7 +143,7 @@ class ASTHelper
      */
     public static function directiveArgValue(DirectiveNode $directive, string $name, mixed $default = null): mixed
     {
-        $arg = self::firstByName($directive->arguments, $name);
+        $arg = static::firstByName($directive->arguments, $name);
 
         return $arg !== null
             ? AST::valueFromASTUntyped($arg->value)
@@ -186,13 +186,13 @@ class ASTHelper
         /** @var \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\DirectiveNode> $directives */
         $directives = $definitionNode->directives;
 
-        return self::firstByName($directives, $name);
+        return static::firstByName($directives, $name);
     }
 
     /** Check if a node has a directive with the given name on it. */
     public static function hasDirective(Node $definitionNode, string $name): bool
     {
-        return self::directiveDefinition($definitionNode, $name) !== null;
+        return static::directiveDefinition($definitionNode, $name) !== null;
     }
 
     /**
@@ -217,6 +217,16 @@ class ASTHelper
         }
 
         return null;
+    }
+
+    /**
+     * Does the given list of nodes contain a node with the given name?
+     *
+     * @param  iterable<\GraphQL\Language\AST\Node>  $nodes
+     */
+    public static function hasNode(iterable $nodes, string $name): bool
+    {
+        return static::firstByName($nodes, $name) !== null;
     }
 
     /** Directives might have an additional namespace associated with them, @see \Nuwave\Lighthouse\Schema\Directives\NamespaceDirective. */
@@ -244,7 +254,7 @@ class ASTHelper
     /** Checks the given type to see whether it implements the given interface. */
     public static function typeImplementsInterface(ObjectTypeDefinitionNode $type, string $interfaceName): bool
     {
-        return self::firstByName($type->interfaces, $interfaceName) !== null;
+        return static::hasNode($type->interfaces, $interfaceName);
     }
 
     public static function addDirectiveToFields(DirectiveNode $directiveNode, ObjectTypeDefinitionNode|ObjectTypeExtensionNode|InterfaceTypeDefinitionNode|InterfaceTypeExtensionNode &$typeWithFields): void
@@ -253,14 +263,14 @@ class ASTHelper
 
         $directiveLocator = Container::getInstance()->make(DirectiveLocator::class);
         $directive = $directiveLocator->resolve($name);
-        $directiveDefinition = self::extractDirectiveDefinition($directive::definition());
+        $directiveDefinition = static::extractDirectiveDefinition($directive::definition());
 
         foreach ($typeWithFields->fields as $fieldDefinition) {
             // If the field already has the same directive defined, and it is not
             // a repeatable directive, skip over it.
             // Field directives are more specific than those defined on a type.
             if (
-                self::hasDirective($fieldDefinition, $name)
+                static::hasDirective($fieldDefinition, $name)
                 && ! $directiveDefinition->repeatable
             ) {
                 continue;
