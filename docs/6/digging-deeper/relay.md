@@ -33,11 +33,11 @@ type User {
 You may rebind the `\Nuwave\Lighthouse\Support\Contracts\GlobalId` interface to add your
 own mechanism of encoding/decoding global ids.
 
-[Global Object Identification](https://facebook.github.io/relay/graphql/objectidentification.htm)
+[Global Object Identification](https://relay.dev/graphql/objectidentification.htm)
 
-[@node](../api-reference/directives.md#node)
-
-[@globalId](../api-reference/directives.md#globalid)
+Directives:
+- [@node](../api-reference/directives.md#node)
+- [@globalId](../api-reference/directives.md#globalid)
 
 ## Input Object Mutations
 
