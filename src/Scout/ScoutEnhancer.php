@@ -64,19 +64,25 @@ class ScoutEnhancer
         return $this->hasSearchArguments();
     }
 
-    public function enhanceBuilder(): ScoutBuilder
+    /** @param  (callable(\Nuwave\Lighthouse\Scout\ScoutBuilderDirective): bool)|null  $directiveFilter */
+    public function enhanceBuilder(callable $directiveFilter = null): ScoutBuilder
     {
         $scoutBuilder = $this->builder instanceof ScoutBuilder
             ? $this->builder
             : $this->enhanceEloquentBuilder();
 
         foreach ($this->argumentsWithScoutBuilderDirectives as $argument) {
-            $scoutBuilderDirective = $argument
-                ->directives
-                ->first(Utils::instanceofMatcher(ScoutBuilderDirective::class));
-            assert($scoutBuilderDirective instanceof ScoutBuilderDirective);
+            foreach ($argument->directives as $directive) {
+                if (! ($directive instanceof ScoutBuilderDirective)) {
+                    continue;
+                }
 
-            $scoutBuilderDirective->handleScoutBuilder($scoutBuilder, $argument->toPlain());
+                if ($directiveFilter !== null && ! $directiveFilter($directive)) {
+                    continue;
+                }
+
+                $directive->handleScoutBuilder($scoutBuilder, $argument->toPlain());
+            }
         }
 
         return $scoutBuilder;

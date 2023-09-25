@@ -122,7 +122,7 @@ final class SearchDirectiveTest extends DBTestCase
             ->andReturn(new EloquentCollection())
             ->once();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type Post {
             id: Int!
         }
@@ -133,11 +133,11 @@ final class SearchDirectiveTest extends DBTestCase
 
         type Query {
             posts(
-                input: PostsInput! @builder(method: "' . $this->qualifyTestResolver('customBuilderMethod') . '")
+                input: PostsInput! @builder(method: "{$this->qualifyTestResolver('customBuilderMethod')}")
                 search: String! @search
             ): [Post!]! @all
         }
-        ';
+        GRAPHQL;
 
         $this->graphQL(/** @lang GraphQL */ '
         query ($id: Int!) {

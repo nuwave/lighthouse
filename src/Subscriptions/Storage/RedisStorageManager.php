@@ -153,11 +153,11 @@ class RedisStorageManager implements StoresSubscriptions
 
     protected function channelKey(string $channel): string
     {
-        return self::SUBSCRIBER_KEY . '.' . $channel;
+        return self::SUBSCRIBER_KEY . ".{$channel}";
     }
 
     protected function topicKey(string $topic): string
     {
-        return self::TOPIC_KEY . '.' . $topic;
+        return self::TOPIC_KEY . ".{$topic}";
     }
 }

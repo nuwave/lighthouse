@@ -61,8 +61,7 @@ final class ErrorTest extends TestCase
     public function testHandlesErrorInResolver(): void
     {
         $message = 'foo';
-        $this->mockResolver()
-            ->willThrowException(new Error($message));
+        $this->mockResolver(static fn () => throw new Error($message));
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -94,8 +93,7 @@ final class ErrorTest extends TestCase
         $config = $this->app->make(ConfigRepository::class);
         $config->set('lighthouse.debug', DebugFlag::INCLUDE_DEBUG_MESSAGE);
 
-        $this->mockResolver()
-            ->willThrowException(new \Exception('foo'));
+        $this->mockResolver(static fn () => throw new \Exception('foo'));
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -146,6 +144,69 @@ final class ErrorTest extends TestCase
             ->assertGraphQLErrorMessage('Field TestInput.integer of required type Int! was not provided.');
     }
 
+    public function testReturnsPartialDataIfNullableFieldFails(): void
+    {
+        $config = $this->app->make(ConfigRepository::class);
+        $config->set('lighthouse.debug', DebugFlag::INCLUDE_DEBUG_MESSAGE);
+
+        $successValue = 1;
+        $this->mockResolver($successValue, 'success');
+
+        $error = new \Exception('fail');
+        $this->mockResolver(static fn () => throw $error, 'fail');
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            success: Int! @mock(key: "success")
+            fail: Int @mock(key: "fail")
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+            {
+                success
+                fail
+            }
+            ')
+            ->assertStatus(200)
+            ->assertJson([
+                'data' => [
+                    'success' => $successValue,
+                    'fail' => null,
+                ],
+            ])
+            ->assertGraphQLError($error);
+    }
+
+    public function testReturnsNoDataIfNonNullableFieldFails(): void
+    {
+        $config = $this->app->make(ConfigRepository::class);
+        $config->set('lighthouse.debug', DebugFlag::INCLUDE_DEBUG_MESSAGE);
+
+        $successValue = 1;
+        $this->mockResolver($successValue, 'success');
+
+        $error = new \Exception('fail');
+        $this->mockResolver(static fn () => throw $error, 'fail');
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            success: Int! @mock(key: "success")
+            fail: Int! @mock(key: "fail")
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+            {
+                success
+                fail
+            }
+            ')
+            ->assertStatus(200)
+            ->assertJsonMissingPath('data')
+            ->assertGraphQLError($error);
+    }
+
     public function testUnknownTypeInVariableDefinition(): void
     {
         $this->schema = /** @lang GraphQL */ '
@@ -170,8 +231,7 @@ final class ErrorTest extends TestCase
 
         $message = 'foo';
 
-        $this->mockResolver()
-            ->willThrowException(new \Exception($message));
+        $this->mockResolver(static fn () => throw new \Exception($message));
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -195,8 +255,7 @@ final class ErrorTest extends TestCase
     {
         $error = new Error('foo');
 
-        $this->mockResolver()
-            ->willThrowException($error);
+        $this->mockResolver(static fn () => throw $error);
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -221,8 +280,7 @@ final class ErrorTest extends TestCase
 
         $exception = new \Exception('foo');
 
-        $this->mockResolver()
-            ->willThrowException($exception);
+        $this->mockResolver(static fn () => throw $exception);
 
         $this->schema = /** @lang GraphQL */ '
         type Query {

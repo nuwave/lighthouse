@@ -64,6 +64,8 @@ abstract class BaseDirective implements Directive
         $this->directiveNode = $directiveNode;
         $this->definitionNode = $definitionNode;
 
+        unset($this->directiveArgs);
+
         return $this;
     }
 
@@ -88,7 +90,7 @@ abstract class BaseDirective implements Directive
     }
 
     /**
-     * Get a Closure that is defined through an argument on the directive.
+     * Get a Closure that is defined through an argument of the directive.
      *
      * @api
      */
@@ -116,7 +118,7 @@ abstract class BaseDirective implements Directive
     }
 
     /**
-     * Get the value of an argument on the directive.
+     * Get the value of an argument of the directive.
      *
      * @api
      *

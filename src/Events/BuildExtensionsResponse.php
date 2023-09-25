@@ -8,6 +8,4 @@ namespace Nuwave\Lighthouse\Events;
  * Listeners may return a @see \Nuwave\Lighthouse\Execution\ExtensionsResponse
  * to include in the response.
  */
-class BuildExtensionsResponse
-{
-}
+class BuildExtensionsResponse {}

@@ -438,7 +438,8 @@ GRAPHQL
         $task = factory(Task::class)->create();
         $image = factory(Image::class)->create();
 
-        $actionInput = ucfirst($action) . 'TaskInput';
+        $upperAction = ucfirst($action);
+        $actionInput = "{$upperAction}TaskInput";
 
         $newTaskName = 'foo';
 
@@ -488,7 +489,8 @@ GRAPHQL
         $image = factory(Image::class)->make();
         $task->images()->save($image);
 
-        $actionInput = ucfirst($action) . 'TaskInput';
+        $upperAction = ucfirst($action);
+        $actionInput = "{$upperAction}TaskInput";
 
         $newTaskName = 'foo';
 
@@ -536,7 +538,8 @@ GRAPHQL
         $image = factory(Image::class)->make();
         $task->images()->save($image);
 
-        $actionInput = ucfirst($action) . 'TaskInput';
+        $upperAction = ucfirst($action);
+        $actionInput = "{$upperAction}TaskInput";
 
         $calledImageSaving = 0;
         Image::saving(static function () use (&$calledImageSaving): void {

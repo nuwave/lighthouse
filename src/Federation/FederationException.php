@@ -2,6 +2,4 @@
 
 namespace Nuwave\Lighthouse\Federation;
 
-class FederationException extends \Exception
-{
-}
+class FederationException extends \Exception {}

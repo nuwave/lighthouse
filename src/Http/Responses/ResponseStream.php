@@ -8,7 +8,11 @@ use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 
 class ResponseStream extends Stream implements CanStreamResponse
 {
-    public const EOL = "\r\n";
+    protected const EOL = "\r\n";
+
+    protected const BOUNDARY = self::EOL . '---' . self::EOL;
+
+    protected const TERMINATING_BOUNDARY = self::EOL . '-----' . self::EOL;
 
     public function stream(array $data, array $paths, bool $isFinalChunk): void
     {
@@ -42,18 +46,8 @@ class ResponseStream extends Stream implements CanStreamResponse
         }
 
         if ($isFinalChunk) {
-            $this->emit($this->terminatingBoundary());
+            $this->emit(self::TERMINATING_BOUNDARY);
         }
-    }
-
-    protected function boundary(): string
-    {
-        return self::EOL . '---' . self::EOL;
-    }
-
-    protected function terminatingBoundary(): string
-    {
-        return self::EOL . '-----' . self::EOL;
     }
 
     /**
@@ -71,13 +65,13 @@ class ResponseStream extends Stream implements CanStreamResponse
 
         $chunk = implode(self::EOL, [
             'Content-Type: application/json',
-            'Content-Length: ' . $length,
+            "Content-Length: {$length}",
             '',
             $json,
             '',
         ]);
 
-        return $this->boundary() . $chunk;
+        return self::BOUNDARY . $chunk;
     }
 
     /** Stream chunked data to client. */

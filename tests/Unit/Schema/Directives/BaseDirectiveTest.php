@@ -238,6 +238,30 @@ final class BaseDirectiveTest extends TestCase
         $directive->validateMutuallyExclusiveArguments(['bar', 'baz', 'qux']);
     }
 
+    public function testHydrateShouldResetCachedArgs(): void
+    {
+        $directive = $this->constructFieldDirective('foo: ID @dummy(arg: "value")');
+
+        $this->assertSame(
+            'value',
+            // @phpstan-ignore-next-line protected method is called via wrapper below
+            $directive->directiveArgValue('arg'),
+        );
+
+        $field = Parser::fieldDefinition('foo: ID @dummy(arg: "new value")');
+
+        $directive->hydrate(
+            $field->directives[0],
+            $field,
+        );
+
+        $this->assertSame(
+            'new value',
+            // @phpstan-ignore-next-line protected method is called via wrapper below
+            $directive->directiveArgValue('arg'),
+        );
+    }
+
     protected function constructFieldDirective(string $definition): BaseDirective
     {
         $fieldDefinition = Parser::fieldDefinition($definition);

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace DummyNamespace;
 
@@ -10,7 +10,7 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 final class DummyClass
 {
     public function __construct(
-        private TypeRegistry $typeRegistry;
+        private TypeRegistry $typeRegistry,
     ) {}
 
     /**

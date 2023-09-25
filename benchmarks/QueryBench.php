@@ -13,6 +13,11 @@ abstract class QueryBench extends TestCase
     /** Cached graphQL endpoint. */
     protected string $graphQLEndpoint;
 
+    public function __construct()
+    {
+        parent::__construct(static::class);
+    }
+
     public function setUp(): void
     {
         parent::setUp();

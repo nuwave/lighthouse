@@ -56,9 +56,7 @@ final class BroadcastManagerTest extends TestCase
                 return new Response();
             }
 
-            public function broadcast(Subscriber $subscriber, mixed $data): void
-            {
-            }
+            public function broadcast(Subscriber $subscriber, mixed $data): void {}
         };
 
         $this->broadcastManager->extend('foo', static function ($app, array $config) use (&$broadcasterConfig, $broadcaster): Broadcaster {

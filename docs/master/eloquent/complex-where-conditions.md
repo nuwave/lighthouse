@@ -89,7 +89,7 @@ The blank type named `_` will be changed to the actual type.
 Here are the types that will be included in the compiled schema:
 
 ```graphql
-"Dynamic WHERE conditions for the `where` argument on the query `people`."
+"Dynamic WHERE conditions for the `where` argument of the query `people`."
 input QueryPeopleWhereWhereConditions {
   "The column that is used for the condition."
   column: QueryPeopleWhereColumn
@@ -110,7 +110,7 @@ input QueryPeopleWhereWhereConditions {
   HAS: QueryPeopleWhereWhereConditionsRelation
 }
 
-"Allowed column names for the `where` argument on the query `people`."
+"Allowed column names for the `where` argument of the query `people`."
 enum QueryPeopleWhereColumn {
   AGE @enum(value: "age")
   TYPE @enum(value: "type")
@@ -294,7 +294,7 @@ type Role {
 Again, Lighthouse will auto-generate an `input` and `enum` definition for your query:
 
 ```graphql
-"Dynamic WHERE conditions for the `hasRole` argument on the query `people`."
+"Dynamic WHERE conditions for the `hasRole` argument of the query `people`."
 input QueryPeopleHasRoleWhereConditions {
   "The column that is used for the condition."
   column: QueryPeopleHasRoleColumn
@@ -312,7 +312,7 @@ input QueryPeopleHasRoleWhereConditions {
   OR: [QueryPeopleHasRoleWhereConditions!]
 }
 
-"Allowed column names for the `hasRole` argument on the query `people`."
+"Allowed column names for the `hasRole` argument of the query `people`."
 enum QueryPeopleHasRoleColumn {
   NAME @enum(value: "name")
   ACCESS_LEVEL @enum(value: "access_level")

@@ -12,6 +12,7 @@ phpunit.xml
 .phpunit.result.cache
 .php-cs-fixer.cache
 build
+phpstan-tmp-dir
 
 # composer
 composer.phar

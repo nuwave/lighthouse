@@ -6,6 +6,6 @@ use Tests\Utils\Models\Role;
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(Role::class, static fn (Faker $faker): array => [
-    'name' => 'role_' . $faker->unique()->randomNumber(),
+    'name' => "role_{$faker->unique()->randomNumber()}",
     'acl_id' => static fn () => factory(ACL::class)->create()->getKey(),
 ]);

@@ -28,9 +28,7 @@ trait TestsSerialization
                         return new User();
                     }
 
-                    public function setUser(?Authenticatable $user): void
-                    {
-                    }
+                    public function setUser(?Authenticatable $user): void {}
 
                     public function request(): Request
                     {

@@ -9,6 +9,91 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.19.0
+
+### Added
+
+- Allow customizing the definition of the root `Query` field `node` added by `@node` https://github.com/nuwave/lighthouse/pull/2449
+
+## v6.18.2
+
+### Fixed
+
+- Handle explicit `null` in `@notIn`, `@whereBetween` and `@whereNotBetween` directives https://github.com/nuwave/lighthouse/pull/2446
+
+## v6.18.1
+
+### Fixed
+
+- Handle explicit `null` in `@in` directive https://github.com/nuwave/lighthouse/pull/2445
+
+## v6.18.0
+
+### Added
+
+- Add directive `@feature` to conditionally add annotated elements based on the state of a feature using [Laravel Pennant](https://github.com/laravel/pennant) https://github.com/nuwave/lighthouse/pull/2442 
+
+## v6.17.0
+
+### Added
+
+- Improve stubs for PHP 8.2 and above https://github.com/nuwave/lighthouse/pull/2441
+
+## v6.16.2
+
+### Fixed
+
+- Fix `NOT_LIKE` operator in `@whereConditions` https://github.com/nuwave/lighthouse/pull/2432
+
+## v6.16.1
+
+### Fixed
+
+- Reset cached values of arguments in `BaseDirective::hydrate()` https://github.com/nuwave/lighthouse/pull/2430
+
+## v6.16.0
+
+### Changed
+
+- `ScoutEnhancer::enhanceBuilder()` will process not only the first but all `ScoutBuilderDirective` attached to argument https://github.com/nuwave/lighthouse/pull/2429
+- `ResolveInfo::enhanceBuilder()` will pass `$directiveFilter` into `ScoutEnhancer::enhanceBuilder()` https://github.com/nuwave/lighthouse/pull/2429
+
+## v6.15.0
+
+### Added
+
+- Ensure `@scope` supports custom query builders https://github.com/nuwave/lighthouse/pull/2423
+
+## v6.14.0
+
+### Added
+
+- Add support to generate tests when generating field classes https://github.com/nuwave/lighthouse/pull/2419
+
+## v6.13.0
+
+### Added
+
+- Validate arguments with list types do not use `@spread` https://github.com/nuwave/lighthouse/pull/2421
+
+## v6.12.0
+
+### Changed
+
+- Add `PaginatorInfo`, `SimplePaginatorInfo`, `PageInfo` only when required https://github.com/nuwave/lighthouse/pull/2413
+
+## v6.11.0
+
+### Added
+
+- Add option `findOrFail` to `@can` directive https://github.com/nuwave/lighthouse/pull/2416
+
+## v6.10.1
+
+### Fixed
+
+- Guess type names of programmatically registered types for models https://github.com/nuwave/lighthouse/pull/2415
+
 ## v6.10.0
 
 ### Added
@@ -1190,7 +1275,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Deprecated
 
-- Deprecate the `globalId` argument on the `@upsert` directive https://github.com/nuwave/lighthouse/pull/1804
+- Deprecate the `globalId` argument of the `@upsert` directive https://github.com/nuwave/lighthouse/pull/1804
 
 ## v5.3.0
 
@@ -1243,7 +1328,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
-- Allow spec-compliant definition of the `messages` argument on `@rules` and `@rulesForArray` https://github.com/nuwave/lighthouse/pull/1662
+- Allow spec-compliant definition of the `messages` argument of `@rules` and `@rulesForArray` https://github.com/nuwave/lighthouse/pull/1662
 - Validate correct usage of `@rules` and `@rulesForArray` https://github.com/nuwave/lighthouse/pull/1662
 - Allow eager-loading multiple relations on a single field using `@with` https://github.com/nuwave/lighthouse/pull/1528
 - Add `\Nuwave\Lighthouse\Execution\DataLoader\BatchLoaderRegistry` to instantiate arbitrary batch loaders https://github.com/nuwave/lighthouse/pull/1528
@@ -1258,8 +1343,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Deprecated
 
-- Deprecate the `globalId` argument on the `@delete`, `@forceDelete` and `@restore` directives https://github.com/nuwave/lighthouse/pull/1660
-- Deprecate passing the `messages` argument on `@rules` and `@rulesForArray` as a map with arbitrary keys https://github.com/nuwave/lighthouse/pull/1662
+- Deprecate the `globalId` argument of the `@delete`, `@forceDelete` and `@restore` directives https://github.com/nuwave/lighthouse/pull/1660
+- Deprecate passing the `messages` argument of `@rules` and `@rulesForArray` as a map with arbitrary keys https://github.com/nuwave/lighthouse/pull/1662
 - Deprecate `\Nuwave\Lighthouse\Execution\DataLoader\BatchLoader` in favour of `\Nuwave\Lighthouse\Execution\DataLoader\BatchLoaderRegistry` https://github.com/nuwave/lighthouse/pull/1528
 
 ### Fixed

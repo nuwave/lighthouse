@@ -17,9 +17,106 @@ use Tests\TestCase;
 
 final class PaginateDirectiveTest extends TestCase
 {
-    public function testIncludesPaginationInfoObjectsInSchema(): void
+    public function testIncludesPaginatorInfoTypeInSchema(): void
     {
-        $schema = $this->buildSchemaWithPlaceholderQuery('');
+        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
+        type User {
+            id: ID!
+            name: String!
+        }
+
+        extend type Query {
+            users: [User!]! @paginate
+        }
+        ');
+        $schemaString = SchemaPrinter::doPrint($schema);
+
+        $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
+"Information about pagination using a fully featured paginator."
+type PaginatorInfo {
+  "Number of items in the current page."
+  count: Int!
+
+  "Index of the current page."
+  currentPage: Int!
+
+  "Index of the first item in the current page."
+  firstItem: Int
+
+  "Are there more pages after this one?"
+  hasMorePages: Boolean!
+
+  "Index of the last item in the current page."
+  lastItem: Int
+
+  "Index of the last available page."
+  lastPage: Int!
+
+  "Number of items per page."
+  perPage: Int!
+
+  "Number of total available items."
+  total: Int!
+}
+GRAPHQL
+            ,
+            $schemaString,
+        );
+    }
+
+    public function testIncludesSimplePaginatorInfoTypeInSchema(): void
+    {
+        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
+        type User {
+            id: ID!
+            name: String!
+        }
+
+        extend type Query {
+            users: [User!]! @paginate(type: SIMPLE)
+        }
+        ');
+        $schemaString = SchemaPrinter::doPrint($schema);
+
+        $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
+"Information about pagination using a simple paginator."
+type SimplePaginatorInfo {
+  "Number of items in the current page."
+  count: Int!
+
+  "Index of the current page."
+  currentPage: Int!
+
+  "Index of the first item in the current page."
+  firstItem: Int
+
+  "Index of the last item in the current page."
+  lastItem: Int
+
+  "Number of items per page."
+  perPage: Int!
+
+  "Are there more pages after this one?"
+  hasMorePages: Boolean!
+}
+GRAPHQL
+            ,
+            $schemaString,
+        );
+    }
+
+    public function testIncludesPageInfoTypeInSchema(): void
+    {
+        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
+        type User {
+            id: ID!
+            name: String!
+        }
+
+        extend type Query {
+            users: [User!]! @paginate(type: CONNECTION)
+        }
+        ');
         $schemaString = SchemaPrinter::doPrint($schema);
 
         $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
@@ -53,64 +150,16 @@ GRAPHQL
             ,
             $schemaString,
         );
+    }
 
-        $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
-"Information about pagination using a fully featured paginator."
-type PaginatorInfo {
-  "Number of items in the current page."
-  count: Int!
+    public function testDoesntIncludePaginationInfoObjectsInSchemaIfNotNeeded(): void
+    {
+        $schema = $this->buildSchemaWithPlaceholderQuery('');
+        $typeMap = $schema->getTypeMap();
 
-  "Index of the current page."
-  currentPage: Int!
-
-  "Index of the first item in the current page."
-  firstItem: Int
-
-  "Are there more pages after this one?"
-  hasMorePages: Boolean!
-
-  "Index of the last item in the current page."
-  lastItem: Int
-
-  "Index of the last available page."
-  lastPage: Int!
-
-  "Number of items per page."
-  perPage: Int!
-
-  "Number of total available items."
-  total: Int!
-}
-GRAPHQL
-            ,
-            $schemaString,
-        );
-
-        $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
-"Information about pagination using a simple paginator."
-type SimplePaginatorInfo {
-  "Number of items in the current page."
-  count: Int!
-
-  "Index of the current page."
-  currentPage: Int!
-
-  "Index of the first item in the current page."
-  firstItem: Int
-
-  "Index of the last item in the current page."
-  lastItem: Int
-
-  "Number of items per page."
-  perPage: Int!
-
-  "Are there more pages after this one?"
-  hasMorePages: Boolean!
-}
-GRAPHQL
-            ,
-            $schemaString,
-        );
+        $this->assertArrayNotHasKey('PageInfo', $typeMap);
+        $this->assertArrayNotHasKey('SimplePaginatorInfo', $typeMap);
+        $this->assertArrayNotHasKey('PaginatorInfo', $typeMap);
     }
 
     public function testManipulatesPaginator(): void
@@ -421,16 +470,16 @@ GRAPHQL
     {
         config(['lighthouse.pagination.max_count' => 5]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type User {
             id: ID!
             name: String!
         }
 
         type Query {
-            users: [User!]! @paginate(maxCount: 6, resolver: "' . $this->qualifyTestResolver('returnPaginatedDataInsteadOfBuilder') . '")
+            users: [User!]! @paginate(maxCount: 6, resolver: "{$this->qualifyTestResolver('returnPaginatedDataInsteadOfBuilder')}")
         }
-        ';
+        GRAPHQL;
 
         $result = $this->graphQL(/** @lang GraphQL */ '
         {
@@ -728,7 +777,7 @@ GRAPHQL
         ])->assertGraphQLErrorMessage(QueryComplexity::maxQueryComplexityErrorMessage($max, $complexity));
     }
 
-    /** @param  array{complexity: int} $args */
+    /** @param  array{complexity: int}  $args */
     public static function complexityResolver(int $childrenComplexity, array $args): int
     {
         return $args['complexity'];

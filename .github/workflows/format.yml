@@ -16,7 +16,7 @@ jobs:
         with:
           coverage: none
           extensions: mbstring
-          php-version: 8.1
+          php-version: 8.2
 
       - run: composer install --no-interaction --no-progress --no-suggest
 
@@ -35,6 +35,7 @@ jobs:
 
       - uses: creyD/prettier_action@v2.2
         with:
+          prettier_version: 2.8.8
           prettier_options: --write --tab-width=2 docs/**/**/*.md docs/**/*.js
           branch: ${{ github.head_ref }}
           commit_message: Prettify docs
@@ -52,7 +53,7 @@ jobs:
         with:
           coverage: none
           extensions: mbstring
-          php-version: 8.1
+          php-version: 8.2
 
       - run: composer install --no-interaction --no-progress --no-suggest
 

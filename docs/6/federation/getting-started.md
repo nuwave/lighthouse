@@ -18,8 +18,10 @@ Add the service provider to your `config/app.php`:
 ],
 ```
 
-## Extends
+## Publishing Your Schema
 
-You have to use `@extends` in place of `extend type` to annotate type references.
-This is because Lighthouse merges type extensions before the final schema is produced,
-thus they would not be preserved to appear in the federation schema SDL.
+In order to generate a `.graphql` schema file suitable for publishing, use the `--federation` option of [`print-schema`](../api-reference/commands.md#print-schema).
+
+```sh
+php artisan lighthouse:print-schema --federation
+```

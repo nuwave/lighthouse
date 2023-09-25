@@ -6,6 +6,8 @@ use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Redis\Factory as RedisFactory;
 use Illuminate\Redis\Connections\Connection as RedisConnection;
 use Nuwave\Lighthouse\Subscriptions\Storage\RedisStorageManager;
+use PHPUnit\Framework\Constraint\Callback;
+use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\MockObject\MockObject;
 use Tests\EnablesSubscriptionServiceProvider;
 use Tests\TestCase;
@@ -14,6 +16,52 @@ use Tests\Utils\Subscriptions\DummySubscriber;
 final class RedisStorageManagerTest extends TestCase
 {
     use EnablesSubscriptionServiceProvider;
+
+    /**
+     * TODO remove when an official replacement for withConsecutive is available.
+     *
+     * @see https://github.com/sebastianbergmann/phpunit/issues/4026#issuecomment-1418205424
+     *
+     * @param  array<mixed>  $firstCallArguments
+     * @param  array<mixed>  ...$consecutiveCallsArguments
+     *
+     * @return iterable<callback<mixed>>
+     */
+    private static function withConsecutive(array $firstCallArguments, array ...$consecutiveCallsArguments): iterable
+    {
+        foreach ($consecutiveCallsArguments as $consecutiveCallArguments) {
+            self::assertSameSize($firstCallArguments, $consecutiveCallArguments, 'Each expected arguments list need to have the same size.');
+        }
+
+        $allConsecutiveCallsArguments = [$firstCallArguments, ...$consecutiveCallsArguments];
+
+        $numberOfArguments = count($firstCallArguments);
+        $argumentList = [];
+        for ($argumentPosition = 0; $argumentPosition < $numberOfArguments; ++$argumentPosition) {
+            $argumentList[$argumentPosition] = array_column($allConsecutiveCallsArguments, $argumentPosition);
+        }
+
+        $mockedMethodCall = 0;
+        $callbackCall = 0;
+        foreach ($argumentList as $index => $argument) {
+            yield new Callback(
+                static function (mixed $actualArgument) use ($argumentList, &$mockedMethodCall, &$callbackCall, $index, $numberOfArguments): bool {
+                    $expected = $argumentList[$index][$mockedMethodCall] ?? null;
+
+                    ++$callbackCall;
+                    $mockedMethodCall = (int) ($callbackCall / $numberOfArguments);
+
+                    if ($expected instanceof Constraint) {
+                        self::assertThat($actualArgument, $expected);
+                    } else {
+                        self::assertEquals($expected, $actualArgument);
+                    }
+
+                    return true;
+                },
+            );
+        }
+    }
 
     public function testSubscriberByChannel(): void
     {
@@ -26,7 +74,7 @@ final class RedisStorageManagerTest extends TestCase
         $subscriber = new DummySubscriber($channel, 'test-topic');
         $redisConnection->expects($this->once())
             ->method('command')
-            ->with('get', ['graphql.subscriber.' . $channel])
+            ->with('get', ["graphql.subscriber.{$channel}"])
             ->willReturn(serialize($subscriber));
 
         $manager = new RedisStorageManager($config, $redisFactory);
@@ -42,15 +90,15 @@ final class RedisStorageManagerTest extends TestCase
         $redisFactory = $this->getRedisFactory($redisConnection);
 
         $channel = 'test-channel';
-        $prefixedChannel = 'graphql.subscriber.' . $channel;
+        $prefixedChannel = "graphql.subscriber.{$channel}";
         $subscriber = new DummySubscriber($channel, 'test-topic');
         $redisConnection->expects($this->exactly(3))
             ->method('command')
-            ->withConsecutive(
+            ->with(...$this->withConsecutive(
                 ['get', [$prefixedChannel]],
                 ['del', [$prefixedChannel]],
-                ['srem', ['graphql.topic.' . $subscriber->topic, $channel]],
-            )
+                ['srem', ["graphql.topic.{$subscriber->topic}", $channel]],
+            ))
             ->willReturnOnConsecutiveCalls(
                 serialize($subscriber),
             );
@@ -78,7 +126,7 @@ final class RedisStorageManagerTest extends TestCase
         $topicKey = 'graphql.topic.some-topic';
         $redisConnection->expects($this->exactly(3))
             ->method('command')
-            ->withConsecutive(
+            ->with(...$this->withConsecutive(
                 ['sadd', [
                     $topicKey,
                     $channel,
@@ -92,7 +140,7 @@ final class RedisStorageManagerTest extends TestCase
                     $ttl,
                     serialize($subscriberUnderTopic),
                 ]],
-            );
+            ));
 
         $manager = new RedisStorageManager($config, $redisFactory);
         $manager->storeSubscriber($subscriber, $storedTopic);
@@ -116,7 +164,7 @@ final class RedisStorageManagerTest extends TestCase
         $topicKey = 'graphql.topic.some-topic';
         $redisConnection->expects($this->exactly(2))
             ->method('command')
-            ->withConsecutive(
+            ->with(...$this->withConsecutive(
                 ['sadd', [
                     $topicKey,
                     $channel,
@@ -125,7 +173,7 @@ final class RedisStorageManagerTest extends TestCase
                     'graphql.subscriber.private-lighthouse-foo',
                     serialize($subscriberUnderTopic),
                 ]],
-            );
+            ));
 
         $manager = new RedisStorageManager($config, $redisFactory);
         $manager->storeSubscriber($subscriber, $storedTopic);
@@ -149,14 +197,14 @@ final class RedisStorageManagerTest extends TestCase
 
         $redisConnection->expects($this->exactly(2))
             ->method('command')
-            ->withConsecutive(
+            ->with(...$this->withConsecutive(
                 ['smembers', ["graphql.topic.{$topic}"]],
                 ['mget', [[
                     'graphql.subscriber.foo1',
                     'graphql.subscriber.foo2',
                     'graphql.subscriber.foo3',
                 ]]],
-            )
+            ))
             ->willReturnOnConsecutiveCalls(
                 ['foo1', 'foo2', 'foo3'],
                 [

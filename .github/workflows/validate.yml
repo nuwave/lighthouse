@@ -54,7 +54,10 @@ jobs:
           key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-os-${{ matrix.os }}-composer-${{ matrix.composer.name }}
 
       - name: "Remove conflicting dependencies that are not needed here"
-        run: composer remove --dev phpbench/phpbench rector/rector --no-update
+        run: composer remove --dev --no-update phpbench/phpbench rector/rector
+
+      - if: matrix.laravel-version != '^10'
+        run: composer remove --dev --no-update laravel/pennant
 
       - run: >
           composer require
@@ -122,7 +125,10 @@ jobs:
           key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-os-${{ matrix.os }}-composer-${{ matrix.composer.name }}
 
       - name: "Remove conflicting dependencies that are not needed here"
-        run: composer remove --dev nunomaduro/larastan phpstan/phpstan-mockery phpbench/phpbench rector/rector --no-update
+        run: composer remove --dev --no-update nunomaduro/larastan phpstan/phpstan-mockery phpbench/phpbench rector/rector
+
+      - if: matrix.laravel-version != '^10'
+        run: composer remove --dev --no-update laravel/pennant
 
       - run: >
           composer require
@@ -141,9 +147,9 @@ jobs:
     strategy:
       matrix:
         php-version:
-          - 8.1
+          - "8.2"
         laravel-version:
-          - ^9
+          - "^10"
 
     services:
       mysql:
@@ -190,9 +196,9 @@ jobs:
     strategy:
       matrix:
         php-version:
-          - 8.1
+          - "8.2"
         laravel-version:
-          - ^9
+          - "^10"
 
     steps:
       - uses: actions/checkout@v3

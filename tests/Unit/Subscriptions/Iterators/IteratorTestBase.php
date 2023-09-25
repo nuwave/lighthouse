@@ -13,7 +13,7 @@ use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Tests\EnablesSubscriptionServiceProvider;
 use Tests\TestCase;
 
-abstract class IteratorTest extends TestCase
+abstract class IteratorTestBase extends TestCase
 {
     use EnablesSubscriptionServiceProvider;
 

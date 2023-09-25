@@ -29,7 +29,7 @@ It will prevent the following type of HTTP requests:
 ### `messages` on `@rules` and `@rulesForArray`
 
 Lighthouse previously allowed passing a map with arbitrary keys as the `messages`
-argument on `@rules` and `@rulesForArray`. Such a construct is impossible to define
+argument of `@rules` and `@rulesForArray`. Such a construct is impossible to define
 within the directive definition and leads to static validation errors.
 
 ```diff
@@ -320,7 +320,7 @@ cache, then you will need to change your code.
 ### Register `ScoutServiceProvider` if you use `@search`
 
 If you use the `@search` directive in your schema, you will now need to register the service provider
-in your `app/config.php`, it is no longer registered by default.
+in your `config/app.php`, it is no longer registered by default.
 
 ```php
 'providers' => [
@@ -342,7 +342,7 @@ the default Laravel authentication guard will be used (`auth.defaults.guard`).
 
 ### Update `@auth` and `@whereAuth` directives
 
-The `guard` argument on `@auth` and `@whereAuth` directives has been renamed to `guards` and now expects a list instead of a single string.
+The `guard` argument of `@auth` and `@whereAuth` directives has been renamed to `guards` and now expects a list instead of a single string.
 
 ```diff
 - @auth(guard: "api")

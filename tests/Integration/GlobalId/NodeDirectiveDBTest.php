@@ -217,4 +217,32 @@ final class NodeDirectiveDBTest extends DBTestCase
         }
         ');
     }
+
+    public function testPreservesCustomNodeField(): void
+    {
+        $result = 42;
+        $this->mockResolver($result);
+
+        $this->schema .= /** @lang GraphQL */ '
+        type Query {
+            # Nonsensical example, just done this way for ease of testing.
+            # Usually customization would have the purpose of adding middleware.
+            node: Int! @mock
+        }
+
+        type User @node {
+            name: String!
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            node
+        }
+        ')->assertExactJson([
+            'data' => [
+                'node' => $result,
+            ],
+        ]);
+    }
 }

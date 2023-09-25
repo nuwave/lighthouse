@@ -89,8 +89,7 @@ class ASTBuilder
     {
         foreach ($this->documentAST->types as $typeDefinition) {
             foreach (
-                $this->directiveLocator->associatedOfType($typeDefinition, TypeManipulator::class)
-                as $typeManipulator
+                $this->directiveLocator->associatedOfType($typeDefinition, TypeManipulator::class) as $typeManipulator
             ) {
                 $typeManipulator->manipulateTypeDefinition($this->documentAST, $typeDefinition);
             }
@@ -105,8 +104,7 @@ class ASTBuilder
                 // Before we actually extend the types, we apply the manipulator directives
                 // that are defined on type extensions themselves
                 foreach (
-                    $this->directiveLocator->associatedOfType($typeExtension, TypeExtensionManipulator::class)
-                    as $typeExtensionManipulator
+                    $this->directiveLocator->associatedOfType($typeExtension, TypeExtensionManipulator::class) as $typeExtensionManipulator
                 ) {
                     $typeExtensionManipulator->manipulateTypeExtension($this->documentAST, $typeExtension);
                 }
@@ -194,8 +192,7 @@ class ASTBuilder
             if ($typeDefinition instanceof ObjectTypeDefinitionNode || $typeDefinition instanceof InterfaceTypeDefinitionNode) {
                 foreach ($typeDefinition->fields as $fieldDefinition) {
                     foreach (
-                        $this->directiveLocator->associatedOfType($fieldDefinition, FieldManipulator::class)
-                        as $fieldManipulator
+                        $this->directiveLocator->associatedOfType($fieldDefinition, FieldManipulator::class) as $fieldManipulator
                     ) {
                         $fieldManipulator->manipulateFieldDefinition($this->documentAST, $fieldDefinition, $typeDefinition);
                     }
@@ -212,8 +209,7 @@ class ASTBuilder
                 foreach ($typeDefinition->fields as $fieldDefinition) {
                     foreach ($fieldDefinition->arguments as $argumentDefinition) {
                         foreach (
-                            $this->directiveLocator->associatedOfType($argumentDefinition, ArgManipulator::class)
-                            as $argManipulator
+                            $this->directiveLocator->associatedOfType($argumentDefinition, ArgManipulator::class) as $argManipulator
                         ) {
                             $argManipulator->manipulateArgDefinition(
                                 $this->documentAST,

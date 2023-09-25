@@ -7,19 +7,25 @@ All of them are namespaced under `lighthouse`.
 
 Compile the GraphQL schema and cache it.
 
-    php artisan lighthouse:cache
+```sh
+php artisan lighthouse:cache
+```
 
 ## clear-cache
 
 Clear the GraphQL schema cache.
 
-    php artisan lighthouse:clear-cache
+```sh
+php artisan lighthouse:clear-cache
+```
 
 ## directive
 
 Create a class for a custom schema directive.
 
-    php artisan lighthouse:directive
+```sh
+php artisan lighthouse:directive
+```
 
 Use the `--type`, `--field` and `--argument` options to define where your directive can be used.
 
@@ -27,7 +33,9 @@ Use the `--type`, `--field` and `--argument` options to define where your direct
 
 Create a resolver class for a field on a non-root type.
 
-    php artisan lighthouse:field <parent>.<field>
+```sh
+php artisan lighthouse:field <parent>.<field>
+```
 
 ## ide-helper
 
@@ -59,13 +67,17 @@ built-in directives such as `@deprecated`.
 
 Create a type resolver class for a GraphQL interface type.
 
-    php artisan lighthouse:interface <name>
+```sh
+php artisan lighthouse:interface <name>
+```
 
 ## mutation
 
 Create a resolver class for a single field on the root Mutation type.
 
-    php artisan lighthouse:mutation <name>
+```sh
+php artisan lighthouse:mutation <name>
+```
 
 Use the option `--full` to include the seldom needed resolver arguments `$context` and `$resolveInfo`.
 
@@ -73,22 +85,25 @@ Use the option `--full` to include the seldom needed resolver arguments `$contex
 
 Compile the GraphQL schema and print the result.
 
-    php artisan lighthouse:print-schema
+```sh
+php artisan lighthouse:print-schema
+```
 
-This can be quite useful, as the root `.graphql` files do not necessarily
-contains the whole schema. Schema imports, native PHP types and schema manipulation
-may influence the final schema.
+This can be quite useful, as the root `.graphql` files do not necessarily contain the whole schema.
+Schema imports, native PHP types and schema manipulation may influence the final schema.
 
-Use the `-W` / `--write` option to output the schema to the default file storage
-(usually `storage/app`) as `lighthouse-schema.graphql`.
-
+Use the `-W` / `--write` option to output the schema to the default file storage (usually `storage/app`) as `lighthouse-schema.graphql`.
 You can output your schema in JSON format by using the `--json` flag.
+
+The `--federation` option should be used to produce a schema file suitable for [Apollo Federation](https://www.apollographql.com/docs/federation).
 
 ## query
 
 Create a resolver class for a single field on the root Query type.
 
-    php artisan lighthouse:query <name>
+```sh
+php artisan lighthouse:query <name>
+```
 
 Use the option `--full` to include the seldom needed resolver arguments `$context` and `$resolveInfo`.
 
@@ -96,22 +111,30 @@ Use the option `--full` to include the seldom needed resolver arguments `$contex
 
 Create a class for a GraphQL scalar type.
 
-    php artisan lighthouse:scalar <name>
+```sh
+php artisan lighthouse:scalar <name>
+```
 
 ## subscription
 
 Create a resolver class for a single field on the root Subscription type.
 
-    php artisan lighthouse:subscription <name>
+```sh
+php artisan lighthouse:subscription <name>
+```
 
 ## union
 
 Create a type resolver class for a GraphQL union type.
 
-    php artisan lighthouse:union <name>
+```sh
+php artisan lighthouse:union <name>
+```
 
 ## validate-schema
 
 Validate the GraphQL schema definition.
 
-    php artisan lighthouse:validate-schema
+```sh
+php artisan lighthouse:validate-schema
+```

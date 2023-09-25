@@ -27,7 +27,7 @@ namespace App\GraphQL\Mutations;
 
 final class LikePost
 {
-    /** @param array{id: string} $args */
+    /** @param  array{id: string}  $args */
     public function __invoke(mixed $root, array $args): array
     {
         // do the main work

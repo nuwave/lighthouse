@@ -91,6 +91,41 @@ final class WhereConditionsDirectiveTest extends DBTestCase
         ')->assertJsonCount(2, 'data.users');
     }
 
+    public function testOperatorNotLike(): void
+    {
+        $user1 = factory(User::class)->make();
+        assert($user1 instanceof User);
+        $user1->name = 'foo';
+        $user1->save();
+
+        $user2 = factory(User::class)->make();
+        assert($user2 instanceof User);
+        $user2->name = 'bar';
+        $user2->save();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users(
+                where: {
+                    column: "name"
+                    operator: NOT_LIKE
+                    value: "ba%"
+                }
+            ) {
+                id
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => "{$user1->id}",
+                    ],
+                ],
+            ],
+        ]);
+    }
+
     public function testOperatorIn(): void
     {
         factory(User::class, 5)->create();
@@ -790,7 +825,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertGraphQLErrorMessage(SQLOperator::missingValueForColumn('no_value'));
+        ')->assertGraphQLError(SQLOperator::missingValueForColumn('no_value'));
     }
 
     public function testOnlyAllowsWhitelistedColumns(): void

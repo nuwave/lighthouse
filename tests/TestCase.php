@@ -26,11 +26,11 @@ use Nuwave\Lighthouse\Testing\MocksResolvers;
 use Nuwave\Lighthouse\Testing\TestingServiceProvider;
 use Nuwave\Lighthouse\Testing\UsesTestSchema;
 use Nuwave\Lighthouse\Validation\ValidationServiceProvider;
-use Orchestra\Testbench\TestCase as BaseTestCase;
+use Orchestra\Testbench\TestCase as TestbenchTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use Tests\Utils\Policies\AuthServiceProvider;
 
-abstract class TestCase extends BaseTestCase
+abstract class TestCase extends TestbenchTestCase
 {
     use ArraySubsetAsserts;
     use MakesGraphQLRequests;
@@ -59,8 +59,13 @@ GRAPHQL;
         // This default is only valid for testing Lighthouse itself and thus
         // is not defined in the reusable test trait.
         $this->schema ??= self::PLACEHOLDER_QUERY;
-
         $this->setUpTestSchema();
+
+        // Using qualifyTestResolver() requires instantiation of the test class through the container.
+        // https://laravel.com/docs/container#binding-primitives
+        $this->app->when(static::class)
+            ->needs('$name')
+            ->give('TestName');
     }
 
     /** @return array<class-string<\Illuminate\Support\ServiceProvider>> */
@@ -164,6 +169,8 @@ GRAPHQL;
             'prefix' => 'lighthouse-test-',
         ]);
 
+        $config->set('pennant.default', 'array');
+
         // Defaults to "algolia", which is not needed in our test setup
         $config->set('scout.driver', null);
 
@@ -204,7 +211,7 @@ GRAPHQL;
     }
 
     /** Get a fully qualified reference to a method that is defined on the test class. */
-    protected function qualifyTestResolver(string $method): string
+    protected static function qualifyTestResolver(string $method): string
     {
         $escapedClass = addslashes(static::class);
 

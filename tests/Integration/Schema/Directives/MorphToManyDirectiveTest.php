@@ -226,8 +226,8 @@ final class MorphToManyDirectiveTest extends DBTestCase
                 return $tag;
             });
 
-        $this->schema = /** @lang GraphQL */ '
-        interface Tag @interface(resolveType: "' . $this->qualifyTestResolver('resolveType') . '") {
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        interface Tag @interface(resolveType: "{$this->qualifyTestResolver('resolveType')}") {
             id: ID!
         }
 
@@ -262,7 +262,7 @@ final class MorphToManyDirectiveTest extends DBTestCase
                 id: ID! @eq
             ): User @find
         }
-        ';
+        GRAPHQL;
 
         $this->graphQL(/** @lang GraphQL */ '
         query ($userId: ID!){

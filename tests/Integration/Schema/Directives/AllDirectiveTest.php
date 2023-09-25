@@ -176,16 +176,16 @@ final class AllDirectiveTest extends DBTestCase
     {
         factory(User::class, 2)->create();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type User {
             id: ID!
             name: String!
         }
 
         type Query {
-            users: [User!]! @all(builder: "' . $this->qualifyTestResolver('builder') . '")
+            users: [User!]! @all(builder: "{$this->qualifyTestResolver('builder')}")
         }
-        ';
+        GRAPHQL;
 
         // The custom builder is supposed to change the sort order
         $this->graphQL(/** @lang GraphQL */ '
@@ -216,20 +216,20 @@ final class AllDirectiveTest extends DBTestCase
         $posts = factory(Post::class, 2)->make();
         $user->posts()->saveMany($posts);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type Post {
             id: ID!
         }
 
         type User {
             id: ID!
-            posts: [Post!]! @all(builder: "' . $this->qualifyTestResolver('builderForRelation') . '")
+            posts: [Post!]! @all(builder: "{$this->qualifyTestResolver('builderForRelation')}")
         }
 
         type Query {
             user(id: ID! @eq): User @find
         }
-        ';
+        GRAPHQL;
 
         // The custom builder is supposed to change the sort order
         $this->graphQL(/** @lang GraphQL */ "
@@ -303,7 +303,8 @@ GRAPHQL;
     /** @return \Illuminate\Database\Eloquent\Builder<\Tests\Utils\Models\User> */
     public static function builder(): EloquentBuilder
     {
-        return User::orderBy('id', 'DESC');
+        return User::query()
+            ->orderBy('id', 'DESC');
     }
 
     /** @return \Illuminate\Database\Eloquent\Relations\Relation<\Tests\Utils\Models\Post> */

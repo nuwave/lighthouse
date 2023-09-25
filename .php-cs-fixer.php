@@ -1,11 +1,13 @@
 <?php declare(strict_types=1);
 
+use Tests\LaravelPhpdocAlignmentFixer;
+
 use function MLL\PhpCsFixerConfig\risky;
 
 $finder = PhpCsFixer\Finder::create()
-    ->notPath('vendor')
     ->in(__DIR__)
     ->name('*.php')
+    ->notPath('vendor')
     ->ignoreDotFiles(false)
     ->ignoreVCS(true);
 
@@ -23,9 +25,5 @@ return risky($finder, [
             'parameters',
         ],
     ],
-    'yoda_style' => [
-        'equal' => false,
-        'identical' => false,
-        'less_and_greater' => false,
-    ],
-]);
+    'Laravel/laravel_phpdoc_alignment' => true,
+])->registerCustomFixers([new LaravelPhpdocAlignmentFixer()]);

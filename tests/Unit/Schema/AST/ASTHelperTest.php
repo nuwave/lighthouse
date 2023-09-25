@@ -222,6 +222,22 @@ GRAPHQL
         $this->assertSame(Type::ID, $type->name->value);
     }
 
+    public function testUnderlyingTypeReturnsNullOnUnknownType(): void
+    {
+        $type = ASTHelper::underlyingType(
+            Parser::fieldDefinition('foo: Unknown'),
+        );
+        $this->assertNull($type);
+    }
+
+    public function testModelNameGuessesProgrammaticallyRegisteredTypeName(): void
+    {
+        $modelName = ASTHelper::modelName(
+            Parser::fieldDefinition('foo: ProgrammaticallyRegistered'),
+        );
+        $this->assertSame('ProgrammaticallyRegistered', $modelName);
+    }
+
     public function testDynamicallyAddedFieldManipulatorDirective(): void
     {
         $astBuilder = $this->app->make(ASTBuilder::class);
