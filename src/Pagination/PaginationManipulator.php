@@ -95,7 +95,7 @@ class PaginationManipulator
                 {$paginationType->infoFieldName()}: PageInfo! @field(resolver: "{$connectionFieldClass}@pageInfoResolver")
 
                 "A list of {$fieldTypeName} edges."
-                edges: [{$connectionEdgeName}!]! @field(resolver: "{$connectionFieldClass}@edgeResolver")
+                edges: [{$connectionEdgeName}!]! @field(resolver: "{$connectionFieldClass}@edgeResolver") {$this->addCacheControlDirective()}
             }
 GRAPHQL
         );
@@ -179,7 +179,7 @@ GRAPHQL
                 {$paginationType->infoFieldName()}: PaginatorInfo! @field(resolver: "{$paginatorFieldClassName}@paginatorInfoResolver")
 
                 "A list of {$fieldTypeName} items."
-                data: [{$fieldTypeName}!]! @field(resolver: "{$paginatorFieldClassName}@dataResolver")
+                data: [{$fieldTypeName}!]! @field(resolver: "{$paginatorFieldClassName}@dataResolver") {$this->addCacheControlDirective()}
             }
         GRAPHQL);
         $this->addPaginationWrapperType($paginatorType);
@@ -219,7 +219,7 @@ GRAPHQL
                 {$paginationType->infoFieldName()}: SimplePaginatorInfo! @field(resolver: "{$paginatorFieldClassName}@paginatorInfoResolver")
 
                 "A list of {$fieldTypeName} items."
-                data: [{$fieldTypeName}!]! @field(resolver: "{$paginatorFieldClassName}@dataResolver")
+                data: [{$fieldTypeName}!]! @field(resolver: "{$paginatorFieldClassName}@dataResolver") {$this->addCacheControlDirective()}
             }
         GRAPHQL);
         $this->addPaginationWrapperType($paginatorType);
@@ -353,5 +353,14 @@ GRAPHQL
               lastPage: Int!
             }
         ');
+    }
+
+    private function addCacheControlDirective(): string
+    {
+        if (app()->providerIsLoaded(\Nuwave\Lighthouse\CacheControl\CacheControlServiceProvider::class)) {
+            return '@cacheControl(inheritMaxAge: true)';
+        }
+
+        return '';
     }
 }

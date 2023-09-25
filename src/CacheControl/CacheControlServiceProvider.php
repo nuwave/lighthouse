@@ -43,15 +43,7 @@ class CacheControlServiceProvider extends ServiceProvider
                         ? ASTHelper::directiveDefinition($field->astNode, 'cacheControl')
                         : null;
                     if ($cacheControlDirective !== null) {
-                        if (! ASTHelper::directiveArgValue($cacheControlDirective, 'inheritMaxAge')) {
-                            $cacheControl->addMaxAge(
-                                ASTHelper::directiveArgValue($cacheControlDirective, 'maxAge') ?? 0,
-                            );
-                        }
-
-                        if (ASTHelper::directiveArgValue($cacheControlDirective, 'scope') === 'PRIVATE') {
-                            $cacheControl->setPrivate();
-                        }
+                        self::setCacheValues($cacheControlDirective, $cacheControl);
                     } else {
                         $parent = $typeInfo->getParentType();
                         assert($parent instanceof NamedType);
@@ -65,7 +57,12 @@ class CacheControlServiceProvider extends ServiceProvider
                                 $nodeType = $nodeType->getInnermostType();
                             }
 
-                            if (! $nodeType instanceof ScalarType) {
+                            $cacheControlDirective = isset($nodeType->astNode)
+                                ? ASTHelper::directiveDefinition($nodeType->astNode, 'cacheControl')
+                                : null;
+                            if ($cacheControlDirective !== null) {
+                                self::setCacheValues($cacheControlDirective, $cacheControl);
+                            } elseif (! $nodeType instanceof ScalarType) {
                                 $cacheControl->addMaxAge(0);
                             }
                         }
@@ -91,5 +88,18 @@ class CacheControlServiceProvider extends ServiceProvider
 
             $this->app->forgetInstance(CacheControl::class);
         });
+    }
+
+    private static function setCacheValues(\GraphQL\Language\AST\DirectiveNode $cacheControlDirective, CacheControl $cacheControl): void
+    {
+        if (! ASTHelper::directiveArgValue($cacheControlDirective, 'inheritMaxAge')) {
+            $cacheControl->addMaxAge(
+                ASTHelper::directiveArgValue($cacheControlDirective, 'maxAge') ?? 0,
+            );
+        }
+
+        if (ASTHelper::directiveArgValue($cacheControlDirective, 'scope') === 'PRIVATE') {
+            $cacheControl->setPrivate();
+        }
     }
 }
