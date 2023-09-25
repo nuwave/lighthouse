@@ -380,7 +380,7 @@ final class CacheControlDirectiveTest extends DBTestCase
         $tasks = factory(Task::class, 3)->make();
         $user->tasks()->saveMany($tasks);
 
-        $res = $this->graphQL($query)
+        $this->graphQL($query)
             ->assertHeader('Cache-Control', $expectedHeaderString);
     }
 
