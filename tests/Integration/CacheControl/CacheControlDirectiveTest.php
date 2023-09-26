@@ -384,11 +384,10 @@ final class CacheControlDirectiveTest extends DBTestCase
             ->assertHeader('Cache-Control', $expectedHeaderString);
     }
 
-    /** @return array<int, array{string, string}> */
-    public static function typeLevelCacheDataProvider(): array
+    /** @return iterable<array{string, string}> */
+    public static function typeLevelCacheDataProvider(): iterable
     {
-        return [
-            [/** @lang GraphQL */ '
+        yield [/** @lang GraphQL */ '
                 {
                     user {
                         tasks {
