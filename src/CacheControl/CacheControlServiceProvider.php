@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\CacheControl;
 
+use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\FieldNode;
 use GraphQL\Language\AST\NodeKind;
 use GraphQL\Language\Visitor;
@@ -90,7 +91,8 @@ class CacheControlServiceProvider extends ServiceProvider
         });
     }
 
-    private static function setCacheValues(\GraphQL\Language\AST\DirectiveNode $cacheControlDirective, CacheControl $cacheControl): void
+    /** Set HTTP cache header values based on the cacheControl directive. */
+    private static function setCacheValues(DirectiveNode $cacheControlDirective, CacheControl $cacheControl): void
     {
         if (! ASTHelper::directiveArgValue($cacheControlDirective, 'inheritMaxAge')) {
             $cacheControl->addMaxAge(

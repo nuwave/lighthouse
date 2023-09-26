@@ -7,6 +7,7 @@ use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
+use Nuwave\Lighthouse\CacheControl\CacheControlServiceProvider;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
@@ -357,7 +358,7 @@ GRAPHQL
 
     private function addCacheControlDirective(): string
     {
-        if (app()->providerIsLoaded(\Nuwave\Lighthouse\CacheControl\CacheControlServiceProvider::class)) {
+        if (app()->providerIsLoaded(CacheControlServiceProvider::class)) {
             return '@cacheControl(inheritMaxAge: true)';
         }
 
