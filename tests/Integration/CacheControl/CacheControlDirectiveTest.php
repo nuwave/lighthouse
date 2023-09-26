@@ -397,7 +397,7 @@ final class CacheControlDirectiveTest extends DBTestCase
                     }
                 }
             ', 'max-age=10, private',
-            ];
+        ];
 
         yield [/** @lang GraphQL */ '
                 {
@@ -409,6 +409,6 @@ final class CacheControlDirectiveTest extends DBTestCase
                     }
                 }
             ', 'max-age=20, private',
-            ];
+        ];
     }
 }
