@@ -58,11 +58,11 @@ class NodeRegistry
 
         // This check forces Lighthouse to eagerly load the type, which might not have
         // happened if the client only references it indirectly through an interface.
-        // Loading the type in turn causes the TypeMiddleware to run and thus register
-        // the type in the NodeRegistry.
+        // Loading the type in turn causes the TypeMiddleware to run and thus register the type in the NodeRegistry.
         $this->typeRegistry->has($decodedType)
             ?: throw new Error("[{$decodedType}] is not a type and cannot be resolved.");
 
+        // We can not continue without a resolver.
         $resolver = $this->nodeResolverFns[$decodedType]
             ?? throw new Error("[{$decodedType}] is not a registered node and cannot be resolved.");
 
