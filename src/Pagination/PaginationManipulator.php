@@ -7,7 +7,6 @@ use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
-use Illuminate\Container\Container;
 use Nuwave\Lighthouse\CacheControl\CacheControlServiceProvider;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
@@ -366,7 +365,8 @@ GRAPHQL
      */
     private function maybeInheritCacheControlDirective(): string
     {
-        if (Container::getInstance()->providerIsLoaded(CacheControlServiceProvider::class)) {
+        // Not using Illuminate\Container\Container::getInstance() here as it causes PHPStan issues
+        if (app()->providerIsLoaded(CacheControlServiceProvider::class)) {
             return /** @lang GraphQL */ '@cacheControl(inheritMaxAge: true)';
         }
 
