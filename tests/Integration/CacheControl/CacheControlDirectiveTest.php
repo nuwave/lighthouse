@@ -340,6 +340,9 @@ final class CacheControlDirectiveTest extends DBTestCase
         $this->graphQL(/** @lang GraphQL */ '
                 {
                     users(first:10) {
+                        paginatorInfo {
+                            count
+                        }
                        data {
                             tasks(first:10) {
                                 data {

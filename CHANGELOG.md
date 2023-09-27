@@ -15,7 +15,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Fixed
 
-- cacheControl logic can handle pagination data field https://github.com/nuwave/lighthouse/pull/2451
+- cacheControl logic can handle pagination fields https://github.com/nuwave/lighthouse/pull/2451
 
 ## v6.19.0
 

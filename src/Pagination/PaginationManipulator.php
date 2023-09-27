@@ -93,7 +93,7 @@ class PaginationManipulator
             "A paginated list of {$fieldTypeName} edges."
             type {$connectionTypeName} {
                 "Pagination information about the list of edges."
-                {$paginationType->infoFieldName()}: PageInfo! @field(resolver: "{$connectionFieldClass}@pageInfoResolver")
+                {$paginationType->infoFieldName()}: PageInfo! @field(resolver: "{$connectionFieldClass}@pageInfoResolver") {$this->addCacheControlDirective()}
 
                 "A list of {$fieldTypeName} edges."
                 edges: [{$connectionEdgeName}!]! @field(resolver: "{$connectionFieldClass}@edgeResolver") {$this->addCacheControlDirective()}
@@ -177,7 +177,7 @@ GRAPHQL
             "A paginated list of {$fieldTypeName} items."
             type {$paginatorTypeName} {
                 "Pagination information about the list of items."
-                {$paginationType->infoFieldName()}: PaginatorInfo! @field(resolver: "{$paginatorFieldClassName}@paginatorInfoResolver")
+                {$paginationType->infoFieldName()}: PaginatorInfo! @field(resolver: "{$paginatorFieldClassName}@paginatorInfoResolver") {$this->addCacheControlDirective()}
 
                 "A list of {$fieldTypeName} items."
                 data: [{$fieldTypeName}!]! @field(resolver: "{$paginatorFieldClassName}@dataResolver") {$this->addCacheControlDirective()}
@@ -217,7 +217,7 @@ GRAPHQL
             "A paginated list of {$fieldTypeName} items."
             type {$paginatorTypeName} {
                 "Pagination information about the list of items."
-                {$paginationType->infoFieldName()}: SimplePaginatorInfo! @field(resolver: "{$paginatorFieldClassName}@paginatorInfoResolver")
+                {$paginationType->infoFieldName()}: SimplePaginatorInfo! @field(resolver: "{$paginatorFieldClassName}@paginatorInfoResolver") {$this->addCacheControlDirective()}
 
                 "A list of {$fieldTypeName} items."
                 data: [{$fieldTypeName}!]! @field(resolver: "{$paginatorFieldClassName}@dataResolver") {$this->addCacheControlDirective()}
@@ -356,6 +356,11 @@ GRAPHQL
         ');
     }
 
+    /**
+     * Pagination adds 'paginatorInfo' and 'data' fields to the response. These new fields in the
+     * cache control logic are identified as objects, but they should not affect the HTTP cache
+     * header values. Therefore @cacheControl directive with inheritance should be applied on them.
+     * */
     private function addCacheControlDirective(): string
     {
         if (app()->providerIsLoaded(CacheControlServiceProvider::class)) {
