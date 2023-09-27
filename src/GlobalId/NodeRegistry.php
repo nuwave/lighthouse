@@ -60,15 +60,11 @@ class NodeRegistry
         // happened if the client only references it indirectly through an interface.
         // Loading the type in turn causes the TypeMiddleware to run and thus register
         // the type in the NodeRegistry.
-        if (! $this->typeRegistry->has($decodedType)) {
-            throw new Error("[{$decodedType}] is not a type and cannot be resolved.");
-        }
+        $this->typeRegistry->has($decodedType)
+            ?: throw new Error("[{$decodedType}] is not a type and cannot be resolved.");
 
-        $resolver = $this->nodeResolverFns[$decodedType] ?? null;
-        // Check if we have a resolver registered for the given type
-        if (! $resolver) {
-            throw new Error("[{$decodedType}] is not a registered node and cannot be resolved.");
-        }
+        $resolver = $this->nodeResolverFns[$decodedType]
+            ?? throw new Error("[{$decodedType}] is not a registered node and cannot be resolved.");
 
         // Stash the decoded type, as it will later be used to determine the correct return type of the node query
         $this->currentType = $decodedType;
