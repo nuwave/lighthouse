@@ -62,12 +62,23 @@ GRAPHQL;
             return $builder;
         }
 
+        $operator = $this->directiveArgValue('operator', '=');
+
+        // If the client sends an illegal value to the used operator it would crash the query
+        // we prevent it checking if the combination is acceptable using `prepareValueAndOperator`
+        // and catching the exception, if the combination is illegal we just ignore it
+        try {
+            $builder->prepareValueAndOperator($value, $operator);
+        } catch (\InvalidArgumentException) {
+            return $builder;
+        }
+
         // Allow users to overwrite the default "where" clause, e.g. "whereYear"
         $clause = $this->directiveArgValue('clause', 'where');
 
         return $builder->{$clause}(
             $this->directiveArgValue('key', $this->nodeName()),
-            $this->directiveArgValue('operator', '='),
+            $operator,
             $value
         );
     }
