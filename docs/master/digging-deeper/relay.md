@@ -36,6 +36,7 @@ own mechanism of encoding/decoding global ids.
 [Global Object Identification](https://relay.dev/graphql/objectidentification.htm)
 
 Directives:
+
 - [@node](../api-reference/directives.md#node)
 - [@globalId](../api-reference/directives.md#globalid)
 

@@ -2365,10 +2365,11 @@ If you want to customize its description, change the resolver or add middleware,
 
 ```graphql
 type Query {
-    "This description is up to you."
-    node(id: ID! @globalId): Node @field(resolver: "Nuwave\\Lighthouse\\GlobalId\\NodeRegistry@resolve")
-        @someMiddlewareDirective
-        @maybeAuthorization
+  "This description is up to you."
+  node(id: ID! @globalId): Node
+    @field(resolver: "Nuwave\\Lighthouse\\GlobalId\\NodeRegistry@resolve")
+    @someMiddlewareDirective
+    @maybeAuthorization
 }
 ```
 
