@@ -7,6 +7,7 @@ use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
+use Nuwave\Lighthouse\CacheControl\CacheControlServiceProvider;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
@@ -92,10 +93,10 @@ class PaginationManipulator
             "A paginated list of {$fieldTypeName} edges."
             type {$connectionTypeName} {
                 "Pagination information about the list of edges."
-                {$paginationType->infoFieldName()}: PageInfo! @field(resolver: "{$connectionFieldClass}@pageInfoResolver")
+                {$paginationType->infoFieldName()}: PageInfo! @field(resolver: "{$connectionFieldClass}@pageInfoResolver") {$this->addCacheControlDirective()}
 
                 "A list of {$fieldTypeName} edges."
-                edges: [{$connectionEdgeName}!]! @field(resolver: "{$connectionFieldClass}@edgeResolver")
+                edges: [{$connectionEdgeName}!]! @field(resolver: "{$connectionFieldClass}@edgeResolver") {$this->addCacheControlDirective()}
             }
 GRAPHQL
         );
@@ -176,10 +177,10 @@ GRAPHQL
             "A paginated list of {$fieldTypeName} items."
             type {$paginatorTypeName} {
                 "Pagination information about the list of items."
-                {$paginationType->infoFieldName()}: PaginatorInfo! @field(resolver: "{$paginatorFieldClassName}@paginatorInfoResolver")
+                {$paginationType->infoFieldName()}: PaginatorInfo! @field(resolver: "{$paginatorFieldClassName}@paginatorInfoResolver") {$this->addCacheControlDirective()}
 
                 "A list of {$fieldTypeName} items."
-                data: [{$fieldTypeName}!]! @field(resolver: "{$paginatorFieldClassName}@dataResolver")
+                data: [{$fieldTypeName}!]! @field(resolver: "{$paginatorFieldClassName}@dataResolver") {$this->addCacheControlDirective()}
             }
         GRAPHQL);
         $this->addPaginationWrapperType($paginatorType);
@@ -216,10 +217,10 @@ GRAPHQL
             "A paginated list of {$fieldTypeName} items."
             type {$paginatorTypeName} {
                 "Pagination information about the list of items."
-                {$paginationType->infoFieldName()}: SimplePaginatorInfo! @field(resolver: "{$paginatorFieldClassName}@paginatorInfoResolver")
+                {$paginationType->infoFieldName()}: SimplePaginatorInfo! @field(resolver: "{$paginatorFieldClassName}@paginatorInfoResolver") {$this->addCacheControlDirective()}
 
                 "A list of {$fieldTypeName} items."
-                data: [{$fieldTypeName}!]! @field(resolver: "{$paginatorFieldClassName}@dataResolver")
+                data: [{$fieldTypeName}!]! @field(resolver: "{$paginatorFieldClassName}@dataResolver") {$this->addCacheControlDirective()}
             }
         GRAPHQL);
         $this->addPaginationWrapperType($paginatorType);
@@ -353,5 +354,19 @@ GRAPHQL
               lastPage: Int!
             }
         ');
+    }
+
+    /**
+     * Pagination adds 'paginatorInfo' and 'data' fields to the response. These new fields in the
+     * cache control logic are identified as objects, but they should not affect the HTTP cache
+     * header values. Therefore @cacheControl directive with inheritance should be applied on them.
+     * */
+    private function addCacheControlDirective(): string
+    {
+        if (app()->providerIsLoaded(CacheControlServiceProvider::class)) {
+            return '@cacheControl(inheritMaxAge: true)';
+        }
+
+        return '';
     }
 }
