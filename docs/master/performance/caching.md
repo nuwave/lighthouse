@@ -132,7 +132,7 @@ Add the service provider to your `config/app.php`:
 You can change the [`Cache-Control` header](https://developer.mozilla.org/de/docs/Web/HTTP/Headers/Cache-Control) of your response
 regardless of [@cache](../api-reference/directives.md#cache)
 by adding the [@cacheControl](../api-reference/directives.md#cachecontrol) directive to a field. The directive can be defined
-on the field level or type level.
+on the field-level or type-level. Note that field-level settings override type-level settings.
 
 The final header settings are calculated based on these rules:
 
