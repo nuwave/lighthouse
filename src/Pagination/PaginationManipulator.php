@@ -7,6 +7,7 @@ use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
+use Illuminate\Container\Container;
 use Nuwave\Lighthouse\CacheControl\CacheControlServiceProvider;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
@@ -93,10 +94,10 @@ class PaginationManipulator
             "A paginated list of {$fieldTypeName} edges."
             type {$connectionTypeName} {
                 "Pagination information about the list of edges."
-                {$paginationType->infoFieldName()}: PageInfo! @field(resolver: "{$connectionFieldClass}@pageInfoResolver") {$this->addCacheControlDirective()}
+                {$paginationType->infoFieldName()}: PageInfo! @field(resolver: "{$connectionFieldClass}@pageInfoResolver") {$this->maybeInheritCacheControlDirective()}
 
                 "A list of {$fieldTypeName} edges."
-                edges: [{$connectionEdgeName}!]! @field(resolver: "{$connectionFieldClass}@edgeResolver") {$this->addCacheControlDirective()}
+                edges: [{$connectionEdgeName}!]! @field(resolver: "{$connectionFieldClass}@edgeResolver") {$this->maybeInheritCacheControlDirective()}
             }
 GRAPHQL
         );
@@ -177,10 +178,10 @@ GRAPHQL
             "A paginated list of {$fieldTypeName} items."
             type {$paginatorTypeName} {
                 "Pagination information about the list of items."
-                {$paginationType->infoFieldName()}: PaginatorInfo! @field(resolver: "{$paginatorFieldClassName}@paginatorInfoResolver") {$this->addCacheControlDirective()}
+                {$paginationType->infoFieldName()}: PaginatorInfo! @field(resolver: "{$paginatorFieldClassName}@paginatorInfoResolver") {$this->maybeInheritCacheControlDirective()}
 
                 "A list of {$fieldTypeName} items."
-                data: [{$fieldTypeName}!]! @field(resolver: "{$paginatorFieldClassName}@dataResolver") {$this->addCacheControlDirective()}
+                data: [{$fieldTypeName}!]! @field(resolver: "{$paginatorFieldClassName}@dataResolver") {$this->maybeInheritCacheControlDirective()}
             }
         GRAPHQL);
         $this->addPaginationWrapperType($paginatorType);
@@ -217,10 +218,10 @@ GRAPHQL
             "A paginated list of {$fieldTypeName} items."
             type {$paginatorTypeName} {
                 "Pagination information about the list of items."
-                {$paginationType->infoFieldName()}: SimplePaginatorInfo! @field(resolver: "{$paginatorFieldClassName}@paginatorInfoResolver") {$this->addCacheControlDirective()}
+                {$paginationType->infoFieldName()}: SimplePaginatorInfo! @field(resolver: "{$paginatorFieldClassName}@paginatorInfoResolver") {$this->maybeInheritCacheControlDirective()}
 
                 "A list of {$fieldTypeName} items."
-                data: [{$fieldTypeName}!]! @field(resolver: "{$paginatorFieldClassName}@dataResolver") {$this->addCacheControlDirective()}
+                data: [{$fieldTypeName}!]! @field(resolver: "{$paginatorFieldClassName}@dataResolver") {$this->maybeInheritCacheControlDirective()}
             }
         GRAPHQL);
         $this->addPaginationWrapperType($paginatorType);
@@ -357,14 +358,16 @@ GRAPHQL
     }
 
     /**
-     * Pagination adds 'paginatorInfo' and 'data' fields to the response. These new fields in the
-     * cache control logic are identified as objects, but they should not affect the HTTP cache
-     * header values. Therefore @cacheControl directive with inheritance should be applied on them.
-     * */
-    private function addCacheControlDirective(): string
+     * If cache control is used, inherit the max age set in the parent field.
+     *
+     * Pagination adds the nested fields `paginatorInfo` and `data`.
+     * Cache control identifies this as a new entity, but it should actually not affect the HTTP cache header values.
+     * Therefore, the @cacheControl directive is applied to inherit whatever max age the parent field set.
+     */
+    private function maybeInheritCacheControlDirective(): string
     {
-        if (app()->providerIsLoaded(CacheControlServiceProvider::class)) {
-            return '@cacheControl(inheritMaxAge: true)';
+        if (Container::getInstance()->providerIsLoaded(CacheControlServiceProvider::class)) {
+            return /** @lang GraphQL */ '@cacheControl(inheritMaxAge: true)';
         }
 
         return '';

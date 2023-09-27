@@ -338,21 +338,21 @@ final class CacheControlDirectiveTest extends DBTestCase
         $user->tasks()->saveMany($tasks);
 
         $this->graphQL(/** @lang GraphQL */ '
-                {
-                    users(first:10) {
-                        paginatorInfo {
-                            count
-                        }
-                       data {
-                            tasks(first:10) {
-                                data {
-                                    id
-                                    foo
-                                }
-                            }
-                       }    
+            {
+                users(first: 10) {
+                    paginatorInfo {
+                        count
                     }
+                   data {
+                        tasks(first: 10) {
+                            data {
+                                id
+                                foo
+                            }
+                        }
+                   }    
                 }
+            }
             ')
             ->assertHeader('Cache-Control', 'max-age=5, private');
     }
@@ -391,27 +391,29 @@ final class CacheControlDirectiveTest extends DBTestCase
     public static function typeLevelCacheDataProvider(): iterable
     {
         yield [/** @lang GraphQL */ '
-                {
-                    user {
-                        tasks {
-                            id
-                            foo
-                        }
+            {
+                user {
+                    tasks {
+                        id
+                        foo
                     }
                 }
-            ', 'max-age=10, private',
+            }
+            ',
+            'max-age=10, private',
         ];
 
         yield [/** @lang GraphQL */ '
-                {
-                    user {
-                        tasksWithCache {
-                            id
-                            foo
-                        }
+            {
+                user {
+                    tasksWithCache {
+                        id
+                        foo
                     }
                 }
-            ', 'max-age=20, private',
+            }
+            ',
+            'max-age=20, private',
         ];
     }
 }
