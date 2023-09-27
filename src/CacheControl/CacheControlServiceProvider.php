@@ -91,7 +91,7 @@ class CacheControlServiceProvider extends ServiceProvider
         });
     }
 
-    /** Set HTTP cache header values based on the cacheControl directive. */
+    /** Set HTTP cache header values based on the @cacheControl directive. */
     private static function setCacheValues(DirectiveNode $cacheControlDirective, CacheControl $cacheControl): void
     {
         if (! ASTHelper::directiveArgValue($cacheControlDirective, 'inheritMaxAge')) {

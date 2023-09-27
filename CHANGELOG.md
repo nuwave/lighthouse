@@ -11,11 +11,11 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
-- cacheControl directive can set on type level https://github.com/nuwave/lighthouse/pull/2451
+- Allow `@cacheControl` directive on type level https://github.com/nuwave/lighthouse/pull/2451
 
 ### Fixed
 
-- cacheControl logic can handle pagination fields https://github.com/nuwave/lighthouse/pull/2451
+- Inherit `@cacheControl` in pagination on fields https://github.com/nuwave/lighthouse/pull/2451
 
 ## v6.19.0
 
