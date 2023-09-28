@@ -43,8 +43,7 @@ directive @where(
   value: WhereValue
 
   """
-  Wether null values should be ignored.
-  If set to true null values will be treated as if the argument is not present in the request.
+  Treat explicit `null` as if the argument is not present in the request?
   """
   ignoreNull: Boolean! = false
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
