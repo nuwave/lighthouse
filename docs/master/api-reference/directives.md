@@ -3722,7 +3722,7 @@ If you want to prevent explicit `null` values to be passed to the query you can 
 ```graphql
 type Post {
     id: ID!
-    # There are not null titles
+    # Never null
     title: String!
 }
 
