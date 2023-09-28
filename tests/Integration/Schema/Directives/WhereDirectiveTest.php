@@ -45,7 +45,7 @@ final class WhereDirectiveTest extends DBTestCase
         $userWithoutEmail = factory(User::class)->create(['email' => null]);
         $userWithEmail = factory(User::class)->create();
 
-        $this->schema = /** @lang GraphQL */'
+        $this->schema = /** @lang GraphQL */ '
         scalar DateTime @scalar(class: "Nuwave\\\Lighthouse\\\Schema\\\Types\\\Scalars\\\DateTime")
 
         type User {
@@ -60,7 +60,7 @@ final class WhereDirectiveTest extends DBTestCase
         ';
 
         $this
-            ->graphQL(/** @lang GraphQL */'
+            ->graphQL(/** @lang GraphQL */ '
             {
                 usersIgnoreNull(email: null) {
                     id
@@ -74,12 +74,12 @@ final class WhereDirectiveTest extends DBTestCase
             ->assertGraphQLErrorFree()
             ->assertJsonCount(2, 'data.usersIgnoreNull')
             ->assertJsonPath('data.usersIgnoreNull', [
-                ['id' => (string)$userWithoutEmail->id],
-                ['id' => (string)$userWithEmail->id],
+                ['id' => (string) $userWithoutEmail->id],
+                ['id' => (string) $userWithEmail->id],
             ])
             ->assertJsonCount(1, 'data.usersExplicitNull')
             ->assertJsonPath('data.usersExplicitNull', [[
-                'id' => (string)$userWithoutEmail->id,
+                'id' => (string) $userWithoutEmail->id,
             ]]);
     }
 }
