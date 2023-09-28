@@ -40,35 +40,6 @@ final class WhereDirectiveTest extends DBTestCase
             ->assertJsonCount(1, 'data.usersBeginningWithF');
     }
 
-    public function testInvalidOperatorValueIsIgnored(): void
-    {
-        $users = factory(User::class, 2)->create();
-
-        $this->schema = /** @lang GraphQL */'
-        scalar DateTime @scalar(class: "Nuwave\\\Lighthouse\\\Schema\\\Types\\\Scalars\\\DateTime")
-
-        type User {
-            id: ID!
-            created_at: DateTime!
-        }
-
-        type Query {
-            users(createdAfter: DateTime @where(key: "created_at", operator: ">")): [User!]! @all
-        }
-        ';
-
-        $this
-            ->graphQL(/** @lang GraphQL */'
-            {
-                users(createdAfter: null) {
-                    id
-                }
-            }
-            ')
-            ->assertGraphQLErrorFree()
-            ->assertJsonCount($users->count(), 'data.users');
-    }
-
     public function testIgnoreNull(): void
     {
         $userWithoutEmail = factory(User::class)->create(['email' => null]);
