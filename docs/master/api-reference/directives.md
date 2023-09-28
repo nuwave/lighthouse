@@ -3679,7 +3679,7 @@ directive @where(
   value: WhereValue
 
   """
-  Treat explicit `null` as if the argument is not present in the request.
+  Treat explicit `null` as if the argument is not present in the request?
   """
   ignoreNull: Boolean! = false
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
