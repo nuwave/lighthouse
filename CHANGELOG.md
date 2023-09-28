@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.21.0
+
+- Add option `ignoreNull` to `@where` directive https://github.com/nuwave/lighthouse/pull/2447
+
 ## v6.20.0
 
 ### Added
