@@ -155,10 +155,7 @@ GRAPHQL;
     }
 
     /**
-     * @param mixed                $root
-     * @param array<string, mixed> $args
-     * @param GraphQLContext       $context
-     * @param ResolveInfo          $resolveInfo
+     * @param  array<string, mixed>  $args
      *
      * @return iterable<\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>>
      */
