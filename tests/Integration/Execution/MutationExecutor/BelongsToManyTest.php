@@ -682,6 +682,61 @@ GRAPHQL
     /**
      * @dataProvider existingModelMutations
      */
+    public function testDoNotDeleteWithoutRelationWithBelongsToMany(string $action): void
+    {
+        $users = [factory(User::class)->create(), factory(User::class)->create()];
+        factory(Role::class)
+            ->createMany([[], []])
+            ->each(function (Role $role, int $index) use ($users): void {
+                $role->users()->attach($users[$index]);
+            });
+
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+        mutation {
+            {$action}Role(input: {
+                id: 1
+                name: "is_user"
+                users: {
+                    delete: [2]
+                }
+            }) {
+                id
+                name
+                users {
+                    id
+                }
+            }
+        }
+GRAPHQL
+        )->assertJson([
+            'data' => [
+                "{$action}Role" => [
+                    'id' => '1',
+                    'name' => 'is_user',
+                    'users' => [
+                        [
+                            'id' => '1',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        /** @var Role $role */
+        $role = Role::find(1);
+        $this->assertCount(1, $role->users()->get());
+        $this->assertSame('is_user', $role->name);
+
+        /** @var Role $role */
+        $role = Role::find(2);
+        $this->assertCount(1, $role->users()->get());
+        $this->assertNotNull(User::find(1));
+        $this->assertNotNull(User::find(2));
+    }
+
+    /**
+     * @dataProvider existingModelMutations
+     */
     public function testConnectWithBelongsToMany(string $action): void
     {
         factory(User::class)->create();

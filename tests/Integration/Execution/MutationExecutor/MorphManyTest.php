@@ -442,6 +442,50 @@ GRAPHQL
     /**
      * @dataProvider existingModelMutations
      */
+    public function testShouldNotDeleteWithoutRelationUpdateAndDeleteMorphMany(string $action): void
+    {
+        $images = [factory(Image::class)->create(), factory(Image::class)->create()];
+        factory(Task::class)
+            ->createMany([[], []])
+            ->each(function (Task $task, int $index) use ($images): void {
+                $task->images()->save($images[$index]);
+            });
+
+        $this->graphQL(/** @lang GraphQL */ "
+        mutation {
+            {$action}Task(input: {
+                id: 1
+                name: \"foo\"
+                images: {
+                    delete: [1]
+                }
+            }) {
+                id
+            }
+        }
+        ")->assertJson([
+            'data' => [
+                "{$action}Task" => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'images' => [
+                        [
+                            'id' => $images[0]->id,
+                        ]
+                    ],
+                ],
+            ],
+        ]);
+
+        /** @var Task $task */
+        $task = Task::find(2);
+        $this->assertCount(1, $task->images()->get());
+        $this->assertNotNull(Image::find(2));
+    }
+
+    /**
+     * @dataProvider existingModelMutations
+     */
     public function testUpdateAndConnectMorphMany(string $action): void
     {
         $task = factory(Task::class)->create();
@@ -450,8 +494,8 @@ GRAPHQL
         $actionInputName = ucfirst($action);
 
         $this->graphQL(/** @lang GraphQL */ "
-            mutation ${action}Task(\$input: {$actionInputName}TaskInput!) {
-                ${action}Task(input: \$input) {
+            mutation ${$action}Task(\$input: {$actionInputName}TaskInput!) {
+                ${$action}Task(input: \$input) {
                     id
                     name
                     images {
@@ -471,7 +515,7 @@ GRAPHQL
             ],
         ])->assertJson([
             'data' => [
-                "${action}Task" => [
+                "${$action}Task" => [
                     'id' => '1',
                     'name' => 'foo',
                     'images' => [
