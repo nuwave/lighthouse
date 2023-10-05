@@ -494,8 +494,8 @@ GRAPHQL
         $actionInputName = ucfirst($action);
 
         $this->graphQL(/** @lang GraphQL */ "
-            mutation ${$action}Task(\$input: {$actionInputName}TaskInput!) {
-                ${$action}Task(input: \$input) {
+            mutation ${action}Task(\$input: {$actionInputName}TaskInput!) {
+                ${action}Task(input: \$input) {
                     id
                     name
                     images {
@@ -515,7 +515,7 @@ GRAPHQL
             ],
         ])->assertJson([
             'data' => [
-                "${$action}Task" => [
+                "${action}Task" => [
                     'id' => '1',
                     'name' => 'foo',
                     'images' => [
