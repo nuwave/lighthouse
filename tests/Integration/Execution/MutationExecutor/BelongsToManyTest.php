@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 namespace Tests\Integration\Execution\MutationExecutor;
 
@@ -7,9 +7,9 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Role;
 use Tests\Utils\Models\User;
 
-final class BelongsToManyTest extends DBTestCase
+class BelongsToManyTest extends DBTestCase
 {
-    protected string $schema = /** @lang GraphQL */ '
+    protected $schema = /** @lang GraphQL */ '
     type Role {
         id: ID!
         name: String
@@ -550,8 +550,10 @@ GRAPHQL
         $this->assertSame('is_user', $role->name);
     }
 
-    /** @return array<array<string, string>> */
-    public static function existingModelMutations(): array
+    /**
+     * @return array<array<string, string>>
+     */
+    public function existingModelMutations(): array
     {
         return [
             ['Update action' => 'update'],
@@ -559,7 +561,9 @@ GRAPHQL
         ];
     }
 
-    /** @dataProvider existingModelMutations */
+    /**
+     * @dataProvider existingModelMutations
+     */
     public function testUpdateWithBelongsToMany(string $action): void
     {
         factory(Role::class)
@@ -568,16 +572,16 @@ GRAPHQL
             ])
             ->users()
             ->attach(
-                factory(User::class, 2)->create(),
+                factory(User::class, 2)->create()
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            {$action}Role(input: {
+            ${action}Role(input: {
                 id: 1
                 name: "is_user"
                 users: {
-                    {$action}: [{
+                    ${action}: [{
                         id: 1
                         name: "user1"
                     },
@@ -598,7 +602,7 @@ GRAPHQL
 GRAPHQL
         )->assertJson([
             'data' => [
-                "{$action}Role" => [
+                "${action}Role" => [
                     'id' => '1',
                     'name' => 'is_user',
                     'users' => [
@@ -621,7 +625,9 @@ GRAPHQL
         $this->assertSame('is_user', $role->name);
     }
 
-    /** @dataProvider existingModelMutations */
+    /**
+     * @dataProvider existingModelMutations
+     */
     public function testDeleteWithBelongsToMany(string $action): void
     {
         factory(Role::class)
@@ -630,12 +636,12 @@ GRAPHQL
             ])
             ->users()
             ->attach(
-                factory(User::class, 2)->create(),
+                factory(User::class, 2)->create()
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            {$action}Role(input: {
+            ${action}Role(input: {
                 id: 1
                 name: "is_user"
                 users: {
@@ -652,7 +658,7 @@ GRAPHQL
 GRAPHQL
         )->assertJson([
             'data' => [
-                "{$action}Role" => [
+                "${action}Role" => [
                     'id' => '1',
                     'name' => 'is_user',
                     'users' => [
@@ -673,7 +679,9 @@ GRAPHQL
         $this->assertNotNull(User::find(2));
     }
 
-    /** @dataProvider existingModelMutations */
+    /**
+     * @dataProvider existingModelMutations
+     */
     public function testDoNotDeleteWithoutRelationWithBelongsToMany(string $action): void
     {
         $users = [
@@ -689,7 +697,7 @@ GRAPHQL
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            {$action}Role(input: {
+            ${action}Role(input: {
                 id: 1
                 name: "is_user"
                 users: {
@@ -720,17 +728,19 @@ GRAPHQL
 
         /** @var Role $role */
         $role = Role::findOrFail(1);
-        $this->assertCount(1, $role->users);
+        $this->assertCount(1, $role->users()->get());
         $this->assertSame('is_user', $role->name);
 
         /** @var Role $role */
         $role = Role::findOrFail(2);
         $this->assertCount(1, $role->users);
-        $this->assertNotNull(User::find(1));
-        $this->assertNotNull(User::find(2));
+        $this->assertNotNull(User::find($users[0]->id));
+        $this->assertNotNull(User::find($users[1]->id));
     }
 
-    /** @dataProvider existingModelMutations */
+    /**
+     * @dataProvider existingModelMutations
+     */
     public function testConnectWithBelongsToMany(string $action): void
     {
         factory(User::class)->create();
@@ -738,12 +748,12 @@ GRAPHQL
             ->create()
             ->users()
             ->attach(
-                factory(User::class)->create(),
+                factory(User::class)->create()
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            {$action}Role(input: {
+            ${action}Role(input: {
                 id: 1
                 users: {
                     connect: [1]
@@ -759,7 +769,7 @@ GRAPHQL
 GRAPHQL
         )->assertJson([
             'data' => [
-                "{$action}Role" => [
+                "${action}Role" => [
                     'id' => '1',
                     'users' => [
                         [
@@ -778,7 +788,9 @@ GRAPHQL
         $this->assertCount(2, $role->users()->get());
     }
 
-    /** @dataProvider existingModelMutations */
+    /**
+     * @dataProvider existingModelMutations
+     */
     public function testSyncWithBelongsToMany(string $action): void
     {
         factory(User::class)->create();
@@ -786,12 +798,12 @@ GRAPHQL
             ->create()
             ->users()
             ->attach(
-                factory(User::class)->create(),
+                factory(User::class)->create()
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            {$action}Role(input: {
+            ${action}Role(input: {
                 id: 1
                 users: {
                     sync: [1, 2]
@@ -807,7 +819,7 @@ GRAPHQL
 GRAPHQL
         )->assertJson([
             'data' => [
-                "{$action}Role" => [
+                "${action}Role" => [
                     'id' => '1',
                     'users' => [
                         [
@@ -826,19 +838,21 @@ GRAPHQL
         $this->assertCount(2, $role->users()->get());
     }
 
-    /** @dataProvider existingModelMutations */
+    /**
+     * @dataProvider existingModelMutations
+     */
     public function testDisconnectWithBelongsToMany(string $action): void
     {
         factory(Role::class)
             ->create()
             ->users()
             ->attach(
-                factory(User::class, 2)->create(),
+                factory(User::class, 2)->create()
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            {$action}Role(input: {
+            ${action}Role(input: {
                 id: 1
                 users: {
                     disconnect: [1]
@@ -853,7 +867,7 @@ GRAPHQL
 GRAPHQL
         )->assertJson([
             'data' => [
-                "{$action}Role" => [
+                "${action}Role" => [
                     'id' => '1',
                     'users' => [
                         [
@@ -947,21 +961,23 @@ GRAPHQL
         ]);
     }
 
-    /** @dataProvider existingModelMutations */
+    /**
+     * @dataProvider existingModelMutations
+     */
     public function testDisconnectAllRelatedModelsOnEmptySync(string $action): void
     {
         /** @var User $user */
         $user = factory(User::class)->create();
         /** @var Role $role */
         $role = $user->roles()->save(
-            factory(Role::class)->make(),
+            factory(Role::class)->make()
         );
 
         $this->assertCount(1, $role->users);
 
         $this->graphQL(/** @lang GraphQL */ "
         mutation {
-            {$action}Role(input: {
+            ${action}Role(input: {
                 id: 1
                 users: {
                     sync: []
@@ -976,7 +992,7 @@ GRAPHQL
         }
         ")->assertJson([
             'data' => [
-                "{$action}Role" => [
+                "${action}Role" => [
                     'id' => '1',
                     'users' => [],
                 ],
