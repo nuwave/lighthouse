@@ -444,26 +444,31 @@ GRAPHQL
      */
     public function testShouldNotDeleteWithoutRelationUpdateAndDeleteMorphMany(string $action): void
     {
-        $images = [factory(Image::class)->create(), factory(Image::class)->create()];
+        $images = [
+            factory(Image::class)->create(),
+            factory(Image::class)->create()
+        ];
+
         factory(Task::class)
             ->createMany([[], []])
             ->each(function (Task $task, int $index) use ($images): void {
                 $task->images()->save($images[$index]);
             });
 
-        $this->graphQL(/** @lang GraphQL */ "
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            {$action}Task(input: {
+            ${action}Task(input: {
                 id: 1
-                name: \"foo\"
+                name: "foo"
                 images: {
-                    delete: [1]
+                    delete: [{$images[1]->id}]
                 }
             }) {
                 id
             }
         }
-        ")->assertJson([
+GRAPHQL
+        )->assertJson([
             'data' => [
                 "{$action}Task" => [
                     'id' => '1',
@@ -478,8 +483,8 @@ GRAPHQL
         ]);
 
         /** @var Task $task */
-        $task = Task::find(2);
-        $this->assertCount(1, $task->images()->get());
+        $task = Task::findOrFail(2);
+        $this->assertCount(1, $task->images);
         $this->assertNotNull(Image::find(2));
     }
 

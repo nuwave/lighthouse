@@ -508,7 +508,11 @@ GRAPHQL
      */
     public function testDeleteHasManyWithoutRelation(string $action): void
     {
-        $tasks = [factory(Task::class)->create(), factory(Task::class)->create()];
+        $tasks = [
+            factory(Task::class)->create(),
+            factory(Task::class)->create()
+        ];
+
         factory(User::class)
             ->createMany([[], []])
             ->each(function (User $user, int $index) use ($tasks): void {
@@ -517,7 +521,7 @@ GRAPHQL
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            ${$action}User(input: {
+            ${action}User(input: {
                 id: 1
                 name: "foo"
                 tasks: {
@@ -547,12 +551,12 @@ GRAPHQL
         ]);
 
         /** @var User $user */
-        $user = User::find(1);
-        $this->assertCount(1, $user->tasks()->get());
+        $user = User::findOrFail(1);
+        $this->assertCount(1, $user->tasks);
 
         /** @var User $user */
-        $user = User::find(2);
-        $this->assertCount(1, $user->tasks()->get());
+        $user = User::findOrFail(2);
+        $this->assertCount(1, $user->tasks);
         $this->assertNotNull(Task::find($tasks[1]->id));
     }
 

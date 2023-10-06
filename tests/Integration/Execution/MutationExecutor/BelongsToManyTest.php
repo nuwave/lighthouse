@@ -684,7 +684,11 @@ GRAPHQL
      */
     public function testDoNotDeleteWithoutRelationWithBelongsToMany(string $action): void
     {
-        $users = [factory(User::class)->create(), factory(User::class)->create()];
+        $users = [
+            factory(User::class)->create(),
+            factory(User::class)->create()
+        ];
+
         factory(Role::class)
             ->createMany([[], []])
             ->each(function (Role $role, int $index) use ($users): void {
@@ -693,11 +697,11 @@ GRAPHQL
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            {$action}Role(input: {
+            ${action}Role(input: {
                 id: 1
                 name: "is_user"
                 users: {
-                    delete: [2]
+                    delete: [{$users[1]->id}]
                 }
             }) {
                 id
@@ -715,7 +719,7 @@ GRAPHQL
                     'name' => 'is_user',
                     'users' => [
                         [
-                            'id' => '1',
+                            'id' => $users[0]->id,
                         ],
                     ],
                 ],
@@ -723,15 +727,15 @@ GRAPHQL
         ]);
 
         /** @var Role $role */
-        $role = Role::find(1);
+        $role = Role::findOrFail(1);
         $this->assertCount(1, $role->users()->get());
         $this->assertSame('is_user', $role->name);
 
         /** @var Role $role */
-        $role = Role::find(2);
-        $this->assertCount(1, $role->users()->get());
-        $this->assertNotNull(User::find(1));
-        $this->assertNotNull(User::find(2));
+        $role = Role::findOrFail(2);
+        $this->assertCount(1, $role->users);
+        $this->assertNotNull(User::find($users[0]->id));
+        $this->assertNotNull(User::find($users[1]->id));
     }
 
     /**
