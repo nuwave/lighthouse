@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.22.0
+
+### Added
+
+- Add option `root` to `@can` directive https://github.com/nuwave/lighthouse/pull/2452
+
 ## v6.21.0
 
 ### Added
