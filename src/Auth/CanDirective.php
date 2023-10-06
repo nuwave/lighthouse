@@ -53,7 +53,7 @@ directive @can(
   Check the policy against the model instances returned by the field resolver.
   Only use this if the field does not mutate data, it is run before checking.
 
-  Mutually exclusive with `query` and `find`.
+  Mutually exclusive with `query`, `find`, and `root`.
   """
   resolved: Boolean! = false
 
@@ -80,7 +80,7 @@ directive @can(
   Query for specific model instances to check the policy against, using arguments
   with directives that add constraints to the query builder, such as `@eq`.
 
-  Mutually exclusive with `resolved` and `find`.
+  Mutually exclusive with `resolved`, `find`, and `root`.
   """
   query: Boolean! = false
 
@@ -95,7 +95,7 @@ directive @can(
 
   You may pass the string in dot notation to use nested inputs.
 
-  Mutually exclusive with `resolved` and `query`.
+  Mutually exclusive with `resolved`, `query`, and `root`.
   """
   find: String
 
@@ -103,6 +103,13 @@ directive @can(
   Should the query fail when the models of `find` were not found?
   """
   findOrFail: Boolean! = true
+
+  """
+  If your policy should check against the root value.
+
+  Mutually exclusive with `resolved`, `query`, and `find`.
+  """
+  root: Boolean! = false
 ) repeatable on FIELD_DEFINITION
 
 """
@@ -165,6 +172,10 @@ GRAPHQL;
                     $resolveInfo,
                 )
                 ->get();
+        }
+
+        if ($this->directiveArgValue('root')) {
+            return [$root];
         }
 
         if ($find = $this->directiveArgValue('find')) {
@@ -276,7 +287,7 @@ GRAPHQL;
 
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType): void
     {
-        $this->validateMutuallyExclusiveArguments(['resolved', 'query', 'find']);
+        $this->validateMutuallyExclusiveArguments(['resolved', 'query', 'find', 'root']);
 
         if ($this->directiveHasArgument('resolved') && $parentType->name->value === RootType::MUTATION) {
             throw self::resolvedIsUnsafeInMutations($fieldDefinition->name->value);

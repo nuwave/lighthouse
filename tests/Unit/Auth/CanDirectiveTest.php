@@ -281,6 +281,42 @@ final class CanDirectiveTest extends TestCase
         ]);
     }
 
+    public function testChecksAgainstRootModel(): void
+    {
+        $this->be(new User());
+
+        $this->mockResolver(fn (): User => $this->resolveUser());
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            user(foo: String): User! @mock
+        }
+
+        type User {
+            name: String @can(ability: "view", root: true)
+            email: String @can(ability: "superAdminOnly", root: true)
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            user(foo: "bar") {
+                name
+                email
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'name' => 'foo',
+                    'email' => null,
+                ],
+            ],
+        ])->assertJsonFragment([
+            'message' => 'Only super admins allowed',
+        ]);
+    }
+
     public function testInjectedArgsAndStaticArgs(): void
     {
         $this->be(new User());
@@ -322,6 +358,7 @@ final class CanDirectiveTest extends TestCase
     {
         $user = new User();
         $user->name = 'foo';
+        $user->email = 'test@example.com';
 
         return $user;
     }
