@@ -86,7 +86,7 @@ A nested `BelongsTo` relationship exposes the following operations:
 - `disconnect` the related model
 - `delete` the related model and the association to it
 
-Both `disconnect` and `delete` don't make much sense in the context of an update.
+Both `disconnect` and `delete` don't make much sense when creating a new model.
 You can control what operations are possible by defining just what you need in the `input`.
 We choose to expose the following operations on the related `User` model:
 
