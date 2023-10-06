@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Execution\MutationExecutor;
 
@@ -8,7 +8,7 @@ use Tests\Utils\Models\Task;
 
 class MorphManyTest extends DBTestCase
 {
-    protected $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ '
     type Task {
         id: ID!
         name: String!
@@ -257,9 +257,7 @@ GRAPHQL
         ]);
     }
 
-    /**
-     * @return array<array<string, string>>
-     */
+    /** @return array<array<string, string>> */
     public function existingModelMutations(): array
     {
         return [
@@ -268,16 +266,14 @@ GRAPHQL
         ];
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    /** @dataProvider existingModelMutations */
     public function testUpdateWithNewMorphMany(string $action): void
     {
         factory(Task::class)->create();
 
         $this->graphQL(/** @lang GraphQL */ "
         mutation {
-            ${action}Task(input: {
+            {$action}Task(input: {
                 id: 1
                 name: \"foo\"
                 images: {
@@ -295,7 +291,7 @@ GRAPHQL
         }
         ")->assertJson([
             'data' => [
-                "${action}Task" => [
+                "{$action}Task" => [
                     'id' => '1',
                     'name' => 'foo',
                     'images' => [
@@ -308,21 +304,19 @@ GRAPHQL
         ]);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    /** @dataProvider existingModelMutations */
     public function testUpdateAndUpdateMorphMany(string $action): void
     {
         factory(Task::class)
             ->create()
             ->images()
             ->save(
-                factory(Image::class)->create()
+                factory(Image::class)->create(),
             );
 
         $this->graphQL(/** @lang GraphQL */ "
         mutation {
-            ${action}Task(input: {
+            {$action}Task(input: {
                 id: 1
                 name: \"foo\"
                 images: {
@@ -341,7 +335,7 @@ GRAPHQL
         }
         ")->assertJson([
             'data' => [
-                "${action}Task" => [
+                "{$action}Task" => [
                     'id' => '1',
                     'name' => 'foo',
                     'images' => [
@@ -354,21 +348,19 @@ GRAPHQL
         ]);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    /** @dataProvider existingModelMutations */
     public function testUpdateAndUpsertMorphMany(string $action): void
     {
         factory(Task::class)
             ->create()
             ->images()
             ->save(
-                factory(Image::class)->create()
+                factory(Image::class)->create(),
             );
 
         $this->graphQL(/** @lang GraphQL */ "
         mutation {
-            ${action}Task(input: {
+            {$action}Task(input: {
                 id: 1
                 name: \"foo\"
                 images: {
@@ -387,7 +379,7 @@ GRAPHQL
         }
         ")->assertJson([
             'data' => [
-                "${action}Task" => [
+                "{$action}Task" => [
                     'id' => '1',
                     'name' => 'foo',
                     'images' => [
@@ -400,21 +392,19 @@ GRAPHQL
         ]);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    /** @dataProvider existingModelMutations */
     public function testUpdateAndDeleteMorphMany(string $action): void
     {
         factory(Task::class)
             ->create()
             ->images()
             ->save(
-                factory(Image::class)->create()
+                factory(Image::class)->create(),
             );
 
         $this->graphQL(/** @lang GraphQL */ "
         mutation {
-            ${action}Task(input: {
+            {$action}Task(input: {
                 id: 1
                 name: \"foo\"
                 images: {
@@ -430,7 +420,7 @@ GRAPHQL
         }
         ")->assertJson([
             'data' => [
-                "${action}Task" => [
+                "{$action}Task" => [
                     'id' => '1',
                     'name' => 'foo',
                     'images' => [],
@@ -439,25 +429,23 @@ GRAPHQL
         ]);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    /** @dataProvider existingModelMutations */
     public function testShouldNotDeleteWithoutRelationUpdateAndDeleteMorphMany(string $action): void
     {
         $images = [
             factory(Image::class)->create(),
-            factory(Image::class)->create()
+            factory(Image::class)->create(),
         ];
 
         factory(Task::class)
             ->createMany([[], []])
-            ->each(function (Task $task, int $index) use ($images): void {
+            ->each(static function (Task $task, int $index) use ($images): void {
                 $task->images()->save($images[$index]);
             });
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            ${action}Task(input: {
+            {$action}Task(input: {
                 id: 1
                 name: "foo"
                 images: {
@@ -476,7 +464,7 @@ GRAPHQL
                     'images' => [
                         [
                             'id' => $images[0]->id,
-                        ]
+                        ],
                     ],
                 ],
             ],
@@ -488,9 +476,7 @@ GRAPHQL
         $this->assertNotNull(Image::find(2));
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    /** @dataProvider existingModelMutations */
     public function testUpdateAndConnectMorphMany(string $action): void
     {
         $task = factory(Task::class)->create();
@@ -499,8 +485,8 @@ GRAPHQL
         $actionInputName = ucfirst($action);
 
         $this->graphQL(/** @lang GraphQL */ "
-            mutation ${action}Task(\$input: {$actionInputName}TaskInput!) {
-                ${action}Task(input: \$input) {
+            mutation {$action}Task(\$input: {$actionInputName}TaskInput!) {
+                {$action}Task(input: \$input) {
                     id
                     name
                     images {
@@ -520,7 +506,7 @@ GRAPHQL
             ],
         ])->assertJson([
             'data' => [
-                "${action}Task" => [
+                "{$action}Task" => [
                     'id' => '1',
                     'name' => 'foo',
                     'images' => [
@@ -533,9 +519,7 @@ GRAPHQL
         ]);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    /** @dataProvider existingModelMutations */
     public function testUpdateAndDisconnectMorphMany(string $action): void
     {
         /** @var \Tests\Utils\Models\Task $task */
@@ -548,8 +532,8 @@ GRAPHQL
         $actionInputName = ucfirst($action);
 
         $this->graphQL(/** @lang GraphQL */ "
-            mutation ${action}Task(\$input: {$actionInputName}TaskInput!) {
-                ${action}Task(input: \$input) {
+            mutation {$action}Task(\$input: {$actionInputName}TaskInput!) {
+                {$action}Task(input: \$input) {
                     id
                     name
                     images {
@@ -569,7 +553,7 @@ GRAPHQL
             ],
         ])->assertJson([
             'data' => [
-                "${action}Task" => [
+                "{$action}Task" => [
                     'id' => '1',
                     'name' => 'foo',
                     'images' => [],
