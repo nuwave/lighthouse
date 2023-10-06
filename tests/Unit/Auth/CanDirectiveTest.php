@@ -257,7 +257,7 @@ final class CanDirectiveTest extends TestCase
         $this->schema = /** @lang GraphQL */ '
         type Query {
             user(foo: String): User!
-                @can(ability:"injectArgs", injectArgs: true)
+                @can(ability: "injectArgs", injectArgs: true)
                 @mock
         }
 
@@ -268,7 +268,7 @@ final class CanDirectiveTest extends TestCase
 
         $this->graphQL(/** @lang GraphQL */ '
         {
-            user(foo: "bar"){
+            user(foo: "bar") {
                 name
             }
         }
