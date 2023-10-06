@@ -497,12 +497,14 @@ GRAPHQL
         ]);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    /** @dataProvider existingModelMutations */
     public function testDeleteHasManyWithoutRelation(string $action): void
     {
-        $tasks = [factory(Task::class)->create(), factory(Task::class)->create()];
+        $tasks = [
+            factory(Task::class)->create(),
+            factory(Task::class)->create()
+        ];
+
         factory(User::class)
             ->createMany([[], []])
             ->each(function (User $user, int $index) use ($tasks): void {

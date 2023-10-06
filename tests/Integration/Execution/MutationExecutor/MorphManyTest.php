@@ -446,11 +446,11 @@ GRAPHQL
                 $task->images()->save($images[$index]);
             });
 
-        $this->graphQL(/** @lang GraphQL */ "
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            {$action}Task(input: {
+            ${action}Task(input: {
                 id: 1
-                name: \"foo\"
+                name: "foo"
                 images: {
                     delete: [{$images[1]->id}]
                 }
@@ -458,7 +458,8 @@ GRAPHQL
                 id
             }
         }
-        ")->assertJson([
+GRAPHQL
+        )->assertJson([
             'data' => [
                 "{$action}Task" => [
                     'id' => '1',
