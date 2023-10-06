@@ -285,33 +285,35 @@ final class CanDirectiveTest extends TestCase
     {
         $this->be(new User());
 
-        $this->mockResolver(function (): User {
-            return $this->resolveUser();
-        });
+        $this->mockResolver(fn (): User => $this->resolveUser());
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            user(foo: String): User!
-                @mock
+            user(foo: String): User! @mock
         }
 
         type User {
-            name: String @can(ability:"view", rootModel: true)
+            name: String @can(ability: "view", root: true)
+            email: String @can(ability: "superAdminOnly", root: true)
         }
         ';
 
         $this->graphQL(/** @lang GraphQL */ '
         {
-            user(foo: "bar"){
+            user(foo: "bar") {
                 name
+                email
             }
         }
         ')->assertJson([
             'data' => [
                 'user' => [
                     'name' => 'foo',
+                    'email' => null,
                 ],
             ],
+        ])->assertJsonFragment([
+            'message' => 'Only super admins allowed',
         ]);
     }
 
@@ -356,6 +358,7 @@ final class CanDirectiveTest extends TestCase
     {
         $user = new User();
         $user->name = 'foo';
+        $user->email = 'test@example.com';
 
         return $user;
     }

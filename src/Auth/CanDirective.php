@@ -53,7 +53,7 @@ directive @can(
   Check the policy against the model instances returned by the field resolver.
   Only use this if the field does not mutate data, it is run before checking.
 
-  Mutually exclusive with `query`, `find`, and `rootModel`.
+  Mutually exclusive with `query`, `find`, and `root`.
   """
   resolved: Boolean! = false
 
@@ -80,7 +80,7 @@ directive @can(
   Query for specific model instances to check the policy against, using arguments
   with directives that add constraints to the query builder, such as `@eq`.
 
-  Mutually exclusive with `resolved`, `find`, and `rootModel`.
+  Mutually exclusive with `resolved`, `find`, and `root`.
   """
   query: Boolean! = false
 
@@ -95,7 +95,7 @@ directive @can(
 
   You may pass the string in dot notation to use nested inputs.
 
-  Mutually exclusive with `resolved`, `query`, and `rootModel`.
+  Mutually exclusive with `resolved`, `query`, and `root`.
   """
   find: String
 
@@ -109,7 +109,7 @@ directive @can(
 
   Mutually exclusive with `resolved`, `query`, and `find`.
   """
-  rootModel: Boolean! = false
+  root: Boolean! = false
 ) repeatable on FIELD_DEFINITION
 
 """
@@ -174,7 +174,7 @@ GRAPHQL;
                 ->get();
         }
 
-        if ($this->directiveArgValue('rootModel')) {
+        if ($this->directiveArgValue('root')) {
             return [$root];
         }
 
@@ -287,7 +287,7 @@ GRAPHQL;
 
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType): void
     {
-        $this->validateMutuallyExclusiveArguments(['resolved', 'query', 'find', 'rootModel']);
+        $this->validateMutuallyExclusiveArguments(['resolved', 'query', 'find', 'root']);
 
         if ($this->directiveHasArgument('resolved') && $parentType->name->value === RootType::MUTATION) {
             throw self::resolvedIsUnsafeInMutations($fieldDefinition->name->value);
