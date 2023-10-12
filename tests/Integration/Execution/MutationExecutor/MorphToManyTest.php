@@ -61,7 +61,10 @@ final class MorphToManyTest extends DBTestCase
 
     public function testCreateATaskWithExistingTagsByUsingConnect(): void
     {
-        $id = factory(Tag::class)->create(['name' => 'php'])->id;
+        $tag = factory(Tag::class)->make();
+        assert($tag instanceof Tag);
+        $tag->name = 'php';
+        $tag->save();
 
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -81,7 +84,7 @@ final class MorphToManyTest extends DBTestCase
                 'createTask' => [
                     'tags' => [
                         [
-                            'id' => $id,
+                            'id' => $tag->id,
                         ],
                     ],
                 ],
@@ -120,9 +123,12 @@ final class MorphToManyTest extends DBTestCase
 
     public function testUpsertATaskWithExistingTagsByUsingConnect(): void
     {
-        $id = factory(Tag::class)->create(['name' => 'php'])->id;
+        $tag = factory(Tag::class)->make();
+        assert($tag instanceof Tag);
+        $tag->name = 'php';
+        $tag->save();
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             upsertTask(input: {
                 id: 1
@@ -141,7 +147,7 @@ final class MorphToManyTest extends DBTestCase
                 'upsertTask' => [
                     'tags' => [
                         [
-                            'id' => $id,
+                            'id' => $tag->id,
                         ],
                     ],
                 ],
@@ -151,9 +157,12 @@ final class MorphToManyTest extends DBTestCase
 
     public function testCreateATaskWithExistingTagsByUsingSync(): void
     {
-        $id = factory(Tag::class)->create(['name' => 'php'])->id;
+        $tag = factory(Tag::class)->make();
+        assert($tag instanceof Tag);
+        $tag->name = 'php';
+        $tag->save();
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createTask(input: {
                 name: "Finish tests"
@@ -171,7 +180,7 @@ final class MorphToManyTest extends DBTestCase
                 'createTask' => [
                     'tags' => [
                         [
-                            'id' => $id,
+                            'id' => $tag->id,
                         ],
                     ],
                 ],
@@ -181,9 +190,12 @@ final class MorphToManyTest extends DBTestCase
 
     public function testUpsertATaskWithExistingTagsByUsingSync(): void
     {
-        $id = factory(Tag::class)->create(['name' => 'php'])->id;
+        $tag = factory(Tag::class)->make();
+        assert($tag instanceof Tag);
+        $tag->name = 'php';
+        $tag->save();
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             upsertTask(input: {
                 id: 1
@@ -202,7 +214,7 @@ final class MorphToManyTest extends DBTestCase
                 'upsertTask' => [
                     'tags' => [
                         [
-                            'id' => $id,
+                            'id' => $tag->id,
                         ],
                     ],
                 ],
@@ -212,7 +224,7 @@ final class MorphToManyTest extends DBTestCase
 
     public function testCreateANewTagRelationByUsingCreate(): void
     {
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createTask(input: {
                 name: "Finish tests"

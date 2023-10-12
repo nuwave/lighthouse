@@ -125,7 +125,10 @@ final class HasManyTest extends DBTestCase
     public function testCreateWithConnectHasMany(): void
     {
         $task1 = factory(Task::class)->create();
+        assert($task1 instanceof Task);
+
         $task2 = factory(Task::class)->create();
+        assert($task2 instanceof Task);
 
         $this->graphQL(/** @lang GraphQL */ '
             mutation ($input: CreateUserInput!) {
@@ -344,8 +347,7 @@ final class HasManyTest extends DBTestCase
                 }
             }
         }
-GRAPHQL
-        )->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 "{$action}User" => [
                     'id' => '1',
@@ -364,8 +366,8 @@ GRAPHQL
     /** @dataProvider existingModelMutations */
     public function testUpdateHasMany(string $action): void
     {
-        /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
+        assert($user instanceof User);
 
         $user->tasks()
             ->save(
@@ -392,8 +394,7 @@ GRAPHQL
                 }
             }
         }
-GRAPHQL
-        )->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 "{$action}User" => [
                     'id' => "{$user->id}",
@@ -412,8 +413,8 @@ GRAPHQL
     /** @dataProvider existingModelMutations */
     public function testUpsertHasMany(string $action): void
     {
-        /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
+        assert($user instanceof User);
 
         $user->tasks()
             ->save(
@@ -460,8 +461,8 @@ GRAPHQL
     /** @dataProvider existingModelMutations */
     public function testDeleteHasMany(string $action): void
     {
-        /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
+        assert($user instanceof User);
 
         $user->tasks()
             ->save(
@@ -555,11 +556,14 @@ GRAPHQL
     /** @dataProvider existingModelMutations */
     public function testConnectHasMany(string $action): void
     {
-        /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
+        assert($user instanceof User);
 
         $task1 = factory(Task::class)->create();
+        assert($task1 instanceof Task);
+
         $task2 = factory(Task::class)->create();
+        assert($task2 instanceof Task);
 
         $actionInputName = ucfirst($action);
 
@@ -612,13 +616,13 @@ GRAPHQL
     {
         $user = factory(User::class)->create();
 
-        /** @var \Tests\Utils\Models\Task $taskDisconnect */
         $taskDisconnect = factory(Task::class)->make();
+        assert($taskDisconnect instanceof Task);
         $taskDisconnect->user()->associate($user);
         $taskDisconnect->save();
 
-        /** @var \Tests\Utils\Models\Task $taskKeep */
         $taskKeep = factory(Task::class)->make();
+        assert($taskKeep instanceof Task);
         $taskKeep->user()->associate($user);
         $taskKeep->save();
 
@@ -738,6 +742,7 @@ GRAPHQL
 
         // The first User has the first Role.
         $role = Role::firstOrFail();
+        assert($role instanceof Role);
         $this->assertSame([1], $role->users()->pluck('users.id')->toArray());
 
         // Create another User.
