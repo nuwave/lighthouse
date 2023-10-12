@@ -543,12 +543,12 @@ GRAPHQL
             ],
         ]);
 
-        /** @var User $user */
         $user = User::findOrFail(1);
+        assert($user instanceof User);
         $this->assertCount(1, $user->tasks);
 
-        /** @var User $user */
         $user = User::findOrFail(2);
+        assert($user instanceof User);
         $this->assertCount(1, $user->tasks);
         $this->assertNotNull(Task::find($tasks[1]->id));
     }

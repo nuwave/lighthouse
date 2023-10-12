@@ -734,13 +734,13 @@ GRAPHQL
             ],
         ]);
 
-        /** @var Role $role */
         $role = Role::findOrFail(1);
+        assert($role instanceof Role);
         $this->assertCount(1, $role->users()->get());
         $this->assertSame('is_user', $role->name);
 
-        /** @var Role $role */
         $role = Role::findOrFail(2);
+        assert($role instanceof Role);
         $this->assertCount(1, $role->users);
         $this->assertNotNull(User::find($users[0]->id));
         $this->assertNotNull(User::find($users[1]->id));

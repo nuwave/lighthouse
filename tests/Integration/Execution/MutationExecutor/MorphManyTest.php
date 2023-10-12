@@ -475,8 +475,8 @@ GRAPHQL
             ],
         ]);
 
-        /** @var Task $task */
         $task = Task::findOrFail(2);
+        assert($task instanceof Task);
         $this->assertCount(1, $task->images);
         $this->assertNotNull(Image::find(2));
     }
