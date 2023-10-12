@@ -73,7 +73,10 @@ final class MorphToTest extends DBTestCase
 
     public function testConnectsMorphTo(): void
     {
-        factory(Task::class)->create(['name' => 'first_task']);
+        $task = factory(Task::class)->make();
+        assert($task instanceof Task);
+        $task->name = 'first_task';
+        $task->save();
 
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -110,7 +113,10 @@ final class MorphToTest extends DBTestCase
 
     public function testConnectsMorphToWithUpsert(): void
     {
-        factory(Task::class)->create(['name' => 'first_task']);
+        $task = factory(Task::class)->make();
+        assert($task instanceof Task);
+        $task->name = 'first_task';
+        $task->save();
 
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -189,11 +195,13 @@ final class MorphToTest extends DBTestCase
     /** @dataProvider existingModelMutations */
     public function testDisconnectsMorphTo(string $action): void
     {
-        /** @var \Tests\Utils\Models\Task $task */
-        $task = factory(Task::class)->create(['name' => 'first_task']);
+        $task = factory(Task::class)->make();
+        assert($task instanceof Task);
+        $task->name = 'first_task';
+        $task->save();
 
-        /** @var \Tests\Utils\Models\Image $image */
         $image = $task->image()->make();
+        assert($image instanceof Image);
         $image->url = 'bar';
         $image->save();
 
@@ -214,8 +222,7 @@ final class MorphToTest extends DBTestCase
                 }
             }
         }
-GRAPHQL
-        )->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 $field => [
                     'url' => 'foo',
@@ -228,11 +235,13 @@ GRAPHQL
     /** @dataProvider existingModelMutations */
     public function testDeletesMorphTo(string $action): void
     {
-        /** @var \Tests\Utils\Models\Task $task */
-        $task = factory(Task::class)->create(['name' => 'first_task']);
+        $task = factory(Task::class)->make();
+        assert($task instanceof Task);
+        $task->name = 'first_task';
+        $task->save();
 
-        /** @var \Tests\Utils\Models\Image $image */
         $image = $task->image()->make();
+        assert($image instanceof Image);
         $image->url = 'bar';
         $image->save();
 
@@ -253,9 +262,7 @@ GRAPHQL
                 }
             }
         }
-
-GRAPHQL
-        )->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 $field => [
                     'url' => 'foo',

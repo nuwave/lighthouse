@@ -154,6 +154,7 @@ final class MorphManyTest extends DBTestCase
     public function testCreateWithConnectMorphMany(): void
     {
         $image1 = factory(Image::class)->create();
+        assert($image1 instanceof Image);
 
         $this->graphQL(/** @lang GraphQL */ '
             mutation ($input: CreateTaskInput!){
@@ -307,9 +308,10 @@ GRAPHQL
     /** @dataProvider existingModelMutations */
     public function testUpdateAndUpdateMorphMany(string $action): void
     {
-        factory(Task::class)
-            ->create()
-            ->images()
+        $task = factory(Task::class)->create();
+        assert($task instanceof Task);
+
+        $task->images()
             ->save(
                 factory(Image::class)->create(),
             );
@@ -352,9 +354,10 @@ GRAPHQL
     /** @dataProvider existingModelMutations */
     public function testUpdateAndUpsertMorphMany(string $action): void
     {
-        factory(Task::class)
-            ->create()
-            ->images()
+        $task = factory(Task::class)->create();
+        assert($task instanceof Task);
+
+        $task->images()
             ->save(
                 factory(Image::class)->create(),
             );
@@ -378,8 +381,7 @@ GRAPHQL
                 }
             }
         }
-GRAPHQL
-        )->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 "{$action}Task" => [
                     'id' => '1',
@@ -397,9 +399,10 @@ GRAPHQL
     /** @dataProvider existingModelMutations */
     public function testUpdateAndDeleteMorphMany(string $action): void
     {
-        factory(Task::class)
-            ->create()
-            ->images()
+        $task = factory(Task::class)->create();
+        assert($task instanceof Task);
+
+        $task->images()
             ->save(
                 factory(Image::class)->create(),
             );
@@ -420,8 +423,7 @@ GRAPHQL
                 }
             }
         }
-GRAPHQL
-        )->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 "{$action}Task" => [
                     'id' => '1',
@@ -436,7 +438,10 @@ GRAPHQL
     public function testUpdateAndConnectMorphMany(string $action): void
     {
         $task = factory(Task::class)->create();
+        assert($task instanceof Task);
+
         $image = factory(Image::class)->create();
+        assert($image instanceof Image);
 
         $upperAction = ucfirst($action);
         $actionInput = "{$upperAction}TaskInput";
@@ -453,40 +458,39 @@ GRAPHQL
                     }
                 }
             }
-GRAPHQL
-            , [
-                'input' => [
-                    'id' => $task->id,
+            GRAPHQL, [
+            'input' => [
+                'id' => $task->id,
+                'name' => $newTaskName,
+                'images' => [
+                    'connect' => [
+                        $image->id,
+                    ],
+                ],
+            ],
+        ])->assertJson([
+            'data' => [
+                "{$action}Task" => [
+                    'id' => "{$task->id}",
                     'name' => $newTaskName,
                     'images' => [
-                        'connect' => [
-                            $image->id,
+                        [
+                            'url' => $image->url,
                         ],
                     ],
                 ],
-            ])->assertJson([
-                'data' => [
-                    "{$action}Task" => [
-                        'id' => "{$task->id}",
-                        'name' => $newTaskName,
-                        'images' => [
-                            [
-                                'url' => $image->url,
-                            ],
-                        ],
-                    ],
-                ],
-            ]);
+            ],
+        ]);
     }
 
     /** @dataProvider existingModelMutations */
     public function testUpdateAndDisconnectMorphMany(string $action): void
     {
-        /** @var \Tests\Utils\Models\Task $task */
         $task = factory(Task::class)->create();
+        assert($task instanceof Task);
 
-        /** @var \Tests\Utils\Models\Image $image */
         $image = factory(Image::class)->make();
+        assert($image instanceof Image);
         $task->images()->save($image);
 
         $upperAction = ucfirst($action);
@@ -504,26 +508,25 @@ GRAPHQL
                     }
                 }
             }
-GRAPHQL
-            , [
-                'input' => [
-                    'id' => $task->id,
+            GRAPHQL, [
+            'input' => [
+                'id' => $task->id,
+                'name' => $newTaskName,
+                'images' => [
+                    'disconnect' => [
+                        $image->id,
+                    ],
+                ],
+            ],
+        ])->assertJson([
+            'data' => [
+                "{$action}Task" => [
+                    'id' => "{$task->id}",
                     'name' => $newTaskName,
-                    'images' => [
-                        'disconnect' => [
-                            $image->id,
-                        ],
-                    ],
+                    'images' => [],
                 ],
-            ])->assertJson([
-                'data' => [
-                    "{$action}Task" => [
-                        'id' => "{$task->id}",
-                        'name' => $newTaskName,
-                        'images' => [],
-                    ],
-                ],
-            ]);
+            ],
+        ]);
 
         $this->assertNull($image->refresh()->imageable);
     }
@@ -531,11 +534,11 @@ GRAPHQL
     /** @dataProvider existingModelMutations */
     public function testDisconnectModelEventsMorphMany(string $action): void
     {
-        /** @var \Tests\Utils\Models\Task $task */
         $task = factory(Task::class)->create();
+        assert($task instanceof Task);
 
-        /** @var \Tests\Utils\Models\Image $image */
         $image = factory(Image::class)->make();
+        assert($image instanceof Image);
         $task->images()->save($image);
 
         $upperAction = ucfirst($action);
@@ -555,24 +558,23 @@ GRAPHQL
                     }
                 }
             }
-GRAPHQL
-            , [
-                'input' => [
-                    'id' => $task->id,
-                    'images' => [
-                        'disconnect' => [
-                            $image->id,
-                        ],
+            GRAPHQL, [
+            'input' => [
+                'id' => $task->id,
+                'images' => [
+                    'disconnect' => [
+                        $image->id,
                     ],
                 ],
-            ])->assertJson([
-                'data' => [
-                    "{$action}Task" => [
-                        'id' => "{$task->id}",
-                        'images' => [],
-                    ],
+            ],
+        ])->assertJson([
+            'data' => [
+                "{$action}Task" => [
+                    'id' => "{$task->id}",
+                    'images' => [],
                 ],
-            ]);
+            ],
+        ]);
 
         $this->assertSame(1, $calledImageSaving);
     }

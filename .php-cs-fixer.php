@@ -8,6 +8,7 @@ $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__)
     ->name('*.php')
     ->notPath('vendor')
+    ->notPath('phpstan-tmp-dir')
     ->ignoreDotFiles(false)
     ->ignoreVCS(true);
 

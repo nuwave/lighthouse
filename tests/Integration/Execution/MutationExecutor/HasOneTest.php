@@ -239,8 +239,7 @@ final class HasOneTest extends DBTestCase
                 }
             }
         }
-GRAPHQL
-        )->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'updateTask' => [
                     'name' => 'foo',
@@ -283,8 +282,7 @@ GRAPHQL
                 }
             }
         }
-GRAPHQL
-        )->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 "{$action}Task" => [
                     'id' => '1',
@@ -301,9 +299,10 @@ GRAPHQL
     /** @dataProvider existingModelMutations */
     public function testUpdateAndUpdateHasOne(string $action): void
     {
-        factory(Task::class)
-            ->create()
-            ->post()
+        $task = factory(Task::class)->create();
+        assert($task instanceof Task);
+
+        $task->post()
             ->save(
                 factory(Post::class)->create(),
             );
@@ -328,8 +327,7 @@ GRAPHQL
                 }
             }
         }
-GRAPHQL
-        )->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 "{$action}Task" => [
                     'id' => '1',
@@ -346,9 +344,10 @@ GRAPHQL
     /** @dataProvider existingModelMutations */
     public function testUpdateAndUpsertHasOne(string $action): void
     {
-        factory(Task::class)
-            ->create()
-            ->post()
+        $task = factory(Task::class)->create();
+        assert($task instanceof Task);
+
+        $task->post()
             ->save(
                 factory(Post::class)->create(),
             );
@@ -373,8 +372,7 @@ GRAPHQL
                 }
             }
         }
-GRAPHQL
-        )->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 "{$action}Task" => [
                     'id' => '1',
@@ -391,9 +389,10 @@ GRAPHQL
     /** @dataProvider existingModelMutations */
     public function testUpdateAndDeleteHasOne(string $action): void
     {
-        factory(Task::class)
-            ->create()
-            ->post()
+        $task = factory(Task::class)->create();
+        assert($task instanceof Task);
+
+        $task->post()
             ->save(
                 factory(Post::class)->create(),
             );
@@ -415,9 +414,7 @@ GRAPHQL
                 }
             }
         }
-
-GRAPHQL
-        )->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 "{$action}Task" => [
                     'id' => '1',

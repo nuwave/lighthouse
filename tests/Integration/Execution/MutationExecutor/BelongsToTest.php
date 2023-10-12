@@ -374,9 +374,10 @@ GRAPHQL
 
     public function testCreateAndUpdateBelongsTo(): void
     {
-        factory(User::class)->create([
-            'name' => 'foo',
-        ]);
+        $user = factory(User::class)->make();
+        assert($user instanceof User);
+        $user->name = 'foo';
+        $user->save();
 
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -413,9 +414,10 @@ GRAPHQL
 
     public function testUpsertUsingCreateAndUpdateBelongsTo(): void
     {
-        factory(User::class)->create([
-            'name' => 'foo',
-        ]);
+        $user = factory(User::class)->make();
+        assert($user instanceof User);
+        $user->name = 'foo';
+        $user->save();
 
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -453,9 +455,10 @@ GRAPHQL
 
     public function testUpsertUsingCreateAndUpdateUsingUpsertBelongsTo(): void
     {
-        factory(User::class)->create([
-            'name' => 'foo',
-        ]);
+        $user = factory(User::class)->make();
+        assert($user instanceof User);
+        $user->name = 'foo';
+        $user->save();
 
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -541,6 +544,7 @@ GRAPHQL
         );
 
         $task = Task::findOrFail(1);
+        assert($task instanceof Task);
         $this->assertNull($task->user, 'Must disconnect the parent relationship.');
     }
 
@@ -896,6 +900,7 @@ GRAPHQL
 
         // The first User has the first Role.
         $role = Role::firstOrFail();
+        assert($role instanceof Role);
         $this->assertSame([1], $role->users()->pluck('users.id')->toArray());
 
         // Create another User.

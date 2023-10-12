@@ -223,14 +223,14 @@ GRAPHQL
     {
         factory(Task::class)->create();
 
-        $this->graphQL(/** @lang GraphQL */ "
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
             {$action}Task(input: {
                 id: 1
-                name: \"foo\"
+                name: "foo"
                 image: {
                     create: {
-                        url: \"foo\"
+                        url: "foo"
                     }
                 }
             }) {
@@ -241,7 +241,7 @@ GRAPHQL
                 }
             }
         }
-        ")->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 "{$action}Task" => [
                     'id' => '1',
@@ -259,15 +259,15 @@ GRAPHQL
     {
         factory(Task::class)->create();
 
-        $this->graphQL(/** @lang GraphQL */ "
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
             {$action}Task(input: {
                 id: 1
-                name: \"foo\"
+                name: "foo"
                 image: {
                     upsert: {
                         id: 1
-                        url: \"foo\"
+                        url: "foo"
                     }
                 }
             }) {
@@ -278,7 +278,7 @@ GRAPHQL
                 }
             }
         }
-        ")->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 "{$action}Task" => [
                     'id' => '1',
@@ -294,22 +294,23 @@ GRAPHQL
     /** @dataProvider existingModelMutations */
     public function testUpdateAndUpdateMorphOne(string $action): void
     {
-        factory(Task::class)
-            ->create()
-            ->images()
+        $task = factory(Task::class)->create();
+        assert($task instanceof Task);
+
+        $task->images()
             ->save(
                 factory(Image::class)->create(),
             );
 
-        $this->graphQL(/** @lang GraphQL */ "
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
             {$action}Task(input: {
                 id: 1
-                name: \"foo\"
+                name: "foo"
                 image: {
                     update: {
                         id: 1
-                        url: \"foo\"
+                        url: "foo"
                     }
                 }
             }) {
@@ -320,7 +321,7 @@ GRAPHQL
                 }
             }
         }
-        ")->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 "{$action}Task" => [
                     'id' => '1',
@@ -336,18 +337,19 @@ GRAPHQL
     /** @dataProvider existingModelMutations */
     public function testUpdateAndDeleteMorphOne(string $action): void
     {
-        factory(Task::class)
-            ->create()
-            ->images()
+        $task = factory(Task::class)->create();
+        assert($task instanceof Task);
+
+        $task->images()
             ->save(
                 factory(Image::class)->create(),
             );
 
-        $this->graphQL("
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
             {$action}Task(input: {
                 id: 1
-                name: \"foo\"
+                name: "foo"
                 image: {
                     delete: 1
                 }
@@ -359,7 +361,7 @@ GRAPHQL
                 }
             }
         }
-        ")->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 "{$action}Task" => [
                     'id' => '1',
