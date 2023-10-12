@@ -530,7 +530,7 @@ GRAPHQL
 GRAPHQL
         )->assertJson([
             'data' => [
-                "{${$action}}User" => [
+                "{$action}User" => [
                     'id' => '1',
                     'name' => 'foo',
                     'tasks' => [
