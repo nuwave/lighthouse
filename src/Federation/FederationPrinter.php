@@ -134,6 +134,7 @@ class FederationPrinter
 
                 return SchemaPrinter::printDirectives($directivesToPrint);
             }
+
             if ($astNode instanceof FieldDefinitionNode) {
                 $directivesToPrint = [];
                 foreach ($astNode->directives as $directive) {

@@ -18,7 +18,8 @@ final class FederationSchemaTest extends TestCase
 
     public function testServiceQueryShouldReturnValidSdl(): void
     {
-        $foo = /** @lang GraphQL */ <<<'GRAPHQL'
+        $foo /** @lang GraphQL */
+            = <<<'GRAPHQL'
 type Foo @key(fields: "id") {
   id: ID! @external
   foo: String!
@@ -26,7 +27,8 @@ type Foo @key(fields: "id") {
 
 GRAPHQL;
 
-        $query = /** @lang GraphQL */ <<<'GRAPHQL'
+        $query /** @lang GraphQL */
+            = <<<'GRAPHQL'
 type Query {
   foo: Int!
 }
@@ -43,7 +45,8 @@ GRAPHQL;
 
     public function testServiceQueryShouldReturnValidSdlWithoutQuery(): void
     {
-        $foo = /** @lang GraphQL */ <<<'GRAPHQL'
+        $foo /** @lang GraphQL */
+            = <<<'GRAPHQL'
 type Foo @key(fields: "id") {
   id: ID! @external
   foo: String!
@@ -84,6 +87,43 @@ GRAPHQL;
         $types = $_Entity->getTypes();
         $this->assertSame('Foo', $types[0]->name);
         $this->assertSame('Bar', $types[1]->name);
+    }
+
+    public function testServiceQueryShouldReturnFederationV2SchemaExtension(): void
+    {
+        $schemaExtension = 'extend schema @link(url: "https:\/\/specs.apollo.dev\/federation\/v2.3", import: ["@composeDirective", "@extends", "@external", "@inaccessible", "@interfaceObject", "@key", "@override", "@provides", "@requires", "@shareable", "@tag"])';
+
+        $foo = /** @lang GraphQL */ <<<'GRAPHQL'
+type Foo @key(fields: "id") {
+  id: ID!
+}
+GRAPHQL;
+
+        $this->schema = $schemaExtension . ' ' . $foo;
+
+        $sdl = $this->_serviceSdl();
+
+        $this->assertStringContainsString($schemaExtension, $sdl);
+        $this->assertStringContainsString('type Foo', $sdl);
+    }
+
+    public function testServiceQueryShouldReturnFederationV2ComposedDirectives(): void
+    {
+        $schemaExtension = 'extend schema @link(url: "https:\/\/specs.apollo.dev\/federation\/v2.3", import: ["@composeDirective"]) @link(url: "https:\/\/myspecs.dev\/myCustomDirective\/v1.0", import: ["@foo"]) @composeDirective(name: "@foo")';
+
+        $foo = /** @lang GraphQL */ <<<'GRAPHQL'
+type Foo @key(fields: "id") {
+  id: ID!
+}
+GRAPHQL;
+
+        $this->schema = $schemaExtension . ' ' . $foo;
+
+        $sdl = $this->_serviceSdl();
+
+        $this->assertStringContainsString($schemaExtension, $sdl);
+        $this->assertStringContainsString('directive @foo on FIELD_DEFINITION', $sdl);
+        $this->assertStringContainsString('type Foo', $sdl);
     }
 
     protected function _serviceSdl(): string
