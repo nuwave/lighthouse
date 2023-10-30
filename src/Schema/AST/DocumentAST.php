@@ -6,6 +6,7 @@ use GraphQL\Error\SyntaxError;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\AST\SchemaExtensionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionNode;
 use GraphQL\Language\Parser;
@@ -80,6 +81,9 @@ class DocumentAST implements Arrayable
      */
     public array $classNameToObjectTypeNames = [];
 
+    /** @var array<int,SchemaExtensionNode> */
+    public array $schemaExtensions = [];
+
     /** Create a new DocumentAST instance from a schema. */
     public static function fromSource(string $schema): self
     {
@@ -132,6 +136,8 @@ class DocumentAST implements Arrayable
                 $instance->typeExtensions[$definition->getName()->value][] = $definition;
             } elseif ($definition instanceof DirectiveDefinitionNode) {
                 $instance->directives[$definition->name->value] = $definition;
+            } elseif ($definition instanceof SchemaExtensionNode) {
+                $instance->schemaExtensions[] = $definition;
             } else {
                 throw new \Exception('Unknown definition type: ' . $definition::class);
             }

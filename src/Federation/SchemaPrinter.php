@@ -2,15 +2,56 @@
 
 namespace Nuwave\Lighthouse\Federation;
 
+use GraphQL\Language\AST\ArgumentNode;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\Printer;
 use GraphQL\Type\Definition\FieldDefinition;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Type\Schema;
 use GraphQL\Utils\SchemaPrinter as GraphQLSchemaPrinter;
+use Illuminate\Container\Container;
+use Nuwave\Lighthouse\Schema\DirectiveLocator;
 
 class SchemaPrinter extends GraphQLSchemaPrinter
 {
+    protected static function printSchemaDefinition(Schema $schema): ?string
+    {
+        $composedDirectives = [];
+        $schemaDirectives = [];
+
+        foreach ($schema->extensionASTNodes as $extension) {
+            foreach ($extension->directives as $directive) {
+                assert($directive instanceof DirectiveNode);
+
+                $schemaDirectives[] = $directive;
+
+                if ($directive->name->value === 'composeDirective') {
+                    foreach ($directive->arguments as $argument) {
+                        assert($argument instanceof ArgumentNode);
+
+                        if ($argument->name->value === 'name') {
+                            $composedDirectives[] = ltrim($argument->value->value, '@');
+                        }
+                    }
+                }
+            }
+        }
+
+        $result = 'extend schema' . self::printDirectives($schemaDirectives) . "\n";
+
+        if ($composedDirectives !== []) {
+            $directiveLocator = Container::getInstance()->make(DirectiveLocator::class);
+
+            $result .= "\n" . implode("\n", array_map(
+                static fn (string $directive): string => $directiveLocator->create($composedDirectives[0])->definition(),
+                $composedDirectives,
+            ));
+        }
+
+        return $result;
+    }
+
     /**
      * @param  array<string, mixed>  $options
      * @param  \GraphQL\Type\Definition\ObjectType|\GraphQL\Type\Definition\InterfaceType  $type
