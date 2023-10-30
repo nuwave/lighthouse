@@ -1,7 +1,7 @@
 # Best Practices
 
 When starting out with developing a GraphQL API, it is a good idea to look at existing best practices.
-We recommend you use [GraphQL Rules](https://github.com/graphql-rules/graphql-rules/tree/master/docs/rules) and the following tips as a starting point
+We recommend you use [GraphQL Rules](https://github.com/graphql-rules/graphql-rules/blob/master/docs/rules/README.md) and the following tips as a starting point
 to develop a set of guidelines that works for you.
 
 ## In the mutation response, return a field of type Query
