@@ -16,7 +16,7 @@ use Nuwave\Lighthouse\Schema\DirectiveLocator;
 
 class SchemaPrinter extends GraphQLSchemaPrinter
 {
-    protected static function printSchemaDefinition(Schema $schema): ?string
+    protected static function printSchemaDefinition(Schema $schema): string
     {
         $composedDirectives = [];
         $schemaDirectives = [];
