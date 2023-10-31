@@ -60,7 +60,7 @@ final class ResolverProviderTest extends TestCase
         ]);
     }
 
-    /** @see https://graphql-rules.com/rules/mutation-payload-query */
+    /** @see https://github.com/graphql-rules/graphql-rules/blob/master/docs/rules/06-mutations/mutation-payload-query.md */
     public function testRootQueryMutationPayload(): void
     {
         $fooResult = 1;
