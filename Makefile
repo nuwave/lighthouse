@@ -69,3 +69,12 @@ docs: up ## Render the docs in a development server
 
 docs/node_modules: up docs/package.json docs/yarn.lock ## Install yarn dependencies
 	${dcnode} yarn
+
+.PHONY: proto
+proto:
+	${dcphp} mkdir -p /tmp/proto
+	${dcphp} protoc --php_out=/tmp/proto src/Tracing/reports.proto
+	${dcphp} sh -c 'rm -rf /tmp/proto/Nuwave/Lighthouse/Tracing/Proto/Trace_*.php'
+	${dcphp} rm -rf src/Tracing/Proto
+	${dcphp} mv /tmp/proto/Nuwave/Lighthouse/Tracing/Proto src/Tracing/Proto
+	${dcphp} rm -rf /tmp/proto

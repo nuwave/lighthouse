@@ -2,71 +2,131 @@
 
 namespace Nuwave\Lighthouse\Tracing;
 
+use Google\Protobuf\Timestamp;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Carbon;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
 use Nuwave\Lighthouse\Events\StartExecution;
+use Nuwave\Lighthouse\Events\StartRequest;
 use Nuwave\Lighthouse\Execution\ExtensionsResponse;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
+use Nuwave\Lighthouse\Federation\FederationServiceProvider;
+use Nuwave\Lighthouse\Tracing\Proto\Trace;
+use Nuwave\Lighthouse\Tracing\Proto\Trace\Node;
 
 /**
  * See https://github.com/apollographql/apollo-tracing#response-format.
  */
 class Tracing
 {
-    /** The point in time when the request was initially started. */
-    protected Carbon $executionStartAbsolute;
+    protected bool $isSubgraph;
 
-    /**
-     * The precise point in time when the request was initially started.
-     *
-     * This is either in seconds with microsecond precision (float) or nanoseconds (int).
-     */
-    protected int|float $executionStartPrecise;
+    protected ?Trace $trace = null;
 
-    /**
-     * Trace entries for a single query execution.
-     *
-     * @var array<int, array<string, mixed>>
-     */
-    protected array $resolverTraces = [];
+    protected float|int $requestStartPrecise;
+
+    /** @var array<string,Node> */
+    protected array $nodes = [];
+
+    public function __construct()
+    {
+        $app = Container::getInstance();
+        assert($app instanceof Application);
+        $this->isSubgraph = $app->providerIsLoaded(FederationServiceProvider::class);
+    }
+
+    public function handleStartRequest(StartRequest $startRequest): void
+    {
+        if ($this->isSubgraph && $startRequest->request->header('apollo-federation-include-trace') !== 'ftv1') {
+            return;
+        }
+
+        $this->trace = new Trace();
+        $this->trace->setRoot(new Node());
+        $this->trace->setFieldExecutionWeight(1);
+    }
 
     public function handleStartExecution(StartExecution $startExecution): void
     {
-        $this->executionStartAbsolute = Carbon::now();
-        $this->executionStartPrecise = $this->timestamp();
-        $this->resolverTraces = [];
+        if ($this->trace === null) {
+            return;
+        }
+
+        $this->requestStartPrecise = $this->timestamp();
+        $this->trace->setStartTime((new Timestamp())->setSeconds((int) $startExecution->moment->getTimestamp()));
     }
 
-    public function handleBuildExtensionsResponse(BuildExtensionsResponse $buildExtensionsResponse): ExtensionsResponse
+    public function handleBuildExtensionsResponse(BuildExtensionsResponse $buildExtensionsResponse): ?ExtensionsResponse
     {
-        $requestEndAbsolute = Carbon::now();
+        if ($this->trace === null) {
+            return null;
+        }
+
         $requestEndPrecise = $this->timestamp();
 
+        $this->trace->setEndTime((new Timestamp())->setSeconds((int) Carbon::now()->getTimestamp()));
+        $this->trace->setDurationNs($this->diffTimeInNanoseconds($this->requestStartPrecise, $requestEndPrecise));
+
         return new ExtensionsResponse(
-            'tracing',
-            [
-                'version' => 1,
-                'startTime' => $this->formatTimestamp($this->executionStartAbsolute),
-                'endTime' => $this->formatTimestamp($requestEndAbsolute),
-                'duration' => $this->diffTimeInNanoseconds($this->executionStartPrecise, $requestEndPrecise),
-                'execution' => [
-                    'resolvers' => $this->resolverTraces,
-                ],
-            ],
+            'ftv1',
+            base64_encode($this->trace->serializeToString()),
         );
     }
 
     /** Record resolver execution time. */
     public function record(ResolveInfo $resolveInfo, float|int $start, float|int $end): void
     {
-        $this->resolverTraces[] = [
-            'path' => $resolveInfo->path,
-            'parentType' => $resolveInfo->parentType->name,
-            'fieldName' => $resolveInfo->fieldName,
-            'returnType' => $resolveInfo->returnType->toString(),
-            'startOffset' => $this->diffTimeInNanoseconds($this->executionStartPrecise, $start),
-            'duration' => $this->diffTimeInNanoseconds($start, $end),
-        ];
+        if ($this->trace === null) {
+            return;
+        }
+
+        $node = $this->newNode($resolveInfo->path);
+        $node->setType($resolveInfo->returnType->toString());
+        $node->setParentType($resolveInfo->parentType->toString());
+        $node->setStartTime($this->diffTimeInNanoseconds($start, $this->requestStartPrecise));
+        $node->setEndTime($this->diffTimeInNanoseconds($end, $this->requestStartPrecise));
+    }
+
+    /** @param  array<int, int|string>  $path */
+    protected function newNode(array $path): Node
+    {
+        $node = new Node();
+
+        $field = $path[count($path) - 1];
+        if (is_int($field)) {
+            $node->setIndex($field);
+        } else {
+            $node->setResponseName($field);
+        }
+
+        $this->nodes[implode('.', $path)] = $node;
+
+        $parentNode = $this->ensureParentNode($path);
+
+        if ($parentNode !== null) {
+            $parentNode->getChild()[] = $node;
+        }
+
+        return $node;
+    }
+
+    /** @param  array<int, int|string>  $path */
+    protected function ensureParentNode(array $path): ?Node
+    {
+        if ($path === []) {
+            return null;
+        }
+
+        if (count($path) === 1) {
+            return $this->trace?->getRoot();
+        }
+
+        $parentPath = array_slice($path, 0, -1);
+
+        $parentNode = $this->nodes[implode('.', $parentPath)] ?? null;
+
+        return $parentNode ?? $this->newNode($parentPath);
     }
 
     /**

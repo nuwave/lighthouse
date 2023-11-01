@@ -10,6 +10,7 @@ RUN apt-get update && \
         libzip-dev \
         zip \
         libicu-dev \
+        protobuf-compiler \
     && docker-php-ext-install \
         zip \
         mysqli \

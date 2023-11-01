@@ -7,12 +7,14 @@ use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Events\ValidateSchema;
+use Nuwave\Lighthouse\Tracing\TracingServiceProvider;
 
 class FederationServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
         $this->app->singleton(EntityResolverProvider::class);
+        $this->app->register(TracingServiceProvider::class);
     }
 
     public function boot(Dispatcher $dispatcher): void
