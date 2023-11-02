@@ -54,7 +54,12 @@ class Tracing
         }
 
         $this->requestStartPrecise = $this->timestamp();
-        $this->trace->setStartTime((new Timestamp())->setSeconds((int) $startExecution->moment->getTimestamp()));
+
+        $this->trace->setStartTime(
+            (new Timestamp())
+                ->setSeconds($startExecution->moment->getTimestamp())
+                ->setNanos($startExecution->moment->micro * 1000)
+        );
     }
 
     public function handleBuildExtensionsResponse(BuildExtensionsResponse $buildExtensionsResponse): ?ExtensionsResponse
@@ -63,9 +68,14 @@ class Tracing
             return null;
         }
 
+        $requestEnd = Carbon::now();
         $requestEndPrecise = $this->timestamp();
 
-        $this->trace->setEndTime((new Timestamp())->setSeconds((int) Carbon::now()->getTimestamp()));
+        $this->trace->setEndTime(
+            (new Timestamp())
+                ->setSeconds((int) $requestEnd->getTimestamp())
+                ->setNanos($requestEnd->micro * 1000)
+        );
         $this->trace->setDurationNs($this->diffTimeInNanoseconds($this->requestStartPrecise, $requestEndPrecise));
 
         return new ExtensionsResponse(
