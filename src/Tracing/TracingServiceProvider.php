@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Tracing;
 
 use GraphQL\Language\Parser;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
@@ -26,8 +27,8 @@ class TracingServiceProvider extends ServiceProvider
             $manipulateAST->documentAST,
             Parser::constDirective('@tracing'),
         ));
-        $dispatcher->listen(StartRequest::class, Tracing::class . '@handleStartRequest');
-        $dispatcher->listen(StartExecution::class, Tracing::class . '@handleStartExecution');
-        $dispatcher->listen(BuildExtensionsResponse::class, Tracing::class . '@handleBuildExtensionsResponse');
+        $dispatcher->listen(StartRequest::class, fn (StartRequest $event) => Container::getInstance()->make(Tracing::class)->handleStartRequest($event));
+        $dispatcher->listen(StartExecution::class, fn (StartExecution $event) => Container::getInstance()->make(Tracing::class)->handleStartExecution($event));
+        $dispatcher->listen(BuildExtensionsResponse::class, fn (BuildExtensionsResponse $event) => Container::getInstance()->make(Tracing::class)->handleBuildExtensionsResponse($event));
     }
 }
