@@ -94,8 +94,8 @@ class Tracing
         $node = $this->newNode($resolveInfo->path);
         $node->setType($resolveInfo->returnType->toString());
         $node->setParentType($resolveInfo->parentType->toString());
-        $node->setStartTime($this->diffTimeInNanoseconds($start, $this->requestStartPrecise));
-        $node->setEndTime($this->diffTimeInNanoseconds($end, $this->requestStartPrecise));
+        $node->setStartTime($this->diffTimeInNanoseconds($this->requestStartPrecise, $start));
+        $node->setEndTime($this->diffTimeInNanoseconds($this->requestStartPrecise, $end));
     }
 
     /** @param  array<int, int|string>  $path */
