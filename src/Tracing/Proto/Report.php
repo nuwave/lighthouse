@@ -21,7 +21,7 @@ use Google\Protobuf\Internal\GPBUtil;
 class Report extends \Google\Protobuf\Internal\Message
 {
     /** Generated from protobuf field <code>.ReportHeader header = 1;</code> */
-    protected $header;
+    protected ?\Nuwave\Lighthouse\Tracing\Proto\ReportHeader $header = null;
 
     /**
      * key is statsReportKey (# operationName\nsignature) Note that the nested
@@ -44,7 +44,7 @@ class Report extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp end_time = 2;</code>
      */
-    protected $end_time;
+    protected ?\Google\Protobuf\Timestamp $end_time = null;
 
     /**
      * Total number of operations processed during this period.
@@ -85,7 +85,7 @@ class Report extends \Google\Protobuf\Internal\Message
      *           If there are no traces and no end_time present the report will not be able to be processed.
      *           Note: This will override the end_time from traces.
      *     @var int|string $operation_count
-     *           Total number of operations processed during this period.
+     *           Total number of operations processed during this period
      *     @var bool $traces_pre_aggregated
      *           If this is set to true, the stats in TracesWithStats.stats_with_context
      *           represent all of the operations described from this report, and the

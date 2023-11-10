@@ -16,14 +16,14 @@ class Trace extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp start_time = 4;</code>
      */
-    protected $start_time;
+    protected ?\Google\Protobuf\Timestamp $start_time = null;
 
     /**
      * Wallclock time when the trace ended.
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp end_time = 3;</code>
      */
-    protected $end_time;
+    protected ?\Google\Protobuf\Timestamp $end_time = null;
 
     /**
      * High precision duration of the trace; may not equal end_time-start_time
@@ -39,7 +39,7 @@ class Trace extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.Trace.Node root = 14;</code>
      */
-    protected $root;
+    protected ?\Nuwave\Lighthouse\Tracing\Proto\Trace\Node $root = null;
 
     /**
      * If this is true, the trace is potentially missing some nodes that were
@@ -83,7 +83,7 @@ class Trace extends \Google\Protobuf\Internal\Message
     protected $unexecutedOperationName = '';
 
     /** Generated from protobuf field <code>.Trace.Details details = 6;</code> */
-    protected $details;
+    protected ?\Nuwave\Lighthouse\Tracing\Proto\Trace\Details $details = null;
 
     /** Generated from protobuf field <code>string client_name = 7;</code> */
     protected $client_name = '';
@@ -92,10 +92,10 @@ class Trace extends \Google\Protobuf\Internal\Message
     protected $client_version = '';
 
     /** Generated from protobuf field <code>.Trace.HTTP http = 10;</code> */
-    protected $http;
+    protected ?\Nuwave\Lighthouse\Tracing\Proto\Trace\HTTP $http = null;
 
     /** Generated from protobuf field <code>.Trace.CachePolicy cache_policy = 18;</code> */
-    protected $cache_policy;
+    protected ?\Nuwave\Lighthouse\Tracing\Proto\Trace\CachePolicy $cache_policy = null;
 
     /**
      * If this Trace was created by a Router/Gateway, this is the query plan, including
@@ -105,7 +105,7 @@ class Trace extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.Trace.QueryPlanNode query_plan = 26;</code>
      */
-    protected $query_plan;
+    protected ?\Nuwave\Lighthouse\Tracing\Proto\Trace\QueryPlanNode $query_plan = null;
 
     /**
      * Was this response served from a full query response cache?  (In that case
@@ -164,15 +164,15 @@ class Trace extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @var \Google\Protobuf\Timestamp $start_time
-     *           Wallclock time when the trace began.
+     *           Wallclock time when the trace began
      *     @var \Google\Protobuf\Timestamp $end_time
-     *           Wallclock time when the trace ended.
+     *           Wallclock time when the trace ended
      *     @var int|string $duration_ns
      *           High precision duration of the trace; may not equal end_time-start_time
-     *           (eg, if your machine's clock changed during the trace).
+     *           (eg, if your machine's clock changed during the trace)
      *     @var \Nuwave\Lighthouse\Tracing\Proto\Trace\Node $root
      *           A tree containing information about all resolvers run directly by this
-     *           service, including errors.
+     *           service, including errors
      *     @var bool $is_incomplete
      *           If this is true, the trace is potentially missing some nodes that were
      *           present on the query plan. This can happen if the trace span buffer used
@@ -195,7 +195,7 @@ class Trace extends \Google\Protobuf\Internal\Message
      *     @var string $unexecutedOperationBody
      *           Optional: when GraphQL parsing or validation against the GraphQL schema fails, these fields
      *           can include reference to the operation being sent for users to dig into the set of operations
-     *           that are failing validation.
+     *           that are failing validation
      *     @var string $unexecutedOperationName
      *     @var \Nuwave\Lighthouse\Tracing\Proto\Trace\Details $details
      *     @var string $client_name

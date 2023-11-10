@@ -32,7 +32,7 @@ class FetchNode extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.Trace trace = 3;</code>
      */
-    protected $trace;
+    protected ?\Nuwave\Lighthouse\Tracing\Proto\Trace $trace = null;
 
     /**
      * relative to the outer trace's start_time, in ns, measured in the Router/Gateway.
@@ -47,10 +47,10 @@ class FetchNode extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp sent_time = 5;</code>
      */
-    protected $sent_time;
+    protected ?\Google\Protobuf\Timestamp $sent_time = null;
 
     /** Generated from protobuf field <code>.google.protobuf.Timestamp received_time = 6;</code> */
-    protected $received_time;
+    protected ?\Google\Protobuf\Timestamp $received_time = null;
 
     /**
      * Constructor.
@@ -66,12 +66,12 @@ class FetchNode extends \Google\Protobuf\Internal\Message
      *     @var \Nuwave\Lighthouse\Tracing\Proto\Trace $trace
      *           This Trace only contains start_time, end_time, duration_ns, and root;
      *           all timings were calculated **on the subgraph**, and clock skew
-     *           will be handled by the ingress server.
+     *           will be handled by the ingress server
      *     @var int|string $sent_time_offset
-     *           relative to the outer trace's start_time, in ns, measured in the Router/Gateway.
+     *           relative to the outer trace's start_time, in ns, measured in the Router/Gateway
      *     @var \Google\Protobuf\Timestamp $sent_time
      *           Wallclock times measured in the Router/Gateway for when this operation was
-     *           sent and received.
+     *           sent and received
      *     @var \Google\Protobuf\Timestamp $received_time
      * }
      */
@@ -168,11 +168,9 @@ class FetchNode extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.Trace trace = 3;</code>
      *
-     * @param  \Nuwave\Lighthouse\Tracing\Proto\Trace  $var
-     *
      * @return $this
      */
-    public function setTrace($var)
+    public function setTrace(?\Nuwave\Lighthouse\Tracing\Proto\Trace $var)
     {
         GPBUtil::checkMessage($var, \Nuwave\Lighthouse\Tracing\Proto\Trace::class);
         $this->trace = $var;
@@ -232,11 +230,9 @@ class FetchNode extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.google.protobuf.Timestamp sent_time = 5;</code>
      *
-     * @param  \Google\Protobuf\Timestamp  $var
-     *
      * @return $this
      */
-    public function setSentTime($var)
+    public function setSentTime(?\Google\Protobuf\Timestamp $var)
     {
         GPBUtil::checkMessage($var, \Google\Protobuf\Timestamp::class);
         $this->sent_time = $var;
@@ -263,11 +259,9 @@ class FetchNode extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.google.protobuf.Timestamp received_time = 6;</code>.
      *
-     * @param  \Google\Protobuf\Timestamp  $var
-     *
      * @return $this
      */
-    public function setReceivedTime($var)
+    public function setReceivedTime(?\Google\Protobuf\Timestamp $var)
     {
         GPBUtil::checkMessage($var, \Google\Protobuf\Timestamp::class);
         $this->received_time = $var;

@@ -30,7 +30,7 @@ class QueryLatencyStats extends \Google\Protobuf\Internal\Message
     private $cache_latency_count;
 
     /** Generated from protobuf field <code>.PathErrorStats root_error_stats = 7;</code> */
-    protected $root_error_stats;
+    protected ?\Nuwave\Lighthouse\Tracing\Proto\PathErrorStats $root_error_stats = null;
 
     /** Generated from protobuf field <code>uint64 requests_with_errors_count = 8;</code> */
     protected $requests_with_errors_count = 0;

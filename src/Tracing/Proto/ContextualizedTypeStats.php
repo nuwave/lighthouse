@@ -12,7 +12,7 @@ use Google\Protobuf\Internal\GPBUtil;
 class ContextualizedTypeStats extends \Google\Protobuf\Internal\Message
 {
     /** Generated from protobuf field <code>.StatsContext context = 1;</code> */
-    protected $context;
+    protected ?\Nuwave\Lighthouse\Tracing\Proto\StatsContext $context = null;
 
     /** Generated from protobuf field <code>map<string, .TypeStat> per_type_stat = 2;</code> */
     private $per_type_stat;

@@ -12,7 +12,7 @@ use Google\Protobuf\Internal\GPBUtil;
 class DeferNodePrimary extends \Google\Protobuf\Internal\Message
 {
     /** Generated from protobuf field <code>.Trace.QueryPlanNode node = 1;</code> */
-    protected $node;
+    protected ?\Nuwave\Lighthouse\Tracing\Proto\Trace\QueryPlanNode $node = null;
 
     /**
      * Constructor.
@@ -48,11 +48,9 @@ class DeferNodePrimary extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.Trace.QueryPlanNode node = 1;</code>.
      *
-     * @param  \Nuwave\Lighthouse\Tracing\Proto\Trace\QueryPlanNode  $var
-     *
      * @return $this
      */
-    public function setNode($var)
+    public function setNode(?\Nuwave\Lighthouse\Tracing\Proto\Trace\QueryPlanNode $var)
     {
         GPBUtil::checkMessage($var, \Nuwave\Lighthouse\Tracing\Proto\Trace\QueryPlanNode::class);
         $this->node = $var;
