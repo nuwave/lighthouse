@@ -128,7 +128,7 @@ class GraphQL
 
         /** @var array<\Nuwave\Lighthouse\Execution\ExtensionsResponse|null> $extensionsResponses */
         $extensionsResponses = (array) $this->eventDispatcher->dispatch(
-            new BuildExtensionsResponse(),
+            new BuildExtensionsResponse($result),
         );
 
         foreach ($extensionsResponses as $extensionsResponse) {

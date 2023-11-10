@@ -3,6 +3,8 @@
 namespace Nuwave\Lighthouse\Tracing;
 
 use Google\Protobuf\Timestamp;
+use GraphQL\Error\Error;
+use GraphQL\Language\SourceLocation;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Carbon;
@@ -13,6 +15,7 @@ use Nuwave\Lighthouse\Execution\ExtensionsResponse;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Federation\FederationServiceProvider;
 use Nuwave\Lighthouse\Tracing\Proto\Trace;
+use Nuwave\Lighthouse\Tracing\Proto\Trace\Location;
 use Nuwave\Lighthouse\Tracing\Proto\Trace\Node;
 
 /**
@@ -58,7 +61,7 @@ class Tracing
         $this->trace->setStartTime(
             (new Timestamp())
                 ->setSeconds($startExecution->moment->getTimestamp())
-                ->setNanos($startExecution->moment->micro * 1000)
+                ->setNanos($startExecution->moment->micro * 1000),
         );
     }
 
@@ -73,10 +76,16 @@ class Tracing
 
         $this->trace->setEndTime(
             (new Timestamp())
-                ->setSeconds((int) $requestEnd->getTimestamp())
-                ->setNanos($requestEnd->micro * 1000)
+                ->setSeconds($requestEnd->getTimestamp())
+                ->setNanos($requestEnd->micro * 1000),
         );
         $this->trace->setDurationNs($this->diffTimeInNanoseconds($this->requestStartPrecise, $requestEndPrecise));
+
+        foreach ($buildExtensionsResponse->result->errors as $resultError) {
+            $this->recordError($resultError);
+        }
+
+        assert($this->trace !== null);
 
         return new ExtensionsResponse(
             'ftv1',
@@ -91,16 +100,50 @@ class Tracing
             return;
         }
 
-        $node = $this->newNode($resolveInfo->path);
+        $node = $this->findOrNewNode($resolveInfo->path);
         $node->setType($resolveInfo->returnType->toString());
         $node->setParentType($resolveInfo->parentType->toString());
         $node->setStartTime($this->diffTimeInNanoseconds($this->requestStartPrecise, $start));
         $node->setEndTime($this->diffTimeInNanoseconds($this->requestStartPrecise, $end));
     }
 
-    /** @param  array<int, int|string>  $path */
-    protected function newNode(array $path): Node
+    public function recordError(Error $error): void
     {
+        if ($this->trace === null) {
+            return;
+        }
+
+        $traceError = new Trace\Error();
+        $traceError->setMessage($error->getMessage());
+        $traceError->setLocation(array_map(static function (SourceLocation $sourceLocation): Location {
+            $location = new Location();
+            $location->setLine($sourceLocation->line);
+            $location->setColumn($sourceLocation->column);
+
+            return $location;
+        }, $error->getLocations()));
+        $traceError->setJson(json_encode($error->jsonSerialize(), JSON_THROW_ON_ERROR));
+
+        $node = $this->findOrNewNode($error->getPath() ?? []);
+        $node->setError([$traceError]);
+    }
+
+    /** @param  array<int, int|string>  $path */
+    protected function findOrNewNode(array $path): Node
+    {
+        assert($this->trace !== null);
+        assert($this->trace->getRoot() !== null);
+
+        if ($path === []) {
+            return $this->trace->getRoot();
+        }
+
+        $pathKey = implode('.', $path);
+
+        if (isset($this->nodes[$pathKey])) {
+            return $this->nodes[$pathKey];
+        }
+
         $node = new Node();
 
         $field = $path[count($path) - 1];
@@ -110,7 +153,7 @@ class Tracing
             $node->setResponseName($field);
         }
 
-        $this->nodes[implode('.', $path)] = $node;
+        $this->nodes[$pathKey] = $node;
 
         $parentNode = $this->ensureParentNode($path);
 
@@ -136,7 +179,7 @@ class Tracing
 
         $parentNode = $this->nodes[implode('.', $parentPath)] ?? null;
 
-        return $parentNode ?? $this->newNode($parentPath);
+        return $parentNode ?? $this->findOrNewNode($parentPath);
     }
 
     /**
