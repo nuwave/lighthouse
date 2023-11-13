@@ -190,6 +190,18 @@ final class ASTBuilderTest extends TestCase
         $this->astBuilder->documentAST();
     }
 
+    public function testDoesNotAllowExtendingUndefinedUnions(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        union MyFirstEnum = String
+
+        extend union MySecondUnion = Int
+        ';
+
+        $this->expectExceptionObject(new DefinitionException('Could not find a base definition MySecondUnion of kind ' . NodeKind::UNION_TYPE_EXTENSION . ' to extend.'));
+        $this->astBuilder->documentAST();
+    }
+
     public function testDoesNotAllowDuplicateFieldsOnTypeExtensions(): void
     {
         $this->schema = /** @lang GraphQL */ '
