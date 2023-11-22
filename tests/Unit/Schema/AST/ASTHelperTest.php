@@ -424,7 +424,7 @@ GRAPHQL
         assert($inputType instanceof InputObjectTypeDefinitionNode);
 
         $fieldType = $inputType->fields[0];
-        assert($fieldType instanceof FieldDefinitionNode);
+        assert($fieldType instanceof InputValueDefinitionNode);
 
         $typeType = $fieldType->type;
         assert($typeType instanceof NamedTypeNode);
