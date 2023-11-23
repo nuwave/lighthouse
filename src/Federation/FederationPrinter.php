@@ -2,11 +2,8 @@
 
 namespace Nuwave\Lighthouse\Federation;
 
-use GraphQL\Language\AST\ArgumentNode;
-use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Type\Definition\Argument;
 use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\EnumType;
@@ -97,7 +94,7 @@ class FederationPrinter
 
         $federationDirectives = array_merge(
             static::FEDERATION_DIRECTIVES,
-            static::getComposedDirectives($schema),
+            FederationHelper::composedDirectives($schema),
         );
 
         $config->setDirectives(array_filter(
@@ -156,29 +153,5 @@ class FederationPrinter
             new Schema($config),
             ['printDirectives' => $printDirectives],
         );
-    }
-
-    /** @return array<string> */
-    protected static function getComposedDirectives(Schema $schema): array
-    {
-        $composedDirectives = [];
-
-        foreach ($schema->extensionASTNodes as $extension) {
-            foreach ($extension->directives as $directive) {
-                assert($directive instanceof DirectiveNode);
-
-                if ($directive->name->value === 'composeDirective') {
-                    foreach ($directive->arguments as $argument) {
-                        assert($argument instanceof ArgumentNode);
-
-                        if ($argument->name->value === 'name' && $argument->value instanceof StringValueNode) {
-                            $composedDirectives[] = ltrim($argument->value->value, '@');
-                        }
-                    }
-                }
-            }
-        }
-
-        return $composedDirectives;
     }
 }

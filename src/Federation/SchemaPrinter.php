@@ -2,9 +2,7 @@
 
 namespace Nuwave\Lighthouse\Federation;
 
-use GraphQL\Language\AST\ArgumentNode;
 use GraphQL\Language\AST\DirectiveNode;
-use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Language\Printer;
 use GraphQL\Type\Definition\FieldDefinition;
 use GraphQL\Type\Definition\InterfaceType;
@@ -18,35 +16,18 @@ class SchemaPrinter extends GraphQLSchemaPrinter
 {
     protected static function printSchemaDefinition(Schema $schema): string
     {
-        $composedDirectives = [];
-        $schemaDirectives = [];
-
-        foreach ($schema->extensionASTNodes as $extension) {
-            foreach ($extension->directives as $directive) {
-                assert($directive instanceof DirectiveNode);
-
-                $schemaDirectives[] = $directive;
-
-                if ($directive->name->value === 'composeDirective') {
-                    foreach ($directive->arguments as $argument) {
-                        assert($argument instanceof ArgumentNode);
-
-                        if ($argument->name->value === 'name' && $argument->value instanceof StringValueNode) {
-                            $composedDirectives[] = ltrim($argument->value->value, '@');
-                        }
-                    }
-                }
-            }
-        }
+        $schemaDirectives = FederationHelper::schemaDirectives($schema);
 
         $result = 'extend schema' . self::printDirectives($schemaDirectives) . "\n";
 
-        if ($composedDirectives !== []) {
+        $directivesToPreserve = FederationHelper::composedDirectives($schema);
+
+        if ($directivesToPreserve !== []) {
             $directiveLocator = Container::getInstance()->make(DirectiveLocator::class);
 
             $result .= "\n" . implode("\n", array_map(
-                static fn (string $directive): string => $directiveLocator->create($composedDirectives[0])->definition(),
-                $composedDirectives,
+                static fn (string $directive): string => $directiveLocator->create($directive)->definition(),
+                $directivesToPreserve,
             ));
         }
 

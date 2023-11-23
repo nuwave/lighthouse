@@ -243,7 +243,6 @@ class DocumentAST implements Arrayable
         // @phpstan-ignore-next-line Since we start from the array form, the generic type does not match
         $this->directives = new NodeList($directives);
         // @phpstan-ignore-next-line Since we start from the array form, the generic type does not match
-
         $this->schemaExtensions = array_map(fn (array $node): SchemaExtensionNode => $this->hydrateSchemaExtension($node), $schemaExtensions);
     }
 

@@ -4,7 +4,6 @@ namespace Tests\Unit\Schema\AST;
 
 use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\DirectiveNode;
-use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\SchemaExtensionNode;
 use GraphQL\Language\Parser;
@@ -109,7 +108,8 @@ final class DocumentASTTest extends TestCase
 
         $this->assertSame(['Query'], $reserialized->classNameToObjectTypeNames[User::class]);
 
-        $this->assertInstanceOf(SchemaExtensionNode::class, $reserialized->schemaExtensions[0]);
-        $this->assertInstanceOf(DirectiveNode::class, $reserialized->schemaExtensions[0]->directives[0]);
+        $schemaExtension = $reserialized->schemaExtensions[0];
+        $this->assertInstanceOf(SchemaExtensionNode::class, $schemaExtension);
+        $this->assertInstanceOf(DirectiveNode::class, $schemaExtension->directives[0]);
     }
 }
