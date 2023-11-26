@@ -61,4 +61,4 @@ parameters:
   - '#Parameter \#2 \$type of method Nuwave\\Lighthouse\\Schema\\TypeRegistry::.+Lazy\(\) expects callable\(\): GraphQL\\Type\\Definition\\Type&GraphQL\\Type\\Definition\\NamedType, Closure\(\): GraphQL\\Type\\Definition\\ObjectType given\.#'
 
   # Older versions of bensampo/laravel-enum are not generic yet
-  - '#contains generic type BenSampo\\Enum\\Enum<mixed> but class BenSampo\\Enum\\Enum is not generic\.#'
+  - '#contains generic type BenSampo\\Enum\\Enum<+*> but class BenSampo\\Enum\\Enum is not generic\.#'
