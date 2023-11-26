@@ -249,6 +249,8 @@ class DocumentAST implements Arrayable
     /**
      * AST::fromArray does not hydrate SchemaExtensionNode.
      *
+     * TODO remove when this is implemented in https://github.com/webonyx/graphql-php
+     *
      * @param  array<string, mixed>  $node
      */
     protected function hydrateSchemaExtension(array $node): SchemaExtensionNode

@@ -9,7 +9,7 @@ use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 class FederationHelper
 {
     /** @return array<string> */
-    public static function composedDirectives(Schema $schema): array
+    public static function directivesToCompose(Schema $schema): array
     {
         $composedDirectives = [];
 
@@ -29,7 +29,7 @@ class FederationHelper
     }
 
     /** @return array<DirectiveNode> */
-    public static function schemaDirectives(Schema $schema): array
+    public static function schemaExtensionDirectives(Schema $schema): array
     {
         $schemaDirectives = [];
 

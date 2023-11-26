@@ -16,19 +16,21 @@ class SchemaPrinter extends GraphQLSchemaPrinter
 {
     protected static function printSchemaDefinition(Schema $schema): string
     {
-        $schemaDirectives = FederationHelper::schemaDirectives($schema);
+        $schemaExtensionDirectives = self::printDirectives(FederationHelper::schemaExtensionDirectives($schema));
+        $result = "extend schema{$schemaExtensionDirectives}\n";
 
-        $result = 'extend schema' . self::printDirectives($schemaDirectives) . "\n";
+        $directivesToCompose = FederationHelper::directivesToCompose($schema);
 
-        $directivesToPreserve = FederationHelper::composedDirectives($schema);
-
-        if ($directivesToPreserve !== []) {
+        if ($directivesToCompose !== []) {
             $directiveLocator = Container::getInstance()->make(DirectiveLocator::class);
 
-            $result .= "\n" . implode("\n", array_map(
-                static fn (string $directive): string => $directiveLocator->create($directive)->definition(),
-                $directivesToPreserve,
-            ));
+            $directivesToComposeDefinitions = array_map(
+                static fn (string $directive): string => $directiveLocator
+                    ->create($directive)
+                    ->definition(),
+                $directivesToCompose,
+            );
+            $result .= "\n" . implode("\n\n", $directivesToComposeDefinitions);
         }
 
         return $result;

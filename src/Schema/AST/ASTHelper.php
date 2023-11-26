@@ -172,11 +172,7 @@ class ASTHelper
         return AST::valueFromAST($defaultValue, $argumentType);
     }
 
-    /**
-     * Get a directive with the given name if it is defined upon the node.
-     *
-     * As of now, directives may only be used once per location.
-     */
+    /** Get a directive with the given name if it is defined upon the node, assuming it is only used once. */
     public static function directiveDefinition(Node $definitionNode, string $name): ?DirectiveNode
     {
         foreach (static::directiveDefinitions($definitionNode, $name) as $directive) {
@@ -187,16 +183,15 @@ class ASTHelper
     }
 
     /**
-     * Get a directive with the given name if it is defined upon the node.
-     *
-     * As of now, directives may only be used once per location.
+     * Get all directives with the given name if it is defined upon the node.
      *
      * @return iterable<\GraphQL\Language\AST\DirectiveNode>
      */
     public static function directiveDefinitions(Node $definitionNode, string $name): iterable
     {
         if (! property_exists($definitionNode, 'directives')) {
-            throw new \Exception('Expected Node class with property `directives`, got: ' . $definitionNode::class);
+            $nodeClassWithoutDirectives = $definitionNode::class;
+            throw new \Exception("Expected Node class with property `directives`, got: {$nodeClassWithoutDirectives}.");
         }
 
         /** @var \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\DirectiveNode> $directives */

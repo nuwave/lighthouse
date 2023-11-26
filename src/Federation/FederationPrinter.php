@@ -94,7 +94,7 @@ class FederationPrinter
 
         $federationDirectives = array_merge(
             static::FEDERATION_DIRECTIVES,
-            FederationHelper::composedDirectives($schema),
+            FederationHelper::directivesToCompose($schema),
         );
 
         $config->setDirectives(array_filter(
