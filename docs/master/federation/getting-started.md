@@ -6,9 +6,7 @@ Federation enables you to combine GraphQL services into a single unified data gr
 Read more about the core concepts and motivation in the [Apollo Federation docs](https://www.apollographql.com/docs/federation).
 
 Lighthouse can act as a federation capable service as described in the [Apollo Federation specification](https://www.apollographql.com/docs/federation/federation-spec) v2.
-It can not:
-- serve as a [federation gateway](https://www.apollographql.com/docs/federation/gateway)
-- provide [federated tracing](https://www.apollographql.com/docs/federation/metrics)
+It can not serve as a [federation gateway](https://www.apollographql.com/docs/federation/gateway).
 
 ## Setup
 
@@ -30,11 +28,11 @@ php artisan lighthouse:print-schema --federation
 
 ## Apollo Federation v2
 
-Support for Apollo Federation v2 is `opt-in` and can be enabled adding the following schema extension in your graphql schema (take a look at [apollo documentation](https://www.apollographql.com/docs/federation/federated-types/federated-directives) for up to date spec):
+Support for Apollo Federation v2 is `opt-in` and can be enabled by adding the following to your schema.
+See [the Apollo documentation on federated directives](https://www.apollographql.com/docs/federation/federated-types/federated-directives) for the latest spec.
 
 ```graphql
-extend schema
-@link(
+extend schema @link(
     url: "https://specs.apollo.dev/federation/v2.3",
     import: [
         "@composeDirective",
@@ -58,24 +56,36 @@ Some features of the Apollo Federation specification **are not supported** by Li
 
 #### Renaming directives
 
-Renaming imported directives is not supported. You can only use the default names.
+Renaming imported directives is not supported.
+You can only use the default names.
 
 ```graphql
 extend schema
-@link(url: "https://specs.apollo.dev/federation/v2.3",
-    import: [{ name: "@key", as: "@uniqueKey"}, "@shareable"])
+@link(
+    url: "https://specs.apollo.dev/federation/v2.3",
+    import: [
+        { name: "@key", as: "@uniqueKey" },
+        "@shareable"
+    ]
+)
 ```
 
 #### Namespaced directives
 
-Using directives from a namespace without import is not supported. You should import the directive and use the default name.
+Using directives from a namespace without an import is not supported.
+You should import the directive and use the default name.
 
 ```graphql
-extend schema
-@link(url: "https://specs.apollo.dev/federation/v2.3",
-    import: ["@key"])
+extend schema @link(
+    url: "https://specs.apollo.dev/federation/v2.3",
+    import: ["@key"]
+)
 
 type Book @federation__shareable {
     title: String!
 }
 ```
+
+#### Federated tracing
+
+[Federated tracing](https://www.apollographql.com/docs/federation/metrics) is not supported.
