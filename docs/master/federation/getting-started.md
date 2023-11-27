@@ -27,3 +27,55 @@ In order to generate a `.graphql` schema file suitable for publishing, use the `
 ```sh
 php artisan lighthouse:print-schema --federation
 ```
+
+## Apollo Federation v2
+
+Support for Apollo Federation v2 is `opt-in` and can be enabled adding the following schema extension in your graphql schema (take a look at [apollo documentation](https://www.apollographql.com/docs/federation/federated-types/federated-directives) for up to date spec):
+
+```graphql
+extend schema
+@link(
+    url: "https://specs.apollo.dev/federation/v2.3",
+    import: [
+        "@composeDirective",
+        "@extends",
+        "@external",
+        "@inaccessible",
+        "@interfaceObject",
+        "@key",
+        "@override",
+        "@provides",
+        "@requires",
+        "@shareable",
+        "@tag"
+    ]
+)
+```
+
+### Unsupported features
+
+Some features of the Apollo Federation specification **are not supported** by Lighthouse:
+
+#### Renaming directives
+
+Renaming imported directives is not supported. You can only use the default names.
+
+```graphql
+extend schema
+@link(url: "https://specs.apollo.dev/federation/v2.3",
+    import: [{ name: "@key", as: "@uniqueKey"}, "@shareable"])
+```
+
+#### Namespaced directives
+
+Using directives from a namespace without import is not supported. You should import the directive and use the default name.
+
+```graphql
+extend schema
+@link(url: "https://specs.apollo.dev/federation/v2.3",
+    import: ["@key"])
+
+type Book @federation__shareable {
+    title: String!
+}
+```
