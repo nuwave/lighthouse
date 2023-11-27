@@ -4,8 +4,10 @@ namespace Nuwave\Lighthouse\Schema\AST;
 
 use GraphQL\Error\SyntaxError;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
+use GraphQL\Language\AST\Location;
 use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\AST\SchemaExtensionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionNode;
 use GraphQL\Language\Parser;
@@ -29,6 +31,7 @@ use Nuwave\Lighthouse\Support\Utils;
  *     types: array<int, array<string, mixed>>,
  *     directives: array<int, array<string, mixed>>,
  *     classNameToObjectTypeName: ClassNameToObjectTypeName,
+ *     schemaExtensions: array<int, array<string, mixed>>,
  * }
  *
  * @implements \Illuminate\Contracts\Support\Arrayable<string, mixed>
@@ -40,6 +43,8 @@ class DocumentAST implements Arrayable
     public const DIRECTIVES = 'directives';
 
     public const CLASS_NAME_TO_OBJECT_TYPE_NAME = 'classNameToObjectTypeName';
+
+    public const SCHEMA_EXTENSIONS = 'schemaExtensions';
 
     /**
      * The types within the schema.
@@ -79,6 +84,9 @@ class DocumentAST implements Arrayable
      * @var ClassNameToObjectTypeName
      */
     public array $classNameToObjectTypeNames = [];
+
+    /** @var array<int,SchemaExtensionNode> */
+    public array $schemaExtensions = [];
 
     /** Create a new DocumentAST instance from a schema. */
     public static function fromSource(string $schema): self
@@ -132,6 +140,8 @@ class DocumentAST implements Arrayable
                 $instance->typeExtensions[$definition->getName()->value][] = $definition;
             } elseif ($definition instanceof DirectiveDefinitionNode) {
                 $instance->directives[$definition->name->value] = $definition;
+            } elseif ($definition instanceof SchemaExtensionNode) {
+                $instance->schemaExtensions[] = $definition;
             } else {
                 throw new \Exception('Unknown definition type: ' . $definition::class);
             }
@@ -186,6 +196,7 @@ class DocumentAST implements Arrayable
             // @phpstan-ignore-next-line Before serialization, those are arrays
             self::DIRECTIVES => array_map([AST::class, 'toArray'], $this->directives),
             self::CLASS_NAME_TO_OBJECT_TYPE_NAME => $this->classNameToObjectTypeNames,
+            self::SCHEMA_EXTENSIONS => array_map([AST::class, 'toArray'], $this->schemaExtensions),
         ];
     }
 
@@ -221,6 +232,7 @@ class DocumentAST implements Arrayable
             self::TYPES => $types,
             self::DIRECTIVES => $directives,
             self::CLASS_NAME_TO_OBJECT_TYPE_NAME => $this->classNameToObjectTypeNames,
+            self::SCHEMA_EXTENSIONS => $schemaExtensions,
         ] = $ast;
 
         // Utilize the NodeList for lazy unserialization for performance gains.
@@ -230,5 +242,39 @@ class DocumentAST implements Arrayable
         $this->types = new NodeList($types);
         // @phpstan-ignore-next-line Since we start from the array form, the generic type does not match
         $this->directives = new NodeList($directives);
+        // @phpstan-ignore-next-line Since we start from the array form, the generic type does not match
+        $this->schemaExtensions = array_map(fn (array $node): SchemaExtensionNode => $this->hydrateSchemaExtension($node), $schemaExtensions);
+    }
+
+    /**
+     * AST::fromArray does not hydrate SchemaExtensionNode.
+     *
+     * TODO remove when this is implemented in https://github.com/webonyx/graphql-php
+     *
+     * @param  array<string, mixed>  $node
+     */
+    protected function hydrateSchemaExtension(array $node): SchemaExtensionNode
+    {
+        $instance = new SchemaExtensionNode([]);
+
+        if (isset($node['loc']['start'], $node['loc']['end'])) {
+            $instance->loc = Location::create($node['loc']['start'], $node['loc']['end']);
+        }
+
+        foreach ($node as $key => $value) {
+            if ($key === 'loc' || $key === 'kind') {
+                continue;
+            }
+
+            if (\is_array($value)) {
+                $value = isset($value[0]) || $value === []
+                    ? new NodeList($value)
+                    : AST::fromArray($value);
+            }
+
+            $instance->{$key} = $value;
+        }
+
+        return $instance;
     }
 }
