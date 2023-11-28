@@ -20,7 +20,7 @@ class SchemaPrinter extends GraphQLSchemaPrinter
 
         $schemaExtensionDirectives = FederationHelper::schemaExtensionDirectives($schema);
         if ($schemaExtensionDirectives !== []) {
-            $result .= sprintf('extend schema%s', self::printDirectives($schemaExtensionDirectives));
+            $result .= 'extend schema' . self::printDirectives($schemaExtensionDirectives);
         }
 
         $directivesToCompose = FederationHelper::directivesToCompose($schema);
