@@ -2283,7 +2283,8 @@ A [@namespace](#namespace) directive defined on a field directive wins in case o
 
 ```graphql
 """
-A no-op nested field resolver that allows nesting of queries and mutations.
+Provides a no-op field resolver that allows nesting of queries and mutations.
+Useful to implement [namespacing by separation of concerns](https://www.apollographql.com/docs/technotes/TN0012-namespacing-by-separation-of-concern/).
 """
 directive @namespaced on FIELD_DEFINITION
 ```
@@ -2296,13 +2297,8 @@ type Query {
 }
 
 type PostQueries {
-    single(
-        id: ID @eq
-    ): Post! @find
-
-    list(
-        title: String @where(operator: "like")
-    ): [Post!]! @paginate(defaultCount: 10)
+    single(id: ID @eq): Post! @find
+    list(title: String @where(operator: "like")): [Post!]! @paginate(defaultCount: 10)
 }
 
 type Mutation {
@@ -2310,17 +2306,9 @@ type Mutation {
 }
 
 type PostMutations {
-    create(
-        input: PostCreateInput @spread
-    ): Post! @create
-
-    update(
-        input: PostUpdateInput @spread
-    ): Post! @update
-
-    delete(
-        id: ID! @whereKey
-    ): Post @delete
+    create(input: PostCreateInput @spread): Post! @create
+    update(input: PostUpdateInput @spread): Post! @update
+    delete(id: ID! @whereKey): Post @delete
 }
 ```
 

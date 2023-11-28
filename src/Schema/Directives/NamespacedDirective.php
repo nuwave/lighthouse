@@ -12,8 +12,9 @@ final class NamespacedDirective extends BaseDirective implements FieldResolver
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-A no-op nested field resolver that allows nesting of queries and mutations.
-"""          
+Provides a no-op field resolver that allows nesting of queries and mutations.
+Useful to implement [namespacing by separation of concerns](https://www.apollographql.com/docs/technotes/TN0012-namespacing-by-separation-of-concern/).
+"""
 directive @namespaced on FIELD_DEFINITION
 GRAPHQL;
     }
