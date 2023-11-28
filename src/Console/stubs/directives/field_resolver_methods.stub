@@ -1,13 +1,9 @@
     /**
-     * Set a field resolver on the FieldValue.
+     * Returns a field resolver function.
      *
-     * This must call $fieldValue->setResolver() before returning
-     * the FieldValue.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
-     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
+     * @return callable(mixed, array<string, mixed>, \Nuwave\Lighthouse\Support\Contracts\GraphQLContext, \Nuwave\Lighthouse\Execution\ResolveInfo): mixed
      */
-    public function resolveField(FieldValue $fieldValue)
+    public function resolveField(FieldValue $fieldValue): callable
     {
         // TODO implement the field resolver
     }
