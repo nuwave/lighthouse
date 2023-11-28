@@ -40,6 +40,7 @@ GRAPHQL;
 
         $this->assertStringContainsString(self::SCHEMA_TYPE, $tester->getDisplay());
         $this->assertStringContainsString(self::SCHEMA_QUERY, $tester->getDisplay());
+        $this->assertStringNotContainsString('extend schema', $tester->getDisplay());
     }
 
     public function testWritesSchema(): void

@@ -16,8 +16,12 @@ class SchemaPrinter extends GraphQLSchemaPrinter
 {
     protected static function printSchemaDefinition(Schema $schema): string
     {
-        $schemaExtensionDirectives = self::printDirectives(FederationHelper::schemaExtensionDirectives($schema));
-        $result = "extend schema{$schemaExtensionDirectives}\n";
+        $result = '';
+
+        $schemaExtensionDirectives = FederationHelper::schemaExtensionDirectives($schema);
+        if ($schemaExtensionDirectives !== []) {
+            $result .= sprintf('extend schema%s', self::printDirectives($schemaExtensionDirectives));
+        }
 
         $directivesToCompose = FederationHelper::directivesToCompose($schema);
 
@@ -30,7 +34,7 @@ class SchemaPrinter extends GraphQLSchemaPrinter
                     ->definition(),
                 $directivesToCompose,
             );
-            $result .= "\n" . implode("\n\n", $directivesToComposeDefinitions);
+            $result .= "\n\n" . implode("\n\n", $directivesToComposeDefinitions);
         }
 
         return $result;
