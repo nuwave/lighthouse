@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Tracing;
 use GraphQL\Language\Parser;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
 use Nuwave\Lighthouse\Events\ManipulateAST;
@@ -13,12 +14,19 @@ use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Events\StartRequest;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Tracing\ApolloTracing\ApolloTracing;
+use Nuwave\Lighthouse\Tracing\FederatedTracing\FederatedTracing;
 
 class TracingServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->scoped(Tracing::class, ApolloTracing::class);
+        $this->app->scoped(Tracing::class, static function (Application $app): Tracing {
+            if (config('lighthouse.tracing.driver') === 'ftv1') {
+                return $app->make(FederatedTracing::class);
+            }
+
+            return $app->make(ApolloTracing::class);
+        });
     }
 
     public function boot(Dispatcher $dispatcher): void

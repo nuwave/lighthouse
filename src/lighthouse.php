@@ -453,4 +453,22 @@ return [
          */
         'entities_resolver_namespace' => 'App\\GraphQL\\Entities',
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Tracing
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for tracing support.
+    |
+    */
+
+    'tracing' => [
+        /*
+         * Driver used for tracing.
+         *
+         * Available options: 'apollo-tracing', 'ftv1'
+         */
+        'driver' => env('LIGHTHOUSE_TRACING', 'apollo-tracing'),
+    ],
 ];

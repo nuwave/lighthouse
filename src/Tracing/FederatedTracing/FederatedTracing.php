@@ -21,7 +21,7 @@ use Nuwave\Lighthouse\Tracing\Tracing;
 use Nuwave\Lighthouse\Tracing\TracingUtilities;
 
 /**
- * See https://github.com/apollographql/apollo-tracing#response-format.
+ * See https://www.apollographql.com/docs/federation/metrics/.
  */
 class FederatedTracing implements Tracing
 {

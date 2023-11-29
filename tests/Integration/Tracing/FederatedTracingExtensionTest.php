@@ -3,9 +3,7 @@
 namespace Tests\Integration\Tracing;
 
 use Nuwave\Lighthouse\Federation\FederationServiceProvider;
-use Nuwave\Lighthouse\Tracing\FederatedTracing\FederatedTracing;
 use Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace;
-use Nuwave\Lighthouse\Tracing\Tracing;
 use Nuwave\Lighthouse\Tracing\TracingServiceProvider;
 use Tests\TestCase;
 
@@ -33,7 +31,7 @@ final class FederatedTracingExtensionTest extends TestCase
     {
         parent::setUp();
 
-        $this->app->scoped(Tracing::class, FederatedTracing::class);
+        config()->set('lighthouse.tracing.driver', 'ftv1');
     }
 
     public function testHeaderIsRequiredToEnableTracing(): void
@@ -99,8 +97,7 @@ final class FederatedTracingExtensionTest extends TestCase
     public function testAddFtv1ExtensionMetaToBatchedResults(): void
     {
         $postData = [
-            'query' /** @lang GraphQL */
-                => '
+            'query' /** @lang GraphQL */ => '
                 {
                     foo { id }
                 }
