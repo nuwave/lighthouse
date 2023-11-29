@@ -5,11 +5,11 @@ namespace Tests\Integration\Tracing;
 use Nuwave\Lighthouse\Tracing\TracingServiceProvider;
 use Tests\TestCase;
 
-final class TracingExtensionTest extends TestCase
+final class ApolloTracingExtensionTest extends TestCase
 {
     protected string $schema = /** @lang GraphQL */ '
     type Query {
-        foo: String! @field(resolver: "Tests\\\Integration\\\Tracing\\\TracingExtensionTest@resolve")
+        foo: String! @field(resolver: "Tests\\\Integration\\\Tracing\\\ApolloTracingExtensionTest@resolve")
     }
     ';
 

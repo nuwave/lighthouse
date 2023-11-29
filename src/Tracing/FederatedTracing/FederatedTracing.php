@@ -29,7 +29,9 @@ class FederatedTracing implements Tracing
 
     protected bool $isSubgraph;
 
-    protected ?Trace $trace = null;
+    protected bool $enabled = true;
+
+    protected Trace $trace;
 
     protected float|int $requestStartPrecise;
 
@@ -46,22 +48,26 @@ class FederatedTracing implements Tracing
     public function handleStartRequest(StartRequest $startRequest): void
     {
         if ($this->isSubgraph && $startRequest->request->header('apollo-federation-include-trace') !== 'ftv1') {
+            $this->enabled = false;
+
             return;
         }
 
-        $this->trace = new Trace();
-        $this->trace->setRoot(new Node());
-        $this->trace->setFieldExecutionWeight(1);
+        $this->enabled = true;
     }
 
     public function handleStartExecution(StartExecution $startExecution): void
     {
-        if ($this->trace === null) {
+        if (! $this->enabled) {
             return;
         }
 
         $this->requestStartPrecise = $this->timestamp();
+        $this->nodes = [];
 
+        $this->trace = new Trace();
+        $this->trace->setRoot(new Node());
+        $this->trace->setFieldExecutionWeight(1);
         $this->trace->setStartTime(
             (new Timestamp())
                 ->setSeconds($startExecution->moment->getTimestamp())
@@ -71,7 +77,7 @@ class FederatedTracing implements Tracing
 
     public function handleBuildExtensionsResponse(BuildExtensionsResponse $buildExtensionsResponse): ?ExtensionsResponse
     {
-        if ($this->trace === null) {
+        if (! $this->enabled) {
             return null;
         }
 
@@ -100,7 +106,7 @@ class FederatedTracing implements Tracing
     /** Record resolver execution time. */
     public function record(ResolveInfo $resolveInfo, float|int $start, float|int $end): void
     {
-        if ($this->trace === null) {
+        if (! $this->enabled) {
             return;
         }
 
@@ -113,7 +119,7 @@ class FederatedTracing implements Tracing
 
     protected function recordError(Error $error): void
     {
-        if ($this->trace === null) {
+        if (! $this->enabled) {
             return;
         }
 
@@ -176,7 +182,7 @@ class FederatedTracing implements Tracing
         }
 
         if (count($path) === 1) {
-            return $this->trace?->getRoot();
+            return $this->trace->getRoot();
         }
 
         $parentPath = array_slice($path, 0, -1);
