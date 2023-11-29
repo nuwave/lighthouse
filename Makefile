@@ -71,10 +71,10 @@ docs/node_modules: up docs/package.json docs/yarn.lock ## Install yarn dependenc
 	${dcnode} yarn
 
 .PHONY: proto
-proto:
+proto: up
 	${dcphp} mkdir -p /tmp/proto
-	${dcphp} protoc --php_out=/tmp/proto src/Tracing/reports.proto
-	${dcphp} sh -c 'rm -rf /tmp/proto/Nuwave/Lighthouse/Tracing/Proto/Trace_*.php'
-	${dcphp} rm -rf src/Tracing/Proto
-	${dcphp} mv /tmp/proto/Nuwave/Lighthouse/Tracing/Proto src/Tracing/Proto
+	${dcphp} protoc --php_out=/tmp/proto src/Tracing/FederatedTracing/reports.proto
+	${dcphp} sh -c 'rm -rf /tmp/proto/Nuwave/Lighthouse/Tracing/FederatedTracing/Proto/Trace_*.php'
+	${dcphp} rm -rf src/Tracing/FederatedTracing/Proto
+	${dcphp} mv /tmp/proto/Nuwave/Lighthouse/Tracing/FederatedTracing/Proto src/Tracing/FederatedTracing/Proto
 	${dcphp} rm -rf /tmp/proto

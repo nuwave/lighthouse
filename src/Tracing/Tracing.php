@@ -2,220 +2,27 @@
 
 namespace Nuwave\Lighthouse\Tracing;
 
-use Google\Protobuf\Timestamp;
-use GraphQL\Error\Error;
-use GraphQL\Language\SourceLocation;
-use Illuminate\Container\Container;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Support\Carbon;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
 use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Events\StartRequest;
 use Nuwave\Lighthouse\Execution\ExtensionsResponse;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
-use Nuwave\Lighthouse\Federation\FederationServiceProvider;
-use Nuwave\Lighthouse\Tracing\Proto\Trace;
-use Nuwave\Lighthouse\Tracing\Proto\Trace\Location;
-use Nuwave\Lighthouse\Tracing\Proto\Trace\Node;
 
-/**
- * See https://github.com/apollographql/apollo-tracing#response-format.
- */
-class Tracing
+interface Tracing
 {
-    protected bool $isSubgraph;
+    public function handleStartRequest(StartRequest $startRequest): void;
 
-    protected ?Trace $trace = null;
+    public function handleStartExecution(StartExecution $startExecution): void;
 
-    protected float|int $requestStartPrecise;
-
-    /** @var array<string,Node> */
-    protected array $nodes = [];
-
-    public function __construct()
-    {
-        $app = Container::getInstance();
-        assert($app instanceof Application);
-        $this->isSubgraph = $app->providerIsLoaded(FederationServiceProvider::class);
-    }
-
-    public function handleStartRequest(StartRequest $startRequest): void
-    {
-        if ($this->isSubgraph && $startRequest->request->header('apollo-federation-include-trace') !== 'ftv1') {
-            return;
-        }
-
-        $this->trace = new Trace();
-        $this->trace->setRoot(new Node());
-        $this->trace->setFieldExecutionWeight(1);
-    }
-
-    public function handleStartExecution(StartExecution $startExecution): void
-    {
-        if ($this->trace === null) {
-            return;
-        }
-
-        $this->requestStartPrecise = $this->timestamp();
-
-        $this->trace->setStartTime(
-            (new Timestamp())
-                ->setSeconds($startExecution->moment->getTimestamp())
-                ->setNanos($startExecution->moment->micro * 1000),
-        );
-    }
-
-    public function handleBuildExtensionsResponse(BuildExtensionsResponse $buildExtensionsResponse): ?ExtensionsResponse
-    {
-        if ($this->trace === null) {
-            return null;
-        }
-
-        $requestEnd = Carbon::now();
-        $requestEndPrecise = $this->timestamp();
-
-        $this->trace->setEndTime(
-            (new Timestamp())
-                ->setSeconds($requestEnd->getTimestamp())
-                ->setNanos($requestEnd->micro * 1000),
-        );
-        $this->trace->setDurationNs($this->diffTimeInNanoseconds($this->requestStartPrecise, $requestEndPrecise));
-
-        foreach ($buildExtensionsResponse->result->errors as $resultError) {
-            $this->recordError($resultError);
-        }
-
-        assert($this->trace !== null);
-
-        return new ExtensionsResponse(
-            'ftv1',
-            base64_encode($this->trace->serializeToString()),
-        );
-    }
+    public function handleBuildExtensionsResponse(BuildExtensionsResponse $buildExtensionsResponse): ?ExtensionsResponse;
 
     /** Record resolver execution time. */
-    public function record(ResolveInfo $resolveInfo, float|int $start, float|int $end): void
-    {
-        if ($this->trace === null) {
-            return;
-        }
-
-        $node = $this->findOrNewNode($resolveInfo->path);
-        $node->setType($resolveInfo->returnType->toString());
-        $node->setParentType($resolveInfo->parentType->toString());
-        $node->setStartTime($this->diffTimeInNanoseconds($this->requestStartPrecise, $start));
-        $node->setEndTime($this->diffTimeInNanoseconds($this->requestStartPrecise, $end));
-    }
-
-    public function recordError(Error $error): void
-    {
-        if ($this->trace === null) {
-            return;
-        }
-
-        $traceError = new Trace\Error();
-        $traceError->setMessage($error->getMessage());
-        $traceError->setLocation(array_map(static function (SourceLocation $sourceLocation): Location {
-            $location = new Location();
-            $location->setLine($sourceLocation->line);
-            $location->setColumn($sourceLocation->column);
-
-            return $location;
-        }, $error->getLocations()));
-        $traceError->setJson(json_encode($error->jsonSerialize(), JSON_THROW_ON_ERROR));
-
-        $node = $this->findOrNewNode($error->getPath() ?? []);
-        $node->setError([$traceError]);
-    }
-
-    /** @param  array<int, int|string>  $path */
-    protected function findOrNewNode(array $path): Node
-    {
-        assert($this->trace !== null);
-        assert($this->trace->getRoot() !== null);
-
-        if ($path === []) {
-            return $this->trace->getRoot();
-        }
-
-        $pathKey = implode('.', $path);
-
-        if (isset($this->nodes[$pathKey])) {
-            return $this->nodes[$pathKey];
-        }
-
-        $node = new Node();
-
-        $field = $path[count($path) - 1];
-        if (is_int($field)) {
-            $node->setIndex($field);
-        } else {
-            $node->setResponseName($field);
-        }
-
-        $this->nodes[$pathKey] = $node;
-
-        $parentNode = $this->ensureParentNode($path);
-
-        if ($parentNode !== null) {
-            $parentNode->getChild()[] = $node;
-        }
-
-        return $node;
-    }
-
-    /** @param  array<int, int|string>  $path */
-    protected function ensureParentNode(array $path): ?Node
-    {
-        if ($path === []) {
-            return null;
-        }
-
-        if (count($path) === 1) {
-            return $this->trace?->getRoot();
-        }
-
-        $parentPath = array_slice($path, 0, -1);
-
-        $parentNode = $this->nodes[implode('.', $parentPath)] ?? null;
-
-        return $parentNode ?? $this->findOrNewNode($parentPath);
-    }
+    public function record(ResolveInfo $resolveInfo, float|int $start, float|int $end): void;
 
     /**
      * Get the system's highest resolution of time possible.
      *
      * This is either in seconds with microsecond precision (float) or nanoseconds (int).
      */
-    public function timestamp(): float|int
-    {
-        return $this->platformSupportsNanoseconds()
-            ? hrtime(true)
-            : microtime(true);
-    }
-
-    /** Diff the time results to each other and convert to nanoseconds if needed. */
-    protected function diffTimeInNanoseconds(float|int $start, float|int $end): int
-    {
-        if ($this->platformSupportsNanoseconds()) {
-            return (int) ($end - $start);
-        }
-
-        // Difference is in seconds (with microsecond precision)
-        // * 1000 to get to milliseconds
-        // * 1000 to get to microseconds
-        // * 1000 to get to nanoseconds
-        return (int) (($end - $start) * 1000 * 1000 * 1000);
-    }
-
-    /** Is the `hrtime` function available to get a nanosecond precision point in time? */
-    protected function platformSupportsNanoseconds(): bool
-    {
-        return function_exists('hrtime');
-    }
-
-    protected function formatTimestamp(Carbon $timestamp): string
-    {
-        return $timestamp->format(Carbon::RFC3339_EXTENDED);
-    }
+    public function timestamp(): float|int;
 }

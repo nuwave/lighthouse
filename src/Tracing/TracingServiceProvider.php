@@ -12,12 +12,13 @@ use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Events\StartRequest;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Tracing\ApolloTracing\ApolloTracing;
 
 class TracingServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->scoped(Tracing::class);
+        $this->app->scoped(Tracing::class, ApolloTracing::class);
     }
 
     public function boot(Dispatcher $dispatcher): void
@@ -29,6 +30,6 @@ class TracingServiceProvider extends ServiceProvider
         ));
         $dispatcher->listen(StartRequest::class, static fn (StartRequest $event) => Container::getInstance()->make(Tracing::class)->handleStartRequest($event));
         $dispatcher->listen(StartExecution::class, static fn (StartExecution $event) => Container::getInstance()->make(Tracing::class)->handleStartExecution($event));
-        $dispatcher->listen(BuildExtensionsResponse::class, static fn (BuildExtensionsResponse $event): ?\Nuwave\Lighthouse\Execution\ExtensionsResponse => Container::getInstance()->make(Tracing::class)->handleBuildExtensionsResponse($event));
+        $dispatcher->listen(BuildExtensionsResponse::class, static fn (BuildExtensionsResponse $event) => Container::getInstance()->make(Tracing::class)->handleBuildExtensionsResponse($event));
     }
 }
