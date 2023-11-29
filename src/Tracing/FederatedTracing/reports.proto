@@ -1,5 +1,5 @@
 // This file is copied over from the `apollo-engine-reporting` package.
-// https://github.com/apollographql/apollo-server/blob/master/packages/apollo-engine-reporting-protobuf/src/reports.proto
+// https://github.com/apollographql/apollo-server/blob/main/packages/usage-reporting-protobuf/src/reports.proto
 
 syntax = "proto3";
 
@@ -285,7 +285,7 @@ message Trace {
 
   // removed: Node parse = 12; Node validate = 13;
   //          Id128 server_id = 1; Id128 client_id = 2;
-	//          String client_reference_id = 23; String client_address = 9;
+  //          String client_reference_id = 23; String client_address = 9;
   reserved 1, 2, 9, 12, 13, 23;
 }
 
