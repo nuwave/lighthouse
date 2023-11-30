@@ -7,10 +7,39 @@ use GraphQL\Language\Printer;
 use GraphQL\Type\Definition\FieldDefinition;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Type\Schema;
 use GraphQL\Utils\SchemaPrinter as GraphQLSchemaPrinter;
+use Illuminate\Container\Container;
+use Nuwave\Lighthouse\Schema\DirectiveLocator;
 
 class SchemaPrinter extends GraphQLSchemaPrinter
 {
+    protected static function printSchemaDefinition(Schema $schema): string
+    {
+        $result = '';
+
+        $schemaExtensionDirectives = FederationHelper::schemaExtensionDirectives($schema);
+        if ($schemaExtensionDirectives !== []) {
+            $result .= 'extend schema' . self::printDirectives($schemaExtensionDirectives);
+        }
+
+        $directivesToCompose = FederationHelper::directivesToCompose($schema);
+
+        if ($directivesToCompose !== []) {
+            $directiveLocator = Container::getInstance()->make(DirectiveLocator::class);
+
+            $directivesToComposeDefinitions = array_map(
+                static fn (string $directive): string => $directiveLocator
+                    ->create($directive)
+                    ->definition(),
+                $directivesToCompose,
+            );
+            $result .= "\n\n" . implode("\n\n", $directivesToComposeDefinitions);
+        }
+
+        return $result;
+    }
+
     /**
      * @param  array<string, mixed>  $options
      * @param  \GraphQL\Type\Definition\ObjectType|\GraphQL\Type\Definition\InterfaceType  $type
