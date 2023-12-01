@@ -38,7 +38,6 @@
         "illuminate/routing": "^9 || ^10",
         "illuminate/support": "^9 || ^10",
         "illuminate/validation": "^9 || ^10",
-        "google/protobuf": "^3.21",
         "laragraph/utils": "^1.5 || ^2",
         "thecodingmachine/safe": "^1 || ^2",
         "webonyx/graphql-php": "^15"
@@ -49,6 +48,7 @@
         "dms/phpunit-arraysubset-asserts": "^0.4 || ^0.5",
         "ergebnis/composer-normalize": "^2.2.2",
         "fakerphp/faker": "^1.21",
+        "google/protobuf": "^3.21",
         "laravel/framework": "^9 || ^10",
         "laravel/legacy-factories": "^1.1.1",
         "laravel/lumen-framework": "^9 || ^10 || dev-master",
@@ -79,6 +79,7 @@
         "mll-lab/graphql-php-scalars": "Useful scalar types, required for @whereConditions",
         "mll-lab/laravel-graphiql": "A graphical interactive in-browser GraphQL IDE - integrated with Laravel",
         "pusher/pusher-php-server": "Required when using the Pusher Subscriptions driver",
+        "google/protobuf": "Required when using ftv1 tracing driver",
         "ext-protobuf": "Improve protobuf serialization performance (used for tracing)"
     },
     "minimum-stability": "dev",

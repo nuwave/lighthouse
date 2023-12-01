@@ -9,8 +9,7 @@ use Tests\TestCase;
 
 final class FederatedTracingExtensionTest extends TestCase
 {
-    protected string $schema /** @lang GraphQL */
-        = '
+    protected string $schema = /** @lang GraphQL */ '
     type Query {
         foo: Foo!
     }

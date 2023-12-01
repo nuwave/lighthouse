@@ -20,9 +20,7 @@ use Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Node;
 use Nuwave\Lighthouse\Tracing\Tracing;
 use Nuwave\Lighthouse\Tracing\TracingUtilities;
 
-/**
- * See https://www.apollographql.com/docs/federation/metrics/.
- */
+/** See https://www.apollographql.com/docs/federation/metrics/. */
 class FederatedTracing implements Tracing
 {
     use TracingUtilities;
@@ -33,6 +31,11 @@ class FederatedTracing implements Tracing
 
     protected Trace $trace;
 
+    /**
+     * The precise point in time when the request was initially started.
+     *
+     * This is either in seconds with microsecond precision (float) or nanoseconds (int).
+     */
     protected float|int $requestStartPrecise;
 
     /** @var array<string,Node> */

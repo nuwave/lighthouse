@@ -468,6 +468,8 @@ return [
          * Driver used for tracing.
          *
          * Available options: 'apollo-tracing', 'ftv1'
+         *
+         * Will be removed in Lighthouse v7 and implicitly default to 'ftv1'.
          */
         'driver' => env('LIGHTHOUSE_TRACING', 'apollo-tracing'),
     ],

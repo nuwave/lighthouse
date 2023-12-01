@@ -13,9 +13,7 @@ use GraphQL\Executor\ExecutionResult;
 class BuildExtensionsResponse
 {
     public function __construct(
-        /**
-         * The result of resolving a single operation.
-         */
+        /** The result of resolving a single operation. */
         public ExecutionResult $result,
     ) {}
 }

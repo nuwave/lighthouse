@@ -11,9 +11,7 @@ use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Tracing\Tracing;
 use Nuwave\Lighthouse\Tracing\TracingUtilities;
 
-/**
- * See https://github.com/apollographql/apollo-tracing#response-format.
- */
+/** See https://github.com/apollographql/apollo-tracing#response-format. */
 class ApolloTracing implements Tracing
 {
     use TracingUtilities;
