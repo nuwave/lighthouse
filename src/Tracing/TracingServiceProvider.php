@@ -36,8 +36,14 @@ class TracingServiceProvider extends ServiceProvider
             $manipulateAST->documentAST,
             Parser::constDirective('@tracing'),
         ));
-        $dispatcher->listen(StartRequest::class, static fn (StartRequest $event) => Container::getInstance()->make(Tracing::class)->handleStartRequest($event));
-        $dispatcher->listen(StartExecution::class, static fn (StartExecution $event) => Container::getInstance()->make(Tracing::class)->handleStartExecution($event));
-        $dispatcher->listen(BuildExtensionsResponse::class, static fn (BuildExtensionsResponse $event) => Container::getInstance()->make(Tracing::class)->handleBuildExtensionsResponse($event));
+        $dispatcher->listen(StartRequest::class, static fn (StartRequest $event) => Container::getInstance()
+            ->make(Tracing::class)
+            ->handleStartRequest($event));
+        $dispatcher->listen(StartExecution::class, static fn (StartExecution $event) => Container::getInstance()
+            ->make(Tracing::class)
+            ->handleStartExecution($event));
+        $dispatcher->listen(BuildExtensionsResponse::class, static fn (BuildExtensionsResponse $event) => Container::getInstance()
+            ->make(Tracing::class)
+            ->handleBuildExtensionsResponse($event));
     }
 }

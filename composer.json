@@ -79,7 +79,7 @@
         "mll-lab/graphql-php-scalars": "Useful scalar types, required for @whereConditions",
         "mll-lab/laravel-graphiql": "A graphical interactive in-browser GraphQL IDE - integrated with Laravel",
         "pusher/pusher-php-server": "Required when using the Pusher Subscriptions driver",
-        "google/protobuf": "Required when using ftv1 tracing driver",
+        "google/protobuf": "Required when using the tracing driver federated-tracing",
         "ext-protobuf": "Improve protobuf serialization performance (used for tracing)"
     },
     "minimum-stability": "dev",
