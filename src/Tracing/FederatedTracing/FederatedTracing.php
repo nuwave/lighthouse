@@ -27,6 +27,8 @@ class FederatedTracing implements Tracing
 
     public const NAME = 'federated-tracing';
 
+    public const V1 = 'ftv1';
+
     protected bool $isSubgraph;
 
     protected bool $enabled = true;
@@ -52,7 +54,7 @@ class FederatedTracing implements Tracing
 
     public function handleStartRequest(StartRequest $startRequest): void
     {
-        if ($this->isSubgraph && $startRequest->request->header('apollo-federation-include-trace') !== 'ftv1') {
+        if ($this->isSubgraph && $startRequest->request->header('apollo-federation-include-trace') !== self::V1) {
             $this->enabled = false;
 
             return;
@@ -103,7 +105,7 @@ class FederatedTracing implements Tracing
         assert($this->trace !== null);
 
         return new ExtensionsResponse(
-            'ftv1',
+            self::V1,
             base64_encode($this->trace->serializeToString()),
         );
     }

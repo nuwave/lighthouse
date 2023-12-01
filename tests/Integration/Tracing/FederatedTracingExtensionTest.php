@@ -54,7 +54,7 @@ final class FederatedTracingExtensionTest extends TestCase
                 foo { id }
             }
             ',
-                headers: ['apollo-federation-include-trace' => 'ftv1'],
+                headers: ['apollo-federation-include-trace' => FederatedTracing::V1],
             );
 
         $response->assertJsonStructure([
@@ -115,7 +115,7 @@ final class FederatedTracingExtensionTest extends TestCase
                     $postData,
                     $postData,
                 ],
-                headers: ['apollo-federation-include-trace' => 'ftv1'],
+                headers: ['apollo-federation-include-trace' => FederatedTracing::V1],
             );
 
         $result->assertJsonCount(2)
