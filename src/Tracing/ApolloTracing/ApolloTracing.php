@@ -16,6 +16,8 @@ class ApolloTracing implements Tracing
 {
     use TracingUtilities;
 
+    public const NAME = 'apollo-tracing';
+
     /** The point in time when the request was initially started. */
     protected Carbon $executionStartAbsolute;
 

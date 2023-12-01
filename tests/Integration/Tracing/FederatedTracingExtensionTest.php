@@ -3,6 +3,7 @@
 namespace Tests\Integration\Tracing;
 
 use Nuwave\Lighthouse\Federation\FederationServiceProvider;
+use Nuwave\Lighthouse\Tracing\FederatedTracing\FederatedTracing;
 use Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace;
 use Nuwave\Lighthouse\Tracing\TracingServiceProvider;
 use Tests\TestCase;
@@ -30,7 +31,7 @@ final class FederatedTracingExtensionTest extends TestCase
     {
         parent::setUp();
 
-        config()->set('lighthouse.tracing.driver', 'ftv1');
+        config()->set('lighthouse.tracing.driver', FederatedTracing::NAME);
     }
 
     public function testHeaderIsRequiredToEnableTracing(): void
