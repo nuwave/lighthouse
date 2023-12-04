@@ -1,4 +1,3 @@
-# buf.gen.yaml
 version: v1
 managed:
   enabled: true

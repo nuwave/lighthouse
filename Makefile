@@ -76,7 +76,4 @@ proto: up
 	${dcphp} rm -rf src/Tracing/FederatedTracing/Proto
 	${dcphp} mv proto-tmp/Nuwave/Lighthouse/Tracing/FederatedTracing/Proto src/Tracing/FederatedTracing/Proto
 	${dcphp} rm -rf proto-tmp
-	# It keeps changing things three times
-	$(MAKE) fix
-	$(MAKE) fix
-	$(MAKE) fix
+	$(MAKE) php-cs-fixer

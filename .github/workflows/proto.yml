@@ -10,8 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref }}
 
       - uses: shivammathur/setup-php@v2
         with:
@@ -29,14 +27,7 @@ jobs:
           mv proto-tmp/Nuwave/Lighthouse/Tracing/FederatedTracing/Proto src/Tracing/FederatedTracing/Proto
           rm -rf proto-tmp
 
-      # It keeps changing things three times
-      - run: |
-          vendor/bin/rector process && vendor/bin/php-cs-fixer fix
-          vendor/bin/rector process && vendor/bin/php-cs-fixer fix
-          vendor/bin/rector process && vendor/bin/php-cs-fixer fix
-
-      - run: git pull
-        if: github.head_ref != ''
+      - run: vendor/bin/php-cs-fixer fix
 
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
