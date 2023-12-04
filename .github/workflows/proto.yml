@@ -1,5 +1,6 @@
 name: "Build protobuf"
 on:
+  pull_request:
   push:
     branches:
       - '*'
