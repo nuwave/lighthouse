@@ -9,7 +9,9 @@ jobs:
   proto:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
 
       - uses: shivammathur/setup-php@v2
         with:
@@ -34,7 +36,8 @@ jobs:
           vendor/bin/rector process && vendor/bin/php-cs-fixer fix
 
       - run: git pull
+        if: github.head_ref != ''
 
-      - uses: stefanzweifel/git-auto-commit-action@v4
+      - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: Apply proto changes
