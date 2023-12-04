@@ -72,9 +72,11 @@ docs/node_modules: up docs/package.json docs/yarn.lock ## Install yarn dependenc
 
 .PHONY: proto
 proto: up
-	${dcphp} mkdir -p /tmp/proto
-	${dcphp} protoc --php_out=/tmp/proto src/Tracing/FederatedTracing/reports.proto
-	${dcphp} sh -c 'rm -rf /tmp/proto/Nuwave/Lighthouse/Tracing/FederatedTracing/Proto/Trace_*.php'
+	docker run --rm --volume ".:/tmp" --workdir /tmp bufbuild/buf generate
 	${dcphp} rm -rf src/Tracing/FederatedTracing/Proto
-	${dcphp} mv /tmp/proto/Nuwave/Lighthouse/Tracing/FederatedTracing/Proto src/Tracing/FederatedTracing/Proto
-	${dcphp} rm -rf /tmp/proto
+	${dcphp} mv proto-tmp/Nuwave/Lighthouse/Tracing/FederatedTracing/Proto src/Tracing/FederatedTracing/Proto
+	${dcphp} rm -rf proto-tmp
+	# It keeps changing things three times
+	$(MAKE) fix
+	$(MAKE) fix
+	$(MAKE) fix

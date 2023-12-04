@@ -17,7 +17,7 @@ trim_trailing_whitespace = false
 [*.neon]
 indent_size = 2
 
-[*.yml]
+[{*.yml, *.yaml}]
 indent_size = 2
 
 [*.proto]
