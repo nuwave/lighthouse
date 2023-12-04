@@ -1,6 +1,5 @@
 name: "Build protobuf"
 on:
-  pull_request:
   push:
     branches:
       - '*'
@@ -10,6 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
 
       - uses: shivammathur/setup-php@v2
         with:
@@ -27,7 +28,9 @@ jobs:
           mv proto-tmp/Nuwave/Lighthouse/Tracing/FederatedTracing/Proto src/Tracing/FederatedTracing/Proto
           rm -rf proto-tmp
 
-      - run: vendor/bin/php-cs-fixer fix
+      - run: vendor/bin/php-cs-fixer fix src/Tracing/FederatedTracing/Proto
+
+      - run: git pull
 
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
