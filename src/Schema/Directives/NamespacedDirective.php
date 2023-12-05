@@ -1,12 +1,12 @@
 <?php declare(strict_types=1);
 
-namespace App\GraphQL\Directives;
+namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
-final class NamespacedDirective extends BaseDirective implements FieldResolver
+class NamespacedDirective extends BaseDirective implements FieldResolver
 {
     public static function definition(): string
     {
@@ -21,6 +21,7 @@ GRAPHQL;
 
     public function resolveField(FieldValue $fieldValue): callable
     {
-        return static fn (mixed $root): mixed => true;
+
+        return static fn (): bool => true;
     }
 }
