@@ -13,20 +13,12 @@ use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Events\StartRequest;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
-use Nuwave\Lighthouse\Tracing\ApolloTracing\ApolloTracing;
-use Nuwave\Lighthouse\Tracing\FederatedTracing\FederatedTracing;
 
 class TracingServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->scoped(Tracing::class, static function (Application $app): Tracing {
-            if (config('lighthouse.tracing.driver') === FederatedTracing::class) {
-                return $app->make(FederatedTracing::class);
-            }
-
-            return $app->make(ApolloTracing::class);
-        });
+        $this->app->scoped(Tracing::class, static fn (Application $app): Tracing => $app->make(config('lighthouse.tracing.driver')));
     }
 
     public function boot(Dispatcher $dispatcher): void
