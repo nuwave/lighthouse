@@ -20,8 +20,9 @@ jobs:
           sed -i '3 i option php_namespace = "Nuwave\\\\Lighthouse\\\\Tracing\\\\FederatedTracing\\\\Proto";' src/Tracing/FederatedTracing/reports.proto
           sed -i '4 i option php_metadata_namespace = "Nuwave\\\\Lighthouse\\\\Tracing\\\\FederatedTracing\\\\Proto\\\\Metadata";' src/Tracing/FederatedTracing/reports.proto
 
-      - run: git pull
-
-      - uses: stefanzweifel/git-auto-commit-action@v5
+      - uses: peter-evans/create-pull-request@v5
         with:
+          title: 'Updated `reports.proto`'
           commit_message: Updated `reports.proto`
+          branch: patch/update-reports-proto
+          delete-branch: true
