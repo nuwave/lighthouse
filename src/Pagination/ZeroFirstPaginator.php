@@ -6,7 +6,7 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
 
 /**
- * @extends \Illuminate\Pagination\LengthAwarePaginator<mixed>
+ * @extends \Illuminate\Pagination\Paginator<mixed>
  */
 class ZeroFirstPaginator extends Paginator
 {

@@ -119,10 +119,10 @@ class PaginationArgs
                 return new ZeroFirstPaginator($this->page);
             }
 
-            return new ZeroFirstLengthAwarePaginator(
-                $builder->count(),
-                $this->page,
-            );
+            $total = $builder instanceof ScoutBuilder
+                ? 0 // Laravel\Scout\Builder exposes no method to get the total count
+                : $builder->count(); // @phpstan-ignore-line see Illuminate\Database\Query\Builder::count(), available as a mixin in the other classes
+            return new ZeroFirstLengthAwarePaginator($total, $this->page);
         }
 
         $methodName = $this->type->isSimple()
