@@ -25,8 +25,6 @@ class FederatedTracing implements Tracing
 {
     use TracingUtilities;
 
-    public const NAME = 'federated-tracing';
-
     public const V1 = 'ftv1';
 
     protected bool $isSubgraph;

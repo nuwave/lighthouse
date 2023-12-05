@@ -21,7 +21,7 @@ class TracingServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->scoped(Tracing::class, static function (Application $app): Tracing {
-            if (config('lighthouse.tracing.driver') === FederatedTracing::NAME) {
+            if (config('lighthouse.tracing.driver') === FederatedTracing::class) {
                 return $app->make(FederatedTracing::class);
             }
 

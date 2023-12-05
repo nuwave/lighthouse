@@ -467,10 +467,10 @@ return [
         /*
          * Driver used for tracing.
          *
-         * Available options: 'apollo-tracing', 'federated-tracing'
+         * Available options: '\Nuwave\Lighthouse\Tracing\ApolloTracing\ApolloTracing::class', '\Nuwave\Lighthouse\Tracing\FederatedTracing\FederatedTracing::class'
          *
-         * Will be removed in Lighthouse v7 and implicitly default to 'federated-tracing'.
+         * Will be removed in Lighthouse v7 and implicitly default to 'Nuwave\Lighthouse\Tracing\FederatedTracing\FederatedTracing::class'.
          */
-        'driver' => env('LIGHTHOUSE_TRACING', \Nuwave\Lighthouse\Tracing\ApolloTracing\ApolloTracing::NAME),
+        'driver' => \Nuwave\Lighthouse\Tracing\ApolloTracing\ApolloTracing::class,
     ],
 ];

@@ -33,7 +33,7 @@ final class FederatedTracingExtensionTest extends TestCase
         parent::setUp();
 
         $config = $this->app->make(Repository::class);
-        $config->set('lighthouse.tracing.driver', FederatedTracing::NAME);
+        $config->set('lighthouse.tracing.driver', FederatedTracing::class);
     }
 
     public function testHeaderIsRequiredToEnableTracing(): void
