@@ -450,7 +450,7 @@ GRAPHQL;
                 }
             }
         }
-        ')->assertJson([
+        ')->assertExactJson([
             'data' => [
                 'users' => [
                     'pageInfo' => [
@@ -463,9 +463,10 @@ GRAPHQL;
                         'startCursor' => null,
                         'total' => 0,
                     ],
+                    'edges' => [],
                 ],
             ],
-        ])->assertJsonCount(0, 'data.users.edges');
+        ]);
     }
 
     public function testQueriesPaginationWithNoData(): void
@@ -498,7 +499,7 @@ GRAPHQL;
                 }
             }
         }
-        ')->assertJson([
+        ')->assertExactJson([
             'data' => [
                 'users' => [
                     'paginatorInfo' => [
@@ -511,9 +512,62 @@ GRAPHQL;
                         'perPage' => 5,
                         'total' => 0,
                     ],
+                    'data' => [],
                 ],
             ],
-        ])->assertJsonCount(0, 'data.users.data');
+        ]);
+    }
+
+    public function testQueriesFirst0(): void
+    {
+        $amount = 3;
+        factory(User::class, $amount)->create();
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID!
+        }
+
+        type Query {
+            users: [User!]! @paginate
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users(first: 0) {
+                paginatorInfo {
+                    count
+                    currentPage
+                    firstItem
+                    hasMorePages
+                    lastItem
+                    lastPage
+                    perPage
+                    total
+                }
+                data {
+                    id
+                }
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'users' => [
+                    'paginatorInfo' => [
+                        'count' => 0,
+                        'currentPage' => 1,
+                        'firstItem' => null,
+                        'hasMorePages' => false,
+                        'lastItem' => null,
+                        'lastPage' => 0,
+                        'perPage' => 0,
+                        'total' => $amount,
+                    ],
+                    'data' => [],
+                ],
+            ],
+        ]);
     }
 
     public function testQueriesPaginationWithoutPaginatorInfo(): void
