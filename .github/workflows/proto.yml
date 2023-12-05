@@ -3,6 +3,9 @@ on:
   push:
     branches:
       - '*'
+    paths:
+      - '**.proto'
+      - 'buf.gen.yaml'
 
 jobs:
   proto:
