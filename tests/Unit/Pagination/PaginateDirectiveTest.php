@@ -14,7 +14,6 @@ use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Nuwave\Lighthouse\Pagination\PaginationType;
 use Tests\TestCase;
-use Tests\Utils\Models\User;
 
 final class PaginateDirectiveTest extends TestCase
 {
@@ -723,6 +722,7 @@ GRAPHQL
 
     /**
      * @param  array{first: int}  $args
+     *
      * @return \Illuminate\Pagination\LengthAwarePaginator<array<string, int>>
      */
     public static function returnPaginatedDataInsteadOfBuilder(mixed $root, array $args): LengthAwarePaginator
