@@ -86,7 +86,6 @@ final class CacheStorageManagerTest extends TestCase
     protected function assertSubscriberIsSame(Subscriber $expected, ?Subscriber $actual): void
     {
         $this->assertNotNull($actual);
-        /** @var \Nuwave\Lighthouse\Subscriptions\Subscriber $actual */
         $this->assertSame(
             AST::toArray($expected->query),
             AST::toArray($actual->query),

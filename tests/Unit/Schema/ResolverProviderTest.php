@@ -12,8 +12,7 @@ use Tests\TestCase;
 
 final class ResolverProviderTest extends TestCase
 {
-    /** @var \Nuwave\Lighthouse\Schema\ResolverProvider */
-    protected $resolverProvider;
+    protected ResolverProvider $resolverProvider;
 
     protected function setUp(): void
     {

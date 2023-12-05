@@ -12,8 +12,7 @@ use Tests\TestCase;
 
 final class DirectiveFactoryTest extends TestCase
 {
-    /** @var \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory */
-    protected $directiveFactory;
+    protected DirectiveFactory $directiveFactory;
 
     protected function setUp(): void
     {

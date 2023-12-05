@@ -17,8 +17,7 @@ use Tests\TestCase;
 
 final class ASTBuilderTest extends TestCase
 {
-    /** @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder */
-    protected $astBuilder;
+    protected ASTBuilder $astBuilder;
 
     protected function setUp(): void
     {
