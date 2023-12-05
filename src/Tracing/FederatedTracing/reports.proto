@@ -1,10 +1,10 @@
-// This file is copied over from the `apollo-engine-reporting` package.
-// https://github.com/apollographql/apollo-server/blob/main/packages/usage-reporting-protobuf/src/reports.proto
-
 syntax = "proto3";
 
 option php_namespace = "Nuwave\\Lighthouse\\Tracing\\FederatedTracing\\Proto";
 option php_metadata_namespace = "Nuwave\\Lighthouse\\Tracing\\FederatedTracing\\Proto\\Metadata";
+
+// Note: The Apollo usage reporting API is subject to change. We strongly encourage developers to contact Apollo support
+// at support@apollographql.com to discuss their use case prior to building their own reporting agent using this module.
 
 import "google/protobuf/timestamp.proto";
 
@@ -245,6 +245,10 @@ message Trace {
   string client_name = 7;
   string client_version = 8;
 
+  string operation_type = 35;
+  string operation_subtype = 36;
+
+
   HTTP http = 10;
 
   CachePolicy cache_policy = 18;
@@ -326,31 +330,55 @@ message PathErrorStats {
 }
 
 message QueryLatencyStats {
+  // The latencies of all non-cached requests, so the sum of all counts should equal request_count minus cache_hits.
+  // This is an array of counts within a logarithmic range of 384 latency buckets. To calculate the bucket from a
+  // microsecond, use the formula: max(0, min(ceil(ln(x)/ln(1.1)), 383)). So for example, 323424 microseconds (323.424
+  // ms) corresponds to bucket 134. Buckets can be skipped using a negative number, so one request on that bucket could
+  // be represented as [-134, 1] (skip buckets numbered 0 to 133 and set a 1 in bucket 134).
   repeated sint64 latency_count = 13;
+
+  // The total number of requests, including both cache hits and cache misses
   uint64 request_count = 2;
+
+  // The total number of requests that were cache hits. Each request should be represented in cache_latency_count
   uint64 cache_hits = 3;
+
   uint64 persisted_query_hits = 4;
   uint64 persisted_query_misses = 5;
+
+  // This array includes the latency buckets for all operations included in cache_hits
+  // See comment on latency_count for details.
   repeated sint64 cache_latency_count = 14;
+
+  // Paths and counts for each error. The total number of requests with errors within this object should be the same as
+  // requests_with_errors_count below.
   PathErrorStats root_error_stats = 7;
+
+  // Total number of requests that contained at least one error
   uint64 requests_with_errors_count = 8;
+
   repeated sint64 public_cache_ttl_count = 15;
   repeated sint64 private_cache_ttl_count = 16;
   uint64 registered_operation_count = 11;
   uint64 forbidden_operation_count = 12;
+
   // The number of requests that were executed without field-level
   // instrumentation (and thus do not contribute to `observed_execution_count`
   // fields on this message's cousin-twice-removed FieldStats).
   uint64 requests_without_field_instrumentation = 17;
+
   // 1, 6, 9, and 10 were old int64 histograms
   reserved 1, 6, 9, 10;
 }
 
+// The context around a block of stats and traces indicating from which client the operation was executed and its
+// operation type. Operation type and subtype are only used by Apollo Router.
 message StatsContext {
-  // string client_reference_id = 1;
-  reserved 1;
+  reserved 1; // string client_reference_id = 1;
   string client_name = 2;
   string client_version = 3;
+  string operation_type = 4;
+  string operation_subtype = 5;
 }
 
 message ContextualizedQueryLatencyStats {
@@ -374,7 +402,7 @@ message FieldStat {
   // Number of times that the resolver for this field is directly observed being
   // executed.
   uint64 observed_execution_count = 5;
-  // Same as `count` but potentially scaled upwards if the server was only
+  // Same as `observed_execution_count` but potentially scaled upwards if the server was only
   // performing field-level instrumentation on a sampling of operations.  For
   // example, if the server randomly instruments 1% of requests for this
   // operation, this number will be 100 times greater than
@@ -393,6 +421,7 @@ message FieldStat {
   // the same way as estimated_execution_count so its "total count" might be
   // greater than `observed_execution_count` and may not exactly equal
   // `estimated_execution_count` due to rounding.
+  // See comment on QueryLatencyStats's latency_count for details.
   repeated sint64 latency_count = 9;
   reserved 1, 2, 7, 8;
 }
@@ -412,25 +441,26 @@ message ReferencedFieldsForType {
 
 
 
-// This is the top-level message used by the new traces ingress. This
-// is designed for the apollo-engine-reporting TypeScript agent and will
-// eventually be documented as a public ingress API. This message consists
-// solely of traces; the equivalent of the StatsReport is automatically
-// generated server-side from this message. Agent should either send a trace or include it in the stats
-// for every request in this report. Generally, buffering up until a large
-// size has been reached (say, 4MB) or 5-10 seconds has passed is appropriate.
-// This message used to be know as FullTracesReport, but got renamed since it isn't just for traces anymore
+// This is the top-level message used by Apollo Server, Apollo Router, and other libraries to report usage information
+// to Apollo. This message consists of traces and stats for operations. By default, each individual operation execution
+// should be either represented as a trace or within stats, but not both. However if the "traces_pre_aggregated" field
+// is set to true, all operations should be included in stats and anything specified as a trace is not added in to the
+// aggregate stats. For performance reasons, we recommend that traces are sampled so that only somewhere around 1% of
+// operation executions are sent as traces. Additionally, buffering operations up until a large size has been reached
+// (say, 4MB) or 5-10 seconds has passed is appropriate.
+// This message used to be known as FullTracesReport, but got renamed since it isn't just for traces anymore.
 message Report {
+  message OperationCountByType {
+    string type = 1;
+    string subtype = 2;
+    uint64 operation_count = 3;
+  }
+
   ReportHeader header = 1;
 
-  // key is statsReportKey (# operationName\nsignature) Note that the nested
-  // traces will *not* have a signature or details.operationName (because the
-  // key is adequate).
-  //
-  // We also assume that traces don't have
-  // legacy_per_query_implicit_operation_name, and we don't require them to have
-  // details.raw_query (which would consume a lot of space and has privacy/data
-  // access issues, and isn't currently exposed by our app anyway).
+  // If QueryMetadata isn't provided, this key should be a statsReportKey (# operationName\nsignature). If the operation
+  // name, signature, and persisted query IDs are provided in the QueryMetadata, and this operation was requested via a
+  // persisted query, this key can be "pq# <persisted query id>" instead of the signature and operation.
   map<string, TracesAndStats> traces_per_query = 5;
 
   // This is the time that the requests in this trace are considered to have taken place
@@ -439,8 +469,14 @@ message Report {
   // Note: This will override the end_time from traces.
   google.protobuf.Timestamp end_time = 2; // required if no traces in this message
 
-  // Total number of operations processed during this period.
+  // Total number of operations processed during this period. This includes all operations, even if they are sampled
+  // and not included in the query latency stats.
   uint64 operation_count = 6;
+
+  // Total number of operations broken up by operation type and operation subtype.
+  // Only either this or operation_count should be populated, but if both are present, the total across all types and
+  // subtypes should match the overall operation_count.
+  repeated OperationCountByType operation_count_by_type = 8;
 
   // If this is set to true, the stats in TracesWithStats.stats_with_context
   // represent all of the operations described from this report, and the
@@ -457,6 +493,15 @@ message ContextualizedStats {
   // field executions and thus only reflects operations for which field-level tracing occurred.
   map<string, TypeStat> per_type_stat = 3;
 
+}
+
+message QueryMetadata {
+  // The operation name. For now this is a required field if QueryMetadata is present.
+  string name = 1;
+  // the operation signature. For now this is a required field if QueryMetadata is present.
+  string signature = 2;
+  // (Optional) Persisted query ID that was used to request this operation.
+  string pq_id = 3;
 }
 
 // A sequence of traces and stats. If Report.traces_pre_aggregated (at the top
@@ -478,4 +523,8 @@ message TracesAndStats {
   // matches similar algorithms in Apollo's servers. It is otherwise ignored and should not
   // be included in reports.
   repeated Trace internal_traces_contributing_to_stats = 3;
+
+  // This is an optional field that is used to provide more context to the key of this object within the
+  // traces_per_query map. If it's omitted, we assume the key is a standard operation name and signature key.
+  QueryMetadata query_metadata = 5;
 }
