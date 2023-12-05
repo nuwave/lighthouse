@@ -115,7 +115,7 @@ $user = User::create([
 
 ## Working with proto files
 
-Lighthouse uses [protobuf](https://developers.google.com/protocol-buffers) files for [federated tracing](`src/Tracing/FederatedTracing/reports.proto`).
+Lighthouse uses [protobuf](https://developers.google.com/protocol-buffers) files for [federated tracing](src/Tracing/FederatedTracing/reports.proto).
 When updating the proto files, the PHP classes need to be regenerated.
 The generation is done with [buf](https://buf.build/docs/generate/overview).
 The `make proto` command generates the new PHP classes and replace the old ones.
