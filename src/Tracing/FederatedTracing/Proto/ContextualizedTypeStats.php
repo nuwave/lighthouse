@@ -11,10 +11,10 @@ use Google\Protobuf\Internal\GPBUtil;
  */
 class ContextualizedTypeStats extends \Google\Protobuf\Internal\Message
 {
-    /** Generated from protobuf field <code>.StatsContext context = 1;</code> */
-    protected ?\Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\StatsContext $context = null;
+    /** Generated from protobuf field <code>.StatsContext context = 1 [json_name = "context"];</code> */
+    protected $context;
 
-    /** Generated from protobuf field <code>map<string, .TypeStat> per_type_stat = 2;</code> */
+    /** Generated from protobuf field <code>map<string, .TypeStat> per_type_stat = 2 [json_name = "perTypeStat"];</code> */
     private $per_type_stat;
 
     /**
@@ -33,8 +33,12 @@ class ContextualizedTypeStats extends \Google\Protobuf\Internal\Message
         parent::__construct($data);
     }
 
-    /** Generated from protobuf field <code>.StatsContext context = 1;</code> */
-    public function getContext(): ?StatsContext
+    /**
+     * Generated from protobuf field <code>.StatsContext context = 1 [json_name = "context"];</code>.
+     *
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\StatsContext|null
+     */
+    public function getContext()
     {
         return $this->context;
     }
@@ -44,17 +48,19 @@ class ContextualizedTypeStats extends \Google\Protobuf\Internal\Message
         return isset($this->context);
     }
 
-    public function clearContext(): void
+    public function clearContext()
     {
         unset($this->context);
     }
 
     /**
-     * Generated from protobuf field <code>.StatsContext context = 1;</code>.
+     * Generated from protobuf field <code>.StatsContext context = 1 [json_name = "context"];</code>.
+     *
+     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\StatsContext  $var
      *
      * @return $this
      */
-    public function setContext(?StatsContext $var)
+    public function setContext($var)
     {
         GPBUtil::checkMessage($var, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\StatsContext::class);
         $this->context = $var;
@@ -63,7 +69,7 @@ class ContextualizedTypeStats extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>map<string, .TypeStat> per_type_stat = 2;</code>.
+     * Generated from protobuf field <code>map<string, .TypeStat> per_type_stat = 2 [json_name = "perTypeStat"];</code>.
      *
      * @return \Google\Protobuf\Internal\MapField
      */
@@ -73,11 +79,13 @@ class ContextualizedTypeStats extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>map<string, .TypeStat> per_type_stat = 2;</code>.
+     * Generated from protobuf field <code>map<string, .TypeStat> per_type_stat = 2 [json_name = "perTypeStat"];</code>.
+     *
+     * @param  array|\Google\Protobuf\Internal\MapField  $var
      *
      * @return $this
      */
-    public function setPerTypeStat(array|\Google\Protobuf\Internal\MapField $var)
+    public function setPerTypeStat($var)
     {
         $arr = GPBUtil::checkMapField($var, \Google\Protobuf\Internal\GPBType::STRING, \Google\Protobuf\Internal\GPBType::MESSAGE, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\TypeStat::class);
         $this->per_type_stat = $arr;

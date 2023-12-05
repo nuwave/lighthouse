@@ -14,14 +14,14 @@ class ReferencedFieldsForType extends \Google\Protobuf\Internal\Message
     /**
      * Contains (eg) "email" for User.email:String!
      *
-     * Generated from protobuf field <code>repeated string field_names = 1;</code>
+     * Generated from protobuf field <code>repeated string field_names = 1 [json_name = "fieldNames"];</code>
      */
     private $field_names;
 
     /**
      * True if this type is an interface.
      *
-     * Generated from protobuf field <code>bool is_interface = 2;</code>
+     * Generated from protobuf field <code>bool is_interface = 2 [json_name = "isInterface"];</code>
      */
     protected $is_interface = false;
 
@@ -46,7 +46,7 @@ class ReferencedFieldsForType extends \Google\Protobuf\Internal\Message
     /**
      * Contains (eg) "email" for User.email:String!
      *
-     * Generated from protobuf field <code>repeated string field_names = 1;</code>
+     * Generated from protobuf field <code>repeated string field_names = 1 [json_name = "fieldNames"];</code>
      *
      * @return \Google\Protobuf\Internal\RepeatedField
      */
@@ -58,13 +58,13 @@ class ReferencedFieldsForType extends \Google\Protobuf\Internal\Message
     /**
      * Contains (eg) "email" for User.email:String!
      *
-     * Generated from protobuf field <code>repeated string field_names = 1;</code>
+     * Generated from protobuf field <code>repeated string field_names = 1 [json_name = "fieldNames"];</code>
      *
      * @param  array<string>|\Google\Protobuf\Internal\RepeatedField  $var
      *
      * @return $this
      */
-    public function setFieldNames(array|\Google\Protobuf\Internal\RepeatedField $var)
+    public function setFieldNames($var)
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::STRING);
         $this->field_names = $arr;
@@ -75,7 +75,7 @@ class ReferencedFieldsForType extends \Google\Protobuf\Internal\Message
     /**
      * True if this type is an interface.
      *
-     * Generated from protobuf field <code>bool is_interface = 2;</code>
+     * Generated from protobuf field <code>bool is_interface = 2 [json_name = "isInterface"];</code>
      *
      * @return bool
      */
@@ -87,7 +87,7 @@ class ReferencedFieldsForType extends \Google\Protobuf\Internal\Message
     /**
      * True if this type is an interface.
      *
-     * Generated from protobuf field <code>bool is_interface = 2;</code>
+     * Generated from protobuf field <code>bool is_interface = 2 [json_name = "isInterface"];</code>
      *
      * @param  bool  $var
      *

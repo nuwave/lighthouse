@@ -14,7 +14,7 @@ class TypeStat extends \Google\Protobuf\Internal\Message
     /**
      * Key is (eg) "email" for User.email:String!
      *
-     * Generated from protobuf field <code>map<string, .FieldStat> per_field_stat = 3;</code>
+     * Generated from protobuf field <code>map<string, .FieldStat> per_field_stat = 3 [json_name = "perFieldStat"];</code>
      */
     private $per_field_stat;
 
@@ -37,7 +37,7 @@ class TypeStat extends \Google\Protobuf\Internal\Message
     /**
      * Key is (eg) "email" for User.email:String!
      *
-     * Generated from protobuf field <code>map<string, .FieldStat> per_field_stat = 3;</code>
+     * Generated from protobuf field <code>map<string, .FieldStat> per_field_stat = 3 [json_name = "perFieldStat"];</code>
      *
      * @return \Google\Protobuf\Internal\MapField
      */
@@ -49,11 +49,13 @@ class TypeStat extends \Google\Protobuf\Internal\Message
     /**
      * Key is (eg) "email" for User.email:String!
      *
-     * Generated from protobuf field <code>map<string, .FieldStat> per_field_stat = 3;</code>
+     * Generated from protobuf field <code>map<string, .FieldStat> per_field_stat = 3 [json_name = "perFieldStat"];</code>
+     *
+     * @param  array|\Google\Protobuf\Internal\MapField  $var
      *
      * @return $this
      */
-    public function setPerFieldStat(array|\Google\Protobuf\Internal\MapField $var)
+    public function setPerFieldStat($var)
     {
         $arr = GPBUtil::checkMapField($var, \Google\Protobuf\Internal\GPBType::STRING, \Google\Protobuf\Internal\GPBType::MESSAGE, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\FieldStat::class);
         $this->per_field_stat = $arr;

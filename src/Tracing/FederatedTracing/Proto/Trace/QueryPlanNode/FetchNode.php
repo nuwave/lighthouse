@@ -18,11 +18,11 @@ class FetchNode extends \Google\Protobuf\Internal\Message
      * executed against this service, we should include that here in each fetch node.
      * This might include an operation signature, requires directive, reference resolutions, etc.
      *
-     * Generated from protobuf field <code>string service_name = 1;</code>
+     * Generated from protobuf field <code>string service_name = 1 [json_name = "serviceName"];</code>
      */
     protected $service_name = '';
 
-    /** Generated from protobuf field <code>bool trace_parsing_failed = 2;</code> */
+    /** Generated from protobuf field <code>bool trace_parsing_failed = 2 [json_name = "traceParsingFailed"];</code> */
     protected $trace_parsing_failed = false;
 
     /**
@@ -30,14 +30,14 @@ class FetchNode extends \Google\Protobuf\Internal\Message
      * all timings were calculated **on the subgraph**, and clock skew
      * will be handled by the ingress server.
      *
-     * Generated from protobuf field <code>.Trace trace = 3;</code>
+     * Generated from protobuf field <code>.Trace trace = 3 [json_name = "trace"];</code>
      */
-    protected ?\Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace $trace = null;
+    protected $trace;
 
     /**
      * relative to the outer trace's start_time, in ns, measured in the Router/Gateway.
      *
-     * Generated from protobuf field <code>uint64 sent_time_offset = 4;</code>
+     * Generated from protobuf field <code>uint64 sent_time_offset = 4 [json_name = "sentTimeOffset"];</code>
      */
     protected $sent_time_offset = 0;
 
@@ -45,12 +45,12 @@ class FetchNode extends \Google\Protobuf\Internal\Message
      * Wallclock times measured in the Router/Gateway for when this operation was
      * sent and received.
      *
-     * Generated from protobuf field <code>.google.protobuf.Timestamp sent_time = 5;</code>
+     * Generated from protobuf field <code>.google.protobuf.Timestamp sent_time = 5 [json_name = "sentTime"];</code>
      */
-    protected ?\Google\Protobuf\Timestamp $sent_time = null;
+    protected $sent_time;
 
-    /** Generated from protobuf field <code>.google.protobuf.Timestamp received_time = 6;</code> */
-    protected ?\Google\Protobuf\Timestamp $received_time = null;
+    /** Generated from protobuf field <code>.google.protobuf.Timestamp received_time = 6 [json_name = "receivedTime"];</code> */
+    protected $received_time;
 
     /**
      * Constructor.
@@ -66,12 +66,12 @@ class FetchNode extends \Google\Protobuf\Internal\Message
      *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace $trace
      *           This Trace only contains start_time, end_time, duration_ns, and root;
      *           all timings were calculated **on the subgraph**, and clock skew
-     *           will be handled by the ingress server
+     *           will be handled by the ingress server.
      *     @var int|string $sent_time_offset
-     *           relative to the outer trace's start_time, in ns, measured in the Router/Gateway
+     *           relative to the outer trace's start_time, in ns, measured in the Router/Gateway.
      *     @var \Google\Protobuf\Timestamp $sent_time
      *           Wallclock times measured in the Router/Gateway for when this operation was
-     *           sent and received
+     *           sent and received.
      *     @var \Google\Protobuf\Timestamp $received_time
      * }
      */
@@ -86,7 +86,7 @@ class FetchNode extends \Google\Protobuf\Internal\Message
      * executed against this service, we should include that here in each fetch node.
      * This might include an operation signature, requires directive, reference resolutions, etc.
      *
-     * Generated from protobuf field <code>string service_name = 1;</code>
+     * Generated from protobuf field <code>string service_name = 1 [json_name = "serviceName"];</code>
      *
      * @return string
      */
@@ -100,7 +100,7 @@ class FetchNode extends \Google\Protobuf\Internal\Message
      * executed against this service, we should include that here in each fetch node.
      * This might include an operation signature, requires directive, reference resolutions, etc.
      *
-     * Generated from protobuf field <code>string service_name = 1;</code>
+     * Generated from protobuf field <code>string service_name = 1 [json_name = "serviceName"];</code>
      *
      * @param  string  $var
      *
@@ -115,7 +115,7 @@ class FetchNode extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>bool trace_parsing_failed = 2;</code>.
+     * Generated from protobuf field <code>bool trace_parsing_failed = 2 [json_name = "traceParsingFailed"];</code>.
      *
      * @return bool
      */
@@ -125,7 +125,7 @@ class FetchNode extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>bool trace_parsing_failed = 2;</code>.
+     * Generated from protobuf field <code>bool trace_parsing_failed = 2 [json_name = "traceParsingFailed"];</code>.
      *
      * @param  bool  $var
      *
@@ -144,9 +144,11 @@ class FetchNode extends \Google\Protobuf\Internal\Message
      * all timings were calculated **on the subgraph**, and clock skew
      * will be handled by the ingress server.
      *
-     * Generated from protobuf field <code>.Trace trace = 3;</code>
+     * Generated from protobuf field <code>.Trace trace = 3 [json_name = "trace"];</code>
+     *
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace|null
      */
-    public function getTrace(): ?\Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace
+    public function getTrace()
     {
         return $this->trace;
     }
@@ -156,7 +158,7 @@ class FetchNode extends \Google\Protobuf\Internal\Message
         return isset($this->trace);
     }
 
-    public function clearTrace(): void
+    public function clearTrace()
     {
         unset($this->trace);
     }
@@ -166,11 +168,13 @@ class FetchNode extends \Google\Protobuf\Internal\Message
      * all timings were calculated **on the subgraph**, and clock skew
      * will be handled by the ingress server.
      *
-     * Generated from protobuf field <code>.Trace trace = 3;</code>
+     * Generated from protobuf field <code>.Trace trace = 3 [json_name = "trace"];</code>
+     *
+     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace  $var
      *
      * @return $this
      */
-    public function setTrace(?\Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace $var)
+    public function setTrace($var)
     {
         GPBUtil::checkMessage($var, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace::class);
         $this->trace = $var;
@@ -181,9 +185,11 @@ class FetchNode extends \Google\Protobuf\Internal\Message
     /**
      * relative to the outer trace's start_time, in ns, measured in the Router/Gateway.
      *
-     * Generated from protobuf field <code>uint64 sent_time_offset = 4;</code>
+     * Generated from protobuf field <code>uint64 sent_time_offset = 4 [json_name = "sentTimeOffset"];</code>
+     *
+     * @return int|string
      */
-    public function getSentTimeOffset(): int|string
+    public function getSentTimeOffset()
     {
         return $this->sent_time_offset;
     }
@@ -191,11 +197,13 @@ class FetchNode extends \Google\Protobuf\Internal\Message
     /**
      * relative to the outer trace's start_time, in ns, measured in the Router/Gateway.
      *
-     * Generated from protobuf field <code>uint64 sent_time_offset = 4;</code>
+     * Generated from protobuf field <code>uint64 sent_time_offset = 4 [json_name = "sentTimeOffset"];</code>
+     *
+     * @param  int|string  $var
      *
      * @return $this
      */
-    public function setSentTimeOffset(int|string $var)
+    public function setSentTimeOffset($var)
     {
         GPBUtil::checkUint64($var);
         $this->sent_time_offset = $var;
@@ -207,9 +215,11 @@ class FetchNode extends \Google\Protobuf\Internal\Message
      * Wallclock times measured in the Router/Gateway for when this operation was
      * sent and received.
      *
-     * Generated from protobuf field <code>.google.protobuf.Timestamp sent_time = 5;</code>
+     * Generated from protobuf field <code>.google.protobuf.Timestamp sent_time = 5 [json_name = "sentTime"];</code>
+     *
+     * @return \Google\Protobuf\Timestamp|null
      */
-    public function getSentTime(): ?\Google\Protobuf\Timestamp
+    public function getSentTime()
     {
         return $this->sent_time;
     }
@@ -219,7 +229,7 @@ class FetchNode extends \Google\Protobuf\Internal\Message
         return isset($this->sent_time);
     }
 
-    public function clearSentTime(): void
+    public function clearSentTime()
     {
         unset($this->sent_time);
     }
@@ -228,11 +238,13 @@ class FetchNode extends \Google\Protobuf\Internal\Message
      * Wallclock times measured in the Router/Gateway for when this operation was
      * sent and received.
      *
-     * Generated from protobuf field <code>.google.protobuf.Timestamp sent_time = 5;</code>
+     * Generated from protobuf field <code>.google.protobuf.Timestamp sent_time = 5 [json_name = "sentTime"];</code>
+     *
+     * @param  \Google\Protobuf\Timestamp  $var
      *
      * @return $this
      */
-    public function setSentTime(?\Google\Protobuf\Timestamp $var)
+    public function setSentTime($var)
     {
         GPBUtil::checkMessage($var, \Google\Protobuf\Timestamp::class);
         $this->sent_time = $var;
@@ -240,8 +252,12 @@ class FetchNode extends \Google\Protobuf\Internal\Message
         return $this;
     }
 
-    /** Generated from protobuf field <code>.google.protobuf.Timestamp received_time = 6;</code> */
-    public function getReceivedTime(): ?\Google\Protobuf\Timestamp
+    /**
+     * Generated from protobuf field <code>.google.protobuf.Timestamp received_time = 6 [json_name = "receivedTime"];</code>.
+     *
+     * @return \Google\Protobuf\Timestamp|null
+     */
+    public function getReceivedTime()
     {
         return $this->received_time;
     }
@@ -251,17 +267,19 @@ class FetchNode extends \Google\Protobuf\Internal\Message
         return isset($this->received_time);
     }
 
-    public function clearReceivedTime(): void
+    public function clearReceivedTime()
     {
         unset($this->received_time);
     }
 
     /**
-     * Generated from protobuf field <code>.google.protobuf.Timestamp received_time = 6;</code>.
+     * Generated from protobuf field <code>.google.protobuf.Timestamp received_time = 6 [json_name = "receivedTime"];</code>.
+     *
+     * @param  \Google\Protobuf\Timestamp  $var
      *
      * @return $this
      */
-    public function setReceivedTime(?\Google\Protobuf\Timestamp $var)
+    public function setReceivedTime($var)
     {
         GPBUtil::checkMessage($var, \Google\Protobuf\Timestamp::class);
         $this->received_time = $var;

@@ -17,44 +17,44 @@ use Google\Protobuf\Internal\GPBUtil;
  */
 class Node extends \Google\Protobuf\Internal\Message
 {
-    /** Generated from protobuf field <code>string original_field_name = 14;</code> */
+    /** Generated from protobuf field <code>string original_field_name = 14 [json_name = "originalFieldName"];</code> */
     protected $original_field_name = '';
 
     /**
      * The field's return type; e.g. "String!" for User.email:String!
      *
-     * Generated from protobuf field <code>string type = 3;</code>
+     * Generated from protobuf field <code>string type = 3 [json_name = "type"];</code>
      */
     protected $type = '';
 
     /**
      * The field's parent type; e.g. "User" for User.email:String!
      *
-     * Generated from protobuf field <code>string parent_type = 13;</code>
+     * Generated from protobuf field <code>string parent_type = 13 [json_name = "parentType"];</code>
      */
     protected $parent_type = '';
 
-    /** Generated from protobuf field <code>.Trace.CachePolicy cache_policy = 5;</code> */
-    protected ?\Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\CachePolicy $cache_policy = null;
+    /** Generated from protobuf field <code>.Trace.CachePolicy cache_policy = 5 [json_name = "cachePolicy"];</code> */
+    protected $cache_policy;
 
     /**
      * relative to the trace's start_time, in ns.
      *
-     * Generated from protobuf field <code>uint64 start_time = 8;</code>
+     * Generated from protobuf field <code>uint64 start_time = 8 [json_name = "startTime"];</code>
      */
     protected $start_time = 0;
 
     /**
      * relative to the trace's start_time, in ns.
      *
-     * Generated from protobuf field <code>uint64 end_time = 9;</code>
+     * Generated from protobuf field <code>uint64 end_time = 9 [json_name = "endTime"];</code>
      */
     protected $end_time = 0;
 
-    /** Generated from protobuf field <code>repeated .Trace.Error error = 11;</code> */
+    /** Generated from protobuf field <code>repeated .Trace.Error error = 11 [json_name = "error"];</code> */
     private $error;
 
-    /** Generated from protobuf field <code>repeated .Trace.Node child = 12;</code> */
+    /** Generated from protobuf field <code>repeated .Trace.Node child = 12 [json_name = "child"];</code> */
     private $child;
 
     protected $id;
@@ -88,7 +88,7 @@ class Node extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string response_name = 1;</code>.
+     * Generated from protobuf field <code>string response_name = 1 [json_name = "responseName"];</code>.
      *
      * @return string
      */
@@ -103,7 +103,7 @@ class Node extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string response_name = 1;</code>.
+     * Generated from protobuf field <code>string response_name = 1 [json_name = "responseName"];</code>.
      *
      * @param  string  $var
      *
@@ -118,7 +118,7 @@ class Node extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>uint32 index = 2;</code>.
+     * Generated from protobuf field <code>uint32 index = 2 [json_name = "index"];</code>.
      *
      * @return int
      */
@@ -133,7 +133,7 @@ class Node extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>uint32 index = 2;</code>.
+     * Generated from protobuf field <code>uint32 index = 2 [json_name = "index"];</code>.
      *
      * @param  int  $var
      *
@@ -148,7 +148,7 @@ class Node extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string original_field_name = 14;</code>.
+     * Generated from protobuf field <code>string original_field_name = 14 [json_name = "originalFieldName"];</code>.
      *
      * @return string
      */
@@ -158,7 +158,7 @@ class Node extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string original_field_name = 14;</code>.
+     * Generated from protobuf field <code>string original_field_name = 14 [json_name = "originalFieldName"];</code>.
      *
      * @param  string  $var
      *
@@ -175,7 +175,7 @@ class Node extends \Google\Protobuf\Internal\Message
     /**
      * The field's return type; e.g. "String!" for User.email:String!
      *
-     * Generated from protobuf field <code>string type = 3;</code>
+     * Generated from protobuf field <code>string type = 3 [json_name = "type"];</code>
      *
      * @return string
      */
@@ -187,7 +187,7 @@ class Node extends \Google\Protobuf\Internal\Message
     /**
      * The field's return type; e.g. "String!" for User.email:String!
      *
-     * Generated from protobuf field <code>string type = 3;</code>
+     * Generated from protobuf field <code>string type = 3 [json_name = "type"];</code>
      *
      * @param  string  $var
      *
@@ -204,7 +204,7 @@ class Node extends \Google\Protobuf\Internal\Message
     /**
      * The field's parent type; e.g. "User" for User.email:String!
      *
-     * Generated from protobuf field <code>string parent_type = 13;</code>
+     * Generated from protobuf field <code>string parent_type = 13 [json_name = "parentType"];</code>
      *
      * @return string
      */
@@ -216,7 +216,7 @@ class Node extends \Google\Protobuf\Internal\Message
     /**
      * The field's parent type; e.g. "User" for User.email:String!
      *
-     * Generated from protobuf field <code>string parent_type = 13;</code>
+     * Generated from protobuf field <code>string parent_type = 13 [json_name = "parentType"];</code>
      *
      * @param  string  $var
      *
@@ -230,8 +230,12 @@ class Node extends \Google\Protobuf\Internal\Message
         return $this;
     }
 
-    /** Generated from protobuf field <code>.Trace.CachePolicy cache_policy = 5;</code> */
-    public function getCachePolicy(): ?CachePolicy
+    /**
+     * Generated from protobuf field <code>.Trace.CachePolicy cache_policy = 5 [json_name = "cachePolicy"];</code>.
+     *
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\CachePolicy|null
+     */
+    public function getCachePolicy()
     {
         return $this->cache_policy;
     }
@@ -241,17 +245,19 @@ class Node extends \Google\Protobuf\Internal\Message
         return isset($this->cache_policy);
     }
 
-    public function clearCachePolicy(): void
+    public function clearCachePolicy()
     {
         unset($this->cache_policy);
     }
 
     /**
-     * Generated from protobuf field <code>.Trace.CachePolicy cache_policy = 5;</code>.
+     * Generated from protobuf field <code>.Trace.CachePolicy cache_policy = 5 [json_name = "cachePolicy"];</code>.
+     *
+     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\CachePolicy  $var
      *
      * @return $this
      */
-    public function setCachePolicy(?CachePolicy $var)
+    public function setCachePolicy($var)
     {
         GPBUtil::checkMessage($var, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\CachePolicy::class);
         $this->cache_policy = $var;
@@ -262,9 +268,11 @@ class Node extends \Google\Protobuf\Internal\Message
     /**
      * relative to the trace's start_time, in ns.
      *
-     * Generated from protobuf field <code>uint64 start_time = 8;</code>
+     * Generated from protobuf field <code>uint64 start_time = 8 [json_name = "startTime"];</code>
+     *
+     * @return int|string
      */
-    public function getStartTime(): int|string
+    public function getStartTime()
     {
         return $this->start_time;
     }
@@ -272,11 +280,13 @@ class Node extends \Google\Protobuf\Internal\Message
     /**
      * relative to the trace's start_time, in ns.
      *
-     * Generated from protobuf field <code>uint64 start_time = 8;</code>
+     * Generated from protobuf field <code>uint64 start_time = 8 [json_name = "startTime"];</code>
+     *
+     * @param  int|string  $var
      *
      * @return $this
      */
-    public function setStartTime(int|string $var)
+    public function setStartTime($var)
     {
         GPBUtil::checkUint64($var);
         $this->start_time = $var;
@@ -287,9 +297,11 @@ class Node extends \Google\Protobuf\Internal\Message
     /**
      * relative to the trace's start_time, in ns.
      *
-     * Generated from protobuf field <code>uint64 end_time = 9;</code>
+     * Generated from protobuf field <code>uint64 end_time = 9 [json_name = "endTime"];</code>
+     *
+     * @return int|string
      */
-    public function getEndTime(): int|string
+    public function getEndTime()
     {
         return $this->end_time;
     }
@@ -297,11 +309,13 @@ class Node extends \Google\Protobuf\Internal\Message
     /**
      * relative to the trace's start_time, in ns.
      *
-     * Generated from protobuf field <code>uint64 end_time = 9;</code>
+     * Generated from protobuf field <code>uint64 end_time = 9 [json_name = "endTime"];</code>
+     *
+     * @param  int|string  $var
      *
      * @return $this
      */
-    public function setEndTime(int|string $var)
+    public function setEndTime($var)
     {
         GPBUtil::checkUint64($var);
         $this->end_time = $var;
@@ -310,7 +324,7 @@ class Node extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .Trace.Error error = 11;</code>.
+     * Generated from protobuf field <code>repeated .Trace.Error error = 11 [json_name = "error"];</code>.
      *
      * @return \Google\Protobuf\Internal\RepeatedField
      */
@@ -320,13 +334,13 @@ class Node extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .Trace.Error error = 11;</code>.
+     * Generated from protobuf field <code>repeated .Trace.Error error = 11 [json_name = "error"];</code>.
      *
      * @param  array<\Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Error>|\Google\Protobuf\Internal\RepeatedField  $var
      *
      * @return $this
      */
-    public function setError(array|\Google\Protobuf\Internal\RepeatedField $var)
+    public function setError($var)
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Error::class);
         $this->error = $arr;
@@ -335,7 +349,7 @@ class Node extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .Trace.Node child = 12;</code>.
+     * Generated from protobuf field <code>repeated .Trace.Node child = 12 [json_name = "child"];</code>.
      *
      * @return \Google\Protobuf\Internal\RepeatedField
      */
@@ -345,13 +359,13 @@ class Node extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .Trace.Node child = 12;</code>.
+     * Generated from protobuf field <code>repeated .Trace.Node child = 12 [json_name = "child"];</code>.
      *
      * @param  array<\Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Node>|\Google\Protobuf\Internal\RepeatedField  $var
      *
      * @return $this
      */
-    public function setChild(array|\Google\Protobuf\Internal\RepeatedField $var)
+    public function setChild($var)
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Node::class);
         $this->child = $arr;

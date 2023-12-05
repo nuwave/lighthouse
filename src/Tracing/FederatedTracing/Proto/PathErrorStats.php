@@ -11,13 +11,13 @@ use Google\Protobuf\Internal\GPBUtil;
  */
 class PathErrorStats extends \Google\Protobuf\Internal\Message
 {
-    /** Generated from protobuf field <code>map<string, .PathErrorStats> children = 1;</code> */
+    /** Generated from protobuf field <code>map<string, .PathErrorStats> children = 1 [json_name = "children"];</code> */
     private $children;
 
-    /** Generated from protobuf field <code>uint64 errors_count = 4;</code> */
+    /** Generated from protobuf field <code>uint64 errors_count = 4 [json_name = "errorsCount"];</code> */
     protected $errors_count = 0;
 
-    /** Generated from protobuf field <code>uint64 requests_with_errors_count = 5;</code> */
+    /** Generated from protobuf field <code>uint64 requests_with_errors_count = 5 [json_name = "requestsWithErrorsCount"];</code> */
     protected $requests_with_errors_count = 0;
 
     /**
@@ -38,7 +38,7 @@ class PathErrorStats extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>map<string, .PathErrorStats> children = 1;</code>.
+     * Generated from protobuf field <code>map<string, .PathErrorStats> children = 1 [json_name = "children"];</code>.
      *
      * @return \Google\Protobuf\Internal\MapField
      */
@@ -48,11 +48,13 @@ class PathErrorStats extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>map<string, .PathErrorStats> children = 1;</code>.
+     * Generated from protobuf field <code>map<string, .PathErrorStats> children = 1 [json_name = "children"];</code>.
+     *
+     * @param  array|\Google\Protobuf\Internal\MapField  $var
      *
      * @return $this
      */
-    public function setChildren(array|\Google\Protobuf\Internal\MapField $var)
+    public function setChildren($var)
     {
         $arr = GPBUtil::checkMapField($var, \Google\Protobuf\Internal\GPBType::STRING, \Google\Protobuf\Internal\GPBType::MESSAGE, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\PathErrorStats::class);
         $this->children = $arr;
@@ -60,18 +62,24 @@ class PathErrorStats extends \Google\Protobuf\Internal\Message
         return $this;
     }
 
-    /** Generated from protobuf field <code>uint64 errors_count = 4;</code> */
-    public function getErrorsCount(): int|string
+    /**
+     * Generated from protobuf field <code>uint64 errors_count = 4 [json_name = "errorsCount"];</code>.
+     *
+     * @return int|string
+     */
+    public function getErrorsCount()
     {
         return $this->errors_count;
     }
 
     /**
-     * Generated from protobuf field <code>uint64 errors_count = 4;</code>.
+     * Generated from protobuf field <code>uint64 errors_count = 4 [json_name = "errorsCount"];</code>.
+     *
+     * @param  int|string  $var
      *
      * @return $this
      */
-    public function setErrorsCount(int|string $var)
+    public function setErrorsCount($var)
     {
         GPBUtil::checkUint64($var);
         $this->errors_count = $var;
@@ -79,18 +87,24 @@ class PathErrorStats extends \Google\Protobuf\Internal\Message
         return $this;
     }
 
-    /** Generated from protobuf field <code>uint64 requests_with_errors_count = 5;</code> */
-    public function getRequestsWithErrorsCount(): int|string
+    /**
+     * Generated from protobuf field <code>uint64 requests_with_errors_count = 5 [json_name = "requestsWithErrorsCount"];</code>.
+     *
+     * @return int|string
+     */
+    public function getRequestsWithErrorsCount()
     {
         return $this->requests_with_errors_count;
     }
 
     /**
-     * Generated from protobuf field <code>uint64 requests_with_errors_count = 5;</code>.
+     * Generated from protobuf field <code>uint64 requests_with_errors_count = 5 [json_name = "requestsWithErrorsCount"];</code>.
+     *
+     * @param  int|string  $var
      *
      * @return $this
      */
-    public function setRequestsWithErrorsCount(int|string $var)
+    public function setRequestsWithErrorsCount($var)
     {
         GPBUtil::checkUint64($var);
         $this->requests_with_errors_count = $var;

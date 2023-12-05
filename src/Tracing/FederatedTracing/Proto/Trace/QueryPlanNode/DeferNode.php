@@ -13,10 +13,10 @@ use Google\Protobuf\Internal\GPBUtil;
  */
 class DeferNode extends \Google\Protobuf\Internal\Message
 {
-    /** Generated from protobuf field <code>.Trace.QueryPlanNode.DeferNodePrimary primary = 1;</code> */
-    protected ?\Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\DeferNodePrimary $primary = null;
+    /** Generated from protobuf field <code>.Trace.QueryPlanNode.DeferNodePrimary primary = 1 [json_name = "primary"];</code> */
+    protected $primary;
 
-    /** Generated from protobuf field <code>repeated .Trace.QueryPlanNode.DeferredNode deferred = 2;</code> */
+    /** Generated from protobuf field <code>repeated .Trace.QueryPlanNode.DeferredNode deferred = 2 [json_name = "deferred"];</code> */
     private $deferred;
 
     /**
@@ -35,8 +35,12 @@ class DeferNode extends \Google\Protobuf\Internal\Message
         parent::__construct($data);
     }
 
-    /** Generated from protobuf field <code>.Trace.QueryPlanNode.DeferNodePrimary primary = 1;</code> */
-    public function getPrimary(): ?DeferNodePrimary
+    /**
+     * Generated from protobuf field <code>.Trace.QueryPlanNode.DeferNodePrimary primary = 1 [json_name = "primary"];</code>.
+     *
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\DeferNodePrimary|null
+     */
+    public function getPrimary()
     {
         return $this->primary;
     }
@@ -46,17 +50,19 @@ class DeferNode extends \Google\Protobuf\Internal\Message
         return isset($this->primary);
     }
 
-    public function clearPrimary(): void
+    public function clearPrimary()
     {
         unset($this->primary);
     }
 
     /**
-     * Generated from protobuf field <code>.Trace.QueryPlanNode.DeferNodePrimary primary = 1;</code>.
+     * Generated from protobuf field <code>.Trace.QueryPlanNode.DeferNodePrimary primary = 1 [json_name = "primary"];</code>.
+     *
+     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\DeferNodePrimary  $var
      *
      * @return $this
      */
-    public function setPrimary(?DeferNodePrimary $var)
+    public function setPrimary($var)
     {
         GPBUtil::checkMessage($var, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\DeferNodePrimary::class);
         $this->primary = $var;
@@ -65,7 +71,7 @@ class DeferNode extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .Trace.QueryPlanNode.DeferredNode deferred = 2;</code>.
+     * Generated from protobuf field <code>repeated .Trace.QueryPlanNode.DeferredNode deferred = 2 [json_name = "deferred"];</code>.
      *
      * @return \Google\Protobuf\Internal\RepeatedField
      */
@@ -75,13 +81,13 @@ class DeferNode extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .Trace.QueryPlanNode.DeferredNode deferred = 2;</code>.
+     * Generated from protobuf field <code>repeated .Trace.QueryPlanNode.DeferredNode deferred = 2 [json_name = "deferred"];</code>.
      *
      * @param  array<\Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\DeferredNode>|\Google\Protobuf\Internal\RepeatedField  $var
      *
      * @return $this
      */
-    public function setDeferred(array|\Google\Protobuf\Internal\RepeatedField $var)
+    public function setDeferred($var)
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\DeferredNode::class);
         $this->deferred = $arr;

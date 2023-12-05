@@ -11,13 +11,13 @@ use Google\Protobuf\Internal\GPBUtil;
  */
 class CachePolicy extends \Google\Protobuf\Internal\Message
 {
-    /** Generated from protobuf field <code>.Trace.CachePolicy.Scope scope = 1;</code> */
+    /** Generated from protobuf field <code>.Trace.CachePolicy.Scope scope = 1 [json_name = "scope"];</code> */
     protected $scope = 0;
 
     /**
      * use 0 for absent, -1 for 0.
      *
-     * Generated from protobuf field <code>int64 max_age_ns = 2;</code>
+     * Generated from protobuf field <code>int64 max_age_ns = 2 [json_name = "maxAgeNs"];</code>
      */
     protected $max_age_ns = 0;
 
@@ -39,7 +39,7 @@ class CachePolicy extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.Trace.CachePolicy.Scope scope = 1;</code>.
+     * Generated from protobuf field <code>.Trace.CachePolicy.Scope scope = 1 [json_name = "scope"];</code>.
      *
      * @return int
      */
@@ -49,7 +49,7 @@ class CachePolicy extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.Trace.CachePolicy.Scope scope = 1;</code>.
+     * Generated from protobuf field <code>.Trace.CachePolicy.Scope scope = 1 [json_name = "scope"];</code>.
      *
      * @param  int  $var
      *
@@ -57,7 +57,7 @@ class CachePolicy extends \Google\Protobuf\Internal\Message
      */
     public function setScope($var)
     {
-        GPBUtil::checkEnum($var);
+        GPBUtil::checkEnum($var, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\CachePolicy\Scope::class);
         $this->scope = $var;
 
         return $this;
@@ -66,9 +66,11 @@ class CachePolicy extends \Google\Protobuf\Internal\Message
     /**
      * use 0 for absent, -1 for 0.
      *
-     * Generated from protobuf field <code>int64 max_age_ns = 2;</code>
+     * Generated from protobuf field <code>int64 max_age_ns = 2 [json_name = "maxAgeNs"];</code>
+     *
+     * @return int|string
      */
-    public function getMaxAgeNs(): int|string
+    public function getMaxAgeNs()
     {
         return $this->max_age_ns;
     }
@@ -76,11 +78,13 @@ class CachePolicy extends \Google\Protobuf\Internal\Message
     /**
      * use 0 for absent, -1 for 0.
      *
-     * Generated from protobuf field <code>int64 max_age_ns = 2;</code>
+     * Generated from protobuf field <code>int64 max_age_ns = 2 [json_name = "maxAgeNs"];</code>
+     *
+     * @param  int|string  $var
      *
      * @return $this
      */
-    public function setMaxAgeNs(int|string $var)
+    public function setMaxAgeNs($var)
     {
         GPBUtil::checkInt64($var);
         $this->max_age_ns = $var;

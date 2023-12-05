@@ -11,8 +11,8 @@ use Google\Protobuf\Internal\GPBUtil;
  */
 class DeferNodePrimary extends \Google\Protobuf\Internal\Message
 {
-    /** Generated from protobuf field <code>.Trace.QueryPlanNode node = 1;</code> */
-    protected ?\Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode $node = null;
+    /** Generated from protobuf field <code>.Trace.QueryPlanNode node = 1 [json_name = "node"];</code> */
+    protected $node;
 
     /**
      * Constructor.
@@ -29,8 +29,12 @@ class DeferNodePrimary extends \Google\Protobuf\Internal\Message
         parent::__construct($data);
     }
 
-    /** Generated from protobuf field <code>.Trace.QueryPlanNode node = 1;</code> */
-    public function getNode(): ?\Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode
+    /**
+     * Generated from protobuf field <code>.Trace.QueryPlanNode node = 1 [json_name = "node"];</code>.
+     *
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode|null
+     */
+    public function getNode()
     {
         return $this->node;
     }
@@ -40,17 +44,19 @@ class DeferNodePrimary extends \Google\Protobuf\Internal\Message
         return isset($this->node);
     }
 
-    public function clearNode(): void
+    public function clearNode()
     {
         unset($this->node);
     }
 
     /**
-     * Generated from protobuf field <code>.Trace.QueryPlanNode node = 1;</code>.
+     * Generated from protobuf field <code>.Trace.QueryPlanNode node = 1 [json_name = "node"];</code>.
+     *
+     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode  $var
      *
      * @return $this
      */
-    public function setNode(?\Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode $var)
+    public function setNode($var)
     {
         GPBUtil::checkMessage($var, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode::class);
         $this->node = $var;

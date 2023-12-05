@@ -17,10 +17,10 @@ use Google\Protobuf\Internal\GPBUtil;
  */
 class TracesAndStats extends \Google\Protobuf\Internal\Message
 {
-    /** Generated from protobuf field <code>repeated .Trace trace = 1;</code> */
+    /** Generated from protobuf field <code>repeated .Trace trace = 1 [json_name = "trace"];</code> */
     private $trace;
 
-    /** Generated from protobuf field <code>repeated .ContextualizedStats stats_with_context = 2;</code> */
+    /** Generated from protobuf field <code>repeated .ContextualizedStats stats_with_context = 2 [json_name = "statsWithContext"];</code> */
     private $stats_with_context;
 
     /**
@@ -31,7 +31,7 @@ class TracesAndStats extends \Google\Protobuf\Internal\Message
      * (as FieldStats will include the concrete object type for fields referenced
      * via an interface type).
      *
-     * Generated from protobuf field <code>map<string, .ReferencedFieldsForType> referenced_fields_by_type = 4;</code>
+     * Generated from protobuf field <code>map<string, .ReferencedFieldsForType> referenced_fields_by_type = 4 [json_name = "referencedFieldsByType"];</code>
      */
     private $referenced_fields_by_type;
 
@@ -40,9 +40,17 @@ class TracesAndStats extends \Google\Protobuf\Internal\Message
      * matches similar algorithms in Apollo's servers. It is otherwise ignored and should not
      * be included in reports.
      *
-     * Generated from protobuf field <code>repeated .Trace internal_traces_contributing_to_stats = 3;</code>
+     * Generated from protobuf field <code>repeated .Trace internal_traces_contributing_to_stats = 3 [json_name = "internalTracesContributingToStats"];</code>
      */
     private $internal_traces_contributing_to_stats;
+
+    /**
+     * This is an optional field that is used to provide more context to the key of this object within the
+     * traces_per_query map. If it's omitted, we assume the key is a standard operation name and signature key.
+     *
+     * Generated from protobuf field <code>.QueryMetadata query_metadata = 5 [json_name = "queryMetadata"];</code>
+     */
+    protected $query_metadata;
 
     /**
      * Constructor.
@@ -63,6 +71,9 @@ class TracesAndStats extends \Google\Protobuf\Internal\Message
      *           This field is used to validate that the algorithm used to construct `stats_with_context`
      *           matches similar algorithms in Apollo's servers. It is otherwise ignored and should not
      *           be included in reports.
+     *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\QueryMetadata $query_metadata
+     *           This is an optional field that is used to provide more context to the key of this object within the
+     *           traces_per_query map. If it's omitted, we assume the key is a standard operation name and signature key.
      * }
      */
     public function __construct($data = null)
@@ -72,7 +83,7 @@ class TracesAndStats extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .Trace trace = 1;</code>.
+     * Generated from protobuf field <code>repeated .Trace trace = 1 [json_name = "trace"];</code>.
      *
      * @return \Google\Protobuf\Internal\RepeatedField
      */
@@ -82,13 +93,13 @@ class TracesAndStats extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .Trace trace = 1;</code>.
+     * Generated from protobuf field <code>repeated .Trace trace = 1 [json_name = "trace"];</code>.
      *
      * @param  array<\Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace>|\Google\Protobuf\Internal\RepeatedField  $var
      *
      * @return $this
      */
-    public function setTrace(array|\Google\Protobuf\Internal\RepeatedField $var)
+    public function setTrace($var)
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace::class);
         $this->trace = $arr;
@@ -97,7 +108,7 @@ class TracesAndStats extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .ContextualizedStats stats_with_context = 2;</code>.
+     * Generated from protobuf field <code>repeated .ContextualizedStats stats_with_context = 2 [json_name = "statsWithContext"];</code>.
      *
      * @return \Google\Protobuf\Internal\RepeatedField
      */
@@ -107,13 +118,13 @@ class TracesAndStats extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .ContextualizedStats stats_with_context = 2;</code>.
+     * Generated from protobuf field <code>repeated .ContextualizedStats stats_with_context = 2 [json_name = "statsWithContext"];</code>.
      *
      * @param  array<\Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\ContextualizedStats>|\Google\Protobuf\Internal\RepeatedField  $var
      *
      * @return $this
      */
-    public function setStatsWithContext(array|\Google\Protobuf\Internal\RepeatedField $var)
+    public function setStatsWithContext($var)
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\ContextualizedStats::class);
         $this->stats_with_context = $arr;
@@ -129,7 +140,7 @@ class TracesAndStats extends \Google\Protobuf\Internal\Message
      * (as FieldStats will include the concrete object type for fields referenced
      * via an interface type).
      *
-     * Generated from protobuf field <code>map<string, .ReferencedFieldsForType> referenced_fields_by_type = 4;</code>
+     * Generated from protobuf field <code>map<string, .ReferencedFieldsForType> referenced_fields_by_type = 4 [json_name = "referencedFieldsByType"];</code>
      *
      * @return \Google\Protobuf\Internal\MapField
      */
@@ -146,11 +157,13 @@ class TracesAndStats extends \Google\Protobuf\Internal\Message
      * (as FieldStats will include the concrete object type for fields referenced
      * via an interface type).
      *
-     * Generated from protobuf field <code>map<string, .ReferencedFieldsForType> referenced_fields_by_type = 4;</code>
+     * Generated from protobuf field <code>map<string, .ReferencedFieldsForType> referenced_fields_by_type = 4 [json_name = "referencedFieldsByType"];</code>
+     *
+     * @param  array|\Google\Protobuf\Internal\MapField  $var
      *
      * @return $this
      */
-    public function setReferencedFieldsByType(array|\Google\Protobuf\Internal\MapField $var)
+    public function setReferencedFieldsByType($var)
     {
         $arr = GPBUtil::checkMapField($var, \Google\Protobuf\Internal\GPBType::STRING, \Google\Protobuf\Internal\GPBType::MESSAGE, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\ReferencedFieldsForType::class);
         $this->referenced_fields_by_type = $arr;
@@ -163,7 +176,7 @@ class TracesAndStats extends \Google\Protobuf\Internal\Message
      * matches similar algorithms in Apollo's servers. It is otherwise ignored and should not
      * be included in reports.
      *
-     * Generated from protobuf field <code>repeated .Trace internal_traces_contributing_to_stats = 3;</code>
+     * Generated from protobuf field <code>repeated .Trace internal_traces_contributing_to_stats = 3 [json_name = "internalTracesContributingToStats"];</code>
      *
      * @return \Google\Protobuf\Internal\RepeatedField
      */
@@ -177,16 +190,57 @@ class TracesAndStats extends \Google\Protobuf\Internal\Message
      * matches similar algorithms in Apollo's servers. It is otherwise ignored and should not
      * be included in reports.
      *
-     * Generated from protobuf field <code>repeated .Trace internal_traces_contributing_to_stats = 3;</code>
+     * Generated from protobuf field <code>repeated .Trace internal_traces_contributing_to_stats = 3 [json_name = "internalTracesContributingToStats"];</code>
      *
      * @param  array<\Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace>|\Google\Protobuf\Internal\RepeatedField  $var
      *
      * @return $this
      */
-    public function setInternalTracesContributingToStats(array|\Google\Protobuf\Internal\RepeatedField $var)
+    public function setInternalTracesContributingToStats($var)
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace::class);
         $this->internal_traces_contributing_to_stats = $arr;
+
+        return $this;
+    }
+
+    /**
+     * This is an optional field that is used to provide more context to the key of this object within the
+     * traces_per_query map. If it's omitted, we assume the key is a standard operation name and signature key.
+     *
+     * Generated from protobuf field <code>.QueryMetadata query_metadata = 5 [json_name = "queryMetadata"];</code>
+     *
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\QueryMetadata|null
+     */
+    public function getQueryMetadata()
+    {
+        return $this->query_metadata;
+    }
+
+    public function hasQueryMetadata()
+    {
+        return isset($this->query_metadata);
+    }
+
+    public function clearQueryMetadata()
+    {
+        unset($this->query_metadata);
+    }
+
+    /**
+     * This is an optional field that is used to provide more context to the key of this object within the
+     * traces_per_query map. If it's omitted, we assume the key is a standard operation name and signature key.
+     *
+     * Generated from protobuf field <code>.QueryMetadata query_metadata = 5 [json_name = "queryMetadata"];</code>
+     *
+     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\QueryMetadata  $var
+     *
+     * @return $this
+     */
+    public function setQueryMetadata($var)
+    {
+        GPBUtil::checkMessage($var, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\QueryMetadata::class);
+        $this->query_metadata = $var;
 
         return $this;
     }

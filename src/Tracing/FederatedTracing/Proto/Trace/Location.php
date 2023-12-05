@@ -11,10 +11,10 @@ use Google\Protobuf\Internal\GPBUtil;
  */
 class Location extends \Google\Protobuf\Internal\Message
 {
-    /** Generated from protobuf field <code>uint32 line = 1;</code> */
+    /** Generated from protobuf field <code>uint32 line = 1 [json_name = "line"];</code> */
     protected $line = 0;
 
-    /** Generated from protobuf field <code>uint32 column = 2;</code> */
+    /** Generated from protobuf field <code>uint32 column = 2 [json_name = "column"];</code> */
     protected $column = 0;
 
     /**
@@ -34,7 +34,7 @@ class Location extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>uint32 line = 1;</code>.
+     * Generated from protobuf field <code>uint32 line = 1 [json_name = "line"];</code>.
      *
      * @return int
      */
@@ -44,7 +44,7 @@ class Location extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>uint32 line = 1;</code>.
+     * Generated from protobuf field <code>uint32 line = 1 [json_name = "line"];</code>.
      *
      * @param  int  $var
      *
@@ -59,7 +59,7 @@ class Location extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>uint32 column = 2;</code>.
+     * Generated from protobuf field <code>uint32 column = 2 [json_name = "column"];</code>.
      *
      * @return int
      */
@@ -69,7 +69,7 @@ class Location extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>uint32 column = 2;</code>.
+     * Generated from protobuf field <code>uint32 column = 2 [json_name = "column"];</code>.
      *
      * @param  int  $var
      *

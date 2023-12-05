@@ -11,10 +11,10 @@ use Google\Protobuf\Internal\GPBUtil;
  */
 class DeferredNodeDepends extends \Google\Protobuf\Internal\Message
 {
-    /** Generated from protobuf field <code>string id = 1;</code> */
+    /** Generated from protobuf field <code>string id = 1 [json_name = "id"];</code> */
     protected $id = '';
 
-    /** Generated from protobuf field <code>string defer_label = 2;</code> */
+    /** Generated from protobuf field <code>string defer_label = 2 [json_name = "deferLabel"];</code> */
     protected $defer_label = '';
 
     /**
@@ -34,7 +34,7 @@ class DeferredNodeDepends extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string id = 1;</code>.
+     * Generated from protobuf field <code>string id = 1 [json_name = "id"];</code>.
      *
      * @return string
      */
@@ -44,7 +44,7 @@ class DeferredNodeDepends extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string id = 1;</code>.
+     * Generated from protobuf field <code>string id = 1 [json_name = "id"];</code>.
      *
      * @param  string  $var
      *
@@ -59,7 +59,7 @@ class DeferredNodeDepends extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string defer_label = 2;</code>.
+     * Generated from protobuf field <code>string defer_label = 2 [json_name = "deferLabel"];</code>.
      *
      * @return string
      */
@@ -69,7 +69,7 @@ class DeferredNodeDepends extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string defer_label = 2;</code>.
+     * Generated from protobuf field <code>string defer_label = 2 [json_name = "deferLabel"];</code>.
      *
      * @param  string  $var
      *

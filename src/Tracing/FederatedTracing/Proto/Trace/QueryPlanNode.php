@@ -38,8 +38,12 @@ class QueryPlanNode extends \Google\Protobuf\Internal\Message
         parent::__construct($data);
     }
 
-    /** Generated from protobuf field <code>.Trace.QueryPlanNode.SequenceNode sequence = 1;</code> */
-    public function getSequence(): ?QueryPlanNode\SequenceNode
+    /**
+     * Generated from protobuf field <code>.Trace.QueryPlanNode.SequenceNode sequence = 1 [json_name = "sequence"];</code>.
+     *
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\SequenceNode|null
+     */
+    public function getSequence()
     {
         return $this->readOneof(1);
     }
@@ -50,7 +54,7 @@ class QueryPlanNode extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.Trace.QueryPlanNode.SequenceNode sequence = 1;</code>.
+     * Generated from protobuf field <code>.Trace.QueryPlanNode.SequenceNode sequence = 1 [json_name = "sequence"];</code>.
      *
      * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\SequenceNode  $var
      *
@@ -64,8 +68,12 @@ class QueryPlanNode extends \Google\Protobuf\Internal\Message
         return $this;
     }
 
-    /** Generated from protobuf field <code>.Trace.QueryPlanNode.ParallelNode parallel = 2;</code> */
-    public function getParallel(): ?QueryPlanNode\ParallelNode
+    /**
+     * Generated from protobuf field <code>.Trace.QueryPlanNode.ParallelNode parallel = 2 [json_name = "parallel"];</code>.
+     *
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\ParallelNode|null
+     */
+    public function getParallel()
     {
         return $this->readOneof(2);
     }
@@ -76,7 +84,7 @@ class QueryPlanNode extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.Trace.QueryPlanNode.ParallelNode parallel = 2;</code>.
+     * Generated from protobuf field <code>.Trace.QueryPlanNode.ParallelNode parallel = 2 [json_name = "parallel"];</code>.
      *
      * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\ParallelNode  $var
      *
@@ -90,8 +98,12 @@ class QueryPlanNode extends \Google\Protobuf\Internal\Message
         return $this;
     }
 
-    /** Generated from protobuf field <code>.Trace.QueryPlanNode.FetchNode fetch = 3;</code> */
-    public function getFetch(): ?QueryPlanNode\FetchNode
+    /**
+     * Generated from protobuf field <code>.Trace.QueryPlanNode.FetchNode fetch = 3 [json_name = "fetch"];</code>.
+     *
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\FetchNode|null
+     */
+    public function getFetch()
     {
         return $this->readOneof(3);
     }
@@ -102,7 +114,7 @@ class QueryPlanNode extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.Trace.QueryPlanNode.FetchNode fetch = 3;</code>.
+     * Generated from protobuf field <code>.Trace.QueryPlanNode.FetchNode fetch = 3 [json_name = "fetch"];</code>.
      *
      * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\FetchNode  $var
      *
@@ -116,8 +128,12 @@ class QueryPlanNode extends \Google\Protobuf\Internal\Message
         return $this;
     }
 
-    /** Generated from protobuf field <code>.Trace.QueryPlanNode.FlattenNode flatten = 4;</code> */
-    public function getFlatten(): ?QueryPlanNode\FlattenNode
+    /**
+     * Generated from protobuf field <code>.Trace.QueryPlanNode.FlattenNode flatten = 4 [json_name = "flatten"];</code>.
+     *
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\FlattenNode|null
+     */
+    public function getFlatten()
     {
         return $this->readOneof(4);
     }
@@ -128,7 +144,7 @@ class QueryPlanNode extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.Trace.QueryPlanNode.FlattenNode flatten = 4;</code>.
+     * Generated from protobuf field <code>.Trace.QueryPlanNode.FlattenNode flatten = 4 [json_name = "flatten"];</code>.
      *
      * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\FlattenNode  $var
      *
@@ -142,8 +158,12 @@ class QueryPlanNode extends \Google\Protobuf\Internal\Message
         return $this;
     }
 
-    /** Generated from protobuf field <code>.Trace.QueryPlanNode.DeferNode defer = 5;</code> */
-    public function getDefer(): ?QueryPlanNode\DeferNode
+    /**
+     * Generated from protobuf field <code>.Trace.QueryPlanNode.DeferNode defer = 5 [json_name = "defer"];</code>.
+     *
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\DeferNode|null
+     */
+    public function getDefer()
     {
         return $this->readOneof(5);
     }
@@ -154,7 +174,7 @@ class QueryPlanNode extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.Trace.QueryPlanNode.DeferNode defer = 5;</code>.
+     * Generated from protobuf field <code>.Trace.QueryPlanNode.DeferNode defer = 5 [json_name = "defer"];</code>.
      *
      * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\DeferNode  $var
      *
@@ -168,8 +188,12 @@ class QueryPlanNode extends \Google\Protobuf\Internal\Message
         return $this;
     }
 
-    /** Generated from protobuf field <code>.Trace.QueryPlanNode.ConditionNode condition = 6;</code> */
-    public function getCondition(): ?QueryPlanNode\ConditionNode
+    /**
+     * Generated from protobuf field <code>.Trace.QueryPlanNode.ConditionNode condition = 6 [json_name = "condition"];</code>.
+     *
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\ConditionNode|null
+     */
+    public function getCondition()
     {
         return $this->readOneof(6);
     }
@@ -180,7 +204,7 @@ class QueryPlanNode extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.Trace.QueryPlanNode.ConditionNode condition = 6;</code>.
+     * Generated from protobuf field <code>.Trace.QueryPlanNode.ConditionNode condition = 6 [json_name = "condition"];</code>.
      *
      * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\ConditionNode  $var
      *

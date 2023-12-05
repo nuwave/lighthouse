@@ -11,35 +11,26 @@ class Method
 {
     /** Generated from protobuf enum <code>UNKNOWN = 0;</code> */
     public const UNKNOWN = 0;
-
     /** Generated from protobuf enum <code>OPTIONS = 1;</code> */
     public const OPTIONS = 1;
-
     /** Generated from protobuf enum <code>GET = 2;</code> */
     public const GET = 2;
-
     /** Generated from protobuf enum <code>HEAD = 3;</code> */
     public const HEAD = 3;
-
     /** Generated from protobuf enum <code>POST = 4;</code> */
     public const POST = 4;
-
     /** Generated from protobuf enum <code>PUT = 5;</code> */
     public const PUT = 5;
-
     /** Generated from protobuf enum <code>DELETE = 6;</code> */
     public const DELETE = 6;
-
     /** Generated from protobuf enum <code>TRACE = 7;</code> */
     public const TRACE = 7;
-
     /** Generated from protobuf enum <code>CONNECT = 8;</code> */
     public const CONNECT = 8;
-
     /** Generated from protobuf enum <code>PATCH = 9;</code> */
     public const PATCH = 9;
 
-    private static array $valueToName = [
+    private static $valueToName = [
         self::UNKNOWN => 'UNKNOWN',
         self::OPTIONS => 'OPTIONS',
         self::GET => 'GET',

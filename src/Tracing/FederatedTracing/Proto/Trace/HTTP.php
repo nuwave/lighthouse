@@ -11,20 +11,20 @@ use Google\Protobuf\Internal\GPBUtil;
  */
 class HTTP extends \Google\Protobuf\Internal\Message
 {
-    /** Generated from protobuf field <code>.Trace.HTTP.Method method = 1;</code> */
+    /** Generated from protobuf field <code>.Trace.HTTP.Method method = 1 [json_name = "method"];</code> */
     protected $method = 0;
 
     /**
      * Should exclude manual blacklist ("Auth" by default).
      *
-     * Generated from protobuf field <code>map<string, .Trace.HTTP.Values> request_headers = 4;</code>
+     * Generated from protobuf field <code>map<string, .Trace.HTTP.Values> request_headers = 4 [json_name = "requestHeaders"];</code>
      */
     private $request_headers;
 
-    /** Generated from protobuf field <code>map<string, .Trace.HTTP.Values> response_headers = 5;</code> */
+    /** Generated from protobuf field <code>map<string, .Trace.HTTP.Values> response_headers = 5 [json_name = "responseHeaders"];</code> */
     private $response_headers;
 
-    /** Generated from protobuf field <code>uint32 status_code = 6;</code> */
+    /** Generated from protobuf field <code>uint32 status_code = 6 [json_name = "statusCode"];</code> */
     protected $status_code = 0;
 
     /**
@@ -47,7 +47,7 @@ class HTTP extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.Trace.HTTP.Method method = 1;</code>.
+     * Generated from protobuf field <code>.Trace.HTTP.Method method = 1 [json_name = "method"];</code>.
      *
      * @return int
      */
@@ -57,7 +57,7 @@ class HTTP extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.Trace.HTTP.Method method = 1;</code>.
+     * Generated from protobuf field <code>.Trace.HTTP.Method method = 1 [json_name = "method"];</code>.
      *
      * @param  int  $var
      *
@@ -65,7 +65,7 @@ class HTTP extends \Google\Protobuf\Internal\Message
      */
     public function setMethod($var)
     {
-        GPBUtil::checkEnum($var);
+        GPBUtil::checkEnum($var, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\HTTP\Method::class);
         $this->method = $var;
 
         return $this;
@@ -74,7 +74,7 @@ class HTTP extends \Google\Protobuf\Internal\Message
     /**
      * Should exclude manual blacklist ("Auth" by default).
      *
-     * Generated from protobuf field <code>map<string, .Trace.HTTP.Values> request_headers = 4;</code>
+     * Generated from protobuf field <code>map<string, .Trace.HTTP.Values> request_headers = 4 [json_name = "requestHeaders"];</code>
      *
      * @return \Google\Protobuf\Internal\MapField
      */
@@ -86,11 +86,13 @@ class HTTP extends \Google\Protobuf\Internal\Message
     /**
      * Should exclude manual blacklist ("Auth" by default).
      *
-     * Generated from protobuf field <code>map<string, .Trace.HTTP.Values> request_headers = 4;</code>
+     * Generated from protobuf field <code>map<string, .Trace.HTTP.Values> request_headers = 4 [json_name = "requestHeaders"];</code>
+     *
+     * @param  array|\Google\Protobuf\Internal\MapField  $var
      *
      * @return $this
      */
-    public function setRequestHeaders(array|\Google\Protobuf\Internal\MapField $var)
+    public function setRequestHeaders($var)
     {
         $arr = GPBUtil::checkMapField($var, \Google\Protobuf\Internal\GPBType::STRING, \Google\Protobuf\Internal\GPBType::MESSAGE, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\HTTP\Values::class);
         $this->request_headers = $arr;
@@ -99,7 +101,7 @@ class HTTP extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>map<string, .Trace.HTTP.Values> response_headers = 5;</code>.
+     * Generated from protobuf field <code>map<string, .Trace.HTTP.Values> response_headers = 5 [json_name = "responseHeaders"];</code>.
      *
      * @return \Google\Protobuf\Internal\MapField
      */
@@ -109,11 +111,13 @@ class HTTP extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>map<string, .Trace.HTTP.Values> response_headers = 5;</code>.
+     * Generated from protobuf field <code>map<string, .Trace.HTTP.Values> response_headers = 5 [json_name = "responseHeaders"];</code>.
+     *
+     * @param  array|\Google\Protobuf\Internal\MapField  $var
      *
      * @return $this
      */
-    public function setResponseHeaders(array|\Google\Protobuf\Internal\MapField $var)
+    public function setResponseHeaders($var)
     {
         $arr = GPBUtil::checkMapField($var, \Google\Protobuf\Internal\GPBType::STRING, \Google\Protobuf\Internal\GPBType::MESSAGE, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\HTTP\Values::class);
         $this->response_headers = $arr;
@@ -122,7 +126,7 @@ class HTTP extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>uint32 status_code = 6;</code>.
+     * Generated from protobuf field <code>uint32 status_code = 6 [json_name = "statusCode"];</code>.
      *
      * @return int
      */
@@ -132,7 +136,7 @@ class HTTP extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>uint32 status_code = 6;</code>.
+     * Generated from protobuf field <code>uint32 status_code = 6 [json_name = "statusCode"];</code>.
      *
      * @param  int  $var
      *

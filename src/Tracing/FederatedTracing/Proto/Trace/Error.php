@@ -14,17 +14,17 @@ class Error extends \Google\Protobuf\Internal\Message
     /**
      * required.
      *
-     * Generated from protobuf field <code>string message = 1;</code>
+     * Generated from protobuf field <code>string message = 1 [json_name = "message"];</code>
      */
     protected $message = '';
 
-    /** Generated from protobuf field <code>repeated .Trace.Location location = 2;</code> */
+    /** Generated from protobuf field <code>repeated .Trace.Location location = 2 [json_name = "location"];</code> */
     private $location;
 
-    /** Generated from protobuf field <code>uint64 time_ns = 3;</code> */
+    /** Generated from protobuf field <code>uint64 time_ns = 3 [json_name = "timeNs"];</code> */
     protected $time_ns = 0;
 
-    /** Generated from protobuf field <code>string json = 4;</code> */
+    /** Generated from protobuf field <code>string json = 4 [json_name = "json"];</code> */
     protected $json = '';
 
     /**
@@ -49,7 +49,7 @@ class Error extends \Google\Protobuf\Internal\Message
     /**
      * required.
      *
-     * Generated from protobuf field <code>string message = 1;</code>
+     * Generated from protobuf field <code>string message = 1 [json_name = "message"];</code>
      *
      * @return string
      */
@@ -61,7 +61,7 @@ class Error extends \Google\Protobuf\Internal\Message
     /**
      * required.
      *
-     * Generated from protobuf field <code>string message = 1;</code>
+     * Generated from protobuf field <code>string message = 1 [json_name = "message"];</code>
      *
      * @param  string  $var
      *
@@ -76,7 +76,7 @@ class Error extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .Trace.Location location = 2;</code>.
+     * Generated from protobuf field <code>repeated .Trace.Location location = 2 [json_name = "location"];</code>.
      *
      * @return \Google\Protobuf\Internal\RepeatedField
      */
@@ -86,13 +86,13 @@ class Error extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .Trace.Location location = 2;</code>.
+     * Generated from protobuf field <code>repeated .Trace.Location location = 2 [json_name = "location"];</code>.
      *
      * @param  array<\Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Location>|\Google\Protobuf\Internal\RepeatedField  $var
      *
      * @return $this
      */
-    public function setLocation(array|\Google\Protobuf\Internal\RepeatedField $var)
+    public function setLocation($var)
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Location::class);
         $this->location = $arr;
@@ -100,18 +100,24 @@ class Error extends \Google\Protobuf\Internal\Message
         return $this;
     }
 
-    /** Generated from protobuf field <code>uint64 time_ns = 3;</code> */
-    public function getTimeNs(): int|string
+    /**
+     * Generated from protobuf field <code>uint64 time_ns = 3 [json_name = "timeNs"];</code>.
+     *
+     * @return int|string
+     */
+    public function getTimeNs()
     {
         return $this->time_ns;
     }
 
     /**
-     * Generated from protobuf field <code>uint64 time_ns = 3;</code>.
+     * Generated from protobuf field <code>uint64 time_ns = 3 [json_name = "timeNs"];</code>.
+     *
+     * @param  int|string  $var
      *
      * @return $this
      */
-    public function setTimeNs(int|string $var)
+    public function setTimeNs($var)
     {
         GPBUtil::checkUint64($var);
         $this->time_ns = $var;
@@ -120,7 +126,7 @@ class Error extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string json = 4;</code>.
+     * Generated from protobuf field <code>string json = 4 [json_name = "json"];</code>.
      *
      * @return string
      */
@@ -130,7 +136,7 @@ class Error extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string json = 4;</code>.
+     * Generated from protobuf field <code>string json = 4 [json_name = "json"];</code>.
      *
      * @param  string  $var
      *

@@ -7,32 +7,28 @@ namespace Nuwave\Lighthouse\Tracing\FederatedTracing\Proto;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * This is the top-level message used by the new traces ingress. This
- * is designed for the apollo-engine-reporting TypeScript agent and will
- * eventually be documented as a public ingress API. This message consists
- * solely of traces; the equivalent of the StatsReport is automatically
- * generated server-side from this message. Agent should either send a trace or include it in the stats
- * for every request in this report. Generally, buffering up until a large
- * size has been reached (say, 4MB) or 5-10 seconds has passed is appropriate.
- * This message used to be know as FullTracesReport, but got renamed since it isn't just for traces anymore.
+ * This is the top-level message used by Apollo Server, Apollo Router, and other libraries to report usage information
+ * to Apollo. This message consists of traces and stats for operations. By default, each individual operation execution
+ * should be either represented as a trace or within stats, but not both. However if the "traces_pre_aggregated" field
+ * is set to true, all operations should be included in stats and anything specified as a trace is not added in to the
+ * aggregate stats. For performance reasons, we recommend that traces are sampled so that only somewhere around 1% of
+ * operation executions are sent as traces. Additionally, buffering operations up until a large size has been reached
+ * (say, 4MB) or 5-10 seconds has passed is appropriate.
+ * This message used to be known as FullTracesReport, but got renamed since it isn't just for traces anymore.
  *
  * Generated from protobuf message <code>Report</code>
  */
 class Report extends \Google\Protobuf\Internal\Message
 {
-    /** Generated from protobuf field <code>.ReportHeader header = 1;</code> */
-    protected ?\Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\ReportHeader $header = null;
+    /** Generated from protobuf field <code>.ReportHeader header = 1 [json_name = "header"];</code> */
+    protected $header;
 
     /**
-     * key is statsReportKey (# operationName\nsignature) Note that the nested
-     * traces will *not* have a signature or details.operationName (because the
-     * key is adequate).
-     * We also assume that traces don't have
-     * legacy_per_query_implicit_operation_name, and we don't require them to have
-     * details.raw_query (which would consume a lot of space and has privacy/data
-     * access issues, and isn't currently exposed by our app anyway).
+     * If QueryMetadata isn't provided, this key should be a statsReportKey (# operationName\nsignature). If the operation
+     * name, signature, and persisted query IDs are provided in the QueryMetadata, and this operation was requested via a
+     * persisted query, this key can be "pq# <persisted query id>" instead of the signature and operation.
      *
-     * Generated from protobuf field <code>map<string, .TracesAndStats> traces_per_query = 5;</code>
+     * Generated from protobuf field <code>map<string, .TracesAndStats> traces_per_query = 5 [json_name = "tracesPerQuery"];</code>
      */
     private $traces_per_query;
 
@@ -42,16 +38,26 @@ class Report extends \Google\Protobuf\Internal\Message
      * If there are no traces and no end_time present the report will not be able to be processed.
      * Note: This will override the end_time from traces.
      *
-     * Generated from protobuf field <code>.google.protobuf.Timestamp end_time = 2;</code>
+     * Generated from protobuf field <code>.google.protobuf.Timestamp end_time = 2 [json_name = "endTime"];</code>
      */
-    protected ?\Google\Protobuf\Timestamp $end_time = null;
+    protected $end_time;
 
     /**
-     * Total number of operations processed during this period.
+     * Total number of operations processed during this period. This includes all operations, even if they are sampled
+     * and not included in the query latency stats.
      *
-     * Generated from protobuf field <code>uint64 operation_count = 6;</code>
+     * Generated from protobuf field <code>uint64 operation_count = 6 [json_name = "operationCount"];</code>
      */
     protected $operation_count = 0;
+
+    /**
+     * Total number of operations broken up by operation type and operation subtype.
+     * Only either this or operation_count should be populated, but if both are present, the total across all types and
+     * subtypes should match the overall operation_count.
+     *
+     * Generated from protobuf field <code>repeated .Report.OperationCountByType operation_count_by_type = 8 [json_name = "operationCountByType"];</code>
+     */
+    private $operation_count_by_type;
 
     /**
      * If this is set to true, the stats in TracesWithStats.stats_with_context
@@ -60,7 +66,7 @@ class Report extends \Google\Protobuf\Internal\Message
      * operations. If this is false, each operation is described in precisely
      * one of those two fields.
      *
-     * Generated from protobuf field <code>bool traces_pre_aggregated = 7;</code>
+     * Generated from protobuf field <code>bool traces_pre_aggregated = 7 [json_name = "tracesPreAggregated"];</code>
      */
     protected $traces_pre_aggregated = false;
 
@@ -72,20 +78,21 @@ class Report extends \Google\Protobuf\Internal\Message
      *
      *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\ReportHeader $header
      *     @var array|\Google\Protobuf\Internal\MapField $traces_per_query
-     *           key is statsReportKey (# operationName\nsignature) Note that the nested
-     *           traces will *not* have a signature or details.operationName (because the
-     *           key is adequate).
-     *           We also assume that traces don't have
-     *           legacy_per_query_implicit_operation_name, and we don't require them to have
-     *           details.raw_query (which would consume a lot of space and has privacy/data
-     *           access issues, and isn't currently exposed by our app anyway).
+     *           If QueryMetadata isn't provided, this key should be a statsReportKey (# operationName\nsignature). If the operation
+     *           name, signature, and persisted query IDs are provided in the QueryMetadata, and this operation was requested via a
+     *           persisted query, this key can be "pq# <persisted query id>" instead of the signature and operation.
      *     @var \Google\Protobuf\Timestamp $end_time
      *           This is the time that the requests in this trace are considered to have taken place
      *           If this field is not present the max of the end_time of each trace will be used instead.
      *           If there are no traces and no end_time present the report will not be able to be processed.
      *           Note: This will override the end_time from traces.
      *     @var int|string $operation_count
-     *           Total number of operations processed during this period
+     *           Total number of operations processed during this period. This includes all operations, even if they are sampled
+     *           and not included in the query latency stats.
+     *     @var array<\Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Report\OperationCountByType>|\Google\Protobuf\Internal\RepeatedField $operation_count_by_type
+     *           Total number of operations broken up by operation type and operation subtype.
+     *           Only either this or operation_count should be populated, but if both are present, the total across all types and
+     *           subtypes should match the overall operation_count.
      *     @var bool $traces_pre_aggregated
      *           If this is set to true, the stats in TracesWithStats.stats_with_context
      *           represent all of the operations described from this report, and the
@@ -100,8 +107,12 @@ class Report extends \Google\Protobuf\Internal\Message
         parent::__construct($data);
     }
 
-    /** Generated from protobuf field <code>.ReportHeader header = 1;</code> */
-    public function getHeader(): ?ReportHeader
+    /**
+     * Generated from protobuf field <code>.ReportHeader header = 1 [json_name = "header"];</code>.
+     *
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\ReportHeader|null
+     */
+    public function getHeader()
     {
         return $this->header;
     }
@@ -111,17 +122,19 @@ class Report extends \Google\Protobuf\Internal\Message
         return isset($this->header);
     }
 
-    public function clearHeader(): void
+    public function clearHeader()
     {
         unset($this->header);
     }
 
     /**
-     * Generated from protobuf field <code>.ReportHeader header = 1;</code>.
+     * Generated from protobuf field <code>.ReportHeader header = 1 [json_name = "header"];</code>.
+     *
+     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\ReportHeader  $var
      *
      * @return $this
      */
-    public function setHeader(?ReportHeader $var)
+    public function setHeader($var)
     {
         GPBUtil::checkMessage($var, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\ReportHeader::class);
         $this->header = $var;
@@ -130,15 +143,11 @@ class Report extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * key is statsReportKey (# operationName\nsignature) Note that the nested
-     * traces will *not* have a signature or details.operationName (because the
-     * key is adequate).
-     * We also assume that traces don't have
-     * legacy_per_query_implicit_operation_name, and we don't require them to have
-     * details.raw_query (which would consume a lot of space and has privacy/data
-     * access issues, and isn't currently exposed by our app anyway).
+     * If QueryMetadata isn't provided, this key should be a statsReportKey (# operationName\nsignature). If the operation
+     * name, signature, and persisted query IDs are provided in the QueryMetadata, and this operation was requested via a
+     * persisted query, this key can be "pq# <persisted query id>" instead of the signature and operation.
      *
-     * Generated from protobuf field <code>map<string, .TracesAndStats> traces_per_query = 5;</code>
+     * Generated from protobuf field <code>map<string, .TracesAndStats> traces_per_query = 5 [json_name = "tracesPerQuery"];</code>
      *
      * @return \Google\Protobuf\Internal\MapField
      */
@@ -148,19 +157,17 @@ class Report extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * key is statsReportKey (# operationName\nsignature) Note that the nested
-     * traces will *not* have a signature or details.operationName (because the
-     * key is adequate).
-     * We also assume that traces don't have
-     * legacy_per_query_implicit_operation_name, and we don't require them to have
-     * details.raw_query (which would consume a lot of space and has privacy/data
-     * access issues, and isn't currently exposed by our app anyway).
+     * If QueryMetadata isn't provided, this key should be a statsReportKey (# operationName\nsignature). If the operation
+     * name, signature, and persisted query IDs are provided in the QueryMetadata, and this operation was requested via a
+     * persisted query, this key can be "pq# <persisted query id>" instead of the signature and operation.
      *
-     * Generated from protobuf field <code>map<string, .TracesAndStats> traces_per_query = 5;</code>
+     * Generated from protobuf field <code>map<string, .TracesAndStats> traces_per_query = 5 [json_name = "tracesPerQuery"];</code>
+     *
+     * @param  array|\Google\Protobuf\Internal\MapField  $var
      *
      * @return $this
      */
-    public function setTracesPerQuery(array|\Google\Protobuf\Internal\MapField $var)
+    public function setTracesPerQuery($var)
     {
         $arr = GPBUtil::checkMapField($var, \Google\Protobuf\Internal\GPBType::STRING, \Google\Protobuf\Internal\GPBType::MESSAGE, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\TracesAndStats::class);
         $this->traces_per_query = $arr;
@@ -174,9 +181,11 @@ class Report extends \Google\Protobuf\Internal\Message
      * If there are no traces and no end_time present the report will not be able to be processed.
      * Note: This will override the end_time from traces.
      *
-     * Generated from protobuf field <code>.google.protobuf.Timestamp end_time = 2;</code>
+     * Generated from protobuf field <code>.google.protobuf.Timestamp end_time = 2 [json_name = "endTime"];</code>
+     *
+     * @return \Google\Protobuf\Timestamp|null
      */
-    public function getEndTime(): ?\Google\Protobuf\Timestamp
+    public function getEndTime()
     {
         return $this->end_time;
     }
@@ -186,7 +195,7 @@ class Report extends \Google\Protobuf\Internal\Message
         return isset($this->end_time);
     }
 
-    public function clearEndTime(): void
+    public function clearEndTime()
     {
         unset($this->end_time);
     }
@@ -197,11 +206,13 @@ class Report extends \Google\Protobuf\Internal\Message
      * If there are no traces and no end_time present the report will not be able to be processed.
      * Note: This will override the end_time from traces.
      *
-     * Generated from protobuf field <code>.google.protobuf.Timestamp end_time = 2;</code>
+     * Generated from protobuf field <code>.google.protobuf.Timestamp end_time = 2 [json_name = "endTime"];</code>
+     *
+     * @param  \Google\Protobuf\Timestamp  $var
      *
      * @return $this
      */
-    public function setEndTime(?\Google\Protobuf\Timestamp $var)
+    public function setEndTime($var)
     {
         GPBUtil::checkMessage($var, \Google\Protobuf\Timestamp::class);
         $this->end_time = $var;
@@ -210,26 +221,65 @@ class Report extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Total number of operations processed during this period.
+     * Total number of operations processed during this period. This includes all operations, even if they are sampled
+     * and not included in the query latency stats.
      *
-     * Generated from protobuf field <code>uint64 operation_count = 6;</code>
+     * Generated from protobuf field <code>uint64 operation_count = 6 [json_name = "operationCount"];</code>
+     *
+     * @return int|string
      */
-    public function getOperationCount(): int|string
+    public function getOperationCount()
     {
         return $this->operation_count;
     }
 
     /**
-     * Total number of operations processed during this period.
+     * Total number of operations processed during this period. This includes all operations, even if they are sampled
+     * and not included in the query latency stats.
      *
-     * Generated from protobuf field <code>uint64 operation_count = 6;</code>
+     * Generated from protobuf field <code>uint64 operation_count = 6 [json_name = "operationCount"];</code>
+     *
+     * @param  int|string  $var
      *
      * @return $this
      */
-    public function setOperationCount(int|string $var)
+    public function setOperationCount($var)
     {
         GPBUtil::checkUint64($var);
         $this->operation_count = $var;
+
+        return $this;
+    }
+
+    /**
+     * Total number of operations broken up by operation type and operation subtype.
+     * Only either this or operation_count should be populated, but if both are present, the total across all types and
+     * subtypes should match the overall operation_count.
+     *
+     * Generated from protobuf field <code>repeated .Report.OperationCountByType operation_count_by_type = 8 [json_name = "operationCountByType"];</code>
+     *
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getOperationCountByType()
+    {
+        return $this->operation_count_by_type;
+    }
+
+    /**
+     * Total number of operations broken up by operation type and operation subtype.
+     * Only either this or operation_count should be populated, but if both are present, the total across all types and
+     * subtypes should match the overall operation_count.
+     *
+     * Generated from protobuf field <code>repeated .Report.OperationCountByType operation_count_by_type = 8 [json_name = "operationCountByType"];</code>
+     *
+     * @param  array<\Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Report\OperationCountByType>|\Google\Protobuf\Internal\RepeatedField  $var
+     *
+     * @return $this
+     */
+    public function setOperationCountByType($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Report\OperationCountByType::class);
+        $this->operation_count_by_type = $arr;
 
         return $this;
     }
@@ -241,7 +291,7 @@ class Report extends \Google\Protobuf\Internal\Message
      * operations. If this is false, each operation is described in precisely
      * one of those two fields.
      *
-     * Generated from protobuf field <code>bool traces_pre_aggregated = 7;</code>
+     * Generated from protobuf field <code>bool traces_pre_aggregated = 7 [json_name = "tracesPreAggregated"];</code>
      *
      * @return bool
      */
@@ -257,7 +307,7 @@ class Report extends \Google\Protobuf\Internal\Message
      * operations. If this is false, each operation is described in precisely
      * one of those two fields.
      *
-     * Generated from protobuf field <code>bool traces_pre_aggregated = 7;</code>
+     * Generated from protobuf field <code>bool traces_pre_aggregated = 7 [json_name = "tracesPreAggregated"];</code>
      *
      * @param  bool  $var
      *

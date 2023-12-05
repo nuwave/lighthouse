@@ -11,17 +11,17 @@ use Google\Protobuf\Internal\GPBUtil;
  */
 class DeferredNode extends \Google\Protobuf\Internal\Message
 {
-    /** Generated from protobuf field <code>repeated .Trace.QueryPlanNode.DeferredNodeDepends depends = 1;</code> */
+    /** Generated from protobuf field <code>repeated .Trace.QueryPlanNode.DeferredNodeDepends depends = 1 [json_name = "depends"];</code> */
     private $depends;
 
-    /** Generated from protobuf field <code>string label = 2;</code> */
+    /** Generated from protobuf field <code>string label = 2 [json_name = "label"];</code> */
     protected $label = '';
 
-    /** Generated from protobuf field <code>repeated .Trace.QueryPlanNode.ResponsePathElement path = 3;</code> */
+    /** Generated from protobuf field <code>repeated .Trace.QueryPlanNode.ResponsePathElement path = 3 [json_name = "path"];</code> */
     private $path;
 
-    /** Generated from protobuf field <code>.Trace.QueryPlanNode node = 4;</code> */
-    protected ?\Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode $node = null;
+    /** Generated from protobuf field <code>.Trace.QueryPlanNode node = 4 [json_name = "node"];</code> */
+    protected $node;
 
     /**
      * Constructor.
@@ -42,7 +42,7 @@ class DeferredNode extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .Trace.QueryPlanNode.DeferredNodeDepends depends = 1;</code>.
+     * Generated from protobuf field <code>repeated .Trace.QueryPlanNode.DeferredNodeDepends depends = 1 [json_name = "depends"];</code>.
      *
      * @return \Google\Protobuf\Internal\RepeatedField
      */
@@ -52,13 +52,13 @@ class DeferredNode extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .Trace.QueryPlanNode.DeferredNodeDepends depends = 1;</code>.
+     * Generated from protobuf field <code>repeated .Trace.QueryPlanNode.DeferredNodeDepends depends = 1 [json_name = "depends"];</code>.
      *
      * @param  array<\Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\DeferredNodeDepends>|\Google\Protobuf\Internal\RepeatedField  $var
      *
      * @return $this
      */
-    public function setDepends(array|\Google\Protobuf\Internal\RepeatedField $var)
+    public function setDepends($var)
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\DeferredNodeDepends::class);
         $this->depends = $arr;
@@ -67,7 +67,7 @@ class DeferredNode extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string label = 2;</code>.
+     * Generated from protobuf field <code>string label = 2 [json_name = "label"];</code>.
      *
      * @return string
      */
@@ -77,7 +77,7 @@ class DeferredNode extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string label = 2;</code>.
+     * Generated from protobuf field <code>string label = 2 [json_name = "label"];</code>.
      *
      * @param  string  $var
      *
@@ -92,7 +92,7 @@ class DeferredNode extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .Trace.QueryPlanNode.ResponsePathElement path = 3;</code>.
+     * Generated from protobuf field <code>repeated .Trace.QueryPlanNode.ResponsePathElement path = 3 [json_name = "path"];</code>.
      *
      * @return \Google\Protobuf\Internal\RepeatedField
      */
@@ -102,13 +102,13 @@ class DeferredNode extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .Trace.QueryPlanNode.ResponsePathElement path = 3;</code>.
+     * Generated from protobuf field <code>repeated .Trace.QueryPlanNode.ResponsePathElement path = 3 [json_name = "path"];</code>.
      *
      * @param  array<\Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\ResponsePathElement>|\Google\Protobuf\Internal\RepeatedField  $var
      *
      * @return $this
      */
-    public function setPath(array|\Google\Protobuf\Internal\RepeatedField $var)
+    public function setPath($var)
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\ResponsePathElement::class);
         $this->path = $arr;
@@ -116,8 +116,12 @@ class DeferredNode extends \Google\Protobuf\Internal\Message
         return $this;
     }
 
-    /** Generated from protobuf field <code>.Trace.QueryPlanNode node = 4;</code> */
-    public function getNode(): ?\Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode
+    /**
+     * Generated from protobuf field <code>.Trace.QueryPlanNode node = 4 [json_name = "node"];</code>.
+     *
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode|null
+     */
+    public function getNode()
     {
         return $this->node;
     }
@@ -127,17 +131,19 @@ class DeferredNode extends \Google\Protobuf\Internal\Message
         return isset($this->node);
     }
 
-    public function clearNode(): void
+    public function clearNode()
     {
         unset($this->node);
     }
 
     /**
-     * Generated from protobuf field <code>.Trace.QueryPlanNode node = 4;</code>.
+     * Generated from protobuf field <code>.Trace.QueryPlanNode node = 4 [json_name = "node"];</code>.
+     *
+     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode  $var
      *
      * @return $this
      */
-    public function setNode(?\Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode $var)
+    public function setNode($var)
     {
         GPBUtil::checkMessage($var, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode::class);
         $this->node = $var;

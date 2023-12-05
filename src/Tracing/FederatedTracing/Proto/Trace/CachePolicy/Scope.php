@@ -11,14 +11,12 @@ class Scope
 {
     /** Generated from protobuf enum <code>UNKNOWN = 0;</code> */
     public const UNKNOWN = 0;
-
     /** Generated from protobuf enum <code>PUBLIC = 1;</code> */
     public const PBPUBLIC = 1;
-
     /** Generated from protobuf enum <code>PRIVATE = 2;</code> */
     public const PBPRIVATE = 2;
 
-    private static array $valueToName = [
+    private static $valueToName = [
         self::UNKNOWN => 'UNKNOWN',
         self::PBPUBLIC => 'PUBLIC',
         self::PBPRIVATE => 'PRIVATE',

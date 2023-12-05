@@ -14,7 +14,7 @@ class FieldStat extends \Google\Protobuf\Internal\Message
     /**
      * required; eg "String!" for User.email:String!
      *
-     * Generated from protobuf field <code>string return_type = 3;</code>
+     * Generated from protobuf field <code>string return_type = 3 [json_name = "returnType"];</code>
      */
     protected $return_type = '';
 
@@ -25,7 +25,7 @@ class FieldStat extends \Google\Protobuf\Internal\Message
      * `observed_execution_count` field (and does not need to be scaled by
      * field_execution_weight).
      *
-     * Generated from protobuf field <code>uint64 errors_count = 4;</code>
+     * Generated from protobuf field <code>uint64 errors_count = 4 [json_name = "errorsCount"];</code>
      */
     protected $errors_count = 0;
 
@@ -33,12 +33,12 @@ class FieldStat extends \Google\Protobuf\Internal\Message
      * Number of times that the resolver for this field is directly observed being
      * executed.
      *
-     * Generated from protobuf field <code>uint64 observed_execution_count = 5;</code>
+     * Generated from protobuf field <code>uint64 observed_execution_count = 5 [json_name = "observedExecutionCount"];</code>
      */
     protected $observed_execution_count = 0;
 
     /**
-     * Same as `count` but potentially scaled upwards if the server was only
+     * Same as `observed_execution_count` but potentially scaled upwards if the server was only
      * performing field-level instrumentation on a sampling of operations.  For
      * example, if the server randomly instruments 1% of requests for this
      * operation, this number will be 100 times greater than
@@ -47,7 +47,7 @@ class FieldStat extends \Google\Protobuf\Internal\Message
      * observed field execution, while `observed_execution_count` above goes
      * up by 1.).
      *
-     * Generated from protobuf field <code>uint64 estimated_execution_count = 10;</code>
+     * Generated from protobuf field <code>uint64 estimated_execution_count = 10 [json_name = "estimatedExecutionCount"];</code>
      */
     protected $estimated_execution_count = 0;
 
@@ -58,7 +58,7 @@ class FieldStat extends \Google\Protobuf\Internal\Message
      * includes all requests rather than just requests with field-level
      * instrumentation.
      *
-     * Generated from protobuf field <code>uint64 requests_with_errors_count = 6;</code>
+     * Generated from protobuf field <code>uint64 requests_with_errors_count = 6 [json_name = "requestsWithErrorsCount"];</code>
      */
     protected $requests_with_errors_count = 0;
 
@@ -67,8 +67,9 @@ class FieldStat extends \Google\Protobuf\Internal\Message
      * the same way as estimated_execution_count so its "total count" might be
      * greater than `observed_execution_count` and may not exactly equal
      * `estimated_execution_count` due to rounding.
+     * See comment on QueryLatencyStats's latency_count for details.
      *
-     * Generated from protobuf field <code>repeated sint64 latency_count = 9;</code>
+     * Generated from protobuf field <code>repeated sint64 latency_count = 9 [json_name = "latencyCount"];</code>
      */
     private $latency_count;
 
@@ -88,9 +89,9 @@ class FieldStat extends \Google\Protobuf\Internal\Message
      *           field_execution_weight).
      *     @var int|string $observed_execution_count
      *           Number of times that the resolver for this field is directly observed being
-     *           executed
+     *           executed.
      *     @var int|string $estimated_execution_count
-     *           Same as `count` but potentially scaled upwards if the server was only
+     *           Same as `observed_execution_count` but potentially scaled upwards if the server was only
      *           performing field-level instrumentation on a sampling of operations.  For
      *           example, if the server randomly instruments 1% of requests for this
      *           operation, this number will be 100 times greater than
@@ -109,6 +110,7 @@ class FieldStat extends \Google\Protobuf\Internal\Message
      *           the same way as estimated_execution_count so its "total count" might be
      *           greater than `observed_execution_count` and may not exactly equal
      *           `estimated_execution_count` due to rounding.
+     *           See comment on QueryLatencyStats's latency_count for details.
      * }
      */
     public function __construct($data = null)
@@ -120,7 +122,7 @@ class FieldStat extends \Google\Protobuf\Internal\Message
     /**
      * required; eg "String!" for User.email:String!
      *
-     * Generated from protobuf field <code>string return_type = 3;</code>
+     * Generated from protobuf field <code>string return_type = 3 [json_name = "returnType"];</code>
      *
      * @return string
      */
@@ -132,7 +134,7 @@ class FieldStat extends \Google\Protobuf\Internal\Message
     /**
      * required; eg "String!" for User.email:String!
      *
-     * Generated from protobuf field <code>string return_type = 3;</code>
+     * Generated from protobuf field <code>string return_type = 3 [json_name = "returnType"];</code>
      *
      * @param  string  $var
      *
@@ -153,9 +155,11 @@ class FieldStat extends \Google\Protobuf\Internal\Message
      * `observed_execution_count` field (and does not need to be scaled by
      * field_execution_weight).
      *
-     * Generated from protobuf field <code>uint64 errors_count = 4;</code>
+     * Generated from protobuf field <code>uint64 errors_count = 4 [json_name = "errorsCount"];</code>
+     *
+     * @return int|string
      */
-    public function getErrorsCount(): int|string
+    public function getErrorsCount()
     {
         return $this->errors_count;
     }
@@ -167,11 +171,13 @@ class FieldStat extends \Google\Protobuf\Internal\Message
      * `observed_execution_count` field (and does not need to be scaled by
      * field_execution_weight).
      *
-     * Generated from protobuf field <code>uint64 errors_count = 4;</code>
+     * Generated from protobuf field <code>uint64 errors_count = 4 [json_name = "errorsCount"];</code>
+     *
+     * @param  int|string  $var
      *
      * @return $this
      */
-    public function setErrorsCount(int|string $var)
+    public function setErrorsCount($var)
     {
         GPBUtil::checkUint64($var);
         $this->errors_count = $var;
@@ -183,9 +189,11 @@ class FieldStat extends \Google\Protobuf\Internal\Message
      * Number of times that the resolver for this field is directly observed being
      * executed.
      *
-     * Generated from protobuf field <code>uint64 observed_execution_count = 5;</code>
+     * Generated from protobuf field <code>uint64 observed_execution_count = 5 [json_name = "observedExecutionCount"];</code>
+     *
+     * @return int|string
      */
-    public function getObservedExecutionCount(): int|string
+    public function getObservedExecutionCount()
     {
         return $this->observed_execution_count;
     }
@@ -194,11 +202,13 @@ class FieldStat extends \Google\Protobuf\Internal\Message
      * Number of times that the resolver for this field is directly observed being
      * executed.
      *
-     * Generated from protobuf field <code>uint64 observed_execution_count = 5;</code>
+     * Generated from protobuf field <code>uint64 observed_execution_count = 5 [json_name = "observedExecutionCount"];</code>
+     *
+     * @param  int|string  $var
      *
      * @return $this
      */
-    public function setObservedExecutionCount(int|string $var)
+    public function setObservedExecutionCount($var)
     {
         GPBUtil::checkUint64($var);
         $this->observed_execution_count = $var;
@@ -207,7 +217,7 @@ class FieldStat extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Same as `count` but potentially scaled upwards if the server was only
+     * Same as `observed_execution_count` but potentially scaled upwards if the server was only
      * performing field-level instrumentation on a sampling of operations.  For
      * example, if the server randomly instruments 1% of requests for this
      * operation, this number will be 100 times greater than
@@ -216,15 +226,17 @@ class FieldStat extends \Google\Protobuf\Internal\Message
      * observed field execution, while `observed_execution_count` above goes
      * up by 1.).
      *
-     * Generated from protobuf field <code>uint64 estimated_execution_count = 10;</code>
+     * Generated from protobuf field <code>uint64 estimated_execution_count = 10 [json_name = "estimatedExecutionCount"];</code>
+     *
+     * @return int|string
      */
-    public function getEstimatedExecutionCount(): int|string
+    public function getEstimatedExecutionCount()
     {
         return $this->estimated_execution_count;
     }
 
     /**
-     * Same as `count` but potentially scaled upwards if the server was only
+     * Same as `observed_execution_count` but potentially scaled upwards if the server was only
      * performing field-level instrumentation on a sampling of operations.  For
      * example, if the server randomly instruments 1% of requests for this
      * operation, this number will be 100 times greater than
@@ -233,11 +245,13 @@ class FieldStat extends \Google\Protobuf\Internal\Message
      * observed field execution, while `observed_execution_count` above goes
      * up by 1.).
      *
-     * Generated from protobuf field <code>uint64 estimated_execution_count = 10;</code>
+     * Generated from protobuf field <code>uint64 estimated_execution_count = 10 [json_name = "estimatedExecutionCount"];</code>
+     *
+     * @param  int|string  $var
      *
      * @return $this
      */
-    public function setEstimatedExecutionCount(int|string $var)
+    public function setEstimatedExecutionCount($var)
     {
         GPBUtil::checkUint64($var);
         $this->estimated_execution_count = $var;
@@ -252,9 +266,11 @@ class FieldStat extends \Google\Protobuf\Internal\Message
      * includes all requests rather than just requests with field-level
      * instrumentation.
      *
-     * Generated from protobuf field <code>uint64 requests_with_errors_count = 6;</code>
+     * Generated from protobuf field <code>uint64 requests_with_errors_count = 6 [json_name = "requestsWithErrorsCount"];</code>
+     *
+     * @return int|string
      */
-    public function getRequestsWithErrorsCount(): int|string
+    public function getRequestsWithErrorsCount()
     {
         return $this->requests_with_errors_count;
     }
@@ -266,11 +282,13 @@ class FieldStat extends \Google\Protobuf\Internal\Message
      * includes all requests rather than just requests with field-level
      * instrumentation.
      *
-     * Generated from protobuf field <code>uint64 requests_with_errors_count = 6;</code>
+     * Generated from protobuf field <code>uint64 requests_with_errors_count = 6 [json_name = "requestsWithErrorsCount"];</code>
+     *
+     * @param  int|string  $var
      *
      * @return $this
      */
-    public function setRequestsWithErrorsCount(int|string $var)
+    public function setRequestsWithErrorsCount($var)
     {
         GPBUtil::checkUint64($var);
         $this->requests_with_errors_count = $var;
@@ -283,8 +301,9 @@ class FieldStat extends \Google\Protobuf\Internal\Message
      * the same way as estimated_execution_count so its "total count" might be
      * greater than `observed_execution_count` and may not exactly equal
      * `estimated_execution_count` due to rounding.
+     * See comment on QueryLatencyStats's latency_count for details.
      *
-     * Generated from protobuf field <code>repeated sint64 latency_count = 9;</code>
+     * Generated from protobuf field <code>repeated sint64 latency_count = 9 [json_name = "latencyCount"];</code>
      *
      * @return \Google\Protobuf\Internal\RepeatedField
      */
@@ -298,14 +317,15 @@ class FieldStat extends \Google\Protobuf\Internal\Message
      * the same way as estimated_execution_count so its "total count" might be
      * greater than `observed_execution_count` and may not exactly equal
      * `estimated_execution_count` due to rounding.
+     * See comment on QueryLatencyStats's latency_count for details.
      *
-     * Generated from protobuf field <code>repeated sint64 latency_count = 9;</code>
+     * Generated from protobuf field <code>repeated sint64 latency_count = 9 [json_name = "latencyCount"];</code>
      *
      * @param  array<int>|array<string>|\Google\Protobuf\Internal\RepeatedField  $var
      *
      * @return $this
      */
-    public function setLatencyCount(array|\Google\Protobuf\Internal\RepeatedField $var)
+    public function setLatencyCount($var)
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::SINT64);
         $this->latency_count = $arr;

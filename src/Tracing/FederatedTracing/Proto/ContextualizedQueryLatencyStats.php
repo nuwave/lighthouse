@@ -11,11 +11,11 @@ use Google\Protobuf\Internal\GPBUtil;
  */
 class ContextualizedQueryLatencyStats extends \Google\Protobuf\Internal\Message
 {
-    /** Generated from protobuf field <code>.QueryLatencyStats query_latency_stats = 1;</code> */
-    protected ?\Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\QueryLatencyStats $query_latency_stats = null;
+    /** Generated from protobuf field <code>.QueryLatencyStats query_latency_stats = 1 [json_name = "queryLatencyStats"];</code> */
+    protected $query_latency_stats;
 
-    /** Generated from protobuf field <code>.StatsContext context = 2;</code> */
-    protected ?\Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\StatsContext $context = null;
+    /** Generated from protobuf field <code>.StatsContext context = 2 [json_name = "context"];</code> */
+    protected $context;
 
     /**
      * Constructor.
@@ -33,8 +33,12 @@ class ContextualizedQueryLatencyStats extends \Google\Protobuf\Internal\Message
         parent::__construct($data);
     }
 
-    /** Generated from protobuf field <code>.QueryLatencyStats query_latency_stats = 1;</code> */
-    public function getQueryLatencyStats(): ?QueryLatencyStats
+    /**
+     * Generated from protobuf field <code>.QueryLatencyStats query_latency_stats = 1 [json_name = "queryLatencyStats"];</code>.
+     *
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\QueryLatencyStats|null
+     */
+    public function getQueryLatencyStats()
     {
         return $this->query_latency_stats;
     }
@@ -44,17 +48,19 @@ class ContextualizedQueryLatencyStats extends \Google\Protobuf\Internal\Message
         return isset($this->query_latency_stats);
     }
 
-    public function clearQueryLatencyStats(): void
+    public function clearQueryLatencyStats()
     {
         unset($this->query_latency_stats);
     }
 
     /**
-     * Generated from protobuf field <code>.QueryLatencyStats query_latency_stats = 1;</code>.
+     * Generated from protobuf field <code>.QueryLatencyStats query_latency_stats = 1 [json_name = "queryLatencyStats"];</code>.
+     *
+     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\QueryLatencyStats  $var
      *
      * @return $this
      */
-    public function setQueryLatencyStats(?QueryLatencyStats $var)
+    public function setQueryLatencyStats($var)
     {
         GPBUtil::checkMessage($var, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\QueryLatencyStats::class);
         $this->query_latency_stats = $var;
@@ -62,8 +68,12 @@ class ContextualizedQueryLatencyStats extends \Google\Protobuf\Internal\Message
         return $this;
     }
 
-    /** Generated from protobuf field <code>.StatsContext context = 2;</code> */
-    public function getContext(): ?StatsContext
+    /**
+     * Generated from protobuf field <code>.StatsContext context = 2 [json_name = "context"];</code>.
+     *
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\StatsContext|null
+     */
+    public function getContext()
     {
         return $this->context;
     }
@@ -73,17 +83,19 @@ class ContextualizedQueryLatencyStats extends \Google\Protobuf\Internal\Message
         return isset($this->context);
     }
 
-    public function clearContext(): void
+    public function clearContext()
     {
         unset($this->context);
     }
 
     /**
-     * Generated from protobuf field <code>.StatsContext context = 2;</code>.
+     * Generated from protobuf field <code>.StatsContext context = 2 [json_name = "context"];</code>.
+     *
+     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\StatsContext  $var
      *
      * @return $this
      */
-    public function setContext(?StatsContext $var)
+    public function setContext($var)
     {
         GPBUtil::checkMessage($var, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\StatsContext::class);
         $this->context = $var;

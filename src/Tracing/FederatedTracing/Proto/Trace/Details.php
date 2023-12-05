@@ -17,7 +17,7 @@ class Details extends \Google\Protobuf\Internal\Message
      * enclosed in double quotes, etc.  The value of a private variable is
      * the empty string.
      *
-     * Generated from protobuf field <code>map<string, string> variables_json = 4;</code>
+     * Generated from protobuf field <code>map<string, string> variables_json = 4 [json_name = "variablesJson"];</code>
      */
     private $variables_json;
 
@@ -26,7 +26,7 @@ class Details extends \Google\Protobuf\Internal\Message
      * don't include this in traces inside a FullTracesReport; the operation
      * name for these traces comes from the key of the traces_per_query map.
      *
-     * Generated from protobuf field <code>string operation_name = 3;</code>
+     * Generated from protobuf field <code>string operation_name = 3 [json_name = "operationName"];</code>
      */
     protected $operation_name = '';
 
@@ -59,7 +59,7 @@ class Details extends \Google\Protobuf\Internal\Message
      * enclosed in double quotes, etc.  The value of a private variable is
      * the empty string.
      *
-     * Generated from protobuf field <code>map<string, string> variables_json = 4;</code>
+     * Generated from protobuf field <code>map<string, string> variables_json = 4 [json_name = "variablesJson"];</code>
      *
      * @return \Google\Protobuf\Internal\MapField
      */
@@ -74,11 +74,13 @@ class Details extends \Google\Protobuf\Internal\Message
      * enclosed in double quotes, etc.  The value of a private variable is
      * the empty string.
      *
-     * Generated from protobuf field <code>map<string, string> variables_json = 4;</code>
+     * Generated from protobuf field <code>map<string, string> variables_json = 4 [json_name = "variablesJson"];</code>
+     *
+     * @param  array|\Google\Protobuf\Internal\MapField  $var
      *
      * @return $this
      */
-    public function setVariablesJson(array|\Google\Protobuf\Internal\MapField $var)
+    public function setVariablesJson($var)
     {
         $arr = GPBUtil::checkMapField($var, \Google\Protobuf\Internal\GPBType::STRING, \Google\Protobuf\Internal\GPBType::STRING);
         $this->variables_json = $arr;
@@ -91,7 +93,7 @@ class Details extends \Google\Protobuf\Internal\Message
      * don't include this in traces inside a FullTracesReport; the operation
      * name for these traces comes from the key of the traces_per_query map.
      *
-     * Generated from protobuf field <code>string operation_name = 3;</code>
+     * Generated from protobuf field <code>string operation_name = 3 [json_name = "operationName"];</code>
      *
      * @return string
      */
@@ -105,7 +107,7 @@ class Details extends \Google\Protobuf\Internal\Message
      * don't include this in traces inside a FullTracesReport; the operation
      * name for these traces comes from the key of the traces_per_query map.
      *
-     * Generated from protobuf field <code>string operation_name = 3;</code>
+     * Generated from protobuf field <code>string operation_name = 3 [json_name = "operationName"];</code>
      *
      * @param  string  $var
      *

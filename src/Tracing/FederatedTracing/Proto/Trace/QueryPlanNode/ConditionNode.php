@@ -11,14 +11,14 @@ use Google\Protobuf\Internal\GPBUtil;
  */
 class ConditionNode extends \Google\Protobuf\Internal\Message
 {
-    /** Generated from protobuf field <code>string condition = 1;</code> */
+    /** Generated from protobuf field <code>string condition = 1 [json_name = "condition"];</code> */
     protected $condition = '';
 
-    /** Generated from protobuf field <code>.Trace.QueryPlanNode if_clause = 2;</code> */
-    protected ?\Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode $if_clause = null;
+    /** Generated from protobuf field <code>.Trace.QueryPlanNode if_clause = 2 [json_name = "ifClause"];</code> */
+    protected $if_clause;
 
-    /** Generated from protobuf field <code>.Trace.QueryPlanNode else_clause = 3;</code> */
-    protected ?\Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode $else_clause = null;
+    /** Generated from protobuf field <code>.Trace.QueryPlanNode else_clause = 3 [json_name = "elseClause"];</code> */
+    protected $else_clause;
 
     /**
      * Constructor.
@@ -38,7 +38,7 @@ class ConditionNode extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string condition = 1;</code>.
+     * Generated from protobuf field <code>string condition = 1 [json_name = "condition"];</code>.
      *
      * @return string
      */
@@ -48,7 +48,7 @@ class ConditionNode extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string condition = 1;</code>.
+     * Generated from protobuf field <code>string condition = 1 [json_name = "condition"];</code>.
      *
      * @param  string  $var
      *
@@ -62,8 +62,12 @@ class ConditionNode extends \Google\Protobuf\Internal\Message
         return $this;
     }
 
-    /** Generated from protobuf field <code>.Trace.QueryPlanNode if_clause = 2;</code> */
-    public function getIfClause(): ?\Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode
+    /**
+     * Generated from protobuf field <code>.Trace.QueryPlanNode if_clause = 2 [json_name = "ifClause"];</code>.
+     *
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode|null
+     */
+    public function getIfClause()
     {
         return $this->if_clause;
     }
@@ -73,17 +77,19 @@ class ConditionNode extends \Google\Protobuf\Internal\Message
         return isset($this->if_clause);
     }
 
-    public function clearIfClause(): void
+    public function clearIfClause()
     {
         unset($this->if_clause);
     }
 
     /**
-     * Generated from protobuf field <code>.Trace.QueryPlanNode if_clause = 2;</code>.
+     * Generated from protobuf field <code>.Trace.QueryPlanNode if_clause = 2 [json_name = "ifClause"];</code>.
+     *
+     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode  $var
      *
      * @return $this
      */
-    public function setIfClause(?\Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode $var)
+    public function setIfClause($var)
     {
         GPBUtil::checkMessage($var, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode::class);
         $this->if_clause = $var;
@@ -91,8 +97,12 @@ class ConditionNode extends \Google\Protobuf\Internal\Message
         return $this;
     }
 
-    /** Generated from protobuf field <code>.Trace.QueryPlanNode else_clause = 3;</code> */
-    public function getElseClause(): ?\Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode
+    /**
+     * Generated from protobuf field <code>.Trace.QueryPlanNode else_clause = 3 [json_name = "elseClause"];</code>.
+     *
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode|null
+     */
+    public function getElseClause()
     {
         return $this->else_clause;
     }
@@ -102,17 +112,19 @@ class ConditionNode extends \Google\Protobuf\Internal\Message
         return isset($this->else_clause);
     }
 
-    public function clearElseClause(): void
+    public function clearElseClause()
     {
         unset($this->else_clause);
     }
 
     /**
-     * Generated from protobuf field <code>.Trace.QueryPlanNode else_clause = 3;</code>.
+     * Generated from protobuf field <code>.Trace.QueryPlanNode else_clause = 3 [json_name = "elseClause"];</code>.
+     *
+     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode  $var
      *
      * @return $this
      */
-    public function setElseClause(?\Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode $var)
+    public function setElseClause($var)
     {
         GPBUtil::checkMessage($var, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode::class);
         $this->else_clause = $var;

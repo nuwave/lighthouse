@@ -13,7 +13,7 @@ use Google\Protobuf\Internal\GPBUtil;
  */
 class ParallelNode extends \Google\Protobuf\Internal\Message
 {
-    /** Generated from protobuf field <code>repeated .Trace.QueryPlanNode nodes = 1;</code> */
+    /** Generated from protobuf field <code>repeated .Trace.QueryPlanNode nodes = 1 [json_name = "nodes"];</code> */
     private $nodes;
 
     /**
@@ -32,7 +32,7 @@ class ParallelNode extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .Trace.QueryPlanNode nodes = 1;</code>.
+     * Generated from protobuf field <code>repeated .Trace.QueryPlanNode nodes = 1 [json_name = "nodes"];</code>.
      *
      * @return \Google\Protobuf\Internal\RepeatedField
      */
@@ -42,13 +42,13 @@ class ParallelNode extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated .Trace.QueryPlanNode nodes = 1;</code>.
+     * Generated from protobuf field <code>repeated .Trace.QueryPlanNode nodes = 1 [json_name = "nodes"];</code>.
      *
      * @param  array<\Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode>|\Google\Protobuf\Internal\RepeatedField  $var
      *
      * @return $this
      */
-    public function setNodes(array|\Google\Protobuf\Internal\RepeatedField $var)
+    public function setNodes($var)
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode::class);
         $this->nodes = $arr;

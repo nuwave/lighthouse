@@ -22,42 +22,42 @@ class ReportHeader extends \Google\Protobuf\Internal\Message
     /**
      * eg "mygraph&#64;myvariant".
      *
-     * Generated from protobuf field <code>string graph_ref = 12;</code>
+     * Generated from protobuf field <code>string graph_ref = 12 [json_name = "graphRef"];</code>
      */
     protected $graph_ref = '';
 
     /**
      * eg "host-01.example.com".
      *
-     * Generated from protobuf field <code>string hostname = 5;</code>
+     * Generated from protobuf field <code>string hostname = 5 [json_name = "hostname"];</code>
      */
     protected $hostname = '';
 
     /**
      * eg "engineproxy 0.1.0".
      *
-     * Generated from protobuf field <code>string agent_version = 6;</code>
+     * Generated from protobuf field <code>string agent_version = 6 [json_name = "agentVersion"];</code>
      */
     protected $agent_version = '';
 
     /**
      * eg "prod-4279-20160804T065423Z-5-g3cf0aa8" (taken from `git describe --tags`).
      *
-     * Generated from protobuf field <code>string service_version = 7;</code>
+     * Generated from protobuf field <code>string service_version = 7 [json_name = "serviceVersion"];</code>
      */
     protected $service_version = '';
 
     /**
      * eg "node v4.6.0".
      *
-     * Generated from protobuf field <code>string runtime_version = 8;</code>
+     * Generated from protobuf field <code>string runtime_version = 8 [json_name = "runtimeVersion"];</code>
      */
     protected $runtime_version = '';
 
     /**
      * eg "Linux box 4.6.5-1-ec2 #1 SMP Mon Aug 1 02:31:38 PDT 2016 x86_64 GNU/Linux".
      *
-     * Generated from protobuf field <code>string uname = 9;</code>
+     * Generated from protobuf field <code>string uname = 9 [json_name = "uname"];</code>
      */
     protected $uname = '';
 
@@ -66,7 +66,7 @@ class ReportHeader extends \Google\Protobuf\Internal\Message
      * Using this in place of what used to be schema_hash, since that is no longer
      * attached to a schema in the backend.
      *
-     * Generated from protobuf field <code>string executable_schema_id = 11;</code>
+     * Generated from protobuf field <code>string executable_schema_id = 11 [json_name = "executableSchemaId"];</code>
      */
     protected $executable_schema_id = '';
 
@@ -103,7 +103,7 @@ class ReportHeader extends \Google\Protobuf\Internal\Message
     /**
      * eg "mygraph&#64;myvariant".
      *
-     * Generated from protobuf field <code>string graph_ref = 12;</code>
+     * Generated from protobuf field <code>string graph_ref = 12 [json_name = "graphRef"];</code>
      *
      * @return string
      */
@@ -115,7 +115,7 @@ class ReportHeader extends \Google\Protobuf\Internal\Message
     /**
      * eg "mygraph&#64;myvariant".
      *
-     * Generated from protobuf field <code>string graph_ref = 12;</code>
+     * Generated from protobuf field <code>string graph_ref = 12 [json_name = "graphRef"];</code>
      *
      * @param  string  $var
      *
@@ -132,7 +132,7 @@ class ReportHeader extends \Google\Protobuf\Internal\Message
     /**
      * eg "host-01.example.com".
      *
-     * Generated from protobuf field <code>string hostname = 5;</code>
+     * Generated from protobuf field <code>string hostname = 5 [json_name = "hostname"];</code>
      *
      * @return string
      */
@@ -144,7 +144,7 @@ class ReportHeader extends \Google\Protobuf\Internal\Message
     /**
      * eg "host-01.example.com".
      *
-     * Generated from protobuf field <code>string hostname = 5;</code>
+     * Generated from protobuf field <code>string hostname = 5 [json_name = "hostname"];</code>
      *
      * @param  string  $var
      *
@@ -161,7 +161,7 @@ class ReportHeader extends \Google\Protobuf\Internal\Message
     /**
      * eg "engineproxy 0.1.0".
      *
-     * Generated from protobuf field <code>string agent_version = 6;</code>
+     * Generated from protobuf field <code>string agent_version = 6 [json_name = "agentVersion"];</code>
      *
      * @return string
      */
@@ -173,7 +173,7 @@ class ReportHeader extends \Google\Protobuf\Internal\Message
     /**
      * eg "engineproxy 0.1.0".
      *
-     * Generated from protobuf field <code>string agent_version = 6;</code>
+     * Generated from protobuf field <code>string agent_version = 6 [json_name = "agentVersion"];</code>
      *
      * @param  string  $var
      *
@@ -190,7 +190,7 @@ class ReportHeader extends \Google\Protobuf\Internal\Message
     /**
      * eg "prod-4279-20160804T065423Z-5-g3cf0aa8" (taken from `git describe --tags`).
      *
-     * Generated from protobuf field <code>string service_version = 7;</code>
+     * Generated from protobuf field <code>string service_version = 7 [json_name = "serviceVersion"];</code>
      *
      * @return string
      */
@@ -202,7 +202,7 @@ class ReportHeader extends \Google\Protobuf\Internal\Message
     /**
      * eg "prod-4279-20160804T065423Z-5-g3cf0aa8" (taken from `git describe --tags`).
      *
-     * Generated from protobuf field <code>string service_version = 7;</code>
+     * Generated from protobuf field <code>string service_version = 7 [json_name = "serviceVersion"];</code>
      *
      * @param  string  $var
      *
@@ -219,7 +219,7 @@ class ReportHeader extends \Google\Protobuf\Internal\Message
     /**
      * eg "node v4.6.0".
      *
-     * Generated from protobuf field <code>string runtime_version = 8;</code>
+     * Generated from protobuf field <code>string runtime_version = 8 [json_name = "runtimeVersion"];</code>
      *
      * @return string
      */
@@ -231,7 +231,7 @@ class ReportHeader extends \Google\Protobuf\Internal\Message
     /**
      * eg "node v4.6.0".
      *
-     * Generated from protobuf field <code>string runtime_version = 8;</code>
+     * Generated from protobuf field <code>string runtime_version = 8 [json_name = "runtimeVersion"];</code>
      *
      * @param  string  $var
      *
@@ -248,7 +248,7 @@ class ReportHeader extends \Google\Protobuf\Internal\Message
     /**
      * eg "Linux box 4.6.5-1-ec2 #1 SMP Mon Aug 1 02:31:38 PDT 2016 x86_64 GNU/Linux".
      *
-     * Generated from protobuf field <code>string uname = 9;</code>
+     * Generated from protobuf field <code>string uname = 9 [json_name = "uname"];</code>
      *
      * @return string
      */
@@ -260,7 +260,7 @@ class ReportHeader extends \Google\Protobuf\Internal\Message
     /**
      * eg "Linux box 4.6.5-1-ec2 #1 SMP Mon Aug 1 02:31:38 PDT 2016 x86_64 GNU/Linux".
      *
-     * Generated from protobuf field <code>string uname = 9;</code>
+     * Generated from protobuf field <code>string uname = 9 [json_name = "uname"];</code>
      *
      * @param  string  $var
      *
@@ -279,7 +279,7 @@ class ReportHeader extends \Google\Protobuf\Internal\Message
      * Using this in place of what used to be schema_hash, since that is no longer
      * attached to a schema in the backend.
      *
-     * Generated from protobuf field <code>string executable_schema_id = 11;</code>
+     * Generated from protobuf field <code>string executable_schema_id = 11 [json_name = "executableSchemaId"];</code>
      *
      * @return string
      */
@@ -293,7 +293,7 @@ class ReportHeader extends \Google\Protobuf\Internal\Message
      * Using this in place of what used to be schema_hash, since that is no longer
      * attached to a schema in the backend.
      *
-     * Generated from protobuf field <code>string executable_schema_id = 11;</code>
+     * Generated from protobuf field <code>string executable_schema_id = 11 [json_name = "executableSchemaId"];</code>
      *
      * @param  string  $var
      *

@@ -14,22 +14,22 @@ class Trace extends \Google\Protobuf\Internal\Message
     /**
      * Wallclock time when the trace began.
      *
-     * Generated from protobuf field <code>.google.protobuf.Timestamp start_time = 4;</code>
+     * Generated from protobuf field <code>.google.protobuf.Timestamp start_time = 4 [json_name = "startTime"];</code>
      */
-    protected ?\Google\Protobuf\Timestamp $start_time = null;
+    protected $start_time;
 
     /**
      * Wallclock time when the trace ended.
      *
-     * Generated from protobuf field <code>.google.protobuf.Timestamp end_time = 3;</code>
+     * Generated from protobuf field <code>.google.protobuf.Timestamp end_time = 3 [json_name = "endTime"];</code>
      */
-    protected ?\Google\Protobuf\Timestamp $end_time = null;
+    protected $end_time;
 
     /**
      * High precision duration of the trace; may not equal end_time-start_time
      * (eg, if your machine's clock changed during the trace).
      *
-     * Generated from protobuf field <code>uint64 duration_ns = 11;</code>
+     * Generated from protobuf field <code>uint64 duration_ns = 11 [json_name = "durationNs"];</code>
      */
     protected $duration_ns = 0;
 
@@ -37,9 +37,9 @@ class Trace extends \Google\Protobuf\Internal\Message
      * A tree containing information about all resolvers run directly by this
      * service, including errors.
      *
-     * Generated from protobuf field <code>.Trace.Node root = 14;</code>
+     * Generated from protobuf field <code>.Trace.Node root = 14 [json_name = "root"];</code>
      */
-    protected ?\Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Node $root = null;
+    protected $root;
 
     /**
      * If this is true, the trace is potentially missing some nodes that were
@@ -50,7 +50,7 @@ class Trace extends \Google\Protobuf\Internal\Message
      * missing. If this is true we should display a warning to the user when they
      * view the trace in Explorer.
      *
-     * Generated from protobuf field <code>bool is_incomplete = 33;</code>
+     * Generated from protobuf field <code>bool is_incomplete = 33 [json_name = "isIncomplete"];</code>
      */
     protected $is_incomplete = false;
 
@@ -66,7 +66,7 @@ class Trace extends \Google\Protobuf\Internal\Message
      * Engineproxy provides the signature in legacy_signature_needs_resigning
      * instead.
      *
-     * Generated from protobuf field <code>string signature = 19;</code>
+     * Generated from protobuf field <code>string signature = 19 [json_name = "signature"];</code>
      */
     protected $signature = '';
 
@@ -75,27 +75,33 @@ class Trace extends \Google\Protobuf\Internal\Message
      * can include reference to the operation being sent for users to dig into the set of operations
      * that are failing validation.
      *
-     * Generated from protobuf field <code>string unexecutedOperationBody = 27;</code>
+     * Generated from protobuf field <code>string unexecutedOperationBody = 27 [json_name = "unexecutedOperationBody"];</code>
      */
     protected $unexecutedOperationBody = '';
 
-    /** Generated from protobuf field <code>string unexecutedOperationName = 28;</code> */
+    /** Generated from protobuf field <code>string unexecutedOperationName = 28 [json_name = "unexecutedOperationName"];</code> */
     protected $unexecutedOperationName = '';
 
-    /** Generated from protobuf field <code>.Trace.Details details = 6;</code> */
-    protected ?\Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Details $details = null;
+    /** Generated from protobuf field <code>.Trace.Details details = 6 [json_name = "details"];</code> */
+    protected $details;
 
-    /** Generated from protobuf field <code>string client_name = 7;</code> */
+    /** Generated from protobuf field <code>string client_name = 7 [json_name = "clientName"];</code> */
     protected $client_name = '';
 
-    /** Generated from protobuf field <code>string client_version = 8;</code> */
+    /** Generated from protobuf field <code>string client_version = 8 [json_name = "clientVersion"];</code> */
     protected $client_version = '';
 
-    /** Generated from protobuf field <code>.Trace.HTTP http = 10;</code> */
-    protected ?\Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\HTTP $http = null;
+    /** Generated from protobuf field <code>string operation_type = 35 [json_name = "operationType"];</code> */
+    protected $operation_type = '';
 
-    /** Generated from protobuf field <code>.Trace.CachePolicy cache_policy = 18;</code> */
-    protected ?\Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\CachePolicy $cache_policy = null;
+    /** Generated from protobuf field <code>string operation_subtype = 36 [json_name = "operationSubtype"];</code> */
+    protected $operation_subtype = '';
+
+    /** Generated from protobuf field <code>.Trace.HTTP http = 10 [json_name = "http"];</code> */
+    protected $http;
+
+    /** Generated from protobuf field <code>.Trace.CachePolicy cache_policy = 18 [json_name = "cachePolicy"];</code> */
+    protected $cache_policy;
 
     /**
      * If this Trace was created by a Router/Gateway, this is the query plan, including
@@ -103,22 +109,22 @@ class Trace extends \Google\Protobuf\Internal\Message
      * top-level Trace won't contain any resolvers (though it could contain errors
      * that occurred in the Router/Gateway itself).
      *
-     * Generated from protobuf field <code>.Trace.QueryPlanNode query_plan = 26;</code>
+     * Generated from protobuf field <code>.Trace.QueryPlanNode query_plan = 26 [json_name = "queryPlan"];</code>
      */
-    protected ?\Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode $query_plan = null;
+    protected $query_plan;
 
     /**
      * Was this response served from a full query response cache?  (In that case
      * the node tree will have no resolvers.).
      *
-     * Generated from protobuf field <code>bool full_query_cache_hit = 20;</code>
+     * Generated from protobuf field <code>bool full_query_cache_hit = 20 [json_name = "fullQueryCacheHit"];</code>
      */
     protected $full_query_cache_hit = false;
 
     /**
      * Was this query specified successfully as a persisted query hash?
      *
-     * Generated from protobuf field <code>bool persisted_query_hit = 21;</code>
+     * Generated from protobuf field <code>bool persisted_query_hit = 21 [json_name = "persistedQueryHit"];</code>
      */
     protected $persisted_query_hit = false;
 
@@ -127,21 +133,21 @@ class Trace extends \Google\Protobuf\Internal\Message
      * (This typically means that a previous request was rejected as an unknown
      * persisted query.).
      *
-     * Generated from protobuf field <code>bool persisted_query_register = 22;</code>
+     * Generated from protobuf field <code>bool persisted_query_register = 22 [json_name = "persistedQueryRegister"];</code>
      */
     protected $persisted_query_register = false;
 
     /**
      * Was this operation registered and a part of the safelist?
      *
-     * Generated from protobuf field <code>bool registered_operation = 24;</code>
+     * Generated from protobuf field <code>bool registered_operation = 24 [json_name = "registeredOperation"];</code>
      */
     protected $registered_operation = false;
 
     /**
      * Was this operation forbidden due to lack of safelisting?
      *
-     * Generated from protobuf field <code>bool forbidden_operation = 25;</code>
+     * Generated from protobuf field <code>bool forbidden_operation = 25 [json_name = "forbiddenOperation"];</code>
      */
     protected $forbidden_operation = false;
 
@@ -153,7 +159,7 @@ class Trace extends \Google\Protobuf\Internal\Message
      * typically be at least 1.
      * 0 is treated as 1 for backwards compatibility.
      *
-     * Generated from protobuf field <code>double field_execution_weight = 31;</code>
+     * Generated from protobuf field <code>double field_execution_weight = 31 [json_name = "fieldExecutionWeight"];</code>
      */
     protected $field_execution_weight = 0.0;
 
@@ -164,15 +170,15 @@ class Trace extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @var \Google\Protobuf\Timestamp $start_time
-     *           Wallclock time when the trace began
+     *           Wallclock time when the trace began.
      *     @var \Google\Protobuf\Timestamp $end_time
-     *           Wallclock time when the trace ended
+     *           Wallclock time when the trace ended.
      *     @var int|string $duration_ns
      *           High precision duration of the trace; may not equal end_time-start_time
-     *           (eg, if your machine's clock changed during the trace)
+     *           (eg, if your machine's clock changed during the trace).
      *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Node $root
      *           A tree containing information about all resolvers run directly by this
-     *           service, including errors
+     *           service, including errors.
      *     @var bool $is_incomplete
      *           If this is true, the trace is potentially missing some nodes that were
      *           present on the query plan. This can happen if the trace span buffer used
@@ -195,11 +201,13 @@ class Trace extends \Google\Protobuf\Internal\Message
      *     @var string $unexecutedOperationBody
      *           Optional: when GraphQL parsing or validation against the GraphQL schema fails, these fields
      *           can include reference to the operation being sent for users to dig into the set of operations
-     *           that are failing validation
+     *           that are failing validation.
      *     @var string $unexecutedOperationName
      *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Details $details
      *     @var string $client_name
      *     @var string $client_version
+     *     @var string $operation_type
+     *     @var string $operation_subtype
      *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\HTTP $http
      *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\CachePolicy $cache_policy
      *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode $query_plan
@@ -238,9 +246,11 @@ class Trace extends \Google\Protobuf\Internal\Message
     /**
      * Wallclock time when the trace began.
      *
-     * Generated from protobuf field <code>.google.protobuf.Timestamp start_time = 4;</code>
+     * Generated from protobuf field <code>.google.protobuf.Timestamp start_time = 4 [json_name = "startTime"];</code>
+     *
+     * @return \Google\Protobuf\Timestamp|null
      */
-    public function getStartTime(): ?\Google\Protobuf\Timestamp
+    public function getStartTime()
     {
         return $this->start_time;
     }
@@ -250,7 +260,7 @@ class Trace extends \Google\Protobuf\Internal\Message
         return isset($this->start_time);
     }
 
-    public function clearStartTime(): void
+    public function clearStartTime()
     {
         unset($this->start_time);
     }
@@ -258,11 +268,13 @@ class Trace extends \Google\Protobuf\Internal\Message
     /**
      * Wallclock time when the trace began.
      *
-     * Generated from protobuf field <code>.google.protobuf.Timestamp start_time = 4;</code>
+     * Generated from protobuf field <code>.google.protobuf.Timestamp start_time = 4 [json_name = "startTime"];</code>
+     *
+     * @param  \Google\Protobuf\Timestamp  $var
      *
      * @return $this
      */
-    public function setStartTime(?\Google\Protobuf\Timestamp $var)
+    public function setStartTime($var)
     {
         GPBUtil::checkMessage($var, \Google\Protobuf\Timestamp::class);
         $this->start_time = $var;
@@ -273,9 +285,11 @@ class Trace extends \Google\Protobuf\Internal\Message
     /**
      * Wallclock time when the trace ended.
      *
-     * Generated from protobuf field <code>.google.protobuf.Timestamp end_time = 3;</code>
+     * Generated from protobuf field <code>.google.protobuf.Timestamp end_time = 3 [json_name = "endTime"];</code>
+     *
+     * @return \Google\Protobuf\Timestamp|null
      */
-    public function getEndTime(): ?\Google\Protobuf\Timestamp
+    public function getEndTime()
     {
         return $this->end_time;
     }
@@ -285,7 +299,7 @@ class Trace extends \Google\Protobuf\Internal\Message
         return isset($this->end_time);
     }
 
-    public function clearEndTime(): void
+    public function clearEndTime()
     {
         unset($this->end_time);
     }
@@ -293,11 +307,13 @@ class Trace extends \Google\Protobuf\Internal\Message
     /**
      * Wallclock time when the trace ended.
      *
-     * Generated from protobuf field <code>.google.protobuf.Timestamp end_time = 3;</code>
+     * Generated from protobuf field <code>.google.protobuf.Timestamp end_time = 3 [json_name = "endTime"];</code>
+     *
+     * @param  \Google\Protobuf\Timestamp  $var
      *
      * @return $this
      */
-    public function setEndTime(?\Google\Protobuf\Timestamp $var)
+    public function setEndTime($var)
     {
         GPBUtil::checkMessage($var, \Google\Protobuf\Timestamp::class);
         $this->end_time = $var;
@@ -309,9 +325,11 @@ class Trace extends \Google\Protobuf\Internal\Message
      * High precision duration of the trace; may not equal end_time-start_time
      * (eg, if your machine's clock changed during the trace).
      *
-     * Generated from protobuf field <code>uint64 duration_ns = 11;</code>
+     * Generated from protobuf field <code>uint64 duration_ns = 11 [json_name = "durationNs"];</code>
+     *
+     * @return int|string
      */
-    public function getDurationNs(): int|string
+    public function getDurationNs()
     {
         return $this->duration_ns;
     }
@@ -320,11 +338,13 @@ class Trace extends \Google\Protobuf\Internal\Message
      * High precision duration of the trace; may not equal end_time-start_time
      * (eg, if your machine's clock changed during the trace).
      *
-     * Generated from protobuf field <code>uint64 duration_ns = 11;</code>
+     * Generated from protobuf field <code>uint64 duration_ns = 11 [json_name = "durationNs"];</code>
+     *
+     * @param  int|string  $var
      *
      * @return $this
      */
-    public function setDurationNs(int|string $var)
+    public function setDurationNs($var)
     {
         GPBUtil::checkUint64($var);
         $this->duration_ns = $var;
@@ -336,9 +356,11 @@ class Trace extends \Google\Protobuf\Internal\Message
      * A tree containing information about all resolvers run directly by this
      * service, including errors.
      *
-     * Generated from protobuf field <code>.Trace.Node root = 14;</code>
+     * Generated from protobuf field <code>.Trace.Node root = 14 [json_name = "root"];</code>
+     *
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Node|null
      */
-    public function getRoot(): ?Trace\Node
+    public function getRoot()
     {
         return $this->root;
     }
@@ -348,7 +370,7 @@ class Trace extends \Google\Protobuf\Internal\Message
         return isset($this->root);
     }
 
-    public function clearRoot(): void
+    public function clearRoot()
     {
         unset($this->root);
     }
@@ -357,11 +379,13 @@ class Trace extends \Google\Protobuf\Internal\Message
      * A tree containing information about all resolvers run directly by this
      * service, including errors.
      *
-     * Generated from protobuf field <code>.Trace.Node root = 14;</code>
+     * Generated from protobuf field <code>.Trace.Node root = 14 [json_name = "root"];</code>
+     *
+     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Node  $var
      *
      * @return $this
      */
-    public function setRoot(?Trace\Node $var)
+    public function setRoot($var)
     {
         GPBUtil::checkMessage($var, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Node::class);
         $this->root = $var;
@@ -378,7 +402,7 @@ class Trace extends \Google\Protobuf\Internal\Message
      * missing. If this is true we should display a warning to the user when they
      * view the trace in Explorer.
      *
-     * Generated from protobuf field <code>bool is_incomplete = 33;</code>
+     * Generated from protobuf field <code>bool is_incomplete = 33 [json_name = "isIncomplete"];</code>
      *
      * @return bool
      */
@@ -396,7 +420,7 @@ class Trace extends \Google\Protobuf\Internal\Message
      * missing. If this is true we should display a warning to the user when they
      * view the trace in Explorer.
      *
-     * Generated from protobuf field <code>bool is_incomplete = 33;</code>
+     * Generated from protobuf field <code>bool is_incomplete = 33 [json_name = "isIncomplete"];</code>
      *
      * @param  bool  $var
      *
@@ -422,7 +446,7 @@ class Trace extends \Google\Protobuf\Internal\Message
      * Engineproxy provides the signature in legacy_signature_needs_resigning
      * instead.
      *
-     * Generated from protobuf field <code>string signature = 19;</code>
+     * Generated from protobuf field <code>string signature = 19 [json_name = "signature"];</code>
      *
      * @return string
      */
@@ -443,7 +467,7 @@ class Trace extends \Google\Protobuf\Internal\Message
      * Engineproxy provides the signature in legacy_signature_needs_resigning
      * instead.
      *
-     * Generated from protobuf field <code>string signature = 19;</code>
+     * Generated from protobuf field <code>string signature = 19 [json_name = "signature"];</code>
      *
      * @param  string  $var
      *
@@ -462,7 +486,7 @@ class Trace extends \Google\Protobuf\Internal\Message
      * can include reference to the operation being sent for users to dig into the set of operations
      * that are failing validation.
      *
-     * Generated from protobuf field <code>string unexecutedOperationBody = 27;</code>
+     * Generated from protobuf field <code>string unexecutedOperationBody = 27 [json_name = "unexecutedOperationBody"];</code>
      *
      * @return string
      */
@@ -476,7 +500,7 @@ class Trace extends \Google\Protobuf\Internal\Message
      * can include reference to the operation being sent for users to dig into the set of operations
      * that are failing validation.
      *
-     * Generated from protobuf field <code>string unexecutedOperationBody = 27;</code>
+     * Generated from protobuf field <code>string unexecutedOperationBody = 27 [json_name = "unexecutedOperationBody"];</code>
      *
      * @param  string  $var
      *
@@ -491,7 +515,7 @@ class Trace extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string unexecutedOperationName = 28;</code>.
+     * Generated from protobuf field <code>string unexecutedOperationName = 28 [json_name = "unexecutedOperationName"];</code>.
      *
      * @return string
      */
@@ -501,7 +525,7 @@ class Trace extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string unexecutedOperationName = 28;</code>.
+     * Generated from protobuf field <code>string unexecutedOperationName = 28 [json_name = "unexecutedOperationName"];</code>.
      *
      * @param  string  $var
      *
@@ -515,8 +539,12 @@ class Trace extends \Google\Protobuf\Internal\Message
         return $this;
     }
 
-    /** Generated from protobuf field <code>.Trace.Details details = 6;</code> */
-    public function getDetails(): ?Trace\Details
+    /**
+     * Generated from protobuf field <code>.Trace.Details details = 6 [json_name = "details"];</code>.
+     *
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Details|null
+     */
+    public function getDetails()
     {
         return $this->details;
     }
@@ -526,17 +554,19 @@ class Trace extends \Google\Protobuf\Internal\Message
         return isset($this->details);
     }
 
-    public function clearDetails(): void
+    public function clearDetails()
     {
         unset($this->details);
     }
 
     /**
-     * Generated from protobuf field <code>.Trace.Details details = 6;</code>.
+     * Generated from protobuf field <code>.Trace.Details details = 6 [json_name = "details"];</code>.
+     *
+     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Details  $var
      *
      * @return $this
      */
-    public function setDetails(?Trace\Details $var)
+    public function setDetails($var)
     {
         GPBUtil::checkMessage($var, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Details::class);
         $this->details = $var;
@@ -545,7 +575,7 @@ class Trace extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string client_name = 7;</code>.
+     * Generated from protobuf field <code>string client_name = 7 [json_name = "clientName"];</code>.
      *
      * @return string
      */
@@ -555,7 +585,7 @@ class Trace extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string client_name = 7;</code>.
+     * Generated from protobuf field <code>string client_name = 7 [json_name = "clientName"];</code>.
      *
      * @param  string  $var
      *
@@ -570,7 +600,7 @@ class Trace extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string client_version = 8;</code>.
+     * Generated from protobuf field <code>string client_version = 8 [json_name = "clientVersion"];</code>.
      *
      * @return string
      */
@@ -580,7 +610,7 @@ class Trace extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string client_version = 8;</code>.
+     * Generated from protobuf field <code>string client_version = 8 [json_name = "clientVersion"];</code>.
      *
      * @param  string  $var
      *
@@ -594,8 +624,62 @@ class Trace extends \Google\Protobuf\Internal\Message
         return $this;
     }
 
-    /** Generated from protobuf field <code>.Trace.HTTP http = 10;</code> */
-    public function getHttp(): ?Trace\HTTP
+    /**
+     * Generated from protobuf field <code>string operation_type = 35 [json_name = "operationType"];</code>.
+     *
+     * @return string
+     */
+    public function getOperationType()
+    {
+        return $this->operation_type;
+    }
+
+    /**
+     * Generated from protobuf field <code>string operation_type = 35 [json_name = "operationType"];</code>.
+     *
+     * @param  string  $var
+     *
+     * @return $this
+     */
+    public function setOperationType($var)
+    {
+        GPBUtil::checkString($var, true);
+        $this->operation_type = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>string operation_subtype = 36 [json_name = "operationSubtype"];</code>.
+     *
+     * @return string
+     */
+    public function getOperationSubtype()
+    {
+        return $this->operation_subtype;
+    }
+
+    /**
+     * Generated from protobuf field <code>string operation_subtype = 36 [json_name = "operationSubtype"];</code>.
+     *
+     * @param  string  $var
+     *
+     * @return $this
+     */
+    public function setOperationSubtype($var)
+    {
+        GPBUtil::checkString($var, true);
+        $this->operation_subtype = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>.Trace.HTTP http = 10 [json_name = "http"];</code>.
+     *
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\HTTP|null
+     */
+    public function getHttp()
     {
         return $this->http;
     }
@@ -605,17 +689,19 @@ class Trace extends \Google\Protobuf\Internal\Message
         return isset($this->http);
     }
 
-    public function clearHttp(): void
+    public function clearHttp()
     {
         unset($this->http);
     }
 
     /**
-     * Generated from protobuf field <code>.Trace.HTTP http = 10;</code>.
+     * Generated from protobuf field <code>.Trace.HTTP http = 10 [json_name = "http"];</code>.
+     *
+     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\HTTP  $var
      *
      * @return $this
      */
-    public function setHttp(?Trace\HTTP $var)
+    public function setHttp($var)
     {
         GPBUtil::checkMessage($var, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\HTTP::class);
         $this->http = $var;
@@ -623,8 +709,12 @@ class Trace extends \Google\Protobuf\Internal\Message
         return $this;
     }
 
-    /** Generated from protobuf field <code>.Trace.CachePolicy cache_policy = 18;</code> */
-    public function getCachePolicy(): ?Trace\CachePolicy
+    /**
+     * Generated from protobuf field <code>.Trace.CachePolicy cache_policy = 18 [json_name = "cachePolicy"];</code>.
+     *
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\CachePolicy|null
+     */
+    public function getCachePolicy()
     {
         return $this->cache_policy;
     }
@@ -634,17 +724,19 @@ class Trace extends \Google\Protobuf\Internal\Message
         return isset($this->cache_policy);
     }
 
-    public function clearCachePolicy(): void
+    public function clearCachePolicy()
     {
         unset($this->cache_policy);
     }
 
     /**
-     * Generated from protobuf field <code>.Trace.CachePolicy cache_policy = 18;</code>.
+     * Generated from protobuf field <code>.Trace.CachePolicy cache_policy = 18 [json_name = "cachePolicy"];</code>.
+     *
+     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\CachePolicy  $var
      *
      * @return $this
      */
-    public function setCachePolicy(?Trace\CachePolicy $var)
+    public function setCachePolicy($var)
     {
         GPBUtil::checkMessage($var, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\CachePolicy::class);
         $this->cache_policy = $var;
@@ -658,9 +750,11 @@ class Trace extends \Google\Protobuf\Internal\Message
      * top-level Trace won't contain any resolvers (though it could contain errors
      * that occurred in the Router/Gateway itself).
      *
-     * Generated from protobuf field <code>.Trace.QueryPlanNode query_plan = 26;</code>
+     * Generated from protobuf field <code>.Trace.QueryPlanNode query_plan = 26 [json_name = "queryPlan"];</code>
+     *
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode|null
      */
-    public function getQueryPlan(): ?Trace\QueryPlanNode
+    public function getQueryPlan()
     {
         return $this->query_plan;
     }
@@ -670,7 +764,7 @@ class Trace extends \Google\Protobuf\Internal\Message
         return isset($this->query_plan);
     }
 
-    public function clearQueryPlan(): void
+    public function clearQueryPlan()
     {
         unset($this->query_plan);
     }
@@ -681,11 +775,13 @@ class Trace extends \Google\Protobuf\Internal\Message
      * top-level Trace won't contain any resolvers (though it could contain errors
      * that occurred in the Router/Gateway itself).
      *
-     * Generated from protobuf field <code>.Trace.QueryPlanNode query_plan = 26;</code>
+     * Generated from protobuf field <code>.Trace.QueryPlanNode query_plan = 26 [json_name = "queryPlan"];</code>
+     *
+     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode  $var
      *
      * @return $this
      */
-    public function setQueryPlan(?Trace\QueryPlanNode $var)
+    public function setQueryPlan($var)
     {
         GPBUtil::checkMessage($var, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode::class);
         $this->query_plan = $var;
@@ -697,7 +793,7 @@ class Trace extends \Google\Protobuf\Internal\Message
      * Was this response served from a full query response cache?  (In that case
      * the node tree will have no resolvers.).
      *
-     * Generated from protobuf field <code>bool full_query_cache_hit = 20;</code>
+     * Generated from protobuf field <code>bool full_query_cache_hit = 20 [json_name = "fullQueryCacheHit"];</code>
      *
      * @return bool
      */
@@ -710,7 +806,7 @@ class Trace extends \Google\Protobuf\Internal\Message
      * Was this response served from a full query response cache?  (In that case
      * the node tree will have no resolvers.).
      *
-     * Generated from protobuf field <code>bool full_query_cache_hit = 20;</code>
+     * Generated from protobuf field <code>bool full_query_cache_hit = 20 [json_name = "fullQueryCacheHit"];</code>
      *
      * @param  bool  $var
      *
@@ -727,7 +823,7 @@ class Trace extends \Google\Protobuf\Internal\Message
     /**
      * Was this query specified successfully as a persisted query hash?
      *
-     * Generated from protobuf field <code>bool persisted_query_hit = 21;</code>
+     * Generated from protobuf field <code>bool persisted_query_hit = 21 [json_name = "persistedQueryHit"];</code>
      *
      * @return bool
      */
@@ -739,7 +835,7 @@ class Trace extends \Google\Protobuf\Internal\Message
     /**
      * Was this query specified successfully as a persisted query hash?
      *
-     * Generated from protobuf field <code>bool persisted_query_hit = 21;</code>
+     * Generated from protobuf field <code>bool persisted_query_hit = 21 [json_name = "persistedQueryHit"];</code>
      *
      * @param  bool  $var
      *
@@ -758,7 +854,7 @@ class Trace extends \Google\Protobuf\Internal\Message
      * (This typically means that a previous request was rejected as an unknown
      * persisted query.).
      *
-     * Generated from protobuf field <code>bool persisted_query_register = 22;</code>
+     * Generated from protobuf field <code>bool persisted_query_register = 22 [json_name = "persistedQueryRegister"];</code>
      *
      * @return bool
      */
@@ -772,7 +868,7 @@ class Trace extends \Google\Protobuf\Internal\Message
      * (This typically means that a previous request was rejected as an unknown
      * persisted query.).
      *
-     * Generated from protobuf field <code>bool persisted_query_register = 22;</code>
+     * Generated from protobuf field <code>bool persisted_query_register = 22 [json_name = "persistedQueryRegister"];</code>
      *
      * @param  bool  $var
      *
@@ -789,7 +885,7 @@ class Trace extends \Google\Protobuf\Internal\Message
     /**
      * Was this operation registered and a part of the safelist?
      *
-     * Generated from protobuf field <code>bool registered_operation = 24;</code>
+     * Generated from protobuf field <code>bool registered_operation = 24 [json_name = "registeredOperation"];</code>
      *
      * @return bool
      */
@@ -801,7 +897,7 @@ class Trace extends \Google\Protobuf\Internal\Message
     /**
      * Was this operation registered and a part of the safelist?
      *
-     * Generated from protobuf field <code>bool registered_operation = 24;</code>
+     * Generated from protobuf field <code>bool registered_operation = 24 [json_name = "registeredOperation"];</code>
      *
      * @param  bool  $var
      *
@@ -818,7 +914,7 @@ class Trace extends \Google\Protobuf\Internal\Message
     /**
      * Was this operation forbidden due to lack of safelisting?
      *
-     * Generated from protobuf field <code>bool forbidden_operation = 25;</code>
+     * Generated from protobuf field <code>bool forbidden_operation = 25 [json_name = "forbiddenOperation"];</code>
      *
      * @return bool
      */
@@ -830,7 +926,7 @@ class Trace extends \Google\Protobuf\Internal\Message
     /**
      * Was this operation forbidden due to lack of safelisting?
      *
-     * Generated from protobuf field <code>bool forbidden_operation = 25;</code>
+     * Generated from protobuf field <code>bool forbidden_operation = 25 [json_name = "forbiddenOperation"];</code>
      *
      * @param  bool  $var
      *
@@ -852,7 +948,7 @@ class Trace extends \Google\Protobuf\Internal\Message
      * typically be at least 1.
      * 0 is treated as 1 for backwards compatibility.
      *
-     * Generated from protobuf field <code>double field_execution_weight = 31;</code>
+     * Generated from protobuf field <code>double field_execution_weight = 31 [json_name = "fieldExecutionWeight"];</code>
      *
      * @return float
      */
@@ -869,7 +965,7 @@ class Trace extends \Google\Protobuf\Internal\Message
      * typically be at least 1.
      * 0 is treated as 1 for backwards compatibility.
      *
-     * Generated from protobuf field <code>double field_execution_weight = 31;</code>
+     * Generated from protobuf field <code>double field_execution_weight = 31 [json_name = "fieldExecutionWeight"];</code>
      *
      * @param  float  $var
      *

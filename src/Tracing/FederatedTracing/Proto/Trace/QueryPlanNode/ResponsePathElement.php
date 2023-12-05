@@ -30,7 +30,7 @@ class ResponsePathElement extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string field_name = 1;</code>.
+     * Generated from protobuf field <code>string field_name = 1 [json_name = "fieldName"];</code>.
      *
      * @return string
      */
@@ -45,7 +45,7 @@ class ResponsePathElement extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string field_name = 1;</code>.
+     * Generated from protobuf field <code>string field_name = 1 [json_name = "fieldName"];</code>.
      *
      * @param  string  $var
      *
@@ -60,7 +60,7 @@ class ResponsePathElement extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>uint32 index = 2;</code>.
+     * Generated from protobuf field <code>uint32 index = 2 [json_name = "index"];</code>.
      *
      * @return int
      */
@@ -75,7 +75,7 @@ class ResponsePathElement extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>uint32 index = 2;</code>.
+     * Generated from protobuf field <code>uint32 index = 2 [json_name = "index"];</code>.
      *
      * @param  int  $var
      *

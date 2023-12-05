@@ -7,15 +7,24 @@ namespace Nuwave\Lighthouse\Tracing\FederatedTracing\Proto;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Generated from protobuf message <code>StatsContext</code>.
+ * The context around a block of stats and traces indicating from which client the operation was executed and its
+ * operation type. Operation type and subtype are only used by Apollo Router.
+ *
+ * Generated from protobuf message <code>StatsContext</code>
  */
 class StatsContext extends \Google\Protobuf\Internal\Message
 {
-    /** Generated from protobuf field <code>string client_name = 2;</code> */
+    /** Generated from protobuf field <code>string client_name = 2 [json_name = "clientName"];</code> */
     protected $client_name = '';
 
-    /** Generated from protobuf field <code>string client_version = 3;</code> */
+    /** Generated from protobuf field <code>string client_version = 3 [json_name = "clientVersion"];</code> */
     protected $client_version = '';
+
+    /** Generated from protobuf field <code>string operation_type = 4 [json_name = "operationType"];</code> */
+    protected $operation_type = '';
+
+    /** Generated from protobuf field <code>string operation_subtype = 5 [json_name = "operationSubtype"];</code> */
+    protected $operation_subtype = '';
 
     /**
      * Constructor.
@@ -25,6 +34,8 @@ class StatsContext extends \Google\Protobuf\Internal\Message
      *
      *     @var string $client_name
      *     @var string $client_version
+     *     @var string $operation_type
+     *     @var string $operation_subtype
      * }
      */
     public function __construct($data = null)
@@ -34,7 +45,7 @@ class StatsContext extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string client_name = 2;</code>.
+     * Generated from protobuf field <code>string client_name = 2 [json_name = "clientName"];</code>.
      *
      * @return string
      */
@@ -44,7 +55,7 @@ class StatsContext extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string client_name = 2;</code>.
+     * Generated from protobuf field <code>string client_name = 2 [json_name = "clientName"];</code>.
      *
      * @param  string  $var
      *
@@ -59,7 +70,7 @@ class StatsContext extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string client_version = 3;</code>.
+     * Generated from protobuf field <code>string client_version = 3 [json_name = "clientVersion"];</code>.
      *
      * @return string
      */
@@ -69,7 +80,7 @@ class StatsContext extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string client_version = 3;</code>.
+     * Generated from protobuf field <code>string client_version = 3 [json_name = "clientVersion"];</code>.
      *
      * @param  string  $var
      *
@@ -79,6 +90,56 @@ class StatsContext extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, true);
         $this->client_version = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>string operation_type = 4 [json_name = "operationType"];</code>.
+     *
+     * @return string
+     */
+    public function getOperationType()
+    {
+        return $this->operation_type;
+    }
+
+    /**
+     * Generated from protobuf field <code>string operation_type = 4 [json_name = "operationType"];</code>.
+     *
+     * @param  string  $var
+     *
+     * @return $this
+     */
+    public function setOperationType($var)
+    {
+        GPBUtil::checkString($var, true);
+        $this->operation_type = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>string operation_subtype = 5 [json_name = "operationSubtype"];</code>.
+     *
+     * @return string
+     */
+    public function getOperationSubtype()
+    {
+        return $this->operation_subtype;
+    }
+
+    /**
+     * Generated from protobuf field <code>string operation_subtype = 5 [json_name = "operationSubtype"];</code>.
+     *
+     * @param  string  $var
+     *
+     * @return $this
+     */
+    public function setOperationSubtype($var)
+    {
+        GPBUtil::checkString($var, true);
+        $this->operation_subtype = $var;
 
         return $this;
     }

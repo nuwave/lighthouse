@@ -11,7 +11,7 @@ use Google\Protobuf\Internal\GPBUtil;
  */
 class Values extends \Google\Protobuf\Internal\Message
 {
-    /** Generated from protobuf field <code>repeated string value = 1;</code> */
+    /** Generated from protobuf field <code>repeated string value = 1 [json_name = "value"];</code> */
     private $value;
 
     /**
@@ -30,7 +30,7 @@ class Values extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated string value = 1;</code>.
+     * Generated from protobuf field <code>repeated string value = 1 [json_name = "value"];</code>.
      *
      * @return \Google\Protobuf\Internal\RepeatedField
      */
@@ -40,13 +40,13 @@ class Values extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated string value = 1;</code>.
+     * Generated from protobuf field <code>repeated string value = 1 [json_name = "value"];</code>.
      *
      * @param  array<string>|\Google\Protobuf\Internal\RepeatedField  $var
      *
      * @return $this
      */
-    public function setValue(array|\Google\Protobuf\Internal\RepeatedField $var)
+    public function setValue($var)
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::STRING);
         $this->value = $arr;
