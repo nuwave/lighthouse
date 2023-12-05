@@ -2,5 +2,5 @@ version: v1
 managed:
   enabled: true
 plugins:
-  - plugin: buf.build/protocolbuffers/php:v25.1
+  - plugin: buf.build/protocolbuffers/php
     out: proto-tmp
