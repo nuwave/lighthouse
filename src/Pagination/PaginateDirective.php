@@ -148,10 +148,10 @@ GRAPHQL;
 
                 if ($paginationArgs->first === 0) {
                     if ($paginator instanceof LengthAwarePaginator) {
-                        return new ZeroFirstLengthAwarePaginator($paginator->total(), $paginationArgs->page);
+                        return new ZeroPerPageLengthAwarePaginator($paginator->total(), $paginationArgs->page);
                     }
 
-                    return new ZeroFirstPaginator($paginationArgs->page);
+                    return new ZeroPerPagePaginator($paginationArgs->page);
                 }
 
                 return $paginator;

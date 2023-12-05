@@ -116,14 +116,14 @@ class PaginationArgs
     {
         if ($this->first === 0) {
             if ($this->type->isSimple()) {
-                return new ZeroFirstPaginator($this->page);
+                return new ZeroPerPagePaginator($this->page);
             }
 
             $total = $builder instanceof ScoutBuilder
                 ? 0 // Laravel\Scout\Builder exposes no method to get the total count
                 : $builder->count(); // @phpstan-ignore-line see Illuminate\Database\Query\Builder::count(), available as a mixin in the other classes
 
-            return new ZeroFirstLengthAwarePaginator($total, $this->page);
+            return new ZeroPerPageLengthAwarePaginator($total, $this->page);
         }
 
         $methodName = $this->type->isSimple()
