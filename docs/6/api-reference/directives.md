@@ -2279,6 +2279,39 @@ extend type Query @namespace(field: "App\\Blog") {
 
 A [@namespace](#namespace) directive defined on a field directive wins in case of a conflict.
 
+## @namespaced
+
+```graphql
+"""
+Provides a no-op field resolver that allows nesting of queries and mutations.
+Useful to implement [namespacing by separation of concerns](https://www.apollographql.com/docs/technotes/TN0012-namespacing-by-separation-of-concern).
+"""
+directive @namespaced on FIELD_DEFINITION
+```
+
+The following example shows how one can namespace queries and mutations.
+
+```graphql
+type Query {
+    post: PostQueries! @namespaced
+}
+
+type PostQueries {
+    find(id: ID! @whereKey): Post @find
+    list(title: String @where(operator: "like")): [Post!]! @paginate
+}
+
+type Mutation {
+    post: PostMutations! @namespaced
+}
+
+type PostMutations {
+    create(input: PostCreateInput! @spread): Post! @create
+    update(input: PostUpdateInput! @spread): Post! @update
+    delete(id: ID! @whereKey): Post! @delete
+}
+```
+
 ## @neq
 
 ```graphql
