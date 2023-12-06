@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Tracing;
 
+use GraphQL\Error\DebugFlag;
 use Illuminate\Contracts\Config\Repository;
 use Nuwave\Lighthouse\Federation\FederationServiceProvider;
 use Nuwave\Lighthouse\Tracing\FederatedTracing\FederatedTracing;
@@ -11,12 +12,14 @@ use Tests\TestCase;
 
 final class FederatedTracingExtensionTest extends TestCase
 {
-    protected string $schema = /** @lang GraphQL */ '
+    protected string $schema /** @lang GraphQL */
+        = '
     type Query {
         foo: Foo!
     }
     type Foo @key(fields: "id") {
         id: String! @field(resolver: "Tests\\\Integration\\\Tracing\\\FederatedTracingExtensionTest@resolve")
+        bar: String! @field(resolver: "Tests\\\Integration\\\Tracing\\\FederatedTracingExtensionTest@throw")
     }
     ';
 
@@ -34,6 +37,8 @@ final class FederatedTracingExtensionTest extends TestCase
 
         $config = $this->app->make(Repository::class);
         $config->set('lighthouse.tracing.driver', FederatedTracing::class);
+
+        $config->set('lighthouse.debug', DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE);
     }
 
     public function testHeaderIsRequiredToEnableTracing(): void
@@ -65,13 +70,7 @@ final class FederatedTracingExtensionTest extends TestCase
             ],
         ]);
 
-        $ftv1Encoded = $response->json('extensions.ftv1');
-        $ftv1Decoded = \Safe\base64_decode($ftv1Encoded);
-
-        $trace = new Trace();
-        $trace->mergeFromString($ftv1Decoded);
-
-        $traceData = json_decode($trace->serializeToJsonString(), true, 512, JSON_THROW_ON_ERROR);
+        $traceData = $this->decodeFtv1Record($response->json('extensions.ftv1'));
 
         $this->assertArrayHasKey('startTime', $traceData);
         $this->assertArrayHasKey('endTime', $traceData);
@@ -127,15 +126,8 @@ final class FederatedTracingExtensionTest extends TestCase
             ]);
         $this->assertNotEquals($result->json('0.extensions.ftv1'), $result->json('1.extensions.ftv1'));
 
-        $trace1 = new Trace();
-        $trace1->mergeFromString(\Safe\base64_decode($result->json('0.extensions.ftv1')));
-
-        $trace1Data = json_decode($trace1->serializeToJsonString(), true, 512, JSON_THROW_ON_ERROR);
-
-        $trace2 = new Trace();
-        $trace2->mergeFromString(\Safe\base64_decode($result->json('1.extensions.ftv1')));
-
-        $trace2Data = json_decode($trace2->serializeToJsonString(), true, 512, JSON_THROW_ON_ERROR);
+        $trace1Data = $this->decodeFtv1Record($result->json('0.extensions.ftv1'));
+        $trace2Data = $this->decodeFtv1Record($result->json('1.extensions.ftv1'));
 
         $startTime1 = $trace1Data['startTime'];
         $endTime1 = $trace1Data['endTime'];
@@ -156,11 +148,59 @@ final class FederatedTracingExtensionTest extends TestCase
         $this->assertCount(1, $trace2Data['root']['child']);
     }
 
+    public function testReportErrorsToResult(): void
+    {
+        $response = $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo { bar }
+            }
+            ',
+                headers: ['apollo-federation-include-trace' => FederatedTracing::V1],
+            );
+
+        $response->assertJsonStructure([
+            'extensions' => [
+                'ftv1',
+            ],
+        ]);
+
+        $traceData = $this->decodeFtv1Record($response->json('extensions.ftv1'));
+
+        $barNode = $traceData['root']['child'][0]['child'][0];
+        $this->assertArrayHasKey('error', $barNode);
+        $this->assertCount(1, $barNode['error']);
+
+        $barNodeError = $barNode['error'][0];
+        $this->assertSame('Internal server error', $barNodeError['message']);
+        $this->assertCount(1, $barNodeError['location']);
+        $this->assertArrayHasKey('line', $barNodeError['location'][0]);
+        $this->assertArrayHasKey('column', $barNodeError['location'][0]);
+        $this->assertArrayNotHasKey('json', $barNodeError);
+    }
+
     public static function resolve(): string
     {
         // Just enough to consistently change the resulting timestamp
         usleep(1000);
 
         return 'bar';
+    }
+
+    /** @return never */
+    public static function throw(): string
+    {
+        throw new \RuntimeException('foo');
+    }
+
+    /** @return array<string,mixed> */
+    protected function decodeFtv1Record(string $encoded): array
+    {
+        $decoded = \Safe\base64_decode($encoded);
+
+        $trace = new Trace();
+        $trace->mergeFromString($decoded);
+
+        return json_decode($trace->serializeToJsonString(), true, 512, JSON_THROW_ON_ERROR);
     }
 }

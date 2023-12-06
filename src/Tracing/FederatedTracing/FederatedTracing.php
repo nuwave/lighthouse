@@ -129,7 +129,7 @@ class FederatedTracing implements Tracing
         }
 
         $traceError = new Trace\Error();
-        $traceError->setMessage($error->getMessage());
+        $traceError->setMessage($error->isClientSafe() ? $error->getMessage() : 'Internal server error');
         $traceError->setLocation(array_map(static function (SourceLocation $sourceLocation): Location {
             $location = new Location();
             $location->setLine($sourceLocation->line);
@@ -137,7 +137,6 @@ class FederatedTracing implements Tracing
 
             return $location;
         }, $error->getLocations()));
-        $traceError->setJson(json_encode($error->jsonSerialize(), JSON_THROW_ON_ERROR));
 
         $node = $this->findOrNewNode($error->getPath() ?? []);
         $node->setError([$traceError]);
