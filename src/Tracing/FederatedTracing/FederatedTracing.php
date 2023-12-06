@@ -154,10 +154,12 @@ class FederatedTracing implements Tracing
 
         $pathKey = implode('.', $path);
 
-        if (isset($this->nodes[$pathKey])) {
-            return $this->nodes[$pathKey];
-        }
+        return $this->nodes[$pathKey] ??= $this->newNode($path);
+    }
 
+    /** @param  non-empty-array<int, int|string>  $path */
+    protected function newNode(array $path): Node
+    {
         $node = new Node();
 
         $field = $path[count($path) - 1];
@@ -167,26 +169,20 @@ class FederatedTracing implements Tracing
             $node->setResponseName($field);
         }
 
-        $this->nodes[$pathKey] = $node;
-
         $parentNode = $this->ensureParentNode($path);
-
-        if ($parentNode !== null) {
-            $parentNode->getChild()[] = $node;
-        }
+        $parentNode->getChild()[] = $node;
 
         return $node;
     }
 
-    /** @param  array<int, int|string>  $path */
-    protected function ensureParentNode(array $path): ?Node
+    /** @param  non-empty-array<int, int|string>  $path */
+    protected function ensureParentNode(array $path): Node
     {
-        if ($path === []) {
-            return null;
-        }
-
         if (count($path) === 1) {
-            return $this->trace->getRoot();
+            $rootNode = $this->trace->getRoot();
+            assert($rootNode !== null);
+
+            return $rootNode;
         }
 
         $parentPath = array_slice($path, 0, -1);

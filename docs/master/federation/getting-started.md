@@ -55,6 +55,12 @@ extend schema @link(
 In order to use federated tracing, you need to enabled [tracing](../performance/tracing.md)
 and set the driver to `Nuwave\Lighthouse\Tracing\FederatedTracing\FederatedTracing::class` in your `config/lighthouse.php`:
 
+```php
+'tracing' => [
+    'driver' => Nuwave\Lighthouse\Tracing\FederatedTracing\FederatedTracing::class,
+],
+```
+
 Note that federated tracing requires `google/protobuf` to be installed (for better performance you can also install the `protobuf` php extension).
 
 ### Unsupported features

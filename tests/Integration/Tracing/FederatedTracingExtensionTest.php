@@ -12,11 +12,11 @@ use Tests\TestCase;
 
 final class FederatedTracingExtensionTest extends TestCase
 {
-    protected string $schema /** @lang GraphQL */
-        = '
+    protected string $schema = /** @lang GraphQL */ '
     type Query {
         foo: Foo!
     }
+
     type Foo @key(fields: "id") {
         id: String! @field(resolver: "Tests\\\Integration\\\Tracing\\\FederatedTracingExtensionTest@resolve")
         bar: String! @field(resolver: "Tests\\\Integration\\\Tracing\\\FederatedTracingExtensionTest@throw")
@@ -188,7 +188,7 @@ final class FederatedTracingExtensionTest extends TestCase
     }
 
     /** @return never */
-    public static function throw(): string
+    public static function throw(): void
     {
         throw new \RuntimeException('foo');
     }

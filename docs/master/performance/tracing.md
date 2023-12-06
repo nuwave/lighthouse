@@ -14,9 +14,9 @@ Add the service provider to your `config/app.php`
 
 ## Drivers
 
-Lighthouse tracing is implemented though drivers, this allows to easily support different tracing formats.
+Lighthouse tracing is implemented though drivers, this allows supporting different tracing formats.
 
-Out of the box Lighthouse supports the following drivers:
+Lighthouse includes the following drivers:
 
 - `Nuwave\Lighthouse\Tracing\ApolloTracing\ApolloTracing::class` (default) which implements [Apollo Tracing response format](https://github.com/apollographql/apollo-tracing#response-format)
 - `Nuwave\Lighthouse\Tracing\FederatedTracing\FederatedTracing::class` which implements [Apollo Federated tracing](https://www.apollographql.com/docs/federation/metrics/)
