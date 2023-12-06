@@ -58,7 +58,7 @@ final class NamespacedDirectiveTest extends DBTestCase
         ]);
         $userID = $createUserResponse->json('data.user.create.id');
 
-        $this->graphQL(/** @lang GraphQL */'
+        $this->graphQL(/** @lang GraphQL */ '
         query ($id: ID!) {
             user {
                 find(id: $id) {
@@ -80,14 +80,14 @@ final class NamespacedDirectiveTest extends DBTestCase
                     'list' => [
                         [
                             'id' => $userID,
-                        ]
-                    ]
-                ]
-            ]
+                        ],
+                    ],
+                ],
+            ],
         ]);
 
         $newName = 'bar';
-        $this->graphQL(/** @lang GraphQL */'
+        $this->graphQL(/** @lang GraphQL */ '
         mutation ($id: ID!, $name: String) {
             user {
                 update(id: $id, name: $name) {
@@ -106,11 +106,11 @@ final class NamespacedDirectiveTest extends DBTestCase
                         'id' => $userID,
                         'name' => $newName,
                     ],
-                ]
-            ]
+                ],
+            ],
         ]);
 
-        $this->graphQL(/** @lang GraphQL */'
+        $this->graphQL(/** @lang GraphQL */ '
         mutation ($id: ID!) {
             user {
                 delete(id: $id) {
@@ -128,8 +128,8 @@ final class NamespacedDirectiveTest extends DBTestCase
                         'id' => $userID,
                         'name' => $newName,
                     ],
-                ]
-            ]
+                ],
+            ],
         ]);
     }
 }
