@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Add `@namespaced` directive for namespacing by separation of concerns https://github.com/nuwave/lighthouse/pull/2469
+
 ## v6.24.0
 
 ### Added
