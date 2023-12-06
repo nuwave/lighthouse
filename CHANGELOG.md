@@ -13,6 +13,18 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Add `@namespaced` directive for namespacing by separation of concerns https://github.com/nuwave/lighthouse/pull/2469
 
+## v6.24.0
+
+### Added
+
+- Add support for `extend union` syntax https://github.com/nuwave/lighthouse/pull/2468
+
+## v6.23.2
+
+### Fixed
+
+- Exclude unnecessary `extend schema` from federation schema printer https://github.com/nuwave/lighthouse/pull/2477
+
 ## v6.23.1
 
 ### Fixed

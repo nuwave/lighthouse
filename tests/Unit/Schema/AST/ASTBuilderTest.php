@@ -7,6 +7,7 @@ use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\NodeKind;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
@@ -16,8 +17,7 @@ use Tests\TestCase;
 
 final class ASTBuilderTest extends TestCase
 {
-    /** @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder */
-    protected $astBuilder;
+    protected ASTBuilder $astBuilder;
 
     protected function setUp(): void
     {
@@ -152,6 +152,27 @@ final class ASTBuilderTest extends TestCase
         $this->assertCount(4, $myEnum->values);
     }
 
+    public function testMergeUnionExtensionFields(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+            type Foo
+            type Bar
+            type Baz
+
+            union MyUnion = Foo
+
+            extend union MyUnion = Bar
+
+            extend union MyUnion = Baz
+        ';
+        $documentAST = $this->astBuilder->documentAST();
+
+        $myUnion = $documentAST->types['MyUnion'];
+        assert($myUnion instanceof UnionTypeDefinitionNode);
+
+        $this->assertCount(3, $myUnion->types);
+    }
+
     public function testDoesNotAllowExtendingUndefinedTypes(): void
     {
         $this->schema = /** @lang GraphQL */ '
@@ -165,6 +186,18 @@ final class ASTBuilderTest extends TestCase
         ';
 
         $this->expectExceptionObject(new DefinitionException('Could not find a base definition Foo of kind ' . NodeKind::OBJECT_TYPE_EXTENSION . ' to extend.'));
+        $this->astBuilder->documentAST();
+    }
+
+    public function testDoesNotAllowExtendingUndefinedUnions(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        union MyFirstEnum = String
+
+        extend union MySecondUnion = Int
+        ';
+
+        $this->expectExceptionObject(new DefinitionException('Could not find a base definition MySecondUnion of kind ' . NodeKind::UNION_TYPE_EXTENSION . ' to extend.'));
         $this->astBuilder->documentAST();
     }
 
@@ -231,6 +264,21 @@ final class ASTBuilderTest extends TestCase
         ';
 
         $this->expectExceptionObject(new DefinitionException(ASTHelper::duplicateDefinition('TWO')));
+        $this->astBuilder->documentAST();
+    }
+
+    public function testDoesNotAllowDuplicateTypesOnUnionExtensions(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Foo
+        type Bar
+
+        union MyUnion = Foo | Bar
+
+        extend union MyUnion = Bar
+        ';
+
+        $this->expectExceptionObject(new DefinitionException(ASTHelper::duplicateDefinition('Bar')));
         $this->astBuilder->documentAST();
     }
 

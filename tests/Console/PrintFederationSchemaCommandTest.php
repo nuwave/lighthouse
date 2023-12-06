@@ -38,8 +38,11 @@ GRAPHQL;
         $tester = $this->commandTester(new PrintSchemaCommand());
         $tester->execute(['--federation' => true]);
 
-        $this->assertStringContainsString(self::SCHEMA_TYPE, $tester->getDisplay());
-        $this->assertStringContainsString(self::SCHEMA_QUERY, $tester->getDisplay());
+        $sdl = $tester->getDisplay();
+
+        $this->assertStringContainsString(self::SCHEMA_TYPE, $sdl);
+        $this->assertStringContainsString(self::SCHEMA_QUERY, $sdl);
+        $this->assertStringNotContainsString('extend schema', $sdl);
     }
 
     public function testWritesSchema(): void

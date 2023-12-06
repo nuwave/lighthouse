@@ -14,8 +14,7 @@ use Tests\Utils\Models\User;
 
 final class CacheDirectiveTest extends DBTestCase
 {
-    /** @var \Illuminate\Contracts\Cache\Repository */
-    protected $cache;
+    protected CacheRepository $cache;
 
     protected function getEnvironmentSetUp($app): void
     {
