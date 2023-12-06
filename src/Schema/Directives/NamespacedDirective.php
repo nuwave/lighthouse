@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
@@ -21,7 +20,6 @@ GRAPHQL;
 
     public function resolveField(FieldValue $fieldValue): callable
     {
-
         return static fn (): bool => true;
     }
 }
