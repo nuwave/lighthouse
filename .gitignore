@@ -13,6 +13,7 @@ phpunit.xml
 .php-cs-fixer.cache
 build
 phpstan-tmp-dir
+proto-tmp
 
 # composer
 composer.phar

@@ -18,6 +18,7 @@ parameters:
   # laravel/pennant requires Laravel 10
   - src/Pennant
   - tests/Integration/Pennant
+  - src/Tracing/FederatedTracing/Proto # Generated classes from protobuf
   ignoreErrors:
   # PHPStan does not get it
   - '#Parameter \#1 \$callback of static method Closure::fromCallable\(\) expects callable\(\): mixed, array{object, .*} given\.#'

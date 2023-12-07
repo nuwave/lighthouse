@@ -15,6 +15,7 @@ RUN apt-get update && \
         mysqli \
         pdo_mysql \
         intl \
+        bcmath \
     && rm -rf /var/lib/apt/lists/* \
     && pecl install \
         xdebug \
