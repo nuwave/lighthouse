@@ -1239,7 +1239,7 @@ directive @find(
 
 ```graphql
 type Query {
-  userById(id: ID! @eq): User @find
+  userById(id: ID! @whereKey): User @find
 }
 ```
 
@@ -1250,7 +1250,7 @@ If your model does not sit in the default namespace, you can overwrite it.
 
 ```graphql
 type Query {
-  userById(id: ID! @eq): User @find(model: "App\\Authentication\\User")
+  userById(id: ID! @whereKey): User @find(model: "App\\Authentication\\User")
 }
 ```
 

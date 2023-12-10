@@ -121,8 +121,8 @@ Use the [@canResolved](../api-reference/directives.md#canresolved) directive to 
 
 ```graphql
 type Query {
-  post(id: ID! @eq): Post
-    @canResolved(ability: "view")
+  post(id: ID! @whereKey): Post
+    @can(ability: "view", resolved: true)
     @find
     @softDeletes
 }

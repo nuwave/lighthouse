@@ -99,11 +99,11 @@ And can be queried like this:
 Lighthouse provides directives such as [@eq](../api-reference/directives.md#eq)
 to enhance your queries with additional constraints.
 
-The following field definition allows clients to fetch a single User by ID.
+The following field definition allows clients to find a user by their email:
 
 ```graphql
 type Query {
-  user(id: ID! @eq): User @find
+  user(email: String! @eq): User @find
 }
 ```
 
@@ -111,7 +111,8 @@ Query the field like this:
 
 ```graphql
 {
-  user(id: 69) {
+  user(email: "chuck@nor.ris") {
+    id
     name
   }
 }
@@ -123,6 +124,7 @@ If found, the result will look like this:
 {
   "data": {
     "user": {
+      "id": "69420",
       "name": "Chuck Norris"
     }
   }
