@@ -33,6 +33,27 @@ The `@can` directive was removed in favor of more specialized directives:
 - with `resolved` field set: `@canResolved`
 - if none of the above are set: `@canModel`
 
+```diff
+type Mutation {
+-   createPost(input: PostInput): Post @can(ability: "create")
++   createPost(input: PostInput): Post @canModel(ability: "create")
+-   editPost(input: PostInput): Post @can(find: "input.id", ability: "edit")
++   editPost(input: PostInput): Post @canFind(find: "input.id", ability: "edit")
+-   deletePosts(ids: [ID!]! @whereKey): [Post!]! @can(query: true, ability: "delete") @delete
++   deletePosts(ids: [ID!]! @whereKey): [Post!]! @canQuery(ability: "delete") @delete
+}
+
+type Query {
+-   posts: [Post!]! @can(resolved: true, ability: "view") @paginate
++   posts: [Post!]! @canResolved(ability: "view") @paginate
+}
+
+type Post {
+-   sensitiveInformation: String @can(root: true, ability: "admin")
++   sensitiveInformation: String @canRoot(ability: "admin")
+}
+```
+
 ## v5 to v6
 
 ### `messages` on `@rules` and `@rulesForArray`

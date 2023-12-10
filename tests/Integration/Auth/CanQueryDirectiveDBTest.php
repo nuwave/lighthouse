@@ -22,7 +22,7 @@ final class CanQueryDirectiveDBTest extends DBTestCase
         $this->schema = /** @lang GraphQL */ '
         type Query {
             user(name: String! @eq): User
-                @canQuery(ability: "view", query: true)
+                @canQuery(ability: "view")
                 @first
         }
 
@@ -102,7 +102,7 @@ final class CanQueryDirectiveDBTest extends DBTestCase
         $this->schema = /** @lang GraphQL */ '
         type Mutation {
             deletePosts(ids: [ID!]! @whereKey): [Post!]!
-                @canQuery(ability: "delete", query: true)
+                @canQuery(ability: "delete")
                 @delete
         }
 
@@ -146,7 +146,7 @@ final class CanQueryDirectiveDBTest extends DBTestCase
         $this->schema = /** @lang GraphQL */ '
         type Query {
             task(id: ID! @whereKey): Task
-                @canQuery(ability: "adminOnly", query: true)
+                @canQuery(ability: "adminOnly")
                 @softDeletes
                 @find
         }
