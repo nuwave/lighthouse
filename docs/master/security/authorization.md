@@ -89,12 +89,12 @@ final class PostPolicy
 ### Protect mutations using database queries
 
 You can also protect specific models by using the [@canFind](../api-reference/directives.md#canfind) 
-or [@canQuery](../api-reference/directives.md#canquery) directive. They will query the database and check
-policy against the result.
+or [@canQuery](../api-reference/directives.md#canquery) directive.
+They will query the database and check the specified policy against the result.
 
 ```graphql
 type Mutation {
-  editPost(input: PostInput): Post @canFind(ability: "edit", find:"input.id")
+  editPost(input: PostInput): Post @canFind(ability: "edit", find: "input.id")
 }
 
 input PostInput {
@@ -147,7 +147,7 @@ This example shows how to restrict reading the `email` field to only the user it
 
 ```graphql
 type Query {
-  user(id: ID! @eq): User @find
+  user(id: ID! @whereKey: User @find
 }
 
 type User {
