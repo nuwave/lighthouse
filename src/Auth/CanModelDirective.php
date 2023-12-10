@@ -17,7 +17,7 @@ Check a Laravel Policy to ensure the current user is authorized to access a fiel
 
 Check the policy against the root model.
 """
-directive @canRoot(
+directive @canModel(
 {$commonArguments}
 
   """
