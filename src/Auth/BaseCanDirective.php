@@ -36,7 +36,7 @@ abstract class BaseCanDirective extends BaseDirective implements FieldMiddleware
   You may pass arbitrary GraphQL literals,
   e.g.: [1, 2, 3] or { foo: "bar" }
   """
-  args: CanArgs or : [CanArgs]
+  args: CanArgs
 
   """
   Action to do if the user is not authorized.
@@ -46,7 +46,7 @@ abstract class BaseCanDirective extends BaseDirective implements FieldMiddleware
   """
   Value to return if the user is not authorized and `action` is `RETURN_VALUE`.
   """
-  return_value: CanArgs or : [CanArgs]
+  return_value: CanArgs
 GRAPHQL;
     }
 
