@@ -50,6 +50,19 @@ extend schema @link(
 )
 ```
 
+## Federated tracing
+
+In order to use federated tracing, you need to enabled [tracing](../performance/tracing.md)
+and set the driver to `Nuwave\Lighthouse\Tracing\FederatedTracing\FederatedTracing::class` in your `config/lighthouse.php`:
+
+```php
+'tracing' => [
+    'driver' => Nuwave\Lighthouse\Tracing\FederatedTracing\FederatedTracing::class,
+],
+```
+
+Note that federated tracing requires `google/protobuf` to be installed (for better performance you can also install the `protobuf` php extension).
+
 ### Unsupported features
 
 Some features of the Apollo Federation specification **are not supported** by Lighthouse:
@@ -86,6 +99,3 @@ type Book @federation__shareable {
 }
 ```
 
-#### Federated tracing
-
-[Federated tracing](https://www.apollographql.com/docs/federation/metrics) is not supported.
