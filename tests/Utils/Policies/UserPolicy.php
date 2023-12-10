@@ -47,18 +47,32 @@ final class UserPolicy
         return $pass;
     }
 
-    /** @param  array<string, string>  $injectedArgs */
-    public function injectArgs(User $viewer, array $injectedArgs): bool
+    /**
+     * @param User|array<string, mixed> ...$args
+     */
+    public function injectArgs(User $viewer, ...$args): bool
     {
+        $injectedArgs = $args[0];
+        if ($injectedArgs instanceof User){
+            $injectedArgs = $args[1];
+        }
+
         return $injectedArgs === ['foo' => 'bar'];
     }
 
     /**
-     * @param  array<string, string>  $injectedArgs
-     * @param  array<string, string>  $staticArgs
+     * @param User|array<string, mixed> ...$args
      */
-    public function argsWithInjectedArgs(User $viewer, array $injectedArgs, array $staticArgs): bool
+    public function argsWithInjectedArgs(User $viewer, ...$args): bool
     {
+        $injectedArgs = $args[0];
+        $staticArgs = $args[1];
+
+        if ($injectedArgs instanceof User){
+            $injectedArgs = $args[1];
+            $staticArgs = $args[2];
+        }
+
         return $injectedArgs === ['foo' => 'dynamic']
             && $staticArgs === ['foo' => 'static'];
     }

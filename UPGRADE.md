@@ -24,6 +24,15 @@ It will prevent the following type of HTTP requests:
 - `GET` requests
 - `POST` requests that can be created using HTML forms
 
+### `@can` directive is replaced with `@can*` directives
+
+The `@can` directive was removed in favor of more specialized directives:
+- with `find` field set: `@canFind`
+- with `query` field set: `@canQuery`
+- with `root` field set: `@canRoot`
+- with `resolved` field set: `@canResolved`
+- if none of the above are set: `@canModel`
+
 ## v5 to v6
 
 ### `messages` on `@rules` and `@rulesForArray`
