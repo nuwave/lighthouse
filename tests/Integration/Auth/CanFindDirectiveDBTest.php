@@ -23,7 +23,7 @@ final class CanFindDirectiveDBTest extends DBTestCase
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            user(id: ID @eq): User
+            user(id: ID @whereKey): User
                 @canFind(ability: "view", find: "id")
                 @first
         }
@@ -62,7 +62,7 @@ final class CanFindDirectiveDBTest extends DBTestCase
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            user(id: ID @eq): User
+            user(id: ID @whereKey): User
                 @canFind(ability: "view", find: "id")
                 @mock
         }
@@ -102,7 +102,7 @@ final class CanFindDirectiveDBTest extends DBTestCase
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            user(id: ID @eq): User
+            user(id: ID @whereKey): User
                 @canFind(ability: "view", find: "id", action: EXCEPTION_NOT_AUTHORIZED)
                 @mock
         }
@@ -140,7 +140,7 @@ final class CanFindDirectiveDBTest extends DBTestCase
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            user(id: ID @eq): User
+            user(id: ID @whereKey): User
                 @canFind(ability: "view", find: "id", findOrFail: false)
                 @mock
         }
@@ -251,7 +251,7 @@ final class CanFindDirectiveDBTest extends DBTestCase
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            post(foo: ID! @eq): Post
+            post(foo: ID! @whereKey): Post
                 @canFind(ability: "view", find: "foo")
                 @mock
         }
@@ -334,7 +334,7 @@ final class CanFindDirectiveDBTest extends DBTestCase
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            task(id: ID! @eq): Task
+            task(id: ID! @whereKey): Task
                 @canFind(ability: "adminOnly", find: "id")
                 @softDeletes
                 @find

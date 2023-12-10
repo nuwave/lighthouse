@@ -628,7 +628,7 @@ Statically defined arguments that are passed to `Gate::check`.
 You may pass arbitrary GraphQL literals,
 e.g.: [1, 2, 3] or { foo: "bar" }
 """
-args: CanArgs or : [CanArgs]
+args: CanArgs
 
 """
 Action to do if the user is not authorized.
@@ -638,7 +638,7 @@ action: CanAction! = EXCEPTION_PASS
 """
 Value to return if the user is not authorized and `action` is `RETURN_VALUE`.
 """
-return_value: CanArgs or : [CanArgs]
+return_value: CanArgs
 """
 ```
 

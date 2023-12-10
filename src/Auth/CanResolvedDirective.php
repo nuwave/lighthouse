@@ -56,7 +56,7 @@ GRAPHQL;
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType): void
     {
         if ($parentType->name->value === RootType::MUTATION) {
-            throw new DefinitionException("Do not use @can with `resolved` on mutation {$fieldDefinition->name}->value, it is unsafe as the resolver will run before checking permissions. Use `query` or `find`.");
+            throw new DefinitionException("Do not use @canResolved on mutation {$fieldDefinition->name}->value, it is unsafe as the resolver will run before checking permissions. Use `@canFind` or `@canQuery` instead.");
         }
     }
 }

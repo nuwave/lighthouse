@@ -5,7 +5,7 @@ namespace Tests\Unit\Auth;
 use Tests\Utils\Models\User;
 use Tests\Utils\Policies\UserPolicy;
 
-class CanResolvedDirectiveTest extends CanDirectiveTestBase
+final class CanResolvedDirectiveTest extends CanDirectiveTestBase
 {
     public static function getSchema(string $commonArgs): string
     {

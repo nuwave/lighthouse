@@ -4,7 +4,7 @@ namespace Auth;
 
 use Tests\Unit\Auth\CanDirectiveTestBase;
 
-class CanModelDirectiveTest extends CanDirectiveTestBase
+final class CanModelDirectiveTest extends CanDirectiveTestBase
 {
     public static function getSchema(string $commonArgs): string
     {

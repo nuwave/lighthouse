@@ -28,9 +28,7 @@ abstract class CanDirectiveTestBase extends TestCase
 
         $this->schema = $this->getSchema('ability: "adminOnly"');
 
-        $this
-            ->graphQL($this->getQuery())
-            ->assertGraphQLErrorMessage(AuthorizationException::MESSAGE);
+        $this->graphQL($this->getQuery())->assertGraphQLErrorMessage(AuthorizationException::MESSAGE);
     }
 
     public function testThrowsWithCustomMessageIfNotAuthorized(): void
@@ -39,9 +37,7 @@ abstract class CanDirectiveTestBase extends TestCase
 
         $this->schema = $this->getSchema('ability: "superAdminOnly"');
 
-        $this
-            ->graphQL($this->getQuery())
-            ->assertGraphQLErrorMessage(UserPolicy::SUPER_ADMINS_ONLY_MESSAGE);
+        $this->graphQL($this->getQuery())->assertGraphQLErrorMessage(UserPolicy::SUPER_ADMINS_ONLY_MESSAGE);
     }
 
     public function testThrowsFirstWithCustomMessageIfNotAuthorized(): void
@@ -50,9 +46,7 @@ abstract class CanDirectiveTestBase extends TestCase
 
         $this->schema = $this->getSchema('ability: ["superAdminOnly", "adminOnly"]');
 
-        $this
-            ->graphQL($this->getQuery())
-            ->assertGraphQLErrorMessage(UserPolicy::SUPER_ADMINS_ONLY_MESSAGE);
+        $this->graphQL($this->getQuery())->assertGraphQLErrorMessage(UserPolicy::SUPER_ADMINS_ONLY_MESSAGE);
     }
 
     public function testConcealsCustomMessage(): void

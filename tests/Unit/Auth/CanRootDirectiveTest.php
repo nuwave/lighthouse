@@ -7,7 +7,7 @@ use Tests\Unit\Auth\CanDirectiveTestBase;
 use Tests\Utils\Models\User;
 use Tests\Utils\Policies\UserPolicy;
 
-class CanRootDirectiveTest extends CanDirectiveTestBase
+final class CanRootDirectiveTest extends CanDirectiveTestBase
 {
     public static function getSchema(string $commonArgs): string
     {

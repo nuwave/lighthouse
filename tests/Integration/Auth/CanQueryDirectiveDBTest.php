@@ -60,7 +60,7 @@ final class CanQueryDirectiveDBTest extends DBTestCase
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            user(id: ID! @eq): User
+            user(id: ID! @whereKey): User
                 @canQuery(ability: "view", query: true)
                 @find
         }
@@ -145,7 +145,7 @@ final class CanQueryDirectiveDBTest extends DBTestCase
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            task(id: ID! @eq): Task
+            task(id: ID! @whereKey): Task
                 @canQuery(ability: "adminOnly", query: true)
                 @softDeletes
                 @find
