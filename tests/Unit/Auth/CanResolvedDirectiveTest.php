@@ -7,12 +7,12 @@ use Tests\Utils\Policies\UserPolicy;
 
 class CanResolvedDirectiveTest extends CanDirectiveTestBase
 {
-    static function getSchema(string $commonArgs): string
+    public static function getSchema(string $commonArgs): string
     {
         return /** @lang GraphQL */ "
             type Query {
                 user(foo: String): User
-                    @canResolved($commonArgs)
+                    @canResolved({$commonArgs})
                     @mock
             }
 
@@ -45,7 +45,6 @@ class CanResolvedDirectiveTest extends CanDirectiveTestBase
         $this->mockResolver(fn (): User => $this->resolveUser());
         parent::testReturnsValue();
     }
-
 
     public function testProcessesTheArgsArgument(): void
     {

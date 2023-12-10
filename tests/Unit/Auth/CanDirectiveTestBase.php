@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Auth;
 
-use Nuwave\Lighthouse\Auth\CanDirective;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Tests\TestCase;
 use Tests\Utils\Models\User;
@@ -10,7 +9,7 @@ use Tests\Utils\Policies\UserPolicy;
 
 abstract class CanDirectiveTestBase extends TestCase
 {
-    abstract static function getSchema(string $commonArgs): string;
+    abstract public static function getSchema(string $commonArgs): string;
 
     protected function getQuery(): string
     {
@@ -84,7 +83,7 @@ abstract class CanDirectiveTestBase extends TestCase
         $user->name = UserPolicy::ADMIN;
         $this->be($user);
 
-        $this->mockResolver(fn(): User => $this->resolveUser());
+        $this->mockResolver(fn (): User => $this->resolveUser());
 
         $this->schema = $this->getSchema('ability: "adminOnly"');
 
@@ -99,7 +98,7 @@ abstract class CanDirectiveTestBase extends TestCase
 
     public function testAcceptsGuestUser(): void
     {
-        $this->mockResolver(fn(): User => $this->resolveUser());
+        $this->mockResolver(fn (): User => $this->resolveUser());
 
         $this->schema = $this->getSchema('ability: "guestOnly"');
 
@@ -118,7 +117,7 @@ abstract class CanDirectiveTestBase extends TestCase
         $user->name = UserPolicy::ADMIN;
         $this->be($user);
 
-        $this->mockResolver(fn(): User => $this->resolveUser());
+        $this->mockResolver(fn (): User => $this->resolveUser());
 
         $this->schema = $this->getSchema('ability: ["adminOnly", "alwaysTrue"]');
 
@@ -142,7 +141,7 @@ abstract class CanDirectiveTestBase extends TestCase
     {
         $this->be(new User());
 
-        $this->mockResolver(fn(): User => $this->resolveUser());
+        $this->mockResolver(fn (): User => $this->resolveUser());
 
         $this->schema = $this->getSchema('ability: "injectArgs", injectArgs: [true]');
 
@@ -159,7 +158,7 @@ abstract class CanDirectiveTestBase extends TestCase
     {
         $this->be(new User());
 
-        $this->mockResolver(fn(): User => $this->resolveUser());
+        $this->mockResolver(fn (): User => $this->resolveUser());
 
         $this->schema = $this->getSchema('ability: "argsWithInjectedArgs", args: { foo: "static" }, injectArgs: true');
 

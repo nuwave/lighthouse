@@ -2,32 +2,14 @@
 
 namespace Nuwave\Lighthouse\Auth;
 
-use GraphQL\Error\Error;
-use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Contracts\Auth\Access\Gate;
-use Illuminate\Contracts\Pagination\Paginator;
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Execution\Resolved;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
-use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\SoftDeletes\ForceDeleteDirective;
-use Nuwave\Lighthouse\SoftDeletes\RestoreDirective;
-use Nuwave\Lighthouse\SoftDeletes\TrashedDirective;
-use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Utils;
-use Throwable;
 
 abstract class BaseCanDirective extends BaseDirective implements FieldMiddleware
 {
@@ -103,13 +85,13 @@ GRAPHQL;
         $fieldValue->wrapResolver(fn (callable $resolver): \Closure => function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $ability) {
             $gate = $this->gate->forUser($context->user());
             $checkArguments = $this->buildCheckArguments($args);
-            $authorizeModel = fn(string|object|array|null $model) => $this->authorizeModel($gate, $ability, $model, $checkArguments);
+            $authorizeModel = fn (string|object|array|null $model) => $this->authorizeModel($gate, $ability, $model, $checkArguments);
 
             try {
                 return $this->authorizeRequest($root, $args, $context, $resolveInfo, $resolver, $authorizeModel);
-            } catch (Throwable $e) {
+            } catch (\Throwable $e) {
                 $action = $this->directiveArgValue('action');
-                if ($action === 'EXCEPTION_NOT_AUTHORIZED'){
+                if ($action === 'EXCEPTION_NOT_AUTHORIZED') {
                     throw new AuthorizationException();
                 }
 
@@ -117,24 +99,21 @@ GRAPHQL;
                     return $this->directiveArgValue('return_value');
                 }
 
-
                 throw $e;
             }
         });
     }
 
     /**
-     * Authorizes request and resolves the field
+     * Authorizes request and resolves the field.
      *
-     * @param array<string, mixed> $args
-     * @throws \Nuwave\Lighthouse\Exceptions\AuthorizationException
+     * @param  array<string, mixed>  $args
      */
-    protected abstract function authorizeRequest(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo, callable $resolver, callable $authorize): mixed;
+    abstract protected function authorizeRequest(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo, callable $resolver, callable $authorize): mixed;
 
     /**
-     * @param string|array<string> $ability
-     * @param array<int, mixed> $arguments
-     * @throws \Nuwave\Lighthouse\Exceptions\AuthorizationException
+     * @param  string|array<string>  $ability
+     * @param  array<int, mixed>  $arguments
      */
     protected function authorizeModel(Gate $gate, string|array $ability, mixed $model, array $arguments): void
     {

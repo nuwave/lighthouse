@@ -9,7 +9,7 @@ use Tests\Utils\Policies\UserPolicy;
 
 class CanRootDirectiveTest extends CanDirectiveTestBase
 {
-    static function getSchema(string $commonArgs): string
+    public static function getSchema(string $commonArgs): string
     {
         return /** @lang GraphQL */ "
             type Query {
@@ -18,11 +18,10 @@ class CanRootDirectiveTest extends CanDirectiveTestBase
             }
 
             type User {
-                name(foo: String): String @canRoot($commonArgs)
+                name(foo: String): String @canRoot({$commonArgs})
             }
         ";
     }
-
 
     protected function getQuery(): string
     {
@@ -105,14 +104,14 @@ class CanRootDirectiveTest extends CanDirectiveTestBase
         $user->name = UserPolicy::ADMIN;
         $this->be($user);
 
-        $return = new class {
+        $return = new class() {
             public string $name = 'foo';
         };
         $this->mockResolver(fn (): object => $return);
 
         $this->app
             ->make(Gate::class)
-            ->define('customObject', fn(User $authorizedUser, object $root) => $authorizedUser === $user && $root == $return);
+            ->define('customObject', fn (User $authorizedUser, object $root) => $authorizedUser === $user && $root == $return);
 
         $this->schema = $this->getSchema('ability: "customObject"');
 
@@ -136,7 +135,7 @@ class CanRootDirectiveTest extends CanDirectiveTestBase
 
         $this->app
             ->make(Gate::class)
-            ->define('customArray', fn(User $authorizedUser, array $root) => $authorizedUser === $user && $root == $return);
+            ->define('customArray', fn (User $authorizedUser, array $root) => $authorizedUser === $user && $root == $return);
 
         $this->schema = $this->getSchema('ability: "customArray"');
 
@@ -149,27 +148,26 @@ class CanRootDirectiveTest extends CanDirectiveTestBase
         ]);
     }
 
-
     public function testGlobalGate(): void
     {
         $user = new User();
         $this->be($user);
 
-        $this->app->make(Gate::class)->define('globalAdmin', fn($authorizedUser) => $authorizedUser === $user);
+        $this->app->make(Gate::class)->define('globalAdmin', fn ($authorizedUser) => $authorizedUser === $user);
 
         $this->mockResolver(fn (): User => $this->resolveUser());
 
-        $this->schema = /** @lang GraphQL */ "
+        $this->schema = /** @lang GraphQL */ '
             type Query {
                 user: User!
-                    @canRoot(ability: \"globalAdmin\")
+                    @canRoot(ability: "globalAdmin")
                     @mock
             }
 
             type User {
                 name(foo: String): String
             }
-        ";
+        ';
 
         $this->graphQL($this->getQuery())->assertJson([
             'data' => [

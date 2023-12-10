@@ -3,17 +3,15 @@
 namespace Auth;
 
 use Tests\Unit\Auth\CanDirectiveTestBase;
-use Tests\Utils\Models\User;
-use Tests\Utils\Policies\UserPolicy;
 
 class CanModelDirectiveTest extends CanDirectiveTestBase
 {
-    static function getSchema(string $commonArgs): string
+    public static function getSchema(string $commonArgs): string
     {
         return /** @lang GraphQL */ "
             type Query {
                 user(foo: String): User
-                    @canModel($commonArgs)
+                    @canModel({$commonArgs})
                     @mock
             }
 

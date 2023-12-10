@@ -5,7 +5,6 @@ namespace Auth;
 use Nuwave\Lighthouse\Auth\CanDirective;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Tests\DBTestCase;
-use Tests\Utils\Models\Company;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
