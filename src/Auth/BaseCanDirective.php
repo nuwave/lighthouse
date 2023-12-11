@@ -85,7 +85,7 @@ GRAPHQL;
         $fieldValue->wrapResolver(fn (callable $resolver): \Closure => function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $ability) {
             $gate = $this->gate->forUser($context->user());
             $checkArguments = $this->buildCheckArguments($args);
-            $authorizeModel = fn (string|object|array|null $model) => $this->authorizeModel($gate, $ability, $model, $checkArguments);
+            $authorizeModel = fn (mixed $model) => $this->authorizeModel($gate, $ability, $model, $checkArguments);
 
             try {
                 return $this->authorizeRequest($root, $args, $context, $resolveInfo, $resolver, $authorizeModel);
@@ -107,7 +107,11 @@ GRAPHQL;
     /**
      * Authorizes request and resolves the field.
      *
+     * @phpstan-import-type Resolver from \Nuwave\Lighthouse\Schema\Values\FieldValue as Resolver
+     *
      * @param  array<string, mixed>  $args
+     * @param  callable(mixed, array<string, mixed>, \Nuwave\Lighthouse\Support\Contracts\GraphQLContext, \Nuwave\Lighthouse\Execution\ResolveInfo): mixed $resolver
+     * @param  callable(mixed): void  $authorize
      */
     abstract protected function authorizeRequest(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo, callable $resolver, callable $authorize): mixed;
 
