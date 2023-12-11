@@ -46,7 +46,7 @@ abstract class BaseCanDirective extends BaseDirective implements FieldMiddleware
   """
   Value to return if the user is not authorized and `action` is `RETURN_VALUE`.
   """
-  return_value: CanArgs
+  returnValue: CanArgs
 GRAPHQL;
     }
 
@@ -96,7 +96,7 @@ GRAPHQL;
                 }
 
                 if ($action === 'RETURN_VALUE') {
-                    return $this->directiveArgValue('return_value');
+                    return $this->directiveArgValue('returnValue');
                 }
 
                 throw $e;

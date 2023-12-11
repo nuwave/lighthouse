@@ -223,7 +223,7 @@ When a user is not authorized to access a model, you may want to hide the existe
 This can be done by setting action to either EXCEPTION_NOT_AUTHORIZED or RETURN_VALUE. 
 
 In the first case it would always return the generic "not authorized" exception. 
-In the second case it would return value which you can specify in the `return_value` argument.
+In the second case it would return value which you can specify in the `returnValue` argument.
 
 ```graphql
 type Query {
@@ -231,7 +231,7 @@ type Query {
 }
 
 type User {
-    banned: Boolean! @canRoot(ability: "admin", action: RETURN_VALUE, return_value: false)
+    banned: Boolean! @canRoot(ability: "admin", action: RETURN_VALUE, returnValue: false)
 }
 ```
 

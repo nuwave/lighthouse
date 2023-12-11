@@ -62,7 +62,7 @@ abstract class CanDirectiveTestBase extends TestCase
 
     public function testReturnsValue(): void
     {
-        $this->schema = $this->getSchema('ability: "superAdminOnly", action: RETURN_VALUE, return_value: null');
+        $this->schema = $this->getSchema('ability: "superAdminOnly", action: RETURN_VALUE, returnValue: null');
 
         $this->graphQL($this->getQuery())->assertJson([
             'data' => [

@@ -68,7 +68,7 @@ final class CanRootDirectiveTest extends CanDirectiveTestBase
     {
         $this->mockResolver(fn (): User => $this->resolveUser());
 
-        $this->schema = $this->getSchema('ability: "superAdminOnly", action: RETURN_VALUE, return_value: "concealed"');
+        $this->schema = $this->getSchema('ability: "superAdminOnly", action: RETURN_VALUE, returnValue: "concealed"');
 
         $this->graphQL($this->getQuery())->assertJson([
             'data' => [
