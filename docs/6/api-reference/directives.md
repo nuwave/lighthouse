@@ -2293,22 +2293,22 @@ The following example shows how one can namespace queries and mutations.
 
 ```graphql
 type Query {
-    post: PostQueries! @namespaced
+  post: PostQueries! @namespaced
 }
 
 type PostQueries {
-    find(id: ID! @whereKey): Post @find
-    list(title: String @where(operator: "like")): [Post!]! @paginate
+  find(id: ID! @whereKey): Post @find
+  list(title: String @where(operator: "like")): [Post!]! @paginate
 }
 
 type Mutation {
-    post: PostMutations! @namespaced
+  post: PostMutations! @namespaced
 }
 
 type PostMutations {
-    create(input: PostCreateInput! @spread): Post! @create
-    update(input: PostUpdateInput! @spread): Post! @update
-    delete(id: ID! @whereKey): Post! @delete
+  create(input: PostCreateInput! @spread): Post! @create
+  update(input: PostUpdateInput! @spread): Post! @update
+  delete(id: ID! @whereKey): Post! @delete
 }
 ```
 
