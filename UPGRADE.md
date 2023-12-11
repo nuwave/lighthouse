@@ -35,10 +35,10 @@ The `@can` directive was removed in favor of more specialized directives:
 
 ```diff
 type Mutation {
--   createPost(input: PostInput): Post @can(ability: "create")
-+   createPost(input: PostInput): Post @canModel(ability: "create")
--   editPost(input: PostInput): Post @can(find: "input.id", ability: "edit")
-+   editPost(input: PostInput): Post @canFind(find: "input.id", ability: "edit")
+-   createPost(input: PostInput! @spread): Post! @can(ability: "create") @create
++   createPost(input: PostInput! @spread): Post! @canModel(ability: "create") @create
+-   updatePost(input: PostInput! @spread): Post! @can(find: "input.id", ability: "edit") @update
++   updatePost(input: PostInput! @spread): Post! @canFind(find: "input.id", ability: "edit") @update
 -   deletePosts(ids: [ID!]! @whereKey): [Post!]! @can(query: true, ability: "delete") @delete
 +   deletePosts(ids: [ID!]! @whereKey): [Post!]! @canQuery(ability: "delete") @delete
 }
