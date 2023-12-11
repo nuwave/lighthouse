@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.28.0
+
+### Added
+
+- Mark common pagination types as `@shareable` for Apollo Federation v2 https://github.com/nuwave/lighthouse/pull/2485
+
 ## v6.27.0
 
 ### Added
