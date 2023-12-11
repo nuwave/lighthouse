@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.26.1
+
+### Fixed
+
+- Add `scalar link__Import` and `enum link__Purpose` to `@link` definition https://github.com/nuwave/lighthouse/pull/2484
+
 ## v6.26.0
 
 ### Added
