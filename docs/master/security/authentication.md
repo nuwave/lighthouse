@@ -97,7 +97,7 @@ and thus executes before them.
 extend type Query {
   user: User!
     @guard
-    @can(ability: "adminOnly")
+    @canModel(ability: "adminOnly")
   ...
 }
 ```

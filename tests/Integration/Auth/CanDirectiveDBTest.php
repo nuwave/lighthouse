@@ -11,6 +11,7 @@ use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 use Tests\Utils\Policies\UserPolicy;
 
+/** TODO remove with v7 */
 final class CanDirectiveDBTest extends DBTestCase
 {
     public function testQueriesForSpecificModel(): void

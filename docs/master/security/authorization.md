@@ -57,7 +57,7 @@ limited to seeing just those.
 ## Restrict fields through policies
 
 Lighthouse allows you to restrict field operations to a certain group of users.
-Use the [@can*](../api-reference/directives.md#can-family-of-directives) family of directives
+Use the [@can* family of directives](../api-reference/directives.md#can-family-of-directives)
 to leverage [Laravel Policies](https://laravel.com/docs/authorization) for authorization.
 
 Starting from Laravel 5.7, [authorization of guest users](https://laravel.com/docs/authorization#guest-users) is supported.
@@ -282,11 +282,9 @@ GRAPHQL;
     public function handleField(FieldValue $fieldValue): void
     {
         $fieldValue->wrapResolver(fn (callable $resolver) => function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
-            $requiredRole = $this->directiveArgValue('requiredRole');
-            // Throw in case of an invalid schema definition to remind the developer
-            if ($requiredRole === null) {
-                throw new DefinitionException("Missing argument 'requiredRole' for directive '@canAccess'.");
-            }
+            $requiredRole = $this->directiveArgValue('requiredRole')
+                // Throw in case of an invalid schema definition to remind the developer
+                ?? throw new DefinitionException("Missing argument 'requiredRole' for directive '@canAccess'.");
 
             $user = $context->user();
             if (

@@ -48,7 +48,7 @@ See [this issue](https://github.com/nuwave/lighthouse/issues/900) for further di
 ## Security considerations
 
 Lighthouse has no mechanism for fine-grained permissions of nested mutation operations.
-Field directives such as [@can*](../api-reference/directives.md#can-family-of-directives) apply to the whole field.
+Field directives such as the [@can* family of directives](../api-reference/directives.md#can-family-of-directives) apply to the whole field.
 
 Make sure that fields with nested mutations are only available to users who are allowed
 to execute all reachable nested mutations.
