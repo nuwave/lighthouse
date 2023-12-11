@@ -45,13 +45,9 @@ class FederationHelper
         return $schemaDirectives;
     }
 
-    public static function isUsingFederationV2(Schema|DocumentAST $schemaOrDocument): bool
+    public static function isUsingFederationV2(DocumentAST $documentAST): bool
     {
-        $schemaExtensionNodes = $schemaOrDocument instanceof Schema
-            ? $schemaOrDocument->extensionASTNodes
-            : $schemaOrDocument->schemaExtensions;
-
-        foreach ($schemaExtensionNodes as $extension) {
+        foreach ($documentAST->schemaExtensions as $extension) {
             foreach (ASTHelper::directiveDefinitions($extension, 'link') as $directive) {
                 $url = ASTHelper::directiveArgValue($directive, 'url');
 
