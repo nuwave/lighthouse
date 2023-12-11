@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Federation;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Type\Schema;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 
 class FederationHelper
 {
@@ -42,5 +43,20 @@ class FederationHelper
         }
 
         return $schemaDirectives;
+    }
+
+    public static function isUsingFederationV2(DocumentAST $documentAST): bool
+    {
+        foreach ($documentAST->schemaExtensions as $extension) {
+            foreach (ASTHelper::directiveDefinitions($extension, 'link') as $directive) {
+                $url = ASTHelper::directiveArgValue($directive, 'url');
+
+                if (str_starts_with($url, 'https://specs.apollo.dev/federation/v2')) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

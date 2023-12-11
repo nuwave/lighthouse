@@ -8,6 +8,10 @@ use Tests\TestCase;
 
 final class FederationSchemaTest extends TestCase
 {
+    private const FEDERATION_V2_SCHEMA_EXTENSION = /** @lang GraphQL */ <<<'GRAPHQL'
+extend schema @link(url: "https:\/\/specs.apollo.dev\/federation\/v2.3", import: ["@composeDirective", "@extends", "@external", "@inaccessible", "@interfaceObject", "@key", "@override", "@provides", "@requires", "@shareable", "@tag"])
+GRAPHQL;
+
     protected function getPackageProviders($app): array
     {
         return array_merge(
@@ -125,6 +129,51 @@ GRAPHQL;
         $this->assertStringContainsString('directive @foo on FIELD_DEFINITION', $sdl);
         $this->assertStringContainsString('directive @bar on FIELD_DEFINITION', $sdl);
         $this->assertStringContainsString($typeFoo, $sdl);
+    }
+
+    public function testPaginationTypesAreNotMarkedAsSharableWhenUsingFederationV1(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        type User @key(fields: "id") {
+            id: ID!
+        }
+
+        type Query {
+            users1: [User!]! @paginate
+            users2: [User!]! @paginate(type: CONNECTION)
+            users3: [User!]! @paginate(type: SIMPLE)
+        }
+        GRAPHQL;
+
+        $sdl = $this->_serviceSdl();
+
+        $this->assertStringContainsString('type PaginatorInfo {', $sdl);
+        $this->assertStringContainsString('type PageInfo {', $sdl);
+        $this->assertStringContainsString('type SimplePaginatorInfo {', $sdl);
+        $this->assertStringNotContainsString('@shareable', $sdl);
+    }
+
+    public function testPaginationTypesAreMarkedAsSharableWhenUsingFederationV2(): void
+    {
+        $schema = /** @lang GraphQL */ <<<GRAPHQL
+        type User @key(fields: "id") {
+            id: ID!
+        }
+
+        type Query {
+            users1: [User!]! @paginate
+            users2: [User!]! @paginate(type: CONNECTION)
+            users3: [User!]! @paginate(type: SIMPLE)
+        }
+        GRAPHQL;
+
+        $this->schema = self::FEDERATION_V2_SCHEMA_EXTENSION . $schema;
+
+        $sdl = $this->_serviceSdl();
+
+        $this->assertStringContainsString('type PaginatorInfo @shareable {', $sdl);
+        $this->assertStringContainsString('type PageInfo @shareable {', $sdl);
+        $this->assertStringContainsString('type SimplePaginatorInfo @shareable {', $sdl);
     }
 
     protected function _serviceSdl(): string
