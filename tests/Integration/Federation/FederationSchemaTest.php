@@ -8,7 +8,7 @@ use Tests\TestCase;
 
 final class FederationSchemaTest extends TestCase
 {
-    protected const FEDERATION_V2_SCHEMA_EXTENSION = /** @lang GraphQL */ <<<'GRAPHQL'
+    private const FEDERATION_V2_SCHEMA_EXTENSION = /** @lang GraphQL */ <<<'GRAPHQL'
 extend schema @link(url: "https:\/\/specs.apollo.dev\/federation\/v2.3", import: ["@composeDirective", "@extends", "@external", "@inaccessible", "@interfaceObject", "@key", "@override", "@provides", "@requires", "@shareable", "@tag"])
 GRAPHQL;
 
