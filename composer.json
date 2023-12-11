@@ -73,14 +73,14 @@
         "thecodingmachine/phpstan-safe-rule": "^1.2"
     },
     "suggest": {
+        "ext-protobuf": "Improve protobuf serialization performance (used for tracing)",
         "bensampo/laravel-enum": "Convenient enum definitions that can easily be registered in your Schema",
+        "google/protobuf": "Required when using the tracing driver federated-tracing",
         "laravel/pennant": "Required for the @feature directive",
         "laravel/scout": "Required for the @search directive",
         "mll-lab/graphql-php-scalars": "Useful scalar types, required for @whereConditions",
         "mll-lab/laravel-graphiql": "A graphical interactive in-browser GraphQL IDE - integrated with Laravel",
-        "pusher/pusher-php-server": "Required when using the Pusher Subscriptions driver",
-        "google/protobuf": "Required when using the tracing driver federated-tracing",
-        "ext-protobuf": "Improve protobuf serialization performance (used for tracing)"
+        "pusher/pusher-php-server": "Required when using the Pusher Subscriptions driver"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
