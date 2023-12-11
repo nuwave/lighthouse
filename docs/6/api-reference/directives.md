@@ -1193,7 +1193,7 @@ directive @find(
 
 ```graphql
 type Query {
-  userById(id: ID! @eq): User @find
+  userById(id: ID! @whereKey): User @find
 }
 ```
 
@@ -1204,7 +1204,7 @@ If your model does not sit in the default namespace, you can overwrite it.
 
 ```graphql
 type Query {
-  userById(id: ID! @eq): User @find(model: "App\\Authentication\\User")
+  userById(id: ID! @whereKey): User @find(model: "App\\Authentication\\User")
 }
 ```
 
@@ -1459,7 +1459,7 @@ own mechanism of encoding/decoding global ids.
 
 ```graphql
 """
-Run authentication through one or more guards.
+Run authentication through one or more guards from `config/auth.php`.
 
 This is run per field and may allow unauthenticated
 users to still receive partial results.
@@ -1495,7 +1495,7 @@ on all of them at once.
 extend type Query @guard { ... }
 ```
 
-The `@guard` directive will be prepended to other directives defined on the fields
+The [@guard](#guard) directive will be prepended to other directives defined on the fields
 and thus executes before them.
 
 ```graphql
@@ -2293,22 +2293,22 @@ The following example shows how one can namespace queries and mutations.
 
 ```graphql
 type Query {
-    post: PostQueries! @namespaced
+  post: PostQueries! @namespaced
 }
 
 type PostQueries {
-    find(id: ID! @whereKey): Post @find
-    list(title: String @where(operator: "like")): [Post!]! @paginate
+  find(id: ID! @whereKey): Post @find
+  list(title: String @where(operator: "like")): [Post!]! @paginate
 }
 
 type Mutation {
-    post: PostMutations! @namespaced
+  post: PostMutations! @namespaced
 }
 
 type PostMutations {
-    create(input: PostCreateInput! @spread): Post! @create
-    update(input: PostUpdateInput! @spread): Post! @update
-    delete(id: ID! @whereKey): Post! @delete
+  create(input: PostCreateInput! @spread): Post! @create
+  update(input: PostUpdateInput! @spread): Post! @update
+  delete(id: ID! @whereKey): Post! @delete
 }
 ```
 
@@ -2400,7 +2400,7 @@ directive @node(
 ) on OBJECT
 ```
 
-When you use `@node` on a type, Lighthouse will add a field `node` to the root Query type.
+When you use [@node](#node) on a type, Lighthouse will add a field `node` to the root Query type.
 If you want to customize its description, change the resolver or add middleware, you can add it yourself like this:
 
 ```graphql
@@ -2931,7 +2931,7 @@ final class Blog
 
 You can provide your own function that resolves the field by directly returning data in a `\Illuminate\Contracts\Pagination\Paginator` instance.
 
-This is mutually exclusive with `builder` and `model`. Not compatible with `scopes` and builder arguments such as `@eq`.
+This is mutually exclusive with `builder` and `model`. Not compatible with `scopes` and builder arguments such as [@eq](#eq).
 
 ```graphql
 type Query {
@@ -4094,4 +4094,4 @@ type User {
 }
 ```
 
-If you just want to return the count itself as-is, use [`@count`](#count).
+If you just want to return the count itself as-is, use [@count](#count).
