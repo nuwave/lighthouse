@@ -8,7 +8,7 @@ use Tests\TestCase;
 
 final class FederationSchemaTest extends TestCase
 {
-    protected string $federationV2SchemaExtension = /** @lang GraphQL */ <<<'GRAPHQL'
+    protected const FEDERATION_V2_SCHEMA_EXTENSION = /** @lang GraphQL */ <<<'GRAPHQL'
 extend schema @link(url: "https:\/\/specs.apollo.dev\/federation\/v2.3", import: ["@composeDirective", "@extends", "@external", "@inaccessible", "@interfaceObject", "@key", "@override", "@provides", "@requires", "@shareable", "@tag"])
 GRAPHQL;
 
@@ -155,9 +155,7 @@ GRAPHQL;
 
     public function testPaginationTypesAreMarkedAsSharableWhenUsingFederationV2(): void
     {
-        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
-        {$this->federationV2SchemaExtension}
-
+        $schema = /** @lang GraphQL */ <<<GRAPHQL
         type User @key(fields: "id") {
             id: ID!
         }
@@ -168,6 +166,8 @@ GRAPHQL;
             users3: [User!]! @paginate(type: SIMPLE)
         }
         GRAPHQL;
+
+        $this->schema = self::FEDERATION_V2_SCHEMA_EXTENSION . $schema;
 
         $sdl = $this->_serviceSdl();
 
