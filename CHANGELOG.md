@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Split up `@can` directive into `@canFind`, `@canModel`, `@canQuery`, `@canResolved` and `@canRoot` https://github.com/nuwave/lighthouse/pull/2483
+- Added `action` and `returnValue` arguments to `@can*` family of directives https://github.com/nuwave/lighthouse/pull/2483
+- Allows using any objects in `@can*` family of directives https://github.com/nuwave/lighthouse/pull/2483
+
 ## v6.26.1
 
 ### Fixed

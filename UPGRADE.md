@@ -24,6 +24,36 @@ It will prevent the following type of HTTP requests:
 - `GET` requests
 - `POST` requests that can be created using HTML forms
 
+### `@can` directive is replaced with `@can*` directives
+
+The `@can` directive was removed in favor of more specialized directives:
+- with `find` field set: `@canFind`
+- with `query` field set: `@canQuery`
+- with `root` field set: `@canRoot`
+- with `resolved` field set: `@canResolved`
+- if none of the above are set: `@canModel`
+
+```diff
+type Mutation {
+-   createPost(input: PostInput! @spread): Post! @can(ability: "create") @create
++   createPost(input: PostInput! @spread): Post! @canModel(ability: "create") @create
+-   updatePost(input: PostInput! @spread): Post! @can(find: "input.id", ability: "edit") @update
++   updatePost(input: PostInput! @spread): Post! @canFind(find: "input.id", ability: "edit") @update
+-   deletePosts(ids: [ID!]! @whereKey): [Post!]! @can(query: true, ability: "delete") @delete
++   deletePosts(ids: [ID!]! @whereKey): [Post!]! @canQuery(ability: "delete") @delete
+}
+
+type Query {
+-   posts: [Post!]! @can(resolved: true, ability: "view") @paginate
++   posts: [Post!]! @canResolved(ability: "view") @paginate
+}
+
+type Post {
+-   sensitiveInformation: String @can(root: true, ability: "admin")
++   sensitiveInformation: String @canRoot(ability: "admin")
+}
+```
+
 ## v5 to v6
 
 ### `messages` on `@rules` and `@rulesForArray`
