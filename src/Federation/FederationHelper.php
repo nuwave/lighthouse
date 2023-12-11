@@ -55,7 +55,7 @@ class FederationHelper
             foreach (ASTHelper::directiveDefinitions($extension, 'link') as $directive) {
                 $url = ASTHelper::directiveArgValue($directive, 'url');
 
-                if (str_starts_with($url, 'https://specs.apollo.dev/federation/')) {
+                if (str_starts_with($url, 'https://specs.apollo.dev/federation/v2')) {
                     return true;
                 }
             }
