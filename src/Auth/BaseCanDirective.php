@@ -50,7 +50,7 @@ abstract class BaseCanDirective extends BaseDirective implements FieldMiddleware
 GRAPHQL;
     }
 
-    public static function definition(): string
+    public static function commonTypes(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """

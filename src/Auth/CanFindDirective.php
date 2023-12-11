@@ -19,8 +19,11 @@ class CanFindDirective extends BaseCanDirective
     public static function definition(): string
     {
         $commonArguments = BaseCanDirective::commonArguments();
+        $commonTypes = BaseCanDirective::commonTypes();
 
         return /** @lang GraphQL */ <<<GRAPHQL
+{$commonTypes}
+
 """
 Check a Laravel Policy to ensure the current user is authorized to access a field.
 
