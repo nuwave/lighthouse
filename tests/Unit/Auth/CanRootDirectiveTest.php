@@ -70,7 +70,7 @@ final class CanRootDirectiveTest extends CanDirectiveTestBase
 
         $this->schema = $this->getSchema('ability: "superAdminOnly", action: RETURN_VALUE, returnValue: "concealed"');
 
-        $this->graphQL($this->getQuery())->assertJson([
+        $this->query()->assertJson([
             'data' => [
                 'user' => [
                     'name' => 'concealed',
@@ -89,7 +89,7 @@ final class CanRootDirectiveTest extends CanDirectiveTestBase
 
         $this->schema = $this->getSchema('ability: "view"');
 
-        $this->graphQL($this->getQuery())->assertJson([
+        $this->query()->assertJson([
             'data' => [
                 'user' => [
                     'name' => 'foo',
@@ -115,7 +115,7 @@ final class CanRootDirectiveTest extends CanDirectiveTestBase
 
         $this->schema = $this->getSchema('ability: "customObject"');
 
-        $this->graphQL($this->getQuery())->assertJson([
+        $this->query()->assertJson([
             'data' => [
                 'user' => [
                     'name' => 'foo',
@@ -139,7 +139,7 @@ final class CanRootDirectiveTest extends CanDirectiveTestBase
 
         $this->schema = $this->getSchema('ability: "customArray"');
 
-        $this->graphQL($this->getQuery())->assertJson([
+        $this->query()->assertJson([
             'data' => [
                 'user' => [
                     'name' => 'foo',
@@ -169,7 +169,7 @@ final class CanRootDirectiveTest extends CanDirectiveTestBase
             }
         ';
 
-        $this->graphQL($this->getQuery())->assertJson([
+        $this->query()->assertJson([
             'data' => [
                 'user' => [
                     'name' => 'foo',

@@ -62,7 +62,7 @@ final class CanResolvedDirectiveTest extends CanDirectiveTestBase
 
         $this->schema = $this->getSchema('ability: "view"');
 
-        $this->graphQL($this->getQuery())->assertJson([
+        $this->query()->assertJson([
             'data' => [
                 'user' => [
                     'name' => 'foo',

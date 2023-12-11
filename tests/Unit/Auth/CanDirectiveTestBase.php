@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Auth;
 
+use Illuminate\Testing\TestResponse;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Tests\TestCase;
 use Tests\Utils\Models\User;
@@ -22,13 +23,18 @@ abstract class CanDirectiveTestBase extends TestCase
         ';
     }
 
+    protected function query(?string $foo = null): TestResponse
+    {
+        return $this->graphQL($this->getQuery(), ['foo' => $foo]);
+    }
+
     public function testThrowsIfNotAuthorized(): void
     {
         $this->be(new User());
 
         $this->schema = $this->getSchema('ability: "adminOnly"');
 
-        $this->graphQL($this->getQuery())->assertGraphQLErrorMessage(AuthorizationException::MESSAGE);
+        $this->query()->assertGraphQLErrorMessage(AuthorizationException::MESSAGE);
     }
 
     public function testThrowsWithCustomMessageIfNotAuthorized(): void
@@ -37,7 +43,7 @@ abstract class CanDirectiveTestBase extends TestCase
 
         $this->schema = $this->getSchema('ability: "superAdminOnly"');
 
-        $this->graphQL($this->getQuery())->assertGraphQLErrorMessage(UserPolicy::SUPER_ADMINS_ONLY_MESSAGE);
+        $this->query()->assertGraphQLErrorMessage(UserPolicy::SUPER_ADMINS_ONLY_MESSAGE);
     }
 
     public function testThrowsFirstWithCustomMessageIfNotAuthorized(): void
@@ -46,7 +52,7 @@ abstract class CanDirectiveTestBase extends TestCase
 
         $this->schema = $this->getSchema('ability: ["superAdminOnly", "adminOnly"]');
 
-        $this->graphQL($this->getQuery())->assertGraphQLErrorMessage(UserPolicy::SUPER_ADMINS_ONLY_MESSAGE);
+        $this->query()->assertGraphQLErrorMessage(UserPolicy::SUPER_ADMINS_ONLY_MESSAGE);
     }
 
     public function testConcealsCustomMessage(): void
@@ -55,16 +61,14 @@ abstract class CanDirectiveTestBase extends TestCase
 
         $this->schema = $this->getSchema('ability: "superAdminOnly", action: EXCEPTION_NOT_AUTHORIZED');
 
-        $this
-            ->graphQL($this->getQuery())
-            ->assertGraphQLErrorMessage(AuthorizationException::MESSAGE);
+        $this->query()->assertGraphQLErrorMessage(AuthorizationException::MESSAGE);
     }
 
     public function testReturnsValue(): void
     {
         $this->schema = $this->getSchema('ability: "superAdminOnly", action: RETURN_VALUE, returnValue: null');
 
-        $this->graphQL($this->getQuery())->assertJson([
+        $this->query()->assertJson([
             'data' => [
                 'user' => null,
             ],
@@ -81,7 +85,7 @@ abstract class CanDirectiveTestBase extends TestCase
 
         $this->schema = $this->getSchema('ability: "adminOnly"');
 
-        $this->graphQL($this->getQuery())->assertJson([
+        $this->query()->assertJson([
             'data' => [
                 'user' => [
                     'name' => 'foo',
@@ -96,7 +100,7 @@ abstract class CanDirectiveTestBase extends TestCase
 
         $this->schema = $this->getSchema('ability: "guestOnly"');
 
-        $this->graphQL($this->getQuery())->assertJson([
+        $this->query()->assertJson([
             'data' => [
                 'user' => [
                     'name' => 'foo',
@@ -115,7 +119,7 @@ abstract class CanDirectiveTestBase extends TestCase
 
         $this->schema = $this->getSchema('ability: ["adminOnly", "alwaysTrue"]');
 
-        $this->graphQL($this->getQuery())->assertJson([
+        $this->query()->assertJson([
             'data' => [
                 'user' => [
                     'name' => 'foo',
@@ -128,7 +132,7 @@ abstract class CanDirectiveTestBase extends TestCase
     {
         $this->schema = $this->getSchema('ability: "dependingOnArg", args: [false]');
 
-        $this->graphQL($this->getQuery())->assertGraphQLErrorMessage(AuthorizationException::MESSAGE);
+        $this->query()->assertGraphQLErrorMessage(AuthorizationException::MESSAGE);
     }
 
     public function testInjectArgsPassesClientArgumentToPolicy(): void
@@ -139,7 +143,7 @@ abstract class CanDirectiveTestBase extends TestCase
 
         $this->schema = $this->getSchema('ability: "injectArgs", injectArgs: [true]');
 
-        $this->graphQL($this->getQuery(), ['foo' => 'bar'])->assertJson([
+        $this->query('bar')->assertJson([
             'data' => [
                 'user' => [
                     'name' => 'foo',
@@ -156,7 +160,7 @@ abstract class CanDirectiveTestBase extends TestCase
 
         $this->schema = $this->getSchema('ability: "argsWithInjectedArgs", args: { foo: "static" }, injectArgs: true');
 
-        $this->graphQL($this->getQuery(), ['foo' => 'dynamic'])->assertJson([
+        $this->query('dynamic')->assertJson([
             'data' => [
                 'user' => [
                     'name' => 'foo',
