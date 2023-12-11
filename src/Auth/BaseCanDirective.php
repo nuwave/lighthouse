@@ -110,7 +110,7 @@ GRAPHQL;
      * @phpstan-import-type Resolver from \Nuwave\Lighthouse\Schema\Values\FieldValue as Resolver
      *
      * @param  array<string, mixed>  $args
-     * @param  callable(mixed, array<string, mixed>, \Nuwave\Lighthouse\Support\Contracts\GraphQLContext, \Nuwave\Lighthouse\Execution\ResolveInfo): mixed $resolver
+     * @param  callable(mixed, array<string, mixed>, \Nuwave\Lighthouse\Support\Contracts\GraphQLContext, \Nuwave\Lighthouse\Execution\ResolveInfo): mixed  $resolver
      * @param  callable(mixed): void  $authorize
      */
     abstract protected function authorizeRequest(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo, callable $resolver, callable $authorize): mixed;
