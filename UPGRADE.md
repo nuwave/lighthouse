@@ -388,11 +388,10 @@ class SomeField
 
 ### Replace `@middleware` with `@guard` and specialized FieldMiddleware
 
-The `@middleware` directive has been removed, as it violates the boundary between HTTP and GraphQL
-request handling.
+The `@middleware` directive has been removed, as it violates the boundary between HTTP and GraphQL request handling.
+Laravel middleware acts upon the HTTP request as a whole, whereas field middleware must only apply to a part of it. 
 
-Authentication is one of most common use cases for `@middleware`. You can now use
-the [@guard](docs/master/api-reference/directives.md#guard) directive on selected fields.
+If you used `@middleware` for authentication, replace it with [@guard](docs/master/api-reference/directives.md#guard):
 
 ```diff
 type Query {
@@ -404,6 +403,8 @@ type Query {
 Note that [@guard](docs/master/api-reference/directives.md#guard) does not log in users.
 To ensure the user is logged in, add the `AttemptAuthenticate` middleware to your `lighthouse.php`
 middleware config, see the [default config](src/lighthouse.php) for an example.
+
+If you used `@middleware` for authorization, replace it with [@can](docs/master/api-reference/directives.md#can).
 
 Other functionality can be replaced by a custom [`FieldMiddleware`](docs/master/custom-directives/field-directives.md#fieldmiddleware)
 directive. Just like Laravel Middleware, it can wrap around individual field resolvers.
