@@ -23,7 +23,7 @@ final class CanFindDirectiveDBTest extends DBTestCase
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            user(id: ID @whereKey): User
+            user(id: ID! @whereKey): User
                 @canFind(ability: "view", find: "id")
                 @first
         }
@@ -62,7 +62,7 @@ final class CanFindDirectiveDBTest extends DBTestCase
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            user(id: ID @whereKey): User
+            user(id: ID! @whereKey): User
                 @canFind(ability: "view", find: "id")
                 @mock
         }
@@ -102,7 +102,7 @@ final class CanFindDirectiveDBTest extends DBTestCase
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            user(id: ID @whereKey): User
+            user(id: ID! @whereKey): User
                 @canFind(ability: "view", find: "id", action: EXCEPTION_NOT_AUTHORIZED)
                 @mock
         }
@@ -140,7 +140,7 @@ final class CanFindDirectiveDBTest extends DBTestCase
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            user(id: ID @whereKey): User
+            user(id: ID! @whereKey): User
                 @canFind(ability: "view", find: "id", findOrFail: false)
                 @mock
         }
@@ -198,7 +198,7 @@ final class CanFindDirectiveDBTest extends DBTestCase
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            user(input: FindUserInput): User
+            user(input: FindUserInput!): User
                 @canFind(ability: "view", find: "input.id")
                 @first
         }

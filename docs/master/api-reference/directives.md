@@ -638,7 +638,7 @@ action: CanAction! = EXCEPTION_PASS
 """
 Value to return if the user is not authorized and `action` is `RETURN_VALUE`.
 """
-return_value: CanArgs
+returnValue: CanArgs
 """
 ```
 
@@ -661,7 +661,7 @@ enum CanAction {
     EXCEPTION_NOT_AUTHORIZED
 
     """
-    Return the value specified in `value` argument to conceal the real error.
+    Return the value specified in `returnValue` argument to conceal the real error.
     """
     RETURN_VALUE
 }

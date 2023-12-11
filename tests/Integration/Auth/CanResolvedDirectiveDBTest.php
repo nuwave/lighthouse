@@ -110,7 +110,7 @@ final class CanResolvedDirectiveDBTest extends DBTestCase
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            user(id: ID @whereKey): User
+            user(id: ID! @whereKey): User
                 @canResolved(ability: "view")
                 @find
         }

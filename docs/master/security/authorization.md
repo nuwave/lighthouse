@@ -94,11 +94,12 @@ They will query the database and check the specified policy against the result.
 
 ```graphql
 type Mutation {
-  editPost(input: PostInput): Post @canFind(ability: "edit", find: "input.id")
+  updatePost(input: UpdatePostInput! @spread): Post! @canFind(ability: "edit", find: "input.id") @update
 }
 
 input PostInput {
     id: ID!
+    title: String    
 }
 ```
 
@@ -147,7 +148,7 @@ This example shows how to restrict reading the `email` field to only the user it
 
 ```graphql
 type Query {
-  user(id: ID! @whereKey: User @find
+  user(id: ID! @whereKey): User @find
 }
 
 type User {
@@ -171,7 +172,8 @@ You can pass additional arguments to the policy checks by specifying them as `ar
 
 ```graphql
 type Mutation {
-  createPost(input: PostInput): Post
+  createPost(input: CreatePostInput! @spread): Post!
+    @create
     @canModel(ability: "create", args: ["FROM_GRAPHQL"])
 }
 ```
@@ -191,7 +193,7 @@ with the `injectArgs` argument:
 
 ```graphql
 type Mutation {
-  createPost(title: String!): Post @canModel(ability: "create", injectArgs: true)
+  createPost(title: String!): Post @canModel(ability: "create", injectArgs: true) @create
 }
 ```
 
@@ -225,7 +227,7 @@ In the second case it would return value which you can specify in the `return_va
 
 ```graphql
 type Query {
-  user(id: ID! @eq): User @find
+  user(id: ID! @whereKey): User @find
 }
 
 type User {
