@@ -60,12 +60,11 @@ class RulesGatherer
                 Utils::instanceofMatcher(ArgDirective::class),
             );
 
-            if (
-                $argument->type instanceof ListType
-                && is_array($argument->value)
-            ) {
-                foreach ($argument->value as $index => $value) {
-                    $this->handleArgumentValue($value, $directivesForArgument, array_merge($nestedPath, [$index]));
+            if ($argument->type instanceof ListType) {
+                if (is_array($argument->value)) {
+                    foreach ($argument->value as $index => $value) {
+                        $this->handleArgumentValue($value, $directivesForArgument, array_merge($nestedPath, [$index]));
+                    }
                 }
             } else {
                 $this->handleArgumentValue($argument->value, $directivesForArgument, $nestedPath);
