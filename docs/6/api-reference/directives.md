@@ -604,68 +604,86 @@ You can find usage examples of this directive in [the caching docs](../performan
 
 ## @can
 
+Deprecated. Use the [@can* family of directives](#can-family-of-directives) instead.
+
+## @can* family of directives
+
+All @can* directives have common arguments. These arguments specify how gates are checked and what to do if the user is not authorized.
+Each directive has its own set of arguments that specify what to check against.
+
+```graphql
+  """
+The ability to check permissions for.
+"""
+ability: String!
+
+"""
+Pass along the client given input data as arguments to `Gate::check`.
+"""
+injectArgs: Boolean! = false
+
+"""
+Statically defined arguments that are passed to `Gate::check`.
+
+You may pass arbitrary GraphQL literals,
+e.g.: [1, 2, 3] or { foo: "bar" }
+"""
+args: CanArgs
+
+"""
+Action to do if the user is not authorized.
+"""
+action: CanAction! = EXCEPTION_PASS
+
+"""
+Value to return if the user is not authorized and `action` is `RETURN_VALUE`.
+"""
+returnValue: CanArgs
+"""
+```
+
+Types are specified as:
+```graphql
+"""
+Any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
+"""
+scalar CanArgs
+
+enum CanAction {
+    """
+    Pass exception to the client.
+    """
+    EXCEPTION_PASS
+
+    """
+    Throw generic "not authorized" exception to conceal the real error.
+    """
+    EXCEPTION_NOT_AUTHORIZED
+
+    """
+    Return the value specified in `returnValue` argument to conceal the real error.
+    """
+    RETURN_VALUE
+}
+```
+
+You can find usage examples of these directives in [the authorization docs](../security/authorization.md#restrict-fields-through-policies).
+
+### @canFind
+
 ```graphql
 """
 Check a Laravel Policy to ensure the current user is authorized to access a field.
 
-When `injectArgs` and `args` are used together, the client given
-arguments will be passed before the static args.
+Query for specific model instances to check the policy against, using primary key(s) from specified argument.
 """
-directive @can(
+directive @canFind(
   """
-  The ability to check permissions for.
-  """
-  ability: String!
-
-  """
-  Check the policy against the model instances returned by the field resolver.
-  Only use this if the field does not mutate data, it is run before checking.
-
-  Mutually exclusive with `query`, `find`, and `root`.
-  """
-  resolved: Boolean! = false
-
-  """
-  Specify the class name of the model to use.
-  This is only needed when the default model detection does not work.
-  """
-  model: String
-
-  """
-  Pass along the client given input data as arguments to `Gate::check`.
-  """
-  injectArgs: Boolean! = false
-
-  """
-  Statically defined arguments that are passed to `Gate::check`.
-
-  You may pass arbitrary GraphQL literals,
-  e.g.: [1, 2, 3] or { foo: "bar" }
-  """
-  args: CanArgs
-
-  """
-  Query for specific model instances to check the policy against, using arguments
-  with directives that add constraints to the query builder, such as `@eq`.
-
-  Mutually exclusive with `resolved`, `find`, and `root`.
-  """
-  query: Boolean! = false
-
-  """
-  Apply scopes to the underlying query.
-  """
-  scopes: [String!]
-
-  """
-  If your policy checks against specific model instances, specify
-  the name of the field argument that contains its primary key(s).
+  Specify the name of the field argument that contains its primary key(s).
 
   You may pass the string in dot notation to use nested inputs.
-
-  Mutually exclusive with `resolved`, `query`, and `root`.
   """
-  find: String
+  find: String!
 
   """
   Should the query fail when the models of `find` were not found?
@@ -673,40 +691,68 @@ directive @can(
   findOrFail: Boolean! = true
 
   """
-  If your policy should check against the root value.
-
-  Mutually exclusive with `resolved`, `query`, and `find`.
+  Apply scopes to the underlying query.
   """
-  root: Boolean! = false
+  scopes: [String!]
 ) repeatable on FIELD_DEFINITION
-
-"""
-Any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
-"""
-scalar CanArgs
 ```
 
-The name of the returned Type `Post` is used as the Model class, however you may overwrite this by
-passing the `model` argument:
+### canModel
 
 ```graphql
-type Mutation {
-  createBlogPost(input: PostInput!): BlogPost
-    @can(ability: "create", model: "App\\Post")
-}
+"""
+Check a Laravel Policy to ensure the current user is authorized to access a field.
+
+Check the policy against the root model.
+"""
+directive @canRoot(
+  """
+  The model name to check against.
+  """
+  model: String
+
+) repeatable on FIELD_DEFINITION
 ```
 
-Check the policy against the resolved model instances with the `resolved` argument:
+### @canQuery
 
 ```graphql
-type Query {
-  fetchUserByEmail(email: String! @eq): User
-    @can(ability: "view", resolved: true)
-    @find
-}
+"""
+Check a Laravel Policy to ensure the current user is authorized to access a field.
+
+Query for specific model instances to check the policy against, using arguments
+with directives that add constraints to the query builder, such as `@eq`.
+"""
+directive @canQuery(
+    """
+    Apply scopes to the underlying query.
+    """
+    scopes: [String!]
+) repeatable on FIELD_DEFINITION
 ```
 
-You can find usage examples of this directive in [the authorization docs](../security/authorization.md#restrict-fields-through-policies).
+### @canResolved
+
+```graphql
+"""
+Check a Laravel Policy to ensure the current user is authorized to access a field.
+
+Check the policy against the model instances returned by the field resolver.
+Only use this if the field does not mutate data, it is run before checking.
+"""
+directive @canResolved repeatable on FIELD_DEFINITION
+```
+
+### @canRoot
+    
+```graphql
+"""
+Check a Laravel Policy to ensure the current user is authorized to access a field.
+
+Check the policy against the root object.
+"""
+directive @canRoot repeatable on FIELD_DEFINITION
+```
 
 ## @clearCache
 
@@ -1193,7 +1239,7 @@ directive @find(
 
 ```graphql
 type Query {
-  userById(id: ID! @eq): User @find
+  userById(id: ID! @whereKey): User @find
 }
 ```
 
@@ -1204,7 +1250,7 @@ If your model does not sit in the default namespace, you can overwrite it.
 
 ```graphql
 type Query {
-  userById(id: ID! @eq): User @find(model: "App\\Authentication\\User")
+  userById(id: ID! @whereKey): User @find(model: "App\\Authentication\\User")
 }
 ```
 
@@ -1459,7 +1505,7 @@ own mechanism of encoding/decoding global ids.
 
 ```graphql
 """
-Run authentication through one or more guards.
+Run authentication through one or more guards from `config/auth.php`.
 
 This is run per field and may allow unauthenticated
 users to still receive partial results.
@@ -1495,7 +1541,7 @@ on all of them at once.
 extend type Query @guard { ... }
 ```
 
-The `@guard` directive will be prepended to other directives defined on the fields
+The [@guard](#guard) directive will be prepended to other directives defined on the fields
 and thus executes before them.
 
 ```graphql
@@ -2279,6 +2325,39 @@ extend type Query @namespace(field: "App\\Blog") {
 
 A [@namespace](#namespace) directive defined on a field directive wins in case of a conflict.
 
+## @namespaced
+
+```graphql
+"""
+Provides a no-op field resolver that allows nesting of queries and mutations.
+Useful to implement [namespacing by separation of concerns](https://www.apollographql.com/docs/technotes/TN0012-namespacing-by-separation-of-concern).
+"""
+directive @namespaced on FIELD_DEFINITION
+```
+
+The following example shows how one can namespace queries and mutations.
+
+```graphql
+type Query {
+  post: PostQueries! @namespaced
+}
+
+type PostQueries {
+  find(id: ID! @whereKey): Post @find
+  list(title: String @where(operator: "like")): [Post!]! @paginate
+}
+
+type Mutation {
+  post: PostMutations! @namespaced
+}
+
+type PostMutations {
+  create(input: PostCreateInput! @spread): Post! @create
+  update(input: PostUpdateInput! @spread): Post! @update
+  delete(id: ID! @whereKey): Post! @delete
+}
+```
+
 ## @neq
 
 ```graphql
@@ -2367,7 +2446,7 @@ directive @node(
 ) on OBJECT
 ```
 
-When you use `@node` on a type, Lighthouse will add a field `node` to the root Query type.
+When you use [@node](#node) on a type, Lighthouse will add a field `node` to the root Query type.
 If you want to customize its description, change the resolver or add middleware, you can add it yourself like this:
 
 ```graphql
@@ -2898,7 +2977,7 @@ final class Blog
 
 You can provide your own function that resolves the field by directly returning data in a `\Illuminate\Contracts\Pagination\Paginator` instance.
 
-This is mutually exclusive with `builder` and `model`. Not compatible with `scopes` and builder arguments such as `@eq`.
+This is mutually exclusive with `builder` and `model`. Not compatible with `scopes` and builder arguments such as [@eq](#eq).
 
 ```graphql
 type Query {
@@ -4061,4 +4140,4 @@ type User {
 }
 ```
 
-If you just want to return the count itself as-is, use [`@count`](#count).
+If you just want to return the count itself as-is, use [@count](#count).

@@ -32,23 +32,37 @@ Support for Apollo Federation v2 is `opt-in` and can be enabled by adding the fo
 See [the Apollo documentation on federated directives](https://www.apollographql.com/docs/federation/federated-types/federated-directives) for the latest spec.
 
 ```graphql
-extend schema @link(
-    url: "https://specs.apollo.dev/federation/v2.3",
+extend schema
+  @link(
+    url: "https://specs.apollo.dev/federation/v2.3"
     import: [
-        "@composeDirective",
-        "@extends",
-        "@external",
-        "@inaccessible",
-        "@interfaceObject",
-        "@key",
-        "@override",
-        "@provides",
-        "@requires",
-        "@shareable",
-        "@tag"
+      "@composeDirective"
+      "@extends"
+      "@external"
+      "@inaccessible"
+      "@interfaceObject"
+      "@key"
+      "@override"
+      "@provides"
+      "@requires"
+      "@shareable"
+      "@tag"
     ]
-)
+  )
 ```
+
+## Federated tracing
+
+In order to use federated tracing, you need to enabled [tracing](../performance/tracing.md)
+and set the driver to `Nuwave\Lighthouse\Tracing\FederatedTracing\FederatedTracing::class` in your `config/lighthouse.php`:
+
+```php
+'tracing' => [
+    'driver' => Nuwave\Lighthouse\Tracing\FederatedTracing\FederatedTracing::class,
+],
+```
+
+Note that federated tracing requires `google/protobuf` to be installed (for better performance you can also install the `protobuf` php extension).
 
 ### Unsupported features
 
@@ -61,13 +75,10 @@ You can only use the default names.
 
 ```graphql
 extend schema
-@link(
-    url: "https://specs.apollo.dev/federation/v2.3",
-    import: [
-        { name: "@key", as: "@uniqueKey" },
-        "@shareable"
-    ]
-)
+  @link(
+    url: "https://specs.apollo.dev/federation/v2.3"
+    import: [{ name: "@key", as: "@uniqueKey" }, "@shareable"]
+  )
 ```
 
 #### Namespaced directives
@@ -76,16 +87,10 @@ Using directives from a namespace without an import is not supported.
 You should import the directive and use the default name.
 
 ```graphql
-extend schema @link(
-    url: "https://specs.apollo.dev/federation/v2.3",
-    import: ["@key"]
-)
+extend schema
+  @link(url: "https://specs.apollo.dev/federation/v2.3", import: ["@key"])
 
 type Book @federation__shareable {
-    title: String!
+  title: String!
 }
 ```
-
-#### Federated tracing
-
-[Federated tracing](https://www.apollographql.com/docs/federation/metrics) is not supported.

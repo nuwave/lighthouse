@@ -9,9 +9,43 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.29.0
+
 ### Fixed
 
 - Return empty results for pagination `first: 0`
+
+## v6.28.0
+
+### Added
+
+- Mark common pagination types as `@shareable` for Apollo Federation v2 https://github.com/nuwave/lighthouse/pull/2485
+
+## v6.27.0
+
+### Added
+
+- Split up `@can` directive into `@canFind`, `@canModel`, `@canQuery`, `@canResolved` and `@canRoot` https://github.com/nuwave/lighthouse/pull/2483
+- Added `action` and `returnValue` arguments to `@can*` family of directives https://github.com/nuwave/lighthouse/pull/2483
+- Allows using any objects in `@can*` family of directives https://github.com/nuwave/lighthouse/pull/2483
+
+## v6.26.1
+
+### Fixed
+
+- Add `scalar link__Import` and `enum link__Purpose` to `@link` definition https://github.com/nuwave/lighthouse/pull/2484
+
+## v6.26.0
+
+### Added
+
+- Support federated tracing https://github.com/nuwave/lighthouse/pull/2479
+
+## v6.25.0
+
+### Added
+
+- Add `@namespaced` directive for namespacing by separation of concerns https://github.com/nuwave/lighthouse/pull/2469
 
 ## v6.24.0
 

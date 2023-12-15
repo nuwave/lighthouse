@@ -17,8 +17,7 @@ use Tests\TestCase;
 
 final class TypeRegistryTest extends TestCase
 {
-    /** @var \Nuwave\Lighthouse\Schema\TypeRegistry */
-    protected $typeRegistry;
+    protected TypeRegistry $typeRegistry;
 
     protected function setUp(): void
     {
