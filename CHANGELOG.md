@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.29.0
+
+### Fixed
+
+- Return empty results for pagination `first: 0`
+
 ## v6.28.0
 
 ### Added

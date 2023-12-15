@@ -5,18 +5,17 @@ namespace Nuwave\Lighthouse\Pagination;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Laravel\Scout\Builder as ScoutBuilder;
-use Nuwave\Lighthouse\Cache\CacheDirective;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ComplexityResolverDirective;
-use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -138,25 +137,28 @@ GRAPHQL;
     public function resolveField(FieldValue $fieldValue): callable
     {
         return function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Paginator {
+            $paginationArgs = PaginationArgs::extractArgs($args, $resolveInfo, $this->paginationType(), $this->paginateMaxCount());
+
             if ($this->directiveHasArgument('resolver')) {
-                // This is done only for validation
-                PaginationArgs::extractArgs($args, $this->paginationType(), $this->paginateMaxCount());
-
                 $paginator = $this->getResolverFromArgument('resolver')($root, $args, $context, $resolveInfo);
-
                 assert(
                     $paginator instanceof Paginator,
                     "The method referenced by the resolver argument of the @{$this->name()} directive on {$this->nodeName()} must return a Paginator.",
                 );
 
+                if ($paginationArgs->first === 0) {
+                    if ($paginator instanceof LengthAwarePaginator) {
+                        return new ZeroPerPageLengthAwarePaginator($paginator->total(), $paginationArgs->page);
+                    }
+
+                    return new ZeroPerPagePaginator($paginationArgs->page);
+                }
+
                 return $paginator;
             }
 
             if ($this->directiveHasArgument('builder')) {
-                $builderResolver = $this->getResolverFromArgument('builder');
-
-                $query = $builderResolver($root, $args, $context, $resolveInfo);
-
+                $query = $this->getResolverFromArgument('builder')($root, $args, $context, $resolveInfo);
                 assert(
                     $query instanceof QueryBuilder || $query instanceof EloquentBuilder || $query instanceof ScoutBuilder || $query instanceof Relation,
                     "The method referenced by the builder argument of the @{$this->name()} directive on {$this->nodeName()} must return a Builder or Relation.",
@@ -174,40 +176,8 @@ GRAPHQL;
                 $resolveInfo,
             );
 
-            $paginationArgs = PaginationArgs::extractArgs($args, $this->paginationType(), $this->paginateMaxCount());
-
-            $paginationArgs->type = $this->optimalPaginationType($resolveInfo);
-
             return $paginationArgs->applyToBuilder($query);
         };
-    }
-
-    protected function optimalPaginationType(ResolveInfo $resolveInfo): PaginationType
-    {
-        $type = $this->paginationType();
-
-        // Already the most optimal type.
-        if ($type->isSimple()) {
-            return $type;
-        }
-
-        // If the result may be used in a cache, we always want to retrieve and store the full pagination data.
-        // Even though the query that initially creates the cache may not need additional information such as
-        // the total counts, following queries may need them - and use the same cached value.
-        $hasCacheDirective = $resolveInfo->argumentSet
-            ->directives
-            ->contains(static fn (Directive $directive): bool => $directive instanceof CacheDirective);
-        if ($hasCacheDirective) {
-            return $type;
-        }
-
-        // If the page info is not requested, we can save a database query by using the simple paginator.
-        // In contrast to the full pagination, it does not query total counts.
-        if (! isset($resolveInfo->getFieldSelection()[$type->infoFieldName()])) {
-            return new PaginationType(PaginationType::SIMPLE);
-        }
-
-        return $type;
     }
 
     protected function paginationType(): PaginationType
