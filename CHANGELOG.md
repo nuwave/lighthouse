@@ -13,7 +13,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Fixed
 
-- Return empty results for pagination `first: 0`
+- Return empty results for pagination `first: 0` https://github.com/nuwave/lighthouse/pull/2480
 
 ## v6.28.0
 
