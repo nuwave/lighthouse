@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.29.1
+
+### Fixed
+
+- Ensure `@rule` is never applied to argument lists themselves https://github.com/nuwave/lighthouse/pull/2489
+
 ## v6.29.0
 
 ### Fixed
