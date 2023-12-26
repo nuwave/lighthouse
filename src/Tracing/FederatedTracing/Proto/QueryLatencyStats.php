@@ -106,8 +106,8 @@ class QueryLatencyStats extends \Google\Protobuf\Internal\Message
      *     @var int|string $persisted_query_misses
      *     @var array<int>|array<string>|\Google\Protobuf\Internal\RepeatedField $cache_latency_count
      *           This array includes the latency buckets for all operations included in cache_hits
-     *           See comment on latency_count for details.
-     *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\PathErrorStats $root_error_stats
+     *           See comment on latency_count for details
+     *     @var PathErrorStats $root_error_stats
      *           Paths and counts for each error. The total number of requests with errors within this object should be the same as
      *           requests_with_errors_count below.
      *     @var int|string $requests_with_errors_count
@@ -124,7 +124,7 @@ class QueryLatencyStats extends \Google\Protobuf\Internal\Message
      */
     public function __construct($data = null)
     {
-        \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Metadata\Reports::initOnce();
+        Metadata\Reports::initOnce();
         parent::__construct($data);
     }
 
@@ -310,7 +310,7 @@ class QueryLatencyStats extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.PathErrorStats root_error_stats = 7 [json_name = "rootErrorStats"];</code>
      *
-     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\PathErrorStats|null
+     * @return PathErrorStats|null
      */
     public function getRootErrorStats()
     {
@@ -333,13 +333,13 @@ class QueryLatencyStats extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.PathErrorStats root_error_stats = 7 [json_name = "rootErrorStats"];</code>
      *
-     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\PathErrorStats  $var
+     * @param  PathErrorStats  $var
      *
      * @return $this
      */
     public function setRootErrorStats($var)
     {
-        GPBUtil::checkMessage($var, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\PathErrorStats::class);
+        GPBUtil::checkMessage($var, PathErrorStats::class);
         $this->root_error_stats = $var;
 
         return $this;

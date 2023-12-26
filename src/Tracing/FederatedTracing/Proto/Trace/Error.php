@@ -94,7 +94,7 @@ class Error extends \Google\Protobuf\Internal\Message
      */
     public function setLocation($var)
     {
-        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Location::class);
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, Location::class);
         $this->location = $arr;
 
         return $this;

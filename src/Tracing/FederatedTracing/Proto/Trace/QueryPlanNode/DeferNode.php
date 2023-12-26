@@ -25,7 +25,7 @@ class DeferNode extends \Google\Protobuf\Internal\Message
      * @param  array  $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\DeferNodePrimary $primary
+     *     @var DeferNodePrimary $primary
      *     @var array<\Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\DeferredNode>|\Google\Protobuf\Internal\RepeatedField $deferred
      * }
      */
@@ -38,7 +38,7 @@ class DeferNode extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.Trace.QueryPlanNode.DeferNodePrimary primary = 1 [json_name = "primary"];</code>.
      *
-     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\DeferNodePrimary|null
+     * @return DeferNodePrimary|null
      */
     public function getPrimary()
     {
@@ -58,13 +58,13 @@ class DeferNode extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.Trace.QueryPlanNode.DeferNodePrimary primary = 1 [json_name = "primary"];</code>.
      *
-     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\DeferNodePrimary  $var
+     * @param  DeferNodePrimary  $var
      *
      * @return $this
      */
     public function setPrimary($var)
     {
-        GPBUtil::checkMessage($var, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\DeferNodePrimary::class);
+        GPBUtil::checkMessage($var, DeferNodePrimary::class);
         $this->primary = $var;
 
         return $this;
@@ -89,7 +89,7 @@ class DeferNode extends \Google\Protobuf\Internal\Message
      */
     public function setDeferred($var)
     {
-        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\DeferredNode::class);
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, DeferredNode::class);
         $this->deferred = $arr;
 
         return $this;

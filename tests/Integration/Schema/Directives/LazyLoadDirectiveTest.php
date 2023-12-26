@@ -33,7 +33,7 @@ final class LazyLoadDirectiveTest extends DBTestCase
 
     public function testLazyLoadRelationsOnConnections(): void
     {
-        /** @var \Tests\Utils\Models\User $user */
+        /** @var User $user */
         $user = factory(User::class)->create();
 
         $tasks = factory(Task::class, 3)->make();

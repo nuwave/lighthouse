@@ -55,7 +55,7 @@ class FlattenNode extends \Google\Protobuf\Internal\Message
      */
     public function setResponsePath($var)
     {
-        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\ResponsePathElement::class);
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, ResponsePathElement::class);
         $this->response_path = $arr;
 
         return $this;

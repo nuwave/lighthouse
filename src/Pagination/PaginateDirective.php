@@ -205,7 +205,7 @@ GRAPHQL;
 
         return static function (int $childrenComplexity, array $args): int {
             /**
-             * @see \Nuwave\Lighthouse\Pagination\PaginationManipulator::countArgument()
+             * @see PaginationManipulator::countArgument()
              */
             $expectedNumberOfChildren = $args['first'] ?? 1;
 

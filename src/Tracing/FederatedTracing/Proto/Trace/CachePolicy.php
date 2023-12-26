@@ -57,7 +57,7 @@ class CachePolicy extends \Google\Protobuf\Internal\Message
      */
     public function setScope($var)
     {
-        GPBUtil::checkEnum($var, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\CachePolicy\Scope::class);
+        GPBUtil::checkEnum($var, CachePolicy\Scope::class);
         $this->scope = $var;
 
         return $this;

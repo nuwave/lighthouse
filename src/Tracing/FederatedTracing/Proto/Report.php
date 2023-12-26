@@ -76,7 +76,7 @@ class Report extends \Google\Protobuf\Internal\Message
      * @param  array  $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\ReportHeader $header
+     *     @var ReportHeader $header
      *     @var array|\Google\Protobuf\Internal\MapField $traces_per_query
      *           If QueryMetadata isn't provided, this key should be a statsReportKey (# operationName\nsignature). If the operation
      *           name, signature, and persisted query IDs are provided in the QueryMetadata, and this operation was requested via a
@@ -103,14 +103,14 @@ class Report extends \Google\Protobuf\Internal\Message
      */
     public function __construct($data = null)
     {
-        \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Metadata\Reports::initOnce();
+        Metadata\Reports::initOnce();
         parent::__construct($data);
     }
 
     /**
      * Generated from protobuf field <code>.ReportHeader header = 1 [json_name = "header"];</code>.
      *
-     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\ReportHeader|null
+     * @return ReportHeader|null
      */
     public function getHeader()
     {
@@ -130,13 +130,13 @@ class Report extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.ReportHeader header = 1 [json_name = "header"];</code>.
      *
-     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\ReportHeader  $var
+     * @param  ReportHeader  $var
      *
      * @return $this
      */
     public function setHeader($var)
     {
-        GPBUtil::checkMessage($var, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\ReportHeader::class);
+        GPBUtil::checkMessage($var, ReportHeader::class);
         $this->header = $var;
 
         return $this;
@@ -169,7 +169,7 @@ class Report extends \Google\Protobuf\Internal\Message
      */
     public function setTracesPerQuery($var)
     {
-        $arr = GPBUtil::checkMapField($var, \Google\Protobuf\Internal\GPBType::STRING, \Google\Protobuf\Internal\GPBType::MESSAGE, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\TracesAndStats::class);
+        $arr = GPBUtil::checkMapField($var, \Google\Protobuf\Internal\GPBType::STRING, \Google\Protobuf\Internal\GPBType::MESSAGE, TracesAndStats::class);
         $this->traces_per_query = $arr;
 
         return $this;
@@ -278,7 +278,7 @@ class Report extends \Google\Protobuf\Internal\Message
      */
     public function setOperationCountByType($var)
     {
-        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Report\OperationCountByType::class);
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, Report\OperationCountByType::class);
         $this->operation_count_by_type = $arr;
 
         return $this;

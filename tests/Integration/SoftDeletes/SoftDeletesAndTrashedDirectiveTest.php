@@ -104,7 +104,7 @@ final class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
 
     public function testWithFindDirective(): void
     {
-        /** @var \Tests\Utils\Models\Task $taskToRemove */
+        /** @var Task $taskToRemove */
         $taskToRemove = factory(Task::class)->create();
         $taskToRemove->delete();
 
@@ -174,7 +174,7 @@ final class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
     public function testWithPaginateDirective(): void
     {
         $tasks = factory(Task::class, 3)->create();
-        /** @var \Tests\Utils\Models\Task $taskToRemove */
+        /** @var Task $taskToRemove */
         $taskToRemove = $tasks[2];
         $taskToRemove->delete();
 
@@ -241,10 +241,10 @@ final class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
 
     public function testNested(): void
     {
-        /** @var \Tests\Utils\Models\User $user */
+        /** @var User $user */
         $user = factory(User::class)->create();
 
-        /** @var \Tests\Utils\Models\Task $taskToRemove */
+        /** @var Task $taskToRemove */
         $taskToRemove = $user->tasks()->save(
             factory(Task::class)->make(),
         );

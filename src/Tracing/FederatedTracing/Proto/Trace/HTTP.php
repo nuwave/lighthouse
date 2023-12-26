@@ -65,7 +65,7 @@ class HTTP extends \Google\Protobuf\Internal\Message
      */
     public function setMethod($var)
     {
-        GPBUtil::checkEnum($var, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\HTTP\Method::class);
+        GPBUtil::checkEnum($var, HTTP\Method::class);
         $this->method = $var;
 
         return $this;
@@ -94,7 +94,7 @@ class HTTP extends \Google\Protobuf\Internal\Message
      */
     public function setRequestHeaders($var)
     {
-        $arr = GPBUtil::checkMapField($var, \Google\Protobuf\Internal\GPBType::STRING, \Google\Protobuf\Internal\GPBType::MESSAGE, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\HTTP\Values::class);
+        $arr = GPBUtil::checkMapField($var, \Google\Protobuf\Internal\GPBType::STRING, \Google\Protobuf\Internal\GPBType::MESSAGE, HTTP\Values::class);
         $this->request_headers = $arr;
 
         return $this;
@@ -119,7 +119,7 @@ class HTTP extends \Google\Protobuf\Internal\Message
      */
     public function setResponseHeaders($var)
     {
-        $arr = GPBUtil::checkMapField($var, \Google\Protobuf\Internal\GPBType::STRING, \Google\Protobuf\Internal\GPBType::MESSAGE, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\HTTP\Values::class);
+        $arr = GPBUtil::checkMapField($var, \Google\Protobuf\Internal\GPBType::STRING, \Google\Protobuf\Internal\GPBType::MESSAGE, HTTP\Values::class);
         $this->response_headers = $arr;
 
         return $this;

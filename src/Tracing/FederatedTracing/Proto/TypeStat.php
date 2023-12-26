@@ -30,7 +30,7 @@ class TypeStat extends \Google\Protobuf\Internal\Message
      */
     public function __construct($data = null)
     {
-        \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Metadata\Reports::initOnce();
+        Metadata\Reports::initOnce();
         parent::__construct($data);
     }
 
@@ -57,7 +57,7 @@ class TypeStat extends \Google\Protobuf\Internal\Message
      */
     public function setPerFieldStat($var)
     {
-        $arr = GPBUtil::checkMapField($var, \Google\Protobuf\Internal\GPBType::STRING, \Google\Protobuf\Internal\GPBType::MESSAGE, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\FieldStat::class);
+        $arr = GPBUtil::checkMapField($var, \Google\Protobuf\Internal\GPBType::STRING, \Google\Protobuf\Internal\GPBType::MESSAGE, FieldStat::class);
         $this->per_field_stat = $arr;
 
         return $this;

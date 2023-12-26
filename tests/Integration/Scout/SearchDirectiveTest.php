@@ -22,11 +22,11 @@ final class SearchDirectiveTest extends DBTestCase
 
     public function testSearch(): void
     {
-        /** @var \Tests\Utils\Models\Post $postA */
+        /** @var Post $postA */
         $postA = factory(Post::class)->create([
             'title' => 'great title',
         ]);
-        /** @var \Tests\Utils\Models\Post $postB */
+        /** @var Post $postB */
         $postB = factory(Post::class)->create([
             'title' => 'Really great title',
         ]);
@@ -196,11 +196,11 @@ final class SearchDirectiveTest extends DBTestCase
 
     public function testSearchWithinCustomIndex(): void
     {
-        /** @var \Tests\Utils\Models\Post $postA */
+        /** @var Post $postA */
         $postA = factory(Post::class)->create([
             'title' => 'great title',
         ]);
-        /** @var \Tests\Utils\Models\Post $postB */
+        /** @var Post $postB */
         $postB = factory(Post::class)->create([
             'title' => 'Really great title',
         ]);
@@ -354,11 +354,11 @@ final class SearchDirectiveTest extends DBTestCase
 
     public function testHandlesScoutBuilderPaginationArguments(): void
     {
-        /** @var \Tests\Utils\Models\Post $postA */
+        /** @var Post $postA */
         $postA = factory(Post::class)->create([
             'title' => 'great title',
         ]);
-        /** @var \Tests\Utils\Models\Post $postB */
+        /** @var Post $postB */
         $postB = factory(Post::class)->create([
             'title' => 'Really great title',
         ]);

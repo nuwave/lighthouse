@@ -40,7 +40,7 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
     }
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  Model  $parent
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>  $args
      *
      * @return \Illuminate\Database\Eloquent\Model|array<\Illuminate\Database\Eloquent\Model>
