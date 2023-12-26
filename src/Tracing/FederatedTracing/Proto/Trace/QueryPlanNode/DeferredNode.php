@@ -60,7 +60,7 @@ class DeferredNode extends \Google\Protobuf\Internal\Message
      */
     public function setDepends($var)
     {
-        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\DeferredNodeDepends::class);
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, DeferredNodeDepends::class);
         $this->depends = $arr;
 
         return $this;
@@ -110,7 +110,7 @@ class DeferredNode extends \Google\Protobuf\Internal\Message
      */
     public function setPath($var)
     {
-        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\ResponsePathElement::class);
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, ResponsePathElement::class);
         $this->path = $arr;
 
         return $this;

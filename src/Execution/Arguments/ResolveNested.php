@@ -19,7 +19,7 @@ class ResolveNested implements ArgResolver
         $this->argPartitioner = $argPartitioner ?? [ArgPartitioner::class, 'nestedArgResolvers'];
     }
 
-    /** @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args */
+    /** @param  ArgumentSet  $args */
     public function __invoke(mixed $root, $args): mixed
     {
         [$nestedArgs, $regularArgs] = ($this->argPartitioner)($args, $root);

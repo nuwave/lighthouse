@@ -91,9 +91,9 @@ class GraphQL
      *
      * @api
      *
-     * To render the @see \GraphQL\Executor\ExecutionResult
+     * To render the @see ExecutionResult
      * you will probably want to call `->toArray($debug)` on it,
-     * with $debug being a combination of flags in @see \GraphQL\Error\DebugFlag
+     * with $debug being a combination of flags in @see DebugFlag
      *
      * @param  array<string, mixed>|null  $variables
      *

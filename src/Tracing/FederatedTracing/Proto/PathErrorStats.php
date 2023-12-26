@@ -33,7 +33,7 @@ class PathErrorStats extends \Google\Protobuf\Internal\Message
      */
     public function __construct($data = null)
     {
-        \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Metadata\Reports::initOnce();
+        Metadata\Reports::initOnce();
         parent::__construct($data);
     }
 
@@ -56,7 +56,7 @@ class PathErrorStats extends \Google\Protobuf\Internal\Message
      */
     public function setChildren($var)
     {
-        $arr = GPBUtil::checkMapField($var, \Google\Protobuf\Internal\GPBType::STRING, \Google\Protobuf\Internal\GPBType::MESSAGE, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\PathErrorStats::class);
+        $arr = GPBUtil::checkMapField($var, \Google\Protobuf\Internal\GPBType::STRING, \Google\Protobuf\Internal\GPBType::MESSAGE, PathErrorStats::class);
         $this->children = $arr;
 
         return $this;

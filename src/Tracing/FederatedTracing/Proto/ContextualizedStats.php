@@ -31,8 +31,8 @@ class ContextualizedStats extends \Google\Protobuf\Internal\Message
      * @param  array  $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\StatsContext $context
-     *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\QueryLatencyStats $query_latency_stats
+     *     @var StatsContext $context
+     *     @var QueryLatencyStats $query_latency_stats
      *     @var array|\Google\Protobuf\Internal\MapField $per_type_stat
      *           Key is type name. This structure provides data for the count and latency of individual
      *           field executions and thus only reflects operations for which field-level tracing occurred.
@@ -40,14 +40,14 @@ class ContextualizedStats extends \Google\Protobuf\Internal\Message
      */
     public function __construct($data = null)
     {
-        \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Metadata\Reports::initOnce();
+        Metadata\Reports::initOnce();
         parent::__construct($data);
     }
 
     /**
      * Generated from protobuf field <code>.StatsContext context = 1 [json_name = "context"];</code>.
      *
-     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\StatsContext|null
+     * @return StatsContext|null
      */
     public function getContext()
     {
@@ -67,13 +67,13 @@ class ContextualizedStats extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.StatsContext context = 1 [json_name = "context"];</code>.
      *
-     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\StatsContext  $var
+     * @param  StatsContext  $var
      *
      * @return $this
      */
     public function setContext($var)
     {
-        GPBUtil::checkMessage($var, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\StatsContext::class);
+        GPBUtil::checkMessage($var, StatsContext::class);
         $this->context = $var;
 
         return $this;
@@ -82,7 +82,7 @@ class ContextualizedStats extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.QueryLatencyStats query_latency_stats = 2 [json_name = "queryLatencyStats"];</code>.
      *
-     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\QueryLatencyStats|null
+     * @return QueryLatencyStats|null
      */
     public function getQueryLatencyStats()
     {
@@ -102,13 +102,13 @@ class ContextualizedStats extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.QueryLatencyStats query_latency_stats = 2 [json_name = "queryLatencyStats"];</code>.
      *
-     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\QueryLatencyStats  $var
+     * @param  QueryLatencyStats  $var
      *
      * @return $this
      */
     public function setQueryLatencyStats($var)
     {
-        GPBUtil::checkMessage($var, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\QueryLatencyStats::class);
+        GPBUtil::checkMessage($var, QueryLatencyStats::class);
         $this->query_latency_stats = $var;
 
         return $this;
@@ -139,7 +139,7 @@ class ContextualizedStats extends \Google\Protobuf\Internal\Message
      */
     public function setPerTypeStat($var)
     {
-        $arr = GPBUtil::checkMapField($var, \Google\Protobuf\Internal\GPBType::STRING, \Google\Protobuf\Internal\GPBType::MESSAGE, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\TypeStat::class);
+        $arr = GPBUtil::checkMapField($var, \Google\Protobuf\Internal\GPBType::STRING, \Google\Protobuf\Internal\GPBType::MESSAGE, TypeStat::class);
         $this->per_type_stat = $arr;
 
         return $this;

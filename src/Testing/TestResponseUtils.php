@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\Testing;
 /**
  * Because we can not have non-mixin methods in mixin classes.
  *
- * @see \Nuwave\Lighthouse\Testing\TestResponseMixin
+ * @see TestResponseMixin
  */
 class TestResponseUtils
 {

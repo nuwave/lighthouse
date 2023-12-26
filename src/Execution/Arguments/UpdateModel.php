@@ -21,7 +21,7 @@ class UpdateModel implements ArgResolver
 
     /**
      * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
+     * @param  ArgumentSet  $args
      */
     public function __invoke($model, $args): mixed
     {

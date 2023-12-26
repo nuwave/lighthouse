@@ -14,7 +14,7 @@ class NestedManyToMany implements ArgResolver
 
     /**
      * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
+     * @param  ArgumentSet  $args
      */
     public function __invoke($parent, $args): void
     {
