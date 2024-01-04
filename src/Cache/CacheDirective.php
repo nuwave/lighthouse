@@ -109,12 +109,8 @@ GRAPHQL;
             $resolved = $resolver($root, $args, $context, $resolveInfo);
 
             $storeInCache = $maxAge
-                ? static function ($result) use ($cacheKey, $maxAge, $cache): void {
-                    $cache->put($cacheKey, $result, Carbon::now()->addSeconds($maxAge));
-                }
-            : static function ($result) use ($cacheKey, $cache): void {
-                $cache->forever($cacheKey, $result);
-            };
+                ? static fn ($result) => $cache->put($cacheKey, $result, Carbon::now()->addSeconds($maxAge))
+                : static fn ($result) => $cache->forever($cacheKey, $result);
 
             Resolved::handle($resolved, $storeInCache);
 
