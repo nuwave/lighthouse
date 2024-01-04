@@ -22,7 +22,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $color_id
  *
  * Relations
- * @property-read \Tests\Utils\Models\Color $color
+ * @property-read Color $color
  */
 final class Product extends Model
 {

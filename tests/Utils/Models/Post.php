@@ -28,11 +28,11 @@ use Laravel\Scout\Searchable;
  * @property int|null $user_id
  * @property int $task_id
  * @property int|null $parent_id
- * @property-read \Tests\Utils\Models\User $user
+ * @property-read User $user
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Activity> $activity
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Comment> $comments
- * @property-read \Tests\Utils\Models\Task $task
- * @property-read \Tests\Utils\Models\Post $parent
+ * @property-read Task $task
+ * @property-read Post $parent
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Post> $children
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Tag> $tags
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Image> $images

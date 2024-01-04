@@ -15,7 +15,7 @@ use Tests\DBTestCase;
  * @property int|null $user_id
  *
  * Relations
- * @property-read \Tests\Utils\Models\User|null $user
+ * @property-read User|null $user
  */
 final class AlternateConnection extends Model
 {

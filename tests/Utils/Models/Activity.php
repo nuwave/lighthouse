@@ -22,7 +22,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  *
  * Relations
  * @property-read \Tests\Utils\Models\Post|\Tests\Utils\Models\Task $content
- * @property-read \Tests\Utils\Models\User $user
+ * @property-read User $user
  */
 final class Activity extends Model
 {

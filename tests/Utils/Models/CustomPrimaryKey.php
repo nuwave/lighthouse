@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int|null $user_id
  *
  * Relations
- * @property-read \Tests\Utils\Models\User|null $user
+ * @property-read User|null $user
  */
 final class CustomPrimaryKey extends Model
 {
