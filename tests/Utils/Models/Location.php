@@ -22,7 +22,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int|null $parent_id
  *
  * Relations
- * @property-read Location $parent
+ * @property-read \Tests\Utils\Models\Location $parent
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Location> $children
  */
 final class Location extends Model

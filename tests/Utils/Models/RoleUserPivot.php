@@ -18,8 +18,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $role_id
  *
  * Relations
- * @property-read Role $role
- * @property-read User $user
+ * @property-read \Tests\Utils\Models\Role $role
+ * @property-read \Tests\Utils\Models\User $user
  */
 final class RoleUserPivot extends Model
 {

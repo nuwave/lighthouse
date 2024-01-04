@@ -19,7 +19,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  *
  * Relations
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\User> $users
- * @property-read ACL|null $acl
+ * @property-read \Tests\Utils\Models\ACL|null $acl
  */
 final class Role extends Model
 {

@@ -40,14 +40,14 @@ use Tests\Utils\Models\User\UserBuilder;
  *
  * Relations
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\AlternateConnection> $alternateConnections
- * @property-read Company|null $company
- * @property-read Image|null $image
+ * @property-read \Tests\Utils\Models\Company|null $company
+ * @property-read \Tests\Utils\Models\Image|null $image
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\CustomPrimaryKey> $customPrimaryKeys
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Post> $posts
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Role> $roles
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\RoleUserPivot> $rolesPivot
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Task> $tasks
- * @property-read Team|null $team
+ * @property-read \Tests\Utils\Models\Team|null $team
  */
 final class User extends Authenticatable
 {

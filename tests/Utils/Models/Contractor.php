@@ -19,7 +19,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
  * @property \Illuminate\Support\Carbon $updated_at
  *
  * Relations
- * @property-read User $user
+ * @property-read \Tests\Utils\Models\User $user
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Color> $colors
  */
 final class Contractor extends Model
