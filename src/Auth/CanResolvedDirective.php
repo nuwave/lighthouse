@@ -38,12 +38,11 @@ GRAPHQL;
     {
         return Resolved::handle(
             $resolver($root, $args, $context, $resolveInfo),
-            function (mixed $modelLike) use ($authorize) {
+            static function (mixed $modelLike) use ($authorize) {
                 $modelOrModels = $modelLike instanceof Paginator
                     ? $modelLike->items()
                     : $modelLike;
-
-                Utils::applyEach(function (mixed $model) use ($authorize): void {
+                Utils::applyEach(static function (mixed $model) use ($authorize): void {
                     $authorize($model);
                 }, $modelOrModels);
 

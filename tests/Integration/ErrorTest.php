@@ -48,6 +48,43 @@ final class ErrorTest extends TestCase
         );
     }
 
+    public function testReturnsFullGraphQLError(): void
+    {
+        $message = 'some error';
+        $this->mockResolver(static fn (): Error => new Error($message));
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo: ID @mock
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+            {
+                foo
+            }
+            GRAPHQL)
+            ->assertStatus(200)
+            ->assertJson([
+                'data' => [
+                    'foo' => null,
+                ],
+                'errors' => [
+                    [
+                        'message' => $message,
+                        'path' => ['foo'],
+                        'locations' => [
+                            [
+                                'line' => 2,
+                                'column' => 5,
+                            ],
+                        ],
+                    ],
+                ],
+            ]);
+    }
+
     public function testIgnoresInvalidJSONVariables(): void
     {
         $this
