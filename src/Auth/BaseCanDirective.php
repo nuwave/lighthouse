@@ -89,7 +89,7 @@ GRAPHQL;
 
             try {
                 return $this->authorizeRequest($root, $args, $context, $resolveInfo, $resolver, $authorizeModel);
-            } catch (\Throwable $e) {
+            } catch (\Throwable $throwable) {
                 $action = $this->directiveArgValue('action');
                 if ($action === 'EXCEPTION_NOT_AUTHORIZED') {
                     throw new AuthorizationException();
@@ -99,7 +99,7 @@ GRAPHQL;
                     return $this->directiveArgValue('returnValue');
                 }
 
-                throw $e;
+                throw $throwable;
             }
         });
     }

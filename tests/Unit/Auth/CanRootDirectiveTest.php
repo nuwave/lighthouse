@@ -107,11 +107,11 @@ final class CanRootDirectiveTest extends CanDirectiveTestBase
         $return = new class() {
             public string $name = 'foo';
         };
-        $this->mockResolver(fn (): object => $return);
+        $this->mockResolver(static fn (): object => $return);
 
         $this->app
             ->make(Gate::class)
-            ->define('customObject', fn (User $authorizedUser, object $root) => $authorizedUser === $user && $root == $return);
+            ->define('customObject', static fn (User $authorizedUser, object $root): bool => $authorizedUser === $user && $root == $return);
 
         $this->schema = $this->getSchema('ability: "customObject"');
 
@@ -131,11 +131,11 @@ final class CanRootDirectiveTest extends CanDirectiveTestBase
         $this->be($user);
 
         $return = ['name' => 'foo'];
-        $this->mockResolver(fn (): array => $return);
+        $this->mockResolver(static fn (): array => $return);
 
         $this->app
             ->make(Gate::class)
-            ->define('customArray', fn (User $authorizedUser, array $root) => $authorizedUser === $user && $root == $return);
+            ->define('customArray', static fn (User $authorizedUser, array $root): bool => $authorizedUser === $user && $root == $return);
 
         $this->schema = $this->getSchema('ability: "customArray"');
 
@@ -153,7 +153,7 @@ final class CanRootDirectiveTest extends CanDirectiveTestBase
         $user = new User();
         $this->be($user);
 
-        $this->app->make(Gate::class)->define('globalAdmin', fn ($authorizedUser) => $authorizedUser === $user);
+        $this->app->make(Gate::class)->define('globalAdmin', static fn ($authorizedUser): bool => $authorizedUser === $user);
 
         $this->mockResolver(fn (): User => $this->resolveUser());
 

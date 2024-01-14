@@ -81,11 +81,11 @@ final class CanResolvedDirectiveTest extends CanDirectiveTestBase
         $return = new class() {
             public string $name = 'foo';
         };
-        $this->mockResolver(fn (): object => $return);
+        $this->mockResolver(static fn (): object => $return);
 
         $this->app
             ->make(Gate::class)
-            ->define('customObject', fn (User $authorizedUser, object $root) => $authorizedUser === $user && $root == $return);
+            ->define('customObject', static fn (User $authorizedUser, object $root): bool => $authorizedUser === $user && $root == $return);
 
         $this->schema = $this->getSchema('ability: "customObject"');
 

@@ -48,7 +48,7 @@ final class UserPolicy
     }
 
     /** @param  User|array<string, mixed>  ...$args */
-    public function injectArgs(User $viewer, ...$args): bool
+    public function injectArgs(User $viewer, User|array ...$args): bool
     {
         $injectedArgs = $args[0];
         if ($injectedArgs instanceof User) {
@@ -59,7 +59,7 @@ final class UserPolicy
     }
 
     /** @param  User|array<string, mixed>  ...$args */
-    public function argsWithInjectedArgs(User $viewer, ...$args): bool
+    public function argsWithInjectedArgs(User $viewer, User|array ...$args): bool
     {
         $injectedArgs = $args[0];
         $staticArgs = $args[1];

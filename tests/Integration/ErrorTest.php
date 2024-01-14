@@ -51,7 +51,7 @@ final class ErrorTest extends TestCase
     public function testReturnsFullGraphQLError(): void
     {
         $message = 'some error';
-        $this->mockResolver(fn () => new Error($message));
+        $this->mockResolver(static fn (): Error => new Error($message));
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -78,10 +78,10 @@ final class ErrorTest extends TestCase
                             [
                                 'line' => 2,
                                 'column' => 5,
-                            ]
-                        ]
-                    ]
-                ]
+                            ],
+                        ],
+                    ],
+                ],
             ]);
     }
 

@@ -57,7 +57,7 @@ limited to seeing just those.
 ## Restrict fields through policies
 
 Lighthouse allows you to restrict field operations to a certain group of users.
-Use the [@can* family of directives](../api-reference/directives.md#can-family-of-directives)
+Use the [@can\* family of directives](../api-reference/directives.md#can-family-of-directives)
 to leverage [Laravel Policies](https://laravel.com/docs/authorization) for authorization.
 
 Starting from Laravel 5.7, [authorization of guest users](https://laravel.com/docs/authorization#guest-users) is supported.
@@ -88,18 +88,20 @@ final class PostPolicy
 
 ### Protect mutations using database queries
 
-You can also protect specific models by using the [@canFind](../api-reference/directives.md#canfind) 
+You can also protect specific models by using the [@canFind](../api-reference/directives.md#canfind)
 or [@canQuery](../api-reference/directives.md#canquery) directive.
 They will query the database and check the specified policy against the result.
 
 ```graphql
 type Mutation {
-  updatePost(input: UpdatePostInput! @spread): Post! @canFind(ability: "edit", find: "input.id") @update
+  updatePost(input: UpdatePostInput! @spread): Post!
+    @canFind(ability: "edit", find: "input.id")
+    @update
 }
 
 input PostInput {
-    id: ID!
-    title: String    
+  id: ID!
+  title: String
 }
 ```
 
@@ -122,10 +124,7 @@ Use the [@canResolved](../api-reference/directives.md#canresolved) directive to 
 
 ```graphql
 type Query {
-  post(id: ID! @whereKey): Post
-    @canResolved(ability: "view")
-    @find
-    @softDeletes
+  post(id: ID! @whereKey): Post @canResolved(ability: "view") @find @softDeletes
 }
 ```
 
@@ -144,7 +143,7 @@ final class PostPolicy
 You can protect fields with the [@canRoot](../api-reference/directives.md#canroot) directive.
 It checks against the resolved root object.
 
-This example shows how to restrict reading the `email` field to only the user itself: 
+This example shows how to restrict reading the `email` field to only the user itself:
 
 ```graphql
 type Query {
@@ -152,7 +151,7 @@ type Query {
 }
 
 type User {
-    email: String! @canRoot(ability: "viewEmail")
+  email: String! @canRoot(ability: "viewEmail")
 }
 ```
 
@@ -193,7 +192,9 @@ with the `injectArgs` argument:
 
 ```graphql
 type Mutation {
-  createPost(title: String!): Post @canModel(ability: "create", injectArgs: true) @create
+  createPost(title: String!): Post
+    @canModel(ability: "create", injectArgs: true)
+    @create
 }
 ```
 
@@ -219,10 +220,10 @@ final class PostPolicy
 
 ### Concealing the existence of a model or other errors
 
-When a user is not authorized to access a model, you may want to hide the existence of the model. 
-This can be done by setting action to either EXCEPTION_NOT_AUTHORIZED or RETURN_VALUE. 
+When a user is not authorized to access a model, you may want to hide the existence of the model.
+This can be done by setting action to either EXCEPTION_NOT_AUTHORIZED or RETURN_VALUE.
 
-In the first case it would always return the generic "not authorized" exception. 
+In the first case it would always return the generic "not authorized" exception.
 In the second case it would return value which you can specify in the `returnValue` argument.
 
 ```graphql
@@ -231,7 +232,8 @@ type Query {
 }
 
 type User {
-    banned: Boolean! @canRoot(ability: "admin", action: RETURN_VALUE, returnValue: false)
+  banned: Boolean!
+    @canRoot(ability: "admin", action: RETURN_VALUE, returnValue: false)
 }
 ```
 

@@ -604,11 +604,11 @@ You can find usage examples of this directive in [the caching docs](../performan
 
 ## @can
 
-Deprecated. Use the [@can* family of directives](#can-family-of-directives) instead.
+Deprecated. Use the [@can\* family of directives](#can-family-of-directives) instead.
 
-## @can* family of directives
+## @can\* family of directives
 
-All @can* directives have common arguments. These arguments specify how gates are checked and what to do if the user is not authorized.
+All @can\* directives have common arguments. These arguments specify how gates are checked and what to do if the user is not authorized.
 Each directive has its own set of arguments that specify what to check against.
 
 ```graphql
@@ -643,6 +643,7 @@ returnValue: CanArgs
 ```
 
 Types are specified as:
+
 ```graphql
 """
 Any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
@@ -650,20 +651,20 @@ Any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-In
 scalar CanArgs
 
 enum CanAction {
-    """
-    Pass exception to the client.
-    """
-    EXCEPTION_PASS
+  """
+  Pass exception to the client.
+  """
+  EXCEPTION_PASS
 
-    """
-    Throw generic "not authorized" exception to conceal the real error.
-    """
-    EXCEPTION_NOT_AUTHORIZED
+  """
+  Throw generic "not authorized" exception to conceal the real error.
+  """
+  EXCEPTION_NOT_AUTHORIZED
 
-    """
-    Return the value specified in `returnValue` argument to conceal the real error.
-    """
-    RETURN_VALUE
+  """
+  Return the value specified in `returnValue` argument to conceal the real error.
+  """
+  RETURN_VALUE
 }
 ```
 
@@ -710,7 +711,6 @@ directive @canRoot(
   The model name to check against.
   """
   model: String
-
 ) repeatable on FIELD_DEFINITION
 ```
 
@@ -724,10 +724,10 @@ Query for specific model instances to check the policy against, using arguments
 with directives that add constraints to the query builder, such as `@eq`.
 """
 directive @canQuery(
-    """
-    Apply scopes to the underlying query.
-    """
-    scopes: [String!]
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
 ) repeatable on FIELD_DEFINITION
 ```
 
@@ -744,7 +744,7 @@ directive @canResolved repeatable on FIELD_DEFINITION
 ```
 
 ### @canRoot
-    
+
 ```graphql
 """
 Check a Laravel Policy to ensure the current user is authorized to access a field.
