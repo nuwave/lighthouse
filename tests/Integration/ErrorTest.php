@@ -78,10 +78,10 @@ final class ErrorTest extends TestCase
                             [
                                 'line' => 2,
                                 'column' => 5,
-                            ]
-                        ]
-                    ]
-                ]
+                            ],
+                        ],
+                    ],
+                ],
             ]);
     }
 
