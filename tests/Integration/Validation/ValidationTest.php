@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Validation;
 
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator as ValidatorFactory;
@@ -20,7 +21,7 @@ final class ValidationTest extends TestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        /** @var \Illuminate\Contracts\Config\Repository $config */
+        /** @var ConfigRepository $config */
         $config = $app->make(ConfigRepository::class);
 
         // Ensure we test for the result the end user receives
@@ -92,6 +93,47 @@ final class ValidationTest extends TestCase
                 ],
             ]);
     }
+
+    public function testFullValidationErrorWithoutLocationParse(): void
+    {
+        /** @var ConfigRepository $config */
+        $config = Container::getInstance()->make(ConfigRepository::class);
+        $config->set('lighthouse.no_location_on_query_parse', true);
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(
+                bar: String @rules(apply: ["required"])
+            ): Int
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo
+            }
+            ')
+            ->assertExactJson([
+                'errors' => [
+                    [
+                        'message' => 'Validation failed for the field [foo].',
+                        'extensions' => [
+                            'category' => ValidationException::CATEGORY,
+                            ValidationException::CATEGORY => [
+                                'bar' => [
+                                    'The bar field is required.',
+                                ],
+                            ],
+                        ],
+                        'path' => ['foo'],
+                    ],
+                ],
+                'data' => [
+                    'foo' => null,
+                ],
+            ]);
+    }
+
 
     public function testRunsOnNonRootFields(): void
     {
