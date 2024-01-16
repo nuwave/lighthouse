@@ -1972,8 +1972,11 @@ directive @like(
 ```graphql
 """
 Allow clients to specify the maximum number of results to return.
+
+This directive does not influence the number of results the resolver queries internally,
+but limits how much of it is returned to clients.
 """
-directive @limit on ARGUMENT_DEFINITION | FIELD_DEFINITION
+directive @limit on ARGUMENT_DEFINITION
 ```
 
 Place this on any argument to a field that returns a list of results.
