@@ -245,7 +245,7 @@ class GraphQL
         $cacheConfig = $this->configRepository->get('lighthouse.query_cache');
 
         $options = [
-            'noLocation' => $this->configRepository->get('lighthouse.no_location_on_query_parse'),
+            'noLocation' => ! $this->configRepository->get('lighthouse.parse_source_location'),
         ];
         if (! $cacheConfig['enable']) {
             return Parser::parse($query, $options);

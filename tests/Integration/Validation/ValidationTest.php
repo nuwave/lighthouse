@@ -95,7 +95,7 @@ final class ValidationTest extends TestCase
     public function testFullValidationErrorWithoutLocationParse(): void
     {
         $config = $this->app->make(ConfigRepository::class);
-        $config->set('lighthouse.no_location_on_query_parse', true);
+        $config->set('lighthouse.parse_source_location', false);
         $this->schema = /** @lang GraphQL */ '
         type Query {
             foo(

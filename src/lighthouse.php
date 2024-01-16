@@ -136,6 +136,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Parse source location
+    |--------------------------------------------------------------------------
+    | Should the source location be included in the AST nodes resulting from query parsing?
+    | Setting this to `false` improves performance, but omits the key `locations` from errors,
+    | see https://spec.graphql.org/October2021/#sec-Errors.Error-result-format.
+    */
+
+    'parse_source_location' => true,
+
+
+    /*
+    |--------------------------------------------------------------------------
     | Namespaces
     |--------------------------------------------------------------------------
     |
@@ -476,14 +488,4 @@ return [
          */
         'driver' => Nuwave\Lighthouse\Tracing\ApolloTracing\ApolloTracing::class,
     ],
-
-    /*
-    | No Location on query parsing
-    |--------------------------------------------------------------------------
-    | By default, the parser creates AST nodes that know the location in the source that they correspond to.
-    | This configuration flag, if set to true, disables that behavior for performance or testing.
-    | see: https://webonyx.github.io/graphql-php/class-reference/#graphqllanguageparser
-    */
-
-    'no_location_on_query_parse' => false,
 ];
