@@ -21,7 +21,6 @@ final class ValidationTest extends TestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        /** @var ConfigRepository $config */
         $config = $app->make(ConfigRepository::class);
 
         // Ensure we test for the result the end user receives
@@ -96,9 +95,8 @@ final class ValidationTest extends TestCase
 
     public function testFullValidationErrorWithoutLocationParse(): void
     {
-        /** @var ConfigRepository $config */
-        $config = Container::getInstance()->make(ConfigRepository::class);
-        $config->set('lighthouse.no_location_on_query_parse', true);
+        $config = $this->app->make(ConfigRepository::class);
+        $config->set('lighthouse.parse_source_location', false);
         $this->schema = /** @lang GraphQL */ '
         type Query {
             foo(
