@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Add configuration option `parse_source_location` https://github.com/nuwave/lighthouse/pull/2499
+
 ## v6.29.1
 
 ### Fixed

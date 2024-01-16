@@ -48,8 +48,12 @@ final class ErrorTest extends TestCase
         );
     }
 
-    public function testReturnsFullGraphQLError(): void
+    /** @dataProvider parseSourceLocations */
+    public function testReturnsFullGraphQLError(bool $parseSourceLocations): void
     {
+        $config = $this->app->make(ConfigRepository::class);
+        $config->set('lighthouse.parse_source_location', $parseSourceLocations);
+
         $message = 'some error';
         $this->mockResolver(static fn (): Error => new Error($message));
 
@@ -59,7 +63,7 @@ final class ErrorTest extends TestCase
         }
         ';
 
-        $this
+        $response = $this
             ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 foo
@@ -74,15 +78,26 @@ final class ErrorTest extends TestCase
                     [
                         'message' => $message,
                         'path' => ['foo'],
-                        'locations' => [
-                            [
-                                'line' => 2,
-                                'column' => 5,
-                            ],
-                        ],
                     ],
                 ],
             ]);
+
+        $locationsJsonPath = 'errors.0.locations';
+        $parseSourceLocations
+            ? $response->json($locationsJsonPath) === [
+                [
+                    'line' => 2,
+                    'column' => 5,
+                ],
+            ]
+            : $response->assertJsonMissingPath($locationsJsonPath);
+    }
+
+    /** @return iterable<array{bool}> */
+    public static function parseSourceLocations(): iterable
+    {
+        yield [true];
+        yield [false];
     }
 
     public function testIgnoresInvalidJSONVariables(): void
