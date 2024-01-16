@@ -47,6 +47,8 @@ at that point in the git history: `https://github.com/nuwave/lighthouse/tree/<SP
 
 Lighthouse follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+Only the current major version receives new features and bugfixes.
+
 Updating between minor versions will not require changes to PHP code or the GraphQL schema
 and cause no breaking behavioural changes for consumers of the GraphQL API.
 However, only code elements marked with `@api` will remain compatible - all other code in
