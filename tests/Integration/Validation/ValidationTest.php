@@ -94,8 +94,7 @@ final class ValidationTest extends TestCase
 
     public function testFullValidationErrorWithoutLocationParse(): void
     {
-        /** @var ConfigRepository $config */
-        $config = Container::getInstance()->make(ConfigRepository::class);
+        $config = $this->app->make(ConfigRepository::class);
         $config->set('lighthouse.no_location_on_query_parse', true);
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -116,8 +115,7 @@ final class ValidationTest extends TestCase
                     [
                         'message' => 'Validation failed for the field [foo].',
                         'extensions' => [
-                            'category' => ValidationException::CATEGORY,
-                            ValidationException::CATEGORY => [
+                            ValidationException::KEY => [
                                 'bar' => [
                                     'The bar field is required.',
                                 ],

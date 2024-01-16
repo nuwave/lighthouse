@@ -88,8 +88,7 @@ final class ErrorTest extends TestCase
 
     public function testReturnsGraphQLErrorWithoutLocationNode(): void
     {
-        /** @var ConfigRepository $config */
-        $config = Container::getInstance()->make(ConfigRepository::class);
+        $config = $this->app->make(ConfigRepository::class);
         $config->set('lighthouse.no_location_on_query_parse', true);
 
         $message = 'some error';
