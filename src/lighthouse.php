@@ -138,9 +138,11 @@ return [
     |--------------------------------------------------------------------------
     | Parse source location
     |--------------------------------------------------------------------------
+    |
     | Should the source location be included in the AST nodes resulting from query parsing?
     | Setting this to `false` improves performance, but omits the key `locations` from errors,
     | see https://spec.graphql.org/October2021/#sec-Errors.Error-result-format.
+    |
     */
 
     'parse_source_location' => true,
