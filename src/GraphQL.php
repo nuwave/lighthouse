@@ -244,11 +244,8 @@ class GraphQL
     {
         $cacheConfig = $this->configRepository->get('lighthouse.query_cache');
 
-        $options = [
-            'noLocation' => ! $this->configRepository->get('lighthouse.parse_source_location'),
-        ];
         if (! $cacheConfig['enable']) {
-            return Parser::parse($query, $options);
+            return $this->parseQuery($query);
         }
 
         $cacheFactory = Container::getInstance()->make(CacheFactory::class);
@@ -259,7 +256,7 @@ class GraphQL
         return $store->remember(
             "lighthouse:query:{$sha256}",
             $cacheConfig['ttl'],
-            static fn (): DocumentNode => Parser::parse($query, $options),
+            fn (): DocumentNode => $this->parseQuery($query),
         );
     }
 
@@ -355,5 +352,12 @@ class GraphQL
         BatchLoaderRegistry::forgetInstances();
         FieldValue::clear();
         $this->errorPool->clear();
+    }
+
+    protected function parseQuery(string $query): DocumentNode
+    {
+        return Parser::parse($query, [
+            'noLocation' => ! $this->configRepository->get('lighthouse.parse_source_location'),
+        ]);
     }
 }

@@ -2,7 +2,6 @@
 
 namespace Tests\Integration\Validation;
 
-use Illuminate\Container\Container;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator as ValidatorFactory;
@@ -21,7 +20,6 @@ final class ValidationTest extends TestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        /** @var ConfigRepository $config */
         $config = $app->make(ConfigRepository::class);
         // Ensure we test for the result the end user receives
         $config->set('app.debug', false);
@@ -96,6 +94,7 @@ final class ValidationTest extends TestCase
     {
         $config = $this->app->make(ConfigRepository::class);
         $config->set('lighthouse.parse_source_location', false);
+
         $this->schema = /** @lang GraphQL */ '
         type Query {
             foo(
@@ -129,7 +128,6 @@ final class ValidationTest extends TestCase
                 ],
             ]);
     }
-
 
     public function testRunsOnNonRootFields(): void
     {

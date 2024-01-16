@@ -6,7 +6,6 @@ use Composer\InstalledVersions;
 use GraphQL\Error\DebugFlag;
 use GraphQL\Error\Error;
 use GraphQL\Error\FormattedError;
-use Illuminate\Container\Container;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Laragraph\Utils\BadRequestGraphQLException;
 use Tests\TestCase;
@@ -92,9 +91,7 @@ final class ErrorTest extends TestCase
         $config->set('lighthouse.parse_source_location', false);
 
         $message = 'some error';
-        $this->mockResolver(static function () use ($message): Error {
-            return new Error($message);
-        });
+        $this->mockResolver(static fn () => throw new Error($message));
 
         $this->schema = /** @lang GraphQL */ '
         type Query {

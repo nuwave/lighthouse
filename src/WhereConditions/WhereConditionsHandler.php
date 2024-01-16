@@ -95,7 +95,7 @@ class WhereConditionsHandler
                             $builder->getModel(),
                         );
                     }
-                    : null,
+                : null,
                 $operator,
                 $amount,
             )
