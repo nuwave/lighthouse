@@ -11,7 +11,7 @@ interface InputFieldManipulator extends Directive
     /** Manipulate the AST. */
     public function manipulateInputFieldDefinition(
         DocumentAST &$documentAST,
-        InputValueDefinitionNode &$inputDefinition,
-        InputObjectTypeDefinitionNode &$parentType,
+        InputValueDefinitionNode &$inputField,
+        InputObjectTypeDefinitionNode &$parentInput,
     ): void;
 }

@@ -335,7 +335,6 @@ GRAPHQL
                 ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
             ): void {
                 $directiveInstance = ASTHelper::addDirectiveToNode('@foo', $argDefinition);
-
                 assert($directiveInstance instanceof ArgManipulator);
 
                 $directiveInstance->manipulateArgDefinition($documentAST, $argDefinition, $parentField, $parentType);
@@ -377,10 +376,10 @@ GRAPHQL
 
             public function manipulateInputFieldDefinition(
                 DocumentAST &$documentAST,
-                InputValueDefinitionNode &$inputDefinition,
-                InputObjectTypeDefinitionNode &$parentType,
+                InputValueDefinitionNode &$inputField,
+                InputObjectTypeDefinitionNode &$parentInput,
             ): void {
-                $inputDefinition->type = Parser::namedType('Int');
+                $inputField->type = Parser::namedType('Int');
             }
         };
 
@@ -395,14 +394,13 @@ GRAPHQL
 
             public function manipulateInputFieldDefinition(
                 DocumentAST &$documentAST,
-                InputValueDefinitionNode &$inputDefinition,
-                InputObjectTypeDefinitionNode &$parentType,
+                InputValueDefinitionNode &$inputField,
+                InputObjectTypeDefinitionNode &$parentInput,
             ): void {
-                $directiveInstance = ASTHelper::addDirectiveToNode('@foo', $inputDefinition);
-
+                $directiveInstance = ASTHelper::addDirectiveToNode('@foo', $inputField);
                 assert($directiveInstance instanceof InputFieldManipulator);
 
-                $directiveInstance->manipulateInputFieldDefinition($documentAST, $inputDefinition, $parentType);
+                $directiveInstance->manipulateInputFieldDefinition($documentAST, $inputField, $parentInput);
             }
         };
 

@@ -3417,7 +3417,7 @@ they are passed along to the resolver:
 ]
 ```
 
-Note that Lighthouse spreads out the arguments **after** all other [ArgDirectives](../custom-directives/argument-directives.md)
+Note that Lighthouse spreads out the arguments **after** all other [ArgDirectives](../custom-directives/field-argument-directives)
 have been applied, e.g. validation, transformation.
 
 ## @subscription
