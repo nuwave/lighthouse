@@ -2,7 +2,6 @@
 
 namespace Tests\Integration\Validation;
 
-use Illuminate\Container\Container;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator as ValidatorFactory;

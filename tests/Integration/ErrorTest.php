@@ -4,8 +4,6 @@ namespace Tests\Integration;
 
 use GraphQL\Error\DebugFlag;
 use GraphQL\Error\Error;
-use GraphQL\Error\FormattedError;
-use Illuminate\Container\Container;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Tests\TestCase;
 
@@ -56,11 +54,11 @@ final class ErrorTest extends TestCase
         ';
 
         $this
-            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+            ->graphQL(/** @lang GraphQL */'
             {
                 foo
             }
-            GRAPHQL)
+            ')
             ->assertStatus(200)
             ->assertJson([
                 'data' => [
@@ -98,11 +96,11 @@ final class ErrorTest extends TestCase
         ';
 
         $this
-            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+            ->graphQL(/** @lang GraphQL */ '
             {
                 foo
             }
-            GRAPHQL)
+            ')
             ->assertStatus(200)
             ->assertJson([
                 'data' => [
