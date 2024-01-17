@@ -226,7 +226,7 @@ class ASTBuilder
         }
     }    
     
-    /** Apply directives on input that can manipulate the AST. */
+    /** Apply directives on input fields that can manipulate the AST. */
     protected function applyInputManipulators(): void
     {
         foreach ($this->documentAST->types as $typeDefinition) {
