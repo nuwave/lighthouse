@@ -78,6 +78,7 @@ GRAPHQL;
             // @phpstan-ignore-next-line won't be executed on Laravel < 8
             $limiter = $this->limiter->limiter($name);
 
+            // @phpstan-ignore-next-line won't be executed on Laravel < 8
             $limiterResponse = $limiter($this->request);
             // @phpstan-ignore-next-line won't be executed on Laravel < 8
             if ($limiterResponse instanceof Unlimited) {

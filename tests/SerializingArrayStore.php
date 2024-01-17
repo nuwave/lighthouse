@@ -63,9 +63,9 @@ final class SerializingArrayStore extends ArrayStore
     /**
      * Get the expiration time of the key.
      *
-     * @param  int  $seconds
+     * @param  int|float  $seconds
      */
-    protected function calculateExpiration($seconds): int
+    protected function calculateExpiration($seconds)
     {
         return $this->toTimestamp($seconds);
     }
@@ -73,12 +73,12 @@ final class SerializingArrayStore extends ArrayStore
     /**
      * Get the UNIX timestamp for the given number of seconds.
      *
-     * @param  int  $seconds
+     * @param  int|float  $seconds
      */
-    protected function toTimestamp($seconds): int
+    protected function toTimestamp($seconds)
     {
         return $seconds > 0
-            ? $this->availableAt($seconds)
+            ? $this->availableAt((int) $seconds)
             : 0;
     }
 }

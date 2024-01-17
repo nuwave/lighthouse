@@ -62,6 +62,8 @@ jobs:
             laravel-version: ^6
           - php-version: 8.1
             laravel-version: ^7
+          - php-version: 8.1
+            laravel-version: ^8
           - php-version: 8.2
             laravel-version: ^6
           - php-version: 8.2
