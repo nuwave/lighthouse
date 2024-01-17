@@ -4,7 +4,6 @@ namespace Tests\Integration;
 
 use GraphQL\Error\DebugFlag;
 use GraphQL\Error\Error;
-use GraphQL\Error\FormattedError;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Tests\TestCase;
 
@@ -39,6 +38,81 @@ final class ErrorTest extends TestCase
             'nonExistingField',
             $result->json('errors.0.message')
         );
+    }
+
+    public function testReturnsFullGraphQLError(): void
+    {
+        $message = 'some error';
+        $this->mockResolver(static function () use ($message): Error {
+            return new Error($message);
+        });
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo: ID @mock
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */'
+            {
+                foo
+            }
+            ')
+            ->assertStatus(200)
+            ->assertJson([
+                'data' => [
+                    'foo' => null,
+                ],
+                'errors' => [
+                    [
+                        'message' => $message,
+                        'path' => ['foo'],
+                        'locations' => [
+                            [
+                                'line' => 3,
+                                'column' => 17,
+                            ],
+                        ],
+                    ],
+                ],
+            ]);
+    }
+
+    public function testReturnsGraphQLErrorWithoutLocationNode(): void
+    {
+        $config = $this->app->make(ConfigRepository::class);
+        $config->set('lighthouse.parse_source_location', false);
+
+        $message = 'some error';
+        $this->mockResolver(static function () use ($message): Error {
+            return new Error($message);
+        });
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo: ID @mock
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo
+            }
+            ')
+            ->assertStatus(200)
+            ->assertJson([
+                'data' => [
+                    'foo' => null,
+                ],
+                'errors' => [
+                    [
+                        'message' => $message,
+                        'path' => ['foo'],
+                    ],
+                ],
+            ]);
     }
 
     public function testIgnoresInvalidJSONVariables(): void
@@ -237,3 +311,4 @@ final class ErrorTest extends TestCase
             ->assertGraphQLError($exception);
     }
 }
+

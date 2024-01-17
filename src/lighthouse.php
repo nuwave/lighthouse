@@ -28,11 +28,11 @@ return [
          * make sure to return spec-compliant responses in case an error is thrown.
          */
         'middleware' => [
-            \Nuwave\Lighthouse\Support\Http\Middleware\AcceptJson::class,
+            Nuwave\Lighthouse\Support\Http\Middleware\AcceptJson::class,
 
             // Logs in a user if they are authenticated. In contrast to Laravel's 'auth'
             // middleware, this delegates auth and permission checks to the field level.
-            \Nuwave\Lighthouse\Support\Http\Middleware\AttemptAuthentication::class,
+            Nuwave\Lighthouse\Support\Http\Middleware\AttemptAuthentication::class,
 
             // Logs every incoming GraphQL query.
             // \Nuwave\Lighthouse\Support\Http\Middleware\LogGraphQLQueries::class,
@@ -152,11 +152,24 @@ return [
          */
         'ttl' => env(
             'LIGHTHOUSE_QUERY_CACHE_TTL',
-            \Nuwave\Lighthouse\Support\AppVersion::atLeast(5.8)
+            Nuwave\Lighthouse\Support\AppVersion::atLeast(5.8)
                 ? 24 * 60 * 60 // 1 day in seconds
                 : 24 * 60 // 1 day in minutes
         ),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Parse source location
+    |--------------------------------------------------------------------------
+    |
+    | Should the source location be included in the AST nodes resulting from query parsing?
+    | Setting this to `false` improves performance, but omits the key `locations` from errors,
+    | see https://spec.graphql.org/October2021/#sec-Errors.Error-result-format.
+    |
+    */
+
+    'parse_source_location' => true,
 
     /*
     |--------------------------------------------------------------------------
@@ -192,11 +205,11 @@ return [
     */
 
     'security' => [
-        'max_query_complexity' => \GraphQL\Validator\Rules\QueryComplexity::DISABLED,
-        'max_query_depth' => \GraphQL\Validator\Rules\QueryDepth::DISABLED,
+        'max_query_complexity' => GraphQL\Validator\Rules\QueryComplexity::DISABLED,
+        'max_query_depth' => GraphQL\Validator\Rules\QueryDepth::DISABLED,
         'disable_introspection' => (bool) env('LIGHTHOUSE_SECURITY_DISABLE_INTROSPECTION', false)
-            ? \GraphQL\Validator\Rules\DisableIntrospection::ENABLED
-            : \GraphQL\Validator\Rules\DisableIntrospection::DISABLED,
+            ? GraphQL\Validator\Rules\DisableIntrospection::ENABLED
+            : GraphQL\Validator\Rules\DisableIntrospection::DISABLED,
     ],
 
     /*
@@ -251,7 +264,7 @@ return [
     |
     */
 
-    'debug' => env('LIGHTHOUSE_DEBUG', \GraphQL\Error\DebugFlag::INCLUDE_DEBUG_MESSAGE | \GraphQL\Error\DebugFlag::INCLUDE_TRACE),
+    'debug' => env('LIGHTHOUSE_DEBUG', GraphQL\Error\DebugFlag::INCLUDE_DEBUG_MESSAGE | GraphQL\Error\DebugFlag::INCLUDE_TRACE),
 
     /*
     |--------------------------------------------------------------------------
@@ -265,11 +278,11 @@ return [
     */
 
     'error_handlers' => [
-        \Nuwave\Lighthouse\Execution\AuthenticationErrorHandler::class,
-        \Nuwave\Lighthouse\Execution\AuthorizationErrorHandler::class,
-        \Nuwave\Lighthouse\Execution\ValidationErrorHandler::class,
-        \Nuwave\Lighthouse\Execution\ExtensionErrorHandler::class,
-        \Nuwave\Lighthouse\Execution\ReportingErrorHandler::class,
+        Nuwave\Lighthouse\Execution\AuthenticationErrorHandler::class,
+        Nuwave\Lighthouse\Execution\AuthorizationErrorHandler::class,
+        Nuwave\Lighthouse\Execution\ValidationErrorHandler::class,
+        Nuwave\Lighthouse\Execution\ExtensionErrorHandler::class,
+        Nuwave\Lighthouse\Execution\ReportingErrorHandler::class,
     ],
 
     /*
@@ -284,14 +297,14 @@ return [
     */
 
     'field_middleware' => [
-        \Nuwave\Lighthouse\Schema\Directives\TrimDirective::class,
-        \Nuwave\Lighthouse\Schema\Directives\ConvertEmptyStringsToNullDirective::class,
-        \Nuwave\Lighthouse\Schema\Directives\SanitizeDirective::class,
-        \Nuwave\Lighthouse\Validation\ValidateDirective::class,
-        \Nuwave\Lighthouse\Schema\Directives\TransformArgsDirective::class,
-        \Nuwave\Lighthouse\Schema\Directives\SpreadDirective::class,
-        \Nuwave\Lighthouse\Schema\Directives\RenameArgsDirective::class,
-        \Nuwave\Lighthouse\Schema\Directives\DropArgsDirective::class,
+        Nuwave\Lighthouse\Schema\Directives\TrimDirective::class,
+        Nuwave\Lighthouse\Schema\Directives\ConvertEmptyStringsToNullDirective::class,
+        Nuwave\Lighthouse\Schema\Directives\SanitizeDirective::class,
+        Nuwave\Lighthouse\Validation\ValidateDirective::class,
+        Nuwave\Lighthouse\Schema\Directives\TransformArgsDirective::class,
+        Nuwave\Lighthouse\Schema\Directives\SpreadDirective::class,
+        Nuwave\Lighthouse\Schema\Directives\RenameArgsDirective::class,
+        Nuwave\Lighthouse\Schema\Directives\DropArgsDirective::class,
     ],
 
     /*
@@ -453,13 +466,13 @@ return [
             ],
             'pusher' => [
                 'driver' => 'pusher',
-                'routes' => \Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class . '@pusher',
+                'routes' => Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class . '@pusher',
                 'connection' => 'pusher',
             ],
             'echo' => [
                 'driver' => 'echo',
                 'connection' => env('LIGHTHOUSE_SUBSCRIPTION_REDIS_CONNECTION', 'default'),
-                'routes' => \Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class . '@echoRoutes',
+                'routes' => Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class . '@echoRoutes',
             ],
         ],
 

@@ -77,6 +77,7 @@ abstract class DateScalar extends ScalarType
                     || CarbonImmutable::class === get_class($value)
                 )
             ) {
+                // @phpstan-ignore-next-line We need to type hint $value into one of the two types or static analysis will throw
                 assert($value instanceof CarbonCarbon || $value instanceof CarbonImmutable);
 
                 $carbon = IlluminateCarbon::create(

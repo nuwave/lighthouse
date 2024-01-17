@@ -216,7 +216,7 @@ class GraphQL
         $cacheConfig = $this->configRepository->get('lighthouse.query_cache');
 
         if (! $cacheConfig['enable']) {
-            return Parser::parse($query);
+            return $this->parseQuery($query);
         }
 
         $cacheFactory = Container::getInstance()->make(CacheFactory::class);
@@ -227,8 +227,8 @@ class GraphQL
         return $store->remember(
             'lighthouse:query:' . hash('sha256', $query),
             $cacheConfig['ttl'],
-            static function () use ($query): DocumentNode {
-                return Parser::parse($query);
+            function () use ($query): DocumentNode {
+                return $this->parseQuery($query);
             }
         );
     }
@@ -449,5 +449,12 @@ class GraphQL
     public function prepSchema(): Schema
     {
         return $this->schemaBuilder->schema();
+    }
+
+    protected function parseQuery(string $query): DocumentNode
+    {
+        return Parser::parse($query, [
+            'noLocation' => ! $this->configRepository->get('lighthouse.parse_source_location'),
+        ]);
     }
 }
