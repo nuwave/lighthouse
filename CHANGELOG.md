@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Add `InputFieldManipulator` directive interface https://github.com/nuwave/lighthouse/pull/2476
+
 ## v6.30.0
 
 ### Added

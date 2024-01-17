@@ -23,6 +23,7 @@ use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
+use Nuwave\Lighthouse\Support\Contracts\InputFieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator;
 use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
 
@@ -76,6 +77,7 @@ class ASTBuilder
         $this->applyTypeExtensionManipulators();
         $this->applyFieldManipulators();
         $this->applyArgManipulators();
+        $this->applyInputFieldManipulators();
 
         // Listeners may manipulate the DocumentAST that is passed by reference
         // into the ManipulateAST event. This can be useful for extensions
@@ -237,6 +239,26 @@ class ASTBuilder
                                 $typeDefinition,
                             );
                         }
+                    }
+                }
+            }
+        }
+    }    
+    
+    /** Apply directives on input fields that can manipulate the AST. */
+    protected function applyInputFieldManipulators(): void
+    {
+        foreach ($this->documentAST->types as $typeDefinition) {
+            if ($typeDefinition instanceof InputObjectTypeDefinitionNode) {
+                foreach ($typeDefinition->fields as $fieldDefinition) {
+                    foreach (
+                        $this->directiveLocator->associatedOfType($fieldDefinition, InputFieldManipulator::class) as $inputFieldManipulator
+                    ) {
+                        $inputFieldManipulator->manipulateInputFieldDefinition(
+                            $this->documentAST,
+                            $fieldDefinition,
+                            $typeDefinition,
+                        );
                     }
                 }
             }
