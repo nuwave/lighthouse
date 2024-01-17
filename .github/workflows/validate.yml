@@ -97,6 +97,15 @@ jobs:
   tests:
     runs-on: ubuntu-20.04
 
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=10
+
     strategy:
       matrix:
         php-version:
@@ -191,11 +200,14 @@ jobs:
 
       - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
 
-      - run: |
-          sudo systemctl start mysql.service
-          mysql --user=root --password=root --execute='CREATE DATABASE test;'
+      - name: Check MySQL version
+        run: mysql --host 127.0.0.1 --port ${{ job.services.mysql.ports['3306'] }} -uroot -proot -e "SELECT @@VERSION"
 
-      - run: vendor/bin/phpunit --colors=always --verbose
+      - name: Create MySQL test database
+        run: mysql --host 127.0.0.1 --user=root --port ${{ job.services.mysql.ports['3306'] }} --password=root --execute='CREATE DATABASE test;'
+
+      - name: Execute test
+        run: LIGHTHOUSE_TEST_DB_HOST='127.0.0.1' LIGHTHOUSE_TEST_DB_PORT=${{ job.services.mysql.ports['3306'] }} LIGHTHOUSE_TEST_DB_PASSWORD=root vendor/bin/phpunit --colors=always --verbose
 
   coverage:
     runs-on: ubuntu-20.04
