@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.31.1
+
+### Fixed
+
+- Fix `@limit` directive definition
+
 ## v6.31.0
 
 ### Added
