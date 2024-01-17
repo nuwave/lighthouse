@@ -306,4 +306,54 @@ final class RulesDirectiveTest extends TestCase
             [/** @lang GraphQL */ '[{rule: 3, message: "asfd"}]'],
         ];
     }
+
+    public function testValidateElementsOfListType(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(
+                bar: [String]
+                @rules(
+                    apply: ["required"]
+                )
+            ): String
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    bar: ["", null, "bar"]
+                )
+            }
+            ')
+            ->assertGraphQLValidationKeys(['bar.0', 'bar.1']);
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    bar: []
+                )
+            }
+            ')
+            ->assertJson([
+                'data' => [
+                    'foo' => Foo::THE_ANSWER,
+                ],
+            ]);
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo
+            }
+            ')
+            ->assertJson([
+                'data' => [
+                    'foo' => Foo::THE_ANSWER,
+                ],
+            ]);
+    }
 }

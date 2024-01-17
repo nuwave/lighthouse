@@ -146,7 +146,7 @@ GRAPHQL;
         }
         ');
 
-        /** @var \Nuwave\Lighthouse\Subscriptions\Storage\CacheStorageManager $cache */
+        /** @var CacheStorageManager $cache */
         $cache = $this->app->make(CacheStorageManager::class);
 
         $subscriber = $cache

@@ -215,10 +215,10 @@ final class BelongsToDirectiveTest extends DBTestCase
 
     public function testBelongsToItself(): void
     {
-        /** @var \Tests\Utils\Models\Post $parent */
+        /** @var Post $parent */
         $parent = factory(Post::class)->create();
 
-        /** @var \Tests\Utils\Models\Post $child */
+        /** @var Post $child */
         $child = factory(Post::class)->make();
         $child->parent()->associate($parent);
         $child->save();
@@ -267,7 +267,7 @@ final class BelongsToDirectiveTest extends DBTestCase
     {
         $company = factory(Company::class)->create();
 
-        /** @var \Tests\Utils\Models\User $user */
+        /** @var User $user */
         $user = factory(User::class)->make();
         $user->company()->associate($company);
         $user->save();

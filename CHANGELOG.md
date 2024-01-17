@@ -13,6 +13,80 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Add `InputFieldManipulator` directive interface https://github.com/nuwave/lighthouse/pull/2476
 
+## v6.30.0
+
+### Added
+
+- Add configuration option `parse_source_location` https://github.com/nuwave/lighthouse/pull/2499
+
+## v6.29.1
+
+### Fixed
+
+- Ensure `@rule` is never applied to argument lists themselves https://github.com/nuwave/lighthouse/pull/2489
+
+## v6.29.0
+
+### Fixed
+
+- Return empty results for pagination `first: 0` https://github.com/nuwave/lighthouse/pull/2480
+
+## v6.28.0
+
+### Added
+
+- Mark common pagination types as `@shareable` for Apollo Federation v2 https://github.com/nuwave/lighthouse/pull/2485
+
+## v6.27.0
+
+### Added
+
+- Split up `@can` directive into `@canFind`, `@canModel`, `@canQuery`, `@canResolved` and `@canRoot` https://github.com/nuwave/lighthouse/pull/2483
+- Added `action` and `returnValue` arguments to `@can*` family of directives https://github.com/nuwave/lighthouse/pull/2483
+- Allows using any objects in `@can*` family of directives https://github.com/nuwave/lighthouse/pull/2483
+
+## v6.26.1
+
+### Fixed
+
+- Add `scalar link__Import` and `enum link__Purpose` to `@link` definition https://github.com/nuwave/lighthouse/pull/2484
+
+## v6.26.0
+
+### Added
+
+- Support federated tracing https://github.com/nuwave/lighthouse/pull/2479
+
+## v6.25.0
+
+### Added
+
+- Add `@namespaced` directive for namespacing by separation of concerns https://github.com/nuwave/lighthouse/pull/2469
+
+## v6.24.0
+
+### Added
+
+- Add support for `extend union` syntax https://github.com/nuwave/lighthouse/pull/2468
+
+## v6.23.2
+
+### Fixed
+
+- Exclude unnecessary `extend schema` from federation schema printer https://github.com/nuwave/lighthouse/pull/2477
+
+## v6.23.1
+
+### Fixed
+
+- Fix `FieldResolver` directive stubs
+
+## v6.23.0
+
+### Added
+
+- Support Apollo Federation v2, except for federated tracing https://github.com/nuwave/lighthouse/pull/2460
+
 ## v6.22.0
 
 ### Added

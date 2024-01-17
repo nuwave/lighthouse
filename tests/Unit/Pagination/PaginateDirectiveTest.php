@@ -444,14 +444,13 @@ GRAPHQL
         }
 
         type Query {
-            users1: [User!]! @paginate(maxCount: 6)
-            users2: [User!]! @paginate(maxCount: 10)
+            users: [User!]! @paginate(maxCount: 6)
         }
         ';
 
         $result = $this->graphQL(/** @lang GraphQL */ '
         {
-            users1(first: 10) {
+            users(first: 10) {
                 data {
                     id
                     name
@@ -692,8 +691,41 @@ GRAPHQL
         ')->assertGraphQLErrorMessage('Expected value of type "Int!", found null.');
     }
 
-    /** @return \Illuminate\Pagination\LengthAwarePaginator<array<string, int>> */
-    public static function returnPaginatedDataInsteadOfBuilder(): LengthAwarePaginator
+    public function testQueriesFirst0SimplePaginator(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID!
+        }
+
+        type Query {
+            users: [User!]! @paginate
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users(first: 0) {
+                data {
+                    id
+                }
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'users' => [
+                    'data' => [],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @param  array{first: int}  $args
+     *
+     * @return \Illuminate\Pagination\LengthAwarePaginator<array<string, int>>
+     */
+    public static function returnPaginatedDataInsteadOfBuilder(mixed $root, array $args): LengthAwarePaginator
     {
         return new LengthAwarePaginator([
             [
@@ -702,7 +734,7 @@ GRAPHQL
             [
                 'id' => 2,
             ],
-        ], 2, 15);
+        ], 2, $args['first']);
     }
 
     public function testPaginatorResolver(): void
@@ -719,7 +751,10 @@ GRAPHQL
 
         $this->graphQL(/* @lang GraphQL */ '
         {
-            users(first: 0) {
+            users(first: 5) {
+                paginatorInfo {
+                    perPage
+                }
                 data {
                     id
                 }
@@ -728,6 +763,9 @@ GRAPHQL
         ')->assertJson([
             'data' => [
                 'users' => [
+                    'paginatorInfo' => [
+                        'perPage' => 5,
+                    ],
                     'data' => [
                         ['id' => 1],
                         ['id' => 2],

@@ -10,12 +10,12 @@ final class ExistsRuleTest extends DBTestCase
 {
     public function testExistsRule(): void
     {
-        /** @var \Tests\Utils\Models\User $userValid */
+        /** @var User $userValid */
         $userValid = factory(User::class)->make();
         $userValid->name = 'Admin';
         $userValid->save();
 
-        /** @var \Tests\Utils\Models\User $userInvalid */
+        /** @var User $userInvalid */
         $userInvalid = factory(User::class)->make();
         $userInvalid->name = 'Tester';
         $userInvalid->save();

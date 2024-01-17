@@ -161,7 +161,7 @@ final class CountDirectiveDBTest extends DBTestCase
         }
         ';
 
-        /** @var \Tests\Utils\Models\User $user */
+        /** @var User $user */
         $user = factory(User::class)->create();
         factory(Task::class, 3)->create([
             'user_id' => $user->getKey(),
@@ -211,14 +211,14 @@ final class CountDirectiveDBTest extends DBTestCase
         }
         ';
 
-        /** @var \Tests\Utils\Models\User $user */
+        /** @var User $user */
         $user = factory(User::class)->create();
 
-        /** @var \Tests\Utils\Models\Post $post1 */
+        /** @var Post $post1 */
         $post1 = factory(Post::class)->make();
         $user->posts()->save($post1);
 
-        /** @var \Tests\Utils\Models\Activity $activity1 */
+        /** @var Activity $activity1 */
         $activity1 = factory(Activity::class)->make();
         $activity1->user()->associate($user);
         $post1->activity()->save($activity1);
@@ -228,11 +228,11 @@ final class CountDirectiveDBTest extends DBTestCase
                 factory(Image::class, 3)->make(),
             );
 
-        /** @var \Tests\Utils\Models\Post $post2 */
+        /** @var Post $post2 */
         $post2 = factory(Post::class)->make();
         $user->posts()->save($post2);
 
-        /** @var \Tests\Utils\Models\Activity $activity2 */
+        /** @var Activity $activity2 */
         $activity2 = factory(Activity::class)->make();
         $activity2->user()->associate($user);
         $post2->activity()->save($activity2);
@@ -244,7 +244,7 @@ final class CountDirectiveDBTest extends DBTestCase
 
         $task = $post1->task;
 
-        /** @var \Tests\Utils\Models\Activity $activity3 */
+        /** @var Activity $activity3 */
         $activity3 = factory(Activity::class)->make();
         $activity3->user()->associate($user);
         $task->activity()->save($activity3);

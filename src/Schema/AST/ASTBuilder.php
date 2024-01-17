@@ -10,6 +10,8 @@ use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeExtensionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeExtensionNode;
+use GraphQL\Language\AST\UnionTypeDefinitionNode;
+use GraphQL\Language\AST\UnionTypeExtensionNode;
 use GraphQL\Language\Parser;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Support\Arr;
@@ -32,6 +34,7 @@ class ASTBuilder
         InputObjectTypeExtensionNode::class => InputObjectTypeDefinitionNode::class,
         InterfaceTypeExtensionNode::class => InterfaceTypeDefinitionNode::class,
         EnumTypeExtensionNode::class => EnumTypeDefinitionNode::class,
+        UnionTypeExtensionNode::class => UnionTypeDefinitionNode::class,
     ];
 
     /** Initialized lazily in $this->documentAST(). */
@@ -121,6 +124,8 @@ class ASTBuilder
                     $this->extendObjectLikeType($typeName, $typeExtension);
                 } elseif ($typeExtension instanceof EnumTypeExtensionNode) {
                     $this->extendEnumType($typeName, $typeExtension);
+                } elseif ($typeExtension instanceof UnionTypeExtensionNode) {
+                    $this->extendUnionType($typeName, $typeExtension);
                 }
             }
         }
@@ -175,12 +180,26 @@ class ASTBuilder
         );
     }
 
-    protected function missingBaseDefinition(string $typeName, ObjectTypeExtensionNode|InputObjectTypeExtensionNode|InterfaceTypeExtensionNode|EnumTypeExtensionNode $typeExtension): string
+    protected function extendUnionType(string $typeName, UnionTypeExtensionNode $typeExtension): void
+    {
+        $extendedUnion = $this->documentAST->types[$typeName]
+            ?? throw new DefinitionException($this->missingBaseDefinition($typeName, $typeExtension));
+        assert($extendedUnion instanceof UnionTypeDefinitionNode);
+
+        $this->assertExtensionMatchesDefinition($typeExtension, $extendedUnion);
+
+        $extendedUnion->types = ASTHelper::mergeUniqueNodeList(
+            $extendedUnion->types,
+            $typeExtension->types,
+        );
+    }
+
+    protected function missingBaseDefinition(string $typeName, ObjectTypeExtensionNode|InputObjectTypeExtensionNode|InterfaceTypeExtensionNode|EnumTypeExtensionNode|UnionTypeExtensionNode $typeExtension): string
     {
         return "Could not find a base definition {$typeName} of kind {$typeExtension->kind} to extend.";
     }
 
-    protected function assertExtensionMatchesDefinition(ObjectTypeExtensionNode|InputObjectTypeExtensionNode|InterfaceTypeExtensionNode|EnumTypeExtensionNode $extension, ObjectTypeDefinitionNode|InputObjectTypeDefinitionNode|InterfaceTypeDefinitionNode|EnumTypeDefinitionNode $definition): void
+    protected function assertExtensionMatchesDefinition(ObjectTypeExtensionNode|InputObjectTypeExtensionNode|InterfaceTypeExtensionNode|EnumTypeExtensionNode|UnionTypeExtensionNode $extension, ObjectTypeDefinitionNode|InputObjectTypeDefinitionNode|InterfaceTypeDefinitionNode|EnumTypeDefinitionNode|UnionTypeDefinitionNode $definition): void
     {
         if (static::EXTENSION_TO_DEFINITION_CLASS[$extension::class] !== $definition::class) {
             throw new DefinitionException("The type extension {$extension->name->value} of kind {$extension->kind} can not extend a definition of kind {$definition->kind}.");

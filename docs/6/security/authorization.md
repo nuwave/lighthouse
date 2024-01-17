@@ -57,7 +57,7 @@ limited to seeing just those.
 ## Restrict fields through policies
 
 Lighthouse allows you to restrict field operations to a certain group of users.
-Use the [@can](../api-reference/directives.md#can) directive
+Use the [@can\* family of directives](../api-reference/directives.md#can-family-of-directives)
 to leverage [Laravel Policies](https://laravel.com/docs/authorization) for authorization.
 
 Starting from Laravel 5.7, [authorization of guest users](https://laravel.com/docs/authorization#guest-users) is supported.
@@ -66,11 +66,11 @@ Because of this, Lighthouse does **not** validate that the user is authenticated
 ### Protect mutations
 
 As an example, you might want to allow only admin users of your application to create posts.
-Start out by defining [@can](../api-reference/directives.md#can) upon a mutation you want to protect:
+Start out by defining [@canModel](../api-reference/directives.md#canmodel) upon a mutation you want to protect:
 
 ```graphql
 type Mutation {
-  createPost(input: PostInput): Post @can(ability: "create")
+  createPost(input: PostInput): Post @canModel(ability: "create")
 }
 ```
 
@@ -86,20 +86,45 @@ final class PostPolicy
 }
 ```
 
-### Protect specific model instances
+### Protect mutations using database queries
 
-For some models, you may want to restrict access for specific instances of a model.
-Set the `resolved` argument to `true` to have Lighthouse check permissions against
-the resolved model instances.
+You can also protect specific models by using the [@canFind](../api-reference/directives.md#canfind)
+or [@canQuery](../api-reference/directives.md#canquery) directive.
+They will query the database and check the specified policy against the result.
+
+```graphql
+type Mutation {
+  updatePost(input: UpdatePostInput! @spread): Post!
+    @canFind(ability: "edit", find: "input.id")
+    @update
+}
+
+input PostInput {
+  id: ID!
+  title: String
+}
+```
+
+```php
+final class PostPolicy
+{
+    public function edit(User $user, Post $post): bool
+    {
+        return $user->id === $post->author_id;
+    }
+}
+```
+
+### Protect resolved model instances
+
+For some models, you may want to restrict access for already resolved instance of a model.
+Use the [@canResolved](../api-reference/directives.md#canresolved) directive to do so.
 
 > This will actually run the field before checking permissions, do not use in mutations.
 
 ```graphql
 type Query {
-  post(id: ID! @eq): Post
-    @can(ability: "view", resolved: true)
-    @find
-    @softDeletes
+  post(id: ID! @whereKey): Post @canResolved(ability: "view") @find @softDeletes
 }
 ```
 
@@ -113,14 +138,42 @@ final class PostPolicy
 }
 ```
 
+### Protect fields
+
+You can protect fields with the [@canRoot](../api-reference/directives.md#canroot) directive.
+It checks against the resolved root object.
+
+This example shows how to restrict reading the `email` field to only the user itself:
+
+```graphql
+type Query {
+  user(id: ID! @whereKey): User @find
+}
+
+type User {
+  email: String! @canRoot(ability: "viewEmail")
+}
+```
+
+```php
+final class UserPolicy
+{
+    public function viewEmail(User $actor, User $target): bool
+    {
+        return $actor->id === $target->author_id;
+    }
+}
+```
+
 ### Passing additional arguments
 
 You can pass additional arguments to the policy checks by specifying them as `args`:
 
 ```graphql
 type Mutation {
-  createPost(input: PostInput): Post
-    @can(ability: "create", args: ["FROM_GRAPHQL"])
+  createPost(input: CreatePostInput! @spread): Post!
+    @create
+    @canModel(ability: "create", args: ["FROM_GRAPHQL"])
 }
 ```
 
@@ -139,7 +192,9 @@ with the `injectArgs` argument:
 
 ```graphql
 type Mutation {
-  createPost(title: String!): Post @can(ability: "create", injectArgs: true)
+  createPost(title: String!): Post
+    @canModel(ability: "create", injectArgs: true)
+    @create
 }
 ```
 
@@ -162,6 +217,27 @@ final class PostPolicy
     public function create($user, array $injectedArgs, array $staticArgs): bool { ... }
 }
 ```
+
+### Concealing the existence of a model or other errors
+
+When a user is not authorized to access a model, you may want to hide the existence of the model.
+This can be done by setting action to either EXCEPTION_NOT_AUTHORIZED or RETURN_VALUE.
+
+In the first case it would always return the generic "not authorized" exception.
+In the second case it would return value which you can specify in the `returnValue` argument.
+
+```graphql
+type Query {
+  user(id: ID! @whereKey): User @find
+}
+
+type User {
+  banned: Boolean!
+    @canRoot(ability: "admin", action: RETURN_VALUE, returnValue: false)
+}
+```
+
+The `banned` field would return false for all users who are not authorized to access it.
 
 ## Custom field restrictions
 
@@ -208,11 +284,9 @@ GRAPHQL;
     public function handleField(FieldValue $fieldValue): void
     {
         $fieldValue->wrapResolver(fn (callable $resolver) => function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
-            $requiredRole = $this->directiveArgValue('requiredRole');
-            // Throw in case of an invalid schema definition to remind the developer
-            if ($requiredRole === null) {
-                throw new DefinitionException("Missing argument 'requiredRole' for directive '@canAccess'.");
-            }
+            $requiredRole = $this->directiveArgValue('requiredRole')
+                // Throw in case of an invalid schema definition to remind the developer
+                ?? throw new DefinitionException("Missing argument 'requiredRole' for directive '@canAccess'.");
 
             $user = $context->user();
             if (

@@ -60,7 +60,7 @@ GRAPHQL;
     /**
      * Delete one or more related models.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  Model  $parent
      * @param  mixed|array<mixed>  $idOrIds
      */
     public function __invoke($parent, $idOrIds): void

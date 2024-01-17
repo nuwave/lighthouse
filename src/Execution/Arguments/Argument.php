@@ -10,7 +10,7 @@ class Argument
     /**
      * The value given by the client.
      *
-     * @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>|mixed|array<mixed>
+     * @var ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>|mixed|array<mixed>
      */
     public mixed $value;
 
@@ -57,7 +57,7 @@ class Argument
     /**
      * Convert the given value to plain PHP values recursively.
      *
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>|mixed|array<mixed>  $value
+     * @param  ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>|mixed|array<mixed>  $value
      *
      * @return mixed|array<mixed>
      */

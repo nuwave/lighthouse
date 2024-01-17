@@ -9,7 +9,7 @@ use Tests\Utils\Queries\Foo;
 
 final class GlobalIdDirectiveTest extends TestCase
 {
-    /** @var \Nuwave\Lighthouse\GlobalId\GlobalId */
+    /** @var GlobalId */
     protected $globalId;
 
     protected function setUp(): void

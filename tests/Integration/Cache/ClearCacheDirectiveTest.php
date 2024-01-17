@@ -70,7 +70,7 @@ final class ClearCacheDirectiveTest extends TestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type Mutation {
-            foo(id: Int!): Int! @clearCache(type: "Foo", idSource: { argument: "id" })
+            foo(id: ID!): Int! @clearCache(type: "Foo", idSource: { argument: "id" })
         }
         ' . self::PLACEHOLDER_QUERY;
 
@@ -94,7 +94,7 @@ final class ClearCacheDirectiveTest extends TestCase
     {
         $this->schema = /** @lang GraphQL */ '
         input FooInput {
-            id: Int!
+            id: ID!
         }
 
         type Mutation {
@@ -248,7 +248,7 @@ final class ClearCacheDirectiveTest extends TestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type Mutation {
-            foo(id: Int!): Int! @clearCache(type: "Foo", idSource: { argument: "id" }, field: "baz")
+            foo(id: ID!): Int! @clearCache(type: "Foo", idSource: { argument: "id" }, field: "baz")
         }
         ' . self::PLACEHOLDER_QUERY;
 

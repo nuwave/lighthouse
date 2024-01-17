@@ -91,9 +91,9 @@ class GraphQL
      *
      * @api
      *
-     * To render the @see \GraphQL\Executor\ExecutionResult
+     * To render the @see ExecutionResult
      * you will probably want to call `->toArray($debug)` on it,
-     * with $debug being a combination of flags in @see \GraphQL\Error\DebugFlag
+     * with $debug being a combination of flags in @see DebugFlag
      *
      * @param  array<string, mixed>|null  $variables
      *
@@ -128,7 +128,7 @@ class GraphQL
 
         /** @var array<\Nuwave\Lighthouse\Execution\ExtensionsResponse|null> $extensionsResponses */
         $extensionsResponses = (array) $this->eventDispatcher->dispatch(
-            new BuildExtensionsResponse(),
+            new BuildExtensionsResponse($result),
         );
 
         foreach ($extensionsResponses as $extensionsResponse) {
@@ -245,7 +245,7 @@ class GraphQL
         $cacheConfig = $this->configRepository->get('lighthouse.query_cache');
 
         if (! $cacheConfig['enable']) {
-            return Parser::parse($query);
+            return $this->parseQuery($query);
         }
 
         $cacheFactory = Container::getInstance()->make(CacheFactory::class);
@@ -256,7 +256,7 @@ class GraphQL
         return $store->remember(
             "lighthouse:query:{$sha256}",
             $cacheConfig['ttl'],
-            static fn (): DocumentNode => Parser::parse($query),
+            fn (): DocumentNode => $this->parseQuery($query),
         );
     }
 
@@ -352,5 +352,12 @@ class GraphQL
         BatchLoaderRegistry::forgetInstances();
         FieldValue::clear();
         $this->errorPool->clear();
+    }
+
+    protected function parseQuery(string $query): DocumentNode
+    {
+        return Parser::parse($query, [
+            'noLocation' => ! $this->configRepository->get('lighthouse.parse_source_location'),
+        ]);
     }
 }

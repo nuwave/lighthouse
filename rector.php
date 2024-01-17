@@ -39,6 +39,7 @@ return static function (RectorConfig $rectorConfig): void {
         PHPUnitSetList::REMOVE_MOCKS,
     ]);
     $rectorConfig->skip([
+        __DIR__ . '/src/Tracing/FederatedTracing/Proto', // Generated code
         __DIR__ . '/tests/database/migrations', // Does not fit autoloading standards
         __DIR__ . '/tests/LaravelPhpdocAlignmentFixer.php', // Copied from Laravel
         CallableThisArrayToAnonymousFunctionRector::class, // Callable in array form is shorter and more efficient
