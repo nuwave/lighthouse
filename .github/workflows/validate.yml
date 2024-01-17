@@ -9,8 +9,8 @@ env:
   REQUIRED_PHP_EXTENSIONS: mbstring, mysqli, pdo_mysql, redis
   LIGHTHOUSE_TEST_DB_USER: root
   LIGHTHOUSE_TEST_DB_PASSWORD: root
-  LIGHTHOUSE_TEST_DB_HOST: localhost
-  LIGHTHOUSE_TEST_DB_UNIX_SOCKET: /var/run/mysqld/mysqld.sock
+  LIGHTHOUSE_TEST_DB_HOST: 127.0.0.1
+  LIGHTHOUSE_TEST_DB_PORT: 33060
   LIGHTHOUSE_TEST_REDIS_HOST: 127.0.0.1
 
 # Using ubuntu-18.04 because it has MySQL 5.7.
@@ -18,7 +18,7 @@ env:
 
 jobs:
   static-analysis:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
@@ -95,15 +95,16 @@ jobs:
       - run: vendor/bin/phpstan
 
   tests:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     services:
       mysql:
         image: mysql:5.7
         env:
           MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: test
         ports:
-          - 3306:3306
+          - 33060:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=10
 
     strategy:
@@ -203,14 +204,21 @@ jobs:
       - name: Check MySQL version
         run: mysql --host 127.0.0.1 --port ${{ job.services.mysql.ports['3306'] }} -uroot -proot -e "SELECT @@VERSION"
 
-      - name: Create MySQL test database
-        run: mysql --host 127.0.0.1 --user=root --port ${{ job.services.mysql.ports['3306'] }} --password=root --execute='CREATE DATABASE test;'
-
       - name: Execute test
-        run: LIGHTHOUSE_TEST_DB_HOST='127.0.0.1' LIGHTHOUSE_TEST_DB_PORT=${{ job.services.mysql.ports['3306'] }} LIGHTHOUSE_TEST_DB_PASSWORD=root vendor/bin/phpunit --colors=always --verbose
+        run: vendor/bin/phpunit --colors=always --verbose
 
   coverage:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: test
+        ports:
+          - 33060:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=10
 
     strategy:
       matrix:
@@ -247,17 +255,13 @@ jobs:
 
       - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
 
-      - run: |
-          sudo systemctl start mysql.service
-          mysql --user=root --password=root --execute='CREATE DATABASE test;'
-
       - run: vendor/bin/phpunit --coverage-clover=coverage.xml
 
       - name: "Upload to Codecov"
         uses: codecov/codecov-action@v2
 
   benchmarks:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:

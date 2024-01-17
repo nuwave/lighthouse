@@ -70,8 +70,8 @@ final class ErrorTest extends TestCase
                         'path' => ['foo'],
                         'locations' => [
                             [
-                                'line' => 2,
-                                'column' => 5,
+                                'line' => 3,
+                                'column' => 17,
                             ],
                         ],
                     ],
