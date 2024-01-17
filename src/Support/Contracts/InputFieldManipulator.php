@@ -6,10 +6,10 @@ use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 
-interface InputManipulator extends Directive
+interface InputFieldManipulator extends Directive
 {
     /** Manipulate the AST. */
-    public function manipulateInputDefinition(
+    public function manipulateInputFieldDefinition(
         DocumentAST &$documentAST,
         InputValueDefinitionNode &$inputDefinition,
         InputObjectTypeDefinitionNode &$parentType,

@@ -20,7 +20,7 @@ use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
-use Nuwave\Lighthouse\Support\Contracts\InputManipulator;
+use Nuwave\Lighthouse\Support\Contracts\InputFieldManipulator;
 use Tests\TestCase;
 
 final class ASTHelperTest extends TestCase
@@ -367,15 +367,15 @@ GRAPHQL
         $this->assertSame($typeType->name->value, 'Int');
     }
 
-    public function testDynamicallyAddedInputManipulatorDirective(): void
+    public function testDynamicallyAddedInputFieldManipulatorDirective(): void
     {
-        $directive = new class() extends BaseDirective implements InputManipulator {
+        $directive = new class() extends BaseDirective implements InputFieldManipulator {
             public static function definition(): string
             {
                 return /** @lang GraphQL */ 'directive @foo on INPUT_FIELD_DEFINITION';
             }
 
-            public function manipulateInputDefinition(
+            public function manipulateInputFieldDefinition(
                 DocumentAST &$documentAST,
                 InputValueDefinitionNode &$inputDefinition,
                 InputObjectTypeDefinitionNode &$parentType,
@@ -387,22 +387,22 @@ GRAPHQL
         $directiveLocator = $this->app->make(DirectiveLocator::class);
         $directiveLocator->setResolved('foo', $directive::class);
 
-        $dynamicDirective = new class() extends BaseDirective implements InputManipulator {
+        $dynamicDirective = new class() extends BaseDirective implements InputFieldManipulator {
             public static function definition(): string
             {
                 return /** @lang GraphQL */ 'directive @dynamic on INPUT_FIELD_DEFINITION';
             }
 
-            public function manipulateInputDefinition(
+            public function manipulateInputFieldDefinition(
                 DocumentAST &$documentAST,
                 InputValueDefinitionNode &$inputDefinition,
                 InputObjectTypeDefinitionNode &$parentType,
             ): void {
                 $directiveInstance = ASTHelper::addDirectiveToNode('@foo', $inputDefinition);
 
-                assert($directiveInstance instanceof InputManipulator);
+                assert($directiveInstance instanceof InputFieldManipulator);
 
-                $directiveInstance->manipulateInputDefinition($documentAST, $inputDefinition, $parentType);
+                $directiveInstance->manipulateInputFieldDefinition($documentAST, $inputDefinition, $parentType);
             }
         };
 

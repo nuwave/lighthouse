@@ -11,7 +11,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
-- Add `InputManipulator` directive interface https://github.com/nuwave/lighthouse/pull/2476
+- Add `InputFieldManipulator` directive interface https://github.com/nuwave/lighthouse/pull/2476
 
 ## v6.22.0
 
