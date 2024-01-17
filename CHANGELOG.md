@@ -383,6 +383,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove subscriptions version 1
 - Remove `MiddlewareAdapter` https://github.com/nuwave/lighthouse/pull/2358
 
+## v5.72.0
+
+### Added
+
+- Add configuration option `parse_source_location` https://github.com/nuwave/lighthouse/pull/2498
+
 ## v5.71.0
 
 ### Added
