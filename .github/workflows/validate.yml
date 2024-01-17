@@ -18,7 +18,7 @@ env:
 
 jobs:
   static-analysis:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
 
     strategy:
       fail-fast: false
@@ -95,7 +95,7 @@ jobs:
       - run: vendor/bin/phpstan
 
   tests:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
 
     strategy:
       matrix:
@@ -198,7 +198,7 @@ jobs:
       - run: vendor/bin/phpunit --colors=always --verbose
 
   coverage:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
 
     strategy:
       matrix:
@@ -245,7 +245,7 @@ jobs:
         uses: codecov/codecov-action@v2
 
   benchmarks:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
 
     strategy:
       matrix:

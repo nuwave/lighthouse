@@ -313,3 +313,4 @@ final class ErrorTest extends TestCase
             ->assertGraphQLError($exception);
     }
 }
+
