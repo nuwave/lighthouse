@@ -4,6 +4,7 @@
 
 namespace Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode;
 
+use Google\Protobuf\Internal\GPBType;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
@@ -60,7 +61,7 @@ class DeferredNode extends \Google\Protobuf\Internal\Message
      */
     public function setDepends($var)
     {
-        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, DeferredNodeDepends::class);
+        $arr = GPBUtil::checkRepeatedField($var, GPBType::MESSAGE, DeferredNodeDepends::class);
         $this->depends = $arr;
 
         return $this;
@@ -110,7 +111,7 @@ class DeferredNode extends \Google\Protobuf\Internal\Message
      */
     public function setPath($var)
     {
-        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, ResponsePathElement::class);
+        $arr = GPBUtil::checkRepeatedField($var, GPBType::MESSAGE, ResponsePathElement::class);
         $this->path = $arr;
 
         return $this;

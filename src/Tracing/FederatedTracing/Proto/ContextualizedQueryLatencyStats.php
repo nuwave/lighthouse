@@ -23,8 +23,8 @@ class ContextualizedQueryLatencyStats extends \Google\Protobuf\Internal\Message
      * @param  array  $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @var QueryLatencyStats $query_latency_stats
-     *     @var StatsContext $context
+     *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\QueryLatencyStats $query_latency_stats
+     *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\StatsContext $context
      * }
      */
     public function __construct($data = null)
@@ -36,7 +36,7 @@ class ContextualizedQueryLatencyStats extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.QueryLatencyStats query_latency_stats = 1 [json_name = "queryLatencyStats"];</code>.
      *
-     * @return QueryLatencyStats|null
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\QueryLatencyStats|null
      */
     public function getQueryLatencyStats()
     {
@@ -56,7 +56,7 @@ class ContextualizedQueryLatencyStats extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.QueryLatencyStats query_latency_stats = 1 [json_name = "queryLatencyStats"];</code>.
      *
-     * @param  QueryLatencyStats  $var
+     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\QueryLatencyStats  $var
      *
      * @return $this
      */
@@ -71,7 +71,7 @@ class ContextualizedQueryLatencyStats extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.StatsContext context = 2 [json_name = "context"];</code>.
      *
-     * @return StatsContext|null
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\StatsContext|null
      */
     public function getContext()
     {
@@ -91,7 +91,7 @@ class ContextualizedQueryLatencyStats extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.StatsContext context = 2 [json_name = "context"];</code>.
      *
-     * @param  StatsContext  $var
+     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\StatsContext  $var
      *
      * @return $this
      */
