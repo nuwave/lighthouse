@@ -8,8 +8,8 @@ use GraphQL\Utils\AST;
 use Illuminate\Container\Container;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
-use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Support\Contracts\SerializesContext;
 
 class Subscriber
 {
@@ -122,8 +122,8 @@ class Subscriber
         return 'private-lighthouse-' . Str::random(32) . '-' . time();
     }
 
-    protected function contextSerializer(): ContextSerializer
+    protected function contextSerializer(): SerializesContext
     {
-        return Container::getInstance()->make(ContextSerializer::class);
+        return Container::getInstance()->make(SerializesContext::class);
     }
 }

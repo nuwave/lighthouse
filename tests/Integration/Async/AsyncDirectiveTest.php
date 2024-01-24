@@ -2,15 +2,18 @@
 
 namespace Tests\Integration\Async;
 
-use Illuminate\Queue\CallQueuedClosure;
+use Illuminate\Container\Container;
 use Illuminate\Support\Facades\Queue;
+use Nuwave\Lighthouse\Async\AsyncMutation;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Tests\DBTestCase;
 
 final class AsyncDirectiveTest extends DBTestCase
 {
     public function testDispatchesMutation(): void
     {
-        $this->mockResolver('bar');
+        $this->mockResolver(fn (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) => null);
 
         $this->schema .= /** @lang GraphQL */ '
         type Mutation {
@@ -29,17 +32,20 @@ final class AsyncDirectiveTest extends DBTestCase
             ],
         ]);
 
-        $jobs = $queue->pushed(CallQueuedClosure::class);
+        $jobs = $queue->pushed(AsyncMutation::class);
         $this->assertCount(1, $jobs);
         foreach ($jobs as $job) {
-            assert($job instanceof CallQueuedClosure);
-            $job->handle($this->app);
+            assert($job instanceof AsyncMutation);
+
+            $jobCycledThroughSerialization = unserialize(serialize($job));
+            assert($jobCycledThroughSerialization instanceof AsyncMutation);
+            Container::getInstance()->call([$jobCycledThroughSerialization, 'handle']);
         }
     }
 
     public function testDispatchesMutationOnCustomQueue(): void
     {
-        $this->mockResolver('bar');
+        $this->mockResolver(fn (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) => null);
 
         $this->schema .= /** @lang GraphQL */ '
         type Mutation {
@@ -58,12 +64,15 @@ final class AsyncDirectiveTest extends DBTestCase
             ],
         ]);
 
-        $jobs = $queue->pushed(CallQueuedClosure::class);
+        $jobs = $queue->pushed(AsyncMutation::class);
         $this->assertCount(1, $jobs);
         foreach ($jobs as $job) {
-            assert($job instanceof CallQueuedClosure);
+            assert($job instanceof AsyncMutation);
             $this->assertSame('custom', $job->queue);
-            $job->handle($this->app);
+
+            $jobCycledThroughSerialization = unserialize(serialize($job));
+            assert($jobCycledThroughSerialization instanceof AsyncMutation);
+            Container::getInstance()->call([$jobCycledThroughSerialization, 'handle']);
         }
     }
 }
