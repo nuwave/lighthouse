@@ -243,8 +243,8 @@ class ASTBuilder
                 }
             }
         }
-    }    
-    
+    }
+
     /** Apply directives on input fields that can manipulate the AST. */
     protected function applyInputFieldManipulators(): void
     {
