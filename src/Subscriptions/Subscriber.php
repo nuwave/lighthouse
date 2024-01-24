@@ -33,9 +33,7 @@ class Subscriber
     /**
      * The name of the queried field.
      *
-     * Guaranteed be be unique because of
-     *
-     * @see \GraphQL\Validator\Rules\SingleFieldSubscription
+     * Guaranteed to be unique because of @see \GraphQL\Validator\Rules\SingleFieldSubscription
      */
     public string $fieldName;
 
@@ -56,9 +54,7 @@ class Subscriber
          * @var array<string, mixed> $args
          */
         public array $args,
-        /**
-         * The context passed to the query.
-         */
+        /** The context passed to the query. */
         public GraphQLContext $context,
         ResolveInfo $resolveInfo,
     ) {

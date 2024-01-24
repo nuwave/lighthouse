@@ -87,13 +87,9 @@ class GraphQL
     }
 
     /**
-     * Execute a GraphQL query on the Lighthouse schema and return the raw result.
+     * Execute a GraphQL query on the Lighthouse schema and return the serializable result.
      *
      * @api
-     *
-     * To render the @see ExecutionResult
-     * you will probably want to call `->toArray($debug)` on it,
-     * with $debug being a combination of flags in @see DebugFlag
      *
      * @param  array<string, mixed>|null  $variables
      *

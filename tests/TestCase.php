@@ -11,6 +11,7 @@ use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Redis\RedisServiceProvider;
 use Laravel\Scout\ScoutServiceProvider as LaravelScoutServiceProvider;
+use Nuwave\Lighthouse\Async\AsyncServiceProvider;
 use Nuwave\Lighthouse\Auth\AuthServiceProvider as LighthouseAuthServiceProvider;
 use Nuwave\Lighthouse\Cache\CacheServiceProvider;
 use Nuwave\Lighthouse\CacheControl\CacheControlServiceProvider;
@@ -78,6 +79,7 @@ GRAPHQL;
 
             // Lighthouse's own
             LighthouseServiceProvider::class,
+            AsyncServiceProvider::class,
             LighthouseAuthServiceProvider::class,
             CacheServiceProvider::class,
             CacheControlServiceProvider::class,
