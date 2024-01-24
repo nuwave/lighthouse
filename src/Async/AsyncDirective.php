@@ -32,7 +32,7 @@ GRAPHQL;
 
     public function handleField(FieldValue $fieldValue): void
     {
-        $fieldValue->wrapResolver(fn (callable $resolver): \Closure => function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
+        $fieldValue->wrapResolver(fn (callable $resolver): \Closure => function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver): bool {
             if ($root instanceof AsyncRoot) {
                 $resolver($root, $args, $context, $resolveInfo);
             } else {

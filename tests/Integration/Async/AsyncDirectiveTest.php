@@ -14,7 +14,7 @@ final class AsyncDirectiveTest extends DBTestCase
 {
     public function testDispatchesMutation(): void
     {
-        $this->mockResolver(fn (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) => null);
+        $this->mockResolver(static fn (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) => null);
 
         $this->schema .= /** @lang GraphQL */ '
         type Mutation {
@@ -46,7 +46,7 @@ final class AsyncDirectiveTest extends DBTestCase
 
     public function testDispatchesMutationOnCustomQueue(): void
     {
-        $this->mockResolver(fn (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) => null);
+        $this->mockResolver(static fn (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) => null);
 
         $this->schema .= /** @lang GraphQL */ '
         type Mutation {
@@ -80,7 +80,7 @@ final class AsyncDirectiveTest extends DBTestCase
     public function testOnlyOnMutations(): void
     {
         $this->expectExceptionObject(new DefinitionException(
-            'The @async directive must only be used on fields of the root type mutation, found it on Query.foo.'
+            'The @async directive must only be used on fields of the root type mutation, found it on Query.foo.',
         ));
         $this->buildSchema(/** @lang GraphQL */ '
         type Query {

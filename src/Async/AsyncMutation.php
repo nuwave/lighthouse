@@ -21,9 +21,10 @@ class AsyncMutation implements ShouldQueue
 
     public function __construct(
         public string $serializedContext,
-        /** array<string, FragmentDefinitionNode> */
+        /** @var array<string, FragmentDefinitionNode> */
         public array $fragments,
         public OperationDefinitionNode $operation,
+        /** @var array<string, mixed> */
         public array $variableValues,
     ) {}
 
