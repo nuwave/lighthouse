@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Events;
 
@@ -12,15 +12,10 @@ use GraphQL\Executor\ExecutionResult;
  */
 class ManipulateResult
 {
-    /**
-     * The result of resolving an individual query.
-     *
-     * @var \GraphQL\Executor\ExecutionResult
-     */
-    public $result;
-
-    public function __construct(ExecutionResult &$result)
-    {
-        $this->result = $result;
-    }
+    public function __construct(
+        /**
+         * The result of resolving an individual query.
+         */
+        public ExecutionResult &$result,
+    ) {}
 }

@@ -1,38 +1,24 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Subscriptions\Contracts;
 
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
+use Symfony\Component\HttpFoundation\Response;
 
 interface Broadcaster
 {
-    /**
-     * Handle authorized subscription request.
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function authorized(Request $request);
+    public const EVENT_NAME = 'lighthouse-subscription';
 
-    /**
-     * Handle unauthorized subscription request.
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function unauthorized(Request $request);
+    /** Handle authorized subscription request. */
+    public function authorized(Request $request): Response;
 
-    /**
-     * Handle subscription web hook.
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function hook(Request $request);
+    /** Handle unauthorized subscription request. */
+    public function unauthorized(Request $request): Response;
 
-    /**
-     * Send data to subscriber.
-     *
-     * @param  array<mixed>  $data
-     * @return void
-     */
-    public function broadcast(Subscriber $subscriber, array $data);
+    /** Handle subscription web hook. */
+    public function hook(Request $request): Response;
+
+    /** Send data to subscriber. */
+    public function broadcast(Subscriber $subscriber, mixed $data): void;
 }

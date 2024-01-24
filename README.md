@@ -8,17 +8,16 @@
 
 # Lighthouse
 
-[![Continuous Integration](https://github.com/nuwave/lighthouse/workflows/Continuous%20Integration/badge.svg)](https://github.com/nuwave/lighthouse/actions)
+[![Validate](https://github.com/nuwave/lighthouse/workflows/Validate/badge.svg)](https://github.com/nuwave/lighthouse/actions)
 [![Code Coverage](https://codecov.io/gh/nuwave/lighthouse/branch/master/graph/badge.svg)](https://codecov.io/gh/nuwave/lighthouse)
 [![PHPStan](https://img.shields.io/badge/PHPStan-enabled-brightgreen.svg?style=flat)](https://github.com/phpstan/phpstan)
-[![StyleCI](https://github.styleci.io/repos/59965104/shield?branch=master&style=flat)](https://github.styleci.io/repos/59965104)
 
 [![Packagist](https://img.shields.io/packagist/dt/nuwave/lighthouse.svg)](https://packagist.org/packages/nuwave/lighthouse)
 [![Latest Stable Version](https://poser.pugx.org/nuwave/lighthouse/v/stable)](https://packagist.org/packages/nuwave/lighthouse)
 [![GitHub license](https://img.shields.io/github/license/nuwave/lighthouse.svg)](https://github.com/nuwave/lighthouse/blob/master/LICENSE)
 
 [![Ask on Stack Overflow](https://img.shields.io/badge/StackOverflow-ask-orange.svg)](https://stackoverflow.com/questions/tagged/laravel-lighthouse)
-[![Get on Slack](https://img.shields.io/badge/Slack-join-blueviolet.svg)](https://join.slack.com/t/lighthouse-php/shared_invite/enQtMzc1NzQwNTUxMjk3LWMyZWRiNWFmZGUxZmRlNDJkMTQ2ZDA1NzQ1YjVkNTdmNWE1OTUyZjZiN2I2ZGQxNTNiZTZiY2JlNmY2MGUyNTQ)
+[![Get on Slack](https://img.shields.io/badge/Slack-join-blueviolet.svg)](https://join.slack.com/t/lighthouse-php/shared_invite/zt-4sm280w1-wu21r94f3kLRRtBXRbXVfw)
 
 **A framework for serving GraphQL from Laravel**
 
@@ -30,18 +29,30 @@ and offer flexibility when you need it.
 
 ## Documentation
 
-The documentation lives at [lighthouse-php.com](https://lighthouse-php.com/).
+The documentation lives at [lighthouse-php.com](https://lighthouse-php.com).
 
-A chinese translation is available at [lighthouse-php.cn](http://lighthouse-php.cn/) and is maintained
-over at https://github.com/haxibiao/lighthouse.
+The site includes the latest docs for each major version of Lighthouse.
+You can find docs for specific versions by looking at the contents of [/docs/master](/docs/master)
+at that point in the git history: `https://github.com/nuwave/lighthouse/tree/<SPECIFIC-TAG>/docs/master`.
 
 ## Get involved
 
 - Have a question? [Use the laravel-lighthouse tag on Stack Overflow](https://stackoverflow.com/questions/tagged/laravel-lighthouse)
-- Talk to other users? [Hop into Slack](https://join.slack.com/t/lighthouse-php/shared_invite/enQtMzc1NzQwNTUxMjk3LWMyZWRiNWFmZGUxZmRlNDJkMTQ2ZDA1NzQ1YjVkNTdmNWE1OTUyZjZiN2I2ZGQxNTNiZTZiY2JlNmY2MGUyNTQ)
+- Talk to other users? [Hop into Slack](https://join.slack.com/t/lighthouse-php/shared_invite/zt-4sm280w1-wu21r94f3kLRRtBXRbXVfw)
 - Found a bug? [Report a bug](https://github.com/nuwave/lighthouse/issues/new?template=bug_report.md)
 - Have an idea? [Propose a feature](https://github.com/nuwave/lighthouse/issues/new?template=feature_proposal.md)
 - Want to improve Lighthouse? [Read our contribution guidelines](https://github.com/nuwave/lighthouse/blob/master/CONTRIBUTING.md)
+
+## Versioning
+
+Lighthouse follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+Only the current major version receives new features and bugfixes.
+
+Updating between minor versions will not require changes to PHP code or the GraphQL schema
+and cause no breaking behavioural changes for consumers of the GraphQL API.
+However, only code elements marked with `@api` will remain compatible - all other code in
+Lighthouse is considered internal and is thus subject to change.
 
 ## Changelog
 
@@ -49,7 +60,7 @@ All notable changes to this project are documented in [`CHANGELOG.md`](CHANGELOG
 
 ## Upgrade Guide
 
-When upgrading between major versions of Lighthouse, consider [`UPGRADE.MD`](UPGRADE.md).
+When upgrading between major versions of Lighthouse, consider [`UPGRADE.md`](UPGRADE.md).
 
 ## Contributing
 
@@ -58,5 +69,10 @@ We welcome contributions of any kind, see how in [`CONTRIBUTING.md`](CONTRIBUTIN
 ## Security Vulnerabilities
 
 If you discover a security vulnerability within Lighthouse,
-please email Benedikt Franke via [benedikt@franke.tech](mailto:benedikt@franke.tech)
-or visit https://tidelift.com/security.
+please email Benedikt Franke via [benedikt@franke.tech](mailto:benedikt@franke.tech).
+
+## Sponsors
+
+Lighthouse is supported by [its awesome sponsors](https://lighthouse-php.com/sponsors).
+
+If you want to support the development of Lighthouse and see your logo there, consider [sponsoring](https://github.com/sponsors/spawnia).

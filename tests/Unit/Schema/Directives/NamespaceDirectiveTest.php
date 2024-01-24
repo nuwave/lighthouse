@@ -1,13 +1,13 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Schema\Directives;
 
 use Tests\TestCase;
 use Tests\Utils\QueriesSecondary\Foo;
 
-class NamespaceDirectiveTest extends TestCase
+final class NamespaceDirectiveTest extends TestCase
 {
-    public function testCanSetNamespaceOnField(): void
+    public function testSetNamespaceOnField(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -28,7 +28,7 @@ class NamespaceDirectiveTest extends TestCase
         ]);
     }
 
-    public function testCanSetNamespaceFromType(): void
+    public function testSetNamespaceFromType(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query @namespace(field: "Tests\\\Utils\\\QueriesSecondary") {

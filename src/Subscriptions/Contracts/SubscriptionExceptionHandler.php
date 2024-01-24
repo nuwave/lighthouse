@@ -1,22 +1,12 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Subscriptions\Contracts;
 
-use Throwable;
-
 interface SubscriptionExceptionHandler
 {
-    /**
-     * Handle authentication error.
-     *
-     * @return void
-     */
-    public function handleAuthError(Throwable $e);
+    /** Handle authentication error. */
+    public function handleAuthError(\Throwable $e): void;
 
-    /**
-     * Handle broadcast error.
-     *
-     * @return void
-     */
-    public function handleBroadcastError(Throwable $e);
+    /** Handle broadcast error. */
+    public function handleBroadcastError(\Throwable $e): void;
 }

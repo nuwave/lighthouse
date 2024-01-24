@@ -1,34 +1,29 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Execution;
 
 use GraphQL\Error\Error;
-use Throwable;
 
 class ErrorPool
 {
     /**
      * The buffered errors.
      *
-     * @var array<\Throwable>
+     * @var array<int, \Throwable>
      */
-    protected $throwables = [];
+    protected array $throwables = [];
 
-    /**
-     * Stores an error that will be added to the result.
-     */
-    public function record(Throwable $throwable): void
+    /** Stores an error that will be added to the result. */
+    public function record(\Throwable $throwable): void
     {
-        $this->throwables [] = $throwable;
+        $this->throwables[] = $throwable;
     }
 
-    /**
-     * @return array<\GraphQL\Error\Error>
-     */
+    /** @return array<\GraphQL\Error\Error> */
     public function errors(): array
     {
         return array_map(
-            function (Throwable $throwable): Error {
+            static function (\Throwable $throwable): Error {
                 if ($throwable instanceof Error) {
                     return $throwable;
                 }
@@ -39,10 +34,10 @@ class ErrorPool
                     null,
                     [],
                     null,
-                    $throwable
+                    $throwable,
                 );
             },
-            $this->throwables
+            $this->throwables,
         );
     }
 

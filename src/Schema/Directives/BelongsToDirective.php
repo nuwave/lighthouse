@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
@@ -6,7 +6,7 @@ class BelongsToDirective extends RelationDirective
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Resolves a field through the Eloquent `BelongsTo` relationship.
 """
@@ -22,6 +22,6 @@ directive @belongsTo(
   """
   scopes: [String!]
 ) on FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 }

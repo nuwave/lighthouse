@@ -1,27 +1,40 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Utils\Models;
 
-use BenSampo\Enum\Traits\CastsEnums;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Tests\Utils\LaravelEnums\AOrB;
 
 /**
+ * Primary key.
+ *
  * @property int $id
+ *
+ * Attributes
  * @property string|null $name
  * @property AOrB|null $type
+ *
+ * Scopes
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder&static byType(AOrB $aOrB)
  */
-class WithEnum extends Model
+final class WithEnum extends Model
 {
-    use CastsEnums;
-
-    /** @var bool */
     public $timestamps = false;
 
-    /**
-     * @var array<string, class-string<\BenSampo\Enum\Enum>>
-     */
-    protected $enumCasts = [
+    // @phpstan-ignore-next-line iterable type missing in Laravel 9.0.0
+    protected $casts = [
         'type' => AOrB::class,
     ];
+
+    /**
+     * @param  \Illuminate\Database\Eloquent\Builder<self>  $builder
+     *
+     * @return \Illuminate\Database\Eloquent\Builder<self>
+     */
+    public function scopeByType(EloquentBuilder $builder, AOrB $aOrB): EloquentBuilder
+    {
+        return $builder->where('type', $aOrB);
+    }
 }

@@ -1,23 +1,23 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Schema;
 
 use GraphQL\Type\Definition\Directive;
 use Tests\TestCase;
 
-class ClientDirectiveTest extends TestCase
+final class ClientDirectiveTest extends TestCase
 {
     public function testReturnsDefaultDirectivesInIntrospection(): void
     {
         $this->assertNotNull(
-            $this->introspectDirective(Directive::SKIP_NAME)
+            $this->introspectDirective(Directive::SKIP_NAME),
         );
         $this->assertNotNull(
-            $this->introspectDirective(Directive::INCLUDE_NAME)
+            $this->introspectDirective(Directive::INCLUDE_NAME),
         );
     }
 
-    public function testCanDefineACustomClientDirective(): void
+    public function testDefineACustomClientDirective(): void
     {
         $this->schema .= /** @lang GraphQL */ '
         "foo"
@@ -29,7 +29,8 @@ class ClientDirectiveTest extends TestCase
 
         $bar = $this->introspectDirective('bar');
 
-        $this->assertSame(
+        $this->assertIsArray($bar);
+        $this->assertArraySubset(
             [
                 'name' => 'bar',
                 'description' => 'foo',
@@ -49,7 +50,7 @@ class ClientDirectiveTest extends TestCase
                     'FIELD',
                 ],
             ],
-            $bar
+            $bar,
         );
     }
 }

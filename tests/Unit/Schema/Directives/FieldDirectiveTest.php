@@ -1,12 +1,13 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Schema\Directives;
 
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\TestCase;
 use Tests\Utils\Queries\FooBar;
+use Tests\Utils\Types\User\NonRootClassResolver;
 
-class FieldDirectiveTest extends TestCase
+final class FieldDirectiveTest extends TestCase
 {
     public function testAssignsResolverFromCombinedDefinition(): void
     {
@@ -46,45 +47,7 @@ class FieldDirectiveTest extends TestCase
         ]);
     }
 
-    public function testCanResolveFieldWithMergedArgs(): void
-    {
-        $this->schema = /** @lang GraphQL */ '
-        type Query {
-            bar: String! @field(resolver: "Tests\\\Utils\\\Resolvers\\\Foo@baz" args: ["foo.baz"])
-        }
-        ';
-
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            bar
-        }
-        ')->assertJson([
-            'data' => [
-                'bar' => 'foo.baz',
-            ],
-        ]);
-    }
-
     public function testUsesDefaultFieldNamespace(): void
-    {
-        $this->schema = /** @lang GraphQL */ '
-        type Query {
-            bar: String! @field(resolver: "FooBar@customResolve")
-        }
-        ';
-
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            bar
-        }
-        ')->assertJson([
-            'data' => [
-                'bar' => FooBar::CUSTOM_RESOLVE_RESULT,
-            ],
-        ]);
-    }
-
-    public function testUsesDefaultFieldNamespaceForInvokableClass(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -103,17 +66,64 @@ class FieldDirectiveTest extends TestCase
         ]);
     }
 
+    public function testUsesNonRootParentNamespace(): void
+    {
+        $this->mockResolver([]);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            user: User @mock
+        }
+
+        type User {
+            foo: String! @field(resolver: "NonRootClassResolver")
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            user {
+                foo
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'foo' => NonRootClassResolver::RESULT,
+                ],
+            ],
+        ]);
+    }
+
+    public function testUsesDefaultFieldNamespaceWithCustomMethodName(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            bar: String! @field(resolver: "FooBar@customResolve")
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            bar
+        }
+        ')->assertJson([
+            'data' => [
+                'bar' => FooBar::CUSTOM_RESOLVE_RESULT,
+            ],
+        ]);
+    }
+
     public function testThrowsAnErrorWhenNoClassFound(): void
     {
-        $this->expectException(DefinitionException::class);
-        $this->expectExceptionMessage("No class 'NonExisting' was found for directive 'field'");
-
         $this->schema = /** @lang GraphQL */ '
         type Query {
             foo: String! @field(resolver: "NonExisting")
         }
         ';
 
+        $this->expectException(DefinitionException::class);
+        $this->expectExceptionMessage('Failed to find class NonExisting in namespaces [Tests\Utils\Queries, Tests\Utils\QueriesSecondary] for directive @field.');
         $this->graphQL(/** @lang GraphQL */ '
         {
             foo
@@ -123,15 +133,14 @@ class FieldDirectiveTest extends TestCase
 
     public function testThrowsAnErrorWhenClassIsNotInvokable(): void
     {
-        $this->expectException(DefinitionException::class);
-        $this->expectExceptionMessage("Method '__invoke' does not exist on class 'Tests\Utils\Queries\MissingInvoke'");
-
         $this->schema = /** @lang GraphQL */ '
         type Query {
             bar: String! @field(resolver: "MissingInvoke")
         }
         ';
 
+        $this->expectException(DefinitionException::class);
+        $this->expectExceptionMessage("Method '__invoke' does not exist on class 'Tests\Utils\Queries\MissingInvoke'.");
         $this->graphQL(/** @lang GraphQL */ '
         {
             bar

@@ -1,8 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Execution;
 
-use Closure;
 use GraphQL\Error\Error;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 
@@ -11,17 +10,11 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
  */
 class ReportingErrorHandler implements ErrorHandler
 {
-    /**
-     * @var \Illuminate\Contracts\Debug\ExceptionHandler
-     */
-    protected $exceptionHandler;
+    public function __construct(
+        protected ExceptionHandler $exceptionHandler,
+    ) {}
 
-    public function __construct(ExceptionHandler $exceptionHandler)
-    {
-        $this->exceptionHandler = $exceptionHandler;
-    }
-
-    public function __invoke(?Error $error, Closure $next): ?array
+    public function __invoke(?Error $error, \Closure $next): ?array
     {
         if ($error === null) {
             return $next(null);
@@ -33,9 +26,10 @@ class ReportingErrorHandler implements ErrorHandler
             return $next($error);
         }
 
-        // @phpstan-ignore-next-line TODO remove when supporting Laravel 7 and upwards
-        $this->exceptionHandler->report(
-            $error->getPrevious());
+        $previous = $error->getPrevious();
+        if ($previous !== null) {
+            $this->exceptionHandler->report($previous);
+        }
 
         return $next($error);
     }

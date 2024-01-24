@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Types\Scalars;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 
 class DateTimeTz extends DateScalar
 {
@@ -11,8 +11,13 @@ class DateTimeTz extends DateScalar
         return $carbon->toIso8601String();
     }
 
-    protected function parse($value): Carbon
+    protected function parse(mixed $value): Carbon
     {
-        return Carbon::createFromFormat(Carbon::ISO8601, $value);
+        // @phpstan-ignore-next-line We know the format to be good, so this can never return `false`
+        return Carbon::createFromFormat(
+            // https://www.php.net/manual/en/class.datetimeinterface.php#datetime.constants.iso8601
+            Carbon::ATOM,
+            $value,
+        );
     }
 }

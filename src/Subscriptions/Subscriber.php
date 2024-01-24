@@ -1,158 +1,133 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\AST\NodeList;
-use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Utils\AST;
+use Illuminate\Container\Container;
 use Illuminate\Support\Str;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-use Serializable;
 
-class Subscriber implements Serializable
+class Subscriber
 {
     /**
-     * A unique key for the subscriber.
+     * A unique key for the subscriber's channel.
      *
-     * @var string
+     * This has to be unique for each subscriber, because each of them can send a different
+     * query and must receive a response that is specifically tailored towards that.
      */
-    public $channel;
+    public string $channel;
 
-    /**
-     * The topic subscribed to.
-     *
-     * @var string
-     */
-    public $topic;
+    /** X-Socket-ID header passed on the subscription query. */
+    public ?string $socket_id;
 
-    /**
-     * The contents of the query.
-     *
-     * @var \GraphQL\Language\AST\DocumentNode
-     */
-    public $query;
+    /** The topic subscribed to. */
+    public string $topic;
+
+    /** The contents of the query. */
+    public DocumentNode $query;
 
     /**
      * The name of the queried field.
      *
      * Guaranteed be be unique because of
+     *
      * @see \GraphQL\Validator\Rules\SingleFieldSubscription
-     *
-     * @var string
      */
-    public $fieldName;
+    public string $fieldName;
+
+    /** The root element of the query. */
+    public mixed $root;
 
     /**
-     * The root element of the query.
-     *
-     * @var mixed Can be anything.
-     */
-    public $root;
-
-    /**
-     * The args passed to the subscription query.
+     * The variables passed to the subscription query.
      *
      * @var array<string, mixed>
      */
-    public $args;
+    public array $variables = [];
 
-    /**
-     * The context passed to the query.
-     *
-     * @var \Nuwave\Lighthouse\Support\Contracts\GraphQLContext
-     */
-    public $context;
-
-    /**
-     * @param  array<string, mixed>  $args
-     */
     public function __construct(
-        array $args,
-        GraphQLContext $context,
-        ResolveInfo $resolveInfo
+        /**
+         * The args passed to the subscription query.
+         *
+         * @var array<string, mixed> $args
+         */
+        public array $args,
+        /**
+         * The context passed to the query.
+         */
+        public GraphQLContext $context,
+        ResolveInfo $resolveInfo,
     ) {
         $this->fieldName = $resolveInfo->fieldName;
         $this->channel = self::uniqueChannelName();
-        $this->args = $args;
-        $this->context = $context;
+        $this->variables = $resolveInfo->variableValues;
 
-        /**
-         * Must be here, since webonyx/graphql-php validated the subscription.
-         *
-         * @var \GraphQL\Language\AST\OperationDefinitionNode $operation
-         */
-        $operation = $resolveInfo->operation;
+        $xSocketID = request()->header('X-Socket-ID');
+        // @phpstan-ignore-next-line
+        if (is_array($xSocketID)) {
+            throw new \Exception('X-Socket-ID must be a string or null.');
+        }
+
+        $this->socket_id = $xSocketID;
 
         $this->query = new DocumentNode([
             'definitions' => new NodeList(array_merge(
                 $resolveInfo->fragments,
-                [$operation]
+                [$resolveInfo->operation],
             )),
         ]);
     }
 
-    /**
-     * Unserialize subscription from a JSON string.
-     *
-     * @param  string  $subscription
-     */
-    public function unserialize($subscription): void
+    /** @return array<string, mixed> */
+    public function __serialize(): array
     {
-        $data = \Safe\json_decode($subscription, true);
-
-        $this->channel = $data['channel'];
-        $this->topic = $data['topic'];
-        $this->query = AST::fromArray( // @phpstan-ignore-line We know this will be exactly a DocumentNode and nothing else
-            unserialize($data['query'])
-        );
-        $this->fieldName = $data['field_name'];
-        $this->args = $data['args'];
-        $this->context = $this->contextSerializer()->unserialize(
-            $data['context']
-        );
-    }
-
-    /**
-     * Convert this into a JSON string.
-     */
-    public function serialize(): string
-    {
-        return \Safe\json_encode([
+        return [
+            'socket_id' => $this->socket_id,
             'channel' => $this->channel,
             'topic' => $this->topic,
             'query' => serialize(
-                AST::toArray($this->query)
+                AST::toArray($this->query),
             ),
             'field_name' => $this->fieldName,
             'args' => $this->args,
+            'variables' => $this->variables,
             'context' => $this->contextSerializer()->serialize($this->context),
-        ]);
+        ];
     }
 
-    /**
-     * Set root data.
-     *
-     * @return $this
-     */
-    public function setRoot($root): self
+    /** @param  array<string, mixed>  $data */
+    public function __unserialize(array $data): void
     {
-        $this->root = $root;
+        $this->channel = $data['channel'];
+        $this->topic = $data['topic'];
 
-        return $this;
+        $documentNode = AST::fromArray(
+            unserialize($data['query']),
+        );
+        assert($documentNode instanceof DocumentNode, 'We know the type since it is set during construction and serialized.');
+
+        $this->socket_id = $data['socket_id'];
+        $this->query = $documentNode;
+        $this->fieldName = $data['field_name'];
+        $this->args = $data['args'];
+        $this->variables = $data['variables'];
+        $this->context = $this->contextSerializer()->unserialize(
+            $data['context'],
+        );
     }
 
-    /**
-     * Generate a unique private channel name.
-     */
+    /** Generate a unique private channel name. */
     public static function uniqueChannelName(): string
     {
-        return 'private-lighthouse-'.Str::random(32).'-'.time();
+        return 'private-lighthouse-' . Str::random(32) . '-' . time();
     }
 
     protected function contextSerializer(): ContextSerializer
     {
-        return app(ContextSerializer::class);
+        return Container::getInstance()->make(ContextSerializer::class);
     }
 }

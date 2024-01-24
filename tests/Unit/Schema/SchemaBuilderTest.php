@@ -1,42 +1,39 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Schema;
 
+use GraphQL\Type\Definition\Argument;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\EnumValueDefinition;
-use GraphQL\Type\Definition\FieldArgument;
-use GraphQL\Type\Definition\FieldDefinition;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Schema;
 use Nuwave\Lighthouse\Schema\RootType;
 use Tests\TestCase;
 
-class SchemaBuilderTest extends TestCase
+final class SchemaBuilderTest extends TestCase
 {
     public function testGeneratesValidSchema(): void
     {
-        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '');
+        $this->buildSchemaWithPlaceholderQuery('')
+            ->assertValid();
 
-        $this->assertInstanceOf(Schema::class, $schema);
-        // This would throw if the schema were invalid
-        $schema->assertValid();
+        $this->expectNotToPerformAssertions();
     }
 
     public function testGeneratesWithEmptyQueryType(): void
     {
-        $schema = $this->buildSchema(/** @lang GraphQL */ '
-        type Query
+        $this
+            ->buildSchema(/** @lang GraphQL */ '
+            type Query
 
-        extend type Query {
-            foo: Int
-        }
-        ');
+            extend type Query {
+                foo: Int
+            }
+            ')
+            ->assertValid();
 
-        $this->assertInstanceOf(Schema::class, $schema);
-        // This would throw if the schema were invalid
-        $schema->assertValid();
+        $this->expectNotToPerformAssertions();
     }
 
     public function testGeneratesWithEmptyMutationType(): void
@@ -51,14 +48,13 @@ class SchemaBuilderTest extends TestCase
         }
         ');
 
-        /** @var \GraphQL\Type\Definition\ObjectType $mutationObjectType */
         $mutationObjectType = $schema->getType(RootType::MUTATION);
-        $foo = $mutationObjectType->getField('foo');
+        assert($mutationObjectType instanceof ObjectType);
 
-        $this->assertSame('foo', $foo->name);
+        $this->assertSame('foo', $mutationObjectType->getField('foo')->name);
     }
 
-    public function testCanResolveEnumTypes(): void
+    public function testResolveEnumTypes(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
         "Role description"
@@ -71,21 +67,19 @@ class SchemaBuilderTest extends TestCase
         }
         ');
 
-        /** @var \GraphQL\Type\Definition\EnumType $enumType */
         $enumType = $schema->getType('Role');
-        $this->assertInstanceOf(EnumType::class, $enumType);
+        assert($enumType instanceof EnumType);
         $this->assertSame('Role description', $enumType->description);
 
         $enumValues = $enumType->getValues();
         $this->assertCount(2, $enumValues);
 
         $enumValueDefinition = $enumType->getValue('ADMIN');
-        $this->assertInstanceOf(EnumValueDefinition::class, $enumValueDefinition);
-        /** @var \GraphQL\Type\Definition\EnumValueDefinition $enumValueDefinition */
+        assert($enumValueDefinition instanceof EnumValueDefinition);
         $this->assertSame('Company administrator.', $enumValueDefinition->description);
     }
 
-    public function testCanResolveInterfaceTypes(): void
+    public function testResolveInterfaceTypes(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
         """
@@ -97,15 +91,14 @@ class SchemaBuilderTest extends TestCase
         }
         ');
 
-        /** @var \GraphQL\Type\Definition\InterfaceType $interfaceType */
         $interfaceType = $schema->getType('Foo');
-        $this->assertInstanceOf(InterfaceType::class, $interfaceType);
+        assert($interfaceType instanceof InterfaceType);
 
         $this->assertSame('int', $interfaceType->description);
         $this->assertSame('bar is baz', $interfaceType->getField('bar')->description);
     }
 
-    public function testCanResolveObjectTypes(): void
+    public function testResolveObjectTypes(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
         "asdf"
@@ -119,24 +112,20 @@ class SchemaBuilderTest extends TestCase
         ');
 
         $foo = $schema->getType('Foo');
-        $this->assertInstanceOf(ObjectType::class, $foo);
-        /** @var \GraphQL\Type\Definition\ObjectType $foo */
+        assert($foo instanceof ObjectType);
         $this->assertSame('Foo', $foo->name);
 
         $bar = $foo->getField('bar');
-        $this->assertInstanceOf(FieldDefinition::class, $bar);
-        /** @var \GraphQL\Type\Definition\FieldDefinition $bar */
         $this->assertSame('bar attribute of Foo', $bar->description);
 
         $baz = $bar->getArg('baz');
-        $this->assertInstanceOf(FieldArgument::class, $baz);
-        /** @var \GraphQL\Type\Definition\FieldArgument $baz */
+        assert($baz instanceof Argument);
         $this->assertSame('arg', $baz->description);
         $this->assertTrue($baz->defaultValueExists());
         $this->assertFalse($baz->defaultValue);
     }
 
-    public function testCanResolveInputObjectTypes(): void
+    public function testResolveInputObjectTypes(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
         "bla"
@@ -147,9 +136,8 @@ class SchemaBuilderTest extends TestCase
         }
         ');
 
-        /** @var \GraphQL\Type\Definition\InputObjectType $inputObjectType */
         $inputObjectType = $schema->getType('CreateFoo');
-        $this->assertInstanceOf(InputObjectType::class, $inputObjectType);
+        assert($inputObjectType instanceof InputObjectType);
 
         $this->assertSame('CreateFoo', $inputObjectType->name);
         $this->assertSame('bla', $inputObjectType->description);
@@ -157,7 +145,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertSame(123, $inputObjectType->getField('bar')->defaultValue);
     }
 
-    public function testCanResolveMutations(): void
+    public function testResolveMutations(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
         type Mutation {
@@ -165,25 +153,23 @@ class SchemaBuilderTest extends TestCase
         }
         ');
 
-        /** @var \GraphQL\Type\Definition\ObjectType $mutationObjectType */
         $mutationObjectType = $schema->getType(RootType::MUTATION);
-        $foo = $mutationObjectType->getField('foo');
+        assert($mutationObjectType instanceof ObjectType);
 
-        $this->assertSame('foo', $foo->name);
+        $this->assertSame('foo', $mutationObjectType->getField('foo')->name);
     }
 
-    public function testCanResolveQueries(): void
+    public function testResolveQueries(): void
     {
-        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '');
+        $schema = $this->buildSchemaWithPlaceholderQuery('');
 
-        /** @var \GraphQL\Type\Definition\ObjectType $queryObjectType */
         $queryObjectType = $schema->getType(RootType::QUERY);
-        $field = $queryObjectType->getField('foo');
+        assert($queryObjectType instanceof ObjectType);
 
-        $this->assertSame('foo', $field->name);
+        $this->assertSame('foo', $queryObjectType->getField('foo')->name);
     }
 
-    public function testCanExtendObjectTypes(): void
+    public function testExtendObjectTypes(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
         type Foo {
@@ -195,14 +181,14 @@ class SchemaBuilderTest extends TestCase
         }
         ');
 
-        /** @var \GraphQL\Type\Definition\ObjectType $objectType */
         $objectType = $schema->getType('Foo');
-        $fields = $objectType->config['fields']();
+        assert($objectType instanceof ObjectType);
+        $fields = $objectType->getFields();
 
         $this->assertArrayHasKey('baz', $fields);
     }
 
-    public function testCanExtendTypes(): void
+    public function testExtendTypes(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
         type Foo {
@@ -215,8 +201,8 @@ class SchemaBuilderTest extends TestCase
         }
         ');
 
-        /** @var \GraphQL\Type\Definition\ObjectType $type */
         $type = $schema->getType('Foo');
+        assert($type instanceof ObjectType);
 
         $this->assertSame('yo?', $type->getField('bar')->description);
     }
@@ -235,15 +221,13 @@ class SchemaBuilderTest extends TestCase
         }
         ');
 
-        /** @var ObjectType $queryType */
         $queryType = $schema->getQueryType();
+        assert($queryType instanceof ObjectType);
 
         $barArg = $queryType
             ->getField('foo')
             ->getArg('bar');
-
-        $this->assertInstanceOf(FieldArgument::class, $barArg);
-        /** @var \GraphQL\Type\Definition\FieldArgument $barArg */
+        assert($barArg instanceof Argument);
         $this->assertSame('internal', $barArg->defaultValue);
     }
 }

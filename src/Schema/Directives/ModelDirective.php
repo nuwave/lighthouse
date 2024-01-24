@@ -1,12 +1,17 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-class ModelDirective extends NodeDirective
+use GraphQL\Language\AST\Node;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+
+class ModelDirective extends BaseDirective
 {
+    public const NAME = 'model';
+
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Map a model class to an object type.
 
@@ -18,6 +23,17 @@ directive @model(
   """
   class: String!
 ) on OBJECT
-SDL;
+GRAPHQL;
+    }
+
+    /** Attempt to get the model class name from this directive. */
+    public static function modelClass(Node $node): ?string
+    {
+        $modelDirective = ASTHelper::directiveDefinition($node, self::NAME);
+        if ($modelDirective !== null) {
+            return ASTHelper::directiveArgValue($modelDirective, 'class');
+        }
+
+        return null;
     }
 }

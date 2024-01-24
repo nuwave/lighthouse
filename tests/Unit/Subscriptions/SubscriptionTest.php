@@ -1,9 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Subscriptions;
 
 use Illuminate\Http\Request;
-use InvalidArgumentException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\Utils\Subscription;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
@@ -11,95 +11,94 @@ use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
+use Tests\EnablesSubscriptionServiceProvider;
+use Tests\TestCase;
 
-class SubscriptionTest extends SubscriptionTestCase
+final class SubscriptionTest extends TestCase
 {
-    /**
-     * @var string
-     */
-    public const SUBSCRIPTION_FIELD = 'postCreated';
-
-    /**
-     * @var \Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry
-     */
-    protected $subscriptionRegistry;
-
-    /**
-     * @var \Nuwave\Lighthouse\Subscriptions\SubscriptionBroadcaster&\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $broadcaster;
+    use EnablesSubscriptionServiceProvider;
 
     protected function getPackageProviders($app): array
     {
         return array_merge(
             parent::getPackageProviders($app),
-            [SubscriptionServiceProvider::class]
+            [SubscriptionServiceProvider::class],
         );
     }
 
-    protected function setUp(): void
+    public function testBroadcastSubscriptionFromField(): void
     {
-        parent::setUp();
-
-        $this->mockResolverExpects($this->any())
-            ->willReturn(self::SUBSCRIPTION_FIELD);
-
-        $this->schema = /** @lang GraphQL */ '
-        type Query {
-            subscription: String @mock
+        $subscriptionField = 'onPostCreated';
+        $this->schema .= /** @lang GraphQL */ "
+        type Subscription {
+            {$subscriptionField}: ID
         }
-        ';
+        ";
 
-        $this->subscriptionRegistry = app(SubscriptionRegistry::class);
-        $this->subscriptionRegistry->register($this->subscription(), self::SUBSCRIPTION_FIELD);
+        $broadcaster = $this->createMock(SubscriptionBroadcaster::class);
+        $this->app->instance(BroadcastsSubscriptions::class, $broadcaster);
 
-        $this->broadcaster = $this->createMock(SubscriptionBroadcaster::class);
-        $this->app->instance(BroadcastsSubscriptions::class, $this->broadcaster);
-    }
+        $root = 1;
 
-    public function testCanSendSubscriptionToBroadcaster(): void
-    {
-        $root = [
-            'post' => [
-                'id' => 1,
-            ],
-        ];
-
-        $this->broadcaster
+        $broadcaster
             ->expects($this->once())
             ->method('broadcast')
             ->with(
                 $this->isInstanceOf(GraphQLSubscription::class),
-                self::SUBSCRIPTION_FIELD,
-                $root
+                $subscriptionField,
+                $root,
             );
 
-        Subscription::broadcast(self::SUBSCRIPTION_FIELD, $root);
+        Subscription::broadcast($subscriptionField, $root);
     }
 
-    public function testThrowsOnInvalidSubscriptionField(): void
+    public function testBroadcastProgrammaticallyRegisteredSubscription(): void
     {
-        $this->broadcaster
-            ->expects($this->never())
-            ->method('broadcast');
-
-        $this->expectException(InvalidArgumentException::class);
-
-        Subscription::broadcast('unknownField', []);
-    }
-
-    protected function subscription(): GraphQLSubscription
-    {
-        return new class extends GraphQLSubscription {
+        $subscriptionRegistry = $this->app->make(SubscriptionRegistry::class);
+        $subscription = new class() extends GraphQLSubscription {
             public function authorize(Subscriber $subscriber, Request $request): bool
             {
                 return true;
             }
 
-            public function filter(Subscriber $subscriber, $root): bool
+            public function filter(Subscriber $subscriber, mixed $root): bool
             {
                 return true;
             }
         };
+        $subscriptionField = 'onPostCreated';
+        $subscriptionRegistry->register($subscription, $subscriptionField);
+
+        $broadcaster = $this->createMock(SubscriptionBroadcaster::class);
+        $this->app->instance(BroadcastsSubscriptions::class, $broadcaster);
+
+        $root = 1;
+
+        $broadcaster
+            ->expects($this->once())
+            ->method('broadcast')
+            ->with($subscription, $subscriptionField, $root);
+
+        Subscription::broadcast($subscriptionField, $root);
+    }
+
+    public function testThrowsOnInvalidSubscriptionField(): void
+    {
+        $this->schema .= /** @lang GraphQL */ '
+        type Subscription {
+            foo: ID @mock
+        }
+        ';
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        Subscription::broadcast('unknownField', []);
+    }
+
+    public function testThrowsOnMissingSubscriptionRootType(): void
+    {
+        $this->expectException(DefinitionException::class);
+
+        Subscription::broadcast('canNotBeResolvedDueToMissingRootType', []);
     }
 }

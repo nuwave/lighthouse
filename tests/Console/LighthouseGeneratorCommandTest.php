@@ -1,11 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Console;
 
 use Nuwave\Lighthouse\Console\LighthouseGeneratorCommand;
 use Tests\TestCase;
 
-class LighthouseGeneratorCommandTest extends TestCase
+final class LighthouseGeneratorCommandTest extends TestCase
 {
     public function testCommonNamespaceSingle(): void
     {
@@ -13,7 +13,7 @@ class LighthouseGeneratorCommandTest extends TestCase
 
         $this->assertSame(
             $namespace,
-            LighthouseGeneratorCommand::commonNamespace([$namespace])
+            LighthouseGeneratorCommand::commonNamespace([$namespace]),
         );
     }
 
@@ -21,11 +21,11 @@ class LighthouseGeneratorCommandTest extends TestCase
     {
         $this->assertSame(
             'App',
-            LighthouseGeneratorCommand::commonNamespace(['App\\Foo', 'App\\Bar', 'App\\Foo\\Bar'])
+            LighthouseGeneratorCommand::commonNamespace(['App\\Foo', 'App\\Bar', 'App\\Foo\\Bar']),
         );
         $this->assertSame(
             'Foo',
-            LighthouseGeneratorCommand::commonNamespace(['Foo', 'Bar'])
+            LighthouseGeneratorCommand::commonNamespace(['Foo', 'Bar']),
         );
     }
 
@@ -35,7 +35,7 @@ class LighthouseGeneratorCommandTest extends TestCase
 
         $this->assertSame(
             $first,
-            LighthouseGeneratorCommand::commonNamespace([$first, 'Foo\\Bar'])
+            LighthouseGeneratorCommand::commonNamespace([$first, 'Foo\\Bar']),
         );
     }
 

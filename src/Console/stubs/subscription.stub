@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace DummyNamespace;
 
@@ -6,28 +6,16 @@ use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 
-class DummyClass extends GraphQLSubscription
+final class DummyClass extends GraphQLSubscription
 {
-    /**
-     * Check if subscriber is allowed to listen to the subscription.
-     *
-     * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
-     */
+    /** Check if subscriber is allowed to listen to the subscription. */
     public function authorize(Subscriber $subscriber, Request $request): bool
     {
         // TODO implement authorize
     }
 
-    /**
-     * Filter which subscribers should receive the subscription.
-     *
-     * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
-     * @param  mixed  $root
-     * @return bool
-     */
-    public function filter(Subscriber $subscriber, $root): bool
+    /** Filter which subscribers should receive the subscription. */
+    public function filter(Subscriber $subscriber, mixed $root): bool
     {
         // TODO implement filter
     }

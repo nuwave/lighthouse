@@ -1,25 +1,34 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration;
 
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
+use Illuminate\Filesystem\Filesystem;
+use Nuwave\Lighthouse\Exceptions\InvalidSchemaCacheContentsException;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Tests\TestCase;
+use Tests\TestsSchemaCache;
 use Tests\TestsSerialization;
 use Tests\Utils\Models\Comment;
 
-class SchemaCachingTest extends TestCase
+final class SchemaCachingTest extends TestCase
 {
     use TestsSerialization;
+    use TestsSchemaCache;
 
-    protected function getEnvironmentSetUp($app): void
+    protected function setUp(): void
     {
-        parent::getEnvironmentSetUp($app);
+        parent::setUp();
 
-        /** @var \Illuminate\Contracts\Config\Repository $config */
-        $config = $app['config'];
-        $config->set('lighthouse.cache.enable', true);
+        $this->setUpSchemaCache();
+        $this->useSerializingArrayStore();
+    }
 
-        $this->useSerializingArrayStore($app);
+    protected function tearDown(): void
+    {
+        $this->tearDownSchemaCache();
+
+        parent::tearDown();
     }
 
     public function testSchemaCachingWithUnionType(): void
@@ -62,11 +71,28 @@ class SchemaCachingTest extends TestCase
         ]);
     }
 
+    public function testInvalidSchemaCacheContents(): void
+    {
+        $config = $this->app->make(ConfigRepository::class);
+
+        $filesystem = $this->app->make(Filesystem::class);
+        $path = $config->get('lighthouse.schema_cache.path');
+        $filesystem->put($path, '');
+
+        $this->expectExceptionObject(new InvalidSchemaCacheContentsException($path, 1));
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo
+        }
+        ');
+    }
+
     protected function cacheSchema(): void
     {
-        /** @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder $astBuilder */
-        $astBuilder = app(ASTBuilder::class);
+        /** @var ASTBuilder $astBuilder */
+        $astBuilder = $this->app->make(ASTBuilder::class);
         $astBuilder->documentAST();
+
         $this->app->forgetInstance(ASTBuilder::class);
     }
 }

@@ -1,81 +1,137 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Schema\Directives;
 
-use Illuminate\Support\Arr;
+use GraphQL\Validator\Rules\QueryComplexity;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Tests\TestCase;
+use Tests\Utils\Queries\Foo;
 
-class ComplexityDirectiveTest extends TestCase
+final class ComplexityDirectiveTest extends TestCase
 {
-    public function testCanSetDefaultComplexityOnField(): void
+    public const CUSTOM_COMPLEXITY = 123;
+
+    public function testDefaultComplexity(): void
     {
-        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
-        type User {
-            posts: [Post!]! @complexity @hasMany
+        $max = 1;
+        $this->setMaxQueryComplexity($max);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            posts: [Post!]! @all
         }
 
         type Post {
             title: String
         }
-        ');
+        ';
 
-        /** @var \GraphQL\Type\Definition\ObjectType $user */
-        $user = $schema->getType('User');
-        $complexityFn = $user
-            ->getField('posts')
-            ->getComplexityFn();
-
-        $this->assertSame(100, $complexityFn(10, ['first' => 10]));
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            posts {
+                title
+            }
+        }
+        ')->assertGraphQLErrorMessage(QueryComplexity::maxQueryComplexityErrorMessage($max, 2));
     }
 
-    public function testCanSetCustomComplexityResolver(): void
+    public function testKnowsPagination(): void
     {
-        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ <<<GRAPHQL
-        type User {
-            posts: [Post!]!
-                @complexity(resolver: "{$this->qualifyTestResolver('complexity')}")
-                @hasMany
+        $max = 1;
+        $this->setMaxQueryComplexity($max);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            posts: [Post!]! @paginate
         }
 
         type Post {
             title: String
         }
-GRAPHQL
-        );
+        ';
 
-        /** @var \GraphQL\Type\Definition\ObjectType $user */
-        $user = $schema->getType('User');
-        $complexityFn = $user
-            ->getField('posts')
-            ->getComplexityFn();
+        // 1 + (2 for data & title * 10 first items)
+        $expectedCount = 21;
 
-        $this->assertSame(100, $complexityFn(10, ['foo' => 10]));
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            posts(first: 10) {
+                data {
+                    title
+                }
+            }
+        }
+        ')->assertGraphQLErrorMessage(QueryComplexity::maxQueryComplexityErrorMessage($max, $expectedCount));
+    }
+
+    public function testIgnoresFirstArgumentUnrelatedToPagination(): void
+    {
+        $max = 1;
+        $this->setMaxQueryComplexity($max);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            posts(first: String!): [Post!]! @all
+        }
+
+        type Post {
+            title: String
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            posts(first: "named like the generated argument of @paginate, but should not increase complexity here") {
+                title
+            }
+        }
+        ')->assertGraphQLErrorMessage(QueryComplexity::maxQueryComplexityErrorMessage($max, 2));
+    }
+
+    public function testCustomComplexityResolver(): void
+    {
+        $max = 1;
+        $this->setMaxQueryComplexity($max);
+
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        type Query {
+            foo: ID @complexity(resolver: "{$this->qualifyTestResolver('complexity')}")
+        }
+GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo
+        }
+        ')->assertGraphQLErrorMessage(QueryComplexity::maxQueryComplexityErrorMessage($max, self::CUSTOM_COMPLEXITY));
     }
 
     public function testResolvesComplexityResolverThroughDefaultNamespace(): void
     {
-        $schema = $this->buildSchema(/** @lang GraphQL */ '
+        $max = 1;
+        $this->setMaxQueryComplexity($max);
+
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
-            foo: Int
-                @complexity(resolver: "Foo@complexity")
+            foo: Int @complexity(resolver: "Foo@complexity")
         }
-        ');
+GRAPHQL;
 
-        /** @var \GraphQL\Type\Definition\ObjectType $queryType */
-        $queryType = $schema->getQueryType();
-
-        $complexityFn = $queryType
-            ->getField('foo')
-            ->getComplexityFn();
-
-        $this->assertSame(42, $complexityFn());
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo
+        }
+        ')->assertGraphQLErrorMessage(QueryComplexity::maxQueryComplexityErrorMessage($max, Foo::THE_ANSWER));
     }
 
-    /**
-     * @param  array<string, int|null>  $args
-     */
-    public function complexity(int $childrenComplexity, array $args): int
+    public static function complexity(): int
     {
-        return $childrenComplexity * (int) Arr::get($args, 'foo', 0);
+        return self::CUSTOM_COMPLEXITY;
+    }
+
+    protected function setMaxQueryComplexity(int $max): void
+    {
+        $config = $this->app->make(ConfigRepository::class);
+        $config->set('lighthouse.security.max_query_complexity', $max);
     }
 }

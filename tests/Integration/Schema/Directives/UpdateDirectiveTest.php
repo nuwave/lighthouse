@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Schema\Directives;
 
@@ -10,9 +10,9 @@ use Tests\Utils\Models\Company;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class UpdateDirectiveTest extends DBTestCase
+final class UpdateDirectiveTest extends DBTestCase
 {
-    public function testCanUpdateFromFieldArguments(): void
+    public function testUpdateFromFieldArguments(): void
     {
         factory(Company::class)->create(['name' => 'foo']);
 
@@ -52,7 +52,7 @@ class UpdateDirectiveTest extends DBTestCase
         $this->assertSame('bar', Company::firstOrFail()->name);
     }
 
-    public function testCanUpdateFromInputObject(): void
+    public function testUpdateFromInputObject(): void
     {
         factory(Company::class)->create(['name' => 'foo']);
 
@@ -114,16 +114,10 @@ class UpdateDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertJson([
-            'errors' => [
-                [
-                    'message' => UpdateModel::MISSING_PRIMARY_KEY_FOR_UPDATE,
-                ],
-            ],
-        ]);
+        ')->assertGraphQLErrorMessage(UpdateModel::MISSING_PRIMARY_KEY_FOR_UPDATE);
     }
 
-    public function testCanUpdateWithCustomPrimaryKey(): void
+    public function testUpdateWithCustomPrimaryKey(): void
     {
         factory(Category::class)->create(['name' => 'foo']);
 
@@ -163,7 +157,7 @@ class UpdateDirectiveTest extends DBTestCase
         $this->assertSame('bar', Category::firstOrFail()->name);
     }
 
-    public function testCanUpdateWithCustomPrimaryKeyAsId(): void
+    public function testUpdateWithCustomPrimaryKeyAsId(): void
     {
         factory(Category::class)->create(['name' => 'foo']);
 
@@ -389,7 +383,7 @@ class UpdateDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertExactJson([
+        ')->assertJson([
             'data' => [
                 'updateUser' => [
                     'name' => 'foo',

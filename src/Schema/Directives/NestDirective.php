@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
@@ -11,30 +11,27 @@ class NestDirective extends BaseDirective implements ArgResolver
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 A no-op nested arg resolver that delegates all calls
 to the ArgResolver directives attached to the children.
 """
 directive @nest on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
     /**
      * Delegate to nested arg resolvers.
      *
-     * @param  mixed  $root  The result of the parent resolver.
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>  $args  The slice of arguments that belongs to this nested resolver.
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>  $args  the slice of arguments that belongs to this nested resolver
      */
-    public function __invoke($root, $args)
+    public function __invoke(mixed $root, $args): mixed
     {
         $resolveNested = new ResolveNested();
 
-        return Utils::applyEach(
-            static function (ArgumentSet $argumentSet) use ($resolveNested, $root) {
-                return $resolveNested($root, $argumentSet);
-            },
-            $args
+        return Utils::mapEach(
+            static fn (ArgumentSet $argumentSet): mixed => $resolveNested($root, $argumentSet),
+            $args,
         );
     }
 }

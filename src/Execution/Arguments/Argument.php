@@ -1,68 +1,73 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
 use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
 class Argument
 {
     /**
      * The value given by the client.
      *
-     * @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>|mixed|array<mixed>
+     * @var ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>|mixed|array<mixed>
      */
-    public $value;
+    public mixed $value;
 
     /**
      * The type of the argument.
-     *
-     * @var \Nuwave\Lighthouse\Execution\Arguments\ListType|\Nuwave\Lighthouse\Execution\Arguments\NamedType|null
      */
-    public $type;
+    public ListType|NamedType $type;
 
     /**
      * A list of directives associated with that argument.
      *
-     * @var \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive>
+     * @var \Illuminate\Support\Collection<int, \Nuwave\Lighthouse\Support\Contracts\Directive>
      */
-    public $directives;
+    public Collection $directives;
 
-    /**
-     * An argument may have a resolver that handles it's given value.
-     *
-     * @var \Nuwave\Lighthouse\Support\Contracts\ArgResolver|null
-     */
-    public $resolver;
+    /** An argument may have a resolver that handles its given value. */
+    public ?ArgResolver $resolver = null;
 
     public function __construct()
     {
         $this->directives = new Collection();
     }
 
-    /**
-     * Get the plain PHP value of this argument.
-     *
-     * @return mixed The plain PHP value.
-     */
-    public function toPlain()
+    /** Get the plain PHP value of this argument. */
+    public function toPlain(): mixed
     {
         return static::toPlainRecursive($this->value);
+    }
+
+    public function namedType(): ?NamedType
+    {
+        return static::namedTypeRecursive($this->type);
+    }
+
+    protected static function namedTypeRecursive(ListType|NamedType|null $type): ?NamedType
+    {
+        if ($type instanceof ListType) {
+            return static::namedTypeRecursive($type->type);
+        }
+
+        return $type;
     }
 
     /**
      * Convert the given value to plain PHP values recursively.
      *
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>|mixed|array<mixed>  $value
+     * @param  ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>|mixed|array<mixed>  $value
+     *
      * @return mixed|array<mixed>
      */
-    protected static function toPlainRecursive($value)
+    protected static function toPlainRecursive(mixed $value): mixed
     {
         if ($value instanceof ArgumentSet) {
             return $value->toArray();
         }
 
         if (is_array($value)) {
-            // @phpstan-ignore-next-line This callable works just fine
             return array_map([static::class, 'toPlainRecursive'], $value);
         }
 

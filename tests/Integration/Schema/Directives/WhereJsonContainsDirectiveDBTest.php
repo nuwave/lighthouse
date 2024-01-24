@@ -1,13 +1,13 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
-class WhereJsonContainsDirectiveDBTest extends DBTestCase
+final class WhereJsonContainsDirectiveDBTest extends DBTestCase
 {
-    protected $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ '
     type Query {
         users(foo: String! @whereJsonContains(key: "name->nested")): [User!]! @all
     }
@@ -17,7 +17,7 @@ class WhereJsonContainsDirectiveDBTest extends DBTestCase
     }
     ';
 
-    public function testCanApplyWhereJsonContainsFilter(): void
+    public function testApplyWhereJsonContainsFilter(): void
     {
         $nestedBar = \Safe\json_encode([
             'nested' => 'bar',

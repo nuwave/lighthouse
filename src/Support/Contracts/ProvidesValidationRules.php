@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Support\Contracts;
 
@@ -8,9 +8,9 @@ interface ProvidesValidationRules
      * A set of rules for query validation step.
      *
      * Returning `null` enables all available rules.
-     * Empty array would allow to skip query validation.
+     * Empty array skips query validation entirely.
      *
-     * @return array<class-string<\GraphQL\Validator\Rules\ValidationRule>, \GraphQL\Validator\Rules\ValidationRule>|null
+     * @return array<string, \GraphQL\Validator\Rules\ValidationRule>|null
      */
     public function validationRules(): ?array;
 }

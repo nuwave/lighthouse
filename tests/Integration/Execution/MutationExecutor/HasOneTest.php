@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Execution\MutationExecutor;
 
@@ -6,9 +6,9 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 
-class HasOneTest extends DBTestCase
+final class HasOneTest extends DBTestCase
 {
-    protected $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ '
     type Task {
         id: ID!
         name: String!
@@ -76,9 +76,9 @@ class HasOneTest extends DBTestCase
         id: ID
         title: String
     }
-    '.self::PLACEHOLDER_QUERY;
+    ' . self::PLACEHOLDER_QUERY;
 
-    public function testCanCreateWithNewHasOne(): void
+    public function testCreateWithNewHasOne(): void
     {
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -112,7 +112,7 @@ class HasOneTest extends DBTestCase
         ]);
     }
 
-    public function testCanUpsertWithNewHasOne(): void
+    public function testUpsertWithNewHasOne(): void
     {
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -147,7 +147,7 @@ class HasOneTest extends DBTestCase
         ]);
     }
 
-    public function testCanCreateUsingUpsertWithNewHasOne(): void
+    public function testCreateUsingUpsertWithNewHasOne(): void
     {
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -239,8 +239,7 @@ class HasOneTest extends DBTestCase
                 }
             }
         }
-GRAPHQL
-        )->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'updateTask' => [
                     'name' => 'foo',
@@ -250,10 +249,8 @@ GRAPHQL
         ]);
     }
 
-    /**
-     * @return array<array<string, string>>
-     */
-    public function existingModelMutations(): array
+    /** @return array<array<string, string>> */
+    public static function existingModelMutations(): array
     {
         return [
             ['Update action' => 'update'],
@@ -261,16 +258,14 @@ GRAPHQL
         ];
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
-    public function testCanUpdateWithNewHasOne(string $action): void
+    /** @dataProvider existingModelMutations */
+    public function testUpdateWithNewHasOne(string $action): void
     {
         factory(Task::class)->create();
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            ${action}Task(input: {
+            {$action}Task(input: {
                 id: 1
                 name: "foo"
                 post: {
@@ -287,36 +282,34 @@ GRAPHQL
                 }
             }
         }
-GRAPHQL
-            )->assertJson([
-                'data' => [
-                    "${action}Task" => [
+        GRAPHQL)->assertJson([
+            'data' => [
+                "{$action}Task" => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'post' => [
                         'id' => '1',
-                        'name' => 'foo',
-                        'post' => [
-                            'id' => '1',
-                            'title' => 'bar',
-                        ],
+                        'title' => 'bar',
                     ],
                 ],
-            ]);
+            ],
+        ]);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
-    public function testCanUpdateAndUpdateHasOne(string $action): void
+    /** @dataProvider existingModelMutations */
+    public function testUpdateAndUpdateHasOne(string $action): void
     {
-        factory(Task::class)
-            ->create()
-            ->post()
+        $task = factory(Task::class)->create();
+        assert($task instanceof Task);
+
+        $task->post()
             ->save(
-                factory(Post::class)->create()
+                factory(Post::class)->create(),
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            ${action}Task(input: {
+            {$action}Task(input: {
                 id: 1
                 name: "foo"
                 post: {
@@ -334,10 +327,9 @@ GRAPHQL
                 }
             }
         }
-GRAPHQL
-        )->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
-                "${action}Task" => [
+                "{$action}Task" => [
                     'id' => '1',
                     'name' => 'foo',
                     'post' => [
@@ -349,21 +341,20 @@ GRAPHQL
         ]);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
-    public function testCanUpdateAndUpsertHasOne(string $action): void
+    /** @dataProvider existingModelMutations */
+    public function testUpdateAndUpsertHasOne(string $action): void
     {
-        factory(Task::class)
-            ->create()
-            ->post()
+        $task = factory(Task::class)->create();
+        assert($task instanceof Task);
+
+        $task->post()
             ->save(
-                factory(Post::class)->create()
+                factory(Post::class)->create(),
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            ${action}Task(input: {
+            {$action}Task(input: {
                 id: 1
                 name: "foo"
                 post: {
@@ -381,10 +372,9 @@ GRAPHQL
                 }
             }
         }
-GRAPHQL
-        )->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
-                "${action}Task" => [
+                "{$action}Task" => [
                     'id' => '1',
                     'name' => 'foo',
                     'post' => [
@@ -396,21 +386,20 @@ GRAPHQL
         ]);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
-    public function testCanUpdateAndDeleteHasOne(string $action): void
+    /** @dataProvider existingModelMutations */
+    public function testUpdateAndDeleteHasOne(string $action): void
     {
-        factory(Task::class)
-            ->create()
-            ->post()
+        $task = factory(Task::class)->create();
+        assert($task instanceof Task);
+
+        $task->post()
             ->save(
-                factory(Post::class)->create()
+                factory(Post::class)->create(),
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            ${action}Task(input: {
+            {$action}Task(input: {
                 id: 1
                 name: "foo"
                 post: {
@@ -425,11 +414,9 @@ GRAPHQL
                 }
             }
         }
-
-GRAPHQL
-        )->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
-                "${action}Task" => [
+                "{$action}Task" => [
                     'id' => '1',
                     'name' => 'foo',
                     'post' => null,

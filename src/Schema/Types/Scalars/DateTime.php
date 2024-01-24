@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Types\Scalars;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 
 class DateTime extends DateScalar
 {
@@ -11,8 +11,9 @@ class DateTime extends DateScalar
         return $carbon->toDateTimeString();
     }
 
-    protected function parse($value): Carbon
+    protected function parse(mixed $value): Carbon
     {
+        // @phpstan-ignore-next-line We know the format to be good, so this can never return `false`
         return Carbon::createFromFormat(Carbon::DEFAULT_TO_STRING_FORMAT, $value);
     }
 }

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
@@ -12,19 +12,16 @@ use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
 class SaveModel implements ArgResolver
 {
-    /**
-     * @var \Illuminate\Database\Eloquent\Relations\Relation|null
-     */
-    protected $parentRelation;
-
-    public function __construct(?Relation $parentRelation = null)
-    {
-        $this->parentRelation = $parentRelation;
-    }
+    public function __construct(
+        /**
+         * @var \Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>|null $parentRelation
+         */
+        protected ?Relation $parentRelation = null,
+    ) {}
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
+     * @param  Model  $model
+     * @param  ArgumentSet  $args
      */
     public function __invoke($model, $args): Model
     {
@@ -32,13 +29,13 @@ class SaveModel implements ArgResolver
         [$morphTo, $remaining] = ArgPartitioner::relationMethods(
             $args,
             $model,
-            MorphTo::class
+            MorphTo::class,
         );
 
         [$belongsTo, $remaining] = ArgPartitioner::relationMethods(
             $remaining,
             $model,
-            BelongsTo::class
+            BelongsTo::class,
         );
 
         $argsToFill = $remaining->toArray();
@@ -51,15 +48,15 @@ class SaveModel implements ArgResolver
         }
 
         foreach ($belongsTo->arguments as $relationName => $nestedOperations) {
-            /** @var \Illuminate\Database\Eloquent\Relations\BelongsTo $belongsTo */
             $belongsTo = $model->{$relationName}();
+            assert($belongsTo instanceof BelongsTo);
             $belongsToResolver = new ResolveNested(new NestedBelongsTo($belongsTo));
             $belongsToResolver($model, $nestedOperations->value);
         }
 
         foreach ($morphTo->arguments as $relationName => $nestedOperations) {
-            /** @var \Illuminate\Database\Eloquent\Relations\MorphTo $morphTo */
             $morphTo = $model->{$relationName}();
+            assert($morphTo instanceof MorphTo);
             $morphToResolver = new ResolveNested(new NestedMorphTo($morphTo));
             $morphToResolver($model, $nestedOperations->value);
         }

@@ -1,14 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTestbenchProductsTable extends Migration
+final class CreateTestbenchProductsTable extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('products', function (Blueprint $table): void {
@@ -24,9 +21,6 @@ class CreateTestbenchProductsTable extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::drop('products');

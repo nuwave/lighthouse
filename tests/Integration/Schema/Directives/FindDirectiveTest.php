@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Schema\Directives;
 
@@ -6,13 +6,13 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Company;
 use Tests\Utils\Models\User;
 
-class FindDirectiveTest extends DBTestCase
+final class FindDirectiveTest extends DBTestCase
 {
     public function testReturnsSingleUser(): void
     {
-        $userA = factory(User::class)->create(['name' => 'A']);
+        factory(User::class)->create(['name' => 'A']);
         $userB = factory(User::class)->create(['name' => 'B']);
-        $userC = factory(User::class)->create(['name' => 'C']);
+        factory(User::class)->create(['name' => 'C']);
 
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -41,7 +41,7 @@ class FindDirectiveTest extends DBTestCase
     public function testDefaultsToFieldTypeIfNoModelIsSupplied(): void
     {
         $userA = factory(User::class)->create(['name' => 'A']);
-        $userB = factory(User::class)->create(['name' => 'B']);
+        factory(User::class)->create(['name' => 'B']);
 
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -91,13 +91,13 @@ class FindDirectiveTest extends DBTestCase
         ')->assertJsonCount(1, 'errors');
     }
 
-    public function testCanUseScopes(): void
+    public function testUseScopes(): void
     {
         $companyA = factory(Company::class)->create(['name' => 'CompanyA']);
         $companyB = factory(Company::class)->create(['name' => 'CompanyB']);
         $userA = factory(User::class)->create(['name' => 'A', 'company_id' => $companyA->id]);
-        $userB = factory(User::class)->create(['name' => 'A', 'company_id' => $companyB->id]);
-        $userC = factory(User::class)->create(['name' => 'B', 'company_id' => $companyA->id]);
+        factory(User::class)->create(['name' => 'A', 'company_id' => $companyB->id]);
+        factory(User::class)->create(['name' => 'B', 'company_id' => $companyA->id]);
 
         $this->schema = /** @lang GraphQL */ '
         type Company {

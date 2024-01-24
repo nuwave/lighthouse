@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Utils\Validators;
 
 use Nuwave\Lighthouse\Validation\Validator;
 
-class SelfValidatingValidator extends Validator
+final class SelfValidatingValidator extends Validator
 {
     public function rules(): array
     {

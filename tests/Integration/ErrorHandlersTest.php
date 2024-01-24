@@ -1,11 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration;
 
 use Tests\TestCase;
 use Tests\Utils\NullErrorHandler;
 
-class ErrorHandlersTest extends TestCase
+final class ErrorHandlersTest extends TestCase
 {
     public function testErrorHandlerReturningNull(): void
     {
@@ -13,7 +13,7 @@ class ErrorHandlersTest extends TestCase
             NullErrorHandler::class,
         ]]);
 
-        $this->mockResolver(function () {
+        $this->mockResolver(static function (): void {
             throw new \Exception();
         });
 
@@ -31,7 +31,6 @@ class ErrorHandlersTest extends TestCase
             'data' => [
                 'foo' => null,
             ],
-            'errors' => [],
         ]);
     }
 }

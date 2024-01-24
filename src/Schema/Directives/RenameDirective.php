@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
@@ -10,7 +10,7 @@ class RenameDirective extends BaseDirective implements FieldResolver
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Change the internally used name of a field or argument.
 
@@ -22,39 +22,20 @@ directive @rename(
   """
   attribute: String!
 ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
-    /**
-     * Resolve the field directive.
-     */
-    public function resolveField(FieldValue $fieldValue): FieldValue
+    public function resolveField(FieldValue $fieldValue): callable
     {
         $attribute = $this->attributeArgValue();
 
-        return $fieldValue->setResolver(
-            function ($rootValue) use ($attribute) {
-                return data_get($rootValue, $attribute);
-            }
-        );
+        return static fn (mixed $root): mixed => data_get($root, $attribute);
     }
 
-    /**
-     * Retrieves the attribute argument for the directive.
-     *
-     *
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
-     */
+    /** Retrieves the attribute argument for the directive. */
     public function attributeArgValue(): string
     {
-        $attribute = $this->directiveArgValue('attribute');
-
-        if (! $attribute) {
-            throw new DefinitionException(
-                "The @{$this->name()} directive requires an `attribute` argument."
-            );
-        }
-
-        return $attribute;
+        return $this->directiveArgValue('attribute')
+            ?: throw new DefinitionException("The @{$this->name()} directive requires an `attribute` argument.");
     }
 }

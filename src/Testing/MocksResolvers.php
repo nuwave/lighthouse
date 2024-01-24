@@ -1,8 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Testing;
 
+use Illuminate\Container\Container;
 use PHPUnit\Framework\MockObject\Builder\InvocationMocker;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @mixin \PHPUnit\Framework\TestCase
@@ -10,9 +12,11 @@ use PHPUnit\Framework\MockObject\Builder\InvocationMocker;
 trait MocksResolvers
 {
     /**
-     * Create and register a PHPUnit mock to be called through the @mock directive.
+     * Create and register a PHPUnit mock to be called through the `@mock` directive.
      *
      * @param  callable|mixed|null  $resolverOrValue
+     *
+     * @return \PHPUnit\Framework\MockObject\Builder\InvocationMocker<\stdClass>
      */
     protected function mockResolver($resolverOrValue = null, string $key = 'default'): InvocationMocker
     {
@@ -28,28 +32,31 @@ trait MocksResolvers
     }
 
     /**
-     * Register a resolver for @mock.
+     * Register a resolver for `@mock`.
      *
      * @param  \PHPUnit\Framework\MockObject\Rule\InvocationOrder  $invocationOrder
+     *
+     * @return \PHPUnit\Framework\MockObject\Builder\InvocationMocker<\stdClass>
      */
     protected function mockResolverExpects(object $invocationOrder, string $key = 'default'): InvocationMocker
     {
-        $mock = $this->createMock(MockResolver::class);
+        /** @var MockObject|callable $mock */
+        $mock = $this->getMockBuilder(\stdClass::class)
+            ->addMethods(['__invoke'])
+            ->getMock();
 
         $this->registerMockResolver($mock, $key);
 
+        // @phpstan-ignore-next-line generic type mismatch
         return $mock
             ->expects($invocationOrder)
             ->method('__invoke');
     }
 
-    /**
-     * Register a mock resolver that will be called through the @mock directive.
-     */
+    /** Register a mock resolver that will be called through the `@mock` directive. */
     protected function registerMockResolver(callable $mock, string $key): void
     {
-        /** @var \Nuwave\Lighthouse\Testing\MockDirective $mockDirective */
-        $mockDirective = app(MockDirective::class);
-        $mockDirective->register($mock, $key);
+        $mockResolverService = Container::getInstance()->make(MockResolverService::class);
+        $mockResolverService->register($mock, $key);
     }
 }

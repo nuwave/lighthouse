@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Schema\Directives;
 
@@ -10,24 +10,24 @@ use Tests\Utils\Models\Employee;
 use Tests\Utils\Models\Team;
 use Tests\Utils\Models\User;
 
-class MorphOneFromUnionTest extends DBTestCase
+final class MorphOneFromUnionTest extends DBTestCase
 {
-    public function testCanResolveMorphOneRelationshipOnInterface(): void
+    public function testResolveMorphOneRelationshipOnInterface(): void
     {
-        /** @var \Tests\Utils\Models\Employee $employee */
+        /** @var Employee $employee */
         $employee = factory(Employee::class)->create();
-        /** @var \Tests\Utils\Models\Contractor $contractor */
+        /** @var Contractor $contractor */
         $contractor = factory(Contractor::class)->create();
 
         $companyId = factory(Company::class)->create()->getKey();
         $teamId = factory(Team::class)->create()->getKey();
 
-        /** @var \Tests\Utils\Models\User $employeeUser */
+        /** @var User $employeeUser */
         $employeeUser = factory(User::class)->create([
             'company_id' => $companyId,
             'team_id' => $teamId,
         ]);
-        /** @var \Tests\Utils\Models\User $contractorUser */
+        /** @var User $contractorUser */
         $contractorUser = factory(User::class)->create([
             'company_id' => $companyId,
             'team_id' => $teamId,
@@ -36,9 +36,9 @@ class MorphOneFromUnionTest extends DBTestCase
         $employee->user()->save($employeeUser);
         $contractor->user()->save($contractorUser);
 
-        /** @var \Tests\Utils\Models\Color $employeeColor */
+        /** @var Color $employeeColor */
         $employeeColor = factory(Color::class)->create();
-        /** @var \Tests\Utils\Models\Color $contractorColor */
+        /** @var Color $contractorColor */
         $contractorColor = factory(Color::class)->create();
 
         $employee->colors()->save($employeeColor);

@@ -1,14 +1,17 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\WhereConditions;
 
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Str;
 
 class WhereHasConditionsDirective extends WhereConditionsBaseDirective
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Allows clients to filter a query based on the existence of a related model, using
 a dynamically controlled `WHERE` condition that applies to the relationship.
@@ -26,46 +29,61 @@ directive @whereHasConditions(
     """
     Restrict the allowed column names to a well-defined list.
     This improves introspection capabilities and security.
-    Mutually exclusive with the `columnsEnum` argument.
+    Mutually exclusive with `columnsEnum`.
     """
     columns: [String!]
 
     """
     Use an existing enumeration type to restrict the allowed columns to a predefined list.
-    This allowes you to re-use the same enum for multiple fields.
-    Mutually exclusive with the `columns` argument.
+    This allows you to re-use the same enum for multiple fields.
+    Mutually exclusive with `columns`.
     """
     columnsEnum: String
+
+    """
+    Reference a method that applies the client given conditions to the query builder.
+
+    Expected signature: `(
+        \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder,
+        array<string, mixed> $whereConditions
+    ): void`
+
+    Consists of two parts: a class name and a method name, separated by an `@` symbol.
+    If you pass only a class name, the method name defaults to `__invoke`.
+    """
+    handler: String = "\\Nuwave\\Lighthouse\\WhereConditions\\WhereConditionsHandler"
 ) on ARGUMENT_DEFINITION
-SDL;
+GRAPHQL;
     }
 
-    /**
-     * @param  \Illuminate\Database\Eloquent\Builder  $builder  The builder used to resolve the field.
-     * @param  mixed  $whereConditions The client given conditions
-     * @return \Illuminate\Database\Eloquent\Builder The modified builder.
-     */
-    public function handleBuilder($builder, $whereConditions): object
+    /** @param  array<string, mixed>|null  $value  The client given conditions */
+    public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, $value): QueryBuilder|EloquentBuilder|Relation
     {
-        // The value `null` should be allowed but have no effect on the query.
-        if (is_null($whereConditions)) {
+        if ($value === null) {
             return $builder;
         }
 
-        $this->handleHasCondition(
+        if (! $builder instanceof EloquentBuilder) {
+            throw new \Exception('Can not get model from builder of class: ' . $builder::class);
+        }
+
+        $this->handle(
             $builder,
-            $builder->getModel(),
-            $this->getRelationName(),
-            $whereConditions
+            [
+                'HAS' => [
+                    'relation' => $this->relationName(),
+                    'amount' => WhereConditionsServiceProvider::DEFAULT_HAS_AMOUNT,
+                    'operator' => '>=',
+                    'condition' => $value,
+                ],
+            ],
         );
 
         return $builder;
     }
 
-    /**
-     * Get the name of the Eloquent relationship that is used for the query.
-     */
-    public function getRelationName(): string
+    /** Get the name of the Eloquent relationship that is used for the query. */
+    protected function relationName(): string
     {
         $relationName = $this->directiveArgValue('relation');
 
@@ -73,7 +91,7 @@ SDL;
         // name follows a convention and contains the relation name
         if (is_null($relationName)) {
             $relationName = lcfirst(
-                Str::after($this->nodeName(), 'has')
+                Str::after($this->nodeName(), 'has'),
             );
         }
 

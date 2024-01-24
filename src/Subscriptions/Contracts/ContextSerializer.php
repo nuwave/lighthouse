@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Subscriptions\Contracts;
 
@@ -6,17 +6,9 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 interface ContextSerializer
 {
-    /**
-     * Serialize the context.
-     *
-     * @return string
-     */
-    public function serialize(GraphQLContext $context);
+    /** Serialize the context. */
+    public function serialize(GraphQLContext $context): string;
 
-    /**
-     * Unserialize the context.
-     *
-     * @return \Nuwave\Lighthouse\Support\Contracts\GraphQLContext
-     */
-    public function unserialize(string $context);
+    /** Unserialize the context. */
+    public function unserialize(string $context): GraphQLContext;
 }

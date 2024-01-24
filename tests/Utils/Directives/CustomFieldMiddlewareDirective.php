@@ -1,33 +1,22 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Utils\Directives;
 
-use Closure;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
-class CustomFieldMiddlewareDirective extends BaseDirective implements FieldMiddleware
+final class CustomFieldMiddlewareDirective extends BaseDirective implements FieldMiddleware
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 directive @customFieldMiddleware on FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next)
+    public function handleField(FieldValue $fieldValue): void
     {
-        return $next(
-            $fieldValue->setResolver(
-                /**
-                 * @param  array<string, mixed>  $args
-                 * @return array<string, mixed>
-                 */
-                static function ($root, array $args): array {
-                    return $args;
-                }
-            )
-        );
+        $fieldValue->wrapResolver(static fn (): callable => static fn (mixed $root, array $args): array => $args);
     }
 }

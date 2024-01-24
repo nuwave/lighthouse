@@ -1,22 +1,22 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Defer;
 
 use Nuwave\Lighthouse\Defer\DeferServiceProvider;
 use Tests\TestCase;
 
-class DeferIncludeSkipTest extends TestCase
+final class DeferIncludeSkipTest extends TestCase
 {
-    protected $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ '
     directive @include(if: Boolean!) on FIELD
     directive @skip(if: Boolean!) on FIELD
-    '.self::PLACEHOLDER_QUERY;
+    ' . self::PLACEHOLDER_QUERY;
 
     protected function getPackageProviders($app): array
     {
         return array_merge(
             parent::getPackageProviders($app),
-            [DeferServiceProvider::class]
+            [DeferServiceProvider::class],
         );
     }
 

@@ -1,8 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Exceptions;
 
-use Exception;
 use GraphQL\Error\ClientAware;
 
 /**
@@ -10,15 +9,10 @@ use GraphQL\Error\ClientAware;
  *
  * This signals a developer error, so we do not show this exception to the user.
  */
-class DefinitionException extends Exception implements ClientAware
+class DefinitionException extends \Exception implements ClientAware
 {
     public function isClientSafe(): bool
     {
         return false;
-    }
-
-    public function getCategory(): string
-    {
-        return 'schema';
     }
 }

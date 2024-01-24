@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Testing;
 
@@ -8,25 +8,14 @@ use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
 class MockDirective extends BaseDirective implements FieldResolver
 {
-    /**
-     * @var array<string, callable>
-     */
-    protected $mocks;
+    public function __construct(
+        protected MockResolverService $mockResolverService,
+    ) {}
 
-    /**
-     * Register a mock resolver that will be called through this resolver.
-     */
-    public function register(callable $mock, string $key): void
-    {
-        $this->mocks[$key] = $mock;
-    }
-
-    /**
-     * SDL definition of the directive.
-     */
+    /** SDL definition of the directive. */
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Allows you to easily hook up a resolver for an endpoint.
 """
@@ -36,24 +25,17 @@ directive @mock(
     """
     key: String = "default"
 ) on FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
-    /**
-     * Set a field resolver on the FieldValue.
-     *
-     * This must call $fieldValue->setResolver() before returning
-     * the FieldValue.
-     */
-    public function resolveField(FieldValue $fieldValue): FieldValue
+    public function resolveField(FieldValue $fieldValue): callable
     {
-        return $fieldValue->setResolver(
-            function () {
-                $key = $this->directiveArgValue('key', 'default');
-                $resolver = $this->mocks[$key];
+        $key = $this->directiveArgValue('key', 'default');
 
-                return $resolver(...func_get_args());
-            }
-        );
+        return function () use ($key): mixed {
+            $resolver = $this->mockResolverService->get($key);
+
+            return $resolver(...func_get_args());
+        };
     }
 }

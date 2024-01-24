@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Schema\Directives;
 
@@ -7,26 +7,26 @@ use Tests\Utils\Models\Image;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class MorphOneDirectiveTest extends DBTestCase
+final class MorphOneDirectiveTest extends DBTestCase
 {
     /**
-     * Auth user.
+     * The authenticated user.
      *
-     * @var \Tests\Utils\Models\User
+     * @var User
      */
     protected $user;
 
     /**
      * User's task.
      *
-     * @var \Tests\Utils\Models\Task
+     * @var Task
      */
     protected $task;
 
     /**
      * Task's image.
      *
-     * @var \Tests\Utils\Models\Image
+     * @var Image
      */
     protected $image;
 
@@ -41,11 +41,11 @@ class MorphOneDirectiveTest extends DBTestCase
         $this->image = $this->task
             ->images()
             ->save(
-                factory(Image::class)->create()
+                factory(Image::class)->create(),
             );
     }
 
-    public function testCanResolveMorphOneRelationship(): void
+    public function testResolveMorphOneRelationship(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Image {
@@ -90,7 +90,7 @@ class MorphOneDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testCanResolveMorphOneWithCustomName(): void
+    public function testResolveMorphOneWithCustomName(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Image {

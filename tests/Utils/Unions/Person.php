@@ -1,25 +1,15 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Utils\Unions;
 
 use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 
-class Person
+final class Person
 {
-    /**
-     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
-     */
-    protected $typeRegistry;
+    public function __construct(private TypeRegistry $typeRegistry) {}
 
-    public function __construct(TypeRegistry $typeRegistry)
-    {
-        $this->typeRegistry = $typeRegistry;
-    }
-
-    /**
-     * @param  array<string, mixed>  $value
-     */
+    /** @param  array<string, mixed>  $value */
     public function resolveType(array $value): Type
     {
         $type = isset($value['id'])

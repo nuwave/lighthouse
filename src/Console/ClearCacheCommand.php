@@ -1,10 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Contracts\Cache\Repository as CacheRepository;
-use Illuminate\Contracts\Config\Repository as ConfigRepository;
+use Nuwave\Lighthouse\Schema\AST\ASTCache;
 
 class ClearCacheCommand extends Command
 {
@@ -12,11 +11,9 @@ class ClearCacheCommand extends Command
 
     protected $description = 'Clear the GraphQL schema cache.';
 
-    public function handle(CacheRepository $cache, ConfigRepository $config): void
+    public function handle(ASTCache $cache): void
     {
-        $cache->forget(
-            $config->get('lighthouse.cache.key')
-        );
+        $cache->clear();
 
         $this->info('GraphQL AST schema cache deleted.');
     }

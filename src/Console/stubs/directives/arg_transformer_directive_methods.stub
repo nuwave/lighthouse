@@ -1,10 +1,11 @@
     /**
      * Apply transformations on the value of an argument given to a field.
      *
-     * @param  mixed  $argumentValue
-     * @return mixed
+     * @param  mixed  $argumentValue  the client given value
+     *
+     * @return mixed the transformed value
      */
-    public function transform($argumentValue)
+    public function transform(mixed $argumentValue): mixed
     {
         // TODO implement the arg transformer
     }

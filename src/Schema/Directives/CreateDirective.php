@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
@@ -9,7 +9,7 @@ class CreateDirective extends MutationExecutorDirective
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Create a new Eloquent model with the given arguments.
 """
@@ -27,10 +27,10 @@ directive @create(
   """
   relation: String
 ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
-    protected function makeExecutionFunction(?Relation $parentRelation = null): callable
+    protected function makeExecutionFunction(Relation $parentRelation = null): callable
     {
         return new SaveModel($parentRelation);
     }

@@ -1,14 +1,13 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Schema\Directives;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use Tests\TestCase;
-use Tests\Unit\Schema\Directives\Fixtures\Foo;
 
-class MethodDirectiveTest extends TestCase
+final class MethodDirectiveTest extends TestCase
 {
-    protected $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ '
     type Query {
         foo: Foo @mock
     }
@@ -111,7 +110,9 @@ class MethodDirectiveTest extends TestCase
 
     protected function mockFoo(): MockObject
     {
-        $foo = $this->createMock(Foo::class);
+        $foo = $this->getMockBuilder(\stdClass::class)
+            ->addMethods(['bar'])
+            ->getMock();
 
         $this->mockResolver($foo);
 

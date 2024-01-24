@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Testing;
 
 use Tests\TestCase;
 
-class MocksResolversTest extends TestCase
+final class MocksResolversTest extends TestCase
 {
     public function testCallsMock(): void
     {
@@ -34,7 +34,7 @@ class MocksResolversTest extends TestCase
     public function testCustomExpects(): void
     {
         $this->mockResolverExpects(
-            $this->never()
+            $this->never(),
         );
     }
 }

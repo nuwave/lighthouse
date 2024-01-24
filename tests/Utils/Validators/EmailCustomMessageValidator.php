@@ -1,13 +1,14 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Utils\Validators;
 
 use Nuwave\Lighthouse\Validation\Validator;
 
-class EmailCustomMessageValidator extends Validator
+final class EmailCustomMessageValidator extends Validator
 {
-    const MESSAGE = 'this is a custom error message';
+    public const MESSAGE = 'this is a custom error message';
 
+    /** @return array{email: array<string>} */
     public function rules(): array
     {
         return [

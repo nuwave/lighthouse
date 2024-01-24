@@ -1,8 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Schema;
 
-use Closure;
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\ResolverProvider;
@@ -11,57 +10,47 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Values\TypeValue;
 use Tests\TestCase;
 
-class ResolverProviderTest extends TestCase
+final class ResolverProviderTest extends TestCase
 {
-    /**
-     * @var \Nuwave\Lighthouse\Schema\ResolverProvider
-     */
-    protected $resolverProvider;
+    protected ResolverProvider $resolverProvider;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->resolverProvider = new ResolverProvider;
+        $this->resolverProvider = new ResolverProvider();
     }
 
     public function testGetsTheWebonyxDefaultResolverForNonRootFields(): void
     {
         $fieldValue = $this->constructFieldValue('nonExisting: Int', 'NonRoot');
+        $this->resolverProvider->provideResolver($fieldValue);
 
-        $this->assertInstanceOf(
-            Closure::class,
-            $this->resolverProvider->provideResolver($fieldValue)
-        );
+        self::expectNotToPerformAssertions();
     }
 
     public function testGetsTheConventionBasedDefaultResolverForRootFields(): void
     {
         $fieldValue = $this->constructFieldValue('foo: Int');
+        $this->resolverProvider->provideResolver($fieldValue);
 
-        $this->assertInstanceOf(
-            Closure::class,
-            $this->resolverProvider->provideResolver($fieldValue)
-        );
+        self::expectNotToPerformAssertions();
     }
 
     public function testLooksAtMultipleNamespacesWhenLookingForDefaultFieldResolvers(): void
     {
         $fieldValue = $this->constructFieldValue('baz: Int');
+        $this->resolverProvider->provideResolver($fieldValue);
 
-        $this->assertInstanceOf(
-            Closure::class,
-            $this->resolverProvider->provideResolver($fieldValue)
-        );
+        self::expectNotToPerformAssertions();
     }
 
     public function testThrowsIfRootFieldHasNoResolver(): void
     {
-        $this->expectException(DefinitionException::class);
+        $fieldValue = $this->constructFieldValue('noFieldClass: Int');
 
-        $this->resolverProvider->provideResolver(
-            $this->constructFieldValue('noFieldClass: Int')
-        );
+        $this->expectException(DefinitionException::class);
+        $this->resolverProvider->provideResolver($fieldValue);
     }
 
     protected function constructFieldValue(string $fieldDefinition, string $parentTypeName = RootType::QUERY): FieldValue
@@ -76,8 +65,7 @@ class ResolverProviderTest extends TestCase
 
         return new FieldValue(
             $typeValue,
-            // @phpstan-ignore-next-line can not be null
-            $queryType->fields[0]
+            $queryType->fields[0],
         );
     }
 }

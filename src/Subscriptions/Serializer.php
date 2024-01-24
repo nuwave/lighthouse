@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
@@ -13,40 +13,30 @@ class Serializer implements ContextSerializer
 {
     use SerializesAndRestoresModelIdentifiers;
 
-    /**
-     * @var \Nuwave\Lighthouse\Support\Contracts\CreatesContext
-     */
-    protected $createsContext;
+    public function __construct(
+        protected CreatesContext $createsContext,
+    ) {}
 
-    public function __construct(CreatesContext $createsContext)
-    {
-        $this->createsContext = $createsContext;
-    }
-
-    /**
-     * Serialize the context.
-     */
     public function serialize(GraphQLContext $context): string
     {
         $request = $context->request();
 
         return serialize([
-            'request' => [
-                'query' => $request->query->all(),
-                'request' => $request->request->all(),
-                'attributes' => $request->attributes->all(),
-                'cookies' => [],
-                'files' => [],
-                'server' => Arr::except($request->server->all(), ['HTTP_AUTHORIZATION']),
-                'content' => $request->getContent(),
-            ],
+            'request' => $request
+                ? [
+                    'query' => $request->query->all(),
+                    'request' => $request->request->all(),
+                    'attributes' => $request->attributes->all(),
+                    'cookies' => [],
+                    'files' => [],
+                    'server' => Arr::except($request->server->all(), ['HTTP_AUTHORIZATION']),
+                    'content' => $request->getContent(),
+                ]
+                : null,
             'user' => $this->getSerializedPropertyValue($context->user()),
         ]);
     }
 
-    /**
-     * Unserialize the context.
-     */
     public function unserialize(string $context): GraphQLContext
     {
         [
@@ -54,21 +44,20 @@ class Serializer implements ContextSerializer
             'user' => $rawUser
         ] = unserialize($context);
 
-        $request = new Request(
-            $rawRequest['query'],
-            $rawRequest['request'],
-            $rawRequest['attributes'],
-            $rawRequest['cookies'],
-            $rawRequest['files'],
-            $rawRequest['server'],
-            $rawRequest['content']
-        );
-
-        $request->setUserResolver(
-            function () use ($rawUser) {
-                return $this->getRestoredPropertyValue($rawUser);
-            }
-        );
+        if ($rawRequest) {
+            $request = new Request(
+                $rawRequest['query'],
+                $rawRequest['request'],
+                $rawRequest['attributes'],
+                $rawRequest['cookies'],
+                $rawRequest['files'],
+                $rawRequest['server'],
+                $rawRequest['content'],
+            );
+            $request->setUserResolver(fn () => $this->getRestoredPropertyValue($rawUser));
+        } else {
+            $request = null;
+        }
 
         return $this->createsContext->generate($request);
     }

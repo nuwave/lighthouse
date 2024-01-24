@@ -1,40 +1,35 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
 class NestedManyToMany implements ArgResolver
 {
-    /**
-     * @var string
-     */
-    protected $relationName;
-
-    public function __construct(string $relationName)
-    {
-        $this->relationName = $relationName;
-    }
+    public function __construct(
+        protected string $relationName,
+    ) {}
 
     /**
      * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
+     * @param  ArgumentSet  $args
      */
     public function __invoke($parent, $args): void
     {
-        /** @var \Illuminate\Database\Eloquent\Relations\BelongsToMany|\Illuminate\Database\Eloquent\Relations\MorphToMany $relation */
         $relation = $parent->{$this->relationName}();
+        assert($relation instanceof BelongsToMany);
 
         if ($args->has('sync')) {
             $relation->sync(
-                $this->generateRelationArray($args->arguments['sync'])
+                $this->generateRelationArray($args->arguments['sync']),
             );
         }
 
         if ($args->has('syncWithoutDetaching')) {
             $relation->syncWithoutDetaching(
-                $this->generateRelationArray($args->arguments['syncWithoutDetaching'])
+                $this->generateRelationArray($args->arguments['syncWithoutDetaching']),
             );
         }
 
@@ -49,13 +44,13 @@ class NestedManyToMany implements ArgResolver
 
         if ($args->has('connect')) {
             $relation->attach(
-                $this->generateRelationArray($args->arguments['connect'])
+                $this->generateRelationArray($args->arguments['connect']),
             );
         }
 
         if ($args->has('disconnect')) {
             $relation->detach(
-                $args->arguments['disconnect']->toPlain()
+                $args->arguments['disconnect']->toPlain(),
             );
         }
     }
@@ -67,7 +62,6 @@ class NestedManyToMany implements ArgResolver
      * data to store in the pivot table. That array expects passing the id's
      * as keys, so we transform the passed arguments to match that.
      *
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\Argument $args
      * @return array<mixed>
      */
     protected function generateRelationArray(Argument $args): array

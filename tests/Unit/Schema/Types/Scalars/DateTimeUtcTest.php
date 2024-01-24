@@ -1,40 +1,26 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Schema\Types\Scalars;
 
 use Nuwave\Lighthouse\Schema\Types\Scalars\DateScalar;
 use Nuwave\Lighthouse\Schema\Types\Scalars\DateTimeUtc;
-use Nuwave\Lighthouse\Support\AppVersion;
 
-class DateTimeUtcTest extends DateScalarTest
+final class DateTimeUtcTest extends DateScalarTestBase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        if (AppVersion::below(5.8)) {
-            $this->markTestSkipped('This only works with Carbon\Carbon::createFromIsoFormat().');
-        }
-    }
-
     protected function scalarInstance(): DateScalar
     {
         return new DateTimeUtc();
     }
 
-    public function validDates(): array
+    public static function validDates(): iterable
     {
-        return [
-            ['2020-04-20T16:20:04.000000Z'],
-            ['2020-04-20T16:20:04.000Z'],
-            ['2020-04-20T16:20:04.0Z'],
-        ];
+        yield ['2020-04-20T16:20:04.000000Z'];
+        yield ['2020-04-20T16:20:04.000Z'];
+        yield ['2020-04-20T16:20:04.0Z'];
     }
 
-    public function canonicalizeDates(): array
+    public static function canonicalizeDates(): iterable
     {
-        return [
-            ['2020-04-20T16:20:04.123Z', '2020-04-20T16:20:04.123000Z'],
-        ];
+        yield ['2020-04-20T16:20:04.123Z', '2020-04-20T16:20:04.123000Z'];
     }
 }

@@ -1,35 +1,32 @@
-<?php
+<?php declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTestbenchUsersTable extends Migration
+final class CreateTestbenchUsersTable extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table): void {
-            $table->increments('id');
+            // Mostly following https://github.com/laravel/laravel/blob/master/database/migrations/2014_10_12_000000_create_users_table.php
+            // but marking some fields nullable to simplify tests
+            $table->id();
             $table->string('name')->nullable();
-            $table->string('email')->nullable();
+            $table->string('email')->unique()->nullable();
+            $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
+            $table->rememberToken();
+            $table->timestamps();
 
             $table->unsignedInteger('company_id')->nullable();
             $table->unsignedInteger('team_id')->nullable();
 
             $table->unsignedInteger('person_id')->nullable();
             $table->string('person_type')->nullable();
-
-            $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::drop('users');

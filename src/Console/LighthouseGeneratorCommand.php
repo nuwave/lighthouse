@@ -1,9 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Console;
 
 use Illuminate\Console\GeneratorCommand;
-use InvalidArgumentException;
 
 abstract class LighthouseGeneratorCommand extends GeneratorCommand
 {
@@ -18,25 +17,21 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
     {
         $name = $this->argument('name');
         if (! is_string($name)) {
-            throw new InvalidArgumentException('You must the name for the class to generate.');
+            throw new \InvalidArgumentException('You must specify the name for the class to generate.');
         }
 
         return ucfirst(trim($name));
     }
 
-    /**
-     * @param  string  $rootNamespace
-     */
+    /** @param  string  $rootNamespace */
     protected function getDefaultNamespace($rootNamespace): string
     {
-        $namespaces = config('lighthouse.namespaces.'.$this->namespaceConfigKey());
+        $namespaces = config("lighthouse.namespaces.{$this->namespaceConfigKey()}");
 
         return static::commonNamespace((array) $namespaces);
     }
 
-    /**
-     * Get the config key that holds the default namespaces for the class.
-     */
+    /** Get the config key that holds the default namespaces for the class. */
     abstract protected function namespaceConfigKey(): string;
 
     /**
@@ -49,22 +44,20 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
     public static function commonNamespace(array $namespaces): string
     {
         if ($namespaces === []) {
-            throw new InvalidArgumentException(
-                'A default namespace is required for code generation.'
-            );
+            throw new \InvalidArgumentException('A default namespace is required for code generation.');
         }
 
         if (count($namespaces) === 1) {
             return reset($namespaces);
         }
 
-        // Save the first namespac
+        // Save the first namespace
         $preferredNamespaceFallback = reset($namespaces);
 
         // If the strings are sorted, any prefix common to all strings
         // will be common to the sorted first and last strings.
         // All the strings in the middle can be ignored.
-        \Safe\sort($namespaces);
+        sort($namespaces);
 
         $firstParts = explode('\\', reset($namespaces));
         $lastParts = explode('\\', end($namespaces));
@@ -81,7 +74,7 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
                 break;
             }
 
-            $matching [] = $part;
+            $matching[] = $part;
         }
 
         // We could not determine a common part of the configured namespaces,

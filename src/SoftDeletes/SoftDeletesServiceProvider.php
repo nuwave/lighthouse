@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\SoftDeletes;
 
@@ -14,11 +14,11 @@ use Nuwave\Lighthouse\Support\Utils;
 class SoftDeletesServiceProvider extends ServiceProvider
 {
     /**
-     * Ensure a model uses the SoftDeletes trait.
+     * Ensure the model uses the SoftDeletes trait.
      *
      * @param  class-string<\Illuminate\Database\Eloquent\Model>  $modelClass
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
-     * @see \Illuminate\Database\Eloquent\SoftDeletes
+     *
+     * @see SoftDeletes
      */
     public static function assertModelUsesSoftDeletes(string $modelClass, string $exceptionMessage): void
     {
@@ -27,38 +27,26 @@ class SoftDeletesServiceProvider extends ServiceProvider
         }
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(Dispatcher $dispatcher): void
     {
-        $dispatcher->listen(
-            ManipulateAST::class,
-            function (ManipulateAST $manipulateAST): void {
-                $manipulateAST->documentAST
-                    ->setTypeDefinition(
-                        Parser::enumTypeDefinition('
-                            "Specify if you want to include or exclude trashed results from a query."
-                            enum Trashed {
-                                "Only return trashed results."
-                                ONLY @enum(value: "only")
+        $dispatcher->listen(RegisterDirectiveNamespaces::class, static fn (): string => __NAMESPACE__);
+        $dispatcher->listen(ManipulateAST::class, static function (ManipulateAST $manipulateAST): void {
+            $manipulateAST->documentAST
+                ->setTypeDefinition(
+                    Parser::enumTypeDefinition('
+                        "Specify if you want to include or exclude trashed results from a query."
+                        enum Trashed {
+                            "Only return trashed results."
+                            ONLY @enum(value: "only")
 
-                                "Return both trashed and non-trashed results."
-                                WITH @enum(value: "with")
+                            "Return both trashed and non-trashed results."
+                            WITH @enum(value: "with")
 
-                                "Only return non-trashed results."
-                                WITHOUT @enum(value: "without")
-                            }
-                        ')
-                    );
-            }
-        );
-
-        $dispatcher->listen(
-            RegisterDirectiveNamespaces::class,
-            function (RegisterDirectiveNamespaces $registerDirectiveNamespaces): string {
-                return __NAMESPACE__;
-            }
-        );
+                            "Only return non-trashed results."
+                            WITHOUT @enum(value: "without")
+                        }
+                    '),
+                );
+        });
     }
 }

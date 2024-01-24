@@ -1,14 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTestbenchImagesTable extends Migration
+final class CreateTestbenchImagesTable extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('images', function (Blueprint $table): void {
@@ -22,9 +19,6 @@ class CreateTestbenchImagesTable extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::drop('images');

@@ -1,17 +1,20 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Schema\AST;
 
 use GraphQL\Language\AST\DirectiveDefinitionNode;
-use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\AST\SchemaExtensionNode;
 use GraphQL\Language\Parser;
-use Nuwave\Lighthouse\Exceptions\ParseException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Exceptions\SchemaSyntaxErrorException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\RootType;
 use Tests\TestCase;
+use Tests\Utils\Models\User;
 
-class DocumentASTTest extends TestCase
+final class DocumentASTTest extends TestCase
 {
     public function testParsesSimpleSchema(): void
     {
@@ -23,16 +26,40 @@ class DocumentASTTest extends TestCase
 
         $this->assertInstanceOf(
             ObjectTypeDefinitionNode::class,
-            $documentAST->types[RootType::QUERY]
+            $documentAST->types[RootType::QUERY],
         );
     }
 
     public function testThrowsOnInvalidSchema(): void
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessageRegExp('/^Syntax Error/');
+        $this->expectException(SchemaSyntaxErrorException::class);
+        $this->expectExceptionMessage('Syntax Error: Expected Name, found !, near: ');
 
-        DocumentAST::fromSource('foo');
+        DocumentAST::fromSource(/** @lang GraphQL */ '
+        type Mutation {
+            bar: Int
+        }
+
+        type Query {
+            foo: Int!!
+        }
+
+        type Foo {
+            bar: ID
+        }
+        ');
+    }
+
+    public function testThrowsOnUnknownModelClasses(): void
+    {
+        $this->expectException(DefinitionException::class);
+        $this->expectExceptionMessage('Failed to find a model class Unknown in namespaces [Tests\Utils\Models, Tests\Utils\ModelsSecondary] referenced in @model on type Query.');
+
+        DocumentAST::fromSource(/** @lang GraphQL */ '
+        type Query @model(class: "Unknown") {
+            foo: Int!
+        }
+        ');
     }
 
     public function testOverwritesDefinitionWithSameName(): void
@@ -53,41 +80,36 @@ class DocumentASTTest extends TestCase
 
         $this->assertSame(
             $overwrite,
-            $documentAST->types[RootType::QUERY]
+            $documentAST->types[RootType::QUERY],
         );
     }
 
-    public function testCanBeSerialized(): void
+    public function testBeSerialized(): void
     {
         $documentAST = DocumentAST::fromSource(/** @lang GraphQL */ '
-        type Query {
+        extend schema @link(url: "https://specs.apollo.dev/federation/v2.3", import: ["@key"])
+
+        type Query @model(class: "User") {
             foo: Int
         }
 
         directive @foo on FIELD
         ');
 
-        /** @var \Nuwave\Lighthouse\Schema\AST\DocumentAST $reserialized */
         $reserialized = unserialize(
-            serialize($documentAST)
+            serialize($documentAST),
         );
+        assert($reserialized instanceof DocumentAST);
 
-        /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
         $queryType = $reserialized->types[RootType::QUERY];
-        $this->assertInstanceOf(
-            ObjectTypeDefinitionNode::class,
-            $queryType
-        );
+        $this->assertInstanceOf(ObjectTypeDefinitionNode::class, $queryType);
 
-        $this->assertInstanceOf(
-            FieldDefinitionNode::class,
-            // @phpstan-ignore-next-line can not be null
-            $queryType->fields[0]
-        );
+        $this->assertInstanceOf(DirectiveDefinitionNode::class, $reserialized->directives['foo']);
 
-        $this->assertInstanceOf(
-            DirectiveDefinitionNode::class,
-            $reserialized->directives['foo']
-        );
+        $this->assertSame(['Query'], $reserialized->classNameToObjectTypeNames[User::class]);
+
+        $schemaExtension = $reserialized->schemaExtensions[0];
+        $this->assertInstanceOf(SchemaExtensionNode::class, $schemaExtension);
+        $this->assertInstanceOf(DirectiveNode::class, $schemaExtension->directives[0]);
     }
 }

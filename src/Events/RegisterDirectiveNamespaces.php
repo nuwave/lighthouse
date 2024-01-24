@@ -1,16 +1,15 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Events;
 
 /**
- * Fires when the directive factory is constructed.
+ * Fires when the schema is constructed and the first directive is encountered.
  *
- * Listeners may return one or more strings that are used as the base
- * namespace for locating directives.
+ * Listeners may return namespaces in the form of either:
+ * - a single string
+ * - an iterable of multiple strings
+ * The returned namespaces will be used as the search base for locating directives.
  *
- * @see \Nuwave\Lighthouse\Schema\DirectiveLocator
+ * @see \Nuwave\Lighthouse\Schema\DirectiveLocator::namespaces()
  */
-class RegisterDirectiveNamespaces
-{
-    //
-}
+class RegisterDirectiveNamespaces {}

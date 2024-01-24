@@ -1,14 +1,17 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
 class WhereBetweenDirective extends BaseDirective implements ArgBuilderDirective
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Verify that a column's value is between two values.
 
@@ -22,20 +25,18 @@ directive @whereBetween(
   """
   key: String
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
-    /**
-     * Apply a "WHERE BETWEEN" clause.
-     *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
-     */
-    public function handleBuilder($builder, $values): object
+    public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, $value): QueryBuilder|EloquentBuilder|Relation
     {
+        if ($value === null) {
+            return $builder;
+        }
+
         return $builder->whereBetween(
             $this->directiveArgValue('key', $this->nodeName()),
-            $values
+            $value,
         );
     }
 }

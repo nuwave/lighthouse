@@ -1,29 +1,32 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Schema\AST;
 
+use GraphQL\Language\AST\EnumTypeDefinitionNode;
+use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\NodeKind;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\AST\UnionTypeDefinitionNode;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\RootType;
 use Tests\TestCase;
 
-class ASTBuilderTest extends TestCase
+final class ASTBuilderTest extends TestCase
 {
-    /**
-     * @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder
-     */
-    protected $astBuilder;
+    protected ASTBuilder $astBuilder;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->astBuilder = app(ASTBuilder::class);
+        $this->astBuilder = $this->app->make(ASTBuilder::class);
     }
 
-    public function testCanMergeTypeExtensionFields(): void
+    public function testMergeTypeExtensionFields(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -40,13 +43,10 @@ class ASTBuilderTest extends TestCase
         ';
         $documentAST = $this->astBuilder->documentAST();
 
-        /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
         $queryType = $documentAST->types[RootType::QUERY];
+        assert($queryType instanceof ObjectTypeDefinitionNode);
 
-        $fields = $queryType->fields;
-        $this->assertNotNull($fields);
-        /** @var array<\GraphQL\Language\AST\FieldDefinitionNode> $fields */
-        $this->assertCount(3, $fields);
+        $this->assertCount(3, $queryType->fields);
     }
 
     public function testAllowsExtendingUndefinedRootTypes(): void
@@ -66,32 +66,23 @@ class ASTBuilderTest extends TestCase
         ';
         $documentAST = $this->astBuilder->documentAST();
 
-        /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
         $queryType = $documentAST->types[RootType::QUERY];
+        assert($queryType instanceof ObjectTypeDefinitionNode);
 
-        $queryFields = $queryType->fields;
-        $this->assertNotNull($queryFields);
-        /** @var array<\GraphQL\Language\AST\FieldDefinitionNode> $queryFields */
-        $this->assertCount(1, $queryFields);
+        $this->assertCount(1, $queryType->fields);
 
-        /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $mutationType */
         $mutationType = $documentAST->types[RootType::MUTATION];
+        assert($mutationType instanceof ObjectTypeDefinitionNode);
 
-        $mutationFields = $mutationType->fields;
-        $this->assertNotNull($mutationFields);
-        /** @var array<\GraphQL\Language\AST\FieldDefinitionNode> $mutationFields */
-        $this->assertCount(1, $mutationFields);
+        $this->assertCount(1, $mutationType->fields);
 
-        /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $subscriptionType */
         $subscriptionType = $documentAST->types[RootType::SUBSCRIPTION];
+        assert($subscriptionType instanceof ObjectTypeDefinitionNode);
 
-        $subscriptionFields = $subscriptionType->fields;
-        $this->assertNotNull($subscriptionFields);
-        /** @var array<\GraphQL\Language\AST\FieldDefinitionNode> $subscriptionFields */
-        $this->assertCount(1, $subscriptionFields);
+        $this->assertCount(1, $subscriptionType->fields);
     }
 
-    public function testCanMergeInputExtensionFields(): void
+    public function testMergeInputExtensionFields(): void
     {
         $this->schema = /** @lang GraphQL */ '
         input Inputs {
@@ -108,16 +99,13 @@ class ASTBuilderTest extends TestCase
         ';
         $documentAST = $this->astBuilder->documentAST();
 
-        /** @var \GraphQL\Language\AST\InputObjectTypeDefinitionNode $inputs */
         $inputs = $documentAST->types['Inputs'];
+        assert($inputs instanceof InputObjectTypeDefinitionNode);
 
-        $fields = $inputs->fields;
-        $this->assertNotNull($fields);
-        /** @var array<\GraphQL\Language\AST\InputValueDefinitionNode> $fields */
-        $this->assertCount(3, $fields);
+        $this->assertCount(3, $inputs->fields);
     }
 
-    public function testCanMergeInterfaceExtensionFields(): void
+    public function testMergeInterfaceExtensionFields(): void
     {
         $this->schema = /** @lang GraphQL */ '
         interface Named {
@@ -134,16 +122,13 @@ class ASTBuilderTest extends TestCase
         ';
         $documentAST = $this->astBuilder->documentAST();
 
-        /** @var \GraphQL\Language\AST\InterfaceTypeDefinitionNode $named */
         $named = $documentAST->types['Named'];
+        assert($named instanceof InterfaceTypeDefinitionNode);
 
-        $fields = $named->fields;
-        $this->assertNotNull($fields);
-        /** @var array<\GraphQL\Language\AST\FieldDefinitionNode> $fields */
-        $this->assertCount(3, $fields);
+        $this->assertCount(3, $named->fields);
     }
 
-    public function testCanMergeEnumExtensionFields(): void
+    public function testMergeEnumExtensionFields(): void
     {
         $this->schema = /** @lang GraphQL */ '
         enum MyEnum {
@@ -161,13 +146,31 @@ class ASTBuilderTest extends TestCase
         ';
         $documentAST = $this->astBuilder->documentAST();
 
-        /** @var \GraphQL\Language\AST\EnumTypeDefinitionNode $myEnum */
         $myEnum = $documentAST->types['MyEnum'];
+        assert($myEnum instanceof EnumTypeDefinitionNode);
 
-        $values = $myEnum->values;
-        $this->assertNotNull($values);
-        /** @var \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\EnumValueDefinitionNode> $values */
-        $this->assertCount(4, $values);
+        $this->assertCount(4, $myEnum->values);
+    }
+
+    public function testMergeUnionExtensionFields(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+            type Foo
+            type Bar
+            type Baz
+
+            union MyUnion = Foo
+
+            extend union MyUnion = Bar
+
+            extend union MyUnion = Baz
+        ';
+        $documentAST = $this->astBuilder->documentAST();
+
+        $myUnion = $documentAST->types['MyUnion'];
+        assert($myUnion instanceof UnionTypeDefinitionNode);
+
+        $this->assertCount(3, $myUnion->types);
     }
 
     public function testDoesNotAllowExtendingUndefinedTypes(): void
@@ -182,8 +185,19 @@ class ASTBuilderTest extends TestCase
         }
         ';
 
-        $this->expectException(DefinitionException::class);
-        $this->expectExceptionMessage('Could not find a base definition Foo of kind '.NodeKind::OBJECT_TYPE_EXTENSION.' to extend.');
+        $this->expectExceptionObject(new DefinitionException('Could not find a base definition Foo of kind ' . NodeKind::OBJECT_TYPE_EXTENSION . ' to extend.'));
+        $this->astBuilder->documentAST();
+    }
+
+    public function testDoesNotAllowExtendingUndefinedUnions(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        union MyFirstEnum = String
+
+        extend union MySecondUnion = Int
+        ';
+
+        $this->expectExceptionObject(new DefinitionException('Could not find a base definition MySecondUnion of kind ' . NodeKind::UNION_TYPE_EXTENSION . ' to extend.'));
         $this->astBuilder->documentAST();
     }
 
@@ -199,8 +213,7 @@ class ASTBuilderTest extends TestCase
         }
         ';
 
-        $this->expectException(DefinitionException::class);
-        $this->expectExceptionMessage(ASTHelper::duplicateDefinition('foo'));
+        $this->expectExceptionObject(new DefinitionException(ASTHelper::duplicateDefinition('foo')));
         $this->astBuilder->documentAST();
     }
 
@@ -216,8 +229,7 @@ class ASTBuilderTest extends TestCase
         }
         ';
 
-        $this->expectException(DefinitionException::class);
-        $this->expectExceptionMessage(ASTHelper::duplicateDefinition('foo'));
+        $this->expectExceptionObject(new DefinitionException(ASTHelper::duplicateDefinition('foo')));
         $this->astBuilder->documentAST();
     }
 
@@ -233,8 +245,7 @@ class ASTBuilderTest extends TestCase
         }
         ';
 
-        $this->expectException(DefinitionException::class);
-        $this->expectException(DefinitionException::class);
+        $this->expectExceptionObject(new DefinitionException(ASTHelper::duplicateDefinition('foo')));
         $this->astBuilder->documentAST();
     }
 
@@ -252,8 +263,22 @@ class ASTBuilderTest extends TestCase
         }
         ';
 
-        $this->expectException(DefinitionException::class);
-        $this->expectExceptionMessage(ASTHelper::duplicateDefinition('TWO'));
+        $this->expectExceptionObject(new DefinitionException(ASTHelper::duplicateDefinition('TWO')));
+        $this->astBuilder->documentAST();
+    }
+
+    public function testDoesNotAllowDuplicateTypesOnUnionExtensions(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Foo
+        type Bar
+
+        union MyUnion = Foo | Bar
+
+        extend union MyUnion = Bar
+        ';
+
+        $this->expectExceptionObject(new DefinitionException(ASTHelper::duplicateDefinition('Bar')));
         $this->astBuilder->documentAST();
     }
 
@@ -269,8 +294,37 @@ class ASTBuilderTest extends TestCase
         }
         ';
 
-        $this->expectException(DefinitionException::class);
-        $this->expectExceptionMessage('The type extension Foo of kind '.NodeKind::INTERFACE_TYPE_EXTENSION.' can not extend a definition of kind '.NodeKind::OBJECT_TYPE_DEFINITION.'.');
+        $this->expectExceptionObject(new DefinitionException('The type extension Foo of kind ' . NodeKind::INTERFACE_TYPE_EXTENSION . ' can not extend a definition of kind ' . NodeKind::OBJECT_TYPE_DEFINITION . '.'));
         $this->astBuilder->documentAST();
+    }
+
+    public function testMergeTypeExtensionInterfaces(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type User implements Emailable {
+            email: String!
+        }
+
+        interface Emailable {
+            email: String!
+        }
+
+        interface Nameable {
+            name: String!
+        }
+
+        extend type User implements Nameable {
+            name: String!
+        }
+        ';
+        $documentAST = $this->astBuilder->documentAST();
+
+        $userType = $documentAST->types['User'];
+        assert($userType instanceof ObjectTypeDefinitionNode);
+
+        $interfaces = new Collection($userType->interfaces);
+        $this->assertCount(2, $interfaces);
+        $this->assertTrue($interfaces->contains('name.value', 'Emailable'));
+        $this->assertTrue($interfaces->contains('name.value', 'Nameable'));
     }
 }

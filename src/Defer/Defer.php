@@ -1,121 +1,89 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Defer;
 
-use Closure;
-use GraphQL\Language\Parser;
-use GraphQL\Server\Helper;
-use Illuminate\Contracts\Container\Container;
-use Illuminate\Http\Request;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Arr;
-use Laragraph\LaravelGraphQLUtils\RequestParser;
-use Nuwave\Lighthouse\Events\ManipulateAST;
+use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\GraphQL;
-use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class Defer implements CreatesResponse
 {
-    /**
-     * @var \Nuwave\Lighthouse\Support\Contracts\CanStreamResponse
-     */
-    protected $stream;
+    protected StartExecution $startExecution;
 
     /**
-     * @var \Nuwave\Lighthouse\GraphQL
+     * A map from paths to deferred resolvers.
+     *
+     * @var array<string, callable(): mixed>
      */
-    protected $graphQL;
+    protected array $deferred = [];
 
     /**
-     * @var \Illuminate\Contracts\Container\Container
-     */
-    protected $container;
-
-    /**
-     * @var array<mixed>
-     */
-    protected $result = [];
-
-    /**
-     * @var array<mixed>
-     */
-    protected $deferred = [];
-
-    /**
+     * Paths resolved during the current nesting of defers.
+     *
      * @var array<int, mixed>
      */
-    protected $resolved = [];
+    protected array $resolved = [];
 
     /**
-     * @var bool
+     * The entire result of resolving the query up until the current nesting.
+     *
+     * @var array<string, mixed>
      */
-    protected $acceptFurtherDeferring = true;
+    protected array $result = [];
 
-    /**
-     * @var bool
-     */
-    protected $isStreaming = false;
+    /** Should further deferring happen? */
+    protected bool $shouldDeferFurther = true;
 
-    /**
-     * @var float|int
-     */
-    protected $maxExecutionTime = 0;
+    /** Are we currently streaming deferred results? */
+    protected bool $isStreaming = false;
 
-    /**
-     * @var int
-     */
-    protected $maxNestedFields = 0;
+    protected int|float $maxExecutionTime = 0;
 
-    public function __construct(CanStreamResponse $stream, GraphQL $graphQL, Container $container)
-    {
-        $this->stream = $stream;
-        $this->graphQL = $graphQL;
-        $this->container = $container;
-        $this->maxNestedFields = config('lighthouse.defer.max_nested_fields', 0);
+    protected int $maxNestedFields = 0;
+
+    public function __construct(
+        protected CanStreamResponse $stream,
+        protected GraphQL $graphQL,
+        ConfigRepository $config,
+    ) {
+        $executionTime = $config->get('lighthouse.defer.max_execution_ms', 0);
+        if ($executionTime > 0) {
+            $this->maxExecutionTime = microtime(true) + $executionTime * 1000;
+        }
+
+        $this->maxNestedFields = $config->get('lighthouse.defer.max_nested_fields', 0);
     }
 
-    /**
-     * Set the tracing directive on all fields of the query to enable tracing them.
-     */
-    public function handleManipulateAST(ManipulateAST $manipulateAST): void
+    public function handleStartExecution(StartExecution $startExecution): void
     {
-        ASTHelper::attachDirectiveToObjectTypeFields(
-            $manipulateAST->documentAST,
-            Parser::constDirective(/** @lang GraphQL */ '@deferrable')
-        );
-
-        $manipulateAST->documentAST->setDirectiveDefinition(
-            Parser::directiveDefinition(/** @lang GraphQL */ '
-"""
-Use this directive on expensive or slow fields to resolve them asynchronously.
-Must not be placed upon:
-- Non-Nullable fields
-- Mutation root fields
-"""
-directive @defer(if: Boolean = true) on FIELD
-')
-        );
-    }
-
-    public function isStreaming(): bool
-    {
-        return $this->isStreaming;
+        $this->startExecution = $startExecution;
     }
 
     /**
      * Register deferred field.
      *
-     * @return mixed The data if it is already available.
+     * @param  callable(): mixed  $resolver
+     *
+     * @return mixed the data if it is already available
      */
-    public function defer(Closure $resolver, string $path)
+    public function defer(callable $resolver, string $path): mixed
     {
-        if ($data = Arr::get($this->result, "data.{$path}")) {
+        $data = $this->getData($path);
+        if ($data !== null) {
             return $data;
         }
 
-        if ($this->isDeferred($path) || ! $this->acceptFurtherDeferring) {
+        // If we have been here before, now is the time to resolve this field
+        $deferredResolver = $this->deferred[$path] ?? null;
+        if ($deferredResolver !== null) {
+            return $this->resolve($deferredResolver, $path);
+        }
+
+        if (! $this->shouldDeferFurther) {
             return $this->resolve($resolver, $path);
         }
 
@@ -124,49 +92,31 @@ directive @defer(if: Boolean = true) on FIELD
         return null;
     }
 
-    /**
-     * @return mixed The loaded data.
-     */
-    public function findOrResolve(Closure $originalResolver, string $path)
+    protected function getData(string $path): mixed
     {
-        if (! $this->hasData($path)) {
-            if (isset($this->deferred[$path])) {
-                unset($this->deferred[$path]);
-            }
-
-            return $this->resolve($originalResolver, $path);
-        }
-
         return Arr::get($this->result, "data.{$path}");
     }
 
-    /**
-     * Resolve field with data or resolver.
-     *
-     * @return mixed The result of calling the resolver.
-     */
-    public function resolve(Closure $originalResolver, string $path)
+    /** @param  callable(): mixed  $resolver */
+    protected function resolve(callable $resolver, string $path): mixed
     {
-        $isDeferred = $this->isDeferred($path);
-        $resolver = $isDeferred
-            ? $this->deferred[$path]
-            : $originalResolver;
-
-        if ($isDeferred) {
-            $this->resolved[] = $path;
-
-            unset($this->deferred[$path]);
-        }
+        unset($this->deferred[$path]);
+        $this->resolved[] = $path;
 
         return $resolver();
     }
 
-    public function isDeferred(string $path): bool
+    /** @param  callable(): mixed  $originalResolver */
+    public function findOrResolve(callable $originalResolver, string $path): mixed
     {
-        return isset($this->deferred[$path]);
+        if ($this->hasData($path)) {
+            return $this->getData($path);
+        }
+
+        return $originalResolver();
     }
 
-    public function hasData(string $path): bool
+    protected function hasData(string $path): bool
     {
         return Arr::has($this->result, "data.{$path}");
     }
@@ -174,40 +124,39 @@ directive @defer(if: Boolean = true) on FIELD
     /**
      * Return either a final response or a stream of responses.
      *
-     * @param  array<mixed>  $result
+     * @param  array<string, mixed>  $result
+     *
      * @return \Illuminate\Http\Response|\Symfony\Component\HttpFoundation\StreamedResponse
      */
     public function createResponse(array $result): Response
     {
-        if (empty($this->deferred)) {
+        if (! $this->hasRemainingDeferred()) {
             return response($result);
         }
 
+        $this->result = $result;
+        $this->isStreaming = true;
+
         return response()->stream(
-            function () use ($result): void {
+            function (): void {
+                $this->stream();
+
                 $nested = 1;
-                $this->result = $result;
-                $this->isStreaming = true;
-                $this->stream->stream($result, [], empty($this->deferred));
-
-                if ($executionTime = config('lighthouse.defer.max_execution_ms', 0)) {
-                    $this->maxExecutionTime = microtime(true) + $executionTime * 1000;
-                }
-
                 while (
-                    count($this->deferred)
-                    && ! $this->executionTimeExpired()
+                    $this->hasRemainingDeferred()
+                    && ! $this->maxExecutionTimeReached()
                     && ! $this->maxNestedFieldsResolved($nested)
                 ) {
-                    $nested++;
+                    ++$nested;
                     $this->executeDeferred();
                 }
 
                 // We've hit the max execution time or max nested levels of deferred fields.
+                $this->shouldDeferFurther = false;
+
                 // We process remaining deferred fields, but are no longer allowing additional
                 // fields to be deferred.
-                if (count($this->deferred) > 0) {
-                    $this->acceptFurtherDeferring = false;
+                if ($this->hasRemainingDeferred()) {
                     $this->executeDeferred();
                 }
             },
@@ -215,27 +164,26 @@ directive @defer(if: Boolean = true) on FIELD
             [
                 'X-Accel-Buffering' => 'no',
                 'Content-Type' => 'multipart/mixed; boundary="-"',
-            ]
+            ],
         );
     }
 
-    public function setMaxExecutionTime(float $time): void
+    protected function hasRemainingDeferred(): bool
     {
-        $this->maxExecutionTime = $time;
+        return $this->deferred !== [];
     }
 
-    /**
-     * Override max nested fields.
-     */
-    public function setMaxNestedFields(int $max): void
+    protected function stream(): void
     {
-        $this->maxNestedFields = $max;
+        $this->stream->stream(
+            $this->result,
+            $this->resolved,
+            ! $this->hasRemainingDeferred(),
+        );
     }
 
-    /**
-     * Check if the maximum execution time has expired.
-     */
-    protected function executionTimeExpired(): bool
+    /** Check if we reached the maximum execution time. */
+    protected function maxExecutionTimeReached(): bool
     {
         if ($this->maxExecutionTime === 0) {
             return false;
@@ -244,35 +192,36 @@ directive @defer(if: Boolean = true) on FIELD
         return $this->maxExecutionTime <= microtime(true);
     }
 
-    /**
-     * Check if the maximum number of nested field has been resolved.
-     */
+    /** Check if the maximum number of nested field has been resolved. */
     protected function maxNestedFieldsResolved(int $nested): bool
     {
         if ($this->maxNestedFields === 0) {
             return false;
         }
 
-        return $nested >= $this->maxNestedFields;
+        return $this->maxNestedFields <= $nested;
     }
 
-    /**
-     * Execute deferred fields.
-     */
     protected function executeDeferred(): void
     {
-        $this->result = $this->container->call(
-            function (Request $request, RequestParser $requestParser, Helper $graphQLHelper) {
-                return $this->graphQL->executeRequest($request, $requestParser, $graphQLHelper);
-            }
+        $this->result = $this->graphQL->executeParsedQuery(
+            $this->startExecution->query,
+            $this->startExecution->context,
+            $this->startExecution->variables,
+            null,
+            $this->startExecution->operationName,
         );
-
-        $this->stream->stream(
-            $this->result,
-            $this->resolved,
-            empty($this->deferred)
-        );
-
+        $this->stream();
         $this->resolved = [];
+    }
+
+    public function setMaxExecutionTime(float $time): void
+    {
+        $this->maxExecutionTime = $time;
+    }
+
+    public function setMaxNestedFields(int $max): void
+    {
+        $this->maxNestedFields = $max;
     }
 }

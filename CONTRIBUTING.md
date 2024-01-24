@@ -4,24 +4,63 @@ Thank you for contributing to Lighthouse. Here are some tips to make this easy f
 
 ## The process
 
+If this is your first time contributing to any project on GitHub, see [First Contributions](https://github.com/firstcontributions/first-contributions/blob/master/README.md).
+For this project specifically, follow these steps:
+
 1. Fork the project
-1. Create a new branch
-1. Code, commit and push
-1. Open a pull request detailing your changes. Make sure to follow the [template](.github/PULL_REQUEST_TEMPLATE.md)
+1. Clone the repository
+1. [Set up the project](#setup)
+1. Create a branch
+1. Code according to the [guidelines](#code-guidelines) and [style](#code-style)
+1. [Test your changes](#testing)
+1. Commit and push
+1. Open a pull request, following the [template](.github/PULL_REQUEST_TEMPLATE.md)
 
 ## Setup
 
-The project setup is based upon [docker-compose](https://docs.docker.com/compose/install/).
-For convenience, common tasks are wrapped up in the [Makefile](Makefile) for usage with [GNU make](https://www.gnu.org/software/make/).
+This section describes the setup of  a local development environment to run tests
+and other quality tools.
 
-Just clone the project and run the following in the project root:
+### Docker + Make
 
-    make setup
-    make
+A reproducible environment with minimal dependencies:
 
+- [docker-compose](https://docs.docker.com/compose/install)
+- [GNU Make](https://www.gnu.org/software/make) (optional)
+
+For convenience, common tasks during development are wrapped up in the [Makefile](Makefile).
 To see the available commands, run:
 
     make help
+
+Clone the project and run the following in the project root:
+
+    make setup
+
+Before you commit changes, run all validation steps with:
+
+    make
+
+### Native Tools
+
+You can use native tools instead of Docker + Make, with the following requirements:
+
+- PHP (see [composer.json](composer.json) for the minimal required version)
+- Composer (version 2 is recommended)
+- MySQL (any Laravel supported version should work)
+- Redis 6
+
+Clone the project and run the following in the project root:
+
+    composer install
+
+Copy the PHPUnit configuration:
+
+    cp phpunit.xml.dist phpunit.xml
+
+Change the `env` parameters to connect to MySQL and Redis test instances.
+
+Common tasks during development are listed in the `scripts` section of [composer.json](composer.json).
 
 ## Testing
 
@@ -43,10 +82,55 @@ Set the environment variable `XDEBUG_REMOTE_HOST` to the IP of your host machine
 seen from the Docker container. This may differ based on your setup: When running
 Docker for Desktop, it is usually `10.0.2.2`, when running from a VM it is something else.
 
+### Test Data Setup
+
+Use relations over direct access to foreign keys.
+
+```php
+$user = factory(User::class)->create();
+
+// Right
+$post = factory(Post::class)->make();
+$user->post()->save();
+
+// Wrong
+$user = factory(Post::class)->create([
+    'user_id' => $post->id,
+]);
+```
+
+Use properties over arrays to fill fields.
+
+```php
+// Right
+$user = new User();
+$user->name = 'Sepp';
+$user->save();
+
+// Wrong
+$user = User::create([
+    'name' => 'Sepp',
+]);
+```
+
+## Working with proto files
+
+Lighthouse uses [protobuf](https://developers.google.com/protocol-buffers) files for [federated tracing](src/Tracing/FederatedTracing/reports.proto).
+When updating the proto files, the PHP classes need to be regenerated.
+The generation is done with [buf](https://buf.build/docs/generate/overview).
+The `make proto` command generates the new PHP classes and replace the old ones.
+
 ## Documentation
 
+### External
+
 The documentation for Lighthouse is located in [`/docs`](/docs).
-You can check out the [Docs README](/docs/.github/README.md) for more information on how to contribute to the docs.
+See [/docs/.github/README.md](/docs/.github/README.md) for more information on how to contribute to the docs.
+
+### Internal
+
+Mark classes or methods that are meant to be used by end-users with the `@api` PHPDoc tag.
+Those elements are guaranteed to not change until the next major release.
 
 ## Changelog
 
@@ -67,10 +151,17 @@ Then, add a short description of your change and close it off with a link to you
 
 ## Code guidelines
 
-### `protected` over `private`
+### Extensibility
 
-Always use class member visibility `protected` over `private`. We cannot foresee every
-possible use case in advance, extending the code should remain possible. 
+We cannot foresee every possible use case in advance, extending the code should remain possible.
+
+#### `protected` over `private`
+
+Always use class member visibility `protected` over `private`.
+
+#### `final` classes
+
+Prefer `final` classes in [tests](tests), but never use them in [src](src).
 
 ### Laravel feature usage
 
@@ -81,13 +172,10 @@ Not every application has them enabled - Lumen does not use Facades by default.
 
 Prefer direct usage of Illuminate classes instead of helpers.
 
-```php
-// Correct usage
-use \Illuminate\Support\Arr;
-Arr::get($foo, 'bar');
-
-// Wrong usage
-array_get($foo, 'bar');
+```diff
+-array_get($foo, 'bar');
++use \Illuminate\Support\Arr;
++Arr::get($foo, 'bar');
 ```
 
 A notable exception is the `response()` helper - using DI for injecting a
@@ -122,26 +210,21 @@ function foo(): Collection
 ```
 
 Use `self` to annotate that a class returns an instance of itself (or its child).
-Use [PHPDoc type hints](http://docs.phpdoc.org/guides/types.html#keywords) to
+Use [PHPDoc type hints](https://docs.phpdoc.org/guides/types.html#keywords) to
 differentiate between cases where you return the original object instance and
 other cases where you instantiate a new class.
 
 ```php
-<?php
-
 class Foo
 {
     /**
      * Some attribute.
-     *
-     * @var string
      */
-    protected $bar;
+    protected string $bar;
 
     /**
      * Use $this for fluent setters when we expect the exact same object back.
      *
-     * @param  string  $bar
      * @return $this
      */
     public function setBar(string $bar): self
@@ -166,31 +249,11 @@ class Foo
 }
 ```
 
-### Annotating Exception Throwing
-
-Only annotate `@throws` for Exceptions that are thrown in the function itself.
-
-```php
-/**
- * @throws \Exception
- */
-function foo(){
-  throw Excection();
-}
-
-/**
- * No need to annotate the Exception here, even though
- * it is thrown indirectly.
- */
-function bar(){
-  foo();
-}
-```
-
 ## Code style
 
-We use [StyleCI](https://styleci.io/) to ensure clean formatting, oriented
-at the Laravel coding style.
+We format the code automatically with [php-cs-fixer](https://github.com/friendsofphp/php-cs-fixer).
+
+    make fix
 
 Prefer explicit naming and short, focused functions over excessive comments.
 
@@ -228,8 +291,6 @@ When used in the actual source code, classes must always be imported at the top.
 Class references in PHPDoc must use the full namespace.
 
 ```php
-<?php
-
 use Illuminate\Database\Eloquent\Model;
 
 class Foo
@@ -253,43 +314,11 @@ You can use the following two case-sensitive regexes to search for violations:
 @(var|param|return|throws)\s*[A-Z]
 ```
 
-### Test Data Setup
-
-Use relations over direct access to foreign keys.
-
-```php
-$user = factory(User::class)->create();
-
-// Right
-$post = factory(Post::class)->make();
-$user->post()->save();
-
-// Wrong
-$user = factory(Post::class)->create([
-    'user_id' => $post->id,
-]);
-```
-
-Use properties over arrays to fill fields.
-
-```php
-// Right
-$user = new User();
-$user->name = 'Sepp';
-$user->save();
-
-// Wrong
-$user = User::create([
-    'name' => 'Sepp',
-]);
-```
-
 ## Benchmarks
 
 We use [phpbench](https://github.com/phpbench/phpbench) for running benchmarks
 on performance critical pieces of code.
 
-Run the reports that are defined in `phpbench.json` via the command line,
-for example:
+Run the reports that are defined in `phpbench.json` via the command line:
 
-    vendor/bin/phpbench run --report=ast
+    make bench

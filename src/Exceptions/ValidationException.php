@@ -1,24 +1,40 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Exceptions;
 
-use Exception;
+use GraphQL\Error\ClientAware;
+use GraphQL\Error\ProvidesExtensions;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Validation\ValidationException as LaravelValidationException;
 
-class ValidationException extends Exception implements RendersErrorsExtensions
+class ValidationException extends \Exception implements ClientAware, ProvidesExtensions
 {
-    const CATEGORY = 'validation';
+    public const KEY = 'validation';
+
+    public function __construct(
+        string $message,
+        protected Validator $validator,
+    ) {
+        parent::__construct($message);
+    }
+
+    public static function fromLaravel(LaravelValidationException $laravelException): self
+    {
+        return new static($laravelException->getMessage(), $laravelException->validator);
+    }
 
     /**
-     * @var \Illuminate\Contracts\Validation\Validator
+     * Instantiate from a plain array of messages.
+     *
+     * @see \Illuminate\Validation\ValidationException::withMessages()
+     *
+     * @param  array<string, string|array<string>>  $messages
      */
-    protected $validator;
-
-    public function __construct(string $message, Validator $validator)
+    public static function withMessages(array $messages): self
     {
-        parent::__construct($message);
-
-        $this->validator = $validator;
+        return static::fromLaravel(
+            LaravelValidationException::withMessages($messages),
+        );
     }
 
     public function isClientSafe(): bool
@@ -26,15 +42,11 @@ class ValidationException extends Exception implements RendersErrorsExtensions
         return true;
     }
 
-    public function getCategory(): string
-    {
-        return self::CATEGORY;
-    }
-
-    public function extensionsContent(): array
+    /** @return array{validation: array<string, array<int, string>>} */
+    public function getExtensions(): array
     {
         return [
-            'validation' => $this->validator->errors()->messages(),
+            self::KEY => $this->validator->errors()->messages(),
         ];
     }
 }

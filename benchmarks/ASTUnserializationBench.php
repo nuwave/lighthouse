@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Benchmarks;
 
@@ -10,7 +10,7 @@ use Nuwave\Lighthouse\Schema\AST\DocumentAST;
  */
 class ASTUnserializationBench
 {
-    public const SCHEMA = /** @lang GraphQL */ <<<'SCHEMA'
+    public const SCHEMA = /** @lang GraphQL */ <<<'GRAPHQL'
 type Query {
   query1: String
   query2: String
@@ -25,17 +25,11 @@ type Foo {
   foo1: Boolean
   foo2: Boolean
 }
-SCHEMA;
+GRAPHQL;
 
-    /**
-     * @var string
-     */
-    protected $documentNode;
+    protected string $documentNode;
 
-    /**
-     * @var string
-     */
-    protected $documentAST;
+    protected string $documentAST;
 
     public function prepareSchema(): void
     {
@@ -43,17 +37,18 @@ SCHEMA;
             Parser::parse(
                 self::SCHEMA,
                 // Ignore location since it only bloats the AST
-                ['noLocation' => true]
-            )
+                ['noLocation' => true],
+            ),
         );
 
         $this->documentAST = serialize(
-            DocumentAST::fromSource(self::SCHEMA)
+            DocumentAST::fromSource(self::SCHEMA),
         );
     }
 
     /**
      * @Revs(100)
+     *
      * @Iterations(10)
      */
     public function benchUnserializeDocumentNode(): void
@@ -63,6 +58,7 @@ SCHEMA;
 
     /**
      * @Revs(100)
+     *
      * @Iterations(10)
      */
     public function benchUnserializeDocumentAST(): void

@@ -1,7 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Console;
 
+use GraphQL\Language\DirectiveLocation;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
@@ -21,20 +22,23 @@ use Symfony\Component\Console\Input\InputOption;
 
 class DirectiveCommand extends LighthouseGeneratorCommand
 {
-    const ARGUMENT_INTERFACES = [
+    /** @var array<int, class-string> */
+    public const ARGUMENT_INTERFACES = [
         ArgTransformerDirective::class,
         ArgBuilderDirective::class,
         ArgResolver::class,
         ArgManipulator::class,
     ];
 
-    const FIELD_INTERFACES = [
+    /** @var array<int, class-string> */
+    public const FIELD_INTERFACES = [
         FieldResolver::class,
         FieldMiddleware::class,
         FieldManipulator::class,
     ];
 
-    const TYPE_INTERFACES = [
+    /** @var array<int, class-string> */
+    public const TYPE_INTERFACES = [
         TypeManipulator::class,
         TypeMiddleware::class,
         TypeResolver::class,
@@ -45,37 +49,23 @@ class DirectiveCommand extends LighthouseGeneratorCommand
 
     protected $description = 'Create a class for a custom schema directive.';
 
-    /**
-     * The type of class being generated.
-     *
-     * @var string
-     */
     protected $type = 'Directive';
 
-    /**
-     * The required imports.
-     *
-     * @var \Illuminate\Support\Collection<string>
-     */
-    protected $imports;
+    /** @var \Illuminate\Support\Collection<int, string> */
+    protected Collection $requiredImports;
 
-    /**
-     * The implemented interfaces.
-     *
-     * @var \Illuminate\Support\Collection<string>
-     */
-    protected $implements;
+    /** @var \Illuminate\Support\Collection<int, string> */
+    protected Collection $implementedInterfaces;
 
-    /**
-     * The method stubs.
-     *
-     * @var \Illuminate\Support\Collection<string>
-     */
-    protected $methods;
+    /** @var \Illuminate\Support\Collection<int, string> */
+    protected Collection $possibleLocations;
+
+    /** @var \Illuminate\Support\Collection<int, string> */
+    protected Collection $methodStubs;
 
     protected function getNameInput(): string
     {
-        return parent::getNameInput().'Directive';
+        return parent::getNameInput() . 'Directive';
     }
 
     protected function namespaceConfigKey(): string
@@ -83,28 +73,41 @@ class DirectiveCommand extends LighthouseGeneratorCommand
         return 'directives';
     }
 
-    /**
-     * @param  string  $name
-     *
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
-     */
     protected function buildClass($name): string
     {
-        $this->imports = new Collection();
-        $this->implements = new Collection();
-        $this->methods = new Collection();
+        $this->requiredImports = new Collection();
+        $this->implementedInterfaces = new Collection();
+        $this->possibleLocations = new Collection();
+        $this->methodStubs = new Collection();
 
         $stub = parent::buildClass($name);
 
-        if ($this->option('type')) {
+        $forType = $this->option('type');
+        $forField = $this->option('field');
+        $forArgument = $this->option('argument');
+
+        if (! $forType && ! $forField && ! $forArgument) {
+            throw new \Exception('Must specify at least one of: --type, --field, --argument');
+        }
+
+        if ($forType) {
             $this->askForInterfaces(self::TYPE_INTERFACES);
+            $this->askForLocations([
+                DirectiveLocation::OBJECT,
+                DirectiveLocation::IFACE,
+                DirectiveLocation::ENUM,
+                DirectiveLocation::INPUT_OBJECT,
+                DirectiveLocation::SCALAR,
+                DirectiveLocation::UNION,
+            ]);
         }
 
-        if ($this->option('field')) {
+        if ($forField) {
             $this->askForInterfaces(self::FIELD_INTERFACES);
+            $this->addLocation(DirectiveLocation::FIELD_DEFINITION);
         }
 
-        if ($this->option('argument')) {
+        if ($forArgument) {
             // Arg directives always either implement ArgDirective or ArgDirectiveForArray.
             if ($this->confirm('Will your argument directive apply to a list of items?')) {
                 $this->implementInterface(ArgDirectiveForArray::class);
@@ -113,87 +116,129 @@ class DirectiveCommand extends LighthouseGeneratorCommand
             }
 
             $this->askForInterfaces(self::ARGUMENT_INTERFACES);
+            $this->askForLocations([
+                DirectiveLocation::ARGUMENT_DEFINITION,
+                DirectiveLocation::INPUT_FIELD_DEFINITION,
+            ]);
         }
 
         $stub = str_replace(
             '{{ imports }}',
-            $this->imports
+            $this->requiredImports
                 ->filter()
                 ->unique()
                 ->implode("\n"),
-            $stub
+            $stub,
+        );
+
+        $directiveName = parent::getNameInput();
+        $stub = str_replace(
+            '{{ name }}',
+            lcfirst($directiveName),
+            $stub,
+        );
+
+        $stub = str_replace(
+            '{{ locations }}',
+            $this->possibleLocations->implode(' | '),
+            $stub,
         );
 
         $stub = str_replace(
             '{{ methods }}',
-            $this->methods->implode("\n"),
-            $stub
+            $this->methodStubs->implode("\n"),
+            $stub,
         );
 
         return str_replace(
             '{{ implements }}',
-            $this->implements->implode(', '),
-            $stub
+            $this->implementedInterfaces->implode(', '),
+            $stub,
         );
     }
 
     /**
      * Ask the user if the directive should implement any of the given interfaces.
      *
-     * @param  array<class-string> $interfaces
+     * @param  array<class-string>  $availableInterfaces
      */
-    protected function askForInterfaces(array $interfaces): void
+    protected function askForInterfaces(array $availableInterfaces): void
     {
-        foreach ($interfaces as $interface) {
-            if ($this->confirm("Should the directive implement the {$this->shortName($interface)} middleware?")) {
-                $this->implementInterface($interface);
-            }
+        $implementedInterfaces = $this->choice(
+            'Which interfaces should the directive implement?',
+            $availableInterfaces,
+            null,
+            null,
+            true,
+        );
+        assert(is_array($implementedInterfaces), 'Because we set $multiple = true');
+
+        foreach ($implementedInterfaces as $interface) {
+            $this->implementInterface($interface);
         }
     }
 
-    /**
-     * @param  class-string  $interface
-     */
+    /** @param  array<int, string>  $availableLocations */
+    public function askForLocations(array $availableLocations): void
+    {
+        $usedLocations = $this->choice(
+            'In which schema locations can the directive be used?',
+            $availableLocations,
+            null,
+            null,
+            true,
+        );
+        assert(is_array($usedLocations), 'Because we set $multiple = true');
+
+        foreach ($usedLocations as $location) {
+            $this->addLocation($location);
+        }
+    }
+
+    /** @param  class-string  $interface */
     protected function shortName(string $interface): string
     {
         return Str::afterLast($interface, '\\');
     }
 
-    /**
-     * @param  class-string  $interface
-     */
+    /** @param  class-string  $interface */
     protected function implementInterface(string $interface): void
     {
         $shortName = $this->shortName($interface);
-        $this->implements->push($shortName);
+        $this->implementedInterfaces->push($shortName);
 
-        $this->imports->push("use {$interface};");
+        $this->requiredImports->push("use {$interface};");
         if ($imports = $this->interfaceImports($shortName)) {
             $imports = explode("\n", $imports);
-            $this->imports->push(...$imports);
+            $this->requiredImports->push(...$imports);
         }
 
         if ($methods = $this->interfaceMethods($shortName)) {
-            $this->methods->push($methods);
+            $this->methodStubs->push($methods);
         }
+    }
+
+    private function addLocation(string $location): void
+    {
+        $this->possibleLocations->push($location);
     }
 
     protected function getStub(): string
     {
-        return __DIR__.'/stubs/directive.stub';
+        return __DIR__ . '/stubs/directive.stub';
     }
 
     protected function interfaceMethods(string $interface): ?string
     {
         return $this->getFileIfExists(
-            __DIR__.'/stubs/directives/'.Str::snake($interface).'_methods.stub'
+            __DIR__ . '/stubs/directives/' . Str::snake($interface) . '_methods.stub',
         );
     }
 
     protected function interfaceImports(string $interface): ?string
     {
         return $this->getFileIfExists(
-            __DIR__.'/stubs/directives/'.Str::snake($interface).'_imports.stub'
+            __DIR__ . '/stubs/directives/' . Str::snake($interface) . '_imports.stub',
         );
     }
 
@@ -206,9 +251,7 @@ class DirectiveCommand extends LighthouseGeneratorCommand
         return $this->files->get($path);
     }
 
-    /**
-     * @return array<array<mixed>>
-     */
+    /** @return array<int, array<int, mixed>> */
     protected function getOptions(): array
     {
         return [

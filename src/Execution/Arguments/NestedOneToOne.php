@@ -1,29 +1,25 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
 class NestedOneToOne implements ArgResolver
 {
-    /**
-     * @var string
-     */
-    protected $relationName;
-
-    public function __construct(string $relationName)
-    {
-        $this->relationName = $relationName;
-    }
+    public function __construct(
+        protected string $relationName,
+    ) {}
 
     /**
      * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
+     * @param  ArgumentSet  $args
      */
     public function __invoke($parent, $args): void
     {
-        /** @var \Illuminate\Database\Eloquent\Relations\HasOne|\Illuminate\Database\Eloquent\Relations\MorphOne $relation */
         $relation = $parent->{$this->relationName}();
+        assert($relation instanceof HasOne || $relation instanceof MorphOne);
 
         if ($args->has('create')) {
             $saveModel = new ResolveNested(new SaveModel($relation));
@@ -45,7 +41,7 @@ class NestedOneToOne implements ArgResolver
 
         if ($args->has('delete')) {
             $relation->getRelated()::destroy(
-                $args->arguments['delete']->toPlain()
+                $args->arguments['delete']->toPlain(),
             );
         }
     }

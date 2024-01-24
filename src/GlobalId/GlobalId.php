@@ -1,44 +1,25 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\GlobalId;
 
-use Nuwave\Lighthouse\Support\Contracts\GlobalId as GlobalIdContract;
-
 /**
- * The default encoding of global IDs in Lighthouse.
- *
- * The way that IDs are generated basically works like this:
- *
- * 1. Take the name of a type, e.g. "User" and an ID, e.g. 123
- * 2. Glue them together, separated by a colon, e.g. "User:123"
- * 3. base64_encode the result
- *
- * This can then be reversed to uniquely identify an entity in our
- * schema, just by looking at a single ID.
+ * Encode and decode globally unique IDs.
  */
-class GlobalId implements GlobalIdContract
+interface GlobalId
 {
-    public function encode(string $type, $id): string
-    {
-        return base64_encode($type.':'.$id);
-    }
+    /** Glue together a type and an id to create a global id. */
+    public function encode(string $type, int|string $id): string;
 
-    public function decode(string $globalID): array
-    {
-        return explode(':', \Safe\base64_decode($globalID));
-    }
+    /**
+     * Split a global id into the type and the id it contains.
+     *
+     * @return array{0: string, 1: string} A tuple of [$type, $id], e.g. ['User', '123']
+     */
+    public function decode(string $globalID): array;
 
-    public function decodeID(string $globalID): string
-    {
-        [$type, $id] = self::decode($globalID);
+    /** Decode the Global ID and get just the ID. */
+    public function decodeID(string $globalID): string;
 
-        return trim($id);
-    }
-
-    public function decodeType(string $globalID): string
-    {
-        [$type, $id] = self::decode($globalID);
-
-        return trim($type);
-    }
+    /** Decode the Global ID and get just the type. */
+    public function decodeType(string $globalID): string;
 }

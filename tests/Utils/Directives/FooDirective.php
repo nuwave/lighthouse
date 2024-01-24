@@ -1,18 +1,18 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Utils\Directives;
 
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 
-class FooDirective extends BaseDirective
+final class FooDirective extends BaseDirective
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Maximum bar.
 """
 directive @foo on FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 }

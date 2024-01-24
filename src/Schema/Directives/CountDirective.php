@@ -1,30 +1,43 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Illuminate\Database\Eloquent\Builder;
+use GraphQL\Deferred;
+use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Execution\DataLoader\RelationCountBatchLoader;
+use Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry;
+use Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader;
+use Nuwave\Lighthouse\Execution\ModelsLoader\CountModelsLoader;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class CountDirective extends WithRelationDirective implements FieldResolver
+class CountDirective extends BaseDirective implements FieldResolver, FieldManipulator
 {
+    use RelationDirectiveHelpers;
+
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Returns the count of a given relationship or model.
 """
 directive @count(
   """
-  The relationship which you want to run the count on.
+  The relationship to count.
+  Mutually exclusive with `model`.
   """
   relation: String
 
   """
-  The model to run the count on.
+  The model to count.
+  Mutually exclusive with `relation`.
   """
   model: String
 
@@ -32,59 +45,63 @@ directive @count(
   Apply scopes to the underlying query.
   """
   scopes: [String!]
+
+  """
+  Count only rows where the given columns are non-null.
+  `*` counts every row.
+  """
+  columns: [String!]! = ["*"]
+
+  """
+  Should exclude duplicated rows?
+  """
+  distinct: Boolean! = false
 ) on FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
-    /**
-     * Returns the count of a given relationship or model.
-     */
-    public function resolveField(FieldValue $value): FieldValue
+    public function resolveField(FieldValue $fieldValue): callable
     {
-        return $value->setResolver(
-            $this->deferredRelationResolver(
-                function (?Model $model) {
-                    // Fetch the count by relation
-                    $relation = $this->directiveArgValue('relation');
-                    if (! is_null($relation)) {
-                        return $model->{$this->nodeName()};
-                    }
+        $modelArg = $this->directiveArgValue('model');
+        if (is_string($modelArg)) {
+            return function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg): int {
+                $query = $this
+                    ->namespaceModelClass($modelArg)::query();
 
-                    // Else we try to fetch by model.
-                    $modelArg = $this->directiveArgValue('model');
-                    if (! is_null($modelArg)) {
-                        return $this->countModel($modelArg);
-                    }
+                $this->makeBuilderDecorator($root, $args, $context, $resolveInfo)($query);
 
-                    throw new DefinitionException(
-                        "A `model` or `relation` argument must be assigned to the '{$this->name()}' directive on '{$this->nodeName()}"
-                    );
+                if ($this->directiveArgValue('distinct')) {
+                    $query->distinct();
                 }
-            )
-        );
-    }
 
-    public function batchLoaderClass(): string
-    {
-        return RelationCountBatchLoader::class;
-    }
+                $columns = $this->directiveArgValue('columns');
+                if ($columns) {
+                    return $query->count(...$columns);
+                }
 
-    protected function countModel(string $modelName): int
-    {
-        $scopesArg = $this->directiveArgValue('scopes');
+                return $query->count();
+            };
+        }
 
-        return $this->namespaceModelClass($modelName)
-            ::query()
-            ->when(! is_null($scopesArg), function (Builder $query) use ($scopesArg) {
-                return $query->scopes($scopesArg);
-            })
-            ->count();
-    }
-
-    public function relationName(): string
-    {
         $relation = $this->directiveArgValue('relation');
+        if (is_string($relation)) {
+            return function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Deferred {
+                $relationBatchLoader = BatchLoaderRegistry::instance(
+                    [...$this->qualifyPath($args, $resolveInfo), 'count'],
+                    fn (): RelationBatchLoader => new RelationBatchLoader(
+                        new CountModelsLoader($this->relation(), $this->makeBuilderDecorator($parent, $args, $context, $resolveInfo)),
+                    ),
+                );
 
-        return "{$relation} as {$this->nodeName()}";
+                return $relationBatchLoader->load($parent);
+            };
+        }
+
+        throw new DefinitionException("A `model` or `relation` argument must be assigned to the '{$this->name()}' directive on '{$this->nodeName()}'.");
+    }
+
+    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType): void
+    {
+        $this->validateMutuallyExclusiveArguments(['model', 'relation']);
     }
 }

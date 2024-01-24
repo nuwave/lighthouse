@@ -1,57 +1,35 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace DummyNamespace;
 
+use GraphQL\Language\AST\Node;
 use GraphQL\Type\Definition\ScalarType;
 
-/**
- * Read more about scalars here http://webonyx.github.io/graphql-php/type-system/scalar-types/
- */
-class DummyClass extends ScalarType
+/** Read more about scalars here: https://webonyx.github.io/graphql-php/type-definitions/scalars. */
+final class DummyClass extends ScalarType
 {
-    /**
-     * Serializes an internal value to include in a response.
-     *
-     * @param  mixed  $value
-     * @return mixed
-     */
-    public function serialize($value)
+    /** Serializes an internal value to include in a response. */
+    public function serialize(mixed $value): mixed
     {
-        // Assuming the internal representation of the value is always correct
-        return $value;
-
-        // TODO validate if it might be incorrect
+        // TODO validate if $value might be incorrect
     }
 
-    /**
-     * Parses an externally provided value (query variable) to use as an input
-     *
-     * @param  mixed  $value
-     * @return mixed
-     */
-    public function parseValue($value)
+    /** Parses an externally provided value (query variable) to use as an input. */
+    public function parseValue(mixed $value): mixed
     {
-        // TODO implement validation
-
-        return $value;
+        // TODO implement validation and transformation of $value
     }
 
     /**
      * Parses an externally provided literal value (hardcoded in GraphQL query) to use as an input.
      *
-     * E.g.
-     * {
-     *   user(email: "user@example.com")
-     * }
+     * Should throw an exception with a client friendly message on invalid value nodes, @see \GraphQL\Error\ClientAware.
      *
-     * @param  \GraphQL\Language\AST\Node  $valueNode
+     * @param  \GraphQL\Language\AST\ValueNode&\GraphQL\Language\AST\Node  $valueNode
      * @param  array<string, mixed>|null  $variables
-     * @return mixed
      */
-    public function parseLiteral($valueNode, ?array $variables = null)
+    public function parseLiteral(Node $valueNode, ?array $variables = null): mixed
     {
-        // TODO implement validation
-
-        return $valueNode->value;
+        // TODO implement validation and transformation of $valueNode
     }
 }

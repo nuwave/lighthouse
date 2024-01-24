@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
@@ -8,16 +8,12 @@ use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
 class UpdateModel implements ArgResolver
 {
-    const MISSING_PRIMARY_KEY_FOR_UPDATE = 'Missing primary key for update.';
+    public const MISSING_PRIMARY_KEY_FOR_UPDATE = 'Missing primary key for update.';
 
-    /**
-     * @var callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver
-     */
+    /** @var callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver */
     protected $previous;
 
-    /**
-     * @param callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver $previous
-     */
+    /** @param  callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver  $previous */
     public function __construct(callable $previous)
     {
         $this->previous = $previous;
@@ -25,18 +21,14 @@ class UpdateModel implements ArgResolver
 
     /**
      * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
+     * @param  ArgumentSet  $args
      */
-    public function __invoke($model, $args)
+    public function __invoke($model, $args): mixed
     {
-        /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument|null $id */
         $id = Arr::pull($args->arguments, 'id')
             ?? Arr::pull($args->arguments, $model->getKeyName())
-            ?? null;
-
-        if ($id === null) {
-            throw new Error(self::MISSING_PRIMARY_KEY_FOR_UPDATE);
-        }
+            ?? throw new Error(self::MISSING_PRIMARY_KEY_FOR_UPDATE);
+        assert($id instanceof Argument);
 
         $model = $model->newQuery()->findOrFail($id->value);
 

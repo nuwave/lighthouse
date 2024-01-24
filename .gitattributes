@@ -8,7 +8,7 @@
 /.editorconfig export-ignore
 /.gitattributes export-ignore
 /.gitignore export-ignore
-/.styleci.yml export-ignore
+/.php-cs-fixer.php export-ignore
 /CHANGELOG.md export-ignore
 /CONTRIBUTING.md export-ignore
 /docker-compose.yml export-ignore
@@ -20,5 +20,5 @@
 /phpbench.json export-ignore
 /phpstan.neon export-ignore
 /phpunit.xml.dist export-ignore
-/rector.php
+/rector.php export-ignore
 /UPGRADE.md export-ignore

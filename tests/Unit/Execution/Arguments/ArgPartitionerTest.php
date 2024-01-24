@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Execution\Arguments;
 
@@ -12,9 +12,9 @@ use Tests\Unit\Execution\Arguments\Fixtures\Nested;
 use Tests\Utils\Models\User;
 use Tests\Utils\Models\WithoutRelationClassImport;
 
-class ArgPartitionerTest extends TestCase
+final class ArgPartitionerTest extends TestCase
 {
-    public function testPartitionArgsWithArResolvers(): void
+    public function testPartitionArgsWithArgResolvers(): void
     {
         $argumentSet = new ArgumentSet();
 
@@ -29,12 +29,12 @@ class ArgPartitionerTest extends TestCase
 
         $this->assertSame(
             ['regular' => $regular],
-            $regularArgs->arguments
+            $regularArgs->arguments,
         );
 
         $this->assertSame(
             ['nested' => $nested],
-            $nestedArgs->arguments
+            $nestedArgs->arguments,
         );
     }
 
@@ -46,22 +46,52 @@ class ArgPartitionerTest extends TestCase
         $argumentSet->arguments['regular'] = $regular;
 
         $tasksRelation = new Argument();
+        $tasksRelation->value = new ArgumentSet();
         $argumentSet->arguments['tasks'] = $tasksRelation;
+
+        $postsRelation = new Argument();
+        $postsRelation->value = null;
+        $argumentSet->arguments['posts'] = $postsRelation;
 
         [$hasManyArgs, $regularArgs] = ArgPartitioner::relationMethods(
             $argumentSet,
             new User(),
-            HasMany::class
+            HasMany::class,
         );
 
         $this->assertSame(
             ['regular' => $regular],
-            $regularArgs->arguments
+            $regularArgs->arguments,
         );
 
         $this->assertSame(
             ['tasks' => $tasksRelation],
-            $hasManyArgs->arguments
+            $hasManyArgs->arguments,
+        );
+    }
+
+    public function testArgsMatchingNonRelationMethod(): void
+    {
+        $argumentSet = new ArgumentSet();
+
+        /** @see User::nonRelationPrimitive() */
+        $nonRelationPrimitive = new Argument();
+        $argumentSet->arguments['nonRelationPrimitive'] = $nonRelationPrimitive;
+
+        [$hasManyArgs, $regularArgs] = ArgPartitioner::relationMethods(
+            $argumentSet,
+            new User(),
+            HasMany::class,
+        );
+
+        $this->assertSame(
+            ['nonRelationPrimitive' => $nonRelationPrimitive],
+            $regularArgs->arguments,
+        );
+
+        $this->assertSame(
+            [],
+            $hasManyArgs->arguments,
         );
     }
 
@@ -77,7 +107,7 @@ class ArgPartitionerTest extends TestCase
         ArgPartitioner::relationMethods(
             $argumentSet,
             new WithoutRelationClassImport(),
-            HasMany::class
+            HasMany::class,
         );
     }
 }

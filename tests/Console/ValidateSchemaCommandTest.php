@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Console;
 
@@ -6,7 +6,7 @@ use Nuwave\Lighthouse\Console\ValidateSchemaCommand;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Tests\TestCase;
 
-class ValidateSchemaCommandTest extends TestCase
+final class ValidateSchemaCommandTest extends TestCase
 {
     public function testValidatesCorrectSchema(): void
     {
@@ -36,10 +36,12 @@ class ValidateSchemaCommandTest extends TestCase
         $tester->execute([]);
     }
 
+    /** @return never */
     public function testFailsValidationDirectiveInWrongLocation(): void
     {
         $this->markTestSkipped('This validation needs to be in the upstream webonyx/graphql-php validation');
 
+        // @phpstan-ignore-next-line https://github.com/phpstan/phpstan-phpunit/issues/52
         $this->schema = /** @lang GraphQL */ '
         type Query @field {
             foo: ID @eq

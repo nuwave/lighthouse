@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace DummyNamespace;
 
 use Nuwave\Lighthouse\Validation\Validator;
 
-class DummyClass extends Validator
+final class DummyClass extends Validator
 {
     /**
      * Return the validation rules.

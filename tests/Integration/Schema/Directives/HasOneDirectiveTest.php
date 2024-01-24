@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Schema\Directives;
 
@@ -6,30 +6,32 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 
-class HasOneDirectiveTest extends DBTestCase
+final class HasOneDirectiveTest extends DBTestCase
 {
-    public function testCanQueryHasOneRelationship(): void
+    public function testQueryHasOneRelationship(): void
     {
-        // Task with id 1, no post
+        // Task with no post
         factory(Task::class)->create();
-        // Creates a task with id 2 and assigns it to this post
-        factory(Post::class)->create();
 
-        $this->schema = '
+        // Creates a task and assigns it to this post
+        $post = factory(Post::class)->create();
+        assert($post instanceof Post);
+
+        $this->schema = /** @lang GraphQL */ '
         type Post {
             id: Int
         }
-        
+
         type Task {
             post: Post @hasOne
         }
-        
+
         type Query {
             tasks: [Task!]! @all
         }
         ';
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ '
         {
             tasks {
                 post {
@@ -45,7 +47,7 @@ class HasOneDirectiveTest extends DBTestCase
                     ],
                     [
                         'post' => [
-                            'id' => 1,
+                            'id' => $post->id,
                         ],
                     ],
                 ],

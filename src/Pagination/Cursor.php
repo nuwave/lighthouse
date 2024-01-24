@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Pagination;
 
@@ -33,9 +33,7 @@ class Cursor
         return 0;
     }
 
-    /**
-     * Encode the given offset to make the implementation opaque.
-     */
+    /** Encode the given offset to make the implementation opaque. */
     public static function encode(int $offset): string
     {
         return base64_encode((string) $offset);

@@ -1,16 +1,30 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Utils\Policies;
 
+use Illuminate\Auth\Access\Response;
 use Tests\Utils\Models\User;
 
-class UserPolicy
+final class UserPolicy
 {
+    public const SUPER_ADMIN = 'super admin';
+
     public const ADMIN = 'admin';
+
+    public const SUPER_ADMINS_ONLY_MESSAGE = 'Only super admins allowed';
 
     public function adminOnly(User $user): bool
     {
         return $user->name === self::ADMIN;
+    }
+
+    public function superAdminOnly(User $user): Response
+    {
+        if ($user->name === self::SUPER_ADMIN) {
+            return Response::allow();
+        }
+
+        return Response::deny(self::SUPER_ADMINS_ONLY_MESSAGE);
     }
 
     public function alwaysTrue(): bool
@@ -33,20 +47,28 @@ class UserPolicy
         return $pass;
     }
 
-    /**
-     * @param  array<string, string>  $injectedArgs
-     */
-    public function injectArgs(User $viewer, array $injectedArgs): bool
+    /** @param  User|array<string, mixed>  ...$args */
+    public function injectArgs(User $viewer, User|array ...$args): bool
     {
+        $injectedArgs = $args[0];
+        if ($injectedArgs instanceof User) {
+            $injectedArgs = $args[1];
+        }
+
         return $injectedArgs === ['foo' => 'bar'];
     }
 
-    /**
-     * @param  array<string, string>  $injectedArgs
-     * @param  array<string, string>  $staticArgs
-     */
-    public function argsWithInjectedArgs(User $viewer, array $injectedArgs, array $staticArgs): bool
+    /** @param  User|array<string, mixed>  ...$args */
+    public function argsWithInjectedArgs(User $viewer, User|array ...$args): bool
     {
+        $injectedArgs = $args[0];
+        $staticArgs = $args[1];
+
+        if ($injectedArgs instanceof User) {
+            $injectedArgs = $args[1];
+            $staticArgs = $args[2];
+        }
+
         return $injectedArgs === ['foo' => 'dynamic']
             && $staticArgs === ['foo' => 'static'];
     }

@@ -1,11 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
-class FirstDirectiveTest extends DBTestCase
+final class FirstDirectiveTest extends DBTestCase
 {
     public function testReturnsASingleUser(): void
     {
@@ -14,15 +14,15 @@ class FirstDirectiveTest extends DBTestCase
             id: ID!
             name: String!
         }
-        
+
         type Query {
             user(id: ID @eq): User @first(model: "User")
         }
         ';
 
-        $userA = factory(User::class)->create(['name' => 'A']);
+        factory(User::class)->create(['name' => 'A']);
         $userB = factory(User::class)->create(['name' => 'B']);
-        $userC = factory(User::class)->create(['name' => 'C']);
+        factory(User::class)->create(['name' => 'C']);
 
         $this->graphQL("
         {
@@ -46,15 +46,15 @@ class FirstDirectiveTest extends DBTestCase
             id: ID!
             name: String!
         }
-        
+
         type Query {
             user(name: String @eq): User @first(model: "User")
         }
         ';
 
         $userA = factory(User::class)->create(['name' => 'A']);
-        $userB = factory(User::class)->create(['name' => 'A']);
-        $userC = factory(User::class)->create(['name' => 'B']);
+        factory(User::class)->create(['name' => 'A']);
+        factory(User::class)->create(['name' => 'B']);
 
         $this->graphQL('
         {

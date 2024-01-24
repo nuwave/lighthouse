@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
@@ -7,19 +7,16 @@ use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
 class NestedMorphTo implements ArgResolver
 {
-    /**
-     * @var \Illuminate\Database\Eloquent\Relations\MorphTo
-     */
-    protected $relation;
-
-    public function __construct(MorphTo $relation)
-    {
-        $this->relation = $relation;
-    }
+    public function __construct(
+        /**
+         * @var \Illuminate\Database\Eloquent\Relations\MorphTo<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model>  $relation
+         */
+        protected MorphTo $relation,
+    ) {}
 
     /**
      * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
+     * @param  ArgumentSet  $args
      */
     public function __invoke($parent, $args): void
     {
@@ -29,11 +26,11 @@ class NestedMorphTo implements ArgResolver
             $connectArgs = $args->arguments['connect']->value;
 
             $morphToModel = $this->relation->createModelByType(
-                (string) $connectArgs->arguments['type']->value
+                (string) $connectArgs->arguments['type']->value,
             );
             $morphToModel->setAttribute(
                 $morphToModel->getKeyName(),
-                $connectArgs->arguments['id']->value
+                $connectArgs->arguments['id']->value,
             );
 
             $this->relation->associate($morphToModel);

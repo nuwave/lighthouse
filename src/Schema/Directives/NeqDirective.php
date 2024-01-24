@@ -1,16 +1,19 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
 class NeqDirective extends BaseDirective implements ArgBuilderDirective
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Use the client given value to add an not-equal conditional to a database query.
+Use the client given value to add a not-equal conditional to a database query.
 """
 directive @neq(
   """
@@ -19,21 +22,15 @@ directive @neq(
   """
   key: String
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
-    /**
-     * Apply a "WHERE <> $value" clause.
-     *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
-     */
-    public function handleBuilder($builder, $value): object
+    public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, $value): QueryBuilder|EloquentBuilder|Relation
     {
         return $builder->where(
             $this->directiveArgValue('key', $this->nodeName()),
             '<>',
-            $value
+            $value,
         );
     }
 }

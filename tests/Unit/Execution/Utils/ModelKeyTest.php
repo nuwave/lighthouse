@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Execution\Utils;
 
@@ -7,7 +7,7 @@ use Tests\TestCase;
 use Tests\Utils\Models\Product;
 use Tests\Utils\Models\User;
 
-class ModelKeyTest extends TestCase
+final class ModelKeyTest extends TestCase
 {
     public function testModelSingleKey(): void
     {

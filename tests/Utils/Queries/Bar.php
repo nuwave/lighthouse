@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Utils\Queries;
 
-class Bar
+final class Bar
 {
     public const RESULT = 'foobaz';
 

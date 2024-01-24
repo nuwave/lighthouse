@@ -3,9 +3,15 @@
 ## Plugins
 
 - [joselfonseca/lighthouse-graphql-passport-auth](https://github.com/joselfonseca/lighthouse-graphql-passport-auth)
+- [daniel-de-wit/lighthouse-sanctum](https://github.com/daniel-de-wit/lighthouse-sanctum)
+- [thekonz/lighthouse-redis-broadcaster](https://github.com/thekonz/lighthouse-redis-broadcaster)
+- [brightalley/lighthouse-apollo](https://github.com/brightalley/lighthouse-apollo)
+- [roboroads/lighthouse-settings](https://github.com/Roboroads/lighthouse-settings)
 
 ## Tutorials
 
+- [Laravel GraphQL by Bitfumes](https://www.youtube.com/watch?v=iA3eFL8uq-c)
+- [Laracasts: GraphQL with Laravel and Vue](https://laracasts.com/series/graphql-with-laravel-and-vue)
 - [Building a GraphQL Server with Laravel](https://www.toptal.com/graphql/laravel-graphql-server-tutorial)
 - [Video Walkthrough by Christopher Moore](https://youtu.be/y19EaW2X7ac)
 - [GraphQL in Laravel done right](https://medium.com/@olivernybroe/graphql-in-laravel-done-right-9cf123d5601b)
@@ -19,10 +25,12 @@
 
 ## Recommended Packages
 
-- [mll-lab/laravel-graphql-playground](https://github.com/mll-lab/laravel-graphql-playground)
+- [mll-lab/laravel-graphiql](https://github.com/mll-lab/laravel-graphiql)
+- [mll-lab/laravel-graphql-voyager](https://github.com/mll-lab/laravel-graphql-voyager)
 - [mll-lab/graphql-php-scalars](https://github.com/mll-lab/graphql-php-scalars)
 - [marvinrabe/laravel-graphql-test](https://github.com/marvinrabe/laravel-graphql-test)
 
 ## Recommended Clients
 
 - [Buoy - A Lighthouse-client for Angular](https://ngx-buoy.com)
+- [Sailor - A typesafe GraphQL client for PHP](https://github.com/spawnia/sailor)

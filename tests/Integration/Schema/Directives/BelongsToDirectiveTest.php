@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Schema\Directives;
 
@@ -9,44 +9,18 @@ use Tests\Utils\Models\Product;
 use Tests\Utils\Models\Team;
 use Tests\Utils\Models\User;
 
-class BelongsToDirectiveTest extends DBTestCase
+final class BelongsToDirectiveTest extends DBTestCase
 {
-    /**
-     * Auth user.
-     *
-     * @var \Tests\Utils\Models\User
-     */
-    protected $user;
-
-    /**
-     * User's team.
-     *
-     * @var \Tests\Utils\Models\Team
-     */
-    protected $team;
-
-    /**
-     * User's company.
-     *
-     * @var \Tests\Utils\Models\Company
-     */
-    protected $company;
-
-    protected function setUp(): void
+    public function testResolveBelongsToRelationship(): void
     {
-        parent::setUp();
+        $company = factory(Company::class)->create();
 
-        $this->company = factory(Company::class)->create();
-        $this->team = factory(Team::class)->create();
-        $this->user = factory(User::class)->create([
-            'company_id' => $this->company->getKey(),
-            'team_id' => $this->team->getKey(),
-        ]);
-    }
+        $user = factory(User::class)->make();
+        assert($user instanceof User);
+        $user->company()->associate($company);
+        $user->save();
 
-    public function testCanResolveBelongsToRelationship(): void
-    {
-        $this->be($this->user);
+        $this->be($user);
 
         $this->schema = /** @lang GraphQL */ '
         type Company {
@@ -74,16 +48,23 @@ class BelongsToDirectiveTest extends DBTestCase
             'data' => [
                 'user' => [
                     'company' => [
-                        'name' => $this->company->name,
+                        'name' => $company->name,
                     ],
                 ],
             ],
         ]);
     }
 
-    public function testCanResolveBelongsToWithCustomName(): void
+    public function testResolveBelongsToWithCustomName(): void
     {
-        $this->be($this->user);
+        $company = factory(Company::class)->create();
+
+        $user = factory(User::class)->make();
+        assert($user instanceof User);
+        $user->company()->associate($company);
+        $user->save();
+
+        $this->be($user);
 
         $this->schema = /** @lang GraphQL */ '
         type Company {
@@ -111,16 +92,25 @@ class BelongsToDirectiveTest extends DBTestCase
             'data' => [
                 'user' => [
                     'account' => [
-                        'name' => $this->company->name,
+                        'name' => $company->name,
                     ],
                 ],
             ],
         ]);
     }
 
-    public function testCanResolveBelongsToRelationshipWithTwoRelation(): void
+    public function testResolveBelongsToRelationshipWithTwoRelation(): void
     {
-        $this->be($this->user);
+        $company = factory(Company::class)->create();
+        $team = factory(Team::class)->create();
+
+        $user = factory(User::class)->make();
+        assert($user instanceof User);
+        $user->company()->associate($company);
+        $user->team()->associate($team);
+        $user->save();
+
+        $this->be($user);
 
         $this->schema = /** @lang GraphQL */ '
         type Company {
@@ -156,20 +146,18 @@ class BelongsToDirectiveTest extends DBTestCase
             'data' => [
                 'user' => [
                     'company' => [
-                        'name' => $this->company->name,
+                        'name' => $company->name,
                     ],
                     'team' => [
-                        'name' => $this->team->name,
+                        'name' => $team->name,
                     ],
                 ],
             ],
         ]);
     }
 
-    public function testCanResolveBelongsToRelationshipWhenMainModelHasCompositePrimaryKey(): void
+    public function testResolveBelongsToRelationshipWhenMainModelHasCompositePrimaryKey(): void
     {
-        $this->be($this->user);
-
         $products = factory(Product::class, 2)->create();
 
         $this->schema = /** @lang GraphQL */ '
@@ -227,10 +215,10 @@ class BelongsToDirectiveTest extends DBTestCase
 
     public function testBelongsToItself(): void
     {
-        /** @var \Tests\Utils\Models\Post $parent */
+        /** @var Post $parent */
         $parent = factory(Post::class)->create();
 
-        /** @var \Tests\Utils\Models\Post $child */
+        /** @var Post $child */
         $child = factory(Post::class)->make();
         $child->parent()->associate($parent);
         $child->save();
@@ -273,5 +261,149 @@ class BelongsToDirectiveTest extends DBTestCase
                     ],
                 ],
             ]);
+    }
+
+    public function testDoesNotShortcutForeignKeySelectionByDefault(): void
+    {
+        $company = factory(Company::class)->create();
+
+        /** @var User $user */
+        $user = factory(User::class)->make();
+        $user->company()->associate($company);
+        $user->save();
+
+        $this->be($user);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Company {
+            id: ID! @rename(attribute: "uuid")
+        }
+
+        type User {
+            company: Company @belongsTo
+        }
+
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            user {
+                company {
+                    id
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'company' => [
+                        'id' => $company->uuid,
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testShortcutsForeignKey(): void
+    {
+        config(['lighthouse.shortcut_foreign_key_selection' => true]);
+
+        $company = factory(Company::class)->create();
+        assert($company instanceof Company);
+
+        $user = factory(User::class)->make();
+        assert($user instanceof User);
+        $user->company()->associate($company);
+        $user->save();
+
+        $user->setRelations([]);
+
+        $this->be($user);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Company {
+            id: ID!
+        }
+
+        type User {
+            company: Company @belongsTo
+        }
+
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $this->assertNoQueriesExecuted(function () use ($company): void {
+            $this->graphQL(/** @lang GraphQL */ '
+            {
+                user {
+                    company {
+                        id
+                    }
+                }
+            }
+            ')->assertJson([
+                'data' => [
+                    'user' => [
+                        'company' => [
+                            'id' => $company->id,
+                        ],
+                    ],
+                ],
+            ]);
+        });
+    }
+
+    public function testDoesNotShortcutForeignKeyIfQueryHasConditions(): void
+    {
+        config(['lighthouse.shortcut_foreign_key_selection' => true]);
+
+        $company = factory(Company::class)->create();
+        assert($company instanceof Company);
+
+        $user = factory(User::class)->make();
+        assert($user instanceof User);
+        $user->company()->associate($company);
+        $user->save();
+
+        $this->be($user);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Company {
+            id: ID!
+        }
+
+        type User {
+            company(name: String @eq): Company @belongsTo
+        }
+
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $this->assertQueryCountMatches(1, function () use ($company): void {
+            $this->graphQL(/** @lang GraphQL */ '
+            query ($name: String) {
+                user {
+                    company(name: $name) {
+                        id
+                    }
+                }
+            }
+            ', [
+                'name' => "{$company->name} no match",
+            ])->assertJson([
+                'data' => [
+                    'user' => [
+                        'company' => null,
+                    ],
+                ],
+            ]);
+        });
     }
 }

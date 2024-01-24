@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration;
 
@@ -6,9 +6,9 @@ use GraphQL\Error\Error;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Tests\TestCase;
 
-class ReportingErrorHandlerTest extends TestCase
+final class ReportingErrorHandlerTest extends TestCase
 {
-    protected $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ '
     type Query {
         foo: ID @mock
     }
@@ -17,18 +17,14 @@ class ReportingErrorHandlerTest extends TestCase
     public function testReportsNonClientSafeErrors(): void
     {
         $exception = new \Exception('some internal error that was unexpected');
-        $this->mockResolver(function () use ($exception) {
-            throw $exception;
-        });
+        $this->mockResolver(static fn () => throw $exception);
 
         $handler = $this->createMock(ExceptionHandler::class);
         $handler
             ->expects($this->atLeastOnce())
             ->method('report')
             ->with($exception);
-        app()->singleton(ExceptionHandler::class, function () use ($handler) {
-            return $handler;
-        });
+        $this->app->singleton(ExceptionHandler::class, static fn () => $handler);
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -40,18 +36,14 @@ class ReportingErrorHandlerTest extends TestCase
     public function testDoesNotReportClientSafeErrors(): void
     {
         $error = new Error('an expected error that is shown to clients');
-        $this->mockResolver(function () use ($error) {
-            throw $error;
-        });
+        $this->mockResolver(static fn () => throw $error);
 
         $handler = $this->createMock(ExceptionHandler::class);
         $handler
             ->expects($this->never())
             ->method('report')
             ->with($error);
-        app()->singleton(ExceptionHandler::class, function () use ($handler) {
-            return $handler;
-        });
+        $this->app->singleton(ExceptionHandler::class, static fn () => $handler);
 
         $this->graphQL(/** @lang GraphQL */ '
         {

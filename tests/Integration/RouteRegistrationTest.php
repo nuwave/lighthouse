@@ -1,19 +1,15 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration;
 
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Routing\Route;
+use Illuminate\Routing\Router;
 use Nuwave\Lighthouse\LighthouseServiceProvider;
-use Orchestra\Testbench\TestCase;
+use Tests\TestCase;
 
-class RouteRegistrationTest extends TestCase
+final class RouteRegistrationTest extends TestCase
 {
-    /**
-     * Get package providers.
-     *
-     * @param  \Illuminate\Foundation\Application  $app
-     * @return array<class-string>
-     */
     protected function getPackageProviders($app): array
     {
         return [
@@ -25,27 +21,21 @@ class RouteRegistrationTest extends TestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        /** @var \Illuminate\Contracts\Config\Repository $config */
-        $config = $app['config'];
-        $config->set(
-            'lighthouse.route.prefix',
-            'foo'
-        );
+        $config = $app->make(ConfigRepository::class);
+        $config->set('lighthouse.route.prefix', 'foo');
     }
 
     public function testRegisterRouteWithCustomConfig(): void
     {
-        /** @var \Illuminate\Routing\Router $router */
-        $router = app('router');
+        $router = $this->app->make(Router::class);
         $routes = $router->getRoutes();
 
         $graphqlRoute = $routes->getByName('graphql');
+        assert($graphqlRoute instanceof Route);
 
-        $this->assertInstanceOf(Route::class, $graphqlRoute);
-        /** @var \Illuminate\Routing\Route $graphqlRoute */
-        $this->assertEquals(
+        $this->assertSame(
             ['GET', 'POST', 'HEAD'],
-            $graphqlRoute->methods()
+            $graphqlRoute->methods(),
         );
         $this->assertSame('foo', $graphqlRoute->getPrefix());
     }

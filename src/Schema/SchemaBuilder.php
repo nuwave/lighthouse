@@ -1,85 +1,87 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema;
 
 use GraphQL\GraphQL;
+use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
+use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\AST\ExecutableTypeNodeConverter;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 
 class SchemaBuilder
 {
-    /**
-     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
-     */
-    protected $typeRegistry;
+    protected Schema $schema;
 
-    public function __construct(TypeRegistry $typeRegistry)
+    public function __construct(
+        protected TypeRegistry $typeRegistry,
+        protected ASTBuilder $astBuilder,
+    ) {}
+
+    public function schema(): Schema
     {
-        $this->typeRegistry = $typeRegistry;
+        return $this->schema ??= $this->build(
+            $this->astBuilder->documentAST(),
+        );
     }
 
-    /**
-     * Build an executable schema from AST.
-     */
-    public function build(DocumentAST $documentAST): Schema
+    /** Build an executable schema from an AST. */
+    protected function build(DocumentAST $documentAST): Schema
     {
         $config = SchemaConfig::create();
 
         $this->typeRegistry->setDocumentAST($documentAST);
 
         // Always set Query since it is required
-        /** @var \GraphQL\Type\Definition\ObjectType $query */
         $query = $this->typeRegistry->get(RootType::QUERY);
+        assert($query instanceof ObjectType);
         $config->setQuery($query);
 
         // Mutation and Subscription are optional, so only add them
         // if they are present in the schema
         if (isset($documentAST->types[RootType::MUTATION])) {
-            /** @var \GraphQL\Type\Definition\ObjectType $mutation */
             $mutation = $this->typeRegistry->get(RootType::MUTATION);
+            assert($mutation instanceof ObjectType);
             $config->setMutation($mutation);
         }
 
         if (isset($documentAST->types[RootType::SUBSCRIPTION])) {
-            /** @var \GraphQL\Type\Definition\ObjectType $subscription */
             $subscription = $this->typeRegistry->get(RootType::SUBSCRIPTION);
-            // Eager-load the subscription fields to ensure they are registered
-            $subscription->getFields();
-
+            assert($subscription instanceof ObjectType);
             $config->setSubscription($subscription);
         }
 
         // Use lazy type loading to prevent unnecessary work
         $config->setTypeLoader(
-            function (string $name): Type {
-                return $this->typeRegistry->get($name);
-            }
+            fn (string $name): ?Type => $this->typeRegistry->search($name),
         );
 
-        // This is just used for introspection, it is required
-        // to be able to retrieve all the types in the schema
+        // Enables introspection to list all types in the schema
         $config->setTypes(
-            function (): array {
-                return $this->typeRegistry->possibleTypes();
-            }
+            /**
+             * @return array<string, \GraphQL\Type\Definition\Type>
+             */
+            fn (): array => $this->typeRegistry->possibleTypes(),
         );
 
         // There is no way to resolve directives lazily, so we convert them eagerly
         $directiveFactory = new DirectiveFactory(
-            new ExecutableTypeNodeConverter($this->typeRegistry)
+            new ExecutableTypeNodeConverter($this->typeRegistry),
         );
 
         $directives = [];
         foreach ($documentAST->directives as $directiveDefinition) {
-            $directives [] = $directiveFactory->handle($directiveDefinition);
+            $directives[] = $directiveFactory->handle($directiveDefinition);
         }
 
         $config->setDirectives(
-            array_merge(GraphQL::getStandardDirectives(), $directives)
+            array_merge(GraphQL::getStandardDirectives(), $directives),
         );
+
+        $config->setExtensionASTNodes($documentAST->schemaExtensions);
 
         return new Schema($config);
     }

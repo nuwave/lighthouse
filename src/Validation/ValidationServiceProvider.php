@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Validation;
 
@@ -8,16 +8,8 @@ use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 
 class ValidationServiceProvider extends ServiceProvider
 {
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(Dispatcher $dispatcher): void
     {
-        $dispatcher->listen(
-            RegisterDirectiveNamespaces::class,
-            function (RegisterDirectiveNamespaces $registerDirectiveNamespaces): string {
-                return __NAMESPACE__;
-            }
-        );
+        $dispatcher->listen(RegisterDirectiveNamespaces::class, static fn (): string => __NAMESPACE__);
     }
 }

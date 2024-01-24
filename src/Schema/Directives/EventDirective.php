@@ -1,27 +1,20 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Closure;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
 class EventDirective extends BaseDirective implements FieldMiddleware
 {
-    /**
-     * @var \Illuminate\Contracts\Events\Dispatcher
-     */
-    protected $eventsDispatcher;
-
-    public function __construct(EventsDispatcher $eventsDispatcher)
-    {
-        $this->eventsDispatcher = $eventsDispatcher;
-    }
+    public function __construct(
+        protected EventsDispatcher $eventsDispatcher,
+    ) {}
 
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Dispatch an event after the resolution of a field.
 
@@ -34,29 +27,21 @@ directive @event(
   """
   dispatch: String!
 ) repeatable on FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue): void
     {
-        $previousResolver = $fieldValue->getResolver();
-
-        return $next(
-            $fieldValue->setResolver(
-                function () use ($previousResolver) {
-                    $result = $previousResolver(...func_get_args());
-
-                    $eventClassName = $this->namespaceClassName(
-                        $this->directiveArgValue('dispatch')
-                    );
-
-                    $this->eventsDispatcher->dispatch(
-                        new $eventClassName($result)
-                    );
-
-                    return $result;
-                }
-            )
+        $eventClassName = $this->namespaceClassName(
+            $this->directiveArgValue('dispatch'),
         );
+
+        $fieldValue->resultHandler(function ($result) use ($eventClassName) {
+            $this->eventsDispatcher->dispatch(
+                new $eventClassName($result),
+            );
+
+            return $result;
+        });
     }
 }

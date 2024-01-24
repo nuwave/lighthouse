@@ -6,7 +6,7 @@ sidebar: auto
 
 This is an introductory tutorial for building a GraphQL server with Lighthouse.
 While we try to keep it beginner friendly, we recommend familiarizing yourself
-with [GraphQL](https://graphql.org/) and [Laravel](https://laravel.com/) first.
+with [GraphQL](https://graphql.org) and [Laravel](https://laravel.com) first.
 
 The source code of the finished project is available at [nuwave/lighthouse-tutorial](https://github.com/nuwave/lighthouse-tutorial).
 
@@ -19,16 +19,16 @@ gives clients the power to ask for exactly what they need and nothing more,
 makes it easier to evolve APIs over time, and enables powerful developer tools.
 
 <div align="center">
-  <img src="./playground.png">  
-  <small>GraphQL Playground</small>
+  <img src="https://raw.githubusercontent.com/graphql/graphiql/main/packages/graphiql/resources/graphiql.png" alt="Screenshot of GraphiQL with Doc Explorer Open">  
+  <small>GraphiQL</small>
 </div>
 
-GraphQL has been released only as a [_specification_](https://facebook.github.io/graphql/).
+GraphQL has been released only as a [_specification_](https://facebook.github.io/graphql).
 This means that GraphQL is in fact not more than a long document that describes in detail
 the behaviour of a GraphQL server.
 
 GraphQL has its own type system that’s used to define the schema of an API.
-The syntax for writing schemas is called [Schema Definition Language](https://www.prisma.io/blog/graphql-sdl-schema-definition-language-6755bcb9ce51/) or short **SDL**.
+The syntax for writing schemas is called [Schema Definition Language](https://www.prisma.io/blog/graphql-sdl-schema-definition-language-6755bcb9ce51) or short **SDL**.
 
 Here is an example how we can use the SDL to define a type called `User` and its
 relation to another type `Post`.
@@ -53,8 +53,7 @@ We also defined the inverse relationship from `Post` to `User` through the `auth
 
 ## What is Lighthouse?
 
-Lighthouse integrates with any Laravel project to make it easy to serve
-your own GraphQL server.
+Lighthouse integrates with any Laravel project to serve a GraphQL API.
 
 The process of building a GraphQL server with Lighthouse can be described in 3 steps:
 
@@ -73,7 +72,7 @@ In this tutorial we will create a GraphQL API for a simple Blog from scratch wit
 
 - Laravel
 - Lighthouse
-- GraphQL Playground
+- GraphiQL
 
 ::: tip
 You can download the source code for this tutorial at [https://github.com/nuwave/lighthouse-tutorial](https://github.com/nuwave/lighthouse-tutorial)
@@ -89,10 +88,7 @@ You can use an existing project and skip ahead to [Installing Lighthouse](#insta
 but you may have to adapt a few things to fit your existing app as we go along.
 :::
 
-Assuming you are using the Laravel installer, create a new project
-(read more about [installing Laravel](https://laravel.com/docs/#installing-laravel)):
-
-    laravel new lighthouse-tutorial
+Create a new project by following [installing Laravel](https://laravel.com/docs/#installing-laravel).
 
 Consult the [Laravel docs on database configuration](https://laravel.com/docs/database#configuration)
 and ensure you have a working database set up.
@@ -104,25 +100,24 @@ Run database migrations to create the `users` table:
 Seed the database with some fake users:
 
     php artisan tinker
-    factory('App\User', 10)->create();
+    \App\Models\User::factory(10)->create()
 
 ### Installing Lighthouse
 
-Of course, we will use Lighthouse as the GraphQL Server.
+Of course, we will use Lighthouse as the GraphQL Server:
 
     composer require nuwave/lighthouse
 
-In this tutorial we will use [GraphQL Playground](https://github.com/prisma-labs/graphql-playground)
-as an IDE for GraphQL queries. It's like Postman for GraphQL, but with super powers.
-
-    composer require mll-lab/laravel-graphql-playground
-
-Then publish default schema to `graphql/schema.graphql`.
+Publish the default schema to `graphql/schema.graphql`:
 
     php artisan vendor:publish --tag=lighthouse-schema
 
-To make sure everything is working, access Laravel GraphQL Playground on `/graphql-playground`
-and try the following query:
+We will use [GraphiQL](https://github.com/graphql/graphiql/tree/main/packages/graphiql)
+to interactively run GraphQL queries:
+
+    composer require mll-lab/laravel-graphiql
+
+To make sure everything is working, access `/graphiql` and try this query:
 
 ```graphql
 {
@@ -133,8 +128,6 @@ and try the following query:
   }
 }
 ```
-
-Now, let's move on and create a GraphQL API for our blog.
 
 ## The Models
 
@@ -157,22 +150,20 @@ Begin by defining models and migrations for your posts and comments
 
     php artisan make:model -m Post
 
-Replace the newly generated `app/Post.php` and the `create_posts_table.php` with this:
+Replace the newly generated `app/Models/Post.php` and the `create_posts_table.php` with this:
 
 ```php
-<?php
-
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Post extends Model
+final class Post extends Model
 {
     public function author(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'author_id');
     }
 
     public function comments(): HasMany
@@ -183,14 +174,11 @@ class Post extends Model
 ```
 
 ```php
-<?php
-
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreatePostsTable extends Migration
-{
+return new class() extends Migration {
     public function up(): void
     {
         Schema::create('posts', function (Blueprint $table) {
@@ -206,7 +194,7 @@ class CreatePostsTable extends Migration
     {
         Schema::dropIfExists('posts');
     }
-}
+};
 ```
 
 Let's do the same for the Comment model:
@@ -214,14 +202,12 @@ Let's do the same for the Comment model:
     php artisan make:model -m Comment
 
 ```php
-<?php
-
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Comment extends Model
+final class Comment extends Model
 {
     public function post(): BelongsTo
     {
@@ -231,14 +217,11 @@ class Comment extends Model
 ```
 
 ```php
-<?php
-
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateCommentsTable extends Migration
-{
+return new class() extends Migration {
     public function up(): void
     {
         Schema::create('comments', function (Blueprint $table) {
@@ -253,50 +236,53 @@ class CreateCommentsTable extends Migration
     {
         Schema::dropIfExists('comments');
     }
-}
+};
 ```
 
 Remember to run the migrations:
 
     php artisan migrate
 
-Finally, add the `posts` relation to `app/User.php`
+Finally, add the `posts` relation to `app/Models/User.php`
 
 ```php
-<?php
+namespace App\Models;
 
-namespace App;
-
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+final class User extends Authenticatable
 {
-    use Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var array
+     * @var array<int, string>
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name',
+        'email',
+        'password',
     ];
 
     /**
      * The attributes that should be hidden for arrays.
      *
-     * @var array
+     * @var array<int, string>
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password',
+        'remember_token',
     ];
 
     /**
      * The attributes that should be cast to native types.
      *
-     * @var array
+     * @var array<string, string|\Illuminate\Contracts\Database\Eloquent\Castable>
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
@@ -318,6 +304,7 @@ We add two queries for retrieving posts to the root `Query` type:
 
 ```diff
 type Query {
+   ...
 +  posts: [Post!]! @all
 +  post(id: Int! @eq): Post @find
 }
@@ -365,7 +352,7 @@ Just like in Eloquent, we express the relationship between our types using the
 Insert some fake data into your database,
 you can use [Laravel seeders](https://laravel.com/docs/seeding) for that.
 
-Visit `/graphql-playground` and try the following query:
+Visit `/graphiql` and try the following query:
 
 ```graphql
 {
@@ -387,11 +374,11 @@ You should get a list of all the posts in your database,
 together with all of its comments and the name of the author.
 
 Hopefully, this example showed you a glimpse of the power of GraphQL
-and how Lighthouse makes it easy to build your own server with Laravel.
+and how you can serve your own GraphQL API with Lighthouse.
 
 ## Next Steps
 
-The app you just built might use some more features.
+The app you just built might need some more features.
 Here are a few ideas on what you might add to learn more about Lighthouse.
 
 - [Add pagination to your fields](../master/api-reference/directives.md#paginate)

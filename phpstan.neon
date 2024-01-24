@@ -1,70 +1,65 @@
-includes:
-- vendor/bensampo/laravel-enum/extension.neon
-- vendor/nunomaduro/larastan/extension.neon
-- vendor/phpstan/phpstan-mockery/extension.neon
-- vendor/thecodingmachine/phpstan-safe-rule/phpstan-safe-rule.neon
 parameters:
-  level: max
+  level: 8 # TODO level up to max
+  stubFiles:
+  - _ide_helper.php
   paths:
   - benchmarks
   - src
   - tests
-  excludes_analyse:
-  - tests/database/migrations/*
-
-  # Indirectly refers to \App\User (maybe through larastan?)
-  - tests/Utils/Models/User.php
-
-  # Intentionally wrong
-  - tests/Utils/Models/WithoutRelationClassImport.php
-
-  # Compatibility fix because Laravel moved the TestResponse class
-  - tests/TestCase.php
-  - tests/Laravel7ExceptionHandler.php
-  - tests/PreLaravel7ExceptionHandler.php
-
-  # As long as we support multiple Laravel versions at once, there will be some dead spots
-  reportUnmatchedIgnoredErrors: false
+  checkOctaneCompatibility: true
+  reportUnmatchedIgnoredErrors: false # As long as we support multiple Laravel versions at once, there will be some dead spots
+  # Install https://plugins.jetbrains.com/plugin/7677-awesome-console to make those links clickable
+  editorUrl: '%%relFile%%:%%line%%'
+  editorUrlTitle: '%%relFile%%:%%line%%'
+  tmpDir: phpstan-tmp-dir
+  excludePaths:
+  - tests/Utils/Models/WithoutRelationClassImport.php # Intentionally wrong
+  - tests/LaravelPhpdocAlignmentFixer.php # Copied from laravel/pint
+  # laravel/pennant requires Laravel 10
+  - src/Pennant
+  - tests/Integration/Pennant
+  - src/Tracing/FederatedTracing/Proto # Generated classes from protobuf
   ignoreErrors:
+  # PHPStan does not get it
+  - '#Parameter \#1 \$callback of static method Closure::fromCallable\(\) expects callable\(\): mixed, array{object, .*} given\.#'
+
   # Some parts of Laravel are just really magical
-  - '#Parameter \#1 \$callable of static method Closure::fromCallable\(\) expects callable\(\): mixed, array\(\*NEVER\*, .*\) given\.#'
+  - '#Parameter \#1 \$response of static method Nuwave\\Lighthouse\\Testing\\TestResponseUtils::extractValidationErrors\(\) expects Illuminate\\Testing\\TestResponse, \$this\(Nuwave\\Lighthouse\\Testing\\TestResponseMixin\) given\.#'
   - path: tests/database/factories/*
     message: '#Variable \$factory might not be defined#'
-  - '#Function factory invoked with 2 parameters, 0 required\.#'
-  - '#Function factory invoked with 1 parameter, 0 required\.#'
-  - '#Parameter \#1 \$callback of method Illuminate\\Support\\Collection<mixed,mixed>::mapWithKeys\(\) expects callable\(mixed, mixed\): array, Closure\(Illuminate\\Support\\Collection\): Illuminate\\Database\\Eloquent\\Collection given\.#'
+
+  # Mixins are magical
+  - path: src/Testing/TestResponseMixin.php
+    message: '#Method Nuwave\\Lighthouse\\Testing\\TestResponseMixin::assertGraphQLErrorMessage\(\) invoked with 1 parameter, 0 required\.#'
+  - path: src/Testing/TestResponseMixin.php
+    message: '#Method Nuwave\\Lighthouse\\Testing\\TestResponseMixin::assertGraphQLDebugMessage\(\) invoked with 1 parameter, 0 required\.#'
+  - path: src/Testing/TestResponseMixin.php
+    message: '#Anonymous function should return Illuminate\\Testing\\TestResponse but returns .*#'
+
+  # Relation forwards calls to Builder
+  - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Builder<Illuminate\\Database\\Eloquent\\Model>|Illuminate\\Database\\Eloquent\\Relations\\Relation<Illuminate\\Database\\Eloquent\\Model>|Illuminate\\Database\\Query\\Builder::(orderBy|where|whereIn|whereNotIn|whereBetween|whereJsonContains|whereNotBetween)\(\)\.#'
 
   # This test cheats and uses reflection to make assertions
   - path: tests/Unit/Schema/Directives/BaseDirectiveTest.php
     message: '#Call to protected method getModelClass\(\) of class Nuwave\\Lighthouse\\Schema\\Directives\\BaseDirective\.#'
 
-  # Can not specify a class-string for traits
-  - path: src/Schema/Directives/SearchDirective.php
-    message: '#PHPDoc tag @var for variable \$modelClass contains unresolvable type\.#'
-
-  # Correctly writing out the union of all the subtypes of AST nodes is too much work
-  - '#Access to an undefined property GraphQL\\Language\\AST\\Node::\$name\.#'
-  - '#Access to an undefined property GraphQL\\Language\\AST\\Node::\$directives\.#'
-  - '#Access to an undefined property GraphQL\\Language\\AST\\TypeNode::\$kind\.#'
-  - '#.* expects GraphQL\\Language\\AST\\Node, GraphQL\\Language\\AST\\TypeDefinitionNode given\.#'
-  - '#PHPDoc tag @param for parameter \$definition with type GraphQL\\Language\\AST\\FieldDefinitionNode\|GraphQL\\Language\\AST\\TypeDefinitionNode is not subtype of native type GraphQL\\Language\\AST\\Node\.#'
-
-  # Should work once we update to a version of graphql-php that has more accurate types
-  - '#Cannot call method merge\(\) on array<GraphQL\\Language\\AST\\ArgumentNode>\.#'
-  - '#.* does not accept GraphQL\\Language\\AST\\NodeList.*#'
-
-  # This class or an equivalent of it will be present in a Laravel install
-  - '#.* unknown class App\\User\.#'
-
   # This is a library, so it should be extendable
   - '#Unsafe usage of new static.*#'
 
-  # Compatibility fix because Laravel moved the TestResponse class
-  - '#.*TestResponse.*#'
-  - '#Unable to resolve the template type ExpectedType in call to method PHPUnit\\Framework\\Assert::assertSame\(\)#'
+  # Ease transition for non-nullable properties towards native types https://github.com/phpstan/phpstan/issues/5150
+  - '#Property .* in isset\(\) is not nullable\.#'
 
-  # We are monkeypatching ResolveInfo to pass information through resolver middleware
-  - '#Access to an undefined property GraphQL\\Type\\Definition\\ResolveInfo::\$argumentSet\.#'
+  # Unavailable in thecodingmachine/safe:1
+  - '#Function (hrtime) is unsafe to use\. It can return FALSE instead of throwing an exception\.#'
 
-  # This really has no type in root resolvers
-  - '#Method .* has parameter \$root with no typehint specified\.#'
+  # Unavailable in thecodingmachine/safe:2
+  - '#Function (sort|substr|ksort) is unsafe to use\. It can return FALSE instead of throwing an exception\.#'
+
+  # Lumen type hints are just wrong
+  - '#Parameter \#1 \$content of function response expects string, .* given\.#'
+
+  # Seems like a bug in PHPStan
+  - '#Parameter \#2 \$type of method Nuwave\\Lighthouse\\Schema\\TypeRegistry::.+Lazy\(\) expects callable\(\): GraphQL\\Type\\Definition\\Type&GraphQL\\Type\\Definition\\NamedType, Closure\(\): GraphQL\\Type\\Definition\\ObjectType given\.#'
+
+  # Older versions of bensampo/laravel-enum are not generic yet
+  - '#contains generic type BenSampo\\Enum\\Enum<.+> but class BenSampo\\Enum\\Enum is not generic\.#'

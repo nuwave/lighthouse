@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Events;
 
@@ -7,9 +7,9 @@ use Illuminate\Support\Facades\Event;
 use Nuwave\Lighthouse\Events\ManipulateAST;
 use Tests\TestCase;
 
-class ManipulateASTTest extends TestCase
+final class ManipulateASTTest extends TestCase
 {
-    public function testCanManipulateTheAST(): void
+    public function testManipulateTheAST(): void
     {
         $this->schema = '
         type Query {
@@ -17,9 +17,9 @@ class ManipulateASTTest extends TestCase
         }
         ';
 
-        Event::listen(ManipulateAST::class, function (ManipulateAST $manipulateAST): void {
+        Event::listen(ManipulateAST::class, static function (ManipulateAST $manipulateAST): void {
             $manipulateAST->documentAST->setTypeDefinition(
-                Parser::objectTypeDefinition(self::PLACEHOLDER_QUERY)
+                Parser::objectTypeDefinition(self::PLACEHOLDER_QUERY),
             );
         });
 

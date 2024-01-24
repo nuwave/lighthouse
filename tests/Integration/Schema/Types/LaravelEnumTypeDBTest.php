@@ -1,20 +1,16 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Schema\Types;
 
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\Types\LaravelEnumType;
-use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\DBTestCase;
 use Tests\Utils\LaravelEnums\AOrB;
 use Tests\Utils\Models\WithEnum;
 
-class LaravelEnumTypeDBTest extends DBTestCase
+final class LaravelEnumTypeDBTest extends DBTestCase
 {
-    /**
-     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
-     */
-    protected $typeRegistry;
+    protected TypeRegistry $typeRegistry;
 
     protected function setUp(): void
     {
@@ -40,7 +36,7 @@ class LaravelEnumTypeDBTest extends DBTestCase
         ';
 
         $this->typeRegistry->register(
-            new LaravelEnumType(AOrB::class)
+            new LaravelEnumType(AOrB::class),
         );
 
         $typeA = [
@@ -66,10 +62,6 @@ class LaravelEnumTypeDBTest extends DBTestCase
 
     public function testWhereJsonContainsUsingEnumType(): void
     {
-        if (AppVersion::below(5.6)) {
-            $this->markTestSkipped('Laravel supports whereJsonContains from version 5.6.');
-        }
-
         // We use the "name" field to store the "type" JSON
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -84,7 +76,7 @@ class LaravelEnumTypeDBTest extends DBTestCase
         ';
 
         $this->typeRegistry->register(
-            new LaravelEnumType(AOrB::class)
+            new LaravelEnumType(AOrB::class),
         );
 
         $encodedType = \Safe\json_encode([AOrB::A]);
@@ -103,6 +95,47 @@ class LaravelEnumTypeDBTest extends DBTestCase
             'data' => [
                 'withEnum' => [
                     'name' => $encodedType,
+                ],
+            ],
+        ]);
+    }
+
+    public function testScopeUsingEnumType(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            withEnum(
+                byType: AOrB @scope
+            ): WithEnum @find
+        }
+
+        type WithEnum {
+            type: AOrB
+        }
+        ';
+
+        $this->typeRegistry->register(
+            new LaravelEnumType(AOrB::class),
+        );
+
+        $a = AOrB::A();
+
+        $withEnum = new WithEnum();
+        $withEnum->type = $a;
+        $withEnum->save();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($type: AOrB) {
+            withEnum(byType: $type) {
+                type
+            }
+        }
+        ', [
+            'type' => $a->key,
+        ])->assertJson([
+            'data' => [
+                'withEnum' => [
+                    'type' => $a->key,
                 ],
             ],
         ]);

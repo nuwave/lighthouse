@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Execution\MutationExecutor;
 
@@ -6,9 +6,9 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Image;
 use Tests\Utils\Models\Task;
 
-class MorphToTest extends DBTestCase
+final class MorphToTest extends DBTestCase
 {
-    protected $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ '
     type Task {
         id: ID
         name: String
@@ -69,11 +69,14 @@ class MorphToTest extends DBTestCase
         disconnect: Boolean
         delete: Boolean
     }
-    '.self::PLACEHOLDER_QUERY;
+    ' . self::PLACEHOLDER_QUERY;
 
     public function testConnectsMorphTo(): void
     {
-        factory(Task::class)->create(['name' => 'first_task']);
+        $task = factory(Task::class)->make();
+        assert($task instanceof Task);
+        $task->name = 'first_task';
+        $task->save();
 
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -110,7 +113,10 @@ class MorphToTest extends DBTestCase
 
     public function testConnectsMorphToWithUpsert(): void
     {
-        factory(Task::class)->create(['name' => 'first_task']);
+        $task = factory(Task::class)->make();
+        assert($task instanceof Task);
+        $task->name = 'first_task';
+        $task->save();
 
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -177,10 +183,8 @@ class MorphToTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @return array<array<string, string>>
-     */
-    public function existingModelMutations(): array
+    /** @return array<array<string, string>> */
+    public static function existingModelMutations(): array
     {
         return [
             ['Update action' => 'update'],
@@ -188,20 +192,20 @@ class MorphToTest extends DBTestCase
         ];
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    /** @dataProvider existingModelMutations */
     public function testDisconnectsMorphTo(string $action): void
     {
-        /** @var \Tests\Utils\Models\Task $task */
-        $task = factory(Task::class)->create(['name' => 'first_task']);
+        $task = factory(Task::class)->make();
+        assert($task instanceof Task);
+        $task->name = 'first_task';
+        $task->save();
 
-        /** @var \Tests\Utils\Models\Image $image */
         $image = $task->image()->make();
+        assert($image instanceof Image);
         $image->url = 'bar';
         $image->save();
 
-        $field = "${action}Image";
+        $field = "{$action}Image";
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
             {$field}(input: {
@@ -218,8 +222,7 @@ class MorphToTest extends DBTestCase
                 }
             }
         }
-GRAPHQL
-        )->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 $field => [
                     'url' => 'foo',
@@ -229,20 +232,20 @@ GRAPHQL
         ]);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
+    /** @dataProvider existingModelMutations */
     public function testDeletesMorphTo(string $action): void
     {
-        /** @var \Tests\Utils\Models\Task $task */
-        $task = factory(Task::class)->create(['name' => 'first_task']);
+        $task = factory(Task::class)->make();
+        assert($task instanceof Task);
+        $task->name = 'first_task';
+        $task->save();
 
-        /** @var \Tests\Utils\Models\Image $image */
         $image = $task->image()->make();
+        assert($image instanceof Image);
         $image->url = 'bar';
         $image->save();
 
-        $field = "${action}Image";
+        $field = "{$action}Image";
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
             {$field}(input: {
@@ -259,9 +262,7 @@ GRAPHQL
                 }
             }
         }
-
-GRAPHQL
-        )->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 $field => [
                     'url' => 'foo',

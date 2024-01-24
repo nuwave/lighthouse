@@ -1,14 +1,16 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\WhereConditions;
 
 use GraphQL\Error\Error;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 
 class SQLOperator implements Operator
 {
-    public static function missingValueForColumn(string $column): string
+    public static function missingValueForColumn(string $column): Error
     {
-        return "Did not receive a value to match the WhereConditions for column {$column}.";
+        return new Error("Did not receive a value to match the WhereConditions for column {$column}.");
     }
 
     public function enumDefinition(): string
@@ -38,7 +40,7 @@ enum SQLOperator {
     LIKE @enum(value: "LIKE")
 
     "Negation of simple pattern matching (`NOT LIKE`)"
-    NOT_LIKE @enum(value: "NOT_LIKE")
+    NOT_LIKE @enum(value: "NOT LIKE")
 
     "Whether a value is within a set of values (`IN`)"
     IN @enum(value: "In")
@@ -71,7 +73,7 @@ GRAPHQL;
         return 'GTE';
     }
 
-    public function applyConditions($builder, array $whereConditions, string $boolean)
+    public function applyConditions(QueryBuilder|EloquentBuilder $builder, array $whereConditions, string $boolean): QueryBuilder|EloquentBuilder
     {
         $column = $whereConditions['column'];
 
@@ -91,7 +93,7 @@ GRAPHQL;
             $args[] = $operator;
         } else {
             // We utilize the fact that the operators are named after Laravel's condition
-            // methods so we can simply append the name, e.g. whereNull, whereNotBetween
+            // methods, so we can simply append the name, e.g. whereNull, whereNotBetween
             $method .= $operator;
         }
 
@@ -99,9 +101,7 @@ GRAPHQL;
             // The conditions with arity 1 require no args apart from the column name.
             // All other arities take a value to query against.
             if (! array_key_exists('value', $whereConditions)) {
-                throw new Error(
-                    self::missingValueForColumn($column)
-                );
+                throw self::missingValueForColumn($column);
             }
 
             $args[] = $whereConditions['value'];

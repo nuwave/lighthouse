@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Models;
 
@@ -6,9 +6,9 @@ use Illuminate\Support\Facades\DB;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
-class UserTest extends DBTestCase
+final class UserTest extends DBTestCase
 {
-    public function testCanInsertRecordsIntoTestDB(): void
+    public function testInsertRecordsIntoTestDB(): void
     {
         factory(User::class, 2)->create();
 
