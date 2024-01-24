@@ -5,6 +5,7 @@ namespace Tests\Integration\Async;
 use Illuminate\Container\Container;
 use Illuminate\Support\Facades\Queue;
 use Nuwave\Lighthouse\Async\AsyncMutation;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Tests\DBTestCase;
@@ -74,5 +75,17 @@ final class AsyncDirectiveTest extends DBTestCase
             assert($jobCycledThroughSerialization instanceof AsyncMutation);
             Container::getInstance()->call([$jobCycledThroughSerialization, 'handle']);
         }
+    }
+
+    public function testOnlyOnMutations(): void
+    {
+        $this->expectExceptionObject(new DefinitionException(
+            'The @async directive must only be used on fields of the root type mutation, found it on Query.foo.'
+        ));
+        $this->buildSchema(/** @lang GraphQL */ '
+        type Query {
+            foo: Boolean! @async
+        }
+        ');
     }
 }
