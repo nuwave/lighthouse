@@ -55,7 +55,7 @@ final class SubscriptionTest extends TestCase
                 @broadcast(subscription: "onPostCreated")
 
             updatePost(post: String!): Post
-                @field(resolver: "{$this->qualifyTestResolver()}")
+                @mock
                 @broadcast(subscription: "onPostUpdated")
         }
 
@@ -67,7 +67,7 @@ GRAPHQL;
 
     public function testSendsSubscriptionChannelInResponse(): void
     {
-        $response = $this->subscribeToOnPostCreatedSubscription();
+        $response = $this->subscribe();
 
         $cache = $this->app->make(CacheStorageManager::class);
 
@@ -121,7 +121,7 @@ GRAPHQL;
 
     public function testBroadcastSubscriptions(): void
     {
-        $this->subscribeToOnPostCreatedSubscription();
+        $this->subscribe();
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createPost(title: "Foobar") {
@@ -131,7 +131,6 @@ GRAPHQL;
         ');
 
         $broadcastManager = $this->app->make(BroadcastManager::class);
-
         $log = $broadcastManager->driver();
         assert($log instanceof LogBroadcaster);
 
@@ -220,8 +219,10 @@ GRAPHQL;
         }
         ');
 
-        /** @var \Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster $log */
-        $log = app(BroadcastManager::class)->driver();
+        $broadcastManager = $this->app->make(BroadcastManager::class);
+        $log = $broadcastManager->driver();
+        assert($log instanceof LogBroadcaster);
+
         $this->assertCount(1, $log->broadcasts());
 
         $broadcasted = Arr::get(Arr::first($log->broadcasts()), 'data', []);
@@ -253,8 +254,10 @@ GRAPHQL;
             }
         ');
 
-        /** @var \Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster $log */
-        $log = app(BroadcastManager::class)->driver();
+        $broadcastManager = $this->app->make(BroadcastManager::class);
+        $log = $broadcastManager->driver();
+        assert($log instanceof LogBroadcaster);
+
         $this->assertCount(1, $log->broadcasts());
 
         $broadcasted = Arr::get(Arr::first($log->broadcasts()), 'data', []);
@@ -296,8 +299,10 @@ GRAPHQL;
             }
         ');
 
-        /** @var \Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster $log */
-        $log = app(BroadcastManager::class)->driver();
+        $broadcastManager = $this->app->make(BroadcastManager::class);
+        $log = $broadcastManager->driver();
+        assert($log instanceof LogBroadcaster);
+
         $this->assertCount(1, $log->broadcasts());
 
         $broadcasted = Arr::get(Arr::first($log->broadcasts()), 'data', []);
