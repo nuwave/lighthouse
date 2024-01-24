@@ -151,4 +151,13 @@ class LaravelEnumType extends EnumType
 
         return $key;
     }
+
+    public function parseValue($value)
+    {
+        if ($value instanceof $this->enumClass) {
+            return $value;
+        }
+
+        return parent::parseValue($value);
+    }
 }
