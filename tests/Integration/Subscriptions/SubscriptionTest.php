@@ -471,11 +471,11 @@ GRAPHQL;
      *
      * @return array<string, array<string, mixed>>
      */
-    protected function buildResponse(string $channelName, string $channel): array
+    protected function buildResponse(string $fieldName, string $channel): array
     {
         return [
             'data' => [
-                'onPostCreated' => null,
+                $fieldName => null,
             ],
             'extensions' => [
                 'lighthouse_subscriptions' => [
