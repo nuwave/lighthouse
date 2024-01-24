@@ -41,7 +41,6 @@ GRAPHQL;
                 $serializedContext = $contextSerializer->serialize($context);
 
                 AsyncMutation::dispatch(
-                    $args,
                     $serializedContext,
                     $resolveInfo->fragments,
                     $resolveInfo->operation,

@@ -20,8 +20,6 @@ class AsyncMutation implements ShouldQueue
     use Queueable;
 
     public function __construct(
-        /** @var array<string, mixed> */
-        public array $args,
         public string $serializedContext,
         /** array<string, FragmentDefinitionNode> */
         public array $fragments,
