@@ -29,10 +29,8 @@ class RedisStorageManager implements StoresSubscriptions
 
     protected RedisConnection $connection;
 
-    /**
-     * The time to live in seconds for items in the cache.
-     */
-    protected int|null $ttl = null;
+    /** The time to live in seconds for items in the cache. */
+    protected ?int $ttl = null;
 
     public function __construct(ConfigRepository $config, RedisFactory $redis)
     {

@@ -163,12 +163,12 @@ it will actually execute the underlying field resolver.
 The result is not checked for errors, ensure your GraphQL error handling reports relevant exceptions.
 """
 directive @async(
-    """
-    Name of the queue to dispatch the job on.
-    If not specified, jobs will be dispatched to the default queue.
-    See https://laravel.com/docs/queues#customizing-the-queue-and-connection.
-    """
-    queue: String
+  """
+  Name of the queue to dispatch the job on.
+  If not specified, jobs will be dispatched to the default queue.
+  See https://laravel.com/docs/queues#customizing-the-queue-and-connection.
+  """
+  queue: String
 ) on FIELD_DEFINITION
 ```
 

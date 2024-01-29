@@ -9,6 +9,21 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.32.0
+
+### Added
+
+- Add `@async` directive https://github.com/nuwave/lighthouse/pull/2501
+
+### Changed
+
+- Move and rename `Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer` to `Nuwave\Lighthouse\Support\Contracts\SerializesContext` https://github.com/nuwave/lighthouse/pull/2501
+- Do not bind `CreatesContext` and `CanStreamResponse` as singletons https://github.com/nuwave/lighthouse/pull/2501
+
+### Fixed
+
+- Fix parsing reserialized `LaravelEnumType` from `ResolveInfo::$variableValues` https://github.com/nuwave/lighthouse/pull/2501
+
 ## v6.31.1
 
 ### Fixed
