@@ -148,6 +148,30 @@ type Query {
 }
 ```
 
+## @async
+
+```graphql
+"""
+Defer the execution of mutations to [queued jobs](https://laravel.com/docs/queues).
+
+This directive must only be used on fields of the root mutation type.
+When the field is executed, a `Nuwave\Lighthouse\Async\AsyncMutation` job is dispatched
+and the value `true` is returned - thus the fields return type must be `Boolean!`.
+
+Once a [queue worker](https://laravel.com/docs/queues#running-the-queue-worker) picks up the job,
+it will actually execute the underlying field resolver.
+The result is not checked for errors, ensure your GraphQL error handling reports relevant exceptions.
+"""
+directive @async(
+    """
+    Name of the queue to dispatch the job on.
+    If not specified, jobs will be dispatched to the default queue.
+    See https://laravel.com/docs/queues#customizing-the-queue-and-connection.
+    """
+    queue: String
+) on FIELD_DEFINITION
+```
+
 ## @auth
 
 ```graphql
