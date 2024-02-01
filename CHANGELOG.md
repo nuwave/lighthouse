@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Resolve all pivot attributes https://github.com/nuwave/lighthouse/pull/2464
+
 ## v6.22.0
 
 ### Added
