@@ -72,7 +72,9 @@ module.exports = [
       ["custom-directives/getting-started", "Getting Started"],
       "custom-directives/type-directives",
       "custom-directives/field-directives",
-      "custom-directives/argument-directives",
+      "custom-directives/input-value-directives",
+      "custom-directives/field-argument-directives",
+      "custom-directives/input-field-directives",
     ],
   },
   {

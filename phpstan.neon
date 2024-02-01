@@ -18,6 +18,7 @@ parameters:
   # laravel/pennant requires Laravel 10
   - src/Pennant
   - tests/Integration/Pennant
+  - src/Tracing/FederatedTracing/Proto # Generated classes from protobuf
   ignoreErrors:
   # PHPStan does not get it
   - '#Parameter \#1 \$callback of static method Closure::fromCallable\(\) expects callable\(\): mixed, array{object, .*} given\.#'
@@ -26,7 +27,6 @@ parameters:
   - '#Parameter \#1 \$response of static method Nuwave\\Lighthouse\\Testing\\TestResponseUtils::extractValidationErrors\(\) expects Illuminate\\Testing\\TestResponse, \$this\(Nuwave\\Lighthouse\\Testing\\TestResponseMixin\) given\.#'
   - path: tests/database/factories/*
     message: '#Variable \$factory might not be defined#'
-
 
   # Mixins are magical
   - path: src/Testing/TestResponseMixin.php
@@ -60,3 +60,6 @@ parameters:
 
   # Seems like a bug in PHPStan
   - '#Parameter \#2 \$type of method Nuwave\\Lighthouse\\Schema\\TypeRegistry::.+Lazy\(\) expects callable\(\): GraphQL\\Type\\Definition\\Type&GraphQL\\Type\\Definition\\NamedType, Closure\(\): GraphQL\\Type\\Definition\\ObjectType given\.#'
+
+  # Older versions of bensampo/laravel-enum are not generic yet
+  - '#contains generic type BenSampo\\Enum\\Enum<.+> but class BenSampo\\Enum\\Enum is not generic\.#'

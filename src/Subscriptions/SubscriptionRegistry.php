@@ -14,8 +14,8 @@ use Nuwave\Lighthouse\Execution\ExtensionsResponse;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Schema\Types\NotFoundSubscription;
-use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
+use Nuwave\Lighthouse\Support\Contracts\SerializesContext;
 use Nuwave\Lighthouse\Support\Utils;
 
 class SubscriptionRegistry
@@ -35,7 +35,7 @@ class SubscriptionRegistry
     protected array $subscriptions = [];
 
     public function __construct(
-        protected ContextSerializer $serializer,
+        protected SerializesContext $serializer,
         protected StoresSubscriptions $storage,
         protected SchemaBuilder $schemaBuilder,
         protected ConfigRepository $configRepository,

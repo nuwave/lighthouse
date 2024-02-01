@@ -3,6 +3,7 @@
 namespace Tests\Unit\Schema\AST;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\NamedTypeNode;
@@ -19,6 +20,7 @@ use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
+use Nuwave\Lighthouse\Support\Contracts\InputFieldManipulator;
 use Tests\TestCase;
 
 final class ASTHelperTest extends TestCase
@@ -333,7 +335,6 @@ GRAPHQL
                 ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
             ): void {
                 $directiveInstance = ASTHelper::addDirectiveToNode('@foo', $argDefinition);
-
                 assert($directiveInstance instanceof ArgManipulator);
 
                 $directiveInstance->manipulateArgDefinition($documentAST, $argDefinition, $parentField, $parentType);
@@ -360,6 +361,70 @@ GRAPHQL
         assert($argumentType instanceof InputValueDefinitionNode);
 
         $typeType = $argumentType->type;
+        assert($typeType instanceof NamedTypeNode);
+
+        $this->assertSame($typeType->name->value, 'Int');
+    }
+
+    public function testDynamicallyAddedInputFieldManipulatorDirective(): void
+    {
+        $directive = new class() extends BaseDirective implements InputFieldManipulator {
+            public static function definition(): string
+            {
+                return /** @lang GraphQL */ 'directive @foo on INPUT_FIELD_DEFINITION';
+            }
+
+            public function manipulateInputFieldDefinition(
+                DocumentAST &$documentAST,
+                InputValueDefinitionNode &$inputField,
+                InputObjectTypeDefinitionNode &$parentInput,
+            ): void {
+                $inputField->type = Parser::namedType('Int');
+            }
+        };
+
+        $directiveLocator = $this->app->make(DirectiveLocator::class);
+        $directiveLocator->setResolved('foo', $directive::class);
+
+        $dynamicDirective = new class() extends BaseDirective implements InputFieldManipulator {
+            public static function definition(): string
+            {
+                return /** @lang GraphQL */ 'directive @dynamic on INPUT_FIELD_DEFINITION';
+            }
+
+            public function manipulateInputFieldDefinition(
+                DocumentAST &$documentAST,
+                InputValueDefinitionNode &$inputField,
+                InputObjectTypeDefinitionNode &$parentInput,
+            ): void {
+                $directiveInstance = ASTHelper::addDirectiveToNode('@foo', $inputField);
+                assert($directiveInstance instanceof InputFieldManipulator);
+
+                $directiveInstance->manipulateInputFieldDefinition($documentAST, $inputField, $parentInput);
+            }
+        };
+
+        $directiveLocator->setResolved('dynamic', $dynamicDirective::class);
+
+        $this->schema = /** @lang GraphQL */ '
+        input Input {
+            name: String @dynamic
+        }
+
+        type Query {
+            foo(name: Input): String
+        }
+        ';
+        $astBuilder = $this->app->make(ASTBuilder::class);
+        $documentAST = $astBuilder->documentAST();
+
+        $inputType = $documentAST->types['Input'];
+        assert($inputType instanceof InputObjectTypeDefinitionNode);
+
+        $fieldType = $inputType->fields[0];
+        assert($fieldType instanceof InputValueDefinitionNode);
+
+        $typeType = $fieldType->type;
         assert($typeType instanceof NamedTypeNode);
 
         $this->assertSame($typeType->name->value, 'Int');

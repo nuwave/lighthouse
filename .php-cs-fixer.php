@@ -26,5 +26,8 @@ return risky($finder, [
             'parameters',
         ],
     ],
+    'fully_qualified_strict_types' => [
+        'phpdoc_tags' => [],
+    ],
     'Laravel/laravel_phpdoc_alignment' => true,
 ])->registerCustomFixers([new LaravelPhpdocAlignmentFixer()]);

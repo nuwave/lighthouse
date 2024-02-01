@@ -21,10 +21,8 @@ class CacheStorageManager implements StoresSubscriptions
     /** The cache to store channels and topics. */
     protected CacheRepository $cache;
 
-    /**
-     * The time to live for items in the cache.
-     */
-    protected int|null $ttl = null;
+    /** The time to live for items in the cache. */
+    protected ?int $ttl = null;
 
     public function __construct(CacheFactory $cacheFactory, ConfigRepository $config)
     {

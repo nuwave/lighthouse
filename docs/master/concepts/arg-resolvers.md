@@ -205,4 +205,4 @@ final class CreateDirective extends BaseDirective implements FieldResolver, ArgR
 }
 ```
 
-You may define your own nested arg resolver directives by implementing [`ArgResolver`](../custom-directives/argument-directives.md#argresolver).
+You may define your own nested arg resolver directives by implementing [`ArgResolver`](../custom-directives/field-argument-directives#argresolver).

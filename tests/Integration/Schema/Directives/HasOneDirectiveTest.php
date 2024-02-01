@@ -12,8 +12,10 @@ final class HasOneDirectiveTest extends DBTestCase
     {
         // Task with no post
         factory(Task::class)->create();
+
         // Creates a task and assigns it to this post
         $post = factory(Post::class)->create();
+        assert($post instanceof Post);
 
         $this->schema = /** @lang GraphQL */ '
         type Post {

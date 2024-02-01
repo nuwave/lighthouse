@@ -136,6 +136,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Parse source location
+    |--------------------------------------------------------------------------
+    |
+    | Should the source location be included in the AST nodes resulting from query parsing?
+    | Setting this to `false` improves performance, but omits the key `locations` from errors,
+    | see https://spec.graphql.org/October2021/#sec-Errors.Error-result-format.
+    |
+    */
+
+    'parse_source_location' => true,
+
+    /*
+    |--------------------------------------------------------------------------
     | Namespaces
     |--------------------------------------------------------------------------
     |
@@ -452,5 +465,28 @@ return [
          * Location of resolver classes when resolving the `_entities` field.
          */
         'entities_resolver_namespace' => 'App\\GraphQL\\Entities',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Tracing
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for tracing support.
+    |
+    */
+
+    'tracing' => [
+        /*
+         * Driver used for tracing.
+         *
+         * Accepts the fully qualified class name of a class that implements Nuwave\Lighthouse\Tracing\Tracing.
+         * Lighthouse provides:
+         * - Nuwave\Lighthouse\Tracing\ApolloTracing\ApolloTracing::class
+         * - Nuwave\Lighthouse\Tracing\FederatedTracing\FederatedTracing::class
+         *
+         * In Lighthouse v7 the default will be changed to 'Nuwave\Lighthouse\Tracing\FederatedTracing\FederatedTracing::class'.
+         */
+        'driver' => Nuwave\Lighthouse\Tracing\ApolloTracing\ApolloTracing::class,
     ],
 ];

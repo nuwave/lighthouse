@@ -28,6 +28,7 @@ use Nuwave\Lighthouse\Console\ValidateSchemaCommand;
 use Nuwave\Lighthouse\Console\ValidatorCommand;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Execution\ContextFactory;
+use Nuwave\Lighthouse\Execution\ContextSerializer;
 use Nuwave\Lighthouse\Execution\ErrorPool;
 use Nuwave\Lighthouse\Execution\SingleResponse;
 use Nuwave\Lighthouse\Execution\ValidationRulesProvider;
@@ -47,6 +48,7 @@ use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules;
+use Nuwave\Lighthouse\Support\Contracts\SerializesContext;
 
 class LighthouseServiceProvider extends ServiceProvider
 {
@@ -78,9 +80,10 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->app->singleton(DirectiveLocator::class);
         $this->app->singleton(TypeRegistry::class);
         $this->app->singleton(ErrorPool::class);
-        $this->app->singleton(CreatesContext::class, ContextFactory::class);
-        $this->app->singleton(CanStreamResponse::class, ResponseStream::class);
 
+        $this->app->bind(CanStreamResponse::class, ResponseStream::class);
+        $this->app->bind(CreatesContext::class, ContextFactory::class);
+        $this->app->bind(SerializesContext::class, ContextSerializer::class);
         $this->app->bind(CreatesResponse::class, SingleResponse::class);
 
         $this->app->singleton(SchemaSourceProvider::class, static fn (): SchemaStitcher => new SchemaStitcher(

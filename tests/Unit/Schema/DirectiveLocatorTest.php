@@ -79,7 +79,7 @@ final class DirectiveLocatorTest extends TestCase
     {
         $this->expectException(DirectiveException::class);
 
-        $this->directiveLocator->create('bar');
+        $this->directiveLocator->create('foobar');
     }
 
     public function testCreateSingleDirective(): void

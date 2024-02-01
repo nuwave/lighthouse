@@ -48,7 +48,7 @@ final class RedisStorageManagerTest extends TestCase
 
     public function testDeleteSubscriber(): void
     {
-        /** @var \Nuwave\Lighthouse\Subscriptions\Storage\RedisStorageManager $storage */
+        /** @var RedisStorageManager $storage */
         $storage = $this->app->make(RedisStorageManager::class);
 
         $response = $this->querySubscription();

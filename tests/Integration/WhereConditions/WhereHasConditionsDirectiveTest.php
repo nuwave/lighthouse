@@ -476,10 +476,10 @@ final class WhereHasConditionsDirectiveTest extends DBTestCase
 
     public function testWhereHasBelongsToSameTableRelationship(): void
     {
-        /** @var \Tests\Utils\Models\Location $parent */
+        /** @var Location $parent */
         $parent = factory(Location::class)->create();
 
-        /** @var \Tests\Utils\Models\Location $child */
+        /** @var Location $child */
         $child = factory(Location::class)->make();
         $child->parent()->associate($parent);
         $child->save();
@@ -518,10 +518,10 @@ final class WhereHasConditionsDirectiveTest extends DBTestCase
 
     public function testWhereHasHasManySameTableRelationship(): void
     {
-        /** @var \Tests\Utils\Models\Location $parent */
+        /** @var Location $parent */
         $parent = factory(Location::class)->create();
 
-        /** @var \Tests\Utils\Models\Location $child */
+        /** @var Location $child */
         $child = factory(Location::class)->make();
         $child->parent()->associate($parent);
         $child->save();

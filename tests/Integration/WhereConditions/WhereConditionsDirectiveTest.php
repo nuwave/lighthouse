@@ -937,7 +937,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
         }
         ';
 
-        /** @var \Tests\Utils\Models\Location $location */
+        /** @var Location $location */
         $location = factory(Location::class)->make();
         $location->extra = [
             'value' => 'exampleValue',
@@ -983,12 +983,12 @@ final class WhereConditionsDirectiveTest extends DBTestCase
         }
 GRAPHQL;
 
-        /** @var \Tests\Utils\Models\User $user1 */
+        /** @var User $user1 */
         $user1 = factory(User::class)->make();
         $user1->name = 'foo';
         $user1->save();
 
-        /** @var \Tests\Utils\Models\User $user2 */
+        /** @var User $user2 */
         $user2 = factory(User::class)->make();
         $user2->name = 'foofoo';
         $user2->save();

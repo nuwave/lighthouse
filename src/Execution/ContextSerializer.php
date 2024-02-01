@@ -1,15 +1,15 @@
 <?php declare(strict_types=1);
 
-namespace Nuwave\Lighthouse\Subscriptions;
+namespace Nuwave\Lighthouse\Execution;
 
 use Illuminate\Http\Request;
 use Illuminate\Queue\SerializesAndRestoresModelIdentifiers;
 use Illuminate\Support\Arr;
-use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Support\Contracts\SerializesContext;
 
-class Serializer implements ContextSerializer
+class ContextSerializer implements SerializesContext
 {
     use SerializesAndRestoresModelIdentifiers;
 

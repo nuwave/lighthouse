@@ -5,7 +5,7 @@ use Tests\Utils\Models\Company;
 use Tests\Utils\Models\Team;
 use Tests\Utils\Models\User;
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+/** @var Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(User::class, static fn (Faker $faker): array => [
     'company_id' => static fn () => factory(Company::class)->create()->getKey(),
     'team_id' => static fn () => factory(Team::class)->create()->getKey(),

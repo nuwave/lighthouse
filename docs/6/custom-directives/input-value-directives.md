@@ -1,9 +1,9 @@
-# Argument Directives
+# Input Value Directives
 
-Argument directives can be applied to a [InputValueDefinition](https://graphql.github.io/graphql-spec/June2018/#InputValueDefinition).
+Some directives can be applied to field arguments or input fields (any [InputValueDefinition](https://graphql.github.io/graphql-spec/June2018/#InputValueDefinition)).
 
 As arguments may be contained within a list in the schema definition, you must specify
-what your argument should apply to in addition to its function.
+what your directive should apply to in addition to its function.
 
 - If it applies to the individual items within the list,
   implement the [`\Nuwave\Lighthouse\Support\Contracts\ArgDirective`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ArgDirective.php) interface.
@@ -212,70 +212,3 @@ that field resolvers are composed together.
 
 For an in-depth explanation of the concept of composing arg resolvers,
 read the [explanation of arg resolvers](../concepts/arg-resolvers.md).
-
-## ArgManipulator
-
-An [`\Nuwave\Lighthouse\Support\Contracts\ArgManipulator`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ArgManipulator.php)
-directive can be used to manipulate the schema AST.
-
-For example, you might want to add a directive that automagically derives the arguments
-for a field based on an object type. A skeleton for this directive might look something like this:
-
-```php
-namespace App\GraphQL\Directives;
-
-use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
-use GraphQL\Language\AST\InputValueDefinitionNode;
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
-
-final class ModelArgsDirective extends BaseDirective implements ArgManipulator
-{
-    public static function definition(): string
-    {
-        return /** @lang GraphQL */ <<<'GRAPHQL'
-"""
-Automatically generates an input argument based on a type.
-"""
-directive @typeToInput(
-    """
-    The name of the type to use as the basis for the input type.
-    """
-    name: String!
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-GRAPHQL;
-    }
-
-    /**
-     * Manipulate the AST.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
-     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $argDefinition
-     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $parentField
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
-     * @return void
-     */
-    public function manipulateArgDefinition(
-        DocumentAST &$documentAST,
-        InputValueDefinitionNode &$argDefinition,
-        FieldDefinitionNode &$parentField,
-        ObjectTypeDefinitionNode &$parentType
-    ): void {
-        $typeName = $this->directiveArgValue('name');
-        $type = $documentAST->types[$typeName];
-
-        $input = $this->generateInputFromType($type);
-        $argDefinition->name->value = $input->value->name;
-
-        $documentAST->setTypeDefinition($input);
-    }
-
-    protected function generateInputFromType(ObjectTypeDefinitionNode $type): InputObjectTypeDefinitionNode
-    {
-        // TODO generate this type based on rules and conventions that work for you
-    }
-}
-```

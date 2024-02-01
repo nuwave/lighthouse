@@ -129,7 +129,7 @@ final class User extends Authenticatable
         return $this->belongsTo(Team::class);
     }
 
-    public function getCompanyNameAttribute(): string|null
+    public function getCompanyNameAttribute(): ?string
     {
         return $this->company?->name;
     }
