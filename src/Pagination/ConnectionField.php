@@ -86,7 +86,7 @@ class ConnectionField
                         break;
 
                     case 'pivot':
-                        $data['pivot'] = $item->pivot->getAttributes();
+                        $data['pivot'] = $item->pivot;
                         break;
 
                     default:
