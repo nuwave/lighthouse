@@ -259,6 +259,70 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         ])->assertJsonCount(2, 'data.user.roles.edges');
     }
 
+    public function testQueryBelongsToManyRelayConnectionWithCustomEdgeHavingPivotFieldUsingDirective(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            roles: [Role!]! @belongsToMany(type: CONNECTION, edgeType: "UserRoleEdge")
+        }
+
+        type Role {
+            id: ID!
+        }
+
+        type UserRole {
+            meta: String
+        }
+
+        type UserRoleEdge {
+            node: Role!
+            cursor: String!
+            pivot: UserRole
+        }
+
+        type Query {
+            user: User! @auth
+        }
+        ';
+
+        $user = factory(User::class)->create();
+        assert($user instanceof User);
+        $this->be($user);
+
+        $roles = factory(Role::class, 3)->create();
+        $meta = ['meta' => 'new'];
+        $user->roles()->attach($roles, $meta);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            user {
+                roles(first: 2) {
+                    edges {
+                        pivot {
+                            meta
+                        }
+                        node {
+                            id
+                        }
+                    }
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'roles' => [
+                        'edges' => [
+                            'pivot' => [
+                                $meta,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ])->assertJsonCount(2, 'data.user.roles.edges');
+    }
+
     public function testQueryBelongsToManyPivot(): void
     {
         $this->schema = /** @lang GraphQL */ '
