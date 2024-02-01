@@ -9,9 +9,11 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.33.0
+
 ### Added
 
-- Resolve all pivot attributes https://github.com/nuwave/lighthouse/pull/2464
+- Expose pivot field on pagination edge https://github.com/nuwave/lighthouse/pull/2464
 
 ## v6.32.0
 
