@@ -419,7 +419,7 @@ type RoleUserPivot {
 ```
 
 When using the `type` argument with pagination style `CONNECTION`, you may create your own [edge type](https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types)
-that contains the attributes of the intermediate table.
+that either contains the attributes of the intermediate table or contains a `pivot` field with the corresponding type.
 
 The custom edge type must contain at least the following two fields:
 
@@ -440,6 +440,25 @@ type RoleEdge {
   meta: String
 }
 ```
+
+As an alternative, you can also expose the `pivot` field on the edge:
+
+```graphql
+type User {
+  roles: [Role!]! @belongsToMany(type: CONNECTION)
+}
+
+type UserRole {
+  meta: String
+}
+
+type RoleEdge {
+  node: Role!
+  cursor: String!
+  pivot: UserRole
+}
+```
+
 
 ## @broadcast
 
