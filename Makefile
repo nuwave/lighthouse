@@ -13,7 +13,7 @@ setup: build docs/node_modules vendor ## Setup the local environment
 
 .PHONY: build
 build: ## Build the local Docker containers
-	docker-compose build --pull --build-arg USER_ID=$(shell id --user) --build-arg GROUP_ID=$(shell id --group)
+	docker-compose build --pull --build-arg USER_ID=$(shell id -u) --build-arg GROUP_ID=$(shell id -g)
 
 .PHONY: up
 up: ## Bring up the docker-compose stack
