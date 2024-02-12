@@ -13,6 +13,7 @@ setup: build docs/node_modules vendor ## Setup the local environment
 
 .PHONY: build
 build: ## Build the local Docker containers
+	# Using short options of `id` to ensure compatibility with macOS, see https://github.com/nuwave/lighthouse/pull/2504
 	docker-compose build --pull --build-arg USER_ID=$(shell id -u) --build-arg GROUP_ID=$(shell id -g)
 
 .PHONY: up
