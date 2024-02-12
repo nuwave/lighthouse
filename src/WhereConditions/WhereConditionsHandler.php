@@ -23,7 +23,7 @@ class WhereConditionsHandler
     public function __invoke(
         object $builder,
         array $whereConditions,
-        Model $model = null,
+        ?Model $model = null,
         string $boolean = 'and',
     ): void {
         if ($builder instanceof EloquentBuilder) {
@@ -78,7 +78,7 @@ class WhereConditionsHandler
         string $relation,
         string $operator,
         int $amount,
-        array $condition = null,
+        ?array $condition = null,
     ): QueryBuilder {
         return $model
             ->newQuery()

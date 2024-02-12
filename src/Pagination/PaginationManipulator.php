@@ -54,9 +54,9 @@ class PaginationManipulator
         PaginationType $paginationType,
         FieldDefinitionNode &$fieldDefinition,
         ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
-        int $defaultCount = null,
-        int $maxCount = null,
-        ObjectTypeDefinitionNode $edgeType = null,
+        ?int $defaultCount = null,
+        ?int $maxCount = null,
+        ?ObjectTypeDefinitionNode $edgeType = null,
     ): void {
         if ($paginationType->isConnection()) {
             $this->registerConnection($fieldDefinition, $parentType, $paginationType, $defaultCount, $maxCount, $edgeType);
@@ -71,9 +71,9 @@ class PaginationManipulator
         FieldDefinitionNode &$fieldDefinition,
         ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
         PaginationType $paginationType,
-        int $defaultCount = null,
-        int $maxCount = null,
-        ObjectTypeDefinitionNode $edgeType = null,
+        ?int $defaultCount = null,
+        ?int $maxCount = null,
+        ?ObjectTypeDefinitionNode $edgeType = null,
     ): void {
         $pageInfoNode = $this->pageInfo();
         if (! isset($this->documentAST->types[$pageInfoNode->getName()->value])) {
@@ -163,8 +163,8 @@ GRAPHQL
         FieldDefinitionNode &$fieldDefinition,
         ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
         PaginationType $paginationType,
-        int $defaultCount = null,
-        int $maxCount = null,
+        ?int $defaultCount = null,
+        ?int $maxCount = null,
     ): void {
         $paginatorInfoNode = $this->paginatorInfo();
         if (! isset($this->documentAST->types[$paginatorInfoNode->getName()->value])) {
@@ -203,8 +203,8 @@ GRAPHQL
         FieldDefinitionNode &$fieldDefinition,
         ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
         PaginationType $paginationType,
-        int $defaultCount = null,
-        int $maxCount = null,
+        ?int $defaultCount = null,
+        ?int $maxCount = null,
     ): void {
         $simplePaginatorInfoNode = $this->simplePaginatorInfo();
         if (! isset($this->documentAST->types[$simplePaginatorInfoNode->getName()->value])) {
@@ -240,7 +240,7 @@ GRAPHQL
     }
 
     /** Build the count argument definition string, considering default and max values. */
-    protected static function countArgument(int $defaultCount = null, int $maxCount = null): string
+    protected static function countArgument(?int $defaultCount = null, ?int $maxCount = null): string
     {
         $description = '"Limits number of fetched items.';
         if ($maxCount) {

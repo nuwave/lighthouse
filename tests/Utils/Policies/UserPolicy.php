@@ -32,7 +32,7 @@ final class UserPolicy
         return true;
     }
 
-    public function guestOnly(User $viewer = null): bool
+    public function guestOnly(?User $viewer = null): bool
     {
         return $viewer === null;
     }
