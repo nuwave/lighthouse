@@ -459,7 +459,6 @@ type RoleEdge {
 }
 ```
 
-
 ## @broadcast
 
 ```graphql

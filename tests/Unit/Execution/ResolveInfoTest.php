@@ -102,8 +102,11 @@ final class ResolveInfoTest extends TestCase
                 // empty
             }
 
-            public static function applyArgBuilderDirectives(ArgumentSet $argumentSet, Relation|EloquentBuilder|QueryBuilder &$builder, callable $directiveFilter = null): void
-            {
+            public static function applyArgBuilderDirectives(
+                ArgumentSet $argumentSet,
+                Relation|EloquentBuilder|QueryBuilder &$builder,
+                ?callable $directiveFilter = null,
+            ): void {
                 parent::applyArgBuilderDirectives(
                     $argumentSet,
                     $builder,

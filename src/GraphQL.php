@@ -73,7 +73,7 @@ class GraphQL
         GraphQLContext $context,
         ?array $variables = [],
         mixed $root = null,
-        string $operationName = null,
+        ?string $operationName = null,
     ): array {
         try {
             $parsedQuery = $this->parse($query);
@@ -100,7 +100,7 @@ class GraphQL
         GraphQLContext $context,
         ?array $variables = [],
         mixed $root = null,
-        string $operationName = null,
+        ?string $operationName = null,
     ): array {
         // Building the executable schema might take a while to do,
         // so we do it before we fire the StartExecution event.
