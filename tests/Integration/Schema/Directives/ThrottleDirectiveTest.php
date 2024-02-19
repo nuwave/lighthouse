@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Faker\Factory;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Response;
@@ -58,27 +59,25 @@ final class ThrottleDirectiveTest extends TestCase
         }
         ';
 
+        $query = /** @lang GraphQL */ '
+        {
+            foo
+        }
+        ';
+
         $rateLimiter = $this->app->make(RateLimiter::class);
         $rateLimiter->for(
             'test',
             static fn (): Limit => Limit::perMinute(1),
         );
 
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            foo
-        }
-        ')->assertJson([
+        $this->graphQL($query)->assertJson([
             'data' => [
                 'foo' => Foo::THE_ANSWER,
             ],
         ]);
 
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            foo
-        }
-        ')->assertGraphQLError(
+        $this->graphQL($query)->assertGraphQLError(
             new RateLimitException('Query.foo'),
         );
     }
@@ -91,22 +90,30 @@ final class ThrottleDirectiveTest extends TestCase
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $query = /** @lang GraphQL */ '
         {
             foo
         }
-        ')->assertJson([
+        ';
+
+        $faker = Factory::create()->unique();
+        $ip = $faker->ipv4;
+        $ip2 = $faker->ipv4;
+
+        $this->graphQL($query, [], [], ['REMOTE_ADDR' => $ip])->assertJson([
             'data' => [
                 'foo' => Foo::THE_ANSWER,
             ],
         ]);
 
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            foo
-        }
-        ')->assertGraphQLError(
+        $this->graphQL($query, [], [], ['REMOTE_ADDR' => $ip])->assertGraphQLError(
             new RateLimitException('Query.foo'),
         );
+
+        $this->graphQL($query, [], [], ['REMOTE_ADDR' => $ip2])->assertJson([
+            'data' => [
+                'foo' => Foo::THE_ANSWER,
+            ],
+        ]);
     }
 }
