@@ -153,7 +153,7 @@ class PaginatedModelsLoader implements ModelsLoader
             static fn (string $relation): bool => ! $model->relationLoaded($relation),
         );
 
-        if (count($unloadedWiths) > 0) {
+        if ($unloadedWiths !== []) {
             $models->load($unloadedWiths);
         }
     }

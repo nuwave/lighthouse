@@ -121,31 +121,28 @@ final class ResolveInfoTest extends TestCase
             static fn (ArgBuilderDirective $directive): bool => $directive !== $directiveIgnored,
         );
 
-        self::assertSame(
+        $this->assertSame([
             [
-                [
-                    'type' => 'Basic',
-                    'column' => 'two',
-                    'operator' => '=',
-                    'value' => $value,
-                    'boolean' => 'and',
-                ],
-                [
-                    'type' => 'Basic',
-                    'column' => 'one',
-                    'operator' => '=',
-                    'value' => $value,
-                    'boolean' => 'and',
-                ],
-                [
-                    'type' => 'Basic',
-                    'column' => 'nested',
-                    'operator' => '=',
-                    'value' => $nested,
-                    'boolean' => 'and',
-                ],
+                'type' => 'Basic',
+                'column' => 'two',
+                'operator' => '=',
+                'value' => $value,
+                'boolean' => 'and',
             ],
-            $builder->toBase()->wheres,
-        );
+            [
+                'type' => 'Basic',
+                'column' => 'one',
+                'operator' => '=',
+                'value' => $value,
+                'boolean' => 'and',
+            ],
+            [
+                'type' => 'Basic',
+                'column' => 'nested',
+                'operator' => '=',
+                'value' => $nested,
+                'boolean' => 'and',
+            ],
+        ], $builder->toBase()->wheres);
     }
 }

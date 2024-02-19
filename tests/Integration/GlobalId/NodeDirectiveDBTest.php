@@ -199,13 +199,11 @@ final class NodeDirectiveDBTest extends DBTestCase
         ]);
     }
 
-    /** @return array<array<string>> */
-    public static function modelNodeDirectiveStyles(): array
+    /** @return iterable<array{string}> */
+    public static function modelNodeDirectiveStyles(): iterable
     {
-        return [
-            ['@node'],
-            ['@node(model: "User")'],
-        ];
+        yield ['@node'];
+        yield ['@node(model: "User")'];
     }
 
     public function testThrowsWhenNodeDirectiveIsDefinedOnNonObjectType(): void
