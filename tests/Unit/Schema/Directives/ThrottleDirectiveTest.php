@@ -60,6 +60,36 @@ final class ThrottleDirectiveTest extends TestCase
         $this->assertEquals($queriedKeys[1], $queriedKeys[3]);
     }
 
+    public function testUnlimitedNamedLimiter(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo: Int @throttle(name: "test")
+        }
+        ';
+
+        $rateLimiter = $this->createMock(RateLimiter::class);
+        $rateLimiter->expects(self::atLeast(1))
+            ->method('limiter')
+            ->with('test')
+            ->willReturn(static fn (): Limit => Limit::none());
+
+        $rateLimiter->expects(self::never())
+            ->method('hit');
+
+        $this->app->singleton(RateLimiter::class, static fn (): RateLimiter => $rateLimiter);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo
+        }
+        ')->assertJson([
+            'data' => [
+                'foo' => Foo::THE_ANSWER,
+            ],
+        ]);
+    }
+
     public function testWithNullRequest(): void
     {
         $this->schema = /** @lang GraphQL */ '
