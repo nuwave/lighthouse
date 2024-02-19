@@ -174,6 +174,7 @@ class ASTBuilder
 
         $this->assertExtensionMatchesDefinition($typeExtension, $extendedEnum);
 
+        $extendedEnum->directives = $extendedEnum->directives->merge($typeExtension->directives);
         $extendedEnum->values = ASTHelper::mergeUniqueNodeList(
             $extendedEnum->values,
             $typeExtension->values,

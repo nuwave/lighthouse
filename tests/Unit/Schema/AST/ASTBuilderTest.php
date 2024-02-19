@@ -12,6 +12,8 @@ use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Schema\DirectiveLocator;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\RootType;
 use Tests\TestCase;
 
@@ -150,6 +152,36 @@ final class ASTBuilderTest extends TestCase
         assert($myEnum instanceof EnumTypeDefinitionNode);
 
         $this->assertCount(4, $myEnum->values);
+    }
+
+    public function testMergeEnumExtensionDirectives(): void
+    {
+        $directive = new class() extends BaseDirective {
+            public static function definition(): string
+            {
+                return /** @lang GraphQL */ 'directive @foo on ENUM';
+            }
+        };
+
+        $directiveLocator = $this->app->make(DirectiveLocator::class);
+        $directiveLocator->setResolved('foo', $directive::class);
+
+        $this->schema = /** @lang GraphQL */ '
+        enum MyEnum {
+            ONE
+            TWO
+        }
+
+        extend enum MyEnum @foo
+
+        extend enum MyEnum @foo
+        ';
+        $documentAST = $this->astBuilder->documentAST();
+
+        $myEnum = $documentAST->types['MyEnum'];
+        assert($myEnum instanceof EnumTypeDefinitionNode);
+
+        $this->assertCount(2, $myEnum->directives);
     }
 
     public function testMergeUnionExtensionFields(): void
