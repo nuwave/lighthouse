@@ -50,6 +50,44 @@ final class CanFindDirectiveDBTest extends DBTestCase
         ]);
     }
 
+    public function testCustomModelName(): void
+    {
+        $admin = new User();
+        $admin->name = UserPolicy::ADMIN;
+        $this->be($admin);
+
+        $user = factory(User::class)->create();
+        assert($user instanceof User);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            account(id: ID! @whereKey): Account
+                @canFind(ability: "view", find: "id", model: "User")
+                @first(model: "User")
+        }
+
+        type Account {
+            name: String!
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($id: ID!) {
+            account(id: $id) {
+                name
+            }
+        }
+        ', [
+            'id' => $user->getKey(),
+        ])->assertJson([
+            'data' => [
+                'account' => [
+                    'name' => $user->name,
+                ],
+            ],
+        ]);
+    }
+
     public function testFailsToFindSpecificModel(): void
     {
         $user = new User();
