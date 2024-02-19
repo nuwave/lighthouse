@@ -49,16 +49,14 @@ abstract class DateScalarTestBase extends TestCase
     /**
      * Those values should fail passing as a date.
      *
-     * @return array<array<mixed>>
+     * @return iterable<array{mixed}>
      */
-    public static function invalidDateValues(): array
+    public static function invalidDateValues(): iterable
     {
-        return [
-            [1],
-            ['rolf'],
-            [null],
-            [''],
-        ];
+        yield [1];
+        yield ['rolf'];
+        yield [null];
+        yield [''];
     }
 
     /** @dataProvider validDates */

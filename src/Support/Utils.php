@@ -118,7 +118,10 @@ class Utils
     public static function mapEachRecursive(callable $callback, mixed $valueOrValues): mixed
     {
         if (is_array($valueOrValues)) {
-            return array_map(static fn ($value) => static::mapEachRecursive($callback, $value), $valueOrValues);
+            return array_map(
+                static fn ($value): mixed => static::mapEachRecursive($callback, $value),
+                $valueOrValues,
+            );
         }
 
         return $callback($valueOrValues);

@@ -69,7 +69,7 @@
         "phpunit/phpunit": "^9.6.4 || ^10",
         "predis/predis": "^1.1 || ^2.1",
         "pusher/pusher-php-server": "^5 || ^6 || ^7.0.2",
-        "rector/rector": "^0.15.18",
+        "rector/rector": "^1",
         "thecodingmachine/phpstan-safe-rule": "^1.2"
     },
     "suggest": {
