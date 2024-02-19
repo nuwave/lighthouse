@@ -4,7 +4,12 @@ namespace Tests\Unit\Schema\Directives;
 
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
+use Nuwave\Lighthouse\Execution\UserGraphQLContext;
+use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Tests\TestCase;
+use Tests\Unit\Execution\Fixtures\FooContext;
 use Tests\Utils\Queries\Foo;
 
 final class ThrottleDirectiveTest extends TestCase
@@ -56,7 +61,7 @@ final class ThrottleDirectiveTest extends TestCase
         $this->assertEquals($queriedKeys[1], $queriedKeys[3]);
     }
 
-    public function testUnlimitedNamedLimiter(): void
+    public function testWithNullRequest(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -68,13 +73,20 @@ final class ThrottleDirectiveTest extends TestCase
         $rateLimiter->expects(self::atLeast(1))
             ->method('limiter')
             ->with('test')
-            ->willReturn(static fn (): Limit => Limit::none());
-
-        $rateLimiter->expects(self::never())
-            ->method('tooManyAttempts');
+            ->willReturn(static fn (): array => [
+                Limit::perMinute(1),
+            ]);
 
         $rateLimiter->expects(self::never())
             ->method('hit');
+
+        // create a context with null request
+        $this->app->singleton(CreatesContext::class, static fn (): CreatesContext => new class() implements CreatesContext {
+            public function generate(?Request $request): GraphQLContext
+            {
+                return new FooContext();
+            }
+        });
 
         $this->app->singleton(RateLimiter::class, static fn (): RateLimiter => $rateLimiter);
 

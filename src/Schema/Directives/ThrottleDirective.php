@@ -57,21 +57,19 @@ GRAPHQL;
     public function handleField(FieldValue $fieldValue): void
     {
         $name = $this->directiveArgValue('name');
+        $limiter = $name !== null ? $this->limiter->limiter($name) : null;
+
         $prefix = $this->directiveArgValue('prefix', '');
         $maxAttempts = $this->directiveArgValue('maxAttempts', 60);
         $decayMinutes = $this->directiveArgValue('decayMinutes', 1.0);
 
-        $fieldValue->wrapResolver(fn (callable $resolver): \Closure => function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $name, $prefix, $maxAttempts, $decayMinutes): mixed {
+        $fieldValue->wrapResolver(fn (callable $resolver): \Closure => function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $name, $limiter, $prefix, $maxAttempts, $decayMinutes): mixed {
             $request = $context->request();
-            if ($request == null) {
+            if ($request === null) {
                 return $resolver($root, $args, $context, $resolveInfo);
             }
 
-            if ($name !== null) {
-                // @phpstan-ignore-next-line limiter() can actually return null, some Laravel versions lie
-                $limiter = $this->limiter->limiter($name)
-                    ?? throw new DefinitionException("Named limiter {$name} not found.");
-
+            if ($limiter !== null) {
                 $limiterResponse = $limiter($request);
                 if ($limiterResponse instanceof Unlimited) {
                     return $resolver($root, $args, $context, $resolveInfo);
@@ -106,7 +104,6 @@ GRAPHQL;
     {
         $name = $this->directiveArgValue('name');
         if ($name !== null) {
-            // @phpstan-ignore-next-line $limiter may be null although it's not specified in limiter() PHPDoc
             $this->limiter->limiter($name)
                 ?? throw new DefinitionException("Named limiter {$name} is not found.");
         }
