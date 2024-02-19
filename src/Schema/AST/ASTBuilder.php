@@ -161,6 +161,7 @@ class ASTBuilder
             // @phpstan-ignore-next-line
             $typeExtension->fields,
         );
+        $extendedObjectLikeType->directives = $extendedObjectLikeType->directives->merge($typeExtension->directives);
 
         if ($extendedObjectLikeType instanceof ObjectTypeDefinitionNode) {
             assert($typeExtension instanceof ObjectTypeExtensionNode, 'We know this because we passed assertExtensionMatchesDefinition().');

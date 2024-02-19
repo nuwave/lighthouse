@@ -54,6 +54,35 @@ final class ASTBuilderTest extends TestCase
         $this->assertCount(3, $queryType->fields);
     }
 
+    public function testMergeTypeExtensionDirectives(): void
+    {
+        $directive = new class() extends BaseDirective {
+            public static function definition(): string
+            {
+                return /** @lang GraphQL */ 'directive @foo on OBJECT';
+            }
+        };
+
+        $directiveLocator = $this->app->make(DirectiveLocator::class);
+        $directiveLocator->setResolved('foo', $directive::class);
+
+        $this->schema = /** @lang GraphQL */ '
+        type MyType {
+            field: String
+        }
+
+        extend type MyType @foo
+
+        extend type MyType @foo
+        ';
+        $documentAST = $this->astBuilder->documentAST();
+
+        $myType = $documentAST->types['MyType'];
+        assert($myType instanceof ObjectTypeDefinitionNode);
+
+        $this->assertCount(2, $myType->directives);
+    }
+
     public function testAllowsExtendingUndefinedRootTypes(): void
     {
         $this->schema = /** @lang GraphQL */ '
@@ -110,6 +139,35 @@ final class ASTBuilderTest extends TestCase
         $this->assertCount(3, $inputs->fields);
     }
 
+    public function testMergeInputExtensionDirectives(): void
+    {
+        $directive = new class() extends BaseDirective {
+            public static function definition(): string
+            {
+                return /** @lang GraphQL */ 'directive @foo on INPUT_OBJECT';
+            }
+        };
+
+        $directiveLocator = $this->app->make(DirectiveLocator::class);
+        $directiveLocator->setResolved('foo', $directive::class);
+
+        $this->schema = /** @lang GraphQL */ '
+        input MyInput {
+            field: String
+        }
+
+        extend input MyInput @foo
+
+        extend input MyInput @foo
+        ';
+        $documentAST = $this->astBuilder->documentAST();
+
+        $myInput = $documentAST->types['MyInput'];
+        assert($myInput instanceof InputObjectTypeDefinitionNode);
+
+        $this->assertCount(2, $myInput->directives);
+    }
+
     public function testMergeInterfaceExtensionFields(): void
     {
         $this->schema = /** @lang GraphQL */ '
@@ -131,6 +189,35 @@ final class ASTBuilderTest extends TestCase
         assert($named instanceof InterfaceTypeDefinitionNode);
 
         $this->assertCount(3, $named->fields);
+    }
+
+    public function testMergeInterfaceExtensionDirectives(): void
+    {
+        $directive = new class() extends BaseDirective {
+            public static function definition(): string
+            {
+                return /** @lang GraphQL */ 'directive @foo on INTERFACE';
+            }
+        };
+
+        $directiveLocator = $this->app->make(DirectiveLocator::class);
+        $directiveLocator->setResolved('foo', $directive::class);
+
+        $this->schema = /** @lang GraphQL */ '
+        interface MyInterface {
+            field: String
+        }
+
+        extend interface MyInterface @foo
+
+        extend interface MyInterface @foo
+        ';
+        $documentAST = $this->astBuilder->documentAST();
+
+        $myInterface = $documentAST->types['MyInterface'];
+        assert($myInterface instanceof InterfaceTypeDefinitionNode);
+
+        $this->assertCount(2, $myInterface->directives);
     }
 
     public function testMergeScalarExtensionDirectives(): void
