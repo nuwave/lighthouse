@@ -1376,12 +1376,10 @@ final class HasManyDirectiveTest extends DBTestCase
         ')->assertJsonCount(3, 'data.user.foos.edges');
     }
 
-    /** @return array<int, array{0: bool}> */
-    public static function batchloadRelations(): array
+    /** @return iterable<array{bool}> */
+    public static function batchloadRelations(): iterable
     {
-        return [
-            [true],
-            [false],
-        ];
+        yield [true];
+        yield [false];
     }
 }

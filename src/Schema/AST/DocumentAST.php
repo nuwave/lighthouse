@@ -170,8 +170,6 @@ class DocumentAST implements Arrayable
      * Set a directive definition in the AST.
      *
      * This operation will overwrite existing definitions with the same name.
-     *
-     * @param  \GraphQL\Language\AST\DirectiveDefinitionNode&\GraphQL\Language\AST\Node  $directive
      */
     public function setDirectiveDefinition(DirectiveDefinitionNode $directive): self
     {

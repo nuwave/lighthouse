@@ -152,7 +152,7 @@ GRAPHQL;
         $subscriber = $cache
             ->subscribersByTopic('ON_POST_CREATED')
             ->first();
-        self::assertNotNull($subscriber);
+        $this->assertNotNull($subscriber);
 
         $response->assertExactJson([
             'data' => [

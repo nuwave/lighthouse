@@ -78,29 +78,30 @@ final class CacheControlDirectiveTest extends DBTestCase
             ->assertHeader('Cache-Control', $expectedHeaderString);
     }
 
-    /** @return array<int, array{string, string}> */
-    public static function rootScalarDataProvider(): array
+    /** @return iterable<array{string, string}> */
+    public static function rootScalarDataProvider(): iterable
     {
-        return [
-            [/** @lang GraphQL */ '
-                {
-                    default
-                }
-            ', 'no-cache, private',
-            ],
-            [/** @lang GraphQL */ '
-                {
-                    withDirective
-                }
-            ', 'max-age=5, public',
-            ],
-            [/** @lang GraphQL */ '
-                {
-                    default
-                    withDirective
-                }
-            ', 'no-cache, private',
-            ],
+        yield [/** @lang GraphQL */ '
+            {
+                default
+            }
+            ',
+            'no-cache, private',
+        ];
+        yield [/** @lang GraphQL */ '
+            {
+                withDirective
+            }
+            ',
+            'max-age=5, public',
+        ];
+        yield [/** @lang GraphQL */ '
+            {
+                default
+                withDirective
+            }
+            ',
+            'no-cache, private',
         ];
     }
 
@@ -161,17 +162,15 @@ final class CacheControlDirectiveTest extends DBTestCase
         ')->assertHeader('Cache-Control', $expectedHeaderString);
     }
 
-    /** @return array<string, array{string, string}> */
-    public static function argumentsDataProvider(): array
+    /** @return iterable<array{string, string}> */
+    public static function argumentsDataProvider(): iterable
     {
-        return [
-            'noArguments' => ['@cacheControl', 'no-cache, public'],
-            'onlyMaxAge' => ['@cacheControl(maxAge: 10)', 'max-age=10, public'],
-            'onlyScope' => ['@cacheControl(scope: PRIVATE)', 'no-cache, private'],
-            'inheritMaxAge' => ['@cacheControl(inheritMaxAge: true)', 'max-age=50, public'],
-            'inheritMaxAgeDenyMaxAge' => ['@cacheControl(maxAge: 0, inheritMaxAge: true)', 'max-age=50, public'],
-            'maxAgePrivate' => ['@cacheControl(maxAge:10, scope: PRIVATE)', 'max-age=10, private'],
-        ];
+        yield 'noArguments' => ['@cacheControl', 'no-cache, public'];
+        yield 'onlyMaxAge' => ['@cacheControl(maxAge: 10)', 'max-age=10, public'];
+        yield 'onlyScope' => ['@cacheControl(scope: PRIVATE)', 'no-cache, private'];
+        yield 'inheritMaxAge' => ['@cacheControl(inheritMaxAge: true)', 'max-age=50, public'];
+        yield 'inheritMaxAgeDenyMaxAge' => ['@cacheControl(maxAge: 0, inheritMaxAge: true)', 'max-age=50, public'];
+        yield 'maxAgePrivate' => ['@cacheControl(maxAge:10, scope: PRIVATE)', 'max-age=10, private'];
     }
 
     /** @dataProvider nestedQueryDataProvider */
@@ -224,92 +223,97 @@ final class CacheControlDirectiveTest extends DBTestCase
             ->assertHeader('Cache-Control', $expectedHeaderString);
     }
 
-    /** @return array<int, array{string, string}> */
-    public static function nestedQueryDataProvider(): array
+    /** @return iterable<array{string, string}> */
+    public static function nestedQueryDataProvider(): iterable
     {
-        return [
-            [/** @lang GraphQL */ '
-                {
-                    user {
-                        tasks {
+        yield [/** @lang GraphQL */ '
+            {
+                user {
+                    tasks {
+                        id
+                        foo
+                    }
+                }
+            }
+            ',
+            'max-age=5, private',
+        ];
+        yield [/** @lang GraphQL */ '
+            {
+                user {
+                    tasks {
+                        id
+                    }
+                }
+            }
+            ',
+            'max-age=5, private',
+        ];
+        yield [/** @lang GraphQL */ '
+            {
+                team {
+                    users {
+                        tasks  {
+                            id
+                        }
+                    }
+                }
+            }
+            ',
+            'no-cache, public',
+        ];
+        yield [/** @lang GraphQL */ '
+            {
+                team {
+                    users {
+                        tasks  {
+                            foo
+                        }
+                    }
+                }
+            }
+            ',
+            'no-cache, public',
+        ];
+        yield [/** @lang GraphQL */ '
+            {
+                teamWithCache {
+                    users {
+                        tasks  {
+                            bar
+                        }
+                    }
+                }
+            }
+            ',
+            'max-age=20, public',
+        ];
+        yield [/** @lang GraphQL */ '
+            {
+                teamWithCache {
+                    users {
+                        posts  {
+                            id
+                        }
+                    }
+                }
+            }
+            ',
+            'no-cache, public',
+        ];
+        yield [/** @lang GraphQL */ '
+            {
+                teamWithCache {
+                    users {
+                        posts  {
                             id
                             foo
                         }
                     }
                 }
-            ', 'max-age=5, private',
-            ],
-            [/** @lang GraphQL */ '
-                {
-                    user {
-                        tasks {
-                            id
-                        }
-                    }
-                }
-            ', 'max-age=5, private',
-            ],
-            [/** @lang GraphQL */ '
-                {
-                    team {
-                        users {
-                            tasks  {
-                                id
-                            }
-                        }
-                    }
-                }
-            ', 'no-cache, public',
-            ],
-            [/** @lang GraphQL */ '
-                {
-                    team {
-                        users {
-                            tasks  {
-                                foo
-                            }
-                        }
-                    }
-                }
-            ', 'no-cache, public',
-            ],
-            [/** @lang GraphQL */ '
-                {
-                    teamWithCache {
-                        users {
-                            tasks  {
-                                bar
-                            }
-                        }
-                    }
-                }
-            ', 'max-age=20, public',
-            ],
-            [/** @lang GraphQL */ '
-                {
-                    teamWithCache {
-                        users {
-                            posts  {
-                                id
-                            }
-                        }
-                    }
-                }
-            ', 'no-cache, public',
-            ],
-            [/** @lang GraphQL */ '
-                {
-                    teamWithCache {
-                        users {
-                            posts  {
-                                id
-                                foo
-                            }
-                        }
-                    }
-                }
-            ', 'no-cache, private',
-            ],
+            }
+            ',
+            'no-cache, private',
         ];
     }
 
@@ -319,7 +323,7 @@ final class CacheControlDirectiveTest extends DBTestCase
         type User {
             tasks: [Task!]! @hasMany(type: PAGINATOR) @cacheControl(maxAge: 50)
         }
-        
+
         type Task {
             id: Int @cacheControl(maxAge: 10)
             foo: String @cacheControl(inheritMaxAge: true)
@@ -350,7 +354,7 @@ final class CacheControlDirectiveTest extends DBTestCase
                                 foo
                             }
                         }
-                   }    
+                   }
                 }
             }
             ')
@@ -365,9 +369,9 @@ final class CacheControlDirectiveTest extends DBTestCase
             tasks: [Task!]! @hasMany
             tasksWithCache: [Task!]! @hasMany(relation: "tasks") @cacheControl(maxAge: 20)
         }
-        
+
         type Task @cacheControl(maxAge: 10){
-            id: Int 
+            id: Int
             foo: String
             bar: String
         }

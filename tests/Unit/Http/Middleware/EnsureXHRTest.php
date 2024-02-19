@@ -76,16 +76,14 @@ final class EnsureXHRTest extends TestCase
         );
     }
 
-    /** @return array{array{string}} */
-    public static function formContentTypes(): array
+    /** @return iterable<array{string}> */
+    public static function formContentTypes(): iterable
     {
-        return [
-            ['application/x-www-form-urlencoded'],
-            ['multipart/form-data'],
-            ['text/plain'],
-            ['multipart/form-data; boundary=-------12345'],
-            ['text/plain; encoding=utf-8'],
-        ];
+        yield ['application/x-www-form-urlencoded'];
+        yield ['multipart/form-data'];
+        yield ['text/plain'];
+        yield ['multipart/form-data; boundary=-------12345'];
+        yield ['text/plain; encoding=utf-8'];
     }
 
     public function testForbidEmptyContentType(): void
