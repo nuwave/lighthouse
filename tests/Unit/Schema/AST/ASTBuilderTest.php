@@ -7,6 +7,7 @@ use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\NodeKind;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
@@ -16,6 +17,8 @@ use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\RootType;
 use Tests\TestCase;
+
+use function assert;
 
 final class ASTBuilderTest extends TestCase
 {
@@ -128,6 +131,33 @@ final class ASTBuilderTest extends TestCase
         assert($named instanceof InterfaceTypeDefinitionNode);
 
         $this->assertCount(3, $named->fields);
+    }
+
+    public function testMergeScalarExtensionDirectives(): void
+    {
+        $directive = new class() extends BaseDirective {
+            public static function definition(): string
+            {
+                return /** @lang GraphQL */ 'directive @foo on SCALAR';
+            }
+        };
+
+        $directiveLocator = $this->app->make(DirectiveLocator::class);
+        $directiveLocator->setResolved('foo', $directive::class);
+
+        $this->schema = /** @lang GraphQL */ '
+        scalar MyScalar
+
+        extend scalar MyScalar @foo
+
+        extend scalar MyScalar @foo
+        ';
+        $documentAST = $this->astBuilder->documentAST();
+
+        $myScalar = $documentAST->types['MyScalar'];
+        assert($myScalar instanceof ScalarTypeDefinitionNode);
+
+        $this->assertCount(2, $myScalar->directives);
     }
 
     public function testMergeEnumExtensionFields(): void
