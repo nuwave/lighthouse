@@ -65,7 +65,6 @@ final class ThrottleDirectiveTest extends TestCase
         }
         ';
 
-
         $rateLimiter = $this->app->make(RateLimiter::class);
         $rateLimiter->for(
             'test',

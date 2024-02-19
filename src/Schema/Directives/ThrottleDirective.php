@@ -63,7 +63,7 @@ GRAPHQL;
 
         $fieldValue->wrapResolver(fn (callable $resolver): \Closure => function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $name, $prefix, $maxAttempts, $decayMinutes): mixed {
             $request = $context->request();
-            if ($request == null){
+            if ($request == null) {
                 return $resolver($root, $args, $context, $resolveInfo);
             }
 
