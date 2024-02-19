@@ -12,6 +12,7 @@ use Rector\CodingStyle\Rector\Closure\StaticClosureRector;
 use Rector\CodingStyle\Rector\Encapsed\EncapsedStringsToSprintfRector;
 use Rector\Config\RectorConfig;
 use Rector\Php71\Rector\FuncCall\RemoveExtraParametersRector;
+use Rector\PHPUnit\PHPUnit60\Rector\ClassMethod\AddDoesNotPerformAssertionToNonAssertingTestRector;
 use Rector\PHPUnit\Set\PHPUnitSetList;
 use Rector\Set\ValueObject\SetList;
 use Rector\TypeDeclaration\Rector\FunctionLike\AddReturnTypeDeclarationFromYieldsRector;
@@ -56,6 +57,7 @@ return static function (RectorConfig $rectorConfig): void {
         EncapsedStringsToSprintfRector::class, // unreadable, slow, error prone
         AddReturnTypeDeclarationFromYieldsRector::class, // iterable is fine
         UnusedForeachValueToArrayKeysRector::class, // inefficient
+        AddDoesNotPerformAssertionToNonAssertingTestRector::class, // does not recognize mockResolver
     ]);
     $rectorConfig->paths([
         __DIR__ . '/src',
