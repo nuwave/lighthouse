@@ -746,7 +746,7 @@ directive @canFind(
 ) repeatable on FIELD_DEFINITION
 ```
 
-### canModel
+### canRoot
 
 ```graphql
 """
