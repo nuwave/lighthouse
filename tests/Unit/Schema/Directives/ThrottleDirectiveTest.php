@@ -75,6 +75,9 @@ final class ThrottleDirectiveTest extends TestCase
             ->willReturn(static fn (): Limit => Limit::none());
 
         $rateLimiter->expects(self::never())
+            ->method('tooManyAttempts');
+
+        $rateLimiter->expects(self::never())
             ->method('hit');
 
         $this->app->singleton(RateLimiter::class, static fn (): RateLimiter => $rateLimiter);
