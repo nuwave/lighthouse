@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.33.2
+
+### Fixed
+
+- Fix `ThrottleDirective` to not reuse the first `Request` it had encountered https://github.com/nuwave/lighthouse/pull/2511
+
 ## v6.33.1
 
 ### Fixed
