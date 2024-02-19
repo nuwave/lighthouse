@@ -650,11 +650,11 @@ Deprecated. Use the [@can\* family of directives](#can-family-of-directives) ins
 
 ## @can\* family of directives
 
-All @can\* directives have common arguments. These arguments specify how gates are checked and what to do if the user is not authorized.
+All `@can*` directives have common arguments. These arguments specify how gates are checked and what to do if the user is not authorized.
 Each directive has its own set of arguments that specify what to check against.
 
 ```graphql
-  """
+"""
 The ability to check permissions for.
 """
 ability: String!
@@ -729,6 +729,12 @@ directive @canFind(
   find: String!
 
   """
+  Specify the class name of the model to use.
+  This is only needed when the default model detection does not work.
+  """
+  model: String
+
+  """
   Should the query fail when the models of `find` were not found?
   """
   findOrFail: Boolean! = true
@@ -740,7 +746,7 @@ directive @canFind(
 ) repeatable on FIELD_DEFINITION
 ```
 
-### canModel
+### canRoot
 
 ```graphql
 """
