@@ -322,6 +322,26 @@ final class ASTBuilderTest extends TestCase
         $this->assertCount(3, $myUnion->types);
     }
 
+    public function testDoesNotAllowExtendingUndefinedScalar(): void
+    {
+        $directive = new class() extends BaseDirective {
+            public static function definition(): string
+            {
+                return /** @lang GraphQL */ 'directive @foo on SCALAR';
+            }
+        };
+
+        $directiveLocator = $this->app->make(DirectiveLocator::class);
+        $directiveLocator->setResolved('foo', $directive::class);
+
+        $this->schema = /** @lang GraphQL */ '
+        extend scalar MyScalar @foo
+        ';
+
+        $this->expectExceptionObject(new DefinitionException('Could not find a base definition MyScalar of kind ' . NodeKind::SCALAR_TYPE_EXTENSION . ' to extend.'));
+        $this->astBuilder->documentAST();
+    }
+
     public function testDoesNotAllowExtendingUndefinedTypes(): void
     {
         $this->schema = /** @lang GraphQL */ '
