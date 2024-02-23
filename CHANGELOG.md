@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.33.4
+
+### Fixed
+
+- Fix stub for type resolvers used in `lighthouse:union` and `lighthouse:interface` artisan commands https://github.com/nuwave/lighthouse/pull/2518
+
 ## v6.33.3
 
 ### Fixed
