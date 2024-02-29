@@ -4,6 +4,7 @@
 
 namespace Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode;
 
+use Google\Protobuf\Internal\GPBType;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
@@ -50,7 +51,7 @@ class SequenceNode extends \Google\Protobuf\Internal\Message
      */
     public function setNodes($var)
     {
-        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode::class);
+        $arr = GPBUtil::checkRepeatedField($var, GPBType::MESSAGE, \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode::class);
         $this->nodes = $arr;
 
         return $this;
