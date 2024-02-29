@@ -56,33 +56,28 @@ abstract class DateScalar extends ScalarType
     protected function tryParsingDate(mixed $value, string $exceptionClass): IlluminateCarbon
     {
         try {
-            if(
-                is_object($value)
-                && $value::class === IlluminateCarbon::class
-            ) {
-                return $value;
-            }
+            if(is_object($value)) {
+                if ($value::class === IlluminateCarbon::class) {
+                    return $value;
+                }
 
-            if (
-                is_object($value)
                 // We want to know if we have exactly a Carbon\Carbon, not a subclass thereof
-                && (
-                    $value::class === CarbonCarbon::class
+                if ($value::class === CarbonCarbon::class
                     || $value::class === CarbonImmutable::class
-                )
-            ) {
-                $carbon = IlluminateCarbon::create(
-                    $value->year,
-                    $value->month,
-                    $value->day,
-                    $value->hour,
-                    $value->minute,
-                    $value->second,
-                    $value->timezone,
-                );
-                assert($carbon instanceof IlluminateCarbon, 'Given we had a valid Carbon instance before, this can not fail.');
+                ) {
+                    $carbon = IlluminateCarbon::create(
+                        $value->year,
+                        $value->month,
+                        $value->day,
+                        $value->hour,
+                        $value->minute,
+                        $value->second,
+                        $value->timezone,
+                    );
+                    assert($carbon instanceof IlluminateCarbon, 'Given we had a valid Carbon instance before, this can not fail.');
 
-                return $carbon;
+                    return $carbon;
+                }
             }
 
             return $this->parse($value);

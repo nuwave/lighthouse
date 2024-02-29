@@ -11,7 +11,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Fixed
 
-- Fix date scalar try to parse Illuminate\\Support\\Carbon as string https://github.com/nuwave/lighthouse/pull/2470
+- Fix `Date` scalar trying to parse `Illuminate\Support\Carbon` as `string` https://github.com/nuwave/lighthouse/pull/2470
 
 ## v6.22.0
 
