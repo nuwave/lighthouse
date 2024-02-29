@@ -56,7 +56,7 @@ abstract class DateScalar extends ScalarType
     protected function tryParsingDate(mixed $value, string $exceptionClass): IlluminateCarbon
     {
         try {
-            if(is_object($value)) {
+            if (is_object($value)) {
                 if ($value::class === IlluminateCarbon::class) {
                     return $value;
                 }
