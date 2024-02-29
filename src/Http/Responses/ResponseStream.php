@@ -33,7 +33,7 @@ class ResponseStream extends Stream implements CanStreamResponse
                     ->all();
 
                 $errors = $this->chunkError($path, $data);
-                if (! empty($errors)) {
+                if ($errors !== null && $errors !== []) {
                     $chunk['errors'] = $errors;
                 }
 

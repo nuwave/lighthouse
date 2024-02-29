@@ -3,7 +3,9 @@
 namespace Tests\Unit\Schema\AST;
 
 use GraphQL\Language\AST\DirectiveDefinitionNode;
+use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\AST\SchemaExtensionNode;
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Exceptions\SchemaSyntaxErrorException;
@@ -85,6 +87,8 @@ final class DocumentASTTest extends TestCase
     public function testBeSerialized(): void
     {
         $documentAST = DocumentAST::fromSource(/** @lang GraphQL */ '
+        extend schema @link(url: "https://specs.apollo.dev/federation/v2.3", import: ["@key"])
+
         type Query @model(class: "User") {
             foo: Int
         }
@@ -103,5 +107,9 @@ final class DocumentASTTest extends TestCase
         $this->assertInstanceOf(DirectiveDefinitionNode::class, $reserialized->directives['foo']);
 
         $this->assertSame(['Query'], $reserialized->classNameToObjectTypeNames[User::class]);
+
+        $schemaExtension = $reserialized->schemaExtensions[0];
+        $this->assertInstanceOf(SchemaExtensionNode::class, $schemaExtension);
+        $this->assertInstanceOf(DirectiveNode::class, $schemaExtension->directives[0]);
     }
 }

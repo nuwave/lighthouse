@@ -81,6 +81,8 @@ class SchemaBuilder
             array_merge(GraphQL::getStandardDirectives(), $directives),
         );
 
+        $config->setExtensionASTNodes($documentAST->schemaExtensions);
+
         return new Schema($config);
     }
 }

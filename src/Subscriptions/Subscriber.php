@@ -8,8 +8,8 @@ use GraphQL\Utils\AST;
 use Illuminate\Container\Container;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
-use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Support\Contracts\SerializesContext;
 
 class Subscriber
 {
@@ -33,9 +33,7 @@ class Subscriber
     /**
      * The name of the queried field.
      *
-     * Guaranteed be be unique because of
-     *
-     * @see \GraphQL\Validator\Rules\SingleFieldSubscription
+     * Guaranteed to be unique because of @see \GraphQL\Validator\Rules\SingleFieldSubscription
      */
     public string $fieldName;
 
@@ -56,9 +54,7 @@ class Subscriber
          * @var array<string, mixed> $args
          */
         public array $args,
-        /**
-         * The context passed to the query.
-         */
+        /** The context passed to the query. */
         public GraphQLContext $context,
         ResolveInfo $resolveInfo,
     ) {
@@ -126,8 +122,8 @@ class Subscriber
         return 'private-lighthouse-' . Str::random(32) . '-' . time();
     }
 
-    protected function contextSerializer(): ContextSerializer
+    protected function contextSerializer(): SerializesContext
     {
-        return Container::getInstance()->make(ContextSerializer::class);
+        return Container::getInstance()->make(SerializesContext::class);
     }
 }

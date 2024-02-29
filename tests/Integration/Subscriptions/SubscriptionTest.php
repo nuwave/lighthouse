@@ -146,13 +146,13 @@ GRAPHQL;
         }
         ');
 
-        /** @var \Nuwave\Lighthouse\Subscriptions\Storage\CacheStorageManager $cache */
+        /** @var CacheStorageManager $cache */
         $cache = $this->app->make(CacheStorageManager::class);
 
         $subscriber = $cache
             ->subscribersByTopic('ON_POST_CREATED')
             ->first();
-        self::assertNotNull($subscriber);
+        $this->assertNotNull($subscriber);
 
         $response->assertExactJson([
             'data' => [

@@ -13,6 +13,137 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Fix `Date` scalar trying to parse `Illuminate\Support\Carbon` as `string` https://github.com/nuwave/lighthouse/pull/2470
 
+## v6.33.4
+
+### Fixed
+
+- Fix stub for type resolvers used in `lighthouse:union` and `lighthouse:interface` artisan commands https://github.com/nuwave/lighthouse/pull/2518
+
+## v6.33.3
+
+### Fixed
+
+- Allow custom model name in `@canFind` https://github.com/nuwave/lighthouse/pull/2515
+
+## v6.33.2
+
+### Fixed
+
+- Fix `ThrottleDirective` to not reuse the first `Request` it had encountered https://github.com/nuwave/lighthouse/pull/2511
+
+## v6.33.1
+
+### Fixed
+
+- Remove duplicate `CanArgs` from directive definition https://github.com/nuwave/lighthouse/pull/2510
+
+## v6.33.0
+
+### Added
+
+- Expose pivot field on pagination edge https://github.com/nuwave/lighthouse/pull/2464
+
+## v6.32.0
+
+### Added
+
+- Add `@async` directive https://github.com/nuwave/lighthouse/pull/2501
+
+### Changed
+
+- Move and rename `Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer` to `Nuwave\Lighthouse\Support\Contracts\SerializesContext` https://github.com/nuwave/lighthouse/pull/2501
+- Do not bind `CreatesContext` and `CanStreamResponse` as singletons https://github.com/nuwave/lighthouse/pull/2501
+
+### Fixed
+
+- Fix parsing reserialized `LaravelEnumType` from `ResolveInfo::$variableValues` https://github.com/nuwave/lighthouse/pull/2501
+
+## v6.31.1
+
+### Fixed
+
+- Fix `@limit` directive definition
+
+## v6.31.0
+
+### Added
+
+- Add `InputFieldManipulator` directive interface https://github.com/nuwave/lighthouse/pull/2476
+
+## v6.30.0
+
+### Added
+
+- Add configuration option `parse_source_location` https://github.com/nuwave/lighthouse/pull/2499
+
+## v6.29.1
+
+### Fixed
+
+- Ensure `@rule` is never applied to argument lists themselves https://github.com/nuwave/lighthouse/pull/2489
+
+## v6.29.0
+
+### Fixed
+
+- Return empty results for pagination `first: 0` https://github.com/nuwave/lighthouse/pull/2480
+
+## v6.28.0
+
+### Added
+
+- Mark common pagination types as `@shareable` for Apollo Federation v2 https://github.com/nuwave/lighthouse/pull/2485
+
+## v6.27.0
+
+### Added
+
+- Split up `@can` directive into `@canFind`, `@canModel`, `@canQuery`, `@canResolved` and `@canRoot` https://github.com/nuwave/lighthouse/pull/2483
+- Added `action` and `returnValue` arguments to `@can*` family of directives https://github.com/nuwave/lighthouse/pull/2483
+- Allows using any objects in `@can*` family of directives https://github.com/nuwave/lighthouse/pull/2483
+
+## v6.26.1
+
+### Fixed
+
+- Add `scalar link__Import` and `enum link__Purpose` to `@link` definition https://github.com/nuwave/lighthouse/pull/2484
+
+## v6.26.0
+
+### Added
+
+- Support federated tracing https://github.com/nuwave/lighthouse/pull/2479
+
+## v6.25.0
+
+### Added
+
+- Add `@namespaced` directive for namespacing by separation of concerns https://github.com/nuwave/lighthouse/pull/2469
+
+## v6.24.0
+
+### Added
+
+- Add support for `extend union` syntax https://github.com/nuwave/lighthouse/pull/2468
+
+## v6.23.2
+
+### Fixed
+
+- Exclude unnecessary `extend schema` from federation schema printer https://github.com/nuwave/lighthouse/pull/2477
+
+## v6.23.1
+
+### Fixed
+
+- Fix `FieldResolver` directive stubs
+
+## v6.23.0
+
+### Added
+
+- Support Apollo Federation v2, except for federated tracing https://github.com/nuwave/lighthouse/pull/2460
+
 ## v6.22.0
 
 ### Added
@@ -300,6 +431,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Remove alias/Facade `graphql`
 - Remove subscriptions version 1
 - Remove `MiddlewareAdapter` https://github.com/nuwave/lighthouse/pull/2358
+
+## v5.72.0
+
+### Added
+
+- Add configuration option `parse_source_location` https://github.com/nuwave/lighthouse/pull/2498
 
 ## v5.71.0
 

@@ -18,17 +18,17 @@ final class MorphManyDirectiveTest extends DBTestCase
     /**
      * The authenticated user.
      *
-     * @var \Tests\Utils\Models\User
+     * @var User
      */
     protected $user;
 
-    /** @var \Tests\Utils\Models\Task */
+    /** @var Task */
     protected $task;
 
     /** @var \Illuminate\Support\Collection<int, \Tests\Utils\Models\Image> */
     protected $taskImages;
 
-    /** @var \Tests\Utils\Models\Post */
+    /** @var Post */
     protected $post;
 
     /** @var \Illuminate\Support\Collection<int, \Tests\Utils\Models\Image> */

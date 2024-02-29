@@ -18,7 +18,7 @@ class SoftDeletesServiceProvider extends ServiceProvider
      *
      * @param  class-string<\Illuminate\Database\Eloquent\Model>  $modelClass
      *
-     * @see \Illuminate\Database\Eloquent\SoftDeletes
+     * @see SoftDeletes
      */
     public static function assertModelUsesSoftDeletes(string $modelClass, string $exceptionMessage): void
     {

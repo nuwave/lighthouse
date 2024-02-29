@@ -13,7 +13,6 @@ use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
-use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionExceptionHandler;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator;
@@ -38,7 +37,6 @@ class SubscriptionServiceProvider extends ServiceProvider
             };
         });
 
-        $this->app->bind(ContextSerializer::class, Serializer::class);
         $this->app->bind(AuthorizesSubscriptions::class, Authorizer::class);
         $this->app->bind(SubscriptionIterator::class, SyncIterator::class);
         $this->app->bind(SubscriptionExceptionHandler::class, ExceptionHandler::class);

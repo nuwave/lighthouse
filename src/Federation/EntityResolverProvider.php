@@ -176,7 +176,7 @@ class EntityResolverProvider
     protected function satisfiesKeyFields(SelectionSetNode $keyFields, array $representation): bool
     {
         foreach ($keyFields->selections as $field) {
-            /** @see \Nuwave\Lighthouse\Federation\SchemaValidator */
+            /** @see SchemaValidator */
             assert($field instanceof FieldNode, 'Fragments or spreads are not allowed in key fields');
 
             $fieldName = $field->name->value;
@@ -208,7 +208,7 @@ class EntityResolverProvider
     protected function applySatisfiedSelection(EloquentBuilder $builder, SelectionSetNode $keyFields, array $representation, ObjectTypeDefinitionNode $definition): void
     {
         foreach ($keyFields->selections as $field) {
-            /** @see \Nuwave\Lighthouse\Federation\SchemaValidator */
+            /** @see SchemaValidator */
             assert($field instanceof FieldNode, 'Fragments or spreads are not allowed in key fields');
 
             $fieldName = $field->name->value;

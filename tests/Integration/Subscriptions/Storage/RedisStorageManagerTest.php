@@ -48,7 +48,7 @@ final class RedisStorageManagerTest extends TestCase
 
     public function testDeleteSubscriber(): void
     {
-        /** @var \Nuwave\Lighthouse\Subscriptions\Storage\RedisStorageManager $storage */
+        /** @var RedisStorageManager $storage */
         $storage = $this->app->make(RedisStorageManager::class);
 
         $response = $this->querySubscription();
@@ -106,7 +106,7 @@ final class RedisStorageManagerTest extends TestCase
         ]);
 
         $createdSubscriber = $storage->subscribersByTopic('TASK_CREATED')->first();
-        self::assertNotNull($createdSubscriber);
+        $this->assertNotNull($createdSubscriber);
         $this->assertSame('1234.1234', $createdSubscriber->socket_id);
     }
 

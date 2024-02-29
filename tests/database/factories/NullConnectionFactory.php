@@ -3,5 +3,5 @@
 use Faker\Generator as Faker;
 use Tests\Utils\Models\NullConnection;
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+/** @var Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(NullConnection::class, static fn (Faker $faker): array => []);

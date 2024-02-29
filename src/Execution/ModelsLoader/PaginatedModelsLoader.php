@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
-use Nuwave\Lighthouse\Pagination\ZeroPageLengthAwarePaginator;
+use Nuwave\Lighthouse\Pagination\ZeroPerPageLengthAwarePaginator;
 use Nuwave\Lighthouse\Support\Utils;
 
 class PaginatedModelsLoader implements ModelsLoader
@@ -153,7 +153,7 @@ class PaginatedModelsLoader implements ModelsLoader
             static fn (string $relation): bool => ! $model->relationLoaded($relation),
         );
 
-        if (count($unloadedWiths) > 0) {
+        if ($unloadedWiths !== []) {
             $models->load($unloadedWiths);
         }
     }
@@ -185,7 +185,7 @@ class PaginatedModelsLoader implements ModelsLoader
             $total = CountModelsLoader::extractCount($model, $this->relation);
 
             $paginator = $first === 0
-                ? new ZeroPageLengthAwarePaginator($total, $page)
+                ? new ZeroPerPageLengthAwarePaginator($total, $page)
                 : new LengthAwarePaginator($model->getRelation($this->relation), $total, $first, $page);
 
             $model->setRelation($this->relation, $paginator);

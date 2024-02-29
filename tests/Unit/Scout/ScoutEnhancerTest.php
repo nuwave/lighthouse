@@ -96,13 +96,10 @@ final class ScoutEnhancerTest extends TestCase
         $enhancer = new ScoutEnhancer($argumentSet, $builder);
         $builder = $enhancer->enhanceBuilder(static fn (ScoutBuilderDirective $directive): bool => $directive !== $directiveIgnored);
 
-        self::assertSame(
-            [
-                'two' => $value,
-                'one' => $value,
-                'nested' => $nested,
-            ],
-            $builder->wheres,
-        );
+        $this->assertSame([
+            'two' => $value,
+            'one' => $value,
+            'nested' => $nested,
+        ], $builder->wheres);
     }
 }

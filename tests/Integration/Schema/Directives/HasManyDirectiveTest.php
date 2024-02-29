@@ -297,6 +297,63 @@ final class HasManyDirectiveTest extends DBTestCase
             ]);
     }
 
+    public function testQueryPaginatedHasManyFirst0(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID!
+            tasks: [Task!]! @hasMany(type: PAGINATOR)
+        }
+
+        type Task {
+            id: ID!
+        }
+
+        type Query {
+            users: [User!]! @all
+        }
+        ';
+
+        $user = factory(User::class)->create();
+        assert($user instanceof User);
+
+        $tasksCount = 3;
+        $tasks = factory(Task::class, $tasksCount)->make();
+        $user->tasks()->saveMany($tasks);
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                users {
+                    id
+                    tasks(first: 0) {
+                        paginatorInfo {
+                            total
+                        }
+                        data {
+                            id
+                        }
+                    }
+                }
+            }
+            ')
+            ->assertExactJson([
+                'data' => [
+                    'users' => [
+                        [
+                            'id' => (string) $user->id,
+                            'tasks' => [
+                                'paginatorInfo' => [
+                                    'total' => $tasksCount,
+                                ],
+                                'data' => [],
+                            ],
+                        ],
+                    ],
+                ],
+            ]);
+    }
+
     public function testQueryPaginatedHasManyWithNonUniqueForeignKey(): void
     {
         $this->schema = /** @lang GraphQL */ '
@@ -1319,12 +1376,10 @@ final class HasManyDirectiveTest extends DBTestCase
         ')->assertJsonCount(3, 'data.user.foos.edges');
     }
 
-    /** @return array<int, array{0: bool}> */
-    public static function batchloadRelations(): array
+    /** @return iterable<array{bool}> */
+    public static function batchloadRelations(): iterable
     {
-        return [
-            [true],
-            [false],
-        ];
+        yield [true];
+        yield [false];
     }
 }

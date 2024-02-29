@@ -30,7 +30,7 @@ class GuardDirective extends BaseDirective implements FieldMiddleware, TypeManip
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Run authentication through one or more guards.
+Run authentication through one or more guards from `config/auth.php`.
 
 This is run per field and may allow unauthenticated
 users to still receive partial results.

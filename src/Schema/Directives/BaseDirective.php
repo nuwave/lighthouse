@@ -167,7 +167,7 @@ abstract class BaseDirective implements Directive
     protected function namespaceClassName(
         string $classCandidate,
         array $namespacesToTry = [],
-        callable $determineMatch = null,
+        ?callable $determineMatch = null,
     ): string {
         $namespaceForDirective = ASTHelper::namespaceForDirective(
             $this->definitionNode,

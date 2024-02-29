@@ -126,7 +126,7 @@ class ArgumentSetFactory
     /**
      * Wrap a client-given value with information from a named type.
      *
-     * @return \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|mixed
+     * @return ArgumentSet|mixed
      */
     protected function wrapWithNamedType(mixed $value, NamedType $namedType)
     {

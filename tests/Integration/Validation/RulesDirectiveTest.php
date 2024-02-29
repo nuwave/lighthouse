@@ -271,15 +271,13 @@ final class RulesDirectiveTest extends TestCase
         ");
     }
 
-    /** @return array<array<int, string>> */
-    public static function invalidApplyArguments(): array
+    /** @return iterable<array{string}> */
+    public static function invalidApplyArguments(): iterable
     {
-        return [
-            [/** @lang GraphQL */ '123'],
-            [/** @lang GraphQL */ '"123"'],
-            [/** @lang GraphQL */ '[]'],
-            [/** @lang GraphQL */ '[123]'],
-        ];
+        yield [/** @lang GraphQL */ '123'];
+        yield [/** @lang GraphQL */ '"123"'];
+        yield [/** @lang GraphQL */ '[]'];
+        yield [/** @lang GraphQL */ '[123]'];
     }
 
     /** @dataProvider invalidMessageArguments */
@@ -293,17 +291,65 @@ final class RulesDirectiveTest extends TestCase
         ");
     }
 
-    /** @return array<array<int, string>> */
-    public static function invalidMessageArguments(): array
+    /** @return iterable<array{string}> */
+    public static function invalidMessageArguments(): iterable
     {
-        return [
-            [/** @lang GraphQL */ '"foo"'],
-            [/** @lang GraphQL */ '{foo: 3}'],
-            [/** @lang GraphQL */ '[1, 2]'],
-            [/** @lang GraphQL */ '[{foo: 3}]'],
-            [/** @lang GraphQL */ '[{rule: "email"}]'],
-            [/** @lang GraphQL */ '[{rule: "email", message: null}]'],
-            [/** @lang GraphQL */ '[{rule: 3, message: "asfd"}]'],
-        ];
+        yield [/** @lang GraphQL */ '"foo"'];
+        yield [/** @lang GraphQL */ '{foo: 3}'];
+        yield [/** @lang GraphQL */ '[1, 2]'];
+        yield [/** @lang GraphQL */ '[{foo: 3}]'];
+        yield [/** @lang GraphQL */ '[{rule: "email"}]'];
+        yield [/** @lang GraphQL */ '[{rule: "email", message: null}]'];
+        yield [/** @lang GraphQL */ '[{rule: 3, message: "asfd"}]'];
+    }
+
+    public function testValidateElementsOfListType(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(
+                bar: [String]
+                @rules(
+                    apply: ["required"]
+                )
+            ): String
+        }
+        ';
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    bar: ["", null, "bar"]
+                )
+            }
+            ')
+            ->assertGraphQLValidationKeys(['bar.0', 'bar.1']);
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo(
+                    bar: []
+                )
+            }
+            ')
+            ->assertJson([
+                'data' => [
+                    'foo' => Foo::THE_ANSWER,
+                ],
+            ]);
+
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            {
+                foo
+            }
+            ')
+            ->assertJson([
+                'data' => [
+                    'foo' => Foo::THE_ANSWER,
+                ],
+            ]);
     }
 }

@@ -28,6 +28,7 @@ use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Utils;
 
+/** @deprecated TODO remove with v7 */
 class CanDirective extends BaseDirective implements FieldMiddleware, FieldManipulator
 {
     public function __construct(
@@ -73,6 +74,8 @@ directive @can(
 
   You may pass arbitrary GraphQL literals,
   e.g.: [1, 2, 3] or { foo: "bar" }
+
+  CanArgs pseudo-scalar is defined in BaseCanDirective.
   """
   args: CanArgs
 
@@ -111,11 +114,6 @@ directive @can(
   """
   root: Boolean! = false
 ) repeatable on FIELD_DEFINITION
-
-"""
-Any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
-"""
-scalar CanArgs
 GRAPHQL;
     }
 

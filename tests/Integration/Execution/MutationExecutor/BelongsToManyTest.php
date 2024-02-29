@@ -566,13 +566,11 @@ GRAPHQL
         $this->assertSame('is_user', $role->name);
     }
 
-    /** @return array<array<string, string>> */
-    public static function existingModelMutations(): array
+    /** @return iterable<array{string}> */
+    public static function existingModelMutations(): iterable
     {
-        return [
-            ['Update action' => 'update'],
-            ['Upsert action' => 'upsert'],
-        ];
+        yield 'Update action' => ['update'];
+        yield 'Upsert action' => ['upsert'];
     }
 
     /** @dataProvider existingModelMutations */

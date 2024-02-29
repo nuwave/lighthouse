@@ -24,6 +24,36 @@ It will prevent the following type of HTTP requests:
 - `GET` requests
 - `POST` requests that can be created using HTML forms
 
+### `@can` directive is replaced with `@can*` directives
+
+The `@can` directive was removed in favor of more specialized directives:
+- with `find` field set: `@canFind`
+- with `query` field set: `@canQuery`
+- with `root` field set: `@canRoot`
+- with `resolved` field set: `@canResolved`
+- if none of the above are set: `@canModel`
+
+```diff
+type Mutation {
+-   createPost(input: PostInput! @spread): Post! @can(ability: "create") @create
++   createPost(input: PostInput! @spread): Post! @canModel(ability: "create") @create
+-   updatePost(input: PostInput! @spread): Post! @can(find: "input.id", ability: "edit") @update
++   updatePost(input: PostInput! @spread): Post! @canFind(find: "input.id", ability: "edit") @update
+-   deletePosts(ids: [ID!]! @whereKey): [Post!]! @can(query: true, ability: "delete") @delete
++   deletePosts(ids: [ID!]! @whereKey): [Post!]! @canQuery(ability: "delete") @delete
+}
+
+type Query {
+-   posts: [Post!]! @can(resolved: true, ability: "view") @paginate
++   posts: [Post!]! @canResolved(ability: "view") @paginate
+}
+
+type Post {
+-   sensitiveInformation: String @can(root: true, ability: "admin")
++   sensitiveInformation: String @canRoot(ability: "admin")
+}
+```
+
 ## v5 to v6
 
 ### `messages` on `@rules` and `@rulesForArray`
@@ -388,11 +418,10 @@ class SomeField
 
 ### Replace `@middleware` with `@guard` and specialized FieldMiddleware
 
-The `@middleware` directive has been removed, as it violates the boundary between HTTP and GraphQL
-request handling.
+The `@middleware` directive has been removed, as it violates the boundary between HTTP and GraphQL request handling.
+Laravel middleware acts upon the HTTP request as a whole, whereas field middleware must only apply to a part of it. 
 
-Authentication is one of most common use cases for `@middleware`. You can now use
-the [@guard](docs/master/api-reference/directives.md#guard) directive on selected fields.
+If you used `@middleware` for authentication, replace it with [@guard](docs/master/api-reference/directives.md#guard):
 
 ```diff
 type Query {
@@ -404,6 +433,8 @@ type Query {
 Note that [@guard](docs/master/api-reference/directives.md#guard) does not log in users.
 To ensure the user is logged in, add the `AttemptAuthenticate` middleware to your `lighthouse.php`
 middleware config, see the [default config](src/lighthouse.php) for an example.
+
+If you used `@middleware` for authorization, replace it with [@can](docs/master/api-reference/directives.md#can).
 
 Other functionality can be replaced by a custom [`FieldMiddleware`](docs/master/custom-directives/field-directives.md#fieldmiddleware)
 directive. Just like Laravel Middleware, it can wrap around individual field resolvers.

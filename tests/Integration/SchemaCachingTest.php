@@ -89,7 +89,7 @@ final class SchemaCachingTest extends TestCase
 
     protected function cacheSchema(): void
     {
-        /** @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder $astBuilder */
+        /** @var ASTBuilder $astBuilder */
         $astBuilder = $this->app->make(ASTBuilder::class);
         $astBuilder->documentAST();
 

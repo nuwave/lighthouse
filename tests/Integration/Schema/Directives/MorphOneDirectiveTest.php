@@ -12,21 +12,21 @@ final class MorphOneDirectiveTest extends DBTestCase
     /**
      * The authenticated user.
      *
-     * @var \Tests\Utils\Models\User
+     * @var User
      */
     protected $user;
 
     /**
      * User's task.
      *
-     * @var \Tests\Utils\Models\Task
+     * @var Task
      */
     protected $task;
 
     /**
      * Task's image.
      *
-     * @var \Tests\Utils\Models\Image
+     * @var Image
      */
     protected $image;
 

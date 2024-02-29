@@ -13,7 +13,8 @@ setup: build docs/node_modules vendor ## Setup the local environment
 
 .PHONY: build
 build: ## Build the local Docker containers
-	docker-compose build --pull --build-arg USER_ID=$(shell id --user) --build-arg GROUP_ID=$(shell id --group)
+	# Using short options of `id` to ensure compatibility with macOS, see https://github.com/nuwave/lighthouse/pull/2504
+	docker-compose build --pull --build-arg USER_ID=$(shell id -u) --build-arg GROUP_ID=$(shell id -g)
 
 .PHONY: up
 up: ## Bring up the docker-compose stack
@@ -69,3 +70,19 @@ docs: up ## Render the docs in a development server
 
 docs/node_modules: up docs/package.json docs/yarn.lock ## Install yarn dependencies
 	${dcnode} yarn
+
+.PHONY: proto/update-reports
+proto/update-reports:
+	${dcphp} curl -sSfo src/Tracing/FederatedTracing/reports.proto https://usage-reporting.api.apollographql.com/proto/reports.proto
+	${dcphp} sed -i 's/ \[(js_use_toArray) = true]//g' src/Tracing/FederatedTracing/reports.proto
+	${dcphp} sed -i 's/ \[(js_preEncoded) = true]//g' src/Tracing/FederatedTracing/reports.proto
+	${dcphp} sed -i '3 i option php_namespace = "Nuwave\\\\Lighthouse\\\\Tracing\\\\FederatedTracing\\\\Proto";' src/Tracing/FederatedTracing/reports.proto
+	${dcphp} sed -i '4 i option php_metadata_namespace = "Nuwave\\\\Lighthouse\\\\Tracing\\\\FederatedTracing\\\\Proto\\\\Metadata";' src/Tracing/FederatedTracing/reports.proto
+
+.PHONY: proto
+proto:
+	docker run --rm --volume ".:/tmp" --workdir /tmp bufbuild/buf generate
+	${dcphp} rm -rf src/Tracing/FederatedTracing/Proto
+	${dcphp} mv proto-tmp/Nuwave/Lighthouse/Tracing/FederatedTracing/Proto src/Tracing/FederatedTracing/Proto
+	${dcphp} rm -rf proto-tmp
+	$(MAKE) php-cs-fixer

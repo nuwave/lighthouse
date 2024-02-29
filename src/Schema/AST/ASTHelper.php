@@ -172,27 +172,60 @@ class ASTHelper
         return AST::valueFromAST($defaultValue, $argumentType);
     }
 
-    /**
-     * Get a directive with the given name if it is defined upon the node.
-     *
-     * As of now, directives may only be used once per location.
-     */
+    /** Get a directive with the given name if it is defined upon the node, assuming it is only used once. */
     public static function directiveDefinition(Node $definitionNode, string $name): ?DirectiveNode
     {
+        foreach (static::directiveDefinitions($definitionNode, $name) as $directive) {
+            return $directive;
+        }
+
+        return null;
+    }
+
+    /**
+     * Get all directives with the given name if it is defined upon the node.
+     *
+     * @return iterable<\GraphQL\Language\AST\DirectiveNode>
+     */
+    public static function directiveDefinitions(Node $definitionNode, string $name): iterable
+    {
         if (! property_exists($definitionNode, 'directives')) {
-            throw new \Exception('Expected Node class with property `directives`, got: ' . $definitionNode::class);
+            $nodeClassWithoutDirectives = $definitionNode::class;
+            throw new \Exception("Expected Node class with property `directives`, got: {$nodeClassWithoutDirectives}.");
         }
 
         /** @var \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\DirectiveNode> $directives */
         $directives = $definitionNode->directives;
 
-        return static::firstByName($directives, $name);
+        return static::filterByName($directives, $name);
     }
 
     /** Check if a node has a directive with the given name on it. */
     public static function hasDirective(Node $definitionNode, string $name): bool
     {
         return static::directiveDefinition($definitionNode, $name) !== null;
+    }
+
+    /**
+     * Out of a list of nodes, get the ones that matches the given name.
+     *
+     * @template TNode of \GraphQL\Language\AST\Node
+     *
+     * @param  iterable<TNode>  $nodes
+     *
+     * @return iterable<TNode>
+     */
+    public static function filterByName(iterable $nodes, string $name): iterable
+    {
+        foreach ($nodes as $node) {
+            if (! property_exists($node, 'name')) {
+                throw new \Exception('Expected a Node with a name property, got: ' . $node::class);
+            }
+
+            if ($node->name->value === $name) {
+                yield $node;
+            }
+        }
     }
 
     /**
@@ -206,14 +239,8 @@ class ASTHelper
      */
     public static function firstByName(iterable $nodes, string $name): ?Node
     {
-        foreach ($nodes as $node) {
-            if (! property_exists($node, 'name')) {
-                throw new \Exception('Expected a Node with a name property, got: ' . $node::class);
-            }
-
-            if ($node->name->value === $name) {
-                return $node;
-            }
+        foreach (static::filterByName($nodes, $name) as $node) {
+            return $node;
         }
 
         return null;

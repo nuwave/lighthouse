@@ -178,8 +178,7 @@ class TestResponseMixin
             assert($mock instanceof LegacyMockInterface); // @phpstan-ignore-line mixins are magical
 
             $broadcastedData = [];
-            $mock->shouldHaveReceived('broadcast', static function (Subscriber $subscriber, $data) use ($channel, &$broadcastedData): bool {
-                Assert::assertIsArray($data);
+            $mock->shouldHaveReceived('broadcast', static function (Subscriber $subscriber, array $data) use ($channel, &$broadcastedData): bool {
                 Assert::assertArrayHasKey('data', $data);
                 if ($channel === $subscriber->channel) {
                     $broadcastedData[] = Arr::first($data['data']);
