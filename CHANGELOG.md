@@ -13,6 +13,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Fix `Date` scalar trying to parse `Illuminate\Support\Carbon` as `string` https://github.com/nuwave/lighthouse/pull/2470
 
+## v6.34.0
+
+### Added
+
+- Merge directives from Scalar/Enum/Type/Input/Interface extension node into target node https://github.com/nuwave/lighthouse/pull/2512
+
 ## v6.33.4
 
 ### Fixed
