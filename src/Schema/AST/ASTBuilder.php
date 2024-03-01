@@ -10,6 +10,8 @@ use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeExtensionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeExtensionNode;
+use GraphQL\Language\AST\ScalarTypeDefinitionNode;
+use GraphQL\Language\AST\ScalarTypeExtensionNode;
 use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use GraphQL\Language\AST\UnionTypeExtensionNode;
 use GraphQL\Language\Parser;
@@ -33,6 +35,7 @@ class ASTBuilder
         ObjectTypeExtensionNode::class => ObjectTypeDefinitionNode::class,
         InputObjectTypeExtensionNode::class => InputObjectTypeDefinitionNode::class,
         InterfaceTypeExtensionNode::class => InterfaceTypeDefinitionNode::class,
+        ScalarTypeExtensionNode::class => ScalarTypeDefinitionNode::class,
         EnumTypeExtensionNode::class => EnumTypeDefinitionNode::class,
         UnionTypeExtensionNode::class => UnionTypeDefinitionNode::class,
     ];
@@ -122,6 +125,8 @@ class ASTBuilder
                     || $typeExtension instanceof InterfaceTypeExtensionNode
                 ) {
                     $this->extendObjectLikeType($typeName, $typeExtension);
+                } elseif ($typeExtension instanceof ScalarTypeExtensionNode) {
+                    $this->extendScalarType($typeName, $typeExtension);
                 } elseif ($typeExtension instanceof EnumTypeExtensionNode) {
                     $this->extendEnumType($typeName, $typeExtension);
                 } elseif ($typeExtension instanceof UnionTypeExtensionNode) {
@@ -156,6 +161,7 @@ class ASTBuilder
             // @phpstan-ignore-next-line
             $typeExtension->fields,
         );
+        $extendedObjectLikeType->directives = $extendedObjectLikeType->directives->merge($typeExtension->directives);
 
         if ($extendedObjectLikeType instanceof ObjectTypeDefinitionNode) {
             assert($typeExtension instanceof ObjectTypeExtensionNode, 'We know this because we passed assertExtensionMatchesDefinition().');
@@ -166,6 +172,17 @@ class ASTBuilder
         }
     }
 
+    protected function extendScalarType(string $typeName, ScalarTypeExtensionNode $typeExtension): void
+    {
+        $extendedScalar = $this->documentAST->types[$typeName]
+            ?? throw new DefinitionException($this->missingBaseDefinition($typeName, $typeExtension));
+        assert($extendedScalar instanceof ScalarTypeDefinitionNode);
+
+        $this->assertExtensionMatchesDefinition($typeExtension, $extendedScalar);
+
+        $extendedScalar->directives = $extendedScalar->directives->merge($typeExtension->directives);
+    }
+
     protected function extendEnumType(string $typeName, EnumTypeExtensionNode $typeExtension): void
     {
         $extendedEnum = $this->documentAST->types[$typeName]
@@ -174,6 +191,7 @@ class ASTBuilder
 
         $this->assertExtensionMatchesDefinition($typeExtension, $extendedEnum);
 
+        $extendedEnum->directives = $extendedEnum->directives->merge($typeExtension->directives);
         $extendedEnum->values = ASTHelper::mergeUniqueNodeList(
             $extendedEnum->values,
             $typeExtension->values,
@@ -194,12 +212,15 @@ class ASTBuilder
         );
     }
 
-    protected function missingBaseDefinition(string $typeName, ObjectTypeExtensionNode|InputObjectTypeExtensionNode|InterfaceTypeExtensionNode|EnumTypeExtensionNode|UnionTypeExtensionNode $typeExtension): string
+    protected function missingBaseDefinition(string $typeName, ObjectTypeExtensionNode|InputObjectTypeExtensionNode|InterfaceTypeExtensionNode|ScalarTypeExtensionNode|EnumTypeExtensionNode|UnionTypeExtensionNode $typeExtension): string
     {
         return "Could not find a base definition {$typeName} of kind {$typeExtension->kind} to extend.";
     }
 
-    protected function assertExtensionMatchesDefinition(ObjectTypeExtensionNode|InputObjectTypeExtensionNode|InterfaceTypeExtensionNode|EnumTypeExtensionNode|UnionTypeExtensionNode $extension, ObjectTypeDefinitionNode|InputObjectTypeDefinitionNode|InterfaceTypeDefinitionNode|EnumTypeDefinitionNode|UnionTypeDefinitionNode $definition): void
+    protected function assertExtensionMatchesDefinition(
+        ObjectTypeExtensionNode|InputObjectTypeExtensionNode|InterfaceTypeExtensionNode|ScalarTypeExtensionNode|EnumTypeExtensionNode|UnionTypeExtensionNode $extension,
+        ObjectTypeDefinitionNode|InputObjectTypeDefinitionNode|InterfaceTypeDefinitionNode|ScalarTypeDefinitionNode|EnumTypeDefinitionNode|UnionTypeDefinitionNode $definition,
+    ): void
     {
         if (static::EXTENSION_TO_DEFINITION_CLASS[$extension::class] !== $definition::class) {
             throw new DefinitionException("The type extension {$extension->name->value} of kind {$extension->kind} can not extend a definition of kind {$definition->kind}.");
