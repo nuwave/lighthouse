@@ -9,6 +9,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.34.1
+
 ### Fixed
 
 - Fix `Date` scalar trying to parse `Illuminate\Support\Carbon` as `string` https://github.com/nuwave/lighthouse/pull/2470
