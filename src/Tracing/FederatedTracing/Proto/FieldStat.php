@@ -4,6 +4,7 @@
 
 namespace Nuwave\Lighthouse\Tracing\FederatedTracing\Proto;
 
+use Google\Protobuf\Internal\GPBType;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
@@ -327,7 +328,7 @@ class FieldStat extends \Google\Protobuf\Internal\Message
      */
     public function setLatencyCount($var)
     {
-        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::SINT64);
+        $arr = GPBUtil::checkRepeatedField($var, GPBType::SINT64);
         $this->latency_count = $arr;
 
         return $this;

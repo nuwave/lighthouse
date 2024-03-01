@@ -32,6 +32,13 @@ abstract class DateScalarTestBase extends TestCase
         $dateScalar->parseValue($value);
     }
 
+    public function testReturnsIlluminateSupportCarbonAsIs(): void
+    {
+        $this->assertTrue(
+            $this->scalarInstance()->parseValue(IlluminateCarbon::now())->isValid(),
+        );
+    }
+
     public function testConvertsCarbonCarbonToIlluminateSupportCarbon(): void
     {
         $this->assertTrue(

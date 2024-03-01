@@ -4,6 +4,7 @@
 
 namespace Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace;
 
+use Google\Protobuf\Internal\GPBType;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
@@ -72,7 +73,7 @@ class Node extends \Google\Protobuf\Internal\Message
      *           The field's return type; e.g. "String!" for User.email:String!
      *     @var string $parent_type
      *           The field's parent type; e.g. "User" for User.email:String!
-     *     @var CachePolicy $cache_policy
+     *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\CachePolicy $cache_policy
      *     @var int|string $start_time
      *           relative to the trace's start_time, in ns
      *     @var int|string $end_time
@@ -233,7 +234,7 @@ class Node extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.Trace.CachePolicy cache_policy = 5 [json_name = "cachePolicy"];</code>.
      *
-     * @return CachePolicy|null
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\CachePolicy|null
      */
     public function getCachePolicy()
     {
@@ -253,7 +254,7 @@ class Node extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.Trace.CachePolicy cache_policy = 5 [json_name = "cachePolicy"];</code>.
      *
-     * @param  CachePolicy  $var
+     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\CachePolicy  $var
      *
      * @return $this
      */
@@ -342,7 +343,7 @@ class Node extends \Google\Protobuf\Internal\Message
      */
     public function setError($var)
     {
-        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, Error::class);
+        $arr = GPBUtil::checkRepeatedField($var, GPBType::MESSAGE, Error::class);
         $this->error = $arr;
 
         return $this;
@@ -367,7 +368,7 @@ class Node extends \Google\Protobuf\Internal\Message
      */
     public function setChild($var)
     {
-        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, Node::class);
+        $arr = GPBUtil::checkRepeatedField($var, GPBType::MESSAGE, Node::class);
         $this->child = $arr;
 
         return $this;

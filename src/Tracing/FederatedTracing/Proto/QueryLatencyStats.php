@@ -4,6 +4,7 @@
 
 namespace Nuwave\Lighthouse\Tracing\FederatedTracing\Proto;
 
+use Google\Protobuf\Internal\GPBType;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
@@ -107,7 +108,7 @@ class QueryLatencyStats extends \Google\Protobuf\Internal\Message
      *     @var array<int>|array<string>|\Google\Protobuf\Internal\RepeatedField $cache_latency_count
      *           This array includes the latency buckets for all operations included in cache_hits
      *           See comment on latency_count for details
-     *     @var PathErrorStats $root_error_stats
+     *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\PathErrorStats $root_error_stats
      *           Paths and counts for each error. The total number of requests with errors within this object should be the same as
      *           requests_with_errors_count below.
      *     @var int|string $requests_with_errors_count
@@ -159,7 +160,7 @@ class QueryLatencyStats extends \Google\Protobuf\Internal\Message
      */
     public function setLatencyCount($var)
     {
-        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::SINT64);
+        $arr = GPBUtil::checkRepeatedField($var, GPBType::SINT64);
         $this->latency_count = $arr;
 
         return $this;
@@ -298,7 +299,7 @@ class QueryLatencyStats extends \Google\Protobuf\Internal\Message
      */
     public function setCacheLatencyCount($var)
     {
-        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::SINT64);
+        $arr = GPBUtil::checkRepeatedField($var, GPBType::SINT64);
         $this->cache_latency_count = $arr;
 
         return $this;
@@ -310,7 +311,7 @@ class QueryLatencyStats extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.PathErrorStats root_error_stats = 7 [json_name = "rootErrorStats"];</code>
      *
-     * @return PathErrorStats|null
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\PathErrorStats|null
      */
     public function getRootErrorStats()
     {
@@ -333,7 +334,7 @@ class QueryLatencyStats extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.PathErrorStats root_error_stats = 7 [json_name = "rootErrorStats"];</code>
      *
-     * @param  PathErrorStats  $var
+     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\PathErrorStats  $var
      *
      * @return $this
      */
@@ -393,7 +394,7 @@ class QueryLatencyStats extends \Google\Protobuf\Internal\Message
      */
     public function setPublicCacheTtlCount($var)
     {
-        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::SINT64);
+        $arr = GPBUtil::checkRepeatedField($var, GPBType::SINT64);
         $this->public_cache_ttl_count = $arr;
 
         return $this;
@@ -418,7 +419,7 @@ class QueryLatencyStats extends \Google\Protobuf\Internal\Message
      */
     public function setPrivateCacheTtlCount($var)
     {
-        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::SINT64);
+        $arr = GPBUtil::checkRepeatedField($var, GPBType::SINT64);
         $this->private_cache_ttl_count = $arr;
 
         return $this;

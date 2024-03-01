@@ -24,12 +24,12 @@ class QueryPlanNode extends \Google\Protobuf\Internal\Message
      * @param  array  $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @var QueryPlanNode\SequenceNode $sequence
-     *     @var QueryPlanNode\ParallelNode $parallel
-     *     @var QueryPlanNode\FetchNode $fetch
-     *     @var QueryPlanNode\FlattenNode $flatten
-     *     @var QueryPlanNode\DeferNode $defer
-     *     @var QueryPlanNode\ConditionNode $condition
+     *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\SequenceNode $sequence
+     *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\ParallelNode $parallel
+     *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\FetchNode $fetch
+     *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\FlattenNode $flatten
+     *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\DeferNode $defer
+     *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\ConditionNode $condition
      * }
      */
     public function __construct($data = null)
@@ -41,7 +41,7 @@ class QueryPlanNode extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.Trace.QueryPlanNode.SequenceNode sequence = 1 [json_name = "sequence"];</code>.
      *
-     * @return QueryPlanNode\SequenceNode|null
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\SequenceNode|null
      */
     public function getSequence()
     {
@@ -56,7 +56,7 @@ class QueryPlanNode extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.Trace.QueryPlanNode.SequenceNode sequence = 1 [json_name = "sequence"];</code>.
      *
-     * @param  QueryPlanNode\SequenceNode  $var
+     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\SequenceNode  $var
      *
      * @return $this
      */
@@ -71,7 +71,7 @@ class QueryPlanNode extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.Trace.QueryPlanNode.ParallelNode parallel = 2 [json_name = "parallel"];</code>.
      *
-     * @return QueryPlanNode\ParallelNode|null
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\ParallelNode|null
      */
     public function getParallel()
     {
@@ -86,7 +86,7 @@ class QueryPlanNode extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.Trace.QueryPlanNode.ParallelNode parallel = 2 [json_name = "parallel"];</code>.
      *
-     * @param  QueryPlanNode\ParallelNode  $var
+     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\ParallelNode  $var
      *
      * @return $this
      */
@@ -101,7 +101,7 @@ class QueryPlanNode extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.Trace.QueryPlanNode.FetchNode fetch = 3 [json_name = "fetch"];</code>.
      *
-     * @return QueryPlanNode\FetchNode|null
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\FetchNode|null
      */
     public function getFetch()
     {
@@ -116,7 +116,7 @@ class QueryPlanNode extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.Trace.QueryPlanNode.FetchNode fetch = 3 [json_name = "fetch"];</code>.
      *
-     * @param  QueryPlanNode\FetchNode  $var
+     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\FetchNode  $var
      *
      * @return $this
      */
@@ -131,7 +131,7 @@ class QueryPlanNode extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.Trace.QueryPlanNode.FlattenNode flatten = 4 [json_name = "flatten"];</code>.
      *
-     * @return QueryPlanNode\FlattenNode|null
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\FlattenNode|null
      */
     public function getFlatten()
     {
@@ -146,7 +146,7 @@ class QueryPlanNode extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.Trace.QueryPlanNode.FlattenNode flatten = 4 [json_name = "flatten"];</code>.
      *
-     * @param  QueryPlanNode\FlattenNode  $var
+     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\FlattenNode  $var
      *
      * @return $this
      */
@@ -161,7 +161,7 @@ class QueryPlanNode extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.Trace.QueryPlanNode.DeferNode defer = 5 [json_name = "defer"];</code>.
      *
-     * @return QueryPlanNode\DeferNode|null
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\DeferNode|null
      */
     public function getDefer()
     {
@@ -176,7 +176,7 @@ class QueryPlanNode extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.Trace.QueryPlanNode.DeferNode defer = 5 [json_name = "defer"];</code>.
      *
-     * @param  QueryPlanNode\DeferNode  $var
+     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\DeferNode  $var
      *
      * @return $this
      */
@@ -191,7 +191,7 @@ class QueryPlanNode extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.Trace.QueryPlanNode.ConditionNode condition = 6 [json_name = "condition"];</code>.
      *
-     * @return QueryPlanNode\ConditionNode|null
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\ConditionNode|null
      */
     public function getCondition()
     {
@@ -206,7 +206,7 @@ class QueryPlanNode extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.Trace.QueryPlanNode.ConditionNode condition = 6 [json_name = "condition"];</code>.
      *
-     * @param  QueryPlanNode\ConditionNode  $var
+     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode\ConditionNode  $var
      *
      * @return $this
      */

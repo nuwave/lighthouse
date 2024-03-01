@@ -176,7 +176,7 @@ class Trace extends \Google\Protobuf\Internal\Message
      *     @var int|string $duration_ns
      *           High precision duration of the trace; may not equal end_time-start_time
      *           (eg, if your machine's clock changed during the trace)
-     *     @var Trace\Node $root
+     *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Node $root
      *           A tree containing information about all resolvers run directly by this
      *           service, including errors
      *     @var bool $is_incomplete
@@ -203,14 +203,14 @@ class Trace extends \Google\Protobuf\Internal\Message
      *           can include reference to the operation being sent for users to dig into the set of operations
      *           that are failing validation
      *     @var string $unexecutedOperationName
-     *     @var Trace\Details $details
+     *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Details $details
      *     @var string $client_name
      *     @var string $client_version
      *     @var string $operation_type
      *     @var string $operation_subtype
-     *     @var Trace\HTTP $http
-     *     @var Trace\CachePolicy $cache_policy
-     *     @var Trace\QueryPlanNode $query_plan
+     *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\HTTP $http
+     *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\CachePolicy $cache_policy
+     *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode $query_plan
      *           If this Trace was created by a Router/Gateway, this is the query plan, including
      *           sub-Traces for subgraphs. Note that the 'root' tree on the
      *           top-level Trace won't contain any resolvers (though it could contain errors
@@ -358,7 +358,7 @@ class Trace extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.Trace.Node root = 14 [json_name = "root"];</code>
      *
-     * @return Trace\Node|null
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Node|null
      */
     public function getRoot()
     {
@@ -381,7 +381,7 @@ class Trace extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.Trace.Node root = 14 [json_name = "root"];</code>
      *
-     * @param  Trace\Node  $var
+     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Node  $var
      *
      * @return $this
      */
@@ -542,7 +542,7 @@ class Trace extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.Trace.Details details = 6 [json_name = "details"];</code>.
      *
-     * @return Trace\Details|null
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Details|null
      */
     public function getDetails()
     {
@@ -562,7 +562,7 @@ class Trace extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.Trace.Details details = 6 [json_name = "details"];</code>.
      *
-     * @param  Trace\Details  $var
+     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Details  $var
      *
      * @return $this
      */
@@ -677,7 +677,7 @@ class Trace extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.Trace.HTTP http = 10 [json_name = "http"];</code>.
      *
-     * @return Trace\HTTP|null
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\HTTP|null
      */
     public function getHttp()
     {
@@ -697,7 +697,7 @@ class Trace extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.Trace.HTTP http = 10 [json_name = "http"];</code>.
      *
-     * @param  Trace\HTTP  $var
+     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\HTTP  $var
      *
      * @return $this
      */
@@ -712,7 +712,7 @@ class Trace extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.Trace.CachePolicy cache_policy = 18 [json_name = "cachePolicy"];</code>.
      *
-     * @return Trace\CachePolicy|null
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\CachePolicy|null
      */
     public function getCachePolicy()
     {
@@ -732,7 +732,7 @@ class Trace extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.Trace.CachePolicy cache_policy = 18 [json_name = "cachePolicy"];</code>.
      *
-     * @param  Trace\CachePolicy  $var
+     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\CachePolicy  $var
      *
      * @return $this
      */
@@ -752,7 +752,7 @@ class Trace extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.Trace.QueryPlanNode query_plan = 26 [json_name = "queryPlan"];</code>
      *
-     * @return Trace\QueryPlanNode|null
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode|null
      */
     public function getQueryPlan()
     {
@@ -777,7 +777,7 @@ class Trace extends \Google\Protobuf\Internal\Message
      *
      * Generated from protobuf field <code>.Trace.QueryPlanNode query_plan = 26 [json_name = "queryPlan"];</code>
      *
-     * @param  Trace\QueryPlanNode  $var
+     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode  $var
      *
      * @return $this
      */

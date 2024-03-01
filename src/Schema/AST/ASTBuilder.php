@@ -220,8 +220,7 @@ class ASTBuilder
     protected function assertExtensionMatchesDefinition(
         ObjectTypeExtensionNode|InputObjectTypeExtensionNode|InterfaceTypeExtensionNode|ScalarTypeExtensionNode|EnumTypeExtensionNode|UnionTypeExtensionNode $extension,
         ObjectTypeDefinitionNode|InputObjectTypeDefinitionNode|InterfaceTypeDefinitionNode|ScalarTypeDefinitionNode|EnumTypeDefinitionNode|UnionTypeDefinitionNode $definition,
-    ): void
-    {
+    ): void {
         if (static::EXTENSION_TO_DEFINITION_CLASS[$extension::class] !== $definition::class) {
             throw new DefinitionException("The type extension {$extension->name->value} of kind {$extension->kind} can not extend a definition of kind {$definition->kind}.");
         }

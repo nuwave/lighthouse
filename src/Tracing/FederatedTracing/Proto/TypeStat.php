@@ -4,6 +4,7 @@
 
 namespace Nuwave\Lighthouse\Tracing\FederatedTracing\Proto;
 
+use Google\Protobuf\Internal\GPBType;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
@@ -57,7 +58,7 @@ class TypeStat extends \Google\Protobuf\Internal\Message
      */
     public function setPerFieldStat($var)
     {
-        $arr = GPBUtil::checkMapField($var, \Google\Protobuf\Internal\GPBType::STRING, \Google\Protobuf\Internal\GPBType::MESSAGE, FieldStat::class);
+        $arr = GPBUtil::checkMapField($var, GPBType::STRING, GPBType::MESSAGE, FieldStat::class);
         $this->per_field_stat = $arr;
 
         return $this;
