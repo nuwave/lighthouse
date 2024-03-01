@@ -18,8 +18,6 @@ use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\RootType;
 use Tests\TestCase;
 
-use function assert;
-
 final class ASTBuilderTest extends TestCase
 {
     protected ASTBuilder $astBuilder;
@@ -59,7 +57,7 @@ final class ASTBuilderTest extends TestCase
         $directive = new class() extends BaseDirective {
             public static function definition(): string
             {
-                return /** @lang GraphQL */ 'directive @foo on OBJECT';
+                return /** @lang GraphQL */ 'directive @foo repeatable on OBJECT';
             }
         };
 
@@ -144,7 +142,7 @@ final class ASTBuilderTest extends TestCase
         $directive = new class() extends BaseDirective {
             public static function definition(): string
             {
-                return /** @lang GraphQL */ 'directive @foo on INPUT_OBJECT';
+                return /** @lang GraphQL */ 'directive @foo repeatable on INPUT_OBJECT';
             }
         };
 
@@ -196,7 +194,7 @@ final class ASTBuilderTest extends TestCase
         $directive = new class() extends BaseDirective {
             public static function definition(): string
             {
-                return /** @lang GraphQL */ 'directive @foo on INTERFACE';
+                return /** @lang GraphQL */ 'directive @foo repeatable on INTERFACE';
             }
         };
 
@@ -225,7 +223,7 @@ final class ASTBuilderTest extends TestCase
         $directive = new class() extends BaseDirective {
             public static function definition(): string
             {
-                return /** @lang GraphQL */ 'directive @foo on SCALAR';
+                return /** @lang GraphQL */ 'directive @foo repeatable on SCALAR';
             }
         };
 
@@ -276,7 +274,7 @@ final class ASTBuilderTest extends TestCase
         $directive = new class() extends BaseDirective {
             public static function definition(): string
             {
-                return /** @lang GraphQL */ 'directive @foo on ENUM';
+                return /** @lang GraphQL */ 'directive @foo repeatable on ENUM';
             }
         };
 
@@ -327,7 +325,7 @@ final class ASTBuilderTest extends TestCase
         $directive = new class() extends BaseDirective {
             public static function definition(): string
             {
-                return /** @lang GraphQL */ 'directive @foo on SCALAR';
+                return /** @lang GraphQL */ 'directive @foo repeatable on SCALAR';
             }
         };
 
