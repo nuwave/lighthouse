@@ -1,5 +1,5 @@
 blank_issues_enabled: false
 contact_links:
-  - name: GitHub Discussions
-    url: https://github.com/nuwave/lighthouse/discussions
-    about: Please ask and answer questions here.
+  - name: Support question
+    url: https://github.com/nuwave/lighthouse/discussions/new?category=q-a
+    about: Use GitHub discussions to ask and answer support questions
