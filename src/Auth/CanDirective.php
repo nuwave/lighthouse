@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
+use Nuwave\Lighthouse\Exceptions\ClientSafeModelNotFoundException;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\Resolved;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
@@ -217,7 +218,7 @@ GRAPHQL;
                     ? $enhancedBuilder->findOrFail($findValue)
                     : $enhancedBuilder->find($findValue);
             } catch (ModelNotFoundException $modelNotFoundException) {
-                throw new Error($modelNotFoundException->getMessage());
+                throw new ClientSafeModelNotFoundException($modelNotFoundException->getMessage(), previous: $modelNotFoundException);
             }
 
             if ($modelOrModels instanceof Model) {

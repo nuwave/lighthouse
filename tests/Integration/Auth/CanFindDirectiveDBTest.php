@@ -2,8 +2,10 @@
 
 namespace Auth;
 
+use GraphQL\Error\Error;
 use Nuwave\Lighthouse\Auth\CanDirective;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
+use Nuwave\Lighthouse\Exceptions\ClientSafeModelNotFoundException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
@@ -126,6 +128,44 @@ final class CanFindDirectiveDBTest extends DBTestCase
                 ],
             ],
         ]);
+    }
+
+    public function testThrowsCustomExceptionWhenFailsToFindModel(): void
+    {
+        $user = new User();
+        $user->name = UserPolicy::ADMIN;
+        $this->be($user);
+
+        $this->mockResolverExpects(
+            $this->never(),
+        );
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            user(id: ID! @whereKey): User
+                @canFind(ability: "view", find: "id")
+                @mock
+        }
+
+        type User {
+            name: String!
+        }
+        ';
+
+        $this->rethrowGraphQLErrors();
+
+        try {
+            $this->graphQL(/** @lang GraphQL */ '
+            {
+                user(id: "not-present") {
+                    name
+                }
+            }
+            ');
+        } catch (Error $error) {
+            $this->assertNotEmpty($error->getPrevious());
+            $this->assertEquals(ClientSafeModelNotFoundException::class, get_class($error->getPrevious()));
+        }
     }
 
     public function testFailsToFindSpecificModelConcealException(): void
