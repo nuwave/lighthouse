@@ -81,8 +81,9 @@ proto/update-reports:
 
 .PHONY: proto
 proto:
-	docker run --rm --volume ".:/tmp" --workdir /tmp bufbuild/buf generate
-	${dcphp} rm -rf src/Tracing/FederatedTracing/Proto
-	${dcphp} mv proto-tmp/Nuwave/Lighthouse/Tracing/FederatedTracing/Proto src/Tracing/FederatedTracing/Proto
-	${dcphp} rm -rf proto-tmp
+	docker run --rm --volume=.:/workdir --workdir=/workdir --pull=always bufbuild/buf generate
+	rm -rf src/Tracing/FederatedTracing/Proto
+	sudo chown --recursive "$(shell id -u):$(shell id -g)" proto-tmp
+	mv proto-tmp/Nuwave/Lighthouse/Tracing/FederatedTracing/Proto src/Tracing/FederatedTracing/Proto
+	rm -rf proto-tmp
 	$(MAKE) php-cs-fixer
