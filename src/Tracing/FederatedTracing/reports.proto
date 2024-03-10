@@ -286,11 +286,11 @@ message Trace {
   double field_execution_weight = 31;
 
 
-
   // removed: Node parse = 12; Node validate = 13;
   //          Id128 server_id = 1; Id128 client_id = 2;
   //          String client_reference_id = 23; String client_address = 9;
-  reserved 1, 2, 9, 12, 13, 23;
+  //          29 and 30 were internal fields.
+  reserved 1, 2, 9, 12, 13, 23, 29, 30;
 }
 
 // The `service` value embedded within the header key is not guaranteed to contain an actual service,
@@ -439,8 +439,6 @@ message ReferencedFieldsForType {
   bool is_interface = 2;
 }
 
-
-
 // This is the top-level message used by Apollo Server, Apollo Router, and other libraries to report usage information
 // to Apollo. This message consists of traces and stats for operations. By default, each individual operation execution
 // should be either represented as a trace or within stats, but not both. However if the "traces_pre_aggregated" field
@@ -493,6 +491,7 @@ message ContextualizedStats {
   // field executions and thus only reflects operations for which field-level tracing occurred.
   map<string, TypeStat> per_type_stat = 3;
 
+  reserved 4, 5;
 }
 
 message QueryMetadata {
