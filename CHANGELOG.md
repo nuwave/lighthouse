@@ -9,7 +9,11 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
-- Add `ClientSafeModelNotFoundException` to wrap original exception in `@can` and `@canFind`
+## v6.35.0
+
+### Added
+
+- Add `ClientSafeModelNotFoundException` to wrap original exception in `@can` and `@canFind` https://github.com/nuwave/lighthouse/pull/2522
 
 ## v6.34.1
 
