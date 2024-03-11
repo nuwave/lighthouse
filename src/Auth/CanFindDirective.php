@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Arr;
+use Nuwave\Lighthouse\Exceptions\ClientSafeModelNotFoundException;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\SoftDeletes\ForceDeleteDirective;
 use Nuwave\Lighthouse\SoftDeletes\RestoreDirective;
@@ -115,7 +116,7 @@ GRAPHQL;
                 ? $enhancedBuilder->findOrFail($findValue)
                 : $enhancedBuilder->find($findValue);
         } catch (ModelNotFoundException $modelNotFoundException) {
-            throw new Error($modelNotFoundException->getMessage());
+            throw ClientSafeModelNotFoundException::fromLaravel($modelNotFoundException);
         }
 
         if ($modelOrModels instanceof Model) {
