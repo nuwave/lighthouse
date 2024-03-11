@@ -116,7 +116,7 @@ GRAPHQL;
                 ? $enhancedBuilder->findOrFail($findValue)
                 : $enhancedBuilder->find($findValue);
         } catch (ModelNotFoundException $modelNotFoundException) {
-            throw new ClientSafeModelNotFoundException($modelNotFoundException->getMessage(), previous: $modelNotFoundException);
+            throw ClientSafeModelNotFoundException::fromLaravel($modelNotFoundException);
         }
 
         if ($modelOrModels instanceof Model) {

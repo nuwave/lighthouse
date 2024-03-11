@@ -126,8 +126,10 @@ final class CanDirectiveDBTest extends DBTestCase
             }
             ');
         } catch (Error $error) {
-            $this->assertNotEmpty($error->getPrevious());
-            $this->assertEquals(ClientSafeModelNotFoundException::class, get_class($error->getPrevious()));
+            $previous = $error->getPrevious();
+
+            $this->assertNotNull($previous);
+            $this->assertSame(ClientSafeModelNotFoundException::class, get_class($previous));
         }
     }
 
