@@ -93,6 +93,7 @@ final class CanDirectiveDBTest extends DBTestCase
             ],
         ]);
     }
+
     public function testThrowsCustomExceptionWhenFailsToFindModel(): void
     {
         $user = new User();
