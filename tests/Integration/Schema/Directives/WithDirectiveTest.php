@@ -60,7 +60,7 @@ final class WithDirectiveTest extends DBTestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            users: User @first
+            user: User @first
         }
 
         type User {
@@ -92,13 +92,13 @@ final class WithDirectiveTest extends DBTestCase
 
         $this->graphQL(/** @lang GraphQL */ '
         {
-            users {
+            user {
                 postsCommentsLoaded
             }
         }
         ')->assertJson([
             'data' => [
-                'users' => [
+                'user' => [
                     'postsCommentsLoaded' => true,
                 ],
             ],
@@ -247,8 +247,7 @@ final class WithDirectiveTest extends DBTestCase
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            users: User
-                @first
+            user: User @first
         }
 
         type User {
@@ -287,13 +286,13 @@ final class WithDirectiveTest extends DBTestCase
 
         $this->graphQL(/** @lang GraphQL */ '
         {
-            users {
+            user {
                 tasksAndPostsCommentsLoaded
             }
         }
         ')->assertJson([
             'data' => [
-                'users' => [
+                'user' => [
                     'tasksAndPostsCommentsLoaded' => true,
                 ],
             ],
@@ -302,15 +301,9 @@ final class WithDirectiveTest extends DBTestCase
 
     public function testEagerLoadsMultipleNestedRelationsAtOnce(): void
     {
-        $eloquentCollection = \Illuminate\Database\Eloquent\Collection::class;
-        $simpleModelsLoader = \Nuwave\Lighthouse\Execution\ModelsLoader\SimpleModelsLoader::class;
-        $this->markTestSkipped("Not working due to the current naive usage of {$eloquentCollection}::load() in {$simpleModelsLoader}::load().");
-
-        // @phpstan-ignore-next-line unreachable due to markTestSkipped
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            users: User
-                @first
+            user: User @first
         }
 
         type User {
@@ -361,13 +354,13 @@ final class WithDirectiveTest extends DBTestCase
 
         $this->graphQL(/** @lang GraphQL */ '
         {
-            users {
+            user {
                 postTasksAndPostsCommentsLoaded
             }
         }
         ')->assertJson([
             'data' => [
-                'users' => [
+                'user' => [
                     'postTasksAndPostsCommentsLoaded' => true,
                 ],
             ],
