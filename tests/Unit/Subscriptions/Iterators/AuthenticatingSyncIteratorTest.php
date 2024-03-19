@@ -96,6 +96,11 @@ final class AuthenticatingSyncIteratorAuthenticatableStub implements Authenticat
         return '';
     }
 
+    public function getAuthPasswordName()
+    {
+        return '';
+    }
+
     public function getRememberToken()
     {
         return '';
