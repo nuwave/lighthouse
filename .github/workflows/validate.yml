@@ -30,6 +30,7 @@ jobs:
         laravel-version:
           - "^9"
           - "^10"
+          - "^11"
         composer:
           - name: lowest
             arg: "--prefer-lowest --prefer-stable"
@@ -38,6 +39,8 @@ jobs:
         exclude:
           - php-version: "8.0"
             laravel-version: "^10"
+          - php-version: "8.0"
+            laravel-version: "^11"
 
     steps:
       - uses: actions/checkout@v3
@@ -86,6 +89,7 @@ jobs:
         laravel-version:
           - "^9"
           - "^10"
+          - "^11"
         os:
           - ubuntu-latest
         composer:
@@ -96,6 +100,8 @@ jobs:
         exclude:
           - php-version: "8.0"
             laravel-version: "^10"
+          - php-version: "8.0"
+            laravel-version: "^11"
 
     services:
       mysql:
