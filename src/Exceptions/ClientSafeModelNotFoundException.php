@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 /**
  * @template TModel of \Illuminate\Database\Eloquent\Model
+ *
  * @extends ModelNotFoundException<TModel>
  */
 class ClientSafeModelNotFoundException extends ModelNotFoundException implements ClientAware
@@ -18,6 +19,7 @@ class ClientSafeModelNotFoundException extends ModelNotFoundException implements
 
     /**
      * @param  ModelNotFoundException<TModel>  $laravelException
+     *
      * @return self<TModel>
      */
     public static function fromLaravel(ModelNotFoundException $laravelException): self
