@@ -52,7 +52,6 @@
         "larastan/larastan": "^2.6.1",
         "laravel/framework": "^11",
         "laravel/legacy-factories": "^1.1.1",
-        "laravel/lumen-framework": "^9 || ^10 || dev-master",
         "laravel/pennant": "^1",
         "laravel/scout": "^8 || ^9 || ^10 || ^11",
         "mattiasgeniar/phpunit-query-count-assertions": "^1.1",
