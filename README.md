@@ -16,9 +16,6 @@
 [![Latest Stable Version](https://poser.pugx.org/nuwave/lighthouse/v/stable)](https://packagist.org/packages/nuwave/lighthouse)
 [![GitHub license](https://img.shields.io/github/license/nuwave/lighthouse.svg)](https://github.com/nuwave/lighthouse/blob/master/LICENSE)
 
-[![Ask on Stack Overflow](https://img.shields.io/badge/StackOverflow-ask-orange.svg)](https://stackoverflow.com/questions/tagged/laravel-lighthouse)
-[![Get on Slack](https://img.shields.io/badge/Slack-join-blueviolet.svg)](https://join.slack.com/t/lighthouse-php/shared_invite/zt-4sm280w1-wu21r94f3kLRRtBXRbXVfw)
-
 **A framework for serving GraphQL from Laravel**
 
 </div>
@@ -37,8 +34,8 @@ at that point in the git history: `https://github.com/nuwave/lighthouse/tree/<SP
 
 ## Get involved
 
-- Have a question? [Use the laravel-lighthouse tag on Stack Overflow](https://stackoverflow.com/questions/tagged/laravel-lighthouse)
-- Talk to other users? [Hop into Slack](https://join.slack.com/t/lighthouse-php/shared_invite/zt-4sm280w1-wu21r94f3kLRRtBXRbXVfw)
+- Have a question? [Get your answer using GitHub discussions](https://github.com/nuwave/lighthouse/discussions/new?category=q-a)
+- Talk to other users? [Start a discussion](https://github.com/nuwave/lighthouse/discussions/new?category=general)
 - Found a bug? [Report a bug](https://github.com/nuwave/lighthouse/issues/new?template=bug_report.md)
 - Have an idea? [Propose a feature](https://github.com/nuwave/lighthouse/issues/new?template=feature_proposal.md)
 - Want to improve Lighthouse? [Read our contribution guidelines](https://github.com/nuwave/lighthouse/blob/master/CONTRIBUTING.md)

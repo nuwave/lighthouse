@@ -73,7 +73,7 @@ class GraphQL
         GraphQLContext $context,
         ?array $variables = [],
         mixed $root = null,
-        string $operationName = null,
+        ?string $operationName = null,
     ): array {
         try {
             $parsedQuery = $this->parse($query);
@@ -87,13 +87,9 @@ class GraphQL
     }
 
     /**
-     * Execute a GraphQL query on the Lighthouse schema and return the raw result.
+     * Execute a GraphQL query on the Lighthouse schema and return the serializable result.
      *
      * @api
-     *
-     * To render the @see ExecutionResult
-     * you will probably want to call `->toArray($debug)` on it,
-     * with $debug being a combination of flags in @see DebugFlag
      *
      * @param  array<string, mixed>|null  $variables
      *
@@ -104,7 +100,7 @@ class GraphQL
         GraphQLContext $context,
         ?array $variables = [],
         mixed $root = null,
-        string $operationName = null,
+        ?string $operationName = null,
     ): array {
         // Building the executable schema might take a while to do,
         // so we do it before we fire the StartExecution event.

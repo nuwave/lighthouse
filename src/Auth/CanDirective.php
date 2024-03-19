@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
+use Nuwave\Lighthouse\Exceptions\ClientSafeModelNotFoundException;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\Resolved;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
@@ -74,6 +75,8 @@ directive @can(
 
   You may pass arbitrary GraphQL literals,
   e.g.: [1, 2, 3] or { foo: "bar" }
+
+  CanArgs pseudo-scalar is defined in BaseCanDirective.
   """
   args: CanArgs
 
@@ -112,11 +115,6 @@ directive @can(
   """
   root: Boolean! = false
 ) repeatable on FIELD_DEFINITION
-
-"""
-Any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
-"""
-scalar CanArgs
 GRAPHQL;
     }
 
@@ -220,7 +218,7 @@ GRAPHQL;
                     ? $enhancedBuilder->findOrFail($findValue)
                     : $enhancedBuilder->find($findValue);
             } catch (ModelNotFoundException $modelNotFoundException) {
-                throw new Error($modelNotFoundException->getMessage());
+                throw ClientSafeModelNotFoundException::fromLaravel($modelNotFoundException);
             }
 
             if ($modelOrModels instanceof Model) {

@@ -7,11 +7,14 @@ use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\NodeKind;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Schema\DirectiveLocator;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\RootType;
 use Tests\TestCase;
 
@@ -47,6 +50,35 @@ final class ASTBuilderTest extends TestCase
         assert($queryType instanceof ObjectTypeDefinitionNode);
 
         $this->assertCount(3, $queryType->fields);
+    }
+
+    public function testMergeTypeExtensionDirectives(): void
+    {
+        $directive = new class() extends BaseDirective {
+            public static function definition(): string
+            {
+                return /** @lang GraphQL */ 'directive @foo repeatable on OBJECT';
+            }
+        };
+
+        $directiveLocator = $this->app->make(DirectiveLocator::class);
+        $directiveLocator->setResolved('foo', $directive::class);
+
+        $this->schema = /** @lang GraphQL */ '
+        type MyType {
+            field: String
+        }
+
+        extend type MyType @foo
+
+        extend type MyType @foo
+        ';
+        $documentAST = $this->astBuilder->documentAST();
+
+        $myType = $documentAST->types['MyType'];
+        assert($myType instanceof ObjectTypeDefinitionNode);
+
+        $this->assertCount(2, $myType->directives);
     }
 
     public function testAllowsExtendingUndefinedRootTypes(): void
@@ -105,6 +137,35 @@ final class ASTBuilderTest extends TestCase
         $this->assertCount(3, $inputs->fields);
     }
 
+    public function testMergeInputExtensionDirectives(): void
+    {
+        $directive = new class() extends BaseDirective {
+            public static function definition(): string
+            {
+                return /** @lang GraphQL */ 'directive @foo repeatable on INPUT_OBJECT';
+            }
+        };
+
+        $directiveLocator = $this->app->make(DirectiveLocator::class);
+        $directiveLocator->setResolved('foo', $directive::class);
+
+        $this->schema = /** @lang GraphQL */ '
+        input MyInput {
+            field: String
+        }
+
+        extend input MyInput @foo
+
+        extend input MyInput @foo
+        ';
+        $documentAST = $this->astBuilder->documentAST();
+
+        $myInput = $documentAST->types['MyInput'];
+        assert($myInput instanceof InputObjectTypeDefinitionNode);
+
+        $this->assertCount(2, $myInput->directives);
+    }
+
     public function testMergeInterfaceExtensionFields(): void
     {
         $this->schema = /** @lang GraphQL */ '
@@ -126,6 +187,62 @@ final class ASTBuilderTest extends TestCase
         assert($named instanceof InterfaceTypeDefinitionNode);
 
         $this->assertCount(3, $named->fields);
+    }
+
+    public function testMergeInterfaceExtensionDirectives(): void
+    {
+        $directive = new class() extends BaseDirective {
+            public static function definition(): string
+            {
+                return /** @lang GraphQL */ 'directive @foo repeatable on INTERFACE';
+            }
+        };
+
+        $directiveLocator = $this->app->make(DirectiveLocator::class);
+        $directiveLocator->setResolved('foo', $directive::class);
+
+        $this->schema = /** @lang GraphQL */ '
+        interface MyInterface {
+            field: String
+        }
+
+        extend interface MyInterface @foo
+
+        extend interface MyInterface @foo
+        ';
+        $documentAST = $this->astBuilder->documentAST();
+
+        $myInterface = $documentAST->types['MyInterface'];
+        assert($myInterface instanceof InterfaceTypeDefinitionNode);
+
+        $this->assertCount(2, $myInterface->directives);
+    }
+
+    public function testMergeScalarExtensionDirectives(): void
+    {
+        $directive = new class() extends BaseDirective {
+            public static function definition(): string
+            {
+                return /** @lang GraphQL */ 'directive @foo repeatable on SCALAR';
+            }
+        };
+
+        $directiveLocator = $this->app->make(DirectiveLocator::class);
+        $directiveLocator->setResolved('foo', $directive::class);
+
+        $this->schema = /** @lang GraphQL */ '
+        scalar MyScalar
+
+        extend scalar MyScalar @foo
+
+        extend scalar MyScalar @foo
+        ';
+        $documentAST = $this->astBuilder->documentAST();
+
+        $myScalar = $documentAST->types['MyScalar'];
+        assert($myScalar instanceof ScalarTypeDefinitionNode);
+
+        $this->assertCount(2, $myScalar->directives);
     }
 
     public function testMergeEnumExtensionFields(): void
@@ -152,6 +269,36 @@ final class ASTBuilderTest extends TestCase
         $this->assertCount(4, $myEnum->values);
     }
 
+    public function testMergeEnumExtensionDirectives(): void
+    {
+        $directive = new class() extends BaseDirective {
+            public static function definition(): string
+            {
+                return /** @lang GraphQL */ 'directive @foo repeatable on ENUM';
+            }
+        };
+
+        $directiveLocator = $this->app->make(DirectiveLocator::class);
+        $directiveLocator->setResolved('foo', $directive::class);
+
+        $this->schema = /** @lang GraphQL */ '
+        enum MyEnum {
+            ONE
+            TWO
+        }
+
+        extend enum MyEnum @foo
+
+        extend enum MyEnum @foo
+        ';
+        $documentAST = $this->astBuilder->documentAST();
+
+        $myEnum = $documentAST->types['MyEnum'];
+        assert($myEnum instanceof EnumTypeDefinitionNode);
+
+        $this->assertCount(2, $myEnum->directives);
+    }
+
     public function testMergeUnionExtensionFields(): void
     {
         $this->schema = /** @lang GraphQL */ '
@@ -171,6 +318,26 @@ final class ASTBuilderTest extends TestCase
         assert($myUnion instanceof UnionTypeDefinitionNode);
 
         $this->assertCount(3, $myUnion->types);
+    }
+
+    public function testDoesNotAllowExtendingUndefinedScalar(): void
+    {
+        $directive = new class() extends BaseDirective {
+            public static function definition(): string
+            {
+                return /** @lang GraphQL */ 'directive @foo repeatable on SCALAR';
+            }
+        };
+
+        $directiveLocator = $this->app->make(DirectiveLocator::class);
+        $directiveLocator->setResolved('foo', $directive::class);
+
+        $this->schema = /** @lang GraphQL */ '
+        extend scalar MyScalar @foo
+        ';
+
+        $this->expectExceptionObject(new DefinitionException('Could not find a base definition MyScalar of kind ' . NodeKind::SCALAR_TYPE_EXTENSION . ' to extend.'));
+        $this->astBuilder->documentAST();
     }
 
     public function testDoesNotAllowExtendingUndefinedTypes(): void

@@ -4,6 +4,7 @@
 
 namespace Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace;
 
+use Google\Protobuf\Internal\GPBType;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
@@ -94,7 +95,7 @@ class Error extends \Google\Protobuf\Internal\Message
      */
     public function setLocation($var)
     {
-        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, Location::class);
+        $arr = GPBUtil::checkRepeatedField($var, GPBType::MESSAGE, Location::class);
         $this->location = $arr;
 
         return $this;

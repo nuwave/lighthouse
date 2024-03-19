@@ -4,6 +4,7 @@
 
 namespace Nuwave\Lighthouse\Tracing\FederatedTracing\Proto;
 
+use Google\Protobuf\Internal\GPBType;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
@@ -76,7 +77,7 @@ class Report extends \Google\Protobuf\Internal\Message
      * @param  array  $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @var ReportHeader $header
+     *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\ReportHeader $header
      *     @var array|\Google\Protobuf\Internal\MapField $traces_per_query
      *           If QueryMetadata isn't provided, this key should be a statsReportKey (# operationName\nsignature). If the operation
      *           name, signature, and persisted query IDs are provided in the QueryMetadata, and this operation was requested via a
@@ -110,7 +111,7 @@ class Report extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.ReportHeader header = 1 [json_name = "header"];</code>.
      *
-     * @return ReportHeader|null
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\ReportHeader|null
      */
     public function getHeader()
     {
@@ -130,7 +131,7 @@ class Report extends \Google\Protobuf\Internal\Message
     /**
      * Generated from protobuf field <code>.ReportHeader header = 1 [json_name = "header"];</code>.
      *
-     * @param  ReportHeader  $var
+     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\ReportHeader  $var
      *
      * @return $this
      */
@@ -169,7 +170,7 @@ class Report extends \Google\Protobuf\Internal\Message
      */
     public function setTracesPerQuery($var)
     {
-        $arr = GPBUtil::checkMapField($var, \Google\Protobuf\Internal\GPBType::STRING, \Google\Protobuf\Internal\GPBType::MESSAGE, TracesAndStats::class);
+        $arr = GPBUtil::checkMapField($var, GPBType::STRING, GPBType::MESSAGE, TracesAndStats::class);
         $this->traces_per_query = $arr;
 
         return $this;
@@ -278,7 +279,7 @@ class Report extends \Google\Protobuf\Internal\Message
      */
     public function setOperationCountByType($var)
     {
-        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, Report\OperationCountByType::class);
+        $arr = GPBUtil::checkRepeatedField($var, GPBType::MESSAGE, Report\OperationCountByType::class);
         $this->operation_count_by_type = $arr;
 
         return $this;

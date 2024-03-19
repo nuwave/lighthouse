@@ -21,7 +21,7 @@ final class TranslateDescriptionDirective extends BaseDirective implements Input
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Extends the description with automatic translations. 
+Extends the description with automatic translations.
 """
 directive @translateDescription on INPUT_FIELD_DEFINITION
 GRAPHQL;

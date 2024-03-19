@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Arr;
+use Nuwave\Lighthouse\Exceptions\ClientSafeModelNotFoundException;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\SoftDeletes\ForceDeleteDirective;
 use Nuwave\Lighthouse\SoftDeletes\RestoreDirective;
@@ -38,6 +39,12 @@ directive @canFind(
   You may pass the string in dot notation to use nested inputs.
   """
   find: String!
+
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model detection does not work.
+  """
+  model: String
 
   """
   Should the query fail when the models of `find` were not found?
@@ -109,7 +116,7 @@ GRAPHQL;
                 ? $enhancedBuilder->findOrFail($findValue)
                 : $enhancedBuilder->find($findValue);
         } catch (ModelNotFoundException $modelNotFoundException) {
-            throw new Error($modelNotFoundException->getMessage());
+            throw ClientSafeModelNotFoundException::fromLaravel($modelNotFoundException);
         }
 
         if ($modelOrModels instanceof Model) {

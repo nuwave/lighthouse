@@ -23,7 +23,7 @@ abstract class CanDirectiveTestBase extends TestCase
         ';
     }
 
-    protected function query(string $foo = null): TestResponse
+    protected function query(?string $foo = null): TestResponse
     {
         return $this->graphQL($this->getQuery(), ['foo' => $foo]);
     }

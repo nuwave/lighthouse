@@ -58,7 +58,7 @@ GRAPHQL;
      *
      * @param  array<string>  $guards
      */
-    protected function authenticatedUserID(array $guards): int|null|string
+    protected function authenticatedUserID(array $guards): int|string|null
     {
         foreach ($guards as $guard) {
             $id = $this->authFactory->guard($guard)

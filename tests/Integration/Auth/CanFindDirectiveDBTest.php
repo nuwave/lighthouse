@@ -2,8 +2,10 @@
 
 namespace Auth;
 
+use GraphQL\Error\Error;
 use Nuwave\Lighthouse\Auth\CanDirective;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
+use Nuwave\Lighthouse\Exceptions\ClientSafeModelNotFoundException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
@@ -50,6 +52,44 @@ final class CanFindDirectiveDBTest extends DBTestCase
         ]);
     }
 
+    public function testCustomModelName(): void
+    {
+        $admin = new User();
+        $admin->name = UserPolicy::ADMIN;
+        $this->be($admin);
+
+        $user = factory(User::class)->create();
+        assert($user instanceof User);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            account(id: ID! @whereKey): Account
+                @canFind(ability: "view", find: "id", model: "User")
+                @first(model: "User")
+        }
+
+        type Account {
+            name: String!
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($id: ID!) {
+            account(id: $id) {
+                name
+            }
+        }
+        ', [
+            'id' => $user->getKey(),
+        ])->assertJson([
+            'data' => [
+                'account' => [
+                    'name' => $user->name,
+                ],
+            ],
+        ]);
+    }
+
     public function testFailsToFindSpecificModel(): void
     {
         $user = new User();
@@ -88,6 +128,46 @@ final class CanFindDirectiveDBTest extends DBTestCase
                 ],
             ],
         ]);
+    }
+
+    public function testThrowsCustomExceptionWhenFailsToFindModel(): void
+    {
+        $user = new User();
+        $user->name = UserPolicy::ADMIN;
+        $this->be($user);
+
+        $this->mockResolverExpects(
+            $this->never(),
+        );
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            user(id: ID! @whereKey): User
+                @canFind(ability: "view", find: "id")
+                @mock
+        }
+
+        type User {
+            name: String!
+        }
+        ';
+
+        $this->rethrowGraphQLErrors();
+
+        try {
+            $this->graphQL(/** @lang GraphQL */ '
+            {
+                user(id: "not-present") {
+                    name
+                }
+            }
+            ');
+        } catch (Error $error) {
+            $previous = $error->getPrevious();
+
+            $this->assertNotNull($previous);
+            $this->assertSame(ClientSafeModelNotFoundException::class, get_class($previous));
+        }
     }
 
     public function testFailsToFindSpecificModelConcealException(): void

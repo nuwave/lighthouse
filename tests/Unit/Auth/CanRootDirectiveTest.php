@@ -111,7 +111,7 @@ final class CanRootDirectiveTest extends CanDirectiveTestBase
 
         $this->app
             ->make(Gate::class)
-            ->define('customObject', static fn (User $authorizedUser, object $root): bool => $authorizedUser === $user && $root == $return);
+            ->define('customObject', static fn (User $authorizedUser, object $root): bool => $authorizedUser === $user && $root === $return);
 
         $this->schema = $this->getSchema('ability: "customObject"');
 

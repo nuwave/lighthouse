@@ -27,10 +27,10 @@ final class RedisStorageManagerTest extends TestCase
      *
      * @return iterable<callback<mixed>>
      */
-    private static function withConsecutive(array $firstCallArguments, array ...$consecutiveCallsArguments): iterable
+    private function withConsecutive(array $firstCallArguments, array ...$consecutiveCallsArguments): iterable
     {
         foreach ($consecutiveCallsArguments as $consecutiveCallArguments) {
-            self::assertSameSize($firstCallArguments, $consecutiveCallArguments, 'Each expected arguments list need to have the same size.');
+            $this->assertSameSize($firstCallArguments, $consecutiveCallArguments, 'Each expected arguments list need to have the same size.');
         }
 
         $allConsecutiveCallsArguments = [$firstCallArguments, ...$consecutiveCallsArguments];

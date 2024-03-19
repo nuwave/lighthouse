@@ -65,7 +65,7 @@ class ScoutEnhancer
     }
 
     /** @param  (callable(\Nuwave\Lighthouse\Scout\ScoutBuilderDirective): bool)|null  $directiveFilter */
-    public function enhanceBuilder(callable $directiveFilter = null): ScoutBuilder
+    public function enhanceBuilder(?callable $directiveFilter = null): ScoutBuilder
     {
         $scoutBuilder = $this->builder instanceof ScoutBuilder
             ? $this->builder

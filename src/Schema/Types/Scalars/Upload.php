@@ -33,7 +33,7 @@ class Upload extends ScalarType
      * @param  \GraphQL\Language\AST\Node  $valueNode
      * @param  array<string, mixed>|null  $variables
      */
-    public function parseLiteral($valueNode, array $variables = null): void
+    public function parseLiteral($valueNode, ?array $variables = null): void
     {
         throw new Error('"Upload" cannot be hardcoded in a query. Be sure to conform to the GraphQL multipart request specification: https://github.com/jaydenseric/graphql-multipart-request-spec.');
     }

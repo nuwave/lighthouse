@@ -1,10 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Nuwave\Lighthouse\Subscriptions\Contracts;
+namespace Nuwave\Lighthouse\Support\Contracts;
 
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-
-interface ContextSerializer
+interface SerializesContext
 {
     /** Serialize the context. */
     public function serialize(GraphQLContext $context): string;

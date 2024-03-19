@@ -206,13 +206,11 @@ final class RelationBatchLoaderTest extends DBTestCase
         });
     }
 
-    /** @return array<array<bool|int>> */
-    public static function batchloadRelationsSetting(): array
+    /** @return iterable<array{bool, int}> */
+    public static function batchloadRelationsSetting(): iterable
     {
-        return [
-            [true, 2],
-            [false, 3],
-        ];
+        yield [true, 2];
+        yield [false, 3];
     }
 
     public function testCombineEagerLoadsThatAreTheSame(): void

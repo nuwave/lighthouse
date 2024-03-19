@@ -107,6 +107,7 @@
         "laravel": {
             "providers": [
                 "Nuwave\\Lighthouse\\LighthouseServiceProvider",
+                "Nuwave\\Lighthouse\\Async\\AsyncServiceProvider",
                 "Nuwave\\Lighthouse\\Auth\\AuthServiceProvider",
                 "Nuwave\\Lighthouse\\Cache\\CacheServiceProvider",
                 "Nuwave\\Lighthouse\\GlobalId\\GlobalIdServiceProvider",

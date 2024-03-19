@@ -4,6 +4,7 @@
 
 namespace Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace;
 
+use Google\Protobuf\Internal\GPBType;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
@@ -82,7 +83,7 @@ class Details extends \Google\Protobuf\Internal\Message
      */
     public function setVariablesJson($var)
     {
-        $arr = GPBUtil::checkMapField($var, \Google\Protobuf\Internal\GPBType::STRING, \Google\Protobuf\Internal\GPBType::STRING);
+        $arr = GPBUtil::checkMapField($var, GPBType::STRING, GPBType::STRING);
         $this->variables_json = $arr;
 
         return $this;

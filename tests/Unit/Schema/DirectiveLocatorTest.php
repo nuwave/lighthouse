@@ -72,7 +72,7 @@ final class DirectiveLocatorTest extends TestCase
             ->associated($fieldDefinition)
             ->first();
 
-        self::assertNotInstanceOf(BaseDirective::class, $directive);
+        $this->assertNotInstanceOf(BaseDirective::class, $directive);
     }
 
     public function testThrowsIfDirectiveNameCanNotBeResolved(): void

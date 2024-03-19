@@ -148,6 +148,30 @@ type Query {
 }
 ```
 
+## @async
+
+```graphql
+"""
+Defer the execution of mutations to [queued jobs](https://laravel.com/docs/queues).
+
+This directive must only be used on fields of the root mutation type.
+When the field is executed, a `Nuwave\Lighthouse\Async\AsyncMutation` job is dispatched
+and the value `true` is returned - thus the fields return type must be `Boolean!`.
+
+Once a [queue worker](https://laravel.com/docs/queues#running-the-queue-worker) picks up the job,
+it will actually execute the underlying field resolver.
+The result is not checked for errors, ensure your GraphQL error handling reports relevant exceptions.
+"""
+directive @async(
+  """
+  Name of the queue to dispatch the job on.
+  If not specified, jobs will be dispatched to the default queue.
+  See https://laravel.com/docs/queues#customizing-the-queue-and-connection.
+  """
+  queue: String
+) on FIELD_DEFINITION
+```
+
 ## @auth
 
 ```graphql
@@ -395,7 +419,7 @@ type RoleUserPivot {
 ```
 
 When using the `type` argument with pagination style `CONNECTION`, you may create your own [edge type](https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types)
-that contains the attributes of the intermediate table.
+that either contains the attributes of the intermediate table or contains a `pivot` field with the corresponding type.
 
 The custom edge type must contain at least the following two fields:
 
@@ -414,6 +438,24 @@ type RoleEdge {
   node: Role!
   cursor: String!
   meta: String
+}
+```
+
+As an alternative, you can also expose the `pivot` field on the edge:
+
+```graphql
+type User {
+  roles: [Role!]! @belongsToMany(type: CONNECTION)
+}
+
+type UserRole {
+  meta: String
+}
+
+type RoleEdge {
+  node: Role!
+  cursor: String!
+  pivot: UserRole
 }
 ```
 
@@ -608,11 +650,11 @@ Deprecated. Use the [@can\* family of directives](#can-family-of-directives) ins
 
 ## @can\* family of directives
 
-All @can\* directives have common arguments. These arguments specify how gates are checked and what to do if the user is not authorized.
+All `@can*` directives have common arguments. These arguments specify how gates are checked and what to do if the user is not authorized.
 Each directive has its own set of arguments that specify what to check against.
 
 ```graphql
-  """
+"""
 The ability to check permissions for.
 """
 ability: String!
@@ -687,6 +729,12 @@ directive @canFind(
   find: String!
 
   """
+  Specify the class name of the model to use.
+  This is only needed when the default model detection does not work.
+  """
+  model: String
+
+  """
   Should the query fail when the models of `find` were not found?
   """
   findOrFail: Boolean! = true
@@ -698,7 +746,7 @@ directive @canFind(
 ) repeatable on FIELD_DEFINITION
 ```
 
-### canModel
+### canRoot
 
 ```graphql
 """

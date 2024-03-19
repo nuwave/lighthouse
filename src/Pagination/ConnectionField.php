@@ -85,6 +85,10 @@ class ConnectionField
                         $data['node'] = $item;
                         break;
 
+                    case 'pivot':
+                        $data['pivot'] = $item->pivot;
+                        break;
+
                     default:
                         // All other fields on the return type are assumed to be part
                         // of the edge, so we try to locate them in the pivot attribute

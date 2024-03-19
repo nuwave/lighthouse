@@ -9,6 +9,69 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.35.0
+
+### Added
+
+- Add `ClientSafeModelNotFoundException` to wrap original exception in `@can` and `@canFind` https://github.com/nuwave/lighthouse/pull/2522
+
+## v6.34.1
+
+### Fixed
+
+- Fix `Date` scalar trying to parse `Illuminate\Support\Carbon` as `string` https://github.com/nuwave/lighthouse/pull/2470
+
+## v6.34.0
+
+### Added
+
+- Merge directives from Scalar/Enum/Type/Input/Interface extension node into target node https://github.com/nuwave/lighthouse/pull/2512
+
+## v6.33.4
+
+### Fixed
+
+- Fix stub for type resolvers used in `lighthouse:union` and `lighthouse:interface` artisan commands https://github.com/nuwave/lighthouse/pull/2518
+
+## v6.33.3
+
+### Fixed
+
+- Allow custom model name in `@canFind` https://github.com/nuwave/lighthouse/pull/2515
+
+## v6.33.2
+
+### Fixed
+
+- Fix `ThrottleDirective` to not reuse the first `Request` it had encountered https://github.com/nuwave/lighthouse/pull/2511
+
+## v6.33.1
+
+### Fixed
+
+- Remove duplicate `CanArgs` from directive definition https://github.com/nuwave/lighthouse/pull/2510
+
+## v6.33.0
+
+### Added
+
+- Expose pivot field on pagination edge https://github.com/nuwave/lighthouse/pull/2464
+
+## v6.32.0
+
+### Added
+
+- Add `@async` directive https://github.com/nuwave/lighthouse/pull/2501
+
+### Changed
+
+- Move and rename `Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer` to `Nuwave\Lighthouse\Support\Contracts\SerializesContext` https://github.com/nuwave/lighthouse/pull/2501
+- Do not bind `CreatesContext` and `CanStreamResponse` as singletons https://github.com/nuwave/lighthouse/pull/2501
+
+### Fixed
+
+- Fix parsing reserialized `LaravelEnumType` from `ResolveInfo::$variableValues` https://github.com/nuwave/lighthouse/pull/2501
+
 ## v6.31.1
 
 ### Fixed
