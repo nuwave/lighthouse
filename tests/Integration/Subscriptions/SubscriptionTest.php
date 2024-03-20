@@ -39,14 +39,24 @@ final class SubscriptionTest extends TestCase
             body: String @guard
         }
 
+        enum PostStatus {
+            PUBLISHED @enum(value: "published")
+            DELETED @enum(value: "deleted")
+        }
+
         type Subscription {
             onPostCreated: Post
+            onPostUpdated(status: PostStatus!): Post
         }
 
         type Mutation {
             createPost(title: String!, body: String): Post
                 @mock
                 @broadcast(subscription: "onPostCreated")
+
+            updatePost(post: String!): Post
+                @mock
+                @broadcast(subscription: "onPostUpdated")
         }
 
         type Query {
@@ -121,7 +131,6 @@ GRAPHQL;
         ');
 
         $broadcastManager = $this->app->make(BroadcastManager::class);
-
         $log = $broadcastManager->driver();
         assert($log instanceof LogBroadcaster);
 
@@ -190,6 +199,115 @@ GRAPHQL;
                 ],
             ],
         ]);
+    }
+
+    public function testSubscriptionWithEnumInputCorrectlyResolves(): void
+    {
+        $this->graphQL(/** @lang GraphQL */ '
+        subscription {
+            onPostUpdated(status: DELETED) {
+                body
+            }
+        }
+        ');
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            updatePost(post: "Foobar") {
+                body
+            }
+        }
+        ');
+
+        $broadcastManager = $this->app->make(BroadcastManager::class);
+        $log = $broadcastManager->driver();
+        assert($log instanceof LogBroadcaster);
+
+        $this->assertCount(1, $log->broadcasts());
+
+        $broadcasted = Arr::get(Arr::first($log->broadcasts()), 'data', []);
+        $this->assertArrayHasKey('onPostUpdated', $broadcasted);
+        $this->assertSame(['body' => 'Foobar'], $broadcasted['onPostUpdated']);
+    }
+
+    public function testSubscriptionWithEnumInputVariableCorrectlyResolves(): void
+    {
+        $this->postGraphQL([
+            'query' => /** @lang GraphQL */ '
+                subscription OnPostUpdated($status: PostStatus!) {
+                    onPostUpdated(status: $status) {
+                        body
+                    }
+                }
+            ',
+            'variables' => [
+                'status' => 'DELETED',
+            ],
+            'operationName' => 'OnPostUpdated',
+        ]);
+
+        $this->graphQL(/** @lang GraphQL */ '
+            mutation {
+                updatePost(post: "Foobar") {
+                    body
+                }
+            }
+        ');
+
+        $broadcastManager = $this->app->make(BroadcastManager::class);
+        $log = $broadcastManager->driver();
+        assert($log instanceof LogBroadcaster);
+
+        $this->assertCount(1, $log->broadcasts());
+
+        $broadcasted = Arr::get(Arr::first($log->broadcasts()), 'data', []);
+        $this->assertArrayHasKey('onPostUpdated', $broadcasted);
+        $this->assertSame(['body' => 'Foobar'], $broadcasted['onPostUpdated']);
+    }
+
+    public function testSubscriptionWithEnumInputCorrectlyResolvesUsingBatchedQuery(): void
+    {
+        $this
+            ->postGraphQL([
+                [
+                    'query' => /** @lang GraphQL */ '
+                        {
+                            bar
+                        }
+                    ',
+                ],
+                [
+                    'query' => /** @lang GraphQL */ '
+                        subscription OnPostUpdated($status: PostStatus!) {
+                            onPostUpdated(status: $status) {
+                                body
+                            }
+                        }
+                    ',
+                    'variables' => [
+                        'status' => 'DELETED',
+                    ],
+                    'operationName' => 'OnPostUpdated',
+                ],
+            ]);
+
+        $this->graphQL(/** @lang GraphQL */ '
+            mutation {
+                updatePost(post: "Foobar") {
+                    body
+                }
+            }
+        ');
+
+        $broadcastManager = $this->app->make(BroadcastManager::class);
+        $log = $broadcastManager->driver();
+        assert($log instanceof LogBroadcaster);
+
+        $this->assertCount(1, $log->broadcasts());
+
+        $broadcasted = Arr::get(Arr::first($log->broadcasts()), 'data', []);
+        $this->assertArrayHasKey('onPostUpdated', $broadcasted);
+        $this->assertSame(['body' => 'Foobar'], $broadcasted['onPostUpdated']);
     }
 
     public function testWithExcludeEmpty(): void
@@ -353,11 +471,11 @@ GRAPHQL;
      *
      * @return array<string, array<string, mixed>>
      */
-    protected function buildResponse(string $channelName, string $channel): array
+    protected function buildResponse(string $fieldName, string $channel): array
     {
         return [
             'data' => [
-                'onPostCreated' => null,
+                $fieldName => null,
             ],
             'extensions' => [
                 'lighthouse_subscriptions' => [
