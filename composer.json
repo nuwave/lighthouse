@@ -50,7 +50,7 @@
         "fakerphp/faker": "^1.21",
         "google/protobuf": "^3.21",
         "larastan/larastan": "^2.6.1",
-        "laravel/framework": "^11",
+        "laravel/framework": "^9 || ^10 || ^11",
         "laravel/legacy-factories": "^1.1.1",
         "laravel/pennant": "^1",
         "laravel/scout": "^8 || ^9 || ^10 || ^11",
