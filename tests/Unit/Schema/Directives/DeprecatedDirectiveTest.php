@@ -58,7 +58,7 @@ final class DeprecatedDirectiveTest extends TestCase
 
         $types = $withoutDeprecatedIntrospection->json('data.__schema.types');
         $foo = Arr::first($types, static fn (array $type): bool => $type['name'] === 'Foo');
-        $this->assertCount(1, $foo['enumValues']);
+        $this->assertCount(1, $foo['enumValues'] ?? 0);
 
         $includeDeprecatedIntrospection = $this->graphQL(
             $introspectionQuery,
@@ -85,6 +85,6 @@ final class DeprecatedDirectiveTest extends TestCase
 
         $types = $includeDeprecatedIntrospection->json('data.__schema.types');
         $foo = Arr::first($types, static fn (array $type): bool => $type['name'] === 'Foo');
-        $this->assertCount(2, $foo['enumValues']);
+        $this->assertCount(2, $foo['enumValues'] ?? 0);
     }
 }
