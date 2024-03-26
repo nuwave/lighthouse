@@ -82,5 +82,10 @@ parameters:
       - '#PHPDoc tag @var for variable \$router contains unknown class Laravel\\Lumen\\Routing\\Router\.#'
       - '#Call to method addRoute\(\) on an unknown class Laravel\\Lumen\\Routing\\Router\.#'
 
+  # Recent Mocker version do not account for the last arg possibly being a closure
+  - path: tests/Unit/Subscriptions/Iterators/AuthenticatingSyncIteratorTest.php
+    message: '#Parameter \#2 \.\.\.\$args of static method Mockery::mock\(\) expects array\|class-string<Nuwave\\Lighthouse\\Subscriptions\\SubscriptionGuard>\|Nuwave\\Lighthouse\\Subscriptions\\SubscriptionGuard, Closure given\.#'
+
+
 
 
