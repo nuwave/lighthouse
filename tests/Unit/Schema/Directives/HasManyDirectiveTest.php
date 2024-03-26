@@ -49,7 +49,7 @@ final class HasManyDirectiveTest extends DBTestCase
         );
         $this->assertSame(
             $expectedConnectionName,
-            $tasks['type']['ofType']['name'],
+            $tasks['type']['ofType']['name'] ?? 0,
         );
     }
 
