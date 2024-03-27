@@ -139,7 +139,7 @@ jobs:
       - name: "Remove conflicting dependencies that are not needed here"
         run: composer remove --dev --no-update larastan/larastan phpstan/phpstan-mockery phpbench/phpbench rector/rector
 
-      - if: matrix.laravel-version != '^10'
+      - if: matrix.laravel-version != '^10' && matrix.laravel-version != '^11'
         run: composer remove --dev --no-update laravel/pennant
 
       - run: >
