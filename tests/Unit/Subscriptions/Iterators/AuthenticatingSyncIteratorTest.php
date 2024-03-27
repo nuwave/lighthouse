@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Unit\Subscriptions\Iterators;
 
@@ -79,7 +81,9 @@ final class AuthenticatingSyncIteratorTest extends IteratorTestBase
 
 final class AuthenticatingSyncIteratorAuthenticatableStub implements Authenticatable
 {
-    public function __construct(private int $id) {}
+    public function __construct(private int $id)
+    {
+    }
 
     public function getAuthIdentifierName()
     {
@@ -91,24 +95,26 @@ final class AuthenticatingSyncIteratorAuthenticatableStub implements Authenticat
         return $this->id;
     }
 
-    public function getAuthPassword()
+    public function getAuthPassword(): string
     {
         return '';
     }
 
-    public function getAuthPasswordName()
+    public function getAuthPasswordName(): string
     {
         return '';
     }
 
-    public function getRememberToken()
+    public function getRememberToken(): string
     {
         return '';
     }
 
-    public function setRememberToken($value): void {}
+    public function setRememberToken($value): void
+    {
+    }
 
-    public function getRememberTokenName()
+    public function getRememberTokenName(): string
     {
         return '';
     }
