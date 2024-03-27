@@ -89,3 +89,9 @@ parameters:
   - path: tests/Integration/Schema/Directives/BuilderDirectiveTest.php
     message: '#Return type of call to static method Mockery::mock\(\) contains unresolvable type\.#'
 
+  # Laravel added generics to Arr::first in 11.x, not sure how to handle them for now.
+  - path: src/OrderBy/OrderByDirective.php
+    message: '#Unable to resolve the template type TValue in call to method static method Illuminate\\Support\\Arr::first\(\)#'
+  - path: src/Testing/TestResponseMixin.php
+    message: '#Unable to resolve the template type TValue in call to method static method Illuminate\\Support\\Arr::first\(\)#'
+
