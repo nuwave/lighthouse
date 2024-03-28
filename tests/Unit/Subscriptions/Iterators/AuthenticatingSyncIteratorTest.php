@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Subscriptions\Iterators;
 
@@ -81,9 +79,7 @@ final class AuthenticatingSyncIteratorTest extends IteratorTestBase
 
 final class AuthenticatingSyncIteratorAuthenticatableStub implements Authenticatable
 {
-    public function __construct(private int $id)
-    {
-    }
+    public function __construct(private int $id) {}
 
     public function getAuthIdentifierName()
     {
