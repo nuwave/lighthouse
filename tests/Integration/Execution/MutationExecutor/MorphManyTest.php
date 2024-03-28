@@ -433,6 +433,53 @@ GRAPHQL
     }
 
     /** @dataProvider existingModelMutations */
+    public function testShouldNotDeleteWithoutRelationUpdateAndDeleteMorphMany(string $action): void
+    {
+        $images = [
+            factory(Image::class)->create(),
+            factory(Image::class)->create(),
+        ];
+
+        factory(Task::class)
+            ->createMany([[], []])
+            ->each(static function (Task $task, int $index) use ($images): void {
+                $task->images()->save($images[$index]);
+            });
+
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+        mutation {
+            {$action}Task(input: {
+                id: 1
+                name: "foo"
+                images: {
+                    delete: [{$images[1]->id}]
+                }
+            }) {
+                id
+            }
+        }
+GRAPHQL
+        )->assertJson([
+            'data' => [
+                "{$action}Task" => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'images' => [
+                        [
+                            'id' => $images[0]->id,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $task = Task::findOrFail(2);
+        assert($task instanceof Task);
+        $this->assertCount(1, $task->images);
+        $this->assertNotNull(Image::find(2));
+    }
+
+    /** @dataProvider existingModelMutations */
     public function testUpdateAndConnectMorphMany(string $action): void
     {
         $task = factory(Task::class)->create();
