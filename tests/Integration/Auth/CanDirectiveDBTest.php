@@ -93,6 +93,7 @@ final class CanDirectiveDBTest extends DBTestCase
             ],
         ]);
     }
+
     public function testThrowsCustomExceptionWhenFailsToFindModel(): void
     {
         $user = new User();
@@ -129,7 +130,7 @@ final class CanDirectiveDBTest extends DBTestCase
             $previous = $error->getPrevious();
 
             $this->assertNotNull($previous);
-            $this->assertSame(ClientSafeModelNotFoundException::class, get_class($previous));
+            $this->assertInstanceOf(ClientSafeModelNotFoundException::class, $previous);
         }
     }
 

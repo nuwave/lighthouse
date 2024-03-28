@@ -20,6 +20,8 @@ parameters:
   - src/Pennant
   - tests/Integration/Pennant
   - src/Tracing/FederatedTracing/Proto # Generated classes from protobuf
+  # Ignore errors caused by the absence of Lumen in the dev dependencies
+  - tests/Unit/Testing/TestingTraitDummyLumen.php
   ignoreErrors:
   # PHPStan does not get it
   - '#Parameter \#1 \$callback of static method Closure::fromCallable\(\) expects callable\(\): mixed, array{object, .*} given\.#'
@@ -64,3 +66,32 @@ parameters:
 
   # Older versions of bensampo/laravel-enum are not generic yet
   - '#contains generic type BenSampo\\Enum\\Enum<.+> but class BenSampo\\Enum\\Enum is not generic\.#'
+
+  # Ignore errors caused by the absence of Lumen in the dev dependencies
+  - path: src/Support/AppVersion.php
+    message: '#PHPDoc tag @var for variable \$container contains unknown class Laravel\\Lumen\\Application.#'
+  - path: src/Support/AppVersion.php
+    message: '#Call to method version\(\) on an unknown class Laravel\\Lumen\\Application.#'
+  - path: src/Subscriptions/SubscriptionRouter.php
+    messages:
+      - '#Parameter \$router of method Nuwave\\Lighthouse\\Subscriptions\\SubscriptionRouter::pusher\(\) has invalid type Laravel\\Lumen\\Routing\\Router\.#'
+      - '#Call to method post\(\) on an unknown class Laravel\\Lumen\\Routing\\Router\.#'
+      - '#Parameter \$router of method Nuwave\\Lighthouse\\Subscriptions\\SubscriptionRouter::echoRoutes\(\) has invalid type Laravel\\Lumen\\Routing\\Router\.#'
+  - path: src/Http/routes.php
+    messages:
+      - '#PHPDoc tag @var for variable \$router contains unknown class Laravel\\Lumen\\Routing\\Router\.#'
+      - '#Call to method addRoute\(\) on an unknown class Laravel\\Lumen\\Routing\\Router\.#'
+
+  # Recent Mockery versions do not account for the last arg possibly being a closure
+  - path: tests/Unit/Subscriptions/Iterators/AuthenticatingSyncIteratorTest.php
+    message: '#Parameter \#2 \.\.\.\$args of static method Mockery::mock\(\) expects array\|class-string<Nuwave\\Lighthouse\\Subscriptions\\SubscriptionGuard>\|Nuwave\\Lighthouse\\Subscriptions\\SubscriptionGuard, Closure given\.#'
+
+  - path: tests/Integration/Schema/Directives/BuilderDirectiveTest.php
+    message: '#Return type of call to static method Mockery::mock\(\) contains unresolvable type\.#'
+
+  # Laravel added generics to Arr::first in 11.x, not sure how to handle them for now.
+  - path: src/OrderBy/OrderByDirective.php
+    message: '#Unable to resolve the template type TValue in call to method static method Illuminate\\Support\\Arr::first\(\)#'
+  - path: src/Testing/TestResponseMixin.php
+    message: '#Unable to resolve the template type TValue in call to method static method Illuminate\\Support\\Arr::first\(\)#'
+

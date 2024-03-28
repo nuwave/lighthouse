@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Support Laravel 11 https://github.com/nuwave/lighthouse/pull/2508
+
 ## v6.35.0
 
 ### Added

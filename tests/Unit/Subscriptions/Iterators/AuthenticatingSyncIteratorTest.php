@@ -91,19 +91,24 @@ final class AuthenticatingSyncIteratorAuthenticatableStub implements Authenticat
         return $this->id;
     }
 
-    public function getAuthPassword()
+    public function getAuthPassword(): string
     {
         return '';
     }
 
-    public function getRememberToken()
+    public function getAuthPasswordName(): string
+    {
+        return '';
+    }
+
+    public function getRememberToken(): string
     {
         return '';
     }
 
     public function setRememberToken($value): void {}
 
-    public function getRememberTokenName()
+    public function getRememberTokenName(): string
     {
         return '';
     }
