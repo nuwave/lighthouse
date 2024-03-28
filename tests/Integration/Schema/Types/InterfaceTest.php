@@ -4,7 +4,6 @@ namespace Tests\Integration\Schema\Types;
 
 use GraphQL\Type\Definition\Type;
 use Illuminate\Container\Container;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\DBTestCase;

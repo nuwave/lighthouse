@@ -106,9 +106,7 @@ final class AuthenticatingSyncIteratorAuthenticatableStub implements Authenticat
         return '';
     }
 
-    public function setRememberToken($value): void
-    {
-    }
+    public function setRememberToken($value): void {}
 
     public function getRememberTokenName(): string
     {
