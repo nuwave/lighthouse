@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Support SQLite https://github.com/nuwave/lighthouse/pull/2539
+
 ## v6.36.0
 
 ### Added
