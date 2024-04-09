@@ -5,7 +5,7 @@ namespace Tests;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Facades\DB;
 use Mattiasgeniar\PhpunitQueryCountAssertions\AssertsQueryCounts;
-use Safe\sprintf;
+use function Safe\sprintf;
 
 abstract class DBTestCase extends TestCase
 {
