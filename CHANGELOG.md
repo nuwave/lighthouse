@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Compare raw attributes only https://github.com/nuwave/lighthouse/pull/2540
+
 ## v6.36.0
 
 ### Added
