@@ -25,8 +25,20 @@ class NestedMorphTo implements ArgResolver
         if ($args->has('connect')) {
             $connectArgs = $args->arguments['connect']->value;
 
+            $morphType = $connectArgs->arguments['type']->value;
+            if (PHP_VERSION_ID >= 80100)
+            {
+                if ($morphType instanceof \BackedEnum)
+                {
+                    $morphType = $morphType->value;
+                }
+                else if ($morphType instanceof \UnitEnum)
+                {
+                    $morphType = $morphType->name;
+                }
+            }
             $morphToModel = $this->relation->createModelByType(
-                (string) $connectArgs->arguments['type']->value,
+                (string) $morphType,
             );
             $morphToModel->setAttribute(
                 $morphToModel->getKeyName(),

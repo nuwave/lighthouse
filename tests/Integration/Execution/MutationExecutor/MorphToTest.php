@@ -1,8 +1,11 @@
-<?php declare(strict_types=1);
+<?php declare( strict_types=1 );
 
 namespace Tests\Integration\Execution\MutationExecutor;
 
+use GraphQL\Type\Definition\PhpEnumType;
+use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\DBTestCase;
+use Tests\Utils\Enums\ImageableType;
 use Tests\Utils\Models\Image;
 use Tests\Utils\Models\Task;
 
@@ -22,6 +25,7 @@ final class MorphToTest extends DBTestCase
 
     type Mutation {
         createImage(input: CreateImageInput! @spread): Image @create
+        createImageWithEnumType(input: CreateImageWithEnumTypeInput! @spread): Image @create
         updateImage(input: UpdateImageInput! @spread): Image @update
         upsertImage(input: UpsertImageInput! @spread): Image @upsert
     }
@@ -39,6 +43,22 @@ final class MorphToTest extends DBTestCase
 
     input ConnectImageableInput {
         type: String!
+        id: ID!
+    }
+
+    input CreateImageWithEnumTypeInput {
+        from: String
+        to: String
+        url: String
+        imageable: CreateImageableOperationsWithEnumType
+    }
+
+    input CreateImageableOperationsWithEnumType {
+        connect: ConnectImageableWithEnumTypeInput
+    }
+
+    input ConnectImageableWithEnumTypeInput {
+        type: ImageableType!
         id: ID!
     }
 
@@ -71,6 +91,16 @@ final class MorphToTest extends DBTestCase
     }
     ' . self::PLACEHOLDER_QUERY;
 
+    /** @var TypeRegistry */
+    protected $typeRegistry;
+
+    protected function setUp () : void
+    {
+        parent::setUp();
+
+        $this->typeRegistry = $this->app->make( TypeRegistry::class );
+    }
+
     public function testConnectsMorphTo(): void
     {
         $task = factory(Task::class)->make();
@@ -100,6 +130,48 @@ final class MorphToTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'createImage' => [
+                    'id' => '1',
+                    'url' => 'foo',
+                    'imageable' => [
+                        'id' => '1',
+                        'name' => 'first_task',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testConnectsMorphToWithEnumType () : void
+    {
+        $this->typeRegistry->register( new PhpEnumType( ImageableType::class ) );
+
+        $task = factory(Task::class)->make();
+        assert($task instanceof Task);
+        $task->name = 'first_task';
+        $task->save();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            createImageWithEnumType(input: {
+                url: "foo"
+                imageable: {
+                    connect: {
+                        type: TASK
+                        id: 1
+                    }
+                }
+            }) {
+                id
+                url
+                imageable {
+                    id
+                    name
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'createImageWithEnumType' => [
                     'id' => '1',
                     'url' => 'foo',
                     'imageable' => [
