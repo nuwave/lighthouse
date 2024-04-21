@@ -22,6 +22,9 @@ parameters:
   - src/Tracing/FederatedTracing/Proto # Generated classes from protobuf
   # Ignore errors caused by the absence of Lumen in the dev dependencies
   - tests/Unit/Testing/TestingTraitDummyLumen.php
+  # Native enums
+  - tests/Utils/Enums/ImageableType.php
+  - tests/Utils/Enums/ImageableType.php
   ignoreErrors:
   # PHPStan does not get it
   - '#Parameter \#1 \$callback of static method Closure::fromCallable\(\) expects callable\(\): mixed, array{object, .*} given\.#'

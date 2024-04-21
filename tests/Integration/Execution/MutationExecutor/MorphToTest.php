@@ -134,7 +134,8 @@ final class MorphToTest extends DBTestCase
     public function testConnectsMorphToWithEnumType(): void
     {
         $typeRegistry = $this->app->make(TypeRegistry::class);
-        $typeRegistry->register(new PhpEnumType(ImageableType::class));
+        $phpEnumType = new PhpEnumType(ImageableType::class); // @phpstan-ignore-line native enums not supported in all versions
+        $typeRegistry->register($phpEnumType);
 
         $task = factory(Task::class)->make();
         assert($task instanceof Task);
