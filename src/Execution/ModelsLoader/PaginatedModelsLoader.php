@@ -85,9 +85,7 @@ class PaginatedModelsLoader implements ModelsLoader
         return $relatedModels->unique(
             // Compare all attributes because there might not be a unique primary key
             // or there could be differing pivot attributes.
-            static function (Model $relatedModel): string {
-                return json_encode($relatedModel->getOriginal());
-            },
+            static fn (Model $relatedModel): string => json_encode($relatedModel->getOriginal()),
         );
     }
 
