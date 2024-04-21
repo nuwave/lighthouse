@@ -9,7 +9,9 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
-- Native PHP Enums registered through the TypeRegistry may be used as morph type in nested MorphTo relations 
+### Fixed
+
+- Native PHP Enums registered through the `TypeRegistry` may be used as morph type in nested `MorphTo` relations https://github.com/nuwave/lighthouse/pull/2544
 
 ## v6.36.0
 

@@ -91,16 +91,6 @@ final class MorphToTest extends DBTestCase
     }
     ' . self::PLACEHOLDER_QUERY;
 
-    /** @var TypeRegistry */
-    protected $typeRegistry;
-
-    protected function setUp () : void
-    {
-        parent::setUp();
-
-        $this->typeRegistry = $this->app->make( TypeRegistry::class );
-    }
-
     public function testConnectsMorphTo(): void
     {
         $task = factory(Task::class)->make();
@@ -141,9 +131,10 @@ final class MorphToTest extends DBTestCase
         ]);
     }
 
-    public function testConnectsMorphToWithEnumType () : void
+    public function testConnectsMorphToWithEnumType(): void
     {
-        $this->typeRegistry->register( new PhpEnumType( ImageableType::class ) );
+        $typeRegistry = $this->app->make(TypeRegistry::class);
+        $typeRegistry->register(new PhpEnumType(ImageableType::class));
 
         $task = factory(Task::class)->make();
         assert($task instanceof Task);
