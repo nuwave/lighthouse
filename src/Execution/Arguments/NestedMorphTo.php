@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
 class NestedMorphTo implements ArgResolver
@@ -44,7 +45,12 @@ class NestedMorphTo implements ArgResolver
     {
         if (PHP_VERSION_ID >= 80100) {
             if ($morphType instanceof \BackedEnum) {
-                return $morphType->value;
+                $value = $morphType->value;
+                if (! is_string($value)) {
+                    throw new DefinitionException("Enum {$morphType::class} must be string backed.");
+                }
+
+                return $value;
             }
 
             if ($morphType instanceof \UnitEnum) {
