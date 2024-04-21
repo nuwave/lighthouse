@@ -47,7 +47,8 @@ class NestedMorphTo implements ArgResolver
             if ($morphType instanceof \BackedEnum) {
                 $value = $morphType->value;
                 if (! is_string($value)) {
-                    throw new DefinitionException("Enum {$morphType::class} must be string backed.");
+                    $enumClass = $morphType::class;
+                    throw new DefinitionException("Enum {$enumClass} must be string backed.");
                 }
 
                 return $value;
