@@ -51,8 +51,10 @@ abstract class DBTestCase extends TestCase
 
         $config = $app->make(ConfigRepository::class);
         $config->set('database.default', self::DEFAULT_CONNECTION);
-        $config->set('database.connections.' . self::DEFAULT_CONNECTION, $this->databaseOptions());
-        $config->set('database.connections.' . self::ALTERNATE_CONNECTION, $this->databaseOptions());
+
+        $databaseOptions = $this->databaseOptions();
+        $config->set('database.connections.' . self::DEFAULT_CONNECTION, $databaseOptions);
+        $config->set('database.connections.' . self::ALTERNATE_CONNECTION, $databaseOptions);
     }
 
     /** @return 'mysql'|'sqlite' */
