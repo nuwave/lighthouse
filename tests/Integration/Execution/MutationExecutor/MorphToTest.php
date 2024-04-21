@@ -133,6 +133,10 @@ final class MorphToTest extends DBTestCase
 
     public function testConnectsMorphToWithEnumType(): void
     {
+        if (PHP_VERSION_ID < 80100) {
+            $this->markTestSkipped('Requires native enums.');
+        }
+
         $typeRegistry = $this->app->make(TypeRegistry::class);
         $phpEnumType = new PhpEnumType(ImageableType::class); // @phpstan-ignore-line native enums not supported in all versions
         $typeRegistry->register($phpEnumType);
