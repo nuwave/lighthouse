@@ -313,8 +313,10 @@ return [
     | Transactional Mutations
     |--------------------------------------------------------------------------
     |
-    | If set to true, built-in directives that mutate models will be
-    | wrapped in a transaction to ensure atomicity.
+    | If set to true, the execution of built-in directives that mutate models
+    | will be wrapped in a transaction to ensure atomicity.
+    | The transaction is committed after the root field resolves,
+    | thus errors in nested fields do not cause a rollback.
     |
     */
 
