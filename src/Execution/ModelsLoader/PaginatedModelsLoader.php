@@ -12,6 +12,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Nuwave\Lighthouse\Pagination\ZeroPerPageLengthAwarePaginator;
 use Nuwave\Lighthouse\Support\Utils;
+
 use function Safe\json_encode;
 
 class PaginatedModelsLoader implements ModelsLoader
