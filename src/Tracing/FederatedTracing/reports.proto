@@ -8,6 +8,8 @@ option php_metadata_namespace = "Nuwave\\Lighthouse\\Tracing\\FederatedTracing\\
 
 import "google/protobuf/timestamp.proto";
 
+
+
 message Trace {
   message CachePolicy {
     enum Scope {
@@ -198,6 +200,26 @@ message Trace {
     }
   }
 
+  // The cost of the operation
+  message Limits {
+    // The result of the operation.
+    string result = 1;
+    // The strategy used in cost calculations.
+    string strategy = 2;
+    // The estimated cost as calculated via the strategy specified in strategy
+    uint64 cost_estimated = 3;
+    // The actual cost using the strategy specified in strategy
+    uint64 cost_actual = 4;
+    // The depth of the query
+    uint64 depth = 5;
+    // The height of the query
+    uint64 height = 6;
+    // The number of aliases in the query
+    uint64 alias_count = 7;
+    // The number of root fields in the query
+    uint64 root_field_count = 8;
+  }
+
   // Wallclock time when the trace began.
   google.protobuf.Timestamp start_time = 4; // required
   // Wallclock time when the trace ended.
@@ -285,6 +307,9 @@ message Trace {
   // 0 is treated as 1 for backwards compatibility.
   double field_execution_weight = 31;
 
+  // The limits information of the query.
+  Limits limits = 32;
+
 
   // removed: Node parse = 12; Node validate = 13;
   //          Id128 server_id = 1; Id128 client_id = 2;
@@ -371,6 +396,29 @@ message QueryLatencyStats {
   reserved 1, 6, 9, 10;
 }
 
+//  Stats on the query that can be populated by the gateway or router.
+message LimitsStats {
+  // The strategy used in cost calculations.
+  string strategy = 1;
+  // The estimated cost as calculated via the strategy specified in stats context
+  // The reason that this is a histogram rather than fixed cost is that it can be affected by paging variables.
+  repeated sint64 cost_estimated = 2;
+  // The maximum estimated cost of the query
+  uint64 max_cost_estimated = 3;
+  // The actual cost using the strategy specified in stats context
+  repeated sint64 cost_actual = 4;
+  // The maximum estimated cost of the query
+  uint64 max_cost_actual = 5;
+  // The total depth of the query
+  uint64 depth = 6;
+  // The height of the query
+  uint64 height = 7;
+  // The number of aliases in the query
+  uint64 alias_count = 8;
+  // The number of root fields in the query
+  uint64 root_field_count = 9;
+}
+
 // The context around a block of stats and traces indicating from which client the operation was executed and its
 // operation type. Operation type and subtype are only used by Apollo Router.
 message StatsContext {
@@ -379,6 +427,9 @@ message StatsContext {
   string client_version = 3;
   string operation_type = 4;
   string operation_subtype = 5;
+  // The result of the operation. Either OK or the error code that caused the operation to fail.
+  // This will not contain all errors from a query, only the primary reason the operation failed. e.g. a limits failure or an auth failure.
+  string result = 6;
 }
 
 message ContextualizedQueryLatencyStats {
@@ -426,11 +477,26 @@ message FieldStat {
   reserved 1, 2, 7, 8;
 }
 
+// As FieldStat only gets returned for FTV1 payloads this is a separate message that can be used to collect stats in the router or gateway obtained directly from the request schema and response.
+message LocalFieldStat {
+  string return_type = 1; // required; eg "String!" for User.email:String!
+  // Histogram of returned array sizes
+  repeated sint64 array_size = 2;
+}
+
 message TypeStat {
   // Key is (eg) "email" for User.email:String!
   map<string, FieldStat> per_field_stat = 3;
+
   reserved 1, 2;
 }
+
+message LocalTypeStat {
+  // Key is (eg) "email" for User.email:String!
+  // Unlike FieldStat, this is populated outside of FTV1 requests.
+  map<string, LocalFieldStat> local_per_field_stat = 1;
+}
+
 
 message ReferencedFieldsForType {
   // Contains (eg) "email" for User.email:String!
@@ -482,7 +548,13 @@ message Report {
   // operations. If this is false, each operation is described in precisely
   // one of those two fields.
   bool traces_pre_aggregated = 7;
+
+  // This indicates whether or not extended references are enabled, which are within the stats with context and contain
+  // input type and enum value references. We need this flag so we can tell if the option is enabled even when there are
+  // no extended references to report.
+  bool extended_references_enabled = 9;
 }
+
 
 message ContextualizedStats {
   StatsContext context = 1;
@@ -490,6 +562,19 @@ message ContextualizedStats {
   // Key is type name. This structure provides data for the count and latency of individual
   // field executions and thus only reflects operations for which field-level tracing occurred.
   map<string, TypeStat> per_type_stat = 3;
+
+  // Extended references including input types and enum values.
+  ExtendedReferences extended_references = 6;
+
+  // Per type stats that are obtained directly by the router or gateway rather than FTV1.
+  map<string, LocalTypeStat> local_per_type_stat = 7;
+
+  // Stats that contain limits information for the query.
+  LimitsStats limits_stats = 8;
+
+  // Total number of operations processed during this period for this context. This includes all operations, even if they are sampled
+  // and not included in the query latency stats.
+  uint64 operation_count = 9;
 
   reserved 4, 5;
 }
@@ -501,6 +586,34 @@ message QueryMetadata {
   string signature = 2;
   // (Optional) Persisted query ID that was used to request this operation.
   string pq_id = 3;
+}
+
+message ExtendedReferences {
+  map<string, InputTypeStats> input_types = 1;
+
+  // Map of enum name to stats about that enum.
+  map<string, EnumStats> enum_values = 2;
+}
+
+message InputTypeStats {
+  // Map of input object type to the stats about the fields within that object.
+  map<string, InputFieldStats> field_names = 1;
+}
+
+message InputFieldStats {
+  // The total number of operations that reference the input object field.
+  uint64 refs = 1;
+
+  // The number of operations that reference the input object field as a null value.
+  uint64 null_refs = 2;
+
+  // The number of operations that don't reference this input object field (the field is missing or undefined).
+  uint64 missing = 3;
+}
+
+message EnumStats {
+  // Map of enum value name to the number of referencing operations.
+  map<string, uint64> enum_values = 1;
 }
 
 // A sequence of traces and stats. If Report.traces_pre_aggregated (at the top
@@ -518,12 +631,11 @@ message TracesAndStats {
   // (as FieldStats will include the concrete object type for fields referenced
   // via an interface type).
   map<string, ReferencedFieldsForType> referenced_fields_by_type = 4;
-  // This field is used to validate that the algorithm used to construct `stats_with_context`
-  // matches similar algorithms in Apollo's servers. It is otherwise ignored and should not
-  // be included in reports.
-  repeated Trace internal_traces_contributing_to_stats = 3;
 
   // This is an optional field that is used to provide more context to the key of this object within the
   // traces_per_query map. If it's omitted, we assume the key is a standard operation name and signature key.
   QueryMetadata query_metadata = 5;
+
+  reserved 3;
 }
+
