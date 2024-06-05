@@ -9,6 +9,30 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.36.3
+
+### Fixed
+
+- Actually use raw attributes in comparison of paginated related models https://github.com/nuwave/lighthouse/pull/2550
+
+## v6.36.2
+
+### Changed
+
+- Compare raw attributes only when ensuring uniqueness of paginated related models https://github.com/nuwave/lighthouse/pull/2540
+
+## v6.36.1
+
+### Fixed
+
+- Native PHP Enums registered through the `TypeRegistry` may be used as morph type in nested `MorphTo` relations https://github.com/nuwave/lighthouse/pull/2544
+
+## v6.36.0
+
+### Added
+
+- Support Laravel 11 https://github.com/nuwave/lighthouse/pull/2508
+
 ## v6.35.0
 
 ### Added

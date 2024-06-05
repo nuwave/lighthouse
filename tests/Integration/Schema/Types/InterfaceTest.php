@@ -4,7 +4,6 @@ namespace Tests\Integration\Schema\Types;
 
 use GraphQL\Type\Definition\Type;
 use Illuminate\Container\Container;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\DBTestCase;
@@ -341,11 +340,11 @@ GRAPHQL;
         $this->assertSame('PostPaginator', $result->json('data.__type.fields.0.type.ofType.name'));
     }
 
-    /** @return \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\User|\Tests\Utils\Models\Team> */
-    public static function fetchResults(): EloquentCollection
+    /** @return \Illuminate\Support\Collection<int, \Tests\Utils\Models\User|\Tests\Utils\Models\Team> */
+    public static function fetchResults(): Collection
     {
-        /** @var \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\User|\Tests\Utils\Models\Team> $results */
-        $results = new EloquentCollection();
+        /** @var \Illuminate\Support\Collection<int, \Tests\Utils\Models\User|\Tests\Utils\Models\Team> $results */
+        $results = new Collection();
 
         return $results
             ->concat(User::all())

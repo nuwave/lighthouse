@@ -13,6 +13,8 @@ use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Nuwave\Lighthouse\Pagination\ZeroPerPageLengthAwarePaginator;
 use Nuwave\Lighthouse\Support\Utils;
 
+use function Safe\json_encode;
+
 class PaginatedModelsLoader implements ModelsLoader
 {
     public function __construct(
@@ -84,7 +86,7 @@ class PaginatedModelsLoader implements ModelsLoader
         return $relatedModels->unique(
             // Compare all attributes because there might not be a unique primary key
             // or there could be differing pivot attributes.
-            static fn (Model $relatedModel): string => $relatedModel->toJson(),
+            static fn (Model $relatedModel): string => json_encode($relatedModel->getRawOriginal()),
         );
     }
 

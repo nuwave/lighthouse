@@ -316,18 +316,19 @@ Read more about them in the [GraphQL Reference](https://graphql.org/learn/schema
 ## Union
 
 A Union is an abstract type that simply enumerates other Object Types.
-They are similar to interfaces in that they can return different types, but they can not
-have fields defined.
+They are similar to interfaces in that they can return different types, but do not prescribe any common fields.
 
 ```graphql
 union Person = User | Employee
 
 type User {
   id: ID!
+  email: String!
 }
 
 type Employee {
-  employeeId: ID!
+  id: ID!
+  department: Department!
 }
 ```
 

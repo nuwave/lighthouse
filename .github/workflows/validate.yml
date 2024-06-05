@@ -30,6 +30,7 @@ jobs:
         laravel-version:
           - "^9"
           - "^10"
+          - "^11"
         composer:
           - name: lowest
             arg: "--prefer-lowest --prefer-stable"
@@ -38,9 +39,13 @@ jobs:
         exclude:
           - php-version: "8.0"
             laravel-version: "^10"
+          - php-version: "8.0"
+            laravel-version: "^11"
+          - php-version: "8.1"
+            laravel-version: "^11"
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: shivammathur/setup-php@v2
         with:
@@ -86,6 +91,7 @@ jobs:
         laravel-version:
           - "^9"
           - "^10"
+          - "^11"
         os:
           - ubuntu-latest
         composer:
@@ -96,6 +102,10 @@ jobs:
         exclude:
           - php-version: "8.0"
             laravel-version: "^10"
+          - php-version: "8.0"
+            laravel-version: "^11"
+          - php-version: "8.1"
+            laravel-version: "^11"
 
     services:
       mysql:
@@ -113,10 +123,11 @@ jobs:
         options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: shivammathur/setup-php@v2
         with:
+          coverage: none
           extensions: ${{ env.REQUIRED_PHP_EXTENSIONS }}
           php-version: ${{ matrix.php-version }}
 
@@ -129,7 +140,7 @@ jobs:
       - name: "Remove conflicting dependencies that are not needed here"
         run: composer remove --dev --no-update larastan/larastan phpstan/phpstan-mockery phpbench/phpbench rector/rector
 
-      - if: matrix.laravel-version != '^10'
+      - if: matrix.laravel-version != '^10' && matrix.laravel-version != '^11'
         run: composer remove --dev --no-update laravel/pennant
 
       - run: >
@@ -169,7 +180,7 @@ jobs:
         options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: shivammathur/setup-php@v2
         with:
@@ -203,7 +214,7 @@ jobs:
           - "^10"
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: shivammathur/setup-php@v2
         with:

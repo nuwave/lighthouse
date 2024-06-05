@@ -3,7 +3,7 @@
 namespace Tests\Integration\Schema\Types;
 
 use GraphQL\Error\InvariantViolation;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
@@ -178,11 +178,11 @@ GRAPHQL;
         ');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\User|\Tests\Utils\Models\Post> */
-    public static function fetchResults(): EloquentCollection
+    /** @return \Illuminate\Support\Collection<int, \Tests\Utils\Models\User|\Tests\Utils\Models\Post> */
+    public static function fetchResults(): Collection
     {
-        /** @var \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\User|\Tests\Utils\Models\Post> $results */
-        $results = new EloquentCollection();
+        /** @var \Illuminate\Support\Collection<int, \Tests\Utils\Models\User|\Tests\Utils\Models\Post> $results */
+        $results = new Collection();
 
         return $results
             ->concat(User::all())
