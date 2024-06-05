@@ -27,6 +27,35 @@ class ContextualizedStats extends \Google\Protobuf\Internal\Message
     private $per_type_stat;
 
     /**
+     * Extended references including input types and enum values.
+     *
+     * Generated from protobuf field <code>.ExtendedReferences extended_references = 6 [json_name = "extendedReferences"];</code>
+     */
+    protected $extended_references;
+
+    /**
+     * Per type stats that are obtained directly by the router or gateway rather than FTV1.
+     *
+     * Generated from protobuf field <code>map<string, .LocalTypeStat> local_per_type_stat = 7 [json_name = "localPerTypeStat"];</code>
+     */
+    private $local_per_type_stat;
+
+    /**
+     * Stats that contain limits information for the query.
+     *
+     * Generated from protobuf field <code>.LimitsStats limits_stats = 8 [json_name = "limitsStats"];</code>
+     */
+    protected $limits_stats;
+
+    /**
+     * Total number of operations processed during this period for this context. This includes all operations, even if they are sampled
+     * and not included in the query latency stats.
+     *
+     * Generated from protobuf field <code>uint64 operation_count = 9 [json_name = "operationCount"];</code>
+     */
+    protected $operation_count = 0;
+
+    /**
      * Constructor.
      *
      * @param  array  $data {
@@ -37,6 +66,15 @@ class ContextualizedStats extends \Google\Protobuf\Internal\Message
      *     @var array|\Google\Protobuf\Internal\MapField $per_type_stat
      *           Key is type name. This structure provides data for the count and latency of individual
      *           field executions and thus only reflects operations for which field-level tracing occurred.
+     *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\ExtendedReferences $extended_references
+     *           Extended references including input types and enum values.
+     *     @var array|\Google\Protobuf\Internal\MapField $local_per_type_stat
+     *           Per type stats that are obtained directly by the router or gateway rather than FTV1.
+     *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\LimitsStats $limits_stats
+     *           Stats that contain limits information for the query.
+     *     @var int|string $operation_count
+     *           Total number of operations processed during this period for this context. This includes all operations, even if they are sampled
+     *           and not included in the query latency stats.
      * }
      */
     public function __construct($data = null)
@@ -142,6 +180,144 @@ class ContextualizedStats extends \Google\Protobuf\Internal\Message
     {
         $arr = GPBUtil::checkMapField($var, GPBType::STRING, GPBType::MESSAGE, TypeStat::class);
         $this->per_type_stat = $arr;
+
+        return $this;
+    }
+
+    /**
+     * Extended references including input types and enum values.
+     *
+     * Generated from protobuf field <code>.ExtendedReferences extended_references = 6 [json_name = "extendedReferences"];</code>
+     *
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\ExtendedReferences|null
+     */
+    public function getExtendedReferences()
+    {
+        return $this->extended_references;
+    }
+
+    public function hasExtendedReferences()
+    {
+        return isset($this->extended_references);
+    }
+
+    public function clearExtendedReferences()
+    {
+        unset($this->extended_references);
+    }
+
+    /**
+     * Extended references including input types and enum values.
+     *
+     * Generated from protobuf field <code>.ExtendedReferences extended_references = 6 [json_name = "extendedReferences"];</code>
+     *
+     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\ExtendedReferences  $var
+     *
+     * @return $this
+     */
+    public function setExtendedReferences($var)
+    {
+        GPBUtil::checkMessage($var, ExtendedReferences::class);
+        $this->extended_references = $var;
+
+        return $this;
+    }
+
+    /**
+     * Per type stats that are obtained directly by the router or gateway rather than FTV1.
+     *
+     * Generated from protobuf field <code>map<string, .LocalTypeStat> local_per_type_stat = 7 [json_name = "localPerTypeStat"];</code>
+     *
+     * @return \Google\Protobuf\Internal\MapField
+     */
+    public function getLocalPerTypeStat()
+    {
+        return $this->local_per_type_stat;
+    }
+
+    /**
+     * Per type stats that are obtained directly by the router or gateway rather than FTV1.
+     *
+     * Generated from protobuf field <code>map<string, .LocalTypeStat> local_per_type_stat = 7 [json_name = "localPerTypeStat"];</code>
+     *
+     * @param  array|\Google\Protobuf\Internal\MapField  $var
+     *
+     * @return $this
+     */
+    public function setLocalPerTypeStat($var)
+    {
+        $arr = GPBUtil::checkMapField($var, GPBType::STRING, GPBType::MESSAGE, LocalTypeStat::class);
+        $this->local_per_type_stat = $arr;
+
+        return $this;
+    }
+
+    /**
+     * Stats that contain limits information for the query.
+     *
+     * Generated from protobuf field <code>.LimitsStats limits_stats = 8 [json_name = "limitsStats"];</code>
+     *
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\LimitsStats|null
+     */
+    public function getLimitsStats()
+    {
+        return $this->limits_stats;
+    }
+
+    public function hasLimitsStats()
+    {
+        return isset($this->limits_stats);
+    }
+
+    public function clearLimitsStats()
+    {
+        unset($this->limits_stats);
+    }
+
+    /**
+     * Stats that contain limits information for the query.
+     *
+     * Generated from protobuf field <code>.LimitsStats limits_stats = 8 [json_name = "limitsStats"];</code>
+     *
+     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\LimitsStats  $var
+     *
+     * @return $this
+     */
+    public function setLimitsStats($var)
+    {
+        GPBUtil::checkMessage($var, LimitsStats::class);
+        $this->limits_stats = $var;
+
+        return $this;
+    }
+
+    /**
+     * Total number of operations processed during this period for this context. This includes all operations, even if they are sampled
+     * and not included in the query latency stats.
+     *
+     * Generated from protobuf field <code>uint64 operation_count = 9 [json_name = "operationCount"];</code>
+     *
+     * @return int|string
+     */
+    public function getOperationCount()
+    {
+        return $this->operation_count;
+    }
+
+    /**
+     * Total number of operations processed during this period for this context. This includes all operations, even if they are sampled
+     * and not included in the query latency stats.
+     *
+     * Generated from protobuf field <code>uint64 operation_count = 9 [json_name = "operationCount"];</code>
+     *
+     * @param  int|string  $var
+     *
+     * @return $this
+     */
+    public function setOperationCount($var)
+    {
+        GPBUtil::checkUint64($var);
+        $this->operation_count = $var;
 
         return $this;
     }

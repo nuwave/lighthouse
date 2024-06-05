@@ -60,6 +60,7 @@ final class MorphManyDirectiveTest extends DBTestCase
         $this->post = factory(Post::class)->create([
             'user_id' => $this->user->id,
         ]);
+        // @phpstan-ignore-next-line generic false-positive
         $this->postImages = Collection::times(
             $this->faker()->numberBetween(1, 10),
             fn (): Image => $this->post

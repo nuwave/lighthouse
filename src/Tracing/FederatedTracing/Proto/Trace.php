@@ -164,21 +164,28 @@ class Trace extends \Google\Protobuf\Internal\Message
     protected $field_execution_weight = 0.0;
 
     /**
+     * The limits information of the query.
+     *
+     * Generated from protobuf field <code>.Trace.Limits limits = 32 [json_name = "limits"];</code>
+     */
+    protected $limits;
+
+    /**
      * Constructor.
      *
      * @param  array  $data {
      *     Optional. Data for populating the Message object.
      *
      *     @var \Google\Protobuf\Timestamp $start_time
-     *           Wallclock time when the trace began
+     *           Wallclock time when the trace began.
      *     @var \Google\Protobuf\Timestamp $end_time
-     *           Wallclock time when the trace ended
+     *           Wallclock time when the trace ended.
      *     @var int|string $duration_ns
      *           High precision duration of the trace; may not equal end_time-start_time
-     *           (eg, if your machine's clock changed during the trace)
+     *           (eg, if your machine's clock changed during the trace).
      *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Node $root
      *           A tree containing information about all resolvers run directly by this
-     *           service, including errors
+     *           service, including errors.
      *     @var bool $is_incomplete
      *           If this is true, the trace is potentially missing some nodes that were
      *           present on the query plan. This can happen if the trace span buffer used
@@ -201,7 +208,7 @@ class Trace extends \Google\Protobuf\Internal\Message
      *     @var string $unexecutedOperationBody
      *           Optional: when GraphQL parsing or validation against the GraphQL schema fails, these fields
      *           can include reference to the operation being sent for users to dig into the set of operations
-     *           that are failing validation
+     *           that are failing validation.
      *     @var string $unexecutedOperationName
      *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Details $details
      *     @var string $client_name
@@ -235,6 +242,8 @@ class Trace extends \Google\Protobuf\Internal\Message
      *           towards the estimated_execution_count rather than just 1. This value should
      *           typically be at least 1.
      *           0 is treated as 1 for backwards compatibility.
+     *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Limits $limits
+     *           The limits information of the query.
      * }
      */
     public function __construct($data = null)
@@ -975,6 +984,45 @@ class Trace extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkDouble($var);
         $this->field_execution_weight = $var;
+
+        return $this;
+    }
+
+    /**
+     * The limits information of the query.
+     *
+     * Generated from protobuf field <code>.Trace.Limits limits = 32 [json_name = "limits"];</code>
+     *
+     * @return \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Limits|null
+     */
+    public function getLimits()
+    {
+        return $this->limits;
+    }
+
+    public function hasLimits()
+    {
+        return isset($this->limits);
+    }
+
+    public function clearLimits()
+    {
+        unset($this->limits);
+    }
+
+    /**
+     * The limits information of the query.
+     *
+     * Generated from protobuf field <code>.Trace.Limits limits = 32 [json_name = "limits"];</code>
+     *
+     * @param  \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Limits  $var
+     *
+     * @return $this
+     */
+    public function setLimits($var)
+    {
+        GPBUtil::checkMessage($var, Trace\Limits::class);
+        $this->limits = $var;
 
         return $this;
     }

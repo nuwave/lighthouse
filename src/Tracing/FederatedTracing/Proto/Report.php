@@ -72,6 +72,15 @@ class Report extends \Google\Protobuf\Internal\Message
     protected $traces_pre_aggregated = false;
 
     /**
+     * This indicates whether or not extended references are enabled, which are within the stats with context and contain
+     * input type and enum value references. We need this flag so we can tell if the option is enabled even when there are
+     * no extended references to report.
+     *
+     * Generated from protobuf field <code>bool extended_references_enabled = 9 [json_name = "extendedReferencesEnabled"];</code>
+     */
+    protected $extended_references_enabled = false;
+
+    /**
      * Constructor.
      *
      * @param  array  $data {
@@ -100,6 +109,10 @@ class Report extends \Google\Protobuf\Internal\Message
      *           traces in TracesWithStats.trace are a sampling of some of the same
      *           operations. If this is false, each operation is described in precisely
      *           one of those two fields.
+     *     @var bool $extended_references_enabled
+     *           This indicates whether or not extended references are enabled, which are within the stats with context and contain
+     *           input type and enum value references. We need this flag so we can tell if the option is enabled even when there are
+     *           no extended references to report.
      * }
      */
     public function __construct($data = null)
@@ -318,6 +331,39 @@ class Report extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkBool($var);
         $this->traces_pre_aggregated = $var;
+
+        return $this;
+    }
+
+    /**
+     * This indicates whether or not extended references are enabled, which are within the stats with context and contain
+     * input type and enum value references. We need this flag so we can tell if the option is enabled even when there are
+     * no extended references to report.
+     *
+     * Generated from protobuf field <code>bool extended_references_enabled = 9 [json_name = "extendedReferencesEnabled"];</code>
+     *
+     * @return bool
+     */
+    public function getExtendedReferencesEnabled()
+    {
+        return $this->extended_references_enabled;
+    }
+
+    /**
+     * This indicates whether or not extended references are enabled, which are within the stats with context and contain
+     * input type and enum value references. We need this flag so we can tell if the option is enabled even when there are
+     * no extended references to report.
+     *
+     * Generated from protobuf field <code>bool extended_references_enabled = 9 [json_name = "extendedReferencesEnabled"];</code>
+     *
+     * @param  bool  $var
+     *
+     * @return $this
+     */
+    public function setExtendedReferencesEnabled($var)
+    {
+        GPBUtil::checkBool($var);
+        $this->extended_references_enabled = $var;
 
         return $this;
     }

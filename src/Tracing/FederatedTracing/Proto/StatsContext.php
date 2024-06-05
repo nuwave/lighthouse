@@ -27,6 +27,14 @@ class StatsContext extends \Google\Protobuf\Internal\Message
     protected $operation_subtype = '';
 
     /**
+     * The result of the operation. Either OK or the error code that caused the operation to fail.
+     * This will not contain all errors from a query, only the primary reason the operation failed. e.g. a limits failure or an auth failure.
+     *
+     * Generated from protobuf field <code>string result = 6 [json_name = "result"];</code>
+     */
+    protected $result = '';
+
+    /**
      * Constructor.
      *
      * @param  array  $data {
@@ -36,6 +44,9 @@ class StatsContext extends \Google\Protobuf\Internal\Message
      *     @var string $client_version
      *     @var string $operation_type
      *     @var string $operation_subtype
+     *     @var string $result
+     *           The result of the operation. Either OK or the error code that caused the operation to fail.
+     *           This will not contain all errors from a query, only the primary reason the operation failed. e.g. a limits failure or an auth failure.
      * }
      */
     public function __construct($data = null)
@@ -140,6 +151,37 @@ class StatsContext extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, true);
         $this->operation_subtype = $var;
+
+        return $this;
+    }
+
+    /**
+     * The result of the operation. Either OK or the error code that caused the operation to fail.
+     * This will not contain all errors from a query, only the primary reason the operation failed. e.g. a limits failure or an auth failure.
+     *
+     * Generated from protobuf field <code>string result = 6 [json_name = "result"];</code>
+     *
+     * @return string
+     */
+    public function getResult()
+    {
+        return $this->result;
+    }
+
+    /**
+     * The result of the operation. Either OK or the error code that caused the operation to fail.
+     * This will not contain all errors from a query, only the primary reason the operation failed. e.g. a limits failure or an auth failure.
+     *
+     * Generated from protobuf field <code>string result = 6 [json_name = "result"];</code>
+     *
+     * @param  string  $var
+     *
+     * @return $this
+     */
+    public function setResult($var)
+    {
+        GPBUtil::checkString($var, true);
+        $this->result = $var;
 
         return $this;
     }
