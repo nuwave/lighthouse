@@ -167,9 +167,7 @@ class GraphQL
         );
 
         $resultOrResults = LighthouseUtils::mapEach(
-            /**
-             * @return array<string, mixed>
-             */
+            /** @return array<string, mixed> */
             fn (OperationParams $operationParams): array => $this->executeOperation($operationParams, $context),
             $operationOrOperations,
         );
@@ -323,11 +321,9 @@ class GraphQL
                 ->map(fn (Error $error): ?array => $this->pipeline
                     ->send($error)
                     ->through($handlers)
-                    ->then(
-                        static fn (?Error $error): ?array => $error === null
-                            ? null
-                            : $formatter($error),
-                    ))
+                    ->then(static fn (?Error $error): ?array => $error === null
+                        ? null
+                        : $formatter($error)))
                 ->filter()
                 ->all();
         };
