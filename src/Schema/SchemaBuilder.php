@@ -61,9 +61,7 @@ class SchemaBuilder
 
         // Enables introspection to list all types in the schema
         $config->setTypes(
-            /**
-             * @return array<string, \GraphQL\Type\Definition\Type>
-             */
+            /** @return array<string, \GraphQL\Type\Definition\Type> */
             fn (): array => $this->typeRegistry->possibleTypes(),
         );
 

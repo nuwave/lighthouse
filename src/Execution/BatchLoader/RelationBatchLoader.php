@@ -59,9 +59,7 @@ class RelationBatchLoader
 
         // Monomorphize the models to simplify eager loading relations onto them
         $parentsGroupedByClass = $parentModels->groupBy(
-            /**
-             * @return class-string<\Illuminate\Database\Eloquent\Model>
-             */
+            /** @return class-string<\Illuminate\Database\Eloquent\Model> */
             static fn (Model $model): string => $model::class,
             true,
         );
