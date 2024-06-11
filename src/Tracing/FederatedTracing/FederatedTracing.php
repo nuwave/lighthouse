@@ -3,7 +3,7 @@
 namespace Nuwave\Lighthouse\Tracing\FederatedTracing;
 
 use Google\Protobuf\Timestamp;
-use GraphQL\Error\Error;
+use GraphQL\Error\Error as GraphQLError;
 use GraphQL\Language\SourceLocation;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
@@ -15,12 +15,13 @@ use Nuwave\Lighthouse\Execution\ExtensionsResponse;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Federation\FederationServiceProvider;
 use Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace;
+use Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Error as TraceError;
 use Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Location;
 use Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Node;
 use Nuwave\Lighthouse\Tracing\Tracing;
 use Nuwave\Lighthouse\Tracing\TracingUtilities;
 
-/** See https://www.apollographql.com/docs/federation/metrics/. */
+/** See https://www.apollographql.com/docs/federation/metrics. */
 class FederatedTracing implements Tracing
 {
     use TracingUtilities;
@@ -122,13 +123,13 @@ class FederatedTracing implements Tracing
         $node->setEndTime($this->diffTimeInNanoseconds($this->requestStartPrecise, $end));
     }
 
-    protected function recordError(Error $error): void
+    protected function recordError(GraphQLError $error): void
     {
         if (! $this->enabled) {
             return;
         }
 
-        $traceError = new Trace\Error();
+        $traceError = new TraceError();
         $traceError->setMessage($error->isClientSafe() ? $error->getMessage() : 'Internal server error');
         $traceError->setLocation(array_map(static function (SourceLocation $sourceLocation): Location {
             $location = new Location();
