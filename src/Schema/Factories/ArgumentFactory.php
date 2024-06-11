@@ -50,7 +50,7 @@ class ArgumentFactory
 
         $config = [
             'name' => $definitionNode->name->value,
-            'description' => $definitionNode->description->value ?? null,
+            'description' => $definitionNode->description?->value,
             'type' => $type,
             'astNode' => $definitionNode,
         ];

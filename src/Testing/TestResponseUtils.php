@@ -19,9 +19,7 @@ class TestResponseUtils
         $errors = $response->json('errors') ?? [];
 
         foreach ($errors as $error) {
-            $validation = $error['extensions']['validation']
-                ?? null;
-
+            $validation = $error['extensions']['validation'] ?? null;
             if (is_array($validation)) {
                 return $validation;
             }

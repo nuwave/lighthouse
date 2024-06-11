@@ -41,7 +41,7 @@ class PusherLink extends ApolloLink {
         next: (data) => {
           // If the operation has the subscription channel, it's a subscription
           subscriptionChannel =
-            data?.extensions?.lighthouse_subscriptions.channel ?? null;
+            data?.extensions?.lighthouse_subscriptions.channel;
 
           // No subscription found in the response, pipe data through
           if (!subscriptionChannel) {
@@ -173,8 +173,7 @@ const createHandler = (options) => {
           return response.json();
         })
         .then((json) => {
-          channelName =
-            response?.extensions?.lighthouse_subscriptions.channel ?? null;
+          channelName = response?.extensions?.lighthouse_subscriptions.channel;
 
           if (!channelName) {
             return;

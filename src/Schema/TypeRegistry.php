@@ -313,14 +313,14 @@ class TypeRegistry
                 'value' => $enumDirective instanceof EnumDirective
                     ? $enumDirective->value()
                     : $enumValue->name->value,
-                'description' => $enumValue->description->value ?? null,
+                'description' => $enumValue->description?->value,
                 'deprecationReason' => ASTHelper::deprecationReason($enumValue),
             ];
         }
 
         return new EnumType([
             'name' => $enumDefinition->name->value,
-            'description' => $enumDefinition->description->value ?? null,
+            'description' => $enumDefinition->description?->value,
             'values' => $values,
             'astNode' => $enumDefinition,
         ]);
@@ -352,7 +352,7 @@ class TypeRegistry
 
         return new $namespacedClassName([
             'name' => $scalarName,
-            'description' => $scalarDefinition->description->value ?? null,
+            'description' => $scalarDefinition->description?->value,
             'astNode' => $scalarDefinition,
         ]);
     }
@@ -361,7 +361,7 @@ class TypeRegistry
     {
         return new ObjectType([
             'name' => $objectDefinition->name->value,
-            'description' => $objectDefinition->description->value ?? null,
+            'description' => $objectDefinition->description?->value,
             'fields' => $this->makeFieldsLoader($objectDefinition),
             'interfaces' => function () use ($objectDefinition): array {
                 $interfaces = [];
@@ -401,14 +401,12 @@ class TypeRegistry
 
     protected function resolveInputObjectType(InputObjectTypeDefinitionNode $inputDefinition): InputObjectType
     {
-        /**
-         * @return array<string, array<string, mixed>>
-         */
+        /** @return array<string, array<string, mixed>> */
         $fields = fn (): array => $this->argumentFactory->toTypeMap($inputDefinition->fields);
 
         return new InputObjectType([
             'name' => $inputDefinition->name->value,
-            'description' => $inputDefinition->description->value ?? null,
+            'description' => $inputDefinition->description?->value,
             'fields' => $fields,
             'astNode' => $inputDefinition,
         ]);
@@ -435,7 +433,7 @@ class TypeRegistry
 
         return new InterfaceType([
             'name' => $nodeName,
-            'description' => $interfaceDefinition->description->value ?? null,
+            'description' => $interfaceDefinition->description?->value,
             'fields' => $this->makeFieldsLoader($interfaceDefinition),
             'resolveType' => $typeResolver,
             'astNode' => $interfaceDefinition,
@@ -546,7 +544,7 @@ class TypeRegistry
 
         return new UnionType([
             'name' => $nodeName,
-            'description' => $unionDefinition->description->value ?? null,
+            'description' => $unionDefinition->description?->value,
             'types' => function () use ($unionDefinition): array {
                 $types = [];
 

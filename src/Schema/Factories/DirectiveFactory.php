@@ -25,7 +25,7 @@ class DirectiveFactory
 
             $argumentConfig = [
                 'name' => $argument->name->value,
-                'description' => $argument->description->value ?? null,
+                'description' => $argument->description?->value,
                 'type' => $argumentType,
             ];
 
@@ -46,7 +46,7 @@ class DirectiveFactory
 
         return new Directive([
             'name' => $directive->name->value,
-            'description' => $directive->description->value ?? null,
+            'description' => $directive->description?->value,
             'locations' => $locations,
             'args' => $arguments,
             'isRepeatable' => $directive->repeatable,
