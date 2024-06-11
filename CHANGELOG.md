@@ -9,6 +9,13 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.37.0
+
+### Changed
+
+- Also report instances of `GraphQL\Error\Error` without previous exceptions in `ReportingErrorHandler` https://github.com/nuwave/lighthouse/pull/2567
+- Report all errors thrown during the execution of async mutations regardless of client-safety https://github.com/nuwave/lighthouse/pull/2567
+
 ## v6.36.3
 
 ### Fixed
