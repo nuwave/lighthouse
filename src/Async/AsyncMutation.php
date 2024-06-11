@@ -7,6 +7,7 @@ use GraphQL\Language\AST\FragmentDefinitionNode;
 use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\OperationDefinitionNode;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -28,15 +29,21 @@ class AsyncMutation implements ShouldQueue
         public array $variableValues,
     ) {}
 
-    public function handle(GraphQL $graphQL, SerializesContext $serializesContext): void
+    public function handle(GraphQL $graphQL, SerializesContext $serializesContext, ExceptionHandler $exceptionHandler): void
     {
-        $graphQL->executeParsedQuery(
+        $result = $graphQL->executeParsedQueryRaw(
             $this->query(),
             $serializesContext->unserialize($this->serializedContext),
             $this->variableValues,
             AsyncRoot::instance(),
             $this->operation->name?->value,
         );
+
+        foreach ($result->errors as $error) {
+            $exceptionHandler->report(
+                $error->getPrevious() ?? $error,
+            );
+        }
     }
 
     protected function query(): DocumentNode

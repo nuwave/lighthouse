@@ -102,6 +102,23 @@ class GraphQL
         mixed $root = null,
         ?string $operationName = null,
     ): array {
+        $result = $this->executeParsedQueryRaw($query, $context, $variables, $root, $operationName);
+
+        return $this->toSerializableArray($result);
+    }
+
+    /**
+     * Execute a GraphQL query on the Lighthouse schema and return the raw result.
+     *
+     * @param  array<string, mixed>|null  $variables
+     */
+    public function executeParsedQueryRaw(
+        DocumentNode $query,
+        GraphQLContext $context,
+        ?array $variables = [],
+        mixed $root = null,
+        ?string $operationName = null,
+    ): ExecutionResult {
         // Building the executable schema might take a while to do,
         // so we do it before we fire the StartExecution event.
         // This allows tracking the time for batched queries independently.
@@ -148,7 +165,7 @@ class GraphQL
 
         $this->cleanUpAfterExecution();
 
-        return $this->toSerializableArray($result);
+        return $result;
     }
 
     /**

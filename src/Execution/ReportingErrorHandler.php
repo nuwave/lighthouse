@@ -26,10 +26,9 @@ class ReportingErrorHandler implements ErrorHandler
             return $next($error);
         }
 
-        $previous = $error->getPrevious();
-        if ($previous !== null) {
-            $this->exceptionHandler->report($previous);
-        }
+        $this->exceptionHandler->report(
+            $error->getPrevious() ?? $error,
+        );
 
         return $next($error);
     }
