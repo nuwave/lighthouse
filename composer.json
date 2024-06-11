@@ -91,7 +91,10 @@
         "psr-4": {
             "Benchmarks\\": "benchmarks/",
             "Tests\\": "tests/"
-        }
+        },
+        "files": [
+            "vendor/dms/phpunit-arraysubset-asserts/src/ArraySubsetAsserts.php"
+        ]
     },
     "config": {
         "allow-plugins": {

@@ -378,6 +378,7 @@ GRAPHQL
     /** If federation v2 is used, add the @shareable directive to the pagination generic types. */
     private function maybeAddShareableDirective(): string
     {
+        // Not using Illuminate\Container\Container::getInstance() here as it causes PHPStan issues
         if (app()->providerIsLoaded(FederationServiceProvider::class) && FederationHelper::isUsingFederationV2($this->documentAST)) {
             return /** @lang GraphQL */ '@shareable';
         }
