@@ -160,7 +160,8 @@ and the value `true` is returned - thus the fields return type must be `Boolean!
 
 Once a [queue worker](https://laravel.com/docs/queues#running-the-queue-worker) picks up the job,
 it will actually execute the underlying field resolver.
-The result is not checked for errors, ensure your GraphQL error handling reports relevant exceptions.
+Errors that occur during execution are reported through the Laravel exception handler.
+The handlers in the `config/lighthouse.php` option `error_handlers` are not called.
 """
 directive @async(
   """

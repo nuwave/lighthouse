@@ -84,7 +84,7 @@ directive can be used to manipulate the schema AST.
 This directive type is implemented as an abstract class rather than a pure interface and allows
 you to define complex validation rules for a field with ease.
 
-[Read more about it in the Validation section](../security/validation.md#validate-fields).
+[Read more about it in the Validation section](../security/validation.md#validator-for-fields).
 
 ## ComplexityResolverDirective
 
