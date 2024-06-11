@@ -18,8 +18,10 @@ class ReportingErrorHandler implements ErrorHandler
             return $next(null);
         }
 
-        // Client-safe errors are assumed to be something that a client can handle
-        // or is expected to happen, e.g. wrong syntax, authentication or validation
+        // Client-safe errors are assumed to be something that:
+        // - a client can understand and handle
+        // - were caused by client misuse, e.g. wrong syntax, authentication, validation
+        // Thus, they are typically not actionable for server developers.
         if ($error->isClientSafe()) {
             return $next($error);
         }

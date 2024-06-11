@@ -310,7 +310,7 @@ class GraphQL
     {
         // @phpstan-ignore-next-line callable is not recognized correctly and can not be type-hinted to match
         return $this->errorsHandler ??= function (array $errors, callable $formatter): array {
-            // User defined error handlers, implementing \Nuwave\Lighthouse\Execution\ErrorHandler
+            // User defined error handlers, implementing \Nuwave\Lighthouse\Execution\ErrorHandler.
             // This allows the user to register multiple handlers and pipe the errors through.
             $handlers = [];
             foreach ($this->configRepository->get('lighthouse.error_handlers', []) as $handlerClass) {
@@ -331,11 +331,10 @@ class GraphQL
 
     protected function debugFlag(): int
     {
-        // If debugging is set to false globally, do not add GraphQL specific
-        // debugging info either. If it is true, then we fetch the debug
-        // level from the Lighthouse configuration.
         return $this->configRepository->get('app.debug')
+            // If Laravel debugging is enabled, we fetch the debug level from the Lighthouse configuration.
             ? (int) $this->configRepository->get('lighthouse.debug')
+            // If Laravel debugging is disabled, do not add GraphQL specific debugging info either.
             : DebugFlag::NONE;
     }
 
