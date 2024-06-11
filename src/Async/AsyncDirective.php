@@ -71,7 +71,7 @@ GRAPHQL;
         $parentName = $parentType->name->value;
         if ($parentName !== RootType::MUTATION) {
             $location = "{$parentName}.{$fieldDefinition->name->value}";
-            throw new DefinitionException("The @async directive must only be used on fields of the root type mutation, found it on {$location}.");
+            throw new DefinitionException("The @async directive must only be used on root mutation fields, found it on {$location}.");
         }
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Schema\Directives;
 
+use Illuminate\Container\Container;
 use Tests\TestCase;
 
 final class ShowDirectiveTest extends TestCase
@@ -59,7 +60,7 @@ final class ShowDirectiveTest extends TestCase
         }
         ';
 
-        app()->instance('env', 'production');
+        Container::getInstance()->instance('env', 'production');
         $this->graphQL($introspectionQuery)
             ->assertJsonCount(1, 'data.__schema.queryType.fields')
             ->assertJsonPath('data.__schema.queryType.fields.0.name', 'hiddenField');

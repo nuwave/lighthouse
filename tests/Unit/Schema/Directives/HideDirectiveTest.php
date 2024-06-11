@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Schema\Directives;
 
+use Illuminate\Container\Container;
 use Tests\TestCase;
 
 final class HideDirectiveTest extends TestCase
@@ -59,7 +60,7 @@ final class HideDirectiveTest extends TestCase
         }
         ';
 
-        app()->instance('env', 'production');
+        Container::getInstance()->instance('env', 'production');
         $this->graphQL($introspectionQuery)
             ->assertJsonCount(0, 'data.__schema.queryType.fields');
     }
