@@ -60,17 +60,17 @@ GRAPHQL;
     /**
      * Delete one or more related models.
      *
-     * @param  Model  $parent
+     * @param  Model  $model
      * @param  mixed|array<mixed>  $idOrIds
      */
-    public function __invoke($parent, $idOrIds): void
+    public function __invoke($model, $idOrIds): void
     {
         $relationName = $this->directiveArgValue(
             'relation',
             // Use the name of the argument if no explicit relation name is given
             $this->nodeName(),
         );
-        $relation = $parent->{$relationName}();
+        $relation = $model->{$relationName}();
         assert($relation instanceof Relation);
 
         // Those types of relations may only have one related model attached to
