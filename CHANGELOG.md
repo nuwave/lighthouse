@@ -13,7 +13,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Fixed
 
-- Eliminate redundant `Model::save()` calls in nested mutations
+- Eliminate redundant `Model::save()` calls in nested mutations https://github.com/nuwave/lighthouse/pull/2570
 
 ## v6.37.0
 
