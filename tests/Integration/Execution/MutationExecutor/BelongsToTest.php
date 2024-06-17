@@ -2,6 +2,8 @@
 
 namespace Tests\Integration\Execution\MutationExecutor;
 
+use Illuminate\Database\Events\QueryExecuted;
+use Illuminate\Support\Facades\DB;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Role;
 use Tests\Utils\Models\Task;
@@ -272,7 +274,7 @@ final class BelongsToTest extends DBTestCase
         ]);
     }
 
-    public function testUpsertBelongsToWithoutId(): void
+    public function testUpsertBelongsToWithoutID(): void
     {
         $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
@@ -451,6 +453,121 @@ GRAPHQL
                 ],
             ],
         ]);
+    }
+
+    /** @see https://github.com/nuwave/lighthouse/pull/2570 */
+    public function testSavesOnlyOnceWithMultipleBelongsTo(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Mutation {
+            updateUser(input: UpdateUserInput! @spread): User! @update
+        }
+
+        type User {
+            id: ID!
+            name: String!
+            company: Company
+            team: Team
+        }
+
+        type Company {
+            id: ID!
+            name: String!
+        }
+
+        type Team {
+            id: ID!
+            name: String!
+        }
+
+        input UpdateUserInput {
+            id: ID!
+            name: String!
+            company: UpdateCompanyBelongsTo
+            team: UpdateTeamBelongsTo
+        }
+
+        input UpdateCompanyBelongsTo {
+            update: UpdateCompanyInput
+        }
+
+        input UpdateCompanyInput {
+            id: ID!
+            name: String!
+        }
+
+        input UpdateTeamBelongsTo {
+            update: UpdateTeamInput
+        }
+
+        input UpdateTeamInput {
+            id: ID!
+            name: String!
+        }
+        ' . self::PLACEHOLDER_QUERY;
+
+        $user = factory(User::class)->make();
+        assert($user instanceof User);
+        $user->name = 'foo';
+        $user->company()->dissociate();
+        $user->team()->dissociate();
+        $user->save();
+
+        $queries = [];
+        DB::listen(function (QueryExecuted $query) use (&$queries): void {
+            dump($query->sql);
+            $queries[] = $query->sql;
+        });
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            updateUser(input: {
+                id: 1
+                name: "user"
+                company: {
+                    update: {
+                        id: 1
+                        name: "company"
+                    }
+                }
+                team: {
+                    update: {
+                        id: 1
+                        name: "team"
+                    }
+                }
+            }) {
+                id
+                name
+                company {
+                    id
+                    name
+                }
+                team {
+                    id
+                    name
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'updateUser' => [
+                    'id' => '1',
+                    'name' => 'user',
+                    'company' => [
+                        'id' => '1',
+                        'name' => 'company',
+                    ],
+                    'team' => [
+                        'id' => '1',
+                        'name' => 'team',
+                    ],
+                ],
+            ],
+        ]);
+
+        $updateUsersQueries = array_filter($queries, fn (string $sql): bool => str_starts_with($sql, 'update `users`'));
+        $this->assertCount(1, $updateUsersQueries);
     }
 
     public function testUpsertUsingCreateAndUpdateUsingUpsertBelongsTo(): void
