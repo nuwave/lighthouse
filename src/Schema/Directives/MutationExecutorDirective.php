@@ -40,12 +40,12 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
     }
 
     /**
-     * @param  Model  $parent
+     * @param  Model  $model
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>  $args
      *
      * @return \Illuminate\Database\Eloquent\Model|array<\Illuminate\Database\Eloquent\Model>
      */
-    public function __invoke($parent, $args): mixed
+    public function __invoke($model, $args): mixed
     {
         $relationName = $this->directiveArgValue(
             'relation',
@@ -53,7 +53,7 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
             $this->nodeName(),
         );
 
-        $relation = $parent->{$relationName}();
+        $relation = $model->{$relationName}();
         assert($relation instanceof Relation);
 
         // @phpstan-ignore-next-line Relation&Builder mixin not recognized

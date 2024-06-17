@@ -8,20 +8,18 @@ use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 class NestedBelongsTo implements ArgResolver
 {
     public function __construct(
-        /**
-         * @var \Illuminate\Database\Eloquent\Relations\BelongsTo<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model> $relation
-         */
+        /** @var \Illuminate\Database\Eloquent\Relations\BelongsTo<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model> $relation */
         protected BelongsTo $relation,
     ) {}
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  ArgumentSet  $args
      */
-    public function __invoke($parent, $args): void
+    public function __invoke($model, $args): void
     {
         if ($args->has('create')) {
-            $saveModel = new ResolveNested(new SaveModel($this->relation));
+            $saveModel = new ResolveNested(new SaveModel());
             $related = $saveModel(
                 $this->relation->make(),
                 $args->arguments['create']->value,
@@ -34,7 +32,7 @@ class NestedBelongsTo implements ArgResolver
         }
 
         if ($args->has('update')) {
-            $updateModel = new ResolveNested(new UpdateModel(new SaveModel($this->relation)));
+            $updateModel = new ResolveNested(new UpdateModel(new SaveModel()));
             $related = $updateModel(
                 $this->relation->make(),
                 $args->arguments['update']->value,
@@ -43,7 +41,7 @@ class NestedBelongsTo implements ArgResolver
         }
 
         if ($args->has('upsert')) {
-            $upsertModel = new ResolveNested(new UpsertModel(new SaveModel($this->relation)));
+            $upsertModel = new ResolveNested(new UpsertModel(new SaveModel()));
             $related = $upsertModel(
                 $this->relation->make(),
                 $args->arguments['upsert']->value,
