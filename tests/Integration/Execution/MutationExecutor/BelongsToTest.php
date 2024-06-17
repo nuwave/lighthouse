@@ -514,7 +514,7 @@ GRAPHQL
         $user->save();
 
         $queries = [];
-        DB::listen(function (QueryExecuted $query) use (&$queries): void {
+        DB::listen(static function (QueryExecuted $query) use (&$queries): void {
             dump($query->sql);
             $queries[] = $query->sql;
         });
@@ -566,7 +566,7 @@ GRAPHQL
             ],
         ]);
 
-        $updateUsersQueries = array_filter($queries, fn (string $sql): bool => str_starts_with($sql, 'update `users`'));
+        $updateUsersQueries = array_filter($queries, static fn (string $sql): bool => str_starts_with($sql, 'update `users`'));
         $this->assertCount(1, $updateUsersQueries);
     }
 
