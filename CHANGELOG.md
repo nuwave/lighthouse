@@ -13,7 +13,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
-- Add option `builder` to `@limit` to apply an actual `LIMIT` clause
+- Add option `builder` to `@limit` to apply an actual `LIMIT` clause https://github.com/nuwave/lighthouse/pull/2571
 
 ## v6.37.1
 

@@ -119,7 +119,7 @@ An [`\Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective`](https://github.c
 directive allows using arguments passed by the client to dynamically
 modify the database query that Lighthouse creates for a field.
 
-Currently, the following directives use the defined filters for resolving the query:
+Currently, the following directives use arguments to modify the query:
 
 - [@all](../api-reference/directives.md#all)
 - [@paginate](../api-reference/directives.md#paginate)
