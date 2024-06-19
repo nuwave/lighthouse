@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.38.0
+
+### Added
+
+- Add option `builder` to `@limit` to apply an actual `LIMIT` clause
+
 ## v6.37.1
 
 ### Fixed

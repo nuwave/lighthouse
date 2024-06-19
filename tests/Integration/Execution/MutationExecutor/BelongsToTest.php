@@ -515,7 +515,6 @@ GRAPHQL
 
         $queries = [];
         DB::listen(static function (QueryExecuted $query) use (&$queries): void {
-            dump($query->sql);
             $queries[] = $query->sql;
         });
 

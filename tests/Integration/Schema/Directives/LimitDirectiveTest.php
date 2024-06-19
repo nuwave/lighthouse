@@ -3,6 +3,8 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
+use Illuminate\Database\Events\QueryExecuted;
+use Illuminate\Support\Facades\DB;
 use Nuwave\Lighthouse\Cache\CacheKeyAndTagsGenerator;
 use Tests\DBTestCase;
 use Tests\TestsSerialization;
@@ -34,6 +36,11 @@ final class LimitDirectiveTest extends DBTestCase
         }
         ';
 
+        $queries = [];
+        DB::listen(static function (QueryExecuted $query) use (&$queries): void {
+            $queries[] = $query->sql;
+        });
+
         $limit = 1;
         $this->graphQL(/** @lang GraphQL */ '
         query ($limit: Int) {
@@ -44,6 +51,43 @@ final class LimitDirectiveTest extends DBTestCase
         ', [
             'limit' => $limit,
         ])->assertJsonCount($limit, 'data.users');
+        $this->assertSame([
+            'select * from `users`',
+        ], $queries);
+    }
+
+    public function testLimitsQueryBuilder(): void
+    {
+        factory(User::class, 2)->create();
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID!
+        }
+
+        type Query {
+            users(limit: Int @limit(builder: true)): [User!]! @all
+        }
+        ';
+
+        $queries = [];
+        DB::listen(static function (QueryExecuted $query) use (&$queries): void {
+            $queries[] = $query->sql;
+        });
+
+        $limit = 1;
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($limit: Int) {
+            users(limit: $limit) {
+                id
+            }
+        }
+        ', [
+            'limit' => $limit,
+        ])->assertJsonCount($limit, 'data.users');
+        $this->assertSame([
+            "select * from `users` limit {$limit}",
+        ], $queries);
     }
 
     /**
