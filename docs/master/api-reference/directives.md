@@ -2021,15 +2021,23 @@ directive @like(
 ```graphql
 """
 Allow clients to specify the maximum number of results to return when used on an argument,
-or statically limits them when used on a field.
+or statically limit them when used on a field.
 
-This directive does not influence the number of results the resolver queries internally,
-but limits how much of it is returned to clients.
+By default, this directive does not influence the number of results the resolver queries internally,
+but limits how much of it is returned to clients. Use the `builder` argument to change this.
 """
-directive @limit on ARGUMENT_DEFINITION | FIELD_DEFINITION
+directive @limit(
+  """
+  You may set this to `true` if the field uses a query builder,
+  then this directive will apply a LIMIT clause to it.
+  Typically, this option should only be used for root fields,
+  as it may cause wrong results with batched relation queries.
+  """
+  builder: Boolean! = false
+) on ARGUMENT_DEFINITION | FIELD_DEFINITION
 ```
 
-Place this on any argument to a field that returns a list of results.
+You may place this on any argument to a field that returns a list of results.
 
 ```graphql
 type Query {
@@ -2041,7 +2049,7 @@ Lighthouse will return at most the number of results that the client requested.
 
 ```graphql
 {
-  users(limit: 5) {
+  users(limit: 4) {
     name
   }
 }
@@ -2054,9 +2062,18 @@ Lighthouse will return at most the number of results that the client requested.
       { "name": "Never" },
       { "name": "more" },
       { "name": "than" },
-      { "name": "5" }
+      { "name": "4" }
     ]
   }
+}
+```
+
+If your field is resolved through a database query, you may add the `builder` argument to apply
+an actual `LIMIT` clause to your SQL:
+
+```graphql
+type Query {
+  users(limit: Int @limit(builder: true)): [User!]! @all
 }
 ```
 

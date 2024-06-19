@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Schema\Directives;
+namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;

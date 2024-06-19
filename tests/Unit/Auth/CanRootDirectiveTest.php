@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Auth;
+namespace Tests\Unit\Auth;
 
 use Illuminate\Contracts\Auth\Access\Gate;
-use Tests\Unit\Auth\CanDirectiveTestBase;
 use Tests\Utils\Models\User;
 use Tests\Utils\Policies\UserPolicy;
 
