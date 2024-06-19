@@ -2027,13 +2027,13 @@ By default, this directive does not influence the number of results the resolver
 but limits how much of it is returned to clients. Use the `builder` argument to change this.
 """
 directive @limit(
-    """
-    You may set this to `true` if the field uses a query builder,
-    then this directive will apply a LIMIT clause to it.
-    Typically, this option should only be used for root fields,
-    as it may cause wrong results with batched relation queries.
-    """
-    builder: Boolean! = false
+  """
+  You may set this to `true` if the field uses a query builder,
+  then this directive will apply a LIMIT clause to it.
+  Typically, this option should only be used for root fields,
+  as it may cause wrong results with batched relation queries.
+  """
+  builder: Boolean! = false
 ) on ARGUMENT_DEFINITION | FIELD_DEFINITION
 ```
 

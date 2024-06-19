@@ -1,8 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Auth;
-
-use Tests\Unit\Auth\CanDirectiveTestBase;
+namespace Tests\Unit\Auth;
 
 final class CanModelDirectiveTest extends CanDirectiveTestBase
 {

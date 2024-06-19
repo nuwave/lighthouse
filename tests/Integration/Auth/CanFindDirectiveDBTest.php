@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Auth;
+namespace Tests\Integration\Auth;
 
 use GraphQL\Error\Error;
 use Nuwave\Lighthouse\Auth\CanDirective;
