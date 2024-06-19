@@ -2,7 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
