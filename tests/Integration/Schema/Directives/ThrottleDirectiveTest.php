@@ -103,7 +103,7 @@ final class ThrottleDirectiveTest extends TestCase
             static fn (): Limit => Limit::perMinute(1),
         );
 
-        $knownDate = Carbon::create(2020, 1, 1, 1); // arbitrary known date
+        $knownDate = Carbon::createStrict(2020, 1, 1, 1); // arbitrary known date
         Carbon::setTestNow($knownDate);
 
         $this->graphQL($query)->assertJson([
