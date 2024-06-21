@@ -9,6 +9,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.38.1
+
 ### Fixed
 
 - Correct decay value calculation in `@throttle` directive https://github.com/nuwave/lighthouse/pull/2573
