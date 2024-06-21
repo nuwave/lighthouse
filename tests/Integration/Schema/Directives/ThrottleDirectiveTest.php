@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Carbon\Carbon;
 use Faker\Factory;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -80,6 +81,51 @@ final class ThrottleDirectiveTest extends TestCase
         $this->graphQL($query)->assertGraphQLError(
             new RateLimitException('Query.foo'),
         );
+    }
+    
+    public function testLimitClears(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo: Int @throttle(name: "test")
+        }
+        ';
+
+        $query = /** @lang GraphQL */ '
+        {
+            foo
+        }
+        ';
+
+        $rateLimiter = $this->app->make(RateLimiter::class);
+        $rateLimiter->for(
+            'test',
+            static fn (): Limit => Limit::perMinute(1),
+        );
+
+        $knownDate = Carbon::createStrict(2020, 1, 1, 1); // arbitrary known date
+        Carbon::setTestNow($knownDate);
+
+        $this->graphQL($query)->assertJson([
+            'data' => [
+                'foo' => Foo::THE_ANSWER,
+            ],
+        ]);
+
+        $this->graphQL($query)->assertGraphQLError(
+            new RateLimitException('Query.foo'),
+        );
+
+        // wait two minutes and assert that the limit is reset
+        Carbon::setTestNow($knownDate->copy()->addMinutes(2));
+
+        $this->graphQL($query)->assertJson([
+            'data' => [
+                'foo' => Foo::THE_ANSWER,
+            ],
+        ]);
+
+        Carbon::setTestNow();
     }
 
     public function testInlineLimiter(): void
