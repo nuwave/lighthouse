@@ -11,7 +11,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Fixed
 
-- Fixed bug where decay value in ThrottleDirective was calculated incorrectly
+- Correct decay value calculation in `@throttle` directive https://github.com/nuwave/lighthouse/pull/2573
 
 ## v6.38.0
 
