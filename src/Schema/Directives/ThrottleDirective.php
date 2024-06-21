@@ -84,7 +84,7 @@ GRAPHQL;
                         sha1($name . $limit->key),
                         $limit->maxAttempts,
                         // Laravel 11 switched to using seconds
-                        $limit->decayMinutes ?? $limit->decaySeconds * 60,
+                        $limit->decayMinutes ?? $limit->decaySeconds / 60,
                         "{$resolveInfo->parentType}.{$resolveInfo->fieldName}",
                     );
                 }

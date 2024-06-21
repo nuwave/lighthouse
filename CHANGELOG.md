@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+
+- Fixed bug where decay value in ThrottleDirective was calculated incorrectly
+
 ## v6.38.0
 
 ### Added
