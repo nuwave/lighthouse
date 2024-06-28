@@ -82,7 +82,7 @@ final class ThrottleDirectiveTest extends TestCase
             new RateLimitException('Query.foo'),
         );
     }
-    
+
     public function testLimitClears(): void
     {
         $this->schema = /** @lang GraphQL */ '
