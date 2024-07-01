@@ -1,6 +1,5 @@
 <?php declare(strict_types=1);
 
-use Rector\CodeQuality\Rector\Array_\CallableThisArrayToAnonymousFunctionRector;
 use Rector\CodeQuality\Rector\Concat\JoinStringConcatRector;
 use Rector\CodeQuality\Rector\Foreach_\UnusedForeachValueToArrayKeysRector;
 use Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector;
@@ -32,11 +31,11 @@ return static function (RectorConfig $rectorConfig): void {
         PHPUnitSetList::PHPUNIT_90,
         PHPUnitSetList::PHPUNIT_CODE_QUALITY,
     ]);
+    $rectorConfig->rule(StaticClosureRector::class);
     $rectorConfig->skip([
         __DIR__ . '/src/Tracing/FederatedTracing/Proto', // Generated code
         __DIR__ . '/tests/database/migrations', // Does not fit autoloader standards
         __DIR__ . '/tests/LaravelPhpdocAlignmentFixer.php', // Copied from Laravel
-        CallableThisArrayToAnonymousFunctionRector::class, // Callable in array form is shorter and more efficient
         IssetOnPropertyObjectToPropertyExistsRector::class, // isset() is nice when moving towards typed properties
         FlipTypeControlToUseExclusiveTypeRector::class, // Unnecessarily complex with PHPStan
         JoinStringConcatRector::class => [
