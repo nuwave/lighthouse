@@ -154,6 +154,62 @@ final class UpdateManyDirectiveTest extends DBTestCase
         $this->assertSame($name, $company1->refresh()->name);
     }
 
+    /** TODO consider either throwing or ensuring the latest results for each entry */
+    public function testSameIDMultipleTimes(): void
+    {
+        $company1 = factory(Company::class)->create();
+        assert($company1 instanceof Company);
+        $company1->name = 'foo1';
+        $company1->save();
+
+        $this->schema .= /** @lang GraphQL */ '
+        type Company {
+            id: ID!
+            name: String!
+        }
+
+        input UpdateCompanyInput {
+            id: ID!
+            name: String
+        }
+
+        type Mutation {
+            updateCompanies(inputs: [UpdateCompanyInput]!): [Company!]! @updateMany
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            updateCompanies(inputs: [
+                {
+                    id: 1
+                    name: "foo2"
+                }
+                {
+                    id: 1
+                    name: "foo3"
+                }
+            ]) {
+                id
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'updateCompanies' => [
+                    [
+                        'id' => '1',
+                        'name' => 'foo2',
+                    ],
+                    [
+                        'id' => '1',
+                        'name' => 'foo3',
+                    ],
+                ]
+            ]
+        ]);
+    }
+
     public function testMissingArgument(): void
     {
         $this->schema .= /** @lang GraphQL */ '
