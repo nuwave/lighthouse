@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
-use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
 
 final class WithoutGlobalScopesDirective extends BaseDirective implements ArgBuilderDirective
 {

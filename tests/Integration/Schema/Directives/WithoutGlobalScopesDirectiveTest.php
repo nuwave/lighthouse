@@ -1,15 +1,15 @@
 <?php
 
-namespace Schema\Directives;
+namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\Episode;
 
 class WithoutGlobalScopesDirectiveTest extends DBTestCase
 {
-    public function testWithScope(): void
+    public function testDefaultCondition(): void
     {
-        factory(Episode::class)->times(10)->make();
+        factory(Episode::class)->make();
 
         $this->schema = /** @lang GraphQL */
             '
@@ -23,8 +23,7 @@ class WithoutGlobalScopesDirectiveTest extends DBTestCase
 
         type Episode {
             id: ID!
-            title: String!
-            schedule_at : DateTime
+
         }
         ';
 
@@ -35,12 +34,18 @@ class WithoutGlobalScopesDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertJsonCount(0, 'data.episodes');
+        ')->assertExactJson(
+            [
+                'data' => [
+                    'episodes' => [],
+                ],
+            ]
+        );
     }
 
-    public function testWithoutScope(): void
+    public function testWithPassingDirective(): void
     {
-        factory(Episode::class)->times(10)->make();
+        $episode = factory(Episode::class)->make();
 
         $this->schema = /** @lang GraphQL */
             '
@@ -54,8 +59,7 @@ class WithoutGlobalScopesDirectiveTest extends DBTestCase
 
         type Episode {
             id: ID!
-            title: String!
-            schedule_at : DateTime
+
         }
         ';
 
@@ -66,6 +70,18 @@ class WithoutGlobalScopesDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertJsonCount(10, 'data.episodes');
+        ')->assertExactJson(
+            [
+                'data' => [
+                    'episodes' => [
+                        [
+                            'id' => "{$episode->id}",
+                        ],
+                    ],
+                ],
+            ]
+        );
     }
+
+
 }
