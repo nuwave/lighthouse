@@ -20,7 +20,7 @@ Removes any number of global scopes from the query builder.
 The scopes will only be removed if the client-given value of the argument is truthy.
 
   """
-   names of the scopes on the custom query builder.
+  The names of the global scopes to omit.
   """
 names: [String!]
 ) on FIELD_DEFINITION
