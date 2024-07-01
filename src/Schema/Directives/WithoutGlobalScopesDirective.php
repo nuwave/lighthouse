@@ -23,7 +23,7 @@ The scopes will only be removed if the client-given value of the argument is tru
   The names of the global scopes to omit.
   """
 names: [String!]
-) on FIELD_DEFINITION
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 GRAPHQL;
     }
 
