@@ -205,8 +205,8 @@ final class UpdateManyDirectiveTest extends DBTestCase
                         'id' => '1',
                         'name' => 'foo3',
                     ],
-                ]
-            ]
+                ],
+            ],
         ]);
     }
 
