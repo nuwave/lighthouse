@@ -4,7 +4,7 @@ namespace Tests\Integration\Schema\Directives;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Schema\Directives\ManyMutationExecutorDirective;
+use Nuwave\Lighthouse\Schema\Directives\ManyModelMutationDirective;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Company;
 
@@ -149,6 +149,7 @@ final class UpdateManyDirectiveTest extends DBTestCase
         } catch (ModelNotFoundException $modelNotFoundException) {
             $exception = $modelNotFoundException;
         }
+
         $this->assertNotNull($exception);
 
         $this->assertSame($name, $company1->refresh()->name);
@@ -229,7 +230,7 @@ final class UpdateManyDirectiveTest extends DBTestCase
         ';
 
         $this->expectExceptionObject(new DefinitionException(
-            ManyMutationExecutorDirective::NOT_EXACTLY_ONE_ARGUMENT,
+            ManyModelMutationDirective::NOT_EXACTLY_ONE_ARGUMENT,
         ));
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -255,7 +256,7 @@ final class UpdateManyDirectiveTest extends DBTestCase
         ';
 
         $this->expectExceptionObject(new DefinitionException(
-            ManyMutationExecutorDirective::NOT_EXACTLY_ONE_ARGUMENT,
+            ManyModelMutationDirective::NOT_EXACTLY_ONE_ARGUMENT,
         ));
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -286,7 +287,7 @@ final class UpdateManyDirectiveTest extends DBTestCase
         ';
 
         $this->expectExceptionObject(new DefinitionException(
-            ManyMutationExecutorDirective::ARGUMENT_NOT_LIST,
+            ManyModelMutationDirective::ARGUMENT_NOT_LIST,
         ));
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -315,7 +316,7 @@ final class UpdateManyDirectiveTest extends DBTestCase
         ';
 
         $this->expectExceptionObject(new DefinitionException(
-            ManyMutationExecutorDirective::LIST_ITEM_NOT_INPUT_OBJECT,
+            ManyModelMutationDirective::LIST_ITEM_NOT_INPUT_OBJECT,
         ));
         $this->graphQL(/** @lang GraphQL */ '
         mutation {

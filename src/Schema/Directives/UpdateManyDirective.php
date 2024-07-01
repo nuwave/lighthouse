@@ -6,13 +6,13 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Nuwave\Lighthouse\Execution\Arguments\SaveModel;
 use Nuwave\Lighthouse\Execution\Arguments\UpdateModel;
 
-class UpdateManyDirective extends ManyMutationExecutorDirective
+class UpdateManyDirective extends ManyModelMutationDirective
 {
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Update multiple Eloquent models with the inputs of the field.
+Update multiple Eloquent models with the given arguments.
 """
 directive @updateMany(
   """
