@@ -14,7 +14,10 @@ final class WithoutGlobalScopesDirective extends BaseDirective implements ArgBui
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-directive @withoutGlobalScopes(
+"""
+Removes any number of global scopes from the query builder.
+
+The scopes will only be removed if the client-given value of the argument is truthy.
 
   """
    names of the scopes on the custom query builder.
