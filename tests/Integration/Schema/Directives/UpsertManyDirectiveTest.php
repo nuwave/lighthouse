@@ -9,7 +9,7 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-final class UpsertDirectiveTest extends DBTestCase
+final class UpsertManyDirectiveTest extends DBTestCase
 {
     public function testNestedArgResolver(): void
     {
@@ -39,7 +39,7 @@ final class UpsertDirectiveTest extends DBTestCase
         input UpdateUserInput {
             id: Int
             name: String
-            tasks: [UpdateTaskInput!] @upsert(relation: "tasks")
+            tasks: [UpdateTaskInput!] @upsertMany(relation: "tasks")
         }
 
         input UpdateTaskInput {
@@ -112,7 +112,7 @@ final class UpsertDirectiveTest extends DBTestCase
         input UpdateUserInput {
             id: Int
             name: String
-            tasks: [UpdateTaskInput!] @upsert(relation: "tasks")
+            tasks: [UpdateTaskInput!] @upsertMany(relation: "tasks")
         }
 
         input UpdateTaskInput {
@@ -161,7 +161,7 @@ final class UpsertDirectiveTest extends DBTestCase
     {
         $this->schema .= /** @lang GraphQL */ <<<GRAPHQL
         type Mutation {
-            upsertUser(input: UpsertUserInput! @spread): IUser! @upsert
+            upsertUsers(inputs: [UpsertUserInput!]!): [IUser!]! @upsertMany
         }
 
         interface IUser
@@ -182,9 +182,14 @@ GRAPHQL;
 
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
-            upsertUser(input: {
-                name: "foo"
-            }) {
+            upsertUsers(inputs: [
+                {
+                    name: "foo"
+                }
+                {
+                    name: "bar"
+                }
+            ]) {
                 ... on Admin {
                     id
                     name
@@ -193,9 +198,15 @@ GRAPHQL;
         }
         ')->assertJson([
             'data' => [
-                'upsertUser' => [
-                    'id' => 1,
-                    'name' => 'foo',
+                'upsertUsers' => [
+                    [
+                        'id' => 1,
+                        'name' => 'foo',
+                    ],
+                    [
+                        'id' => 2,
+                        'name' => 'bar',
+                    ],
                 ],
             ],
         ]);

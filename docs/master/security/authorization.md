@@ -172,8 +172,8 @@ You can pass additional arguments to the policy checks by specifying them as `ar
 ```graphql
 type Mutation {
   createPost(input: CreatePostInput! @spread): Post!
-    @create
     @canModel(ability: "create", args: ["FROM_GRAPHQL"])
+    @create
 }
 ```
 

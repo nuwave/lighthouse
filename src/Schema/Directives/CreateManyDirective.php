@@ -4,17 +4,16 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Nuwave\Lighthouse\Execution\Arguments\SaveModel;
-use Nuwave\Lighthouse\Execution\Arguments\UpdateModel;
 
-class UpdateDirective extends OneModelMutationDirective
+class CreateManyDirective extends ManyModelMutationDirective
 {
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Update an Eloquent model with the given arguments.
+Create multiple new Eloquent models with the given arguments.
 """
-directive @update(
+directive @createMany(
   """
   Specify the class name of the model to use.
   This is only needed when the default model detection does not work.
@@ -33,6 +32,6 @@ GRAPHQL;
 
     protected function makeExecutionFunction(?Relation $parentRelation = null): callable
     {
-        return new UpdateModel(new SaveModel($parentRelation));
+        return new SaveModel($parentRelation);
     }
 }

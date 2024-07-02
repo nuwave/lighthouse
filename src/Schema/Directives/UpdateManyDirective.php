@@ -6,15 +6,15 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Nuwave\Lighthouse\Execution\Arguments\SaveModel;
 use Nuwave\Lighthouse\Execution\Arguments\UpdateModel;
 
-class UpdateDirective extends OneModelMutationDirective
+class UpdateManyDirective extends ManyModelMutationDirective
 {
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Update an Eloquent model with the given arguments.
+Update multiple Eloquent models with the given arguments.
 """
-directive @update(
+directive @updateMany(
   """
   Specify the class name of the model to use.
   This is only needed when the default model detection does not work.
