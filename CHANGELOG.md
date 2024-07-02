@@ -13,6 +13,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Add directives `@createMany`, `@updateMany` and `@upsertMany` to mutate multiple models at once https://github.com/nuwave/lighthouse/pull/2578
 
+### Changed
+
+- Split `MutationExecutorDirective` into `OneModelMutationDirective` and `ManyModelMutationDirective` https://github.com/nuwave/lighthouse/pull/2578
+
 ## v6.38.1
 
 ### Fixed
