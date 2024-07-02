@@ -3,7 +3,6 @@
 use Rector\CodeQuality\Rector\Concat\JoinStringConcatRector;
 use Rector\CodeQuality\Rector\Foreach_\UnusedForeachValueToArrayKeysRector;
 use Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector;
-use Rector\CodeQuality\Rector\Identical\GetClassToInstanceOfRector;
 use Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector;
 use Rector\CodeQuality\Rector\Isset_\IssetOnPropertyObjectToPropertyExistsRector;
 use Rector\CodingStyle\Rector\ClassMethod\MakeInheritedMethodVisibilitySameAsParentRector;
@@ -46,9 +45,6 @@ return static function (RectorConfig $rectorConfig): void {
         ],
         StaticClosureRector::class => [
             __DIR__ . '/src/Testing/TestResponseMixin.php', // Cannot bind an instance to a static closure
-        ],
-        GetClassToInstanceOfRector::class => [
-            __DIR__ . '/src/Schema/Types/Scalars/DateScalar.php', // We need to compare exact classes, not subclasses
         ],
         MakeInheritedMethodVisibilitySameAsParentRector::class => [
             __DIR__ . '/tests/Unit/Execution/ResolveInfoTest.php', // Makes method public on purpose
