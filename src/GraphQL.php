@@ -285,7 +285,11 @@ class GraphQL
         return $result->toArray($this->debugFlag());
     }
 
-    /** Loads persisted query from the query cache. */
+    /**
+     * Loads persisted query from the query cache.
+     *
+     * @api
+     */
     public function loadPersistedQuery(string $sha256hash): DocumentNode
     {
         $lighthouseConfig = $this->configRepository->get('lighthouse');
