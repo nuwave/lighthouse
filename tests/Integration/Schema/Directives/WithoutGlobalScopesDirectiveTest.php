@@ -9,7 +9,7 @@ final class WithoutGlobalScopesDirectiveTest extends DBTestCase
 {
     public function testDefaultCondition(): void
     {
-        factory(Episode::class)->make();
+        factory(Episode::class)->create();
 
         $this->schema = /** @lang GraphQL */
             '
@@ -45,7 +45,7 @@ final class WithoutGlobalScopesDirectiveTest extends DBTestCase
 
     public function testWithPassingDirective(): void
     {
-        $episode = factory(Episode::class)->make();
+        $episode = factory(Episode::class)->create();
 
         $this->schema = /** @lang GraphQL */
             '
