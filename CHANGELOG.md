@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.40.0
+
+### Added
+
+- Make `GraphQL::loadPersistedQuery` public https://github.com/nuwave/lighthouse/pull/2579
+
 ## v6.39.0
 
 ### Added
