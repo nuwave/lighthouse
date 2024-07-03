@@ -49,6 +49,13 @@ class GraphQL
      */
     protected $errorsHandler;
 
+    /**
+     * Previously loaded queries.
+     *
+     * @var array<string, DocumentNode>
+     */
+    protected array $persistedQueries = [];
+
     public function __construct(
         protected SchemaBuilder $schemaBuilder,
         protected Pipeline $pipeline,
@@ -286,8 +293,12 @@ class GraphQL
     }
 
     /** Loads persisted query from the query cache. */
-    protected function loadPersistedQuery(string $sha256hash): DocumentNode
+    public function loadPersistedQuery(string $sha256hash): DocumentNode
     {
+        if (in_array($sha256Hash, $this->persistedQueries)) {
+            return $this->persistedQueries[$sha256hash];
+        }
+
         $lighthouseConfig = $this->configRepository->get('lighthouse');
         $cacheConfig = $lighthouseConfig['query_cache'] ?? null;
         if (
