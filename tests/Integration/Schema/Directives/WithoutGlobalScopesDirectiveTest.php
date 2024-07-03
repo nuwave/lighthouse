@@ -5,7 +5,7 @@ namespace Tests\Integration\Schema\Directives;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Episode;
 
-class WithoutGlobalScopesDirectiveTest extends DBTestCase
+final class WithoutGlobalScopesDirectiveTest extends DBTestCase
 {
     public function testDefaultCondition(): void
     {
