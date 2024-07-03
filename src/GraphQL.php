@@ -50,7 +50,7 @@ class GraphQL
     protected $errorsHandler;
 
     /**
-     * Previously loaded queries.
+     * Previously persisted queries.
      *
      * @var array<string, DocumentNode>
      */
@@ -295,10 +295,6 @@ class GraphQL
     /** Loads persisted query from the query cache. */
     public function loadPersistedQuery(string $sha256hash): DocumentNode
     {
-        if (in_array($sha256Hash, $this->persistedQueries)) {
-            return $this->persistedQueries[$sha256hash];
-        }
-
         $lighthouseConfig = $this->configRepository->get('lighthouse');
         $cacheConfig = $lighthouseConfig['query_cache'] ?? null;
         if (
@@ -317,10 +313,19 @@ class GraphQL
             );
         }
 
+        if (in_array($sha256hash, $this->persistedQueries)) {
+            return $this->persistedQueries[$sha256hash];
+        }
+
         $cacheFactory = Container::getInstance()->make(CacheFactory::class);
         $store = $cacheFactory->store($cacheConfig['store']);
+        $persistedQuery = $store->get("lighthouse:query:{$sha256hash}");
 
-        return $store->get("lighthouse:query:{$sha256hash}")
+        if ($persistedQuery) {
+            $this->persistedQueries[$sha256hash] = $persistedQuery;
+        }
+
+        return $persistedQuery
             // https://github.com/apollographql/apollo-server/blob/37a5c862261806817a1d71852c4e1d9cdb59eab2/packages/apollo-server-errors/src/index.ts#L230-L239
             ?? throw new Error(
                 'PersistedQueryNotFound',
