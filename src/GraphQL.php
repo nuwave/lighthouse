@@ -49,13 +49,6 @@ class GraphQL
      */
     protected $errorsHandler;
 
-    /**
-     * Previously persisted queries.
-     *
-     * @var array<string, DocumentNode>
-     */
-    protected array $persistedQueries = [];
-
     public function __construct(
         protected SchemaBuilder $schemaBuilder,
         protected Pipeline $pipeline,
@@ -313,19 +306,10 @@ class GraphQL
             );
         }
 
-        if (in_array($sha256hash, $this->persistedQueries)) {
-            return $this->persistedQueries[$sha256hash];
-        }
-
         $cacheFactory = Container::getInstance()->make(CacheFactory::class);
         $store = $cacheFactory->store($cacheConfig['store']);
-        $persistedQuery = $store->get("lighthouse:query:{$sha256hash}");
 
-        if ($persistedQuery) {
-            $this->persistedQueries[$sha256hash] = $persistedQuery;
-        }
-
-        return $persistedQuery
+        return $store->get("lighthouse:query:{$sha256hash}")
             // https://github.com/apollographql/apollo-server/blob/37a5c862261806817a1d71852c4e1d9cdb59eab2/packages/apollo-server-errors/src/index.ts#L230-L239
             ?? throw new Error(
                 'PersistedQueryNotFound',
