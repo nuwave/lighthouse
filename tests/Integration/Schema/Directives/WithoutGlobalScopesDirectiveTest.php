@@ -3,26 +3,27 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
-use Tests\Utils\Models\Episode;
+use Tests\Utils\Models\Podcast;
 
 final class WithoutGlobalScopesDirectiveTest extends DBTestCase
 {
     public function testDefaultCondition(): void
     {
-        factory(Episode::class)->create();
+        factory(Podcast::class)->create();
 
         $this->schema = /** @lang GraphQL */
             '
         type Query {
-             episodes(
-        allEpisodes: Boolean @withoutGlobalScopes(names: ["published"])
+             podcasts(
+        allPodcasts: Boolean @withoutGlobalScopes(names: ["published"])
         )
 
-    : [Episode!]! @all
+    : [Podcast!]! @all
         }
 
-        type Episode {
+        type Podcast {
             id: ID!
+            schedule_at: String!
 
         }
         ';
@@ -30,14 +31,15 @@ final class WithoutGlobalScopesDirectiveTest extends DBTestCase
 
         $this->graphQL(/** @lang GraphQL */ '
         {
-            episodes {
+            podcasts {
                 id
+                schedule_at
             }
         }
         ')->assertExactJson(
             [
                 'data' => [
-                    'episodes' => [],
+                    'podcasts' => [],
                 ],
             ]
         );
@@ -45,19 +47,19 @@ final class WithoutGlobalScopesDirectiveTest extends DBTestCase
 
     public function testWithPassingDirective(): void
     {
-        $episode = factory(Episode::class)->create();
+        $podcast = factory(Podcast::class)->create();
 
         $this->schema = /** @lang GraphQL */
             '
         type Query {
-             episodes(
-        allEpisodes: Boolean @withoutGlobalScopes(names: ["published"])
+             podcasts(
+        allPodcasts: Boolean @withoutGlobalScopes(names: ["published"])
         )
 
-    : [Episode!]! @all
+    : [Podcast!]! @all
         }
 
-        type Episode {
+        type Podcast {
             id: ID!
 
         }
@@ -66,16 +68,16 @@ final class WithoutGlobalScopesDirectiveTest extends DBTestCase
 
         $this->graphQL(/** @lang GraphQL */ '
         {
-            episodes (allEpisodes: true) {
+            podcasts (allPodcasts: true) {
                 id
             }
         }
         ')->assertExactJson(
             [
                 'data' => [
-                    'episodes' => [
+                    'podcasts' => [
                         [
-                            'id' => "{$episode->id}",
+                            'id' => "{$podcast->id}",
                         ],
                     ],
                 ],

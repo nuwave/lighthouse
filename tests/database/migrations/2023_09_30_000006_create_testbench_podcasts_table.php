@@ -3,20 +3,23 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Tests\Constants;
 
-final class CreateTestbenchEpisodesTable extends Migration
+final class CreateTestbenchPodcastsTable extends Migration
 {
     public function up(): void
     {
-        Schema::create('episodes', function (Blueprint $table): void {
+        Schema::create('podcasts', function (Blueprint $table): void {
             $table->increments('id');
             $table->string('title');
             $table->timestamp('schedule_at')->nullable();
+            $table->softDeletes();
+            $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::drop('episodes');
+        Schema::drop('podcasts');
     }
 }

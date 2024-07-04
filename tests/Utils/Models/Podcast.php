@@ -4,6 +4,7 @@ namespace Tests\Utils\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 
 /**
@@ -17,8 +18,10 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon $schedule_at
 **/
 
-final class Episode extends Model
+final class Podcast extends Model
 {
+    use SoftDeletes;
+
     protected static function booted(): void
     {
         self::addGlobalScope("published", function (Builder $q) {
