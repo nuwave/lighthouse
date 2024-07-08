@@ -5,5 +5,6 @@ use Faker\Generator as Faker;
 /** @var Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(\Tests\Utils\Models\Podcast::class, static fn (Faker $faker): array => [
     'title' => $faker->title,
-    'schedule_at' => null,
+//    'schedule_at' => null,
+    'schedule_at' => $faker->randomElement([null, $faker->date()]),
 ]);

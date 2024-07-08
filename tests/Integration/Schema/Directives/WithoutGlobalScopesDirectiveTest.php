@@ -9,7 +9,10 @@ final class WithoutGlobalScopesDirectiveTest extends DBTestCase
 {
     public function testDefaultCondition(): void
     {
-        factory(Podcast::class)->create();
+        factory(Podcast::class, 5)->create();
+
+        $scheduled_podcasts = Podcast::query()
+            ->get();
 
         $this->schema = /** @lang GraphQL */
             '
@@ -39,15 +42,23 @@ final class WithoutGlobalScopesDirectiveTest extends DBTestCase
         ')->assertExactJson(
             [
                 'data' => [
-                    'podcasts' => [],
-                ],
+                    'podcasts' => $scheduled_podcasts
+                        ->map(static fn (Podcast $podcast): array => [
+                            'id' => (string) $podcast->id,
+                            'schedule_at' => $podcast->schedule_at,
+                        ])
+                ]
             ]
-        );
+        )->assertJsonCount($scheduled_podcasts->count(), 'data.podcasts');
     }
 
     public function testWithPassingDirective(): void
     {
-        $podcast = factory(Podcast::class)->create();
+        factory(Podcast::class, 5)->create();
+
+        $all_podcasts = Podcast::query()
+            ->withoutGlobalScopes(["published"])
+            ->get();
 
         $this->schema = /** @lang GraphQL */
             '
@@ -61,7 +72,7 @@ final class WithoutGlobalScopesDirectiveTest extends DBTestCase
 
         type Podcast {
             id: ID!
-
+            schedule_at: String
         }
         ';
 
@@ -70,6 +81,7 @@ final class WithoutGlobalScopesDirectiveTest extends DBTestCase
         {
             podcasts (allPodcasts: true) {
                 id
+                schedule_at
             }
         }
         ')->assertExactJson(
@@ -77,13 +89,28 @@ final class WithoutGlobalScopesDirectiveTest extends DBTestCase
                 'data' => [
                     'podcasts' => [
                         [
-                            'id' => "{$podcast->id}",
+                            'id' => (string) $all_podcasts[0]->id,
+                            'schedule_at' => $all_podcasts[0]->schedule_at ?? null
+                        ],
+                        [
+                            'id' => (string) $all_podcasts[1]->id,
+                            'schedule_at' => $all_podcasts[1]->schedule_at ?? null
+                        ],
+                        [
+                            'id' => (string) $all_podcasts[2]->id,
+                            'schedule_at' => $all_podcasts[2]->schedule_at ?? null
+                        ],
+                        [
+                            'id' => (string) $all_podcasts[3]->id,
+                            'schedule_at' => $all_podcasts[3]->schedule_at ?? null
+                        ],
+                        [
+                            'id' => (string) $all_podcasts[4]->id,
+                            'schedule_at' => $all_podcasts[4]->schedule_at ?? null
                         ],
                     ],
                 ],
             ]
-        );
+        )->assertJsonCount($all_podcasts->count(), 'data.podcasts');
     }
-
-
 }
