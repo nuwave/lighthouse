@@ -3371,57 +3371,6 @@ type Query {
 }
 ```
 
-## @withoutGlobalScopes
-
-```graphql
-"""
-
-Omit your global scopes to the query builder.
-
-The withoutGlobalScopes method will receive the client-given value of the argument as the second parameter.
-This also works with custom query builders, it simply calls its methods with the argument value.
-"""
-directive @withoutGlobalScopes(
-  """
-  The names of the global scopes to omit
-  """
-  names: [String!]
-) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-```
-
-> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
-> Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
-
-```graphql
-type Query {
-  posts(allPosts: Boolean @withoutGlobalScopes(names: ["published"])): [Post!]! @all
-}
-```
-
-
-```php
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
-
-final class Post extends Model
-{
-     protected static function booted(): void
-    {
-        self::addGlobalScope("published", function (Builder $q) {
-            ...your logic...
-        });
-    }
-}
-```
-
-You can pass an array of your global scopes:
-
-```graphql
-type Query {
-  posts(allPosts: Boolean @withoutGlobalScopes(names: ["published" , "secondGlobalScope"])): [Post!] @all
-}
-```
-
 ## @search
 
 ```graphql
@@ -4366,3 +4315,45 @@ type User {
 ```
 
 If you just want to return the count itself as-is, use [@count](#count).
+
+## @withoutGlobalScopes
+
+```graphql
+"""
+Omit any number of global scopes from the query builder.
+
+This directive should be used on arguments of type `Boolean`.
+The scopes will be removed only if `true` is passed by the client.
+"""
+directive @withoutGlobalScopes(
+  """
+  The names of the global scopes to omit.
+  """
+  names: [String!]!
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
+
+> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
+> Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
+
+```php
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+
+final class Post extends Model
+{
+    protected static function booted(): void
+    {
+        self::addGlobalScope('scheduled', fn (Builder $query): Builder => $query
+            ->whereNotNull('schedule_at'));
+    }
+}
+```
+
+```graphql
+type Query {
+  posts(
+    includeUnscheduled: Boolean @withoutGlobalScopes(names: ["scheduled"])
+  ): [Post!]! @all
+}
+```
