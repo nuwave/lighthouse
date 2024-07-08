@@ -59,7 +59,7 @@ We will start of by defining a mutation to create a post.
 
 ```graphql
 type Mutation {
-  createPost(input: CreatePostInput! @spread): Post @create
+  createPost(input: CreatePostInput! @spread): Post! @create
 }
 ```
 
@@ -171,7 +171,7 @@ but `delete` also removes the author model itself.
 
 ```graphql
 type Mutation {
-  updatePost(input: UpdatePostInput! @spread): Post @update
+  updatePost(input: UpdatePostInput! @spread): Post! @update
 }
 
 input UpdatePostInput {
@@ -276,7 +276,7 @@ type Image {
 }
 
 type Mutation {
-  updateImage(input: UpdateImageInput! @spread): Image @update
+  updateImage(input: UpdateImageInput! @spread): Image! @update
 }
 
 input UpdateImageInput {
@@ -364,7 +364,7 @@ We will start off by defining a mutation to update a `User`.
 
 ```graphql
 type Mutation {
-  updateUser(input: UpdateUserInput! @spread): User @update
+  updateUser(input: UpdateUserInput! @spread): User! @update
 }
 ```
 
@@ -431,7 +431,7 @@ We will start off by defining a mutation to create an `User`.
 
 ```graphql
 type Mutation {
-  createUser(input: CreateUserInput! @spread): User @create
+  createUser(input: CreateUserInput! @spread): User! @create
 }
 ```
 
@@ -506,7 +506,7 @@ The following example covers the full range of possible operations:
 
 ```graphql
 type Mutation {
-  updateUser(input: UpdateUserInput! @spread): User @update
+  updateUser(input: UpdateUserInput! @spread): User! @update
 }
 
 input UpdateUserInput {
@@ -576,7 +576,7 @@ as attaching existing ones.
 
 ```graphql
 type Mutation {
-  createPost(input: CreatePostInput! @spread): Post @create
+  createPost(input: CreatePostInput! @spread): Post! @create
 }
 
 input CreatePostInput {
@@ -712,7 +712,7 @@ all other fields will be inserted into the pivot table.
 
 ```graphql
 type Mutation {
-  updateUser(input: UpdateUserInput! @spread): User @update
+  updateUser(input: UpdateUserInput! @spread): User! @update
 }
 
 input UpdateUserInput {

@@ -1019,7 +1019,7 @@ Use it on a root mutation field that returns an instance of the Model.
 
 ```graphql
 type Mutation {
-  createPost(title: String!): Post @create
+  createPost(title: String!): Post! @create
 }
 ```
 
@@ -1028,7 +1028,7 @@ to spread out the nested values before applying it to the resolver.
 
 ```graphql
 type Mutation {
-  createPost(input: CreatePostInput! @spread): Post @create
+  createPost(input: CreatePostInput! @spread): Post! @create
 }
 
 input CreatePostInput {
@@ -1041,11 +1041,45 @@ or is located in a non-default namespace, set it with the `model` argument.
 
 ```graphql
 type Mutation {
-  createPost(title: String!): Post @create(model: "Foo\\Bar\\MyPost")
+  createPost(title: String!): Post! @create(model: "Foo\\Bar\\MyPost")
 }
 ```
 
 This directive can also be used as a [nested arg resolver](../concepts/arg-resolvers.md).
+
+## @createMany
+
+```graphql
+"""
+Create multiple new Eloquent models with the given arguments.
+"""
+directive @createMany(
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model detection does not work.
+  """
+  model: String
+
+  """
+  Specify the name of the relation on the parent model.
+  This is only needed when using this directive as a nested arg
+  resolver and if the name of the relation is not the arg name.
+  """
+  relation: String
+) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
+
+When used on a field, it must have exactly one argument where the type is a non-null list of input objects.
+
+```graphql
+type Mutation {
+  createPosts(inputs: [CreatePostInput!]!): [Post!]! @createMany
+}
+
+input CreatePostInput {
+  title: String!
+}
+```
 
 ## @delete
 
@@ -1172,7 +1206,7 @@ type User {
 }
 
 type Mutation {
-  createUser(email: String!, foo: String @drop): User @create
+  createUser(email: String!, foo: String @drop): User! @create
 }
 ```
 
@@ -1242,7 +1276,7 @@ If you pass only a class name, the method name defaults to `__invoke`.
 
 ```graphql
 type Mutation {
-  createPost(title: String!): Post
+  createPost(title: String!): Post!
     @field(resolver: "App\\GraphQL\\Mutations\\PostMutator@create")
 }
 ```
@@ -1868,9 +1902,9 @@ automatically used for creating new models and cannot be manipulated.
 
 ```graphql
 type Mutation {
-  createPost(title: String!, content: String!): Post
-    @create
+  createPost(title: String!, content: String!): Post!
     @inject(context: "user.id", name: "user_id")
+    @create
 }
 ```
 
@@ -1879,9 +1913,9 @@ set a nested argument.
 
 ```graphql
 type Mutation {
-  createTask(input: CreateTaskInput!): Task
-    @create
+  createTask(input: CreateTaskInput!): Task!
     @inject(context: "user.id", name: "input.user_id")
+    @create
 }
 ```
 
@@ -2466,7 +2500,7 @@ This may be useful to logically group arg resolvers.
 
 ```graphql
 type Mutation {
-  createUser(name: String, tasks: UserTasksOperations @nest): User @create
+  createUser(name: String, tasks: UserTasksOperations @nest): User! @create
 }
 
 input UserTasksOperations {
@@ -3496,7 +3530,7 @@ You may use [@spread](#spread) on field arguments or on input object fields:
 
 ```graphql
 type Mutation {
-  updatePost(id: ID!, input: PostInput! @spread): Post @update
+  updatePost(id: ID!, input: PostInput! @spread): Post! @update
 }
 
 input PostInput {
@@ -3727,7 +3761,7 @@ final class Person
 
 ```graphql
 """
-Update an Eloquent model with the input values of the field.
+Update an Eloquent model with the given arguments.
 """
 directive @update(
   """
@@ -3749,7 +3783,7 @@ Use it on a root mutation field that returns an instance of the Model.
 
 ```graphql
 type Mutation {
-  updatePost(id: ID!, content: String): Post @update
+  updatePost(id: ID!, content: String): Post! @update
 }
 ```
 
@@ -3758,7 +3792,7 @@ Client libraries such as Apollo base their caching mechanism on that assumption.
 
 ```graphql
 type Mutation {
-  updatePost(id: ID! @rename(attribute: "post_id"), content: String): Post
+  updatePost(id: ID! @rename(attribute: "post_id"), content: String): Post!
     @update
 }
 ```
@@ -3768,11 +3802,46 @@ or is located in a non-default namespace, set it with the `model` argument.
 
 ```graphql
 type Mutation {
-  updateAuthor(id: ID!, name: String): Author @update(model: "App\\User")
+  updateAuthor(id: ID!, name: String): Author! @update(model: "App\\User")
 }
 ```
 
 This directive can also be used as a [nested arg resolver](../concepts/arg-resolvers.md).
+
+## @updateMany
+
+```graphql
+"""
+Update multiple Eloquent models with the given arguments.
+"""
+directive @updateMany(
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model detection does not work.
+  """
+  model: String
+
+  """
+  Specify the name of the relation on the parent model.
+  This is only needed when using this directive as a nested arg
+  resolver and if the name of the relation is not the arg name.
+  """
+  relation: String
+) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
+
+When used on a field, it must have exactly one argument where the type is a non-null list of input objects.
+
+```graphql
+type Mutation {
+  updatePosts(inputs: [UpdatePostInput!]!): [Post!]! @updateMany
+}
+
+input UpdatePostInput {
+  id: ID!
+  title: String
+}
+```
 
 ## @upload
 
@@ -3808,7 +3877,7 @@ For example, you want to pass in a user avatar, have that file uploaded and the 
 type Mutation {
   createUser(
     avatar: Upload @upload(disk: "public", path: "images/avatars", public: true)
-  ): User @create
+  ): User! @create
 }
 
 type User {
@@ -3820,7 +3889,7 @@ type User {
 
 ```graphql
 """
-Create or update an Eloquent model with the input values of the field.
+Create or update an Eloquent model with the given arguments.
 """
 directive @upsert(
   """
@@ -3844,11 +3913,46 @@ In case no `id` is specified, an auto-generated fresh ID will be used instead.
 
 ```graphql
 type Mutation {
-  upsertPost(post_id: ID!, content: String): Post @upsert
+  upsertPost(id: ID, content: String!): Post! @upsert
 }
 ```
 
 This directive can also be used as a [nested arg resolver](../concepts/arg-resolvers.md).
+
+## @upsertMany
+
+```graphql
+"""
+Create or update multiple Eloquent models with given arguments.
+"""
+directive @upsertMany(
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model detection does not work.
+  """
+  model: String
+
+  """
+  Specify the name of the relation on the parent model.
+  This is only needed when using this directive as a nested arg
+  resolver and if the name of the relation is not the arg name.
+  """
+  relation: String
+) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
+
+When used on a field, it must have exactly one argument where the type is a non-null list of input objects.
+
+```graphql
+type Mutation {
+  upsertPosts(inputs: [UpsertPostInput!]!): [Post!]! @upsertMany
+}
+
+input UpsertPostInput {
+  id: ID
+  title: String!
+}
+```
 
 ## @validator
 
