@@ -2261,7 +2261,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
   with the latest changes in the base configuration file https://github.com/nuwave/lighthouse/pull/820
 - Move `SubscriptionExceptionHandler` into namespace `Nuwave\Lighthouse\Subscriptions\Contracts` https://github.com/nuwave/lighthouse/pull/819
 - The pagination field argument that controls the amount of results
-  now default tos `first` instead of `count`. The config `pagination_amount_argument`
+  now defaults to `first` instead of `count`. The config `pagination_amount_argument`
   can be used to change the argument name https://github.com/nuwave/lighthouse/pull/852
 - Rename `ArgValidationDirective` to `ProvidesRules` and drop `get` prefix from the methods within https://github.com/nuwave/lighthouse/pull/846
 - Make the argument used for finding a model to check `@can` against configurable.
