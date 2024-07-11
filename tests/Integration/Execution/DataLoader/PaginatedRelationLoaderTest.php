@@ -168,9 +168,10 @@ final class PaginatedRelationLoaderTest extends DBTestCase
     {
         $task = factory(Task::class)->create();
         assert($task instanceof Task);
-        $task->tags()->saveMany(
-            factory(Tag::class, 3)->make(),
-        );
+
+        foreach (factory(Tag::class, 3)->make() as $tag) {
+            $task->tags()->save($tag);
+        }
 
         $this->assertCount(3, $task->tags);
 

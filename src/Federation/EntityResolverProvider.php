@@ -66,38 +66,16 @@ class EntityResolverProvider
     /** @return EntityResolver */
     public function resolver(string $typename): callable
     {
-        if (isset($this->resolvers[$typename])) {
-            return $this->resolvers[$typename];
-        }
-
-        $resolver = $this->resolverFromClass($typename)
-            ?? $this->resolverFromModel($typename)
-            ?? throw new Error(self::missingResolver($typename));
-
-        $this->resolvers[$typename] = $resolver;
-
-        return $resolver;
+        return $this->resolvers[$typename]
+            ??= $this->loadResolver($typename);
     }
 
-    public function typeDefinition(string $typename): ObjectTypeDefinitionNode
+    /** @return EntityResolver */
+    protected function loadResolver(string $typename): callable
     {
-        if (isset($this->definitions[$typename])) {
-            return $this->definitions[$typename];
-        }
-
-        $type = $this->schema->getType($typename)
-            ?? throw new Error(self::unknownTypename($typename));
-
-        $definition = $type->astNode()
-            ?? throw new FederationException("Must provide AST definition for type `{$typename}`.");
-
-        if (! $definition instanceof ObjectTypeDefinitionNode) {
-            throw new Error("Expected __typename `{$typename}` to be ObjectTypeDefinition, got {$definition->kind}.");
-        }
-
-        $this->definitions[$typename] = $definition;
-
-        return $definition;
+        return $this->resolverFromClass($typename)
+            ?? $this->resolverFromModel($typename)
+            ?? throw new Error(self::missingResolver($typename));
     }
 
     /** @return EntityResolver|null */
@@ -157,8 +135,29 @@ class EntityResolverProvider
         };
     }
 
+    protected function typeDefinition(string $typename): ObjectTypeDefinitionNode
+    {
+        return $this->definitions[$typename]
+            ??= $this->loadTypeDefinition($typename);
+    }
+
+    protected function loadTypeDefinition(string $typename): ObjectTypeDefinitionNode
+    {
+        $type = $this->schema->getType($typename)
+            ?? throw new Error(self::unknownTypename($typename));
+
+        $definition = $type->astNode()
+            ?? throw new FederationException("Must provide AST definition for type `{$typename}`.");
+
+        if (! $definition instanceof ObjectTypeDefinitionNode) {
+            throw new Error("Expected __typename `{$typename}` to be ObjectTypeDefinition, got {$definition->kind}.");
+        }
+
+        return $definition;
+    }
+
     /**
-     * @param  \Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>  $builder
+     * @param  \Illuminate\Database\Eloquent\Builder<*>  $builder
      * @param  \Illuminate\Support\Collection<int, \GraphQL\Language\AST\SelectionSetNode>  $keyFieldsSelections
      * @param  array<string, mixed>  $representation
      */
@@ -202,7 +201,7 @@ class EntityResolverProvider
     }
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>  $builder
+     * @param  \Illuminate\Database\Eloquent\Builder<*>  $builder
      * @param  array<string, mixed>  $representation
      */
     protected function applySatisfiedSelection(EloquentBuilder $builder, SelectionSetNode $keyFields, array $representation, ObjectTypeDefinitionNode $definition): void
