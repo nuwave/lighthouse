@@ -45,6 +45,9 @@ parameters:
   # Relation forwards calls to Builder
   - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Builder<Illuminate\\Database\\Eloquent\\Model>|Illuminate\\Database\\Eloquent\\Relations\\Relation<Illuminate\\Database\\Eloquent\\Model>|Illuminate\\Database\\Query\\Builder::(orderBy|where|whereIn|whereNotIn|whereBetween|whereJsonContains|whereNotBetween)\(\)\.#'
 
+  # Laravel 11 added generics that are handled differently, so we just omit them
+  - '#generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types#'
+
   # This test cheats and uses reflection to make assertions
   - path: tests/Unit/Schema/Directives/BaseDirectiveTest.php
     message: '#Call to protected method getModelClass\(\) of class Nuwave\\Lighthouse\\Schema\\Directives\\BaseDirective\.#'

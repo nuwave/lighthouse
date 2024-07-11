@@ -157,7 +157,6 @@ class EntityResolverProvider
     }
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Builder<*>  $builder
      * @param  \Illuminate\Support\Collection<int, \GraphQL\Language\AST\SelectionSetNode>  $keyFieldsSelections
      * @param  array<string, mixed>  $representation
      */
@@ -200,10 +199,7 @@ class EntityResolverProvider
         return true;
     }
 
-    /**
-     * @param  \Illuminate\Database\Eloquent\Builder<*>  $builder
-     * @param  array<string, mixed>  $representation
-     */
+    /** @param  array<string, mixed>  $representation */
     protected function applySatisfiedSelection(EloquentBuilder $builder, SelectionSetNode $keyFields, array $representation, ObjectTypeDefinitionNode $definition): void
     {
         foreach ($keyFields->selections as $field) {
