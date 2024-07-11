@@ -135,7 +135,7 @@ class EntityResolverProvider
         };
     }
 
-    protected function typeDefinition(string $typename): ObjectTypeDefinitionNode
+    public function typeDefinition(string $typename): ObjectTypeDefinitionNode
     {
         return $this->definitions[$typename]
             ??= $this->loadTypeDefinition($typename);
