@@ -21,7 +21,7 @@ use Tests\Utils\Models\Car;
 
 final class Owner extends Model
 {
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\Car, self> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<Car> */
     public function car(): BelongsTo
     {
         return $this->belongsTo(Car::class);

@@ -22,13 +22,13 @@ use Tests\Utils\Models\Owner;
 final class Mechanic extends Model
 {
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Tests\Utils\Models\Car, self> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<Car> */
     public function car(): HasOne
     {
         return $this->hasOne(Car::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasOneThrough<\Tests\Utils\Models\Owner, self> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOneThrough<Owner> */
     public function owner(): HasOneThrough
     {
         return $this->hasOneThrough(Owner::class, Car::class);
