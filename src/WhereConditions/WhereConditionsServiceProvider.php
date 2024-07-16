@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\WhereConditions;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Support\ServiceProvider;
 use MLL\GraphQLScalars\MixedScalar;
 use Nuwave\Lighthouse\Events\ManipulateAST;
@@ -24,7 +24,7 @@ class WhereConditionsServiceProvider extends ServiceProvider
         $this->app->bind(Operator::class, SQLOperator::class);
     }
 
-    public function boot(Dispatcher $dispatcher): void
+    public function boot(EventsDispatcher $dispatcher): void
     {
         $dispatcher->listen(RegisterDirectiveNamespaces::class, static fn (): string => __NAMESPACE__);
         $dispatcher->listen(ManipulateAST::class, function (ManipulateAST $manipulateAST): void {

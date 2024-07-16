@@ -7,7 +7,9 @@ use GraphQL\Error\DebugFlag;
 use GraphQL\Error\Error;
 use GraphQL\Error\FormattedError;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
+use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Laragraph\Utils\BadRequestGraphQLException;
+use Nuwave\Lighthouse\Events\StartExecution;
 use Tests\TestCase;
 
 final class ErrorTest extends TestCase
@@ -194,6 +196,69 @@ final class ErrorTest extends TestCase
             ->assertStatus(200)
             ->assertGraphQLErrorMessage('Field TestInput.string of required type String! was not provided.')
             ->assertGraphQLErrorMessage('Field TestInput.integer of required type Int! was not provided.');
+    }
+
+    public function testSplitsErrorsForMultipleOperations(): void
+    {
+        $config = $this->app->make(ConfigRepository::class);
+        $config->set('lighthouse.debug', DebugFlag::INCLUDE_DEBUG_MESSAGE);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo: Int
+            bar: String
+        }
+        ';
+
+        $dispatcher = $this->app->make(EventsDispatcher::class);
+        $dispatcher->listen(
+            StartExecution::class,
+            static fn (StartExecution $startExecution) => throw new \Exception($startExecution->operationName ?? 'unknown operation'),
+        );
+
+        $this
+            ->postGraphQL([
+                [
+                    'query' => /** @lang GraphQL */ '
+                        query Foo {
+                            foo
+                        }
+                        ',
+                    'operationName' => 'Foo',
+                ],
+                [
+                    'query' => /** @lang GraphQL */ '
+                        query Bar {
+                            bar
+                        }
+                        ',
+                    'operationName' => 'Bar',
+                ],
+            ])
+            ->assertExactJson([
+                [
+                    'errors' => [
+                        [
+                            /** @see FormattedError::$internalErrorMessage */
+                            'message' => 'Internal server error',
+                            'extensions' => [
+                                'debugMessage' => 'Foo',
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'errors' => [
+                        [
+                            /** @see FormattedError::$internalErrorMessage */
+                            'message' => 'Internal server error',
+                            'extensions' => [
+                                'debugMessage' => 'Bar',
+                            ],
+                        ],
+                    ],
+                ],
+            ]);
     }
 
     public function testReturnsPartialDataIfNullableFieldFails(): void

@@ -15,7 +15,7 @@ use GraphQL\Server\RequestError;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
+use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
@@ -52,7 +52,7 @@ class GraphQL
     public function __construct(
         protected SchemaBuilder $schemaBuilder,
         protected Pipeline $pipeline,
-        protected EventDispatcher $eventDispatcher,
+        protected EventsDispatcher $eventDispatcher,
         protected ErrorPool $errorPool,
         protected ProvidesValidationRules $providesValidationRules,
         protected GraphQLHelper $graphQLHelper,
@@ -219,17 +219,18 @@ class GraphQL
         }
 
         $queryString = $params->query;
-        if (is_string($queryString)) {
-            return $this->executeQueryString(
-                $queryString,
-                $context,
-                $params->variables,
-                null,
-                $params->operation,
-            );
-        }
 
         try {
+            if (is_string($queryString)) {
+                return $this->executeQueryString(
+                    $queryString,
+                    $context,
+                    $params->variables,
+                    null,
+                    $params->operation,
+                );
+            }
+
             return $this->executeParsedQuery(
                 $this->loadPersistedQuery($params->queryId),
                 $context,
@@ -237,9 +238,9 @@ class GraphQL
                 null,
                 $params->operation,
             );
-        } catch (Error $error) {
+        } catch (\Throwable $throwable) {
             return $this->toSerializableArray(
-                new ExecutionResult(null, [$error]),
+                new ExecutionResult(null, [Error::createLocatedError($throwable)]),
             );
         }
     }
