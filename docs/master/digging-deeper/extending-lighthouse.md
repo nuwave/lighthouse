@@ -18,13 +18,13 @@ Add your custom directives to Lighthouse by listening for the [`RegisterDirectiv
 ```php
 namespace SomeVendor\SomePackage;
 
-use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 
 final class SomePackageServiceProvider extends ServiceProvider
 {
-    public function boot(Dispatcher $dispatcher): void
+    public function boot(EventsDispatcher $dispatcher): void
     {
         $dispatcher->listen(
             RegisterDirectiveNamespaces::class,

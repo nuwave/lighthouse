@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\Subscriptions;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
@@ -44,7 +44,7 @@ class SubscriptionServiceProvider extends ServiceProvider
         $this->app->bind(ProvidesSubscriptionResolver::class, SubscriptionResolverProvider::class);
     }
 
-    public function boot(Dispatcher $dispatcher, ConfigRepository $configRepository): void
+    public function boot(EventsDispatcher $dispatcher, ConfigRepository $configRepository): void
     {
         $dispatcher->listen(RegisterDirectiveNamespaces::class, static fn (): string => __NAMESPACE__ . '\\Directives');
         $dispatcher->listen(StartExecution::class, SubscriptionRegistry::class . '@handleStartExecution');

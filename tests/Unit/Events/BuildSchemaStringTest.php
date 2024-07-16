@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Events;
 
-use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Nuwave\Lighthouse\Events\BuildSchemaString;
 use Tests\TestCase;
 
@@ -10,7 +10,7 @@ final class BuildSchemaStringTest extends TestCase
 {
     public function testInjectsSourceSchemaIntoEvent(): void
     {
-        $dispatcher = $this->app->make(Dispatcher::class);
+        $dispatcher = $this->app->make(EventsDispatcher::class);
         $dispatcher->listen(BuildSchemaString::class, function (BuildSchemaString $buildSchemaString): void {
             $this->assertSame(self::PLACEHOLDER_QUERY, $buildSchemaString->userSchema);
         });
@@ -20,7 +20,7 @@ final class BuildSchemaStringTest extends TestCase
 
     public function testAddAdditionalSchemaThroughEvent(): void
     {
-        $dispatcher = $this->app->make(Dispatcher::class);
+        $dispatcher = $this->app->make(EventsDispatcher::class);
         $dispatcher->listen(BuildSchemaString::class, fn (): string => "
             extend type Query {
                 sayHello: String @field(resolver: \"{$this->qualifyTestResolver('resolveSayHello')}\")
