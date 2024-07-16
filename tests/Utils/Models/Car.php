@@ -19,7 +19,6 @@ use Tests\Utils\Models\Owner;
  *
  *  Relations
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Owner> $owner
- * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Mechanic> $mechanic
 */
 
 final class Car extends Model
@@ -30,10 +29,4 @@ final class Car extends Model
         return $this->hasOne(Owner::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<Mechanic> */
-
-    public function mechanic(): BelongsTo
-    {
-        return $this->belongsTo(Mechanic::class);
-    }
 }
