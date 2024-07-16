@@ -13,7 +13,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Fixed
 
-- Handle errors thrown in lifecycle events per operation
+- Handle errors thrown in lifecycle events per operation https://github.com/nuwave/lighthouse/pull/2584
 
 ## v6.41.0
 
