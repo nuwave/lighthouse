@@ -1850,6 +1850,41 @@ type User {
 }
 ```
 
+## @hasOneThrough
+
+```graphql
+"""
+Corresponds to [the Eloquent relationship HasOneThrough](https://laravel.com/docs/eloquent-relationships#has-one-through).
+"""
+directive @hasOneThrough(
+  """
+  Specify the relationship method name in the model class,
+  if it is named different from the field in the schema.
+  """
+  relation: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+) on FIELD_DEFINITION
+```
+
+```graphql
+type Mechanic {
+  carOwner: Owner @hasOneThrough
+}
+```
+
+If the name of the relationship on the Eloquent model is different than the field name,
+you can override it by setting `relation`.
+
+```graphql
+type Mechanic {
+    carOwner: Owner @hasOneThrough(relation: "owner")
+}
+```
+
 ## @in
 
 ```graphql

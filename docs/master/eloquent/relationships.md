@@ -119,6 +119,16 @@ type Project {
 }
 ```
 
+## Has One Through
+
+Use the [@hasOneThrough](../api-reference/directives.md#hasonethrough) directive to define a [has-one-through relationship](https://laravel.com/docs/eloquent-relationships#has-one-through).
+
+```graphql
+type Mechanic {
+    carOwner: carOwner! @hasOneThrough
+}
+```
+
 ## Renaming relations
 
 When you define a relation, Lighthouse assumes that the field and the relationship
