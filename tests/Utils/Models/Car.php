@@ -31,7 +31,8 @@ final class Car extends Model
         return $this->hasOne(Owner::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\Mechanic> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\Mechanic, self> */
+
     public function mechanic(): BelongsTo
     {
         return $this->belongsTo(Mechanic::class);
