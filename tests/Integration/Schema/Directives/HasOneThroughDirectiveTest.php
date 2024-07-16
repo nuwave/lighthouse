@@ -47,8 +47,7 @@ final class HasOneThroughDirectiveTest extends DBTestCase
         $mechanic->car()->save($car);
         $car->owner()->save($owner);
 
-        $mechanic_owner = $mechanic->owner;
-
+        $mechanic_owner = $mechanic->owner()->first();
         $this->graphQL(/** @lang GraphQL */ '
         {
             mechanics {
