@@ -10,6 +10,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * Primary key.
  * @property int $id
  * @property string $name
+ *
+ *   Foreign keys
+ * @property int|null $car_id
+ *
+ *   Relations
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Car> $car
  */
 
 final class Owner extends Model

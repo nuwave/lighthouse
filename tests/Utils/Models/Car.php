@@ -11,6 +11,13 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * Primary key.
  * @property int $id
  * @property string $name
+ *
+ *  Foreign keys
+ * @property int|null $mechanic_id
+ *
+ *  Relations
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Owner> $owner
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Mechanic> $mechanic
 */
 
 final class Car extends Model

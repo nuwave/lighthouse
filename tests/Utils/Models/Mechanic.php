@@ -11,8 +11,10 @@ use Illuminate\Database\Eloquent\Relations\HasOneThrough;
  * Primary key.
  * @property int $id
  * @property string $name
- * @property-read \Tests\Utils\Models\Owner $owner
  *
+ *   Relations
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Car> $car
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Owner> $owner
  */
 final class Mechanic extends Model
 {
