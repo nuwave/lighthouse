@@ -4,6 +4,7 @@ namespace Tests\Utils\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Tests\Utils\Models\Car;
 
 
@@ -21,9 +22,9 @@ use Tests\Utils\Models\Car;
 
 final class Owner extends Model
 {
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<Car> */
-    public function car(): BelongsTo
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<Car> */
+    public function car(): HasOne
     {
-        return $this->belongsTo(Car::class);
+        return $this->hasOne(Car::class);
     }
 }
