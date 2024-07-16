@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 /**
  * Primary key.
  * @property int $id
- * @property string $title
+ * @property string $name
  * @property-read \Tests\Utils\Models\Owner $owner
  *
  */

@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 /**
  * Primary key.
  * @property int $id
- * @property string $title
+ * @property string $name
 */
 
 final class Car extends Model

@@ -9,8 +9,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * Primary key.
  * @property int $id
- * @property string $title
-*/
+ * @property string $name
+ */
 
 final class Owner extends Model
 {
