@@ -5,6 +5,9 @@ namespace Tests\Utils\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
+use Tests\Utils\Models\Car;
+use Tests\Utils\Models\Owner;
+
 
 
 /**
