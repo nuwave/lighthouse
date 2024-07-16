@@ -16,8 +16,8 @@ use Tests\Utils\Models\Owner;
  * @property string $name
  *
  *   Relations
- * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Car> $car
- * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Owner> $owner
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Car|null $car
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Owner|null $owner
  */
 final class Mechanic extends Model
 {

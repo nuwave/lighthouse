@@ -16,7 +16,7 @@ use Tests\Utils\Models\Car;
  * @property int|null $car_id
  *
  *   Relations
- * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Car> $car
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Car|null $car
  */
 
 final class Owner extends Model

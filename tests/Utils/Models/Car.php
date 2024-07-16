@@ -18,8 +18,8 @@ use Tests\Utils\Models\Mechanic;
  * @property int|null $mechanic_id
  *
  *  Relations
- * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Owner> $owner
- * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Mechanic> $mechanic
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Owner|null $owner
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Mechanic|null $mechanic
 */
 
 final class Car extends Model
