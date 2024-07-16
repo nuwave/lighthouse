@@ -16,11 +16,12 @@ use Tests\Utils\Models\Car;
  * @property int|null $car_id
  *
  *   Relations
- * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Car|null $car
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Car> $car
  */
 
 final class Owner extends Model
 {
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\Car> */
     public function car(): BelongsTo
     {
         return $this->belongsTo(Car::class);

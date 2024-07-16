@@ -16,16 +16,19 @@ use Tests\Utils\Models\Owner;
  * @property string $name
  *
  *   Relations
- * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Car|null $car
- * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Owner|null $owner
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Car> $car
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Owner> $owner
  */
 final class Mechanic extends Model
 {
 
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Tests\Utils\Models\Car> */
     public function car(): HasOne
     {
         return $this->hasOne(Car::class);
     }
+
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOneThrough<\Tests\Utils\Models\Owner> */
     public function owner(): HasOneThrough
     {
         return $this->hasOneThrough(Owner::class, Car::class);
