@@ -134,9 +134,7 @@ final class Task extends Model
         return $this->relationLoaded('user');
     }
 
-
-    /** @return \Illuminate\Database\Eloquent\Relations\HasOneThrough<PostStatus> */
-
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOneThrough<\Tests\Utils\Models\PostStatus> */
     public function postStatus(): HasOneThrough
     {
         return $this->hasOneThrough(PostStatus::class,

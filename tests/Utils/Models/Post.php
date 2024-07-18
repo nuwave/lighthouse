@@ -104,8 +104,7 @@ final class Post extends Model
         return $this->hasMany(RoleUserPivot::class, 'user_id', 'user_id');
     }
 
-
-    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<PostStatus> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Tests\Utils\Models\PostStatus> */
     public function status(): HasOne
     {
         return $this->hasOne(PostStatus::class);

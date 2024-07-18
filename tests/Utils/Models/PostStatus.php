@@ -20,7 +20,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 final class PostStatus extends Model
 {
-    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<Post> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Tests\Utils\Models\Post> */
     public function post(): HasOne
     {
         return $this->hasOne(Post::class);
