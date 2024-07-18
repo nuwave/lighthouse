@@ -3,6 +3,6 @@
 use Faker\Generator as Faker;
 
 /** @var Illuminate\Database\Eloquent\Factory $factory */
-$factory->define(\Tests\Utils\Models\Owner::class, static fn(Faker $faker): array => [
-    'name' => $faker->title,
+$factory->define(\Tests\Utils\Models\PostStatus::class, static fn(Faker $faker): array => [
+    'status' => "DONE",
 ]);

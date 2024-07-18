@@ -4,14 +4,14 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-final class CreateTestbenchOwnersTable extends Migration
+final class CreateTestbenchPostStatusesTable extends Migration
 {
     public function up(): void
     {
-        Schema::create('owners', function (Blueprint $table): void {
+        Schema::create('post_statuses', function (Blueprint $table): void {
             $table->increments('id');
-            $table->string('name');
-            $table->unsignedInteger("car_id")
+            $table->enum('status' , ["DONE" , "PENDING"]);
+            $table->unsignedInteger("post_id")
                 ->nullable();
 
             $table->softDeletes();
@@ -21,6 +21,6 @@ final class CreateTestbenchOwnersTable extends Migration
 
     public function down(): void
     {
-        Schema::drop('owners');
+        Schema::drop('post_statuses');
     }
 }

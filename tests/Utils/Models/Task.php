@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
@@ -131,5 +132,17 @@ final class Task extends Model
     public function userLoaded(): bool
     {
         return $this->relationLoaded('user');
+    }
+
+
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOneThrough<PostStatus> */
+
+    public function postStatus(): HasOneThrough
+    {
+        return $this->hasOneThrough(PostStatus::class,
+            Post::class,
+            'task_id',
+            'post_id'
+        );
     }
 }

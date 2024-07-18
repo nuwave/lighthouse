@@ -11,20 +11,20 @@ use Tests\Utils\Models\Car;
 /**
  * Primary key.
  * @property int $id
- * @property string $name
+ * @property string $status
  *
  *   Foreign keys
- * @property int|null $car_id
+ * @property int|null $post_id
  *
  *   Relations
- * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Car> $car
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Post> $task
  */
 
-final class Owner extends Model
+final class PostStatus extends Model
 {
-    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<Car> */
-    public function car(): HasOne
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<Post> */
+    public function post(): HasOne
     {
-        return $this->hasOne(Car::class);
+        return $this->hasOne(Post::class);
     }
 }

@@ -18,6 +18,7 @@ directive @hasOneThrough(
   if it is named different from the field in the schema.
   """
   relation: String
+
   """
   Apply scopes to the underlying query.
   """

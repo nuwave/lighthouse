@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -101,5 +103,12 @@ final class Post extends Model
     public function roles(): HasMany
     {
         return $this->hasMany(RoleUserPivot::class, 'user_id', 'user_id');
+    }
+
+
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<PostStatus> */
+    public function status(): HasOne
+    {
+        return $this->hasOne(PostStatus::class);
     }
 }

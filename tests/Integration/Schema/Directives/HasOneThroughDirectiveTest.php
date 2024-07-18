@@ -6,71 +6,82 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Car;
 use Tests\Utils\Models\Mechanic;
 use Tests\Utils\Models\Owner;
+use Tests\Utils\Models\Post;
+use Tests\Utils\Models\Task;
+use Tests\Utils\Models\PostStatus;
 
 
 final class HasOneThroughDirectiveTest extends DBTestCase
 {
-    public function testQueryHasOneThroughRelationship(): void
+    public function testQueryHasOneThroughRelationship()
     {
         $this->schema = /** @lang GraphQL */
             '
 
          type Query {
-         mechanics: [Mechanic]! @all
+         tasks: [Task]! @all
           }
 
-        type Mechanic {
+        type Task {
             id: ID!
-            owner: Owner @hasOneThrough
+            postStatus: PostStatus @hasOneThrough
         }
 
-        type Car {
+        type Post {
              id: ID!
         }
 
-        type Owner {
+        type PostStatus {
                id: ID!
-               name: String
+               status: String
 
         }
         ';
 
-        $mechanic = factory(Mechanic::class)->create();
-        assert($mechanic instanceof Mechanic);
+        $task = factory(Task::class)->create();
+        assert($task instanceof Task);
 
-        $car = factory(Car::class)->create();
-        assert($car instanceof Car);
+        $post = factory(Post::class)->create();
+        assert($post instanceof Post);
 
-        $owner = factory(Owner::class)->make();
-        assert($owner instanceof Owner);
+        $post_status = factory(PostStatus::class)->create();
+        assert($post_status instanceof PostStatus);
 
-        $mechanic->car()->save($car);
-        $car->owner()->save($owner);
+        $task->post()->save($post);
+        $post->status()->save($post_status);
 
-        $mechanic_owner = $mechanic->owner()->first();
+        $tasks = Task::all();
+        $task_status = $task->postStatus()->first();
+
         $this->graphQL(/** @lang GraphQL */ '
         {
-            mechanics {
+            tasks {
                     id
-                      owner {
+                      postStatus {
                         id
-                        name
+                        status
                     }
             }
         }
-        ')->assertExactJson(
-            [
-                "data" => [
-                    "mechanics" => [
-                       [ "id" => (string) $mechanic->id,
-                        "owner" => [
-                            "id" => (string) $mechanic_owner->id,
-                            "name" => $mechanic_owner->name
-                        ]]
-                    ]
+        ')
+            ->assertExactJson(
+                [
+                    "data" => [
+                        "tasks" => [
+                            [
+                                "id" => (string)$tasks[0]->id,
+                                "postStatus" => [
+                                    "id" => (string)$task_status->id,
+                                    "status" => $task_status->status
+                                ]],
+                            [
+                                "id" => (string)$tasks[1]->id,
+                                "postStatus" => null
+                            ]
+                        ]
 
+                    ]
                 ]
-            ]
-        );
+            );
     }
 }
