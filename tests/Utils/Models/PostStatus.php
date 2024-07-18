@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property int|null $post_id
  *
  *   Relations
- * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Post> $task
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Post> $post
  */
 
 final class PostStatus extends Model

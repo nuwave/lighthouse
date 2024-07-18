@@ -35,20 +35,18 @@ final class HasOneThroughDirectiveTest extends DBTestCase
         }
         ';
 
-//        $task = factory(Task::class)->create();
-//        assert($task instanceof Task);
-
         $post = factory(Post::class)->create();
         assert($post instanceof Post);
 
         $post_status = factory(PostStatus::class)->create();
         assert($post_status instanceof PostStatus);
 
-//        $task->post()->save($post);
         $post->status()->save($post_status);
 
         $task = Task::query()->first();
-        $task_status = $task->postStatus()->first();
+        if (!empty($task)) {
+            $task_status = $task->postStatus;
+        }
 
         $this->graphQL(/** @lang GraphQL */ '
         {
