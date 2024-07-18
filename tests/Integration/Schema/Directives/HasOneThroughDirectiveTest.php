@@ -44,9 +44,10 @@ final class HasOneThroughDirectiveTest extends DBTestCase
         $post->status()->save($post_status);
 
         $task = Task::query()->first();
-        $task_status = $task->postStatus;
 
-        if ($task and $task_status) {
+        if ($task and $task->postStatus) {
+
+            $task_status = $task->postStatus;
 
             $this->graphQL(/** @lang GraphQL */ '
         {
