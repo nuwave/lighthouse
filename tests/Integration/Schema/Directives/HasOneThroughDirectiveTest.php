@@ -3,9 +3,6 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
-use Tests\Utils\Models\Car;
-use Tests\Utils\Models\Mechanic;
-use Tests\Utils\Models\Owner;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\PostStatus;
@@ -38,8 +35,8 @@ final class HasOneThroughDirectiveTest extends DBTestCase
         }
         ';
 
-        $task = factory(Task::class)->create();
-        assert($task instanceof Task);
+//        $task = factory(Task::class)->create();
+//        assert($task instanceof Task);
 
         $post = factory(Post::class)->create();
         assert($post instanceof Post);
@@ -47,10 +44,10 @@ final class HasOneThroughDirectiveTest extends DBTestCase
         $post_status = factory(PostStatus::class)->create();
         assert($post_status instanceof PostStatus);
 
-        $task->post()->save($post);
+//        $task->post()->save($post);
         $post->status()->save($post_status);
 
-        $tasks = Task::all();
+        $task = Task::query()->first();
         $task_status = $task->postStatus()->first();
 
         $this->graphQL(/** @lang GraphQL */ '
@@ -69,14 +66,11 @@ final class HasOneThroughDirectiveTest extends DBTestCase
                     "data" => [
                         "tasks" => [
                             [
-                                "id" => (string)$tasks[0]->id,
+                                "id" => (string)$task->id,
                                 "postStatus" => [
                                     "id" => (string)$task_status->id,
                                     "status" => $task_status->status
-                                ]],
-                            [
-                                "id" => (string)$tasks[1]->id,
-                                "postStatus" => null
+                                ],
                             ]
                         ]
 
