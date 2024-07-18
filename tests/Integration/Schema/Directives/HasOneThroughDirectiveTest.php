@@ -10,7 +10,7 @@ use Tests\Utils\Models\PostStatus;
 
 final class HasOneThroughDirectiveTest extends DBTestCase
 {
-    public function testQueryHasOneThroughRelationship()
+    public function testQueryHasOneThroughRelationship(): void
     {
         $this->schema = /** @lang GraphQL */
             '
