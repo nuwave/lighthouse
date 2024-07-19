@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.42.0
+
+### Added
+
+- Add `@hasOneThrough` directive https://github.com/nuwave/lighthouse/pull/2585
+
 ## v6.41.1
 
 ### Fixed
