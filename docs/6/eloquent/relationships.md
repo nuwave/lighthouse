@@ -115,7 +115,7 @@ Use the [@hasOneThrough](../api-reference/directives.md#hasonethrough) directive
 
 ```graphql
 type Mechanic {
-    carOwner: Owner! @hasOneThrough
+  carOwner: Owner! @hasOneThrough
 }
 ```
 

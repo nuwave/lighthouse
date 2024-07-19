@@ -10,7 +10,7 @@ final class CreateTestbenchPostStatusesTable extends Migration
     {
         Schema::create('post_statuses', function (Blueprint $table): void {
             $table->id();
-            $table->enum('status' , ['DONE' , 'PENDING']);
+            $table->enum('status', ['DONE', 'PENDING']);
             $table->unsignedBigInteger('post_id');
             $table->softDeletes();
             $table->timestamps();

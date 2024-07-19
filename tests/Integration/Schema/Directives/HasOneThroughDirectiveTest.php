@@ -4,8 +4,8 @@ namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
-use Tests\Utils\Models\Task;
 use Tests\Utils\Models\PostStatus;
+use Tests\Utils\Models\Task;
 
 final class HasOneThroughDirectiveTest extends DBTestCase
 {
@@ -51,17 +51,17 @@ final class HasOneThroughDirectiveTest extends DBTestCase
             }
         }
         ')->assertExactJson([
-            "data" => [
-                "tasks" => [
+            'data' => [
+                'tasks' => [
                     [
-                        "id" => (string) $task->id,
-                        "postStatus" => [
-                            "id" => (string) $postStatus->id,
-                            "status" => $postStatus->status
+                        'id' => (string) $task->id,
+                        'postStatus' => [
+                            'id' => (string) $postStatus->id,
+                            'status' => $postStatus->status,
                         ],
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ]);
     }
 }

@@ -1881,7 +1881,7 @@ you can override it by setting `relation`.
 
 ```graphql
 type Mechanic {
-    carOwner: Owner! @hasOneThrough(relation: "owner")
+  carOwner: Owner! @hasOneThrough(relation: "owner")
 }
 ```
 
