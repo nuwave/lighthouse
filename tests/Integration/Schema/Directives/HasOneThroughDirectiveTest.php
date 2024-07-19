@@ -27,13 +27,8 @@ final class HasOneThroughDirectiveTest extends DBTestCase
         }
         ';
 
-        $task = factory(Task::class)->create();
-        assert($task instanceof Task);
-
-        $post = factory(Post::class)->make();
+        $post = factory(Post::class)->create();
         assert($post instanceof Post);
-        $post->task()->associate($task);
-        $post->save();
 
         $postStatus = factory(PostStatus::class)->make();
         assert($postStatus instanceof PostStatus);
@@ -54,7 +49,7 @@ final class HasOneThroughDirectiveTest extends DBTestCase
             'data' => [
                 'tasks' => [
                     [
-                        'id' => (string) $task->id,
+                        'id' => (string) $post->task->id,
                         'postStatus' => [
                             'id' => (string) $postStatus->id,
                             'status' => $postStatus->status,
