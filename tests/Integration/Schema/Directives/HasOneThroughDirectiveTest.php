@@ -5,7 +5,6 @@ namespace Tests\Integration\Schema\Directives;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\PostStatus;
-use Tests\Utils\Models\Task;
 
 final class HasOneThroughDirectiveTest extends DBTestCase
 {
