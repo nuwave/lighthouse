@@ -36,6 +36,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read \Tests\Utils\Models\Image $image
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Image> $images
  * @property-read \Tests\Utils\Models\Post|null $post
+ * @property-read \Tests\Utils\Models\PostStatus|null $postStatus
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Tag> $tags
  * @property-read \Tests\Utils\Models\User|null $user
  */
@@ -85,6 +86,12 @@ final class Task extends Model
         return $this->hasManyThrough(Comment::class, Post::class);
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOneThrough<\Tests\Utils\Models\PostStatus> */
+    public function postStatus(): HasOneThrough
+    {
+        return $this->hasOneThrough(PostStatus::class, Post::class, 'task_id', 'post_id');
+    }
+
     /** @return \Illuminate\Database\Eloquent\Relations\MorphToMany<\Tests\Utils\Models\Tag> */
     public function tags(): MorphToMany
     {
@@ -132,15 +139,5 @@ final class Task extends Model
     public function userLoaded(): bool
     {
         return $this->relationLoaded('user');
-    }
-
-    /** @return \Illuminate\Database\Eloquent\Relations\HasOneThrough<\Tests\Utils\Models\PostStatus> */
-    public function postStatus(): HasOneThrough
-    {
-        return $this->hasOneThrough(PostStatus::class,
-            Post::class,
-            'task_id',
-            'post_id'
-        );
     }
 }

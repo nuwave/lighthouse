@@ -3,26 +3,28 @@
 namespace Tests\Utils\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 
 /**
  * Primary key.
+ *
  * @property int $id
+ *
+ * Attributes
  * @property string $status
  *
- *   Foreign keys
- * @property int|null $post_id
+ * Foreign keys
+ * @property int $post_id
  *
- *   Relations
- * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Post> $post
+ * Relations
+ * @property-read \Tests\Utils\Models\Post $post
  */
-
 final class PostStatus extends Model
 {
-    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Tests\Utils\Models\Post> */
-    public function post(): HasOne
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\Post> */
+    public function post(): BelongsTo
     {
-        return $this->hasOne(Post::class);
+        return $this->belongsTo(Post::class);
     }
 }

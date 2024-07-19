@@ -9,7 +9,7 @@ use Tests\Utils\Models\User;
 $factory->define(Post::class, static fn (Faker $faker): array => [
     'title' => $faker->title,
     'body' => $faker->sentence,
-    'user_id' => static fn () => factory(User::class)->create()->getKey(),
-    'task_id' => static fn () => factory(Task::class)->create()->getKey(),
-    'parent_id' => null,
+    'user_id' => $faker->randomElement([factory(User::class), null]),
+    'task_id' => factory(Task::class),
+    'parent_id' => $faker->randomElement([factory(Post::class), null]),
 ]);
