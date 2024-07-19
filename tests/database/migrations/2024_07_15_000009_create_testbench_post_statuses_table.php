@@ -4,21 +4,21 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-final class CreateTestbenchColorsTable extends Migration
+final class CreateTestbenchPostStatusesTable extends Migration
 {
     public function up(): void
     {
-        Schema::create('colors', function (Blueprint $table): void {
+        Schema::create('post_statuses', function (Blueprint $table): void {
             $table->id();
-            $table->string('name');
-            $table->unsignedBigInteger('creator_id')->nullable();
-            $table->string('creator_type')->nullable();
+            $table->enum('status', ['DONE', 'PENDING']);
+            $table->unsignedBigInteger('post_id');
+            $table->softDeletes();
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::drop('colors');
+        Schema::drop('post_statuses');
     }
 }

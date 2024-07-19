@@ -9,7 +9,7 @@ final class CreateTestbenchNullConnectionsTable extends Migration
     public function up(): void
     {
         Schema::create('null_connections', function (Blueprint $table): void {
-            $table->increments('id');
+            $table->id();
         });
     }
 

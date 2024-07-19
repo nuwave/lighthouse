@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
@@ -35,6 +36,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read \Tests\Utils\Models\Image $image
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Image> $images
  * @property-read \Tests\Utils\Models\Post|null $post
+ * @property-read \Tests\Utils\Models\Comment|null $postComments
+ * @property-read \Tests\Utils\Models\PostStatus|null $postStatus
  * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Tag> $tags
  * @property-read \Tests\Utils\Models\User|null $user
  */
@@ -82,6 +85,12 @@ final class Task extends Model
     public function postComments(): HasManyThrough
     {
         return $this->hasManyThrough(Comment::class, Post::class);
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOneThrough<\Tests\Utils\Models\PostStatus> */
+    public function postStatus(): HasOneThrough
+    {
+        return $this->hasOneThrough(PostStatus::class, Post::class, 'task_id', 'post_id');
     }
 
     /** @return \Illuminate\Database\Eloquent\Relations\MorphToMany<\Tests\Utils\Models\Tag> */

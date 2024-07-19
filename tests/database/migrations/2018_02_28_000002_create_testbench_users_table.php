@@ -18,11 +18,9 @@ final class CreateTestbenchUsersTable extends Migration
             $table->string('password')->nullable();
             $table->rememberToken();
             $table->timestamps();
-
-            $table->unsignedInteger('company_id')->nullable();
-            $table->unsignedInteger('team_id')->nullable();
-
-            $table->unsignedInteger('person_id')->nullable();
+            $table->unsignedBigInteger('company_id')->nullable();
+            $table->unsignedBigInteger('team_id')->nullable();
+            $table->unsignedBigInteger('person_id')->nullable();
             $table->string('person_type')->nullable();
         });
     }

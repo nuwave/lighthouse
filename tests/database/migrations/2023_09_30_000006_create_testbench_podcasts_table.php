@@ -9,7 +9,7 @@ final class CreateTestbenchPodcastsTable extends Migration
     public function up(): void
     {
         Schema::create('podcasts', function (Blueprint $table): void {
-            $table->increments('id');
+            $table->id();
             $table->string('title');
             $table->timestamp('schedule_at')->nullable();
             $table->softDeletes();

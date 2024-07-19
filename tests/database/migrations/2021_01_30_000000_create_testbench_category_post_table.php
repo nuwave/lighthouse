@@ -9,10 +9,9 @@ final class CreateTestbenchCategoryPostTable extends Migration
     public function up(): void
     {
         Schema::create('category_post', function (Blueprint $table): void {
-            $table->increments('id');
-
-            $table->unsignedInteger('category_id');
-            $table->unsignedInteger('post_id');
+            $table->id();
+            $table->unsignedBigInteger('category_id');
+            $table->unsignedBigInteger('post_id');
         });
     }
 

@@ -9,7 +9,7 @@ final class CreateTestbenchAclsTable extends Migration
     public function up(): void
     {
         Schema::create('acls', function (Blueprint $table): void {
-            $table->increments('id');
+            $table->id();
             $table->boolean('create_post');
             $table->boolean('read_post');
             $table->boolean('update_post');
