@@ -2,9 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
-
-class HasOneThroughDirective extends RelationDirective implements FieldManipulator
+class HasOneThroughDirective extends RelationDirective
 {
     public static function definition(): string
     {
