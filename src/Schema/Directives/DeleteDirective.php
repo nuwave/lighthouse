@@ -90,7 +90,7 @@ GRAPHQL;
                     $relation->getParent()->save();
                 }
 
-                $relation->first()->delete();
+                $relation->first()?->delete();
             }
         } else {
             // @phpstan-ignore-next-line Relation&Builder mixin not recognized
