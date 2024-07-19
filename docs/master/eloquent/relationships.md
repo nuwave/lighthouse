@@ -109,6 +109,16 @@ type Role {
 }
 ```
 
+## Has One Through
+
+Use the [@hasOneThrough](../api-reference/directives.md#hasonethrough) directive to define a [has-one-through relationship](https://laravel.com/docs/eloquent-relationships#has-one-through).
+
+```graphql
+type Mechanic {
+    carOwner: Owner! @hasOneThrough
+}
+```
+
 ## Has Many Through
 
 Use the [@hasManyThrough](../api-reference/directives.md#hasmanythrough) directive to define a [has-many-through relationship](https://laravel.com/docs/eloquent-relationships#has-many-through).
@@ -116,16 +126,6 @@ Use the [@hasManyThrough](../api-reference/directives.md#hasmanythrough) directi
 ```graphql
 type Project {
   deployments: [Deployment!]! @hasManyThrough
-}
-```
-
-## Has One Through
-
-Use the [@hasOneThrough](../api-reference/directives.md#hasonethrough) directive to define a [has-one-through relationship](https://laravel.com/docs/eloquent-relationships#has-one-through).
-
-```graphql
-type Mechanic {
-    carOwner: carOwner! @hasOneThrough
 }
 ```
 

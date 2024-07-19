@@ -1738,7 +1738,7 @@ type User {
 }
 ```
 
-If the name of the relationship on the Eloquent model is different than the field name,
+If the name of the relationship on the Eloquent model differs from the field name,
 you can override it by setting `relation`.
 
 ```graphql
@@ -1841,7 +1841,7 @@ type User {
 }
 ```
 
-If the name of the relationship on the Eloquent model is different than the field name,
+If the name of the relationship on the Eloquent model differs from the field name,
 you can override it by setting `relation`.
 
 ```graphql
@@ -1872,16 +1872,16 @@ directive @hasOneThrough(
 
 ```graphql
 type Mechanic {
-  carOwner: Owner @hasOneThrough
+  carOwner: Owner! @hasOneThrough
 }
 ```
 
-If the name of the relationship on the Eloquent model is different than the field name,
+If the name of the relationship on the Eloquent model differs from the field name,
 you can override it by setting `relation`.
 
 ```graphql
 type Mechanic {
-    carOwner: Owner @hasOneThrough(relation: "owner")
+    carOwner: Owner! @hasOneThrough(relation: "owner")
 }
 ```
 
