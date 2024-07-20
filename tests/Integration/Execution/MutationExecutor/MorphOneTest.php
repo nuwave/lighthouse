@@ -369,4 +369,46 @@ GRAPHQL
             ],
         ]);
     }
+
+    public function testNestedConnectMorphOne()
+    {
+        $task = factory(Task::class)->create();
+        assert($task instanceof Task);
+
+        $image = factory(Image::class)->create();
+        assert($image instanceof Image);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation UpdateTask($input: UpdateTaskInput!){
+            updateTask(input: $input) {
+                id
+                name
+                image {
+                    url
+                }
+            }
+        }
+        ', [
+            'input' => [
+                'id' => $task->id,
+                'name' => 'foo',
+                'image' => [
+                    'upsert' => [
+                        'id' => $image->id,
+                        'url' => 'foo',
+                    ],
+                ],
+            ],
+        ])->assertJson([
+            'data' => [
+                'updateTask' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'image' => [
+                        'url' => 'foo',
+                    ],
+                ],
+            ],
+        ]);
+    }
 }
