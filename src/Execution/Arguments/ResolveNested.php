@@ -22,6 +22,7 @@ class ResolveNested implements ArgResolver
     /** @param  ArgumentSet  $args */
     public function __invoke(mixed $root, $args): mixed
     {
+
         [$nestedArgs, $regularArgs] = ($this->argPartitioner)($args, $root);
         assert($nestedArgs instanceof ArgumentSet);
 
