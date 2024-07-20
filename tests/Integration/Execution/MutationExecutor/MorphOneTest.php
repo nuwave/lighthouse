@@ -370,7 +370,7 @@ GRAPHQL
         ]);
     }
 
-    public function testNestedConnectMorphOne()
+    public function testNestedConnectMorphOne(): void
     {
         $task = factory(Task::class)->create();
         assert($task instanceof Task);

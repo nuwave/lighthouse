@@ -836,7 +836,7 @@ GRAPHQL
     }
 
 
-    public function testUpdateNestedHasMany()
+    public function testUpdateNestedHasMany(): void
     {
         $user = factory(User::class)->create();
         $user->save();
