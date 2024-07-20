@@ -31,7 +31,7 @@ class NestedOneToMany implements ArgResolver
         }
 
         if ($args->has('update')) {
-            $updateModel = new ResolveNested(new UpdateModel(new SaveModel($relation)));
+            $updateModel = new ResolveNested(new UpdateModel(new SaveModel()));
 
             foreach ($args->arguments['update']->value as $childArgs) {
                 // @phpstan-ignore-next-line Relation&Builder mixin not recognized

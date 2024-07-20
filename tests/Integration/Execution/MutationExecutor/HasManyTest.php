@@ -508,6 +508,9 @@ GRAPHQL
         $task2 = factory(Task::class)->create();
         assert($task2 instanceof Task);
 
+        $task3 = factory(Task::class)->create();
+        assert($task2 instanceof Task);
+
         $actionInputName = ucfirst($action);
 
         $this->graphQL(/** @lang GraphQL */ "
@@ -531,6 +534,11 @@ GRAPHQL
                             $task1->id,
                             $task2->id,
                         ],
+                        'update' => [
+                            [
+                                'id' => $task3->id
+                            ]
+                        ]
                     ],
                 ],
             ],
@@ -547,6 +555,10 @@ GRAPHQL
                         [
                             'id' => "{$task2->id}",
                             'name' => $task2->name,
+                        ],
+                        [
+                            'id' => "{$task3->id}",
+                            'name' => null,
                         ],
                     ],
                 ],
@@ -828,54 +840,6 @@ GRAPHQL
                     'customPrimaryKeys' => [
                         [
                             'custom_primary_key_id' => '3',
-                        ],
-                    ],
-                ],
-            ],
-        ]);
-    }
-
-    public function testNestedHasManyUpdate()
-    {
-        $user = factory(User::class)->make();
-        $user->save();
-
-        $task = factory(Task::class)->make();
-        $task->save();
-
-        $res = $this->graphQL(/** @lang GraphQL */ '
-            mutation UpdateUser($input: UpdateUserInput!){
-                updateUser(input: $input) {
-                    id
-                    name
-                    tasks {
-                        id
-                        name
-                    }
-                }
-            }
-           ', [
-               'input' => [
-                   'id' => $user->id,
-                   'name' => 'foo',
-                   'tasks' => [
-                       'update' => [
-                           [
-                               'id' => $task->id,
-                               'name' => 'bar',
-                           ],
-                       ],
-                   ],
-               ],
-        ])->assertJson([
-            'data' => [
-                'updateUser' => [
-                    'id' => (string) $user->id,
-                    'name' => 'foo',
-                    'tasks' => [
-                        [
-                            'id' => (string) $task->id,
-                            'name' => 'bar',
                         ],
                     ],
                 ],
