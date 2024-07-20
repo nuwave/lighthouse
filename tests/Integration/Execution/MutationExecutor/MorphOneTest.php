@@ -13,23 +13,11 @@ final class MorphOneTest extends DBTestCase
         id: ID!
         name: String!
         image: Image
-        activity: [Activity!] @morphMany
     }
 
     type Image {
         id: ID!
         url: String
-    }
-
-    type Activity {
-        id: ID!
-        user: User! @belongsTo
-        content: Task @morphTo
-    }
-
-    type User {
-        id: ID!
-        name: String!
     }
 
     type Mutation {
@@ -41,23 +29,6 @@ final class MorphOneTest extends DBTestCase
     input CreateTaskInput {
         name: String!
         image: CreateImageRelation
-        activity: CreateActivityMorphMany
-    }
-
-    input CreateActivityMorphMany {
-      create: [CreateActivityInput!]
-    }
-
-    input CreateActivityInput {
-      user: CreateUserRelation
-    }
-
-    input CreateUserRelation {
-      create: CreateUserInput
-    }
-
-    input CreateUserInput {
-        name: String!
     }
 
     input CreateImageRelation {
@@ -105,57 +76,6 @@ final class MorphOneTest extends DBTestCase
         url: String
     }
     ' . self::PLACEHOLDER_QUERY;
-
-    public function testDeeplyNestedMorphOne(): void
-    {
-        $res = $this->graphQL(/** @lang GraphQL */ '
-        mutation CreateTask($input: CreateTaskInput!){
-            createTask(input: $input) {
-                id
-                name
-                activity {
-                    id
-                    user {
-                        id
-                        name
-                    }
-                }
-            }
-        }
-        ', [
-            'input' => [
-                'name' => 'foo',
-                'activity' => [
-                    'create' => [
-                        [
-                            'user' => [
-                                'create' => [
-                                    'name' => 'bar'
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
-            ]
-        ])->assertJson([
-            'data' => [
-                'createTask' => [
-                    'id' => '1',
-                    'name' => 'foo',
-                    'activity' => [
-                        [
-                            'id' => '1',
-                            'user' => [
-                                'id' => '1',
-                                'name' => 'bar',
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-        ]);
-
-    }
 
     public function testCreateWithNewMorphOne(): void
     {

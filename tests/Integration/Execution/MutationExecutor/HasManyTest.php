@@ -834,4 +834,52 @@ GRAPHQL
             ],
         ]);
     }
+
+    public function testNestedHasManyUpdate()
+    {
+        $user = factory(User::class)->make();
+        $user->save();
+
+        $task = factory(Task::class)->make();
+        $task->save();
+
+        $res = $this->graphQL(/** @lang GraphQL */ '
+            mutation UpdateUser($input: UpdateUserInput!){
+                updateUser(input: $input) {
+                    id
+                    name
+                    tasks {
+                        id
+                        name
+                    }
+                }
+            }
+           ', [
+               'input' => [
+                   'id' => $user->id,
+                   'name' => 'foo',
+                   'tasks' => [
+                       'update' => [
+                           [
+                               'id' => $task->id,
+                               'name' => 'bar',
+                           ],
+                       ],
+                   ],
+               ],
+        ])->assertJson([
+            'data' => [
+                'updateUser' => [
+                    'id' => (string) $user->id,
+                    'name' => 'foo',
+                    'tasks' => [
+                        [
+                            'id' => (string) $task->id,
+                            'name' => 'bar',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
 }
