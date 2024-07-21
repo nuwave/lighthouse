@@ -379,7 +379,7 @@ GRAPHQL
         assert($image instanceof Image);
 
         $this->graphQL(/** @lang GraphQL */ '
-        mutation UpdateTask($input: UpdateTaskInput!){
+        mutation ($input: UpdateTaskInput!) {
             updateTask(input: $input) {
                 id
                 name
