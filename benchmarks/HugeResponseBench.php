@@ -2,7 +2,7 @@
 
 namespace Benchmarks;
 
-class HugeResponseBench extends QueryBench
+final class HugeResponseBench extends QueryBench
 {
     protected string $schema = /** @lang GraphQL */ <<<'GRAPHQL'
 type Query {

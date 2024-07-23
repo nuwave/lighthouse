@@ -67,11 +67,11 @@ class ContextualizedStats extends \Google\Protobuf\Internal\Message
      *           Key is type name. This structure provides data for the count and latency of individual
      *           field executions and thus only reflects operations for which field-level tracing occurred.
      *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\ExtendedReferences $extended_references
-     *           Extended references including input types and enum values
+     *           Extended references including input types and enum values.
      *     @var array|\Google\Protobuf\Internal\MapField $local_per_type_stat
-     *           Per type stats that are obtained directly by the router or gateway rather than FTV1
+     *           Per type stats that are obtained directly by the router or gateway rather than FTV1.
      *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\LimitsStats $limits_stats
-     *           Stats that contain limits information for the query
+     *           Stats that contain limits information for the query.
      *     @var int|string $operation_count
      *           Total number of operations processed during this period for this context. This includes all operations, even if they are sampled
      *           and not included in the query latency stats.

@@ -5,9 +5,7 @@ namespace Benchmarks;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Tests\TestCase;
 
-/**
- * @BeforeMethods({"setUp"})
- */
+/** @BeforeMethods({"setUp"}) */
 abstract class QueryBench extends TestCase
 {
     /** Cached graphQL endpoint. */

@@ -5,10 +5,8 @@ namespace Benchmarks;
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 
-/**
- * @BeforeMethods({"prepareSchema"})
- */
-class ASTUnserializationBench
+/** @BeforeMethods({"prepareSchema"}) */
+final class ASTUnserializationBench
 {
     public const SCHEMA = /** @lang GraphQL */ <<<'GRAPHQL'
 type Query {
@@ -36,8 +34,7 @@ GRAPHQL;
         $this->documentNode = serialize(
             Parser::parse(
                 self::SCHEMA,
-                // Ignore location since it only bloats the AST
-                ['noLocation' => true],
+                ['noLocation' => true], // Ignore location since it only bloats the AST
             ),
         );
 
