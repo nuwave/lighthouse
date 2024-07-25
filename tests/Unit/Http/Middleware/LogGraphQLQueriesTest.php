@@ -4,13 +4,14 @@ namespace Tests\Unit\Http\Middleware;
 
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Nuwave\Lighthouse\Http\Middleware\LogGraphQLQueries;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Tests\TestCase;
 
 final class LogGraphQLQueriesTest extends TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject&\Psr\Log\LoggerInterface */
-    protected $logger;
+    protected MockObject $logger;
 
     protected function getEnvironmentSetUp($app): void
     {
@@ -28,10 +29,10 @@ final class LogGraphQLQueriesTest extends TestCase
     public function testLogsEveryQuery(): void
     {
         $query = /** @lang GraphQL */ <<<'GRAPHQL'
-{
-    foo
-}
-GRAPHQL;
+        {
+            foo
+        }
+        GRAPHQL;
 
         $this->logger
             ->expects($this->once())
