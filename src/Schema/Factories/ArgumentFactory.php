@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Schema\Factories;
 
 use GraphQL\Language\AST\InputValueDefinitionNode;
-use GraphQL\Type\Definition\InputType;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Container\Container;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
