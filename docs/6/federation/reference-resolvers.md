@@ -101,7 +101,10 @@ final class Product implements BatchedEntityResolver
 {
     public function __invoke(array $representations): iterable
     {
-        $products = ProductRepository::byIDs(Arr::pluck($representations, 'id'))->keyBy('id');
+        $ids = Arr::pluck($representations, 'id');
+
+        $products = ProductRepository::byIDs($ids)
+            ->keyBy('id');
 
         $result = [];
         foreach ($representations as $key => $representation) {
