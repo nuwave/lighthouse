@@ -120,7 +120,7 @@ final class HasOneTest extends DBTestCase
                 name: "foo"
                 post: {
                     upsert: {
-                        id: 1
+                        id: 2
                         title: "bar"
                     }
                 }
@@ -139,7 +139,7 @@ final class HasOneTest extends DBTestCase
                     'id' => '1',
                     'name' => 'foo',
                     'post' => [
-                        'id' => '1',
+                        'id' => '2',
                         'title' => 'bar',
                     ],
                 ],
@@ -183,7 +183,7 @@ final class HasOneTest extends DBTestCase
         ]);
     }
 
-    public function testUpsertHasOneWithoutId(): void
+    public function testUpsertHasOneWithoutID(): void
     {
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -191,6 +191,41 @@ final class HasOneTest extends DBTestCase
                 name: "foo"
                 post: {
                     upsert: {
+                        title: "bar"
+                    }
+                }
+            }) {
+                id
+                name
+                post {
+                    id
+                    title
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'upsertTask' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'post' => [
+                        'id' => '1',
+                        'title' => 'bar',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testUpsertHasOneWithIDNull(): void
+    {
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation {
+            upsertTask(input: {
+                name: "foo"
+                post: {
+                    upsert: {
+                        id: null
                         title: "bar"
                     }
                 }
