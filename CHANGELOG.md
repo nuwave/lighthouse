@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.42.1
+
+### Changed
+
+- Improve validation message when using output types as inputs https://github.com/nuwave/lighthouse/pull/2594
+
 ## v6.42.0
 
 ### Added
