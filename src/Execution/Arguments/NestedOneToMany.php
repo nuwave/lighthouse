@@ -22,7 +22,7 @@ class NestedOneToMany implements ArgResolver
         assert($relation instanceof HasMany || $relation instanceof MorphMany);
 
         if ($args->has('create')) {
-            $saveModel = new ResolveNested(new SaveModel());
+            $saveModel = new ResolveNested(new SaveModel($relation));
 
             foreach ($args->arguments['create']->value as $childArgs) {
                 // @phpstan-ignore-next-line Relation&Builder mixin not recognized
@@ -31,7 +31,7 @@ class NestedOneToMany implements ArgResolver
         }
 
         if ($args->has('update')) {
-            $updateModel = new ResolveNested(new UpdateModel(new SaveModel()));
+            $updateModel = new ResolveNested(new UpdateModel(new SaveModel($relation)));
 
             foreach ($args->arguments['update']->value as $childArgs) {
                 // @phpstan-ignore-next-line Relation&Builder mixin not recognized
@@ -40,7 +40,7 @@ class NestedOneToMany implements ArgResolver
         }
 
         if ($args->has('upsert')) {
-            $upsertModel = new ResolveNested(new UpsertModel(new SaveModel()));
+            $upsertModel = new ResolveNested(new UpsertModel(new SaveModel($relation)));
 
             foreach ($args->arguments['upsert']->value as $childArgs) {
                 // @phpstan-ignore-next-line Relation&Builder mixin not recognized

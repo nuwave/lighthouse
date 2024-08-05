@@ -22,19 +22,19 @@ class NestedOneToOne implements ArgResolver
         assert($relation instanceof HasOne || $relation instanceof MorphOne);
 
         if ($args->has('create')) {
-            $saveModel = new ResolveNested(new SaveModel());
+            $saveModel = new ResolveNested(new SaveModel($relation));
 
             $saveModel($relation->make(), $args->arguments['create']->value);
         }
 
         if ($args->has('update')) {
-            $updateModel = new ResolveNested(new UpdateModel(new SaveModel()));
+            $updateModel = new ResolveNested(new UpdateModel(new SaveModel($relation)));
 
             $updateModel($relation->make(), $args->arguments['update']->value);
         }
 
         if ($args->has('upsert')) {
-            $upsertModel = new ResolveNested(new UpsertModel(new SaveModel()));
+            $upsertModel = new ResolveNested(new UpsertModel(new SaveModel($relation)));
 
             $upsertModel($relation->make(), $args->arguments['upsert']->value);
         }

@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.42.2
+
+### Fixed
+
+- Restore correct function of nested `HasMany` and `MorphOne` mutations https://github.com/nuwave/lighthouse/pull/2591
+
 ## v6.42.1
 
 ### Changed
