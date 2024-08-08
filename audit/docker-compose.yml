@@ -1,0 +1,18 @@
+services:
+  server:
+    build:
+      context: ../
+      dockerfile: audit/server.dockerfile
+    entrypoint: 'php artisan serve --host=0.0.0.0'
+    healthcheck:
+      test: curl -f http://localhost:8000/graphql?query=%7B__typename%7D || exit 1
+      interval: 3s
+      timeout: 1s
+
+  client:
+    image: denoland/deno:1.31.3
+    working_dir: /workdir
+    volumes:
+      - ./:/workdir
+    entrypoint: /bin/bash
+    tty: true
