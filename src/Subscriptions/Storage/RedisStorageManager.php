@@ -65,6 +65,9 @@ class RedisStorageManager implements StoresSubscriptions
             return new Collection();
         }
 
+        // Store all keys as missing keys to remove the ones which are expired later.
+        $missingKeys = $subscriberIds;
+
         // Since we store the individual subscribers with a prefix,
         // but not in the set, we have to add the prefix here.
         $subscriberIds = array_map([$this, 'channelKey'], $subscriberIds);
@@ -73,22 +76,37 @@ class RedisStorageManager implements StoresSubscriptions
         // This is like using multiple get calls (getSubscriber uses the get command).
         $subscribers = $this->connection->command('mget', [$subscriberIds]);
 
-        return (new Collection($subscribers))
+        $subscribersCollection = (new Collection($subscribers))
             ->filter()
-            ->map(static function (?string $subscriber): ?Subscriber {
-                // Some entries may be expired
+            ->map(static function (?string $subscriber) use (&$missingKeys): ?Subscriber {
+                // Some entries may be expired.
                 if ($subscriber === null) {
                     return null;
                 }
 
                 // Other entries may contain invalid values
                 try {
-                    return unserialize($subscriber);
+                    $subscriber = unserialize($subscriber);
+
+                    // This key exists so remove it from the list of missing keys.
+                    $missingKeys = array_diff($missingKeys, [$subscriber->channel]);
+
+                    return $subscriber;
                 } catch (\ErrorException) {
                     return null;
                 }
             })
             ->filter();
+
+        // Remove expired subscribers from the set of subscribers of this topic.
+        if (! empty($missingKeys)) {
+            $this->connection->command('srem', [
+                $this->topicKey($topic),
+                ...$missingKeys,
+            ]);
+        }
+
+        return $subscribersCollection;
     }
 
     public function storeSubscriber(Subscriber $subscriber, string $topic): void
