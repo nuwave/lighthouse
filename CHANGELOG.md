@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.43.0
+
+### Added
+
+- Remove expired members from subscription topic stored in Redis set map https://github.com/nuwave/lighthouse/pull/2601
+
 ## v6.42.2
 
 ### Fixed
