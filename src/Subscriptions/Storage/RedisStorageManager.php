@@ -62,7 +62,7 @@ class RedisStorageManager implements StoresSubscriptions
         // As explained in storeSubscriber, we use redis sets to store the names of subscribers of a topic.
         // We can retrieve all members of a set using the command smembers.
         $subscriberIds = $this->connection->command('smembers', [$this->topicKey($topic)]);
-        if (count($subscriberIds) === 0) {
+        if ($subscriberIds === []) {
             return new Collection();
         }
 
@@ -100,7 +100,7 @@ class RedisStorageManager implements StoresSubscriptions
             ->filter();
 
         // Remove expired subscribers from the set of subscribers of this topic.
-        if (! empty($missingKeys)) {
+        if ($missingKeys !== []) {
             $this->connection->command('srem', [
                 $this->topicKey($topic),
                 ...$missingKeys,
