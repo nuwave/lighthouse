@@ -12,6 +12,7 @@ use Nuwave\Lighthouse\Subscriptions\Subscriber;
 
 /**
  * Stores subscribers and topics in redis.
+ *
  * - Topics are subscriptions like "userCreated" or "userDeleted".
  * - Subscribers are clients that are listening to channels like "private-lighthouse-a7ef3d".
  *
@@ -84,7 +85,7 @@ class RedisStorageManager implements StoresSubscriptions
                     return null;
                 }
 
-                // Other entries may contain invalid values
+                // Other entries may contain invalid values.
                 try {
                     $subscriber = unserialize($subscriber);
 
@@ -114,7 +115,7 @@ class RedisStorageManager implements StoresSubscriptions
         $subscriber->topic = $topic;
 
         // In contrast to the CacheStorageManager, we use redis sets.
-        // Instead of reading the entire list, adding the subscriber and storing the list;
+        // Instead of reading the entire list, adding the subscriber, and storing the list;
         // we simply add the name of the subscriber to the set of subscribers of this topic using the sadd command...
         $topicKey = $this->topicKey($topic);
         $this->connection->command('sadd', [
@@ -126,7 +127,7 @@ class RedisStorageManager implements StoresSubscriptions
             $this->connection->command('expire', [$topicKey, $this->ttl]);
         }
 
-        // Lastly, we store the subscriber as a serialized string...
+        // Lastly, we store the subscriber as a serialized string.
         $setCommand = 'set';
         $setArguments = [
             $this->channelKey($subscriber->channel),
