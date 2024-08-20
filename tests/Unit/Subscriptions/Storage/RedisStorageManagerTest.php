@@ -102,7 +102,7 @@ final class RedisStorageManagerTest extends TestCase
             ->willReturnOnConsecutiveCalls(
                 serialize($subscriber),
                 true,
-                true
+                true,
             );
 
         $manager = new RedisStorageManager($config, $redisFactory);
