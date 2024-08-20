@@ -101,6 +101,8 @@ final class RedisStorageManagerTest extends TestCase
             ))
             ->willReturnOnConsecutiveCalls(
                 serialize($subscriber),
+                true,
+                true,
             );
 
         $manager = new RedisStorageManager($config, $redisFactory);
@@ -195,7 +197,7 @@ final class RedisStorageManagerTest extends TestCase
             $subscriber2,
         ];
 
-        $redisConnection->expects($this->exactly(2))
+        $redisConnection->expects($this->exactly(3))
             ->method('command')
             ->with(...$this->withConsecutive(
                 ['smembers', ["graphql.topic.{$topic}"]],
@@ -203,10 +205,12 @@ final class RedisStorageManagerTest extends TestCase
                     'graphql.subscriber.foo1',
                     'graphql.subscriber.foo2',
                     'graphql.subscriber.foo3',
+                    'graphql.subscriber.foo4',
                 ]]],
+                ['srem', ["graphql.topic.{$topic}", 'foo3', 'foo4']],
             ))
             ->willReturnOnConsecutiveCalls(
-                ['foo1', 'foo2', 'foo3'],
+                ['foo1', 'foo2', 'foo3', 'foo4'],
                 [
                     serialize($subscriber1),
                     serialize($subscriber2),
@@ -217,6 +221,7 @@ final class RedisStorageManagerTest extends TestCase
                     // mget non-existing-entry
                     false,
                 ],
+                null,
             );
 
         $this->assertEquals(
