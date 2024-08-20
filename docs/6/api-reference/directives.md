@@ -747,7 +747,7 @@ directive @canFind(
 ) repeatable on FIELD_DEFINITION
 ```
 
-### canRoot
+### @canModel
 
 ```graphql
 """
@@ -755,7 +755,7 @@ Check a Laravel Policy to ensure the current user is authorized to access a fiel
 
 Check the policy against the root model.
 """
-directive @canRoot(
+directive @canModel(
   """
   The model name to check against.
   """
