@@ -76,7 +76,7 @@ GRAPHQL;
      *
      * @Revs(10)
      *
-     * @Iterations(1)
+     * @Iterations(10)
      *
      * @ParamProviders({"providePerformanceTuning"})
      *
