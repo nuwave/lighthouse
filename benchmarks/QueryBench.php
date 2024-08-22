@@ -34,7 +34,11 @@ abstract class QueryBench extends TestCase
         return $this->graphQLEndpoint;
     }
 
-    /** Set up function with the performance tuning. */
+    /**
+     * Set up function with the performance tuning.
+     *
+     * @param  array{0: bool, 1: bool, 2: bool}  $params Performance tuning parameters
+     */
     public function setPerformanceTuning(array $params): void
     {
         $this->setUp();
@@ -45,14 +49,16 @@ abstract class QueryBench extends TestCase
         $this->app->make(ConfigRepository::class)->set('lighthouse.validation_cache.enable', $params[2]);
     }
 
+    /**
+     * Indexes:
+     *  0: Remove all middlewares
+     *  1: Enable query cache
+     *  2: Enable validation cache
+     *
+     * @return array<string, array{0: bool, 1: bool, 2: bool}>
+     */
     public function providePerformanceTuning(): array
     {
-        /**
-         * Indexes:
-         * 0: Remove all middlewares
-         * 1: Enable query cache
-         * 2: Enable validation cache
-         */
         return [
             'nothing' => [false, false, false],
             'query cache' => [false, true, false],
