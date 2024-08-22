@@ -95,7 +95,6 @@ class ValidationCachingTest extends TestCase
         Event::assertDispatchedTimes(KeyWritten::class, 0);
     }
 
-
     public function testErrorsAreNotCached(): void
     {
         $config = $this->app->make(ConfigRepository::class);
@@ -242,7 +241,7 @@ GRAPHQL;
         {
             foo
         }
-        ')->assertGraphQLErrorMessage('Cannot query field "foo" on type "Query".');;
+        ')->assertGraphQLErrorMessage('Cannot query field "foo" on type "Query".');
 
         Event::assertDispatchedTimes(CacheMissed::class, 1);
         Event::assertDispatchedTimes(CacheHit::class, 0);

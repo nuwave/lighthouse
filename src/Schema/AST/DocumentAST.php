@@ -90,9 +90,7 @@ class DocumentAST implements Arrayable
     /** @var array<int,SchemaExtensionNode> */
     public array $schemaExtensions = [];
 
-    /**
-     * A hash of the schema.
-     */
+    /** A hash of the schema. */
     public ?string $hash = null;
 
     /** Create a new DocumentAST instance from a schema. */

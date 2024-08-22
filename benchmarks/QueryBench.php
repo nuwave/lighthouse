@@ -34,13 +34,11 @@ abstract class QueryBench extends TestCase
         return $this->graphQLEndpoint;
     }
 
-    /**
-     * Set up function with the performance tuning.
-     */
+    /** Set up function with the performance tuning. */
     public function setPerformanceTuning(array $params): void
     {
         $this->setUp();
-        if ($params[0]){
+        if ($params[0]) {
             $this->app->make(ConfigRepository::class)->set('lighthouse.field_middleware', []);
         }
         $this->app->make(ConfigRepository::class)->set('lighthouse.query_cache.enable', $params[1]);

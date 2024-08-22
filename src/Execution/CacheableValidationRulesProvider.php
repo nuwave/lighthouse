@@ -18,22 +18,23 @@ class CacheableValidationRulesProvider implements ProvidesCacheableValidationRul
     public function cacheableValidationRules(): array
     {
         $result = [
-                QueryDepth::class => new QueryDepth($this->configRepository->get('lighthouse.security.max_query_depth', 0)),
-                DisableIntrospection::class => new DisableIntrospection($this->configRepository->get('lighthouse.security.disable_introspection', 0)),
-            ] + DocumentValidator::allRules();
+            QueryDepth::class => new QueryDepth($this->configRepository->get('lighthouse.security.max_query_depth', 0)),
+            DisableIntrospection::class => new DisableIntrospection($this->configRepository->get('lighthouse.security.disable_introspection', 0)),
+        ] + DocumentValidator::allRules();
 
         unset($result[QueryComplexity::class]);
+
         return $result;
     }
 
     public function validationRules(): ?array
     {
         $maxQueryComplexity = $this->configRepository->get('lighthouse.security.max_query_complexity', 0);
+
         return $maxQueryComplexity === 0
             ? []
             : [
                 QueryComplexity::class => new QueryComplexity($maxQueryComplexity),
             ];
-
     }
 }

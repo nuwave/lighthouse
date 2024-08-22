@@ -10,23 +10,20 @@ type Query {
     @field(resolver: "Benchmarks\\HugeRequestBench@resolve")
 }
 GRAPHQL;
+
     protected ?string $query = null;
 
     /**
      * Resolves foo.
      *
      * @skip
-     *
-     * @return string
      */
     public function resolve(): string
     {
-        return "foo";
+        return 'foo';
     }
 
-    /**
-     * Generates query with $count fragments.
-     */
+    /** Generates query with $count fragments. */
     private function generateQuery(int $count): string
     {
         $query = '{';
@@ -45,10 +42,13 @@ GRAPHQL;
 
     /**
      * @Warmup(1)
+     *
      * @Revs(10)
+     *
      * @Iterations(10)
      *
      * @ParamProviders({"providePerformanceTuning"})
+     *
      * @BeforeMethods("setPerformanceTuning")
      */
     public function benchmark1(): void
@@ -59,10 +59,13 @@ GRAPHQL;
 
     /**
      * @Warmup(1)
+     *
      * @Revs(10)
+     *
      * @Iterations(10)
      *
      * @ParamProviders({"providePerformanceTuning"})
+     *
      * @BeforeMethods("setPerformanceTuning")
      */
     public function benchmark10(): void
@@ -75,10 +78,13 @@ GRAPHQL;
 
     /**
      * @Warmup(1)
+     *
      * @Revs(10)
+     *
      * @Iterations(10)
      *
      * @ParamProviders({"providePerformanceTuning"})
+     *
      * @BeforeMethods("setPerformanceTuning")
      */
     public function benchmark100(): void

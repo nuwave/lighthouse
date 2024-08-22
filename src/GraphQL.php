@@ -248,7 +248,7 @@ class GraphQL
                 $params->variables,
                 null,
                 $params->operation,
-                $params->queryId
+                $params->queryId,
             );
         } catch (\Throwable $throwable) {
             return $this->toSerializableArray(
@@ -264,7 +264,7 @@ class GraphQL
      *
      * @api
      */
-    public function parse(string $query, string &$hash = null): DocumentNode
+    public function parse(string $query, ?string &$hash = null): DocumentNode
     {
         $cacheConfig = $this->configRepository->get('lighthouse.query_cache');
         $hash = hash('sha256', $query);
@@ -385,29 +385,25 @@ class GraphQL
         ]);
     }
 
-
     /**
      * Execute the validation rules that are cacheable.
      *
      * @return array<Error>
-     *
-     * @throws \Exception
      */
     protected function executeAndCacheValidationRules(
         SchemaType $schema,
         ?string $schemaHash,
         DocumentNode $query,
-        ?string $queryHash
-    ): array
-    {
-        if (!$this->providesValidationRules instanceof ProvidesCacheableValidationRules) {
+        ?string $queryHash,
+    ): array {
+        if (! $this->providesValidationRules instanceof ProvidesCacheableValidationRules) {
             return [];
         }
 
         $validationRules = $this->providesValidationRules->cacheableValidationRules();
         foreach ($validationRules as $rule) {
             if ($rule instanceof QueryComplexity) {
-                throw new \InvalidArgumentException("QueryComplexity rule should not be registered in cacheableValidationRules");
+                throw new \InvalidArgumentException('QueryComplexity rule should not be registered in cacheableValidationRules');
             }
         }
 
@@ -422,7 +418,7 @@ class GraphQL
         /** @var CacheFactory $cacheFactory */
         $cacheFactory = Container::getInstance()->make(CacheFactory::class);
         $store = $cacheFactory->store($cacheConfig['store']);
-        if ($store->get($cacheKey) === true){
+        if ($store->get($cacheKey) === true) {
             return [];
         }
 
@@ -432,6 +428,7 @@ class GraphQL
         }
 
         $store->put($cacheKey, true, $cacheConfig['ttl']);
+
         return [];
     }
 }
