@@ -12,6 +12,9 @@ use GraphQL\Language\Parser;
 use GraphQL\Server\Helper as GraphQLHelper;
 use GraphQL\Server\OperationParams;
 use GraphQL\Server\RequestError;
+use GraphQL\Type\Schema as SchemaType;
+use GraphQL\Validator\DocumentValidator;
+use GraphQL\Validator\Rules\QueryComplexity;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
@@ -29,6 +32,7 @@ use Nuwave\Lighthouse\Execution\ErrorPool;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Support\Contracts\ProvidesCacheableValidationRules;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules;
 use Nuwave\Lighthouse\Support\Utils as LighthouseUtils;
 
@@ -127,6 +131,11 @@ class GraphQL
         $this->eventDispatcher->dispatch(
             new StartExecution($schema, $query, $variables, $operationName, $context),
         );
+
+        $errors = $this->executeAndCacheValidationRules($schema, $query);
+        if ($errors !== []) {
+            return new ExecutionResult(null, $errors);
+        }
 
         $result = GraphQLBase::executeQuery(
             $schema,
@@ -372,5 +381,29 @@ class GraphQL
         return Parser::parse($query, [
             'noLocation' => ! $this->configRepository->get('lighthouse.parse_source_location'),
         ]);
+    }
+
+
+    /**
+     * Execute the validation rules that are cacheable.
+     *
+     * @return array<Error>
+     *
+     * @throws \Exception
+     */
+    protected function executeAndCacheValidationRules(SchemaType $schema, DocumentNode $query): array
+    {
+        if (!$this->providesValidationRules instanceof ProvidesCacheableValidationRules) {
+            return [];
+        }
+
+        $validationRules = $this->providesValidationRules->cacheableValidationRules();
+        foreach ($validationRules as $rule) {
+            if ($rule instanceof QueryComplexity) {
+                throw new \InvalidArgumentException("QueryComplexity rule should not be registered in cacheableValidationRules");
+            }
+        }
+
+        return DocumentValidator::validate($schema, $query, $validationRules);
     }
 }
