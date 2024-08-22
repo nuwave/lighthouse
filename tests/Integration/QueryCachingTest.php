@@ -14,6 +14,7 @@ final class QueryCachingTest extends TestCase
     {
         $config = $this->app->make(ConfigRepository::class);
         $config->set('lighthouse.query_cache.enable', true);
+        $config->set('lighthouse.validation_cache.enable', false);
 
         Event::fake();
 
@@ -51,6 +52,7 @@ final class QueryCachingTest extends TestCase
     {
         $config = $this->app->make(ConfigRepository::class);
         $config->set('lighthouse.query_cache.enable', true);
+        $config->set('lighthouse.validation_cache.enable', false);
 
         Event::fake();
 
@@ -84,6 +86,7 @@ final class QueryCachingTest extends TestCase
     {
         $config = $this->app->make(ConfigRepository::class);
         $config->set('lighthouse.query_cache.enable', false);
+        $config->set('lighthouse.validation_cache.enable', false);
 
         Event::fake();
 
