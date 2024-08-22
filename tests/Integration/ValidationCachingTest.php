@@ -49,6 +49,53 @@ class ValidationCachingTest extends TestCase
         Event::assertDispatchedTimes(KeyWritten::class, 1);
     }
 
+    public function testDisabled(): void
+    {
+        $config = $this->app->make(ConfigRepository::class);
+        $config->set('lighthouse.query_cache.enable', false);
+        $config->set('lighthouse.validation_cache.enable', false);
+
+        Event::fake();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo
+        }
+        ')->assertExactJson([
+            'data' => [
+                'foo' => Foo::THE_ANSWER,
+            ],
+        ]);
+
+        Event::assertDispatchedTimes(CacheMissed::class, 0);
+        Event::assertDispatchedTimes(CacheHit::class, 0);
+        Event::assertDispatchedTimes(KeyWritten::class, 0);
+    }
+
+    public function testConfigMissing(): void
+    {
+        $config = $this->app->make(ConfigRepository::class);
+        $config->set('lighthouse.query_cache.enable', false);
+        $config->set('lighthouse.validation_cache', null);
+
+        Event::fake();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo
+        }
+        ')->assertExactJson([
+            'data' => [
+                'foo' => Foo::THE_ANSWER,
+            ],
+        ]);
+
+        Event::assertDispatchedTimes(CacheMissed::class, 0);
+        Event::assertDispatchedTimes(CacheHit::class, 0);
+        Event::assertDispatchedTimes(KeyWritten::class, 0);
+    }
+
+
     public function testErrorsAreNotCached(): void
     {
         $config = $this->app->make(ConfigRepository::class);

@@ -8,7 +8,6 @@ use GraphQL\Validator\Rules\QueryComplexity;
 use GraphQL\Validator\Rules\QueryDepth;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesCacheableValidationRules;
-use Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules;
 
 class CacheableValidationRulesProvider implements ProvidesCacheableValidationRules
 {
@@ -29,8 +28,12 @@ class CacheableValidationRulesProvider implements ProvidesCacheableValidationRul
 
     public function validationRules(): ?array
     {
-        return [
-            QueryComplexity::class => new QueryComplexity($this->configRepository->get('lighthouse.security.max_query_complexity', 0)),
-        ];
+        $maxQueryComplexity = $this->configRepository->get('lighthouse.security.max_query_complexity', 0);
+        return $maxQueryComplexity === 0
+            ? []
+            : [
+                QueryComplexity::class => new QueryComplexity($maxQueryComplexity),
+            ];
+
     }
 }

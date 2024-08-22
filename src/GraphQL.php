@@ -248,6 +248,7 @@ class GraphQL
                 $params->variables,
                 null,
                 $params->operation,
+                $params->queryId
             );
         } catch (\Throwable $throwable) {
             return $this->toSerializableArray(
@@ -421,7 +422,7 @@ class GraphQL
         /** @var CacheFactory $cacheFactory */
         $cacheFactory = Container::getInstance()->make(CacheFactory::class);
         $store = $cacheFactory->store($cacheConfig['store']);
-        if ($store->get($cacheKey) !== null){
+        if ($store->get($cacheKey) === true){
             return [];
         }
 
