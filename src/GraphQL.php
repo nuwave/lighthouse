@@ -80,14 +80,14 @@ class GraphQL
         ?string $operationName = null,
     ): array {
         try {
-            $parsedQuery = $this->parse($query);
+            $parsedQuery = $this->parse($query, $queryHash);
         } catch (SyntaxError $syntaxError) {
             return $this->toSerializableArray(
                 new ExecutionResult(null, [$syntaxError]),
             );
         }
 
-        return $this->executeParsedQuery($parsedQuery, $context, $variables, $root, $operationName);
+        return $this->executeParsedQuery($parsedQuery, $context, $variables, $root, $operationName, $queryHash);
     }
 
     /**
@@ -105,8 +105,9 @@ class GraphQL
         ?array $variables = [],
         mixed $root = null,
         ?string $operationName = null,
+        ?string $queryHash = null,
     ): array {
-        $result = $this->executeParsedQueryRaw($query, $context, $variables, $root, $operationName);
+        $result = $this->executeParsedQueryRaw($query, $context, $variables, $root, $operationName, $queryHash);
 
         return $this->toSerializableArray($result);
     }
@@ -122,6 +123,7 @@ class GraphQL
         ?array $variables = [],
         mixed $root = null,
         ?string $operationName = null,
+        ?string $queryHash = null,
     ): ExecutionResult {
         // Building the executable schema might take a while to do,
         // so we do it before we fire the StartExecution event.
@@ -132,7 +134,7 @@ class GraphQL
             new StartExecution($schema, $query, $variables, $operationName, $context),
         );
 
-        $errors = $this->executeAndCacheValidationRules($schema, $query);
+        $errors = $this->executeAndCacheValidationRules($schema, $this->schemaBuilder->schemaHash(), $query, $queryHash);
         if ($errors !== []) {
             return new ExecutionResult(null, $errors);
         }
@@ -261,9 +263,10 @@ class GraphQL
      *
      * @api
      */
-    public function parse(string $query): DocumentNode
+    public function parse(string $query, string &$hash = null): DocumentNode
     {
         $cacheConfig = $this->configRepository->get('lighthouse.query_cache');
+        $hash = hash('sha256', $query);
 
         if (! $cacheConfig['enable']) {
             return $this->parseQuery($query);
@@ -272,10 +275,8 @@ class GraphQL
         $cacheFactory = Container::getInstance()->make(CacheFactory::class);
         $store = $cacheFactory->store($cacheConfig['store']);
 
-        $sha256 = hash('sha256', $query);
-
         return $store->remember(
-            "lighthouse:query:{$sha256}",
+            "lighthouse:query:{$hash}",
             $cacheConfig['ttl'],
             fn (): DocumentNode => $this->parseQuery($query),
         );
@@ -391,7 +392,12 @@ class GraphQL
      *
      * @throws \Exception
      */
-    protected function executeAndCacheValidationRules(SchemaType $schema, DocumentNode $query): array
+    protected function executeAndCacheValidationRules(
+        SchemaType $schema,
+        ?string $schemaHash,
+        DocumentNode $query,
+        ?string $queryHash
+    ): array
     {
         if (!$this->providesValidationRules instanceof ProvidesCacheableValidationRules) {
             return [];
@@ -404,8 +410,27 @@ class GraphQL
             }
         }
 
-        //$schemaHash = $this->schemaBuilder->schemaHash();
+        $cacheConfig = $this->configRepository->get('lighthouse.validation_cache');
 
-        return DocumentValidator::validate($schema, $query, $validationRules);
+        if ($schemaHash === null || $queryHash === null || ! ($cacheConfig['enable'] ?? false)) {
+            return DocumentValidator::validate($schema, $query, $validationRules);
+        }
+
+        $cacheKey = "lighthouse:validation:{$schemaHash}:{$queryHash}";
+
+        /** @var CacheFactory $cacheFactory */
+        $cacheFactory = Container::getInstance()->make(CacheFactory::class);
+        $store = $cacheFactory->store($cacheConfig['store']);
+        if ($store->get($cacheKey) !== null){
+            return [];
+        }
+
+        $result = DocumentValidator::validate($schema, $query, $validationRules);
+        if ($result !== []) {
+            return $result;
+        }
+
+        $store->put($cacheKey, true, $cacheConfig['ttl']);
+        return [];
     }
 }
