@@ -314,12 +314,12 @@ By default, Lighthouse enables all default query validation rules from `webonyx/
 This covers fundamental checks, e.g. queried fields match the schema, variables have values of the correct type.
 
 If you want to add custom rules or change which ones are used, you can bind a custom implementation
-of the interface `\Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules` through a service provider.
+of the interface `\Nuwave\Lighthouse\Support\Contracts\ProvidesCacheableValidationRules` through a service provider.
 
 ```php
 use Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules;
 
-final class MyCustomRulesProvider implements ProvidesValidationRules {}
+final class MyCustomRulesProvider implements ProvidesCacheableValidationRules {}
 
-$this->app->bind(ProvidesValidationRules::class, MyCustomRulesProvider::class);
+$this->app->bind(ProvidesCacheableValidationRules::class, MyCustomRulesProvider::class);
 ```
