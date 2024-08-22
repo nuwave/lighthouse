@@ -35,15 +35,31 @@ abstract class QueryBench extends TestCase
     }
 
     /**
-     * Define environment setup.
-     *
-     * @param  \Illuminate\Foundation\Application  $app
+     * Set up function with the performance tuning.
      */
-    protected function getEnvironmentSetUp($app): void
+    public function setPerformanceTuning(array $params): void
     {
-        parent::getEnvironmentSetUp($app);
+        $this->setUp();
+        if ($params[0]){
+            $this->app->make(ConfigRepository::class)->set('lighthouse.field_middleware', []);
+        }
+        $this->app->make(ConfigRepository::class)->set('lighthouse.query_cache.enable', $params[1]);
+        $this->app->make(ConfigRepository::class)->set('lighthouse.validation_cache.enable', $params[2]);
+    }
 
-        $config = $app->make(ConfigRepository::class);
-        $config->set('lighthouse.field_middleware', []);
+    public function providePerformanceTuning(): array
+    {
+        /**
+         * Indexes:
+         * 0: Remove all middlewares
+         * 1: Enable query cache
+         * 2: Enable validation cache
+         */
+        return [
+            'nothing' => [false, false, false],
+            'query cache' => [false, true, false],
+            'validation cache' => [false, true, true],
+            'everything' => [true, true, true],
+        ];
     }
 }
