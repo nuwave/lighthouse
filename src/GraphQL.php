@@ -404,6 +404,8 @@ class GraphQL
             }
         }
 
+        //$schemaHash = $this->schemaBuilder->schemaHash();
+
         return DocumentValidator::validate($schema, $query, $validationRules);
     }
 }

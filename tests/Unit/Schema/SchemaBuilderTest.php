@@ -9,6 +9,7 @@ use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ObjectType;
 use Nuwave\Lighthouse\Schema\RootType;
+use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Tests\TestCase;
 
 final class SchemaBuilderTest extends TestCase
@@ -18,7 +19,7 @@ final class SchemaBuilderTest extends TestCase
         $this->buildSchemaWithPlaceholderQuery('')
             ->assertValid();
 
-        $this->expectNotToPerformAssertions();
+        $this->assertNotNull($this->app->make(SchemaBuilder::class)->schemaHash());
     }
 
     public function testGeneratesWithEmptyQueryType(): void

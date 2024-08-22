@@ -28,6 +28,11 @@ class SchemaBuilder
         );
     }
 
+    public function schemaHash(): ?string
+    {
+        return $this->astBuilder->documentAST()->hash;
+    }
+
     /** Build an executable schema from an AST. */
     protected function build(DocumentAST $documentAST): Schema
     {

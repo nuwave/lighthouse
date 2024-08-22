@@ -28,6 +28,8 @@ final class DocumentASTTest extends TestCase
             ObjectTypeDefinitionNode::class,
             $documentAST->types[RootType::QUERY],
         );
+
+        $this->assertNotNull($documentAST->hash);
     }
 
     public function testThrowsOnInvalidSchema(): void
@@ -111,5 +113,7 @@ final class DocumentASTTest extends TestCase
         $schemaExtension = $reserialized->schemaExtensions[0];
         $this->assertInstanceOf(SchemaExtensionNode::class, $schemaExtension);
         $this->assertInstanceOf(DirectiveNode::class, $schemaExtension->directives[0]);
+
+        $this->assertEquals($documentAST->hash, $reserialized->hash);
     }
 }
