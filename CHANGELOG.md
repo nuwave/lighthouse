@@ -13,7 +13,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Changed
 
-- Improve formatting of `_lighthouse_ide_helper.php`
+- Improve formatting of `_lighthouse_ide_helper.php` https://github.com/nuwave/lighthouse/pull/2604
 
 ## v6.43.0
 
