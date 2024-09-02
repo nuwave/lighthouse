@@ -327,7 +327,7 @@ class ASTHelper
     }
 
     /** Given a collection of directives, returns the string value for the deprecation reason. */
-    public static function deprecationReason(EnumValueDefinitionNode|FieldDefinitionNode $node): ?string
+    public static function deprecationReason(EnumValueDefinitionNode|FieldDefinitionNode|InputValueDefinitionNode $node): ?string
     {
         $deprecated = Values::getDirectiveValues(
             DirectiveDefinition::deprecatedDirective(),
