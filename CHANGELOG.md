@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.44.0
+
+### Added
+
+- Allow `@deprecated` directive on arguments and input fields https://github.com/nuwave/lighthouse/pull/2607
+
 ## v6.43.1
 
 ### Changed
