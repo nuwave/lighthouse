@@ -9,6 +9,9 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+- Ensure `deprecationReason` is set on arguments and input fields https://github.com/nuwave/lighthouse/pull/2609
+
 ## v6.44.0
 
 ### Added
