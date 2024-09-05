@@ -161,9 +161,6 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
     public function testConvertsEmptyStringToNullOnAField(): void
     {
         $this->schema = /** @lang GraphQL */ '
@@ -189,14 +186,11 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
             'data' => [
                 'foo' => [
                     'bar' => null,
-                ]
+                ],
             ],
         ]);
     }
 
-    /**
-     * @test
-     */
     public function testConvertsEmptyStringToNullWithGlobalFieldMiddleware(): void
     {
         config(['lighthouse.field_middleware' => [
@@ -225,7 +219,7 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
             'data' => [
                 'foo' => [
                     'bar' => null,
-                ]
+                ],
             ],
         ]);
     }
