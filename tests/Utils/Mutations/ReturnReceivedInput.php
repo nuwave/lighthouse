@@ -1,12 +1,15 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Utils\Mutations;
 
-class ReturnReceivedInput
+final class ReturnReceivedInput
 {
-    public function __invoke($rootValue, array $args): array
+    /**
+     * @param array<string, mixed> $args
+     *
+     * @return array<string, mixed>
+     */
+    public function __invoke(mixed $root, array $args): array
     {
         return $args;
     }
