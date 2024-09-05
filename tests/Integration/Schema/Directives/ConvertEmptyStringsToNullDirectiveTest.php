@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Nuwave\Lighthouse\Schema\Directives\ConvertEmptyStringsToNullDirective;
 use Tests\TestCase;
 
 final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
@@ -156,6 +157,75 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
         ')->assertExactJson([
             'data' => [
                 'foo' => null,
+            ],
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function testConvertsEmptyStringToNullOnAField(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(bar: String!): FooResponse
+                @convertEmptyStringsToNull
+                @field(resolver: "Tests\\\Utils\\\Mutations\\\ReturnReceivedInput")
+
+        }
+
+        type FooResponse {
+            bar: String
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo(bar: "") {
+                bar
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'foo' => [
+                    'bar' => null,
+                ]
+            ],
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function testConvertsEmptyStringToNullWithGlobalFieldMiddleware(): void
+    {
+        config(['lighthouse.field_middleware' => [
+            ConvertEmptyStringsToNullDirective::class,
+        ]]);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(bar: String!): FooResponse
+                @field(resolver: "Tests\\\Utils\\\Mutations\\\ReturnReceivedInput")
+
+        }
+
+        type FooResponse {
+            bar: String
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo(bar: "") {
+                bar
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'foo' => [
+                    'bar' => null,
+                ]
             ],
         ]);
     }
