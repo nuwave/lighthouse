@@ -161,14 +161,13 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
         ]);
     }
 
-    public function testConvertsEmptyStringToNullOnAField(): void
+    public function testConvertsEmptyStringToNullWithFieldDirective(): void
     {
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            foo(bar: String!): FooResponse
+            foo(bar: String): FooResponse
                 @convertEmptyStringsToNull
                 @field(resolver: "Tests\\\Utils\\\Mutations\\\ReturnReceivedInput")
-
         }
 
         type FooResponse {
@@ -199,9 +198,8 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            foo(bar: String!): FooResponse
+            foo(bar: String): FooResponse
                 @field(resolver: "Tests\\\Utils\\\Mutations\\\ReturnReceivedInput")
-
         }
 
         type FooResponse {
