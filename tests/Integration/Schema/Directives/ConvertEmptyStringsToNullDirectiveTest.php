@@ -231,15 +231,15 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
                 @field(resolver: "Tests\\\Utils\\\Mutations\\\ReturnReceivedInput")
         }
 
+        input FooInput {
+            bar: String
+        }
+
         type FooInputResponse {
             input: FooResponse
         }
 
         type FooResponse {
-            bar: String
-        }
-
-        input FooInput {
             bar: String
         }
         ';
@@ -277,15 +277,15 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
                 @field(resolver: "Tests\\\Utils\\\Mutations\\\ReturnReceivedInput")
         }
 
+        input FooInput {
+            bar: String
+        }
+
         type FooInputResponse {
             input: FooResponse
         }
 
         type FooResponse {
-            bar: String
-        }
-
-        input FooInput {
             bar: String
         }
         ';

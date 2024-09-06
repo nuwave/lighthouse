@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.44.2
+
+### Fixed
+
+- Apply `@convertEmptyStringsToNull` to input fields when used upon fields https://github.com/nuwave/lighthouse/issues/2610
+
 ## v6.44.1
 
 ### Fixed
