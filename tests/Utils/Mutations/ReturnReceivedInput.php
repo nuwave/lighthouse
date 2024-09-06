@@ -5,7 +5,7 @@ namespace Tests\Utils\Mutations;
 final class ReturnReceivedInput
 {
     /**
-     * @param array<string, mixed> $args
+     * @param  array<string, mixed>  $args
      *
      * @return array<string, mixed>
      */
