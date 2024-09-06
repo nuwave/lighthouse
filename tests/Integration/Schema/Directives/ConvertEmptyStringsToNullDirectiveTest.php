@@ -221,4 +221,93 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
             ],
         ]);
     }
+
+    public function testConvertsEmptyStringToNullWithFieldDirectiveAndInputType(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(input: FooInput): FooInputResponse
+                @convertEmptyStringsToNull
+                @field(resolver: "Tests\\\Utils\\\Mutations\\\ReturnReceivedInput")
+        }
+
+        type FooInputResponse {
+            input: FooResponse
+        }
+
+        type FooResponse {
+            bar: String
+        }
+
+        input FooInput {
+            bar: String
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo(input: {
+                bar: ""
+            }) {
+                input {
+                    bar
+                }
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'foo' => [
+                    'input' => [
+                        'bar' => null,
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testConvertsEmptyStringToNullWithGlobalFieldMiddlewareAndInputType(): void
+    {
+        config(['lighthouse.field_middleware' => [
+            ConvertEmptyStringsToNullDirective::class,
+        ]]);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(input: FooInput): FooInputResponse
+                @field(resolver: "Tests\\\Utils\\\Mutations\\\ReturnReceivedInput")
+        }
+
+        type FooInputResponse {
+            input: FooResponse
+        }
+
+        type FooResponse {
+            bar: String
+        }
+
+        input FooInput {
+            bar: String
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo(input: {
+                bar: ""
+            }) {
+                input {
+                    bar
+                }
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'foo' => [
+                    'input' => [
+                        'bar' => null,
+                    ],
+                ],
+            ],
+        ]);
+    }
 }
