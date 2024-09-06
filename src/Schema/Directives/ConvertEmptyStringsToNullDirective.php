@@ -44,12 +44,13 @@ GRAPHQL;
     {
         foreach ($argumentSet->arguments as $argument) {
             $namedType = $argument->namedType();
-            if (
-                $namedType !== null
+            $argumentValue = $argument->value;
+
+            $isNullableStringType = $namedType !== null
                 && $namedType->name === ScalarType::STRING
-                && ! $namedType->nonNull
-            ) {
-                $argument->value = $this->sanitize($argument->value);
+                && ! $namedType->nonNull;
+            if ($isNullableStringType || $argumentValue instanceof ArgumentSet) {
+                $argument->value = $this->sanitize($argumentValue);
             }
         }
 
@@ -63,10 +64,8 @@ GRAPHQL;
      */
     protected function transformLeaf(mixed $value): mixed
     {
-        if ($value === '') {
-            return null;
-        }
-
-        return $value;
+        return $value === ''
+            ? null
+            : $value;
     }
 }
