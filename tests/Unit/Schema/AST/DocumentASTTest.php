@@ -114,6 +114,6 @@ final class DocumentASTTest extends TestCase
         $this->assertInstanceOf(SchemaExtensionNode::class, $schemaExtension);
         $this->assertInstanceOf(DirectiveNode::class, $schemaExtension->directives[0]);
 
-        $this->assertEquals($documentAST->hash, $reserialized->hash);
+        $this->assertSame($documentAST->hash, $reserialized->hash);
     }
 }

@@ -101,7 +101,6 @@ class LighthouseServiceProvider extends ServiceProvider
             }
         });
 
-        // $this->app->bind(ProvidesValidationRules::class, ValidationRulesProvider::class);
         $this->app->bind(ProvidesValidationRules::class, CacheableValidationRulesProvider::class);
 
         $this->commands(self::COMMANDS);

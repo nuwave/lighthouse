@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
 
-class ValidationCachingTest extends TestCase
+final class ValidationCachingTest extends TestCase
 {
     public function testEnabled(): void
     {

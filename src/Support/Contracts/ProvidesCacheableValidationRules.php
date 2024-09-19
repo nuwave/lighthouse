@@ -7,7 +7,7 @@ interface ProvidesCacheableValidationRules extends ProvidesValidationRules
     /**
      * A set of rules for the first query validation step.
      *
-     * These rules would be executed first and their result would be cached.
+     * These rules are executed first and their result is cached.
      *
      * @return array<string, \GraphQL\Validator\Rules\ValidationRule>
      */
@@ -16,7 +16,7 @@ interface ProvidesCacheableValidationRules extends ProvidesValidationRules
     /**
      * A set of rules for the second query validation step.
      *
-     * These rules would always be executed and not cached.
+     * These rules are always be executed and not cached.
      *
      * Returning `null` enables all available rules.
      * Empty array skips query validation entirely.

@@ -17,11 +17,12 @@ APQ is enabled by default, but depends on query caching being enabled.
 
 ## Query validation caching
 
-Lighthouse can cache the result of the query validation process as well. It only caches queries without errors.
+Lighthouse can cache the result of the query validation process as well.
+It only caches queries without errors.
 `QueryComplexity` validation can not be cached as it is dependent on the query, so it is always executed.
 
-Query validation caching is disabled by default. You can enable it by setting `validation_cache.enable` to `true` in the
-configuration in `config/lighthouse.php`.
+Query validation caching is disabled by default.
+You can enable it by setting `validation_cache.enable` to `true` in `config/lighthouse.php`.
 
 ## Testing caveats
 
