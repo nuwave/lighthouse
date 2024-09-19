@@ -13,6 +13,24 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Cache query validation results https://github.com/nuwave/lighthouse/pull/2603
 
+## v6.44.2
+
+### Fixed
+
+- Apply `@convertEmptyStringsToNull` to input fields when used upon fields https://github.com/nuwave/lighthouse/issues/2610
+
+## v6.44.1
+
+### Fixed
+
+- Ensure `deprecationReason` is set on arguments and input fields https://github.com/nuwave/lighthouse/pull/2609
+
+## v6.44.0
+
+### Added
+
+- Allow `@deprecated` directive on arguments and input fields https://github.com/nuwave/lighthouse/pull/2607
+
 ## v6.43.1
 
 ### Changed

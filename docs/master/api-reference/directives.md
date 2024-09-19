@@ -896,7 +896,10 @@ final class ComplexityAnalyzer
 
 ```graphql
 """
-Replaces `""` with `null`.
+Replaces incoming empty strings `""` with `null`.
+
+When used upon fields, empty strings for non-nullable inputs will pass unchanged.
+Only explicitly placing this on non-nullable inputs will force the conversion.
 """
 directive @convertEmptyStringsToNull on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 ```
@@ -1165,17 +1168,16 @@ Marks an element of a GraphQL schema as no longer supported.
 """
 directive @deprecated(
   """
-  Explains why this element was deprecated, usually also including a
-  suggestion for how to access supported similar data.
-  Formatted in [Markdown](https://commonmark.org).
+  Explains why this element was deprecated.
+  It is also beneficial to suggest what to use instead.
+  Formatted in Markdown, as specified by [CommonMark](https://commonmark.org).
   """
   reason: String = "No longer supported"
-) on FIELD_DEFINITION | ENUM_VALUE
+) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | ENUM_VALUE
 ```
 
-You can mark fields as deprecated by adding the [@deprecated](#deprecated) directive.
-It is recommended to provide a `reason` for the deprecation, as well as a suggestion on
-how to move forward.
+You can indicate schema elements are no longer supported by adding the [@deprecated](#deprecated) directive.
+It is recommended to provide a `reason` for the deprecation, as well as suggest a replacement.
 
 ```graphql
 type Query {

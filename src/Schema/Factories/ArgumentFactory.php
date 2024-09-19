@@ -50,6 +50,7 @@ class ArgumentFactory
             'name' => $definitionNode->name->value,
             'description' => $definitionNode->description?->value,
             'type' => $type,
+            'deprecationReason' => ASTHelper::deprecationReason($definitionNode),
             'astNode' => $definitionNode,
         ];
 

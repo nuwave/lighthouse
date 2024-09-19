@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Nuwave\Lighthouse\Schema\Directives\ConvertEmptyStringsToNullDirective;
 use Tests\TestCase;
 
 final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
@@ -156,6 +157,156 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
         ')->assertExactJson([
             'data' => [
                 'foo' => null,
+            ],
+        ]);
+    }
+
+    public function testConvertsEmptyStringToNullWithFieldDirective(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(bar: String): FooResponse
+                @convertEmptyStringsToNull
+                @field(resolver: "Tests\\\Utils\\\Mutations\\\ReturnReceivedInput")
+        }
+
+        type FooResponse {
+            bar: String
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo(bar: "") {
+                bar
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'foo' => [
+                    'bar' => null,
+                ],
+            ],
+        ]);
+    }
+
+    public function testConvertsEmptyStringToNullWithGlobalFieldMiddleware(): void
+    {
+        config(['lighthouse.field_middleware' => [
+            ConvertEmptyStringsToNullDirective::class,
+        ]]);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(bar: String): FooResponse
+                @field(resolver: "Tests\\\Utils\\\Mutations\\\ReturnReceivedInput")
+        }
+
+        type FooResponse {
+            bar: String
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo(bar: "") {
+                bar
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'foo' => [
+                    'bar' => null,
+                ],
+            ],
+        ]);
+    }
+
+    public function testConvertsEmptyStringToNullWithFieldDirectiveAndInputType(): void
+    {
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(input: FooInput): FooInputResponse
+                @convertEmptyStringsToNull
+                @field(resolver: "Tests\\\Utils\\\Mutations\\\ReturnReceivedInput")
+        }
+
+        input FooInput {
+            bar: String
+        }
+
+        type FooInputResponse {
+            input: FooResponse
+        }
+
+        type FooResponse {
+            bar: String
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo(input: {
+                bar: ""
+            }) {
+                input {
+                    bar
+                }
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'foo' => [
+                    'input' => [
+                        'bar' => null,
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testConvertsEmptyStringToNullWithGlobalFieldMiddlewareAndInputType(): void
+    {
+        config(['lighthouse.field_middleware' => [
+            ConvertEmptyStringsToNullDirective::class,
+        ]]);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Query {
+            foo(input: FooInput): FooInputResponse
+                @field(resolver: "Tests\\\Utils\\\Mutations\\\ReturnReceivedInput")
+        }
+
+        input FooInput {
+            bar: String
+        }
+
+        type FooInputResponse {
+            input: FooResponse
+        }
+
+        type FooResponse {
+            bar: String
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo(input: {
+                bar: ""
+            }) {
+                input {
+                    bar
+                }
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'foo' => [
+                    'input' => [
+                        'bar' => null,
+                    ],
+                ],
             ],
         ]);
     }

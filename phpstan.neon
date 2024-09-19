@@ -46,7 +46,7 @@ parameters:
   - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Builder<Illuminate\\Database\\Eloquent\\Model>|Illuminate\\Database\\Eloquent\\Relations\\Relation<Illuminate\\Database\\Eloquent\\Model>|Illuminate\\Database\\Query\\Builder::(orderBy|where|whereIn|whereNotIn|whereBetween|whereJsonContains|whereNotBetween)\(\)\.#'
 
   # Laravel 11 added generics that are handled differently, so we just omit them
-  - '#generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types#'
+  - '#generic class (Illuminate\\Database\\Eloquent\\Builder|Laravel\\Scout\\Builder)( but)? does not specify its types#'
 
   # This test cheats and uses reflection to make assertions
   - path: tests/Unit/Schema/Directives/BaseDirectiveTest.php
