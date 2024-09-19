@@ -16,7 +16,7 @@ final class QueryCachingTest extends TestCase
         $config->set('lighthouse.query_cache.enable', true);
         $config->set('lighthouse.validation_cache.enable', false);
 
-        Event::fake();
+        $event = Event::fake();
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -28,9 +28,9 @@ final class QueryCachingTest extends TestCase
             ],
         ]);
 
-        Event::assertDispatchedTimes(CacheMissed::class, 1);
-        Event::assertDispatchedTimes(CacheHit::class, 0);
-        Event::assertDispatchedTimes(KeyWritten::class, 1);
+        $event->assertDispatchedTimes(CacheMissed::class, 1);
+        $event->assertDispatchedTimes(CacheHit::class, 0);
+        $event->assertDispatchedTimes(KeyWritten::class, 1);
 
         // second request should be hit
         $this->graphQL(/** @lang GraphQL */ '
@@ -43,9 +43,9 @@ final class QueryCachingTest extends TestCase
             ],
         ]);
 
-        Event::assertDispatchedTimes(CacheMissed::class, 1);
-        Event::assertDispatchedTimes(CacheHit::class, 1);
-        Event::assertDispatchedTimes(KeyWritten::class, 1);
+        $event->assertDispatchedTimes(CacheMissed::class, 1);
+        $event->assertDispatchedTimes(CacheHit::class, 1);
+        $event->assertDispatchedTimes(KeyWritten::class, 1);
     }
 
     public function testDifferentQueriesHasDifferentKeys(): void
@@ -54,7 +54,7 @@ final class QueryCachingTest extends TestCase
         $config->set('lighthouse.query_cache.enable', true);
         $config->set('lighthouse.validation_cache.enable', false);
 
-        Event::fake();
+        $event = Event::fake();
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -77,9 +77,9 @@ final class QueryCachingTest extends TestCase
             ],
         ]);
 
-        Event::assertDispatchedTimes(CacheMissed::class, 2);
-        Event::assertDispatchedTimes(CacheHit::class, 0);
-        Event::assertDispatchedTimes(KeyWritten::class, 2);
+        $event->assertDispatchedTimes(CacheMissed::class, 2);
+        $event->assertDispatchedTimes(CacheHit::class, 0);
+        $event->assertDispatchedTimes(KeyWritten::class, 2);
     }
 
     public function testDisabled(): void
@@ -88,7 +88,7 @@ final class QueryCachingTest extends TestCase
         $config->set('lighthouse.query_cache.enable', false);
         $config->set('lighthouse.validation_cache.enable', false);
 
-        Event::fake();
+        $event = Event::fake();
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -100,8 +100,8 @@ final class QueryCachingTest extends TestCase
             ],
         ]);
 
-        Event::assertDispatchedTimes(CacheMissed::class, 0);
-        Event::assertDispatchedTimes(CacheHit::class, 0);
-        Event::assertDispatchedTimes(KeyWritten::class, 0);
+        $event->assertDispatchedTimes(CacheMissed::class, 0);
+        $event->assertDispatchedTimes(CacheHit::class, 0);
+        $event->assertDispatchedTimes(KeyWritten::class, 0);
     }
 }
