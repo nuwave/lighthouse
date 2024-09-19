@@ -134,7 +134,7 @@ class GraphQL
             new StartExecution($schema, $query, $variables, $operationName, $context),
         );
 
-        $errors = $this->executeAndCacheValidationRules($schema, $this->schemaBuilder->schemaHash(), $query, $queryHash);
+        $errors = $this->validateCacheableRules($schema, $this->schemaBuilder->schemaHash(), $query, $queryHash);
         if ($errors !== []) {
             return new ExecutionResult(null, $errors);
         }
@@ -386,11 +386,11 @@ class GraphQL
     }
 
     /**
-     * Execute the validation rules that are cacheable.
+     * Validate rules that are cacheable. Either by using the cache or by running them.
      *
      * @return array<Error>
      */
-    protected function executeAndCacheValidationRules(
+    protected function validateCacheableRules(
         SchemaType $schema,
         ?string $schemaHash,
         DocumentNode $query,
