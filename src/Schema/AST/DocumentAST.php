@@ -32,7 +32,7 @@ use Nuwave\Lighthouse\Support\Utils;
  *     directives: array<int, array<string, mixed>>,
  *     classNameToObjectTypeName: ClassNameToObjectTypeName,
  *     schemaExtensions: array<int, array<string, mixed>>,
- *     hash: string|null,
+ *     hash: string,
  * }
  *
  * @implements \Illuminate\Contracts\Support\Arrayable<string, mixed>
