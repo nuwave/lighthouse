@@ -24,7 +24,7 @@ final class DocumentASTTest extends TestCase
         }
         ';
         // calculated as hash('sha256', $schema)
-        $schemaHash = "99fd7bd3f58a98d8932c1f5d1da718707f6f471e93d96e0bc913436445a947ac";
+        $schemaHash = '99fd7bd3f58a98d8932c1f5d1da718707f6f471e93d96e0bc913436445a947ac';
         $documentAST = DocumentAST::fromSource($schema);
 
         $this->assertInstanceOf(
