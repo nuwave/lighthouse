@@ -16,7 +16,7 @@ interface ProvidesCacheableValidationRules extends ProvidesValidationRules
     /**
      * A set of rules for the second query validation step.
      *
-     * These rules are always be executed and not cached.
+     * These rules are always executed and not cached.
      *
      * Returning `null` enables all available rules.
      * Empty array skips query validation entirely.
