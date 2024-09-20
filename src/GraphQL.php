@@ -46,8 +46,6 @@ use Nuwave\Lighthouse\Support\Utils as LighthouseUtils;
  */
 class GraphQL
 {
-    protected const CACHEABLE_RULES_ERROR_FREE_RESULT = true;
-
     /**
      * Lazily initialized.
      *
@@ -396,7 +394,7 @@ class GraphQL
      *
      * @param  array<string, \GraphQL\Validator\Rules\ValidationRule>  $validationRules
      *
-     * @return array<Error>
+     * @return array<\GraphQL\Error\Error>
      */
     protected function validateCacheableRules(
         array $validationRules,
@@ -427,17 +425,22 @@ class GraphQL
         assert($cacheFactory instanceof CacheFactory);
 
         $store = $cacheFactory->store($cacheConfig['store']);
-        if ($store->get($cacheKey) === self::CACHEABLE_RULES_ERROR_FREE_RESULT) {
-            return [];
+        $cachedResult = $store->get($cacheKey);
+        if ($cachedResult !== null) {
+            return $cachedResult;
         }
 
         $result = DocumentValidator::validate($schema, $query, $validationRules);
+
+        // If there are any errors, we return them without caching them.
+        // As of webonyx/graphql-php 15.14.0, GraphQL\Error\Error is not serializable.
+        // We would have to figure out how to serialize them properly to cache them.
         if ($result !== []) {
             return $result;
         }
 
-        $store->put($cacheKey, self::CACHEABLE_RULES_ERROR_FREE_RESULT, $cacheConfig['ttl']);
+        $store->put($cacheKey, $result, $cacheConfig['ttl']);
 
-        return [];
+        return $result;
     }
 }
