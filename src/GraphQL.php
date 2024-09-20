@@ -12,7 +12,7 @@ use GraphQL\Language\Parser;
 use GraphQL\Server\Helper as GraphQLHelper;
 use GraphQL\Server\OperationParams;
 use GraphQL\Server\RequestError;
-use GraphQL\Type\Schema as SchemaType;
+use GraphQL\Type\Schema;
 use GraphQL\Validator\DocumentValidator;
 use GraphQL\Validator\Rules\QueryComplexity;
 use Illuminate\Container\Container;
@@ -28,11 +28,11 @@ use Nuwave\Lighthouse\Events\ManipulateResult;
 use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Events\StartOperationOrOperations;
 use Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry;
+use Nuwave\Lighthouse\Execution\CacheableValidationRulesProvider;
 use Nuwave\Lighthouse\Execution\ErrorPool;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-use Nuwave\Lighthouse\Support\Contracts\ProvidesCacheableValidationRules;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules;
 use Nuwave\Lighthouse\Support\Utils as LighthouseUtils;
 
@@ -46,6 +46,8 @@ use Nuwave\Lighthouse\Support\Utils as LighthouseUtils;
  */
 class GraphQL
 {
+    protected const CACHEABLE_RULES_ERROR_FREE_RESULT = true;
+
     /**
      * Lazily initialized.
      *
@@ -134,9 +136,13 @@ class GraphQL
             new StartExecution($schema, $query, $variables, $operationName, $context),
         );
 
-        $errors = $this->validateCacheableRules($schema, $this->schemaBuilder->schemaHash(), $query, $queryHash);
-        if ($errors !== []) {
-            return new ExecutionResult(null, $errors);
+        if ($this->providesValidationRules instanceof CacheableValidationRulesProvider) {
+            $validationRules = $this->providesValidationRules->cacheableValidationRules();
+
+            $errors = $this->validateCacheableRules($validationRules, $schema, $this->schemaBuilder->schemaHash(), $query, $queryHash);
+            if ($errors !== []) {
+                return new ExecutionResult(null, $errors);
+            }
         }
 
         $result = GraphQLBase::executeQuery(
@@ -386,39 +392,42 @@ class GraphQL
     }
 
     /**
-     * Validate rules that are cacheable. Either by using the cache or by running them.
+     * Provides a result for cacheable validation rules by running them or retrieving it from the cache.
+     *
+     * @param  array<string, \GraphQL\Validator\Rules\ValidationRule>  $validationRules
      *
      * @return array<Error>
      */
     protected function validateCacheableRules(
-        SchemaType $schema,
+        array $validationRules,
+        Schema $schema,
         string $schemaHash,
         DocumentNode $query,
         ?string $queryHash,
     ): array {
-        if (! $this->providesValidationRules instanceof ProvidesCacheableValidationRules) {
-            return [];
-        }
-
-        $validationRules = $this->providesValidationRules->cacheableValidationRules();
         foreach ($validationRules as $rule) {
             if ($rule instanceof QueryComplexity) {
-                throw new \InvalidArgumentException('QueryComplexity rule should not be registered in cacheableValidationRules');
+                throw new \InvalidArgumentException('The QueryComplexity rule must not be registered in cacheableValidationRules, as it depends on variables.');
             }
+        }
+
+        if ($queryHash === null) {
+            return DocumentValidator::validate($schema, $query, $validationRules);
         }
 
         $cacheConfig = $this->configRepository->get('lighthouse.validation_cache');
 
-        if ($queryHash === null || ! ($cacheConfig['enable'] ?? false)) {
+        if (! isset($cacheConfig['enable']) || ! $cacheConfig['enable']) {
             return DocumentValidator::validate($schema, $query, $validationRules);
         }
 
         $cacheKey = "lighthouse:validation:{$schemaHash}:{$queryHash}";
 
-        /** @var CacheFactory $cacheFactory */
         $cacheFactory = Container::getInstance()->make(CacheFactory::class);
+        assert($cacheFactory instanceof CacheFactory);
+
         $store = $cacheFactory->store($cacheConfig['store']);
-        if ($store->get($cacheKey) === true) {
+        if ($store->get($cacheKey) === self::CACHEABLE_RULES_ERROR_FREE_RESULT) {
             return [];
         }
 
@@ -427,7 +436,7 @@ class GraphQL
             return $result;
         }
 
-        $store->put($cacheKey, true, $cacheConfig['ttl']);
+        $store->put($cacheKey, self::CACHEABLE_RULES_ERROR_FREE_RESULT, $cacheConfig['ttl']);
 
         return [];
     }

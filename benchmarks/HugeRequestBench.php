@@ -30,6 +30,7 @@ GRAPHQL;
         for ($i = 0; $i < $count; ++$i) {
             $query .= '...foo' . $i . PHP_EOL;
         }
+
         $query .= '}' . PHP_EOL;
         for ($i = 0; $i < $count; ++$i) {
             $query .= 'fragment foo' . $i . ' on Query {' . PHP_EOL;
@@ -70,9 +71,7 @@ GRAPHQL;
      */
     public function benchmark10(): void
     {
-        if ($this->query === null) {
-            $this->query = $this->generateQuery(10);
-        }
+        $this->query ??= $this->generateQuery(10);
         $this->graphQL($this->query);
     }
 
@@ -89,9 +88,7 @@ GRAPHQL;
      */
     public function benchmark100(): void
     {
-        if ($this->query === null) {
-            $this->query = $this->generateQuery(100);
-        }
+        $this->query ??= $this->generateQuery(100);
         $this->graphQL($this->query);
     }
 }

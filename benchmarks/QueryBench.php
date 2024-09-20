@@ -20,7 +20,10 @@ abstract class QueryBench extends TestCase
     {
         parent::setUp();
 
-        $routeName = config('lighthouse.route.name');
+        $configRepository = $this->app->make(ConfigRepository::class);
+        assert($configRepository instanceof ConfigRepository);
+
+        $routeName = $configRepository->get('lighthouse.route.name');
         $this->graphQLEndpoint = route($routeName);
     }
 
@@ -42,11 +45,16 @@ abstract class QueryBench extends TestCase
     public function setPerformanceTuning(array $params): void
     {
         $this->setUp();
+
+        $configRepository = $this->app->make(ConfigRepository::class);
+        assert($configRepository instanceof ConfigRepository);
+
         if ($params[0]) {
-            $this->app->make(ConfigRepository::class)->set('lighthouse.field_middleware', []);
+            $configRepository->set('lighthouse.field_middleware', []);
         }
-        $this->app->make(ConfigRepository::class)->set('lighthouse.query_cache.enable', $params[1]);
-        $this->app->make(ConfigRepository::class)->set('lighthouse.validation_cache.enable', $params[2]);
+
+        $configRepository->set('lighthouse.query_cache.enable', $params[1]);
+        $configRepository->set('lighthouse.validation_cache.enable', $params[2]);
     }
 
     /**
@@ -62,7 +70,7 @@ abstract class QueryBench extends TestCase
         return [
             'nothing' => [false, false, false],
             'query cache' => [false, true, false],
-            'validation cache' => [false, true, true],
+            'query + validation cache' => [false, true, true],
             'everything' => [true, true, true],
         ];
     }
