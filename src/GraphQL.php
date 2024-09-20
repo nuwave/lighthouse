@@ -392,7 +392,7 @@ class GraphQL
      */
     protected function validateCacheableRules(
         SchemaType $schema,
-        ?string $schemaHash,
+        string $schemaHash,
         DocumentNode $query,
         ?string $queryHash,
     ): array {
@@ -409,7 +409,7 @@ class GraphQL
 
         $cacheConfig = $this->configRepository->get('lighthouse.validation_cache');
 
-        if ($schemaHash === null || $queryHash === null || ! ($cacheConfig['enable'] ?? false)) {
+        if ($queryHash === null || ! ($cacheConfig['enable'] ?? false)) {
             return DocumentValidator::validate($schema, $query, $validationRules);
         }
 

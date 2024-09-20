@@ -28,7 +28,7 @@ class SchemaBuilder
         );
     }
 
-    public function schemaHash(): ?string
+    public function schemaHash(): string
     {
         return $this->astBuilder->documentAST()->hash;
     }
