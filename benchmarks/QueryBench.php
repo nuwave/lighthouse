@@ -20,7 +20,10 @@ abstract class QueryBench extends TestCase
     {
         parent::setUp();
 
-        $routeName = config('lighthouse.route.name');
+        $configRepository = $this->app->make(ConfigRepository::class);
+        assert($configRepository instanceof ConfigRepository);
+
+        $routeName = $configRepository->get('lighthouse.route.name');
         $this->graphQLEndpoint = route($routeName);
     }
 
@@ -35,15 +38,40 @@ abstract class QueryBench extends TestCase
     }
 
     /**
-     * Define environment setup.
+     * Set up function with the performance tuning.
      *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param  array{0: bool, 1: bool, 2: bool}  $params Performance tuning parameters
      */
-    protected function getEnvironmentSetUp($app): void
+    public function setPerformanceTuning(array $params): void
     {
-        parent::getEnvironmentSetUp($app);
+        $this->setUp();
 
-        $config = $app->make(ConfigRepository::class);
-        $config->set('lighthouse.field_middleware', []);
+        $configRepository = $this->app->make(ConfigRepository::class);
+        assert($configRepository instanceof ConfigRepository);
+
+        if ($params[0]) {
+            $configRepository->set('lighthouse.field_middleware', []);
+        }
+
+        $configRepository->set('lighthouse.query_cache.enable', $params[1]);
+        $configRepository->set('lighthouse.validation_cache.enable', $params[2]);
+    }
+
+    /**
+     * Indexes:
+     *  0: Remove all middlewares
+     *  1: Enable query cache
+     *  2: Enable validation cache
+     *
+     * @return array<string, array{0: bool, 1: bool, 2: bool}>
+     */
+    public function providePerformanceTuning(): array
+    {
+        return [
+            'nothing' => [false, false, false],
+            'query cache' => [false, true, false],
+            'query + validation cache' => [false, true, true],
+            'everything' => [true, true, true],
+        ];
     }
 }

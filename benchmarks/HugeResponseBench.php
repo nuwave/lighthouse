@@ -50,9 +50,15 @@ GRAPHQL;
     }
 
     /**
+     * @Warmup(1)
+     *
+     * @Revs(10)
+     *
      * @Iterations(10)
      *
-     * @OutputTimeUnit("seconds", precision=3)
+     * @ParamProviders({"providePerformanceTuning"})
+     *
+     * @BeforeMethods("setPerformanceTuning")
      */
     public function benchmark1(): void
     {
@@ -66,9 +72,15 @@ GRAPHQL;
     }
 
     /**
+     * @Warmup(1)
+     *
+     * @Revs(10)
+     *
      * @Iterations(10)
      *
-     * @OutputTimeUnit("seconds", precision=3)
+     * @ParamProviders({"providePerformanceTuning"})
+     *
+     * @BeforeMethods("setPerformanceTuning")
      */
     public function benchmark100(): void
     {
@@ -84,9 +96,15 @@ GRAPHQL;
     }
 
     /**
+     * @Warmup(1)
+     *
+     * @Revs(10)
+     *
      * @Iterations(10)
      *
-     * @OutputTimeUnit("seconds", precision=3)
+     * @ParamProviders({"providePerformanceTuning"})
+     *
+     * @BeforeMethods("setPerformanceTuning")
      */
     public function benchmark10k(): void
     {

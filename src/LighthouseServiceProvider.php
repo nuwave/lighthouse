@@ -27,11 +27,11 @@ use Nuwave\Lighthouse\Console\UnionCommand;
 use Nuwave\Lighthouse\Console\ValidateSchemaCommand;
 use Nuwave\Lighthouse\Console\ValidatorCommand;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
+use Nuwave\Lighthouse\Execution\CacheableValidationRulesProvider;
 use Nuwave\Lighthouse\Execution\ContextFactory;
 use Nuwave\Lighthouse\Execution\ContextSerializer;
 use Nuwave\Lighthouse\Execution\ErrorPool;
 use Nuwave\Lighthouse\Execution\SingleResponse;
-use Nuwave\Lighthouse\Execution\ValidationRulesProvider;
 use Nuwave\Lighthouse\Http\Responses\ResponseStream;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
@@ -100,7 +100,7 @@ class LighthouseServiceProvider extends ServiceProvider
             }
         });
 
-        $this->app->bind(ProvidesValidationRules::class, ValidationRulesProvider::class);
+        $this->app->bind(ProvidesValidationRules::class, CacheableValidationRulesProvider::class);
 
         $this->commands(self::COMMANDS);
     }
