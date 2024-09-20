@@ -18,18 +18,21 @@ final class DocumentASTTest extends TestCase
 {
     public function testParsesSimpleSchema(): void
     {
-        $documentAST = DocumentAST::fromSource(/** @lang GraphQL */ '
+        $schema = /** @lang GraphQL */ '
         type Query {
             foo: Int
         }
-        ');
+        ';
+        // calculated as hash('sha256', $schema)
+        $schemaHash = "99fd7bd3f58a98d8932c1f5d1da718707f6f471e93d96e0bc913436445a947ac";
+        $documentAST = DocumentAST::fromSource($schema);
 
         $this->assertInstanceOf(
             ObjectTypeDefinitionNode::class,
             $documentAST->types[RootType::QUERY],
         );
 
-        $this->assertNotNull($documentAST->hash);
+        $this->assertSame($schemaHash, $documentAST->hash);
     }
 
     public function testThrowsOnInvalidSchema(): void
