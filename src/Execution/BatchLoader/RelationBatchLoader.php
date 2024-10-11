@@ -49,13 +49,13 @@ class RelationBatchLoader
                 $this->resolve();
             }
 
-            return $this->results[$modelKey];
+            return $this->results[$modelKey] ?? null;
         });
     }
 
     protected function resolve(): void
     {
-        $parentModels = new EloquentCollection($this->parents);
+        $parentModels = (new EloquentCollection($this->parents))->filter(fn (Model $model): bool => $model->exists);
 
         // Monomorphize the models to simplify eager loading relations onto them
         $parentsGroupedByClass = $parentModels->groupBy(
