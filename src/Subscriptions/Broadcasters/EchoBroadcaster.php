@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use Nuwave\Lighthouse\Subscriptions\Events\EchoSubscriptionEvent;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
+use Illuminate\Support\Facades\Broadcast;
 
 class EchoBroadcaster implements Broadcaster
 {
@@ -24,17 +25,15 @@ class EchoBroadcaster implements Broadcaster
 
     public function authorized(Request $request): JsonResponse
     {
-        $userId = md5(
-            $request->input('channel_name')
-            . $request->input('socket_id'),
+        $pusher = Broadcast::getPusher();
+        $channel = $request->input('channel_name');
+        $socketId = $request->input('socket_id');
+        $data = \Safe\json_decode(
+            $pusher->socket_auth($channel, $socketId),
+            true,
         );
 
-        return new JsonResponse([
-            'channel_data' => [
-                'user_id' => $userId,
-                'user_info' => [],
-            ],
-        ], 200);
+        return new JsonResponse($data, 200);
     }
 
     public function unauthorized(Request $request): JsonResponse
