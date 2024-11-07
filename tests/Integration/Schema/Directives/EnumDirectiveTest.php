@@ -34,7 +34,7 @@ final class EnumDirectiveTest extends TestCase
             ->assertExactJson([
                 'data' => [
                     'status' => 'INACTIVE',
-                ]
+                ],
             ]);
     }
 }
