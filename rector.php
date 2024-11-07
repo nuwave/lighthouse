@@ -45,6 +45,8 @@ return static function (RectorConfig $rectorConfig): void {
         Rector\CodingStyle\Rector\Encapsed\EncapsedStringsToSprintfRector::class, // unreadable, slow, error prone
         Rector\TypeDeclaration\Rector\FunctionLike\AddReturnTypeDeclarationFromYieldsRector::class, // iterable is fine
         Rector\CodeQuality\Rector\Foreach_\UnusedForeachValueToArrayKeysRector::class, // inefficient
+        Rector\PHPUnit\CodeQuality\Rector\Class_\NarrowUnusedSetUpDefinedPropertyRector::class, // falsely removes $this->schema assignments in some tests
+        Rector\PHPUnit\PHPUnit100\Rector\StmtsAwareInterface\WithConsecutiveRector::class, // messes up our custom withConsecutive replacement
         Rector\PHPUnit\PHPUnit60\Rector\ClassMethod\AddDoesNotPerformAssertionToNonAssertingTestRector::class, // does not recognize mockResolver
         Rector\Php80\Rector\FunctionLike\MixedTypeRector::class, // removes useful comments
     ]);
