@@ -57,7 +57,7 @@ scalar Email @scalar(class: "MLL\\GraphQLScalars\\Email")
 ## Enum
 
 Enums are types with a restricted set of values (similar to `enum` found in database migrations).
-They are defined as a list of `UPPERCASE` string keys.
+By convention, they are defined as a list of `UPPER_CASE` string keys.
 
 ### Schema definition
 
