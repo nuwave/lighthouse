@@ -3,14 +3,20 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
+use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\AST\TypeDefinitionNode;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
+use Nuwave\Lighthouse\Support\Contracts\InputFieldManipulator;
+use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
 
-class HideDirective extends BaseDirective implements FieldManipulator
+class HideDirective extends BaseDirective implements ArgManipulator, FieldManipulator, InputFieldManipulator, TypeManipulator
 {
     protected string $env;
 
@@ -36,7 +42,7 @@ directive @hide(
   Specify which environments must not use this field, e.g. ["production"].
   """
   env: [String!]!
-) repeatable on FIELD_DEFINITION
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION | OBJECT
 GRAPHQL;
     }
 
@@ -48,16 +54,57 @@ GRAPHQL;
 
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType): void
     {
-        if ($this->shouldHide()) {
-            $keyToRemove = null;
-            foreach ($parentType->fields as $key => $value) {
-                if ($value === $fieldDefinition) {
-                    $keyToRemove = $key;
-                    break;
-                }
-            }
+        if (! $this->shouldHide()) {
+            return;
+        }
 
-            unset($parentType->fields[$keyToRemove]);
+        foreach ($parentType->fields as $key => $value) {
+            if ($value === $fieldDefinition) {
+                unset($parentType->fields[$key]);
+                break;
+            }
+        }
+    }
+
+    public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition): void
+    {
+        if (! $this->shouldHide()) {
+            return;
+        }
+
+        foreach ($documentAST->types as $key => $value) {
+            if ($value === $typeDefinition) {
+                unset($documentAST->types[$key]);
+                break;
+            }
+        }
+    }
+
+    public function manipulateInputFieldDefinition(DocumentAST &$documentAST, InputValueDefinitionNode &$inputField, InputObjectTypeDefinitionNode &$parentInput): void
+    {
+        if (! $this->shouldHide()) {
+            return;
+        }
+
+        foreach ($parentInput->fields as $key => $value) {
+            if ($value === $inputField) {
+                unset($parentInput->fields[$key]);
+                break;
+            }
+        }
+    }
+
+    public function manipulateArgDefinition(DocumentAST &$documentAST, InputValueDefinitionNode &$argDefinition, FieldDefinitionNode &$parentField, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType): void
+    {
+        if (! $this->shouldHide()) {
+            return;
+        }
+
+        foreach ($parentField->arguments as $key => $value) {
+            if ($value === $argDefinition) {
+                unset($parentField->arguments[$key]);
+                break;
+            }
         }
     }
 }
