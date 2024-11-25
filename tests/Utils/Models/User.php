@@ -79,7 +79,7 @@ final class User extends Authenticatable
         return $this->hasMany(AlternateConnection::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\Company, self> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\Company, $this> */
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
@@ -117,13 +117,13 @@ final class User extends Authenticatable
         return $this->hasMany(RoleUserPivot::class, 'user_id');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\Task> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\Task, $this> */
     public function tasks(): HasMany
     {
         return $this->hasMany(Task::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\Team, self> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\Team, $this> */
     public function team(): BelongsTo
     {
         return $this->belongsTo(Team::class);

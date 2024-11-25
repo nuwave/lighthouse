@@ -34,7 +34,7 @@ final class Color extends Model
         return $this->hasMany(Product::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\MorphTo<Model, self> */
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphTo<Model, $this> */
     public function creator(): MorphTo
     {
         return $this->morphTo();

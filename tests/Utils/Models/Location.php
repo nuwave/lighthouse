@@ -32,7 +32,7 @@ final class Location extends Model
         'extra' => 'array',
     ];
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<self, self> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<self, $this> */
     public function parent(): BelongsTo
     {
         return $this->belongsTo(__CLASS__, 'parent_id');

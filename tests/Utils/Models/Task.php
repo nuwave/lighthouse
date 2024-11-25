@@ -99,7 +99,7 @@ final class Task extends Model
         return $this->morphToMany(Tag::class, 'taggable');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\User, self> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\User, $this> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

@@ -33,7 +33,7 @@ final class Role extends Model
             ->withPivot('meta');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\ACL, self> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\ACL, $this> */
     public function acl(): BelongsTo
     {
         return $this->belongsTo(ACL::class);

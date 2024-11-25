@@ -78,7 +78,7 @@ final class Post extends Model
         return $this->morphMany(Image::class, 'imageable');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<self, self> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<self, $this> */
     public function parent(): BelongsTo
     {
         return $this->belongsTo(self::class);
@@ -96,7 +96,7 @@ final class Post extends Model
         return $this->hasOne(PostStatus::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\Task, self> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\Task, $this> */
     public function task(): BelongsTo
     {
         return $this->belongsTo(Task::class);
@@ -108,7 +108,7 @@ final class Post extends Model
         return $this->morphToMany(Tag::class, 'taggable');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\User, self> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\User, $this> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
