@@ -50,8 +50,8 @@ parameters:
   - '#contains generic type Illuminate\\Testing\\TestResponse<.+> but class Illuminate\\Testing\\TestResponse is not generic\.#'
   - '#Generic type Illuminate\\Database\\Eloquent\\Relations\\(HasOne|HasMany|BelongsToMany|MorphOne|MorphMany|MorphToMany)<.+, .+> in PHPDoc tag @return specifies 2 template types, but class Illuminate\\Database\\Eloquent\\Relations\\\1 supports only 1: TRelatedModel#'
   - '#Method .+ should return Illuminate\\Database\\Eloquent\\Relations\\(HasOne|HasMany|BelongsToMany|MorphOne|MorphMany|MorphToMany)<(.+), .+> but returns Illuminate\\Database\\Eloquent\\Relations\\\1<\2>.#'
-  - '#Generic type Illuminate\\Database\\Eloquent\\Relations\\HasManyThrough<.+, .+, .+> in PHPDoc tag @return specifies 3 template types, but class Illuminate\\Database\\Eloquent\\Relations\\HasManyThrough supports only 1: TRelatedModel#'
-  - '#Method .+ should return Illuminate\\Database\\Eloquent\\Relations\\HasManyThrough<(.+), .+> but returns Illuminate\\Database\\Eloquent\\Relations\\HasManyThrough<\1>.#'
+  - '#Generic type Illuminate\\Database\\Eloquent\\Relations\\(HasOneThrough|HasManyThrough)<.+, .+, .+> in PHPDoc tag @return specifies 3 template types, but class Illuminate\\Database\\Eloquent\\Relations\\\1 supports only 1: TRelatedModel#'
+  - '#Method .+ should return Illuminate\\Database\\Eloquent\\Relations\\(HasOneThrough|HasManyThrough)<(.+), .+> but returns Illuminate\\Database\\Eloquent\\Relations\\\1<\2>.#'
 
   # This test cheats and uses reflection to make assertions
   - path: tests/Unit/Schema/Directives/BaseDirectiveTest.php
