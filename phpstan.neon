@@ -31,7 +31,7 @@ parameters:
 
   # Some parts of Laravel are just really magical
   - '#Parameter \#1 \$response of static method Nuwave\\Lighthouse\\Testing\\TestResponseUtils::extractValidationErrors\(\) expects Illuminate\\Testing\\TestResponse<Symfony\\Component\\HttpFoundation\\Response>, \$this\(Nuwave\\Lighthouse\\Testing\\TestResponseMixin\) given\.#'
-  - path: tests/database/factories/*
+  - path: tests/database/factories
     message: '#Variable \$factory might not be defined#'
 
   # Mixins are magical
