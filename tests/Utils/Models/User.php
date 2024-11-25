@@ -73,37 +73,37 @@ final class User extends Authenticatable
         return parent::query(); // @phpstan-ignore-line this function is more of an assertion
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\AlternateConnection> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\AlternateConnection, $this> */
     public function alternateConnections(): HasMany
     {
         return $this->hasMany(AlternateConnection::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\Company, self> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\Company, $this> */
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\CustomPrimaryKey> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\CustomPrimaryKey, $this> */
     public function customPrimaryKeys(): HasMany
     {
         return $this->hasMany(CustomPrimaryKey::class, 'user_id');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\MorphOne<\Tests\Utils\Models\Image> */
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphOne<\Tests\Utils\Models\Image, $this> */
     public function image(): MorphOne
     {
         return $this->morphOne(Image::class, 'imageable');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\Post> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\Post, $this> */
     public function posts(): HasMany
     {
         return $this->hasMany(Post::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Tests\Utils\Models\Role> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Tests\Utils\Models\Role, $this> */
     public function roles(): BelongsToMany
     {
         return $this
@@ -111,19 +111,19 @@ final class User extends Authenticatable
             ->withPivot('meta');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\RoleUserPivot> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\RoleUserPivot, $this> */
     public function rolesPivot(): HasMany
     {
         return $this->hasMany(RoleUserPivot::class, 'user_id');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\Task> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\Task, $this> */
     public function tasks(): HasMany
     {
         return $this->hasMany(Task::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\Team, self> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\Team, $this> */
     public function team(): BelongsTo
     {
         return $this->belongsTo(Team::class);

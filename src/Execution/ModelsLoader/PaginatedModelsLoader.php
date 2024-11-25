@@ -71,6 +71,7 @@ class PaginatedModelsLoader implements ModelsLoader
         // Merge all the relation queries into a single query with UNION ALL.
 
         $firstRelation = $relations->shift();
+        // @phpstan-ignore function.impossibleType,instanceof.alwaysFalse
         assert($firstRelation instanceof Relation, 'Non-null because only non-empty lists of parents are passed into this loader.');
 
         // Use ->getQuery() to respect model scopes, such as soft deletes

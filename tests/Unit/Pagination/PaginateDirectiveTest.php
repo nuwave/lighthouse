@@ -723,7 +723,7 @@ GRAPHQL
     /**
      * @param  array{first: int}  $args
      *
-     * @return \Illuminate\Pagination\LengthAwarePaginator<array<string, int>>
+     * @return \Illuminate\Pagination\LengthAwarePaginator<array{id: int}>
      */
     public static function returnPaginatedDataInsteadOfBuilder(mixed $root, array $args): LengthAwarePaginator
     {

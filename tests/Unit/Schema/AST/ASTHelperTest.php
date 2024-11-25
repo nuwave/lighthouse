@@ -298,7 +298,7 @@ GRAPHQL
         $typeType = $fieldType->type;
         assert($typeType instanceof NamedTypeNode);
 
-        $this->assertSame($typeType->name->value, 'Int');
+        $this->assertSame('Int', $typeType->name->value);
     }
 
     public function testDynamicallyAddedArgManipulatorDirective(): void
@@ -363,7 +363,7 @@ GRAPHQL
         $typeType = $argumentType->type;
         assert($typeType instanceof NamedTypeNode);
 
-        $this->assertSame($typeType->name->value, 'Int');
+        $this->assertSame('Int', $typeType->name->value);
     }
 
     public function testDynamicallyAddedInputFieldManipulatorDirective(): void
@@ -427,6 +427,6 @@ GRAPHQL
         $typeType = $fieldType->type;
         assert($typeType instanceof NamedTypeNode);
 
-        $this->assertSame($typeType->name->value, 'Int');
+        $this->assertSame('Int', $typeType->name->value);
     }
 }

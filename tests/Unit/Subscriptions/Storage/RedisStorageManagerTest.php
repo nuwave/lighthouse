@@ -25,7 +25,7 @@ final class RedisStorageManagerTest extends TestCase
      * @param  array<mixed>  $firstCallArguments
      * @param  array<mixed>  ...$consecutiveCallsArguments
      *
-     * @return iterable<callback<mixed>>
+     * @return iterable<\PHPUnit\Framework\Constraint\Callback<mixed>>
      */
     private function withConsecutive(array $firstCallArguments, array ...$consecutiveCallsArguments): iterable
     {

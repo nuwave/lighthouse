@@ -57,49 +57,49 @@ final class Task extends Model
         });
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Tests\Utils\Models\Activity> */
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Tests\Utils\Models\Activity, $this> */
     public function activity(): MorphMany
     {
         return $this->morphMany(Activity::class, 'content');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\MorphOne<\Tests\Utils\Models\Image> */
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphOne<\Tests\Utils\Models\Image, $this> */
     public function image(): MorphOne
     {
         return $this->morphOne(Image::class, 'imageable');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Tests\Utils\Models\Image> */
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Tests\Utils\Models\Image, $this> */
     public function images(): MorphMany
     {
         return $this->morphMany(Image::class, 'imageable');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Tests\Utils\Models\Post> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Tests\Utils\Models\Post, $this> */
     public function post(): HasOne
     {
         return $this->hasOne(Post::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\Tests\Utils\Models\Comment> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\Tests\Utils\Models\Comment, \Tests\Utils\Models\Post, $this> */
     public function postComments(): HasManyThrough
     {
         return $this->hasManyThrough(Comment::class, Post::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasOneThrough<\Tests\Utils\Models\PostStatus> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOneThrough<\Tests\Utils\Models\PostStatus, \Tests\Utils\Models\Post, $this> */
     public function postStatus(): HasOneThrough
     {
         return $this->hasOneThrough(PostStatus::class, Post::class, 'task_id', 'post_id');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\MorphToMany<\Tests\Utils\Models\Tag> */
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphToMany<\Tests\Utils\Models\Tag, $this> */
     public function tags(): MorphToMany
     {
         return $this->morphToMany(Tag::class, 'taggable');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\User, self> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\User, $this> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

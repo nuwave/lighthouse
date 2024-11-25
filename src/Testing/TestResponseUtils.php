@@ -10,7 +10,7 @@ namespace Nuwave\Lighthouse\Testing;
 class TestResponseUtils
 {
     /**
-     * @param  \Illuminate\Testing\TestResponse  $response
+     * @param  \Illuminate\Testing\TestResponse<\Symfony\Component\HttpFoundation\Response>  $response
      *
      * @return array<string, array<int, string>>|null
      */

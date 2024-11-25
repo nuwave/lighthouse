@@ -22,7 +22,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 final class Company extends Model
 {
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\User> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\User, $this> */
     public function users(): HasMany
     {
         return $this->hasMany(User::class);
