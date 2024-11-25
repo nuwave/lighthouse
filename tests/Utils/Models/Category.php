@@ -28,7 +28,7 @@ final class Category extends Model
         return $this->belongsTo(Category::class, 'parent_id');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Tests\Utils\Models\Post> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Tests\Utils\Models\Post, $this> */
     public function posts(): BelongsToMany
     {
         return $this->belongsToMany(Post::class, 'category_post', 'post_id', 'category_id');

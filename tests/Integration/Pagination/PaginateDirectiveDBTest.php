@@ -267,13 +267,14 @@ GRAPHQL;
     public static function builder(): EloquentBuilder
     {
         return User::query()
-            ->orderBy('id', 'DESC');
+            ->orderByDesc('id');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\Relation<\Tests\Utils\Models\Post> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\Post, \Tests\Utils\Models\User> */
     public static function builderForRelation(User $parent): Relation
     {
-        return $parent->posts()->orderBy('id', 'DESC');
+        return $parent->posts()
+            ->orderByDesc('id');
     }
 
     public static function builderForScoutBuilder(): ScoutBuilder

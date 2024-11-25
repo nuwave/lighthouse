@@ -38,7 +38,7 @@ final class Location extends Model
         return $this->belongsTo(__CLASS__, 'parent_id');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<self> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<self, $this> */
     public function children(): HasMany
     {
         return $this->hasMany(__CLASS__, 'parent_id');

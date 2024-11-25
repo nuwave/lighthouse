@@ -48,31 +48,31 @@ final class Post extends Model
     use Searchable;
     use SoftDeletes;
 
-    /** @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Tests\Utils\Models\Activity> */
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Tests\Utils\Models\Activity, $this> */
     public function activity(): MorphMany
     {
         return $this->morphMany(Activity::class, 'content');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Tests\Utils\Models\Category> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Tests\Utils\Models\Category, $this> */
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class, 'category_post', 'category_id', 'post_id');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<self> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<self, $this> */
     public function children(): HasMany
     {
         return $this->hasMany(self::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\Comment> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\Comment, $this> */
     public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Tests\Utils\Models\Image> */
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Tests\Utils\Models\Image, $this> */
     public function images(): MorphMany
     {
         return $this->morphMany(Image::class, 'imageable');
@@ -84,13 +84,13 @@ final class Post extends Model
         return $this->belongsTo(self::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\RoleUserPivot> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\RoleUserPivot, $this> */
     public function roles(): HasMany
     {
         return $this->hasMany(RoleUserPivot::class, 'user_id', 'user_id');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Tests\Utils\Models\PostStatus> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Tests\Utils\Models\PostStatus, $this> */
     public function status(): HasOne
     {
         return $this->hasOne(PostStatus::class);
@@ -102,7 +102,7 @@ final class Post extends Model
         return $this->belongsTo(Task::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\MorphToMany<\Tests\Utils\Models\Tag> */
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphToMany<\Tests\Utils\Models\Tag, $this> */
     public function tags(): MorphToMany
     {
         return $this->morphToMany(Tag::class, 'taggable');

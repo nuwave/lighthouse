@@ -30,7 +30,7 @@ parameters:
   - '#Parameter \#1 \$callback of static method Closure::fromCallable\(\) expects callable\(\): mixed, array{object, .*} given\.#'
 
   # Some parts of Laravel are just really magical
-  - '#Parameter \#1 \$response of static method Nuwave\\Lighthouse\\Testing\\TestResponseUtils::extractValidationErrors\(\) expects Illuminate\\Testing\\TestResponse, \$this\(Nuwave\\Lighthouse\\Testing\\TestResponseMixin\) given\.#'
+  - '#Parameter \#1 \$response of static method Nuwave\\Lighthouse\\Testing\\TestResponseUtils::extractValidationErrors\(\) expects Illuminate\\Testing\\TestResponse<Symfony\\Component\\HttpFoundation\\Response>, \$this\(Nuwave\\Lighthouse\\Testing\\TestResponseMixin\) given\.#'
   - path: tests/database/factories/*
     message: '#Variable \$factory might not be defined#'
 
@@ -101,3 +101,5 @@ parameters:
   - path: src/Testing/TestResponseMixin.php
     message: '#Unable to resolve the template type TValue in call to method static method Illuminate\\Support\\Arr::first\(\)#'
 
+  # Lots of work to specify the generics, little gain
+  - message: '#Method .+ return type with generic class Illuminate\\Testing\\TestResponse does not specify its types: TResponse#'

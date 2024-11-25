@@ -22,7 +22,7 @@ final class NullConnection extends Model
         return null;
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\User> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\User, $this> */
     public function users(): HasMany
     {
         return $this->hasMany(User::class, 'company_id');

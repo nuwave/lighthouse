@@ -28,7 +28,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  */
 final class Color extends Model
 {
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\Product> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\Product, $this> */
     public function products(): HasMany
     {
         return $this->hasMany(Product::class);

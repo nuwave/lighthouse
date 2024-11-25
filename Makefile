@@ -6,7 +6,7 @@ it: vendor fix stan test ## Run useful checks before commits
 
 .PHONY: help
 help: ## Display this list of targets with descriptions
-	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(firstword $(MAKEFILE_LIST)) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}'
+	@grep --extended-regexp '^[a-zA-Z0-9_-]+:.*?## .*$$' $(firstword $(MAKEFILE_LIST)) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}'
 
 .PHONY: setup
 setup: build docs/node_modules vendor ## Prepare the local environment
@@ -37,7 +37,7 @@ prettier: up ## Format code with prettier
 
 .PHONY: stan
 stan: up ## Run static analysis with PHPStan
-	${dcphp} vendor/bin/phpstan
+	${dcphp} vendor/bin/phpstan --verbose
 
 .PHONY: test
 test: up ## Run tests with PHPUnit

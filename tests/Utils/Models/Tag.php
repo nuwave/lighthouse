@@ -24,13 +24,13 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
  */
 final class Tag extends Model
 {
-    /** @return \Illuminate\Database\Eloquent\Relations\MorphToMany<\Tests\Utils\Models\Post> */
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphToMany<\Tests\Utils\Models\Post, $this> */
     public function posts(): MorphToMany
     {
         return $this->morphedByMany(Post::class, 'taggable');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\MorphToMany<\Tests\Utils\Models\Task> */
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphToMany<\Tests\Utils\Models\Task, $this> */
     public function tasks(): MorphToMany
     {
         return $this->morphedByMany(Task::class, 'taggable');

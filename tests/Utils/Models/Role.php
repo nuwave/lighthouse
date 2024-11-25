@@ -25,7 +25,7 @@ final class Role extends Model
 {
     public $timestamps = false;
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Tests\Utils\Models\User> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Tests\Utils\Models\User, $this> */
     public function users(): BelongsToMany
     {
         return $this
