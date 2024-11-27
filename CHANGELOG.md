@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.45.1
+
+### Fixed
+
+- Fix field middleware directive stub https://github.com/nuwave/lighthouse/commit/21edcfe4762b4b6f14134e8b5c636662f97443ff
+
 ## v6.45.0
 
 ### Added
