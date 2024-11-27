@@ -9,7 +9,16 @@ and allow them to apply complex, dynamic WHERE conditions to queries.
 
 ## Setup
 
-Add the service provider to your `config/app.php`:
+For Laravel 11 and higher, add the service provider to your `bootstrap/providers.php`:
+
+```php
+return [
+    // ...
+    \Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider::class,
+]
+```
+
+For other versions, add the service provider to your `config/app.php`:
 
 ```php
 'providers' => [
