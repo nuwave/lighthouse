@@ -9,13 +9,8 @@ Much of the credit should be given to the [Ruby implementation](https://github.c
 
 ## Setup
 
-Add the service provider to your `config/app.php`:
-
-```php
-'providers' => [
-    \Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider::class,
-],
-```
+Register the service provider `Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider`,
+see [registering providers in Laravel](https://laravel.com/docs/providers#registering-providers).
 
 If you want to use [the Pusher driver](https://laravel.com/docs/11.x/broadcasting#pusher-channels), you need to install the [Pusher PHP Library](https://github.com/pusher/pusher-http-php)
 for interacting with the Pusher HTTP API.

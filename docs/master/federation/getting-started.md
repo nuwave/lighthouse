@@ -10,13 +10,8 @@ It can not serve as a [federation gateway](https://www.apollographql.com/docs/fe
 
 ## Setup
 
-Add the service provider to your `config/app.php`:
-
-```php
-'providers' => [
-    \Nuwave\Lighthouse\Federation\FederationServiceProvider::class,
-],
-```
+Register the service provider `Nuwave\Lighthouse\Federation\FederationServiceProvider`,
+see [registering providers in Laravel](https://laravel.com/docs/providers#registering-providers).
 
 ## Publishing Your Schema
 

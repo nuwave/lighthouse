@@ -1247,13 +1247,8 @@ enum FeatureState {
 ```
 
 Requires the installation of [Laravel Pennant](https://laravel.com/docs/pennant)
-and manual registration of the service provider in `config/app.php`:
-
-```php
-'providers' => [
-    \Nuwave\Lighthouse\Pennant\PennantServiceProvider::class,
-],
-```
+and manual registration of the service provider `Nuwave\Lighthouse\Pennant\PennantServiceProvider`,
+see [registering providers in Laravel](https://laravel.com/docs/providers#registering-providers).
 
 ## @field
 
@@ -3423,13 +3418,8 @@ directive @search(
 ```
 
 Requires the installation of [Laravel Scout](https://laravel.com/docs/scout)
-and manual registration of the service provider in `config/app.php`:
-
-```php
-'providers' => [
-    \Nuwave\Lighthouse\Scout\ScoutServiceProvider::class,
-],
-```
+and manual registration of the service provider `Nuwave\Lighthouse\Scout\ScoutServiceProvider`,
+see [registering providers in Laravel](https://laravel.com/docs/providers#registering-providers).
 
 The `search()` method of the model is called with the value of the argument,
 using the driver you configured for Scout.

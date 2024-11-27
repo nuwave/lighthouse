@@ -349,14 +349,10 @@ cache, then you will need to change your code.
 
 ### Register `ScoutServiceProvider` if you use `@search`
 
-If you use the `@search` directive in your schema, you will now need to register the service provider
-in your `config/app.php`, it is no longer registered by default.
-
-```php
-'providers' => [
-    \Nuwave\Lighthouse\Scout\ScoutServiceProvider::class,
-],
-```
+If you use the `@search` directive in your schema,
+you will now need to register the service provider `Nuwave\Lighthouse\Scout\ScoutServiceProvider`,
+it is no longer registered by default.
+See [registering providers in Laravel](https://laravel.com/docs/providers#registering-providers).
 
 ### Update `lighthouse.guard` configuration
 

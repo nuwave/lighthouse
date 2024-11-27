@@ -18,17 +18,14 @@ return [
 ]
 ```
 
-For other versions, add the service provider to your `config/app.php`:
-
-```php
-'providers' => [
-    \Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider::class,
-],
-```
+For other versions, register the service provider `Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider`,
+see [registering providers in Laravel](https://laravel.com/docs/providers#registering-providers).
 
 Install the dependency [mll-lab/graphql-php-scalars](https://github.com/mll-lab/graphql-php-scalars):
 
-    composer require mll-lab/graphql-php-scalars
+```shell
+composer require mll-lab/graphql-php-scalars
+```
 
 ## Usage
 
@@ -400,21 +397,12 @@ final class GraphQLServiceProvider extends ServiceProvider
 }
 ```
 
-Don't forget to register your new service provider in `config/app.php`.
-Make sure to add it after Lighthouse's `\Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider::class`:
+Don't forget to [register your new service provider in Laravel](https://laravel.com/docs/providers#registering-providers).
+Make sure to add it after Lighthouse's service provider:
 
 ```diff
-'providers' => [
-    /*
-     * Package Service Providers...
-     */
     \Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider::class,
-
-    /*
-     * Application Service Providers...
-     */
 +   \App\GraphQL\GraphQLServiceProvider::class,
-],
 ```
 
 ## Custom handler

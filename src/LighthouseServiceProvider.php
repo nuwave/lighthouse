@@ -94,9 +94,7 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->app->bind(ProvidesSubscriptionResolver::class, static fn (): ProvidesSubscriptionResolver => new class() implements ProvidesSubscriptionResolver {
             public function provideSubscriptionResolver(FieldValue $fieldValue): \Closure
             {
-                throw new \Exception(
-                    'Add the SubscriptionServiceProvider to your config/app.php to enable subscriptions.',
-                );
+                throw new \Exception('Register the SubscriptionServiceProvider to enable subscriptions.');
             }
         });
 
