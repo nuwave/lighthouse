@@ -8,9 +8,7 @@ use Illuminate\Container\Container;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\ExecutableTypeNodeConverter;
 
-/**
- * @phpstan-import-type ArgumentConfig from \GraphQL\Type\Definition\Argument
- */
+/** @phpstan-import-type ArgumentConfig from \GraphQL\Type\Definition\Argument */
 class ArgumentFactory
 {
     /**
