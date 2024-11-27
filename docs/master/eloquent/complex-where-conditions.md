@@ -9,7 +9,7 @@ and allow them to apply complex, dynamic WHERE conditions to queries.
 
 ## Setup
 
-For Laravel 11 and higher: add the service provider to your `bootstrap/providers.php`:
+For Laravel 11 and higher, add the service provider to your `bootstrap/providers.php`:
 
 ```php
 return [
