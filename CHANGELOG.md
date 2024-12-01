@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.46.0
+
+### Added
+
+- Expose query complexity score in lifecycle event `BuildExtensionsResponse` https://github.com/nuwave/lighthouse/pull/2637
+
 ## v6.45.1
 
 ### Fixed
