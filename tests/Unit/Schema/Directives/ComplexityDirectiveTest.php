@@ -46,8 +46,11 @@ final class ComplexityDirectiveTest extends TestCase
 
         $this->assertCount(1, $events);
 
-        $event = $events[0];
-        $this->assertSame(2, $event->queryComplexity);
+        // TODO remove this check when updating the required version of webonyx/graphql-php
+        if (method_exists(QueryComplexity::class, 'getQueryComplexity')) {
+            $event = $events[0];
+            $this->assertSame(2, $event->queryComplexity);
+        }
     }
 
     public function testKnowsPagination(): void

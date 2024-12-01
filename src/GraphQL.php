@@ -157,8 +157,11 @@ class GraphQL
         );
 
         $queryComplexityRule = $validationRules[QueryComplexity::class] ?? null;
-        assert($queryComplexityRule instanceof QueryComplexity || $queryComplexityRule === null);
-        $queryComplexity = $queryComplexityRule?->getQueryComplexity();
+        $queryComplexity = $queryComplexityRule instanceof QueryComplexity
+            // TODO remove this check when updating the required version of webonyx/graphql-php
+            && method_exists($queryComplexityRule, 'getQueryComplexity')
+            ? $queryComplexityRule->getQueryComplexity()
+            : null;
 
         /** @var array<\Nuwave\Lighthouse\Execution\ExtensionsResponse|null> $extensionsResponses */
         $extensionsResponses = (array) $this->eventDispatcher->dispatch(
