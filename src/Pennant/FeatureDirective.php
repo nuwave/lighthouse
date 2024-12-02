@@ -30,7 +30,7 @@ directive @feature(
     Specify what the state of the feature should be for the field to be included.
     """
     when: FeatureState! = ACTIVE
-) on FIELD_DEFINITION | OBJECT
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION | OBJECT
 
 """
 Options for the `when` argument of `@feature`.
