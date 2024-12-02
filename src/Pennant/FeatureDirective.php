@@ -6,7 +6,7 @@ use Laravel\Pennant\FeatureManager;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\HideDirective;
 
-final class FeatureDirective extends HideDirective
+class FeatureDirective extends HideDirective
 {
     public function __construct(
         private FeatureManager $features,
