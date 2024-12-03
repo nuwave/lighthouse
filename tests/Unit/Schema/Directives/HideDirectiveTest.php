@@ -120,9 +120,10 @@ final class HideDirectiveTest extends TestCase
 
         $types = $this->graphQL($introspectionQuery)->json('data.__schema.types');
 
-        $input = array_find($types, fn (array $type): bool => $type['name'] === 'Input');
+        $input = array_filter($types, fn (array $type): bool => $type['name'] === 'Input');
 
-        $this->assertEmpty($input['inputFields']);
+        $this->assertCount(1, $input);
+        $this->assertEmpty(current($input)['inputFields']);
     }
 
     public function testHiddenWhenManuallySettingEnv(): void
