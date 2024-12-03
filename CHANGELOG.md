@@ -9,6 +9,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+- Allow `@show`, `@hide` and `@feature` directive to be used on types, arguments and input types. https://github.com/nuwave/lighthouse/pull/2638
+
 ## v6.45.1
 
 ### Fixed
