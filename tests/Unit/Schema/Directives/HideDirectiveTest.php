@@ -118,7 +118,8 @@ final class HideDirectiveTest extends TestCase
         }
         ';
 
-        $types = $this->graphQL($introspectionQuery)->json('data.__schema.types');
+        $types = $this->graphQL($introspectionQuery)
+            ->json('data.__schema.types');
 
         $input = array_filter($types, fn (array $type): bool => $type['name'] === 'Input');
 

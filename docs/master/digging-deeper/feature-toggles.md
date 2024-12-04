@@ -27,8 +27,8 @@ type Query {
 
 ## @feature
 
-The [@feature](../api-reference/directives.md#feature) directive allows to include fields, types, arguments or input fields, in the schema depending
-on a [Laravel Pennant](https://laravel.com/docs/pennant) feature.
+The [@feature](../api-reference/directives.md#feature) directive allows to include fields, types, arguments, or input fields in the schema
+depending on whether a [Laravel Pennant](https://laravel.com/docs/pennant) feature is active.
 
 For example, you might want a new experimental field only to be available when the according feature is active:
 
@@ -59,8 +59,9 @@ type Query {
 
 ## Conditional Type Inclusion
 
-When you conditionally include a type, using [@show](../api-reference/directives.md#show), [@hide](../api-reference/directives.md#hide) or [@feature](../api-reference/directives.md#feature), any fields using it must 
-also be conditionally included, otherwise the schema might be invalid in case the type is missing.
+When you conditionally include a type using [@show](../api-reference/directives.md#show), [@hide](../api-reference/directives.md#hide) or [@feature](../api-reference/directives.md#feature),
+any fields using it must also be conditionally included.
+If the type is omitted but still used somewhere, the schema will be invalid.
 
 ```graphql
 type ExperimentalType @feature(name: "new-api") {
