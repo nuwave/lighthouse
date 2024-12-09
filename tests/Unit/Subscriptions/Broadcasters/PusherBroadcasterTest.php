@@ -3,8 +3,8 @@
 namespace Tests\Unit\Subscriptions\Broadcasters;
 
 use Illuminate\Config\Repository as ConfigRepository;
+use Nuwave\Lighthouse\Subscriptions\BroadcastDriverManager;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\PusherBroadcaster;
-use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Psr\Log\LoggerInterface;
 use Tests\EnablesSubscriptionServiceProvider;
@@ -56,8 +56,9 @@ final class PusherBroadcasterTest extends TestCase
     /** @param  \Nuwave\Lighthouse\Subscriptions\Subscriber&\PHPUnit\Framework\MockObject\MockObject  $subscriber */
     private function broadcast(object $subscriber): void
     {
-        $broadcastManager = $this->app->make(BroadcastManager::class);
-        $pusherBroadcaster = $broadcastManager->driver('pusher');
+        $broadcastDriverManager = $this->app->make(BroadcastDriverManager::class);
+
+        $pusherBroadcaster = $broadcastDriverManager->driver('pusher');
         assert($pusherBroadcaster instanceof PusherBroadcaster);
 
         $pusherBroadcaster->broadcast($subscriber, 'foo');
