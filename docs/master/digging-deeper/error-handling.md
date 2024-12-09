@@ -22,6 +22,7 @@ The error handler `Nuwave\Lighthouse\Execution\ReportingErrorHandler` is include
 and reports non-client-safe errors through the default Laravel exception handler.
 
 Client-safe errors are assumed to be something that:
+
 - a client can understand and handle
 - were caused by client misuse, e.g. wrong syntax, authentication, validation
 
