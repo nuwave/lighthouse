@@ -86,9 +86,8 @@ parameters:
     message: '#Call to method version\(\) on an unknown class Laravel\\Lumen\\Application.#'
   - path: src/Subscriptions/SubscriptionRouter.php
     messages:
-      - '#Parameter \$router of method Nuwave\\Lighthouse\\Subscriptions\\SubscriptionRouter::pusher\(\) has invalid type Laravel\\Lumen\\Routing\\Router\.#'
+      - '#Parameter \$router of method Nuwave\\Lighthouse\\Subscriptions\\SubscriptionRouter::.+\(\) has invalid type Laravel\\Lumen\\Routing\\Router\.#'
       - '#Call to method post\(\) on an unknown class Laravel\\Lumen\\Routing\\Router\.#'
-      - '#Parameter \$router of method Nuwave\\Lighthouse\\Subscriptions\\SubscriptionRouter::echoRoutes\(\) has invalid type Laravel\\Lumen\\Routing\\Router\.#'
   - path: src/Http/routes.php
     messages:
       - '#PHPDoc tag @var for variable \$router contains unknown class Laravel\\Lumen\\Routing\\Router\.#'

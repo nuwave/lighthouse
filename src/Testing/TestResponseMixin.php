@@ -8,15 +8,13 @@ use Illuminate\Support\Arr;
 use Illuminate\Testing\TestResponse;
 use Mockery\LegacyMockInterface;
 use Mockery\MockInterface;
-use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
+use Nuwave\Lighthouse\Subscriptions\BroadcastDriverManager;
 use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @mixin \Illuminate\Testing\TestResponse
- */
+/** @mixin \Illuminate\Testing\TestResponse */
 class TestResponseMixin
 {
     public function assertGraphQLValidationError(): \Closure
@@ -155,12 +153,13 @@ class TestResponseMixin
     public function graphQLSubscriptionMock(): \Closure
     {
         return function (): MockInterface {
-            $broadcastManager = Container::getInstance()->make(BroadcastManager::class);
-            assert($broadcastManager instanceof BroadcastManager);
-            $mock = $broadcastManager->driver();
-            assert($mock instanceof Broadcaster && $mock instanceof MockInterface);
+            $broadcastDriverManager = Container::getInstance()->make(BroadcastDriverManager::class);
+            assert($broadcastDriverManager instanceof BroadcastDriverManager);
 
-            return $mock;
+            $broadcastDriver = $broadcastDriverManager->driver();
+            assert($broadcastDriver instanceof Broadcaster && $broadcastDriver instanceof MockInterface);
+
+            return $broadcastDriver;
         };
     }
 

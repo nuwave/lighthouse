@@ -8,8 +8,8 @@ use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Arr;
 use Illuminate\Testing\TestResponse;
 use Mockery\MockInterface;
+use Nuwave\Lighthouse\Subscriptions\BroadcastDriverManager;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
-use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
 use Nuwave\Lighthouse\Subscriptions\Storage\CacheStorageManager;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Testing\TestsSubscriptions;
@@ -118,14 +118,14 @@ GRAPHQL;
                 title
             }
         }
-        ');
+        ')->assertGraphQLErrorFree();
 
-        $broadcastManager = $this->app->make(BroadcastManager::class);
+        $broadcastDriverManager = $this->app->make(BroadcastDriverManager::class);
 
-        $log = $broadcastManager->driver();
-        assert($log instanceof LogBroadcaster);
+        $logDriver = $broadcastDriverManager->driver();
+        assert($logDriver instanceof LogBroadcaster);
 
-        $broadcasts = $log->broadcasts();
+        $broadcasts = $logDriver->broadcasts();
 
         $this->assertNotNull($broadcasts);
         /** @var array<mixed> $broadcasts */
@@ -144,10 +144,10 @@ GRAPHQL;
                 title
             }
         }
-        ');
+        ')->assertGraphQLErrorFree();
 
-        /** @var CacheStorageManager $cache */
         $cache = $this->app->make(CacheStorageManager::class);
+        assert($cache instanceof CacheStorageManager);
 
         $subscriber = $cache
             ->subscribersByTopic('ON_POST_CREATED')
@@ -169,18 +169,15 @@ GRAPHQL;
     public function testWithoutExcludeEmpty(): void
     {
         $config = $this->app->make(ConfigRepository::class);
-
         $config->set('lighthouse.subscriptions.exclude_empty', false);
 
         $this->subscribe();
 
-        $response = $this->graphQL(/** @lang GraphQL */ '
-        query foo {
+        $this->graphQL(/** @lang GraphQL */ '
+        {
             foo
         }
-        ');
-
-        $response->assertExactJson([
+        ')->assertExactJson([
             'data' => [
                 'foo' => '42',
             ],
@@ -199,13 +196,11 @@ GRAPHQL;
 
         $this->subscribe();
 
-        $response = $this->graphQL(/** @lang GraphQL */ '
-        query foo {
+        $this->graphQL(/** @lang GraphQL */ '
+        {
             foo
         }
-        ');
-
-        $response->assertExactJson([
+        ')->assertExactJson([
             'data' => [
                 'foo' => '42',
             ],
@@ -221,7 +216,7 @@ GRAPHQL;
                     body
                 }
             }
-        ');
+        ')->assertGraphQLErrorFree();
 
         $authFactory = $this->app->make(AuthFactory::class);
         $sessionGuard = $authFactory->guard();
@@ -234,10 +229,11 @@ GRAPHQL;
                 title
             }
         }
-        ');
+        ')->assertGraphQLErrorFree();
 
-        $broadcastManager = $this->app->make(BroadcastManager::class);
-        $log = $broadcastManager->driver();
+        $broadcastDriverManager = $this->app->make(BroadcastDriverManager::class);
+
+        $log = $broadcastDriverManager->driver();
         assert($log instanceof LogBroadcaster);
 
         $broadcasts = $log->broadcasts();
@@ -281,7 +277,7 @@ GRAPHQL;
                 title
             }
         }
-        ');
+        ')->assertGraphQLErrorFree();
 
         $response->assertGraphQLBroadcasted([
             ['title' => 'foo'],
@@ -298,7 +294,7 @@ GRAPHQL;
                 title
             }
         }
-        ');
+        ')->assertGraphQLErrorFree();
 
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -306,7 +302,7 @@ GRAPHQL;
                 title
             }
         }
-        ');
+        ')->assertGraphQLErrorFree();
 
         $response->assertGraphQLBroadcasted([
             ['title' => 'foo'],
