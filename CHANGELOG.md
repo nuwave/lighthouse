@@ -9,6 +9,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.47.0
+
 ### Added
 
 - Support Laravel Reverb as a subscriptions broadcasting driver https://github.com/nuwave/lighthouse/pull/2639
