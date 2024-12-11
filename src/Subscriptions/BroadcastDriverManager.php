@@ -17,7 +17,7 @@ use Pusher\Pusher;
  * @method \Symfony\Component\HttpFoundation\Response authorized(\Illuminate\Http\Request $request)
  * @method \Symfony\Component\HttpFoundation\Response unauthorized(\Illuminate\Http\Request $request)
  */
-class BroadcastManager extends DriverManager
+class BroadcastDriverManager extends DriverManager
 {
     protected function configKey(): string
     {
@@ -38,11 +38,9 @@ class BroadcastManager extends DriverManager
     protected function createPusherDriver(array $config): PusherBroadcaster
     {
         $connection = $config['connection'] ?? 'pusher';
-        $driverConfig = config("broadcasting.connections.{$connection}");
 
-        if (empty($driverConfig) || $driverConfig['driver'] !== 'pusher') {
-            throw new \RuntimeException("Could not initialize Pusher broadcast driver for connection: {$connection}.");
-        }
+        $driverConfig = config("broadcasting.connections.{$connection}")
+            ?? throw new \RuntimeException("Missing connection {$connection} from config/broadcasting.php.");
 
         $pusher = new Pusher(
             $driverConfig['key'],

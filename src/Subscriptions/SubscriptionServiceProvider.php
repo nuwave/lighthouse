@@ -26,7 +26,7 @@ class SubscriptionServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->singleton(BroadcastManager::class);
+        $this->app->singleton(BroadcastDriverManager::class);
         $this->app->singleton(SubscriptionRegistry::class);
         $this->app->singleton(StoresSubscriptions::class, static function (Container $app): StoresSubscriptions {
             $configRepository = $app->make(ConfigRepository::class);
