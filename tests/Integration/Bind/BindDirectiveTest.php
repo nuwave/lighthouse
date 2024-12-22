@@ -1,19 +1,19 @@
 <?php declare(strict_types=1);
 
-namespace Tests\Integration\Schema\Directives;
+namespace Tests\Integration\Bind;
 
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Testing\MocksResolvers;
 use Nuwave\Lighthouse\Testing\UsesTestSchema;
 use Tests\DBTestCase;
-use Tests\Integration\Schema\Directives\Fixtures\SpyResolver;
 use Tests\Utils\Models\User;
+use Tests\Utils\Resolvers\SpyResolver;
 use Throwable;
 
 use function factory;
 
-final class BindingDirectiveTest extends DBTestCase
+final class BindDirectiveTest extends DBTestCase
 {
     use UsesTestSchema;
     use MocksResolvers;

@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Nuwave\Lighthouse\Binding;
+namespace Nuwave\Lighthouse\Bind;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -11,9 +11,9 @@ use function is_iterable;
 class ModelBinding
 {
     /**
-     * @param \Nuwave\Lighthouse\Binding\BindingDefinition<\Illuminate\Database\Eloquent\Model> $definition
+     * @param \Nuwave\Lighthouse\Bind\BindDefinition<\Illuminate\Database\Eloquent\Model> $definition
      */
-    public function __invoke(mixed $value, BindingDefinition $definition): Model|Collection|null
+    public function __invoke(mixed $value, BindDefinition $definition): Model|Collection|null
     {
         $binding = $definition->class::query()
             ->with($definition->with)

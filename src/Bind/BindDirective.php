@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Nuwave\Lighthouse\Schema\Directives;
+namespace Nuwave\Lighthouse\Bind;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
@@ -8,9 +8,8 @@ use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Contracts\Container\Container;
-use Nuwave\Lighthouse\Binding\BindingDefinition;
-use Nuwave\Lighthouse\Binding\ModelBinding;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
@@ -93,9 +92,9 @@ GRAPHQL;
         return $bind($argumentValue, $definition);
     }
 
-    private function bindingDefinition(): BindingDefinition
+    private function bindingDefinition(): BindDefinition
     {
-        return new BindingDefinition(
+        return new BindDefinition(
             $this->directiveArgValue('class'),
             $this->directiveArgValue('column', 'id'),
             $this->directiveArgValue('with', []),

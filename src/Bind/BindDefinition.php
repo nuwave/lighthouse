@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Nuwave\Lighthouse\Binding;
+namespace Nuwave\Lighthouse\Bind;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
@@ -18,7 +18,7 @@ use function sprintf;
  * @property-read array<string> $with
  * @property-read bool $optional
  */
-class BindingDefinition
+class BindDefinition
 {
     /**
      * @param class-string<TClass> $class

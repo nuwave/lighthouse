@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Integration\Schema\Directives\Fixtures;
+namespace Tests\Utils\Resolvers;
 
 /**
  * @template TReturn
