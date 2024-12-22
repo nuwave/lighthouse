@@ -7,28 +7,21 @@ use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Illuminate\Contracts\Container\Container;
+use Nuwave\Lighthouse\Binding\BindingDefinition;
+use Nuwave\Lighthouse\Binding\ModelBinding;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
 use Nuwave\Lighthouse\Support\Contracts\InputFieldManipulator;
 
-use function class_exists;
-use function is_callable;
-use function is_subclass_of;
-use function sprintf;
-
-class BindDirective extends BaseDirective implements
-    ArgTransformerDirective,
-    ArgDirective,
-    ArgDirectiveForArray,
-    ArgManipulator,
-    InputFieldManipulator
+class BindDirective extends BaseDirective implements ArgTransformerDirective, ArgDirectiveForArray, ArgManipulator, InputFieldManipulator
 {
+    public function __construct(
+        private Container $container,
+    ) {}
+
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
@@ -72,7 +65,7 @@ GRAPHQL;
         FieldDefinitionNode &$parentField,
         ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
     ): void {
-        $this->validateClassArg([
+        $this->bindingDefinition()->validate([
             'argument' => $argDefinition->name->value,
             'field' => $parentField->name->value,
         ]);
@@ -83,56 +76,30 @@ GRAPHQL;
         InputValueDefinitionNode &$inputField,
         InputObjectTypeDefinitionNode &$parentInput,
     ): void {
-        $this->validateClassArg([
+        $this->bindingDefinition()->validate([
             'field' => $inputField->name->value,
             'input' => $parentInput->name->value,
         ]);
     }
 
-    /**
-     * @param array<string, string> $exceptionMessageArgs
-     */
-    private function validateClassArg(array $exceptionMessageArgs): void
-    {
-        $directive = $this->name();
-        $class = $this->directiveArgValue('class');
-
-        if (! class_exists($class)) {
-            throw new DefinitionException(sprintf(
-                "@$directive argument `class` defined on %s `%s` of %s `%s` " .
-                "must be an existing class, received `$class`.",
-                ...$this->spreadKeysAndValues($exceptionMessageArgs),
-            ));
-        }
-
-        if (is_subclass_of($class, Model::class)) {
-            return;
-        }
-
-        if (is_callable($class)) {
-            return;
-        }
-
-        throw new DefinitionException(sprintf(
-            "@$directive argument `class` defined on %s `%s` of %s `%s` must be " .
-            "an Eloquent model or a callable class, received `$class`.",
-            ...$this->spreadKeysAndValues($exceptionMessageArgs),
-        ));
-    }
-
-    /**
-     * @param array<string, string> $keyedValues
-     * @return array<int, string>
-     */
-    private function spreadKeysAndValues(array $keyedValues): array
-    {
-        return Collection::make($keyedValues)->reduce(fn (array $carry, string $value, string $key): array => [
-            ...$carry, $key, $value,
-        ], []);
-    }
-
     public function transform(mixed $argumentValue): mixed
     {
-        return $argumentValue;
+        $definition = $this->bindingDefinition();
+        $bind = match ($definition->isModelBinding()) {
+            true => new ModelBinding(),
+            false => $this->container->make($definition->class),
+        };
+
+        return $bind($argumentValue, $definition);
+    }
+
+    private function bindingDefinition(): BindingDefinition
+    {
+        return new BindingDefinition(
+            $this->directiveArgValue('class'),
+            $this->directiveArgValue('column', 'id'),
+            $this->directiveArgValue('with', []),
+            $this->directiveArgValue('optional', false),
+        );
     }
 }
