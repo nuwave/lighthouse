@@ -178,6 +178,37 @@ final class BindDirectiveTest extends DBTestCase
         ]);
     }
 
+    public function testOptionalModelBindingOnFieldArgument(): void
+    {
+        $this->mockResolver(fn (mixed $root, array $args) => $args['user']);
+        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+            type User {
+                id: ID!
+            }
+            
+            type Query {
+                user(
+                    user: ID! @bind(class: "Tests\\Utils\\Models\\User", optional: true)
+                ): User @mock
+            }
+            GRAPHQL;
+
+        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+            query ($id: ID!) {
+                user(user: $id) {
+                    id
+                }
+            }
+            GRAPHQL, ['id' => '1']);
+
+        $response->assertGraphQLErrorFree();
+        $response->assertJson([
+            'data' => [
+                'user' => null,
+            ],
+        ]);
+    }
+
     public function testModelCollectionBindingOnFieldArgument(): void
     {
         $users = factory(User::class, 2)->create();
@@ -224,6 +255,48 @@ final class BindDirectiveTest extends DBTestCase
         });
     }
 
+    public function testOptionalModelCollectionBindingOnFieldArgument(): void
+    {
+        $resolver = new SpyResolver(return: true);
+        $this->mockResolver($resolver);
+        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+            type User {
+                id: ID!
+            }
+
+            type Mutation {
+                removeUsers(
+                    users: [ID!]! @bind(class: "Tests\\Utils\\Models\\User", optional: true)
+                ): Boolean! @mock
+            }
+            
+            type Query {
+                ping: Boolean
+            }
+            GRAPHQL;
+
+        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+            mutation ($users: [ID!]!) {
+                removeUsers(users: $users)
+            }
+            GRAPHQL,
+            [
+                'users' => ['1', '2'],
+            ],
+        );
+
+        $response->assertGraphQLErrorFree();
+        $response->assertJson([
+            'data' => [
+                'removeUsers' => true,
+            ],
+        ]);
+        $resolver->assertArgs(function (array $args): void {
+            $this->assertArrayHasKey('users', $args);
+            $this->assertEmpty($args['users']);
+        });
+    }
+
     public function testModelBindingOnInputField(): void
     {
         $user = factory(User::class)->create();
@@ -262,6 +335,45 @@ final class BindDirectiveTest extends DBTestCase
                 'user' => [
                     'id' => $user->getKey(),
                 ],
+            ],
+        ]);
+    }
+
+    public function testOptionalModelBindingOnInputField(): void
+    {
+        $this->mockResolver(fn (mixed $root, array $args) => $args['input']['user']);
+        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+            type User {
+                id: ID!
+            }
+            
+            input UserInput {
+                user: ID! @bind(class: "Tests\\Utils\\Models\\User", optional: true)
+            }
+            
+            type Query {
+                user(input: UserInput!): User @mock
+            }
+            GRAPHQL;
+
+        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+            query ($input: UserInput!) {
+                user(input: $input) {
+                    id
+                }
+            }
+            GRAPHQL,
+            [
+                'input' => [
+                    'user' => '1',
+                ],
+            ],
+        );
+
+        $response->assertGraphQLErrorFree();
+        $response->assertJson([
+            'data' => [
+                'user' => null,
             ],
         ]);
     }
@@ -314,6 +426,53 @@ final class BindDirectiveTest extends DBTestCase
             $users->each(function (User $user, int $key) use ($args): void {
                 $this->assertTrue($user->is($args['input']['users'][$key]));
             });
+        });
+    }
+
+    public function testOptionalModelCollectionBindingOnInputField(): void
+    {
+        $resolver = new SpyResolver(return: true);
+        $this->mockResolver($resolver);
+        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+            type User {
+                id: ID!
+            }
+
+            input RemoveUsersInput {
+                users: [ID!]! @bind(class: "Tests\\Utils\\Models\\User", optional: true)
+            }
+
+            type Mutation {
+                removeUsers(input: RemoveUsersInput!): Boolean! @mock
+            }
+            
+            type Query {
+                ping: Boolean
+            }
+            GRAPHQL;
+
+        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+            mutation ($input: RemoveUsersInput!) {
+                removeUsers(input: $input)
+            }
+            GRAPHQL,
+            [
+                'input' => [
+                    'users' => ['1', '2'],
+                ],
+            ],
+        );
+
+        $response->assertGraphQLErrorFree();
+        $response->assertJson([
+            'data' => [
+                'removeUsers' => true,
+            ],
+        ]);
+        $resolver->assertArgs(function (array $args): void {
+            $this->assertArrayHasKey('input', $args);
+            $this->assertArrayHasKey('users', $args['input']);
+            $this->assertEmpty($args['input']['users']);
         });
     }
 
