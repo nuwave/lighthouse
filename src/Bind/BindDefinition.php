@@ -25,6 +25,7 @@ class BindDefinition
      * @param array<string> $with
      */
     public function __construct(
+        public string $nodeName,
         public string $class,
         public string $column,
         public array $with,
@@ -52,7 +53,7 @@ class BindDefinition
         }
 
         throw new DefinitionException(sprintf(
-            "@bind argument `class` defined on %s of %s must be an Eloquent" .
+            "@bind argument `class` defined on %s of %s must be an Eloquent " .
             "model or a callable class, received `$this->class`.",
             ...$this->formatExceptionMessagePlaceholders($exceptionMessagePlaceholders),
         ));

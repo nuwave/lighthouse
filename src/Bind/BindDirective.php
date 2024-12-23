@@ -8,6 +8,8 @@ use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Support\Collection;
+use Illuminate\Support\ItemNotFoundException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
@@ -38,7 +40,7 @@ directive @bind(
     class: String!
     
     """
-    Specify the column name to use when binding Eloquent models.
+    Specify the column name of a unique identifier to use when binding Eloquent models.
     By default, "id" is used the the primary key column.
     """
     column: String! = "id"
@@ -95,6 +97,7 @@ GRAPHQL;
     private function bindingDefinition(): BindDefinition
     {
         return new BindDefinition(
+            $this->nodeName(),
             $this->directiveArgValue('class'),
             $this->directiveArgValue('column', 'id'),
             $this->directiveArgValue('with', []),

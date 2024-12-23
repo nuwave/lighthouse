@@ -2,14 +2,15 @@
 
 namespace Tests\Integration\Bind;
 
-use Illuminate\Support\Collection;
+use GraphQL\Error\Error;
+use Nuwave\Lighthouse\Bind\BindDefinition;
+use Nuwave\Lighthouse\Bind\BindException;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Testing\MocksResolvers;
 use Nuwave\Lighthouse\Testing\UsesTestSchema;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 use Tests\Utils\Resolvers\SpyResolver;
-use Throwable;
 
 use function factory;
 
@@ -38,12 +39,11 @@ final class BindDirectiveTest extends DBTestCase
             }
             GRAPHQL);
 
-        $this->assertThrows($makeRequest, fn (DefinitionException $exception): bool => (
-            $this->assertExceptionMessageContains(
-                ['@bind', 'class', 'argument `user`', 'field `user`', 'NotAClass'],
-                $exception,
-            )
-        ));
+        $this->assertThrows(
+            $makeRequest,
+            DefinitionException::class,
+            'argument `user` of field `user` must be an existing class',
+        );
     }
 
     public function testSchemaValidationFailsWhenClassArgumentDefinedOnInputFieldIsNotAClass(): void
@@ -74,12 +74,11 @@ final class BindDirectiveTest extends DBTestCase
             ],
         );
 
-        $this->assertThrows($makeRequest, fn (DefinitionException $exception): bool => (
-            $this->assertExceptionMessageContains(
-                ['@bind', 'class', 'field `users`', 'input `RemoveUsersInput`', 'NotAClass'],
-                $exception,
-            )
-        ));
+        $this->assertThrows(
+            $makeRequest,
+            DefinitionException::class,
+            'field `users` of input `RemoveUsersInput` must be an existing class',
+        );
     }
 
     public function testSchemaValidationFailsWhenClassArgumentDefinedOnFieldArgumentIsNotAModelOrCallableClass(): void
@@ -102,12 +101,11 @@ final class BindDirectiveTest extends DBTestCase
             }
             GRAPHQL);
 
-        $this->assertThrows($makeRequest, fn (DefinitionException $exception): bool => (
-            $this->assertExceptionMessageContains(
-                ['@bind', 'class', 'argument `user`', 'field `user`', 'stdClass'],
-                $exception,
-            )
-        ));
+        $this->assertThrows(
+            $makeRequest,
+            DefinitionException::class,
+            'argument `user` of field `user` must be an Eloquent model or a callable class',
+        );
     }
 
     public function testSchemaValidationFailsWhenClassArgumentDefinedOnInputFieldIsNotAModelOrCallableClass(): void
@@ -138,12 +136,11 @@ final class BindDirectiveTest extends DBTestCase
             ],
         );
 
-        $this->assertThrows($makeRequest, fn (DefinitionException $exception): bool => (
-            $this->assertExceptionMessageContains(
-                ['@bind', 'class', 'field `users`', 'input `RemoveUsersInput`', 'stdClass'],
-                $exception,
-            )
-        ));
+        $this->assertThrows(
+            $makeRequest,
+            DefinitionException::class,
+            'field `users` of input `RemoveUsersInput` must be an Eloquent model or a callable class',
+        );
     }
 
     public function testModelBindingOnFieldArgument(): void
@@ -166,7 +163,9 @@ final class BindDirectiveTest extends DBTestCase
                     id
                 }
             }
-            GRAPHQL, ['id' => $user->getKey()]);
+            GRAPHQL,
+            ['id' => $user->getKey()],
+        );
 
         $response->assertGraphQLErrorFree();
         $response->assertJson([
@@ -178,7 +177,35 @@ final class BindDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testOptionalModelBindingOnFieldArgument(): void
+    public function testMissingModelBindingOnFieldArgument(): void
+    {
+        $this->rethrowGraphQLErrors();
+        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+            type User {
+                id: ID!
+            }
+
+            type Query {
+                user(user: ID! @bind(class: "Tests\\Utils\\Models\\User")): User! @mock
+            }
+            GRAPHQL;
+
+        $makeRequest = fn () => $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+            query {
+                user(user: "1") {
+                    id
+                }
+            }
+            GRAPHQL);
+
+        $this->assertThrows(
+            $makeRequest,
+            Error::class,
+            BindException::notFound('1', new BindDefinition('user', User::class, 'id', [], false))->getMessage(),
+        );
+    }
+
+    public function testMissingOptionalModelBindingOnFieldArgument(): void
     {
         $this->mockResolver(fn (mixed $root, array $args) => $args['user']);
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
@@ -199,7 +226,9 @@ final class BindDirectiveTest extends DBTestCase
                     id
                 }
             }
-            GRAPHQL, ['id' => '1']);
+            GRAPHQL,
+            ['id' => '1'],
+        );
 
         $response->assertGraphQLErrorFree();
         $response->assertJson([
@@ -235,9 +264,7 @@ final class BindDirectiveTest extends DBTestCase
                 removeUsers(users: $users)
             }
             GRAPHQL,
-            [
-                'users' => $users->map(fn (User $user): int => $user->getKey()),
-            ],
+            ['users' => $users->map(fn (User $user): int => $user->getKey())],
         );
 
         $response->assertGraphQLErrorFree();
@@ -255,8 +282,48 @@ final class BindDirectiveTest extends DBTestCase
         });
     }
 
-    public function testOptionalModelCollectionBindingOnFieldArgument(): void
+    public function testMissingModelCollectionBindingOnFieldArgument(): void
     {
+        $this->rethrowGraphQLErrors();
+        $user = factory(User::class)->create();
+        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+            type User {
+                id: ID!
+            }
+
+            type Mutation {
+                removeUsers(
+                    users: [ID!]! @bind(class: "Tests\\Utils\\Models\\User")
+                ): Boolean! @mock
+            }
+            
+            type Query {
+                ping: Boolean
+            }
+            GRAPHQL;
+
+        $makeRequest = fn () => $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+            mutation ($users: [ID!]!) {
+                removeUsers(users: $users)
+            }
+            GRAPHQL,
+            [
+                'users' => [$user->getKey(), '10'],
+            ],
+        );
+
+        $this->assertThrows(
+            $makeRequest,
+            Error::class,
+            BindException::missingRecords(['10'], new BindDefinition('users', User::class, 'id', [], false))
+                ->getMessage(),
+        );
+    }
+
+    public function testMissingOptionalModelCollectionBindingOnFieldArgument(): void
+    {
+        $this->rethrowGraphQLErrors();
+        $user = factory(User::class)->create();
         $resolver = new SpyResolver(return: true);
         $this->mockResolver($resolver);
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
@@ -281,7 +348,7 @@ final class BindDirectiveTest extends DBTestCase
             }
             GRAPHQL,
             [
-                'users' => ['1', '2'],
+                'users' => [$user->getKey(), '10'],
             ],
         );
 
@@ -291,9 +358,10 @@ final class BindDirectiveTest extends DBTestCase
                 'removeUsers' => true,
             ],
         ]);
-        $resolver->assertArgs(function (array $args): void {
+        $resolver->assertArgs(function (array $args) use ($user): void {
             $this->assertArrayHasKey('users', $args);
-            $this->assertEmpty($args['users']);
+            $this->assertCount(1, $args['users']);
+            $this->assertTrue($user->is($args['users'][0]));
         });
     }
 
@@ -339,7 +407,45 @@ final class BindDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testOptionalModelBindingOnInputField(): void
+    public function testMissingModelBindingOnInputField(): void
+    {
+        $this->rethrowGraphQLErrors();
+        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+            type User {
+                id: ID!
+            }
+
+            input UserInput {
+                user: ID! @bind(class: "Tests\\Utils\\Models\\User")
+            }
+
+            type Query {
+                user(input: UserInput!): User! @mock
+            }
+            GRAPHQL;
+
+        $makeRequest = fn () => $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+            query ($input: UserInput!) {
+                user(input: $input) {
+                    id
+                }
+            }
+            GRAPHQL,
+            [
+                'input' => [
+                    'user' => '1',
+                ],
+            ],
+        );
+
+        $this->assertThrows(
+            $makeRequest,
+            Error::class,
+            BindException::notFound('1', new BindDefinition('user', User::class, 'id', [], false))->getMessage(),
+        );
+    }
+
+    public function testMissingOptionalModelBindingOnInputField(): void
     {
         $this->mockResolver(fn (mixed $root, array $args) => $args['input']['user']);
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
@@ -429,8 +535,52 @@ final class BindDirectiveTest extends DBTestCase
         });
     }
 
-    public function testOptionalModelCollectionBindingOnInputField(): void
+    public function testMissingModelCollectionBindingOnInputField(): void
     {
+        $this->rethrowGraphQLErrors();
+        $user = factory(User::class)->create();
+        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+            type User {
+                id: ID!
+            }
+
+            input RemoveUsersInput {
+                users: [ID!]! @bind(class: "Tests\\Utils\\Models\\User")
+            }
+
+            type Mutation {
+                removeUsers(input: RemoveUsersInput!): Boolean! @mock
+            }
+            
+            type Query {
+                ping: Boolean
+            }
+            GRAPHQL;
+
+        $makeRequest = fn () => $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+            mutation ($input: RemoveUsersInput!) {
+                removeUsers(input: $input)
+            }
+            GRAPHQL,
+            [
+                'input' => [
+                    'users' => [$user->getKey(), '10'],
+                ],
+            ],
+        );
+
+        $this->assertThrows(
+            $makeRequest,
+            Error::class,
+            BindException::missingRecords(['10'], new BindDefinition('users', User::class, 'id', [], false))
+                ->getMessage(),
+        );
+    }
+
+    public function testMissingOptionalModelCollectionBindingOnInputField(): void
+    {
+        $this->rethrowGraphQLErrors();
+        $user = factory(User::class)->create();
         $resolver = new SpyResolver(return: true);
         $this->mockResolver($resolver);
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
@@ -458,7 +608,7 @@ final class BindDirectiveTest extends DBTestCase
             GRAPHQL,
             [
                 'input' => [
-                    'users' => ['1', '2'],
+                    'users' => [$user->getKey(), '10'],
                 ],
             ],
         );
@@ -469,19 +619,11 @@ final class BindDirectiveTest extends DBTestCase
                 'removeUsers' => true,
             ],
         ]);
-        $resolver->assertArgs(function (array $args): void {
+        $resolver->assertArgs(function (array $args) use ($user): void {
             $this->assertArrayHasKey('input', $args);
             $this->assertArrayHasKey('users', $args['input']);
-            $this->assertEmpty($args['input']['users']);
+            $this->assertCount(1, $args['input']['users']);
+            $this->assertTrue($user->is($args['input']['users'][0]));
         });
-    }
-
-    private function assertExceptionMessageContains(array $fragments, Throwable $exception): bool
-    {
-        return Collection::make($fragments)
-            ->each(function (string $fragment) use ($exception): void {
-                $this->assertStringContainsString($fragment, $exception->getMessage());
-            })
-            ->isNotEmpty();
     }
 }
