@@ -2,6 +2,8 @@
 
 namespace Tests\Utils\Resolvers;
 
+use function is_callable;
+
 /**
  * @template TReturn
  */
@@ -22,6 +24,10 @@ final class SpyResolver
     public function __invoke(mixed $root, array $args): mixed
     {
         $this->args = $args;
+
+        if (is_callable($this->return)) {
+            return ($this->return)($root, $args);
+        }
 
         return $this->return;
     }

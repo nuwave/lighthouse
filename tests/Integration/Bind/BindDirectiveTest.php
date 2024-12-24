@@ -274,6 +274,47 @@ final class BindDirectiveTest extends DBTestCase
         ]);
     }
 
+    public function testModelBindingWithEagerLoadingOnFieldArgument(): void
+    {
+        $user = factory(User::class)->create();
+        $resolver = new SpyResolver(fn (mixed $root, array $args) => $args['user']);
+        $this->mockResolver($resolver);
+        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+            type User {
+                id: ID!
+            }
+
+            type Query {
+                user(
+                    user: ID! @bind(class: "Tests\\Utils\\Models\\User", with: ["company"])
+                ): User @mock
+            }
+            GRAPHQL;
+
+        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+            query ($id: ID!) {
+                user(user: $id) {
+                    id
+                }
+            }
+            GRAPHQL,
+            ['id' => $user->getKey()],
+        );
+
+        $response->assertGraphQLErrorFree();
+        $response->assertJson([
+            'data' => [
+                'user' => [
+                    'id' => $user->getKey(),
+                ],
+            ],
+        ]);
+        $resolver->assertArgs(function (array $args): void {
+            $this->assertInstanceOf(User::class, $args['user']);
+            $this->assertTrue($args['user']->relationLoaded('company'));
+        });
+    }
+
     public function testModelCollectionBindingOnFieldArgument(): void
     {
         $users = factory(User::class, 2)->create();
@@ -560,6 +601,53 @@ final class BindDirectiveTest extends DBTestCase
                 ],
             ],
         ]);
+    }
+
+    public function testModelBindingWithEagerLoadingOnInputField(): void
+    {
+        $user = factory(User::class)->create();
+        $resolver = new SpyResolver(fn (mixed $root, array $args) => $args['input']['user']);
+        $this->mockResolver($resolver);
+        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+            type User {
+                id: ID!
+            }
+
+            input UserInput {
+                user: ID! @bind(class: "Tests\\Utils\\Models\\User", with: ["company"])
+            }
+
+            type Query {
+                user(input: UserInput!): User @mock
+            }
+            GRAPHQL;
+
+        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+            query ($input: UserInput!) {
+                user(input: $input) {
+                    id
+                }
+            }
+            GRAPHQL,
+            [
+                'input' => [
+                    'user' => $user->getKey(),
+                ],
+            ],
+        );
+
+        $response->assertGraphQLErrorFree();
+        $response->assertJson([
+            'data' => [
+                'user' => [
+                    'id' => $user->id,
+                ],
+            ],
+        ]);
+        $resolver->assertArgs(function (array $args): void {
+            $this->assertInstanceOf(User::class, $args['input']['user']);
+            $this->assertTrue($args['input']['user']->relationLoaded('company'));
+        });
     }
 
     public function testModelCollectionBindingOnInputField(): void
