@@ -12,26 +12,10 @@ use function implode;
 
 class BindException extends Exception implements ClientAware
 {
-    public static function multipleRecordsFound(mixed $value, BindDefinition $definition): self
-    {
-        return new self(
-            "Unexpectedly found multiple records for binding $definition->nodeName with $definition->column `$value`.",
-        );
-    }
-
     public static function notFound(mixed $value, BindDefinition $definition): self
     {
         return new self(
             "No record found for binding $definition->nodeName with $definition->column `$value`.",
-        );
-    }
-
-    public static function tooManyRecordsFound(mixed $value, BindDefinition $definition): self
-    {
-        $column = Str::plural($definition->column);
-
-        return new self(
-            "Unexpectedly found more records for binding $definition->nodeName with $column `$value`.",
         );
     }
 

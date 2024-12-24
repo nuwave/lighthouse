@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Bind;
 
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\MultipleRecordsFoundException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as IlluminateCollection;
 
@@ -34,7 +35,7 @@ class ModelBinding
     private function modelInstance(EloquentCollection $results, mixed $value, BindDefinition $definition): ?Model
     {
         if ($results->count() > 1) {
-            throw BindException::multipleRecordsFound($value, $definition);
+            throw new MultipleRecordsFoundException($results->count());
         }
 
         $model = $results->first();
@@ -60,7 +61,7 @@ class ModelBinding
         BindDefinition $definition,
     ): EloquentCollection {
         if ($results->count() > $values->unique()->count()) {
-            throw BindException::tooManyRecordsFound($values, $definition);
+            throw new MultipleRecordsFoundException($results->count());
         }
 
         if ($definition->optional) {

@@ -3,6 +3,7 @@
 namespace Tests\Integration\Bind;
 
 use GraphQL\Error\Error;
+use Illuminate\Database\MultipleRecordsFoundException;
 use Nuwave\Lighthouse\Bind\BindDefinition;
 use Nuwave\Lighthouse\Bind\BindException;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
@@ -315,6 +316,39 @@ final class BindDirectiveTest extends DBTestCase
         });
     }
 
+    public function testModelBindingWithTooManyResultsOnFieldArgument(): void
+    {
+        $this->rethrowGraphQLErrors();
+        $users = factory(User::class, 2)->create(['name' => 'John Doe']);
+        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+            type User {
+                id: ID!
+            }
+
+            type Query {
+                user(
+                    user: String! @bind(class: "Tests\\Utils\\Models\\User", column: "name")
+                ): User @mock
+            }
+            GRAPHQL;
+
+        $makeRequest = fn () => $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+            query ($name: String!) {
+                user(user: $name) {
+                    id
+                }
+            }
+            GRAPHQL,
+            ['name' => $users->first()->name],
+        );
+
+        $this->assertThrows(
+            $makeRequest,
+            Error::class,
+            (new MultipleRecordsFoundException($users->count()))->getMessage(),
+        );
+    }
+
     public function testModelCollectionBindingOnFieldArgument(): void
     {
         $users = factory(User::class, 2)->create();
@@ -399,7 +433,6 @@ final class BindDirectiveTest extends DBTestCase
 
     public function testMissingOptionalModelCollectionBindingOnFieldArgument(): void
     {
-        $this->rethrowGraphQLErrors();
         $user = factory(User::class)->create();
         $resolver = new SpyResolver(return: true);
         $this->mockResolver($resolver);
@@ -440,6 +473,43 @@ final class BindDirectiveTest extends DBTestCase
             $this->assertCount(1, $args['users']);
             $this->assertTrue($user->is($args['users'][0]));
         });
+    }
+
+    public function testModelCollectionBindingWithTooManyResultsOnFieldArgument(): void
+    {
+        $this->rethrowGraphQLErrors();
+        $users = factory(User::class, 2)->create(['name' => 'John Doe']);
+        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+            type User {
+                id: ID!
+            }
+
+            type Mutation {
+                removeUsers(
+                    users: [String!]! @bind(class: "Tests\\Utils\\Models\\User", column: "name")
+                ): Boolean! @mock
+            }
+
+            type Query {
+                ping: Boolean
+            }
+            GRAPHQL;
+
+        $makeRequest = fn () => $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+            mutation ($users: [String!]!) {
+                removeUsers(users: $users)
+            }
+            GRAPHQL,
+            [
+                'users' => [$users->first()->name],
+            ],
+        );
+
+        $this->assertThrows(
+            $makeRequest,
+            Error::class,
+            (new MultipleRecordsFoundException($users->count()))->getMessage(),
+        );
     }
 
     public function testModelBindingOnInputField(): void
@@ -650,6 +720,45 @@ final class BindDirectiveTest extends DBTestCase
         });
     }
 
+    public function testModelBindingWithTooManyResultsOnInputField(): void
+    {
+        $this->rethrowGraphQLErrors();
+        $users = factory(User::class, 2)->create(['name' => 'Jane Doe']);
+        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+            type User {
+                id: ID!
+            }
+
+            input UserInput {
+                user: String! @bind(class: "Tests\\Utils\\Models\\User", column: "name")
+            }
+
+            type Query {
+                user(input: UserInput!): User @mock
+            }
+            GRAPHQL;
+
+        $makeRequest = fn () => $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+            query ($input: UserInput!) {
+                user(input: $input) {
+                    id
+                }
+            }
+            GRAPHQL,
+            [
+                'input' => [
+                    'user' => $users->first()->name,
+                ],
+            ],
+        );
+
+        $this->assertThrows(
+            $makeRequest,
+            Error::class,
+            (new MultipleRecordsFoundException($users->count()))->getMessage(),
+        );
+    }
+
     public function testModelCollectionBindingOnInputField(): void
     {
         $users = factory(User::class, 2)->create();
@@ -745,7 +854,6 @@ final class BindDirectiveTest extends DBTestCase
 
     public function testMissingOptionalModelCollectionBindingOnInputField(): void
     {
-        $this->rethrowGraphQLErrors();
         $user = factory(User::class)->create();
         $resolver = new SpyResolver(return: true);
         $this->mockResolver($resolver);
@@ -791,5 +899,46 @@ final class BindDirectiveTest extends DBTestCase
             $this->assertCount(1, $args['input']['users']);
             $this->assertTrue($user->is($args['input']['users'][0]));
         });
+    }
+
+    public function testModelCollectionBindingWithTooManyResultsOnInputField(): void
+    {
+        $this->rethrowGraphQLErrors();
+        $users = factory(User::class, 2)->create(['name' => 'Jane Doe']);
+        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+            type User {
+                id: ID!
+            }
+
+            input RemoveUsersInput {
+                users: [String!]! @bind(class: "Tests\\Utils\\Models\\User", column: "name")
+            }
+
+            type Mutation {
+                removeUsers(input: RemoveUsersInput!): Boolean! @mock
+            }
+
+            type Query {
+                ping: Boolean
+            }
+            GRAPHQL;
+
+        $makeRequest = fn () => $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+            mutation ($input: RemoveUsersInput!) {
+                removeUsers(input: $input)
+            }
+            GRAPHQL,
+            [
+                'input' => [
+                    'users' => [$users->first()->name],
+                ],
+            ],
+        );
+
+        $this->assertThrows(
+            $makeRequest,
+            Error::class,
+            (new MultipleRecordsFoundException($users->count()))->getMessage(),
+        );
     }
 }
