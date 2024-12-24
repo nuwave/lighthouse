@@ -151,7 +151,7 @@ final class BindDirectiveTest extends DBTestCase
             type User {
                 id: ID!
             }
-            
+
             type Query {
                 user(user: ID! @bind(class: "Tests\\Utils\\Models\\User")): User! @mock
             }
@@ -212,7 +212,7 @@ final class BindDirectiveTest extends DBTestCase
             type User {
                 id: ID!
             }
-            
+
             type Query {
                 user(
                     user: ID! @bind(class: "Tests\\Utils\\Models\\User", optional: true)
@@ -238,6 +238,42 @@ final class BindDirectiveTest extends DBTestCase
         ]);
     }
 
+    public function testModelBindingByColumnOnFieldArgument(): void
+    {
+        $user = factory(User::class)->create();
+        $this->mockResolver(fn (mixed $root, array $args) => $args['user']);
+        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+            type User {
+                id: ID!
+            }
+
+            type Query {
+                user(
+                    user: String! @bind(class: "Tests\\Utils\\Models\\User", column: "email")
+                ): User @mock
+            }
+            GRAPHQL;
+
+        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+            query ($email: String!) {
+                user(user: $email) {
+                    id
+                }
+            }
+            GRAPHQL,
+            ['email' => $user->email],
+        );
+
+        $response->assertGraphQLErrorFree();
+        $response->assertJson([
+            'data' => [
+                'user' => [
+                    'id' => $user->getKey(),
+                ],
+            ],
+        ]);
+    }
+
     public function testModelCollectionBindingOnFieldArgument(): void
     {
         $users = factory(User::class, 2)->create();
@@ -253,7 +289,7 @@ final class BindDirectiveTest extends DBTestCase
                     users: [ID!]! @bind(class: "Tests\\Utils\\Models\\User")
                 ): Boolean! @mock
             }
-            
+
             type Query {
                 ping: Boolean
             }
@@ -296,7 +332,7 @@ final class BindDirectiveTest extends DBTestCase
                     users: [ID!]! @bind(class: "Tests\\Utils\\Models\\User")
                 ): Boolean! @mock
             }
-            
+
             type Query {
                 ping: Boolean
             }
@@ -336,7 +372,7 @@ final class BindDirectiveTest extends DBTestCase
                     users: [ID!]! @bind(class: "Tests\\Utils\\Models\\User", optional: true)
                 ): Boolean! @mock
             }
-            
+
             type Query {
                 ping: Boolean
             }
@@ -373,11 +409,11 @@ final class BindDirectiveTest extends DBTestCase
             type User {
                 id: ID!
             }
-            
+
             input UserInput {
                 user: ID! @bind(class: "Tests\\Utils\\Models\\User")
             }
-            
+
             type Query {
                 user(input: UserInput!): User! @mock
             }
@@ -452,11 +488,11 @@ final class BindDirectiveTest extends DBTestCase
             type User {
                 id: ID!
             }
-            
+
             input UserInput {
                 user: ID! @bind(class: "Tests\\Utils\\Models\\User", optional: true)
             }
-            
+
             type Query {
                 user(input: UserInput!): User @mock
             }
@@ -484,6 +520,48 @@ final class BindDirectiveTest extends DBTestCase
         ]);
     }
 
+    public function testModelBindingByColumnOnInputField(): void
+    {
+        $user = factory(User::class)->create();
+        $this->mockResolver(fn (mixed $root, array $args) => $args['input']['user']);
+        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+            type User {
+                id: ID!
+            }
+
+            input UserInput {
+                user: String! @bind(class: "Tests\\Utils\\Models\\User", column: "email")
+            }
+
+            type Query {
+                user(input: UserInput!): User @mock
+            }
+            GRAPHQL;
+
+        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+            query ($input: UserInput!) {
+                user(input: $input) {
+                    id
+                }
+            }
+            GRAPHQL,
+            [
+                'input' => [
+                    'user' => $user->email,
+                ],
+            ],
+        );
+
+        $response->assertGraphQLErrorFree();
+        $response->assertJson([
+            'data' => [
+                'user' => [
+                    'id' => $user->id,
+                ],
+            ],
+        ]);
+    }
+
     public function testModelCollectionBindingOnInputField(): void
     {
         $users = factory(User::class, 2)->create();
@@ -501,7 +579,7 @@ final class BindDirectiveTest extends DBTestCase
             type Mutation {
                 removeUsers(input: RemoveUsersInput!): Boolean! @mock
             }
-            
+
             type Query {
                 ping: Boolean
             }
@@ -551,7 +629,7 @@ final class BindDirectiveTest extends DBTestCase
             type Mutation {
                 removeUsers(input: RemoveUsersInput!): Boolean! @mock
             }
-            
+
             type Query {
                 ping: Boolean
             }
@@ -595,7 +673,7 @@ final class BindDirectiveTest extends DBTestCase
             type Mutation {
                 removeUsers(input: RemoveUsersInput!): Boolean! @mock
             }
-            
+
             type Query {
                 ping: Boolean
             }
