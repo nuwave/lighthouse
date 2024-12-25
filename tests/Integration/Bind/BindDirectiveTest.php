@@ -4,6 +4,7 @@ namespace Tests\Integration\Bind;
 
 use GraphQL\Error\Error;
 use Illuminate\Database\MultipleRecordsFoundException;
+use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Testing\MocksResolvers;
 use Nuwave\Lighthouse\Testing\UsesTestSchema;
@@ -39,11 +40,10 @@ final class BindDirectiveTest extends DBTestCase
             }
             GRAPHQL);
 
-        $this->assertThrows(
-            $makeRequest,
-            DefinitionException::class,
+        $this->assertThrows($makeRequest, fn (DefinitionException $exception): bool => Str::contains(
+            $exception->getMessage(),
             'argument `user` of field `user` must be an existing class',
-        );
+        ));
     }
 
     public function testSchemaValidationFailsWhenClassArgumentDefinedOnInputFieldIsNotAClass(): void
@@ -74,11 +74,10 @@ final class BindDirectiveTest extends DBTestCase
             ],
         );
 
-        $this->assertThrows(
-            $makeRequest,
-            DefinitionException::class,
+        $this->assertThrows($makeRequest, fn (DefinitionException $exception): bool => Str::contains(
+            $exception->getMessage(),
             'field `users` of input `RemoveUsersInput` must be an existing class',
-        );
+        ));
     }
 
     public function testSchemaValidationFailsWhenClassArgumentDefinedOnFieldArgumentIsNotAModelOrCallableClass(): void
@@ -101,11 +100,10 @@ final class BindDirectiveTest extends DBTestCase
             }
             GRAPHQL);
 
-        $this->assertThrows(
-            $makeRequest,
-            DefinitionException::class,
+        $this->assertThrows($makeRequest, fn (DefinitionException $exception): bool => Str::contains(
+            $exception->getMessage(),
             'argument `user` of field `user` must be an Eloquent model or a callable class',
-        );
+        ));
     }
 
     public function testSchemaValidationFailsWhenClassArgumentDefinedOnInputFieldIsNotAModelOrCallableClass(): void
@@ -136,11 +134,10 @@ final class BindDirectiveTest extends DBTestCase
             ],
         );
 
-        $this->assertThrows(
-            $makeRequest,
-            DefinitionException::class,
+        $this->assertThrows($makeRequest, fn (DefinitionException $exception): bool => Str::contains(
+            $exception->getMessage(),
             'field `users` of input `RemoveUsersInput` must be an Eloquent model or a callable class',
-        );
+        ));
     }
 
     public function testModelBindingOnFieldArgument(): void
@@ -337,11 +334,7 @@ final class BindDirectiveTest extends DBTestCase
             ['name' => $users->first()->name],
         );
 
-        $this->assertThrows(
-            $makeRequest,
-            Error::class,
-            (new MultipleRecordsFoundException($users->count()))->getMessage(),
-        );
+        $this->assertThrowsMultipleRecordsFoundException($makeRequest, $users->count());
     }
 
     public function testModelCollectionBindingOnFieldArgument(): void
@@ -495,11 +488,7 @@ final class BindDirectiveTest extends DBTestCase
             ],
         );
 
-        $this->assertThrows(
-            $makeRequest,
-            Error::class,
-            (new MultipleRecordsFoundException($users->count()))->getMessage(),
-        );
+        $this->assertThrowsMultipleRecordsFoundException($makeRequest, $users->count());
     }
 
     public function testModelBindingOnInputField(): void
@@ -740,11 +729,7 @@ final class BindDirectiveTest extends DBTestCase
             ],
         );
 
-        $this->assertThrows(
-            $makeRequest,
-            Error::class,
-            (new MultipleRecordsFoundException($users->count()))->getMessage(),
-        );
+        $this->assertThrowsMultipleRecordsFoundException($makeRequest, $users->count());
     }
 
     public function testModelCollectionBindingOnInputField(): void
@@ -920,10 +905,19 @@ final class BindDirectiveTest extends DBTestCase
             ],
         );
 
-        $this->assertThrows(
-            $makeRequest,
-            Error::class,
-            (new MultipleRecordsFoundException($users->count()))->getMessage(),
-        );
+        $this->assertThrowsMultipleRecordsFoundException($makeRequest, $users->count());
+    }
+
+    private function assertThrowsMultipleRecordsFoundException(callable $makeRequest, int $count): void
+    {
+        $this->assertThrows($makeRequest, function (Error $exception) use ($count): bool {
+            $expected = new MultipleRecordsFoundException($count);
+
+            if (! $exception->getPrevious() instanceof $expected) {
+                return false;
+            }
+
+            return $exception->getMessage() === $expected->getMessage();
+        });
     }
 }
