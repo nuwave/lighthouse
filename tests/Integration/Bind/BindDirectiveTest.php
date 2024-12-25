@@ -211,7 +211,7 @@ final class BindDirectiveTest extends DBTestCase
 
             type Query {
                 user(
-                    user: ID! @bind(class: "Tests\\Utils\\Models\\User", optional: true)
+                    user: ID! @bind(class: "Tests\\Utils\\Models\\User", required: false)
                 ): User @mock
             }
             GRAPHQL;
@@ -433,7 +433,7 @@ final class BindDirectiveTest extends DBTestCase
 
             type Mutation {
                 removeUsers(
-                    users: [ID!]! @bind(class: "Tests\\Utils\\Models\\User", optional: true)
+                    users: [ID!]! @bind(class: "Tests\\Utils\\Models\\User", required: false)
                 ): Boolean! @mock
             }
 
@@ -589,7 +589,7 @@ final class BindDirectiveTest extends DBTestCase
             }
 
             input UserInput {
-                user: ID! @bind(class: "Tests\\Utils\\Models\\User", optional: true)
+                user: ID! @bind(class: "Tests\\Utils\\Models\\User", required: false)
             }
 
             type Query {
@@ -848,7 +848,7 @@ final class BindDirectiveTest extends DBTestCase
             }
 
             input RemoveUsersInput {
-                users: [ID!]! @bind(class: "Tests\\Utils\\Models\\User", optional: true)
+                users: [ID!]! @bind(class: "Tests\\Utils\\Models\\User", required: false)
             }
 
             type Mutation {

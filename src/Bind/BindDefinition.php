@@ -25,11 +25,10 @@ class BindDefinition
      * @param array<string> $with
      */
     public function __construct(
-        public string $nodeName,
         public string $class,
         public string $column,
         public array $with,
-        public bool $optional,
+        public bool $required,
     ) {}
 
     /**

@@ -51,11 +51,12 @@ directive @bind(
     with: [String!]! = []
     
     """
-    Specify whether the binding should be considered optional. When optional, the argument's 
-    value is set to `null` when no matching binding could be resolved. When the binding 
-    isn't optional, an exception is thrown and the field resolver will not be invoked. 
+    Specify whether the binding should be considered required. When required, a validation error will be thrown for 
+    the argument or any item in the argument (when the argument is an array) for which a binding instance could not be 
+    resolved. The field resolver will not be invoked in this case. When not required, the argument value will resolve
+    as null or, when the argument is an array, any item in the argument value will be filtered out of the collection.
     """
-    optional: Boolean! = false
+    required: Boolean! = true
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 GRAPHQL;
     }
@@ -63,11 +64,10 @@ GRAPHQL;
     private function bindDefinition(): BindDefinition
     {
         return new BindDefinition(
-            $this->nodeName(),
             $this->directiveArgValue('class'),
             $this->directiveArgValue('column', 'id'),
             $this->directiveArgValue('with', []),
-            $this->directiveArgValue('optional', false),
+            $this->directiveArgValue('required', true),
         );
     }
 
@@ -98,9 +98,9 @@ GRAPHQL;
     {
         $definition = $this->bindDefinition();
 
-        return match ($definition->optional) {
-            true => [],
-            false => [new BindingExists($this, $definition)],
+        return match ($definition->required) {
+            true => [new BindingExists($this, $definition)],
+            false => [],
         };
     }
 
