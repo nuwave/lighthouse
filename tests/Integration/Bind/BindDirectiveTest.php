@@ -4,8 +4,6 @@ namespace Tests\Integration\Bind;
 
 use GraphQL\Error\Error;
 use Illuminate\Database\MultipleRecordsFoundException;
-use Nuwave\Lighthouse\Bind\BindDefinition;
-use Nuwave\Lighthouse\Bind\BindException;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Testing\MocksResolvers;
 use Nuwave\Lighthouse\Testing\UsesTestSchema;
@@ -14,6 +12,7 @@ use Tests\Utils\Models\User;
 use Tests\Utils\Resolvers\SpyResolver;
 
 use function factory;
+use function trans;
 
 final class BindDirectiveTest extends DBTestCase
 {
@@ -180,7 +179,6 @@ final class BindDirectiveTest extends DBTestCase
 
     public function testMissingModelBindingOnFieldArgument(): void
     {
-        $this->rethrowGraphQLErrors();
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
@@ -191,7 +189,7 @@ final class BindDirectiveTest extends DBTestCase
             }
             GRAPHQL;
 
-        $makeRequest = fn () => $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
             query {
                 user(user: "1") {
                     id
@@ -199,11 +197,8 @@ final class BindDirectiveTest extends DBTestCase
             }
             GRAPHQL);
 
-        $this->assertThrows(
-            $makeRequest,
-            Error::class,
-            BindException::notFound('1', new BindDefinition('user', User::class, 'id', [], false))->getMessage(),
-        );
+        $response->assertOk();
+        $response->assertGraphQLValidationError('user', trans('validation.exists', ['attribute' => 'user']));
     }
 
     public function testMissingOptionalModelBindingOnFieldArgument(): void
@@ -387,15 +382,14 @@ final class BindDirectiveTest extends DBTestCase
         $resolver->assertArgs(function (array $args) use ($users): void {
             $this->assertArrayHasKey('users', $args);
             $this->assertCount($users->count(), $args['users']);
-            $users->each(function (User $user, int $key) use ($args): void {
-                $this->assertTrue($user->is($args['users'][$key]));
+            $users->each(function (User $user) use ($args): void {
+                $this->assertTrue($user->is($args['users'][$user->getKey()]));
             });
         });
     }
 
     public function testMissingModelCollectionBindingOnFieldArgument(): void
     {
-        $this->rethrowGraphQLErrors();
         $user = factory(User::class)->create();
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type User {
@@ -413,7 +407,7 @@ final class BindDirectiveTest extends DBTestCase
             }
             GRAPHQL;
 
-        $makeRequest = fn () => $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
             mutation ($users: [ID!]!) {
                 removeUsers(users: $users)
             }
@@ -423,12 +417,8 @@ final class BindDirectiveTest extends DBTestCase
             ],
         );
 
-        $this->assertThrows(
-            $makeRequest,
-            Error::class,
-            BindException::missingRecords(['10'], new BindDefinition('users', User::class, 'id', [], false))
-                ->getMessage(),
-        );
+        $response->assertOk();
+        $response->assertGraphQLValidationError('users.1', trans('validation.exists', ['attribute' => 'users.1']));
     }
 
     public function testMissingOptionalModelCollectionBindingOnFieldArgument(): void
@@ -471,7 +461,7 @@ final class BindDirectiveTest extends DBTestCase
         $resolver->assertArgs(function (array $args) use ($user): void {
             $this->assertArrayHasKey('users', $args);
             $this->assertCount(1, $args['users']);
-            $this->assertTrue($user->is($args['users'][0]));
+            $this->assertTrue($user->is($args['users'][$user->getKey()]));
         });
     }
 
@@ -556,7 +546,6 @@ final class BindDirectiveTest extends DBTestCase
 
     public function testMissingModelBindingOnInputField(): void
     {
-        $this->rethrowGraphQLErrors();
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
@@ -571,7 +560,7 @@ final class BindDirectiveTest extends DBTestCase
             }
             GRAPHQL;
 
-        $makeRequest = fn () => $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
             query ($input: UserInput!) {
                 user(input: $input) {
                     id
@@ -585,11 +574,10 @@ final class BindDirectiveTest extends DBTestCase
             ],
         );
 
-        $this->assertThrows(
-            $makeRequest,
-            Error::class,
-            BindException::notFound('1', new BindDefinition('user', User::class, 'id', [], false))->getMessage(),
-        );
+        $response->assertOk();
+        $response->assertGraphQLValidationError('input.user', trans('validation.exists', [
+            'attribute' => 'input.user',
+        ]));
     }
 
     public function testMissingOptionalModelBindingOnInputField(): void
@@ -804,15 +792,14 @@ final class BindDirectiveTest extends DBTestCase
             $this->assertArrayHasKey('input', $args);
             $this->assertArrayHasKey('users', $args['input']);
             $this->assertCount($users->count(), $args['input']['users']);
-            $users->each(function (User $user, int $key) use ($args): void {
-                $this->assertTrue($user->is($args['input']['users'][$key]));
+            $users->each(function (User $user) use ($args): void {
+                $this->assertTrue($user->is($args['input']['users'][$user->getKey()]));
             });
         });
     }
 
     public function testMissingModelCollectionBindingOnInputField(): void
     {
-        $this->rethrowGraphQLErrors();
         $user = factory(User::class)->create();
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type User {
@@ -832,7 +819,7 @@ final class BindDirectiveTest extends DBTestCase
             }
             GRAPHQL;
 
-        $makeRequest = fn () => $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
             mutation ($input: RemoveUsersInput!) {
                 removeUsers(input: $input)
             }
@@ -844,12 +831,10 @@ final class BindDirectiveTest extends DBTestCase
             ],
         );
 
-        $this->assertThrows(
-            $makeRequest,
-            Error::class,
-            BindException::missingRecords(['10'], new BindDefinition('users', User::class, 'id', [], false))
-                ->getMessage(),
-        );
+        $response->assertOk();
+        $response->assertGraphQLValidationError('input.users.1', trans('validation.exists', [
+            'attribute' => 'input.users.1',
+        ]));
     }
 
     public function testMissingOptionalModelCollectionBindingOnInputField(): void
@@ -897,7 +882,7 @@ final class BindDirectiveTest extends DBTestCase
             $this->assertArrayHasKey('input', $args);
             $this->assertArrayHasKey('users', $args['input']);
             $this->assertCount(1, $args['input']['users']);
-            $this->assertTrue($user->is($args['input']['users'][0]));
+            $this->assertTrue($user->is($args['input']['users'][$user->getKey()]));
         });
     }
 

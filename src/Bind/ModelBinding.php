@@ -26,32 +26,25 @@ class ModelBinding
             return $this->modelCollection($binding, IlluminateCollection::make($value), $definition);
         }
 
-        return $this->modelInstance($binding, $value, $definition);
+        return $this->modelInstance($binding);
     }
 
     /**
      * @param \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model> $results
      */
-    private function modelInstance(EloquentCollection $results, mixed $value, BindDefinition $definition): ?Model
+    private function modelInstance(EloquentCollection $results): ?Model
     {
         if ($results->count() > 1) {
             throw new MultipleRecordsFoundException($results->count());
         }
 
-        $model = $results->first();
-
-        if ($definition->optional) {
-            return $model;
-        }
-
-        if ($model === null) {
-            throw BindException::notFound($value, $definition);
-        }
-
-        return $model;
+        return $results->first();
     }
 
     /**
+     * Binding collections should be returned with the original values
+     * as keys to allow us to validate the binding when non-optional.
+     * @see \Nuwave\Lighthouse\Bind\BindDirective::rules()
      * @param \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model> $results
      * @return \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>
      */
@@ -64,25 +57,6 @@ class ModelBinding
             throw new MultipleRecordsFoundException($results->count());
         }
 
-        if ($definition->optional) {
-            return $results->values();
-        }
-
-        $results = $results->keyBy($definition->column);
-        $missingResults = new IlluminateCollection();
-
-        foreach ($values as $value) {
-            if ($results->has($value)) {
-                continue;
-            }
-
-            $missingResults->push($value);
-        }
-
-        if ($missingResults->isNotEmpty()) {
-            throw BindException::missingRecords($missingResults->all(), $definition);
-        }
-
-        return $results->values();
+        return $results->keyby($definition->column);
     }
 }

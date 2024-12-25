@@ -8,14 +8,16 @@ use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Contracts\Container\Container;
+use Nuwave\Lighthouse\Bind\Validation\BindingExists;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgumentValidation;
 use Nuwave\Lighthouse\Support\Contracts\InputFieldManipulator;
 
-class BindDirective extends BaseDirective implements ArgTransformerDirective, ArgDirectiveForArray, ArgManipulator, InputFieldManipulator
+class BindDirective extends BaseDirective implements ArgumentValidation, ArgTransformerDirective, ArgDirectiveForArray, ArgManipulator, InputFieldManipulator
 {
     public function __construct(
         private Container $container,
@@ -58,13 +60,24 @@ directive @bind(
 GRAPHQL;
     }
 
+    private function bindDefinition(): BindDefinition
+    {
+        return new BindDefinition(
+            $this->nodeName(),
+            $this->directiveArgValue('class'),
+            $this->directiveArgValue('column', 'id'),
+            $this->directiveArgValue('with', []),
+            $this->directiveArgValue('optional', false),
+        );
+    }
+
     public function manipulateArgDefinition(
         DocumentAST &$documentAST,
         InputValueDefinitionNode &$argDefinition,
         FieldDefinitionNode &$parentField,
         ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
     ): void {
-        $this->bindingDefinition()->validate([
+        $this->bindDefinition()->validate([
             'argument' => $argDefinition->name->value,
             'field' => $parentField->name->value,
         ]);
@@ -75,31 +88,40 @@ GRAPHQL;
         InputValueDefinitionNode &$inputField,
         InputObjectTypeDefinitionNode &$parentInput,
     ): void {
-        $this->bindingDefinition()->validate([
+        $this->bindDefinition()->validate([
             'field' => $inputField->name->value,
             'input' => $parentInput->name->value,
         ]);
     }
 
-    public function transform(mixed $argumentValue): mixed
+    public function rules(): array
     {
-        $definition = $this->bindingDefinition();
+        $definition = $this->bindDefinition();
+
+        return match ($definition->optional) {
+            true => [],
+            false => [new BindingExists($this, $definition)],
+        };
+    }
+
+    public function messages(): array
+    {
+        return [];
+    }
+
+    public function attribute(): ?string
+    {
+        return null;
+    }
+
+    public function transform(mixed $argumentValue, ?BindDefinition $definition = null): mixed
+    {
+        $definition ??= $this->bindDefinition();
         $bind = match ($definition->isModelBinding()) {
             true => new ModelBinding(),
             false => $this->container->make($definition->class),
         };
 
         return $bind($argumentValue, $definition);
-    }
-
-    private function bindingDefinition(): BindDefinition
-    {
-        return new BindDefinition(
-            $this->nodeName(),
-            $this->directiveArgValue('class'),
-            $this->directiveArgValue('column', 'id'),
-            $this->directiveArgValue('with', []),
-            $this->directiveArgValue('optional', false),
-        );
     }
 }
