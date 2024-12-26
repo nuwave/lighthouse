@@ -15,7 +15,7 @@ class ModelBinding
     /**
      * @param \Nuwave\Lighthouse\Bind\BindDefinition<\Illuminate\Database\Eloquent\Model> $definition
      */
-    public function __invoke(mixed $value, BindDefinition $definition): Model|EloquentCollection|null
+    public function __invoke(int|string|array $value, BindDefinition $definition): Model|EloquentCollection|null
     {
         $binding = $definition->class::query()
             ->with($definition->with)

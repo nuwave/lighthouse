@@ -4,7 +4,6 @@ namespace Tests\Integration\Bind;
 
 use GraphQL\Error\Error;
 use Illuminate\Database\MultipleRecordsFoundException;
-use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Testing\MocksResolvers;
 use Nuwave\Lighthouse\Testing\UsesTestSchema;
@@ -32,18 +31,17 @@ final class BindDirectiveTest extends DBTestCase
             }
             GRAPHQL;
 
-        $makeRequest = fn () => $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $this->expectExceptionObject(new DefinitionException(
+            '@bind argument `class` defined on `user.user` must be an existing class, received `NotAClass`.'
+        ));
+
+        $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
             query {
                 user(user: "1") {
                     id
                 }
             }
             GRAPHQL);
-
-        $this->assertThrows($makeRequest, fn (DefinitionException $exception): bool => Str::contains(
-            $exception->getMessage(),
-            'argument `user` of field `user` must be an existing class',
-        ));
     }
 
     public function testSchemaValidationFailsWhenClassArgumentDefinedOnInputFieldIsNotAClass(): void
@@ -62,7 +60,11 @@ final class BindDirectiveTest extends DBTestCase
             }
             GRAPHQL;
 
-        $makeRequest = fn () => $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $this->expectExceptionObject(new DefinitionException(
+            '@bind argument `class` defined on `RemoveUsersInput.users` must be an existing class, received `NotAClass`.'
+        ));
+
+        $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
             mutation ($input: RemoveUsersInput!) {
                 removeUsers(input: $input)
             }
@@ -73,11 +75,6 @@ final class BindDirectiveTest extends DBTestCase
                 ],
             ],
         );
-
-        $this->assertThrows($makeRequest, fn (DefinitionException $exception): bool => Str::contains(
-            $exception->getMessage(),
-            'field `users` of input `RemoveUsersInput` must be an existing class',
-        ));
     }
 
     public function testSchemaValidationFailsWhenClassArgumentDefinedOnFieldArgumentIsNotAModelOrCallableClass(): void
@@ -92,18 +89,18 @@ final class BindDirectiveTest extends DBTestCase
             }
             GRAPHQL;
 
-        $makeRequest = fn () => $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $this->expectExceptionObject(new DefinitionException(
+            '@bind argument `class` defined on `user.user` must be an ' .
+            'Eloquent model or a callable class, received `stdClass`.'
+        ));
+
+        $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
             query {
                 user(user: "1") {
                     id
                 }
             }
             GRAPHQL);
-
-        $this->assertThrows($makeRequest, fn (DefinitionException $exception): bool => Str::contains(
-            $exception->getMessage(),
-            'argument `user` of field `user` must be an Eloquent model or a callable class',
-        ));
     }
 
     public function testSchemaValidationFailsWhenClassArgumentDefinedOnInputFieldIsNotAModelOrCallableClass(): void
@@ -122,7 +119,12 @@ final class BindDirectiveTest extends DBTestCase
             }
             GRAPHQL;
 
-        $makeRequest = fn () => $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $this->expectExceptionObject(new DefinitionException(
+            '@bind argument `class` defined on `RemoveUsersInput.users` must be an ' .
+            'Eloquent model or a callable class, received `stdClass`.'
+        ));
+
+        $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
             mutation ($input: RemoveUsersInput!) {
                 removeUsers(input: $input)
             }
@@ -130,14 +132,85 @@ final class BindDirectiveTest extends DBTestCase
             [
                 'input' => [
                     'users' => ['1'],
-                ]
+                ],
             ],
         );
+    }
 
-        $this->assertThrows($makeRequest, fn (DefinitionException $exception): bool => Str::contains(
-            $exception->getMessage(),
-            'field `users` of input `RemoveUsersInput` must be an Eloquent model or a callable class',
+    public function testSchemaValidationFailsWhenValueTypeDefinedOnFieldArgumentIsNotSupported(): void
+    {
+        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+            type User {
+                id: ID!
+                type: UserType!
+            }
+            
+            enum UserType {
+                ADMINISTRATOR
+                MODERATOR
+            }
+
+            type Query {
+                usersByType(type: UserType! @bind(class: "Tests\\Utils\\Models\\User")): User! @mock
+            }
+            GRAPHQL;
+
+        $this->expectExceptionObject(new DefinitionException(
+            '@bind directive defined on `usersByType.type` does not support value of type `UserType`. ' .
+            'Expected `ID`, `String`, `Int` or a list of one of these types.'
         ));
+
+        $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+            query ($type: UserType!) {
+                usersByType(type: $type) {
+                    id
+                }
+            }
+            GRAPHQL,
+            ['type' => 'ADMINISTRATOR'],
+        );
+    }
+
+    public function testSchemaValidationFailsWhenValueTypeDefinedOnInputFieldIsNotSupported(): void
+    {
+        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+            type User {
+                id: ID!
+                type: UserType!
+            }
+            
+            enum UserType {
+                ADMINISTRATOR
+                MODERATOR
+            }
+            
+            input UsersByTypeInput {
+                type: UserType! @bind(class: "Tests\\Utils\\Models\\User")
+            }
+
+            type Query {
+                usersByType(input: UsersByTypeInput!): User! @mock
+            }
+            GRAPHQL;
+
+        $this->expectExceptionObject(new DefinitionException(
+            '@bind directive defined on `UsersByTypeInput.type` does not support value of type `UserType`. ' .
+            'Expected `ID`, `String`, `Int` or a list of one of these types.'
+        ));
+
+        $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+            query ($input: UsersByTypeInput!) {
+                usersByType(input: $input) {
+                    id
+                }
+            }
+            GRAPHQL,
+            [
+                'input' => [
+                    'type' => 'ADMINISTRATOR',
+                ],
+            ],
+        );
     }
 
     public function testModelBindingOnFieldArgument(): void

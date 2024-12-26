@@ -77,10 +77,7 @@ GRAPHQL;
         FieldDefinitionNode &$parentField,
         ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
     ): void {
-        $this->bindDefinition()->validate([
-            'argument' => $argDefinition->name->value,
-            'field' => $parentField->name->value,
-        ]);
+        $this->bindDefinition()->validate($argDefinition, $parentField);
     }
 
     public function manipulateInputFieldDefinition(
@@ -88,10 +85,7 @@ GRAPHQL;
         InputValueDefinitionNode &$inputField,
         InputObjectTypeDefinitionNode &$parentInput,
     ): void {
-        $this->bindDefinition()->validate([
-            'field' => $inputField->name->value,
-            'input' => $parentInput->name->value,
-        ]);
+        $this->bindDefinition()->validate($inputField, $parentInput);
     }
 
     public function rules(): array
@@ -117,6 +111,7 @@ GRAPHQL;
     public function transform(mixed $argumentValue, ?BindDefinition $definition = null): mixed
     {
         $definition ??= $this->bindDefinition();
+
         $bind = match ($definition->isModelBinding()) {
             true => new ModelBinding(),
             false => $this->container->make($definition->class),
