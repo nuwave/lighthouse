@@ -19,9 +19,14 @@ use Nuwave\Lighthouse\Support\Contracts\InputFieldManipulator;
 
 class BindDirective extends BaseDirective implements ArgumentValidation, ArgTransformerDirective, ArgDirectiveForArray, ArgManipulator, InputFieldManipulator
 {
+    private ?BindDefinition $definition = null;
+    private mixed $binding;
+
     public function __construct(
         private Container $container,
-    ) {}
+    ) {
+        $this->binding = new PendingBinding();
+    }
 
     public static function definition(): string
     {
@@ -52,18 +57,18 @@ directive @bind(
     
     """
     Specify whether the binding should be considered required. When required, a validation error will be thrown for 
-    the argument or any item in the argument (when the argument is an array) for which a binding instance could not be 
-    resolved. The field resolver will not be invoked in this case. When not required, the argument value will resolve
+    the argument or any item in the argument (when the argument is an array) for which a binding instance could not 
+    be resolved. The field resolver will not be invoked in this case. When optional, the argument value will resolve
     as null or, when the argument is an array, any item in the argument value will be filtered out of the collection.
     """
     required: Boolean! = true
-) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 GRAPHQL;
     }
 
     private function bindDefinition(): BindDefinition
     {
-        return new BindDefinition(
+        return $this->definition ??= new BindDefinition(
             $this->directiveArgValue('class'),
             $this->directiveArgValue('column', 'id'),
             $this->directiveArgValue('with', []),
@@ -90,10 +95,8 @@ GRAPHQL;
 
     public function rules(): array
     {
-        $definition = $this->bindDefinition();
-
-        return match ($definition->required) {
-            true => [new BindingExists($this, $definition)],
+        return match ($this->bindDefinition()->required) {
+            true => [new BindingExists($this)],
             false => [],
         };
     }
@@ -108,15 +111,22 @@ GRAPHQL;
         return null;
     }
 
-    public function transform(mixed $argumentValue, ?BindDefinition $definition = null): mixed
+    public function transform(mixed $argumentValue): mixed
     {
-        $definition ??= $this->bindDefinition();
+        // When validating required bindings, the \Nuwave\Lighthouse\Bind\Validation\BindingExists validation rule
+        // should call transform() before it is called by the directive resolver. To avoid resolving the bindings
+        // multiple times, we should remember the resolved binding and reuse it every time transform() is called.
+        if (! $this->binding instanceof PendingBinding) {
+            return $this->binding;
+        }
+
+        $definition = $this->bindDefinition();
 
         $bind = match ($definition->isModelBinding()) {
-            true => new ModelBinding(),
+            true => $this->container->make(ModelBinding::class),
             false => $this->container->make($definition->class),
         };
 
-        return $bind($argumentValue, $definition);
+        return $this->binding = $bind($argumentValue, $definition);
     }
 }

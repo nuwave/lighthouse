@@ -6,7 +6,6 @@ use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Validation\Validator;
-use Nuwave\Lighthouse\Bind\BindDefinition;
 use Nuwave\Lighthouse\Bind\BindDirective;
 
 use function is_array;
@@ -17,7 +16,6 @@ class BindingExists implements ValidationRule, ValidatorAwareRule
 
     public function __construct(
         private BindDirective $directive,
-        private BindDefinition $definition,
     ) {}
 
     public function setValidator(Validator $validator): self
@@ -32,7 +30,7 @@ class BindingExists implements ValidationRule, ValidatorAwareRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        $binding = $this->directive->transform($value, $this->definition);
+        $binding = $this->directive->transform($value);
 
         if ($binding === null) {
             $fail('validation.exists')->translate();

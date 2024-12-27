@@ -8,6 +8,7 @@ use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Testing\MocksResolvers;
 use Nuwave\Lighthouse\Testing\UsesTestSchema;
 use Tests\DBTestCase;
+use Tests\Utils\Models\Company;
 use Tests\Utils\Models\User;
 use Tests\Utils\Resolvers\SpyResolver;
 
@@ -979,6 +980,58 @@ final class BindDirectiveTest extends DBTestCase
         );
 
         $this->assertThrowsMultipleRecordsFoundException($makeRequest, $users->count());
+    }
+
+    public function testMultipleBindingsInSameRequest(): void
+    {
+        $user = factory(User::class)->create();
+        $company = factory(Company::class)->create();
+        $resolver = new SpyResolver(return: true);
+        $this->mockResolver($resolver);
+        $this->schema =  /* @lang GraphQL */ <<<'GRAPHQL'
+            type User {
+                id: ID!
+            }
+
+            type Company {
+                id: ID!
+            }
+
+            type Mutation {
+                addUserToCompany(
+                    user: ID! @bind(class: "Tests\\Utils\\Models\\User")
+                    company: ID! @bind(class: "Tests\\Utils\\Models\\Company")
+                ): Boolean! @mock
+            }
+
+            type Query {
+                ping: Boolean
+            }
+            GRAPHQL;
+
+        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+            mutation ($user: ID!, $company: ID!) {
+                addUserToCompany(user: $user, company: $company)
+            }
+            GRAPHQL,
+            [
+                'user' => $user->getKey(),
+                'company' => $company->getKey(),
+            ],
+        );
+
+        $response->assertGraphQLErrorFree();
+        $response->assertJson([
+            'data' => [
+                'addUserToCompany' => true,
+            ],
+        ]);
+        $resolver->assertArgs(function (array $args) use ($user, $company): void {
+            $this->assertArrayHasKey('user', $args);
+            $this->assertTrue($user->is($args['user']));
+            $this->assertArrayHasKey('company', $args);
+            $this->assertTrue($company->is($args['company']));
+        });
     }
 
     private function assertThrowsMultipleRecordsFoundException(callable $makeRequest, int $count): void
