@@ -12,8 +12,8 @@ use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use function class_exists;
 use function implode;
 use function in_array;
-use function is_callable;
 use function is_subclass_of;
+use function method_exists;
 use function property_exists;
 
 /**
@@ -64,7 +64,7 @@ class BindDefinition
             return;
         }
 
-        if (is_callable($this->class)) {
+        if (method_exists($this->class, '__invoke')) {
             return;
         }
 

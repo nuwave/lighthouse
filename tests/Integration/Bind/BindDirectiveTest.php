@@ -4,10 +4,12 @@ namespace Tests\Integration\Bind;
 
 use GraphQL\Error\Error;
 use Illuminate\Database\MultipleRecordsFoundException;
+use Nuwave\Lighthouse\Bind\BindDefinition;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Testing\MocksResolvers;
 use Nuwave\Lighthouse\Testing\UsesTestSchema;
 use Tests\DBTestCase;
+use Tests\Utils\Bind\SpyCallableClassBinding;
 use Tests\Utils\Models\Company;
 use Tests\Utils\Models\User;
 use Tests\Utils\Resolvers\SpyResolver;
@@ -980,6 +982,316 @@ final class BindDirectiveTest extends DBTestCase
         );
 
         $this->assertThrowsMultipleRecordsFoundException($makeRequest, $users->count());
+    }
+
+    public function testCallableClassBindingOnFieldArgument(): void
+    {
+        $user = factory(User::class)->make(['id' => 1]);
+        $this->instance(SpyCallableClassBinding::class, new SpyCallableClassBinding($user));
+        $this->mockResolver(fn (mixed $root, array $args): User => $args['user']);
+        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+            type User {
+                id: ID!
+            }
+
+            type Query {
+                user(user: ID! @bind(class: "Tests\\Utils\\Bind\\SpyCallableClassBinding")): User! @mock
+            }
+            GRAPHQL;
+
+        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+            query ($id: ID!) {
+                user(user: $id) {
+                    id
+                }
+            }
+            GRAPHQL,
+            ['id' => $user->getKey()],
+        );
+
+        $response->assertGraphQLErrorFree();
+        $response->assertJson([
+            'data' => [
+                'user' => [
+                    'id' => $user->getKey(),
+                ],
+            ],
+        ]);
+    }
+
+    public function testMissingCallableClassBindingOnFieldArgument(): void
+    {
+        $this->instance(SpyCallableClassBinding::class, new SpyCallableClassBinding(null));
+        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+            type User {
+                id: ID!
+            }
+
+            type Query {
+                user(
+                    user: ID! @bind(class: "Tests\\Utils\\Bind\\SpyCallableClassBinding")
+                ): User @mock
+            }
+            GRAPHQL;
+
+        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+            query ($id: ID!) {
+                user(user: $id) {
+                    id
+                }
+            }
+            GRAPHQL,
+            ['id' => '1'],
+        );
+
+        $response->assertOk();
+        $response->assertGraphQLValidationError('user', trans('validation.exists', ['attribute' => 'user']));
+    }
+
+    public function testMissingOptionalCallableClassBindingOnFieldArgument(): void
+    {
+        $this->instance(SpyCallableClassBinding::class, new SpyCallableClassBinding(null));
+        $this->mockResolver(fn (mixed $root, array $args) => $args['user']);
+        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+            type User {
+                id: ID!
+            }
+
+            type Query {
+                user(
+                    user: ID! @bind(class: "Tests\\Utils\\Bind\\SpyCallableClassBinding", required: false)
+                ): User @mock
+            }
+            GRAPHQL;
+
+        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+            query ($id: ID!) {
+                user(user: $id) {
+                    id
+                }
+            }
+            GRAPHQL,
+            ['id' => '1'],
+        );
+
+        $response->assertGraphQLErrorFree();
+        $response->assertJson([
+            'data' => [
+                'user' => null,
+            ],
+        ]);
+    }
+
+    public function testCallableClassBindingWithDirectiveArgumentsOnFieldArgument(): void
+    {
+        $callableClassBinding = new SpyCallableClassBinding(null);
+        $this->instance(SpyCallableClassBinding::class, $callableClassBinding);
+        $this->mockResolver(fn (mixed $root, array $args) => $args['user']);
+        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+            type User {
+                id: ID!
+            }
+
+            type Query {
+                user(
+                    user: ID! @bind(
+                        class: "Tests\\Utils\\Bind\\SpyCallableClassBinding"
+                        column: "uid"
+                        with: ["relation"]
+                        required: false
+                    )
+                ): User @mock
+            }
+            GRAPHQL;
+
+        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+            query ($id: ID!) {
+                user(user: $id) {
+                    id
+                }
+            }
+            GRAPHQL,
+            ['id' => '1'],
+        );
+
+        $response->assertGraphQLErrorFree();
+        $response->assertJson([
+            'data' => [
+                'user' => null,
+            ],
+        ]);
+        $callableClassBinding->assertCalledWith(
+            '1',
+            new BindDefinition(SpyCallableClassBinding::class, 'uid', ['relation'], false),
+        );
+    }
+
+    public function testCallableClassBindingOnInputField(): void
+    {
+        $user = factory(User::class)->make(['id' => 1]);
+        $this->instance(SpyCallableClassBinding::class, new SpyCallableClassBinding($user));
+        $this->mockResolver(fn (mixed $root, array $args): User => $args['input']['user']);
+        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+            type User {
+                id: ID!
+            }
+            
+            input UserInput {
+                user: ID! @bind(class: "Tests\\Utils\\Bind\\SpyCallableClassBinding")
+            }
+
+            type Query {
+                user(input: UserInput!): User! @mock
+            }
+            GRAPHQL;
+
+        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+            query ($input: UserInput!) {
+                user(input: $input) {
+                    id
+                }
+            }
+            GRAPHQL,
+            [
+                'input' => [
+                    'user' => $user->getKey(),
+                ],
+            ],
+        );
+
+        $response->assertGraphQLErrorFree();
+        $response->assertJson([
+            'data' => [
+                'user' => [
+                    'id' => $user->getKey(),
+                ],
+            ],
+        ]);
+    }
+
+    public function testMissingCallableClassBindingOnInputField(): void
+    {
+        $this->instance(SpyCallableClassBinding::class, new SpyCallableClassBinding(null));
+        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+            type User {
+                id: ID!
+            }
+            
+            input UserInput {
+                user: ID! @bind(class: "Tests\\Utils\\Bind\\SpyCallableClassBinding")
+            }
+
+            type Query {
+                user(input: UserInput!): User! @mock
+            }
+            GRAPHQL;
+
+        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+            query ($input: UserInput!) {
+                user(input: $input) {
+                    id
+                }
+            }
+            GRAPHQL,
+            [
+                'input' => [
+                    'user' => '1',
+                ],
+            ],
+        );
+
+        $response->assertOk();
+        $response->assertGraphQLValidationError('input.user', trans('validation.exists', ['attribute' => 'input.user']));
+    }
+
+    public function testMissingOptionalCallableClassBindingOnInputField(): void
+    {
+        $this->instance(SpyCallableClassBinding::class, new SpyCallableClassBinding(null));
+        $this->mockResolver(fn (mixed $root, array $args) => $args['input']['user']);
+        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+            type User {
+                id: ID!
+            }
+            
+            input UserInput {
+                user: ID! @bind(class: "Tests\\Utils\\Bind\\SpyCallableClassBinding", required: false)
+            }
+
+            type Query {
+                user(input: UserInput!): User @mock
+            }
+            GRAPHQL;
+
+        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+            query ($input: UserInput!) {
+                user(input: $input) {
+                    id
+                }
+            }
+            GRAPHQL,
+            [
+                'input' => [
+                    'user' => '1',
+                ],
+            ],
+        );
+
+        $response->assertGraphQLErrorFree();
+        $response->assertJson([
+            'data' => [
+                'user' => null,
+            ],
+        ]);
+    }
+
+    public function testCallableClassBindingWithDirectiveArgumentsOnInputField(): void
+    {
+        $callableClassBinding = new SpyCallableClassBinding(null);
+        $this->instance(SpyCallableClassBinding::class, $callableClassBinding);
+        $this->mockResolver(fn (mixed $root, array $args) => $args['input']['user']);
+        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+            type User {
+                id: ID!
+            }
+            
+            input UserInput {
+                user: ID! @bind(
+                    class: "Tests\\Utils\\Bind\\SpyCallableClassBinding"
+                    column: "uid"
+                    with: ["relation"]
+                    required: false
+                )
+            }
+
+            type Query {
+                user(input: UserInput!): User @mock
+            }
+            GRAPHQL;
+
+        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+            query ($input: UserInput!) {
+                user(input: $input) {
+                    id
+                }
+            }
+            GRAPHQL,
+            [
+                'input' => [
+                    'user' => '1',
+                ],
+            ],
+        );
+
+        $response->assertGraphQLErrorFree();
+        $response->assertJson([
+            'data' => [
+                'user' => null,
+            ],
+        ]);
+        $callableClassBinding->assertCalledWith(
+            '1',
+            new BindDefinition(SpyCallableClassBinding::class, 'uid', ['relation'], false),
+        );
     }
 
     public function testMultipleBindingsInSameRequest(): void
