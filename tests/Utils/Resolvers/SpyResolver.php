@@ -9,6 +9,9 @@ use function is_callable;
  */
 final class SpyResolver
 {
+    /**
+     * @var array<string, mixed>
+     */
     private array $args = [];
 
     /**
@@ -19,6 +22,7 @@ final class SpyResolver
     ) {}
 
     /**
+     * @param array<string, mixed> $args
      * @return TReturn
      */
     public function __invoke(mixed $root, array $args): mixed

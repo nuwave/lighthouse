@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Bind;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
+use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\TypeNode;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
@@ -17,7 +18,7 @@ use function method_exists;
 use function property_exists;
 
 /**
- * @template TClass
+ * @template-covariant TClass of object
  * @property-read class-string<TClass> $class
  * @property-read string $column
  * @property-read array<string> $with
@@ -80,7 +81,11 @@ class BindDefinition
             return $this->valueType($typeNode->type);
         }
 
-        return $typeNode->name->value;
+        if ($typeNode instanceof NamedTypeNode) {
+            return $typeNode->name->value;
+        }
+
+        return '';
     }
 
     public function isModelBinding(): bool

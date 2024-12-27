@@ -11,6 +11,10 @@ use PHPUnit\Framework\Assert;
 final class SpyCallableClassBinding
 {
     private mixed $value = null;
+
+    /**
+     * @var \Nuwave\Lighthouse\Bind\BindDefinition<object>|null
+     */
     private ?BindDefinition $definition = null;
 
     /**
@@ -21,6 +25,7 @@ final class SpyCallableClassBinding
     ) {}
 
     /**
+     * @param \Nuwave\Lighthouse\Bind\BindDefinition<object> $definition
      * @return TReturn
      */
     public function __invoke(mixed $value, BindDefinition $definition): mixed
@@ -31,6 +36,9 @@ final class SpyCallableClassBinding
         return $this->return;
     }
 
+    /**
+     * @param \Nuwave\Lighthouse\Bind\BindDefinition<object> $definition
+     */
     public function assertCalledWith(mixed $value, BindDefinition $definition): void
     {
         Assert::assertSame($value, $this->value);

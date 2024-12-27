@@ -26,7 +26,7 @@ class BindingExists implements ValidationRule, ValidatorAwareRule
     }
 
     /**
-     * @param callable(string): \Illuminate\Translation\PotentiallyTranslatedString $fail
+     * @param \Closure(string): \Illuminate\Translation\PotentiallyTranslatedString $fail
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
@@ -47,7 +47,7 @@ class BindingExists implements ValidationRule, ValidatorAwareRule
                 continue;
             }
 
-            $this->validator->addFailure("$attribute.$key", 'exists');
+            $this->validator?->addFailure("$attribute.$key", 'exists');
         }
     }
 }

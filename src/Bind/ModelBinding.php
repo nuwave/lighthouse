@@ -13,7 +13,9 @@ use function is_array;
 class ModelBinding
 {
     /**
+     * @param int|string|array<int|string> $value
      * @param \Nuwave\Lighthouse\Bind\BindDefinition<\Illuminate\Database\Eloquent\Model> $definition
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection<string, \Illuminate\Database\Eloquent\Model>|null
      */
     public function __invoke(int|string|array $value, BindDefinition $definition): Model|EloquentCollection|null
     {
@@ -30,7 +32,7 @@ class ModelBinding
     }
 
     /**
-     * @param \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model> $results
+     * @param \Illuminate\Database\Eloquent\Collection<int, \Illuminate\Database\Eloquent\Model> $results
      */
     private function modelInstance(EloquentCollection $results): ?Model
     {
@@ -45,8 +47,11 @@ class ModelBinding
      * Binding collections should be returned with the original values
      * as keys to allow us to validate the binding when non-optional.
      * @see \Nuwave\Lighthouse\Bind\BindDirective::rules()
-     * @param \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model> $results
-     * @return \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>
+     *
+     * @param \Illuminate\Database\Eloquent\Collection<int, \Illuminate\Database\Eloquent\Model> $results
+     * @param \Illuminate\Support\Collection<int, mixed> $values
+     * @param \Nuwave\Lighthouse\Bind\BindDefinition<\Illuminate\Database\Eloquent\Model> $definition
+     * @return \Illuminate\Database\Eloquent\Collection<string, \Illuminate\Database\Eloquent\Model>
      */
     private function modelCollection(
         EloquentCollection $results,
