@@ -460,6 +460,153 @@ type RoleEdge {
 }
 ```
 
+## @bind
+
+```graphql
+"""
+Automatically inject (model) instances directly into a resolver's arguments. For example, instead of
+injecting a user's ID, you can inject the entire User model instance that matches the given ID.
+
+This is a GraphQL analogue for Laravel's Route Binding.
+"""
+directive @bind(
+  """
+  Specify the class name of the binding to use. This can be either an Eloquent 
+  model or callable class to bind any other instance than a model.
+  """
+  class: String!
+  
+  """
+  Specify the column name of a unique identifier to use when binding Eloquent models.
+  By default, "id" is used the the primary key column.
+  """
+  column: String! = "id"
+  
+  """
+  Specify the relations to eager-load when binding Eloquent models.
+  """
+  with: [String!]! = []
+  
+  """
+  Specify whether the binding should be considered required. When required, a validation error will be thrown for 
+  the argument or any item in the argument (when the argument is an array) for which a binding instance could not 
+  be resolved. The field resolver will not be invoked in this case. When optional, the argument value will resolve
+  as null or, when the argument is an array, any item in the argument value will be filtered out of the collection.
+  """
+  required: Boolean! = true
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
+
+Resolver model binding (like [Route Model Binding](https://laravel.com/docs/11.x/routing#route-model-binding)) allows to
+inject instances directly into a resolver's arguments instead of the provided scalar identifier, eliminating the need to
+manually query for the instance inside the resolver.
+
+### Basic usage
+
+```graphql
+type Mutation {
+    addUserToCompany(
+        user: ID! @bind(class: "App\\Models\\User")
+        company: ID! @bind(class: "App\\Models\\Company")
+    ): Boolean!
+}
+```
+
+```php
+<?php
+
+namespace App\Http\GraphQL\Mutations;
+
+class AddUserToCompany
+{
+    /**
+     * @param array{user: \App\Models\User, company: \App\Models\Company} $args
+     */
+    public function __invoke(mixed $root, array $args): bool
+    {
+        return $args['user']->associate($args['company'])->save();
+    }
+}
+```
+
+### Binding instances that are not Eloquent models 
+
+To bind instances that are not Eloquent models, callable classes can be used instead:
+
+```graphql
+type Mutation {
+    updateCompanyInfo(
+        company: ID! @bind(class: "App\\Http\\GraphQL\\Bindings\\CompanyBinding")
+    ): Boolean!
+}
+```
+
+```php
+<?php
+
+namespace App\Http\GraphQL\Bindings;
+
+use App\External\Company;
+use App\External\CompanyRepository;
+use Nuwave\Lighthouse\Bind\BindDefinition;
+
+class CompanyBinding
+{
+    public function __construct(
+        private CompanyRepository $companyRepository,
+    ) {}
+    
+    public function __invoke(string $value, BindDefinition $definition): ?Company
+    {
+        if ($this->definition->required) {
+            return $this->companyRepository->findOrFail($value);
+        }
+        
+        return $this->companyRepository->find($value);
+    }
+}
+```
+
+### Binding a collection of instances
+
+When the `@bind` directive is defined on an argument or input field with an array value, it can be used to resolve a 
+collection of instances.
+
+```graphql
+type Mutation {
+    addUsersToCompany(
+        users: [ID!]! @bind(class: "App\\Models\\User")
+        company: ID! @bind(class: "App\\Models\\Company")
+    ): Boolean!
+}
+```
+
+```php
+<?php
+
+namespace App\Http\GraphQL\Mutations;
+
+class RemoveUsers
+{
+    /**
+     * @param array{
+     *     users: \Illuminate\Support\Collection<\App\Models\User>,
+     *     company: \App\Models\Company
+     * } $args
+     */
+    public function __invoke(mixed $root, array $args): bool
+    {
+        foreach ($args['users'] as $user) {
+            if (! $user->associate($args['company'])->save()) {
+                return false;
+            }
+        }
+    
+        return true;
+    }
+}
+```
+
 ## @broadcast
 
 ```graphql

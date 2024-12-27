@@ -32,8 +32,8 @@ class BindDirective extends BaseDirective implements ArgumentValidation, ArgTran
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Automatically inject (model) instances directly into a resolver argument or input field. For example, instead 
-of injecting a user's ID, you can inject the entire User model instance that matches the given ID.
+Automatically inject (model) instances directly into a resolver's arguments. For example, instead of
+injecting a user's ID, you can inject the entire User model instance that matches the given ID.
 
 This is a GraphQL analogue for Laravel's Route Binding.
 """

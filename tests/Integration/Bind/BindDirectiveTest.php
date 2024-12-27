@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Bind;
 
+use Closure;
 use GraphQL\Error\Error;
 use Illuminate\Database\MultipleRecordsFoundException;
 use Nuwave\Lighthouse\Bind\BindDefinition;
@@ -1346,7 +1347,7 @@ final class BindDirectiveTest extends DBTestCase
         });
     }
 
-    private function assertThrowsMultipleRecordsFoundException(callable $makeRequest, int $count): void
+    private function assertThrowsMultipleRecordsFoundException(Closure $makeRequest, int $count): void
     {
         $this->assertThrows($makeRequest, function (Error $exception) use ($count): bool {
             $expected = new MultipleRecordsFoundException($count);
