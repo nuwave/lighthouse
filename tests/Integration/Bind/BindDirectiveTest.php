@@ -1349,14 +1349,15 @@ final class BindDirectiveTest extends DBTestCase
 
     private function assertThrowsMultipleRecordsFoundException(Closure $makeRequest, int $count): void
     {
-        $this->assertThrows($makeRequest, function (Error $exception) use ($count): bool {
-            $expected = new MultipleRecordsFoundException($count);
+        try {
+            $makeRequest();
+        } catch (Error $error) {
+            $this->assertInstanceOf(MultipleRecordsFoundException::class, $error->getPrevious());
+            $this->assertEquals(new MultipleRecordsFoundException($count), $error->getPrevious());
 
-            if (! $exception->getPrevious() instanceof $expected) {
-                return false;
-            }
+            return;
+        }
 
-            return $exception->getMessage() === $expected->getMessage();
-        });
+        $this->fail('Request did not throw an exception.');
     }
 }

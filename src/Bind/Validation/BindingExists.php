@@ -2,15 +2,14 @@
 
 namespace Nuwave\Lighthouse\Bind\Validation;
 
-use Closure;
-use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Contracts\Validation\InvokableRule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Validation\Validator;
 use Nuwave\Lighthouse\Bind\BindDirective;
 
 use function is_array;
 
-class BindingExists implements ValidationRule, ValidatorAwareRule
+class BindingExists implements InvokableRule, ValidatorAwareRule
 {
     private ?Validator $validator = null;
 
@@ -18,17 +17,16 @@ class BindingExists implements ValidationRule, ValidatorAwareRule
         private BindDirective $directive,
     ) {}
 
-    public function setValidator(Validator $validator): self
-    {
-        $this->validator = $validator;
-
-        return $this;
-    }
-
     /**
+     * Because of backwards compatibility with Laravel 9, typehints for this method
+     * must be set through PHPDoc as the interface did not include typehints.
+     * @link https://laravel.com/docs/9.x/validation#using-rule-objects
+     *
+     * @param string $attribute
+     * @parent mixed $value
      * @param \Closure(string): \Illuminate\Translation\PotentiallyTranslatedString $fail
      */
-    public function validate(string $attribute, mixed $value, Closure $fail): void
+    public function __invoke($attribute, $value, $fail): void
     {
         $binding = $this->directive->transform($value);
 
@@ -49,5 +47,19 @@ class BindingExists implements ValidationRule, ValidatorAwareRule
 
             $this->validator?->addFailure("$attribute.$key", 'exists');
         }
+    }
+
+    /**
+     * Because of backwards compatibility with Laravel 9, typehints for this method
+     * must be set through PHPDoc as the interface did not include typehints.
+     * @link https://laravel.com/docs/9.x/validation#custom-validation-rules
+     *
+     * @param \Illuminate\Validation\Validator $validator
+     */
+    public function setValidator($validator): self
+    {
+        $this->validator = $validator;
+
+        return $this;
     }
 }
