@@ -7,25 +7,26 @@ use Generator;
 use GraphQL\Error\ClientAware;
 use GraphQL\Error\Error;
 use Illuminate\Contracts\Config\Repository;
-use Illuminate\Contracts\Debug\ExceptionHandler;
 use LogicException;
 use Nuwave\Lighthouse\Execution\ReportingErrorHandler;
-use PHPUnit\Framework\Assert;
+use Tests\FakeExceptionHandler;
 use Tests\TestCase;
-use Throwable;
 
 use function compact;
 
 final class ReportingErrorHandlerTest extends TestCase
 {
-    private ExceptionHandler $handler;
+    private FakeExceptionHandler $handler;
 
     /** @before */
     public function fakeExceptionHandling(): void
     {
         $this->afterApplicationCreated(function (): void {
             $this->withoutExceptionHandling();
-            $this->handler = $this->fakeExceptionHandler();
+            $this->handler = new FakeExceptionHandler();
+        });
+        $this->beforeApplicationDestroyed(function (): void {
+            unset($this->handler);
         });
     }
 
@@ -110,41 +111,6 @@ final class ReportingErrorHandlerTest extends TestCase
             null => $error,
             default => $previousError,
         });
-    }
-
-    private function fakeExceptionHandler(): ExceptionHandler
-    {
-        return new class implements ExceptionHandler
-        {
-            /**
-             * @var array<Throwable>
-             */
-            private array $reported = [];
-
-            public function report(Throwable $e): void
-            {
-                $this->reported[] = $e;
-            }
-
-            public function shouldReport(Throwable $e): bool
-            {
-                return true;
-            }
-
-            public function assertNothingReported(): void
-            {
-                Assert::assertEmpty($this->reported);
-            }
-
-            public function assertReported(Throwable $e): void
-            {
-                Assert::assertContainsEquals($e, $this->reported);
-            }
-
-            public function render($request, Throwable $e) {}
-
-            public function renderForConsole($output, Throwable $e) {}
-        };
     }
 
     private static function clientSafeError(bool $clientSafe): Exception
