@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Enable reporting client-safe errors https://github.com/nuwave/lighthouse/issues/2647
+
 ## v6.47.0
 
 ### Added
