@@ -12,6 +12,8 @@ use LogicException;
 use Nuwave\Lighthouse\Execution\ReportingErrorHandler;
 use Tests\TestCase;
 
+use function compact;
+
 final class ReportingErrorHandlerTest extends TestCase
 {
     /** @before */
@@ -27,13 +29,13 @@ final class ReportingErrorHandlerTest extends TestCase
         $handler = Exceptions::fake();
         $config = $this->app->make(Repository::class);
         $next = fn (?Error $error): array => match ($error) {
-            null => ['No error to report'],
+            null => ['error' => 'No error to report'],
             default => throw new LogicException('Unexpected error: ' . $error::class),
         };
 
         $result = (new ReportingErrorHandler($handler, $config))(null, $next);
 
-        $this->assertSame(['No error to report'], $result);
+        $this->assertSame(['error' => 'No error to report'], $result);
         $handler->assertReportedCount(0);
     }
 
@@ -44,31 +46,31 @@ final class ReportingErrorHandlerTest extends TestCase
     }
 
     /** @dataProvider shouldAlwaysReport */
-    public function testErrorsThatShouldAlwaysReportWithDefaultConfig(?Exception $previousError): void
+    public function testErrorsThatShouldAlwaysReportWithDefaultConfig(Exception $previousError): void
     {
         $handler = Exceptions::fake();
         $config = $this->app->make(Repository::class);
         $error = new Error(previous: $previousError);
-        $next = fn (Error $error): array => [$error];
+        $next = fn (Error $error): array => compact('error');
 
         $result = (new ReportingErrorHandler($handler, $config))($error, $next);
 
-        $this->assertSame([$error], $result);
+        $this->assertSame(compact('error'), $result);
         $handler->assertReported($previousError::class);
     }
 
     /** @dataProvider shouldAlwaysReport */
-    public function testErrorsThatShouldAlwaysReportWithReportClientSafeEnabled(?Exception $previousError): void
+    public function testErrorsThatShouldAlwaysReportWithReportClientSafeEnabled(Exception $previousError): void
     {
         $handler = Exceptions::fake();
         $config = $this->app->make(Repository::class);
         $config->set('lighthouse.report_client_safe_errors', true);
         $error = new Error(previous: $previousError);
-        $next = fn (Error $error): array => [$error];
+        $next = fn (Error $error): array => compact('error');
 
         $result = (new ReportingErrorHandler($handler, $config))($error, $next);
 
-        $this->assertSame([$error], $result);
+        $this->assertSame(compact('error'), $result);
         $handler->assertReported($previousError::class);
     }
 
@@ -84,11 +86,11 @@ final class ReportingErrorHandlerTest extends TestCase
         $handler = Exceptions::fake();
         $config = $this->app->make(Repository::class);
         $error = new Error(previous: $previousError);
-        $next = fn (Error $error): array => [$error];
+        $next = fn (Error $error): array => compact('error');
 
         $result = (new ReportingErrorHandler($handler, $config))($error, $next);
 
-        $this->assertSame([$error], $result);
+        $this->assertSame(compact('error'), $result);
         $handler->assertReportedCount(0);
     }
 
@@ -99,11 +101,11 @@ final class ReportingErrorHandlerTest extends TestCase
         $config = $this->app->make(Repository::class);
         $config->set('lighthouse.report_client_safe_errors', true);
         $error = new Error(previous: $previousError);
-        $next = fn (Error $error): array => [$error];
+        $next = fn (Error $error): array => compact('error');
 
         $result = (new ReportingErrorHandler($handler, $config))($error, $next);
 
-        $this->assertSame([$error], $result);
+        $this->assertSame(compact('error'), $result);
         $handler->assertReported(match ($previousError) {
             null => $error::class,
             default => $previousError::class,
