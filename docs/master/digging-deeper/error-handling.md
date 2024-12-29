@@ -28,6 +28,17 @@ Client-safe errors are assumed to be something that:
 
 Thus, they are typically not actionable for server developers.
 
+However, as Laravel allows to define a [minimum log level](https://laravel.com/docs/11.x/errors#exception-log-levels) 
+at which each individual log channel is triggered, you can choose to enable reporting client-safe errors through the 
+`lighthouse.php` config:
+
+```php
+'report_client_safe_errors' => env('LIGHTHOUSE_REPORT_CLIENT_SAFE_ERRORS', false),
+```
+
+When enabled, client-safe exceptions will be passed to the default Laravel exception handler, allowing you to configure
+appropriate error reporting outside of Lighthouse.
+
 ## Additional Error Information
 
 The interface [`GraphQL\Error\ProvidesExtensions`](https://github.com/webonyx/graphql-php/blob/master/src/Error/ProvidesExtensions.php)
