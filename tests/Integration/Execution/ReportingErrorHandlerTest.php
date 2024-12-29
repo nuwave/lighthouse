@@ -7,36 +7,40 @@ use Generator;
 use GraphQL\Error\ClientAware;
 use GraphQL\Error\Error;
 use Illuminate\Contracts\Config\Repository;
-use Illuminate\Support\Facades\Exceptions;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use LogicException;
 use Nuwave\Lighthouse\Execution\ReportingErrorHandler;
+use PHPUnit\Framework\Assert;
 use Tests\TestCase;
+use Throwable;
 
 use function compact;
 
 final class ReportingErrorHandlerTest extends TestCase
 {
+    private ExceptionHandler $handler;
+
     /** @before */
-    public function disableExceptionHandling(): void
+    public function fakeExceptionHandling(): void
     {
         $this->afterApplicationCreated(function (): void {
             $this->withoutExceptionHandling();
+            $this->handler = $this->fakeExceptionHandler();
         });
     }
 
     public function testHandlingWhenThereIsNoError(): void
     {
-        $handler = Exceptions::fake();
         $config = $this->app->make(Repository::class);
         $next = fn (?Error $error): array => match ($error) {
             null => ['error' => 'No error to report'],
             default => throw new LogicException('Unexpected error: ' . $error::class),
         };
 
-        $result = (new ReportingErrorHandler($handler, $config))(null, $next);
+        $result = (new ReportingErrorHandler($this->handler, $config))(null, $next);
 
         $this->assertSame(['error' => 'No error to report'], $result);
-        $handler->assertReportedCount(0);
+        $this->handler->assertNothingReported();
     }
 
     public static function shouldAlwaysReport(): Generator
@@ -48,30 +52,28 @@ final class ReportingErrorHandlerTest extends TestCase
     /** @dataProvider shouldAlwaysReport */
     public function testErrorsThatShouldAlwaysReportWithDefaultConfig(Exception $previousError): void
     {
-        $handler = Exceptions::fake();
         $config = $this->app->make(Repository::class);
         $error = new Error(previous: $previousError);
         $next = fn (Error $error): array => compact('error');
 
-        $result = (new ReportingErrorHandler($handler, $config))($error, $next);
+        $result = (new ReportingErrorHandler($this->handler, $config))($error, $next);
 
         $this->assertSame(compact('error'), $result);
-        $handler->assertReported($previousError::class);
+        $this->handler->assertReported($previousError);
     }
 
     /** @dataProvider shouldAlwaysReport */
     public function testErrorsThatShouldAlwaysReportWithReportClientSafeEnabled(Exception $previousError): void
     {
-        $handler = Exceptions::fake();
         $config = $this->app->make(Repository::class);
         $config->set('lighthouse.report_client_safe_errors', true);
         $error = new Error(previous: $previousError);
         $next = fn (Error $error): array => compact('error');
 
-        $result = (new ReportingErrorHandler($handler, $config))($error, $next);
+        $result = (new ReportingErrorHandler($this->handler, $config))($error, $next);
 
         $this->assertSame(compact('error'), $result);
-        $handler->assertReported($previousError::class);
+        $this->handler->assertReported($previousError);
     }
 
     public static function clientSafeErrors(): Generator
@@ -83,33 +85,66 @@ final class ReportingErrorHandlerTest extends TestCase
     /** @dataProvider clientSafeErrors */
     public function testClientSafeErrorsWithDefaultConfig(?Exception $previousError): void
     {
-        $handler = Exceptions::fake();
         $config = $this->app->make(Repository::class);
         $error = new Error(previous: $previousError);
         $next = fn (Error $error): array => compact('error');
 
-        $result = (new ReportingErrorHandler($handler, $config))($error, $next);
+        $result = (new ReportingErrorHandler($this->handler, $config))($error, $next);
 
         $this->assertSame(compact('error'), $result);
-        $handler->assertReportedCount(0);
+        $this->handler->assertNothingReported();
     }
 
     /** @dataProvider clientSafeErrors */
     public function testClientSafeErrorsWithReportClientSafeEnabled(?Exception $previousError): void
     {
-        $handler = Exceptions::fake();
         $config = $this->app->make(Repository::class);
         $config->set('lighthouse.report_client_safe_errors', true);
         $error = new Error(previous: $previousError);
         $next = fn (Error $error): array => compact('error');
 
-        $result = (new ReportingErrorHandler($handler, $config))($error, $next);
+        $result = (new ReportingErrorHandler($this->handler, $config))($error, $next);
 
         $this->assertSame(compact('error'), $result);
-        $handler->assertReported(match ($previousError) {
-            null => $error::class,
-            default => $previousError::class,
+        $this->handler->assertReported(match ($previousError) {
+            null => $error,
+            default => $previousError,
         });
+    }
+
+    private function fakeExceptionHandler(): ExceptionHandler
+    {
+        return new class implements ExceptionHandler
+        {
+            /**
+             * @var array<Throwable>
+             */
+            private array $reported = [];
+
+            public function report(Throwable $e): void
+            {
+                $this->reported[] = $e;
+            }
+
+            public function shouldReport(Throwable $e): bool
+            {
+                return true;
+            }
+
+            public function assertNothingReported(): void
+            {
+                Assert::assertEmpty($this->reported);
+            }
+
+            public function assertReported(Throwable $e): void
+            {
+                Assert::assertContainsEquals($e, $this->reported);
+            }
+
+            public function render($request, Throwable $e) {}
+
+            public function renderForConsole($output, Throwable $e) {}
+        };
     }
 
     private static function clientSafeError(bool $clientSafe): Exception
