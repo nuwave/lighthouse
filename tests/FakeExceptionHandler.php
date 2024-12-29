@@ -5,21 +5,18 @@ namespace Tests;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Response;
-use Throwable;
 
 final class FakeExceptionHandler implements ExceptionHandler
 {
-    /**
-     * @var array<Throwable>
-     */
+    /** @var array<\Throwable> */
     private array $reported = [];
 
-    public function report(Throwable $e): void
+    public function report(\Throwable $e): void
     {
         $this->reported[] = $e;
     }
 
-    public function shouldReport(Throwable $e): bool
+    public function shouldReport(\Throwable $e): bool
     {
         return true;
     }
@@ -29,15 +26,15 @@ final class FakeExceptionHandler implements ExceptionHandler
         Assert::assertEmpty($this->reported);
     }
 
-    public function assertReported(Throwable $e): void
+    public function assertReported(\Throwable $e): void
     {
         Assert::assertContainsEquals($e, $this->reported);
     }
 
-    public function render($request, Throwable $e): Response
+    public function render($request, \Throwable $e): Response
     {
         throw $e;
     }
 
-    public function renderForConsole($output, Throwable $e) {}
+    public function renderForConsole($output, \Throwable $e) {}
 }
