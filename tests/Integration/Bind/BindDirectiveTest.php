@@ -13,7 +13,6 @@ use Tests\DBTestCase;
 use Tests\Utils\Bind\SpyCallableClassBinding;
 use Tests\Utils\Models\Company;
 use Tests\Utils\Models\User;
-use Tests\Utils\Resolvers\SpyResolver;
 
 final class BindDirectiveTest extends DBTestCase
 {
@@ -344,8 +343,11 @@ final class BindDirectiveTest extends DBTestCase
     public function testModelBindingWithEagerLoadingOnFieldArgument(): void
     {
         $user = factory(User::class)->create();
-        $resolver = new SpyResolver(fn (mixed $root, array $args) => $args['user']);
-        $this->mockResolver($resolver);
+        $resolverArgs = [];
+        $this->mockResolver(function ($_, array $args) use (&$resolverArgs) {
+            $resolverArgs = $args;
+            return $args['user'];
+        });
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
@@ -376,10 +378,8 @@ final class BindDirectiveTest extends DBTestCase
                 ],
             ],
         ]);
-        $resolver->assertArgs(function (array $args): void {
-            $this->assertInstanceOf(User::class, $args['user']);
-            $this->assertTrue($args['user']->relationLoaded('company'));
-        });
+        $this->assertInstanceOf(User::class, $resolverArgs['user']);
+        $this->assertTrue($resolverArgs['user']->relationLoaded('company'));
     }
 
     public function testModelBindingWithTooManyResultsOnFieldArgument(): void
@@ -414,8 +414,11 @@ final class BindDirectiveTest extends DBTestCase
     public function testModelCollectionBindingOnFieldArgument(): void
     {
         $users = factory(User::class, 2)->create();
-        $resolver = new SpyResolver(return: true);
-        $this->mockResolver($resolver);
+        $resolverArgs = [];
+        $this->mockResolver(function ($_, array $args) use (&$resolverArgs) {
+            $resolverArgs = $args;
+            return true;
+        });
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
@@ -442,12 +445,10 @@ final class BindDirectiveTest extends DBTestCase
                 'removeUsers' => true,
             ],
         ]);
-        $resolver->assertArgs(function (array $args) use ($users): void {
-            $this->assertArrayHasKey('users', $args);
-            $this->assertCount($users->count(), $args['users']);
-            $users->each(function (User $user) use ($args): void {
-                $this->assertTrue($user->is($args['users'][$user->getKey()]));
-            });
+        $this->assertArrayHasKey('users', $resolverArgs);
+        $this->assertCount($users->count(), $resolverArgs['users']);
+        $users->each(function (User $user) use ($resolverArgs): void {
+            $this->assertTrue($user->is($resolverArgs['users'][$user->getKey()]));
         });
     }
 
@@ -483,8 +484,11 @@ final class BindDirectiveTest extends DBTestCase
     public function testMissingOptionalModelCollectionBindingOnFieldArgument(): void
     {
         $user = factory(User::class)->create();
-        $resolver = new SpyResolver(return: true);
-        $this->mockResolver($resolver);
+        $resolverArgs = [];
+        $this->mockResolver(function ($_, array $args) use (&$resolverArgs) {
+            $resolverArgs = $args;
+            return true;
+        });
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
@@ -513,11 +517,9 @@ final class BindDirectiveTest extends DBTestCase
                 'removeUsers' => true,
             ],
         ]);
-        $resolver->assertArgs(function (array $args) use ($user): void {
-            $this->assertArrayHasKey('users', $args);
-            $this->assertCount(1, $args['users']);
-            $this->assertTrue($user->is($args['users'][$user->getKey()]));
-        });
+        $this->assertArrayHasKey('users', $resolverArgs);
+        $this->assertCount(1, $resolverArgs['users']);
+        $this->assertTrue($user->is($resolverArgs['users'][$user->getKey()]));
     }
 
     public function testModelCollectionBindingWithTooManyResultsOnFieldArgument(): void
@@ -711,8 +713,11 @@ final class BindDirectiveTest extends DBTestCase
     public function testModelBindingWithEagerLoadingOnInputField(): void
     {
         $user = factory(User::class)->create();
-        $resolver = new SpyResolver(fn (mixed $root, array $args) => $args['input']['user']);
-        $this->mockResolver($resolver);
+        $resolverArgs = [];
+        $this->mockResolver(function ($_, array $args) use (&$resolverArgs) {
+            $resolverArgs = $args;
+            return $args['input']['user'];
+        });
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
@@ -745,14 +750,12 @@ final class BindDirectiveTest extends DBTestCase
         $response->assertJson([
             'data' => [
                 'user' => [
-                    'id' => $user->id,
+                    'id' => $user->getKey(),
                 ],
             ],
         ]);
-        $resolver->assertArgs(function (array $args): void {
-            $this->assertInstanceOf(User::class, $args['input']['user']);
-            $this->assertTrue($args['input']['user']->relationLoaded('company'));
-        });
+        $this->assertInstanceOf(User::class, $resolverArgs['input']['user']);
+        $this->assertTrue($resolverArgs['input']['user']->relationLoaded('company'));
     }
 
     public function testModelBindingWithTooManyResultsOnInputField(): void
@@ -793,8 +796,11 @@ final class BindDirectiveTest extends DBTestCase
     public function testModelCollectionBindingOnInputField(): void
     {
         $users = factory(User::class, 2)->create();
-        $resolver = new SpyResolver(return: true);
-        $this->mockResolver($resolver);
+        $resolverArgs = [];
+        $this->mockResolver(function ($_, array $args) use (&$resolverArgs) {
+            $resolverArgs = $args;
+            return true;
+        });
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
@@ -827,13 +833,11 @@ final class BindDirectiveTest extends DBTestCase
                 'removeUsers' => true,
             ],
         ]);
-        $resolver->assertArgs(function (array $args) use ($users): void {
-            $this->assertArrayHasKey('input', $args);
-            $this->assertArrayHasKey('users', $args['input']);
-            $this->assertCount($users->count(), $args['input']['users']);
-            $users->each(function (User $user) use ($args): void {
-                $this->assertTrue($user->is($args['input']['users'][$user->getKey()]));
-            });
+        $this->assertArrayHasKey('input', $resolverArgs);
+        $this->assertArrayHasKey('users', $resolverArgs['input']);
+        $this->assertCount($users->count(), $resolverArgs['input']['users']);
+        $users->each(function (User $user) use ($resolverArgs): void {
+            $this->assertTrue($user->is($resolverArgs['input']['users'][$user->getKey()]));
         });
     }
 
@@ -875,8 +879,11 @@ final class BindDirectiveTest extends DBTestCase
     public function testMissingOptionalModelCollectionBindingOnInputField(): void
     {
         $user = factory(User::class)->create();
-        $resolver = new SpyResolver(return: true);
-        $this->mockResolver($resolver);
+        $resolverArgs = [];
+        $this->mockResolver(function ($_, array $args) use (&$resolverArgs) {
+            $resolverArgs = $args;
+            return true;
+        });
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
@@ -909,12 +916,10 @@ final class BindDirectiveTest extends DBTestCase
                 'removeUsers' => true,
             ],
         ]);
-        $resolver->assertArgs(function (array $args) use ($user): void {
-            $this->assertArrayHasKey('input', $args);
-            $this->assertArrayHasKey('users', $args['input']);
-            $this->assertCount(1, $args['input']['users']);
-            $this->assertTrue($user->is($args['input']['users'][$user->getKey()]));
-        });
+        $this->assertArrayHasKey('input', $resolverArgs);
+        $this->assertArrayHasKey('users', $resolverArgs['input']);
+        $this->assertCount(1, $resolverArgs['input']['users']);
+        $this->assertTrue($user->is($resolverArgs['input']['users'][$user->getKey()]));
     }
 
     public function testModelCollectionBindingWithTooManyResultsOnInputField(): void
@@ -1264,8 +1269,11 @@ final class BindDirectiveTest extends DBTestCase
     {
         $user = factory(User::class)->create();
         $company = factory(Company::class)->create();
-        $resolver = new SpyResolver(return: true);
-        $this->mockResolver($resolver);
+        $resolverArgs = [];
+        $this->mockResolver(function ($_, array $args) use (&$resolverArgs) {
+            $resolverArgs = $args;
+            return true;
+        });
         $this->schema =  /* @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
@@ -1300,12 +1308,10 @@ final class BindDirectiveTest extends DBTestCase
                 'addUserToCompany' => true,
             ],
         ]);
-        $resolver->assertArgs(function (array $args) use ($user, $company): void {
-            $this->assertArrayHasKey('user', $args);
-            $this->assertTrue($user->is($args['user']));
-            $this->assertArrayHasKey('company', $args);
-            $this->assertTrue($company->is($args['company']));
-        });
+        $this->assertArrayHasKey('user', $resolverArgs);
+        $this->assertTrue($user->is($resolverArgs['user']));
+        $this->assertArrayHasKey('company', $resolverArgs);
+        $this->assertTrue($company->is($resolverArgs['company']));
     }
 
     private function assertThrowsMultipleRecordsFoundException(Closure $makeRequest, int $count): void
