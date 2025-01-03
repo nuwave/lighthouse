@@ -19,10 +19,9 @@ use Nuwave\Lighthouse\Support\Contracts\InputFieldManipulator;
 
 class BindDirective extends BaseDirective implements ArgumentValidation, ArgTransformerDirective, ArgDirectiveForArray, ArgManipulator, InputFieldManipulator
 {
-    /**
-     * @var \Nuwave\Lighthouse\Bind\BindDefinition<object>|null
-     */
+    /** @var \Nuwave\Lighthouse\Bind\BindDefinition<object>|null */
     private ?BindDefinition $definition = null;
+
     private mixed $binding;
 
     public function __construct(
@@ -69,16 +68,14 @@ directive @bind(
 GRAPHQL;
     }
 
-    /**
-     * @return \Nuwave\Lighthouse\Bind\BindDefinition<object>
-     */
+    /** @return \Nuwave\Lighthouse\Bind\BindDefinition<object> */
     private function bindDefinition(): BindDefinition
     {
         return $this->definition ??= new BindDefinition(
-            $this->directiveArgValue('class'),
-            $this->directiveArgValue('column', 'id'),
-            $this->directiveArgValue('with', []),
-            $this->directiveArgValue('required', true),
+            class: $this->directiveArgValue('class'),
+            column: $this->directiveArgValue('column', 'id'),
+            with: $this->directiveArgValue('with', []),
+            required: $this->directiveArgValue('required', true),
         );
     }
 
@@ -101,10 +98,9 @@ GRAPHQL;
 
     public function rules(): array
     {
-        return match ($this->bindDefinition()->required) {
-            true => [new BindingExists($this)],
-            false => [],
-        };
+        return $this->bindDefinition()->required
+            ? [new BindingExists($this)]
+            : [];
     }
 
     public function messages(): array
@@ -128,10 +124,9 @@ GRAPHQL;
 
         $definition = $this->bindDefinition();
 
-        $bind = match ($definition->isModelBinding()) {
-            true => $this->container->make(ModelBinding::class),
-            false => $this->container->make($definition->class),
-        };
+        $bind = $definition->isModelBinding()
+            ? $this->container->make(ModelBinding::class)
+            : $this->container->make($definition->class);
 
         return $this->binding = $bind($argumentValue, $definition);
     }

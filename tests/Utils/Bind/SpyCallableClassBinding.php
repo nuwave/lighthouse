@@ -10,15 +10,11 @@ final class SpyCallableClassBinding
 {
     private mixed $value = null;
 
-    /**
-     * @var \Nuwave\Lighthouse\Bind\BindDefinition<object>|null
-     */
+    /** @var \Nuwave\Lighthouse\Bind\BindDefinition<object>|null */
     private ?BindDefinition $definition = null;
 
-    /**
-     * @param TReturn $return
-     */
     public function __construct(
+        /** @var TReturn */
         private mixed $return = null,
     ) {}
 
@@ -34,9 +30,7 @@ final class SpyCallableClassBinding
         return $this->return;
     }
 
-    /**
-     * @param \Nuwave\Lighthouse\Bind\BindDefinition<object> $definition
-     */
+    /** @param \Nuwave\Lighthouse\Bind\BindDefinition<object> $definition */
     public function assertCalledWith(mixed $value, BindDefinition $definition): void
     {
         Assert::assertSame($value, $this->value);
