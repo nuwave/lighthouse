@@ -426,11 +426,7 @@ final class BindDirectiveTest extends DBTestCase
                     users: [ID!]! @bind(class: "Tests\\Utils\\Models\\User")
                 ): Boolean! @mock
             }
-
-            type Query {
-                ping: Boolean
-            }
-            GRAPHQL;
+            GRAPHQL . self::PLACEHOLDER_QUERY;
 
         $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
             mutation ($users: [ID!]!) {
@@ -468,11 +464,7 @@ final class BindDirectiveTest extends DBTestCase
                     users: [ID!]! @bind(class: "Tests\\Utils\\Models\\User")
                 ): Boolean! @mock
             }
-
-            type Query {
-                ping: Boolean
-            }
-            GRAPHQL;
+            GRAPHQL . self::PLACEHOLDER_QUERY;
 
         $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
             mutation ($users: [ID!]!) {
@@ -503,11 +495,7 @@ final class BindDirectiveTest extends DBTestCase
                     users: [ID!]! @bind(class: "Tests\\Utils\\Models\\User", required: false)
                 ): Boolean! @mock
             }
-
-            type Query {
-                ping: Boolean
-            }
-            GRAPHQL;
+            GRAPHQL  . self::PLACEHOLDER_QUERY;
 
         $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
             mutation ($users: [ID!]!) {
@@ -546,11 +534,7 @@ final class BindDirectiveTest extends DBTestCase
                     users: [String!]! @bind(class: "Tests\\Utils\\Models\\User", column: "name")
                 ): Boolean! @mock
             }
-
-            type Query {
-                ping: Boolean
-            }
-            GRAPHQL;
+            GRAPHQL . self::PLACEHOLDER_QUERY;
 
         $makeRequest = fn () => $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
             mutation ($users: [String!]!) {
@@ -823,11 +807,7 @@ final class BindDirectiveTest extends DBTestCase
             type Mutation {
                 removeUsers(input: RemoveUsersInput!): Boolean! @mock
             }
-
-            type Query {
-                ping: Boolean
-            }
-            GRAPHQL;
+            GRAPHQL . self::PLACEHOLDER_QUERY;
 
         $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
             mutation ($input: RemoveUsersInput!) {
@@ -872,11 +852,7 @@ final class BindDirectiveTest extends DBTestCase
             type Mutation {
                 removeUsers(input: RemoveUsersInput!): Boolean! @mock
             }
-
-            type Query {
-                ping: Boolean
-            }
-            GRAPHQL;
+            GRAPHQL . self::PLACEHOLDER_QUERY;
 
         $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
             mutation ($input: RemoveUsersInput!) {
@@ -913,11 +889,7 @@ final class BindDirectiveTest extends DBTestCase
             type Mutation {
                 removeUsers(input: RemoveUsersInput!): Boolean! @mock
             }
-
-            type Query {
-                ping: Boolean
-            }
-            GRAPHQL;
+            GRAPHQL . self::PLACEHOLDER_QUERY;
 
         $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
             mutation ($input: RemoveUsersInput!) {
@@ -961,11 +933,7 @@ final class BindDirectiveTest extends DBTestCase
             type Mutation {
                 removeUsers(input: RemoveUsersInput!): Boolean! @mock
             }
-
-            type Query {
-                ping: Boolean
-            }
-            GRAPHQL;
+            GRAPHQL . self::PLACEHOLDER_QUERY;
 
         $makeRequest = fn () => $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
             mutation ($input: RemoveUsersInput!) {
@@ -1313,11 +1281,7 @@ final class BindDirectiveTest extends DBTestCase
                     company: ID! @bind(class: "Tests\\Utils\\Models\\Company")
                 ): Boolean! @mock
             }
-
-            type Query {
-                ping: Boolean
-            }
-            GRAPHQL;
+            GRAPHQL . self::PLACEHOLDER_QUERY;
 
         $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
             mutation ($user: ID!, $company: ID!) {
