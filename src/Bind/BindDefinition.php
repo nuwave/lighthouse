@@ -27,10 +27,10 @@ class BindDefinition
     ];
 
     public function __construct(
-        /** @param class-string<TClass> $class */
+        /** @var class-string<TClass> */
         public string $class,
         public string $column,
-        /** @param array<string> $with */
+        /** @var array<string> */
         public array $with,
         public bool $required,
     ) {}
