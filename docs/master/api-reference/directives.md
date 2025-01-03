@@ -599,15 +599,13 @@ final class AddUsersToCompany
      */
     public function __invoke(mixed $root, array $args): Collection
     {
-        return Collection::make($args['users'])
+        return $args['users']
             ->map(function (User $user) use ($args): ?User {
                 $user->associate($args['company']);
 
-                if (! $user->save()) {
-                    return null;
-                }
-
-                return $user;
+                return $user->save()
+                    ? $user
+                    : null;
             })
             ->filter();
     }
