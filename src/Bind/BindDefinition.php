@@ -8,7 +8,6 @@ use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 
 /**
  * @template-covariant TClass of object
@@ -19,12 +18,6 @@ use Nuwave\Lighthouse\Schema\AST\ASTHelper;
  */
 class BindDefinition
 {
-    private const SUPPORTED_VALUE_TYPES = [
-        Type::ID,
-        Type::STRING,
-        Type::INT,
-    ];
-
     public function __construct(
         /** @var class-string<TClass> */
         public string $class,
@@ -40,13 +33,6 @@ class BindDefinition
     ): void {
         $nodeName = $definitionNode->name->value;
         $parentNodeName = $parentNode->name->value;
-        $typeName = ASTHelper::getUnderlyingTypeName($definitionNode);
-
-        if (! in_array($typeName, self::SUPPORTED_VALUE_TYPES, true)) {
-            throw new DefinitionException(
-                "@bind directive defined on `{$parentNodeName}.{$nodeName}` does not support value of type `{$typeName}`. Expected `" . implode('`, `', self::SUPPORTED_VALUE_TYPES) . '` or a list of one of these types.',
-            );
-        }
 
         if (! class_exists($this->class)) {
             throw new DefinitionException(
