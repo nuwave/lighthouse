@@ -90,8 +90,7 @@ final class BindDirectiveTest extends DBTestCase
             GRAPHQL;
 
         $this->expectExceptionObject(new DefinitionException(
-            '@bind argument `class` defined on `user.user` must be an ' .
-            'Eloquent model or a callable class, received `stdClass`.'
+            '@bind argument `class` defined on `user.user` must extend Illuminate\Database\Eloquent\Model or define the method `__invoke`, but `stdClass` does neither.'
         ));
 
         $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
@@ -120,8 +119,7 @@ final class BindDirectiveTest extends DBTestCase
             GRAPHQL;
 
         $this->expectExceptionObject(new DefinitionException(
-            '@bind argument `class` defined on `RemoveUsersInput.users` must be an ' .
-            'Eloquent model or a callable class, received `stdClass`.'
+            '@bind argument `class` defined on `RemoveUsersInput.users` must extend Illuminate\Database\Eloquent\Model or define the method `__invoke`, but `stdClass` does neither.'
         ));
 
         $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
