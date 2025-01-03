@@ -289,20 +289,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Report Client-safe Errors
-    |--------------------------------------------------------------------------
-    |
-    | By default, the error handler Nuwave\Lighthouse\Execution\ReportingErrorHandler only reports non-client-safe
-    | errors through the default Laravel exception handler. However, as Laravel allows to define a minimum log
-    | level at which each individual log channel is invoked, it can sometimes be useful to push client-safe
-    | errors to the Laravel exception handler so it can determine which errors to report or not.
-    |
-    */
-
-    'report_client_safe_errors' => env('LIGHTHOUSE_REPORT_CLIENT_SAFE_ERRORS', false),
-
-    /*
-    |--------------------------------------------------------------------------
     | Field Middleware
     |--------------------------------------------------------------------------
     |
