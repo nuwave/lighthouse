@@ -513,18 +513,22 @@ type Mutation {
 ```
 
 ```php
-<?php
+namespace App\GraphQL\Mutations;
 
-namespace App\Http\GraphQL\Mutations;
-
-class AddUserToCompany
+final class AddUserToCompany
 {
     /**
-     * @param array{user: \App\Models\User, company: \App\Models\Company} $args
+     * @param array{
+     *   user: \App\Models\User, 
+     *   company: \App\Models\Company,
+     * } $args
      */
     public function __invoke(mixed $root, array $args): bool
     {
-        return $args['user']->associate($args['company'])->save();
+        $user = $args['user'];
+        $user->associate($args['company']);
+        
+        return $user->save();
     }
 }
 ```
@@ -542,15 +546,13 @@ type Mutation {
 ```
 
 ```php
-<?php
-
-namespace App\Http\GraphQL\Bindings;
+namespace App\GraphQL\Bindings;
 
 use App\External\Company;
 use App\External\CompanyRepository;
 use Nuwave\Lighthouse\Bind\BindDefinition;
 
-class CompanyBinding
+final class CompanyBinding
 {
     public function __construct(
         private CompanyRepository $companyRepository,
@@ -558,7 +560,7 @@ class CompanyBinding
     
     public function __invoke(string $value, BindDefinition $definition): ?Company
     {
-        if ($this->definition->required) {
+        if ($definition->required) {
             return $this->companyRepository->findOrFail($value);
         }
         
@@ -577,32 +579,37 @@ type Mutation {
     addUsersToCompany(
         users: [ID!]! @bind(class: "App\\Models\\User")
         company: ID! @bind(class: "App\\Models\\Company")
-    ): Boolean!
+    ): [User!]!
 }
 ```
 
 ```php
-<?php
+namespace App\GraphQL\Mutations;
 
-namespace App\Http\GraphQL\Mutations;
+use App\Models\User;
 
-class RemoveUsers
+final class AddUsersToCompany
 {
     /**
      * @param array{
-     *     users: \Illuminate\Support\Collection<\App\Models\User>,
-     *     company: \App\Models\Company
+     *     users: \Illuminate\Database\Eloquent\Collection<\App\Models\User>,
+     *     company: \App\Models\Company,
      * } $args
+     * @return \Illuminate\Database\Eloquent\Collection<\App\Models\User>
      */
-    public function __invoke(mixed $root, array $args): bool
+    public function __invoke(mixed $root, array $args): Collection
     {
-        foreach ($args['users'] as $user) {
-            if (! $user->associate($args['company'])->save()) {
-                return false;
-            }
-        }
-    
-        return true;
+        return Collection::make($args['users'])
+            ->map(function (User $user) use ($args): ?User {
+                $user->associate($args['company']);
+
+                if (! $user->save()) {
+                    return null;
+                }
+
+                return $user;
+            })
+            ->filter();
     }
 }
 ```
