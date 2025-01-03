@@ -28,16 +28,20 @@ Client-safe errors are assumed to be something that:
 
 Thus, they are typically not actionable for server developers.
 
-However, as Laravel allows to define a [minimum log level](https://laravel.com/docs/11.x/errors#exception-log-levels) 
-at which each individual log channel is triggered, you can choose to enable reporting client-safe errors through the 
-`lighthouse.php` config:
+However, as Laravel allows to define a [minimum log level](https://laravel.com/docs/errors#exception-log-levels) 
+at which each individual log channel is triggered, you can choose to report client-safe errors by replacing
+`Nuwave\Lighthouse\Execution\ReportingErrorHandler` by `Nuwave\Lighthouse\Execution\AlwaysReportingErrorHandler` 
+in the `lighthouse.php` config:
 
-```php
-'report_client_safe_errors' => env('LIGHTHOUSE_REPORT_CLIENT_SAFE_ERRORS', false),
+```diff
+'error_handlers' => [
+-    Nuwave\Lighthouse\Execution\ReportingErrorHandler::class,
++    Nuwave\Lighthouse\Execution\AlwaysReportingErrorHandler::class,
+],
 ```
 
-When enabled, client-safe exceptions will be passed to the default Laravel exception handler, allowing you to configure
-appropriate error reporting outside of Lighthouse.
+When using `Nuwave\Lighthouse\Execution\AlwaysReportingErrorHandler`, client-safe exceptions will be passed to the 
+default Laravel exception handler, allowing you to configure appropriate error reporting outside of Lighthouse.
 
 ## Additional Error Information
 
