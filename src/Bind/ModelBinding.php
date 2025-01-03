@@ -34,6 +34,10 @@ class ModelBinding
      */
     private function modelInstance(EloquentCollection $results): ?Model
     {
+        // While "too few records" errors are handled as (client-safe) validation errors by applying
+        // the `BindingExists` rule on the BindDirective depending on whether the binding is required,
+        // "too many records" should be considered as (non-client-safe) configuration errors as it
+        // means the binding was not resolved using a unique identifier.
         if ($results->count() > 1) {
             throw new MultipleRecordsFoundException($results->count());
         }
@@ -43,7 +47,7 @@ class ModelBinding
 
     /**
      * Binding collections should be returned with the original values
-     * as keys to allow us to validate the binding when non-optional.
+     * as keys to allow validating the binding when required.
      * @see \Nuwave\Lighthouse\Bind\BindDirective::rules()
      *
      * @param \Illuminate\Database\Eloquent\Collection<int, \Illuminate\Database\Eloquent\Model> $results
@@ -56,10 +60,11 @@ class ModelBinding
         IlluminateCollection $values,
         BindDefinition $definition,
     ): EloquentCollection {
+        /* @see self::modelInstance() */
         if ($results->count() > $values->unique()->count()) {
             throw new MultipleRecordsFoundException($results->count());
         }
 
-        return $results->keyby($definition->column);
+        return $results->keyBy($definition->column);
     }
 }
