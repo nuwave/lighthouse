@@ -3,12 +3,12 @@
 namespace Tests\Integration\Execution;
 
 use GraphQL\Error\Error;
-use Nuwave\Lighthouse\Execution\ReportingErrorHandler;
+use Nuwave\Lighthouse\Execution\AlwaysReportingErrorHandler;
 use Tests\FakeExceptionHandler;
 use Tests\TestCase;
 use Tests\Utils\Exceptions\ClientAwareException;
 
-final class ReportingErrorHandlerTest extends TestCase
+final class AlwaysReportingErrorHandlerTest extends TestCase
 {
     private FakeExceptionHandler $handler;
 
@@ -31,26 +31,26 @@ final class ReportingErrorHandlerTest extends TestCase
             default => throw new \LogicException('Unexpected error: ' . $error::class),
         };
 
-        $result = (new ReportingErrorHandler($this->handler))(null, $next);
+        $result = (new AlwaysReportingErrorHandler($this->handler))(null, $next);
 
         $this->assertSame(['error' => 'No error to report'], $result);
         $this->handler->assertNothingReported();
     }
 
     /** @return iterable<array{\Exception}> */
-    public static function nonClientSafe(): iterable
+    public static function nonClientSafeErrors(): iterable
     {
         yield 'Previous error is not client aware' => [new \Exception('Not client aware')];
         yield 'Previous error is not client safe' => [ClientAwareException::notClientSafe()];
     }
 
-    /** @dataProvider nonClientSafe */
+    /** @dataProvider nonClientSafeErrors */
     public function testNonClientSafeErrors(\Exception $previousError): void
     {
         $error = new Error(previous: $previousError);
         $next = fn (Error $error): array => \compact('error');
 
-        $result = (new ReportingErrorHandler($this->handler))($error, $next);
+        $result = (new AlwaysReportingErrorHandler($this->handler))($error, $next);
 
         $this->assertSame(\compact('error'), $result);
         $this->handler->assertReported($previousError);
@@ -69,9 +69,12 @@ final class ReportingErrorHandlerTest extends TestCase
         $error = new Error(previous: $previousError);
         $next = fn (Error $error): array => \compact('error');
 
-        $result = (new ReportingErrorHandler($this->handler))($error, $next);
+        $result = (new AlwaysReportingErrorHandler($this->handler))($error, $next);
 
         $this->assertSame(\compact('error'), $result);
-        $this->handler->assertNothingReported();
+        $this->handler->assertReported(match ($previousError) {
+            null => $error,
+            default => $previousError,
+        });
     }
 }

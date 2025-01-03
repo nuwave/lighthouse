@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\Execution;
 use GraphQL\Error\Error;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 
-class ReportingErrorHandler implements ErrorHandler
+class AlwaysReportingErrorHandler implements ErrorHandler
 {
     public function __construct(
         protected ExceptionHandler $exceptionHandler,
@@ -15,14 +15,6 @@ class ReportingErrorHandler implements ErrorHandler
     {
         if ($error === null) {
             return $next(null);
-        }
-
-        // Client-safe errors are assumed to be something that:
-        // - a client can understand and handle
-        // - were caused by client misuse, e.g. wrong syntax, authentication, validation
-        // Thus, they are typically not actionable for server developers.
-        if ($error->isClientSafe()) {
-            return $next($error);
         }
 
         $this->exceptionHandler->report(
