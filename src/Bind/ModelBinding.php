@@ -29,10 +29,8 @@ class ModelBinding
         return $this->modelInstance($binding);
     }
 
-    /**
-     * @param \Illuminate\Database\Eloquent\Collection<int, \Illuminate\Database\Eloquent\Model> $results
-     */
-    private function modelInstance(EloquentCollection $results): ?Model
+    /** @param \Illuminate\Database\Eloquent\Collection<int, \Illuminate\Database\Eloquent\Model> $results */
+    protected function modelInstance(EloquentCollection $results): ?Model
     {
         // While "too few records" errors are handled as (client-safe) validation errors by applying
         // the `BindingExists` rule on the BindDirective depending on whether the binding is required,
@@ -55,7 +53,7 @@ class ModelBinding
      * @param \Nuwave\Lighthouse\Bind\BindDefinition<\Illuminate\Database\Eloquent\Model> $definition
      * @return \Illuminate\Database\Eloquent\Collection<string, \Illuminate\Database\Eloquent\Model>
      */
-    private function modelCollection(
+    protected function modelCollection(
         EloquentCollection $results,
         IlluminateCollection $values,
         BindDefinition $definition,

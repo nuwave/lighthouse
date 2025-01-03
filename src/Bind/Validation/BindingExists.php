@@ -9,10 +9,10 @@ use Nuwave\Lighthouse\Bind\BindDirective;
 
 class BindingExists implements InvokableRule, ValidatorAwareRule
 {
-    private ?Validator $validator = null;
+    protected ?Validator $validator = null;
 
     public function __construct(
-        private BindDirective $directive,
+        protected BindDirective $directive,
     ) {}
 
     /**

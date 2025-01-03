@@ -20,12 +20,12 @@ use Nuwave\Lighthouse\Support\Contracts\InputFieldManipulator;
 class BindDirective extends BaseDirective implements ArgumentValidation, ArgTransformerDirective, ArgDirectiveForArray, ArgManipulator, InputFieldManipulator
 {
     /** @var \Nuwave\Lighthouse\Bind\BindDefinition<object>|null */
-    private ?BindDefinition $definition = null;
+    protected ?BindDefinition $definition = null;
 
-    private mixed $binding;
+    protected mixed $binding;
 
     public function __construct(
-        private Container $container,
+        protected Container $container,
     ) {
         $this->binding = new PendingBinding();
     }
@@ -69,7 +69,7 @@ GRAPHQL;
     }
 
     /** @return \Nuwave\Lighthouse\Bind\BindDefinition<object> */
-    private function bindDefinition(): BindDefinition
+    protected function bindDefinition(): BindDefinition
     {
         return $this->definition ??= new BindDefinition(
             class: $this->directiveArgValue('class'),
