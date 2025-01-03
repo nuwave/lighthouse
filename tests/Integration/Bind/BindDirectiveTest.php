@@ -37,7 +37,7 @@ final class BindDirectiveTest extends DBTestCase
         ));
 
         $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
-            query {
+            {
                 user(user: "1") {
                     id
                 }
@@ -96,7 +96,7 @@ final class BindDirectiveTest extends DBTestCase
         ));
 
         $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
-            query {
+            {
                 user(user: "1") {
                     id
                 }
@@ -261,7 +261,7 @@ final class BindDirectiveTest extends DBTestCase
             GRAPHQL;
 
         $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
-            query {
+            {
                 user(user: "1") {
                     id
                 }

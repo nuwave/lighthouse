@@ -43,7 +43,7 @@ class BindingExists implements InvokableRule, ValidatorAwareRule
                 continue;
             }
 
-            $this->validator?->addFailure("$attribute.$key", 'exists');
+            $this->validator?->addFailure("{$attribute}.{$key}", 'exists');
         }
     }
 

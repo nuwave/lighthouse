@@ -7,6 +7,7 @@ use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\TypeNode;
+use GraphQL\Type\Definition\Type;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
@@ -19,15 +20,17 @@ use Nuwave\Lighthouse\Exceptions\DefinitionException;
  */
 class BindDefinition
 {
-    private const SUPPORTED_VALUE_TYPES = ['ID', 'String', 'Int'];
+    private const SUPPORTED_VALUE_TYPES = [
+        Type::ID,
+        Type::STRING,
+        Type::INT,
+    ];
 
-    /**
-     * @param class-string<TClass> $class
-     * @param array<string> $with
-     */
     public function __construct(
+        /** @param class-string<TClass> $class */
         public string $class,
         public string $column,
+        /** @param array<string> $with */
         public array $with,
         public bool $required,
     ) {}
@@ -42,15 +45,13 @@ class BindDefinition
 
         if (! in_array($valueType, self::SUPPORTED_VALUE_TYPES, true)) {
             throw new DefinitionException(
-                "@bind directive defined on `$parentNodeName.$nodeName` does not support value of type `$valueType`. " .
-                "Expected `" . implode('`, `', self::SUPPORTED_VALUE_TYPES) . '` or a list of one of these types.'
+                "@bind directive defined on `{$parentNodeName}.{$nodeName}` does not support value of type `{$valueType}`. Expected `" . implode('`, `', self::SUPPORTED_VALUE_TYPES) . '` or a list of one of these types.',
             );
         }
 
         if (! class_exists($this->class)) {
             throw new DefinitionException(
-                "@bind argument `class` defined on `$parentNodeName.$nodeName` " .
-                "must be an existing class, received `$this->class`.",
+                "@bind argument `class` defined on `{$parentNodeName}.{$nodeName}` must be an existing class, received `{$this->class}`.",
             );
         }
 
@@ -62,9 +63,9 @@ class BindDefinition
             return;
         }
 
+        $modelClass = Model::class;
         throw new DefinitionException(
-            "@bind argument `class` defined on `$parentNodeName.$nodeName` must be " .
-            "an Eloquent model or a callable class, received `$this->class`.",
+            "@bind argument `class` defined on `{$parentNodeName}.{$nodeName}` must extend {$modelClass} or define the method `__invoke`, but `{$this->class}` does neither.",
         );
     }
 
