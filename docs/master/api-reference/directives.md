@@ -497,7 +497,7 @@ directive @bind(
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-Resolver model binding (like [Route Model Binding](https://laravel.com/docs/11.x/routing#route-model-binding)) allows to
+Resolver model binding (like [Route Model Binding](https://laravel.com/docs/routing#route-model-binding)) allows to
 inject instances directly into a resolver's arguments instead of the provided scalar identifier, eliminating the need to
 manually query for the instance inside the resolver.
 
