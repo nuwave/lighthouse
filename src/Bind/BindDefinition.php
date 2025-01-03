@@ -5,11 +5,10 @@ namespace Nuwave\Lighthouse\Bind;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
-use GraphQL\Language\AST\NamedTypeNode;
-use GraphQL\Language\AST\TypeNode;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 
 /**
  * @template-covariant TClass of object
@@ -41,11 +40,11 @@ class BindDefinition
     ): void {
         $nodeName = $definitionNode->name->value;
         $parentNodeName = $parentNode->name->value;
-        $valueType = $this->valueType($definitionNode->type);
+        $typeName = ASTHelper::getUnderlyingTypeName($definitionNode);
 
-        if (! in_array($valueType, self::SUPPORTED_VALUE_TYPES, true)) {
+        if (! in_array($typeName, self::SUPPORTED_VALUE_TYPES, true)) {
             throw new DefinitionException(
-                "@bind directive defined on `{$parentNodeName}.{$nodeName}` does not support value of type `{$valueType}`. Expected `" . implode('`, `', self::SUPPORTED_VALUE_TYPES) . '` or a list of one of these types.',
+                "@bind directive defined on `{$parentNodeName}.{$nodeName}` does not support value of type `{$typeName}`. Expected `" . implode('`, `', self::SUPPORTED_VALUE_TYPES) . '` or a list of one of these types.',
             );
         }
 
@@ -67,19 +66,6 @@ class BindDefinition
         throw new DefinitionException(
             "@bind argument `class` defined on `{$parentNodeName}.{$nodeName}` must extend {$modelClass} or define the method `__invoke`, but `{$this->class}` does neither.",
         );
-    }
-
-    private function valueType(TypeNode $typeNode): string
-    {
-        if (property_exists($typeNode, 'type')) {
-            return $this->valueType($typeNode->type);
-        }
-
-        if ($typeNode instanceof NamedTypeNode) {
-            return $typeNode->name->value;
-        }
-
-        return '';
     }
 
     public function isModelBinding(): bool
