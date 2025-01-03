@@ -32,9 +32,12 @@ class CountModelsLoader implements ModelsLoader
          */
         $countAttributeName = Str::snake("{$relationName}_count");
 
-        $count = (int) $model->getAttribute($countAttributeName);
-        assert(is_int($count), 'avoid runtime check in production since the return type validates this anyway');
+        $count = $model->getAttribute($countAttributeName);
+        if (! is_numeric($count)) {
+            $nonNumericCount = Utils::printSafe($count);
+            throw new \Exception('Expected numeric count, got: {$nonNumericCount}.");
+        }
 
-        return $count;
+        return (int) $count;
     }
 }
