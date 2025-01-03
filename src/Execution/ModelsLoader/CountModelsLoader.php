@@ -35,7 +35,7 @@ class CountModelsLoader implements ModelsLoader
         $count = $model->getAttribute($countAttributeName);
         if (! is_numeric($count)) {
             $nonNumericCount = Utils::printSafe($count);
-            throw new \Exception('Expected numeric count, got: {$nonNumericCount}.");
+            throw new \Exception("Expected numeric count, got: {$nonNumericCount}.");
         }
 
         return (int) $count;
