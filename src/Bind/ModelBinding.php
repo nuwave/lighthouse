@@ -8,8 +8,6 @@ use Illuminate\Database\MultipleRecordsFoundException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as IlluminateCollection;
 
-use function is_array;
-
 class ModelBinding
 {
     /**

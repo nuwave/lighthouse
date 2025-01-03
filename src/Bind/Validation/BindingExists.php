@@ -7,8 +7,6 @@ use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Validation\Validator;
 use Nuwave\Lighthouse\Bind\BindDirective;
 
-use function is_array;
-
 class BindingExists implements InvokableRule, ValidatorAwareRule
 {
     private ?Validator $validator = null;

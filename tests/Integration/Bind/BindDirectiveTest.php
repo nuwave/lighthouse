@@ -15,9 +15,6 @@ use Tests\Utils\Models\Company;
 use Tests\Utils\Models\User;
 use Tests\Utils\Resolvers\SpyResolver;
 
-use function factory;
-use function trans;
-
 final class BindDirectiveTest extends DBTestCase
 {
     use UsesTestSchema;

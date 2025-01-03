@@ -10,13 +10,6 @@ use GraphQL\Language\AST\TypeNode;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
-use function class_exists;
-use function implode;
-use function in_array;
-use function is_subclass_of;
-use function method_exists;
-use function property_exists;
-
 /**
  * @template-covariant TClass of object
  * @property-read class-string<TClass> $class
