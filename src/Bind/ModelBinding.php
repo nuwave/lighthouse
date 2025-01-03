@@ -60,7 +60,7 @@ class ModelBinding
         IlluminateCollection $values,
         BindDefinition $definition,
     ): EloquentCollection {
-        /* @see self::modelInstance() */
+        /** @see self::modelInstance() */
         if ($results->count() > $values->unique()->count()) {
             throw new MultipleRecordsFoundException($results->count());
         }

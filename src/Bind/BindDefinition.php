@@ -5,17 +5,10 @@ namespace Nuwave\Lighthouse\Bind;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
-use GraphQL\Type\Definition\Type;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
-/**
- * @template-covariant TClass of object
- * @property-read class-string<TClass> $class
- * @property-read string $column
- * @property-read array<string> $with
- * @property-read bool $optional
- */
+/** @template-covariant TClass of object */
 class BindDefinition
 {
     public function __construct(
