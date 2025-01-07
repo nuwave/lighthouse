@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Execution\ModelsLoader;
 
+use GraphQL\Utils\Utils;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
