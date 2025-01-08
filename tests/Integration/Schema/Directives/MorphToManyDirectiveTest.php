@@ -203,7 +203,7 @@ final class MorphToManyDirectiveTest extends DBTestCase
         $post->user()->associate($user);
         $post->save();
 
-        /** @var \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\Tag> $postTags */
+        /** @var \Illuminate\Database\Eloquent\Collection<array-key, \Tests\Utils\Models\Tag> $postTags */
         $postTags = factory(Tag::class, 3)
             ->create()
             ->map(static function (Tag $tag) use ($post): Tag {
@@ -217,7 +217,7 @@ final class MorphToManyDirectiveTest extends DBTestCase
         $task->user()->associate($user);
         $task->save();
 
-        /** @var \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\Tag> $taskTags */
+        /** @var \Illuminate\Database\Eloquent\Collection<array-key, \Tests\Utils\Models\Tag> $taskTags */
         $taskTags = factory(Tag::class, 3)
             ->create()
             ->map(static function (Tag $tag) use ($task): Tag {
