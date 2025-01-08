@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.47.1
+
+### Fixed
+
+- Cast model count to `int` in `CountModelsLoader` https://github.com/nuwave/lighthouse/pull/2646
+
 ## v6.47.0
 
 ### Added
