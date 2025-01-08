@@ -27,7 +27,7 @@ class CountModelsLoader implements ModelsLoader
     public static function extractCount(Model $model, string $relationName): int
     {
         /**
-         * This is the name that Eloquent gives to the attribute that contains the count.
+         * This is the name that Eloquent gives to the attribute that contains the count 
          *
          * @see \Illuminate\Database\Eloquent\Concerns\QueriesRelationships::withCount()
          */
