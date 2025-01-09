@@ -13,6 +13,7 @@ use Illuminate\Redis\RedisServiceProvider;
 use Laravel\Scout\ScoutServiceProvider as LaravelScoutServiceProvider;
 use Nuwave\Lighthouse\Async\AsyncServiceProvider;
 use Nuwave\Lighthouse\Auth\AuthServiceProvider as LighthouseAuthServiceProvider;
+use Nuwave\Lighthouse\Bind\BindServiceProvider;
 use Nuwave\Lighthouse\Cache\CacheServiceProvider;
 use Nuwave\Lighthouse\CacheControl\CacheControlServiceProvider;
 use Nuwave\Lighthouse\GlobalId\GlobalIdServiceProvider;
@@ -81,6 +82,7 @@ GRAPHQL;
             LighthouseServiceProvider::class,
             AsyncServiceProvider::class,
             LighthouseAuthServiceProvider::class,
+            BindServiceProvider::class,
             CacheServiceProvider::class,
             CacheControlServiceProvider::class,
             GlobalIdServiceProvider::class,
