@@ -18,11 +18,14 @@ class BindingExists implements InvokableRule, ValidatorAwareRule
     /**
      * Because of backwards compatibility with Laravel 9, typehints for this method
      * must be set through PHPDoc as the interface did not include typehints.
-     * @link https://laravel.com/docs/9.x/validation#using-rule-objects
      *
-     * @param string $attribute
+     * @see https://laravel.com/docs/9.x/validation#using-rule-objects
+     *
+     * @param  string  $attribute
+     *
      * @parent mixed $value
-     * @param \Closure(string): \Illuminate\Translation\PotentiallyTranslatedString $fail
+     *
+     * @param  \Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail
      */
     public function __invoke($attribute, $value, $fail): void
     {
@@ -50,9 +53,10 @@ class BindingExists implements InvokableRule, ValidatorAwareRule
     /**
      * Because of backwards compatibility with Laravel 9, typehints for this method
      * must be set through PHPDoc as the interface did not include typehints.
-     * @link https://laravel.com/docs/9.x/validation#custom-validation-rules
      *
-     * @param \Illuminate\Validation\Validator $validator
+     * @see https://laravel.com/docs/9.x/validation#custom-validation-rules
+     *
+     * @param  \Illuminate\Validation\Validator  $validator
      */
     public function setValidator($validator): self
     {

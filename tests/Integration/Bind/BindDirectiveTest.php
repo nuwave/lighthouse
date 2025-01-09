@@ -2,9 +2,9 @@
 
 namespace Tests\Integration\Bind;
 
-use Closure;
 use GraphQL\Error\Error;
 use Illuminate\Database\MultipleRecordsFoundException;
+use Illuminate\Testing\TestResponse;
 use Nuwave\Lighthouse\Bind\BindDefinition;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Testing\MocksResolvers;
@@ -32,9 +32,8 @@ final class BindDirectiveTest extends DBTestCase
             GRAPHQL;
 
         $this->expectExceptionObject(new DefinitionException(
-            '@bind argument `class` defined on `user.user` must be an existing class, received `NotAClass`.'
+            '@bind argument `class` defined on `user.user` must be an existing class, received `NotAClass`.',
         ));
-
         $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
             {
                 user(user: "1") {
@@ -61,9 +60,8 @@ final class BindDirectiveTest extends DBTestCase
             GRAPHQL;
 
         $this->expectExceptionObject(new DefinitionException(
-            '@bind argument `class` defined on `RemoveUsersInput.users` must be an existing class, received `NotAClass`.'
+            '@bind argument `class` defined on `RemoveUsersInput.users` must be an existing class, received `NotAClass`.',
         ));
-
         $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
             mutation ($input: RemoveUsersInput!) {
                 removeUsers(input: $input)
@@ -90,9 +88,8 @@ final class BindDirectiveTest extends DBTestCase
             GRAPHQL;
 
         $this->expectExceptionObject(new DefinitionException(
-            '@bind argument `class` defined on `user.user` must extend Illuminate\Database\Eloquent\Model or define the method `__invoke`, but `stdClass` does neither.'
+            '@bind argument `class` defined on `user.user` must extend Illuminate\Database\Eloquent\Model or define the method `__invoke`, but `stdClass` does neither.',
         ));
-
         $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
             {
                 user(user: "1") {
@@ -119,9 +116,8 @@ final class BindDirectiveTest extends DBTestCase
             GRAPHQL;
 
         $this->expectExceptionObject(new DefinitionException(
-            '@bind argument `class` defined on `RemoveUsersInput.users` must extend Illuminate\Database\Eloquent\Model or define the method `__invoke`, but `stdClass` does neither.'
+            '@bind argument `class` defined on `RemoveUsersInput.users` must extend Illuminate\Database\Eloquent\Model or define the method `__invoke`, but `stdClass` does neither.',
         ));
-
         $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
             mutation ($input: RemoveUsersInput!) {
                 removeUsers(input: $input)
@@ -138,7 +134,9 @@ final class BindDirectiveTest extends DBTestCase
     public function testModelBindingOnFieldArgument(): void
     {
         $user = factory(User::class)->create();
+
         $this->mockResolver(fn (mixed $root, array $args): User => $args['user']);
+
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
@@ -158,7 +156,6 @@ final class BindDirectiveTest extends DBTestCase
             GRAPHQL,
             ['id' => $user->getKey()],
         );
-
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [
@@ -188,7 +185,6 @@ final class BindDirectiveTest extends DBTestCase
                 }
             }
             GRAPHQL);
-
         $response->assertOk();
         $response->assertGraphQLValidationError('user', trans('validation.exists', ['attribute' => 'user']));
     }
@@ -217,7 +213,6 @@ final class BindDirectiveTest extends DBTestCase
             GRAPHQL,
             ['id' => '1'],
         );
-
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [
@@ -229,7 +224,9 @@ final class BindDirectiveTest extends DBTestCase
     public function testModelBindingByColumnOnFieldArgument(): void
     {
         $user = factory(User::class)->create();
+
         $this->mockResolver(fn (mixed $root, array $args) => $args['user']);
+
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
@@ -251,7 +248,6 @@ final class BindDirectiveTest extends DBTestCase
             GRAPHQL,
             ['email' => $user->email],
         );
-
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [
@@ -265,11 +261,14 @@ final class BindDirectiveTest extends DBTestCase
     public function testModelBindingWithEagerLoadingOnFieldArgument(): void
     {
         $user = factory(User::class)->create();
+
         $resolverArgs = [];
-        $this->mockResolver(function ($_, array $args) use (&$resolverArgs) {
+        $this->mockResolver(static function ($_, array $args) use (&$resolverArgs) {
             $resolverArgs = $args;
+
             return $args['user'];
         });
+
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
@@ -291,7 +290,6 @@ final class BindDirectiveTest extends DBTestCase
             GRAPHQL,
             ['id' => $user->getKey()],
         );
-
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [
@@ -300,6 +298,7 @@ final class BindDirectiveTest extends DBTestCase
                 ],
             ],
         ]);
+
         $this->assertInstanceOf(User::class, $resolverArgs['user']);
         $this->assertTrue($resolverArgs['user']->relationLoaded('company'));
     }
@@ -307,7 +306,9 @@ final class BindDirectiveTest extends DBTestCase
     public function testModelBindingWithTooManyResultsOnFieldArgument(): void
     {
         $this->rethrowGraphQLErrors();
+
         $users = factory(User::class, 2)->create(['name' => 'John Doe']);
+
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
@@ -320,7 +321,7 @@ final class BindDirectiveTest extends DBTestCase
             }
             GRAPHQL;
 
-        $makeRequest = fn () => $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $makeRequest = fn (): TestResponse => $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
             query ($name: String!) {
                 user(user: $name) {
                     id
@@ -329,18 +330,20 @@ final class BindDirectiveTest extends DBTestCase
             GRAPHQL,
             ['name' => $users->first()->name],
         );
-
         $this->assertThrowsMultipleRecordsFoundException($makeRequest, $users->count());
     }
 
     public function testModelCollectionBindingOnFieldArgument(): void
     {
         $users = factory(User::class, 2)->create();
+
         $resolverArgs = [];
-        $this->mockResolver(function ($_, array $args) use (&$resolverArgs) {
+        $this->mockResolver(static function ($_, array $args) use (&$resolverArgs): bool {
             $resolverArgs = $args;
+
             return true;
         });
+
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
@@ -360,13 +363,13 @@ final class BindDirectiveTest extends DBTestCase
             GRAPHQL,
             ['users' => $users->map(fn (User $user): int => $user->getKey())],
         );
-
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [
                 'removeUsers' => true,
             ],
         ]);
+
         $this->assertArrayHasKey('users', $resolverArgs);
         $this->assertCount($users->count(), $resolverArgs['users']);
         $users->each(function (User $user) use ($resolverArgs): void {
@@ -377,6 +380,7 @@ final class BindDirectiveTest extends DBTestCase
     public function testMissingModelCollectionBindingOnFieldArgument(): void
     {
         $user = factory(User::class)->create();
+
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
@@ -398,7 +402,6 @@ final class BindDirectiveTest extends DBTestCase
                 'users' => [$user->getKey(), '10'],
             ],
         );
-
         $response->assertOk();
         $response->assertGraphQLValidationError('users.1', trans('validation.exists', ['attribute' => 'users.1']));
     }
@@ -406,11 +409,14 @@ final class BindDirectiveTest extends DBTestCase
     public function testMissingOptionalModelCollectionBindingOnFieldArgument(): void
     {
         $user = factory(User::class)->create();
+
         $resolverArgs = [];
-        $this->mockResolver(function ($_, array $args) use (&$resolverArgs) {
+        $this->mockResolver(static function ($_, array $args) use (&$resolverArgs): bool {
             $resolverArgs = $args;
+
             return true;
         });
+
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
@@ -421,7 +427,7 @@ final class BindDirectiveTest extends DBTestCase
                     users: [ID!]! @bind(class: "Tests\\Utils\\Models\\User", required: false)
                 ): Boolean! @mock
             }
-            GRAPHQL  . self::PLACEHOLDER_QUERY;
+            GRAPHQL . self::PLACEHOLDER_QUERY;
 
         $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
             mutation ($users: [ID!]!) {
@@ -432,13 +438,13 @@ final class BindDirectiveTest extends DBTestCase
                 'users' => [$user->getKey(), '10'],
             ],
         );
-
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [
                 'removeUsers' => true,
             ],
         ]);
+
         $this->assertArrayHasKey('users', $resolverArgs);
         $this->assertCount(1, $resolverArgs['users']);
         $this->assertTrue($user->is($resolverArgs['users'][$user->getKey()]));
@@ -447,7 +453,9 @@ final class BindDirectiveTest extends DBTestCase
     public function testModelCollectionBindingWithTooManyResultsOnFieldArgument(): void
     {
         $this->rethrowGraphQLErrors();
+
         $users = factory(User::class, 2)->create(['name' => 'John Doe']);
+
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
@@ -460,7 +468,7 @@ final class BindDirectiveTest extends DBTestCase
             }
             GRAPHQL . self::PLACEHOLDER_QUERY;
 
-        $makeRequest = fn () => $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $makeRequest = fn (): TestResponse => $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
             mutation ($users: [String!]!) {
                 removeUsers(users: $users)
             }
@@ -469,14 +477,15 @@ final class BindDirectiveTest extends DBTestCase
                 'users' => [$users->first()->name],
             ],
         );
-
         $this->assertThrowsMultipleRecordsFoundException($makeRequest, $users->count());
     }
 
     public function testModelBindingOnInputField(): void
     {
         $user = factory(User::class)->create();
+
         $this->mockResolver(fn (mixed $root, array $args): User => $args['input']['user']);
+
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
@@ -504,7 +513,6 @@ final class BindDirectiveTest extends DBTestCase
                 ],
             ],
         );
-
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [
@@ -544,7 +552,6 @@ final class BindDirectiveTest extends DBTestCase
                 ],
             ],
         );
-
         $response->assertOk();
         $response->assertGraphQLValidationError('input.user', trans('validation.exists', [
             'attribute' => 'input.user',
@@ -554,6 +561,7 @@ final class BindDirectiveTest extends DBTestCase
     public function testMissingOptionalModelBindingOnInputField(): void
     {
         $this->mockResolver(fn (mixed $root, array $args) => $args['input']['user']);
+
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
@@ -581,7 +589,6 @@ final class BindDirectiveTest extends DBTestCase
                 ],
             ],
         );
-
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [
@@ -593,7 +600,9 @@ final class BindDirectiveTest extends DBTestCase
     public function testModelBindingByColumnOnInputField(): void
     {
         $user = factory(User::class)->create();
+
         $this->mockResolver(fn (mixed $root, array $args) => $args['input']['user']);
+
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
@@ -621,7 +630,6 @@ final class BindDirectiveTest extends DBTestCase
                 ],
             ],
         );
-
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [
@@ -635,11 +643,14 @@ final class BindDirectiveTest extends DBTestCase
     public function testModelBindingWithEagerLoadingOnInputField(): void
     {
         $user = factory(User::class)->create();
+
         $resolverArgs = [];
-        $this->mockResolver(function ($_, array $args) use (&$resolverArgs) {
+        $this->mockResolver(static function ($_, array $args) use (&$resolverArgs) {
             $resolverArgs = $args;
+
             return $args['input']['user'];
         });
+
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
@@ -667,7 +678,6 @@ final class BindDirectiveTest extends DBTestCase
                 ],
             ],
         );
-
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [
@@ -676,6 +686,7 @@ final class BindDirectiveTest extends DBTestCase
                 ],
             ],
         ]);
+
         $this->assertInstanceOf(User::class, $resolverArgs['input']['user']);
         $this->assertTrue($resolverArgs['input']['user']->relationLoaded('company'));
     }
@@ -683,7 +694,9 @@ final class BindDirectiveTest extends DBTestCase
     public function testModelBindingWithTooManyResultsOnInputField(): void
     {
         $this->rethrowGraphQLErrors();
+
         $users = factory(User::class, 2)->create(['name' => 'Jane Doe']);
+
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
@@ -698,7 +711,7 @@ final class BindDirectiveTest extends DBTestCase
             }
             GRAPHQL;
 
-        $makeRequest = fn () => $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $makeRequest = fn (): TestResponse => $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
             query ($input: UserInput!) {
                 user(input: $input) {
                     id
@@ -711,18 +724,20 @@ final class BindDirectiveTest extends DBTestCase
                 ],
             ],
         );
-
         $this->assertThrowsMultipleRecordsFoundException($makeRequest, $users->count());
     }
 
     public function testModelCollectionBindingOnInputField(): void
     {
         $users = factory(User::class, 2)->create();
+
         $resolverArgs = [];
-        $this->mockResolver(function ($_, array $args) use (&$resolverArgs) {
+        $this->mockResolver(static function ($_, array $args) use (&$resolverArgs): bool {
             $resolverArgs = $args;
+
             return true;
         });
+
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
@@ -748,13 +763,13 @@ final class BindDirectiveTest extends DBTestCase
                 ],
             ],
         );
-
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [
                 'removeUsers' => true,
             ],
         ]);
+
         $this->assertArrayHasKey('input', $resolverArgs);
         $this->assertArrayHasKey('users', $resolverArgs['input']);
         $this->assertCount($users->count(), $resolverArgs['input']['users']);
@@ -766,6 +781,7 @@ final class BindDirectiveTest extends DBTestCase
     public function testMissingModelCollectionBindingOnInputField(): void
     {
         $user = factory(User::class)->create();
+
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
@@ -791,7 +807,6 @@ final class BindDirectiveTest extends DBTestCase
                 ],
             ],
         );
-
         $response->assertOk();
         $response->assertGraphQLValidationError('input.users.1', trans('validation.exists', [
             'attribute' => 'input.users.1',
@@ -801,11 +816,14 @@ final class BindDirectiveTest extends DBTestCase
     public function testMissingOptionalModelCollectionBindingOnInputField(): void
     {
         $user = factory(User::class)->create();
+
         $resolverArgs = [];
-        $this->mockResolver(function ($_, array $args) use (&$resolverArgs) {
+        $this->mockResolver(static function ($_, array $args) use (&$resolverArgs): bool {
             $resolverArgs = $args;
+
             return true;
         });
+
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
@@ -831,13 +849,13 @@ final class BindDirectiveTest extends DBTestCase
                 ],
             ],
         );
-
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [
                 'removeUsers' => true,
             ],
         ]);
+
         $this->assertArrayHasKey('input', $resolverArgs);
         $this->assertArrayHasKey('users', $resolverArgs['input']);
         $this->assertCount(1, $resolverArgs['input']['users']);
@@ -847,7 +865,9 @@ final class BindDirectiveTest extends DBTestCase
     public function testModelCollectionBindingWithTooManyResultsOnInputField(): void
     {
         $this->rethrowGraphQLErrors();
+
         $users = factory(User::class, 2)->create(['name' => 'Jane Doe']);
+
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
@@ -862,7 +882,7 @@ final class BindDirectiveTest extends DBTestCase
             }
             GRAPHQL . self::PLACEHOLDER_QUERY;
 
-        $makeRequest = fn () => $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $makeRequest = fn (): TestResponse => $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
             mutation ($input: RemoveUsersInput!) {
                 removeUsers(input: $input)
             }
@@ -873,7 +893,6 @@ final class BindDirectiveTest extends DBTestCase
                 ],
             ],
         );
-
         $this->assertThrowsMultipleRecordsFoundException($makeRequest, $users->count());
     }
 
@@ -881,7 +900,9 @@ final class BindDirectiveTest extends DBTestCase
     {
         $user = factory(User::class)->make(['id' => 1]);
         $this->instance(SpyCallableClassBinding::class, new SpyCallableClassBinding($user));
+
         $this->mockResolver(fn (mixed $root, array $args): User => $args['user']);
+
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
@@ -901,7 +922,6 @@ final class BindDirectiveTest extends DBTestCase
             GRAPHQL,
             ['id' => $user->getKey()],
         );
-
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [
@@ -915,6 +935,7 @@ final class BindDirectiveTest extends DBTestCase
     public function testMissingCallableClassBindingOnFieldArgument(): void
     {
         $this->instance(SpyCallableClassBinding::class, new SpyCallableClassBinding(null));
+
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
@@ -936,7 +957,6 @@ final class BindDirectiveTest extends DBTestCase
             GRAPHQL,
             ['id' => '1'],
         );
-
         $response->assertOk();
         $response->assertGraphQLValidationError('user', trans('validation.exists', ['attribute' => 'user']));
     }
@@ -944,7 +964,9 @@ final class BindDirectiveTest extends DBTestCase
     public function testMissingOptionalCallableClassBindingOnFieldArgument(): void
     {
         $this->instance(SpyCallableClassBinding::class, new SpyCallableClassBinding(null));
+
         $this->mockResolver(fn (mixed $root, array $args) => $args['user']);
+
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
@@ -966,7 +988,6 @@ final class BindDirectiveTest extends DBTestCase
             GRAPHQL,
             ['id' => '1'],
         );
-
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [
@@ -979,7 +1000,9 @@ final class BindDirectiveTest extends DBTestCase
     {
         $callableClassBinding = new SpyCallableClassBinding(null);
         $this->instance(SpyCallableClassBinding::class, $callableClassBinding);
+
         $this->mockResolver(fn (mixed $root, array $args) => $args['user']);
+
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
@@ -1006,13 +1029,13 @@ final class BindDirectiveTest extends DBTestCase
             GRAPHQL,
             ['id' => '1'],
         );
-
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [
                 'user' => null,
             ],
         ]);
+
         $callableClassBinding->assertCalledWith(
             '1',
             new BindDefinition(SpyCallableClassBinding::class, 'uid', ['relation'], false),
@@ -1023,12 +1046,14 @@ final class BindDirectiveTest extends DBTestCase
     {
         $user = factory(User::class)->make(['id' => 1]);
         $this->instance(SpyCallableClassBinding::class, new SpyCallableClassBinding($user));
+
         $this->mockResolver(fn (mixed $root, array $args): User => $args['input']['user']);
+
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
             }
-            
+
             input UserInput {
                 user: ID! @bind(class: "Tests\\Utils\\Bind\\SpyCallableClassBinding")
             }
@@ -1051,7 +1076,6 @@ final class BindDirectiveTest extends DBTestCase
                 ],
             ],
         );
-
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [
@@ -1065,11 +1089,12 @@ final class BindDirectiveTest extends DBTestCase
     public function testMissingCallableClassBindingOnInputField(): void
     {
         $this->instance(SpyCallableClassBinding::class, new SpyCallableClassBinding(null));
+
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
             }
-            
+
             input UserInput {
                 user: ID! @bind(class: "Tests\\Utils\\Bind\\SpyCallableClassBinding")
             }
@@ -1092,7 +1117,6 @@ final class BindDirectiveTest extends DBTestCase
                 ],
             ],
         );
-
         $response->assertOk();
         $response->assertGraphQLValidationError('input.user', trans('validation.exists', ['attribute' => 'input.user']));
     }
@@ -1100,12 +1124,14 @@ final class BindDirectiveTest extends DBTestCase
     public function testMissingOptionalCallableClassBindingOnInputField(): void
     {
         $this->instance(SpyCallableClassBinding::class, new SpyCallableClassBinding(null));
+
         $this->mockResolver(fn (mixed $root, array $args) => $args['input']['user']);
+
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
             }
-            
+
             input UserInput {
                 user: ID! @bind(class: "Tests\\Utils\\Bind\\SpyCallableClassBinding", required: false)
             }
@@ -1128,7 +1154,6 @@ final class BindDirectiveTest extends DBTestCase
                 ],
             ],
         );
-
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [
@@ -1141,12 +1166,14 @@ final class BindDirectiveTest extends DBTestCase
     {
         $callableClassBinding = new SpyCallableClassBinding(null);
         $this->instance(SpyCallableClassBinding::class, $callableClassBinding);
+
         $this->mockResolver(fn (mixed $root, array $args) => $args['input']['user']);
+
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
             }
-            
+
             input UserInput {
                 user: ID! @bind(
                     class: "Tests\\Utils\\Bind\\SpyCallableClassBinding"
@@ -1181,6 +1208,7 @@ final class BindDirectiveTest extends DBTestCase
                 'user' => null,
             ],
         ]);
+
         $callableClassBinding->assertCalledWith(
             '1',
             new BindDefinition(SpyCallableClassBinding::class, 'uid', ['relation'], false),
@@ -1191,11 +1219,14 @@ final class BindDirectiveTest extends DBTestCase
     {
         $user = factory(User::class)->create();
         $company = factory(Company::class)->create();
+
         $resolverArgs = [];
-        $this->mockResolver(function ($_, array $args) use (&$resolverArgs) {
+        $this->mockResolver(static function ($_, array $args) use (&$resolverArgs): bool {
             $resolverArgs = $args;
+
             return true;
         });
+
         $this->schema =  /* @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
@@ -1223,20 +1254,21 @@ final class BindDirectiveTest extends DBTestCase
                 'company' => $company->getKey(),
             ],
         );
-
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [
                 'addUserToCompany' => true,
             ],
         ]);
+
         $this->assertArrayHasKey('user', $resolverArgs);
         $this->assertTrue($user->is($resolverArgs['user']));
+
         $this->assertArrayHasKey('company', $resolverArgs);
         $this->assertTrue($company->is($resolverArgs['company']));
     }
 
-    private function assertThrowsMultipleRecordsFoundException(Closure $makeRequest, int $count): void
+    private function assertThrowsMultipleRecordsFoundException(\Closure $makeRequest, int $count): void
     {
         try {
             $makeRequest();

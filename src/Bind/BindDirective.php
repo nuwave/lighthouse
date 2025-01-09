@@ -34,34 +34,36 @@ class BindDirective extends BaseDirective implements ArgumentValidation, ArgTran
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Automatically inject (model) instances directly into a resolver's arguments. For example, instead of
-injecting a user's ID, you can inject the entire User model instance that matches the given ID.
+Replace argument values with the corresponding model (or some other value) before passing them to the resolver.
+For example, instead of injecting a user's ID, you can inject the entire User model instance that matches the given ID.
+This eliminates the need to manually query for the instance inside the resolver.
 
-This is a GraphQL analogue for Laravel's Route Binding.
+This works analogues to [Laravel's Route Model Binding](https://laravel.com/docs/routing#route-model-binding).
 """
 directive @bind(
     """
-    Specify the class name of the binding to use. This can be either an Eloquent 
-    model or callable class to bind any other instance than a model.
+    Specify the fully qualified class name of the binding to use.
+    This can be either an Eloquent model, or a class that defines a method `__invoke` that resolves the value.
     """
     class: String!
-    
+
     """
     Specify the column name of a unique identifier to use when binding Eloquent models.
-    By default, "id" is used the the primary key column.
+    By default, "id" is used as the primary key column.
     """
     column: String! = "id"
-    
+
     """
     Specify the relations to eager-load when binding Eloquent models.
     """
     with: [String!]! = []
-    
+
     """
-    Specify whether the binding should be considered required. When required, a validation error will be thrown for 
-    the argument or any item in the argument (when the argument is an array) for which a binding instance could not 
-    be resolved. The field resolver will not be invoked in this case. When optional, the argument value will resolve
-    as null or, when the argument is an array, any item in the argument value will be filtered out of the collection.
+    Specify whether the binding should be considered required.
+    When set to `true`, a validation error will be thrown if the value (or any of the list values) can not be resolved.
+    The field resolver will not be invoked in this case.
+    When set to `false`, argument values that can not be resolved will be passed to the resolver as `null`.
+    When the argument is a list, individual values that can not be resolved will be filtered out.
     """
     required: Boolean! = true
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION

@@ -9,6 +9,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.48.0
+
 ### Added
 
 - Add `@bind` directive as a GraphQL analogue for Laravel's Route Model Binding https://github.com/nuwave/lighthouse/pull/2645
