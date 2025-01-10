@@ -30,7 +30,7 @@ Thus, they are typically not actionable for server developers.
 
 However, as Laravel allows to define a [minimum log level](https://laravel.com/docs/errors#exception-log-levels) 
 at which each individual log channel is triggered, you can choose to report client-safe errors by replacing
-`Nuwave\Lighthouse\Execution\ReportingErrorHandler` by `Nuwave\Lighthouse\Execution\AlwaysReportingErrorHandler` 
+`Nuwave\Lighthouse\Execution\ReportingErrorHandler` with `Nuwave\Lighthouse\Execution\AlwaysReportingErrorHandler` 
 in the `lighthouse.php` config:
 
 ```diff
