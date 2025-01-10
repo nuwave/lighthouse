@@ -111,6 +111,7 @@
                 "Nuwave\\Lighthouse\\LighthouseServiceProvider",
                 "Nuwave\\Lighthouse\\Async\\AsyncServiceProvider",
                 "Nuwave\\Lighthouse\\Auth\\AuthServiceProvider",
+                "Nuwave\\Lighthouse\\Bind\\BindServiceProvider",
                 "Nuwave\\Lighthouse\\Cache\\CacheServiceProvider",
                 "Nuwave\\Lighthouse\\GlobalId\\GlobalIdServiceProvider",
                 "Nuwave\\Lighthouse\\OrderBy\\OrderByServiceProvider",
