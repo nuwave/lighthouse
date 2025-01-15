@@ -367,11 +367,14 @@ return [
     |--------------------------------------------------------------------------
     |
     | If set to true, relations marked with directives like @hasMany or @belongsTo
-    | will be optimized by combining the queries through the BatchLoader.
+    | will be optimized by combining the queries through the BatchLoader. By default
+    | this optimization is limited to models on same connections but this can be 
+    | changed.
     |
     */
 
     'batchload_relations' => true,
+    'batchload_relations_only_on_same_connections' => true,
 
     /*
     |--------------------------------------------------------------------------
