@@ -308,9 +308,8 @@ final class BelongsToManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')
-        ->assertJsonPath('data.user.roles.edges.*.pivot', array_fill(0, 2, $meta))
-        ->assertJsonCount(2, 'data.user.roles.edges');
+        ')->assertJsonPath('data.user.roles.edges.*.pivot', array_fill(0, 2, $meta))
+            ->assertJsonCount(2, 'data.user.roles.edges');
     }
 
     public function testQueryBelongsToManyPivot(): void

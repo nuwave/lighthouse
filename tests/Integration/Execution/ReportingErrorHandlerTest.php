@@ -4,6 +4,7 @@ namespace Tests\Integration\Execution;
 
 use GraphQL\Error\Error;
 use Nuwave\Lighthouse\Execution\ReportingErrorHandler;
+use PHPUnit\Framework\Attributes\Before;
 use Tests\FakeExceptionHandler;
 use Tests\TestCase;
 use Tests\Utils\Exceptions\ClientAwareException;
@@ -12,7 +13,7 @@ final class ReportingErrorHandlerTest extends TestCase
 {
     private FakeExceptionHandler $handler;
 
-    /** @before */
+    #[Before]
     public function fakeExceptionHandling(): void
     {
         $this->afterApplicationCreated(function (): void {
@@ -48,11 +49,11 @@ final class ReportingErrorHandlerTest extends TestCase
     public function testNonClientSafeErrors(\Exception $previousError): void
     {
         $error = new Error(previous: $previousError);
-        $next = fn (Error $error): array => \compact('error');
+        $next = fn (Error $error): array => ['error' => $error];
 
         $result = (new ReportingErrorHandler($this->handler))($error, $next);
 
-        $this->assertSame(\compact('error'), $result);
+        $this->assertSame(['error' => $error], $result);
         $this->handler->assertReported($previousError);
     }
 
@@ -67,11 +68,11 @@ final class ReportingErrorHandlerTest extends TestCase
     public function testClientSafeErrors(?\Exception $previousError): void
     {
         $error = new Error(previous: $previousError);
-        $next = fn (Error $error): array => \compact('error');
+        $next = fn (Error $error): array => ['error' => $error];
 
         $result = (new ReportingErrorHandler($this->handler))($error, $next);
 
-        $this->assertSame(\compact('error'), $result);
+        $this->assertSame(['error' => $error], $result);
         $this->handler->assertNothingReported();
     }
 }

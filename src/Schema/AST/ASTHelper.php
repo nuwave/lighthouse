@@ -71,9 +71,7 @@ class ASTHelper
                 $oldName = $definition->name->value;
                 $collisionOccurred = in_array($oldName, $newNames);
                 if ($collisionOccurred && ! $overwriteDuplicates) {
-                    throw new DefinitionException(
-                        static::duplicateDefinition($oldName),
-                    );
+                    throw new DefinitionException(static::duplicateDefinition($oldName));
                 }
 
                 return $collisionOccurred;
@@ -342,11 +340,7 @@ class ASTHelper
         try {
             $document = Parser::parse($definitionString);
         } catch (SyntaxError $syntaxError) {
-            throw new DefinitionException(
-                "Encountered syntax error while parsing this directive definition:\n\n{$definitionString}",
-                $syntaxError->getCode(),
-                $syntaxError,
-            );
+            throw new DefinitionException("Encountered syntax error while parsing this directive definition:\n\n{$definitionString}", $syntaxError->getCode(), $syntaxError);
         }
 
         /** @var \GraphQL\Language\AST\DirectiveDefinitionNode|null $directive */
