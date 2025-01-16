@@ -28,6 +28,18 @@ Client-safe errors are assumed to be something that:
 
 Thus, they are typically not actionable for server developers.
 
+However, you can choose to report client-safe errors by replacing `Nuwave\Lighthouse\Execution\ReportingErrorHandler`
+with `Nuwave\Lighthouse\Execution\AlwaysReportingErrorHandler` in the `lighthouse.php` config:
+
+```diff
+'error_handlers' => [
+-    Nuwave\Lighthouse\Execution\ReportingErrorHandler::class,
++    Nuwave\Lighthouse\Execution\AlwaysReportingErrorHandler::class,
+],
+```
+
+`Nuwave\Lighthouse\Execution\AlwaysReportingErrorHandler` reports all errors through the default Laravel exception handler, regardless of client-safety.
+
 ## Additional Error Information
 
 The interface [`GraphQL\Error\ProvidesExtensions`](https://github.com/webonyx/graphql-php/blob/master/src/Error/ProvidesExtensions.php)
