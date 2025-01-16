@@ -7,7 +7,9 @@ use Nuwave\Lighthouse\Schema\TypeRegistry;
 
 final class Person
 {
-    public function __construct(private TypeRegistry $typeRegistry) {}
+    public function __construct(
+        private TypeRegistry $typeRegistry,
+    ) {}
 
     /** @param  array<string, mixed>  $value */
     public function resolveType(array $value): Type

@@ -36,5 +36,5 @@ final class FakeExceptionHandler implements ExceptionHandler
         throw $e;
     }
 
-    public function renderForConsole($output, \Throwable $e) {}
+    public function renderForConsole($output, \Throwable $e): void {}
 }

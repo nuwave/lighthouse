@@ -63,11 +63,11 @@ class DirectiveLocator
                 // Built-in and plugin defined directives come next
                 $this->eventsDispatcher->dispatch(new RegisterDirectiveNamespaces()),
             ]))
-            ->flatten()
-            ->filter()
-            // Ensure built-in directives come last
-            ->sortBy(static fn (string $namespace): int => (int) str_starts_with($namespace, 'Nuwave\\Lighthouse'))
-            ->all();
+                ->flatten()
+                ->filter()
+                // Ensure built-in directives come last
+                ->sortBy(static fn (string $namespace): int => (int) str_starts_with($namespace, 'Nuwave\\Lighthouse'))
+                ->all();
     }
 
     /**

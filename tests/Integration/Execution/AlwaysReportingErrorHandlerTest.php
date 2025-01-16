@@ -48,11 +48,11 @@ final class AlwaysReportingErrorHandlerTest extends TestCase
     public function testNonClientSafeErrors(\Exception $previousError): void
     {
         $error = new Error(previous: $previousError);
-        $next = fn (Error $error): array => \compact('error');
+        $next = fn (Error $error): array => ['error' => $error];
 
         $result = (new AlwaysReportingErrorHandler($this->handler))($error, $next);
 
-        $this->assertSame(\compact('error'), $result);
+        $this->assertSame(['error' => $error], $result);
         $this->handler->assertReported($previousError);
     }
 
@@ -67,11 +67,11 @@ final class AlwaysReportingErrorHandlerTest extends TestCase
     public function testClientSafeErrors(?\Exception $previousError): void
     {
         $error = new Error(previous: $previousError);
-        $next = fn (Error $error): array => \compact('error');
+        $next = fn (Error $error): array => ['error' => $error];
 
         $result = (new AlwaysReportingErrorHandler($this->handler))($error, $next);
 
-        $this->assertSame(\compact('error'), $result);
+        $this->assertSame(['error' => $error], $result);
         $this->handler->assertReported(match ($previousError) {
             null => $error,
             default => $previousError,
