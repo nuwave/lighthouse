@@ -4,7 +4,6 @@ namespace Tests\Integration\Execution;
 
 use GraphQL\Error\Error;
 use Nuwave\Lighthouse\Execution\ReportingErrorHandler;
-use PHPUnit\Framework\Attributes\Before;
 use Tests\FakeExceptionHandler;
 use Tests\TestCase;
 use Tests\Utils\Exceptions\ClientAwareException;
@@ -13,7 +12,7 @@ final class ReportingErrorHandlerTest extends TestCase
 {
     private FakeExceptionHandler $handler;
 
-    #[Before]
+    /** @before */
     public function fakeExceptionHandling(): void
     {
         $this->afterApplicationCreated(function (): void {

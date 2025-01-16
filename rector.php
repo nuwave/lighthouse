@@ -19,7 +19,6 @@ return static function (RectorConfig $rectorConfig): void {
         PHPUnitSetList::PHPUNIT_80,
         PHPUnitSetList::PHPUNIT_90,
         PHPUnitSetList::PHPUNIT_CODE_QUALITY,
-        PHPUnitSetList::ANNOTATIONS_TO_ATTRIBUTES,
     ]);
     $rectorConfig->rule(Rector\CodingStyle\Rector\Closure\StaticClosureRector::class);
     $rectorConfig->skip([
