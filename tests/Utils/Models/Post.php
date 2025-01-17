@@ -2,6 +2,7 @@
 
 namespace Tests\Utils\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -47,6 +48,15 @@ final class Post extends Model
 {
     use Searchable;
     use SoftDeletes;
+
+    /** @return Attribute<int, int> */
+    protected function id(): Attribute
+    {
+        return Attribute::make(
+            get: fn (mixed $_, array $attributes): int => $attributes[$this->primaryKey],
+            set: fn (int $id) => [$this->primaryKey => $id],
+        );
+    }
 
     /** @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Tests\Utils\Models\Activity, $this> */
     public function activity(): MorphMany
