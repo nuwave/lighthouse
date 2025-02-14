@@ -34,6 +34,7 @@ final class SubscriberTest extends TestCase
 
         $resolveInfo->operation = new OperationDefinitionNode([]);
         $resolveInfo->fragments = [];
+
         $context = new HttpGraphQLContext(new Request());
 
         $subscriber = new Subscriber($args, $context, $resolveInfo);
