@@ -39,7 +39,7 @@
         "illuminate/support": "^9 || ^10 || ^11",
         "illuminate/validation": "^9 || ^10 || ^11",
         "laragraph/utils": "^1.5 || ^2",
-        "thecodingmachine/safe": "^1 || ^2",
+        "thecodingmachine/safe": "^1 || ^2 || ^3",
         "webonyx/graphql-php": "^15"
     },
     "require-dev": {
