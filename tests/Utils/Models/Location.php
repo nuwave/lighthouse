@@ -23,7 +23,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  *
  * Relations
  * @property-read \Tests\Utils\Models\Location $parent
- * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Location> $children
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\Location> $children
  */
 final class Location extends Model
 {

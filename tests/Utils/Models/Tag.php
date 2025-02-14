@@ -19,8 +19,8 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
  * @property \Illuminate\Support\Carbon $updated_at
  *
  * Relations
- * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Post> $posts
- * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Task> $tasks
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\Post> $posts
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\Task> $tasks
  */
 final class Tag extends Model
 {
