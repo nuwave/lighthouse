@@ -39,9 +39,9 @@ class InputFieldStats extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @var int|string $refs
-     *           The total number of operations that reference the input object field
+     *           The total number of operations that reference the input object field.
      *     @var int|string $null_refs
-     *           The number of operations that reference the input object field as a null value
+     *           The number of operations that reference the input object field as a null value.
      *     @var int|string $missing
      *           The number of operations that don't reference this input object field (the field is missing or undefined).
      * }

@@ -90,7 +90,7 @@ class FieldStat extends \Google\Protobuf\Internal\Message
      *           field_execution_weight).
      *     @var int|string $observed_execution_count
      *           Number of times that the resolver for this field is directly observed being
-     *           executed
+     *           executed.
      *     @var int|string $estimated_execution_count
      *           Same as `observed_execution_count` but potentially scaled upwards if the server was only
      *           performing field-level instrumentation on a sampling of operations.  For

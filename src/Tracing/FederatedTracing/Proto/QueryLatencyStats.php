@@ -107,7 +107,7 @@ class QueryLatencyStats extends \Google\Protobuf\Internal\Message
      *     @var int|string $persisted_query_misses
      *     @var array<int>|array<string>|\Google\Protobuf\Internal\RepeatedField $cache_latency_count
      *           This array includes the latency buckets for all operations included in cache_hits
-     *           See comment on latency_count for details
+     *           See comment on latency_count for details.
      *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\PathErrorStats $root_error_stats
      *           Paths and counts for each error. The total number of requests with errors within this object should be the same as
      *           requests_with_errors_count below.

@@ -177,15 +177,15 @@ class Trace extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @var \Google\Protobuf\Timestamp $start_time
-     *           Wallclock time when the trace began
+     *           Wallclock time when the trace began.
      *     @var \Google\Protobuf\Timestamp $end_time
-     *           Wallclock time when the trace ended
+     *           Wallclock time when the trace ended.
      *     @var int|string $duration_ns
      *           High precision duration of the trace; may not equal end_time-start_time
-     *           (eg, if your machine's clock changed during the trace)
+     *           (eg, if your machine's clock changed during the trace).
      *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Node $root
      *           A tree containing information about all resolvers run directly by this
-     *           service, including errors
+     *           service, including errors.
      *     @var bool $is_incomplete
      *           If this is true, the trace is potentially missing some nodes that were
      *           present on the query plan. This can happen if the trace span buffer used
@@ -208,7 +208,7 @@ class Trace extends \Google\Protobuf\Internal\Message
      *     @var string $unexecutedOperationBody
      *           Optional: when GraphQL parsing or validation against the GraphQL schema fails, these fields
      *           can include reference to the operation being sent for users to dig into the set of operations
-     *           that are failing validation
+     *           that are failing validation.
      *     @var string $unexecutedOperationName
      *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Details $details
      *     @var string $client_name

@@ -66,12 +66,12 @@ class FetchNode extends \Google\Protobuf\Internal\Message
      *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace $trace
      *           This Trace only contains start_time, end_time, duration_ns, and root;
      *           all timings were calculated **on the subgraph**, and clock skew
-     *           will be handled by the ingress server
+     *           will be handled by the ingress server.
      *     @var int|string $sent_time_offset
-     *           relative to the outer trace's start_time, in ns, measured in the Router/Gateway
+     *           relative to the outer trace's start_time, in ns, measured in the Router/Gateway.
      *     @var \Google\Protobuf\Timestamp $sent_time
      *           Wallclock times measured in the Router/Gateway for when this operation was
-     *           sent and received
+     *           sent and received.
      *     @var \Google\Protobuf\Timestamp $received_time
      * }
      */
