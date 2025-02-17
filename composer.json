@@ -49,7 +49,7 @@
         "ergebnis/composer-normalize": "^2.2.2",
         "fakerphp/faker": "^1.21",
         "google/protobuf": "^3.21",
-        "larastan/larastan": "^2.6.1 || ^3",
+        "larastan/larastan": "^2.9.14 || ^3.0.4",
         "laravel/framework": "^9 || ^10 || ^11",
         "laravel/legacy-factories": "^1.1.1",
         "laravel/pennant": "^1",
