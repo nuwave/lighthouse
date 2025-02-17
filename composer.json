@@ -59,7 +59,7 @@
         "mll-lab/php-cs-fixer-config": "^5",
         "mockery/mockery": "^1.5",
         "nesbot/carbon": "^2.62.1",
-        "orchestra/testbench": "^7.11 || ^8.8 || ^9",
+        "orchestra/testbench": "^7.50 || ^8.32 || ^9.10",
         "phpbench/phpbench": "^1.2.6",
         "phpstan/extension-installer": "^1",
         "phpstan/phpstan": "^1.12.18 || ^2",
