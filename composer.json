@@ -62,7 +62,7 @@
         "orchestra/testbench": "^7.11 || ^8.8 || ^9",
         "phpbench/phpbench": "^1.2.6",
         "phpstan/extension-installer": "^1",
-        "phpstan/phpstan": "^1.11 || ^2",
+        "phpstan/phpstan": "^1.12.18 || ^2",
         "phpstan/phpstan-mockery": "^1.1 || ^2",
         "phpstan/phpstan-phpunit": "^1.1.1 || ^2",
         "phpunit/phpunit": "^9.6.4 || ^10 || ^11",
