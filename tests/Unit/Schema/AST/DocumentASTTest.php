@@ -114,7 +114,7 @@ final class DocumentASTTest extends TestCase
         $this->assertArrayHasKey(0, $reserialized->schemaExtensions);
 
         $schemaExtension = $reserialized->schemaExtensions[0];
-        $this->assertArrayHasKey(0, $schemaExtension->directives);
+        $this->assertArrayHasKey(0, $schemaExtension->directives); // @phpstan-ignore method.impossibleType (NodeList not understood by earlier deps)
 
         $this->assertSame($documentAST->hash, $reserialized->hash);
     }

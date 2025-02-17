@@ -93,7 +93,7 @@ GRAPHQL;
                 $relation->delete();
             }
         } else {
-            $related = $relation->make();
+            $related = $relation->make(); // @phpstan-ignore method.notFound (Relation delegates to Builder)
             $related::destroy($idOrIds);
         }
     }
