@@ -75,7 +75,7 @@ jobs:
           --update-with-all-dependencies
           ${{ matrix.composer.arg }}
 
-      - run: vendor/bin/phpstan
+      - run: vendor/bin/phpstan --verbose
 
   tests:
     name: PHPUnit on PHP ${{ matrix.php-version }} with Laravel ${{ matrix.laravel-version }} and ${{ matrix.composer.name }} dependencies
