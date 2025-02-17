@@ -93,9 +93,7 @@ GRAPHQL;
                 $relation->delete();
             }
         } else {
-            // @phpstan-ignore-next-line Relation&Builder mixin not recognized
             $related = $relation->make();
-            assert($related instanceof Model);
             $related::destroy($idOrIds);
         }
     }

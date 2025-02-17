@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  *
  * @mixin \Laravel\Lumen\Testing\Concerns\MakesHttpRequests
  */
-trait MakesGraphQLRequestsLumen
+trait MakesGraphQLRequestsLumen // @phpstan-ignore trait.unused (hard to set up testing for)
 {
     /**
      * Stores the result of the introspection query.

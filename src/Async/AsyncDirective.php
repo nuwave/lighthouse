@@ -52,11 +52,9 @@ GRAPHQL;
                 $resolver($root, $args, $context, $resolveInfo);
             } else {
                 $contextSerializer = Container::getInstance()->make(SerializesContext::class);
-                assert($contextSerializer instanceof SerializesContext);
-                $serializedContext = $contextSerializer->serialize($context);
 
                 AsyncMutation::dispatch(
-                    $serializedContext,
+                    $contextSerializer->serialize($context),
                     $resolveInfo->fragments,
                     $resolveInfo->operation,
                     $resolveInfo->variableValues,

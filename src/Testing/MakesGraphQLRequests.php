@@ -247,7 +247,6 @@ trait MakesGraphQLRequests
         ));
 
         $broadcastDriverManager = $app->make(BroadcastDriverManager::class);
-        assert($broadcastDriverManager instanceof BroadcastDriverManager);
 
         // adding a custom driver which is a spied version of log driver
         $broadcastDriverManager->extend('mock', fn () => $this->spy(LogBroadcaster::class)->makePartial());

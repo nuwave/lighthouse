@@ -147,7 +147,6 @@ GRAPHQL;
         ')->assertGraphQLErrorFree();
 
         $cache = $this->app->make(CacheStorageManager::class);
-        assert($cache instanceof CacheStorageManager);
 
         $subscriber = $cache
             ->subscribersByTopic('ON_POST_CREATED')
@@ -315,7 +314,7 @@ GRAPHQL;
         $response = $this->subscribe();
 
         $mock = $response->graphQLSubscriptionMock();
-        assert($mock instanceof MockInterface);
+        assert($mock instanceof MockInterface); // @phpstan-ignore instanceof.alwaysTrue (aids IDE)
         $mock->shouldNotHaveReceived('broadcast');
     }
 

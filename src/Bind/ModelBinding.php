@@ -14,7 +14,7 @@ class ModelBinding
      * @param  int|string|array<int|string>  $value
      * @param  \Nuwave\Lighthouse\Bind\BindDefinition<\Illuminate\Database\Eloquent\Model>  $definition
      *
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection<int, string, \Illuminate\Database\Eloquent\Model>|null
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection<array-key, \Illuminate\Database\Eloquent\Model>|null
      */
     public function __invoke(int|string|array $value, BindDefinition $definition): Model|EloquentCollection|null
     {
@@ -30,7 +30,7 @@ class ModelBinding
         return $this->modelInstance($binding);
     }
 
-    /** @param  \Illuminate\Database\Eloquent\Collection<int, int, \Illuminate\Database\Eloquent\Model>  $results */
+    /** @param  \Illuminate\Database\Eloquent\Collection<array-key, \Illuminate\Database\Eloquent\Model>  $results */
     protected function modelInstance(EloquentCollection $results): ?Model
     {
         // While "too few records" errors are handled as (client-safe) validation errors by applying
@@ -50,11 +50,11 @@ class ModelBinding
      *
      * @see \Nuwave\Lighthouse\Bind\BindDirective::rules()
      *
-     * @param  \Illuminate\Database\Eloquent\Collection<int, int, \Illuminate\Database\Eloquent\Model>  $results
+     * @param  \Illuminate\Database\Eloquent\Collection<array-key, \Illuminate\Database\Eloquent\Model>  $results
      * @param  \Illuminate\Support\Collection<int, mixed>  $values
      * @param  \Nuwave\Lighthouse\Bind\BindDefinition<\Illuminate\Database\Eloquent\Model>  $definition
      *
-     * @return \Illuminate\Database\Eloquent\Collection<int, string, \Illuminate\Database\Eloquent\Model>
+     * @return \Illuminate\Database\Eloquent\Collection<array-key, \Illuminate\Database\Eloquent\Model>
      */
     protected function modelCollection(
         EloquentCollection $results,
