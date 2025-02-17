@@ -51,7 +51,7 @@ class ModelBinding
      * @see \Nuwave\Lighthouse\Bind\BindDirective::rules()
      *
      * @param  \Illuminate\Database\Eloquent\Collection<array-key, \Illuminate\Database\Eloquent\Model>  $results
-     * @param  \Illuminate\Support\Collection<int, mixed>  $values
+     * @param  \Illuminate\Support\Collection<array-key, mixed>  $values
      * @param  \Nuwave\Lighthouse\Bind\BindDefinition<\Illuminate\Database\Eloquent\Model>  $definition
      *
      * @return \Illuminate\Database\Eloquent\Collection<array-key, \Illuminate\Database\Eloquent\Model>
