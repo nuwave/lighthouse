@@ -14,7 +14,7 @@ namespace Illuminate\Testing {
         /**
          * Assert the response contains an error with a matching message.
          *
-         * @param \Throwable $error the expected error
+         * @param  \Throwable  $error the expected error
          *
          * @return $this
          */
@@ -26,7 +26,7 @@ namespace Illuminate\Testing {
         /**
          * Assert the response contains an error with the given message.
          *
-         * @param string $message the expected error message
+         * @param  string  $message the expected error message
          *
          * @return $this
          */
@@ -40,7 +40,7 @@ namespace Illuminate\Testing {
          *
          * Requires the config `lighthouse.debug` to include the option \GraphQL\Error\DebugFlag::INCLUDE_DEBUG_MESSAGE.
          *
-         * @param string $message the expected debug message
+         * @param  string  $message the expected debug message
          *
          * @return $this
          */
@@ -62,7 +62,7 @@ namespace Illuminate\Testing {
         /**
          * Assert the returned result contains exactly the given validation keys.
          *
-         * @param array<string> $keys the validation keys the result should have
+         * @param  array<string>  $keys the validation keys the result should have
          *
          * @return $this
          */
@@ -74,8 +74,8 @@ namespace Illuminate\Testing {
         /**
          * Assert a given validation error is present in the response.
          *
-         * @param string $key the validation key that should be present
-         * @param string $message the expected validation message
+         * @param  string  $key the validation key that should be present
+         * @param  string  $message the expected validation message
          *
          * @return $this
          */
@@ -97,7 +97,7 @@ namespace Illuminate\Testing {
         /**
          * Assert current user is authorized to join a subscription.
          *
-         * @param \PHPUnit\Framework\TestCase $testClassInstance usually $this when calling this from a test class
+         * @param  \PHPUnit\Framework\TestCase  $testClassInstance usually $this when calling this from a test class
          *
          * @return $this
          */
@@ -109,7 +109,7 @@ namespace Illuminate\Testing {
         /**
          * Assert current user is NOT authorized to join a subscription.
          *
-         * @param \PHPUnit\Framework\TestCase $testClassInstance usually $this when calling this from a test class
+         * @param  \PHPUnit\Framework\TestCase  $testClassInstance usually $this when calling this from a test class
          *
          * @return $this
          */
@@ -122,8 +122,8 @@ namespace Illuminate\Testing {
          * For cases where you need more control over your broadcast assertions.
          *
          * @return \Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster&\Mockery\MockInterface
-         * @see \Nuwave\Lighthouse\Testing\TestResponseMixin::assertGraphQLNotBroadcasted
          *
+         * @see \Nuwave\Lighthouse\Testing\TestResponseMixin::assertGraphQLNotBroadcasted
          * @see \Nuwave\Lighthouse\Testing\TestResponseMixin::assertGraphQLBroadcasted
          */
         public function graphQLSubscriptionMock(): Broadcaster
@@ -143,7 +143,7 @@ namespace Illuminate\Testing {
         /**
          * Assert the subscription received the given broadcasts.
          *
-         * @param array<int, array<string, mixed>> $data the broadcast pattern that you are expecting
+         * @param  array<int, array<string, mixed>>  $data the broadcast pattern that you are expecting
          *
          * @return $this
          */
