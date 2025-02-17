@@ -33,6 +33,7 @@ final class AuthenticatingSyncIteratorTest extends IteratorTestBase
                 return $subscriber;
             });
 
+        // @phpstan-ignore argument.type (callable for parameter 2 not recognized)
         $guard = \Mockery::mock(SubscriptionGuard::class, static function (MockInterface $mock) use ($subscribers): void {
             $subscribers->each(static function (Subscriber $subscriber) use ($mock): void {
                 $user = $subscriber->context->user();
