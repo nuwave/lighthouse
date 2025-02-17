@@ -112,10 +112,10 @@ parameters:
 
   # We don't care about configuration caching in our tests
   - path: tests
-    identifier: larastan.noEnvCallsOutsideOfConfig
+    message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
   # This is actually a config file, just not recognized as such
   - path: src/lighthouse.php
-    identifier: larastan.noEnvCallsOutsideOfConfig
+    message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
 
   # Allows assert() calls to assist IDE autocompletion
   - message: '#Call to function assert\(\) with true will always evaluate to true\.#'

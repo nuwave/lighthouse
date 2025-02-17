@@ -13,8 +13,8 @@ class BindDefinition
 {
     public function __construct(
         /** @var class-string<TClass> */
-        public string $class,
         // @phpstan-ignore generics.variance (TODO make class readonly)
+        public string $class,
         public string $column,
         /** @var array<string> */
         public array $with,
