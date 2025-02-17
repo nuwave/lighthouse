@@ -266,8 +266,9 @@ final class MorphToTest extends DBTestCase
         $task->name = 'first_task';
         $task->save();
 
-        $image = $task->image()->make();
+        $image = factory(Image::class)->make();
         assert($image instanceof Image);
+        $image->imageable()->associate($task);
         $image->url = 'bar';
         $image->save();
 
@@ -306,8 +307,9 @@ final class MorphToTest extends DBTestCase
         $task->name = 'first_task';
         $task->save();
 
-        $image = $task->image()->make();
+        $image = factory(Image::class)->make();
         assert($image instanceof Image);
+        $image->imageable()->associate($task);
         $image->url = 'bar';
         $image->save();
 

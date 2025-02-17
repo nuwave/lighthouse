@@ -47,7 +47,8 @@ return static function (RectorConfig $rectorConfig): void {
         Rector\PHPUnit\CodeQuality\Rector\Class_\NarrowUnusedSetUpDefinedPropertyRector::class, // falsely removes $this->schema assignments in some tests
         Rector\PHPUnit\PHPUnit100\Rector\StmtsAwareInterface\WithConsecutiveRector::class, // messes up our custom withConsecutive replacement
         Rector\PHPUnit\PHPUnit60\Rector\ClassMethod\AddDoesNotPerformAssertionToNonAssertingTestRector::class, // does not recognize mockResolver
-        Rector\Php80\Rector\FunctionLike\MixedTypeRector::class, // removes useful comments
+        Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertCountWithZeroToAssertEmptyRector::class, // Allows garbage
+        Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertEmptyNullableObjectToAssertInstanceofRector::class, // Makes assertions more brittle
     ]);
     $rectorConfig->paths([
         __DIR__ . '/benchmarks',

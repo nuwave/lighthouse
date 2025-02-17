@@ -282,7 +282,7 @@ class ASTHelper
         return static::hasNode($type->interfaces, $interfaceName);
     }
 
-    public static function addDirectiveToFields(DirectiveNode $directiveNode, ObjectTypeDefinitionNode|ObjectTypeExtensionNode|InterfaceTypeDefinitionNode|InterfaceTypeExtensionNode &$typeWithFields): void
+    public static function addDirectiveToFields(DirectiveNode $directiveNode, ObjectTypeDefinitionNode|ObjectTypeExtensionNode|InterfaceTypeDefinitionNode|InterfaceTypeExtensionNode $typeWithFields): void
     {
         $name = $directiveNode->name->value;
 

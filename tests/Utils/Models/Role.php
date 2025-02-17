@@ -18,7 +18,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property int|null $acl_id
  *
  * Relations
- * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\User> $users
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\User> $users
  * @property-read \Tests\Utils\Models\ACL|null $acl
  */
 final class Role extends Model

@@ -590,11 +590,11 @@ final class AddUsersToCompany
 {
     /**
      * @param array{
-     *     users: \Illuminate\Database\Eloquent\Collection<\App\Models\User>,
+     *     users: \Illuminate\Database\Eloquent\Collection<int, \App\Models\User>,
      *     company: \App\Models\Company,
      * } $args
      *
-     * @return \Illuminate\Database\Eloquent\Collection<\App\Models\User>
+     * @return \Illuminate\Database\Eloquent\Collection<int, \App\Models\User>
      */
     public function __invoke(mixed $root, array $args): Collection
     {

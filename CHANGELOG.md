@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.50.0
+
+### Added
+
+- Allow `thecodingmachine/safe` 3 https://github.com/nuwave/lighthouse/pull/2657
+
 ## v6.49.1
 
 ### Fixed

@@ -3,9 +3,7 @@
 namespace Tests\Unit\Schema\AST;
 
 use GraphQL\Language\AST\DirectiveDefinitionNode;
-use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use GraphQL\Language\AST\SchemaExtensionNode;
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Exceptions\SchemaSyntaxErrorException;
@@ -113,9 +111,10 @@ final class DocumentASTTest extends TestCase
 
         $this->assertSame(['Query'], $reserialized->classNameToObjectTypeNames[User::class]);
 
+        $this->assertArrayHasKey(0, $reserialized->schemaExtensions);
+
         $schemaExtension = $reserialized->schemaExtensions[0];
-        $this->assertInstanceOf(SchemaExtensionNode::class, $schemaExtension);
-        $this->assertInstanceOf(DirectiveNode::class, $schemaExtension->directives[0]);
+        $this->assertArrayHasKey(0, $schemaExtension->directives); // @phpstan-ignore method.impossibleType (NodeList not understood by earlier deps)
 
         $this->assertSame($documentAST->hash, $reserialized->hash);
     }

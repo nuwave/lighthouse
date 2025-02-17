@@ -14,7 +14,7 @@ use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-/** @mixin \Illuminate\Testing\TestResponse */
+/** @mixin \Illuminate\Testing\TestResponse<*> */
 class TestResponseMixin
 {
     public function assertGraphQLValidationError(): \Closure
@@ -154,7 +154,6 @@ class TestResponseMixin
     {
         return function (): MockInterface {
             $broadcastDriverManager = Container::getInstance()->make(BroadcastDriverManager::class);
-            assert($broadcastDriverManager instanceof BroadcastDriverManager);
 
             $broadcastDriver = $broadcastDriverManager->driver();
             assert($broadcastDriver instanceof Broadcaster && $broadcastDriver instanceof MockInterface);

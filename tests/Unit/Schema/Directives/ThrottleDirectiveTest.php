@@ -24,7 +24,7 @@ final class ThrottleDirectiveTest extends TestCase
         $queriedKeys = [];
 
         $rateLimiter = $this->createMock(RateLimiter::class);
-        $rateLimiter->expects(self::atLeast(1))
+        $rateLimiter->expects($this->atLeast(1))
             ->method('limiter')
             ->with('test')
             ->willReturn(static fn (): array => [
@@ -69,15 +69,15 @@ final class ThrottleDirectiveTest extends TestCase
         ';
 
         $rateLimiter = $this->createMock(RateLimiter::class);
-        $rateLimiter->expects(self::atLeast(1))
+        $rateLimiter->expects($this->atLeast(1))
             ->method('limiter')
             ->with('test')
             ->willReturn(static fn (): Limit => Limit::none());
 
-        $rateLimiter->expects(self::never())
+        $rateLimiter->expects($this->never())
             ->method('tooManyAttempts');
 
-        $rateLimiter->expects(self::never())
+        $rateLimiter->expects($this->never())
             ->method('hit');
 
         $this->app->singleton(RateLimiter::class, static fn (): RateLimiter => $rateLimiter);
@@ -102,14 +102,14 @@ final class ThrottleDirectiveTest extends TestCase
         ';
 
         $rateLimiter = $this->createMock(RateLimiter::class);
-        $rateLimiter->expects(self::atLeast(1))
+        $rateLimiter->expects($this->atLeast(1))
             ->method('limiter')
             ->with('test')
             ->willReturn(static fn (): array => [
                 Limit::perMinute(1),
             ]);
 
-        $rateLimiter->expects(self::never())
+        $rateLimiter->expects($this->never())
             ->method('hit');
 
         // create a context with null request

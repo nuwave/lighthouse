@@ -23,7 +23,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property \Illuminate\Support\Carbon $updated_at
  *
  * Relations
- * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Product> $products
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\Product> $products
  * @property-read \Tests\Utils\Models\Employee|\Tests\Utils\Models\Contractor|null $creator
  */
 final class Color extends Model

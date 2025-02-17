@@ -32,15 +32,15 @@ use Laravel\Scout\Searchable;
  * @property int|null $parent_id
  *
  * Relations
- * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Activity> $activity
- * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Category> $categories
- * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Post> $children
- * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Comment> $comments
- * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Image> $images
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\Activity> $activity
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\Category> $categories
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\Post> $children
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\Comment> $comments
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\Image> $images
  * @property-read \Tests\Utils\Models\Post|null $parent
- * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\RoleUserPivot> $roles
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\RoleUserPivot> $roles
  * @property-read \Tests\Utils\Models\PostStatus|null $status
- * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Tag> $tags
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\Tag> $tags
  * @property-read \Tests\Utils\Models\Task $task
  * @property-read \Tests\Utils\Models\User|null $user
  */

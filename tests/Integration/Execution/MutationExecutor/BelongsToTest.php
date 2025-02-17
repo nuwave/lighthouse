@@ -691,8 +691,7 @@ GRAPHQL
             'Must not delete the second model.',
         );
 
-        $task = Task::findOrFail(1);
-        assert($task instanceof Task);
+        $task = Task::query()->findOrFail(1);
         $this->assertNull($task->user, 'Must disconnect the parent relationship.');
     }
 
@@ -1047,8 +1046,7 @@ GRAPHQL
         ]);
 
         // The first User has the first Role.
-        $role = Role::firstOrFail();
-        assert($role instanceof Role);
+        $role = Role::query()->firstOrFail();
         $this->assertSame([1], $role->users()->pluck('users.id')->toArray());
 
         // Create another User.

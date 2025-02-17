@@ -88,7 +88,7 @@ class DocumentAST implements Arrayable
      */
     public array $classNameToObjectTypeNames = [];
 
-    /** @var array<int,SchemaExtensionNode> */
+    /** @var array<int, SchemaExtensionNode> */
     public array $schemaExtensions = [];
 
     /** A hash of the schema. */
