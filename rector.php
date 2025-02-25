@@ -58,5 +58,12 @@ return static function (RectorConfig $rectorConfig): void {
         __DIR__ . '/_ide_helper.php',
         __DIR__ . '/rector.php',
     ]);
-    $rectorConfig->phpstanConfig(__DIR__ . '/phpstan.neon');
+    $rectorConfig->bootstrapFiles([
+        // Rector uses PHPStan internally, which in turn requires Larastan to be set up correctly
+        __DIR__ . '/vendor/larastan/larastan/bootstrap.php',
+    ]);
+    $rectorConfig->phpstanConfigs([
+        __DIR__ . '/phpstan.neon',
+        __DIR__ . '/vendor/larastan/larastan/extension.neon',
+    ]);
 };
