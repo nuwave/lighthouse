@@ -132,11 +132,6 @@ const pusherLink = new PusherLink({
 const link = ApolloLink.from([pusherLink, httpLink(`${API_LOCATION}/graphql`)]);
 ```
 
-## Apollo for Laravel Echo
-
-If you are using the Laravel Echo subscription driver with Apollo
-you can use [this apollo link](https://github.com/thekonz/apollo-lighthouse-subscription-link).
-
 ## Relay Modern
 
 To use Lighthouse's Pusher subscriptions with Relay Modern you will
