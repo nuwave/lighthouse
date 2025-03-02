@@ -424,15 +424,14 @@ return [
         'storage_ttl' => env('LIGHTHOUSE_SUBSCRIPTION_STORAGE_TTL', null),
 
         /*
+         * Subscriptions channel names will be created as private encrypted channels.
+         */
+        'encrypted_channels' => env('LIGHTHOUSE_SUBSCRIPTION_ENCRYPTED', false),
+
+        /*
          * Default subscription broadcaster.
          */
         'broadcaster' => env('LIGHTHOUSE_BROADCASTER', 'pusher'),
-
-        /*
-         * Subscriptions channel names will be created as private encrypted channels.
-         */
-        'encrypted_channel' => env('LIGHTHOUSE_SUBSCRIPTION_ENCRYPTED', false),
-
         /*
          * Subscription broadcasting drivers with config options.
          */

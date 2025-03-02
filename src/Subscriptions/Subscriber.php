@@ -119,7 +119,9 @@ class Subscriber
     /** Generate a unique private channel name. */
     public static function uniqueChannelName(): string
     {
-        $channelType = config('lighthouse.subscriptions.encrypted_channel') ? 'private-encrypted' : 'private';
+        $channelType = config('lighthouse.subscriptions.encrypted_channels', false)
+            ? 'private-encrypted'
+            : 'private';
 
         return $channelType . '-lighthouse-' . Str::random(32) . '-' . time();
     }
