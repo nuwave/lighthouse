@@ -121,7 +121,7 @@ class Subscriber
     {
         $channelType = config('lighthouse.subscriptions.encrypted_channel') ? 'private-encrypted' : 'private';
 
-        return $channelType. '-lighthouse-' . Str::random(32) . '-' . time();
+        return $channelType . '-lighthouse-' . Str::random(32) . '-' . time();
     }
 
     protected function contextSerializer(): SerializesContext
