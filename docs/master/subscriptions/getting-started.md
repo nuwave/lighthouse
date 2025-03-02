@@ -45,6 +45,24 @@ Unless you delete a subscription, it will continue to broadcast events after the
 The easiest way to expire subscriptions automatically is to use the env `LIGHTHOUSE_SUBSCRIPTION_STORAGE_TTL`
 to set an expiration time in seconds (e.g. `LIGHTHOUSE_SUBSCRIPTION_STORAGE_TTL=3600` to expire in one hour).
 
+## Encrypted Subscriptions
+
+Lighthouse supports encrypted subscriptions for both Pusher and Echo drivers. The main goal is to ensure that all data in transit in a private-encrypted channel is encrypted. 
+
+To enable encrypted subscriptions, set the environment variable `LIGHTHOUSE_SUBSCRIPTION_ENCRYPTED=true`.
+
+For Pusher, the shared secret can be updated in `config/broadcasting.php`:
+
+```php
+// in config/broadcasting.php
+'options' => [
+  'useTLS' => true,
+  'encryption_master_key_base64' => 'YOUR_MASTER_KEY', // generate this with, e.g. 'openssl rand -base64 32'
+],
+```
+
+More details on how to enable encryption are defined in the [Pusher documentation](https://pusher.com/docs/channels/using_channels/encrypted-channels/).
+
 ### Pusher Expiration Webhook
 
 If you are using the Pusher driver, you can use a [`channel existence`](https://pusher.com/docs/channels/server_api/webhooks/#channel-existence-events) webhook to mitigate this problem.
