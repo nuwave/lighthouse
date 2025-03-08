@@ -17,6 +17,6 @@ class DateTimeUtc extends DateScalar
     protected function parse(mixed $value): Carbon
     {
         // @phpstan-ignore-next-line We know the format to be good, so this can never return `false`
-        return Carbon::createFromIsoFormat('YYYY-MM-DDTHH:mm:ss.SSSSSSZ', $value);
+        return Carbon::createFromIsoFormat('YYYY-MM-DDTHH:mm:ss.SSSSSSZ', (string) $value);
     }
 }

@@ -36,7 +36,7 @@ class FieldCommand extends FieldGeneratorCommand
     /** @return array{string, string} */
     protected function nameParts(): array
     {
-        $name = $this->argument('name');
+        $name = (string) $this->argument('name');
 
         $parts = explode('.', $name);
         if (count($parts) !== 2) {
