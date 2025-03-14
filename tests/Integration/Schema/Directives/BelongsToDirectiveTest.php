@@ -411,6 +411,58 @@ final class BelongsToDirectiveTest extends DBTestCase
         });
     }
 
+        public function testDoesNotShortcutForeignKeyIfQueryHasFieldSelection(): void
+    {
+        config(['lighthouse.shortcut_foreign_key_selection' => true]);
+
+        $company = factory(Company::class)->create();
+        assert($company instanceof Company);
+
+        $user = factory(User::class)->make();
+        assert($user instanceof User);
+        $user->company()->associate($company);
+        $user->save();
+
+        $this->be($user);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Company {
+            id: ID!
+            name: String!
+        }
+
+        type User {
+            company: Company @belongsTo
+        }
+
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $this->assertQueryCountMatches(1, function () use ($company): void {
+            $this->graphQL(/** @lang GraphQL */ '
+            query {
+                user {
+                    company {
+                        id
+                        name
+                    }
+                }
+            }
+            ')->assertJson([
+                'data' => [
+                    'user' => [
+                        'company' => [
+                            'id' => $company->id,
+                            'name' => $company->name,
+                        ],
+                    ],
+                ],
+            ]);
+        });
+    }
+
     public function testDoesNotShortcutForeignKeyIfQueryHasConditions(): void
     {
         config(['lighthouse.shortcut_foreign_key_selection' => true]);
