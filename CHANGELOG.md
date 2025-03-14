@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Changed
+
+- Apply shortcut foreign key selection logic when `__typename` is included in related model's field selection https://github.com/nuwave/lighthouse/pull/2666
+
 ## v6.50.0
 
 ### Added
