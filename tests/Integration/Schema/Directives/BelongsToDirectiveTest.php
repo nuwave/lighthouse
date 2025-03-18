@@ -388,7 +388,7 @@ final class BelongsToDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->assertNoQueriesExecuted(function () use ($company): void {
+        $this->assertNoQueriesExecuted(function (): void {
             $this->graphQL(/** @lang GraphQL */ '
             {
                 user {
