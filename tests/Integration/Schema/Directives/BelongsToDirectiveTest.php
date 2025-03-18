@@ -14,6 +14,7 @@ final class BelongsToDirectiveTest extends DBTestCase
     public function testResolveBelongsToRelationship(): void
     {
         $company = factory(Company::class)->create();
+        assert($company instanceof Company);
 
         $user = factory(User::class)->make();
         assert($user instanceof User);
@@ -55,9 +56,68 @@ final class BelongsToDirectiveTest extends DBTestCase
         ]);
     }
 
+    /** https://github.com/nuwave/lighthouse/issues/2668 */
+    public function testResolveBelongsToRelationshipWithNestedRelationship(): void
+    {
+        config(['lighthouse.shortcut_foreign_key_selection' => true]);
+
+        $company = factory(Company::class)->create();
+        assert($company instanceof Company);
+
+        $user = factory(User::class)->make();
+        assert($user instanceof User);
+        $user->company()->associate($company);
+        $user->save();
+
+        $this->be($user);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Company {
+            name: String!
+            users: [User!]! @hasMany
+        }
+
+        type User {
+            id: ID!
+            company: Company @belongsTo
+        }
+
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            user {
+                company {
+                    name
+                    users {
+                        id
+                    }
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'company' => [
+                        'name' => $company->name,
+                        'users' => [
+                            [
+                                'id' => $user->id,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
     public function testResolveBelongsToWithCustomName(): void
     {
         $company = factory(Company::class)->create();
+        assert($company instanceof Company);
 
         $user = factory(User::class)->make();
         assert($user instanceof User);
@@ -102,7 +162,10 @@ final class BelongsToDirectiveTest extends DBTestCase
     public function testResolveBelongsToRelationshipWithTwoRelation(): void
     {
         $company = factory(Company::class)->create();
+        assert($company instanceof Company);
+
         $team = factory(Team::class)->create();
+        assert($team instanceof Team);
 
         $user = factory(User::class)->make();
         assert($user instanceof User);
@@ -215,11 +278,11 @@ final class BelongsToDirectiveTest extends DBTestCase
 
     public function testBelongsToItself(): void
     {
-        /** @var Post $parent */
         $parent = factory(Post::class)->create();
+        assert($parent instanceof Post);
 
-        /** @var Post $child */
         $child = factory(Post::class)->make();
+        assert($child instanceof Post);
         $child->parent()->associate($parent);
         $child->save();
 
@@ -266,9 +329,10 @@ final class BelongsToDirectiveTest extends DBTestCase
     public function testDoesNotShortcutForeignKeySelectionByDefault(): void
     {
         $company = factory(Company::class)->create();
+        assert($company instanceof Company);
 
-        /** @var User $user */
         $user = factory(User::class)->make();
+        assert($user instanceof User);
         $user->company()->associate($company);
         $user->save();
 
@@ -480,9 +544,11 @@ final class BelongsToDirectiveTest extends DBTestCase
         type Company {
             id: ID!
             name: String!
+            users: [User!]! @hasMany
         }
 
         type User {
+            id: ID!
             company: Company @belongsTo
         }
 
@@ -491,7 +557,7 @@ final class BelongsToDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->assertQueryCountMatches(1, function () use ($company): void {
+        $this->assertQueryCountMatches(1, function () use ($user, $company): void {
             $this->graphQL(/** @lang GraphQL */ '
             {
                 user {
