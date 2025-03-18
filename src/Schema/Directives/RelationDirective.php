@@ -54,7 +54,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
             // that we know to be present on the parent model.
             if (
                 $this->lighthouseConfig['shortcut_foreign_key_selection']
-                && ['id' => true] === $resolveInfo->getFieldSelection()
+                && (array_diff_assoc($resolveInfo->getFieldSelection(), ['id' => true, '__typename' => true]) === [])
                 && $relation instanceof BelongsTo
                 && $args === []
             ) {
