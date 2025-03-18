@@ -557,7 +557,7 @@ final class BelongsToDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->assertQueryCountMatches(1, function () use ($user, $company): void {
+        $this->assertQueryCountMatches(1, function () use ($company): void {
             $this->graphQL(/** @lang GraphQL */ '
             {
                 user {
