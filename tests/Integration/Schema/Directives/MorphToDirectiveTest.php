@@ -28,8 +28,8 @@ final class MorphToDirectiveTest extends DBTestCase
         $image->save();
 
         $this->schema =
-            /** @lang GraphQL */
-            '
+        /** @lang GraphQL */
+        '
         type Image {
             id: ID!
             imageable: Task! @morphTo
@@ -48,8 +48,8 @@ final class MorphToDirectiveTest extends DBTestCase
         ';
 
         $this->graphQL(
-            /** @lang GraphQL */
-            '
+        /** @lang GraphQL */
+        '
         query ($id: ID!) {
             image(id: $id) {
                 id
@@ -59,11 +59,9 @@ final class MorphToDirectiveTest extends DBTestCase
                 }
             }
         }
-        ',
-            [
-                'id' => $image->id,
-            ]
-        )->assertJson([
+        ', [
+            'id' => $image->id,
+        ])->assertJson([
             'data' => [
                 'image' => [
                     'id' => $image->id,
@@ -92,8 +90,8 @@ final class MorphToDirectiveTest extends DBTestCase
         $image->save();
 
         $this->schema =
-            /** @lang GraphQL */
-            '
+        /** @lang GraphQL */
+        '
         type Image {
             id: ID!
             customImageable: Task! @morphTo(relation: "imageable")
@@ -112,8 +110,8 @@ final class MorphToDirectiveTest extends DBTestCase
         ';
 
         $this->graphQL(
-            /** @lang GraphQL */
-            '
+        /** @lang GraphQL */
+        '
         query ($id: ID!) {
             image(id: $id) {
                 id
@@ -123,11 +121,9 @@ final class MorphToDirectiveTest extends DBTestCase
                 }
             }
         }
-        ',
-            [
-                'id' => $image->id,
-            ]
-        )->assertJson([
+        ', [
+            'id' => $image->id,
+        ])->assertJson([
             'data' => [
                 'image' => [
                     'id' => $image->id,
@@ -166,8 +162,8 @@ final class MorphToDirectiveTest extends DBTestCase
         $postImage->save();
 
         $this->schema =
-            /** @lang GraphQL */
-            '
+        /** @lang GraphQL */
+        '
         interface Imageable {
             id: ID!
         }
@@ -195,8 +191,8 @@ final class MorphToDirectiveTest extends DBTestCase
         ';
 
         $this->graphQL(
-            /** @lang GraphQL */
-            '
+        /** @lang GraphQL */
+        '
         query ($taskImage: ID!, $postImage: ID!){
             taskImage: image(id: $taskImage) {
                 id
@@ -225,12 +221,10 @@ final class MorphToDirectiveTest extends DBTestCase
                 }
             }
         }
-        ',
-            [
-                'taskImage' => $image->id,
-                'postImage' => $postImage->id,
-            ]
-        )->assertJson([
+        ', [
+            'taskImage' => $image->id,
+            'postImage' => $postImage->id,
+        ])->assertJson([
             'data' => [
                 'taskImage' => [
                     'id' => $image->id,
@@ -278,8 +272,8 @@ final class MorphToDirectiveTest extends DBTestCase
         $postImage->save();
 
         $this->schema =
-            /** @lang GraphQL */
-            '
+        /** @lang GraphQL */
+        '
         interface Imageable {
             id: ID!
         }
@@ -334,27 +328,25 @@ final class MorphToDirectiveTest extends DBTestCase
                         }
                     }
                 }
-                ',
-                [
+                ', [
                     'taskImage' => $image->id,
                     'postImage' => $postImage->id,
-                ]
-            )->assertJson([
-                'data' => [
-                    'taskImage' => [
-                        'id' => $image->id,
-                        'imageable' => [
-                            'id' => $task->id,
+                ])->assertJson([
+                    'data' => [
+                        'taskImage' => [
+                            'id' => $image->id,
+                            'imageable' => [
+                                'id' => $task->id,
+                            ],
+                        ],
+                        'postImage' => [
+                            'id' => $postImage->id,
+                            'imageable' => [
+                                'id' => $post->id,
+                            ],
                         ],
                     ],
-                    'postImage' => [
-                        'id' => $postImage->id,
-                        'imageable' => [
-                            'id' => $post->id,
-                        ],
-                    ],
-                ],
-            ]);
+                ]);
         });
     }
 
@@ -386,8 +378,8 @@ final class MorphToDirectiveTest extends DBTestCase
         $postImage->save();
 
         $this->schema =
-            /** @lang GraphQL */
-            '
+        /** @lang GraphQL */
+        '
         interface Imageable {
             id: ID!
         }
@@ -444,29 +436,27 @@ final class MorphToDirectiveTest extends DBTestCase
                         }
                     }
                 }
-                ',
-                [
+                ', [
                     'taskImage' => $image->id,
                     'postImage' => $postImage->id,
-                ]
-            )->assertJson([
-                'data' => [
-                    'taskImage' => [
-                        'id' => $image->id,
-                        'imageable' => [
-                            '__typename' => 'Task',
-                            'id' => $task->id,
+                ])->assertJson([
+                    'data' => [
+                        'taskImage' => [
+                            'id' => $image->id,
+                            'imageable' => [
+                                '__typename' => 'Task',
+                                'id' => $task->id,
+                            ],
+                        ],
+                        'postImage' => [
+                            'id' => $postImage->id,
+                            'imageable' => [
+                                '__typename' => 'Post',
+                                'id' => $post->id,
+                            ],
                         ],
                     ],
-                    'postImage' => [
-                        'id' => $postImage->id,
-                        'imageable' => [
-                            '__typename' => 'Post',
-                            'id' => $post->id,
-                        ],
-                    ],
-                ],
-            ]);
+                ]);
         });
     }
 
@@ -496,8 +486,8 @@ final class MorphToDirectiveTest extends DBTestCase
         $postImage->save();
 
         $this->schema =
-            /** @lang GraphQL */
-            '
+        /** @lang GraphQL */
+        '
         union Imageable = Task | Post
 
         type Task {
@@ -523,8 +513,8 @@ final class MorphToDirectiveTest extends DBTestCase
         ';
 
         $this->graphQL(
-            /** @lang GraphQL */
-            '
+        /** @lang GraphQL */
+        '
         query ($taskImage: ID!, $postImage: ID!){
             taskImage: image(id: $taskImage) {
                 id
@@ -555,12 +545,10 @@ final class MorphToDirectiveTest extends DBTestCase
                 }
             }
         }
-        ',
-            [
-                'taskImage' => $image->id,
-                'postImage' => $postImage->id,
-            ]
-        )->assertJson([
+        ', [
+            'taskImage' => $image->id,
+            'postImage' => $postImage->id,
+        ])->assertJson([
             'data' => [
                 'taskImage' => [
                     'id' => $image->id,
@@ -610,8 +598,8 @@ final class MorphToDirectiveTest extends DBTestCase
         $postImage->save();
 
         $this->schema =
-            /** @lang GraphQL */
-            '
+        /** @lang GraphQL */
+        '
         union Imageable = Task | Post
 
         type Task {
@@ -664,27 +652,25 @@ final class MorphToDirectiveTest extends DBTestCase
                         }
                     }
                 }
-                ',
-                [
+                ', [
                     'taskImage' => $image->id,
                     'postImage' => $postImage->id,
-                ]
-            )->assertJson([
-                'data' => [
-                    'taskImage' => [
-                        'id' => $image->id,
-                        'imageable' => [
-                            'id' => $task->id,
+                ])->assertJson([
+                    'data' => [
+                        'taskImage' => [
+                            'id' => $image->id,
+                            'imageable' => [
+                                'id' => $task->id,
+                            ],
+                        ],
+                        'postImage' => [
+                            'id' => $postImage->id,
+                            'imageable' => [
+                                'id' => $post->id,
+                            ],
                         ],
                     ],
-                    'postImage' => [
-                        'id' => $postImage->id,
-                        'imageable' => [
-                            'id' => $post->id,
-                        ],
-                    ],
-                ],
-            ]);
+                ]);
         });
     }
 
@@ -716,8 +702,8 @@ final class MorphToDirectiveTest extends DBTestCase
         $postImage->save();
 
         $this->schema =
-            /** @lang GraphQL */
-            '
+        /** @lang GraphQL */
+        '
         union Imageable = Task | Post
 
         type Task {
@@ -772,33 +758,31 @@ final class MorphToDirectiveTest extends DBTestCase
                         }
                     }
                 }
-                ',
-                [
+                ', [
                     'taskImage' => $image->id,
                     'postImage' => $postImage->id,
-                ]
-            )->assertJson([
-                'data' => [
-                    'taskImage' => [
-                        'id' => $image->id,
-                        'imageable' => [
-                            '__typename' => 'Task',
-                            'id' => $task->id,
+                ])->assertJson([
+                    'data' => [
+                        'taskImage' => [
+                            'id' => $image->id,
+                            'imageable' => [
+                                '__typename' => 'Task',
+                                'id' => $task->id,
+                            ],
+                        ],
+                        'postImage' => [
+                            'id' => $postImage->id,
+                            'imageable' => [
+                                '__typename' => 'Post',
+                                'id' => $post->id,
+                            ],
                         ],
                     ],
-                    'postImage' => [
-                        'id' => $postImage->id,
-                        'imageable' => [
-                            '__typename' => 'Post',
-                            'id' => $post->id,
-                        ],
-                    ],
-                ],
-            ]);
+                ]);
         });
     }
 
-    public function testDoesNotShortcutForeignKeySelectionUsingUnionIfQueryHasFieldSelection(): void
+    public function testDoesNotShortcutForeignKeySelectionUsingUnion(): void
     {
         config(['lighthouse.shortcut_foreign_key_selection' => true]);
 
@@ -826,8 +810,8 @@ final class MorphToDirectiveTest extends DBTestCase
         $postImage->save();
 
         $this->schema =
-            /** @lang GraphQL */
-            '
+        /** @lang GraphQL */
+        '
         union Imageable = Task | Post
 
         type Task {
@@ -884,29 +868,27 @@ final class MorphToDirectiveTest extends DBTestCase
                         }
                     }
                 }
-                ',
-                [
+                ', [
                     'taskImage' => $image->id,
                     'postImage' => $postImage->id,
-                ]
-            )->assertJson([
-                'data' => [
-                    'taskImage' => [
-                        'id' => $image->id,
-                        'imageable' => [
-                            'id' => $task->id,
-                            'name' => $task->name,
+                ])->assertJson([
+                    'data' => [
+                        'taskImage' => [
+                            'id' => $image->id,
+                            'imageable' => [
+                                'id' => $task->id,
+                                'name' => $task->name,
+                            ],
+                        ],
+                        'postImage' => [
+                            'id' => $postImage->id,
+                            'imageable' => [
+                                'id' => $post->id,
+                                'title' => $post->title,
+                            ],
                         ],
                     ],
-                    'postImage' => [
-                        'id' => $postImage->id,
-                        'imageable' => [
-                            'id' => $post->id,
-                            'title' => $post->title,
-                        ],
-                    ],
-                ],
-            ]);
+                ]);
         });
     }
 
@@ -928,8 +910,8 @@ final class MorphToDirectiveTest extends DBTestCase
         $image->save();
 
         $this->schema =
-            /** @lang GraphQL */
-            '
+        /** @lang GraphQL */
+        '
         type Image {
             id: ID!
             imageable: Task! @morphTo
@@ -949,8 +931,8 @@ final class MorphToDirectiveTest extends DBTestCase
 
         $this->assertQueryCountMatches(1, function () use ($image, $task): void {
             $this->graphQL(
-                /** @lang GraphQL */
-                '
+            /** @lang GraphQL */
+            '
                 query ($id: ID!) {
                     image(id: $id) {
                         id
@@ -959,11 +941,9 @@ final class MorphToDirectiveTest extends DBTestCase
                         }
                     }
                 }
-                ',
-                [
-                    'id' => $image->id,
-                ]
-            )->assertJson([
+                ', [
+                'id' => $image->id,
+            ])->assertJson([
                 'data' => [
                     'image' => [
                         'id' => $image->id,
@@ -994,8 +974,8 @@ final class MorphToDirectiveTest extends DBTestCase
         $image->save();
 
         $this->schema =
-            /** @lang GraphQL */
-            '
+        /** @lang GraphQL */
+        '
         type Image {
             id: ID!
             imageable: Task! @morphTo
@@ -1015,8 +995,8 @@ final class MorphToDirectiveTest extends DBTestCase
 
         $this->assertQueryCountMatches(1, function () use ($image): void {
             $this->graphQL(
-                /** @lang GraphQL */
-                '
+            /** @lang GraphQL */
+            '
                 query ($id: ID!) {
                     image(id: $id) {
                         id
@@ -1025,11 +1005,9 @@ final class MorphToDirectiveTest extends DBTestCase
                         }
                     }
                 }
-                ',
-                [
-                    'id' => $image->id,
-                ]
-            )->assertJson([
+                ', [
+                'id' => $image->id,
+            ])->assertJson([
                 'data' => [
                     'image' => [
                         'id' => $image->id,
@@ -1060,8 +1038,8 @@ final class MorphToDirectiveTest extends DBTestCase
         $image->save();
 
         $this->schema =
-            /** @lang GraphQL */
-            '
+        /** @lang GraphQL */
+        '
         type Image {
             id: ID!
             imageable: Task! @morphTo
@@ -1081,8 +1059,8 @@ final class MorphToDirectiveTest extends DBTestCase
 
         $this->assertQueryCountMatches(1, function () use ($image, $task): void {
             $this->graphQL(
-                /** @lang GraphQL */
-                '
+            /** @lang GraphQL */
+            '
                 query ($id: ID!) {
                     image(id: $id) {
                         id
@@ -1092,11 +1070,9 @@ final class MorphToDirectiveTest extends DBTestCase
                         }
                     }
                 }
-                ',
-                [
-                    'id' => $image->id,
-                ]
-            )->assertJson([
+                ', [
+                'id' => $image->id,
+            ])->assertJson([
                 'data' => [
                     'image' => [
                         'id' => $image->id,
@@ -1128,8 +1104,8 @@ final class MorphToDirectiveTest extends DBTestCase
         $image->save();
 
         $this->schema =
-            /** @lang GraphQL */
-            '
+        /** @lang GraphQL */
+        '
         type Image {
             id: ID!
             imageable: Task! @morphTo
@@ -1149,8 +1125,8 @@ final class MorphToDirectiveTest extends DBTestCase
 
         $this->assertQueryCountMatches(2, function () use ($image, $task): void {
             $this->graphQL(
-                /** @lang GraphQL */
-                '
+            /** @lang GraphQL */
+            '
                 query ($id: ID!) {
                     image(id: $id) {
                         id
@@ -1160,11 +1136,9 @@ final class MorphToDirectiveTest extends DBTestCase
                         }
                     }
                 }
-                ',
-                [
-                    'id' => $image->id,
-                ]
-            )->assertJson([
+                ', [
+                'id' => $image->id,
+            ])->assertJson([
                 'data' => [
                     'image' => [
                         'id' => $image->id,
