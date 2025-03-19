@@ -55,16 +55,23 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
             // that we know to be present on the parent model.
             if (
                 $this->lighthouseConfig['shortcut_foreign_key_selection']
-                && (array_diff(array_keys($resolveInfo->getFieldSelection()), ['id', '__typename']) === [])
+                && (array_diff_assoc($resolveInfo->getFieldSelection(), ['id' => true, '__typename' => true]) === [])
                 && $relation instanceof BelongsTo
                 && $args === []
             ) {
                 $id = $parent->getAttribute($relation->getForeignKeyName());
 
-                if ($id === null) return null;
+                if ($id === null) {
+                    return null;
+                }
 
                 // If the relation is polymorphic return the model instance so that TypeRegistry::typeResolverFallback can resolve the correct type
-                return $relation instanceof MorphTo ? $relation->getModel()->forceFill(['id' => $id]) : ['id' => $id];
+                if ($relation instanceof MorphTo) {
+                    $model = $relation->getModel();
+                    $model->id = $id;
+                    return $model;
+                }
+                return ['id' => $id];
             }
 
             if (
