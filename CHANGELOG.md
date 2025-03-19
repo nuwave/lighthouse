@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+
+- Use array keys when comparing shortcut foreign key field selection and return model instance when relation is morphTo https://github.com/nuwave/lighthouse/pull/2670
+
 ## v6.51.1
 
 ### Fixed
