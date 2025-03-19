@@ -54,7 +54,7 @@ final class MorphToDirectiveTest extends DBTestCase
             }
         }
         ', [
-                'id' => $image->id,
+            'id' => $image->id,
         ])->assertJson([
             'data' => [
                 'image' => [
@@ -112,7 +112,7 @@ final class MorphToDirectiveTest extends DBTestCase
             }
         }
         ', [
-                'id' => $image->id,
+            'id' => $image->id,
         ])->assertJson([
             'data' => [
                 'image' => [
@@ -208,8 +208,8 @@ final class MorphToDirectiveTest extends DBTestCase
             }
         }
         ', [
-                'taskImage' => $image->id,
-                'postImage' => $postImage->id,
+            'taskImage' => $image->id,
+            'postImage' => $postImage->id,
         ])->assertJson([
             'data' => [
                 'taskImage' => [
