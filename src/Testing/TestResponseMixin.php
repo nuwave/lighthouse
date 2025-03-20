@@ -90,7 +90,7 @@ class TestResponseMixin
         };
     }
 
-        public function assertGraphQLDebugMessage(): \Closure
+    public function assertGraphQLDebugMessage(): \Closure
     {
         return function (string $message): TestResponse {
             $messages = $this->json('errors.*.extensions.debugMessage');
