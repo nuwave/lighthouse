@@ -370,7 +370,7 @@ final class CacheControlDirectiveTest extends DBTestCase
             tasksWithCache: [Task!]! @hasMany(relation: "tasks") @cacheControl(maxAge: 20)
         }
 
-        type Task @cacheControl(maxAge: 10){
+        type Task @cacheControl(maxAge: 10) {
             id: Int
             foo: String
             bar: String
