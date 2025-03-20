@@ -2,7 +2,8 @@
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
          bootstrap="vendor/autoload.php"
-         colors="true">
+         colors="true"
+         cacheDirectory=".phpunit.cache"><!-- TODO revert when a solution for https://github.com/sebastianbergmann/phpunit/issues/6150 appears -->
   <source>
     <include>
       <directory>src</directory>

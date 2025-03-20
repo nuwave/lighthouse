@@ -25,11 +25,10 @@ final class Role extends Model
 {
     public $timestamps = false;
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Tests\Utils\Models\User, $this> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Tests\Utils\Models\User, $this, \Illuminate\Database\Eloquent\Relations\Pivot> */
     public function users(): BelongsToMany
     {
-        return $this
-            ->belongsToMany(User::class)
+        return $this->belongsToMany(User::class)
             ->withPivot('meta');
     }
 

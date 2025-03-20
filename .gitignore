@@ -9,7 +9,7 @@ phpunit.xml
 .gitpod.yml
 
 # Generated files
-.phpunit.result.cache
+.phpunit.cache
 .php-cs-fixer.cache
 build
 phpstan-tmp-dir

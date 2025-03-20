@@ -37,6 +37,9 @@ class FieldCommand extends FieldGeneratorCommand
     protected function nameParts(): array
     {
         $name = $this->argument('name');
+        if (! is_string($name)) {
+            throw new \InvalidArgumentException('You must specify the name for the class to generate.');
+        }
 
         $parts = explode('.', $name);
         if (count($parts) !== 2) {

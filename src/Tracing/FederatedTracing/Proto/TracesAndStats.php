@@ -59,7 +59,8 @@ class TracesAndStats extends \Google\Protobuf\Internal\Message
      *           `&#64;include` or `&#64;skip`, etc). It also may be missing fields that show up in FieldStats
      *           (as FieldStats will include the concrete object type for fields referenced
      *           via an interface type).
-     *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\QueryMetadata $query_metadata
+     *
+     *     @type \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\QueryMetadata $query_metadata
      *           This is an optional field that is used to provide more context to the key of this object within the
      *           traces_per_query map. If it's omitted, we assume the key is a standard operation name and signature key.
      * }

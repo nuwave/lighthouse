@@ -11,7 +11,7 @@ abstract class QueryBench extends TestCase
     /** Cached graphQL endpoint. */
     protected string $graphQLEndpoint;
 
-    public function __construct()
+    public function __construct() // @phpstan-ignore method.parentMethodFinalByPhpDoc (yeah this is hacky)
     {
         parent::__construct(static::class);
     }
