@@ -34,13 +34,16 @@ parameters:
   - path: tests/database/factories
     message: '#Variable \$factory might not be defined#'
 
-  # Mixins are magical
+  # Mixins magically rebind $this to be something else and do other funky stuff
   - path: src/Testing/TestResponseMixin.php
     message: '#Method Nuwave\\Lighthouse\\Testing\\TestResponseMixin::assertGraphQLErrorMessage\(\) invoked with 1 parameter, 0 required\.#'
   - path: src/Testing/TestResponseMixin.php
     message: '#Method Nuwave\\Lighthouse\\Testing\\TestResponseMixin::assertGraphQLDebugMessage\(\) invoked with 1 parameter, 0 required\.#'
   - path: src/Testing/TestResponseMixin.php
     message: '#Anonymous function should return Illuminate\\Testing\\TestResponse but returns .*#'
+
+  # Recognition of mixin methods is broken in some PHPStan/Larastan versions
+  - '#Call to an undefined method Illuminate\\Testing\\TestResponse::(assertGraphQLValidationError|assertGraphQLValidationKeys|assertGraphQLValidationPasses|assertGraphQLError|assertGraphQLErrorMessage|assertGraphQLDebugMessage|assertGraphQLErrorFree|assertGraphQLSubscriptionAuthorized|assertGraphQLSubscriptionNotAuthorized|graphQLSubscriptionMock|graphQLSubscriptionChannelName|assertGraphQLBroadcasted|assertGraphQLNotBroadcasted)\(\)\.#'
 
   # Relation forwards calls to Builder
   - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Builder<Illuminate\\Database\\Eloquent\\Model>|Illuminate\\Database\\Eloquent\\Relations\\Relation<Illuminate\\Database\\Eloquent\\Model>|Illuminate\\Database\\Query\\Builder::(orderBy|where|whereIn|whereNotIn|whereBetween|whereJsonContains|whereNotBetween)\(\)\.#'
