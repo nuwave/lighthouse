@@ -85,10 +85,10 @@ class LimitsStats extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @var string $strategy
-     *           The strategy used in cost calculations
+     *           The strategy used in cost calculations.
      *     @var array<int>|array<string>|\Google\Protobuf\Internal\RepeatedField $cost_estimated
      *           The estimated cost as calculated via the strategy specified in stats context
-     *           The reason that this is a histogram rather than fixed cost is that it can be affected by paging variables
+     *           The reason that this is a histogram rather than fixed cost is that it can be affected by paging variables.
      *     @var int|string $max_cost_estimated
      *           The maximum estimated cost of the query
      *     @var array<int>|array<string>|\Google\Protobuf\Internal\RepeatedField $cost_actual

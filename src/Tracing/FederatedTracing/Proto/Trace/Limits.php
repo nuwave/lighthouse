@@ -76,9 +76,9 @@ class Limits extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @var string $result
-     *           The result of the operation
+     *           The result of the operation.
      *     @var string $strategy
-     *           The strategy used in cost calculations
+     *           The strategy used in cost calculations.
      *     @var int|string $cost_estimated
      *           The estimated cost as calculated via the strategy specified in strategy
      *     @var int|string $cost_actual
