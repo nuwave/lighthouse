@@ -177,12 +177,12 @@ class Trace extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @var \Google\Protobuf\Timestamp $start_time
-     *           Wallclock time when the trace began.
+     *           Wallclock time when the trace began
      *     @var \Google\Protobuf\Timestamp $end_time
-     *           Wallclock time when the trace ended.
+     *           Wallclock time when the trace ended
      *     @var int|string $duration_ns
      *           High precision duration of the trace; may not equal end_time-start_time
-     *           (eg, if your machine's clock changed during the trace).
+     *           (eg, if your machine's clock changed during the trace)
      *
      *     @type \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Node $root
      *           A tree containing information about all resolvers run directly by this
