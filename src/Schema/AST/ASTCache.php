@@ -9,8 +9,8 @@ use Nuwave\Lighthouse\Exceptions\InvalidSchemaCacheContentsException;
 
 /**
  * @phpstan-type CacheConfig array{
- *   enable: bool,
- *   path: string|null,
+ *   enable: bool|int,
+ *   path?: ?string,
  * }
  *
  * @phpstan-import-type SerializableDocumentAST from DocumentAST

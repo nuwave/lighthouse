@@ -51,8 +51,7 @@ parameters:
   # Laravel 11 changes a lot of generics
   - '#generic class (Illuminate\\Database\\Eloquent\\Builder|Laravel\\Scout\\Builder)( but)? does not specify its types#'
   - '#contains generic type Illuminate\\Testing\\TestResponse<.+> but class Illuminate\\Testing\\TestResponse is not generic\.#'
-  - '#Generic type Illuminate\\Database\\Eloquent\\Relations\\(HasOne|HasMany|MorphOne|MorphMany|MorphToMany)<.+, .+> in PHPDoc tag @return specifies 2 template types, but class Illuminate\\Database\\Eloquent\\Relations\\\1 supports only 1: TRelatedModel#'
-  - '#Generic type Illuminate\\Database\\Eloquent\\Relations\\(BelongsToMany)<.+, .+, .+> in PHPDoc tag @return specifies 3 template types, but class Illuminate\\Database\\Eloquent\\Relations\\\1 supports only 2: TRelatedModel, TDeclaringModel#'
+  - '#Generic type Illuminate\\Database\\Eloquent\\Relations\\(HasOne|HasMany|BelongsToMany|MorphOne|MorphMany|MorphToMany)<.+> in PHPDoc tag @return specifies \d template types, but class Illuminate\\Database\\Eloquent\\Relations\\\1 supports only \d: .+#'
   - '#Method .+ should return Illuminate\\Database\\Eloquent\\Relations\\(HasOne|HasMany|BelongsToMany|MorphOne|MorphMany|MorphToMany)<(.+), .+> but returns Illuminate\\Database\\Eloquent\\Relations\\\1<\2>.#'
   - '#Method .+ should return Illuminate\\Database\\Eloquent\\Relations\\(BelongsTo|MorphTo)<(.+), \$this\((.+)\)> but returns Illuminate\\Database\\Eloquent\\Relations\\\1<\2, \3>.#'
   - '#Generic type Illuminate\\Database\\Eloquent\\Relations\\(HasOneThrough|HasManyThrough)<.+, .+, .+> in PHPDoc tag @return specifies 3 template types, but class Illuminate\\Database\\Eloquent\\Relations\\\1 supports only 1: TRelatedModel#'
