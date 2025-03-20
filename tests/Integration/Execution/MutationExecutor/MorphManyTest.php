@@ -157,7 +157,7 @@ final class MorphManyTest extends DBTestCase
         assert($image1 instanceof Image);
 
         $this->graphQL(/** @lang GraphQL */ '
-            mutation ($input: CreateTaskInput!){
+            mutation ($input: CreateTaskInput!) {
                 createTask(input: $input) {
                     id
                     name

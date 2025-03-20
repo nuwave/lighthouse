@@ -45,7 +45,7 @@ final class DeferIncludeSkipTest extends TestCase
     public function testDoesNotDeferWithIncludeFalseFromVariable(): void
     {
         $this->graphQL(/** @lang GraphQL */ '
-        query ($include: Boolean!){
+        query ($include: Boolean!) {
             foo @defer @include(if: $include)
         }
         ', [
@@ -80,7 +80,7 @@ final class DeferIncludeSkipTest extends TestCase
     public function testDoesNotDeferWithSkipTrueFromVariable(): void
     {
         $this->graphQL(/** @lang GraphQL */ '
-        query ($skip: Boolean!){
+        query ($skip: Boolean!) {
             foo @defer @skip(if: $skip)
         }
         ', [
