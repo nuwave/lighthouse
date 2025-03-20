@@ -65,12 +65,15 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
                     return null;
                 }
 
-                // If the relation is polymorphic return the model instance so that TypeRegistry::typeResolverFallback can resolve the correct type
+                // If the relation is polymorphic, instantiate and hydrate the model instance.
+                // This allows TypeRegistry::typeResolverFallback to resolve the correct type.
                 if ($relation instanceof MorphTo) {
                     $model = $relation->getModel();
-                    $model->id = $id;
+                    $model->id = $id; // @phpstan-ignore property.notFound (assuming we have an id property, as it is queried through GraphQL)
+
                     return $model;
                 }
+
                 return ['id' => $id];
             }
 
