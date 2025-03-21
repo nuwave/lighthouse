@@ -176,9 +176,19 @@ final class BuilderDirectiveTest extends DBTestCase
         $users = factory(User::class, 2)->create();
 
         foreach ($users as $user) {
-            $tasks = factory(Task::class, 3)->make();
-            $tasks[0]->name = $user->name;
-            $user->tasks()->saveMany($tasks);
+            assert($user instanceof User);
+
+            $taskWithSameName = factory(Task::class)->make();
+            assert($taskWithSameName instanceof Task);
+            $taskWithSameName->name = $user->name;
+            $taskWithSameName->user()->associate($user);
+            $taskWithSameName->save();
+
+            $taskWithOtherName = factory(Task::class)->make();
+            assert($taskWithOtherName instanceof Task);
+            $taskWithOtherName->name = "Different from {$user->name}";
+            $taskWithOtherName->user()->associate($user);
+            $taskWithOtherName->save();
         }
 
         $this->graphQL(/** @lang GraphQL */ '
