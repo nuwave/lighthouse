@@ -221,15 +221,15 @@ final class BuilderDirectiveTest extends DBTestCase
     }
 
     /**
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<\Tests\Utils\Models\User>  $builder
+     * @param  \Illuminate\Database\Eloquent\Builder<\Tests\Utils\Models\User>  $builder
      *
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<\Tests\Utils\Models\User>
+     * @return \Illuminate\Database\Eloquent\Builder<\Tests\Utils\Models\User>
      */
     public static function specificModel(
-        QueryBuilder|EloquentBuilder $builder,
+        EloquentBuilder $builder,
         ?int $value,
         User $user,
-    ): QueryBuilder|EloquentBuilder {
+    ): EloquentBuilder {
         return $builder->where('name', $user->name);
     }
 }
