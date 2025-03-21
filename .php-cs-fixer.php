@@ -3,6 +3,7 @@
 $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__)
     ->name('*.php')
+    ->notPath('src/Tracing/FederatedTracing/Proto')
     ->notPath('vendor')
     ->notPath('phpstan-tmp-dir')
     ->ignoreDotFiles(false)
