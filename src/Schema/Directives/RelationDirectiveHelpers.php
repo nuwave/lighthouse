@@ -44,6 +44,7 @@ trait RelationDirectiveHelpers
                 $this->scopes(),
                 /**
                  * Sometimes overridden to use a different model than the usual root.
+                 *
                  * @see \Nuwave\Lighthouse\Execution\ModelsLoader\PaginatedModelsLoader::loadRelatedModels
                  * @see \Tests\Integration\Schema\Directives\BuilderDirectiveTest::testCallsCustomBuilderMethodOnFieldWithSpecificModel
                  */
