@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.52.1
+
+### Fixed
+
+- Pass specific parent model instances to builder enhancers when resolving paginated relations on lists https://github.com/nuwave/lighthouse/pull/2671 
+
 ## v6.52.0
 
 ### Added
