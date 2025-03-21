@@ -4,6 +4,8 @@ namespace Tests\Unit\Schema\Directives;
 
 use GraphQL\Validator\Rules\QueryComplexity;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
+use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
+use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
 
@@ -13,6 +15,14 @@ final class ComplexityDirectiveTest extends TestCase
 
     public function testDefaultComplexity(): void
     {
+        $eventsDispatcher = $this->app->make(EventsDispatcher::class);
+
+        /** @var array<int, BuildExtensionsResponse> $events */
+        $events = [];
+        $eventsDispatcher->listen(BuildExtensionsResponse::class, static function (BuildExtensionsResponse $event) use (&$events): void {
+            $events[] = $event;
+        });
+
         $max = 1;
         $this->setMaxQueryComplexity($max);
 
@@ -33,6 +43,14 @@ final class ComplexityDirectiveTest extends TestCase
             }
         }
         ')->assertGraphQLErrorMessage(QueryComplexity::maxQueryComplexityErrorMessage($max, 2));
+
+        $this->assertCount(1, $events);
+
+        // TODO remove this check when updating the required version of webonyx/graphql-php
+        if (method_exists(QueryComplexity::class, 'getQueryComplexity')) {
+            $event = $events[0];
+            $this->assertSame(2, $event->queryComplexity);
+        }
     }
 
     public function testKnowsPagination(): void

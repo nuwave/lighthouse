@@ -137,13 +137,15 @@ class GraphQL
         );
 
         if ($this->providesValidationRules instanceof CacheableValidationRulesProvider) {
-            $validationRules = $this->providesValidationRules->cacheableValidationRules();
+            $cacheableValidationRules = $this->providesValidationRules->cacheableValidationRules();
 
-            $errors = $this->validateCacheableRules($validationRules, $schema, $this->schemaBuilder->schemaHash(), $query, $queryHash);
+            $errors = $this->validateCacheableRules($cacheableValidationRules, $schema, $this->schemaBuilder->schemaHash(), $query, $queryHash);
             if ($errors !== []) {
                 return new ExecutionResult(null, $errors);
             }
         }
+
+        $validationRules = $this->providesValidationRules->validationRules();
 
         $result = GraphQLBase::executeQuery(
             $schema,
@@ -153,12 +155,19 @@ class GraphQL
             $variables,
             $operationName,
             null,
-            $this->providesValidationRules->validationRules(),
+            $validationRules,
         );
+
+        $queryComplexityRule = $validationRules[QueryComplexity::class] ?? null;
+        $queryComplexity = $queryComplexityRule instanceof QueryComplexity
+            // TODO remove this check when updating the required version of webonyx/graphql-php
+            && method_exists($queryComplexityRule, 'getQueryComplexity')
+            ? $queryComplexityRule->getQueryComplexity()
+            : null;
 
         /** @var array<\Nuwave\Lighthouse\Execution\ExtensionsResponse|null> $extensionsResponses */
         $extensionsResponses = (array) $this->eventDispatcher->dispatch(
-            new BuildExtensionsResponse($result),
+            new BuildExtensionsResponse($result, $queryComplexity),
         );
 
         foreach ($extensionsResponses as $extensionsResponse) {

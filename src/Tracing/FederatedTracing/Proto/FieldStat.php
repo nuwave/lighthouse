@@ -82,16 +82,17 @@ class FieldStat extends \Google\Protobuf\Internal\Message
      *
      *     @var string $return_type
      *           required; eg "String!" for User.email:String!
-     *     @var int|string $errors_count
+     *
+     *     @type int|string $errors_count
      *           Number of errors whose path is this field. Note that we assume that error
      *           tracking does *not* require field-level instrumentation so this *will*
      *           include errors from requests that don't contribute to the
      *           `observed_execution_count` field (and does not need to be scaled by
      *           field_execution_weight).
-     *     @var int|string $observed_execution_count
+     *     @type int|string $observed_execution_count
      *           Number of times that the resolver for this field is directly observed being
-     *           executed
-     *     @var int|string $estimated_execution_count
+     *           executed.
+     *     @type int|string $estimated_execution_count
      *           Same as `observed_execution_count` but potentially scaled upwards if the server was only
      *           performing field-level instrumentation on a sampling of operations.  For
      *           example, if the server randomly instruments 1% of requests for this
@@ -100,13 +101,13 @@ class FieldStat extends \Google\Protobuf\Internal\Message
      *           this number goes up by the trace's `field_execution_weight` for each
      *           observed field execution, while `observed_execution_count` above goes
      *           up by 1.)
-     *     @var int|string $requests_with_errors_count
+     *     @type int|string $requests_with_errors_count
      *           Number of times the resolver for this field is executed that resulted in
      *           at least one error. "Request" is a misnomer here as this corresponds to
      *           resolver calls, not overall operations. Like `errors_count` above, this
      *           includes all requests rather than just requests with field-level
      *           instrumentation.
-     *     @var array<int>|array<string>|\Google\Protobuf\Internal\RepeatedField $latency_count
+     *     @type array<int>|array<string>|\Google\Protobuf\Internal\RepeatedField $latency_count
      *           Duration histogram for the latency of this field. Note that it is scaled in
      *           the same way as estimated_execution_count so its "total count" might be
      *           greater than `observed_execution_count` and may not exactly equal
