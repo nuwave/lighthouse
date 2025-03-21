@@ -259,8 +259,7 @@ final class BelongsToManyTest extends DBTestCase
             ],
         ]);
 
-        $role = Role::firstOrFail();
-        assert($role instanceof Role);
+        $role = Role::query()->firstOrFail();
         $this->assertCount(2, $role->users()->get());
         $this->assertSame('is_user', $role->name);
     }
@@ -310,8 +309,7 @@ GRAPHQL
             ],
         ]);
 
-        $role = Role::firstOrFail();
-        assert($role instanceof Role);
+        $role = Role::query()->firstOrFail();
         $this->assertCount(2, $role->users()->get());
         $this->assertSame('is_user', $role->name);
     }
@@ -463,8 +461,7 @@ GRAPHQL
             ],
         ]);
 
-        $role = Role::firstOrFail();
-        assert($role instanceof Role);
+        $role = Role::query()->firstOrFail();
         $this->assertCount(2, $role->users()->get());
         $this->assertSame('is_user', $role->name);
     }
@@ -560,8 +557,7 @@ GRAPHQL
             ],
         ]);
 
-        $role = Role::firstOrFail();
-        assert($role instanceof Role);
+        $role = Role::query()->firstOrFail();
         $this->assertCount(2, $role->users()->get());
         $this->assertSame('is_user', $role->name);
     }
@@ -629,8 +625,7 @@ GRAPHQL
             ],
         ]);
 
-        $role = Role::firstOrFail();
-        assert($role instanceof Role);
+        $role = Role::query()->firstOrFail();
         $this->assertCount(2, $role->users()->get());
         $this->assertSame('is_user', $role->name);
     }
@@ -678,8 +673,7 @@ GRAPHQL
             ],
         ]);
 
-        $role = Role::firstOrFail();
-        assert($role instanceof Role);
+        $role = Role::query()->firstOrFail();
         $this->assertCount(1, $role->users()->get());
         $this->assertSame('is_user', $role->name);
 
@@ -731,8 +725,7 @@ GRAPHQL
             ],
         ]);
 
-        $role = Role::firstOrFail();
-        assert($role instanceof Role);
+        $role = Role::query()->firstOrFail();
         $this->assertCount(2, $role->users()->get());
     }
 
@@ -779,8 +772,7 @@ GRAPHQL
             ],
         ]);
 
-        $role = Role::firstOrFail();
-        assert($role instanceof Role);
+        $role = Role::query()->firstOrFail();
         $this->assertCount(2, $role->users()->get());
     }
 
@@ -822,8 +814,7 @@ GRAPHQL
             ],
         ]);
 
-        $role = Role::firstOrFail();
-        assert($role instanceof Role);
+        $role = Role::query()->firstOrFail();
         $this->assertCount(1, $role->users()->get());
 
         $this->assertNotNull(User::find(1));

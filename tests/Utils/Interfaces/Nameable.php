@@ -10,7 +10,9 @@ use Tests\Utils\Models\User;
 
 final class Nameable
 {
-    public function __construct(private TypeRegistry $typeRegistry) {}
+    public function __construct(
+        private TypeRegistry $typeRegistry,
+    ) {}
 
     public function resolve(?Model $value): ?Type
     {

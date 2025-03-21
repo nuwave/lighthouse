@@ -7,6 +7,8 @@ use Safe\Exceptions\FilesystemException;
 /**
  * Refreshes the schema cache once before any tests are run.
  *
+ * This is a bootable test trait, @see \Illuminate\Foundation\Testing\Concerns\InteractsWithTestCaseLifecycle::setUpTraits
+ *
  * @mixin \Illuminate\Foundation\Testing\Concerns\InteractsWithConsole
  */
 trait RefreshesSchemaCache

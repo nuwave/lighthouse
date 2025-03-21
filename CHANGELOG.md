@@ -9,11 +9,75 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
-## v6.46.0
+## v6.52.0
 
 ### Added
 
 - Expose query complexity score in lifecycle event `BuildExtensionsResponse` https://github.com/nuwave/lighthouse/pull/2637
+
+## v6.51.2
+
+### Fixed
+
+- Fix shortcut foreign key selection for morphTo relationships that use inline fragments in field selection https://github.com/nuwave/lighthouse/pull/2670
+
+## v6.51.1
+
+### Fixed
+
+- Update generated code in `Nuwave\Lighthouse\Tracing\FederatedTracing\Proto`
+
+## v6.51.0
+
+### Fixed
+
+- Apply shortcut foreign key selection logic when `__typename` is included in related model's field selection https://github.com/nuwave/lighthouse/pull/2666
+
+### Changed
+
+- Update `reports.proto` with `Client awareness contexts` https://github.com/nuwave/lighthouse/pull/2667
+
+## v6.50.0
+
+### Added
+
+- Allow `thecodingmachine/safe` 3 https://github.com/nuwave/lighthouse/pull/2657
+
+## v6.49.1
+
+### Fixed
+
+- Pull empty IDs instead of filling them with upsert https://github.com/nuwave/lighthouse/pull/2656
+
+## v6.49.0
+
+### Added
+
+- Make reporting of client-safe errors configurable https://github.com/nuwave/lighthouse/issues/2647
+
+## v6.48.0
+
+### Added
+
+- Add `@bind` directive as a GraphQL analogue for Laravel's Route Model Binding https://github.com/nuwave/lighthouse/pull/2645
+
+## v6.47.1
+
+### Fixed
+
+- Cast model count to `int` in `CountModelsLoader` https://github.com/nuwave/lighthouse/pull/2646
+
+## v6.47.0
+
+### Added
+
+- Support Laravel Reverb as a subscriptions broadcasting driver https://github.com/nuwave/lighthouse/pull/2639
+
+## v6.46.0
+
+### Added
+
+- Allow `@show`, `@hide`, and `@feature` directives to be used on types, arguments and input types https://github.com/nuwave/lighthouse/pull/2638
 
 ## v6.45.1
 

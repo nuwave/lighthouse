@@ -342,7 +342,7 @@ final class CanDirectiveTest extends TestCase
 
         $this->graphQL(/** @lang GraphQL */ '
         {
-            user(foo: "dynamic"){
+            user(foo: "dynamic") {
                 name
             }
         }

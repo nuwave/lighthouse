@@ -79,6 +79,8 @@ class GraphQL
         mixed $root = null,
         ?string $operationName = null,
     ): array {
+        $queryHash = hash('sha256', $query);
+
         try {
             $parsedQuery = $this->parse($query, $queryHash);
         } catch (SyntaxError $syntaxError) {
@@ -277,10 +279,9 @@ class GraphQL
      *
      * @api
      */
-    public function parse(string $query, ?string &$hash = null): DocumentNode
+    public function parse(string $query, string $hash): DocumentNode
     {
         $cacheConfig = $this->configRepository->get('lighthouse.query_cache');
-        $hash = hash('sha256', $query);
 
         if (! $cacheConfig['enable']) {
             return $this->parseQuery($query);
@@ -324,15 +325,7 @@ class GraphQL
             || ! ($cacheConfig['enable'] ?? false)
         ) {
             // https://github.com/apollographql/apollo-server/blob/37a5c862261806817a1d71852c4e1d9cdb59eab2/packages/apollo-server-errors/src/index.ts#L240-L248
-            throw new Error(
-                'PersistedQueryNotSupported',
-                null,
-                null,
-                [],
-                null,
-                null,
-                ['code' => 'PERSISTED_QUERY_NOT_SUPPORTED'],
-            );
+            throw new Error('PersistedQueryNotSupported', null, null, [], null, null, ['code' => 'PERSISTED_QUERY_NOT_SUPPORTED']);
         }
 
         $cacheFactory = Container::getInstance()->make(CacheFactory::class);
@@ -340,15 +333,7 @@ class GraphQL
 
         return $store->get("lighthouse:query:{$sha256hash}")
             // https://github.com/apollographql/apollo-server/blob/37a5c862261806817a1d71852c4e1d9cdb59eab2/packages/apollo-server-errors/src/index.ts#L230-L239
-            ?? throw new Error(
-                'PersistedQueryNotFound',
-                null,
-                null,
-                [],
-                null,
-                null,
-                ['code' => 'PERSISTED_QUERY_NOT_FOUND'],
-            );
+            ?? throw new Error('PersistedQueryNotFound', null, null, [], null, null, ['code' => 'PERSISTED_QUERY_NOT_FOUND']);
     }
 
     /** @return ErrorsHandler */
@@ -403,7 +388,7 @@ class GraphQL
      *
      * @param  array<string, \GraphQL\Validator\Rules\ValidationRule>  $validationRules
      *
-     * @return array<\GraphQL\Error\Error>
+     * @return list<\GraphQL\Error\Error>
      */
     protected function validateCacheableRules(
         array $validationRules,
@@ -431,7 +416,6 @@ class GraphQL
         $cacheKey = "lighthouse:validation:{$schemaHash}:{$queryHash}";
 
         $cacheFactory = Container::getInstance()->make(CacheFactory::class);
-        assert($cacheFactory instanceof CacheFactory);
 
         $store = $cacheFactory->store($cacheConfig['store']);
         $cachedResult = $store->get($cacheKey);

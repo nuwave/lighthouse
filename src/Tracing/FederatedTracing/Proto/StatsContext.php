@@ -35,6 +35,16 @@ class StatsContext extends \Google\Protobuf\Internal\Message
     protected $result = '';
 
     /**
+     * Client awareness contexts.
+     *
+     * Generated from protobuf field <code>string client_library_name = 7 [json_name = "clientLibraryName"];</code>
+     */
+    protected $client_library_name = '';
+
+    /** Generated from protobuf field <code>string client_library_version = 8 [json_name = "clientLibraryVersion"];</code> */
+    protected $client_library_version = '';
+
+    /**
      * Constructor.
      *
      * @param  array  $data {
@@ -47,6 +57,9 @@ class StatsContext extends \Google\Protobuf\Internal\Message
      *     @var string $result
      *           The result of the operation. Either OK or the error code that caused the operation to fail.
      *           This will not contain all errors from a query, only the primary reason the operation failed. e.g. a limits failure or an auth failure.
+     *     @var string $client_library_name
+     *           Client awareness contexts
+     *     @var string $client_library_version
      * }
      */
     public function __construct($data = null)
@@ -182,6 +195,60 @@ class StatsContext extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, true);
         $this->result = $var;
+
+        return $this;
+    }
+
+    /**
+     * Client awareness contexts.
+     *
+     * Generated from protobuf field <code>string client_library_name = 7 [json_name = "clientLibraryName"];</code>
+     *
+     * @return string
+     */
+    public function getClientLibraryName()
+    {
+        return $this->client_library_name;
+    }
+
+    /**
+     * Client awareness contexts.
+     *
+     * Generated from protobuf field <code>string client_library_name = 7 [json_name = "clientLibraryName"];</code>
+     *
+     * @param  string  $var
+     *
+     * @return $this
+     */
+    public function setClientLibraryName($var)
+    {
+        GPBUtil::checkString($var, true);
+        $this->client_library_name = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>string client_library_version = 8 [json_name = "clientLibraryVersion"];</code>.
+     *
+     * @return string
+     */
+    public function getClientLibraryVersion()
+    {
+        return $this->client_library_version;
+    }
+
+    /**
+     * Generated from protobuf field <code>string client_library_version = 8 [json_name = "clientLibraryVersion"];</code>.
+     *
+     * @param  string  $var
+     *
+     * @return $this
+     */
+    public function setClientLibraryVersion($var)
+    {
+        GPBUtil::checkString($var, true);
+        $this->client_library_version = $var;
 
         return $this;
     }

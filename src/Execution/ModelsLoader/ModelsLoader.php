@@ -12,7 +12,7 @@ interface ModelsLoader
      *
      * @template TModel of \Illuminate\Database\Eloquent\Model
      *
-     * @param  \Illuminate\Database\Eloquent\Collection<int, TModel>  $parents
+     * @param  \Illuminate\Database\Eloquent\Collection<array-key, TModel>  $parents
      */
     public function load(EloquentCollection $parents): void;
 

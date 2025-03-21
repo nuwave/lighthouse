@@ -39,9 +39,7 @@ class PaginationArgs
             : Arr::get($args, 'page', 1);
 
         if ($first < 0) {
-            throw new Error(
-                self::requestedLessThanZeroItems($first),
-            );
+            throw new Error(self::requestedLessThanZeroItems($first));
         }
 
         // Make sure the maximum pagination count is not exceeded
@@ -49,9 +47,7 @@ class PaginationArgs
             $paginateMaxCount !== null
             && $first > $paginateMaxCount
         ) {
-            throw new Error(
-                self::requestedTooManyItems($paginateMaxCount, $first),
-            );
+            throw new Error(self::requestedTooManyItems($paginateMaxCount, $first));
         }
 
         $optimalPaginationType = self::optimalPaginationType($proposedPaginationType, $resolveInfo);

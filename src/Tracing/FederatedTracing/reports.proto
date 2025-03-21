@@ -430,6 +430,9 @@ message StatsContext {
   // The result of the operation. Either OK or the error code that caused the operation to fail.
   // This will not contain all errors from a query, only the primary reason the operation failed. e.g. a limits failure or an auth failure.
   string result = 6;
+  // Client awareness contexts
+  string client_library_name = 7;
+  string client_library_version = 8;
 }
 
 message ContextualizedQueryLatencyStats {

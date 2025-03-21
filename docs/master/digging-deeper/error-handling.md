@@ -14,6 +14,32 @@ be implemented by Exceptions to control how they are rendered to the client.
 
 Head over their [Error Handling docs](https://webonyx.github.io/graphql-php/error-handling) to learn more.
 
+## Error Reporting
+
+Lighthouse will catch exceptions thrown during the execution of a query and return them as part of the response.
+
+The error handler `Nuwave\Lighthouse\Execution\ReportingErrorHandler` is included in the default configuration
+and reports non-client-safe errors through the default Laravel exception handler.
+
+Client-safe errors are assumed to be something that:
+
+- a client can understand and handle
+- were caused by client misuse, e.g. wrong syntax, authentication, validation
+
+Thus, they are typically not actionable for server developers.
+
+However, you can choose to report client-safe errors by replacing `Nuwave\Lighthouse\Execution\ReportingErrorHandler`
+with `Nuwave\Lighthouse\Execution\AlwaysReportingErrorHandler` in the `lighthouse.php` config:
+
+```diff
+'error_handlers' => [
+-    Nuwave\Lighthouse\Execution\ReportingErrorHandler::class,
++    Nuwave\Lighthouse\Execution\AlwaysReportingErrorHandler::class,
+],
+```
+
+`Nuwave\Lighthouse\Execution\AlwaysReportingErrorHandler` reports all errors through the default Laravel exception handler, regardless of client-safety.
+
 ## Additional Error Information
 
 The interface [`GraphQL\Error\ProvidesExtensions`](https://github.com/webonyx/graphql-php/blob/master/src/Error/ProvidesExtensions.php)
@@ -116,8 +142,7 @@ Add them to your `lighthouse.php` config file, for example:
 ```php
 'error_handlers' => [
     \App\GraphQL\CountErrorHandler::class,
-    \Nuwave\Lighthouse\Execution\ValidationErrorHandler::class,
-    \Nuwave\Lighthouse\Execution\ReportingErrorHandler::class,
+    ...
 ],
 ```
 

@@ -45,7 +45,6 @@ class FieldValue
     public function __construct(
         /** The parent type of the field. */
         protected TypeValue $parent,
-
         /** The underlying AST definition of the field. */
         protected FieldDefinitionNode $field,
     ) {}

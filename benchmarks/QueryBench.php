@@ -20,10 +20,9 @@ abstract class QueryBench extends TestCase
     {
         parent::setUp();
 
-        $configRepository = $this->app->make(ConfigRepository::class);
-        assert($configRepository instanceof ConfigRepository);
+        $config = $this->app->make(ConfigRepository::class);
 
-        $routeName = $configRepository->get('lighthouse.route.name');
+        $routeName = $config->get('lighthouse.route.name');
         $this->graphQLEndpoint = route($routeName);
     }
 
@@ -47,7 +46,6 @@ abstract class QueryBench extends TestCase
         $this->setUp();
 
         $configRepository = $this->app->make(ConfigRepository::class);
-        assert($configRepository instanceof ConfigRepository);
 
         if ($params[0]) {
             $configRepository->set('lighthouse.field_middleware', []);
