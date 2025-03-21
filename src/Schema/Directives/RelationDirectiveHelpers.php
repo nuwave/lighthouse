@@ -33,8 +33,6 @@ trait RelationDirectiveHelpers
     protected function makeBuilderDecorator(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): \Closure
     {
         return function (object $builder, mixed $specificRoot = null) use ($root, $args, $context, $resolveInfo): void {
-            $effectiveRoot = $specificRoot ?? $root;
-
             if ($builder instanceof Relation) {
                 $builder = $builder->getQuery();
             }
@@ -44,7 +42,7 @@ trait RelationDirectiveHelpers
             $resolveInfo->enhanceBuilder(
                 $builder,
                 $this->scopes(),
-                $effectiveRoot,
+                $specificRoot ?? $root,
                 $args,
                 $context,
                 $resolveInfo,
