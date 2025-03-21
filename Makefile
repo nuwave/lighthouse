@@ -87,4 +87,3 @@ proto:
 	sudo chown --recursive "$(shell id -u):$(shell id -g)" proto-tmp
 	mv proto-tmp/Nuwave/Lighthouse/Tracing/FederatedTracing/Proto src/Tracing/FederatedTracing/Proto
 	rm -rf proto-tmp
-	$(MAKE) php-cs-fixer
