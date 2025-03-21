@@ -28,11 +28,11 @@ trait RelationDirectiveHelpers
     /**
      * @param  array<string, mixed>  $args
      *
-     * @return \Closure(QueryBuilder|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>): void
+     * @return \Closure(QueryBuilder|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>, ?mixed = null): void
      */
     protected function makeBuilderDecorator(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): \Closure
     {
-        return function (object $builder) use ($root, $args, $context, $resolveInfo): void {
+        return function (object $builder, mixed $specificRoot = null) use ($root, $args, $context, $resolveInfo): void {
             if ($builder instanceof Relation) {
                 $builder = $builder->getQuery();
             }
@@ -42,7 +42,12 @@ trait RelationDirectiveHelpers
             $resolveInfo->enhanceBuilder(
                 $builder,
                 $this->scopes(),
-                $root,
+                /**
+                 * Sometimes overridden to use a different model than the usual root.
+                 * @see \Nuwave\Lighthouse\Execution\ModelsLoader\PaginatedModelsLoader::loadRelatedModels
+                 * @see \Tests\Integration\Schema\Directives\BuilderDirectiveTest::testCallsCustomBuilderMethodOnFieldWithSpecificModel
+                 */
+                $specificRoot ?? $root,
                 $args,
                 $context,
                 $resolveInfo,
