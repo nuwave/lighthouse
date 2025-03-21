@@ -78,16 +78,18 @@ class ReportHeader extends \Google\Protobuf\Internal\Message
      *
      *     @var string $graph_ref
      *           eg "mygraph&#64;myvariant"
-     *     @var string $hostname
+     *
+     *     @type string $hostname
      *           eg "host-01.example.com"
-     *     @var string $agent_version
+     *     @type string $agent_version
      *           eg "engineproxy 0.1.0"
-     *     @var string $service_version
+     *     @type string $service_version
      *           eg "prod-4279-20160804T065423Z-5-g3cf0aa8" (taken from `git describe --tags`)
-     *     @var string $runtime_version
+     *     @type string $runtime_version
      *           eg "node v4.6.0"
-     *     @var string $uname
+     *     @type string $uname
      *           eg "Linux box 4.6.5-1-ec2 #1 SMP Mon Aug 1 02:31:38 PDT 2016 x86_64 GNU/Linux"
+     *
      *     @var string $executable_schema_id
      *           An id that is used to represent the schema to Apollo Graph Manager
      *           Using this in place of what used to be schema_hash, since that is no longer

@@ -177,16 +177,17 @@ class Trace extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @var \Google\Protobuf\Timestamp $start_time
-     *           Wallclock time when the trace began
+     *           Wallclock time when the trace began.
      *     @var \Google\Protobuf\Timestamp $end_time
-     *           Wallclock time when the trace ended
+     *           Wallclock time when the trace ended.
      *     @var int|string $duration_ns
      *           High precision duration of the trace; may not equal end_time-start_time
-     *           (eg, if your machine's clock changed during the trace)
-     *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Node $root
+     *           (eg, if your machine's clock changed during the trace).
+     *
+     *     @type \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Node $root
      *           A tree containing information about all resolvers run directly by this
-     *           service, including errors
-     *     @var bool $is_incomplete
+     *           service, including errors.
+     *     @type bool $is_incomplete
      *           If this is true, the trace is potentially missing some nodes that were
      *           present on the query plan. This can happen if the trace span buffer used
      *           in the Router fills up and some spans have to be dropped. In these cases
@@ -194,7 +195,7 @@ class Trace extends \Google\Protobuf\Internal\Message
      *           be missing some referenced or executed fields, and some nodes may be
      *           missing. If this is true we should display a warning to the user when they
      *           view the trace in Explorer.
-     *     @var string $signature
+     *     @type string $signature
      *           In addition to details.raw_query, we include a "signature" of the query,
      *           which can be normalized: for example, you may want to discard aliases, drop
      *           unused operations and fragments, sort fields, etc. The most important thing
@@ -205,43 +206,44 @@ class Trace extends \Google\Protobuf\Internal\Message
      *           that signature is in the key of traces_per_query rather than in this field.
      *           Engineproxy provides the signature in legacy_signature_needs_resigning
      *           instead.
-     *     @var string $unexecutedOperationBody
+     *     @type string $unexecutedOperationBody
      *           Optional: when GraphQL parsing or validation against the GraphQL schema fails, these fields
      *           can include reference to the operation being sent for users to dig into the set of operations
-     *           that are failing validation
-     *     @var string $unexecutedOperationName
-     *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Details $details
-     *     @var string $client_name
-     *     @var string $client_version
-     *     @var string $operation_type
-     *     @var string $operation_subtype
-     *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\HTTP $http
-     *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\CachePolicy $cache_policy
-     *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode $query_plan
+     *           that are failing validation.
+     *     @type string $unexecutedOperationName
+     *     @type \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Details $details
+     *     @type string $client_name
+     *     @type string $client_version
+     *     @type string $operation_type
+     *     @type string $operation_subtype
+     *     @type \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\HTTP $http
+     *     @type \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\CachePolicy $cache_policy
+     *     @type \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\QueryPlanNode $query_plan
      *           If this Trace was created by a Router/Gateway, this is the query plan, including
      *           sub-Traces for subgraphs. Note that the 'root' tree on the
      *           top-level Trace won't contain any resolvers (though it could contain errors
      *           that occurred in the Router/Gateway itself).
-     *     @var bool $full_query_cache_hit
+     *     @type bool $full_query_cache_hit
      *           Was this response served from a full query response cache?  (In that case
      *           the node tree will have no resolvers.)
-     *     @var bool $persisted_query_hit
+     *     @type bool $persisted_query_hit
      *           Was this query specified successfully as a persisted query hash?
-     *     @var bool $persisted_query_register
+     *     @type bool $persisted_query_register
      *           Did this query contain both a full query string and a persisted query hash?
      *           (This typically means that a previous request was rejected as an unknown
      *           persisted query.)
-     *     @var bool $registered_operation
+     *     @type bool $registered_operation
      *           Was this operation registered and a part of the safelist?
-     *     @var bool $forbidden_operation
+     *     @type bool $forbidden_operation
      *           Was this operation forbidden due to lack of safelisting?
-     *     @var float $field_execution_weight
+     *     @type float $field_execution_weight
      *           Some servers don't do field-level instrumentation for every request and assign
      *           each request a "weight" for each request that they do instrument. When this
      *           trace is aggregated into field usage stats, it should count as this value
      *           towards the estimated_execution_count rather than just 1. This value should
      *           typically be at least 1.
      *           0 is treated as 1 for backwards compatibility.
+     *
      *     @var \Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace\Limits $limits
      *           The limits information of the query.
      * }
