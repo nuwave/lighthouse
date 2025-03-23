@@ -47,7 +47,8 @@ to set an expiration time in seconds (e.g. `LIGHTHOUSE_SUBSCRIPTION_STORAGE_TTL=
 
 ## Encrypted Subscriptions
 
-Lighthouse supports encrypted subscriptions for both Pusher and Echo drivers. The main goal is to ensure that all data in transit in a private-encrypted channel is encrypted. 
+Lighthouse supports encrypted subscriptions for the drivers Pusher and Echo.
+The main goal is to ensure that all data in a private-encrypted channel is encrypted in transit. 
 
 To enable encrypted subscriptions, set the environment variable `LIGHTHOUSE_SUBSCRIPTION_ENCRYPTED=true`.
 
@@ -61,7 +62,7 @@ For Pusher, the shared secret can be updated in `config/broadcasting.php`:
 ],
 ```
 
-More details on how to enable encryption are defined in the [Pusher documentation](https://pusher.com/docs/channels/using_channels/encrypted-channels/).
+More details on how to enable encryption are defined in the [Pusher documentation](https://pusher.com/docs/channels/using_channels/encrypted-channels).
 
 ### Pusher Expiration Webhook
 
