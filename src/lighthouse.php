@@ -424,7 +424,7 @@ return [
         'storage_ttl' => env('LIGHTHOUSE_SUBSCRIPTION_STORAGE_TTL', null),
 
         /*
-         * Subscriptions channel names will be created as private encrypted channels.
+         * Encrypt subscription channels by prefixing their names with "private-encrypted-"?
          */
         'encrypted_channels' => env('LIGHTHOUSE_SUBSCRIPTION_ENCRYPTED', false),
 
