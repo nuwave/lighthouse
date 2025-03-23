@@ -273,7 +273,7 @@ class DocumentAST implements Arrayable
                 continue;
             }
 
-            if (\is_array($value)) {
+            if (is_array($value)) {
                 $value = isset($value[0]) || $value === []
                     ? new NodeList($value)
                     : AST::fromArray($value);
