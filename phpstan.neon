@@ -59,9 +59,10 @@ parameters:
   - '#Generic type Illuminate\\Database\\Eloquent\\Relations\\(HasOneThrough|HasManyThrough)<.+, .+, .+> in PHPDoc tag @return specifies 3 template types, but class Illuminate\\Database\\Eloquent\\Relations\\\1 supports only 1: TRelatedModel#'
   - '#Method .+ should return Illuminate\\Database\\Eloquent\\Relations\\(HasOneThrough|HasManyThrough)<(.+), .+> but returns Illuminate\\Database\\Eloquent\\Relations\\\1<\2>.#'
 
-  # Laravel 12 dependencies changes these old generics
+  # Laravel 12 dependencies change these old generics
   - '#Method .* return type with generic class PHPUnit\\Framework\\MockObject\\Builder\\InvocationMocker does not specify its types: TMockedClass#'
-  # Valid but dependent from an external library
+
+    # TODO remove after requiring a current version of webonyx/graphql-php
   - path: src/GraphQL.php
     message : '#Parameter \#2 \$errors of class GraphQL\\Executor\\ExecutionResult constructor expects list<GraphQL\\Error\\Error>, non-empty-array<int, GraphQL\\Error\\Error> given#'
 
