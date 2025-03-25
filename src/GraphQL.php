@@ -379,7 +379,7 @@ class GraphQL
      *
      * @param  array<string, \GraphQL\Validator\Rules\ValidationRule>  $validationRules
      *
-     * @return list<\GraphQL\Error\Error>
+     * @return array<int, \GraphQL\Error\Error>
      */
     protected function validateCacheableRules(
         array $validationRules,
