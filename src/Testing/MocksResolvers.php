@@ -16,7 +16,7 @@ trait MocksResolvers
      *
      * @param  callable|mixed|null  $resolverOrValue
      *
-     * @return \PHPUnit\Framework\MockObject\Builder\InvocationMocker
+     * @return \PHPUnit\Framework\MockObject\Builder\InvocationMocker<\stdClass>
      */
     protected function mockResolver($resolverOrValue = null, string $key = 'default'): InvocationMocker
     {
@@ -36,7 +36,7 @@ trait MocksResolvers
      *
      * @param  \PHPUnit\Framework\MockObject\Rule\InvocationOrder  $invocationOrder
      *
-     * @return \PHPUnit\Framework\MockObject\Builder\InvocationMocker
+     * @return \PHPUnit\Framework\MockObject\Builder\InvocationMocker<\stdClass>
      */
     protected function mockResolverExpects(object $invocationOrder, string $key = 'default'): InvocationMocker
     {
