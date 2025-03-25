@@ -1,5 +1,7 @@
 parameters:
   level: 8 # TODO level up to max
+  bootstrapFiles:
+  - .phpstan-bootstrap.php
   stubFiles:
   - _ide_helper.php
   paths:
