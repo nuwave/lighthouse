@@ -161,9 +161,9 @@ class GraphQL
         $queryComplexityRule = $validationRules[QueryComplexity::class] ?? null;
         $queryComplexity = $queryComplexityRule instanceof QueryComplexity
             // TODO remove this check when updating the required version of webonyx/graphql-php
-            && method_exists($queryComplexityRule, 'getQueryComplexity')
-            ? $queryComplexityRule->getQueryComplexity()
-            : null;
+            && method_exists($queryComplexityRule, 'getQueryComplexity') // @phpstan-ignore function.alreadyNarrowedType (depends on the used library version)
+                ? $queryComplexityRule->getQueryComplexity()
+                : null;
 
         /** @var array<\Nuwave\Lighthouse\Execution\ExtensionsResponse|null> $extensionsResponses */
         $extensionsResponses = (array) $this->eventDispatcher->dispatch(
@@ -404,13 +404,13 @@ class GraphQL
         }
 
         if ($queryHash === null) {
-            return DocumentValidator::validate($schema, $query, $validationRules);
+            return DocumentValidator::validate($schema, $query, $validationRules); // @phpstan-ignore return.type (TODO remove ignore when requiring a newer version of webonyx/graphql-php)
         }
 
         $cacheConfig = $this->configRepository->get('lighthouse.validation_cache');
 
         if (! isset($cacheConfig['enable']) || ! $cacheConfig['enable']) {
-            return DocumentValidator::validate($schema, $query, $validationRules);
+            return DocumentValidator::validate($schema, $query, $validationRules); // @phpstan-ignore return.type (TODO remove ignore when requiring a newer version of webonyx/graphql-php)
         }
 
         $cacheKey = "lighthouse:validation:{$schemaHash}:{$queryHash}";
@@ -429,7 +429,7 @@ class GraphQL
         // As of webonyx/graphql-php 15.14.0, GraphQL\Error\Error is not serializable.
         // We would have to figure out how to serialize them properly to cache them.
         if ($result !== []) {
-            return $result;
+            return $result; // @phpstan-ignore return.type (TODO remove ignore when requiring a newer version of webonyx/graphql-php)
         }
 
         $store->put($cacheKey, $result, $cacheConfig['ttl']);

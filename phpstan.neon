@@ -1,5 +1,7 @@
 parameters:
   level: 8 # TODO level up to max
+  bootstrapFiles:
+  - phpstan-bootstrap.php
   stubFiles:
   - _ide_helper.php
   paths:
@@ -34,7 +36,7 @@ parameters:
   - path: tests/database/factories
     message: '#Variable \$factory might not be defined#'
 
-  # Mixins are magical
+  # Mixins magically rebind $this to be something else and do other funky stuff
   - path: src/Testing/TestResponseMixin.php
     message: '#Method Nuwave\\Lighthouse\\Testing\\TestResponseMixin::assertGraphQLErrorMessage\(\) invoked with 1 parameter, 0 required\.#'
   - path: src/Testing/TestResponseMixin.php
@@ -42,17 +44,23 @@ parameters:
   - path: src/Testing/TestResponseMixin.php
     message: '#Anonymous function should return Illuminate\\Testing\\TestResponse but returns .*#'
 
+  # Recognition of mixin methods is broken in some PHPStan/Larastan versions
+  - '#Call to an undefined method Illuminate\\Testing\\TestResponse::(assertGraphQLValidationError|assertGraphQLValidationKeys|assertGraphQLValidationPasses|assertGraphQLError|assertGraphQLErrorMessage|assertGraphQLDebugMessage|assertGraphQLErrorFree|assertGraphQLSubscriptionAuthorized|assertGraphQLSubscriptionNotAuthorized|graphQLSubscriptionMock|graphQLSubscriptionChannelName|assertGraphQLBroadcasted|assertGraphQLNotBroadcasted)\(\)\.#'
+
   # Relation forwards calls to Builder
   - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Builder<Illuminate\\Database\\Eloquent\\Model>|Illuminate\\Database\\Eloquent\\Relations\\Relation<Illuminate\\Database\\Eloquent\\Model>|Illuminate\\Database\\Query\\Builder::(orderBy|where|whereIn|whereNotIn|whereBetween|whereJsonContains|whereNotBetween)\(\)\.#'
 
   # Laravel 11 changes a lot of generics
   - '#generic class (Illuminate\\Database\\Eloquent\\Builder|Laravel\\Scout\\Builder)( but)? does not specify its types#'
   - '#contains generic type Illuminate\\Testing\\TestResponse<.+> but class Illuminate\\Testing\\TestResponse is not generic\.#'
-  - '#Generic type Illuminate\\Database\\Eloquent\\Relations\\(HasOne|HasMany|BelongsToMany|MorphOne|MorphMany|MorphToMany)<.+, .+> in PHPDoc tag @return specifies 2 template types, but class Illuminate\\Database\\Eloquent\\Relations\\\1 supports only 1: TRelatedModel#'
+  - '#Generic type Illuminate\\Database\\Eloquent\\Relations\\(HasOne|HasMany|BelongsToMany|MorphOne|MorphMany|MorphToMany)<.+> in PHPDoc tag @return specifies \d template types, but class Illuminate\\Database\\Eloquent\\Relations\\\1 supports only \d: .+#'
   - '#Method .+ should return Illuminate\\Database\\Eloquent\\Relations\\(HasOne|HasMany|BelongsToMany|MorphOne|MorphMany|MorphToMany)<(.+), .+> but returns Illuminate\\Database\\Eloquent\\Relations\\\1<\2>.#'
   - '#Method .+ should return Illuminate\\Database\\Eloquent\\Relations\\(BelongsTo|MorphTo)<(.+), \$this\((.+)\)> but returns Illuminate\\Database\\Eloquent\\Relations\\\1<\2, \3>.#'
   - '#Generic type Illuminate\\Database\\Eloquent\\Relations\\(HasOneThrough|HasManyThrough)<.+, .+, .+> in PHPDoc tag @return specifies 3 template types, but class Illuminate\\Database\\Eloquent\\Relations\\\1 supports only 1: TRelatedModel#'
   - '#Method .+ should return Illuminate\\Database\\Eloquent\\Relations\\(HasOneThrough|HasManyThrough)<(.+), .+> but returns Illuminate\\Database\\Eloquent\\Relations\\\1<\2>.#'
+
+  # Different between PHPUnit versions
+  - '#PHPDoc tag @return contains generic type PHPUnit\\Framework\\MockObject\\Builder\\InvocationMocker<stdClass> but class PHPUnit\\Framework\\MockObject\\Builder\\InvocationMocker is not generic.#'
 
   # This test cheats and uses reflection to make assertions
   - path: tests/Unit/Schema/Directives/BaseDirectiveTest.php
@@ -60,6 +68,9 @@ parameters:
 
   # This is a library, so it should be extendable
   - '#Unsafe usage of new static.*#'
+
+  # Possible footgun, but people who extend Lighthouse classes should know what they are doing
+  - '#Cannot unset property .+ because it might have hooks in a subclass\.#'
 
   # Ease transition for non-nullable properties towards native types https://github.com/phpstan/phpstan/issues/5150
   - '#Property .* in isset\(\) is not nullable\.#'

@@ -64,7 +64,7 @@ final class Post extends Model
         return $this->morphMany(Activity::class, 'content');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Tests\Utils\Models\Category, $this> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Tests\Utils\Models\Category, $this, \Illuminate\Database\Eloquent\Relations\Pivot> */
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class, 'category_post', 'category_id', 'post_id');

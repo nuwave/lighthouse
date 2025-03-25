@@ -47,7 +47,7 @@ final class ComplexityDirectiveTest extends TestCase
         $this->assertCount(1, $events);
 
         // TODO remove this check when updating the required version of webonyx/graphql-php
-        if (method_exists(QueryComplexity::class, 'getQueryComplexity')) {
+        if (method_exists(QueryComplexity::class, 'getQueryComplexity')) { // @phpstan-ignore function.alreadyNarrowedType (depends on the used library version)
             $event = $events[0];
             $this->assertSame(2, $event->queryComplexity);
         }
