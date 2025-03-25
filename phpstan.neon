@@ -61,6 +61,7 @@ parameters:
 
   # Laravel 12 dependencies change these old generics. Preserve generics usage.
   - '#PHPDoc tag @return contains generic type PHPUnit\\Framework\\MockObject\\Builder\\InvocationMocker<stdClass> but class PHPUnit\\Framework\\MockObject\\Builder\\InvocationMocker is not generic.#'
+  - '#Method Nuwave\\Lighthouse\\GraphQL::validateCacheableRules\(\) should return list<GraphQL\\Error\\Error> but returns .*#'
 
     # TODO remove after requiring a current version of webonyx/graphql-php
   - path: src/GraphQL.php
