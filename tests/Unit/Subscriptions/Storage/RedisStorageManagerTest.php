@@ -94,11 +94,11 @@ final class RedisStorageManagerTest extends TestCase
         $subscriber = new DummySubscriber($channel, 'test-topic');
         $redisConnection->expects($this->exactly(3))
             ->method('command')
-            ->with(...$this->withConsecutive(
+            ->with(...array_values([...$this->withConsecutive(
                 ['get', [$prefixedChannel]],
                 ['del', [$prefixedChannel]],
                 ['srem', ["graphql.topic.{$subscriber->topic}", $channel]],
-            ))
+            )]))
             ->willReturnOnConsecutiveCalls(
                 serialize($subscriber),
                 true,
@@ -128,7 +128,7 @@ final class RedisStorageManagerTest extends TestCase
         $topicKey = 'graphql.topic.some-topic';
         $redisConnection->expects($this->exactly(3))
             ->method('command')
-            ->with(...$this->withConsecutive(
+            ->with(...array_values([...$this->withConsecutive(
                 ['sadd', [
                     $topicKey,
                     $channel,
@@ -142,7 +142,7 @@ final class RedisStorageManagerTest extends TestCase
                     $ttl,
                     serialize($subscriberUnderTopic),
                 ]],
-            ));
+            )]));
 
         $manager = new RedisStorageManager($config, $redisFactory);
         $manager->storeSubscriber($subscriber, $storedTopic);
@@ -166,7 +166,7 @@ final class RedisStorageManagerTest extends TestCase
         $topicKey = 'graphql.topic.some-topic';
         $redisConnection->expects($this->exactly(2))
             ->method('command')
-            ->with(...$this->withConsecutive(
+            ->with(...array_values([...$this->withConsecutive(
                 ['sadd', [
                     $topicKey,
                     $channel,
@@ -175,7 +175,7 @@ final class RedisStorageManagerTest extends TestCase
                     'graphql.subscriber.private-lighthouse-foo',
                     serialize($subscriberUnderTopic),
                 ]],
-            ));
+            )]));
 
         $manager = new RedisStorageManager($config, $redisFactory);
         $manager->storeSubscriber($subscriber, $storedTopic);
@@ -199,7 +199,7 @@ final class RedisStorageManagerTest extends TestCase
 
         $redisConnection->expects($this->exactly(3))
             ->method('command')
-            ->with(...$this->withConsecutive(
+            ->with(...array_values([...$this->withConsecutive(
                 ['smembers', ["graphql.topic.{$topic}"]],
                 ['mget', [[
                     'graphql.subscriber.foo1',
@@ -208,7 +208,7 @@ final class RedisStorageManagerTest extends TestCase
                     'graphql.subscriber.foo4',
                 ]]],
                 ['srem', ["graphql.topic.{$topic}", 'foo3', 'foo4']],
-            ))
+            )]))
             ->willReturnOnConsecutiveCalls(
                 ['foo1', 'foo2', 'foo3', 'foo4'],
                 [
