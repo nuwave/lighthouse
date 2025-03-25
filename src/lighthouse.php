@@ -424,6 +424,11 @@ return [
         'storage_ttl' => env('LIGHTHOUSE_SUBSCRIPTION_STORAGE_TTL', null),
 
         /*
+         * Encrypt subscription channels by prefixing their names with "private-encrypted-"?
+         */
+        'encrypted_channels' => env('LIGHTHOUSE_SUBSCRIPTION_ENCRYPTED', false),
+
+        /*
          * Default subscription broadcaster.
          */
         'broadcaster' => env('LIGHTHOUSE_BROADCASTER', 'pusher'),

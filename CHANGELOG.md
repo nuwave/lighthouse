@@ -13,6 +13,24 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Support Laravel 12 https://github.com/nuwave/lighthouse/pull/2665
 
+## v6.53.0
+
+### Added
+
+- Support encrypted subscription channels https://github.com/nuwave/lighthouse/pull/2663
+
+## v6.52.1
+
+### Fixed
+
+- Pass specific parent model instances to builder enhancers when resolving paginated relations on lists https://github.com/nuwave/lighthouse/pull/2671 
+
+## v6.52.0
+
+### Added
+
+- Expose query complexity score in lifecycle event `BuildExtensionsResponse` https://github.com/nuwave/lighthouse/pull/2637
+
 ## v6.51.2
 
 ### Fixed
