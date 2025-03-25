@@ -54,9 +54,9 @@ abstract class BaseDirective implements Directive
      *
      * Lazily initialized.
      *
-     * @var array<string, mixed>
+     * @var array<string, mixed>|null
      */
-    protected array $directiveArgs;
+    protected ?array $directiveArgs = null;
 
     /** The hydrate function is called when retrieving a directive from the directive registry. */
     public function hydrate(DirectiveNode $directiveNode, ScalarTypeDefinitionNode|ScalarTypeExtensionNode|ObjectTypeDefinitionNode|ObjectTypeExtensionNode|InterfaceTypeDefinitionNode|InterfaceTypeExtensionNode|UnionTypeDefinitionNode|UnionTypeExtensionNode|EnumTypeDefinitionNode|EnumTypeExtensionNode|InputObjectTypeDefinitionNode|InputObjectTypeExtensionNode|FieldDefinitionNode|InputValueDefinitionNode|EnumValueDefinitionNode $definitionNode): self
@@ -64,7 +64,7 @@ abstract class BaseDirective implements Directive
         $this->directiveNode = $directiveNode;
         $this->definitionNode = $definitionNode;
 
-        unset($this->directiveArgs);
+        $this->directiveArgs = null;
 
         return $this;
     }
@@ -110,11 +110,11 @@ abstract class BaseDirective implements Directive
      */
     protected function directiveHasArgument(string $name): bool
     {
-        if (! isset($this->directiveArgs)) {
+        if ($this->directiveArgs === null) {
             $this->loadArgValues();
         }
 
-        return array_key_exists($name, $this->directiveArgs);
+        return is_array($this->directiveArgs) && array_key_exists($name, $this->directiveArgs);
     }
 
     /**
@@ -128,11 +128,11 @@ abstract class BaseDirective implements Directive
      */
     protected function directiveArgValue(string $name, mixed $default = null): mixed
     {
-        if (! isset($this->directiveArgs)) {
+        if ($this->directiveArgs === null) {
             $this->loadArgValues();
         }
 
-        return array_key_exists($name, $this->directiveArgs)
+        return is_array($this->directiveArgs) && array_key_exists($name, $this->directiveArgs)
             ? $this->directiveArgs[$name]
             : $default;
     }
