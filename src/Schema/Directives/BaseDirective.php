@@ -54,16 +54,16 @@ abstract class BaseDirective implements Directive
      *
      * Lazily initialized.
      *
-     * @var array<string, mixed>|null
+     * @var array<string, mixed>
      */
-    protected ?array $directiveArgs = null;
+    protected array $directiveArgs;
 
     /** The hydrate function is called when retrieving a directive from the directive registry. */
     public function hydrate(DirectiveNode $directiveNode, ScalarTypeDefinitionNode|ScalarTypeExtensionNode|ObjectTypeDefinitionNode|ObjectTypeExtensionNode|InterfaceTypeDefinitionNode|InterfaceTypeExtensionNode|UnionTypeDefinitionNode|UnionTypeExtensionNode|EnumTypeDefinitionNode|EnumTypeExtensionNode|InputObjectTypeDefinitionNode|InputObjectTypeExtensionNode|FieldDefinitionNode|InputValueDefinitionNode|EnumValueDefinitionNode $definitionNode): self
     {
         $this->directiveNode = $directiveNode;
         $this->definitionNode = $definitionNode;
-        $this->directiveArgs = null;
+        $this->directiveArgs = [];
 
         return $this;
     }
@@ -109,11 +109,11 @@ abstract class BaseDirective implements Directive
      */
     protected function directiveHasArgument(string $name): bool
     {
-        if ($this->directiveArgs === null) {
+        if (empty($this->directiveArgs)) {
             $this->loadArgValues();
         }
 
-        return is_array($this->directiveArgs) && array_key_exists($name, $this->directiveArgs);
+        return array_key_exists($name, $this->directiveArgs);
     }
 
     /**
@@ -127,11 +127,11 @@ abstract class BaseDirective implements Directive
      */
     protected function directiveArgValue(string $name, mixed $default = null): mixed
     {
-        if ($this->directiveArgs === null) {
+        if (empty($this->directiveArgs)) {
             $this->loadArgValues();
         }
 
-        return is_array($this->directiveArgs) && array_key_exists($name, $this->directiveArgs)
+        return array_key_exists($name, $this->directiveArgs)
             ? $this->directiveArgs[$name]
             : $default;
     }
