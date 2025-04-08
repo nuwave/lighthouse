@@ -103,7 +103,7 @@ final class User extends Authenticatable
         return $this->hasMany(Post::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Tests\Utils\Models\Role, $this, \Illuminate\Database\Eloquent\Relations\Pivot> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Tests\Utils\Models\Role, $this> */
     public function roles(): BelongsToMany
     {
         return $this->belongsToMany(Role::class)
