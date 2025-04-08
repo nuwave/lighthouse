@@ -727,7 +727,7 @@ GRAPHQL
      */
     public static function returnPaginatedDataInsteadOfBuilder(mixed $root, array $args): LengthAwarePaginator
     {
-        return new LengthAwarePaginator([
+        return new LengthAwarePaginator([ // @phpstan-ignore return.type (pagination generics changed between Laravel versions)
             [
                 'id' => 1,
             ],
