@@ -45,6 +45,6 @@ class PaginatorField
      */
     public function dataResolver(Paginator $paginator): array
     {
-        return $paginator->items();
+        return $paginator->items(); // @phpstan-ignore return.type (mismatch when Paginator has only 1 generic type)
     }
 }
