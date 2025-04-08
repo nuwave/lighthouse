@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\Pagination;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
 
-/** @extends \Illuminate\Pagination\Paginator<mixed> */
+/** @extends \Illuminate\Pagination\Paginator<array-key, mixed> */
 class ZeroPerPagePaginator extends Paginator
 {
     public function __construct(int $page)

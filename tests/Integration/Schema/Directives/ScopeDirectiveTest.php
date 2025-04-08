@@ -14,12 +14,13 @@ final class ScopeDirectiveTest extends DBTestCase
     {
         factory(Task::class)->times(2)->create();
 
-        /** @var Task $taskWithTag */
         $taskWithTag = factory(Task::class)->create();
+        assert($taskWithTag instanceof Task);
 
-        /** @var Tag $tag */
-        $tag = factory(Tag::class)->make();
-        $taskWithTag->tags()->save($tag);
+        $tag = factory(Tag::class)->create();
+        assert($tag instanceof Tag);
+
+        $taskWithTag->tags()->attach($tag);
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -62,11 +63,12 @@ final class ScopeDirectiveTest extends DBTestCase
     {
         factory(Task::class)->times(2)->create();
 
-        /** @var Task $taskWithTag */
         $taskWithTag = factory(Task::class)->create();
+        assert($taskWithTag instanceof Task);
 
-        /** @var Tag $tag */
-        $tag = factory(Tag::class)->make();
+        $tag = factory(Tag::class)->create();
+        assert($tag instanceof Tag);
+
         $taskWithTag->tags()->save($tag);
 
         $this->schema = /** @lang GraphQL */ '
