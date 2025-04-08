@@ -53,7 +53,7 @@ parameters:
   # Laravel 11 changes a lot of generics
   - '#generic class (Illuminate\\Database\\Eloquent\\Builder|Laravel\\Scout\\Builder)( but)? does not specify its types#'
   - '#contains generic type Illuminate\\Testing\\TestResponse<.+> but class Illuminate\\Testing\\TestResponse is not generic\.#'
-  - '#Generic type Illuminate\\(.+)<.+> .+ specifies \d template types, but class Illuminate\\1 supports only \d: .+#'
+  - '#Generic type Illuminate\\.+ specifies \d template types, but (class|interface) Illuminate\\.+ supports only \d: .+#'
   - '#Method .+ should return Illuminate\\Database\\Eloquent\\Relations\\(HasOne|HasMany|BelongsToMany|MorphOne|MorphMany|MorphToMany)<(.+), .+> but returns Illuminate\\Database\\Eloquent\\Relations\\\1<\2>.#'
   - '#Method .+ should return Illuminate\\Database\\Eloquent\\Relations\\(BelongsTo|MorphTo)<(.+), \$this\((.+)\)> but returns Illuminate\\Database\\Eloquent\\Relations\\\1<\2, \3>.#'
   - '#Method .+ should return Illuminate\\Database\\Eloquent\\Relations\\(HasOneThrough|HasManyThrough)<(.+), .+> but returns Illuminate\\Database\\Eloquent\\Relations\\\1<\2>.#'
