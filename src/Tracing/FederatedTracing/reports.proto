@@ -583,9 +583,9 @@ message ContextualizedStats {
 }
 
 message QueryMetadata {
-  // The operation name. For now this is a required field if QueryMetadata is present.
+  // The operation name. For operations with a PQ ID as the stats report key, either name or signature must be present in the metadata.
   string name = 1;
-  // the operation signature. For now this is a required field if QueryMetadata is present.
+  // the operation signature. For operations with a PQ ID as the stats report key, either name or signature must be present in the metadata.
   string signature = 2;
   // (Optional) Persisted query ID that was used to request this operation.
   string pq_id = 3;
