@@ -589,6 +589,8 @@ message QueryMetadata {
   string signature = 2;
   // (Optional) Persisted query ID that was used to request this operation.
   string pq_id = 3;
+  // The query id. Must be present for all operations. If missing, operations will appear in the insights page without a signature and possibly without a name.
+  string operation_id = 4;
 }
 
 message ExtendedReferences {
