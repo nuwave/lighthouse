@@ -14,13 +14,13 @@ use Google\Protobuf\Internal\GPBUtil;
 class QueryMetadata extends \Google\Protobuf\Internal\Message
 {
     /**
-     * The operation name. For now this is a required field if QueryMetadata is present.
+     * The operation name. For operations with a PQ ID as the stats report key, either name or signature must be present in the metadata.
      *
      * Generated from protobuf field <code>string name = 1 [json_name = "name"];</code>
      */
     protected $name = '';
     /**
-     * the operation signature. For now this is a required field if QueryMetadata is present.
+     * the operation signature. For operations with a PQ ID as the stats report key, either name or signature must be present in the metadata.
      *
      * Generated from protobuf field <code>string signature = 2 [json_name = "signature"];</code>
      */
@@ -31,6 +31,12 @@ class QueryMetadata extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>string pq_id = 3 [json_name = "pqId"];</code>
      */
     protected $pq_id = '';
+    /**
+     * The query id. Must be present for all operations. If missing, operations will appear in the insights page without a signature and possibly without a name.
+     *
+     * Generated from protobuf field <code>string operation_id = 4 [json_name = "operationId"];</code>
+     */
+    protected $operation_id = '';
 
     /**
      * Constructor.
@@ -39,11 +45,13 @@ class QueryMetadata extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type string $name
-     *           The operation name. For now this is a required field if QueryMetadata is present.
+     *           The operation name. For operations with a PQ ID as the stats report key, either name or signature must be present in the metadata.
      *     @type string $signature
-     *           the operation signature. For now this is a required field if QueryMetadata is present.
+     *           the operation signature. For operations with a PQ ID as the stats report key, either name or signature must be present in the metadata.
      *     @type string $pq_id
      *           (Optional) Persisted query ID that was used to request this operation.
+     *     @type string $operation_id
+     *           The query id. Must be present for all operations. If missing, operations will appear in the insights page without a signature and possibly without a name.
      * }
      */
     public function __construct($data = NULL) {
@@ -52,7 +60,7 @@ class QueryMetadata extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The operation name. For now this is a required field if QueryMetadata is present.
+     * The operation name. For operations with a PQ ID as the stats report key, either name or signature must be present in the metadata.
      *
      * Generated from protobuf field <code>string name = 1 [json_name = "name"];</code>
      * @return string
@@ -63,7 +71,7 @@ class QueryMetadata extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * The operation name. For now this is a required field if QueryMetadata is present.
+     * The operation name. For operations with a PQ ID as the stats report key, either name or signature must be present in the metadata.
      *
      * Generated from protobuf field <code>string name = 1 [json_name = "name"];</code>
      * @param string $var
@@ -78,7 +86,7 @@ class QueryMetadata extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * the operation signature. For now this is a required field if QueryMetadata is present.
+     * the operation signature. For operations with a PQ ID as the stats report key, either name or signature must be present in the metadata.
      *
      * Generated from protobuf field <code>string signature = 2 [json_name = "signature"];</code>
      * @return string
@@ -89,7 +97,7 @@ class QueryMetadata extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * the operation signature. For now this is a required field if QueryMetadata is present.
+     * the operation signature. For operations with a PQ ID as the stats report key, either name or signature must be present in the metadata.
      *
      * Generated from protobuf field <code>string signature = 2 [json_name = "signature"];</code>
      * @param string $var
@@ -125,6 +133,32 @@ class QueryMetadata extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->pq_id = $var;
+
+        return $this;
+    }
+
+    /**
+     * The query id. Must be present for all operations. If missing, operations will appear in the insights page without a signature and possibly without a name.
+     *
+     * Generated from protobuf field <code>string operation_id = 4 [json_name = "operationId"];</code>
+     * @return string
+     */
+    public function getOperationId()
+    {
+        return $this->operation_id;
+    }
+
+    /**
+     * The query id. Must be present for all operations. If missing, operations will appear in the insights page without a signature and possibly without a name.
+     *
+     * Generated from protobuf field <code>string operation_id = 4 [json_name = "operationId"];</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setOperationId($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->operation_id = $var;
 
         return $this;
     }
