@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.55.0
+
+### Added
+
+- Add field `operation_id` to `message QueryMetadata` in `reports.proto` https://github.com/nuwave/lighthouse/pull/2678
+
 ## v6.54.0
 
 ### Added
