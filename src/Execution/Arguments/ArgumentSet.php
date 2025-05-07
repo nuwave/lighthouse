@@ -59,6 +59,12 @@ class ArgumentSet
         return isset($argument->value);
     }
 
+    /** Check if the ArgumentSet has a value with the given key. */
+    public function exists(string $key): bool
+    {
+        return array_key_exists($key, $this->arguments);
+    }
+
     /**
      * Add a value at the dot-separated path.
      *

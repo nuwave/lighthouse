@@ -8,7 +8,7 @@ use Tests\TestCase;
 
 final class ArgumentSetTest extends TestCase
 {
-    public function testHasArgument(): void
+    public function testHas(): void
     {
         $set = new ArgumentSet();
 
@@ -27,6 +27,27 @@ final class ArgumentSetTest extends TestCase
 
         $arg->value = 'foobar';
         $this->assertTrue($set->has('foo'));
+    }
+
+    public function testExists(): void
+    {
+        $set = new ArgumentSet();
+
+        $this->assertFalse($set->exists('foo'));
+
+        $set->arguments['foo'] = new Argument();
+        $this->assertTrue($set->exists('foo'));
+
+        $arg = new Argument();
+        $arg->value = null;
+        $set->arguments['foo'] = $arg;
+        $this->assertTrue($set->exists('foo'));
+
+        $arg->value = false;
+        $this->assertTrue($set->exists('foo'));
+
+        $arg->value = 'foobar';
+        $this->assertTrue($set->exists('foo'));
     }
 
     public function testSingleFieldToArray(): void
