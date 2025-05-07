@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
 class ArgumentSet
@@ -57,6 +58,12 @@ class ArgumentSet
         }
 
         return isset($argument->value);
+    }
+
+    /** Check if the ArgumentSet has a value with the given key. */
+    public function exists(string $key): bool
+    {
+        return array_key_exists($key, $this->arguments);
     }
 
     /**
