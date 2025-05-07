@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
 class ArgumentSet
