@@ -127,7 +127,11 @@ final class ArgumentSetTest extends TestCase
         $set = new ArgumentSet();
         $set->addValue('foo', 42);
 
-        $this->assertSame(42, $set->arguments['foo']->value);
+        $argument = $set->arguments['foo'];
+        $this->assertSame(42, $argument->value);
+        $this->assertNull($argument->type);
+        $this->assertEmpty($argument->directives);
+        $this->assertNull($argument->resolver);
     }
 
     public function testAddValueDeep(): void
@@ -135,8 +139,18 @@ final class ArgumentSetTest extends TestCase
         $set = new ArgumentSet();
         $set->addValue('foo.bar', 42);
 
-        $foo = $set->arguments['foo']->value;
+        $foo = $set->arguments['foo'];
+        $this->assertNull($foo->type);
+        $this->assertEmpty($foo->directives);
+        $this->assertNull($foo->resolver);
 
-        $this->assertSame(42, $foo->arguments['bar']->value);
+        $fooValue = $foo->value;
+        $this->assertInstanceOf(ArgumentSet::class, $fooValue);;
+
+        $bar = $fooValue->arguments['bar'];
+        $this->assertSame(42, $bar->value);
+        $this->assertNull($bar->type);
+        $this->assertEmpty($bar->directives);
+        $this->assertNull($bar->resolver);
     }
 }
