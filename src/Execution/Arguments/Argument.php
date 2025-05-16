@@ -26,9 +26,7 @@ class Argument
      */
     public Collection $directives;
 
-    /**
-     * A resolver that handles the given value.
-     */
+    /** A resolver that handles the given value. */
     public ?ArgResolver $resolver = null;
 
     public function __construct()

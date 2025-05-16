@@ -145,7 +145,7 @@ final class ArgumentSetTest extends TestCase
         $this->assertNull($foo->resolver);
 
         $fooValue = $foo->value;
-        $this->assertInstanceOf(ArgumentSet::class, $fooValue);;
+        $this->assertInstanceOf(ArgumentSet::class, $fooValue);
 
         $bar = $fooValue->arguments['bar'];
         $this->assertSame(42, $bar->value);
