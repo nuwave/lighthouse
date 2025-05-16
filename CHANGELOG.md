@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.56.1
+
+### Fixed
+
+- Initialize `Argument::$type` with `null` and make it nullable https://github.com/nuwave/lighthouse/pull/2682
+
 ## v6.56.0
 
 ### Added
