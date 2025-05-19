@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.57.0
+
+### Changed
+
+- Update generated protobuf code https://github.com/nuwave/lighthouse/pull/2683
+
 ## v6.56.1
 
 ### Fixed
