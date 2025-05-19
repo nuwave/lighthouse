@@ -16,7 +16,7 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
     protected function getNameInput(): string
     {
         $name = $this->argument('name');
-        if (! is_string($name)) {
+        if (! is_string($name)) { // @phpstan-ignore function.alreadyNarrowedType (necessary in some dependency versions)
             throw new \InvalidArgumentException('You must specify the name for the class to generate.');
         }
 

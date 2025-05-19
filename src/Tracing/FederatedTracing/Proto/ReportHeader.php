@@ -65,6 +65,12 @@ class ReportHeader extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>string executable_schema_id = 11 [json_name = "executableSchemaId"];</code>
      */
     protected $executable_schema_id = '';
+    /**
+     * The unique reporting agent that generated this report.
+     *
+     * Generated from protobuf field <code>string agent_id = 13 [json_name = "agentId"];</code>
+     */
+    protected $agent_id = '';
 
     /**
      * Constructor.
@@ -88,6 +94,8 @@ class ReportHeader extends \Google\Protobuf\Internal\Message
      *           An id that is used to represent the schema to Apollo Graph Manager
      *           Using this in place of what used to be schema_hash, since that is no longer
      *           attached to a schema in the backend.
+     *     @type string $agent_id
+     *           The unique reporting agent that generated this report.
      * }
      */
     public function __construct($data = NULL) {
@@ -277,6 +285,32 @@ class ReportHeader extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->executable_schema_id = $var;
+
+        return $this;
+    }
+
+    /**
+     * The unique reporting agent that generated this report.
+     *
+     * Generated from protobuf field <code>string agent_id = 13 [json_name = "agentId"];</code>
+     * @return string
+     */
+    public function getAgentId()
+    {
+        return $this->agent_id;
+    }
+
+    /**
+     * The unique reporting agent that generated this report.
+     *
+     * Generated from protobuf field <code>string agent_id = 13 [json_name = "agentId"];</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setAgentId($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->agent_id = $var;
 
         return $this;
     }
