@@ -15,7 +15,9 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
 
-      - uses: bufbuild/buf-setup-action@v1
+      - uses: bufbuild/buf-action@v1
+        with:
+          setup_only: true
 
       - run: |
           buf generate
