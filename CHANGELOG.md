@@ -13,7 +13,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Changed
 
-- Use exclusive lock when writing the parsed schema to a file in `ASTCache`
+- Use exclusive lock when writing the parsed schema to a file in `ASTCache` https://github.com/nuwave/lighthouse/pull/2685
 
 ## v6.57.0
 
