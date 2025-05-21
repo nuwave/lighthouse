@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Changed
+
+- Use exclusive lock when writing the parsed schema to a file in `ASTCache`
+
 ## v6.57.0
 
 ### Changed

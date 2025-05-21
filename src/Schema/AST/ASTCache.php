@@ -36,8 +36,16 @@ class ASTCache
 
     public function set(DocumentAST $documentAST): void
     {
-        $variable = var_export($documentAST->toArray(), true);
-        $this->filesystem()->put($this->path, /** @lang PHP */ "<?php return {$variable};");
+        $variable = var_export(
+            value: $documentAST->toArray(),
+            return: true,
+        );
+
+        $this->filesystem()->put(
+            path: $this->path,
+            contents: /** @lang PHP */ "<?php return {$variable};",
+            lock: true,
+        );
     }
 
     public function clear(): void
