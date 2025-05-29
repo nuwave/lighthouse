@@ -24,8 +24,8 @@ final class CanFindDirectiveDBTest extends DBTestCase
         $user = factory(User::class)->create();
         assert($user instanceof User);
 
-        $this->schema = /** @lang GraphQL */
-            '
+        $this->schema /** @lang GraphQL */
+            = '
         type Query {
             user(id: ID! @whereKey): User
                 @canFind(ability: "view", find: "id")
@@ -63,8 +63,8 @@ final class CanFindDirectiveDBTest extends DBTestCase
         $user = factory(User::class)->create();
         assert($user instanceof User);
 
-        $this->schema = /** @lang GraphQL */
-            '
+        $this->schema /** @lang GraphQL */
+            = '
         type Query {
             account(id: ID! @whereKey): Account
                 @canFind(ability: "view", find: "id", model: "User")
@@ -103,8 +103,8 @@ final class CanFindDirectiveDBTest extends DBTestCase
             $this->never(),
         );
 
-        $this->schema = /** @lang GraphQL */
-            '
+        $this->schema /** @lang GraphQL */
+            = '
         type Query {
             user(id: ID! @whereKey): User
                 @canFind(ability: "view", find: "id")
@@ -144,8 +144,8 @@ final class CanFindDirectiveDBTest extends DBTestCase
             $this->never(),
         );
 
-        $this->schema = /** @lang GraphQL */
-            '
+        $this->schema /** @lang GraphQL */
+            = '
         type Query {
             user(id: ID! @whereKey): User
                 @canFind(ability: "view", find: "id")
@@ -185,8 +185,8 @@ final class CanFindDirectiveDBTest extends DBTestCase
             $this->never(),
         );
 
-        $this->schema = /** @lang GraphQL */
-            '
+        $this->schema /** @lang GraphQL */
+            = '
         type Query {
             user(id: ID! @whereKey): User
                 @canFind(ability: "view", find: "id", action: EXCEPTION_NOT_AUTHORIZED)
@@ -225,8 +225,8 @@ final class CanFindDirectiveDBTest extends DBTestCase
         $user = factory(User::class)->create();
         assert($user instanceof User);
 
-        $this->schema = /** @lang GraphQL */
-            '
+        $this->schema /** @lang GraphQL */
+            = '
         type Mutation {
             throwWhenInvoked(id: ID!): User
                 @canFind(ability: "view", find: "id", action: EXCEPTION_NOT_AUTHORIZED)
@@ -256,8 +256,8 @@ final class CanFindDirectiveDBTest extends DBTestCase
 
         $this->mockResolver(null);
 
-        $this->schema = /** @lang GraphQL */
-            '
+        $this->schema /** @lang GraphQL */
+            = '
         type Query {
             user(id: ID! @whereKey): User
                 @canFind(ability: "view", find: "id", findOrFail: false)
@@ -288,8 +288,8 @@ final class CanFindDirectiveDBTest extends DBTestCase
         $user->name = UserPolicy::ADMIN;
         $this->be($user);
 
-        $this->schema = /** @lang GraphQL */
-            '
+        $this->schema /** @lang GraphQL */
+            = '
         type Query {
             user(id: ID): User
                 @canFind(ability: "view", find: "some.path")
@@ -316,8 +316,8 @@ final class CanFindDirectiveDBTest extends DBTestCase
         assert($user instanceof User);
         $this->be($user);
 
-        $this->schema = /** @lang GraphQL */
-            '
+        $this->schema /** @lang GraphQL */
+            = '
         type Query {
             user(input: FindUserInput!): User
                 @canFind(ability: "view", find: "input.id")
@@ -370,8 +370,8 @@ final class CanFindDirectiveDBTest extends DBTestCase
             $this->never(),
         );
 
-        $this->schema = /** @lang GraphQL */
-            '
+        $this->schema /** @lang GraphQL */
+            = '
         type Query {
             post(foo: ID! @whereKey): Post
                 @canFind(ability: "view", find: "foo")
@@ -410,8 +410,8 @@ final class CanFindDirectiveDBTest extends DBTestCase
         $postB->user()->associate($admin);
         $postB->save();
 
-        $this->schema = /** @lang GraphQL */
-            '
+        $this->schema /** @lang GraphQL */
+            = '
         type Mutation {
             deletePosts(ids: [ID!]! @whereKey): [Post!]!
                 @canFind(ability: "delete", find: "ids")
@@ -455,8 +455,8 @@ final class CanFindDirectiveDBTest extends DBTestCase
         assert($task instanceof Task);
         $task->delete();
 
-        $this->schema = /** @lang GraphQL */
-            '
+        $this->schema /** @lang GraphQL */
+            = '
         type Query {
             task(id: ID! @whereKey): Task
                 @canFind(ability: "adminOnly", find: "id")

@@ -93,8 +93,8 @@ final class CanQueryDirectiveDBTest extends DBTestCase
         $user = factory(User::class)->create();
         assert($user instanceof User);
 
-        $this->schema = /** @lang GraphQL */
-            '
+        $this->schema /** @lang GraphQL */
+            = '
         type Mutation {
             throwWhenInvoked(id: ID!): User
                 @canQuery(ability: "view", action: EXCEPTION_NOT_AUTHORIZED)

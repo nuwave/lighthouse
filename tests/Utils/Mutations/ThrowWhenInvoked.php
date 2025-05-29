@@ -9,7 +9,7 @@ final class ThrowWhenInvoked
     public const string ERROR_MESSAGE = 'Custom error message from ThrowWhenInvoked mutation.';
 
     /**
-     * @param array<string, mixed> $args
+     * @param  array<string, mixed>  $args
      *
      * @return array<string, mixed>
      */

@@ -15,8 +15,8 @@ final class CanModelDirectiveDBTest extends DBTestCase
         $admin->name = UserPolicy::ADMIN;
         $this->be($admin);
 
-        $this->schema = /** @lang GraphQL */
-            '
+        $this->schema /** @lang GraphQL */
+            = '
         type Mutation {
             throwWhenInvoked: Task
                 @canModel(ability: "adminOnly", action: EXCEPTION_NOT_AUTHORIZED)
