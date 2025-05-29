@@ -88,7 +88,10 @@ GRAPHQL;
             $authorizeModel = fn (mixed $model) => $this->authorizeModel($gate, $ability, $model, $checkArguments);
 
             try {
-                return $this->authorizeRequest($root, $args, $context, $resolveInfo, $resolver, $authorizeModel);
+                $resolved = $this->authorizeRequest($root, $args, $context, $resolveInfo, $resolver, $authorizeModel);
+                if ($resolved) {
+                    return $resolved;
+                }
             } catch (\Throwable $throwable) {
                 $action = $this->directiveArgValue('action');
                 if ($action === 'EXCEPTION_NOT_AUTHORIZED') {
@@ -101,11 +104,20 @@ GRAPHQL;
 
                 throw $throwable;
             }
+
+            // Try to resolve the field outside the authorization try-catch block to avoid catching resolver exceptions.
+            return $resolver($root, $args, $context, $resolveInfo);
         });
     }
 
     /**
-     * Authorizes request and resolves the field.
+     * Authorizes request and optionally resolves the field.
+     *
+     * This method is called inside the authorization try-catch block, if the field is resolved inside it any exceptions
+     * thrown will be caught and handled according to the `action` argument.
+     *
+     * If the method returns a falsy value, the field will be resolved outside the authorization try-catch block
+     * and any exceptions thrown will not be caught by this directive.
      *
      * @phpstan-import-type Resolver from \Nuwave\Lighthouse\Schema\Values\FieldValue as Resolver
      *

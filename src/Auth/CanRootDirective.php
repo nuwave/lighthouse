@@ -27,6 +27,6 @@ GRAPHQL;
     {
         $authorize($root);
 
-        return $resolver($root, $args, $context, $resolveInfo);
+        return null;
     }
 }

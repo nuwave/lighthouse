@@ -65,7 +65,7 @@ GRAPHQL;
             $authorize($model);
         }
 
-        return $resolver($root, $args, $context, $resolveInfo);
+        return null;
     }
 
     /**
