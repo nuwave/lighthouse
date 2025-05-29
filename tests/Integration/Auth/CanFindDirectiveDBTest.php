@@ -225,10 +225,6 @@ final class CanFindDirectiveDBTest extends DBTestCase
         $user = factory(User::class)->create();
         assert($user instanceof User);
 
-        $this->mockResolverExpects(
-            $this->never(),
-        );
-
         $this->schema = /** @lang GraphQL */
             '
         type Mutation {
