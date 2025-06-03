@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Auth;
 
 use Illuminate\Contracts\Auth\Access\Gate;
+use Nuwave\Lighthouse\Auth\Contracts\ResolvesDuringAuthorization;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -86,10 +87,16 @@ GRAPHQL;
             $gate = $this->gate->forUser($context->user());
             $checkArguments = $this->buildCheckArguments($args);
             $authorizeModel = fn (mixed $model) => $this->authorizeModel($gate, $ability, $model, $checkArguments);
+            $hasResolved = false;
+            $trackedResolver = function () use (&$hasResolved, $resolver) {
+                $hasResolved = true;
+
+                return $resolver(...func_get_args());
+            };
 
             try {
-                $resolved = $this->authorizeRequest($root, $args, $context, $resolveInfo, $resolver, $authorizeModel);
-                if ($resolved) {
+                $resolved = $this->authorizeRequest($root, $args, $context, $resolveInfo, $trackedResolver, $authorizeModel);
+                if ($hasResolved) {
                     return $resolved;
                 }
             } catch (\Throwable $throwable) {
@@ -113,11 +120,9 @@ GRAPHQL;
     /**
      * Authorizes request and optionally resolves the field.
      *
-     * This method is called inside the authorization try-catch block, if the field is resolved inside it any exceptions
-     * thrown will be caught and handled according to the `action` argument.
-     *
-     * If the method returns a falsy value, the field will be resolved outside the authorization try-catch block
-     * and any exceptions thrown will not be caught by this directive.
+     * This method is called inside the authorization try-catch block.
+     * Resolving the field here is optional, it will be done outside the try-catch block if not resolved here.
+     * Resolving inside this method means any exceptions thrown by the resolver will be caught and handled according to the `action` argument.
      *
      * @phpstan-import-type Resolver from \Nuwave\Lighthouse\Schema\Values\FieldValue as Resolver
      *
