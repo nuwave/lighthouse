@@ -6,7 +6,7 @@ use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 
 final class ThrowWhenInvoked
 {
-    public const string ERROR_MESSAGE = 'Custom error message from ThrowWhenInvoked mutation.';
+    public const ERROR_MESSAGE = 'Custom error message from ThrowWhenInvoked mutation.';
 
     /**
      * @param  array<string, mixed>  $args
