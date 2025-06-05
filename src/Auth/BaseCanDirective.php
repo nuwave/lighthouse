@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Auth;
 
 use Illuminate\Contracts\Auth\Access\Gate;
-use Nuwave\Lighthouse\Auth\Contracts\ResolvesDuringAuthorization;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
