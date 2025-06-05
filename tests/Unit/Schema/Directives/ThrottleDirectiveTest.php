@@ -33,7 +33,7 @@ final class ThrottleDirectiveTest extends TestCase
                 Limit::perMinute(3),
             ]);
 
-        $rateLimiter->expects(self::exactly(3))
+        $rateLimiter->expects($this->exactly(3))
             ->method('tooManyAttempts')
             ->willReturnCallback(static function ($key, $maxAttempts) use (&$queriedKeys): bool {
                 $queriedKeys[$maxAttempts] = $key;
@@ -41,7 +41,7 @@ final class ThrottleDirectiveTest extends TestCase
                 return false;
             });
 
-        $rateLimiter->expects(self::exactly(3))
+        $rateLimiter->expects($this->exactly(3))
             ->method('hit');
 
         $this->app->singleton(RateLimiter::class, static fn (): RateLimiter => $rateLimiter);
