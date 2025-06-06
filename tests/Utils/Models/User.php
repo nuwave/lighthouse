@@ -179,9 +179,7 @@ final class User extends Authenticatable
         return 'foo';
     }
 
-    /**
-     * For property tests
-     */
+    /** For property tests */
     public function getLaravelFunctionPropertyAttribute(): string
     {
         return 'foo';
