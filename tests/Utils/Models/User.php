@@ -37,6 +37,7 @@ use Tests\Utils\Models\User\UserBuilder;
  *
  * Virtual
  * @property-read string|null $company_name
+ * @property-read string $laravel_function_property
  *
  * Relations
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\AlternateConnection> $alternateConnections
@@ -177,4 +178,14 @@ final class User extends Authenticatable
     {
         return 'foo';
     }
+
+    /**
+     * For property tests
+     */
+    public function getLaravelFunctionPropertyAttribute(): string
+    {
+        return 'foo';
+    }
+
+    public string $php_property = 'foo';
 }
