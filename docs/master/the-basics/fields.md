@@ -44,7 +44,9 @@ the name of the field you want to generate.
 
 For example, this is how you generate a class for the field `hello`:
 
-    php artisan lighthouse:query Hello
+```shell
+php artisan lighthouse:query Hello
+```
 
 Now your schema can be queried.
 
@@ -214,7 +216,9 @@ If you need to implement custom resolvers for fields that are not on one of the
 root types `Query` or `Mutation`, you can create a resolver class using the built-in `artisan` command `lighthouse:field`.
 For example, this is how you generate a class for the field `name` on type `User`:
 
-    php artisan lighthouse:field User.name
+```shell
+php artisan lighthouse:field User.name
+```
 
 ## Resolver precedence
 
