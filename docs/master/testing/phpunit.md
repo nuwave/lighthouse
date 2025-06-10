@@ -227,7 +227,7 @@ $spy->shouldNotHaveReceived('broadcast', function (Subscriber $subscriber, $broa
 Lighthouse conveniently provides additional assertions as mixins to the `TestResponse` class.
 Make sure to [generate the latest IDE-helper file](../api-reference/commands.md#ide-helper) to get proper autocompletion:
 
-```bash
+```shell
 php artisan lighthouse:ide-helper
 ```
 

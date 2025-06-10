@@ -13,7 +13,7 @@ final class BroadcastDBTest extends DBTestCase
 {
     use EnablesSubscriptionServiceProvider;
 
-    protected string $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ <<<'GRAPHQL'
     type Task {
         id: ID!
         name: String!
@@ -30,7 +30,7 @@ final class BroadcastDBTest extends DBTestCase
     type Subscription {
         taskUpdated: Task
     }
-    ';
+    GRAPHQL;
 
     protected function setUp(): void
     {

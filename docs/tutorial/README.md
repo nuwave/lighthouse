@@ -95,27 +95,37 @@ and ensure you have a working database set up.
 
 Run database migrations to create the `users` table:
 
-    php artisan migrate
+```shell
+php artisan migrate
+```
 
 Seed the database with some fake users:
 
-    php artisan tinker
-    \App\Models\User::factory(10)->create()
+```shell
+php artisan tinker
+\App\Models\User::factory(10)->create()
+```
 
 ### Installing Lighthouse
 
-Of course, we will use Lighthouse as the GraphQL Server:
+Use [composer](https://getcomposer.org) to install Lighthouse:
 
-    composer require nuwave/lighthouse
+```shell
+composer require nuwave/lighthouse
+```
 
 Publish the default schema to `graphql/schema.graphql`:
 
-    php artisan vendor:publish --tag=lighthouse-schema
+```shell
+php artisan vendor:publish --tag=lighthouse-schema
+```
 
 We will use [GraphiQL](https://github.com/graphql/graphiql/tree/main/packages/graphiql)
 to interactively run GraphQL queries:
 
-    composer require mll-lab/laravel-graphiql
+```shell
+composer require mll-lab/laravel-graphiql
+```
 
 To make sure everything is working, access `/graphiql` and try this query:
 
@@ -148,7 +158,9 @@ We can model this in our database schema like this.
 
 Begin by defining models and migrations for your posts and comments
 
-    php artisan make:model -m Post
+```shell
+php artisan make:model -m Post
+```
 
 Replace the newly generated `app/Models/Post.php` and the `create_posts_table.php` with this:
 
@@ -199,7 +211,9 @@ return new class() extends Migration {
 
 Let's do the same for the Comment model:
 
-    php artisan make:model -m Comment
+```shell
+php artisan make:model -m Comment
+```
 
 ```php
 namespace App\Models;
@@ -241,7 +255,9 @@ return new class() extends Migration {
 
 Remember to run the migrations:
 
-    php artisan migrate
+```shell
+php artisan migrate
+```
 
 Finally, add the `posts` relation to `app/Models/User.php`
 
