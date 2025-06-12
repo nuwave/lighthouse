@@ -6,9 +6,13 @@ use GraphQL\Error\ClientAware;
 use GraphQL\Error\Error;
 use GraphQL\Error\ProvidesExtensions;
 use GraphQL\Executor\ExecutionResult;
+use GraphQL\Executor\Executor;
+use GraphQL\Type\Definition\ResolveInfo;
+use GraphQL\Utils\Utils;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\ServiceProvider;
@@ -99,13 +103,13 @@ class LighthouseServiceProvider extends ServiceProvider
         });
 
         $this->app->bind(ProvidesValidationRules::class, CacheableValidationRulesProvider::class);
-
-        $this->commands(self::COMMANDS);
     }
 
     public function boot(ConfigRepository $configRepository, EventsDispatcher $dispatcher): void
     {
         $dispatcher->listen(RegisterDirectiveNamespaces::class, static fn (): string => __NAMESPACE__ . '\\Schema\\Directives');
+
+        $this->commands(self::COMMANDS);
 
         $this->publishes([
             __DIR__ . '/lighthouse.php' => $this->app->configPath() . '/lighthouse.php',
@@ -142,6 +146,23 @@ class LighthouseServiceProvider extends ServiceProvider
                 return new JsonResponse($serializableResult);
             });
         }
+
+        Executor::setDefaultFieldResolver(static function ($objectLikeValue, array $args, $contextValue, ResolveInfo $info): mixed {
+            $fieldName = $info->fieldName;
+
+            if ($objectLikeValue instanceof Model) {
+                $property = $objectLikeValue->getAttribute($fieldName);
+                if ($property === null && property_exists($objectLikeValue, $fieldName)) {
+                    $property = $objectLikeValue->{$fieldName};
+                }
+            } else {
+                $property = Utils::extractKey($objectLikeValue, $fieldName);
+            }
+
+            return $property instanceof \Closure
+                ? $property($objectLikeValue, $args, $contextValue, $info)
+                : $property;
+        });
     }
 
     protected function loadRoutesFrom($path): void

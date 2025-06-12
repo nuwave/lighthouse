@@ -53,6 +53,12 @@ use Tests\Utils\Models\User\UserBuilder;
  */
 final class User extends Authenticatable
 {
+    public const INCREMENTING_ATTRIBUTE_VALUE = 'value of the incrementing attribute';
+
+    public const FUNCTION_PROPERTY_ATTRIBUTE_VALUE = 'value of the virtual property';
+
+    public const PHP_PROPERTY_VALUE = 'value of the PHP property';
+
     /**
      * Ensure that this is functionally equivalent to leaving this as null.
      *
@@ -66,7 +72,7 @@ final class User extends Authenticatable
     ];
 
     /** @see \Tests\Integration\Models\PropertyAccessTest */
-    public string $php_property = 'foo';
+    public string $php_property = self::PHP_PROPERTY_VALUE;
 
     public function newEloquentBuilder($query): UserBuilder
     {
@@ -182,15 +188,27 @@ final class User extends Authenticatable
     /** @see \Tests\Integration\Models\PropertyAccessTest */
     public function getLaravelFunctionPropertyAttribute(): string
     {
-        return 'foo';
+        return self::FUNCTION_PROPERTY_ATTRIBUTE_VALUE;
     }
 
     /** @see \Tests\Integration\Models\PropertyAccessTest */
     public function getExpensivePropertyAttribute(): int
     {
         static $counter = 0;
-        $counter++;
+        ++$counter;
 
         return $counter;
+    }
+
+    /** @see \Tests\Integration\Models\PropertyAccessTest */
+    public function getIncrementingAttribute(): string
+    {
+        return self::INCREMENTING_ATTRIBUTE_VALUE;
+    }
+
+    /** @see \Tests\Integration\Models\PropertyAccessTest */
+    public function getExistsAttribute(): ?bool // @phpstan-ignore return.unusedType
+    {
+        return null;
     }
 }

@@ -71,7 +71,7 @@ final class PropertyAccessTest extends DBTestCase
         ])->assertJson([
             'data' => [
                 'user' => [
-                    'laravel_function_property' => 'foo',
+                    'laravel_function_property' => User::FUNCTION_PROPERTY_ATTRIBUTE_VALUE,
                 ],
             ],
         ]);
@@ -105,7 +105,75 @@ final class PropertyAccessTest extends DBTestCase
         ])->assertJson([
             'data' => [
                 'user' => [
-                    'php_property' => 'foo',
+                    'php_property' => User::PHP_PROPERTY_VALUE,
+                ],
+            ],
+        ]);
+    }
+
+    /** @see https://github.com/nuwave/lighthouse/issues/2687 */
+    public function testPrefersAttributeAccessorThatShadowsPhpProperty(): void
+    {
+        $user = factory(User::class)->create();
+        assert($user instanceof User);
+
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        type User {
+            id: ID!
+            incrementing: String!
+        }
+
+        type Query {
+            user(id: ID! @eq): User @find
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($id: ID!) {
+            user(id: $id) {
+                incrementing
+            }
+        }
+        ', [
+            'id' => $user->id,
+        ])->assertJson([
+            'data' => [
+                'user' => [
+                    'incrementing' => User::INCREMENTING_ATTRIBUTE_VALUE,
+                ],
+            ],
+        ]);
+    }
+
+    /** @see https://github.com/nuwave/lighthouse/issues/2687 */
+    public function testPrefersAttributeAccessorNullThatShadowsPhpProperty(): void
+    {
+        $user = factory(User::class)->create();
+        assert($user instanceof User);
+
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        type User {
+            id: ID!
+            exists: Boolean
+        }
+
+        type Query {
+            user(id: ID! @eq): User @find
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($id: ID!) {
+            user(id: $id) {
+                exists
+            }
+        }
+        ', [
+            'id' => $user->id,
+        ])->assertJson([
+            'data' => [
+                'user' => [
+                    'exists' => null,
                 ],
             ],
         ]);
