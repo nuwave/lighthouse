@@ -7,7 +7,6 @@ use GraphQL\Error\Error;
 use GraphQL\Error\ProvidesExtensions;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\Executor\Executor;
-use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Utils\Utils;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
@@ -35,6 +34,7 @@ use Nuwave\Lighthouse\Execution\CacheableValidationRulesProvider;
 use Nuwave\Lighthouse\Execution\ContextFactory;
 use Nuwave\Lighthouse\Execution\ContextSerializer;
 use Nuwave\Lighthouse\Execution\ErrorPool;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Execution\SingleResponse;
 use Nuwave\Lighthouse\Http\Responses\ResponseStream;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
@@ -49,6 +49,7 @@ use Nuwave\Lighthouse\Support\AppVersion;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules;
@@ -159,26 +160,24 @@ class LighthouseServiceProvider extends ServiceProvider
      *
      * @see \GraphQL\Executor\Executor::defaultFieldResolver()
      *
-     * @return callable(mixed $objectLikeValue, array<string, mixed> $args, mixed $contextValue, ResolveInfo $info): mixed
+     * @param  array<string, mixed>  $args
      */
-    public static function defaultFieldResolver(): callable
+    public static function defaultFieldResolver(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): mixed
     {
-        return static function ($objectLikeValue, array $args, $contextValue, ResolveInfo $info): mixed {
-            $fieldName = $info->fieldName;
+        $fieldName = $resolveInfo->fieldName;
 
-            if ($objectLikeValue instanceof Model) {
-                $property = $objectLikeValue->getAttribute($fieldName);
-                if ($property === null && property_exists($objectLikeValue, $fieldName)) {
-                    $property = $objectLikeValue->{$fieldName};
-                }
-            } else {
-                $property = Utils::extractKey($objectLikeValue, $fieldName);
+        if ($root instanceof Model) {
+            $property = $root->getAttribute($fieldName);
+            if ($property === null && property_exists($root, $fieldName)) {
+                $property = $root->{$fieldName};
             }
+        } else {
+            $property = Utils::extractKey($root, $fieldName);
+        }
 
-            return $property instanceof \Closure
-                ? $property($objectLikeValue, $args, $contextValue, $info)
-                : $property;
-        };
+        return $property instanceof \Closure
+            ? $property($root, $args, $context, $resolveInfo)
+            : $property;
     }
 
     protected function loadRoutesFrom($path): void

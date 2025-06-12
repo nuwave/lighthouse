@@ -173,7 +173,7 @@ final class PropertyAccessTest extends DBTestCase
         ])->assertJson([
             'data' => [
                 'user' => [
-                    'exists' => null,
+                    'exists' => true,
                 ],
             ],
         ]);
