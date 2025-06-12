@@ -147,7 +147,23 @@ class LighthouseServiceProvider extends ServiceProvider
             });
         }
 
-        Executor::setDefaultFieldResolver(static function ($objectLikeValue, array $args, $contextValue, ResolveInfo $info): mixed {
+        Executor::setDefaultFieldResolver([static::class, 'defaultFieldResolver']);
+    }
+
+    /**
+     * The default field resolver for GraphQL queries.
+     *
+     * This method is used to resolve fields on the object-like value returned by a resolver.
+     * It checks if the value is an Eloquent model and retrieves the attribute or property accordingly.
+     * Otherwise, it falls back to the default behavior from webonyx/graphql-php's default field resolver.
+     *
+     * @see \GraphQL\Executor\Executor::defaultFieldResolver()
+     *
+     * @return callable(mixed $objectLikeValue, array<string, mixed> $args, mixed $contextValue, ResolveInfo $info): mixed
+     */
+    public static function defaultFieldResolver(): callable
+    {
+        return static function ($objectLikeValue, array $args, $contextValue, ResolveInfo $info): mixed {
             $fieldName = $info->fieldName;
 
             if ($objectLikeValue instanceof Model) {
@@ -162,7 +178,7 @@ class LighthouseServiceProvider extends ServiceProvider
             return $property instanceof \Closure
                 ? $property($objectLikeValue, $args, $contextValue, $info)
                 : $property;
-        });
+        };
     }
 
     protected function loadRoutesFrom($path): void
