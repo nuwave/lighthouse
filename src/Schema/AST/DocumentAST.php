@@ -242,7 +242,7 @@ class DocumentAST implements Arrayable
             self::HASH => $this->hash,
         ] = $ast;
 
-        // Utilize the NodeList for lazy unserialization for performance gains.
+        // Use the NodeList for lazy unserialization for performance gains.
         // Until they are accessed by name, they are kept in their array form.
 
         // @phpstan-ignore-next-line Since we start from the array form, the generic type does not match

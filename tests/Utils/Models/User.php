@@ -12,7 +12,7 @@ use Tests\Integration\Execution\DataLoader\RelationBatchLoaderTest;
 use Tests\Utils\Models\User\UserBuilder;
 
 /**
- * Account of a person who utilizes this application.
+ * Account of a person who uses this application.
  *
  * Primary key
  *
