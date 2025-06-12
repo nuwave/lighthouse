@@ -86,7 +86,7 @@ final class PropertyAccessTest extends DBTestCase
         $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type User {
             id: ID!
-            php_property: String!
+            php_property: String
         }
 
         type Query {
