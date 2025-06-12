@@ -191,7 +191,7 @@ function resolveUserId(User $user): string
 ```
 
 Writing out each such resolver would be pretty repetitive.
-We can utilize the fourth and final resolver argument `ResolveInfo`, which will give us access
+We can use the fourth and final resolver argument `ResolveInfo`, which will give us access
 to the requested field name, to dynamically access the matching property.
 
 ```php

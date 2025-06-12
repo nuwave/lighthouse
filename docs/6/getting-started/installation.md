@@ -58,9 +58,8 @@ $app->register(\Nuwave\Lighthouse\Validation\ValidationServiceProvider::class);
 
 ## IDE Support
 
-Lighthouse makes heavy use of the SDL and utilizes schema directives.
-To improve your editing experience, you can generate a definition file
-[with an artisan command](../api-reference/commands.md#ide-helper):
+Lighthouse makes heavy use of the SDL and uses schema directives.
+To improve your editing experience, you can generate a definition file [with an artisan command](../api-reference/commands.md#ide-helper):
 
 ```shell
 php artisan lighthouse:ide-helper
