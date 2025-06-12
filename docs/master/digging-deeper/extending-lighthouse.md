@@ -37,7 +37,8 @@ final class SomePackageServiceProvider extends ServiceProvider
 
 Lighthouse will fall back to using [webonyx's default resolver](https://webonyx.github.io/graphql-php/data-fetching/#default-field-resolver)
 for non-root fields, [see resolver precedence](../the-basics/fields.md#resolver-precedence).
-You may overwrite this by passing a `callable` to `GraphQL\Executor\Executor::setDefaultFieldResolver()`.
+
+You may override this by calling `GraphQL\Executor\Executor::setDefaultFieldResolver()` in your service provider's `boot()` method.
 
 ## Use a custom `GraphQLContext`
 
