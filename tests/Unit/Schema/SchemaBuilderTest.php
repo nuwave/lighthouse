@@ -19,7 +19,8 @@ final class SchemaBuilderTest extends TestCase
         $this->buildSchemaWithPlaceholderQuery('')
             ->assertValid();
 
-        $this->assertNotNull($this->app->make(SchemaBuilder::class)->schemaHash());
+        $schemaBuilder = $this->app->make(SchemaBuilder::class);
+        $this->assertNotEmpty($schemaBuilder->schemaHash());
     }
 
     public function testGeneratesWithEmptyQueryType(): void

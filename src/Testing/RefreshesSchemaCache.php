@@ -27,7 +27,7 @@ trait RefreshesSchemaCache
     protected function setUpRefreshesSchemaCache(): void
     {
         if (! static::$schemaCacheWasRefreshed) {
-            // We utilize the filesystem as shared mutable state to coordinate between processes,
+            // We use the filesystem as shared mutable state to coordinate between processes,
             // since the tests might be run in parallel, and we want to ensure the schema cache
             // is refreshed exactly once before all tests.
             \Safe\touch(self::$lockFilePath);
