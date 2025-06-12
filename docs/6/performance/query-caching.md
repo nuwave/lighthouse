@@ -7,7 +7,7 @@ You can define cache store and cache duration, see `config/lighthouse.php`.
 
 Make sure you flush the query cache when you deploy an upgraded version of the `webonyx/graphql-php` dependency:
 
-```sh
+```shell
 php artisan cache:clear
 ```
 

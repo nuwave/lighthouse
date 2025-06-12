@@ -126,7 +126,7 @@ final class UserPostsBatchLoader
     /**
      * Map from user ids to posts.
      *
-     * @var array<int, array<int, \App\Posts\Post>>
+     * @var array<int, array<int, \App\Models\Post>>
      */
     protected array $results = [];
 

@@ -151,9 +151,11 @@ input UpdateUserInput @validator {
 ```
 
 We need to back that with a validator class. Lighthouse uses a simple naming convention for validator classes,
-just use the name of the input type and append `Validator`:
+use the name of the input type and append `Validator`:
 
-    php artisan lighthouse:validator UpdateUserInputValidator
+```shell
+php artisan lighthouse:validator UpdateUserInputValidator
+```
 
 The resulting class will be placed in your configured validator namespace. Let's go ahead
 and define the validation rules for the input:

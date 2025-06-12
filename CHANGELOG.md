@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.58.0
+
+### Changed
+
+- Expose original resolver errors in `@can*` directives instead of always wrapping them https://github.com/nuwave/lighthouse/pull/2686
+
 ## v6.57.1
 
 ### Changed

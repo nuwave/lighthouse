@@ -87,7 +87,7 @@ GRAPHQL;
             $checkArguments = $this->buildCheckArguments($args);
             $authorizeModel = fn (mixed $model) => $this->authorizeModel($gate, $ability, $model, $checkArguments);
             $hasResolved = false;
-            $trackedResolver = function () use (&$hasResolved, $resolver) {
+            $trackedResolver = static function () use (&$hasResolved, $resolver) {
                 $hasResolved = true;
 
                 return $resolver(...func_get_args());

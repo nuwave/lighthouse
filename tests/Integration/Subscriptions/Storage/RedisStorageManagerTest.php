@@ -15,7 +15,7 @@ final class RedisStorageManagerTest extends TestCase
     use TestsRedis;
     use EnablesSubscriptionServiceProvider;
 
-    protected string $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ <<<'GRAPHQL'
     type Task {
         id: ID!
         name: String!
@@ -25,7 +25,7 @@ final class RedisStorageManagerTest extends TestCase
         taskUpdated(id: ID!): Task
         taskCreated: Task
     }
-    ' . self::PLACEHOLDER_QUERY;
+    GRAPHQL . self::PLACEHOLDER_QUERY;
 
     public function testSubscriptionStoredWithPrefix(): void
     {

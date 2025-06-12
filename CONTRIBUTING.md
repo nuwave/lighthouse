@@ -167,8 +167,8 @@ Prefer `final` classes in [tests](tests), but never use them in [src](src).
 
 We strive to be compatible with both Lumen and Laravel.
 
-Do not use Facades and utilize dependency injection instead.
-Not every application has them enabled - Lumen does not use Facades by default.
+Do not use Facades, use dependency injection instead.
+Not every Laravel application has them enabled, and Lumen does not use Facades by default.
 
 Prefer direct usage of Illuminate classes instead of helpers.
 

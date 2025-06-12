@@ -90,7 +90,7 @@ When you resolve the field, the argument will hold the sanitized value.
 ```php
 namespace App\GraphQL\Mutations;
 
-use App\User;
+use App\Models\User;
 
 final class CreateUser
 {

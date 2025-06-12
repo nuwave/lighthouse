@@ -1,7 +1,6 @@
 # Extending Lighthouse
 
-Lighthouse offers various extension points which can be utilized by package developers
-as well as end users.
+Lighthouse offers various extension points which can be used by package and application developers.
 
 ## The Event System
 

@@ -171,7 +171,6 @@ class FieldValue
 
             if (! isset(self::$transformedResolveArgs[$path])) {
                 $argumentSetFactory = Container::getInstance()->make(ArgumentSetFactory::class);
-                assert($argumentSetFactory instanceof ArgumentSetFactory);
 
                 $argumentSet = $argumentSetFactory->fromResolveInfo($baseArgs, $baseResolveInfo);
                 foreach ($this->argumentSetTransformers as $transform) {
