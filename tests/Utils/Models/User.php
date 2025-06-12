@@ -38,6 +38,7 @@ use Tests\Utils\Models\User\UserBuilder;
  * Virtual
  * @property-read string|null $company_name
  * @property-read string $laravel_function_property @see \Tests\Integration\Models\PropertyAccessTest
+ * @property-read int $expensive_property @see \Tests\Integration\Models\PropertyAccessTest
  *
  * Relations
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\AlternateConnection> $alternateConnections
@@ -63,6 +64,9 @@ final class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /** @see \Tests\Integration\Models\PropertyAccessTest */
+    public string $php_property = 'foo';
 
     public function newEloquentBuilder($query): UserBuilder
     {
@@ -147,9 +151,7 @@ final class User extends Authenticatable
     public function postsCommentsLoaded(): bool
     {
         return $this->relationLoaded('posts')
-            && $this
-                ->posts
-                ->first()
+            && $this->posts->first()
                 ?->relationLoaded('comments');
     }
 
@@ -162,9 +164,7 @@ final class User extends Authenticatable
     public function postsTaskLoaded(): bool
     {
         return $this->relationLoaded('posts')
-            && $this
-                ->posts
-                ->first()
+            && $this->posts->first()
                 ?->relationLoaded('task');
     }
 
@@ -186,5 +186,11 @@ final class User extends Authenticatable
     }
 
     /** @see \Tests\Integration\Models\PropertyAccessTest */
-    public string $php_property = 'foo';
+    public function getExpensivePropertyAttribute(): int
+    {
+        static $counter = 0;
+        $counter++;
+
+        return $counter;
+    }
 }

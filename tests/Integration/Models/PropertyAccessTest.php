@@ -77,6 +77,7 @@ final class PropertyAccessTest extends DBTestCase
         ]);
     }
 
+    /** @see https://github.com/nuwave/lighthouse/issues/2687 */
     public function testPhpProperty(): void
     {
         $user = factory(User::class)->create();
@@ -105,6 +106,40 @@ final class PropertyAccessTest extends DBTestCase
             'data' => [
                 'user' => [
                     'php_property' => 'foo',
+                ],
+            ],
+        ]);
+    }
+
+    /** @see https://github.com/nuwave/lighthouse/issues/1671 */
+    public function testExpensivePropertyIsOnlyCalledOnce(): void
+    {
+        $user = factory(User::class)->create();
+        assert($user instanceof User);
+
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        type User {
+            id: ID!
+            expensive_property: Int!
+        }
+
+        type Query {
+            user(id: ID! @eq): User @find
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($id: ID!) {
+            user(id: $id) {
+                expensive_property
+            }
+        }
+        ', [
+            'id' => $user->id,
+        ])->assertJson([
+            'data' => [
+                'user' => [
+                    'expensive_property' => 1,
                 ],
             ],
         ]);
