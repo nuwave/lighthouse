@@ -86,7 +86,7 @@ final class PropertyAccessTest extends DBTestCase
         $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type User {
             id: ID!
-            php_property: String
+            php_property: String!
         }
 
         type Query {
@@ -105,8 +105,7 @@ final class PropertyAccessTest extends DBTestCase
         ])->assertJson([
             'data' => [
                 'user' => [
-                    // TODO consider changing the default resolver so this returns User::PHP_PROPERTY_VALUE
-                    'php_property' => null,
+                    'php_property' => User::PHP_PROPERTY_VALUE,
                 ],
             ],
         ]);
@@ -208,8 +207,7 @@ final class PropertyAccessTest extends DBTestCase
         ])->assertJson([
             'data' => [
                 'user' => [
-                    // TODO consider changing the default resolver so this returns 1
-                    'expensive_property' => 2,
+                    'expensive_property' => 1,
                 ],
             ],
         ]);
