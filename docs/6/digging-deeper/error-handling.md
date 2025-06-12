@@ -146,7 +146,7 @@ Add them to your `lighthouse.php` config file, for example:
 ],
 ```
 
-An error handler class must implement [`\Nuwave\Lighthouse\Execution\ErrorHandler`](https://github.com/nuwave/lighthouse/blob/master/src/Execution/ErrorHandler.php)
+An error handler class must implement [`Nuwave\Lighthouse\Execution\ErrorHandler`](https://github.com/nuwave/lighthouse/blob/master/src/Execution/ErrorHandler.php)
 
 ```php
 namespace App\GraphQL;

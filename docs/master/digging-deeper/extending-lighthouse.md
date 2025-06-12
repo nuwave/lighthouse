@@ -74,8 +74,8 @@ final class MyContext implements GraphQLContext
 }
 ```
 
-You need a factory that creates an instance of `\Nuwave\Lighthouse\Support\Contracts\GraphQLContext`.
-This factory class needs to implement `\Nuwave\Lighthouse\Support\Contracts\CreatesContext`.
+You need a factory that creates an instance of `Nuwave\Lighthouse\Support\Contracts\GraphQLContext`.
+This factory class needs to implement `Nuwave\Lighthouse\Support\Contracts\CreatesContext`.
 
 ```php
 namespace App\GraphQL;

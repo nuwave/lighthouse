@@ -30,7 +30,7 @@ type User {
 
 ## Global Object Identification
 
-You may rebind the `\Nuwave\Lighthouse\Support\Contracts\GlobalId` interface to add your
+You may rebind the `Nuwave\Lighthouse\Support\Contracts\GlobalId` interface to add your
 own mechanism of encoding/decoding global ids.
 
 [Global Object Identification](https://relay.dev/graphql/objectidentification.htm)

@@ -437,8 +437,8 @@ directive. Just like Laravel Middleware, it can wrap around individual field res
 
 ### Directives must have an SDL definition
 
-The interface `\Nuwave\Lighthouse\Support\Contracts\Directive` now has the same functionality
-as the removed `\Nuwave\Lighthouse\Support\Contracts\DefinedDirective`. If you previously
+The interface `Nuwave\Lighthouse\Support\Contracts\Directive` now has the same functionality
+as the removed `Nuwave\Lighthouse\Support\Contracts\DefinedDirective`. If you previously
 implemented `DefinedDirective`, remove it from your directives:
 
 ```diff
@@ -568,11 +568,11 @@ The method will have to change like this:
 
 This affects custom directives that implemented one of the following interfaces:
 
-- `\Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray`
-- `\Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective`
-- `\Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective`
+- `Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray`
+- `Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective`
+- `Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective`
 
-Whereas those interfaces previously extended `\Nuwave\Lighthouse\Support\Contracts\ArgDirective`, you now
+Whereas those interfaces previously extended `Nuwave\Lighthouse\Support\Contracts\ArgDirective`, you now
 have to choose if you want them to apply to entire lists of arguments, elements within that list, or both.
 Change them as follows to make them behave like in v4:
 
@@ -652,7 +652,7 @@ own implementation of `Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubsc
 
 ### `TypeRegistry` does not register duplicates by default
 
-Calling `register()` on the `\Nuwave\Lighthouse\Schema\TypeRegistry` now throws when passing
+Calling `register()` on the `Nuwave\Lighthouse\Schema\TypeRegistry` now throws when passing
 a type that was already registered, as this most likely is an error.
 
 If you want to previous behaviour of overwriting existing types, use `overwrite()` instead.
@@ -678,8 +678,8 @@ If you need to revert to the old behavior of using `fill()`, you can change your
 
 ### Replace `ErrorBuffer` with `ErrorPool`
 
-Collecting partial errors is now done through the singleton `\Nuwave\Lighthouse\Execution\ErrorPool`
-instead of `\Nuwave\Lighthouse\Execution\ErrorBuffer`:
+Collecting partial errors is now done through the singleton `Nuwave\Lighthouse\Execution\ErrorPool`
+instead of `Nuwave\Lighthouse\Execution\ErrorBuffer`:
 
 ```php
 try {
@@ -730,13 +730,13 @@ A few are different:
 +Parser::inputValueDefinition($bar);
 ```
 
-### Add method `defaultHasOperator` to `\Nuwave\Lighthouse\WhereConditions\Operator`
+### Add method `defaultHasOperator` to `Nuwave\Lighthouse\WhereConditions\Operator`
 
 Since the addition of the `HAS` input in `whereCondition` mechanics,
 there has to be a default operator for the `HAS` input.
 
 If you implement your own custom operator, implement `defaultHasOperator`.
-For example, this is the implementation of the default `\Nuwave\Lighthouse\WhereConditions\SQLOperator`:
+For example, this is the implementation of the default `Nuwave\Lighthouse\WhereConditions\SQLOperator`:
 
 ```php
 public function defaultHasOperator(): string

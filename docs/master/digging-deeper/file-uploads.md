@@ -25,7 +25,7 @@ type Mutation {
 ## Handling file uploads
 
 Lighthouse accepts multipart form requests that contain file uploads.
-The given file is injected into the `array $variables` as an instance of [`\Illuminate\Http\UploadedFile`](https://laravel.com/api/9.x/Illuminate/Http/UploadedFile.html)
+The given file is injected into the `array $variables` as an instance of [`Illuminate\Http\UploadedFile`](https://laravel.com/api/9.x/Illuminate/Http/UploadedFile.html)
 and passed into the resolver.
 
 It is up to you how to handle the given file in the resolver,

@@ -6,9 +6,9 @@ As arguments may be contained within a list in the schema definition, you must s
 what your directive should apply to in addition to its function.
 
 - If it applies to the individual items within the list,
-  implement the [`\Nuwave\Lighthouse\Support\Contracts\ArgDirective`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ArgDirective.php) interface.
+  implement the [`Nuwave\Lighthouse\Support\Contracts\ArgDirective`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ArgDirective.php) interface.
 - Else, if it should apply to the whole list,
-  implement the [`\Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ArgDirectiveForArray.php) interface.
+  implement the [`Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ArgDirectiveForArray.php) interface.
 
 You must implement exactly one of those two interfaces in order for an argument directive to work.
 
@@ -39,7 +39,7 @@ In the given example, Lighthouse will take the value of the `password` argument 
 
 ## ArgSanitizerDirective
 
-An [`\Nuwave\Lighthouse\Support\Contracts\ArgSanitizerDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/ArgSanitizerDirective.php)
+An [`Nuwave\Lighthouse\Support\Contracts\ArgSanitizerDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/ArgSanitizerDirective.php)
 takes an incoming value and returns a new value.
 
 Let's take a look at the built-in [@trim](../api-reference/directives.md#trim) directive.
@@ -106,7 +106,7 @@ final class CreateUser
 
 ## ArgTransformerDirective
 
-An [`\Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/ArgTransformerDirective.php)
+An [`Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/ArgTransformerDirective.php)
 works essentially the same as an [`ArgSanitizerDirective`](#argsanitizerdirective).
 Notable differences are:
 
@@ -115,7 +115,7 @@ Notable differences are:
 
 ## ArgBuilderDirective
 
-An [`\Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/ArgBuilderDirective.php)
+An [`Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/ArgBuilderDirective.php)
 directive allows using arguments passed by the client to dynamically
 modify the database query that Lighthouse creates for a field.
 
@@ -206,7 +206,7 @@ input DateRange {
 
 ## ArgResolver
 
-An [`\Nuwave\Lighthouse\Support\Contracts\ArgResolver`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ArgResolver.php)
+An [`Nuwave\Lighthouse\Support\Contracts\ArgResolver`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ArgResolver.php)
 directive allows you to compose resolvers for complex nested inputs, similar to the way
 that field resolvers are composed together.
 

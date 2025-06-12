@@ -21,7 +21,7 @@ php artisan lighthouse:directive --argument upperCase
 ```
 
 That will create a class called `UpperCaseDirective` that extends the
-abstract class `\Nuwave\Lighthouse\Schema\Directives\BaseDirective`.
+abstract class `Nuwave\Lighthouse\Schema\Directives\BaseDirective`.
 
 ```php
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
