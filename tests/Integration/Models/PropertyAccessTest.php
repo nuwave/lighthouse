@@ -1,15 +1,20 @@
 <?php declare(strict_types=1);
 
-namespace Models;
+namespace Tests\Integration\Models;
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
-class PropertyAccessTest extends DBTestCase
+final class PropertyAccessTest extends DBTestCase
 {
     public function testLaravelDatabaseProperty(): void
     {
-        factory(User::class)->create(['name' => 'foobar']);
+        $name = 'foobar';
+
+        $user = factory(User::class)->make();
+        assert($user instanceof User);
+        $user->name = $name;
+        $user->save();
 
         $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type User {
@@ -23,15 +28,17 @@ class PropertyAccessTest extends DBTestCase
         GRAPHQL;
 
         $this->graphQL(/** @lang GraphQL */ '
-        {
-            user(id: 1) {
+        query ($id: ID!) {
+            user(id: $id) {
                 name
             }
         }
-        ')->assertJson([
+        ', [
+            'id' => $user->id,
+        ])->assertJson([
             'data' => [
                 'user' => [
-                    'name' => 'foobar',
+                    'name' => $name,
                 ],
             ],
         ]);
@@ -39,7 +46,8 @@ class PropertyAccessTest extends DBTestCase
 
     public function testLaravelFunctionProperty(): void
     {
-        factory(User::class)->create();
+        $user = factory(User::class)->create();
+        assert($user instanceof User);
 
         $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type User {
@@ -53,12 +61,14 @@ class PropertyAccessTest extends DBTestCase
         GRAPHQL;
 
         $this->graphQL(/** @lang GraphQL */ '
-        {
-            user(id: 1) {
+        query ($id: ID!) {
+            user(id: $id) {
                 laravel_function_property
             }
         }
-        ')->assertJson([
+        ', [
+            'id' => $user->id,
+        ])->assertJson([
             'data' => [
                 'user' => [
                     'laravel_function_property' => 'foo',
@@ -69,7 +79,8 @@ class PropertyAccessTest extends DBTestCase
 
     public function testPhpProperty(): void
     {
-        factory(User::class)->create();
+        $user = factory(User::class)->create();
+        assert($user instanceof User);
 
         $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type User {
@@ -83,12 +94,14 @@ class PropertyAccessTest extends DBTestCase
         GRAPHQL;
 
         $this->graphQL(/** @lang GraphQL */ '
-        {
-            user(id: 1) {
+        query ($id: ID!) {
+            user(id: $id) {
                 php_property
             }
         }
-        ')->assertJson([
+        ', [
+            'id' => $user->id,
+        ])->assertJson([
             'data' => [
                 'user' => [
                     'php_property' => 'foo',
