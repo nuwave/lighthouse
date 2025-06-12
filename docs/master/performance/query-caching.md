@@ -29,7 +29,7 @@ You can enable it by setting `validation_cache.enable` to `true` in `config/ligh
 
 ## Testing caveats
 
-If you are mocking Laravel cache classes like `\Illuminate\Support\Facades\Cache` or `\Illuminate\Cache\Repository` and asserting expectations in your unit tests, it might be best to disable the query cache in your `phpunit.xml`:
+If you are mocking Laravel cache classes like `Illuminate\Support\Facades\Cache` or `Illuminate\Cache\Repository` and asserting expectations in your unit tests, it might be best to disable the query cache in your `phpunit.xml`:
 
 ```diff
   <?xml version="1.0" encoding="UTF-8"?>

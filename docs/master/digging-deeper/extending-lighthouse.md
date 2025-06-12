@@ -44,7 +44,7 @@ You may override this by calling `GraphQL\Executor\Executor::setDefaultFieldReso
 
 The context is the third argument of any resolver function.
 
-You may replace the default `\Nuwave\Lighthouse\Schema\Context` with your own
+You may replace the default `Nuwave\Lighthouse\Schema\Context` with your own
 implementation of the interface `Nuwave\Lighthouse\Support\Contracts\GraphQLContext`.
 The following example is just a starting point of what you can do:
 
@@ -73,8 +73,8 @@ final class MyContext implements GraphQLContext
 }
 ```
 
-You need a factory that creates an instance of `\Nuwave\Lighthouse\Support\Contracts\GraphQLContext`.
-This factory class needs to implement `\Nuwave\Lighthouse\Support\Contracts\CreatesContext`.
+You need a factory that creates an instance of `Nuwave\Lighthouse\Support\Contracts\GraphQLContext`.
+This factory class needs to implement `Nuwave\Lighthouse\Support\Contracts\CreatesContext`.
 
 ```php
 namespace App\GraphQL;

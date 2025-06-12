@@ -4,14 +4,14 @@ Field directives can be applied to any [FieldDefinition](https://graphql.github.
 
 ## FieldResolver
 
-Perhaps the most important directive interface, a [`\Nuwave\Lighthouse\Support\Contracts\FieldResolver`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/FieldResolver.php)
+Perhaps the most important directive interface, a [`Nuwave\Lighthouse\Support\Contracts\FieldResolver`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/FieldResolver.php)
 lets you add a resolver for a field through a directive.
 
 It can be a great way to reuse resolver logic within a schema.
 
 ## FieldMiddleware
 
-A [`\Nuwave\Lighthouse\Support\Contracts\FieldMiddleware`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/FieldMiddleware.php) directive allows you
+A [`Nuwave\Lighthouse\Support\Contracts\FieldMiddleware`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/FieldMiddleware.php) directive allows you
 to wrap around the field resolver, just like [Laravel Middleware](https://laravel.com/docs/middleware).
 
 You may use it to handle incoming values before reaching the final resolver
@@ -64,7 +64,7 @@ type Query {
 
 ## FieldBuilderDirective
 
-A [`\Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/FieldBuilderDirective.php)
+A [`Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/FieldBuilderDirective.php)
 directive allows modifying the database query that Lighthouse creates for a field.
 
 > This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
@@ -76,7 +76,7 @@ The following directives use the defined filter for resolving the query:
 
 ## FieldManipulator
 
-A [`\Nuwave\Lighthouse\Support\Contracts\FieldManipulator`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/FieldManipulator.php)
+A [`Nuwave\Lighthouse\Support\Contracts\FieldManipulator`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/FieldManipulator.php)
 directive can be used to manipulate the schema AST.
 
 ## ValidationDirective
@@ -88,5 +88,5 @@ you to define complex validation rules for a field with ease.
 
 ## ComplexityResolverDirective
 
-A [`\Nuwave\Lighthouse\Support\Contracts\ComplexityResolverDirective`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ComplexityResolverDirective.php)
+A [`Nuwave\Lighthouse\Support\Contracts\ComplexityResolverDirective`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ComplexityResolverDirective.php)
 directive allows you to overwrite the default query complexity calculation.

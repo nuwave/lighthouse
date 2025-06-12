@@ -225,9 +225,9 @@ php artisan lighthouse:field User.name
 Lighthouse uses the following logic to locate field resolvers.
 
 First, it checks if the field definition in the schema is annotated with a [FieldResolver](../custom-directives/field-directives.md#fieldresolver)
-directive. If so, it uses the resolver that is provided by the directive.
+directive. If so, it uses the resolver provided by the directive.
 
-The interface [`\Nuwave\Lighthouse\Support\Contracts\ProvidesResolver`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ProvidesResolver.php)
+The interface [`Nuwave\Lighthouse\Support\Contracts\ProvidesResolver`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ProvidesResolver.php)
 is expected to provide a resolver in case no resolver directive is defined for a field.
 When the field is defined on the root `Subscription` type, the [`Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ProvidesSubscriptionResolver.php)
 interface is used instead.

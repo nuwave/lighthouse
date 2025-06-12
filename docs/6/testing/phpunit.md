@@ -313,7 +313,7 @@ $this->multipartGraphQL($operations, $map, $file);
 If you create or manipulate parts of your schema programmatically, you might
 want to test that. You can use introspection to query your final schema in tests.
 
-Lighthouse uses the introspection query from [`\GraphQL\Type\Introspection::getIntrospectionQuery()`](https://github.com/webonyx/graphql-php/blob/master/src/Type/Introspection.php).
+Lighthouse uses the introspection query from [`GraphQL\Type\Introspection::getIntrospectionQuery()`](https://github.com/webonyx/graphql-php/blob/master/src/Type/Introspection.php).
 
 The `introspect()` helper method runs the full introspection query against your schema.
 
