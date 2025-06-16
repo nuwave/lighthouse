@@ -61,10 +61,11 @@ class ASTCache
     /** @param  callable(): DocumentAST  $build */
     public function fromCacheOrBuild(callable $build): DocumentAST
     {
-        if ($this->filesystem()->exists($this->path())) {
-            $ast = require $this->path();
+        $path = $this->path();
+        if ($this->filesystem()->exists($path)) {
+            $ast = require $path;
             if (! is_array($ast)) {
-                throw new InvalidSchemaCacheContentsException($this->path(), $ast);
+                throw new InvalidSchemaCacheContentsException($path, $ast);
             }
 
             /** @var SerializableDocumentAST $ast */
