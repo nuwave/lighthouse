@@ -1706,7 +1706,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Apply error handling and debug settings consistently https://github.com/nuwave/lighthouse/pull/1749
 - Fix typo `comparision` to `comparison` in generated input types for `@whereHas`
-- Fix redis `mget` being called with an empty list of subscriber ids https://github.com/nuwave/lighthouse/pull/1759
+- Fix redis `mget` being called with an empty list of subscriber IDs https://github.com/nuwave/lighthouse/pull/1759
 - Fix `lighthouse:clear-cache` not clearing cache when a custom cache store is used https://github.com/nuwave/lighthouse/pull/1788
 - Fix subscription storage in redis for predis users https://github.com/nuwave/lighthouse/pull/1814
 - Prepend rule arguments that refer to other arguments with the full path https://github.com/nuwave/lighthouse/pull/1739
@@ -2298,7 +2298,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Fixed
 
-- Fix broken behaviour when using union types with schema caching https://github.com/nuwave/lighthouse/pull/1015
+- Fix broken behavior when using union types with schema caching https://github.com/nuwave/lighthouse/pull/1015
 
 ## v4.4.2
 
@@ -2455,7 +2455,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
   can be used to change the argument name https://github.com/nuwave/lighthouse/pull/852
 - Rename `ArgValidationDirective` to `ProvidesRules` and drop `get` prefix from the methods within https://github.com/nuwave/lighthouse/pull/846
 - Make the argument used for finding a model to check `@can` against configurable.
-  The previous behaviour of implicitly using the `id` argument for finding a specific
+  The previous behavior of implicitly using the `id` argument for finding a specific
   model to authorize against now no longer works. https://github.com/nuwave/lighthouse/pull/856
 - Change the `Nuwave\Lighthouse\Schema\Types\LaravelEnumType` wrapper to map
   to Enum instances internally https://github.com/nuwave/lighthouse/pull/908

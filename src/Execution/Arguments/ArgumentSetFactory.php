@@ -140,7 +140,7 @@ class ArgumentSetFactory
             return $this->wrapArgs($typeDef, $value);
         }
 
-        // Otherwise, we just return the value as is and are done with that subtree
+        // Otherwise, we return the value as is and are done with that subtree
         return $value;
     }
 }

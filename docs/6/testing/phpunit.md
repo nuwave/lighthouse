@@ -282,8 +282,7 @@ $this->graphQL(/** @lang GraphQL */ '
 
 Lighthouse allows you to [upload files](../digging-deeper/file-uploads.md) through GraphQL.
 
-Since multipart form requests are tricky to construct, you can just use the `multipartGraphQL`
-helper method.
+Since multipart form requests are tricky to construct, you can use the `multipartGraphQL` helper method.
 
 ```php
 $operations = [

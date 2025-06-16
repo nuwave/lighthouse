@@ -14,7 +14,7 @@ Compare your `lighthouse.php` against the latest [default configuration](src/lig
 Methods you need to explicitly call to set up test traits were removed in favor of automatically set up test traits.
 Keep in mind they only work when your test class extends `Illuminate\Foundation\Testing\TestCase`.
 
-- Just remove calls to `Nuwave\Lighthouse\Testing\RefreshesSchemaCache::bootRefreshesSchemaCache()`.
+- Remove calls to `Nuwave\Lighthouse\Testing\RefreshesSchemaCache::bootRefreshesSchemaCache()`.
 - Replace calls to `Nuwave\Lighthouse\Testing\MakesGraphQLRequests::setUpSubscriptionEnvironment()` with ` use Nuwave\Lighthouse\Testing\TestsSubscriptions`.
 
 ### `EnsureXHR` is enabled in the default configuration
@@ -191,7 +191,7 @@ public function scopeByType(Builder $builder, int $aOrB): Builder
 ```
 
 In the future, Lighthouse will pass the actual Enum instance along. You can opt in to
-the new behaviour before upgrading by setting `unbox_bensampo_enum_enum_instances` to `false`. 
+the new behavior before upgrading by setting `unbox_bensampo_enum_enum_instances` to `false`. 
 
 ```php
 public function scopeByType(Builder $builder, AOrB $aOrB): Builder
@@ -548,7 +548,7 @@ type Mutation {
 ### `@method` passes down just ordered arguments
 
 Instead of passing down the usual resolver arguments, the `@method` directive will
-now pass just the arguments given to a field. This behaviour could previously be
+now pass just the arguments given to a field. This behavior could previously be
 enabled through the `passOrdered` option, which is now removed.
 
 ```graphql
@@ -655,7 +655,7 @@ own implementation of `Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubsc
 Calling `register()` on the `Nuwave\Lighthouse\Schema\TypeRegistry` now throws when passing
 a type that was already registered, as this most likely is an error.
 
-If you want to previous behaviour of overwriting existing types, use `overwrite()` instead.
+If you want to previous behavior of overwriting existing types, use `overwrite()` instead.
 
 ```diff
 $typeRegistry = app(\Nuwave\Lighthouse\Schema\TypeRegistry::class);

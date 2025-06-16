@@ -76,7 +76,7 @@ GRAPHQL;
                 $path,
             );
 
-            // We found a matching value in the cache, so we can just return early without actually running the query.
+            // We found a matching value in the cache, so we can return early without actually running the query.
             $value = $cache->get($cacheKey);
             if ($value !== null) {
                 // Deferring the result will allow nested deferred resolves to be bundled together, see https://github.com/nuwave/lighthouse/pull/2270#discussion_r1072414584.

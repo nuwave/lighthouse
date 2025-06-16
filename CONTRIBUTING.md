@@ -67,7 +67,7 @@ Common tasks during development are listed in the `scripts` section of [composer
 We use **PHPUnit** for unit tests and integration tests.
 
 Have a new feature? You can start off by writing some tests that detail
-the behaviour you want to achieve and go from there.
+the behavior you want to achieve and go from there.
 
 Fixing a bug? The best way to ensure it is fixed for good and never comes
 back is to write a failing test for it and then make it pass. If you cannot
