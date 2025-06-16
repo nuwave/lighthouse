@@ -84,7 +84,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
             ) {
                 $relationBatchLoader = BatchLoaderRegistry::instance(
                     $this->qualifyPath($args, $resolveInfo),
-                    static fn(): RelationBatchLoader => new RelationBatchLoader(
+                    static fn (): RelationBatchLoader => new RelationBatchLoader(
                         $paginationArgs === null
                         ? new SimpleModelsLoader($relationName, $decorateBuilder)
                         : new PaginatedModelsLoader($relationName, $decorateBuilder, $paginationArgs),
@@ -141,7 +141,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
     {
         if ($edgeTypeName = $this->directiveArgValue('edgeType')) {
             $edgeType = $documentAST->types[$edgeTypeName] ?? null;
-            if (!$edgeType instanceof ObjectTypeDefinitionNode) {
+            if (! $edgeType instanceof ObjectTypeDefinitionNode) {
                 throw new DefinitionException("The `edgeType` argument of @{$this->name()} on {$this->nodeName()} must reference an existing object type definition.");
             }
 
