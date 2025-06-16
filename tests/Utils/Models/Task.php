@@ -34,11 +34,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * Relations
  * @property-read \Tests\Utils\Models\Activity $activity
  * @property-read \Tests\Utils\Models\Image $image
- * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Image> $images
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\Image> $images
  * @property-read \Tests\Utils\Models\Post|null $post
  * @property-read \Tests\Utils\Models\Comment|null $postComments
  * @property-read \Tests\Utils\Models\PostStatus|null $postStatus
- * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Tag> $tags
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\Tag> $tags
  * @property-read \Tests\Utils\Models\User|null $user
  */
 final class Task extends Model

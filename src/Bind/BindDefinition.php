@@ -13,6 +13,7 @@ class BindDefinition
 {
     public function __construct(
         /** @var class-string<TClass> */
+        // @phpstan-ignore generics.variance (TODO make class readonly)
         public string $class,
         public string $column,
         /** @var array<string> */
@@ -28,9 +29,7 @@ class BindDefinition
         $parentNodeName = $parentNode->name->value;
 
         if (! class_exists($this->class)) {
-            throw new DefinitionException(
-                "@bind argument `class` defined on `{$parentNodeName}.{$nodeName}` must be an existing class, received `{$this->class}`.",
-            );
+            throw new DefinitionException("@bind argument `class` defined on `{$parentNodeName}.{$nodeName}` must be an existing class, received `{$this->class}`.");
         }
 
         if ($this->isModelBinding()) {
@@ -42,9 +41,7 @@ class BindDefinition
         }
 
         $modelClass = Model::class;
-        throw new DefinitionException(
-            "@bind argument `class` defined on `{$parentNodeName}.{$nodeName}` must extend {$modelClass} or define the method `__invoke`, but `{$this->class}` does neither.",
-        );
+        throw new DefinitionException("@bind argument `class` defined on `{$parentNodeName}.{$nodeName}` must extend {$modelClass} or define the method `__invoke`, but `{$this->class}` does neither.");
     }
 
     public function isModelBinding(): bool

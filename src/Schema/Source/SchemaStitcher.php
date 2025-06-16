@@ -14,9 +14,7 @@ class SchemaStitcher implements SchemaSourceProvider
     public function __construct(string $rootSchemaPath)
     {
         if (! file_exists($rootSchemaPath)) {
-            throw new FileNotFoundException(
-                "Failed to find a GraphQL schema file at {$rootSchemaPath}. If you just installed Lighthouse, run php artisan vendor:publish --tag=lighthouse-schema",
-            );
+            throw new FileNotFoundException("Failed to find a GraphQL schema file at {$rootSchemaPath}. If you just installed Lighthouse, run php artisan vendor:publish --tag=lighthouse-schema.");
         }
 
         $this->rootSchemaPath = $rootSchemaPath;
@@ -43,11 +41,7 @@ class SchemaStitcher implements SchemaSourceProvider
                     try {
                         $realpath = \Safe\realpath($importFilePath);
                     } catch (FilesystemException $filesystemException) {
-                        throw new FileNotFoundException(
-                            "Did not find GraphQL schema import at {$importFilePath}.",
-                            $filesystemException->getCode(),
-                            $filesystemException,
-                        );
+                        throw new FileNotFoundException("Did not find GraphQL schema import at {$importFilePath}.", $filesystemException->getCode(), $filesystemException);
                     }
 
                     return self::gatherSchemaImportsRecursively($realpath);

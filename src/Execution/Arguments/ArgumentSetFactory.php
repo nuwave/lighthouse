@@ -86,9 +86,9 @@ class ArgumentSetFactory
         $type = $this->argumentTypeNodeConverter->convert($definition->type);
 
         $argument = new Argument();
-        $argument->directives = $this->directiveLocator->associated($definition);
-        $argument->type = $type;
         $argument->value = $this->wrapWithType($value, $type);
+        $argument->type = $type;
+        $argument->directives = $this->directiveLocator->associated($definition);
 
         return $argument;
     }
@@ -140,7 +140,7 @@ class ArgumentSetFactory
             return $this->wrapArgs($typeDef, $value);
         }
 
-        // Otherwise, we just return the value as is and are done with that subtree
+        // Otherwise, we return the value as is and are done with that subtree
         return $value;
     }
 }

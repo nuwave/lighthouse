@@ -10,7 +10,7 @@ use Nuwave\Lighthouse\Testing\UsesTestSchema;
 use Orchestra\Testbench\TestCase;
 
 /**
- * Just a placeholder in order for PHPStan to be able to analyse those traits, see https://phpstan.org/blog/how-phpstan-analyses-traits.
+ * Just a placeholder in order for PHPStan to be able to analyze those traits, see https://phpstan.org/blog/how-phpstan-analyses-traits.
  */
 final class TestingTraitDummyLumen extends TestCase
 {

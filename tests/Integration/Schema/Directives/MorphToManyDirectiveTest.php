@@ -265,7 +265,7 @@ final class MorphToManyDirectiveTest extends DBTestCase
         GRAPHQL;
 
         $this->graphQL(/** @lang GraphQL */ '
-        query ($userId: ID!){
+        query ($userId: ID!) {
             user (id: $userId) {
                 id
                 posts {

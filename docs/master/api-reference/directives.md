@@ -367,8 +367,8 @@ type User {
 
 ### Retrieving Intermediate Table Columns
 
-You may want to allow accessing data that describes the relation between the models
-and is stored in the intermediate table - see [retrieving intermediate table columns in Laravel](https://laravel.com/docs/eloquent-relationships#retrieving-intermediate-table-columns).
+You may want to allow accessing data that describes the relation between the models and is stored in the intermediate table.
+See [retrieving intermediate table columns in Laravel](https://laravel.com/docs/eloquent-relationships#retrieving-intermediate-table-columns).
 
 Just like in Laravel, you can access the `pivot` attribute on the models (or its alias).
 Even though this attribute is always present when querying the model through the relation,
@@ -590,11 +590,11 @@ final class AddUsersToCompany
 {
     /**
      * @param array{
-     *     users: \Illuminate\Database\Eloquent\Collection<\App\Models\User>,
+     *     users: \Illuminate\Database\Eloquent\Collection<int, \App\Models\User>,
      *     company: \App\Models\Company,
      * } $args
      *
-     * @return \Illuminate\Database\Eloquent\Collection<\App\Models\User>
+     * @return \Illuminate\Database\Eloquent\Collection<int, \App\Models\User>
      */
     public function __invoke(mixed $root, array $args): Collection
     {
@@ -642,7 +642,7 @@ type Mutation {
 }
 ```
 
-You may override the default queueing behaviour from the configuration by
+You may override the default queueing behavior from the configuration by
 passing the `shouldQueue` argument.
 
 ```graphql
@@ -1301,7 +1301,7 @@ type Mutation {
 ```
 
 If the model relates to a single other model through a `HasOne`, `MorphOne`, `BelongsTo` or
-`MorphTo` relationship, you can just pass a Boolean instead of an ID, as there is only one
+`MorphTo` relationship, you can pass a Boolean instead of an ID, as there is only one
 possible model that can be deleted.
 
 ```graphql
@@ -1729,8 +1729,8 @@ type Mutation {
 }
 ```
 
-You may rebind the `\Nuwave\Lighthouse\Support\Contracts\GlobalId` interface to add your
-own mechanism of encoding/decoding global ids.
+You may rebind the `Nuwave\Lighthouse\Support\Contracts\GlobalId` interface to add your
+own mechanism of encoding/decoding global IDs.
 
 ## @guard
 
@@ -2154,7 +2154,7 @@ final class Commentable
      */
     public function resolveType(mixed $root, GraphQLContext $context, ResolveInfo $resolveInfo): Type
     {
-        // TODO implement your own resolver logic - if the default is fine, just delete this class
+        // TODO implement your own resolver logic - if the default is fine, delete this class
     }
 }
 ```
@@ -3262,7 +3262,7 @@ final class Blog
 
 ### Custom resolver
 
-You can provide your own function that resolves the field by directly returning data in a `\Illuminate\Contracts\Pagination\Paginator` instance.
+You can provide your own function that resolves the field by directly returning data in a `Illuminate\Contracts\Pagination\Paginator` instance.
 
 This is mutually exclusive with `builder` and `model`. Not compatible with `scopes` and builder arguments such as [@eq](#eq).
 
@@ -3485,7 +3485,7 @@ Reference a class implementing a scalar definition.
 """
 directive @scalar(
   """
-  Reference to a class that extends `\GraphQL\Type\Definition\ScalarType`.
+  Reference to a class that extends `GraphQL\Type\Definition\ScalarType`.
   """
   class: String!
 ) on SCALAR
@@ -3704,11 +3704,11 @@ have been applied, e.g. validation, transformation.
 ```graphql
 """
 Reference a class to handle the broadcasting of a subscription to clients.
-The given class must extend `\Nuwave\Lighthouse\Schema\Types\GraphQLSubscription`.
+The given class must extend `Nuwave\Lighthouse\Schema\Types\GraphQLSubscription`.
 """
 directive @subscription(
   """
-  A reference to a subclass of `\Nuwave\Lighthouse\Schema\Types\GraphQLSubscription`.
+  A reference to a subclass of `Nuwave\Lighthouse\Schema\Types\GraphQLSubscription`.
   """
   class: String!
 ) on FIELD_DEFINITION
@@ -3878,7 +3878,7 @@ final class Person
      */
     public function resolveType(mixed $root, GraphQLContext $context, ResolveInfo $resolveInfo): Type
     {
-        // TODO implement your own resolver logic - if the default is fine, just delete this class
+        // TODO implement your own resolver logic - if the default is fine, delete this class
     }
 }
 ```
@@ -4458,8 +4458,7 @@ type User {
 }
 ```
 
-If you just want to return the relation itself as-is,
-look into [handling Eloquent relationships](../eloquent/relationships.md).
+If you just want to return the relation itself as-is, look into [handling Eloquent relationships](../eloquent/relationships.md).
 
 ## @withCount
 

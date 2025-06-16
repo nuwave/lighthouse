@@ -20,7 +20,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
  *
  * Relations
  * @property-read \Tests\Utils\Models\User $user
- * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Color> $colors
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\Color> $colors
  */
 final class Employee extends Model
 {

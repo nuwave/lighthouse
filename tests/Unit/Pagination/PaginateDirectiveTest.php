@@ -723,11 +723,11 @@ GRAPHQL
     /**
      * @param  array{first: int}  $args
      *
-     * @return \Illuminate\Pagination\LengthAwarePaginator<array{id: int}>
+     * @return \Illuminate\Pagination\LengthAwarePaginator<int, array{id: int}>
      */
     public static function returnPaginatedDataInsteadOfBuilder(mixed $root, array $args): LengthAwarePaginator
     {
-        return new LengthAwarePaginator([
+        return new LengthAwarePaginator([ // @phpstan-ignore return.type (pagination generics changed between Laravel versions)
             [
                 'id' => 1,
             ],

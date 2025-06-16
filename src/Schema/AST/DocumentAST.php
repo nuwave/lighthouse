@@ -88,7 +88,7 @@ class DocumentAST implements Arrayable
      */
     public array $classNameToObjectTypeNames = [];
 
-    /** @var array<int,SchemaExtensionNode> */
+    /** @var array<int, SchemaExtensionNode> */
     public array $schemaExtensions = [];
 
     /** A hash of the schema. */
@@ -242,7 +242,7 @@ class DocumentAST implements Arrayable
             self::HASH => $this->hash,
         ] = $ast;
 
-        // Utilize the NodeList for lazy unserialization for performance gains.
+        // Use the NodeList for lazy unserialization for performance gains.
         // Until they are accessed by name, they are kept in their array form.
 
         // @phpstan-ignore-next-line Since we start from the array form, the generic type does not match
@@ -273,7 +273,7 @@ class DocumentAST implements Arrayable
                 continue;
             }
 
-            if (\is_array($value)) {
+            if (is_array($value)) {
                 $value = isset($value[0]) || $value === []
                     ? new NodeList($value)
                     : AST::fromArray($value);

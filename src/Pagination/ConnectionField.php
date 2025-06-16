@@ -14,7 +14,7 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 class ConnectionField
 {
     /**
-     * @param  \Illuminate\Contracts\Pagination\LengthAwarePaginator<mixed>  $paginator
+     * @param  \Illuminate\Contracts\Pagination\LengthAwarePaginator<*, *>  $paginator
      *
      * @return array{
      *     hasNextPage: bool,
@@ -52,7 +52,7 @@ class ConnectionField
     }
 
     /**
-     * @param  \Illuminate\Contracts\Pagination\Paginator<mixed>  $paginator
+     * @param  \Illuminate\Contracts\Pagination\Paginator<*, *>  $paginator
      * @param  array<string, mixed>  $args
      *
      * @return Collection<int, array<string, mixed>>

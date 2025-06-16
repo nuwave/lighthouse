@@ -45,7 +45,6 @@ class FieldValue
     public function __construct(
         /** The parent type of the field. */
         protected TypeValue $parent,
-
         /** The underlying AST definition of the field. */
         protected FieldDefinitionNode $field,
     ) {}
@@ -172,7 +171,6 @@ class FieldValue
 
             if (! isset(self::$transformedResolveArgs[$path])) {
                 $argumentSetFactory = Container::getInstance()->make(ArgumentSetFactory::class);
-                assert($argumentSetFactory instanceof ArgumentSetFactory);
 
                 $argumentSet = $argumentSetFactory->fromResolveInfo($baseArgs, $baseResolveInfo);
                 foreach ($this->argumentSetTransformers as $transform) {

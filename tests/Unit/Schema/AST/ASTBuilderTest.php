@@ -83,7 +83,7 @@ final class ASTBuilderTest extends TestCase
 
     public function testAllowsExtendingUndefinedRootTypes(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         extend type Query {
             foo: ID
         }
@@ -95,7 +95,7 @@ final class ASTBuilderTest extends TestCase
         extend type Subscription {
             baz: ID
         }
-        ';
+        GRAPHQL;
         $documentAST = $this->astBuilder->documentAST();
 
         $queryType = $documentAST->types[RootType::QUERY];

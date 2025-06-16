@@ -1080,7 +1080,7 @@ final class HasManyDirectiveTest extends DBTestCase
                 ],
             ],
         ])->assertJsonCount(2, 'data.user.tasks.edges')
-        ->assertJsonCount(2, 'data.user.tasks.edges.0.node.user.tasks.edges');
+            ->assertJsonCount(2, 'data.user.tasks.edges.0.node.user.tasks.edges');
     }
 
     public function testQueryHasManySelfReferencingRelationships(): void

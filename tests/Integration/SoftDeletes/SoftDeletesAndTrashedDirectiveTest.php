@@ -355,9 +355,9 @@ final class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
                 }
             }
             ')
-             ->assertJsonCount(3, 'data.users.0.tasksWith')
-             ->assertJsonCount(2, 'data.users.0.tasksWithout')
-             ->assertJsonCount(2, 'data.users.0.tasksSimple');
+            ->assertJsonCount(3, 'data.users.0.tasksWith')
+            ->assertJsonCount(2, 'data.users.0.tasksWithout')
+            ->assertJsonCount(2, 'data.users.0.tasksSimple');
 
         $this
             ->graphQL(/** @lang GraphQL */ '
@@ -377,9 +377,9 @@ final class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
                 }
             }
             ')
-             ->assertJsonCount(3, 'data.usersPaginated.data.0.tasksWith')
-             ->assertJsonCount(2, 'data.usersPaginated.data.0.tasksWithout')
-             ->assertJsonCount(2, 'data.usersPaginated.data.0.tasksSimple');
+            ->assertJsonCount(3, 'data.usersPaginated.data.0.tasksWith')
+            ->assertJsonCount(2, 'data.usersPaginated.data.0.tasksWithout')
+            ->assertJsonCount(2, 'data.usersPaginated.data.0.tasksSimple');
 
         $this
             ->graphQL(/** @lang GraphQL */ '
@@ -397,9 +397,9 @@ final class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
                 }
             }
             ')
-             ->assertJsonCount(3, 'data.user.tasksWith')
-             ->assertJsonCount(2, 'data.user.tasksWithout')
-             ->assertJsonCount(2, 'data.user.tasksSimple');
+            ->assertJsonCount(3, 'data.user.tasksWith')
+            ->assertJsonCount(2, 'data.user.tasksWithout')
+            ->assertJsonCount(2, 'data.user.tasksSimple');
     }
 
     public function testThrowsIfModelDoesNotSupportSoftDeletesTrashed(): void

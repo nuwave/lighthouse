@@ -10,7 +10,9 @@ Schema caching is enabled in non-local environments by default, see `config/ligh
 Update your cache when deploying a new version of your application
 using the [cache](../api-reference/commands.md#cache) artisan command:
 
-    php artisan lighthouse:cache
+```shell
+php artisan lighthouse:cache
+```
 
 The structure of the serialized schema can change between Lighthouse releases.
 In order to prevent errors, use a deployment method that atomically updates

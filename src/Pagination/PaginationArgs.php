@@ -39,9 +39,7 @@ class PaginationArgs
             : Arr::get($args, 'page', 1);
 
         if ($first < 0) {
-            throw new Error(
-                self::requestedLessThanZeroItems($first),
-            );
+            throw new Error(self::requestedLessThanZeroItems($first));
         }
 
         // Make sure the maximum pagination count is not exceeded
@@ -49,9 +47,7 @@ class PaginationArgs
             $paginateMaxCount !== null
             && $first > $paginateMaxCount
         ) {
-            throw new Error(
-                self::requestedTooManyItems($paginateMaxCount, $first),
-            );
+            throw new Error(self::requestedTooManyItems($paginateMaxCount, $first));
         }
 
         $optimalPaginationType = self::optimalPaginationType($proposedPaginationType, $resolveInfo);
@@ -110,20 +106,20 @@ class PaginationArgs
      *
      * @param  \Illuminate\Database\Query\Builder|\Laravel\Scout\Builder|\Illuminate\Database\Eloquent\Builder<TModel>|\Illuminate\Database\Eloquent\Relations\Relation<TModel>  $builder
      *
-     * @return \Illuminate\Contracts\Pagination\Paginator<TModel>
+     * @return \Illuminate\Contracts\Pagination\Paginator<array-key, TModel>
      */
     public function applyToBuilder(QueryBuilder|ScoutBuilder|EloquentBuilder|Relation $builder): Paginator
     {
         if ($this->first === 0) {
             if ($this->type->isSimple()) {
-                return new ZeroPerPagePaginator($this->page);
+                return new ZeroPerPagePaginator($this->page); // @phpstan-ignore return.type (generic type does not matter)
             }
 
             $total = $builder instanceof ScoutBuilder
                 ? 0 // Laravel\Scout\Builder exposes no method to get the total count
                 : $builder->count(); // @phpstan-ignore-line see Illuminate\Database\Query\Builder::count(), available as a mixin in the other classes
 
-            return new ZeroPerPageLengthAwarePaginator($total, $this->page);
+            return new ZeroPerPageLengthAwarePaginator($total, $this->page); // @phpstan-ignore return.type (generic type does not matter)
         }
 
         $methodName = $this->type->isSimple()

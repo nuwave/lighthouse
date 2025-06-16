@@ -67,7 +67,7 @@ Common tasks during development are listed in the `scripts` section of [composer
 We use **PHPUnit** for unit tests and integration tests.
 
 Have a new feature? You can start off by writing some tests that detail
-the behaviour you want to achieve and go from there.
+the behavior you want to achieve and go from there.
 
 Fixing a bug? The best way to ensure it is fixed for good and never comes
 back is to write a failing test for it and then make it pass. If you cannot
@@ -167,8 +167,8 @@ Prefer `final` classes in [tests](tests), but never use them in [src](src).
 
 We strive to be compatible with both Lumen and Laravel.
 
-Do not use Facades and utilize dependency injection instead.
-Not every application has them enabled - Lumen does not use Facades by default.
+Do not use Facades, use dependency injection instead.
+Not every Laravel application has them enabled, and Lumen does not use Facades by default.
 
 Prefer direct usage of Illuminate classes instead of helpers.
 

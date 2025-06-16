@@ -6,6 +6,7 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
+use Tests\Utils\Mutations\ThrowWhenInvoked;
 use Tests\Utils\Policies\UserPolicy;
 
 final class CanQueryDirectiveDBTest extends DBTestCase
@@ -81,6 +82,37 @@ final class CanQueryDirectiveDBTest extends DBTestCase
                 'user' => null,
             ],
         ]);
+    }
+
+    public function testDoesntConcealResolverException(): void
+    {
+        $admin = new User();
+        $admin->name = UserPolicy::ADMIN;
+        $this->be($admin);
+
+        $user = factory(User::class)->create();
+        assert($user instanceof User);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Mutation {
+            throwWhenInvoked(id: ID!): User
+                @canQuery(ability: "view", action: EXCEPTION_NOT_AUTHORIZED)
+        }
+
+        type User {
+            name: String!
+        }
+        ' . self::PLACEHOLDER_QUERY;
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation ($id: ID!) {
+            throwWhenInvoked(id: $id) {
+                name
+            }
+        }
+        ', [
+            'id' => $user->getKey(),
+        ])->assertGraphQLErrorMessage(ThrowWhenInvoked::ERROR_MESSAGE);
     }
 
     public function testHandleMultipleModelsWithQuery(): void

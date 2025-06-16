@@ -24,10 +24,7 @@ final class TypeRegistryTest extends TestCase
         parent::setUp();
 
         $this->typeRegistry = $this->app->make(TypeRegistry::class);
-
         $astBuilder = $this->app->make(ASTBuilder::class);
-        assert($astBuilder instanceof ASTBuilder);
-
         $this->typeRegistry->setDocumentAST($astBuilder->documentAST());
     }
 
@@ -310,7 +307,6 @@ final class TypeRegistryTest extends TestCase
 
         $this->app->forgetInstance(ASTBuilder::class);
         $astBuilder = $this->app->make(ASTBuilder::class);
-
         $this->typeRegistry->setDocumentAST($astBuilder->documentAST());
 
         $lazyTypeName = 'Bar';

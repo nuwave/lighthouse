@@ -9,6 +9,106 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.58.0
+
+### Changed
+
+- Expose original resolver errors in `@can*` directives instead of always wrapping them https://github.com/nuwave/lighthouse/pull/2686
+
+## v6.57.1
+
+### Changed
+
+- Use exclusive lock when writing the parsed schema to a file in `ASTCache` https://github.com/nuwave/lighthouse/pull/2685
+
+## v6.57.0
+
+### Changed
+
+- Update generated protobuf code https://github.com/nuwave/lighthouse/pull/2683
+
+## v6.56.1
+
+### Fixed
+
+- Initialize `Argument::$type` with `null` and make it nullable https://github.com/nuwave/lighthouse/pull/2682
+
+## v6.56.0
+
+### Added
+
+- Add method `ArgumentSet::exists()` https://github.com/nuwave/lighthouse/pull/2680
+
+## v6.55.0
+
+### Added
+
+- Add field `operation_id` to `message QueryMetadata` in `reports.proto` https://github.com/nuwave/lighthouse/pull/2678
+
+## v6.54.0
+
+### Added
+
+- Support Laravel 12 https://github.com/nuwave/lighthouse/pull/2665
+
+## v6.53.0
+
+### Added
+
+- Support encrypted subscription channels https://github.com/nuwave/lighthouse/pull/2663
+
+## v6.52.1
+
+### Fixed
+
+- Pass specific parent model instances to builder enhancers when resolving paginated relations on lists https://github.com/nuwave/lighthouse/pull/2671 
+
+## v6.52.0
+
+### Added
+
+- Expose query complexity score in lifecycle event `BuildExtensionsResponse` https://github.com/nuwave/lighthouse/pull/2637
+
+## v6.51.2
+
+### Fixed
+
+- Fix shortcut foreign key selection for morphTo relationships that use inline fragments in field selection https://github.com/nuwave/lighthouse/pull/2670
+
+## v6.51.1
+
+### Fixed
+
+- Update generated code in `Nuwave\Lighthouse\Tracing\FederatedTracing\Proto`
+
+## v6.51.0
+
+### Fixed
+
+- Apply shortcut foreign key selection logic when `__typename` is included in related model's field selection https://github.com/nuwave/lighthouse/pull/2666
+
+### Changed
+
+- Update `reports.proto` with `Client awareness contexts` https://github.com/nuwave/lighthouse/pull/2667
+
+## v6.50.0
+
+### Added
+
+- Allow `thecodingmachine/safe` 3 https://github.com/nuwave/lighthouse/pull/2657
+
+## v6.49.1
+
+### Fixed
+
+- Pull empty IDs instead of filling them with upsert https://github.com/nuwave/lighthouse/pull/2656
+
+## v6.49.0
+
+### Added
+
+- Make reporting of client-safe errors configurable https://github.com/nuwave/lighthouse/issues/2647
+
 ## v6.48.0
 
 ### Added
@@ -623,7 +723,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Fixed
 
-- Allow `\Illuminate\Http\UploadedFile` in test helper `multipartGraphQL()` argument `array $files`
+- Allow `Illuminate\Http\UploadedFile` in test helper `multipartGraphQL()` argument `array $files`
 
 ## v5.70.2
 
@@ -1172,7 +1272,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
-- Mixin method `assertGraphQLErrorFree()` to `\Illuminate\Testing\TestResponse`
+- Mixin method `assertGraphQLErrorFree()` to `Illuminate\Testing\TestResponse`
 
 ### Fixed
 
@@ -1323,7 +1423,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Fixed
 
-- Allow `\Carbon\CarbonImmutable` for date scalars https://github.com/nuwave/lighthouse/pull/1924
+- Allow `Carbon\CarbonImmutable` for date scalars https://github.com/nuwave/lighthouse/pull/1924
 
 ## v5.22.0
 
@@ -1606,7 +1706,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Apply error handling and debug settings consistently https://github.com/nuwave/lighthouse/pull/1749
 - Fix typo `comparision` to `comparison` in generated input types for `@whereHas`
-- Fix redis `mget` being called with an empty list of subscriber ids https://github.com/nuwave/lighthouse/pull/1759
+- Fix redis `mget` being called with an empty list of subscriber IDs https://github.com/nuwave/lighthouse/pull/1759
 - Fix `lighthouse:clear-cache` not clearing cache when a custom cache store is used https://github.com/nuwave/lighthouse/pull/1788
 - Fix subscription storage in redis for predis users https://github.com/nuwave/lighthouse/pull/1814
 - Prepend rule arguments that refer to other arguments with the full path https://github.com/nuwave/lighthouse/pull/1739
@@ -1642,7 +1742,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Added
 
 - Allow using the `@builder` directive on fields https://github.com/nuwave/lighthouse/pull/1687
-- Add dedicated `\Nuwave\Lighthouse\Scout\ScoutBuilderDirective` https://github.com/nuwave/lighthouse/pull/1691
+- Add dedicated `Nuwave\Lighthouse\Scout\ScoutBuilderDirective` https://github.com/nuwave/lighthouse/pull/1691
 - Allow `@eq` directive on fields https://github.com/nuwave/lighthouse/pull/1681
 - Add `@throttle` directive to set field rate limit using Laravel rate limiting services https://github.com/nuwave/lighthouse/pull/1708
 - Add subscriptions v2 https://github.com/nuwave/lighthouse/pull/1716
@@ -1650,7 +1750,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Changed
 
 - Clarify semantics of combining `@search` with other directives https://github.com/nuwave/lighthouse/pull/1691
-- Move Scout related classes into `\Nuwave\Lighthouse\Scout` https://github.com/nuwave/lighthouse/pull/1698
+- Move Scout related classes into `Nuwave\Lighthouse\Scout` https://github.com/nuwave/lighthouse/pull/1698
 - `BaseDirective` loads all arguments and caches them after the first `directiveHasArgument`/`directiveArgValue` call https://github.com/nuwave/lighthouse/pull/1707
 - Use gate response in authorization errors of `@can` directive https://github.com/nuwave/lighthouse/pull/1715
 
@@ -1669,7 +1769,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Allow spec-compliant definition of the `messages` argument of `@rules` and `@rulesForArray` https://github.com/nuwave/lighthouse/pull/1662
 - Validate correct usage of `@rules` and `@rulesForArray` https://github.com/nuwave/lighthouse/pull/1662
 - Allow eager-loading multiple relations on a single field using `@with` https://github.com/nuwave/lighthouse/pull/1528
-- Add `\Nuwave\Lighthouse\Execution\DataLoader\BatchLoaderRegistry` to instantiate arbitrary batch loaders https://github.com/nuwave/lighthouse/pull/1528
+- Add `Nuwave\Lighthouse\Execution\DataLoader\BatchLoaderRegistry` to instantiate arbitrary batch loaders https://github.com/nuwave/lighthouse/pull/1528
 - Add `@limit` directive to allow clients to specify the maximum number of results to return https://github.com/nuwave/lighthouse/pull/1674
 - Predefine default field ordering by using `@orderBy` on fields https://github.com/nuwave/lighthouse/pull/1678
 - Add `@like` directive to use a client given value to add a `LIKE` conditional to a database query https://github.com/nuwave/lighthouse/issues/1644
@@ -1683,7 +1783,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Deprecate the `globalId` argument of the `@delete`, `@forceDelete` and `@restore` directives https://github.com/nuwave/lighthouse/pull/1660
 - Deprecate passing the `messages` argument of `@rules` and `@rulesForArray` as a map with arbitrary keys https://github.com/nuwave/lighthouse/pull/1662
-- Deprecate `\Nuwave\Lighthouse\Execution\DataLoader\BatchLoader` in favour of `\Nuwave\Lighthouse\Execution\DataLoader\BatchLoaderRegistry` https://github.com/nuwave/lighthouse/pull/1528
+- Deprecate `Nuwave\Lighthouse\Execution\DataLoader\BatchLoader` in favour of `Nuwave\Lighthouse\Execution\DataLoader\BatchLoaderRegistry` https://github.com/nuwave/lighthouse/pull/1528
 
 ### Fixed
 
@@ -1708,7 +1808,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Deprecated
 
-- Deprecate `\Nuwave\Lighthouse\Subscriptions\Subscriber::setRoot()` in favour of property access
+- Deprecate `Nuwave\Lighthouse\Subscriptions\Subscriber::setRoot()` in favour of property access
 
 ## v5.0.0
 
@@ -1730,7 +1830,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Changed
 
 - Use `Illuminate\Support\Carbon` instead of `Carbon\Carbon`
-- `\Nuwave\Lighthouse\Exceptions\ValidationException` no longer extends `\Illuminate\Validation\ValidationException` https://github.com/nuwave/lighthouse/pull/1185
+- `Nuwave\Lighthouse\Exceptions\ValidationException` no longer extends `Illuminate\Validation\ValidationException` https://github.com/nuwave/lighthouse/pull/1185
 - Move validation related classes into namespace `Nuwave\Lighthouse\Validation` https://github.com/nuwave/lighthouse/pull/1185
 - Run `ArgDirectives` in distinct phases: Sanitize, Validate, Transform https://github.com/nuwave/lighthouse/pull/1185
 - The directive interfaces `ArgBuilderDirective`, `ArgTransformerDirective` and `ArgDirectiveForArray`
@@ -1741,12 +1841,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
   This affects `@orderBy`, `@whereConditions` and `@whereHasConditions` https://github.com/nuwave/lighthouse/pull/1337
 - `__invoke` is now the only supported method name for convention based
   field resolver classes  https://github.com/nuwave/lighthouse/pull/1422
-- Change `\Nuwave\Lighthouse\Support\Contracts\Directive` to require all directives to have an SDL
+- Change `Nuwave\Lighthouse\Support\Contracts\Directive` to require all directives to have an SDL
   definition by implementing `public static definition(): string` https://github.com/nuwave/lighthouse/pull/1386
 - Combine `Nuwave\Lighthouse\Schema\Factories\DirectiveNamespacer` and `Nuwave\Lighthouse\Schema\Factories\DirectiveFactory` into
-  `\Lighthouse\Schema\DirectiveLocator` https://github.com/nuwave/lighthouse/pull/1494
+  `Lighthouse\Schema\DirectiveLocator` https://github.com/nuwave/lighthouse/pull/1494
 - Require `haydenpierce/class-finder` as a built-in dependency https://github.com/nuwave/lighthouse/pull/1494
-- Add method `defaultHasOperator` to `\Nuwave\Lighthouse\WhereConditions\Operator` https://github.com/nuwave/lighthouse/pull/1412
+- Add method `defaultHasOperator` to `Nuwave\Lighthouse\WhereConditions\Operator` https://github.com/nuwave/lighthouse/pull/1412
 - Change default configuration options in `lighthouse.php`:
   - `'guard' => 'api'`
   - `'forceFill' => true`
@@ -1769,12 +1869,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Remove support for PHP 7.1, Laravel 5.5 and PHPUnit 6 https://github.com/nuwave/lighthouse/pull/1192
 - Remove `TestResponse::jsonGet()` helper, use `->json()` instead https://github.com/nuwave/lighthouse/pull/1192/files
-- Remove `\Nuwave\Lighthouse\Execution\GraphQLValidator` as validation now uses Laravel's native validator https://github.com/nuwave/lighthouse/pull/1185
+- Remove `Nuwave\Lighthouse\Execution\GraphQLValidator` as validation now uses Laravel's native validator https://github.com/nuwave/lighthouse/pull/1185
 - Remove interfaces `HasArgumentPath` and `HasErrorBuffer` and the parts of `FieldFactory` that calls them https://github.com/nuwave/lighthouse/pull/1185
 - Remove the `ValidationDirective` abstract class in favour of validator classes https://github.com/nuwave/lighthouse/pull/1185
 - Remove configuration option `lighthouse.orderBy`, always uses `column` now https://github.com/nuwave/lighthouse/pull/1337
-- Remove `\Nuwave\Lighthouse\Support\Contracts\DefinedDirective` interface, moving its
-  functionality to `\Nuwave\Lighthouse\Support\Contracts\Directive` https://github.com/nuwave/lighthouse/pull/1386
+- Remove `Nuwave\Lighthouse\Support\Contracts\DefinedDirective` interface, moving its
+  functionality to `Nuwave\Lighthouse\Support\Contracts\Directive` https://github.com/nuwave/lighthouse/pull/1386
 - Remove fallback for `lighthouse.cache.ttl` setting https://github.com/nuwave/lighthouse/pull/1423
 - Remove `Nuwave\Lighthouse\Schema\AST\PartialParser` in favor of `GraphQL\Language\Parser` https://github.com/nuwave/lighthouse/pull/1457
 - Remove `Nuwave\Lighthouse\Execution\GraphQLRequest` singleton https://github.com/nuwave/lighthouse/pull/1424
@@ -1827,10 +1927,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Added
 
 - Add artisan command `lighthouse:cache` to compile GraphQL AST https://github.com/nuwave/lighthouse/pull/1451
-- Add middleware `\Nuwave\Lighthouse\Support\Http\Middleware\LogGraphQLQueries` that logs every incoming
+- Add middleware `Nuwave\Lighthouse\Support\Http\Middleware\LogGraphQLQueries` that logs every incoming
   GraphQL query https://github.com/nuwave/lighthouse/pull/1454
 - Allow custom query validation rules selection by rebinding the interface
-  `\Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules` https://github.com/nuwave/lighthouse/pull/1487
+  `Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules` https://github.com/nuwave/lighthouse/pull/1487
 - Add `DateTimeUtc` scalar https://github.com/nuwave/lighthouse/pull/1320
 
 ### Changed
@@ -1838,7 +1938,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Publish config file with tag `lighthouse-config` and default schema with tag `lighthouse-schema`
   instead of the previously used tags `config` and `schema` https://github.com/nuwave/lighthouse/issues/1489
 - Throw partial errors when failing to delete, forceDelete or restore a model https://github.com/nuwave/lighthouse/pull/1420
-- Add `\Nuwave\Lighthouse\Execution\ErrorPool` to allow collection of partial errors https://github.com/nuwave/lighthouse/pull/1420
+- Add `Nuwave\Lighthouse\Execution\ErrorPool` to allow collection of partial errors https://github.com/nuwave/lighthouse/pull/1420
 
 ### Fixed
 
@@ -1847,7 +1947,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Deprecated
 
-- Deprecate `\Nuwave\Lighthouse\Execution\ErrorBuffer` in favor of `\Nuwave\Lighthouse\Execution\ErrorPool` https://github.com/nuwave/lighthouse/pull/1420
+- Deprecate `Nuwave\Lighthouse\Execution\ErrorBuffer` in favor of `Nuwave\Lighthouse\Execution\ErrorPool` https://github.com/nuwave/lighthouse/pull/1420
 
 ## v4.15.0
 
@@ -1890,7 +1990,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Deprecated
 
-- `\Nuwave\Lighthouse\Support\Contracts\DefinedDirective::definition()` will be moved to `\Nuwave\Lighthouse\Support\Contracts\Directive`
+- `Nuwave\Lighthouse\Support\Contracts\DefinedDirective::definition()` will be moved to `Nuwave\Lighthouse\Support\Contracts\Directive`
   and replace its `name()` method. This requires all directives to have an SDL definition.
 
 ## v4.13.1
@@ -2018,7 +2118,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Add `@hash` directive which uses Laravel's hashing configuration https://github.com/nuwave/lighthouse/pull/1200
 - Add option `passOrdered` to `@method` to pass just the arguments as ordered parameters https://github.com/nuwave/lighthouse/pull/1208
 - Add support to extend `input`, `interface` and `enum` types https://github.com/nuwave/lighthouse/pull/1203
-- Implement `streamGraphQL()` helper in `\Nuwave\Lighthouse\Testing\MakesGraphQLRequestsLumen` https://github.com/nuwave/lighthouse/pull/1222
+- Implement `streamGraphQL()` helper in `Nuwave\Lighthouse\Testing\MakesGraphQLRequestsLumen` https://github.com/nuwave/lighthouse/pull/1222
 - Support Laravel 7 https://github.com/nuwave/lighthouse/pull/1219
 
 ### Deprecated
@@ -2035,14 +2135,14 @@ You can find and compare releases at the [GitHub release page](https://github.co
   and `@orderBy` directives https://github.com/nuwave/lighthouse/pull/1150
 - Exclude or include trashed models in `@can` when `@forceDelete` or `@restore` are used,
   the client does not have to filter explicitly https://github.com/nuwave/lighthouse/pull/1157
-- Add test trait `\Nuwave\Lighthouse\Testing\MakesGraphQLRequestsLumen` for usage
+- Add test trait `Nuwave\Lighthouse\Testing\MakesGraphQLRequestsLumen` for usage
   with Lumen https://github.com/nuwave/lighthouse/pull/1100
-- Add test trait `\Nuwave\Lighthouse\Testing\UsesTestSchema` to enable using
+- Add test trait `Nuwave\Lighthouse\Testing\UsesTestSchema` to enable using
   a dummy schema for testing custom Lighthouse extensions https://github.com/nuwave/lighthouse/pull/1171
 - Simplify mocking resolvers that just return static data https://github.com/nuwave/lighthouse/pull/1177
-- Add utility `\Nuwave\Lighthouse\ClientDirectives\ClientDirective` to correctly
+- Add utility `Nuwave\Lighthouse\ClientDirectives\ClientDirective` to correctly
   get the arguments passed through a client directive https://github.com/nuwave/lighthouse/pull/1184
-- Add `streamGraphQL()` helper method to `\Nuwave\Lighthouse\Testing\MakesGraphQLRequests` for
+- Add `streamGraphQL()` helper method to `Nuwave\Lighthouse\Testing\MakesGraphQLRequests` for
   simple testing of streamed responses, such as `@defer` https://github.com/nuwave/lighthouse/pull/1184
 
 ### Fixed
@@ -2054,12 +2154,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Fix nested mutation `upsert` across two levels of BelongsTo relations https://github.com/nuwave/lighthouse/pull/1169
 - Apply query filters using an `ArgBuilderDirective` such as `@eq` when the argument
   is nested deeply within the input https://github.com/nuwave/lighthouse/pull/1176
-- Fix `\Nuwave\Lighthouse\Testing\MakesGraphQLRequestsLumen` test helper https://github.com/nuwave/lighthouse/pull/1186
+- Fix `Nuwave\Lighthouse\Testing\MakesGraphQLRequestsLumen` test helper https://github.com/nuwave/lighthouse/pull/1186
 - Handle multiple instances of client directives with `@defer` correctly https://github.com/nuwave/lighthouse/pull/1184
 
 ### Deprecated
 
-- Deprecate `\Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider#setRootPath()`, this function
+- Deprecate `Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider#setRootPath()`, this function
   is never called or used anywhere within Lighthouse. It will be removed from the interface.
 
 ## v4.8.1
@@ -2074,7 +2174,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Added
 
 - Compose complex input arguments through nested arg resolvers https://github.com/nuwave/lighthouse/pull/899
-- Add `\Nuwave\Lighthouse\Support\Contracts\ArgResolver` directive interface https://github.com/nuwave/lighthouse/pull/899
+- Add `Nuwave\Lighthouse\Support\Contracts\ArgResolver` directive interface https://github.com/nuwave/lighthouse/pull/899
 - Allow existing mutation directives `@create`, `@update`, `@upsert` and `@delete` to function
   as nested arg resolvers https://github.com/nuwave/lighthouse/pull/899
 - Validate at schema build time that the `apply` argument `@rules` is an array https://github.com/nuwave/lighthouse/pull/1092
@@ -2091,7 +2191,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Changed
 
-- Remove `\Nuwave\Lighthouse\Execution\MutationExecutor` in favor of modular
+- Remove `Nuwave\Lighthouse\Execution\MutationExecutor` in favor of modular
   nested arg resolvers https://github.com/nuwave/lighthouse/pull/899
 - Register the operator enum for `@whereConditions` programmatically and allow
   overwriting it through a service provider https://github.com/nuwave/lighthouse/pull/1099
@@ -2146,7 +2246,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
   arguments to the policy check https://github.com/nuwave/lighthouse/pull/1043
 - Allow globally turning off relation batch loading through the
   config option `batchload_relations` https://github.com/nuwave/lighthouse/pull/1059
-- Add `\Nuwave\Lighthouse\Execution\DataLoader\BatchLoader#loadMany()` function https://github.com/nuwave/lighthouse/pull/973
+- Add `Nuwave\Lighthouse\Execution\DataLoader\BatchLoader#loadMany()` function https://github.com/nuwave/lighthouse/pull/973
 - Extend `@rename` directive to work with arguments and input fields https://github.com/nuwave/lighthouse/issues/521
 
 ### Changed
@@ -2198,7 +2298,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Fixed
 
-- Fix broken behaviour when using union types with schema caching https://github.com/nuwave/lighthouse/pull/1015
+- Fix broken behavior when using union types with schema caching https://github.com/nuwave/lighthouse/pull/1015
 
 ## v4.4.2
 
@@ -2317,7 +2417,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Add the `@namespace` directive as a replacement for the removed `@group` directive https://github.com/nuwave/lighthouse/pull/768
 - The `@defer` extension now supports deferring nested fields of mutations https://github.com/nuwave/lighthouse/pull/855
 - Add a simple way to define complex validation directives by
-  extending `\Nuwave\Lighthouse\Schema\Directives\ValidationDirective` https://github.com/nuwave/lighthouse/pull/846
+  extending `Nuwave\Lighthouse\Schema\Directives\ValidationDirective` https://github.com/nuwave/lighthouse/pull/846
 - Extend the `@belongsToMany` directive to support pivot data on a custom Relay style Edge type https://github.com/nuwave/lighthouse/pull/871
 - Implement `connect`, `disconnect` and `delete` operations for nested mutations upon MorphTo relationships https://github.com/nuwave/lighthouse/pull/879
 
@@ -2355,7 +2455,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
   can be used to change the argument name https://github.com/nuwave/lighthouse/pull/852
 - Rename `ArgValidationDirective` to `ProvidesRules` and drop `get` prefix from the methods within https://github.com/nuwave/lighthouse/pull/846
 - Make the argument used for finding a model to check `@can` against configurable.
-  The previous behaviour of implicitly using the `id` argument for finding a specific
+  The previous behavior of implicitly using the `id` argument for finding a specific
   model to authorize against now no longer works. https://github.com/nuwave/lighthouse/pull/856
 - Change the `Nuwave\Lighthouse\Schema\Types\LaravelEnumType` wrapper to map
   to Enum instances internally https://github.com/nuwave/lighthouse/pull/908
@@ -2381,7 +2481,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 - Add compatibility layer to allow `@middleware` to support Lumen https://github.com/nuwave/lighthouse/pull/786
 - Add option `decode` to `@globaldId` to control the result of decoding https://github.com/nuwave/lighthouse/pull/796
 - Add config option `cache.ttl` for customizing expiration time of schema cache https://github.com/nuwave/lighthouse/pull/801
-- Extract test helpers into a reusable trait `\Nuwave\Lighthouse\Testing\MakesGraphQLRequests` https://github.com/nuwave/lighthouse/pull/802
+- Extract test helpers into a reusable trait `Nuwave\Lighthouse\Testing\MakesGraphQLRequests` https://github.com/nuwave/lighthouse/pull/802
 - Support custom rule classes in `@rules` and `@rulesForArray` https://github.com/nuwave/lighthouse/pull/812
 
 ### Fixed

@@ -11,7 +11,7 @@ abstract class QueryBench extends TestCase
     /** Cached graphQL endpoint. */
     protected string $graphQLEndpoint;
 
-    public function __construct()
+    public function __construct() // @phpstan-ignore method.parentMethodFinalByPhpDoc (yeah this is hacky)
     {
         parent::__construct(static::class);
     }
@@ -21,7 +21,6 @@ abstract class QueryBench extends TestCase
         parent::setUp();
 
         $config = $this->app->make(ConfigRepository::class);
-        assert($config instanceof ConfigRepository);
 
         $routeName = $config->get('lighthouse.route.name');
         $this->graphQLEndpoint = route($routeName);
@@ -47,7 +46,6 @@ abstract class QueryBench extends TestCase
         $this->setUp();
 
         $configRepository = $this->app->make(ConfigRepository::class);
-        assert($configRepository instanceof ConfigRepository);
 
         if ($params[0]) {
             $configRepository->set('lighthouse.field_middleware', []);

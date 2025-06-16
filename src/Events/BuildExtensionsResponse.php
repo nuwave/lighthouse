@@ -15,5 +15,7 @@ class BuildExtensionsResponse
     public function __construct(
         /** The result of resolving a single operation. */
         public ExecutionResult $result,
+        /** The calculated query complexity score of the operation, only available if the validation rule is enabled. */
+        public ?int $queryComplexity,
     ) {}
 }

@@ -11,9 +11,11 @@ final class UserBuilder extends Builder
     /** @param  array{company: string}  $args */
     public function companyName(array $args): self
     {
-        return $this->where(static fn (self $builder): \Tests\Utils\Models\User\UserBuilder => $builder
-            ->whereHas('company', static fn (EloquentBuilder $q): EloquentBuilder => $q
-            ->where('name', $args['company'])));
+        return $this->where(
+            static fn (self $builder): UserBuilder => $builder
+                ->whereHas('company', static fn (EloquentBuilder $q): EloquentBuilder => $q
+                    ->where('name', $args['company'])),
+        );
     }
 
     public function named(): self

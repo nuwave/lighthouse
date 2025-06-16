@@ -80,6 +80,10 @@ abstract class DateScalar extends ScalarType
                 }
             }
 
+            if (! is_string($value)) {
+                throw new $exceptionClass('Query error: Can only parse strings.');
+            }
+
             return $this->parse($value);
         } catch (\Exception $exception) {
             throw new $exceptionClass($exception->getMessage());
@@ -92,7 +96,7 @@ abstract class DateScalar extends ScalarType
     /**
      * Try turning a client value into a Carbon instance.
      *
-     * @param  mixed  $value  a possibly faulty client value
+     * @param  string  $value a possibly faulty client value
      */
-    abstract protected function parse(mixed $value): IlluminateCarbon;
+    abstract protected function parse(string $value): IlluminateCarbon;
 }

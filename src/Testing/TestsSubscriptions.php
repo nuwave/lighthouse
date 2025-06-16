@@ -21,12 +21,11 @@ trait TestsSubscriptions
         $config->set('lighthouse.subscriptions.storage_ttl', null);
 
         // binding an instance to the container, so it can be spied on
-        $app->bind(Broadcaster::class, static fn (ConfigRepository $config): \Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster => new LogBroadcaster(
+        $app->bind(Broadcaster::class, static fn (ConfigRepository $config): LogBroadcaster => new LogBroadcaster(
             $config->get('lighthouse.subscriptions.broadcasters.log'),
         ));
 
         $broadcastDriverManager = $app->make(BroadcastDriverManager::class);
-        assert($broadcastDriverManager instanceof BroadcastDriverManager);
 
         // adding a custom driver which is a spied version of log driver
         $broadcastDriverManager->extend('mock', fn () => $this->spy(LogBroadcaster::class)->makePartial());
