@@ -148,7 +148,7 @@ class LighthouseServiceProvider extends ServiceProvider
             });
         }
 
-        Executor::setDefaultFieldResolver([static::class, 'defaultFieldResolver']);
+        Executor::setDefaultFieldResolver([static::class, 'defaultFieldResolver']); // @phpstan-ignore argument.type (callable not recognized)
     }
 
     /**
