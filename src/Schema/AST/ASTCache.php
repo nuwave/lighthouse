@@ -34,6 +34,11 @@ class ASTCache
         return $this->enable;
     }
 
+    public function path(): string
+    {
+        return $this->path;
+    }
+
     public function set(DocumentAST $documentAST): void
     {
         $variable = var_export(
@@ -42,7 +47,7 @@ class ASTCache
         );
 
         $this->filesystem()->put(
-            path: $this->path,
+            path: $this->path(),
             contents: /** @lang PHP */ "<?php return {$variable};",
             lock: true,
         );
@@ -50,16 +55,17 @@ class ASTCache
 
     public function clear(): void
     {
-        $this->filesystem()->delete($this->path);
+        $this->filesystem()->delete($this->path());
     }
 
     /** @param  callable(): DocumentAST  $build */
     public function fromCacheOrBuild(callable $build): DocumentAST
     {
-        if ($this->filesystem()->exists($this->path)) {
-            $ast = require $this->path;
+        $path = $this->path();
+        if ($this->filesystem()->exists($path)) {
+            $ast = require $path;
             if (! is_array($ast)) {
-                throw new InvalidSchemaCacheContentsException($this->path, $ast);
+                throw new InvalidSchemaCacheContentsException($path, $ast);
             }
 
             /** @var SerializableDocumentAST $ast */
