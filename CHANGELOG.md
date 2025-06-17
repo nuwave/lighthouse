@@ -9,9 +9,11 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.59.0
+
 ### Added
 
-- Add `path()` method to `ASTCache` class https://github.com/nuwave/lighthouse/pull/2694
+- Add method `ASTCache::path()` https://github.com/nuwave/lighthouse/pull/2694
 
 ## v6.58.0
 
