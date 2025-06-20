@@ -219,8 +219,7 @@ class DirectiveLocator
          *
          * @var \Illuminate\Support\Collection<int, TDirective> $associatedOfType
          */
-        $associatedOfType = $this
-            ->associated($node)
+        $associatedOfType = $this->associated($node)
             ->filter(Utils::instanceofMatcher($directiveClass));
 
         return $associatedOfType;

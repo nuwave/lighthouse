@@ -48,8 +48,7 @@ class PaginatedModelsLoader implements ModelsLoader
      */
     protected function loadRelatedModels(EloquentCollection $parents): EloquentCollection
     {
-        $relations = $parents
-            ->toBase()
+        $relations = $parents->toBase()
             ->map(function (Model $model) use ($parents): Relation {
                 $relation = $this->relationInstance($parents);
 
@@ -100,8 +99,7 @@ class PaginatedModelsLoader implements ModelsLoader
      */
     protected function relationInstance(EloquentCollection $parents): Relation
     {
-        return $this
-            ->newModelQuery($parents)
+        return $this->newModelQuery($parents)
             ->getRelation($this->relation);
     }
 
@@ -169,8 +167,7 @@ class PaginatedModelsLoader implements ModelsLoader
      */
     protected function associateRelationModels(EloquentCollection $parents, EloquentCollection $relatedModels): void
     {
-        $this
-            ->relationInstance($parents)
+        $this->relationInstance($parents)
             ->match(
                 $parents->all(),
                 $relatedModels,
