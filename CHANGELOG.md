@@ -9,6 +9,11 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Add `--sort` option to `lighthouse:print-schema` command to sort the compiled
+  schema before printing.
+
 ## v6.60.0
 
 ### Changed
