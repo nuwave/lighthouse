@@ -24,7 +24,7 @@ lighthouse:print-schema
 {--D|disk= : The disk to write the file to}
 {--json : Output JSON instead of GraphQL SDL}
 {--federation : Include federation directives and exclude federation spec additions, like _service.sdl}
-{--sort: Sort all types, fields, and arguments in alphabetical order}
+{--sort : Sort all possible schema elements in alphabetical order}
 SIGNATURE;
 
     protected $description = 'Compile the GraphQL schema and print the result.';
