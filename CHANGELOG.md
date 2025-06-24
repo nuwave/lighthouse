@@ -12,7 +12,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Added
 
 - Add `--sort` option to `lighthouse:print-schema` command to sort the compiled
-  schema before printing.
+  schema before printing https://github.com/nuwave/lighthouse/pull/2696
 
 ## v6.60.0
 

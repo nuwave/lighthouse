@@ -24,7 +24,7 @@ lighthouse:print-schema
 {--D|disk= : The disk to write the file to}
 {--json : Output JSON instead of GraphQL SDL}
 {--federation : Include federation directives and exclude federation spec additions, like _service.sdl}
-{--sort: Sort all types, fields, and arguments in alphabetical order, when possible}
+{--sort: Sort all types, fields, and arguments in alphabetical order}
 SIGNATURE;
 
     protected $description = 'Compile the GraphQL schema and print the result.';
@@ -61,16 +61,15 @@ SIGNATURE;
             $filename = self::JSON_FILENAME;
             $schemaString = \Safe\json_encode(Introspection::fromSchema($schema));
         } else {
-            $options = [];
-            if ($this->option('sort')) {
-                $options = [
+            $options = $this->option('sort')
+                ? [
                     'sortArguments' => true,
                     'sortEnumValues' => true,
                     'sortFields' => true,
                     'sortInputFields' => true,
                     'sortTypes' => true,
-                ];
-            }
+                ]
+                : [];
 
             $filename = self::GRAPHQL_FILENAME;
             $schemaString = SchemaPrinter::doPrint($schema, $options);
