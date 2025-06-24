@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Add option `--sort` to command `lighthouse:print-schema` https://github.com/nuwave/lighthouse/pull/2696
+
 ## v6.60.0
 
 ### Changed
