@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\WhereConditions;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Nuwave\Lighthouse\WhereConditions\SQLOperator;
 use Nuwave\Lighthouse\WhereConditions\WhereConditionsHandler;
@@ -55,13 +56,20 @@ final class WhereConditionsDirectiveTest extends DBTestCase
         );
     }
 
-    public function testItFiltersBetweenWithVariables(): void
+    public function testBetweenWithVariables(): void
     {
-        $user1 = factory(User::class)->create(['date_of_birth' => '2000-01-01']);
-        $user2 = factory(User::class)->create(['date_of_birth' => '1995-01-01']);
+        $user1 = factory(User::class)->create();
+        assert($user1 instanceof User);
+        $user1->date_of_birth = Carbon::createStrict(2000, 1, 1);
+        $user1->save();
+
+        $user2 = factory(User::class)->create();
+        assert($user2 instanceof User);
+        $user2->date_of_birth = Carbon::createStrict(1995, 1, 1);
+        $user2->save();
 
         $this->graphQL(/** @lang GraphQL */ '
-        query FilteredUsers($dobMin: Mixed, $dobMax: Mixed) {
+        query ($dobMin: Mixed, $dobMax: Mixed) {
             users(
                 where: {
                     column: "date_of_birth",
@@ -72,24 +80,34 @@ final class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ', ['dobMin' => '1990-01-01', 'dobMax' => '1999-01-01'])->assertExactJson([
+        ', [
+            'dobMin' => '1990-01-01',
+            'dobMax' => '1999-01-01',
+        ])->assertExactJson([
             'data' => [
                 'users' => [
                     [
-                        'id' => "$user2->id",
-                    ]
+                        'id' => "{$user2->id}",
+                    ],
                 ],
             ],
         ]);
     }
 
-    public function testItFiltersBetweenWithoutVariables(): void
+    public function testBetweenWithLiteralValues(): void
     {
-        $user1 = factory(User::class)->create(['date_of_birth' => '2000-01-01']);
-        $user2 = factory(User::class)->create(['date_of_birth' => '1995-01-01']);
+        $user1 = factory(User::class)->create();
+        assert($user1 instanceof User);
+        $user1->date_of_birth = Carbon::createStrict(2000, 1, 1);
+        $user1->save();
+
+        $user2 = factory(User::class)->create();
+        assert($user2 instanceof User);
+        $user2->date_of_birth = Carbon::createStrict(1995, 1, 1);
+        $user2->save();
 
         $this->graphQL(/** @lang GraphQL */ '
-            query FilteredUsers {
+            query {
                 users(
                     where: {
                         column: "date_of_birth",
@@ -104,8 +122,8 @@ final class WhereConditionsDirectiveTest extends DBTestCase
             'data' => [
                 'users' => [
                     [
-                        'id' => "$user2->id",
-                    ]
+                        'id' => "{$user2->id}",
+                    ],
                 ],
             ],
         ]);

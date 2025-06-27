@@ -2,6 +2,7 @@
 
 namespace Tests\Utils\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -23,6 +24,7 @@ use Tests\Utils\Models\User\UserBuilder;
  * @property string|null $email
  * @property \Illuminate\Support\Carbon|null $email_verified_at
  * @property string|null $password
+ * @property Carbon|null $date_of_birth
  * @property string|null $remember_token
  *
  * Timestamps
@@ -69,6 +71,7 @@ final class User extends Authenticatable
     // @phpstan-ignore-next-line iterable type missing in Laravel 9.0.0
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'date_of_birth' => 'date',
     ];
 
     /** @see \Tests\Integration\Models\PropertyAccessTest */
