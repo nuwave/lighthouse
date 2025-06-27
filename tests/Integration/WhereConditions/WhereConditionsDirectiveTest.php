@@ -20,6 +20,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
         id: ID!
         name: String
         email: String
+        date_of_birth: String
     }
 
     type Post {
@@ -52,6 +53,62 @@ final class WhereConditionsDirectiveTest extends DBTestCase
             parent::getPackageProviders($app),
             [WhereConditionsServiceProvider::class],
         );
+    }
+
+    public function testItFiltersBetweenWithVariables(): void
+    {
+        $user1 = factory(User::class)->create(['date_of_birth' => '2000-01-01']);
+        $user2 = factory(User::class)->create(['date_of_birth' => '1995-01-01']);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query FilteredUsers($dobMin: Mixed, $dobMax: Mixed) {
+            users(
+                where: {
+                    column: "date_of_birth",
+                    operator: BETWEEN,
+                    value: [$dobMin, $dobMax]
+                }
+            ) {
+                id
+            }
+        }
+        ', ['dobMin' => '1990-01-01', 'dobMax' => '1999-01-01'])->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => "$user2->id",
+                    ]
+                ],
+            ],
+        ]);
+    }
+
+    public function testItFiltersBetweenWithoutVariables(): void
+    {
+        $user1 = factory(User::class)->create(['date_of_birth' => '2000-01-01']);
+        $user2 = factory(User::class)->create(['date_of_birth' => '1995-01-01']);
+
+        $this->graphQL(/** @lang GraphQL */ '
+            query FilteredUsers {
+                users(
+                    where: {
+                        column: "date_of_birth",
+                        operator: BETWEEN,
+                        value: ["1990-01-01", "1999-01-01"]
+                    }
+                ) {
+                    id
+                }
+            }
+        ')->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => "$user2->id",
+                    ]
+                ],
+            ],
+        ]);
     }
 
     public function testDefaultsToWhereEqual(): void
