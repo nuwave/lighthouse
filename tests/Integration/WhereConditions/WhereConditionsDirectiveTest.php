@@ -56,7 +56,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
         );
     }
 
-    public function testBetweenWithVariables(): void
+    public function testBetweenWithMultipleVariables(): void
     {
         $user1 = factory(User::class)->create();
         assert($user1 instanceof User);
@@ -83,6 +83,43 @@ final class WhereConditionsDirectiveTest extends DBTestCase
         ', [
             'dobMin' => '1990-01-01',
             'dobMax' => '1999-01-01',
+        ])->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => "{$user2->id}",
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testBetweenWithOneVariable(): void
+    {
+        $user1 = factory(User::class)->create();
+        assert($user1 instanceof User);
+        $user1->date_of_birth = Carbon::createStrict(2000, 1, 1);
+        $user1->save();
+
+        $user2 = factory(User::class)->create();
+        assert($user2 instanceof User);
+        $user2->date_of_birth = Carbon::createStrict(1995, 1, 1);
+        $user2->save();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($dates: Mixed) {
+            users(
+                where: {
+                    column: "date_of_birth",
+                    operator: BETWEEN,
+                    value: $dates
+                }
+            ) {
+                id
+            }
+        }
+        ', [
+            'dates' => ['1990-01-01', '1999-01-01'],
         ])->assertExactJson([
             'data' => [
                 'users' => [
