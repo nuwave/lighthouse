@@ -21,7 +21,6 @@ final class WhereConditionsDirectiveTest extends DBTestCase
         id: ID!
         name: String
         email: String
-        date_of_birth: String
     }
 
     type Post {
