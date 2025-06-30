@@ -55,7 +55,7 @@
         "laravel/pennant": "^1",
         "laravel/scout": "^8 || ^9 || ^10",
         "mattiasgeniar/phpunit-query-count-assertions": "^1.1",
-        "mll-lab/graphql-php-scalars": "^6",
+        "mll-lab/graphql-php-scalars": "^6.4.1",
         "mll-lab/php-cs-fixer-config": "^5",
         "mockery/mockery": "^1.5",
         "nesbot/carbon": "^2.62.1 || ^3.8.4",
