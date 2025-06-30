@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\WhereConditions;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Nuwave\Lighthouse\WhereConditions\SQLOperator;
 use Nuwave\Lighthouse\WhereConditions\WhereConditionsHandler;
@@ -52,6 +53,116 @@ final class WhereConditionsDirectiveTest extends DBTestCase
             parent::getPackageProviders($app),
             [WhereConditionsServiceProvider::class],
         );
+    }
+
+    public function testBetweenWithMultipleVariables(): void
+    {
+        $user1 = factory(User::class)->create();
+        assert($user1 instanceof User);
+        $user1->date_of_birth = Carbon::createStrict(2000, 1, 1);
+        $user1->save();
+
+        $user2 = factory(User::class)->create();
+        assert($user2 instanceof User);
+        $user2->date_of_birth = Carbon::createStrict(1995, 1, 1);
+        $user2->save();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($dobMin: Mixed, $dobMax: Mixed) {
+            users(
+                where: {
+                    column: "date_of_birth",
+                    operator: BETWEEN,
+                    value: [$dobMin, $dobMax]
+                }
+            ) {
+                id
+            }
+        }
+        ', [
+            'dobMin' => '1990-01-01',
+            'dobMax' => '1999-01-01',
+        ])->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => "{$user2->id}",
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testBetweenWithOneVariable(): void
+    {
+        $user1 = factory(User::class)->create();
+        assert($user1 instanceof User);
+        $user1->date_of_birth = Carbon::createStrict(2000, 1, 1);
+        $user1->save();
+
+        $user2 = factory(User::class)->create();
+        assert($user2 instanceof User);
+        $user2->date_of_birth = Carbon::createStrict(1995, 1, 1);
+        $user2->save();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($dates: Mixed) {
+            users(
+                where: {
+                    column: "date_of_birth",
+                    operator: BETWEEN,
+                    value: $dates
+                }
+            ) {
+                id
+            }
+        }
+        ', [
+            'dates' => ['1990-01-01', '1999-01-01'],
+        ])->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => "{$user2->id}",
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testBetweenWithLiteralValues(): void
+    {
+        $user1 = factory(User::class)->create();
+        assert($user1 instanceof User);
+        $user1->date_of_birth = Carbon::createStrict(2000, 1, 1);
+        $user1->save();
+
+        $user2 = factory(User::class)->create();
+        assert($user2 instanceof User);
+        $user2->date_of_birth = Carbon::createStrict(1995, 1, 1);
+        $user2->save();
+
+        $this->graphQL(/** @lang GraphQL */ '
+            query {
+                users(
+                    where: {
+                        column: "date_of_birth",
+                        operator: BETWEEN,
+                        value: ["1990-01-01", "1999-01-01"]
+                    }
+                ) {
+                    id
+                }
+            }
+        ')->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => "{$user2->id}",
+                    ],
+                ],
+            ],
+        ]);
     }
 
     public function testDefaultsToWhereEqual(): void

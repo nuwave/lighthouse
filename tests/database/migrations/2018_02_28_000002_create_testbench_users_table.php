@@ -16,6 +16,7 @@ final class CreateTestbenchUsersTable extends Migration
             $table->string('email')->unique()->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
+            $table->date('date_of_birth')->nullable();
             $table->rememberToken();
             $table->timestamps();
             $table->unsignedBigInteger('company_id')->nullable();
