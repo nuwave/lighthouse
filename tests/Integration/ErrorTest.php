@@ -46,7 +46,7 @@ final class ErrorTest extends TestCase
 
         $this->assertStringContainsString(
             'nonExistingField',
-            $result->json('errors.0.message'),
+            (string) $result->json('errors.0.message'),
         );
     }
 

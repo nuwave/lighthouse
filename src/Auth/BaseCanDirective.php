@@ -46,7 +46,7 @@ abstract class BaseCanDirective extends BaseDirective implements FieldMiddleware
   """
   Value to return if the user is not authorized and `action` is `RETURN_VALUE`.
   """
-  returnValue: CanArgs
+  returnValue: CanReturnValue
 GRAPHQL;
     }
 
@@ -54,9 +54,16 @@ GRAPHQL;
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
+Any constant literal value.
+See https://graphql.github.io/graphql-spec/draft/#sec-Input-Values.
 """
 scalar CanArgs
+
+"""
+Any constant literal value.
+See https://graphql.github.io/graphql-spec/draft/#sec-Input-Values.
+"""
+scalar CanReturnValue
 
 enum CanAction {
     """
@@ -70,7 +77,7 @@ enum CanAction {
     EXCEPTION_NOT_AUTHORIZED
 
     """
-    Return the value specified in `value` argument to conceal the real error.
+    Return the value specified in the `returnValue` directive argument to conceal the real error.
     """
     RETURN_VALUE
 }
