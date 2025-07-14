@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
-use Illuminate\Container\Container;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Filesystem\Filesystem;
 use Nuwave\Lighthouse\Exceptions\InvalidSchemaCacheContentsException;
@@ -21,8 +20,10 @@ class ASTCache
 
     protected string $path;
 
-    public function __construct(ConfigRepository $config)
-    {
+    public function __construct(
+        ConfigRepository $config,
+        protected Filesystem $filesystem,
+    ) {
         /** @var CacheConfig $cacheConfig */
         $cacheConfig = $config->get('lighthouse.schema_cache');
         $this->enable = (bool) $cacheConfig['enable'];
@@ -45,24 +46,27 @@ class ASTCache
             value: $documentAST->toArray(),
             return: true,
         );
+        $contents = /** @lang PHP */ "<?php return {$variable};";
 
-        $this->filesystem()->put(
-            path: $this->path(),
-            contents: /** @lang PHP */ "<?php return {$variable};",
-            lock: true,
-        );
+        // Since the schema cache can be very large, we write it to a temporary file first.
+        // This avoids issues with the filesystem not being able to write large files atomically.
+        // Then, we move the temporary file to the final location which is an atomic operation.
+        $path = $this->path();
+        $partialPath = "{$path}.partial";
+        $this->filesystem->put(path: $partialPath, contents: $contents, lock: true);
+        $this->filesystem->move(path: $partialPath, target: $path);
     }
 
     public function clear(): void
     {
-        $this->filesystem()->delete($this->path());
+        $this->filesystem->delete($this->path());
     }
 
     /** @param  callable(): DocumentAST  $build */
     public function fromCacheOrBuild(callable $build): DocumentAST
     {
         $path = $this->path();
-        if ($this->filesystem()->exists($path)) {
+        if ($this->filesystem->exists($path)) {
             $ast = require $path;
             if (! is_array($ast)) {
                 throw new InvalidSchemaCacheContentsException($path, $ast);
@@ -77,10 +81,5 @@ class ASTCache
         $this->set($documentAST);
 
         return $documentAST;
-    }
-
-    protected function filesystem(): Filesystem
-    {
-        return Container::getInstance()->make(Filesystem::class);
     }
 }
