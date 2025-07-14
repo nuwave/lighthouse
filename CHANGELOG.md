@@ -13,17 +13,17 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Changed
 
-- Refresh schema cache lazily when GraphQL requests are made through `MakesGraphQLRequests`
+- Refresh schema cache lazily when GraphQL requests are made through `MakesGraphQLRequests` https://github.com/nuwave/lighthouse/pull/2702
 
 ### Deprecated
 
-- Deprecate Lumen support
+- Deprecate Lumen support https://github.com/nuwave/lighthouse/pull/2702
 
 ## v6.61.1
 
 ### Fixed
 
-- Improve `@can` directive docs
+- Improve `@can` directive docs https://github.com/nuwave/lighthouse/commit/70bea571382dae21165d81887fc4a9c0bdb91dee
 
 ## v6.61.0
 
