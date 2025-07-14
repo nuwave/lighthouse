@@ -11,11 +11,12 @@ Compare your `lighthouse.php` against the latest [default configuration](src/lig
 
 ### Leverage automatic test trait setup
 
-Methods you need to explicitly call to set up test traits were removed in favor of automatically set up test traits.
-Keep in mind they only work when your test class extends `Illuminate\Foundation\Testing\TestCase`.
+Methods you need to explicitly call to set up test traits were removed in favor of automatic setup.
 
 - Remove calls to `Nuwave\Lighthouse\Testing\RefreshesSchemaCache::bootRefreshesSchemaCache()`.
+  This only works when your test class uses the trait `Nuwave\Lighthouse\Testing\MakesGraphQLRequests`.
 - Replace calls to `Nuwave\Lighthouse\Testing\MakesGraphQLRequests::setUpSubscriptionEnvironment()` with ` use Nuwave\Lighthouse\Testing\TestsSubscriptions`.
+  This only works when your test class extends `Illuminate\Foundation\Testing\TestCase`.
 
 ### `EnsureXHR` is enabled in the default configuration
 

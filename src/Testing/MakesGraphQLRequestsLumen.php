@@ -19,6 +19,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  * Testing helpers for making requests to the GraphQL endpoint.
  *
  * @mixin \Laravel\Lumen\Testing\Concerns\MakesHttpRequests
+ *
+ * @deprecated lumen support will be removed in the next major version
  */
 trait MakesGraphQLRequestsLumen // @phpstan-ignore trait.unused (hard to set up testing for)
 {
