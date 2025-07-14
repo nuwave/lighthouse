@@ -11,6 +11,8 @@ use Orchestra\Testbench\TestCase;
 
 /**
  * Just a placeholder in order for PHPStan to be able to analyze those traits, see https://phpstan.org/blog/how-phpstan-analyses-traits.
+ *
+ * @deprecated lumen support will be removed in the next major version
  */
 final class TestingTraitDummyLumen extends TestCase
 {

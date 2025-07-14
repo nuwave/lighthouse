@@ -74,6 +74,8 @@ trait MakesGraphQLRequests
      */
     protected function postGraphQL(array $data, array $headers = [], array $routeParams = []): TestResponse
     {
+        $this->refreshSchemaCacheIfNecessary();
+
         return $this->postJson(
             $this->graphQLEndpointUrl($routeParams),
             $data,
@@ -100,6 +102,8 @@ trait MakesGraphQLRequests
         array $headers = [],
         array $routeParams = [],
     ): TestResponse {
+        $this->refreshSchemaCacheIfNecessary();
+
         $parameters = [
             'operations' => \Safe\json_encode($operations),
             'map' => \Safe\json_encode($map),
@@ -253,5 +257,12 @@ trait MakesGraphQLRequests
 
         // set the custom driver as the default driver
         $config->set('lighthouse.subscriptions.broadcaster', 'mock');
+    }
+
+    protected function refreshSchemaCacheIfNecessary(): void
+    {
+        if (in_array(RefreshesSchemaCache::class, class_uses_recursive(static::class), true)) {
+            $this->refreshSchemaCache(); // @phpstan-ignore method.notFound (present in RefreshesSchemaCache)
+        }
     }
 }

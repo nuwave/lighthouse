@@ -7,7 +7,7 @@ use Safe\Exceptions\FilesystemException;
 /**
  * Refreshes the schema cache once before any tests are run.
  *
- * This is a bootable test trait, @see \Illuminate\Foundation\Testing\Concerns\InteractsWithTestCaseLifecycle::setUpTraits
+ * This trait only works in combination with @see \Nuwave\Lighthouse\Testing\MakesGraphQLRequests.
  *
  * @mixin \Illuminate\Foundation\Testing\Concerns\InteractsWithConsole
  */
@@ -24,7 +24,7 @@ trait RefreshesSchemaCache
     /** Path to the file used for coordinating exactly-one semantics. */
     protected static string $lockFilePath = __DIR__ . '/schema-cache-refreshing';
 
-    protected function setUpRefreshesSchemaCache(): void
+    protected function refreshSchemaCache(): void
     {
         if (! static::$schemaCacheWasRefreshed) {
             // We use the filesystem as shared mutable state to coordinate between processes,
@@ -48,9 +48,9 @@ trait RefreshesSchemaCache
         }
     }
 
-    /** @deprecated TODO leverage automatic test trait setup, this method will be removed in the next major version */
+    /** @deprecated TODO leverage automatic setup through MakesGraphQLRequests, this method will be removed in the next major version */
     protected function bootRefreshesSchemaCache(): void
     {
-        $this->setUpRefreshesSchemaCache();
+        $this->refreshSchemaCache();
     }
 }
