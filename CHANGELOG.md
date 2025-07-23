@@ -13,7 +13,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Changed
 
-- Simplify cache configuration access
+- Simplify cache configuration access https://github.com/nuwave/lighthouse/pull/2706
 
 ## v6.62.1
 
