@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.62.2
+
+### Changed
+
+- Simplify cache configuration access
+
 ## v6.62.1
 
 ### Fixed

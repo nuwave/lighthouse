@@ -6,7 +6,6 @@ use Illuminate\Cache\Events\KeyWritten;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
@@ -56,29 +55,6 @@ final class ValidationCachingTest extends TestCase
         $config = $this->app->make(ConfigRepository::class);
         $config->set('lighthouse.query_cache.enable', false);
         $config->set('lighthouse.validation_cache.enable', false);
-
-        $event = Event::fake();
-
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            foo
-        }
-        ')->assertExactJson([
-            'data' => [
-                'foo' => Foo::THE_ANSWER,
-            ],
-        ]);
-
-        $event->assertDispatchedTimes(CacheMissed::class, 0);
-        $event->assertDispatchedTimes(CacheHit::class, 0);
-        $event->assertDispatchedTimes(KeyWritten::class, 0);
-    }
-
-    public function testConfigMissing(): void
-    {
-        $config = $this->app->make(ConfigRepository::class);
-        $config->set('lighthouse.query_cache.enable', false);
-        $config->set('lighthouse.validation_cache', null);
 
         $event = Event::fake();
 
