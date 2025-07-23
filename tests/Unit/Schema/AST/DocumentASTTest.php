@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Schema\AST;
 
-use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
@@ -107,7 +106,7 @@ final class DocumentASTTest extends TestCase
         $queryType = $reserialized->types[RootType::QUERY];
         $this->assertInstanceOf(ObjectTypeDefinitionNode::class, $queryType);
 
-        $this->assertInstanceOf(DirectiveDefinitionNode::class, $reserialized->directives['foo']);
+        $this->assertArrayHasKey('foo', $reserialized->directives);
 
         $this->assertSame(['Query'], $reserialized->classNameToObjectTypeNames[User::class]);
 

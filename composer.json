@@ -45,7 +45,6 @@
     "require-dev": {
         "algolia/algoliasearch-client-php": "^3",
         "bensampo/laravel-enum": "^5 || ^6",
-        "dms/phpunit-arraysubset-asserts": "^0.4 || ^0.5 || dev-add-phpunit-11-support",
         "ergebnis/composer-normalize": "^2.2.2",
         "fakerphp/faker": "^1.21",
         "google/protobuf": "^3.21",
@@ -80,12 +79,6 @@
         "mll-lab/laravel-graphiql": "A graphical interactive in-browser GraphQL IDE - integrated with Laravel",
         "pusher/pusher-php-server": "Required when using the Pusher Subscriptions driver"
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/pieterocp/phpunit-arraysubset-asserts"
-        }
-    ],
     "minimum-stability": "dev",
     "prefer-stable": true,
     "autoload": {
@@ -97,10 +90,7 @@
         "psr-4": {
             "Benchmarks\\": "benchmarks/",
             "Tests\\": "tests/"
-        },
-        "files": [
-            "vendor/dms/phpunit-arraysubset-asserts/src/ArraySubsetAsserts.php"
-        ]
+        }
     },
     "config": {
         "allow-plugins": {
