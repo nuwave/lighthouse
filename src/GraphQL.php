@@ -281,18 +281,18 @@ class GraphQL
      */
     public function parse(string $query, string $hash): DocumentNode
     {
-        $cacheConfig = $this->configRepository->get('lighthouse.query_cache');
+        $queryCacheConfig = $this->configRepository->get('lighthouse.query_cache');
 
-        if (! $cacheConfig['enable']) {
+        if (! $queryCacheConfig['enable']) {
             return $this->parseQuery($query);
         }
 
         $cacheFactory = Container::getInstance()->make(CacheFactory::class);
-        $store = $cacheFactory->store($cacheConfig['store']);
+        $store = $cacheFactory->store($queryCacheConfig['store']);
 
         return $store->remember(
             "lighthouse:query:{$hash}",
-            $cacheConfig['ttl'],
+            $queryCacheConfig['ttl'],
             fn (): DocumentNode => $this->parseQuery($query),
         );
     }
@@ -319,17 +319,17 @@ class GraphQL
     public function loadPersistedQuery(string $sha256hash): DocumentNode
     {
         $lighthouseConfig = $this->configRepository->get('lighthouse');
-        $cacheConfig = $lighthouseConfig['query_cache'] ?? null;
+        $queryCacheConfig = $lighthouseConfig['query_cache'];
         if (
-            ! ($lighthouseConfig['persisted_queries'] ?? false)
-            || ! ($cacheConfig['enable'] ?? false)
+            ! $lighthouseConfig['persisted_queries']
+            || ! $queryCacheConfig['enable']
         ) {
             // https://github.com/apollographql/apollo-server/blob/37a5c862261806817a1d71852c4e1d9cdb59eab2/packages/apollo-server-errors/src/index.ts#L240-L248
             throw new Error('PersistedQueryNotSupported', null, null, [], null, null, ['code' => 'PERSISTED_QUERY_NOT_SUPPORTED']);
         }
 
         $cacheFactory = Container::getInstance()->make(CacheFactory::class);
-        $store = $cacheFactory->store($cacheConfig['store']);
+        $store = $cacheFactory->store($queryCacheConfig['store']);
 
         return $store->get("lighthouse:query:{$sha256hash}")
             // https://github.com/apollographql/apollo-server/blob/37a5c862261806817a1d71852c4e1d9cdb59eab2/packages/apollo-server-errors/src/index.ts#L230-L239
@@ -407,17 +407,17 @@ class GraphQL
             return DocumentValidator::validate($schema, $query, $validationRules); // @phpstan-ignore return.type (TODO remove ignore when requiring a newer version of webonyx/graphql-php)
         }
 
-        $cacheConfig = $this->configRepository->get('lighthouse.validation_cache');
+        $validationCacheConfig = $this->configRepository->get('lighthouse.validation_cache');
 
-        if (! isset($cacheConfig['enable']) || ! $cacheConfig['enable']) {
+        if (! $validationCacheConfig['enable']) {
             return DocumentValidator::validate($schema, $query, $validationRules); // @phpstan-ignore return.type (TODO remove ignore when requiring a newer version of webonyx/graphql-php)
         }
 
+        $cacheFactory = Container::getInstance()->make(CacheFactory::class);
+        $store = $cacheFactory->store($validationCacheConfig['store']);
+
         $cacheKey = "lighthouse:validation:{$schemaHash}:{$queryHash}";
 
-        $cacheFactory = Container::getInstance()->make(CacheFactory::class);
-
-        $store = $cacheFactory->store($cacheConfig['store']);
         $cachedResult = $store->get($cacheKey);
         if ($cachedResult !== null) {
             return $cachedResult;
@@ -432,7 +432,7 @@ class GraphQL
             return $result; // @phpstan-ignore return.type (TODO remove ignore when requiring a newer version of webonyx/graphql-php)
         }
 
-        $store->put($cacheKey, $result, $cacheConfig['ttl']);
+        $store->put($cacheKey, $result, $validationCacheConfig['ttl']);
 
         return $result;
     }
