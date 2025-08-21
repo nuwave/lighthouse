@@ -39,6 +39,14 @@ abstract class DateScalarTestBase extends TestCase
         );
     }
 
+    public function testConvertsDateTimeToIlluminateSupportCarbon(): void
+    {
+        $this->assertTrue(
+            // @phpstan-ignore theCodingMachineSafe.class (we want to use the native DateTime to ensure it specifically works)
+            $this->scalarInstance()->parseValue(new \DateTime())->isValid(),
+        );
+    }
+
     public function testConvertsCarbonCarbonToIlluminateSupportCarbon(): void
     {
         $this->assertTrue(
