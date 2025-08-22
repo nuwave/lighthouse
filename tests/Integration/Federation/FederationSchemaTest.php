@@ -105,7 +105,7 @@ GRAPHQL;
 
         $sdl = $this->_serviceSdl();
 
-        $this->assertStringContainsString($schemaExtension, $sdl);
+        $this->assertSdlContainsString($schemaExtension, $sdl);
         $this->assertStringContainsString($typeFoo, $sdl);
     }
 
@@ -125,7 +125,7 @@ GRAPHQL;
 
         $sdl = $this->_serviceSdl();
 
-        $this->assertStringContainsString($schemaExtension, $sdl);
+        $this->assertSdlContainsString($schemaExtension, $sdl);
         $this->assertStringContainsString('directive @foo on FIELD_DEFINITION', $sdl);
         $this->assertStringContainsString('directive @bar on FIELD_DEFINITION', $sdl);
         $this->assertStringContainsString($typeFoo, $sdl);
