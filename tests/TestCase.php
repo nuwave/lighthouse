@@ -212,6 +212,18 @@ GRAPHQL;
         return $schemaBuilder->schema();
     }
 
+    /** Assert that SDL contains the given string, accounting for different forward slash escaping - see https://github.com/webonyx/graphql-php/releases/tag/v15.22.2. */
+    protected function assertSdlContainsString(string $expected, string $sdl): void
+    {
+        // Try both the original string and the escaped version
+        $escapedExpected = str_replace('/', '\/', $expected);
+
+        $this->assertTrue(
+            str_contains($sdl, $expected) || str_contains($sdl, $escapedExpected),
+            "SDL does not contain expected string. Expected either:\n- {$expected}\n- {$escapedExpected}\n\nActual SDL:\n{$sdl}",
+        );
+    }
+
     /** Get a fully qualified reference to a method that is defined on the test class. */
     protected static function qualifyTestResolver(string $method): string
     {

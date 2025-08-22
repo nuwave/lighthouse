@@ -9,7 +9,7 @@ use Tests\TestCase;
 final class FederationSchemaTest extends TestCase
 {
     private const FEDERATION_V2_SCHEMA_EXTENSION = /** @lang GraphQL */ <<<'GRAPHQL'
-extend schema @link(url: "https:\/\/specs.apollo.dev\/federation\/v2.3", import: ["@composeDirective", "@extends", "@external", "@inaccessible", "@interfaceObject", "@key", "@override", "@provides", "@requires", "@shareable", "@tag"])
+extend schema @link(url: "https://specs.apollo.dev/federation/v2.3", import: ["@composeDirective", "@extends", "@external", "@inaccessible", "@interfaceObject", "@key", "@override", "@provides", "@requires", "@shareable", "@tag"])
 GRAPHQL;
 
     protected function getPackageProviders($app): array
@@ -92,7 +92,7 @@ GRAPHQL;
     public function testServiceQueryShouldReturnFederationV2SchemaExtension(): void
     {
         $schemaExtension = /** @lang GraphQL */ <<<'GRAPHQL'
-extend schema @link(url: "https:\/\/specs.apollo.dev\/federation\/v2.3", import: ["@composeDirective", "@extends", "@external", "@inaccessible", "@interfaceObject", "@key", "@override", "@provides", "@requires", "@shareable", "@tag"])
+extend schema @link(url: "https://specs.apollo.dev/federation/v2.3", import: ["@composeDirective", "@extends", "@external", "@inaccessible", "@interfaceObject", "@key", "@override", "@provides", "@requires", "@shareable", "@tag"])
 GRAPHQL;
 
         $typeFoo = /** @lang GraphQL */ <<<'GRAPHQL'
@@ -105,14 +105,14 @@ GRAPHQL;
 
         $sdl = $this->_serviceSdl();
 
-        $this->assertStringContainsString($schemaExtension, $sdl);
+        $this->assertSdlContainsString($schemaExtension, $sdl);
         $this->assertStringContainsString($typeFoo, $sdl);
     }
 
     public function testServiceQueryShouldReturnFederationV2ComposedDirectives(): void
     {
         $schemaExtension = /** @lang GraphQL */ <<<'GRAPHQL'
-extend schema @link(url: "https:\/\/specs.apollo.dev\/federation\/v2.3", import: ["@composeDirective"]) @link(url: "https:\/\/myspecs.dev\/myCustomDirective\/v1.0", import: ["@foo", "@bar"]) @composeDirective(name: "@foo") @composeDirective(name: "@bar")
+extend schema @link(url: "https://specs.apollo.dev/federation/v2.3", import: ["@composeDirective"]) @link(url: "https://myspecs.dev/myCustomDirective/v1.0", import: ["@foo", "@bar"]) @composeDirective(name: "@foo") @composeDirective(name: "@bar")
 GRAPHQL;
 
         $typeFoo = /** @lang GraphQL */ <<<'GRAPHQL'
@@ -125,7 +125,7 @@ GRAPHQL;
 
         $sdl = $this->_serviceSdl();
 
-        $this->assertStringContainsString($schemaExtension, $sdl);
+        $this->assertSdlContainsString($schemaExtension, $sdl);
         $this->assertStringContainsString('directive @foo on FIELD_DEFINITION', $sdl);
         $this->assertStringContainsString('directive @bar on FIELD_DEFINITION', $sdl);
         $this->assertStringContainsString($typeFoo, $sdl);

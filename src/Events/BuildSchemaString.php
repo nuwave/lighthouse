@@ -12,9 +12,7 @@ namespace Nuwave\Lighthouse\Events;
 class BuildSchemaString
 {
     public function __construct(
-        /**
-         * The root schema that was defined by the user.
-         */
+        /** The root schema that was defined by the user. */
         public string $userSchema,
     ) {}
 }
