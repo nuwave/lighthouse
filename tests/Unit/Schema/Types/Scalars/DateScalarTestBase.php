@@ -34,31 +34,30 @@ abstract class DateScalarTestBase extends TestCase
 
     public function testReturnsIlluminateSupportCarbonAsIs(): void
     {
-        $this->assertTrue(
-            $this->scalarInstance()->parseValue(IlluminateCarbon::now())->isValid(),
-        );
+        $original = IlluminateCarbon::now();
+        $parsed = $this->scalarInstance()->parseValue($original);
+        $this->assertSame($original, $parsed);
     }
 
-    public function testConvertsDateTimeToIlluminateSupportCarbon(): void
+    /** @dataProvider dateTimeInterfaceInstances */
+    public function testConvertsDateTimeInterfaceToIlluminateSupportCarbon(\DateTimeInterface $original): void
     {
-        $this->assertTrue(
-            // @phpstan-ignore theCodingMachineSafe.class (we want to use the native DateTime to ensure it specifically works)
-            $this->scalarInstance()->parseValue(new \DateTime())->isValid(),
-        );
+        $parsed = $this->scalarInstance()->parseValue($original);
+        $this->assertSame($original->getTimestamp(), $parsed->getTimestamp());
+        $this->assertTrue($parsed->isValid());
     }
 
-    public function testConvertsCarbonCarbonToIlluminateSupportCarbon(): void
+    /** @return iterable<array{\DateTimeInterface}> */
+    public static function dateTimeInterfaceInstances(): iterable
     {
-        $this->assertTrue(
-            $this->scalarInstance()->parseValue(CarbonCarbon::now())->isValid(),
-        );
-    }
+        yield 'native DateTime' => [new \DateTime()]; // @phpstan-ignore-line theCodingMachineSafe.class (we want to use the native DateTime to ensure it specifically works)
+        yield 'safe DateTime' => [new \Safe\DateTime()];
 
-    public function testConvertsCarbonCarbonImmutableToIlluminateSupportCarbon(): void
-    {
-        $this->assertTrue(
-            $this->scalarInstance()->parseValue(CarbonCarbonImmutable::now())->isValid(),
-        );
+        yield 'native DateTimeImmutable' => [new \DateTimeImmutable()]; // @phpstan-ignore-line theCodingMachineSafe.class (we want to use the native DateTime to ensure it specifically works)
+        yield 'safe DateTimeImmutable' => [new \Safe\DateTimeImmutable()];
+
+        yield 'Carbon' => [CarbonCarbon::now()];
+        yield 'CarbonImmutable' => [CarbonCarbonImmutable::now()];
     }
 
     /**
