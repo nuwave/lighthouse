@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Console;
 
@@ -13,7 +14,11 @@ class ClearQueryCacheCommand extends Command
 
     public function handle(QueryCache $cache): void
     {
-        $cache->clearFileCache($this->option('hours'));
+        $cache->clearFileCache(
+            ($hours = $this->option('hours'))
+                ? intval($hours)
+                : null
+        );
 
         $this->info('GraphQL query cache deleted.');
     }

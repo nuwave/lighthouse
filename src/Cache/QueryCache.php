@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Cache;
 
@@ -13,9 +13,13 @@ use Nuwave\Lighthouse\Exceptions\InvalidQueryCacheContentsException;
 class QueryCache
 {
     private bool $enable;
+
     private ?string $store;
+
     private ?int $ttl;
+
     private bool $useFileCache;
+
     private string $fileCachePath;
 
     public function __construct(
@@ -49,15 +53,14 @@ class QueryCache
             $threshold = now()->subHours($hours)->timestamp;
             $files = array_filter(
                 $files,
-                fn(string $file) => $this->filesystem->lastModified($file) < $threshold
+                fn (string $file): bool => $this->filesystem->lastModified($file) < $threshold,
             );
         }
+
         $this->filesystem->delete($files);
     }
 
-    /**
-     * @param callable(): DocumentNode $build
-     */
+    /** @param  \Closure(): DocumentNode  $build */
     public function fromCacheOrBuild(string $hash, callable $build): DocumentNode
     {
         if ($this->useFileCache) {
@@ -74,17 +77,16 @@ class QueryCache
         );
     }
 
-    /**
-     * @param callable(): DocumentNode $build
-     */
+    /** @param  \Closure(): DocumentNode  $build */
     private function fromFileCacheOrBuild(string $hash, callable $build): DocumentNode
     {
         $filename = $this->fileCachePath() . 'query-' . $hash . '.php';
         if ($this->filesystem->exists($filename)) {
             $queryData = require $filename;
-            if (!is_array($queryData)) {
+            if (! is_array($queryData)) {
                 throw new InvalidQueryCacheContentsException($filename, $queryData);
             }
+
             $query = AST::fromArray($queryData);
             assert($query instanceof DocumentNode);
 

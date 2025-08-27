@@ -286,7 +286,7 @@ class GraphQL
         return $this->queryCache->isEnabled()
             ? $this->queryCache->fromCacheOrBuild(
                 $hash,
-                fn (): DocumentNode => $this->parseQuery($query)
+                fn (): DocumentNode => $this->parseQuery($query),
             )
             : $this->parseQuery($query);
     }

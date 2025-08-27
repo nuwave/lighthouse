@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Console;
 
@@ -8,9 +8,9 @@ use Illuminate\Filesystem\Filesystem;
 use Nuwave\Lighthouse\Console\ClearQueryCacheCommand;
 use Tests\TestCase;
 
-class ClearQueryCacheCommandTest extends TestCase
+final class ClearQueryCacheCommandTest extends TestCase
 {
-    const STORAGE_DIR = __DIR__ . '/../storage';
+    public const STORAGE_DIR = __DIR__ . '/../storage';
 
     protected function setUp(): void
     {
@@ -32,13 +32,13 @@ class ClearQueryCacheCommandTest extends TestCase
         $filesystem = $this->app->make(Filesystem::class);
         // remove all files except dotfiles
         $filesystem->delete(
-            $filesystem->files(self::STORAGE_DIR)
+            $filesystem->files(self::STORAGE_DIR),
         );
 
         parent::tearDown();
     }
 
-    public function testDeleteAll()
+    public function testDeleteAll(): void
     {
         $this->commandTester(new ClearQueryCacheCommand())->execute([]);
 
@@ -47,11 +47,11 @@ class ClearQueryCacheCommandTest extends TestCase
         $this->assertFileExists(self::STORAGE_DIR . '/unrelated.php');
     }
 
-    public function testDeleteThreshold()
+    public function testDeleteThreshold(): void
     {
         $this->travelTo('2025-06-01 12:00:00');
-        \Safe\touch(self::STORAGE_DIR . '/query-1.php', Carbon::parse('2025-06-01 10:00:00')->timestamp);
-        \Safe\touch(self::STORAGE_DIR . '/query-2.php', Carbon::parse('2025-06-01 09:59:59')->timestamp);
+        \Safe\touch(self::STORAGE_DIR . '/query-1.php', Carbon::parse('2025-06-01 10:00:00')->getTimestamp());
+        \Safe\touch(self::STORAGE_DIR . '/query-2.php', Carbon::parse('2025-06-01 09:59:59')->getTimestamp());
 
         $this->commandTester(new ClearQueryCacheCommand())->execute(['--hours' => 2]);
         $this->assertFileExists(self::STORAGE_DIR . '/query-1.php');

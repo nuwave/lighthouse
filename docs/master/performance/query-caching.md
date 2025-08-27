@@ -22,7 +22,7 @@ APQ is enabled by default, but depends on query caching being enabled.
 
 Similar to how schema caching works by storing the compiled schema in a php file
 in your bootstrap/cache directory, you may enable the file based query cache.
-This will allow opcache to pick up the compiled queries, and it also reduces 
+This will allow opcache to pick up the compiled queries, and it also reduces
 network load, if you have been using redis before.
 
 ```dotenv

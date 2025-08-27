@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration;
 
@@ -7,9 +7,9 @@ use Illuminate\Filesystem\Filesystem;
 use Nuwave\Lighthouse\Exceptions\InvalidQueryCacheContentsException;
 use Tests\TestCase;
 
-class FileBasedQueryCacheTest extends TestCase
+final class FileBasedQueryCacheTest extends TestCase
 {
-    const STORAGE_DIR = __DIR__ . '/../storage';
+    public const STORAGE_DIR = __DIR__ . '/../storage';
 
     protected function setUp(): void
     {
@@ -26,15 +26,15 @@ class FileBasedQueryCacheTest extends TestCase
         $filesystem = $this->app->make(Filesystem::class);
         // remove all files except dotfiles
         $filesystem->delete(
-            $filesystem->files(self::STORAGE_DIR)
+            $filesystem->files(self::STORAGE_DIR),
         );
 
         parent::tearDown();
     }
 
-    public function testFileCacheGetsCreated()
+    public function testFileCacheGetsCreated(): void
     {
-        $this->graphQL(/** @lang GraphQL */<<<GQL
+        $this->graphQL(/** @lang GraphQL */ <<<GQL
         query AskFoo {
             foo
         }
@@ -43,16 +43,16 @@ class FileBasedQueryCacheTest extends TestCase
         $this->assertFileExists(self::STORAGE_DIR . '/query-0f0be96218c966b815fd0a976801668f6c7dae61e184d85825ced04a0bb6f139.php');
     }
 
-    public function testCacheFileContainsNonsense()
+    public function testCacheFileContainsNonsense(): void
     {
         $filesystem = $this->app->make(Filesystem::class);
         $filesystem->put(
             self::STORAGE_DIR . '/query-0f0be96218c966b815fd0a976801668f6c7dae61e184d85825ced04a0bb6f139.php',
-            '<?php return "foo";'
+            '<?php return "foo";',
         );
 
         $this->expectException(InvalidQueryCacheContentsException::class);
-        $this->graphQL(/** @lang GraphQL */<<<GQL
+        $this->graphQL(/** @lang GraphQL */ <<<GQL
         query AskFoo {
             foo
         }
