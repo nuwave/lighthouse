@@ -1,5 +1,7 @@
 <?php declare(strict_types=1);
 
+namespace Tests\Integration;
+
 use Illuminate\Cache\Events\CacheHit;
 use Illuminate\Cache\Events\CacheMissed;
 use Illuminate\Cache\Events\KeyWritten;

@@ -9,6 +9,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+- Add a file based query cache for improved performance https://github.com/nuwave/lighthouse/pull/2713
+
 ## v6.62.3
 
 ### Fixed
