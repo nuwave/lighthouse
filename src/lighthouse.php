@@ -132,6 +132,19 @@ return [
          * Duration in seconds the query should remain cached, null means forever.
          */
         'ttl' => env('LIGHTHOUSE_QUERY_CACHE_TTL', 24 * 60 * 60),
+
+        /*
+         * Instead of putting serialised php code into a cache and producing network requests,
+         * this option will store the parsed queries as php files in the filesystem, allowing
+         * opcache to pick them up and reducing network requests from and to your cache system.
+         */
+        'use_file_cache' => env('LIGHTHOUSE_QUERY_CACHE_USE_FILE_CACHE', false),
+
+        /*
+         * If `use_file_cache` is true, this option will specify the path where the files are stored.
+         * The given path must be a folder, as every query will produce its own file.
+         */
+        'file_cache_path' => env('LIGHTHOUSE_QUERY_CACHE_FILE_CACHE_PATH', base_path('bootstrap/cache/queries/')),
     ],
 
     /*

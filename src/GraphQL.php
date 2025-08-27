@@ -21,6 +21,7 @@ use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Cache\QueryCache;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
 use Nuwave\Lighthouse\Events\EndExecution;
 use Nuwave\Lighthouse\Events\EndOperationOrOperations;
@@ -61,6 +62,7 @@ class GraphQL
         protected ProvidesValidationRules $providesValidationRules,
         protected GraphQLHelper $graphQLHelper,
         protected ConfigRepository $configRepository,
+        protected QueryCache $queryCache,
     ) {}
 
     /**
@@ -281,20 +283,12 @@ class GraphQL
      */
     public function parse(string $query, string $hash): DocumentNode
     {
-        $queryCacheConfig = $this->configRepository->get('lighthouse.query_cache');
-
-        if (! $queryCacheConfig['enable']) {
-            return $this->parseQuery($query);
-        }
-
-        $cacheFactory = Container::getInstance()->make(CacheFactory::class);
-        $store = $cacheFactory->store($queryCacheConfig['store']);
-
-        return $store->remember(
-            "lighthouse:query:{$hash}",
-            $queryCacheConfig['ttl'],
-            fn (): DocumentNode => $this->parseQuery($query),
-        );
+        return $this->queryCache->isEnabled()
+            ? $this->queryCache->fromCacheOrBuild(
+                $hash,
+                fn (): DocumentNode => $this->parseQuery($query)
+            )
+            : $this->parseQuery($query);
     }
 
     /**
