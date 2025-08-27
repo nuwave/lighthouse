@@ -25,8 +25,10 @@ class QueryCache
         $this->enable = $config['enable'];
         $this->store = $config['store'];
         $this->ttl = $config['ttl'];
-        $this->useFileCache = $config['use_file_cache'];
-        $this->fileCachePath = rtrim($config['file_cache_path'], '/') . '/';
+
+        $this->useFileCache = $config['use_file_cache'] ?? false;
+        $path = $config['file_cache_path'] ?? base_path('bootstrap/cache');
+        $this->fileCachePath = rtrim($path, '/') . '/';
     }
 
     public function isEnabled(): bool
@@ -42,7 +44,7 @@ class QueryCache
     public function clearFileCache(): void
     {
         $this->filesystem->delete(
-            $this->filesystem->files($this->fileCachePath())
+            $this->filesystem->glob($this->fileCachePath() . 'query-*.php')
         );
     }
 
@@ -70,7 +72,7 @@ class QueryCache
      */
     private function fromFileCacheOrBuild(string $hash, callable $build): DocumentNode
     {
-        $filename = $this->fileCachePath() . $hash . '.php';
+        $filename = $this->fileCachePath() . 'query-' . $hash . '.php';
         if ($this->filesystem->exists($filename)) {
             $queryData = require $filename;
             // todo no array exception

@@ -144,7 +144,7 @@ return [
          * If `use_file_cache` is true, this option will specify the path where the files are stored.
          * The given path must be a folder, as every query will produce its own file.
          */
-        'file_cache_path' => env('LIGHTHOUSE_QUERY_CACHE_FILE_CACHE_PATH', base_path('bootstrap/cache/queries/')),
+        'file_cache_path' => env('LIGHTHOUSE_QUERY_CACHE_FILE_CACHE_PATH', base_path('bootstrap/cache')),
     ],
 
     /*
