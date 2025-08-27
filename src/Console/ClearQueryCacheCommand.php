@@ -7,13 +7,13 @@ use Nuwave\Lighthouse\Cache\QueryCache;
 
 class ClearQueryCacheCommand extends Command
 {
-    protected $name = 'lighthouse:clear-query-cache';
+    protected $signature = 'lighthouse:clear-query-cache {--hours=}';
 
     protected $description = 'Clears the file based GraphQL query cache.';
 
     public function handle(QueryCache $cache): void
     {
-        $cache->clearFileCache();
+        $cache->clearFileCache($this->option('hours'));
 
         $this->info('GraphQL query cache deleted.');
     }

@@ -41,11 +41,17 @@ class QueryCache
         return $this->fileCachePath;
     }
 
-    public function clearFileCache(): void
+    public function clearFileCache(?int $hours = null): void
     {
-        $this->filesystem->delete(
-            $this->filesystem->glob($this->fileCachePath() . 'query-*.php')
-        );
+        $files = $this->filesystem->glob($this->fileCachePath() . 'query-*.php');
+        if (is_int($hours)) {
+            $threshold = now()->subHours($hours)->timestamp;
+            $files = array_filter(
+                $files,
+                fn(string $file) => $this->filesystem->lastModified($file) < $threshold
+            );
+        }
+        $this->filesystem->delete($files);
     }
 
     /**

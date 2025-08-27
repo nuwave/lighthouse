@@ -17,6 +17,7 @@ class FileBasedQueryCacheTest extends TestCase
         $filesystem->delete(
             $filesystem->files(self::STORAGE_DIR)
         );
+
         parent::tearDown();
     }
 

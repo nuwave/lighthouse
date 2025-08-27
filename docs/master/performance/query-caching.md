@@ -18,6 +18,28 @@ Lighthouse supports Automatic Persisted Queries (APQ), compatible with the
 
 APQ is enabled by default, but depends on query caching being enabled.
 
+## File based caching
+
+Similar to how schema caching works by storing the compiled schema in a php file
+in your bootstrap/cache directory, you may enable the file based query cache.
+This will allow opcache to pick up the compiled queries, and it also reduces 
+network load, if you have been using redis before.
+
+```dotenv
+LIGHTHOUSE_QUERY_CACHE_USE_FILE_CACHE=true
+```
+
+One downside with this approach is, that there is no automatic cleanup like with
+a TTL in a caching system. You may run this command to regularly remove old query
+files from the filesystem.
+
+```shell
+# remove all files
+php artisan lighthouse:clear-query-cache
+# only removes files older than 48 hours
+php artisan lighthouse:clear-query-cache --hours=48
+```
+
 ## Query validation caching
 
 Lighthouse can cache the result of the query validation process as well.
