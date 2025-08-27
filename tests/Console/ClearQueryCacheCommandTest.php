@@ -44,6 +44,7 @@ class ClearQueryCacheCommandTest extends TestCase
 
         $this->assertFileDoesNotExist(self::STORAGE_DIR . '/query-1.php');
         $this->assertFileDoesNotExist(self::STORAGE_DIR . '/query-2.php');
+        $this->assertFileExists(self::STORAGE_DIR . '/unrelated.php');
     }
 
     public function testDeleteThreshold()
@@ -55,5 +56,6 @@ class ClearQueryCacheCommandTest extends TestCase
         $this->commandTester(new ClearQueryCacheCommand())->execute(['--hours' => 2]);
         $this->assertFileExists(self::STORAGE_DIR . '/query-1.php');
         $this->assertFileDoesNotExist(self::STORAGE_DIR . '/query-2.php');
+        $this->assertFileExists(self::STORAGE_DIR . '/unrelated.php');
     }
 }
