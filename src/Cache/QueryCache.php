@@ -8,6 +8,7 @@ use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Filesystem\Filesystem;
+use Nuwave\Lighthouse\Exceptions\InvalidQueryCacheContentsException;
 
 class QueryCache
 {
@@ -81,7 +82,9 @@ class QueryCache
         $filename = $this->fileCachePath() . 'query-' . $hash . '.php';
         if ($this->filesystem->exists($filename)) {
             $queryData = require $filename;
-            // todo no array exception
+            if (!is_array($queryData)) {
+                throw new InvalidQueryCacheContentsException($filename, $queryData);
+            }
             $query = AST::fromArray($queryData);
             assert($query instanceof DocumentNode);
 
