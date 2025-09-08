@@ -28,11 +28,11 @@ class QueryCache
     ) {
         $config = $this->configRepository->get('lighthouse.query_cache');
 
-        $this->enable = $config['enable'];
-        $this->store = $config['store'];
-        $this->ttl = $config['ttl'];
-        $this->useFileCache = $config['use_file_cache'];
-        $this->fileCachePath = $config['file_cache_path'];
+        $this->enable = (bool) $config['enable'];
+        $this->store = $config['store'] ?? null;
+        $this->ttl = $config['ttl'] ?? null;
+        $this->useFileCache = $config['use_file_cache'] ?? false;
+        $this->fileCachePath = $config['file_cache_path'] ?? base_path('bootstrap/cache');
     }
 
     public function isEnabled(): bool
