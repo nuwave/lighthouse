@@ -2,13 +2,41 @@
 
 In order to speed up GraphQL query parsing, the parsed queries can be stored in the Laravel cache.
 
-Query caching is enabled by default.
-You can define cache store and cache duration, see `config/lighthouse.php`.
+### Configuration
 
-Make sure you flush the query cache when you deploy an upgraded version of the `webonyx/graphql-php` dependency:
+Query caching is enabled by default.
+You can disable it by setting `query_cache.enable` to `false` in `config/lighthouse.php`.
+
+There are two fundamentally different ways of caching queries:
+- using an external cache through a Laravel cache store like Redis or Memcached
+- using a file based cache that leverages OPcache
+
+Depending on your setup, one or the other might be more suitable.
+You can configure which one to use through the option `query_cache.use_file_cache` in `config/lighthouse.php`.
+
+### Cache invalidation
+
+When using an external cache store, you can configure a TTL for cached queries.
+That way, old queries that are potentially unused will be removed from the cache automatically.
+
+When using the file based cache, you have to manually remove old cached queries.
+Run the following command periodically to remove old files:
 
 ```shell
-php artisan cache:clear
+php artisan lighthouse:clear-query-cache --hours=<TTL in hours>
+```
+
+Make sure you flush the query cache when you deploy an upgraded version of the `webonyx/graphql-php` dependency.
+When using an external cache, remove all keys for the configured store:
+
+```shell
+php artisan cache:clear <store name>
+```
+
+When using the file based cache, remove all cached query files:
+
+```shell
+php artisan lighthouse:clear-query-cache
 ```
 
 ## Automated Persisted Queries
@@ -17,28 +45,6 @@ Lighthouse supports Automatic Persisted Queries (APQ), compatible with the
 [Apollo implementation](https://www.apollographql.com/docs/apollo-server/performance/apq).
 
 APQ is enabled by default, but depends on query caching being enabled.
-
-## File based caching
-
-Similar to how schema caching works by storing the compiled schema in a php file
-in your bootstrap/cache directory, you may enable the file based query cache.
-This will allow opcache to pick up the compiled queries, and it also reduces
-network load, if you have been using redis before.
-
-```dotenv
-LIGHTHOUSE_QUERY_CACHE_USE_FILE_CACHE=true
-```
-
-One downside with this approach is, that there is no automatic cleanup like with
-a TTL in a caching system. You may run this command to regularly remove old query
-files from the filesystem.
-
-```shell
-# remove all files
-php artisan lighthouse:clear-query-cache
-# only removes files older than 48 hours
-php artisan lighthouse:clear-query-cache --hours=48
-```
 
 ## Query validation caching
 
