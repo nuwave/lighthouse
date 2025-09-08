@@ -12,18 +12,18 @@ use Nuwave\Lighthouse\Exceptions\InvalidQueryCacheContentsException;
 
 class QueryCache
 {
-    private bool $enable;
+    protected bool $enable;
 
-    private ?string $store;
+    protected ?string $store;
 
-    private ?int $ttl;
+    protected ?int $ttl;
 
-    private bool $useFileCache;
+    protected bool $useFileCache;
 
-    private string $fileCachePath;
+    protected string $fileCachePath;
 
     public function __construct(
-        private ConfigRepository $configRepository,
+        protected ConfigRepository $configRepository,
         protected Filesystem $filesystem,
     ) {
         $config = $this->configRepository->get('lighthouse.query_cache');
@@ -78,7 +78,7 @@ class QueryCache
     }
 
     /** @param  \Closure(): DocumentNode  $build */
-    private function fromFileCacheOrBuild(string $hash, callable $build): DocumentNode
+    protected function fromFileCacheOrBuild(string $hash, callable $build): DocumentNode
     {
         $filename = $this->fileCachePath() . 'query-' . $hash . '.php';
         if ($this->filesystem->exists($filename)) {
@@ -101,7 +101,7 @@ class QueryCache
         );
         $contents = /** @lang PHP */ "<?php return {$variable};";
 
-        // To prevent opcache from picking up an incomplete file while it is written,
+        // To prevent OPcache from picking up an incomplete file while it is written,
         // we write a temporary file first. Then, we move the temporary file
         // to the final location, which is an atomic operation.
         $partialPath = "{$filename}.partial";
