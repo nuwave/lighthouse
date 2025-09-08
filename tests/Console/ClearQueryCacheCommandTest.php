@@ -4,58 +4,76 @@ namespace Tests\Console;
 
 use Carbon\Carbon;
 use Illuminate\Config\Repository as ConfigRepository;
-use Illuminate\Filesystem\Filesystem;
+use Illuminate\Filesystem\FilesystemAdapter;
+use Illuminate\Support\Facades\Storage;
 use Nuwave\Lighthouse\Console\ClearQueryCacheCommand;
 use Tests\TestCase;
 
 final class ClearQueryCacheCommandTest extends TestCase
 {
-    public const STORAGE_DIR = __DIR__ . '/../storage';
+    private const EMPTY_PHP_FILE_CONTENTS = '<?php';
+
+    private FilesystemAdapter $filesystem;
 
     protected function setUp(): void
     {
         parent::setUp();
 
+        $filesystem = Storage::fake();
+        assert($filesystem instanceof FilesystemAdapter);
+        $this->filesystem = $filesystem;
+
         $config = $this->app->make(ConfigRepository::class);
         $config->set('lighthouse.query_cache.enable', true);
         $config->set('lighthouse.query_cache.use_file_cache', true);
-        $config->set('lighthouse.query_cache.file_cache_path', self::STORAGE_DIR);
-
-        $filesystem = $this->app->make(Filesystem::class);
-        $filesystem->put(self::STORAGE_DIR . '/query-1.php', '<?php');
-        $filesystem->put(self::STORAGE_DIR . '/query-2.php', '<?php');
-        $filesystem->put(self::STORAGE_DIR . '/unrelated.php', '<?php');
-    }
-
-    protected function tearDown(): void
-    {
-        $filesystem = $this->app->make(Filesystem::class);
-        // remove all files except dotfiles
-        $filesystem->delete(
-            $filesystem->files(self::STORAGE_DIR),
-        );
-
-        parent::tearDown();
+        $config->set('lighthouse.query_cache.file_cache_path', $this->filesystem->path(''));
     }
 
     public function testDeleteAll(): void
     {
-        $this->commandTester(new ClearQueryCacheCommand())->execute([]);
+        $this->filesystem->put('query-1.php', self::EMPTY_PHP_FILE_CONTENTS);
+        $this->filesystem->put('query-2.php', self::EMPTY_PHP_FILE_CONTENTS);
+        $this->filesystem->put('unrelated.php', self::EMPTY_PHP_FILE_CONTENTS);
 
-        $this->assertFileDoesNotExist(self::STORAGE_DIR . '/query-1.php');
-        $this->assertFileDoesNotExist(self::STORAGE_DIR . '/query-2.php');
-        $this->assertFileExists(self::STORAGE_DIR . '/unrelated.php');
+        $this->commandTester(new ClearQueryCacheCommand())
+            ->execute([]);
+
+        $this->filesystem->assertMissing('query-1.php');
+        $this->filesystem->assertMissing('query-2.php');
+        $this->filesystem->assertExists('unrelated.php');
     }
 
     public function testDeleteThreshold(): void
     {
-        $this->travelTo('2025-06-01 12:00:00');
-        \Safe\touch(self::STORAGE_DIR . '/query-1.php', Carbon::parse('2025-06-01 10:00:00')->getTimestamp());
-        \Safe\touch(self::STORAGE_DIR . '/query-2.php', Carbon::parse('2025-06-01 09:59:59')->getTimestamp());
+        $this->travelTo(Carbon::createStrict(2024, 6, 1, 10, 0, 0));
+        $this->putWithCurrentTimestamp('query-very-old.php');
 
-        $this->commandTester(new ClearQueryCacheCommand())->execute(['--hours' => 2]);
-        $this->assertFileExists(self::STORAGE_DIR . '/query-1.php');
-        $this->assertFileDoesNotExist(self::STORAGE_DIR . '/query-2.php');
-        $this->assertFileExists(self::STORAGE_DIR . '/unrelated.php');
+        $this->travelTo(Carbon::createStrict(2025, 6, 1, 9, 59, 59));
+        $this->putWithCurrentTimestamp('query-just-too-old.php');
+
+        $this->travelTo(Carbon::createStrict(2025, 6, 1, 10, 0, 0));
+        $this->putWithCurrentTimestamp('query-just-still-valid.php');
+
+        $this->travelTo(Carbon::createStrict(2025, 6, 1, 12, 0, 0));
+        $this->putWithCurrentTimestamp('query-very-recent.php');
+        $this->putWithCurrentTimestamp('unrelated.php');
+
+        $this->commandTester(new ClearQueryCacheCommand())
+            ->execute(['--hours' => 2]);
+        $this->filesystem->assertMissing('query-very-old.php');
+        $this->filesystem->assertMissing('query-just-too-old.php');
+        $this->filesystem->assertExists('query-just-still-valid.php');
+        $this->filesystem->assertExists('query-very-recent.php');
+        $this->filesystem->assertExists('unrelated.php');
+    }
+
+    private function putWithCurrentTimestamp(string $filename): void
+    {
+        $this->filesystem->put($filename, self::EMPTY_PHP_FILE_CONTENTS);
+
+        $currentTimestamp = now()->timestamp;
+        assert(is_int($currentTimestamp));
+
+        \Safe\touch($this->filesystem->path($filename), $currentTimestamp);
     }
 }
