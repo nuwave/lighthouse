@@ -43,6 +43,7 @@ class QueryCache
     public function clearFileCache(?int $hours = null): void
     {
         $files = $this->filesystem->glob("{$this->fileCachePath}/query-*.php");
+
         if (is_int($hours)) {
             $threshold = now()->subHours($hours)->timestamp;
             $files = array_filter(
@@ -55,24 +56,15 @@ class QueryCache
     }
 
     /** @param  \Closure(): DocumentNode  $build */
-    public function fromCacheOrBuild(string $hash, callable $build): DocumentNode
+    public function fromCacheOrBuild(string $hash, \Closure $build): DocumentNode
     {
-        if ($this->useFileCache) {
-            return $this->fromFileCacheOrBuild($hash, $build);
-        }
-
-        $cacheFactory = Container::getInstance()->make(CacheFactory::class);
-        $store = $cacheFactory->store($this->store);
-
-        return $store->remember(
-            "lighthouse:query:{$hash}",
-            $this->ttl,
-            $build,
-        );
+        return $this->useFileCache
+            ? $this->fromFileCacheOrBuild($hash, $build)
+            : $this->fromCacheStoreOrBuild($hash, $build);
     }
 
     /** @param  \Closure(): DocumentNode  $build */
-    protected function fromFileCacheOrBuild(string $hash, callable $build): DocumentNode
+    protected function fromFileCacheOrBuild(string $hash, \Closure $build): DocumentNode
     {
         $filename = "{$this->fileCachePath}/query-{$hash}.php";
         if ($this->filesystem->exists($filename)) {
@@ -103,5 +95,18 @@ class QueryCache
         $this->filesystem->move(path: $partialPath, target: $filename);
 
         return $query;
+    }
+
+    /** @param  \Closure(): DocumentNode  $build */
+    protected function fromCacheStoreOrBuild(string $hash, \Closure $build): DocumentNode
+    {
+        $cacheFactory = Container::getInstance()->make(CacheFactory::class);
+        $store = $cacheFactory->store($this->store);
+
+        return $store->remember(
+            "lighthouse:query:{$hash}",
+            $this->ttl,
+            $build,
+        );
     }
 }
