@@ -342,7 +342,7 @@ abstract class TestCase extends BaseTestCase
 ### Schema caching v1 removal
 
 Schema caching now uses v2 only. That means, the schema cache will be
-written to a php file that OPCache will pick up instead of being written
+written to a php file that OPcache will pick up instead of being written
 to the configured cache driver. This significantly reduces memory usage.
 
 If you had previously depended on the presence of the schema in your
