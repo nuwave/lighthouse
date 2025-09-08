@@ -15,8 +15,8 @@ class ClearQueryCacheCommand extends Command
     {
         $cache->clearFileCache(
             ($hours = $this->option('hours'))
-                ? intval($hours)
-                : null
+                ? (int) $hours
+                : null,
         );
 
         $this->info('GraphQL query cache deleted.');
