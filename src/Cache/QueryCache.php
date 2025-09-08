@@ -27,13 +27,12 @@ class QueryCache
         protected Filesystem $filesystem,
     ) {
         $config = $this->configRepository->get('lighthouse.query_cache');
+
         $this->enable = $config['enable'];
         $this->store = $config['store'];
         $this->ttl = $config['ttl'];
-
-        $this->useFileCache = $config['use_file_cache'] ?? false;
-        $path = $config['file_cache_path'] ?? base_path('bootstrap/cache');
-        $this->fileCachePath = rtrim($path, '/') . '/';
+        $this->useFileCache = $config['use_file_cache'];
+        $this->fileCachePath = $config['file_cache_path'];
     }
 
     public function isEnabled(): bool
@@ -48,7 +47,7 @@ class QueryCache
 
     public function clearFileCache(?int $hours = null): void
     {
-        $files = $this->filesystem->glob($this->fileCachePath() . 'query-*.php');
+        $files = $this->filesystem->glob("{$this->fileCachePath()}/query-*.php");
         if (is_int($hours)) {
             $threshold = now()->subHours($hours)->timestamp;
             $files = array_filter(
@@ -80,7 +79,7 @@ class QueryCache
     /** @param  \Closure(): DocumentNode  $build */
     protected function fromFileCacheOrBuild(string $hash, callable $build): DocumentNode
     {
-        $filename = $this->fileCachePath() . 'query-' . $hash . '.php';
+        $filename = "{$this->fileCachePath()}/query-{$hash}.php";
         if ($this->filesystem->exists($filename)) {
             $queryData = require $filename;
             if (! is_array($queryData)) {
