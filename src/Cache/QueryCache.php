@@ -40,14 +40,9 @@ class QueryCache
         return $this->enable;
     }
 
-    public function fileCachePath(): string
-    {
-        return $this->fileCachePath;
-    }
-
     public function clearFileCache(?int $hours = null): void
     {
-        $files = $this->filesystem->glob("{$this->fileCachePath()}/query-*.php");
+        $files = $this->filesystem->glob("{$this->fileCachePath}/query-*.php");
         if (is_int($hours)) {
             $threshold = now()->subHours($hours)->timestamp;
             $files = array_filter(
@@ -79,7 +74,7 @@ class QueryCache
     /** @param  \Closure(): DocumentNode  $build */
     protected function fromFileCacheOrBuild(string $hash, callable $build): DocumentNode
     {
-        $filename = "{$this->fileCachePath()}/query-{$hash}.php";
+        $filename = "{$this->fileCachePath}/query-{$hash}.php";
         if ($this->filesystem->exists($filename)) {
             $queryData = require $filename;
             if (! is_array($queryData)) {
