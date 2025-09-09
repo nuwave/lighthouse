@@ -8,6 +8,7 @@ Query caching is enabled by default.
 You can disable it by setting `query_cache.enable` to `false` in `config/lighthouse.php`.
 
 There are two fundamentally different ways of caching queries:
+
 - using an external cache through a Laravel cache store like Redis or Memcached
 - using a file based cache that leverages OPcache
 

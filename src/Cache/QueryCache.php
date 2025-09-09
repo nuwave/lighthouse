@@ -82,11 +82,11 @@ class QueryCache
 
         $query = $build();
 
-        $variable = var_export(
+        $queryArrayString = var_export(
             value: $query->toArray(),
             return: true,
         );
-        $contents = /** @lang PHP */ "<?php return {$variable};";
+        $contents = /** @lang PHP */ "<?php return {$queryArrayString};";
         $this->filesystem->put(path: $filePath, contents: $contents, lock: true);
 
         return $query;
