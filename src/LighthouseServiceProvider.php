@@ -15,6 +15,7 @@ use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\Console\CacheCommand;
 use Nuwave\Lighthouse\Console\ClearCacheCommand;
 use Nuwave\Lighthouse\Console\ClearQueryCacheCommand;
+use Nuwave\Lighthouse\Console\ClearSchemaCacheCommand;
 use Nuwave\Lighthouse\Console\DirectiveCommand;
 use Nuwave\Lighthouse\Console\FieldCommand;
 use Nuwave\Lighthouse\Console\IdeHelperCommand;
@@ -58,6 +59,7 @@ class LighthouseServiceProvider extends ServiceProvider
         CacheCommand::class,
         ClearCacheCommand::class,
         ClearQueryCacheCommand::class,
+        ClearSchemaCacheCommand::class,
         DirectiveCommand::class,
         FieldCommand::class,
         IdeHelperCommand::class,

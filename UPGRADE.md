@@ -55,6 +55,15 @@ type Post {
 }
 ```
 
+### Replace `lighthouse:clear-cache` with `lighthouse:clear-schema-cache`
+
+The Artisan command `lighthouse:clear-cache` was renamed to `lighthouse:clear-schema-cache`.
+
+```diff
+-php artisan lighthouse:clear-cache
++php artisan lighthouse:clear-schema-cache
+```
+
 ## v5 to v6
 
 ### `messages` on `@rules` and `@rulesForArray`
