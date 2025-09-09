@@ -124,18 +124,6 @@ return [
         'enable' => env('LIGHTHOUSE_QUERY_CACHE_ENABLE', true),
 
         /*
-         * Allows using a specific cache store, uses the app's default if set to null.
-         * Only relevant when `use_file_cache` is false.
-         */
-        'store' => env('LIGHTHOUSE_QUERY_CACHE_STORE', null),
-
-        /*
-         * Duration in seconds the query should remain cached, null means forever.
-         * Only relevant when `use_file_cache` is false.
-         */
-        'ttl' => env('LIGHTHOUSE_QUERY_CACHE_TTL', 24 * 60 * 60),
-
-        /*
          * Store parsed queries in PHP files instead of the cache store.
          * This allows OPcache to pick them up and takes pressure off the cache store.
          */
@@ -146,6 +134,18 @@ return [
          * The given path must be a folder, as every query will produce its own file.
          */
         'file_cache_path' => env('LIGHTHOUSE_QUERY_CACHE_FILE_CACHE_PATH', base_path('bootstrap/cache')),
+
+        /*
+         * Allows using a specific cache store, uses the app's default if set to null.
+         * Only relevant when `use_file_cache` is false.
+         */
+        'store' => env('LIGHTHOUSE_QUERY_CACHE_STORE', null),
+
+        /*
+         * Duration in seconds the query should remain cached, null means forever.
+         * Only relevant when `use_file_cache` is false.
+         */
+        'ttl' => env('LIGHTHOUSE_QUERY_CACHE_TTL', 24 * 60 * 60),
     ],
 
     /*

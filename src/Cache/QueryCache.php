@@ -14,13 +14,13 @@ class QueryCache
 {
     protected bool $enable;
 
-    protected ?string $store;
-
-    protected ?int $ttl;
-
     protected bool $useFileCache;
 
     protected string $fileCachePath;
+
+    protected ?string $store;
+
+    protected ?int $ttl;
 
     public function __construct(
         protected ConfigRepository $configRepository,
@@ -29,10 +29,10 @@ class QueryCache
         $config = $this->configRepository->get('lighthouse.query_cache');
 
         $this->enable = (bool) $config['enable'];
-        $this->store = $config['store'] ?? null;
-        $this->ttl = $config['ttl'] ?? null;
         $this->useFileCache = $config['use_file_cache'] ?? false;
         $this->fileCachePath = $config['file_cache_path'] ?? base_path('bootstrap/cache');
+        $this->store = $config['store'] ?? null;
+        $this->ttl = $config['ttl'] ?? null;
     }
 
     public function isEnabled(): bool
