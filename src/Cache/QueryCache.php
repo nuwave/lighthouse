@@ -42,7 +42,7 @@ class QueryCache
 
     public function clearFileCache(?int $hours = null): void
     {
-        $files = $this->filesystem->glob("{$this->opcachePath}/lighthouse-query-*.php");
+        $files = $this->filesystem->glob($this->opcacheFilePath('*'));
 
         if (is_int($hours)) {
             $threshold = now()->subHours($hours)->timestamp;
