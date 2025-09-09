@@ -66,11 +66,12 @@ class QueryCache
     /** @param  \Closure(): DocumentNode  $build */
     protected function fromFileCacheOrBuild(string $hash, \Closure $build): DocumentNode
     {
-        $filename = "{$this->fileCachePath}/query-{$hash}.php";
-        if ($this->filesystem->exists($filename)) {
-            $queryData = require $filename;
+        $filePath = "{$this->fileCachePath}/query-{$hash}.php";
+
+        if ($this->filesystem->exists($filePath)) {
+            $queryData = require $filePath;
             if (! is_array($queryData)) {
-                throw new InvalidQueryCacheContentsException($filename, $queryData);
+                throw new InvalidQueryCacheContentsException($filePath, $queryData);
             }
 
             $query = AST::fromArray($queryData);
@@ -86,13 +87,7 @@ class QueryCache
             return: true,
         );
         $contents = /** @lang PHP */ "<?php return {$variable};";
-
-        // To prevent OPcache from picking up an incomplete file while it is written,
-        // we write a temporary file first. Then, we move the temporary file
-        // to the final location, which is an atomic operation.
-        $partialPath = "{$filename}.partial";
-        $this->filesystem->put(path: $partialPath, contents: $contents, lock: true);
-        $this->filesystem->move(path: $partialPath, target: $filename);
+        $this->filesystem->put(path: $filePath, contents: $contents, lock: true);
 
         return $query;
     }
@@ -103,10 +98,6 @@ class QueryCache
         $cacheFactory = Container::getInstance()->make(CacheFactory::class);
         $store = $cacheFactory->store($this->store);
 
-        return $store->remember(
-            "lighthouse:query:{$hash}",
-            $this->ttl,
-            $build,
-        );
+        return $store->remember(key: "lighthouse:query:{$hash}", ttl: $this->ttl, callback: $build);
     }
 }
