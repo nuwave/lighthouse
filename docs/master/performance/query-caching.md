@@ -2,20 +2,29 @@
 
 In order to speed up GraphQL query parsing, the parsed queries can be stored in the Laravel cache.
 
-### Configuration
+## Configuration
 
 Query caching is enabled by default.
 You can disable it by setting `query_cache.enable` to `false` in `config/lighthouse.php`.
 
-There are two fundamentally different ways of caching queries:
+You can control how query caching works through the option `query_cache.mode` in `config/lighthouse.php`.
 
-- using an external cache through a Laravel cache store like Redis or Memcached
-- using a file based cache that leverages OPcache
+### Mode `store`
 
-Depending on your setup, one or the other might be more suitable.
-You can configure which one to use through the option `query_cache.use_file_cache` in `config/lighthouse.php`.
+Use an external shared cache through a Laravel cache store like Redis or Memcached.
+This is only recommended if your application can not write to the local filesystem.
 
-### Cache invalidation
+### Mode `opcache`
+
+Store parsed queries in PHP files on the local filesystem to leverage OPcache.
+This is recommended if your application is running on a single server instance with write access to a persistent local filesystem.
+
+### Mode `hybrid`
+
+Leverage OPcache, but use a shared cache store when local files are not found.
+This is recommended if your application is running on multiple server instances with write access to a persistent local filesystem.
+
+## Cache invalidation
 
 When using an external cache store, you can configure a TTL for cached queries.
 That way, old queries that are potentially unused will be removed from the cache automatically.

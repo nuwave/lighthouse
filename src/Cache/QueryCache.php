@@ -7,16 +7,16 @@ use GraphQL\Utils\AST;
 use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
+use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Filesystem\Filesystem;
-use Nuwave\Lighthouse\Exceptions\InvalidQueryCacheContentsException;
 
 class QueryCache
 {
     protected bool $enable;
 
-    protected bool $useFileCache;
+    protected string $mode;
 
-    protected string $fileCachePath;
+    protected string $opcachePath;
 
     protected ?string $store;
 
@@ -29,8 +29,8 @@ class QueryCache
         $config = $this->configRepository->get('lighthouse.query_cache');
 
         $this->enable = (bool) $config['enable'];
-        $this->useFileCache = $config['use_file_cache'] ?? false;
-        $this->fileCachePath = $config['file_cache_path'] ?? base_path('bootstrap/cache');
+        $this->mode = $config['mode'] ?? 'store';
+        $this->opcachePath = $config['opcache_path'] ?? base_path('bootstrap/cache');
         $this->store = $config['store'] ?? null;
         $this->ttl = $config['ttl'] ?? null;
     }
@@ -42,7 +42,7 @@ class QueryCache
 
     public function clearFileCache(?int $hours = null): void
     {
-        $files = $this->filesystem->glob("{$this->fileCachePath}/query-*.php");
+        $files = $this->filesystem->glob("{$this->opcachePath}/lighthouse-query-*.php");
 
         if (is_int($hours)) {
             $threshold = now()->subHours($hours)->timestamp;
@@ -55,49 +55,99 @@ class QueryCache
         $this->filesystem->delete($files);
     }
 
-    /** @param  \Closure(): DocumentNode  $build */
-    public function fromCacheOrBuild(string $hash, \Closure $build): DocumentNode
+    /** @param  \Closure(): DocumentNode  $parse */
+    public function fromCacheOrParse(string $hash, \Closure $parse): DocumentNode
     {
-        return $this->useFileCache
-            ? $this->fromFileCacheOrBuild($hash, $build)
-            : $this->fromCacheStoreOrBuild($hash, $build);
+        return match ($this->mode) {
+            'store' => $this->fromStoreOrParse($hash, $parse),
+            'opcache' => $this->fromOPcacheOrParse($hash, $parse),
+            'hybrid' => $this->fromHybridOrParse($hash, $parse),
+            default => throw new \InvalidArgumentException("Invalid query cache mode: {$this->mode}."),
+        };
     }
 
-    /** @param  \Closure(): DocumentNode  $build */
-    protected function fromFileCacheOrBuild(string $hash, \Closure $build): DocumentNode
+    /** @param  \Closure(): DocumentNode  $parse */
+    protected function fromStoreOrParse(string $hash, \Closure $parse): DocumentNode
     {
-        $filePath = "{$this->fileCachePath}/query-{$hash}.php";
+        $store = $this->makeCacheStore();
+
+        return $store->remember(key: "lighthouse:query:{$hash}", ttl: $this->ttl, callback: $parse);
+    }
+
+    /** @param  \Closure(): DocumentNode  $parse */
+    protected function fromOPcacheOrParse(string $hash, \Closure $parse): DocumentNode
+    {
+        $filePath = $this->opcacheFilePath($hash);
 
         if ($this->filesystem->exists($filePath)) {
-            $queryData = require $filePath;
-            if (! is_array($queryData)) {
-                throw new InvalidQueryCacheContentsException($filePath, $queryData);
-            }
-
-            $query = AST::fromArray($queryData);
-            assert($query instanceof DocumentNode);
-
-            return $query;
+            return $this->requireOPcacheFile($filePath);
         }
 
-        $query = $build();
+        $query = $parse();
 
-        $queryArrayString = var_export(
-            value: $query->toArray(),
-            return: true,
-        );
-        $contents = /** @lang PHP */ "<?php return {$queryArrayString};";
+        $contents = static::opcacheFileContents($query);
         $this->filesystem->put(path: $filePath, contents: $contents, lock: true);
 
         return $query;
     }
 
-    /** @param  \Closure(): DocumentNode  $build */
-    protected function fromCacheStoreOrBuild(string $hash, \Closure $build): DocumentNode
+    /** @param  \Closure(): DocumentNode  $parse */
+    protected function fromHybridOrParse(string $hash, \Closure $parse): DocumentNode
+    {
+        $filePath = $this->opcacheFilePath($hash);
+
+        if ($this->filesystem->exists($filePath)) {
+            return $this->requireOPcacheFile($filePath);
+        }
+
+        $store = $this->makeCacheStore();
+
+        $contents = $store->get(key: "lighthouse:query:{$hash}");
+        if (is_string($contents)) {
+            $this->filesystem->put(path: $filePath, contents: $contents, lock: true);
+
+            return $this->requireOPcacheFile($filePath);
+        }
+
+        $query = $parse();
+
+        $contents = static::opcacheFileContents($query);
+        $store->put(key: "lighthouse:query:{$hash}", value: $contents, ttl: $this->ttl);
+        $this->filesystem->put(path: $filePath, contents: $contents, lock: true);
+
+        return $query;
+    }
+
+    protected function makeCacheStore(): CacheRepository
     {
         $cacheFactory = Container::getInstance()->make(CacheFactory::class);
-        $store = $cacheFactory->store($this->store);
 
-        return $store->remember(key: "lighthouse:query:{$hash}", ttl: $this->ttl, callback: $build);
+        return $cacheFactory->store($this->store);
+    }
+
+    public static function opcacheFileContents(DocumentNode $query): string
+    {
+        $queryArrayString = var_export(
+            value: $query->toArray(),
+            return: true,
+        );
+
+        return "<?php return {$queryArrayString};";
+    }
+
+    protected function requireOPcacheFile(string $filePath): DocumentNode
+    {
+        $astArray = require $filePath;
+        assert(is_array($astArray), 'The cache file is expected to return an array.');
+
+        $astInstance = AST::fromArray($astArray);
+        assert($astInstance instanceof DocumentNode, 'The AST array is expected to convert to a DocumentNode.');
+
+        return $astInstance;
+    }
+
+    protected function opcacheFilePath(string $hash): string
+    {
+        return "{$this->opcachePath}/lighthouse-query-{$hash}.php";
     }
 }

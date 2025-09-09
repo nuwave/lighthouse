@@ -284,7 +284,7 @@ class GraphQL
     public function parse(string $query, string $hash): DocumentNode
     {
         return $this->queryCache->isEnabled()
-            ? $this->queryCache->fromCacheOrBuild(
+            ? $this->queryCache->fromCacheOrParse(
                 $hash,
                 fn (): DocumentNode => $this->parseQuery($query),
             )

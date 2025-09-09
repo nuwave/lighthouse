@@ -11,7 +11,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
-- Add a file based query cache for improved performance https://github.com/nuwave/lighthouse/pull/2713
+- Add a file based query cache to leverage OPcache for improved performance https://github.com/nuwave/lighthouse/pull/2713
 
 ### Deprecated
 

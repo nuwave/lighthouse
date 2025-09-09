@@ -124,26 +124,28 @@ return [
         'enable' => env('LIGHTHOUSE_QUERY_CACHE_ENABLE', true),
 
         /*
-         * Store parsed queries in PHP files instead of the cache store.
-         * This allows OPcache to pick them up and takes pressure off the cache store.
+         * Configures which mechanism to use for the query cache.
+         * - store: use an external shared cache through a Laravel cache store like Redis or Memcached
+         * - opcache: store parsed queries in PHP files on the local filesystem to leverage OPcache
+         * - hybrid: leverage OPcache, but use a shared cache store when local files are not found
          */
-        'use_file_cache' => env('LIGHTHOUSE_QUERY_CACHE_USE_FILE_CACHE', false),
+        'mode' => env('LIGHTHOUSE_QUERY_CACHE_MODE', 'store'),
 
         /*
-         * If `use_file_cache` is true, this option specifies the path where the files are stored.
+         * Specifies the path where the PHP files are stored when using opcache or hybrid mode.
          * The given path must be a folder, as every query will produce its own file.
          */
-        'file_cache_path' => env('LIGHTHOUSE_QUERY_CACHE_FILE_CACHE_PATH', base_path('bootstrap/cache')),
+        'opcache_path' => env('LIGHTHOUSE_QUERY_CACHE_OPCACHE_PATH', base_path('bootstrap/cache')),
 
         /*
          * Allows using a specific cache store, uses the app's default if set to null.
-         * Only relevant when `use_file_cache` is false.
+         * Not relevant when using opcache mode.
          */
         'store' => env('LIGHTHOUSE_QUERY_CACHE_STORE', null),
 
         /*
          * Duration in seconds the query should remain cached, null means forever.
-         * Only relevant when `use_file_cache` is false.
+         * Not relevant when using opcache mode.
          */
         'ttl' => env('LIGHTHOUSE_QUERY_CACHE_TTL', 24 * 60 * 60),
     ],
