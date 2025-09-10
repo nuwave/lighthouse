@@ -40,19 +40,28 @@ class QueryCache
         return $this->enable;
     }
 
-    public function clearFileCache(?int $hours = null): void
+    public function clear(?int $opcacheTTLHours, ?bool $opcacheOnly): void
     {
-        $files = $this->filesystem->glob($this->opcacheFilePath('*'));
-
-        if (is_int($hours)) {
-            $threshold = now()->subHours($hours)->timestamp;
-            $files = array_filter(
-                $files,
-                fn (string $file): bool => $this->filesystem->lastModified($file) < $threshold,
-            );
+        if (in_array($this->mode, ['store', 'hybrid'])
+            && ! $opcacheOnly
+        ) {
+            $store = $this->makeCacheStore();
+            $store->clear();
         }
 
-        $this->filesystem->delete($files);
+        if (in_array($this->mode, ['opcache', 'hybrid'])) {
+            $files = $this->filesystem->glob($this->opcacheFilePath('*'));
+
+            if (is_int($opcacheTTLHours)) {
+                $threshold = now()->subHours($opcacheTTLHours)->timestamp;
+                $files = array_filter(
+                    $files,
+                    fn (string $file): bool => $this->filesystem->lastModified($file) < $threshold,
+                );
+            }
+
+            $this->filesystem->delete($files);
+        }
     }
 
     /** @param  \Closure(): DocumentNode  $parse */

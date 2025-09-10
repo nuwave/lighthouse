@@ -8,6 +8,7 @@ Query caching is enabled by default.
 You can disable it by setting `query_cache.enable` to `false` in `config/lighthouse.php`.
 
 You can control how query caching works through the option `query_cache.mode` in `config/lighthouse.php`.
+Make sure to [clear the query cache](#cache-invalidation) when changing the mode.
 
 ### Mode `store`
 
@@ -26,24 +27,18 @@ This is recommended if your application is running on multiple server instances 
 
 ## Cache invalidation
 
-When using an external cache store, you can configure a TTL for cached queries.
-That way, old queries that are potentially unused will be removed from the cache automatically.
+You may set the option `query_cache.ttl` in `config/lighthouse.php` to remove cache entries automatically after a given number of seconds.
+This is only supported when using an external shared cache through a Laravel cache store like Redis or Memcached.
+That way, old queries that are potentially unused will be removed after a while.
 
-When using the file based cache, you have to manually remove old cached queries.
-Run the following command periodically to remove old files:
-
-```shell
-php artisan lighthouse:clear-query-cache --hours=<TTL in hours>
-```
-
-Make sure you flush the query cache when you deploy an upgraded version of the `webonyx/graphql-php` dependency.
-When using an external cache, remove all keys for the configured store:
+When using the modes [`opcache`](#mode-opcache) or [`hybrid`](#mode-hybrid), you need to remove old cached query files manually.
+For example, you may run the following command periodically to remove all cached query files older than 24 hours:
 
 ```shell
-php artisan cache:clear <store name>
+php artisan lighthouse:clear-query-cache --opcache-only --opcache-ttl-hours=24
 ```
 
-When using the file based cache, remove all cached query files:
+Make sure you flush the query cache completely when you deploy an upgraded version of the `webonyx/graphql-php` dependency.
 
 ```shell
 php artisan lighthouse:clear-query-cache
