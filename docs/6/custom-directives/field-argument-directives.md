@@ -26,16 +26,16 @@ final class ModelArgsDirective extends BaseDirective implements ArgManipulator
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-"""
-Automatically generates an input argument based on a type.
-"""
-directive @typeToInput(
-    """
-    The name of the type to use as the basis for the input type.
-    """
-    name: String!
-) on ARGUMENT_DEFINITION
-GRAPHQL;
+        """
+        Automatically generates an input argument based on a type.
+        """
+        directive @typeToInput(
+            """
+            The name of the type to use as the basis for the input type.
+            """
+            name: String!
+        ) on ARGUMENT_DEFINITION
+        GRAPHQL;
     }
 
     public function manipulateArgDefinition(

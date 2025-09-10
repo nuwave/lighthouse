@@ -31,8 +31,8 @@ final class ExampleDirective extends BaseDirective implements FieldMiddleware
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-directive @example on FIELD_DEFINITION
-GRAPHQL;
+        directive @example on FIELD_DEFINITION
+        GRAPHQL;
     }
 
     public function handleField(FieldValue $fieldValue): void
