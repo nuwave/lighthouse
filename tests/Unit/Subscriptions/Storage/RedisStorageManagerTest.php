@@ -148,7 +148,7 @@ final class RedisStorageManagerTest extends TestCase
         $manager->storeSubscriber($subscriber, $storedTopic);
     }
 
-    public function testStoreSubscriberWithoutTtl(): void
+    public function testStoreSubscriberWithoutTTL(): void
     {
         $config = $this->createMock(ConfigRepository::class);
         $redisConnection = $this->createMock(RedisConnection::class);

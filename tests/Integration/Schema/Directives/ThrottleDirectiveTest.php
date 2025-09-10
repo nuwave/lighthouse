@@ -104,7 +104,7 @@ final class ThrottleDirectiveTest extends TestCase
         );
 
         $knownDate = Carbon::createStrict(2020, 1, 1, 1); // arbitrary known date
-        Carbon::setTestNow($knownDate);
+        $this->travelTo($knownDate);
 
         $this->graphQL($query)->assertJson([
             'data' => [
@@ -117,15 +117,13 @@ final class ThrottleDirectiveTest extends TestCase
         );
 
         // wait two minutes and assert that the limit is reset
-        Carbon::setTestNow($knownDate->copy()->addMinutes(2));
+        $this->travel(2)->minutes();
 
         $this->graphQL($query)->assertJson([
             'data' => [
                 'foo' => Foo::THE_ANSWER,
             ],
         ]);
-
-        Carbon::setTestNow();
     }
 
     public function testInlineLimiter(): void
