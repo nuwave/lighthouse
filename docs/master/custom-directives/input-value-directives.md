@@ -55,11 +55,11 @@ final class TrimDirective extends BaseDirective implements ArgSanitizerDirective
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-"""
-Run the `trim` function on an input value.
-"""
-directive @trim on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-GRAPHQL;
+        """
+        Run the `trim` function on an input value.
+        """
+        directive @trim on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+        GRAPHQL;
     }
 
     /**
@@ -155,17 +155,17 @@ class EqDirective extends BaseDirective implements ArgBuilderDirective
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-"""
-Add an equal conditional to a database query.
-"""
-directive @eq(
-  """
-  Specify the database column to compare.
-  Only required if database column has a different name than the attribute in your schema.
-  """
-  key: String
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-GRAPHQL;
+        """
+        Add an equal conditional to a database query.
+        """
+        directive @eq(
+          """
+          Specify the database column to compare.
+          Only required if database column has a different name than the attribute in your schema.
+          """
+          key: String
+        ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+        GRAPHQL;
     }
 
     /**

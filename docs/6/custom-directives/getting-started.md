@@ -36,16 +36,16 @@ final class UpperCaseDirective extends BaseDirective
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-"""
-A description of what this directive does.
-"""
-directive @upperCase(
-    """
-    Directives can have arguments to parameterize them.
-    """
-    someArg: String
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-GRAPHQL;
+        """
+        A description of what this directive does.
+        """
+        directive @upperCase(
+            """
+            Directives can have arguments to parameterize them.
+            """
+            someArg: String
+        ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+        GRAPHQL;
     }
 }
 ```

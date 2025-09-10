@@ -9,10 +9,10 @@ final class BarDirective extends BaseDirective
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-"""
-Maximum foo.
-"""
-directive @bar on FIELD_DEFINITION
-GRAPHQL;
+        """
+        Maximum foo.
+        """
+        directive @bar on FIELD_DEFINITION
+        GRAPHQL;
     }
 }

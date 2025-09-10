@@ -133,7 +133,7 @@ GRAPHQL;
         type Query {
             foo: Int @complexity(resolver: "Foo@complexity")
         }
-GRAPHQL;
+        GRAPHQL;
 
         $this->graphQL(/** @lang GraphQL */ '
         {

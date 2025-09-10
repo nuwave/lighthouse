@@ -20,11 +20,11 @@ final class TranslateDescriptionDirective extends BaseDirective implements Input
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-"""
-Extends the description with automatic translations.
-"""
-directive @translateDescription on INPUT_FIELD_DEFINITION
-GRAPHQL;
+        """
+        Extends the description with automatic translations.
+        """
+        directive @translateDescription on INPUT_FIELD_DEFINITION
+        GRAPHQL;
     }
 
     public function manipulateInputFieldDefinition(

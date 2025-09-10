@@ -198,11 +198,10 @@ final class ValidationCachingTest extends TestCase
         $event->assertDispatchedTimes(KeyWritten::class, 1);
 
         $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
-type Query {
-  bar: String
-}
-
-GRAPHQL;
+        type Query {
+          bar: String
+        }
+        GRAPHQL;
         // refresh container, but keep the same cache
         $cacheFactory = $this->app->make(CacheFactory::class);
 
