@@ -12,8 +12,8 @@ final class GlobalFieldMiddlewareDirective extends BaseDirective implements Fiel
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-directive @globalFieldMiddleware on FIELD_DEFINITION
-GRAPHQL;
+        directive @globalFieldMiddleware on FIELD_DEFINITION
+        GRAPHQL;
     }
 
     public function handleField(FieldValue $fieldValue): void

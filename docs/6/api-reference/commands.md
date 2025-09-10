@@ -96,6 +96,7 @@ Schema imports, native PHP types and schema manipulation may influence the final
 
 Use the `-W` / `--write` option to output the schema to the default file storage (usually `storage/app`) as `lighthouse-schema.graphql`.
 You can output your schema in JSON format by using the `--json` flag.
+You can sort the final compiled schema by using the `--sort` flag.
 
 The `--federation` option should be used to produce a schema file suitable for [Apollo Federation](https://www.apollographql.com/docs/federation).
 

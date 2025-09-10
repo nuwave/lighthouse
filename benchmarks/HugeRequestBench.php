@@ -5,11 +5,11 @@ namespace Benchmarks;
 final class HugeRequestBench extends QueryBench
 {
     protected string $schema = /** @lang GraphQL */ <<<'GRAPHQL'
-type Query {
-  foo: String!
-    @field(resolver: "Benchmarks\\HugeRequestBench@resolve")
-}
-GRAPHQL;
+    type Query {
+      foo: String!
+        @field(resolver: "Benchmarks\\HugeRequestBench@resolve")
+    }
+    GRAPHQL;
 
     protected ?string $query = null;
 

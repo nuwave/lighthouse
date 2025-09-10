@@ -179,10 +179,9 @@ final class ASTHelperTest extends TestCase
     public function testExtractDirectiveDefinitionAllowsAuxiliaryTypes(): void
     {
         $directive = ASTHelper::extractDirectiveDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
-directive @foo on OBJECT
-scalar Bar
-GRAPHQL
-        );
+        directive @foo on OBJECT
+        scalar Bar
+        GRAPHQL);
         $this->assertSame('foo', $directive->name->value);
     }
 
@@ -190,28 +189,25 @@ GRAPHQL
     {
         $this->expectException(DefinitionException::class);
         ASTHelper::extractDirectiveDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
-invalid GraphQL
-GRAPHQL
-        );
+        invalid GraphQL
+        GRAPHQL);
     }
 
     public function testThrowsIfMissingDirectiveDefinitions(): void
     {
         $this->expectException(DefinitionException::class);
         ASTHelper::extractDirectiveDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
-scalar Foo
-GRAPHQL
-        );
+        scalar Foo
+        GRAPHQL);
     }
 
     public function testThrowsOnMultipleDirectiveDefinitions(): void
     {
         $this->expectException(DefinitionException::class);
         ASTHelper::extractDirectiveDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
-directive @foo on OBJECT
-directive @bar on OBJECT
-GRAPHQL
-        );
+        directive @foo on OBJECT
+        directive @bar on OBJECT
+        GRAPHQL);
     }
 
     public function testUnderlyingTypeKnowsStandardTypes(): void
