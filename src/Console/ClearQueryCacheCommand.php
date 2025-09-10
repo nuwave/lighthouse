@@ -13,7 +13,7 @@ lighthouse:clear-query-cache
 {--opcache-only : Clear only OPcache files, ignoring the cache store}
 SIGNATURE;
 
-    protected $description = 'Clears the file based GraphQL query cache.';
+    protected $description = 'Clears the GraphQL query cache.';
 
     public function handle(QueryCache $queryCache): void
     {

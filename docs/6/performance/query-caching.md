@@ -32,17 +32,30 @@ This is only supported when using an external shared cache through a Laravel cac
 That way, old queries that are potentially unused will be removed after a while.
 
 When using the modes [`opcache`](#mode-opcache) or [`hybrid`](#mode-hybrid), you need to remove old cached query files manually.
-For example, you may run the following command periodically to remove all cached query files older than 24 hours:
+For example, you may run the following command periodically to remove all cached query files older than 24 hours.
 
 ```shell
 php artisan lighthouse:clear-query-cache --opcache-only --opcache-ttl-hours=24
 ```
 
-Make sure you flush the query cache completely when you deploy an upgraded version of the `webonyx/graphql-php` dependency.
+In some scenarios, you may need to clear the query cache completely.
+
+The Artisan command works based on your current configuration for `query_cache` in `config/lighthouse.php`.
+
+- When using the modes [`store`](#mode-store) or [`hybrid`](#mode-hybrid), all entries in the configured cache store will be removed regardless of their age or whether they even belong to Lighthouse.
+- When using the modes [`opcache`](#mode-opcache) or [`hybrid`](#mode-hybrid), all cached query files will be removed.
+
+When you plan to change `query_cache.mode`, clear your cache while your current configuration is still in place.
 
 ```shell
 php artisan lighthouse:clear-query-cache
 ```
+
+Other reasons to clear the query cache completely include:
+
+- you plan to upgrade the package `webonyx/graphql-php` to a new version that changes the internal representation of parsed queries
+- you have stale queries in your cache that have an inappropriate or missing TTL
+- you want to free up disk space used by cached query files
 
 ## Automated Persisted Queries
 
