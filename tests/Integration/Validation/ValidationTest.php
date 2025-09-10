@@ -58,36 +58,34 @@ final class ValidationTest extends TestCase
         }
         ';
 
-        $this
-            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
-            {
-                foo
-            }
-            GRAPHQL)
-            ->assertExactJson([
-                'errors' => [
-                    [
-                        'message' => 'Validation failed for the field [foo].',
-                        'extensions' => [
-                            ValidationException::KEY => [
-                                'bar' => [
-                                    'The bar field is required.',
-                                ],
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            foo
+        }
+        GRAPHQL)->assertExactJson([
+            'errors' => [
+                [
+                    'message' => 'Validation failed for the field [foo].',
+                    'extensions' => [
+                        ValidationException::KEY => [
+                            'bar' => [
+                                'The bar field is required.',
                             ],
                         ],
-                        'locations' => [
-                            [
-                                'line' => 2,
-                                'column' => 5,
-                            ],
-                        ],
-                        'path' => ['foo'],
                     ],
+                    'locations' => [
+                        [
+                            'line' => 2,
+                            'column' => 5,
+                        ],
+                    ],
+                    'path' => ['foo'],
                 ],
-                'data' => [
-                    'foo' => null,
-                ],
-            ]);
+            ],
+            'data' => [
+                'foo' => null,
+            ],
+        ]);
     }
 
     public function testFullValidationErrorWithoutLocationParse(): void

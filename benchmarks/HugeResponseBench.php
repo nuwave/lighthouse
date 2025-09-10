@@ -5,22 +5,21 @@ namespace Benchmarks;
 final class HugeResponseBench extends QueryBench
 {
     protected string $schema = /** @lang GraphQL */ <<<'GRAPHQL'
-type Query {
-  parent: Parent
-    @field(resolver: "Benchmarks\\HugeResponseBench@resolve")
-}
+    type Query {
+      parent: Parent
+        @field(resolver: "Benchmarks\\HugeResponseBench@resolve")
+    }
 
-type Parent {
-  name: String!
-  children: [Child!]!
-}
+    type Parent {
+      name: String!
+      children: [Child!]!
+    }
 
-type Child {
-  name: String!
-  parent: Parent!
-}
-
-GRAPHQL;
+    type Child {
+      name: String!
+      parent: Parent!
+    }
+    GRAPHQL;
 
     /**
      * Resolves parent.

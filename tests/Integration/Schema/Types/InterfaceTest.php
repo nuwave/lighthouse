@@ -315,7 +315,7 @@ GRAPHQL;
         type Query {
             foo: String
         }
-GRAPHQL;
+        GRAPHQL;
 
         $result = $this->graphQL(/** @lang GraphQL */ '
         {

@@ -54,7 +54,7 @@ final class Post extends Model
     {
         return Attribute::make(
             get: fn (mixed $_, array $attributes): int => $attributes[$this->primaryKey],
-            set: fn (int $id) => [$this->primaryKey => $id],
+            set: fn (int $id): array => [$this->primaryKey => $id],
         );
     }
 
