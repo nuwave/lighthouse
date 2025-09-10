@@ -40,7 +40,7 @@ class QueryCache
         return $this->enable;
     }
 
-    public function clear(?int $opcacheTTLHours, ?bool $opcacheOnly): void
+    public function clear(?int $opcacheTTLHours, bool $opcacheOnly): void
     {
         if (in_array($this->mode, ['store', 'hybrid'])
             && ! $opcacheOnly

@@ -227,6 +227,23 @@ final class ClearQueryCacheCommandTest extends TestCase
         $filesystem->assertExists($recentFile);
     }
 
+    public function testInvalidOPcacheTTLHoursValueShowsError(): void
+    {
+        $filesystem = $this->configureQueryCacheMode('opcache');
+
+        $lighthouseQueryFile = 'lighthouse-query-test.php';
+        $filesystem->put($lighthouseQueryFile, self::MINIMAL_PHP_FILE);
+
+        $commandTester = $this->commandTester(new ClearQueryCacheCommand());
+        $commandTester->execute(['--opcache-ttl-hours' => 'invalid']);
+
+        $output = $commandTester->getDisplay();
+        $this->assertStringContainsString('The --opcache-ttl-hours option must be an integer value representing hours.', $output);
+
+        // Files should remain untouched when command fails with invalid input
+        $filesystem->assertExists($lighthouseQueryFile);
+    }
+
     private function configureQueryCacheMode(string $mode): FilesystemAdapter
     {
         $filesystem = Storage::fake();

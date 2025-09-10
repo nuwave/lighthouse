@@ -17,11 +17,25 @@ SIGNATURE;
 
     public function handle(QueryCache $queryCache): void
     {
+        $opcacheTTLHours = $this->option('opcache-ttl-hours');
+        if ($opcacheTTLHours !== null && ! is_numeric($opcacheTTLHours)) {
+            $this->error('The --opcache-ttl-hours option must be an integer value representing hours.');
+
+            return;
+        }
+
+        $opcacheOnly = $this->option('opcache-only');
+        if (! is_bool($opcacheOnly)) { // @phpstan-ignore function.alreadyNarrowedType (necessary in some dependency versions)
+            $this->error('The --opcache-only option must be a boolean.');
+
+            return;
+        }
+
         $queryCache->clear(
-            opcacheTTLHours: ($hours = $this->option('opcache-ttl-hours'))
-                ? (int) $hours
+            opcacheTTLHours: $opcacheTTLHours !== null
+                ? (int) $opcacheTTLHours
                 : null,
-            opcacheOnly: $this->option('opcache-only'),
+            opcacheOnly: $opcacheOnly,
         );
 
         $this->info('GraphQL query cache deleted.');
