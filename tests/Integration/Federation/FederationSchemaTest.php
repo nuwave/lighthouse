@@ -173,7 +173,7 @@ final class FederationSchemaTest extends TestCase
         $this->assertStringContainsString('type SimplePaginatorInfo @shareable {', $sdl);
     }
 
-    protected function _serviceSdl(): string
+    private function _serviceSdl(): string
     {
         $response = $this->graphQL(/** @lang GraphQL */ '
         {

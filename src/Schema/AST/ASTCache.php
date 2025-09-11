@@ -4,7 +4,7 @@ namespace Nuwave\Lighthouse\Schema\AST;
 
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Filesystem\Filesystem;
-use Nuwave\Lighthouse\Exceptions\InvalidSchemaCacheContentsException;
+use Nuwave\Lighthouse\Support\Utils;
 
 /**
  * @phpstan-type CacheConfig array{
@@ -48,13 +48,7 @@ class ASTCache
         );
         $contents = /** @lang PHP */ "<?php return {$variable};";
 
-        // Since the schema cache can be very large, we write it to a temporary file first.
-        // This avoids issues with the filesystem not being able to write large files atomically.
-        // Then, we move the temporary file to the final location which is an atomic operation.
-        $path = $this->path();
-        $partialPath = "{$path}.partial";
-        $this->filesystem->put(path: $partialPath, contents: $contents, lock: true);
-        $this->filesystem->move(path: $partialPath, target: $path);
+        Utils::atomicPut(filesystem: $this->filesystem, path: $this->path(), contents: $contents);
     }
 
     public function clear(): void
@@ -67,14 +61,12 @@ class ASTCache
     {
         $path = $this->path();
         if ($this->filesystem->exists($path)) {
-            $ast = require $path;
-            if (! is_array($ast)) {
-                throw new InvalidSchemaCacheContentsException($path, $ast);
-            }
+            $astArray = require $path;
+            assert(is_array($astArray), "The schema cache file at {$path} is expected to return an array.");
 
-            /** @var SerializableDocumentAST $ast */
+            /** @var SerializableDocumentAST $astArray */
 
-            return DocumentAST::fromArray($ast);
+            return DocumentAST::fromArray($astArray);
         }
 
         $documentAST = $build();

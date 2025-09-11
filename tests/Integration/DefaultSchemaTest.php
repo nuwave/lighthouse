@@ -154,7 +154,7 @@ final class DefaultSchemaTest extends DBTestCase
             ->assertJsonCount(0, 'data.users.data');
     }
 
-    protected function usersByName(string $name): TestResponse
+    private function usersByName(string $name): TestResponse
     {
         return $this->graphQL(/** @lang GraphQL */ '
             query ($name: String!) {

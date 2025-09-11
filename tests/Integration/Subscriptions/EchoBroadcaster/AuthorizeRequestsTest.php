@@ -106,7 +106,7 @@ final class AuthorizeRequestsTest extends TestCase
             ->assertForbidden();
     }
 
-    protected function querySubscription(): TestResponse
+    private function querySubscription(): TestResponse
     {
         return $this->graphQL(/** @lang GraphQL */ '
         subscription {

@@ -262,7 +262,7 @@ final class BaseDirectiveTest extends TestCase
         );
     }
 
-    protected function constructFieldDirective(string $definition): BaseDirective
+    private function constructFieldDirective(string $definition): BaseDirective
     {
         $fieldDefinition = Parser::fieldDefinition($definition);
 

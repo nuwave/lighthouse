@@ -800,7 +800,7 @@ GRAPHQL
         return $args['complexity'];
     }
 
-    protected function setMaxQueryComplexity(int $max): void
+    private function setMaxQueryComplexity(int $max): void
     {
         $config = $this->app->make(ConfigRepository::class);
         $config->set('lighthouse.security.max_query_complexity', $max);

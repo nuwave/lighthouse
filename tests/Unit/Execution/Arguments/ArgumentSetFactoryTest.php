@@ -164,7 +164,7 @@ final class ArgumentSetFactoryTest extends TestCase
     }
 
     /** @param  array<string, mixed>  $args */
-    protected function rootQueryArgumentSet(array $args): ArgumentSet
+    private function rootQueryArgumentSet(array $args): ArgumentSet
     {
         $astBuilder = $this->app->make(ASTBuilder::class);
         $documentAST = $astBuilder->documentAST();

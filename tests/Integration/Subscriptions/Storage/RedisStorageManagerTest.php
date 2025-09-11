@@ -111,15 +111,15 @@ final class RedisStorageManagerTest extends TestCase
     }
 
     /** @param  array<string, mixed>  $headers */
-    protected function querySubscription(string $topic = /** @lang GraphQL */ 'taskUpdated(id: 123)', array $headers = []): TestResponse
+    private function querySubscription(string $topic = /** @lang GraphQL */ 'taskUpdated(id: 123)', array $headers = []): TestResponse
     {
-        return $this->graphQL(/** @lang GraphQL */ "
+        return $this->graphQL(/** @lang GraphQL */ query: "
         subscription {
             {$topic} {
                 id
                 name
             }
         }
-        ", [], [], $headers);
+        ", headers: $headers);
     }
 }

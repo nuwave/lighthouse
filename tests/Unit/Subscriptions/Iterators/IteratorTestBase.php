@@ -17,7 +17,7 @@ abstract class IteratorTestBase extends TestCase
 {
     use EnablesSubscriptionServiceProvider;
 
-    public function assertIteratesOverItemsWithCallback(SubscriptionIterator $iterator): void
+    protected function assertIteratesOverItemsWithCallback(SubscriptionIterator $iterator): void
     {
         $count = 2;
         $subscribers = [];
@@ -32,7 +32,7 @@ abstract class IteratorTestBase extends TestCase
         $this->assertCount($count, $subscribers);
     }
 
-    public function assertPassesExceptionToHandler(SubscriptionIterator $iterator): void
+    protected function assertPassesExceptionToHandler(SubscriptionIterator $iterator): void
     {
         $exceptionToThrow = new \Exception('test_exception');
 
@@ -58,7 +58,7 @@ abstract class IteratorTestBase extends TestCase
         return Collection::times($count, fn (): Subscriber => $this->generateSubscriber());
     }
 
-    public function generateSubscriber(): Subscriber
+    private function generateSubscriber(): Subscriber
     {
         $resolveInfo = $this->createMock(ResolveInfo::class);
         $resolveInfo->fieldName = 'foo';

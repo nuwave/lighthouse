@@ -68,7 +68,7 @@ final class RedisStorageManagerTest extends TestCase
         /** @var \PHPUnit\Framework\MockObject\MockObject&\Illuminate\Contracts\Config\Repository $config */
         $config = $this->createMock(ConfigRepository::class);
         $redisConnection = $this->createMock(RedisConnection::class);
-        $redisFactory = $this->getRedisFactory($redisConnection);
+        $redisFactory = $this->mockRedisFactory($redisConnection);
 
         $channel = 'test-channel';
         $subscriber = new DummySubscriber($channel, 'test-topic');
@@ -87,7 +87,7 @@ final class RedisStorageManagerTest extends TestCase
     {
         $config = $this->createMock(ConfigRepository::class);
         $redisConnection = $this->createMock(RedisConnection::class);
-        $redisFactory = $this->getRedisFactory($redisConnection);
+        $redisFactory = $this->mockRedisFactory($redisConnection);
 
         $channel = 'test-channel';
         $prefixedChannel = "graphql.subscriber.{$channel}";
@@ -114,7 +114,7 @@ final class RedisStorageManagerTest extends TestCase
     {
         $config = $this->createMock(ConfigRepository::class);
         $redisConnection = $this->createMock(RedisConnection::class);
-        $redisFactory = $this->getRedisFactory($redisConnection);
+        $redisFactory = $this->mockRedisFactory($redisConnection);
 
         $ttl = '1000';
         $config->method('get')->willReturn($ttl);
@@ -152,7 +152,7 @@ final class RedisStorageManagerTest extends TestCase
     {
         $config = $this->createMock(ConfigRepository::class);
         $redisConnection = $this->createMock(RedisConnection::class);
-        $redisFactory = $this->getRedisFactory($redisConnection);
+        $redisFactory = $this->mockRedisFactory($redisConnection);
 
         $ttl = null;
         $config->method('get')->willReturn($ttl);
@@ -185,7 +185,7 @@ final class RedisStorageManagerTest extends TestCase
     {
         $config = $this->createMock(ConfigRepository::class);
         $redisConnection = $this->createMock(RedisConnection::class);
-        $redisFactory = $this->getRedisFactory($redisConnection);
+        $redisFactory = $this->mockRedisFactory($redisConnection);
 
         $topic = 'bar';
 
@@ -238,7 +238,7 @@ final class RedisStorageManagerTest extends TestCase
      *
      * @return \PHPUnit\Framework\MockObject\MockObject&\Illuminate\Contracts\Redis\Factory
      */
-    protected function getRedisFactory(MockObject $redisConnection): MockObject
+    private function mockRedisFactory(MockObject $redisConnection): MockObject
     {
         $redisFactory = $this->createMock(RedisFactory::class);
         $redisFactory->expects($this->once())

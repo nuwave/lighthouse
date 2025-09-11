@@ -244,4 +244,25 @@ final class QueryCacheTest extends TestCase
         $event->assertDispatchedTimes(CacheHit::class, 1);
         $event->assertDispatchedTimes(KeyWritten::class, 0);
     }
+
+    public function testInvalidQueryCacheContents(): void
+    {
+        $filesystem = Storage::fake();
+
+        $config = $this->app->make(ConfigRepository::class);
+        $config->set('lighthouse.query_cache.enable', true);
+        $config->set('lighthouse.query_cache.mode', 'opcache');
+        $config->set('lighthouse.query_cache.opcache_path', $filesystem->path(''));
+
+        $fileName = 'lighthouse-query-ec859ac754fc185143d0daf8dcfa644b5e2271e219b9a8f80c3a6fdfb0ce67d0.php';
+        $filesystem->put($fileName, '');
+
+        $this->expectException(\AssertionError::class);
+        $this->expectExceptionMessage("The query cache file at {$filesystem->path($fileName)} is expected to return an array.");
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            foo
+        }
+        GRAPHQL);
+    }
 }
