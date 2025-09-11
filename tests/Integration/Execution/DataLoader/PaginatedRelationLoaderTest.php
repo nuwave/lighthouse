@@ -189,7 +189,7 @@ final class PaginatedRelationLoaderTest extends DBTestCase
         $this->assertCount($first, $firstTask->tags);
     }
 
-    protected function makePaginationArgs(int $first): PaginationArgs
+    private function makePaginationArgs(int $first): PaginationArgs
     {
         $paginatorArgs = new PaginationArgs(1, $first, new PaginationType('SIMPLE'));
         $paginatorArgs->first = $first;

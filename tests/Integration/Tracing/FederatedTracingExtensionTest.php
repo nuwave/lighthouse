@@ -194,7 +194,7 @@ final class FederatedTracingExtensionTest extends TestCase
     }
 
     /** @return array<string,mixed> */
-    protected function decodeFtv1Record(string $encoded): array
+    private function decodeFtv1Record(string $encoded): array
     {
         $decoded = \Safe\base64_decode($encoded);
 

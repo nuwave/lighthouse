@@ -53,7 +53,7 @@ final class ResolverProviderTest extends TestCase
         $this->resolverProvider->provideResolver($fieldValue);
     }
 
-    protected function constructFieldValue(string $fieldDefinition, string $parentTypeName = RootType::QUERY): FieldValue
+    private function constructFieldValue(string $fieldDefinition, string $parentTypeName = RootType::QUERY): FieldValue
     {
         $queryType = Parser::objectTypeDefinition(/** @lang GraphQL */ "
         type {$parentTypeName} {

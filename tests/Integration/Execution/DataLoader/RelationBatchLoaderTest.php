@@ -550,7 +550,15 @@ final class RelationBatchLoaderTest extends DBTestCase
         ');
 
         Cache::forget(
-            (new CacheKeyAndTagsGenerator())->key(null, false, 'Post', $post2->id, 'comments', [], ['posts', $post2->id, 'comments']),
+            (new CacheKeyAndTagsGenerator())->key(
+                user: null,
+                isPrivate: false,
+                parentName: 'Post',
+                id: $post2->id,
+                fieldName: 'comments',
+                args: [],
+                path: ['posts', $post2->id, 'comments'],
+            ),
         );
 
         $secondRequest = $this->graphQL(/** @lang GraphQL */ '

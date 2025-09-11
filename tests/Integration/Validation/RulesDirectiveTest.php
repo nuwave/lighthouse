@@ -213,7 +213,7 @@ final class RulesDirectiveTest extends TestCase
         $this
             ->graphQL(/** @lang GraphQL */ '
             {
-                foo(emails: [], input: {type: {}})
+                foo(emails: [], input: { type: {} })
             }
             ')
             ->assertGraphQLValidationError('bar', 'The baz field is required.')

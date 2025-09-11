@@ -332,7 +332,7 @@ final class SubscriptionTest extends TestCase
         $this->assertSame($response->graphQLSubscriptionChannelName(), $response->json('extensions.lighthouse_subscriptions.channel'));
     }
 
-    protected function subscribe(): TestResponse
+    private function subscribe(): TestResponse
     {
         return $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         subscription OnPostCreated {
@@ -348,7 +348,7 @@ final class SubscriptionTest extends TestCase
      *
      * @return array<string, array<string, mixed>>
      */
-    protected function buildResponse(string $channelName, string $channel): array
+    private function buildResponse(string $channelName, string $channel): array
     {
         return [
             'data' => [

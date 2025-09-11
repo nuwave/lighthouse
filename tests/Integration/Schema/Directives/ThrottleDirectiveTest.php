@@ -144,17 +144,17 @@ final class ThrottleDirectiveTest extends TestCase
         $ip = $faker->ipv4;
         $ip2 = $faker->ipv4;
 
-        $this->graphQL($query, [], [], ['REMOTE_ADDR' => $ip])->assertJson([
+        $this->graphQL(query: $query, headers: ['REMOTE_ADDR' => $ip])->assertJson([
             'data' => [
                 'foo' => Foo::THE_ANSWER,
             ],
         ]);
 
-        $this->graphQL($query, [], [], ['REMOTE_ADDR' => $ip])->assertGraphQLError(
+        $this->graphQL(query: $query, headers: ['REMOTE_ADDR' => $ip])->assertGraphQLError(
             new RateLimitException('Query.foo'),
         );
 
-        $this->graphQL($query, [], [], ['REMOTE_ADDR' => $ip2])->assertJson([
+        $this->graphQL(query: $query, headers: ['REMOTE_ADDR' => $ip2])->assertJson([
             'data' => [
                 'foo' => Foo::THE_ANSWER,
             ],

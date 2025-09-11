@@ -52,7 +52,7 @@ final class SchemaBuilderTest extends TestCase
         $this->assertSchemaHasQueryTypeWithFederationFields($schema);
     }
 
-    protected function assertSchemaHasQueryTypeWithFederationFields(Schema $schema): void
+    private function assertSchemaHasQueryTypeWithFederationFields(Schema $schema): void
     {
         $queryType = $schema->getQueryType();
         $this->assertInstanceOf(ObjectType::class, $queryType);

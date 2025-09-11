@@ -82,7 +82,7 @@ final class AutomaticPersistedQueriesTest extends TestCase
 
         $sha256 = hash('sha256', $query);
 
-        $this->graphQL($query, [], [
+        $this->graphQL(query: $query, extraParams: [
             'extensions' => [
                 'persistedQuery' => [
                     'version' => 1,
@@ -125,7 +125,7 @@ final class AutomaticPersistedQueriesTest extends TestCase
 
         $sha256 = hash('sha256', $query);
 
-        $this->graphQL($query, [], [
+        $this->graphQL(query: $query, extraParams: [
             'extensions' => [
                 'persistedQuery' => [
                     'version' => 1,

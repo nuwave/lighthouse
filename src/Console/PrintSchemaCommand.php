@@ -84,7 +84,8 @@ SIGNATURE;
                 return;
             }
 
-            $filesystemManager->disk($disk)->put($filename, $schemaString);
+            $filesystem = $filesystemManager->disk($disk);
+            $filesystem->put(path: $filename, contents: $schemaString);
             $this->info("Wrote schema to disk ({$disk}) as {$filename}.");
         } else {
             $this->info($schemaString);

@@ -9,6 +9,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Filesystem\Filesystem;
+use Nuwave\Lighthouse\Support\Utils;
 
 class QueryCache
 {
@@ -30,7 +31,7 @@ class QueryCache
 
         $this->enable = (bool) $config['enable'];
         $this->mode = $config['mode'] ?? 'store';
-        $this->opcachePath = $config['opcache_path'] ?? base_path('bootstrap/cache');
+        $this->opcachePath = rtrim($config['opcache_path'] ?? base_path('bootstrap/cache'), '/');
         $this->store = $config['store'] ?? null;
         $this->ttl = $config['ttl'] ?? null;
     }
@@ -86,16 +87,16 @@ class QueryCache
     /** @param  \Closure(): DocumentNode  $parse */
     protected function fromOPcacheOrParse(string $hash, \Closure $parse): DocumentNode
     {
-        $filePath = $this->opcacheFilePath($hash);
+        $path = $this->opcacheFilePath($hash);
 
-        if ($this->filesystem->exists($filePath)) {
-            return $this->requireOPcacheFile($filePath);
+        if ($this->filesystem->exists($path)) {
+            return $this->requireOPcacheFile($path);
         }
 
         $query = $parse();
 
         $contents = static::opcacheFileContents($query);
-        $this->filesystem->put(path: $filePath, contents: $contents, lock: true);
+        Utils::atomicPut(filesystem: $this->filesystem, path: $path, contents: $contents);
 
         return $query;
     }
@@ -103,26 +104,26 @@ class QueryCache
     /** @param  \Closure(): DocumentNode  $parse */
     protected function fromHybridOrParse(string $hash, \Closure $parse): DocumentNode
     {
-        $filePath = $this->opcacheFilePath($hash);
+        $path = $this->opcacheFilePath($hash);
 
-        if ($this->filesystem->exists($filePath)) {
-            return $this->requireOPcacheFile($filePath);
+        if ($this->filesystem->exists($path)) {
+            return $this->requireOPcacheFile($path);
         }
 
         $store = $this->makeCacheStore();
 
         $contents = $store->get(key: "lighthouse:query:{$hash}");
         if (is_string($contents)) {
-            $this->filesystem->put(path: $filePath, contents: $contents, lock: true);
+            Utils::atomicPut(filesystem: $this->filesystem, path: $path, contents: $contents);
 
-            return $this->requireOPcacheFile($filePath);
+            return $this->requireOPcacheFile($path);
         }
 
         $query = $parse();
 
         $contents = static::opcacheFileContents($query);
         $store->put(key: "lighthouse:query:{$hash}", value: $contents, ttl: $this->ttl);
-        $this->filesystem->put(path: $filePath, contents: $contents, lock: true);
+        Utils::atomicPut(filesystem: $this->filesystem, path: $path, contents: $contents);
 
         return $query;
     }
@@ -144,10 +145,10 @@ class QueryCache
         return "<?php return {$queryArrayString};";
     }
 
-    protected function requireOPcacheFile(string $filePath): DocumentNode
+    protected function requireOPcacheFile(string $path): DocumentNode
     {
-        $astArray = require $filePath;
-        assert(is_array($astArray), 'The cache file is expected to return an array.');
+        $astArray = require $path;
+        assert(is_array($astArray), "The query cache file at {$path} is expected to return an array.");
 
         $astInstance = AST::fromArray($astArray);
         assert($astInstance instanceof DocumentNode, 'The AST array is expected to convert to a DocumentNode.');

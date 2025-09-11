@@ -4,14 +4,13 @@ namespace Tests\Integration;
 
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Filesystem\Filesystem;
-use Nuwave\Lighthouse\Exceptions\InvalidSchemaCacheContentsException;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Tests\TestCase;
 use Tests\TestsSchemaCache;
 use Tests\TestsSerialization;
 use Tests\Utils\Models\Comment;
 
-final class SchemaCachingTest extends TestCase
+final class SchemaCacheTest extends TestCase
 {
     use TestsSerialization;
     use TestsSchemaCache;
@@ -79,7 +78,8 @@ final class SchemaCachingTest extends TestCase
         $path = $config->get('lighthouse.schema_cache.path');
         $filesystem->put($path, '');
 
-        $this->expectExceptionObject(new InvalidSchemaCacheContentsException($path, 1));
+        $this->expectException(\AssertionError::class);
+        $this->expectExceptionMessage("The schema cache file at {$path} is expected to return an array.");
         $this->graphQL(/** @lang GraphQL */ '
         {
             foo
@@ -87,7 +87,7 @@ final class SchemaCachingTest extends TestCase
         ');
     }
 
-    protected function cacheSchema(): void
+    private function cacheSchema(): void
     {
         $astBuilder = $this->app->make(ASTBuilder::class);
         $astBuilder->documentAST();
