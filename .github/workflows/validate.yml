@@ -143,6 +143,7 @@ jobs:
           coverage: none
           extensions: ${{ env.REQUIRED_PHP_EXTENSIONS }}
           php-version: ${{ matrix.php-version }}
+          ini-values: zend.assertions=1
 
       - name: "Cache composer dependencies"
         uses: actions/cache@v3
