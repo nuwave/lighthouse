@@ -319,7 +319,7 @@ class GraphQL
             || ! $queryCacheConfig['enable']
         ) {
             // https://github.com/apollographql/apollo-server/blob/37a5c862261806817a1d71852c4e1d9cdb59eab2/packages/apollo-server-errors/src/index.ts#L240-L248
-            throw new Error('PersistedQueryNotSupported', null, null, [], null, null, ['code' => 'PERSISTED_QUERY_NOT_SUPPORTED']);
+            throw new Error(message: 'PersistedQueryNotSupported', extensions: ['code' => 'PERSISTED_QUERY_NOT_SUPPORTED']);
         }
 
         $cacheFactory = Container::getInstance()->make(CacheFactory::class);
@@ -327,7 +327,7 @@ class GraphQL
 
         return $store->get("lighthouse:query:{$sha256hash}")
             // https://github.com/apollographql/apollo-server/blob/37a5c862261806817a1d71852c4e1d9cdb59eab2/packages/apollo-server-errors/src/index.ts#L230-L239
-            ?? throw new Error('PersistedQueryNotFound', null, null, [], null, null, ['code' => 'PERSISTED_QUERY_NOT_FOUND']);
+            ?? throw new Error(message: 'PersistedQueryNotFound', extensions: ['code' => 'PERSISTED_QUERY_NOT_FOUND']);
     }
 
     /** @return ErrorsHandler */

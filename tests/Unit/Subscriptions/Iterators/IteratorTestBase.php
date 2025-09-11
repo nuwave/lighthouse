@@ -68,6 +68,10 @@ abstract class IteratorTestBase extends TestCase
             ]),
         ]);
 
-        return new Subscriber([], new HttpGraphQLContext(new Request()), $resolveInfo);
+        return new Subscriber(
+            args: [],
+            context: new HttpGraphQLContext(new Request()),
+            resolveInfo: $resolveInfo,
+        );
     }
 }

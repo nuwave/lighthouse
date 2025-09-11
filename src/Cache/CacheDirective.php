@@ -67,13 +67,13 @@ GRAPHQL;
                 : $this->cacheRepository;
 
             $cacheKey = $this->cacheKeyAndTags->key(
-                $context->user(),
-                $isPrivate,
-                $parentName,
-                $rootID,
-                $fieldName,
-                $args,
-                $path,
+                user: $context->user(),
+                isPrivate: $isPrivate,
+                parentName: $parentName,
+                id: $rootID,
+                fieldName: $fieldName,
+                args: $args,
+                path: $path,
             );
 
             // We found a matching value in the cache, so we can return early without actually running the query.
