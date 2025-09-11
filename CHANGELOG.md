@@ -13,7 +13,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Fixed
 
-- Use atomic file writes for query cache
+- Use atomic file writes for query cache https://github.com/nuwave/lighthouse/pull/2716
 
 ## v6.63.0
 
