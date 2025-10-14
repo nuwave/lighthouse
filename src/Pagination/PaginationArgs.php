@@ -17,7 +17,7 @@ class PaginationArgs
 {
     public function __construct(
         public int $page,
-        public int $first,
+        public int $take,
         public PaginationType $type,
     ) {}
 
@@ -28,31 +28,31 @@ class PaginationArgs
      */
     public static function extractArgs(array $args, ResolveInfo $resolveInfo, PaginationType $proposedPaginationType, ?int $paginateMaxCount): self
     {
-        $first = $args['first'];
+        $take = $args['take'];
 
         $page = $proposedPaginationType->isConnection()
             ? self::calculateCurrentPage(
-                $first,
+                $take,
                 Cursor::decode($args),
             )
             // Handles cases "paginate" and "simple", which both take the same args.
             : Arr::get($args, 'page', 1);
 
-        if ($first < 0) {
-            throw new Error(self::requestedLessThanZeroItems($first));
+        if ($take < 0) {
+            throw new Error(self::requestedLessThanZeroItems($take));
         }
 
         // Make sure the maximum pagination count is not exceeded
         if (
             $paginateMaxCount !== null
-            && $first > $paginateMaxCount
+            && $take > $paginateMaxCount
         ) {
-            throw new Error(self::requestedTooManyItems($paginateMaxCount, $first));
+            throw new Error(self::requestedTooManyItems($paginateMaxCount, $take));
         }
 
         $optimalPaginationType = self::optimalPaginationType($proposedPaginationType, $resolveInfo);
 
-        return new static($page, $first, $optimalPaginationType);
+        return new static($page, $take, $optimalPaginationType);
     }
 
     public static function requestedLessThanZeroItems(int $amount): string
@@ -66,10 +66,10 @@ class PaginationArgs
     }
 
     /** Calculate the current page to inform the user about the pagination state. */
-    protected static function calculateCurrentPage(int $first, int $after, int $defaultPage = 1): int
+    protected static function calculateCurrentPage(int $take, int $after, int $defaultPage = 1): int
     {
-        return $first && $after
-            ? (int) floor(($first + $after) / $first)
+        return $take && $after
+            ? (int) floor(($take + $after) / $take)
             : $defaultPage;
     }
 
@@ -110,7 +110,7 @@ class PaginationArgs
      */
     public function applyToBuilder(QueryBuilder|ScoutBuilder|EloquentBuilder|Relation $builder): Paginator
     {
-        if ($this->first === 0) {
+        if ($this->take === 0) {
             if ($this->type->isSimple()) {
                 return new ZeroPerPagePaginator($this->page); // @phpstan-ignore return.type (generic type does not matter)
             }
@@ -127,9 +127,9 @@ class PaginationArgs
             : 'paginate';
 
         if ($builder instanceof ScoutBuilder) {
-            return $builder->{$methodName}($this->first, 'page', $this->page);
+            return $builder->{$methodName}($this->take, 'page', $this->page);
         }
 
-        return $builder->{$methodName}($this->first, ['*'], 'page', $this->page);
+        return $builder->{$methodName}($this->take, ['*'], 'page', $this->page);
     }
 }

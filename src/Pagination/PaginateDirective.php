@@ -146,7 +146,7 @@ GRAPHQL;
                     "The method referenced by the resolver argument of the @{$this->name()} directive on {$this->nodeName()} must return a Paginator.",
                 );
 
-                if ($paginationArgs->first === 0) {
+                if ($paginationArgs->take === 0) {
                     if ($paginator instanceof LengthAwarePaginator) {
                         return new ZeroPerPageLengthAwarePaginator($paginator->total(), $paginationArgs->page);
                     }
@@ -207,7 +207,7 @@ GRAPHQL;
             /**
              * @see PaginationManipulator::countArgument()
              */
-            $expectedNumberOfChildren = $args['first'] ?? 1;
+            $expectedNumberOfChildren = $args['take'] ?? 1;
 
             return
                 // Default complexity for this field itself

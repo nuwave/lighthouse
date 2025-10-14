@@ -64,7 +64,7 @@ class PaginatedModelsLoader implements ModelsLoader
                 $relation->initRelation([$model], $this->relation);
 
                 // @phpstan-ignore-next-line Builder mixin is not understood
-                return $relation->forPage($this->paginationArgs->page, $this->paginationArgs->first);
+                return $relation->forPage($this->paginationArgs->page, $this->paginationArgs->take);
             });
 
         // Merge all the relation queries into a single query with UNION ALL.
@@ -178,15 +178,15 @@ class PaginatedModelsLoader implements ModelsLoader
     /** @param  \Illuminate\Database\Eloquent\Collection<array-key, \Illuminate\Database\Eloquent\Model>  $parents */
     protected function convertRelationToPaginator(EloquentCollection $parents): void
     {
-        $first = $this->paginationArgs->first;
+        $take = $this->paginationArgs->take;
         $page = $this->paginationArgs->page;
 
         foreach ($parents as $model) {
             $total = CountModelsLoader::extractCount($model, $this->relation);
 
-            $paginator = $first === 0
+            $paginator = $take === 0
                 ? new ZeroPerPageLengthAwarePaginator($total, $page)
-                : new LengthAwarePaginator($model->getRelation($this->relation), $total, $first, $page);
+                : new LengthAwarePaginator($model->getRelation($this->relation), $total, $take, $page);
 
             $model->setRelation($this->relation, $paginator);
         }

@@ -251,7 +251,7 @@ GRAPHQL
 
         $description .= "\"\n";
 
-        $definition = 'first: Int!';
+        $definition = 'take: Int!';
         if ($defaultCount) {
             $definition .= " =  {$defaultCount}";
         }
