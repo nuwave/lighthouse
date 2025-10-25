@@ -29,9 +29,7 @@ abstract class DriverManager
     protected array $customCreators = [];
 
     public function __construct(
-        /**
-         * The application instance.
-         */
+        /** The application instance. */
         protected Application $app,
     ) {}
 
