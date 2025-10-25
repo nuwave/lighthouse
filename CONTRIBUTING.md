@@ -1,31 +1,46 @@
-# How to contribute to Lighthouse
+# Lighthouse Contribution Guide
 
-Thank you for contributing to Lighthouse. Here are some tips to make this easy for you.
+Thank you for contributing to Lighthouse.
+Here are some tips and guidelines to make this easy for you.
 
-## The process
+## Open a Pull Request
 
 If this is your first time contributing to any project on GitHub, see [First Contributions](https://github.com/firstcontributions/first-contributions/blob/master/README.md).
 For this project specifically, follow these steps:
 
 1. Fork the project
-1. Clone the repository
-1. [Set up the project](#setup)
-1. Create a branch
-1. Code according to the [guidelines](#code-guidelines) and [style](#code-style)
-1. [Test your changes](#testing)
-1. Commit and push
-1. Open a pull request, following the [template](.github/PULL_REQUEST_TEMPLATE.md)
+2. Clone the repository
+3. [Set up the project](#setup)
+4. Create a branch
+5. Code according to the [guidelines](#code-guidelines) and [style](#code-style)
+6. [Test your changes](#testing)
+7. Commit and push
+8. Open a pull request, following the [template](.github/PULL_REQUEST_TEMPLATE.md)
+
+## Release a New Version
+
+Before you release a new version, make sure to familiarize yourself with:
+- [Keep a Changelog](https://keepachangelog.com/en/1.0.0)
+- [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
+- [Previous GitHub Releases](https://github.com/nuwave/lighthouse/releases)
+
+To create a new release, follow these steps:
+1. Consider the entries in the [`CHANGELOG unreleased section`](CHANGELOG.md#unreleased), add missing entries if needed
+2. Based on those entries and the previous version, define the next version number and add it to the [`CHANGELOG.md`](CHANGELOG.md)
+3. [Draft a new release](https://github.com/nuwave/lighthouse/releases/new)
+4. Add the version number as both tag and title
+5. Add the changelog entries as the description
+6. Publish the release
 
 ## Setup
 
-This section describes the setup of  a local development environment to run tests
-and other quality tools.
+This section describes the setup of a local development environment to run tests and other quality tools.
 
 ### Docker + Make
 
 A reproducible environment with minimal dependencies:
 
-- [docker-compose](https://docs.docker.com/compose/install)
+- [Docker Compose](https://docs.docker.com/compose/install)
 - [GNU Make](https://www.gnu.org/software/make) (optional)
 
 For convenience, common tasks during development are wrapped up in the [Makefile](Makefile).
@@ -43,11 +58,11 @@ Before you commit changes, run all validation steps with:
 
 ### Native Tools
 
-You can use native tools instead of Docker + Make, with the following requirements:
+You can use native tools instead of Docker and Make, with the following requirements:
 
 - PHP (see [composer.json](composer.json) for the minimal required version)
 - Composer (version 2 is recommended)
-- MySQL (any Laravel supported version should work)
+- MySQL (any Laravel-supported version should work)
 - Redis 6
 
 Clone the project and run the following in the project root:
@@ -66,23 +81,23 @@ Common tasks during development are listed in the `scripts` section of [composer
 
 We use **PHPUnit** for unit tests and integration tests.
 
-Have a new feature? You can start off by writing some tests that detail
-the behavior you want to achieve and go from there.
+Have a new feature?
+You can start off by writing some tests that detail the behavior you want to achieve and go from there.
 
-Fixing a bug? The best way to ensure it is fixed for good and never comes
-back is to write a failing test for it and then make it pass. If you cannot
-figure out how to fix it yourself, feel free to submit a PR with a failing test.
+Fixing a bug?
+The best way to ensure it is fixed for good and never comes back is to write a failing test for it and then make it pass.
+If you cannot figure out how to fix it yourself, feel free to submit a PR with a failing test.
 
-Here is how to set up Xdebug in PhpStorm https://www.jetbrains.com/help/phpstorm/configuring-xdebug.html
+Here is how to set up Xdebug in PhpStorm: https://www.jetbrains.com/help/phpstorm/configuring-xdebug.html.
 
 > Enabling Xdebug slows down tests by an order of magnitude.
 > Stop listening for Debug Connection to speed it back up.
 
-Set the environment variable `XDEBUG_REMOTE_HOST` to the IP of your host machine as
-seen from the Docker container. This may differ based on your setup: When running
-Docker for Desktop, it is usually `10.0.2.2`, when running from a VM it is something else.
+Set the environment variable `XDEBUG_REMOTE_HOST` to the IP of your host machine as seen from the Docker container.
+This may differ based on your setup.
+When running Docker for Desktop, it is usually `10.0.2.2`, when running from a VM it is something else.
 
-### Test Data Setup
+### Test data setup
 
 Use relations over direct access to foreign keys.
 
@@ -149,7 +164,7 @@ Choose the appropriate type for your change:
 
 Then, add a short description of your change and close it off with a link to your PR.
 
-## Code guidelines
+## Code Guidelines
 
 ### Extensibility
 
@@ -163,12 +178,12 @@ Always use class member visibility `protected` over `private`.
 
 Prefer `final` classes in [tests](tests), but never use them in [src](src).
 
-### Laravel feature usage
+### Laravel Feature Usage
 
 We strive to be compatible with both Lumen and Laravel.
 
-Do not use Facades, use dependency injection instead.
-Not every Laravel application has them enabled, and Lumen does not use Facades by default.
+Do not use Facades, not every application has them enabled, and Lumen does not use them.
+Use dependency injection instead.
 
 Prefer direct usage of Illuminate classes instead of helpers.
 
@@ -181,7 +196,7 @@ Prefer direct usage of Illuminate classes instead of helpers.
 A notable exception is the `response()` helper - using DI for injecting a
 `ResponseFactory` does not work in Lumen, while `response()` works for both.
 
-### Type definitions
+### Type Definitions
 
 Prefer the strictest possible type annotations wherever possible.
 If known, add additional type information in the PHPDoc.
@@ -249,7 +264,7 @@ class Foo
 }
 ```
 
-## Code style
+## Code Style
 
 We format the code automatically with [php-cs-fixer](https://github.com/friendsofphp/php-cs-fixer).
 
@@ -316,8 +331,7 @@ You can use the following two case-sensitive regexes to search for violations:
 
 ## Benchmarks
 
-We use [phpbench](https://github.com/phpbench/phpbench) for running benchmarks
-on performance critical pieces of code.
+We use [phpbench](https://github.com/phpbench/phpbench) for running benchmarks on performance-critical pieces of code.
 
 Run the reports that are defined in `phpbench.json` via the command line:
 

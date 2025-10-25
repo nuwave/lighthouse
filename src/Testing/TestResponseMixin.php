@@ -179,7 +179,7 @@ class TestResponseMixin
             $mock->shouldHaveReceived('broadcast', static function (Subscriber $subscriber, array $data) use ($channel, &$broadcastedData): bool {
                 Assert::assertArrayHasKey('data', $data);
                 if ($channel === $subscriber->channel) {
-                    $broadcastedData[] = Arr::first($data['data']);
+                    $broadcastedData[] = Arr::first($data['data']); // @phpstan-ignore argument.templateType
                 }
 
                 return true;
