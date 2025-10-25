@@ -289,8 +289,7 @@ final class BelongsToManyTest extends DBTestCase
                 }
             }
         }
-GRAPHQL
-        )->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'upsertRole' => [
                     'id' => '1',

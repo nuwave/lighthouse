@@ -52,7 +52,7 @@ final class Task extends Model
         parent::boot();
 
         // This is used to test that this scope works in all kinds of queries
-        static::addGlobalScope('no_cleaning', static function (EloquentBuilder $builder): void {
+        self::addGlobalScope('no_cleaning', static function (EloquentBuilder $builder): void {
             $builder->where('name', '!=', self::CLEANING);
         });
     }

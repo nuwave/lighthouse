@@ -54,7 +54,7 @@ final class Post extends Model
     {
         return Attribute::make(
             get: fn (mixed $_, array $attributes): int => $attributes[$this->primaryKey],
-            set: fn (int $id) => [$this->primaryKey => $id],
+            set: fn (int $id): array => [$this->primaryKey => $id],
         );
     }
 
@@ -64,7 +64,7 @@ final class Post extends Model
         return $this->morphMany(Activity::class, 'content');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Tests\Utils\Models\Category, $this> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Tests\Utils\Models\Category, $this, \Illuminate\Database\Eloquent\Relations\Pivot> */
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class, 'category_post', 'category_id', 'post_id');

@@ -47,7 +47,7 @@ final class ComplexityDirectiveTest extends TestCase
         $this->assertCount(1, $events);
 
         // TODO remove this check when updating the required version of webonyx/graphql-php
-        if (method_exists(QueryComplexity::class, 'getQueryComplexity')) {
+        if (method_exists(QueryComplexity::class, 'getQueryComplexity')) { // @phpstan-ignore function.alreadyNarrowedType (depends on the used library version)
             $event = $events[0];
             $this->assertSame(2, $event->queryComplexity);
         }
@@ -133,7 +133,7 @@ GRAPHQL;
         type Query {
             foo: Int @complexity(resolver: "Foo@complexity")
         }
-GRAPHQL;
+        GRAPHQL;
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -147,7 +147,7 @@ GRAPHQL;
         return self::CUSTOM_COMPLEXITY;
     }
 
-    protected function setMaxQueryComplexity(int $max): void
+    private function setMaxQueryComplexity(int $max): void
     {
         $config = $this->app->make(ConfigRepository::class);
         $config->set('lighthouse.security.max_query_complexity', $max);

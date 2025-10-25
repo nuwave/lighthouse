@@ -2,7 +2,6 @@
 
 namespace Tests\Integration\OrderBy;
 
-use Illuminate\Support\Carbon;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
@@ -225,11 +224,15 @@ final class OrderByDirectiveDBTest extends DBTestCase
 
     public function testOrderColumnOnField(): void
     {
-        $now = Carbon::now();
-        factory(User::class)->create(['name' => 'A']);
+        $userA = factory(User::class)->make();
+        $userA->name = 'A';
+        $userA->save();
 
-        Carbon::setTestNow($now->addYear());
-        factory(User::class)->create(['name' => 'B']);
+        $this->travel(1)->year();
+
+        $userB = factory(User::class)->make();
+        $userB->name = 'B';
+        $userB->save();
 
         $this->schema = /** @lang GraphQL */ '
         type Query {

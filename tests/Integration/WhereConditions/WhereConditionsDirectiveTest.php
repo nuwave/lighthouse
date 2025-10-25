@@ -2,6 +2,8 @@
 
 namespace Tests\Integration\WhereConditions;
 
+use Carbon\Carbon;
+use GraphQL\Type\TypeKind;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Nuwave\Lighthouse\WhereConditions\SQLOperator;
 use Nuwave\Lighthouse\WhereConditions\WhereConditionsHandler;
@@ -52,6 +54,116 @@ final class WhereConditionsDirectiveTest extends DBTestCase
             parent::getPackageProviders($app),
             [WhereConditionsServiceProvider::class],
         );
+    }
+
+    public function testBetweenWithMultipleVariables(): void
+    {
+        $user1 = factory(User::class)->create();
+        assert($user1 instanceof User);
+        $user1->date_of_birth = Carbon::createStrict(2000, 1, 1);
+        $user1->save();
+
+        $user2 = factory(User::class)->create();
+        assert($user2 instanceof User);
+        $user2->date_of_birth = Carbon::createStrict(1995, 1, 1);
+        $user2->save();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($dobMin: Mixed, $dobMax: Mixed) {
+            users(
+                where: {
+                    column: "date_of_birth",
+                    operator: BETWEEN,
+                    value: [$dobMin, $dobMax]
+                }
+            ) {
+                id
+            }
+        }
+        ', [
+            'dobMin' => '1990-01-01',
+            'dobMax' => '1999-01-01',
+        ])->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => "{$user2->id}",
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testBetweenWithOneVariable(): void
+    {
+        $user1 = factory(User::class)->create();
+        assert($user1 instanceof User);
+        $user1->date_of_birth = Carbon::createStrict(2000, 1, 1);
+        $user1->save();
+
+        $user2 = factory(User::class)->create();
+        assert($user2 instanceof User);
+        $user2->date_of_birth = Carbon::createStrict(1995, 1, 1);
+        $user2->save();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($dates: Mixed) {
+            users(
+                where: {
+                    column: "date_of_birth",
+                    operator: BETWEEN,
+                    value: $dates
+                }
+            ) {
+                id
+            }
+        }
+        ', [
+            'dates' => ['1990-01-01', '1999-01-01'],
+        ])->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => "{$user2->id}",
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testBetweenWithLiteralValues(): void
+    {
+        $user1 = factory(User::class)->create();
+        assert($user1 instanceof User);
+        $user1->date_of_birth = Carbon::createStrict(2000, 1, 1);
+        $user1->save();
+
+        $user2 = factory(User::class)->create();
+        assert($user2 instanceof User);
+        $user2->date_of_birth = Carbon::createStrict(1995, 1, 1);
+        $user2->save();
+
+        $this->graphQL(/** @lang GraphQL */ '
+            query {
+                users(
+                    where: {
+                        column: "date_of_birth",
+                        operator: BETWEEN,
+                        value: ["1990-01-01", "1999-01-01"]
+                    }
+                ) {
+                    id
+                }
+            }
+        ')->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => "{$user2->id}",
+                    ],
+                ],
+            ],
+        ]);
     }
 
     public function testDefaultsToWhereEqual(): void
@@ -830,24 +942,27 @@ final class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testOnlyAllowsWhitelistedColumns(): void
     {
-        factory(User::class)->create();
+        $user = factory(User::class)->create();
+        assert($user instanceof User);
 
         $this->graphQL(/** @lang GraphQL */ '
-        {
+        query ($id: Mixed!) {
             whitelistedColumns(
                 where: {
                     column: ID
-                    value: 1
+                    value: $id
                 }
             ) {
                 id
             }
         }
-        ')->assertJson([
+        ', [
+            'id' => $user->id,
+        ])->assertExactJson([
             'data' => [
                 'whitelistedColumns' => [
                     [
-                        'id' => 1,
+                        'id' => "{$user->id}",
                     ],
                 ],
             ],
@@ -856,46 +971,42 @@ final class WhereConditionsDirectiveTest extends DBTestCase
         $expectedEnumName = 'QueryWhitelistedColumnsWhereColumn';
         $enum = $this->introspectType($expectedEnumName);
 
-        $this->assertNotNull($enum);
+        $this->assertIsArray($enum);
+        $this->assertSame(TypeKind::ENUM, $enum['kind']);
+        $this->assertSame($expectedEnumName, $enum['name']);
+        $this->assertSame('Allowed column names for Query.whitelistedColumns.where.', $enum['description']);
 
-        $this->assertArraySubset(
-            [
-                'kind' => 'ENUM',
-                'name' => $expectedEnumName,
-                'description' => 'Allowed column names for Query.whitelistedColumns.where.',
-                'enumValues' => [
-                    [
-                        'name' => 'ID',
-                    ],
-                    [
-                        'name' => 'CAMEL_CASE',
-                    ],
-                ],
-            ],
-            $enum,
-        );
+        $enumValues = $enum['enumValues'];
+        $this->assertCount(2, $enumValues);
+
+        [$idValue, $camelCaseValue] = $enumValues;
+        $this->assertSame('ID', $idValue['name']);
+        $this->assertSame('CAMEL_CASE', $camelCaseValue['name']);
     }
 
     public function testUseColumnEnumsArg(): void
     {
-        factory(User::class)->create();
+        $user = factory(User::class)->create();
+        assert($user instanceof User);
 
         $this->graphQL(/** @lang GraphQL */ '
-        {
+        query ($id: Mixed!) {
             enumColumns(
                 where: {
                     column: ID
-                    value: 1
+                    value: $id
                 }
             ) {
                 id
             }
         }
-        ')->assertJson([
+        ', [
+            'id' => $user->id,
+        ])->assertExactJson([
             'data' => [
                 'enumColumns' => [
                     [
-                        'id' => 1,
+                        'id' => "{$user->id}",
                     ],
                 ],
             ],
@@ -904,7 +1015,8 @@ final class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testIgnoreNullCondition(): void
     {
-        factory(User::class)->create();
+        $user = factory(User::class)->create();
+        assert($user instanceof User);
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -918,7 +1030,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
             'data' => [
                 'users' => [
                     [
-                        'id' => '1',
+                        'id' => "{$user->id}",
                     ],
                 ],
             ],
@@ -937,8 +1049,8 @@ final class WhereConditionsDirectiveTest extends DBTestCase
         }
         ';
 
-        /** @var Location $location */
         $location = factory(Location::class)->make();
+        assert($location instanceof Location);
         $location->extra = [
             'value' => 'exampleValue',
         ];
@@ -978,18 +1090,18 @@ final class WhereConditionsDirectiveTest extends DBTestCase
         type Query {
             users(where: _ @whereConditions(
                 columns: ["name"],
-                handler: "{$this->qualifyTestResolver('handler')}")
+                handler: "{$this->qualifyTestResolver('valueTwiceHandler')}")
             ): [User!]! @all
         }
 GRAPHQL;
 
-        /** @var User $user1 */
         $user1 = factory(User::class)->make();
+        assert($user1 instanceof User);
         $user1->name = 'foo';
         $user1->save();
 
-        /** @var User $user2 */
         $user2 = factory(User::class)->make();
+        assert($user2 instanceof User);
         $user2->name = 'foofoo';
         $user2->save();
 
@@ -1019,7 +1131,7 @@ GRAPHQL;
      * @param  \Illuminate\Database\Eloquent\Builder<\Tests\Utils\Models\User>  $builder
      * @param  array<string, mixed>  $conditions
      */
-    public static function handler(EloquentBuilder $builder, array $conditions): void
+    public static function valueTwiceHandler(EloquentBuilder $builder, array $conditions): void
     {
         $value = $conditions['value'];
         $builder->where($conditions['column'], $value . $value);

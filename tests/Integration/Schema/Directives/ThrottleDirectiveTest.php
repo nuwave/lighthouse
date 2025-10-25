@@ -104,7 +104,7 @@ final class ThrottleDirectiveTest extends TestCase
         );
 
         $knownDate = Carbon::createStrict(2020, 1, 1, 1); // arbitrary known date
-        Carbon::setTestNow($knownDate);
+        $this->travelTo($knownDate);
 
         $this->graphQL($query)->assertJson([
             'data' => [
@@ -117,15 +117,13 @@ final class ThrottleDirectiveTest extends TestCase
         );
 
         // wait two minutes and assert that the limit is reset
-        Carbon::setTestNow($knownDate->copy()->addMinutes(2));
+        $this->travel(2)->minutes();
 
         $this->graphQL($query)->assertJson([
             'data' => [
                 'foo' => Foo::THE_ANSWER,
             ],
         ]);
-
-        Carbon::setTestNow();
     }
 
     public function testInlineLimiter(): void
@@ -146,17 +144,17 @@ final class ThrottleDirectiveTest extends TestCase
         $ip = $faker->ipv4;
         $ip2 = $faker->ipv4;
 
-        $this->graphQL($query, [], [], ['REMOTE_ADDR' => $ip])->assertJson([
+        $this->graphQL(query: $query, headers: ['REMOTE_ADDR' => $ip])->assertJson([
             'data' => [
                 'foo' => Foo::THE_ANSWER,
             ],
         ]);
 
-        $this->graphQL($query, [], [], ['REMOTE_ADDR' => $ip])->assertGraphQLError(
+        $this->graphQL(query: $query, headers: ['REMOTE_ADDR' => $ip])->assertGraphQLError(
             new RateLimitException('Query.foo'),
         );
 
-        $this->graphQL($query, [], [], ['REMOTE_ADDR' => $ip2])->assertJson([
+        $this->graphQL(query: $query, headers: ['REMOTE_ADDR' => $ip2])->assertJson([
             'data' => [
                 'foo' => Foo::THE_ANSWER,
             ],

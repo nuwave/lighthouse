@@ -52,7 +52,7 @@ final class SubscriptionTest extends TestCase
         type Query {
             foo: String
         }
-GRAPHQL;
+        GRAPHQL;
     }
 
     public function testSendsSubscriptionChannelInResponse(): void
@@ -73,22 +73,22 @@ GRAPHQL;
     {
         $response = $this->postGraphQL([
             [
-                'query' => /** @lang GraphQL */ '
+                'query' => /** @lang GraphQL */ <<<'GRAPHQL'
                     subscription OnPostCreated1 {
                         onPostCreated {
                             title
                         }
                     }
-                    ',
+                    GRAPHQL,
             ],
             [
-                'query' => /** @lang GraphQL */ '
+                'query' => /** @lang GraphQL */ <<<'GRAPHQL'
                     subscription OnPostCreated2 {
                         onPostCreated {
                             title
                         }
                     }
-                    ',
+                    GRAPHQL,
             ],
         ]);
 
@@ -112,13 +112,13 @@ GRAPHQL;
     public function testBroadcastSubscriptions(): void
     {
         $this->subscribe();
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createPost(title: "Foobar") {
                 title
             }
         }
-        ')->assertGraphQLErrorFree();
+        GRAPHQL)->assertGraphQLErrorFree();
 
         $broadcastDriverManager = $this->app->make(BroadcastDriverManager::class);
 
@@ -138,13 +138,13 @@ GRAPHQL;
 
     public function testWithFieldAlias(): void
     {
-        $response = $this->graphQL(/** @lang GraphQL */ '
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         subscription {
             alias: onPostCreated {
                 title
             }
         }
-        ')->assertGraphQLErrorFree();
+        GRAPHQL)->assertGraphQLErrorFree();
 
         $cache = $this->app->make(CacheStorageManager::class);
 
@@ -172,11 +172,11 @@ GRAPHQL;
 
         $this->subscribe();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'foo' => '42',
             ],
@@ -195,11 +195,11 @@ GRAPHQL;
 
         $this->subscribe();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'foo' => '42',
             ],
@@ -209,26 +209,26 @@ GRAPHQL;
     public function testWithGuard(): void
     {
         $this->be(new User());
-        $this->graphQL(/** @lang GraphQL */ '
-            subscription OnPostCreated {
-                onPostCreated {
-                    body
-                }
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        subscription OnPostCreated {
+            onPostCreated {
+                body
             }
-        ')->assertGraphQLErrorFree();
+        }
+        GRAPHQL)->assertGraphQLErrorFree();
 
         $authFactory = $this->app->make(AuthFactory::class);
         $sessionGuard = $authFactory->guard();
         assert($sessionGuard instanceof SessionGuard);
         $sessionGuard->logout();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createPost(title: "foo", body: "bar") {
                 title
             }
         }
-        ')->assertGraphQLErrorFree();
+        GRAPHQL)->assertGraphQLErrorFree();
 
         $broadcastDriverManager = $this->app->make(BroadcastDriverManager::class);
 
@@ -270,13 +270,13 @@ GRAPHQL;
     {
         $response = $this->subscribe();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createPost(title: "foo", body: "bar") {
                 title
             }
         }
-        ')->assertGraphQLErrorFree();
+        GRAPHQL)->assertGraphQLErrorFree();
 
         $response->assertGraphQLBroadcasted([
             ['title' => 'foo'],
@@ -287,21 +287,21 @@ GRAPHQL;
     {
         $response = $this->subscribe();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createPost(title: "foo", body: "bar") {
                 title
             }
         }
-        ')->assertGraphQLErrorFree();
+        GRAPHQL)->assertGraphQLErrorFree();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createPost(title: "baz", body: "boom") {
                 title
             }
         }
-        ')->assertGraphQLErrorFree();
+        GRAPHQL)->assertGraphQLErrorFree();
 
         $response->assertGraphQLBroadcasted([
             ['title' => 'foo'],
@@ -332,15 +332,15 @@ GRAPHQL;
         $this->assertSame($response->graphQLSubscriptionChannelName(), $response->json('extensions.lighthouse_subscriptions.channel'));
     }
 
-    protected function subscribe(): TestResponse
+    private function subscribe(): TestResponse
     {
-        return $this->graphQL(/** @lang GraphQL */ '
-            subscription OnPostCreated {
-                onPostCreated {
-                    title
-                }
+        return $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        subscription OnPostCreated {
+            onPostCreated {
+                title
             }
-        ');
+        }
+        GRAPHQL);
     }
 
     /**
@@ -348,7 +348,7 @@ GRAPHQL;
      *
      * @return array<string, array<string, mixed>>
      */
-    protected function buildResponse(string $channelName, string $channel): array
+    private function buildResponse(string $channelName, string $channel): array
     {
         return [
             'data' => [

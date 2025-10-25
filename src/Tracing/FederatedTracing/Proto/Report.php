@@ -76,6 +76,13 @@ class Report extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>bool extended_references_enabled = 9 [json_name = "extendedReferencesEnabled"];</code>
      */
     protected $extended_references_enabled = false;
+    /**
+     * A list of features enabled by router at the time this report was generated.
+     * It is expected to be included only by Apollo Router, not by any other reporting agent.
+     *
+     * Generated from protobuf field <code>repeated string router_features_enabled = 10 [json_name = "routerFeaturesEnabled"];</code>
+     */
+    private $router_features_enabled;
 
     /**
      * Constructor.
@@ -110,6 +117,9 @@ class Report extends \Google\Protobuf\Internal\Message
      *           This indicates whether or not extended references are enabled, which are within the stats with context and contain
      *           input type and enum value references. We need this flag so we can tell if the option is enabled even when there are
      *           no extended references to report.
+     *     @type array<string>|\Google\Protobuf\Internal\RepeatedField $router_features_enabled
+     *           A list of features enabled by router at the time this report was generated.
+     *           It is expected to be included only by Apollo Router, not by any other reporting agent.
      * }
      */
     public function __construct($data = NULL) {
@@ -339,6 +349,34 @@ class Report extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkBool($var);
         $this->extended_references_enabled = $var;
+
+        return $this;
+    }
+
+    /**
+     * A list of features enabled by router at the time this report was generated.
+     * It is expected to be included only by Apollo Router, not by any other reporting agent.
+     *
+     * Generated from protobuf field <code>repeated string router_features_enabled = 10 [json_name = "routerFeaturesEnabled"];</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getRouterFeaturesEnabled()
+    {
+        return $this->router_features_enabled;
+    }
+
+    /**
+     * A list of features enabled by router at the time this report was generated.
+     * It is expected to be included only by Apollo Router, not by any other reporting agent.
+     *
+     * Generated from protobuf field <code>repeated string router_features_enabled = 10 [json_name = "routerFeaturesEnabled"];</code>
+     * @param array<string>|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setRouterFeaturesEnabled($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::STRING);
+        $this->router_features_enabled = $arr;
 
         return $this;
     }

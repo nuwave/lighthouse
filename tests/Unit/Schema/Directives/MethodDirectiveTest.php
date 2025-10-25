@@ -108,7 +108,7 @@ final class MethodDirectiveTest extends TestCase
         ');
     }
 
-    protected function mockFoo(): MockObject
+    private function mockFoo(): MockObject
     {
         $foo = $this->getMockBuilder(\stdClass::class)
             ->addMethods(['bar'])

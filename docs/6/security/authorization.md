@@ -6,11 +6,11 @@ You can control what they can do by enforcing authorization rules.
 Before you can apply authorization, make sure you cover [authentication](authentication.md) first - it's
 a prerequisite to have your users logged in before checking what they can do.
 
-## Utilize the Viewer pattern
+## Use the Viewer pattern
 
 A common pattern is to allow users to only access entries that belong to them.
 For example, a user may only be able to see notes they created.
-You can utilize the nested nature of GraphQL queries to naturally limit access to such fields.
+You can use the nested nature of GraphQL queries to naturally limit access to such fields.
 
 Begin with a field that represents the currently authenticated user, commonly called `me` or `viewer`.
 You can resolve that field quite easily by using the [@auth](../api-reference/directives.md#auth) directive.
@@ -39,8 +39,7 @@ type Note {
 }
 ```
 
-Now, authenticated users can query for items that belong to them and are naturally
-limited to seeing just those.
+Now, authenticated users can query for items that belong to them and are naturally limited to seeing just those.
 
 ```graphql
 {

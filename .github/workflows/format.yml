@@ -14,9 +14,9 @@ jobs:
 
       - uses: shivammathur/setup-php@v2
         with:
+          php-version: 8.3
           coverage: none
           extensions: mbstring
-          php-version: 8.3
 
       - run: composer install --no-interaction --no-progress --no-suggest
 
@@ -51,9 +51,9 @@ jobs:
 
       - uses: shivammathur/setup-php@v2
         with:
+          php-version: 8.3
           coverage: none
           extensions: mbstring
-          php-version: 8.3
 
       - run: composer install --no-interaction --no-progress --no-suggest
 

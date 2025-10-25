@@ -17,7 +17,7 @@ see [registering providers in Laravel](https://laravel.com/docs/providers#regist
 
 In order to generate a `.graphql` schema file suitable for publishing, use the `--federation` option of [`print-schema`](../api-reference/commands.md#print-schema).
 
-```sh
+```shell
 php artisan lighthouse:print-schema --federation
 ```
 

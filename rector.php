@@ -25,6 +25,7 @@ return static function (RectorConfig $rectorConfig): void {
         __DIR__ . '/src/Tracing/FederatedTracing/Proto', // Generated code
         __DIR__ . '/tests/database/migrations', // Does not fit autoloader standards
         __DIR__ . '/tests/LaravelPhpdocAlignmentFixer.php', // Copied from Laravel
+        __DIR__ . '/tests/Unit/Schema/Directives/MethodDirectiveTest.php', // System error: "Undefined array key 0"
         Rector\CodeQuality\Rector\Isset_\IssetOnPropertyObjectToPropertyExistsRector::class, // isset() is nice when moving towards typed properties
         Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector::class, // Unnecessarily complex with PHPStan
         Rector\CodeQuality\Rector\Concat\JoinStringConcatRector::class => [
@@ -47,7 +48,6 @@ return static function (RectorConfig $rectorConfig): void {
         Rector\PHPUnit\CodeQuality\Rector\Class_\NarrowUnusedSetUpDefinedPropertyRector::class, // falsely removes $this->schema assignments in some tests
         Rector\PHPUnit\PHPUnit100\Rector\StmtsAwareInterface\WithConsecutiveRector::class, // messes up our custom withConsecutive replacement
         Rector\PHPUnit\PHPUnit60\Rector\ClassMethod\AddDoesNotPerformAssertionToNonAssertingTestRector::class, // does not recognize mockResolver
-        Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertCountWithZeroToAssertEmptyRector::class, // Allows garbage
         Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertEmptyNullableObjectToAssertInstanceofRector::class, // Makes assertions more brittle
     ]);
     $rectorConfig->paths([

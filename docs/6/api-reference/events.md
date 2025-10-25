@@ -1,6 +1,6 @@
 # Events
 
-All events reside in the namespace `\Nuwave\Lighthouse\Events`.
+All events reside in the namespace `Nuwave\Lighthouse\Events`.
 
 ## Lifecycle Events
 

@@ -1,7 +1,6 @@
 # Soft Deleting
 
-Lighthouse offers convenient helpers to work with models that utilize
-[soft deletes](https://laravel.com/docs/eloquent#soft-deleting).
+Lighthouse offers convenient helpers to work with models that use [soft deletes](https://laravel.com/docs/eloquent#soft-deleting).
 
 ## Filter Soft Deleted Models
 

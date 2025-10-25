@@ -345,6 +345,9 @@ message ReportHeader {
   // attached to a schema in the backend.
   string executable_schema_id = 11;
 
+  // The unique reporting agent that generated this report.
+  string agent_id = 13;
+
   reserved 3; // removed string service = 3;
 }
 
@@ -556,6 +559,10 @@ message Report {
   // input type and enum value references. We need this flag so we can tell if the option is enabled even when there are
   // no extended references to report.
   bool extended_references_enabled = 9;
+
+  // A list of features enabled by router at the time this report was generated.
+  // It is expected to be included only by Apollo Router, not by any other reporting agent.
+  repeated string router_features_enabled = 10;
 }
 
 
@@ -583,12 +590,13 @@ message ContextualizedStats {
 }
 
 message QueryMetadata {
-  // The operation name. For now this is a required field if QueryMetadata is present.
+  // The operation name. For operations with a PQ ID as the stats report key, either name or signature must be present in the metadata.
   string name = 1;
-  // the operation signature. For now this is a required field if QueryMetadata is present.
+  // the operation signature. For operations with a PQ ID as the stats report key, either name or signature must be present in the metadata.
   string signature = 2;
   // (Optional) Persisted query ID that was used to request this operation.
   string pq_id = 3;
+
 }
 
 message ExtendedReferences {

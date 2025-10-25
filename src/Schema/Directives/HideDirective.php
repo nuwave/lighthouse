@@ -26,7 +26,7 @@ class HideDirective extends BaseDirective implements ArgManipulator, FieldManipu
         assert($app instanceof Application);
 
         $environment = $app->environment();
-        assert(is_string($environment), 'Calling this method without parameters returns the current value of the environment.');
+        assert(is_string($environment), 'Calling this method without parameters returns the current value of the environment.'); // @phpstan-ignore function.alreadyNarrowedType,function.alreadyNarrowedType (dynamic type known only with the latest Larastan version)
 
         $this->env = $environment;
     }

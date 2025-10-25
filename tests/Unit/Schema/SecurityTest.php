@@ -51,7 +51,7 @@ final class SecurityTest extends TestCase
         $this->assertIntrospectionIsDisabled();
     }
 
-    protected function assertMaxQueryComplexityIs1(): void
+    private function assertMaxQueryComplexityIs1(): void
     {
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -64,7 +64,7 @@ final class SecurityTest extends TestCase
         );
     }
 
-    protected function assertMaxQueryDepthIs1(): void
+    private function assertMaxQueryDepthIs1(): void
     {
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -81,7 +81,7 @@ final class SecurityTest extends TestCase
         );
     }
 
-    protected function assertIntrospectionIsDisabled(): void
+    private function assertIntrospectionIsDisabled(): void
     {
         $this->graphQL(/** @lang GraphQL */ '
         {

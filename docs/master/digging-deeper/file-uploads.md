@@ -25,7 +25,7 @@ type Mutation {
 ## Handling file uploads
 
 Lighthouse accepts multipart form requests that contain file uploads.
-The given file is injected into the `array $variables` as an instance of [`\Illuminate\Http\UploadedFile`](https://laravel.com/api/9.x/Illuminate/Http/UploadedFile.html)
+The given file is injected into the `array $variables` as an instance of [`Illuminate\Http\UploadedFile`](https://laravel.com/api/9.x/Illuminate/Http/UploadedFile.html)
 and passed into the resolver.
 
 It is up to you how to handle the given file in the resolver,
@@ -64,13 +64,13 @@ or look at the [specification examples](https://github.com/jaydenseric/graphql-m
 
 To test the example above, prepare a file you can upload.
 
-```bash
+```shell
 echo "test content" > my_file.txt
 ```
 
 Then, send a request to upload the file to your server:
 
-```bash
+```shell
 curl localhost/graphql \
   -F operations='{ "query": "mutation ($file: Upload!) { upload(file: $file) }", "variables": { "file": null } }' \
   -F map='{ "0": ["variables.file"] }' \

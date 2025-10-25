@@ -28,7 +28,7 @@ trait RelationDirectiveHelpers
     /**
      * @param  array<string, mixed>  $args
      *
-     * @return \Closure(QueryBuilder|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>, ?mixed = null): void
+     * @return \Closure(\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>, mixed=): void
      */
     protected function makeBuilderDecorator(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): \Closure
     {

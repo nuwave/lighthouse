@@ -84,4 +84,44 @@ final class LazyLoadDirectiveTest extends DBTestCase
             ],
         ]);
     }
+
+    public function testLazyLoadRelationsOnPaginate(): void
+    {
+        factory(User::class)->create();
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            tasks: [Task!]! @hasMany
+            tasksLoaded: Boolean! @method
+        }
+
+        type Task {
+            id: ID!
+        }
+
+        type Query {
+            users: [User!]! @paginate @lazyLoad(relations: ["tasks"])
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            users(first: 1) {
+                data {
+                    tasksLoaded
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'users' => [
+                    'data' => [
+                        [
+                            'tasksLoaded' => true,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
 }

@@ -216,7 +216,15 @@ final class LimitDirectiveTest extends DBTestCase
         $cache = $this->app->make(CacheRepository::class);
 
         $data = $cache->get(
-            (new CacheKeyAndTagsGenerator())->key(null, false, 'User', $user2->id, 'tasks', ['limit' => 1], ['user', $user2->id, 'tasks']),
+            (new CacheKeyAndTagsGenerator())->key(
+                user: null,
+                isPrivate: false,
+                parentName: 'User',
+                id: $user2->id,
+                fieldName: 'tasks',
+                args: ['limit' => 1],
+                path: ['user', $user2->id, 'tasks'],
+            ),
         );
         $this->assertIsArray($data);
 

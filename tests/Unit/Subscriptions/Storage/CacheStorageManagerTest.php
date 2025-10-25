@@ -23,7 +23,7 @@ final class CacheStorageManagerTest extends TestCase
     }
 
     /** Construct a dummy subscriber for testing. */
-    protected function subscriber(string $queryString): Subscriber
+    private function subscriber(string $queryString): Subscriber
     {
         $subscriber = $this->createMock(Subscriber::class);
         $subscriber->channel = Subscriber::uniqueChannelName();
@@ -83,7 +83,7 @@ final class CacheStorageManagerTest extends TestCase
         $this->assertCount(0, $this->storage->subscribersByTopic($topic));
     }
 
-    protected function assertSubscriberIsSame(Subscriber $expected, ?Subscriber $actual): void
+    private function assertSubscriberIsSame(Subscriber $expected, ?Subscriber $actual): void
     {
         $this->assertNotNull($actual);
         $this->assertSame(

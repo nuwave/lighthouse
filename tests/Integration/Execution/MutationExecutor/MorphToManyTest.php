@@ -348,8 +348,7 @@ final class MorphToManyTest extends DBTestCase
                 }
             }
         }
-GRAPHQL
-        )->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'upsertTask' => [
                     'id' => 1,

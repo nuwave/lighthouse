@@ -32,6 +32,7 @@ jobs:
           - "^9"
           - "^10"
           - "^11"
+          - "^12"
         composer:
           - name: lowest
             arg: "--prefer-lowest --prefer-stable"
@@ -44,15 +45,19 @@ jobs:
             laravel-version: "^11"
           - php-version: "8.1"
             laravel-version: "^11"
+          - php-version: "8.0"
+            laravel-version: "^12"
+          - php-version: "8.1"
+            laravel-version: "^12"
 
     steps:
       - uses: actions/checkout@v4
 
       - uses: shivammathur/setup-php@v2
         with:
+          php-version: ${{ matrix.php-version }}
           coverage: none
           extensions: ${{ env.REQUIRED_PHP_EXTENSIONS }}
-          php-version: ${{ matrix.php-version }}
 
       - name: "Cache composer dependencies"
         uses: actions/cache@v3
@@ -63,7 +68,8 @@ jobs:
       - name: "Remove conflicting dependencies that are not needed here"
         run: composer remove --dev --no-update phpbench/phpbench rector/rector
 
-      - if: matrix.laravel-version != '^10'
+      - name: "Remove Pennant for Laravel 9 because it is not compatible"
+        if: matrix.laravel-version == '^9'
         run: composer remove --dev --no-update laravel/pennant
 
       - run: >
@@ -94,6 +100,7 @@ jobs:
           - "^9"
           - "^10"
           - "^11"
+          - "^12"
         os:
           - ubuntu-latest
         composer:
@@ -108,6 +115,10 @@ jobs:
             laravel-version: "^11"
           - php-version: "8.1"
             laravel-version: "^11"
+          - php-version: "8.0"
+            laravel-version: "^12"
+          - php-version: "8.1"
+            laravel-version: "^12"
 
     services:
       mysql:
@@ -129,9 +140,10 @@ jobs:
 
       - uses: shivammathur/setup-php@v2
         with:
+          php-version: ${{ matrix.php-version }}
           coverage: none
           extensions: ${{ env.REQUIRED_PHP_EXTENSIONS }}
-          php-version: ${{ matrix.php-version }}
+          ini-values: zend.assertions=1
 
       - name: "Cache composer dependencies"
         uses: actions/cache@v3
@@ -142,7 +154,8 @@ jobs:
       - name: "Remove conflicting dependencies that are not needed here"
         run: composer remove --dev --no-update larastan/larastan phpstan/phpstan-mockery phpbench/phpbench rector/rector
 
-      - if: matrix.laravel-version != '^10' && matrix.laravel-version != '^11'
+      - name: "Remove Pennant for Laravel 9 because it is not compatible"
+        if: matrix.laravel-version == '^9'
         run: composer remove --dev --no-update laravel/pennant
 
       - run: >
@@ -162,7 +175,7 @@ jobs:
     strategy:
       matrix:
         php-version: ["8.4"]
-        laravel-version: ["^11"]
+        laravel-version: ["^12"]
 
     services:
       mysql:
@@ -184,9 +197,10 @@ jobs:
 
       - uses: shivammathur/setup-php@v2
         with:
+          php-version: ${{ matrix.php-version }}
           coverage: pcov
           extensions: ${{ env.REQUIRED_PHP_EXTENSIONS }}
-          php-version: ${{ matrix.php-version }}
+          ini-values: zend.assertions=1
 
       - name: "Cache composer dependencies"
         uses: actions/cache@v3
@@ -209,15 +223,16 @@ jobs:
     strategy:
       matrix:
         php-version: ["8.4"]
-        laravel-version: ["^11"]
+        laravel-version: ["^12"]
 
     steps:
       - uses: actions/checkout@v4
 
       - uses: shivammathur/setup-php@v2
         with:
-          extensions: ${{ env.REQUIRED_PHP_EXTENSIONS }}
           php-version: ${{ matrix.php-version }}
+          coverage: none
+          extensions: ${{ env.REQUIRED_PHP_EXTENSIONS }}
 
       - name: "Cache composer dependencies"
         uses: actions/cache@v3

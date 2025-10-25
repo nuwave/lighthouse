@@ -45,7 +45,7 @@ type User {
 ```
 
 You can also use third-party scalars, such as those provided by [mll-lab/graphql-php-scalars](https://github.com/mll-lab/graphql-php-scalars).
-Just `composer require` your package of choice and add a scalar definition to your schema.
+Install your package of choice and add a scalar definition to your schema.
 Use the [@scalar](../api-reference/directives.md#scalar) directive to point to any fully qualified class name:
 
 ```graphql
@@ -332,9 +332,8 @@ type Employee {
 }
 ```
 
-Just like Interfaces, you need a way to determine the concrete Object Type for a Union,
-based on the resolved value. If the default type resolver does not work for you, define your
-own using `php artisan lighthouse:union <Union name>`.
+Just like Interfaces, you need a way to determine the concrete Object Type for a Union, based on the resolved value.
+If the default type resolver does not work for you, define your own using `php artisan lighthouse:union <Union name>`.
 It is automatically put in the default namespace where Lighthouse can discover it by itself.
 
 Read more about them in the [GraphQL Reference](https://graphql.org/learn/schema/#union-types) and the

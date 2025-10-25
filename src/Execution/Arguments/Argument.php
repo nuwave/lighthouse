@@ -17,7 +17,7 @@ class Argument
     /**
      * The type of the argument.
      */
-    public ListType|NamedType $type;
+    public ListType|NamedType|null $type = null;
 
     /**
      * A list of directives associated with that argument.
@@ -26,7 +26,7 @@ class Argument
      */
     public Collection $directives;
 
-    /** An argument may have a resolver that handles its given value. */
+    /** A resolver that handles the given value. */
     public ?ArgResolver $resolver = null;
 
     public function __construct()

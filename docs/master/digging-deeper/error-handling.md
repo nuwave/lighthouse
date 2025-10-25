@@ -89,7 +89,7 @@ final class CustomException extends Exception implements ClientAware, ProvidesEx
 }
 ```
 
-Now you can just throw that Exception somewhere in your code, for example your resolver,
+Now you can throw that Exception somewhere in your code, for example in your resolver,
 and it will display additional error output.
 
 ```php
@@ -146,7 +146,7 @@ Add them to your `lighthouse.php` config file, for example:
 ],
 ```
 
-An error handler class must implement [`\Nuwave\Lighthouse\Execution\ErrorHandler`](https://github.com/nuwave/lighthouse/blob/master/src/Execution/ErrorHandler.php)
+An error handler class must implement [`Nuwave\Lighthouse\Execution\ErrorHandler`](https://github.com/nuwave/lighthouse/blob/master/src/Execution/ErrorHandler.php)
 
 ```php
 namespace App\GraphQL;

@@ -364,7 +364,7 @@ If Lighthouse's default `SQLOperator` does not fit your use case, you can regist
 This may be necessary if your database uses different SQL operators then Lighthouse's default,
 or you want to extend/restrict the allowed operators.
 
-First create a class that implements `\Nuwave\Lighthouse\WhereConditions\Operator`. For example:
+First create a class that implements `Nuwave\Lighthouse\WhereConditions\Operator`. For example:
 
 ```php
 namespace App\GraphQL;

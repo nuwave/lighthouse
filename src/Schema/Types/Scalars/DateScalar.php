@@ -2,8 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Types\Scalars;
 
-use Carbon\Carbon as CarbonCarbon;
-use Carbon\CarbonImmutable;
 use GraphQL\Error\Error;
 use GraphQL\Error\InvariantViolation;
 use GraphQL\Language\AST\Node;
@@ -14,17 +12,15 @@ use Illuminate\Support\Carbon as IlluminateCarbon;
 abstract class DateScalar extends ScalarType
 {
     /**
-     * Serialize an internal value, ensuring it is a valid date string.
+     * Serialize an internal value, ensuring it is a valid date object or string.
      *
-     * @param  \Illuminate\Support\Carbon|string  $value
+     * @param  \DateTimeInterface|string  $value
      */
     public function serialize($value): string
     {
-        if (! $value instanceof IlluminateCarbon) {
-            $value = $this->tryParsingDate($value, InvariantViolation::class);
-        }
+        $carbonValue = $this->tryParsingDate($value, InvariantViolation::class);
 
-        return $this->format($value);
+        return $this->format($carbonValue);
     }
 
     /** Parse an externally provided variable value into a Carbon instance. */
@@ -44,7 +40,13 @@ abstract class DateScalar extends ScalarType
             throw new Error("Query error: Can only parse strings, got {$valueNode->kind}.", $valueNode);
         }
 
-        return $this->tryParsingDate($valueNode->value, Error::class);
+        $value = $valueNode->value;
+
+        try {
+            return $this->parse($value);
+        } catch (\Exception $exception) {
+            throw Error::createLocatedError($exception, $valueNode);
+        }
     }
 
     /**
@@ -57,27 +59,17 @@ abstract class DateScalar extends ScalarType
     {
         try {
             if (is_object($value)) {
-                if ($value::class === IlluminateCarbon::class) {
+                if ($value instanceof IlluminateCarbon) {
                     return $value;
                 }
 
-                // We want to know if we have exactly a Carbon\Carbon, not a subclass thereof
-                if ($value::class === CarbonCarbon::class
-                    || $value::class === CarbonImmutable::class
-                ) {
-                    $carbon = IlluminateCarbon::create(
-                        $value->year,
-                        $value->month,
-                        $value->day,
-                        $value->hour,
-                        $value->minute,
-                        $value->second,
-                        $value->timezone,
-                    );
-                    assert($carbon instanceof IlluminateCarbon, 'Given we had a valid Carbon instance before, this can not fail.');
-
-                    return $carbon;
+                if ($value instanceof \DateTimeInterface) {
+                    return IlluminateCarbon::instance($value);
                 }
+            }
+
+            if (! is_string($value)) {
+                throw new $exceptionClass('Query error: Can only parse strings.');
             }
 
             return $this->parse($value);
@@ -92,7 +84,7 @@ abstract class DateScalar extends ScalarType
     /**
      * Try turning a client value into a Carbon instance.
      *
-     * @param  mixed  $value  a possibly faulty client value
+     * @param  string  $value a possibly faulty client value
      */
-    abstract protected function parse(mixed $value): IlluminateCarbon;
+    abstract protected function parse(string $value): IlluminateCarbon;
 }
