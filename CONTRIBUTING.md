@@ -9,26 +9,28 @@ If this is your first time contributing to any project on GitHub, see [First Con
 For this project specifically, follow these steps:
 
 1. Fork the project
-1. Clone the repository
-1. [Set up the project](#setup)
-1. Create a branch
-1. Code according to the [guidelines](#code-guidelines) and [style](#code-style)
-1. [Test your changes](#testing)
-1. Commit and push
-1. Open a pull request, following the [template](.github/PULL_REQUEST_TEMPLATE.md)
+2. Clone the repository
+3. [Set up the project](#setup)
+4. Create a branch
+5. Code according to the [guidelines](#code-guidelines) and [style](#code-style)
+6. [Test your changes](#testing)
+7. Commit and push
+8. Open a pull request, following the [template](.github/PULL_REQUEST_TEMPLATE.md)
 
 ## Release a New Version
 
+Before you release a new version, make sure to familiarize yourself with:
+- [Keep a Changelog](https://keepachangelog.com/en/1.0.0)
+- [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
+- [Previous GitHub Releases](https://github.com/nuwave/lighthouse/releases)
+
 To create a new release, follow these steps:
-1. Read [Keep a Changelog](https://keepachangelog.com/en/1.0.0)
-1. Read [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
-1. Look at previous released on the [GitHub release page](https://github.com/nuwave/lighthouse/releases)
 1. Consider the entries in the [`CHANGELOG unreleased section`](CHANGELOG.md#unreleased), add missing entries if needed
-1. Based on those entries and the previous version, define the next version number and add it to the [`CHANGELOG.md`](CHANGELOG.md)
-1. [Draft a new release](https://github.com/nuwave/lighthouse/releases/new)
-1. Add the version number as both tag and title
-1. Add the changelog entries as the description
-1. Publish the release
+2. Based on those entries and the previous version, define the next version number and add it to the [`CHANGELOG.md`](CHANGELOG.md)
+3. [Draft a new release](https://github.com/nuwave/lighthouse/releases/new)
+4. Add the version number as both tag and title
+5. Add the changelog entries as the description
+6. Publish the release
 
 ## Setup
 
