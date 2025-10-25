@@ -32,7 +32,7 @@ The site includes the latest docs for each major version of Lighthouse.
 You can find docs for specific versions by looking at the contents of [/docs/master](/docs/master)
 at that point in the git history: `https://github.com/nuwave/lighthouse/tree/<SPECIFIC-TAG>/docs/master`.
 
-## Get involved
+## Get Involved
 
 - Have a question? [Get your answer using GitHub discussions](https://github.com/nuwave/lighthouse/discussions/new?category=q-a)
 - Talk to other users? [Start a discussion](https://github.com/nuwave/lighthouse/discussions/new?category=general)
