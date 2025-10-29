@@ -1127,6 +1127,47 @@ GRAPHQL;
         ]);
     }
 
+    public function testWhereHasConditionsColumnDefaultsToString(): void
+    {
+        $user1 = factory(User::class)->create();
+        assert($user1 instanceof User);
+        $post1 = factory(Post::class)->create();
+        $post1->title = 'Miss';
+        $user1->posts()->save($post1);
+
+        $user2 = factory(User::class)->create();
+        assert($user2 instanceof User);
+        $post2 = factory(Post::class)->create();
+        $post2->title = 'Hit';
+        $user2->posts()->save($post2);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            enumColumns(
+                where: {
+                    HAS: {
+                        relation: "posts"
+                        condition: {
+                            column: "title"
+                            value: "Hit"
+                        }
+                    }
+                }
+            ) {
+                id
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'enumColumns' => [
+                    [
+                        'id' => "{$user2->id}",
+                    ],
+                ],
+            ],
+        ]);
+    }
+
     /**
      * @param  \Illuminate\Database\Eloquent\Builder<\Tests\Utils\Models\User>  $builder
      * @param  array<string, mixed>  $conditions
