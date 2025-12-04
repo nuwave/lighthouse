@@ -324,7 +324,7 @@ class GraphQL
         return $this->queryCache->fromCacheOrParse(
             hash: $sha256hash,
             // https://github.com/apollographql/apollo-server/blob/37a5c862261806817a1d71852c4e1d9cdb59eab2/packages/apollo-server-errors/src/index.ts#L230-L239
-            parse: fn (): never => throw new Error(message: 'PersistedQueryNotFound', extensions: ['code' => 'PERSISTED_QUERY_NOT_FOUND']),
+            parse: fn () => throw new Error(message: 'PersistedQueryNotFound', extensions: ['code' => 'PERSISTED_QUERY_NOT_FOUND']),
         );
     }
 
