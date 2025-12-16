@@ -438,15 +438,15 @@ final class RelationBatchLoaderTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->user()->associate($user);
         $task->save();
 
         $post = factory(Post::class)->make();
-        assert($post instanceof Post);
+        $this->assertInstanceOf(Post::class, $post);
         $post->task()->associate($task);
         $post->user()->associate($user);
         $post->save();
@@ -510,28 +510,28 @@ final class RelationBatchLoaderTest extends DBTestCase
         ';
 
         $user1 = factory(User::class)->create();
-        assert($user1 instanceof User);
+        $this->assertInstanceOf(User::class, $user1);
 
         $post1 = factory(Post::class)->create();
-        assert($post1 instanceof Post);
+        $this->assertInstanceOf(Post::class, $post1);
 
         $comments1 = factory(Comment::class, 3)->make();
         foreach ($comments1 as $comment) {
-            assert($comment instanceof Comment);
+            $this->assertInstanceOf(Comment::class, $comment);
             $comment->user()->associate($user1);
             $comment->post()->associate($post1);
             $comment->save();
         }
 
         $user2 = factory(User::class)->create();
-        assert($user2 instanceof User);
+        $this->assertInstanceOf(User::class, $user2);
 
         $post2 = factory(Post::class)->create();
-        assert($post2 instanceof Post);
+        $this->assertInstanceOf(Post::class, $post2);
 
         $comments2 = factory(Comment::class, 3)->make();
         foreach ($comments2 as $comment) {
-            assert($comment instanceof Comment);
+            $this->assertInstanceOf(Comment::class, $comment);
             $comment->user()->associate($user2);
             $comment->post()->associate($post2);
             $comment->save();

@@ -409,7 +409,7 @@ final class BelongsToTest extends DBTestCase
     public function testCreateAndUpdateBelongsTo(): void
     {
         $user = factory(User::class)->make();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $user->name = 'foo';
         $user->save();
 
@@ -449,7 +449,7 @@ final class BelongsToTest extends DBTestCase
     public function testUpsertUsingCreateAndUpdateBelongsTo(): void
     {
         $user = factory(User::class)->make();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $user->name = 'foo';
         $user->save();
 
@@ -539,7 +539,7 @@ final class BelongsToTest extends DBTestCase
         ' . self::PLACEHOLDER_QUERY;
 
         $user = factory(User::class)->make();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $user->name = 'foo';
         $user->company()->dissociate();
         $user->team()->dissociate();
@@ -604,7 +604,7 @@ final class BelongsToTest extends DBTestCase
     public function testUpsertUsingCreateAndUpdateUsingUpsertBelongsTo(): void
     {
         $user = factory(User::class)->make();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $user->name = 'foo';
         $user->save();
 
@@ -653,7 +653,7 @@ final class BelongsToTest extends DBTestCase
     public function testUpdateAndDisconnectBelongsTo(string $action): void
     {
         $task = factory(Task::class)->create();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
 
         $task->user()->create();
 
@@ -696,12 +696,12 @@ GRAPHQL
     public function testCreateUsingUpsertAndDisconnectBelongsTo(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $task = $user->tasks()->save(
             factory(Task::class)->make(),
         );
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
 
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -745,12 +745,12 @@ GRAPHQL
     public function testUpdateAndDeleteBelongsTo(string $action): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $task = $user->tasks()->save(
             factory(Task::class)->make(),
         );
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
@@ -836,12 +836,12 @@ GRAPHQL
     public function testDoesNotDeleteOrDisconnectOnFalsyValues(string $action): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $task = $user->tasks()->save(
             factory(Task::class)->make(),
         );
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {

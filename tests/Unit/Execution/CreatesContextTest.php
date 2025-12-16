@@ -25,7 +25,7 @@ final class CreatesContextTest extends TestCase
     public function testGenerateCustomContext(): void
     {
         $this->mockResolver(static function (mixed $root, array $args, GraphQLContext $context): string {
-            assert($context instanceof FooContext);
+            \PHPUnit\Framework\Assert::assertInstanceOf(FooContext::class, $context);
 
             return $context->foo();
         });

@@ -69,10 +69,10 @@ final class FederationEntitiesModelTest extends DBTestCase
         ';
 
         $company = factory(Company::class)->create();
-        assert($company instanceof Company);
+        $this->assertInstanceOf(Company::class, $company);
 
         $user = factory(User::class)->make();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $user->id = $company->id + 1;
         $user->company()->associate($company);
         $user->save();
@@ -156,7 +156,7 @@ final class FederationEntitiesModelTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $userRepresentation = [
             '__typename' => 'User',

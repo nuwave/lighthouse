@@ -27,20 +27,20 @@ final class HasManyThroughDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $task = factory(Task::class)->create();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
 
         $post = factory(Post::class)->make();
-        assert($post instanceof Post);
+        $this->assertInstanceOf(Post::class, $post);
         $post->user()->associate($user);
         $post->task()->associate($task);
         $post->save();
 
         $comments = factory(Comment::class, 2)->make();
         foreach ($comments as $comment) {
-            assert($comment instanceof Comment);
+            $this->assertInstanceOf(Comment::class, $comment);
             $comment->user()->associate($user);
             $comment->post()->associate($post);
             $comment->save();

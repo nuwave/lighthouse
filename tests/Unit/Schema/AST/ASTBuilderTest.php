@@ -47,7 +47,7 @@ final class ASTBuilderTest extends TestCase
         $documentAST = $this->astBuilder->documentAST();
 
         $queryType = $documentAST->types[RootType::QUERY];
-        assert($queryType instanceof ObjectTypeDefinitionNode);
+        $this->assertInstanceOf(ObjectTypeDefinitionNode::class, $queryType);
 
         $this->assertCount(3, $queryType->fields);
     }
@@ -76,7 +76,7 @@ final class ASTBuilderTest extends TestCase
         $documentAST = $this->astBuilder->documentAST();
 
         $myType = $documentAST->types['MyType'];
-        assert($myType instanceof ObjectTypeDefinitionNode);
+        $this->assertInstanceOf(ObjectTypeDefinitionNode::class, $myType);
 
         $this->assertCount(2, $myType->directives);
     }
@@ -99,17 +99,17 @@ final class ASTBuilderTest extends TestCase
         $documentAST = $this->astBuilder->documentAST();
 
         $queryType = $documentAST->types[RootType::QUERY];
-        assert($queryType instanceof ObjectTypeDefinitionNode);
+        $this->assertInstanceOf(ObjectTypeDefinitionNode::class, $queryType);
 
         $this->assertCount(1, $queryType->fields);
 
         $mutationType = $documentAST->types[RootType::MUTATION];
-        assert($mutationType instanceof ObjectTypeDefinitionNode);
+        $this->assertInstanceOf(ObjectTypeDefinitionNode::class, $mutationType);
 
         $this->assertCount(1, $mutationType->fields);
 
         $subscriptionType = $documentAST->types[RootType::SUBSCRIPTION];
-        assert($subscriptionType instanceof ObjectTypeDefinitionNode);
+        $this->assertInstanceOf(ObjectTypeDefinitionNode::class, $subscriptionType);
 
         $this->assertCount(1, $subscriptionType->fields);
     }
@@ -132,7 +132,7 @@ final class ASTBuilderTest extends TestCase
         $documentAST = $this->astBuilder->documentAST();
 
         $inputs = $documentAST->types['Inputs'];
-        assert($inputs instanceof InputObjectTypeDefinitionNode);
+        $this->assertInstanceOf(InputObjectTypeDefinitionNode::class, $inputs);
 
         $this->assertCount(3, $inputs->fields);
     }
@@ -161,7 +161,7 @@ final class ASTBuilderTest extends TestCase
         $documentAST = $this->astBuilder->documentAST();
 
         $myInput = $documentAST->types['MyInput'];
-        assert($myInput instanceof InputObjectTypeDefinitionNode);
+        $this->assertInstanceOf(InputObjectTypeDefinitionNode::class, $myInput);
 
         $this->assertCount(2, $myInput->directives);
     }
@@ -184,7 +184,7 @@ final class ASTBuilderTest extends TestCase
         $documentAST = $this->astBuilder->documentAST();
 
         $named = $documentAST->types['Named'];
-        assert($named instanceof InterfaceTypeDefinitionNode);
+        $this->assertInstanceOf(InterfaceTypeDefinitionNode::class, $named);
 
         $this->assertCount(3, $named->fields);
     }
@@ -213,7 +213,7 @@ final class ASTBuilderTest extends TestCase
         $documentAST = $this->astBuilder->documentAST();
 
         $myInterface = $documentAST->types['MyInterface'];
-        assert($myInterface instanceof InterfaceTypeDefinitionNode);
+        $this->assertInstanceOf(InterfaceTypeDefinitionNode::class, $myInterface);
 
         $this->assertCount(2, $myInterface->directives);
     }
@@ -240,7 +240,7 @@ final class ASTBuilderTest extends TestCase
         $documentAST = $this->astBuilder->documentAST();
 
         $myScalar = $documentAST->types['MyScalar'];
-        assert($myScalar instanceof ScalarTypeDefinitionNode);
+        $this->assertInstanceOf(ScalarTypeDefinitionNode::class, $myScalar);
 
         $this->assertCount(2, $myScalar->directives);
     }
@@ -264,7 +264,7 @@ final class ASTBuilderTest extends TestCase
         $documentAST = $this->astBuilder->documentAST();
 
         $myEnum = $documentAST->types['MyEnum'];
-        assert($myEnum instanceof EnumTypeDefinitionNode);
+        $this->assertInstanceOf(EnumTypeDefinitionNode::class, $myEnum);
 
         $this->assertCount(4, $myEnum->values);
     }
@@ -294,7 +294,7 @@ final class ASTBuilderTest extends TestCase
         $documentAST = $this->astBuilder->documentAST();
 
         $myEnum = $documentAST->types['MyEnum'];
-        assert($myEnum instanceof EnumTypeDefinitionNode);
+        $this->assertInstanceOf(EnumTypeDefinitionNode::class, $myEnum);
 
         $this->assertCount(2, $myEnum->directives);
     }
@@ -315,7 +315,7 @@ final class ASTBuilderTest extends TestCase
         $documentAST = $this->astBuilder->documentAST();
 
         $myUnion = $documentAST->types['MyUnion'];
-        assert($myUnion instanceof UnionTypeDefinitionNode);
+        $this->assertInstanceOf(UnionTypeDefinitionNode::class, $myUnion);
 
         $this->assertCount(3, $myUnion->types);
     }
@@ -487,7 +487,7 @@ final class ASTBuilderTest extends TestCase
         $documentAST = $this->astBuilder->documentAST();
 
         $userType = $documentAST->types['User'];
-        assert($userType instanceof ObjectTypeDefinitionNode);
+        $this->assertInstanceOf(ObjectTypeDefinitionNode::class, $userType);
 
         $interfaces = new Collection($userType->interfaces);
         $this->assertCount(2, $interfaces);

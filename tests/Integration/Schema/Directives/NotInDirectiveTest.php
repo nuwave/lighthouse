@@ -10,10 +10,10 @@ final class NotInDirectiveTest extends DBTestCase
     public function testNotInIDs(): void
     {
         $user1 = factory(User::class)->create();
-        assert($user1 instanceof User);
+        $this->assertInstanceOf(User::class, $user1);
 
         $user2 = factory(User::class)->create();
-        assert($user2 instanceof User);
+        $this->assertInstanceOf(User::class, $user2);
 
         $this->schema = /** @lang GraphQL */ '
         type User {

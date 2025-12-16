@@ -211,7 +211,7 @@ final class AllDirectiveTest extends DBTestCase
     public function testSpecifyCustomBuilderForRelation(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $posts = factory(Post::class, 2)->make();
         $user->posts()->saveMany($posts);
@@ -261,7 +261,7 @@ final class AllDirectiveTest extends DBTestCase
         $this->setUpScoutEngine();
 
         $post = factory(Post::class)->create();
-        assert($post instanceof Post);
+        $this->assertInstanceOf(Post::class, $post);
 
         $this->engine->shouldReceive('map')
             ->withArgs(static fn (ScoutBuilder $builder): bool => $builder->wheres === ['id' => "{$post->id}"]

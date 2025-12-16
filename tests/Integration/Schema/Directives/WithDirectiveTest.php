@@ -28,10 +28,10 @@ final class WithDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         foreach (factory(Task::class, 3)->make() as $task) {
-            assert($task instanceof Task);
+            $this->assertInstanceOf(Task::class, $task);
             $task->user()->associate($user);
             $task->save();
         }
@@ -71,15 +71,15 @@ final class WithDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         foreach (factory(Post::class, 2)->make() as $post) {
-            assert($post instanceof Post);
+            $this->assertInstanceOf(Post::class, $post);
             $post->user()->associate($user);
             $post->save();
 
             $comment = factory(Comment::class)->make();
-            assert($comment instanceof Comment);
+            $this->assertInstanceOf(Comment::class, $comment);
             $comment->user()->associate($user);
             $comment->post()->associate($post);
             $comment->save();
@@ -135,15 +135,15 @@ final class WithDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $post1 = factory(Post::class)->make();
-        assert($post1 instanceof Post);
+        $this->assertInstanceOf(Post::class, $post1);
         $post1->user()->associate($user);
         $post1->save();
 
         $activity1 = factory(Activity::class)->make();
-        assert($activity1 instanceof Activity);
+        $this->assertInstanceOf(Activity::class, $activity1);
         $activity1->user()->associate($user);
         $activity1->content()->associate($post1);
         $activity1->save();
@@ -154,12 +154,12 @@ final class WithDirectiveTest extends DBTestCase
             );
 
         $post2 = factory(Post::class)->make();
-        assert($post2 instanceof Post);
+        $this->assertInstanceOf(Post::class, $post2);
         $post2->user()->associate($user);
         $post2->save();
 
         $activity2 = factory(Activity::class)->make();
-        assert($activity2 instanceof Activity);
+        $this->assertInstanceOf(Activity::class, $activity2);
         $activity2->user()->associate($user);
         $activity2->content()->associate($post2);
         $activity2->save();
@@ -172,7 +172,7 @@ final class WithDirectiveTest extends DBTestCase
         $task = $post1->task;
 
         $activity3 = factory(Activity::class)->make();
-        assert($activity3 instanceof Activity);
+        $this->assertInstanceOf(Activity::class, $activity3);
         $activity3->user()->associate($user);
         $activity3->content()->associate($task);
         $activity3->save();
@@ -260,21 +260,21 @@ final class WithDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         foreach (factory(Task::class, 3)->make() as $task) {
-            assert($task instanceof Task);
+            $this->assertInstanceOf(Task::class, $task);
             $task->user()->associate($user);
             $task->save();
         }
 
         foreach (factory(Post::class, 2)->make() as $post) {
-            assert($post instanceof Post);
+            $this->assertInstanceOf(Post::class, $post);
             $post->user()->associate($user);
             $post->save();
 
             $comment = factory(Comment::class)->make();
-            assert($comment instanceof Comment);
+            $this->assertInstanceOf(Comment::class, $comment);
             $comment->user()->associate($user);
             $comment->post()->associate($post);
             $comment->save();
@@ -322,33 +322,33 @@ final class WithDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $taskA = factory(Task::class)->make();
-        assert($taskA instanceof Task);
+        $this->assertInstanceOf(Task::class, $taskA);
         $taskA->user()->associate($user);
         $taskA->save();
 
         $taskB = factory(Task::class)->make();
-        assert($taskB instanceof Task);
+        $this->assertInstanceOf(Task::class, $taskB);
         $taskB->user()->associate($user);
         $taskB->save();
 
         $postA = factory(Post::class)->make();
-        assert($postA instanceof Post);
+        $this->assertInstanceOf(Post::class, $postA);
         $postA->user()->associate($user);
         $postA->task()->associate($taskA);
         $postA->save();
 
         $postB = factory(Post::class)->make();
-        assert($postB instanceof Post);
+        $this->assertInstanceOf(Post::class, $postB);
         $postB->user()->associate($user);
         $postB->task()->associate($taskB);
         $postB->save();
 
         foreach ([$postA, $postB] as $post) {
             $comment = factory(Comment::class)->make();
-            assert($comment instanceof Comment);
+            $this->assertInstanceOf(Comment::class, $comment);
             $comment->user()->associate($user);
             $comment->post()->associate($post);
             $comment->save();

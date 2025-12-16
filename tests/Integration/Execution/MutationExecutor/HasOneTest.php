@@ -333,7 +333,7 @@ final class HasOneTest extends DBTestCase
     public function testUpdateAndUpdateHasOne(string $action): void
     {
         $task = factory(Task::class)->create();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
 
         $task->post()
             ->save(
@@ -378,7 +378,7 @@ final class HasOneTest extends DBTestCase
     public function testUpdateAndUpsertHasOne(string $action): void
     {
         $task = factory(Task::class)->create();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
 
         $task->post()
             ->save(
@@ -423,7 +423,7 @@ final class HasOneTest extends DBTestCase
     public function testUpdateAndDeleteHasOne(string $action): void
     {
         $task = factory(Task::class)->create();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
 
         $task->post()
             ->save(
