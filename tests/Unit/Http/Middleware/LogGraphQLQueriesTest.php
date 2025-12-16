@@ -22,7 +22,7 @@ final class LogGraphQLQueriesTest extends TestCase
             LogGraphQLQueries::class,
         ]);
 
-        $this->logger = $this->getMockForAbstractClass(LoggerInterface::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
         $app->instance(LoggerInterface::class, $this->logger);
     }
 
