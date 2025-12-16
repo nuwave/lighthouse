@@ -4,7 +4,8 @@ namespace Nuwave\Lighthouse\Testing;
 
 use Illuminate\Container\Container;
 use PHPUnit\Framework\MockObject\Builder\InvocationMocker;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\InvocationStubber;
+use PHPUnit\Framework\MockObject\Rule\InvocationOrder;
 
 // PHPUnit 9, 10, 11
 if (class_exists(InvocationMocker::class)) {
@@ -18,7 +19,7 @@ if (class_exists(InvocationMocker::class)) {
          *
          * @param  callable|mixed|null  $resolverOrValue
          *
-         * @return \PHPUnit\Framework\MockObject\Builder\InvocationMocker<MockableResolver>
+         * @return \PHPUnit\Framework\MockObject\Builder\InvocationMocker<\Nuwave\Lighthouse\Testing\MockableResolver>
          */
         protected function mockResolver(mixed $resolverOrValue = null, string $key = 'default'): InvocationMocker
         {
@@ -38,11 +39,10 @@ if (class_exists(InvocationMocker::class)) {
          *
          * @param  \PHPUnit\Framework\MockObject\Rule\InvocationOrder  $invocationOrder
          *
-         * @return \PHPUnit\Framework\MockObject\Builder\InvocationMocker<MockableResolver>
+         * @return \PHPUnit\Framework\MockObject\Builder\InvocationMocker<\Nuwave\Lighthouse\Testing\MockableResolver>
          */
         protected function mockResolverExpects(object $invocationOrder, string $key = 'default'): InvocationMocker
         {
-            /** @var MockObject&callable $mock */
             $mock = $this->createMock(MockableResolver::class);
 
             $this->registerMockResolver($mock, $key);
@@ -72,7 +72,7 @@ if (class_exists(InvocationMocker::class)) {
          *
          * @param  callable|mixed|null  $resolverOrValue
          */
-        protected function mockResolver(mixed $resolverOrValue = null, string $key = 'default'): \PHPUnit\Framework\MockObject\InvocationStubber
+        protected function mockResolver(mixed $resolverOrValue = null, string $key = 'default'): InvocationStubber
         {
             $method = $this->mockResolverExpects($this->atLeastOnce(), $key);
 
@@ -85,14 +85,9 @@ if (class_exists(InvocationMocker::class)) {
             return $method;
         }
 
-        /**
-         * Register a resolver for `@mock`.
-         *
-         * @param  \PHPUnit\Framework\MockObject\Rule\InvocationOrder  $invocationOrder
-         */
-        protected function mockResolverExpects(object $invocationOrder, string $key = 'default'): \PHPUnit\Framework\MockObject\InvocationStubber
+        /** Register a resolver for `@mock`. */
+        protected function mockResolverExpects(InvocationOrder $invocationOrder, string $key = 'default'): InvocationStubber
         {
-            /** @var MockObject&callable $mock */
             $mock = $this->createMock(MockableResolver::class);
 
             $this->registerMockResolver($mock, $key);
