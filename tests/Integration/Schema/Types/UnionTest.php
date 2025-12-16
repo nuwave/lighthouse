@@ -5,6 +5,7 @@ namespace Tests\Integration\Schema\Types;
 use GraphQL\Error\InvariantViolation;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
@@ -12,6 +13,7 @@ use Tests\Utils\Models\User;
 final class UnionTest extends DBTestCase
 {
     /** @dataProvider withAndWithoutCustomTypeResolver */
+    #[DataProvider('withAndWithoutCustomTypeResolver')]
     public function testResolveUnionTypes(string $schema, string $query): void
     {
         // This creates a user with it

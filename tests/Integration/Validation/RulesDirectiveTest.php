@@ -5,6 +5,7 @@ namespace Tests\Integration\Validation;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Support\AppVersion;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
 use Tests\Utils\Rules\FooBarRule;
@@ -261,6 +262,7 @@ final class RulesDirectiveTest extends TestCase
     }
 
     /** @dataProvider invalidApplyArguments */
+    #[DataProvider('invalidApplyArguments')]
     public function testValidateApplyArgument(string $applyArgument): void
     {
         $this->expectException(DefinitionException::class);
@@ -281,6 +283,7 @@ final class RulesDirectiveTest extends TestCase
     }
 
     /** @dataProvider invalidMessageArguments */
+    #[DataProvider('invalidMessageArguments')]
     public function testValidateMessageArgument(string $messageArgument): void
     {
         $this->expectException(DefinitionException::class);

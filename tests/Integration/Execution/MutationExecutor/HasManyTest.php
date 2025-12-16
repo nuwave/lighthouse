@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Execution\MutationExecutor;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\CustomPrimaryKey;
 use Tests\Utils\Models\Role;
@@ -322,6 +323,7 @@ final class HasManyTest extends DBTestCase
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testCreateHasMany(string $action): void
     {
         factory(User::class)->create();
@@ -362,6 +364,7 @@ final class HasManyTest extends DBTestCase
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testUpdateHasMany(string $action): void
     {
         $user = factory(User::class)->create();
@@ -409,6 +412,7 @@ final class HasManyTest extends DBTestCase
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testUpsertHasMany(string $action): void
     {
         $user = factory(User::class)->create();
@@ -457,6 +461,7 @@ GRAPHQL
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testDeleteHasMany(string $action): void
     {
         $user = factory(User::class)->create();
@@ -497,6 +502,7 @@ GRAPHQL
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testConnectHasMany(string $action): void
     {
         $user = factory(User::class)->create();
@@ -555,6 +561,7 @@ GRAPHQL
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testDisconnectHasMany(string $action): void
     {
         $user = factory(User::class)->create();

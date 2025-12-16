@@ -39,7 +39,7 @@ return static function (RectorConfig $rectorConfig): void {
         ],
         Rector\CodingStyle\Rector\ClassMethod\MakeInheritedMethodVisibilitySameAsParentRector::class => [
             __DIR__ . '/tests/Unit/Execution/ResolveInfoTest.php', // Makes method public on purpose
-            __DIR__ . '/benchmarks/QueryBench.php', // setUp serves a double purpose here
+            __DIR__ . '/benchmarks/BenchmarkTestCase.php', // exposes protected methods
         ],
         Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector::class, // if($truthy) is fine and very readable
         Rector\CodingStyle\Rector\Encapsed\EncapsedStringsToSprintfRector::class, // unreadable, slow, error prone

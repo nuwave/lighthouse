@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Execution\MutationExecutor;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Image;
 use Tests\Utils\Models\Task;
@@ -265,6 +266,7 @@ final class MorphManyTest extends DBTestCase
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testUpdateWithNewMorphMany(string $action): void
     {
         factory(Task::class)->create();
@@ -304,6 +306,7 @@ GRAPHQL
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testUpdateAndUpdateMorphMany(string $action): void
     {
         $task = factory(Task::class)->create();
@@ -350,6 +353,7 @@ GRAPHQL
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testUpdateAndUpsertMorphMany(string $action): void
     {
         $task = factory(Task::class)->create();
@@ -395,6 +399,7 @@ GRAPHQL
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testUpdateAndDeleteMorphMany(string $action): void
     {
         $task = factory(Task::class)->create();
@@ -433,6 +438,7 @@ GRAPHQL
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testUpdateAndConnectMorphMany(string $action): void
     {
         $task = factory(Task::class)->create();
@@ -482,6 +488,7 @@ GRAPHQL
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testUpdateAndDisconnectMorphMany(string $action): void
     {
         $task = factory(Task::class)->create();
@@ -530,6 +537,7 @@ GRAPHQL
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testDisconnectModelEventsMorphMany(string $action): void
     {
         $task = factory(Task::class)->create();

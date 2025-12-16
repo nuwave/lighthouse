@@ -10,11 +10,13 @@ use GraphQL\Language\AST\IntValueNode;
 use GraphQL\Language\AST\StringValueNode;
 use Illuminate\Support\Carbon as IlluminateCarbon;
 use Nuwave\Lighthouse\Schema\Types\Scalars\DateScalar;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 abstract class DateScalarTestBase extends TestCase
 {
     /** @dataProvider invalidDateValues */
+    #[DataProvider('invalidDateValues')]
     public function testThrowsIfSerializingInvalidDates(mixed $value): void
     {
         $dateScalar = $this->scalarInstance();
@@ -24,6 +26,7 @@ abstract class DateScalarTestBase extends TestCase
     }
 
     /** @dataProvider invalidDateValues */
+    #[DataProvider('invalidDateValues')]
     public function testThrowsIfParseValueInvalidDate(mixed $value): void
     {
         $dateScalar = $this->scalarInstance();
@@ -40,6 +43,7 @@ abstract class DateScalarTestBase extends TestCase
     }
 
     /** @dataProvider dateTimeInterfaceInstances */
+    #[DataProvider('dateTimeInterfaceInstances')]
     public function testConvertsDateTimeInterfaceToIlluminateSupportCarbon(\DateTimeInterface $original): void
     {
         $parsed = $this->scalarInstance()->parseValue($original);
@@ -74,6 +78,7 @@ abstract class DateScalarTestBase extends TestCase
     }
 
     /** @dataProvider validDates */
+    #[DataProvider('validDates')]
     public function testParsesValueString(string $date): void
     {
         $this->assertTrue(
@@ -82,6 +87,7 @@ abstract class DateScalarTestBase extends TestCase
     }
 
     /** @dataProvider validDates */
+    #[DataProvider('validDates')]
     public function testParsesLiteral(string $date): void
     {
         $dateLiteral = new StringValueNode(
@@ -110,6 +116,7 @@ abstract class DateScalarTestBase extends TestCase
     }
 
     /** @dataProvider canonicalizeDates */
+    #[DataProvider('canonicalizeDates')]
     public function testCanonicalizesValidDateString(string $date, string $canonical): void
     {
         $result = $this->scalarInstance()->serialize($date);

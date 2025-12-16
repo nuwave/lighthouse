@@ -4,6 +4,7 @@ namespace Tests\Integration\Execution\DataLoader;
 
 use Illuminate\Support\Facades\Cache;
 use Nuwave\Lighthouse\Cache\CacheKeyAndTagsGenerator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\AlternateConnection;
 use Tests\Utils\Models\Comment;
@@ -71,6 +72,7 @@ final class RelationBatchLoaderTest extends DBTestCase
     }
 
     /** @dataProvider batchloadRelationsSetting */
+    #[DataProvider('batchloadRelationsSetting')]
     public function testBatchloadRelations(bool $batchloadRelations, int $expectedQueryCount): void
     {
         $this->schema = /** @lang GraphQL */ '
