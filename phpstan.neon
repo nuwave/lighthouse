@@ -28,6 +28,10 @@ parameters:
   - tests/Utils/Enums/ImageableType.php
   - tests/Utils/Enums/ImageableType.php
   ignoreErrors:
+  # PHPUnit 10+ attributes don't exist in PHPUnit 9.x
+  - path: tests
+    message: '#Attribute class PHPUnit\\Framework\\Attributes\\.+ does not exist\.#'
+
   # PHPStan does not get it
   - '#Parameter \#1 \$callback of static method Closure::fromCallable\(\) expects callable\(\): mixed, array{object, .*} given\.#'
 
