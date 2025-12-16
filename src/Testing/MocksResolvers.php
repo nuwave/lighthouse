@@ -18,7 +18,7 @@ if (class_exists(InvocationMocker::class)) {
          *
          * @param  callable|mixed|null  $resolverOrValue
          *
-         * @return InvocationMocker<MockableResolver>
+         * @return \PHPUnit\Framework\MockObject\Builder\InvocationMocker<MockableResolver>
          */
         protected function mockResolver(mixed $resolverOrValue = null, string $key = 'default'): InvocationMocker
         {
@@ -38,7 +38,7 @@ if (class_exists(InvocationMocker::class)) {
          *
          * @param  \PHPUnit\Framework\MockObject\Rule\InvocationOrder  $invocationOrder
          *
-         * @return InvocationMocker<MockableResolver>
+         * @return \PHPUnit\Framework\MockObject\Builder\InvocationMocker<MockableResolver>
          */
         protected function mockResolverExpects(object $invocationOrder, string $key = 'default'): InvocationMocker
         {
