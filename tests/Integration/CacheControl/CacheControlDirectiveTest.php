@@ -205,7 +205,7 @@ final class CacheControlDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $tasks = factory(Task::class, 3)->make();
         $user->tasks()->saveMany($tasks);
@@ -214,7 +214,7 @@ final class CacheControlDirectiveTest extends DBTestCase
         $user->posts()->saveMany($posts);
 
         $team = factory(Team::class)->create();
-        assert($team instanceof Team);
+        $this->assertInstanceOf(Team::class, $team);
 
         $users = factory(User::class, 3)->make();
         $team->users()->saveMany($users);
@@ -336,7 +336,7 @@ final class CacheControlDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $tasks = factory(Task::class, 3)->make();
         $user->tasks()->saveMany($tasks);
@@ -382,7 +382,7 @@ final class CacheControlDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $tasks = factory(Task::class, 3)->make();
         $user->tasks()->saveMany($tasks);

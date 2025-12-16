@@ -31,7 +31,7 @@ final class ArgBuilderDirectiveTest extends DBTestCase
         ';
 
         $user = $users->first();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $this
             ->graphQL(/** @lang GraphQL */ '
@@ -49,12 +49,12 @@ final class ArgBuilderDirectiveTest extends DBTestCase
     public function testAttachInFilterToQuery(): void
     {
         $user1 = factory(User::class)->create();
-        assert($user1 instanceof User);
+        $this->assertInstanceOf(User::class, $user1);
 
         factory(User::class, 3)->create();
 
         $user2 = factory(User::class)->create();
-        assert($user2 instanceof User);
+        $this->assertInstanceOf(User::class, $user2);
 
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -85,12 +85,12 @@ final class ArgBuilderDirectiveTest extends DBTestCase
     public function testAttachNotInFilterToQuery(): void
     {
         $user1 = factory(User::class)->create();
-        assert($user1 instanceof User);
+        $this->assertInstanceOf(User::class, $user1);
 
         factory(User::class, 3)->create();
 
         $user2 = factory(User::class)->create();
-        assert($user2 instanceof User);
+        $this->assertInstanceOf(User::class, $user2);
 
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -133,7 +133,7 @@ final class ArgBuilderDirectiveTest extends DBTestCase
         ';
 
         $user = $users->first();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $this
             ->graphQL(/** @lang GraphQL */ '
@@ -194,7 +194,7 @@ final class ArgBuilderDirectiveTest extends DBTestCase
         factory(User::class, 2)->create();
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $user->created_at = now()->subDay();
         $user->save();
 
@@ -232,7 +232,7 @@ final class ArgBuilderDirectiveTest extends DBTestCase
         factory(User::class, 2)->create();
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $user->created_at = now()->subDay();
         $user->save();
 
@@ -266,7 +266,7 @@ final class ArgBuilderDirectiveTest extends DBTestCase
         factory(User::class, 2)->create();
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $user->created_at = now()->subDay();
         $user->save();
 
@@ -301,7 +301,7 @@ final class ArgBuilderDirectiveTest extends DBTestCase
         $oneYearAgo = now()->subYear();
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $user->created_at = $oneYearAgo;
         $user->save();
 
@@ -330,7 +330,7 @@ final class ArgBuilderDirectiveTest extends DBTestCase
         $users = factory(User::class, 3)->create();
 
         $user = $users->first();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $this->graphQL(/** @lang GraphQL */ '
         query ($name: String) {
@@ -383,17 +383,17 @@ final class ArgBuilderDirectiveTest extends DBTestCase
         $content = 'foo';
 
         $onlyTitle = factory(Post::class)->make();
-        assert($onlyTitle instanceof Post);
+        $this->assertInstanceOf(Post::class, $onlyTitle);
         $onlyTitle->title = $content;
         $onlyTitle->save();
 
         $onlyBody = factory(Post::class)->make();
-        assert($onlyBody instanceof Post);
+        $this->assertInstanceOf(Post::class, $onlyBody);
         $onlyBody->body = $content;
         $onlyBody->save();
 
         $titleAndBody = factory(Post::class)->make();
-        assert($titleAndBody instanceof Post);
+        $this->assertInstanceOf(Post::class, $titleAndBody);
         $titleAndBody->title = $content;
         $titleAndBody->body = $content;
         $titleAndBody->save();

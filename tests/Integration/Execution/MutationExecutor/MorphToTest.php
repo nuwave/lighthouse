@@ -94,7 +94,7 @@ final class MorphToTest extends DBTestCase
     public function testConnectsMorphTo(): void
     {
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->name = 'first_task';
         $task->save();
 
@@ -142,7 +142,7 @@ final class MorphToTest extends DBTestCase
         $typeRegistry->register($phpEnumType);
 
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->name = 'first_task';
         $task->save();
 
@@ -182,7 +182,7 @@ final class MorphToTest extends DBTestCase
     public function testConnectsMorphToWithUpsert(): void
     {
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->name = 'first_task';
         $task->save();
 
@@ -262,12 +262,12 @@ final class MorphToTest extends DBTestCase
     public function testDisconnectsMorphTo(string $action): void
     {
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->name = 'first_task';
         $task->save();
 
         $image = factory(Image::class)->make();
-        assert($image instanceof Image);
+        $this->assertInstanceOf(Image::class, $image);
         $image->imageable()->associate($task);
         $image->url = 'bar';
         $image->save();
@@ -303,12 +303,12 @@ final class MorphToTest extends DBTestCase
     public function testDeletesMorphTo(string $action): void
     {
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->name = 'first_task';
         $task->save();
 
         $image = factory(Image::class)->make();
-        assert($image instanceof Image);
+        $this->assertInstanceOf(Image::class, $image);
         $image->imageable()->associate($task);
         $image->url = 'bar';
         $image->save();

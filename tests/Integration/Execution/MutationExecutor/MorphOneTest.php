@@ -292,7 +292,7 @@ final class MorphOneTest extends DBTestCase
     public function testUpdateAndUpdateMorphOne(string $action): void
     {
         $task = factory(Task::class)->create();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
 
         $task->images()
             ->save(
@@ -335,7 +335,7 @@ final class MorphOneTest extends DBTestCase
     public function testUpdateAndDeleteMorphOne(string $action): void
     {
         $task = factory(Task::class)->create();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
 
         $task->images()
             ->save(
@@ -372,10 +372,10 @@ final class MorphOneTest extends DBTestCase
     public function testNestedConnectMorphOne(): void
     {
         $task = factory(Task::class)->create();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
 
         $image = factory(Image::class)->create();
-        assert($image instanceof Image);
+        $this->assertInstanceOf(Image::class, $image);
 
         $this->graphQL(/** @lang GraphQL */ '
         mutation ($input: UpdateTaskInput!) {

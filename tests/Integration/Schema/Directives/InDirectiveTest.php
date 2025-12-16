@@ -10,7 +10,7 @@ final class InDirectiveTest extends DBTestCase
     public function testInIDs(): void
     {
         $user1 = factory(User::class)->create();
-        assert($user1 instanceof User);
+        $this->assertInstanceOf(User::class, $user1);
 
         factory(User::class)->create();
 

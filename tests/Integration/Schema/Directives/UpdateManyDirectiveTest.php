@@ -13,12 +13,12 @@ final class UpdateManyDirectiveTest extends DBTestCase
     public function testUpdateFromFieldArguments(): void
     {
         $company1 = factory(Company::class)->create();
-        assert($company1 instanceof Company);
+        $this->assertInstanceOf(Company::class, $company1);
         $company1->name = 'foo1';
         $company1->save();
 
         $company2 = factory(Company::class)->create();
-        assert($company2 instanceof Company);
+        $this->assertInstanceOf(Company::class, $company2);
         $company2->name = 'unchanged';
         $company2->save();
 
@@ -107,7 +107,7 @@ final class UpdateManyDirectiveTest extends DBTestCase
         $name = 'foo1';
 
         $company1 = factory(Company::class)->create();
-        assert($company1 instanceof Company);
+        $this->assertInstanceOf(Company::class, $company1);
         $company1->name = $name;
         $company1->save();
 
@@ -159,7 +159,7 @@ final class UpdateManyDirectiveTest extends DBTestCase
     public function testSameIDMultipleTimes(): void
     {
         $company1 = factory(Company::class)->create();
-        assert($company1 instanceof Company);
+        $this->assertInstanceOf(Company::class, $company1);
         $company1->name = 'foo1';
         $company1->save();
 

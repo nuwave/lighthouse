@@ -305,7 +305,7 @@ GRAPHQL
         ");
 
         $queryType = $schema->getQueryType();
-        assert($queryType instanceof ObjectType);
+        $this->assertInstanceOf(ObjectType::class, $queryType);
 
         return $queryType->getField('users');
     }
@@ -373,42 +373,42 @@ GRAPHQL
             }
             ')
             ->getQueryType();
-        assert($queryType instanceof ObjectType);
+        $this->assertInstanceOf(ObjectType::class, $queryType);
 
         $defaultPaginatedAmountArg = $queryType
             ->getField('defaultPaginated')
             ->getArg('first');
-        assert($defaultPaginatedAmountArg instanceof Argument);
+        $this->assertInstanceOf(Argument::class, $defaultPaginatedAmountArg);
         $this->assertSame('Limits number of fetched items. Maximum allowed value: 5.', $defaultPaginatedAmountArg->description);
 
         $defaultRelayFirstArg = $queryType
             ->getField('defaultRelay')
             ->getArg('first');
-        assert($defaultRelayFirstArg instanceof Argument);
+        $this->assertInstanceOf(Argument::class, $defaultRelayFirstArg);
         $this->assertSame('Limits number of fetched items. Maximum allowed value: 5.', $defaultRelayFirstArg->description);
 
         $defaultSimpleFirstArg = $queryType
             ->getField('defaultSimple')
             ->getArg('first');
-        assert($defaultSimpleFirstArg instanceof Argument);
+        $this->assertInstanceOf(Argument::class, $defaultSimpleFirstArg);
         $this->assertSame('Limits number of fetched items. Maximum allowed value: 5.', $defaultSimpleFirstArg->description);
 
         $customPaginatedAmountArg = $queryType
             ->getField('customPaginated')
             ->getArg('first');
-        assert($customPaginatedAmountArg instanceof Argument);
+        $this->assertInstanceOf(Argument::class, $customPaginatedAmountArg);
         $this->assertSame('Limits number of fetched items. Maximum allowed value: 10.', $customPaginatedAmountArg->description);
 
         $customRelayFirstArg = $queryType
             ->getField('customRelay')
             ->getArg('first');
-        assert($customRelayFirstArg instanceof Argument);
+        $this->assertInstanceOf(Argument::class, $customRelayFirstArg);
         $this->assertSame('Limits number of fetched items. Maximum allowed value: 10.', $customRelayFirstArg->description);
 
         $customSimpleFirstArg = $queryType
             ->getField('customSimple')
             ->getArg('first');
-        assert($customSimpleFirstArg instanceof Argument);
+        $this->assertInstanceOf(Argument::class, $customSimpleFirstArg);
         $this->assertSame('Limits number of fetched items. Maximum allowed value: 10.', $customSimpleFirstArg->description);
     }
 
@@ -639,10 +639,10 @@ GRAPHQL
         ');
 
         $userPaginator = $schema->getType('UserPaginator');
-        assert($userPaginator instanceof ObjectType);
+        $this->assertInstanceOf(ObjectType::class, $userPaginator);
 
         $ast = $userPaginator->astNode;
-        assert($ast instanceof ObjectTypeDefinitionNode);
+        $this->assertInstanceOf(ObjectTypeDefinitionNode::class, $ast);
 
         $this->assertCount(1, $ast->directives);
     }

@@ -12,7 +12,7 @@ final class PropertyAccessTest extends DBTestCase
         $name = 'foobar';
 
         $user = factory(User::class)->make();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $user->name = $name;
         $user->save();
 
@@ -47,7 +47,7 @@ final class PropertyAccessTest extends DBTestCase
     public function testLaravelFunctionProperty(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type User {
@@ -81,7 +81,7 @@ final class PropertyAccessTest extends DBTestCase
     public function testPhpProperty(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type User {
@@ -116,7 +116,7 @@ final class PropertyAccessTest extends DBTestCase
     public function testPrefersAttributeAccessorThatShadowsPhpProperty(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type User {
@@ -150,7 +150,7 @@ final class PropertyAccessTest extends DBTestCase
     public function testPrefersAttributeAccessorNullThatShadowsPhpProperty(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type User {
@@ -184,7 +184,7 @@ final class PropertyAccessTest extends DBTestCase
     public function testExpensivePropertyIsOnlyCalledOnce(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type User {

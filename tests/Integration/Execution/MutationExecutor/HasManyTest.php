@@ -125,10 +125,10 @@ final class HasManyTest extends DBTestCase
     public function testCreateWithConnectHasMany(): void
     {
         $task1 = factory(Task::class)->create();
-        assert($task1 instanceof Task);
+        $this->assertInstanceOf(Task::class, $task1);
 
         $task2 = factory(Task::class)->create();
-        assert($task2 instanceof Task);
+        $this->assertInstanceOf(Task::class, $task2);
 
         $this->graphQL(/** @lang GraphQL */ '
             mutation ($input: CreateUserInput!) {
@@ -365,7 +365,7 @@ final class HasManyTest extends DBTestCase
     public function testUpdateHasMany(string $action): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $user->tasks()
             ->save(
@@ -412,7 +412,7 @@ final class HasManyTest extends DBTestCase
     public function testUpsertHasMany(string $action): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $user->tasks()
             ->save(
@@ -460,7 +460,7 @@ GRAPHQL
     public function testDeleteHasMany(string $action): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $user->tasks()
             ->save(
@@ -500,13 +500,13 @@ GRAPHQL
     public function testConnectHasMany(string $action): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $task1 = factory(Task::class)->create();
-        assert($task1 instanceof Task);
+        $this->assertInstanceOf(Task::class, $task1);
 
         $task2 = factory(Task::class)->create();
-        assert($task2 instanceof Task);
+        $this->assertInstanceOf(Task::class, $task2);
 
         $actionInputName = ucfirst($action);
 
@@ -560,12 +560,12 @@ GRAPHQL
         $user = factory(User::class)->create();
 
         $taskDisconnect = factory(Task::class)->make();
-        assert($taskDisconnect instanceof Task);
+        $this->assertInstanceOf(Task::class, $taskDisconnect);
         $taskDisconnect->user()->associate($user);
         $taskDisconnect->save();
 
         $taskKeep = factory(Task::class)->make();
-        assert($taskKeep instanceof Task);
+        $this->assertInstanceOf(Task::class, $taskKeep);
         $taskKeep->user()->associate($user);
         $taskKeep->save();
 
@@ -837,10 +837,10 @@ GRAPHQL
     public function testUpdateNestedHasMany(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $task = factory(Task::class)->create();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
 
         $this->graphQL(/** @lang GraphQL */ '
             mutation ($input: UpdateUserInput!) {

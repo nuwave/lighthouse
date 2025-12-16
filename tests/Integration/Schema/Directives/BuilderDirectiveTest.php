@@ -176,19 +176,19 @@ final class BuilderDirectiveTest extends DBTestCase
         $users = factory(User::class, 2)->create();
 
         foreach ($users as $user) {
-            assert($user instanceof User);
+            $this->assertInstanceOf(User::class, $user);
 
             $userName = $user->name;
             assert(is_string($userName), 'set by UserFactory');
 
             $taskWithSameName = factory(Task::class)->make();
-            assert($taskWithSameName instanceof Task);
+            $this->assertInstanceOf(Task::class, $taskWithSameName);
             $taskWithSameName->name = $userName;
             $taskWithSameName->user()->associate($user);
             $taskWithSameName->save();
 
             $taskWithOtherName = factory(Task::class)->make();
-            assert($taskWithOtherName instanceof Task);
+            $this->assertInstanceOf(Task::class, $taskWithOtherName);
             $taskWithOtherName->name = "Different from {$userName}";
             $taskWithOtherName->user()->associate($user);
             $taskWithOtherName->save();

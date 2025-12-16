@@ -316,12 +316,12 @@ final class BelongsToManyTest extends DBTestCase
     public function testCreateAndConnectWithBelongsToMany(): void
     {
         $user = factory(User::class)->make();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $user->name = 'user_one';
         $user->save();
 
         $user = factory(User::class)->make();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $user->name = 'user_two';
         $user->save();
 
@@ -364,12 +364,12 @@ final class BelongsToManyTest extends DBTestCase
     public function testUpsertUsingCreationAndConnectWithBelongsToMany(): void
     {
         $user = factory(User::class)->make();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $user->name = 'user_one';
         $user->save();
 
         $user = factory(User::class)->make();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $user->name = 'user_two';
         $user->save();
 
@@ -413,7 +413,7 @@ final class BelongsToManyTest extends DBTestCase
     public function testCreateWithBelongsToMany(): void
     {
         $role = factory(Role::class)->make();
-        assert($role instanceof Role);
+        $this->assertInstanceOf(Role::class, $role);
         $role->name = 'is_admin';
         $role->save();
 
@@ -507,7 +507,7 @@ final class BelongsToManyTest extends DBTestCase
     public function testUpsertUsingCreationWithBelongsToMany(): void
     {
         $role = factory(Role::class)->make();
-        assert($role instanceof Role);
+        $this->assertInstanceOf(Role::class, $role);
         $role->name = 'is_admin';
         $role->save();
 
@@ -572,7 +572,7 @@ final class BelongsToManyTest extends DBTestCase
     public function testUpdateWithBelongsToMany(string $action): void
     {
         $role = factory(Role::class)->make();
-        assert($role instanceof Role);
+        $this->assertInstanceOf(Role::class, $role);
         $role->name = 'is_admin';
         $role->save();
 
@@ -633,7 +633,7 @@ final class BelongsToManyTest extends DBTestCase
     public function testDeleteWithBelongsToMany(string $action): void
     {
         $role = factory(Role::class)->make();
-        assert($role instanceof Role);
+        $this->assertInstanceOf(Role::class, $role);
         $role->name = 'is_admin';
         $role->save();
 
@@ -686,7 +686,7 @@ final class BelongsToManyTest extends DBTestCase
         factory(User::class)->create();
 
         $role = factory(Role::class)->create();
-        assert($role instanceof Role);
+        $this->assertInstanceOf(Role::class, $role);
 
         $role->users()
             ->attach(
@@ -734,7 +734,7 @@ final class BelongsToManyTest extends DBTestCase
         factory(User::class)->create();
 
         $role = factory(Role::class)->create();
-        assert($role instanceof Role);
+        $this->assertInstanceOf(Role::class, $role);
         $role->users()
             ->attach(
                 factory(User::class)->create(),
@@ -779,7 +779,7 @@ final class BelongsToManyTest extends DBTestCase
     public function testDisconnectWithBelongsToMany(string $action): void
     {
         $role = factory(Role::class)->create();
-        assert($role instanceof Role);
+        $this->assertInstanceOf(Role::class, $role);
 
         $role->users()
             ->attach(
@@ -899,10 +899,10 @@ final class BelongsToManyTest extends DBTestCase
     public function testDisconnectAllRelatedModelsOnEmptySync(string $action): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $role = factory(Role::class)->make();
-        assert($role instanceof Role);
+        $this->assertInstanceOf(Role::class, $role);
         $user->roles()->save($role);
 
         $this->assertCount(1, $role->users);
@@ -939,7 +939,7 @@ final class BelongsToManyTest extends DBTestCase
     public function testConnectUserWithRoleAndPivotMetaByUsingSync(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         factory(Role::class)->create();
 
@@ -999,7 +999,7 @@ final class BelongsToManyTest extends DBTestCase
     public function testConnectUserWithRoleAndPivotMetaByUsingSyncWithoutDetach(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         factory(Role::class)->create();
         $role2 = factory(Role::class)->create();

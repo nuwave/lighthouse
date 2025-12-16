@@ -15,10 +15,10 @@ final class ScopeDirectiveTest extends DBTestCase
         factory(Task::class)->times(2)->create();
 
         $taskWithTag = factory(Task::class)->create();
-        assert($taskWithTag instanceof Task);
+        $this->assertInstanceOf(Task::class, $taskWithTag);
 
         $tag = factory(Tag::class)->create();
-        assert($tag instanceof Tag);
+        $this->assertInstanceOf(Tag::class, $tag);
 
         $taskWithTag->tags()->attach($tag);
 
@@ -64,10 +64,10 @@ final class ScopeDirectiveTest extends DBTestCase
         factory(Task::class)->times(2)->create();
 
         $taskWithTag = factory(Task::class)->create();
-        assert($taskWithTag instanceof Task);
+        $this->assertInstanceOf(Task::class, $taskWithTag);
 
         $tag = factory(Tag::class)->create();
-        assert($tag instanceof Tag);
+        $this->assertInstanceOf(Tag::class, $tag);
 
         $taskWithTag->tags()->save($tag);
 
@@ -103,12 +103,12 @@ final class ScopeDirectiveTest extends DBTestCase
     public function testWorksWithCustomQueryBuilders(): void
     {
         $named = factory(User::class)->make();
-        assert($named instanceof User);
+        $this->assertInstanceOf(User::class, $named);
         $named->name = 'foo';
         $named->save();
 
         $unnamed = factory(User::class)->make();
-        assert($unnamed instanceof User);
+        $this->assertInstanceOf(User::class, $unnamed);
         $unnamed->name = null;
         $unnamed->save();
 

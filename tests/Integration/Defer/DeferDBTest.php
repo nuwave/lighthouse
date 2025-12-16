@@ -22,10 +22,10 @@ final class DeferDBTest extends DBTestCase
     public function testDeferBelongsToFields(): void
     {
         $company = factory(Company::class)->create();
-        assert($company instanceof Company);
+        $this->assertInstanceOf(Company::class, $company);
 
         $user = factory(User::class)->make();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $user->company()->associate($company);
         $user->save();
 
@@ -76,17 +76,17 @@ final class DeferDBTest extends DBTestCase
     public function testDeferNestedRelationshipFields(): void
     {
         $company = factory(Company::class)->create();
-        assert($company instanceof Company);
+        $this->assertInstanceOf(Company::class, $company);
 
         $users = factory(User::class, 5)->make();
         foreach ($users as $user) {
-            assert($user instanceof User);
+            $this->assertInstanceOf(User::class, $user);
             $user->company()->associate($company);
             $user->save();
         }
 
         $user = $users[0];
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $user->setRelations([]);
 
         $this->mockResolver($user);

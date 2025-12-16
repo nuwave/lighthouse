@@ -247,7 +247,7 @@ final class ClearQueryCacheCommandTest extends TestCase
     private function configureQueryCacheMode(string $mode): FilesystemAdapter
     {
         $filesystem = Storage::fake();
-        assert($filesystem instanceof FilesystemAdapter);
+        $this->assertInstanceOf(FilesystemAdapter::class, $filesystem);
 
         $config = $this->app->make(ConfigRepository::class);
         $config->set('lighthouse.query_cache.enable', true);

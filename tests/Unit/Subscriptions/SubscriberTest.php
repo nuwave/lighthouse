@@ -47,7 +47,7 @@ final class SubscriberTest extends TestCase
 
         $serialized = unserialize(serialize($subscriber));
 
-        assert($serialized instanceof Subscriber);
+        $this->assertInstanceOf(Subscriber::class, $serialized);
         $this->assertSame($args, $serialized->args);
         $this->assertSame($channel, $serialized->channel);
         $this->assertSame($topic, $serialized->topic);

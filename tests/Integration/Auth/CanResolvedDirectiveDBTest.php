@@ -59,7 +59,7 @@ final class CanResolvedDirectiveDBTest extends DBTestCase
         $company = factory(Company::class)->create();
 
         $user = factory(User::class)->make();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $user->company()->associate($company);
         $user->save();
 

@@ -11,17 +11,17 @@ final class WhereBetweenDirectiveTest extends DBTestCase
     public function testBetween(): void
     {
         $user1 = factory(User::class)->make();
-        assert($user1 instanceof User);
+        $this->assertInstanceOf(User::class, $user1);
         $user1->created_at = Carbon::createStrict(2022);
         $user1->save();
 
         $user2 = factory(User::class)->make();
-        assert($user2 instanceof User);
+        $this->assertInstanceOf(User::class, $user2);
         $user2->created_at = Carbon::createStrict(2023);
         $user2->save();
 
         $user3 = factory(User::class)->make();
-        assert($user3 instanceof User);
+        $this->assertInstanceOf(User::class, $user3);
         $user3->created_at = Carbon::createStrict(2024);
         $user3->save();
 

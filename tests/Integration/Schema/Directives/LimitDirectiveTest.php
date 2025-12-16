@@ -135,7 +135,7 @@ final class LimitDirectiveTest extends DBTestCase
         $users = factory(User::class, 2)->create();
 
         foreach ($users as $user) {
-            assert($user instanceof User);
+            $this->assertInstanceOf(User::class, $user);
             $user->tasks()->saveMany(
                 factory(Task::class, 2)->make(),
             );
@@ -180,7 +180,7 @@ final class LimitDirectiveTest extends DBTestCase
         $user2 = factory(User::class)->create();
 
         foreach ([$user1, $user2] as $user) {
-            assert($user instanceof User);
+            $this->assertInstanceOf(User::class, $user);
             $user->tasks()->saveMany(
                 factory(Task::class, 2)->make(),
             );

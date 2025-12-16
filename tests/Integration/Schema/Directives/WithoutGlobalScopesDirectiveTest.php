@@ -11,12 +11,12 @@ final class WithoutGlobalScopesDirectiveTest extends DBTestCase
     public function testOmitsScopesWhenArgumentValueIsTrue(): void
     {
         $scheduledPodcast = factory(Podcast::class)->make();
-        assert($scheduledPodcast instanceof Podcast);
+        $this->assertInstanceOf(Podcast::class, $scheduledPodcast);
         $scheduledPodcast->schedule_at = Carbon::tomorrow();
         $scheduledPodcast->save();
 
         $unscheduledPodcast = factory(Podcast::class)->make();
-        assert($unscheduledPodcast instanceof Podcast);
+        $this->assertInstanceOf(Podcast::class, $unscheduledPodcast);
         $unscheduledPodcast->schedule_at = null;
         $unscheduledPodcast->save();
 

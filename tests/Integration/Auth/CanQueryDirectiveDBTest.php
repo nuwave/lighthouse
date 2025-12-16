@@ -18,7 +18,7 @@ final class CanQueryDirectiveDBTest extends DBTestCase
         $this->be($admin);
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -91,7 +91,7 @@ final class CanQueryDirectiveDBTest extends DBTestCase
         $this->be($admin);
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $this->schema = /** @lang GraphQL */ '
         type Mutation {
@@ -122,12 +122,12 @@ final class CanQueryDirectiveDBTest extends DBTestCase
         $this->be($admin);
 
         $postA = factory(Post::class)->make();
-        assert($postA instanceof Post);
+        $this->assertInstanceOf(Post::class, $postA);
         $postA->user()->associate($admin);
         $postA->save();
 
         $postB = factory(Post::class)->make();
-        assert($postB instanceof Post);
+        $this->assertInstanceOf(Post::class, $postB);
         $postB->user()->associate($admin);
         $postB->save();
 
@@ -172,7 +172,7 @@ final class CanQueryDirectiveDBTest extends DBTestCase
         $this->be($admin);
 
         $task = factory(Task::class)->create();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->delete();
 
         $this->schema = /** @lang GraphQL */ '
