@@ -36,14 +36,12 @@ trait MocksResolvers
      *
      * @param  \PHPUnit\Framework\MockObject\Rule\InvocationOrder  $invocationOrder
      *
-     * @return \PHPUnit\Framework\MockObject\Builder\InvocationMocker<\stdClass>
+     * @return \PHPUnit\Framework\MockObject\Builder\InvocationMocker<\Nuwave\Lighthouse\Testing\MockableResolver>
      */
     protected function mockResolverExpects(object $invocationOrder, string $key = 'default'): InvocationMocker
     {
         /** @var MockObject|callable $mock */
-        $mock = $this->getMockBuilder(\stdClass::class)
-            ->addMethods(['__invoke'])
-            ->getMock();
+        $mock = $this->createMock(MockableResolver::class);
 
         $this->registerMockResolver($mock, $key);
 

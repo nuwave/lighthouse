@@ -60,7 +60,7 @@ parameters:
   - '#Return type of call to method Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany<.+>::save\(\) contains unresolvable type\.#'
 
   # Different between PHPUnit versions
-  - '#PHPDoc tag @return contains generic type PHPUnit\\Framework\\MockObject\\Builder\\InvocationMocker<stdClass> but class PHPUnit\\Framework\\MockObject\\Builder\\InvocationMocker is not generic.#'
+  - '#PHPDoc tag @return contains generic type PHPUnit\\Framework\\MockObject\\Builder\\InvocationMocker<.+> but class PHPUnit\\Framework\\MockObject\\Builder\\InvocationMocker is not generic.#'
 
   # This test cheats and uses reflection to make assertions
   - path: tests/Unit/Schema/Directives/BaseDirectiveTest.php
