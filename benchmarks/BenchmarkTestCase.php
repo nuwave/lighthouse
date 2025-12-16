@@ -6,14 +6,8 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
 
-/**
- * Concrete wrapper that exposes protected members.
- *
- * PHPBench instantiates benchmark classes with no constructor arguments.
- * PHPUnit's TestCase requires constructor arguments, so we use composition
- * instead of inheritance to work around this limitation.
- */
-class BenchmarkTestCase extends TestCase
+/** Allows reusing test setup and helpers for benchmarks. */
+final class BenchmarkTestCase extends TestCase
 {
     public function setUp(): void
     {
