@@ -51,7 +51,7 @@ final class SchemaBuilderTest extends TestCase
         ');
 
         $mutationObjectType = $schema->getType(RootType::MUTATION);
-        assert($mutationObjectType instanceof ObjectType);
+        $this->assertInstanceOf(ObjectType::class, $mutationObjectType);
 
         $this->assertSame('foo', $mutationObjectType->getField('foo')->name);
     }
@@ -70,14 +70,14 @@ final class SchemaBuilderTest extends TestCase
         ');
 
         $enumType = $schema->getType('Role');
-        assert($enumType instanceof EnumType);
+        $this->assertInstanceOf(EnumType::class, $enumType);
         $this->assertSame('Role description', $enumType->description);
 
         $enumValues = $enumType->getValues();
         $this->assertCount(2, $enumValues);
 
         $enumValueDefinition = $enumType->getValue('ADMIN');
-        assert($enumValueDefinition instanceof EnumValueDefinition);
+        $this->assertInstanceOf(EnumValueDefinition::class, $enumValueDefinition);
         $this->assertSame('Company administrator.', $enumValueDefinition->description);
     }
 
@@ -94,7 +94,7 @@ final class SchemaBuilderTest extends TestCase
         ');
 
         $interfaceType = $schema->getType('Foo');
-        assert($interfaceType instanceof InterfaceType);
+        $this->assertInstanceOf(InterfaceType::class, $interfaceType);
 
         $this->assertSame('int', $interfaceType->description);
         $this->assertSame('bar is baz', $interfaceType->getField('bar')->description);
@@ -114,14 +114,14 @@ final class SchemaBuilderTest extends TestCase
         ');
 
         $foo = $schema->getType('Foo');
-        assert($foo instanceof ObjectType);
+        $this->assertInstanceOf(ObjectType::class, $foo);
         $this->assertSame('Foo', $foo->name);
 
         $bar = $foo->getField('bar');
         $this->assertSame('bar attribute of Foo', $bar->description);
 
         $baz = $bar->getArg('baz');
-        assert($baz instanceof Argument);
+        $this->assertInstanceOf(Argument::class, $baz);
         $this->assertSame('arg', $baz->description);
         $this->assertTrue($baz->defaultValueExists());
         $this->assertFalse($baz->defaultValue);
@@ -139,7 +139,7 @@ final class SchemaBuilderTest extends TestCase
         ');
 
         $inputObjectType = $schema->getType('CreateFoo');
-        assert($inputObjectType instanceof InputObjectType);
+        $this->assertInstanceOf(InputObjectType::class, $inputObjectType);
 
         $this->assertSame('CreateFoo', $inputObjectType->name);
         $this->assertSame('bla', $inputObjectType->description);
@@ -156,7 +156,7 @@ final class SchemaBuilderTest extends TestCase
         ');
 
         $mutationObjectType = $schema->getType(RootType::MUTATION);
-        assert($mutationObjectType instanceof ObjectType);
+        $this->assertInstanceOf(ObjectType::class, $mutationObjectType);
 
         $this->assertSame('foo', $mutationObjectType->getField('foo')->name);
     }
@@ -166,7 +166,7 @@ final class SchemaBuilderTest extends TestCase
         $schema = $this->buildSchemaWithPlaceholderQuery('');
 
         $queryObjectType = $schema->getType(RootType::QUERY);
-        assert($queryObjectType instanceof ObjectType);
+        $this->assertInstanceOf(ObjectType::class, $queryObjectType);
 
         $this->assertSame('foo', $queryObjectType->getField('foo')->name);
     }
@@ -184,7 +184,7 @@ final class SchemaBuilderTest extends TestCase
         ');
 
         $objectType = $schema->getType('Foo');
-        assert($objectType instanceof ObjectType);
+        $this->assertInstanceOf(ObjectType::class, $objectType);
         $fields = $objectType->getFields();
 
         $this->assertArrayHasKey('baz', $fields);
@@ -204,7 +204,7 @@ final class SchemaBuilderTest extends TestCase
         ');
 
         $type = $schema->getType('Foo');
-        assert($type instanceof ObjectType);
+        $this->assertInstanceOf(ObjectType::class, $type);
 
         $this->assertSame('yo?', $type->getField('bar')->description);
     }
@@ -224,12 +224,12 @@ final class SchemaBuilderTest extends TestCase
         ');
 
         $queryType = $schema->getQueryType();
-        assert($queryType instanceof ObjectType);
+        $this->assertInstanceOf(ObjectType::class, $queryType);
 
         $barArg = $queryType
             ->getField('foo')
             ->getArg('bar');
-        assert($barArg instanceof Argument);
+        $this->assertInstanceOf(Argument::class, $barArg);
         $this->assertSame('internal', $barArg->defaultValue);
     }
 }

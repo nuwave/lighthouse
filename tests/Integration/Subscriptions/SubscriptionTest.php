@@ -98,10 +98,10 @@ final class SubscriptionTest extends TestCase
         $this->assertCount(2, $subscribers);
 
         $subscriber1 = $subscribers[0];
-        assert($subscriber1 instanceof Subscriber);
+        $this->assertInstanceOf(Subscriber::class, $subscriber1);
 
         $subscriber2 = $subscribers[1];
-        assert($subscriber2 instanceof Subscriber);
+        $this->assertInstanceOf(Subscriber::class, $subscriber2);
 
         $response->assertExactJson([
             $this->buildResponse('onPostCreated', $subscriber1->channel),
@@ -123,7 +123,7 @@ final class SubscriptionTest extends TestCase
         $broadcastDriverManager = $this->app->make(BroadcastDriverManager::class);
 
         $logDriver = $broadcastDriverManager->driver();
-        assert($logDriver instanceof LogBroadcaster);
+        $this->assertInstanceOf(LogBroadcaster::class, $logDriver);
 
         $broadcasts = $logDriver->broadcasts();
 
@@ -219,7 +219,7 @@ final class SubscriptionTest extends TestCase
 
         $authFactory = $this->app->make(AuthFactory::class);
         $sessionGuard = $authFactory->guard();
-        assert($sessionGuard instanceof SessionGuard);
+        $this->assertInstanceOf(SessionGuard::class, $sessionGuard);
         $sessionGuard->logout();
 
         $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
@@ -233,7 +233,7 @@ final class SubscriptionTest extends TestCase
         $broadcastDriverManager = $this->app->make(BroadcastDriverManager::class);
 
         $log = $broadcastDriverManager->driver();
-        assert($log instanceof LogBroadcaster);
+        $this->assertInstanceOf(LogBroadcaster::class, $log);
 
         $broadcasts = $log->broadcasts();
 
@@ -314,7 +314,7 @@ final class SubscriptionTest extends TestCase
         $response = $this->subscribe();
 
         $mock = $response->graphQLSubscriptionMock();
-        assert($mock instanceof MockInterface); // @phpstan-ignore instanceof.alwaysTrue (aids IDE)
+        $this->assertInstanceOf(MockInterface::class, $mock); // @phpstan-ignore method.alreadyNarrowedType (aids IDE)
         $mock->shouldNotHaveReceived('broadcast');
     }
 

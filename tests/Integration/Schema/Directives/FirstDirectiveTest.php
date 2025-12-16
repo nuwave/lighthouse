@@ -21,13 +21,13 @@ final class FirstDirectiveTest extends DBTestCase
         ';
 
         $userA = factory(User::class)->create();
-        assert($userA instanceof User);
+        $this->assertInstanceOf(User::class, $userA);
 
         $userB = factory(User::class)->create();
-        assert($userB instanceof User);
+        $this->assertInstanceOf(User::class, $userB);
 
         $userC = factory(User::class)->create();
-        assert($userC instanceof User);
+        $this->assertInstanceOf(User::class, $userC);
 
         $this->graphQL(/** @lang GraphQL */ '
         query ($id: ID!) {
@@ -60,17 +60,17 @@ final class FirstDirectiveTest extends DBTestCase
         ';
 
         $userA1 = factory(User::class)->create();
-        assert($userA1 instanceof User);
+        $this->assertInstanceOf(User::class, $userA1);
         $userA1->name = 'A';
         $userA1->save();
 
         $userA2 = factory(User::class)->create();
-        assert($userA2 instanceof User);
+        $this->assertInstanceOf(User::class, $userA2);
         $userA2->name = 'A';
         $userA2->save();
 
         $userB = factory(User::class)->create();
-        assert($userB instanceof User);
+        $this->assertInstanceOf(User::class, $userB);
         $userB->name = 'B';
         $userB->save();
 

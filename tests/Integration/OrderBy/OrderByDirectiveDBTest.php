@@ -285,10 +285,10 @@ final class OrderByDirectiveDBTest extends DBTestCase
         ';
 
         $userA = factory(User::class)->create();
-        assert($userA instanceof User);
+        $this->assertInstanceOf(User::class, $userA);
 
         $userB = factory(User::class)->create();
-        assert($userB instanceof User);
+        $this->assertInstanceOf(User::class, $userB);
 
         $userA->tasks()->saveMany(
             factory(Task::class, 1)->create(),
@@ -374,18 +374,18 @@ final class OrderByDirectiveDBTest extends DBTestCase
         ';
 
         $userA = factory(User::class)->create();
-        assert($userA instanceof User);
+        $this->assertInstanceOf(User::class, $userA);
 
         $userB = factory(User::class)->create();
-        assert($userB instanceof User);
+        $this->assertInstanceOf(User::class, $userB);
 
         $taskA1 = factory(Task::class)->make();
-        assert($taskA1 instanceof Task);
+        $this->assertInstanceOf(Task::class, $taskA1);
         $taskA1->difficulty = 1;
         $userA->tasks()->save($taskA1);
 
         $taskB1 = factory(Task::class)->make();
-        assert($taskB1 instanceof Task);
+        $this->assertInstanceOf(Task::class, $taskB1);
         $taskB1->difficulty = 2;
         $userB->tasks()->save($taskB1);
 

@@ -15,7 +15,7 @@ final class DeleteDirectiveTest extends DBTestCase
     public function testDeletesUserAndReturnsIt(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $this->schema .= /** @lang GraphQL */ '
         type User {
@@ -74,7 +74,7 @@ final class DeleteDirectiveTest extends DBTestCase
     public function testDeletesMultipleUsersByIDAndReturnsThem(): void
     {
         $users = factory(User::class, 2)->create();
-        assert($users instanceof EloquentCollection);
+        $this->assertInstanceOf(EloquentCollection::class, $users);
 
         $this->schema .= /** @lang GraphQL */ '
         type User {
@@ -102,12 +102,12 @@ final class DeleteDirectiveTest extends DBTestCase
     public function testDeleteByNonPrimaryKey(): void
     {
         $foo = factory(User::class)->make();
-        assert($foo instanceof User);
+        $this->assertInstanceOf(User::class, $foo);
         $foo->name = 'foo';
         $foo->save();
 
         $bar = factory(User::class)->make();
-        assert($bar instanceof User);
+        $this->assertInstanceOf(User::class, $bar);
         $bar->name = 'bar';
         $bar->save();
 
@@ -145,12 +145,12 @@ final class DeleteDirectiveTest extends DBTestCase
     public function testDeleteWithScopes(): void
     {
         $named = factory(User::class)->make();
-        assert($named instanceof User);
+        $this->assertInstanceOf(User::class, $named);
         $named->name = 'foo';
         $named->save();
 
         $unnamed = factory(User::class)->make();
-        assert($unnamed instanceof User);
+        $this->assertInstanceOf(User::class, $unnamed);
         $unnamed->name = null;
         $unnamed->save();
 
@@ -305,11 +305,11 @@ final class DeleteDirectiveTest extends DBTestCase
     public function testUseNestedArgResolverDelete(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $tasks = factory(Task::class, 2)->make();
         foreach ($tasks as $task) {
-            assert($task instanceof Task);
+            $this->assertInstanceOf(Task::class, $task);
             $task->user()->associate($user);
             $task->save();
         }
@@ -361,10 +361,10 @@ final class DeleteDirectiveTest extends DBTestCase
     public function testDeleteHasOneThroughNestedArgResolver(): void
     {
         $task = factory(Task::class)->create();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
 
         $post = factory(Post::class)->make();
-        assert($post instanceof Post);
+        $this->assertInstanceOf(Post::class, $post);
         $task->post()->save($post);
 
         $this->schema .= /** @lang GraphQL */ '
@@ -433,10 +433,10 @@ final class DeleteDirectiveTest extends DBTestCase
     public function testDeleteBelongsToThroughNestedArgResolver(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->user()->associate($user);
         $task->save();
 
@@ -487,7 +487,7 @@ final class DeleteDirectiveTest extends DBTestCase
         User::deleting(static fn (): bool => false);
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $this->schema .= /** @lang GraphQL */ '
         type User {

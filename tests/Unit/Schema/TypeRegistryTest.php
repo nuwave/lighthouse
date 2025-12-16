@@ -37,12 +37,12 @@ final class TypeRegistryTest extends TestCase
         ');
 
         $enumType = $this->typeRegistry->handle($enumNode);
-        assert($enumType instanceof EnumType);
+        $this->assertInstanceOf(EnumType::class, $enumType);
 
         $this->assertSame('Role', $enumType->name);
 
         $enumValueDefinition = $enumType->getValue('ADMIN');
-        assert($enumValueDefinition instanceof EnumValueDefinition);
+        $this->assertInstanceOf(EnumValueDefinition::class, $enumValueDefinition);
 
         $this->assertSame(123, $enumValueDefinition->value);
     }
@@ -56,12 +56,12 @@ final class TypeRegistryTest extends TestCase
         ');
 
         $enumType = $this->typeRegistry->handle($enumNode);
-        assert($enumType instanceof EnumType);
+        $this->assertInstanceOf(EnumType::class, $enumType);
 
         $this->assertSame('Role', $enumType->name);
 
         $enumValueDefinition = $enumType->getValue('EMPLOYEE');
-        assert($enumValueDefinition instanceof EnumValueDefinition);
+        $this->assertInstanceOf(EnumValueDefinition::class, $enumValueDefinition);
 
         $this->assertSame('EMPLOYEE', $enumValueDefinition->value);
     }
@@ -73,7 +73,7 @@ final class TypeRegistryTest extends TestCase
         ');
 
         $scalarType = $this->typeRegistry->handle($scalarNode);
-        assert($scalarType instanceof ScalarType);
+        $this->assertInstanceOf(ScalarType::class, $scalarType);
 
         $this->assertSame('Email', $scalarType->name);
     }
@@ -85,7 +85,7 @@ final class TypeRegistryTest extends TestCase
         ');
 
         $scalarType = $this->typeRegistry->handle($scalarNode);
-        assert($scalarType instanceof ScalarType);
+        $this->assertInstanceOf(ScalarType::class, $scalarType);
 
         $this->assertSame('DateTime', $scalarType->name);
     }
@@ -97,7 +97,7 @@ final class TypeRegistryTest extends TestCase
         ');
 
         $scalarType = $this->typeRegistry->handle($scalarNode);
-        assert($scalarType instanceof ScalarType);
+        $this->assertInstanceOf(ScalarType::class, $scalarType);
 
         $this->assertSame('SomeEmail', $scalarType->name);
     }
@@ -119,7 +119,7 @@ final class TypeRegistryTest extends TestCase
         ');
 
         $interfaceType = $this->typeRegistry->handle($interfaceNode);
-        assert($interfaceType instanceof InterfaceType);
+        $this->assertInstanceOf(InterfaceType::class, $interfaceType);
 
         $this->assertSame('Foo', $interfaceType->name);
         $this->assertArrayHasKey('bar', $interfaceType->getFields());
@@ -135,7 +135,7 @@ final class TypeRegistryTest extends TestCase
         ');
 
         $interfaceType = $this->typeRegistry->handle($interfaceNode);
-        assert($interfaceType instanceof InterfaceType);
+        $this->assertInstanceOf(InterfaceType::class, $interfaceType);
 
         $this->assertSame('Nameable', $interfaceType->name);
     }
@@ -149,7 +149,7 @@ final class TypeRegistryTest extends TestCase
         ');
 
         $interfaceType = $this->typeRegistry->handle($interfaceNode);
-        assert($interfaceType instanceof InterfaceType);
+        $this->assertInstanceOf(InterfaceType::class, $interfaceType);
 
         $this->assertSame('Bar', $interfaceType->name);
     }
@@ -161,7 +161,7 @@ final class TypeRegistryTest extends TestCase
         ');
 
         $unionType = $this->typeRegistry->handle($unionNode);
-        assert($unionType instanceof UnionType);
+        $this->assertInstanceOf(UnionType::class, $unionType);
 
         $this->assertSame('Foo', $unionType->name);
         $this->assertInstanceOf(\Closure::class, $unionType->config['resolveType'] ?? null);
@@ -176,7 +176,7 @@ final class TypeRegistryTest extends TestCase
         ');
 
         $objectType = $this->typeRegistry->handle($objectTypeNode);
-        assert($objectType instanceof ObjectType);
+        $this->assertInstanceOf(ObjectType::class, $objectType);
 
         $this->assertSame('User', $objectType->name);
         $this->assertArrayHasKey('foo', $objectType->getFields());
@@ -191,7 +191,7 @@ final class TypeRegistryTest extends TestCase
         ');
 
         $inputObjectType = $this->typeRegistry->handle($inputNode);
-        assert($inputObjectType instanceof InputObjectType);
+        $this->assertInstanceOf(InputObjectType::class, $inputObjectType);
 
         $this->assertSame('UserInput', $inputObjectType->name);
         $this->assertArrayHasKey('foo', $inputObjectType->getFields());

@@ -102,23 +102,23 @@ final class ArgumentSetFactoryTest extends TestCase
         $this->assertSame($barValue, $bar->value);
 
         $firstLevel = $bar->type;
-        assert($firstLevel instanceof ListType);
+        $this->assertInstanceOf(ListType::class, $firstLevel);
         $this->assertFalse($firstLevel->nonNull);
 
         $secondLevel = $firstLevel->type;
-        assert($secondLevel instanceof ListType);
+        $this->assertInstanceOf(ListType::class, $secondLevel);
         $this->assertTrue($secondLevel->nonNull);
 
         $thirdLevel = $secondLevel->type;
-        assert($thirdLevel instanceof ListType);
+        $this->assertInstanceOf(ListType::class, $thirdLevel);
         $this->assertFalse($thirdLevel->nonNull);
 
         $fourthLevel = $thirdLevel->type;
-        assert($fourthLevel instanceof ListType);
+        $this->assertInstanceOf(ListType::class, $fourthLevel);
         $this->assertTrue($fourthLevel->nonNull);
 
         $finalLevel = $fourthLevel->type;
-        assert($finalLevel instanceof NamedType);
+        $this->assertInstanceOf(NamedType::class, $finalLevel);
         $this->assertSame(Type::INT, $finalLevel->name);
         $this->assertFalse($finalLevel->nonNull);
     }
@@ -170,12 +170,12 @@ final class ArgumentSetFactoryTest extends TestCase
         $documentAST = $astBuilder->documentAST();
 
         $queryType = $documentAST->types[RootType::QUERY];
-        assert($queryType instanceof ObjectTypeDefinitionNode);
+        $this->assertInstanceOf(ObjectTypeDefinitionNode::class, $queryType);
 
         $fields = $queryType->fields;
 
         $fooField = ASTHelper::firstByName($fields, 'foo');
-        assert($fooField instanceof FieldDefinitionNode);
+        $this->assertInstanceOf(FieldDefinitionNode::class, $fooField);
 
         $factory = $this->app->make(ArgumentSetFactory::class);
 

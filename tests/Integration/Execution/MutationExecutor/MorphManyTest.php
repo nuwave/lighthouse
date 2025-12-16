@@ -154,7 +154,7 @@ final class MorphManyTest extends DBTestCase
     public function testCreateWithConnectMorphMany(): void
     {
         $image1 = factory(Image::class)->create();
-        assert($image1 instanceof Image);
+        $this->assertInstanceOf(Image::class, $image1);
 
         $this->graphQL(/** @lang GraphQL */ '
             mutation ($input: CreateTaskInput!) {
@@ -307,7 +307,7 @@ GRAPHQL
     public function testUpdateAndUpdateMorphMany(string $action): void
     {
         $task = factory(Task::class)->create();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
 
         $task->images()
             ->save(
@@ -353,7 +353,7 @@ GRAPHQL
     public function testUpdateAndUpsertMorphMany(string $action): void
     {
         $task = factory(Task::class)->create();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
 
         $task->images()
             ->save(
@@ -398,7 +398,7 @@ GRAPHQL
     public function testUpdateAndDeleteMorphMany(string $action): void
     {
         $task = factory(Task::class)->create();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
 
         $task->images()
             ->save(
@@ -436,10 +436,10 @@ GRAPHQL
     public function testUpdateAndConnectMorphMany(string $action): void
     {
         $task = factory(Task::class)->create();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
 
         $image = factory(Image::class)->create();
-        assert($image instanceof Image);
+        $this->assertInstanceOf(Image::class, $image);
 
         $upperAction = ucfirst($action);
         $actionInput = "{$upperAction}TaskInput";
@@ -485,10 +485,10 @@ GRAPHQL
     public function testUpdateAndDisconnectMorphMany(string $action): void
     {
         $task = factory(Task::class)->create();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
 
         $image = factory(Image::class)->make();
-        assert($image instanceof Image);
+        $this->assertInstanceOf(Image::class, $image);
         $task->images()->save($image);
 
         $upperAction = ucfirst($action);
@@ -533,10 +533,10 @@ GRAPHQL
     public function testDisconnectModelEventsMorphMany(string $action): void
     {
         $task = factory(Task::class)->create();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
 
         $image = factory(Image::class)->make();
-        assert($image instanceof Image);
+        $this->assertInstanceOf(Image::class, $image);
         $task->images()->save($image);
 
         $upperAction = ucfirst($action);

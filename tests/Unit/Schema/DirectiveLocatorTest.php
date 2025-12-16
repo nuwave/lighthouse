@@ -42,7 +42,7 @@ final class DirectiveLocatorTest extends TestCase
             ->directiveLocator
             ->associated($fieldDefinition)
             ->first();
-        assert($fieldDirective instanceof FieldDirective);
+        $this->assertInstanceOf(FieldDirective::class, $fieldDirective);
 
         $this->assertSame(
             $fieldDefinition,

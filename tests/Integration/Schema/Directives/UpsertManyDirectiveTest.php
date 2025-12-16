@@ -16,7 +16,7 @@ final class UpsertManyDirectiveTest extends DBTestCase
         factory(User::class)->create();
 
         $task = factory(Task::class)->create();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->id = 1;
         $task->name = 'old';
         $task->save();

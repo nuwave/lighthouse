@@ -104,7 +104,7 @@ final class AggregateDirectiveTest extends DBTestCase
             ->create()
             ->each(static function (User $user, int $index): void {
                 $task = factory(Task::class)->make();
-                assert($task instanceof Task);
+                \PHPUnit\Framework\Assert::assertInstanceOf(Task::class, $task);
                 $task->difficulty = $index;
                 $task->user()->associate($user);
                 $task->save();
@@ -148,13 +148,13 @@ final class AggregateDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $ongoing = factory(Task::class)->make();
         $user->tasks()->save($ongoing);
 
         $completed = factory(Task::class)->state('completed')->make();
-        assert($completed instanceof Task);
+        $this->assertInstanceOf(Task::class, $completed);
         $user->tasks()->save($completed);
 
         $this->graphQL(/** @lang GraphQL */ '
@@ -188,28 +188,28 @@ final class AggregateDirectiveTest extends DBTestCase
         ';
 
         $user1 = factory(User::class)->create();
-        assert($user1 instanceof User);
+        $this->assertInstanceOf(User::class, $user1);
 
         $low1 = factory(Task::class)->make();
-        assert($low1 instanceof Task);
+        $this->assertInstanceOf(Task::class, $low1);
         $low1->difficulty = 42;
         $user1->tasks()->save($low1);
 
         $high1 = factory(Task::class)->make();
-        assert($high1 instanceof Task);
+        $this->assertInstanceOf(Task::class, $high1);
         $high1->difficulty = 9001;
         $user1->tasks()->save($high1);
 
         $user2 = factory(User::class)->create();
-        assert($user2 instanceof User);
+        $this->assertInstanceOf(User::class, $user2);
 
         $low2 = factory(Task::class)->make();
-        assert($low2 instanceof Task);
+        $this->assertInstanceOf(Task::class, $low2);
         $low2->difficulty = 69;
         $user2->tasks()->save($low2);
 
         $high2 = factory(Task::class)->make();
-        assert($high2 instanceof Task);
+        $this->assertInstanceOf(Task::class, $high2);
         $high2->difficulty = 9002;
         $user2->tasks()->save($high2);
 
@@ -252,22 +252,22 @@ final class AggregateDirectiveTest extends DBTestCase
         $difficulty = 5;
 
         $task1 = factory(Task::class)->make();
-        assert($task1 instanceof Task);
+        $this->assertInstanceOf(Task::class, $task1);
         $task1->difficulty = 3;
         $task1->save();
 
         $task2 = factory(Task::class)->make();
-        assert($task2 instanceof Task);
+        $this->assertInstanceOf(Task::class, $task2);
         $task2->difficulty = $difficulty;
         $task2->save();
 
         $task3 = factory(Task::class)->make();
-        assert($task3 instanceof Task);
+        $this->assertInstanceOf(Task::class, $task3);
         $task3->difficulty = $difficulty;
         $task3->save();
 
         $task4 = factory(Task::class)->make();
-        assert($task4 instanceof Task);
+        $this->assertInstanceOf(Task::class, $task4);
         $task4->difficulty = $difficulty;
         $task4->save();
 

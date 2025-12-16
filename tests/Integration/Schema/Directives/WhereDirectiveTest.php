@@ -10,12 +10,12 @@ final class WhereDirectiveTest extends DBTestCase
     public function testAttachWhereFilterFromField(): void
     {
         $foo = factory(User::class)->make();
-        assert($foo instanceof User);
+        $this->assertInstanceOf(User::class, $foo);
         $foo->name = 'foo';
         $foo->save();
 
         $bar = factory(User::class)->make();
-        assert($bar instanceof User);
+        $this->assertInstanceOf(User::class, $bar);
         $bar->name = 'bar';
         $bar->save();
 

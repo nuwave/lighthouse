@@ -13,15 +13,15 @@ final class MorphToDirectiveTest extends DBTestCase
     public function testResolveMorphToRelationship(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->user()->associate($user);
         $task->save();
 
         $image = factory(Image::class)->make();
-        assert($image instanceof Image);
+        $this->assertInstanceOf(Image::class, $image);
         $image->imageable()->associate($task);
         $image->save();
 
@@ -71,15 +71,15 @@ final class MorphToDirectiveTest extends DBTestCase
     public function testResolveMorphToWithCustomName(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->user()->associate($user);
         $task->save();
 
         $image = factory(Image::class)->make();
-        assert($image instanceof Image);
+        $this->assertInstanceOf(Image::class, $image);
         $image->imageable()->associate($task);
         $image->save();
 
@@ -129,25 +129,25 @@ final class MorphToDirectiveTest extends DBTestCase
     public function testResolveMorphToUsingInterfaces(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->user()->associate($user);
         $task->save();
 
         $image = factory(Image::class)->make();
-        assert($image instanceof Image);
+        $this->assertInstanceOf(Image::class, $image);
         $image->imageable()->associate($task);
         $image->save();
 
         $post = factory(Post::class)->make();
-        assert($post instanceof Post);
+        $this->assertInstanceOf(Post::class, $post);
         $post->user()->associate($user->id);
         $post->save();
 
         $postImage = factory(Image::class)->make();
-        assert($postImage instanceof Image);
+        $this->assertInstanceOf(Image::class, $postImage);
         $postImage->imageable()->associate($post);
         $postImage->save();
 
@@ -235,25 +235,25 @@ final class MorphToDirectiveTest extends DBTestCase
         config(['lighthouse.shortcut_foreign_key_selection' => true]);
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->user()->associate($user);
         $task->save();
 
         $image = factory(Image::class)->make();
-        assert($image instanceof Image);
+        $this->assertInstanceOf(Image::class, $image);
         $image->imageable()->associate($task);
         $image->save();
 
         $post = factory(Post::class)->make();
-        assert($post instanceof Post);
+        $this->assertInstanceOf(Post::class, $post);
         $post->user()->associate($user->id);
         $post->save();
 
         $postImage = factory(Image::class)->make();
-        assert($postImage instanceof Image);
+        $this->assertInstanceOf(Image::class, $postImage);
         $postImage->imageable()->associate($post);
         $postImage->save();
 
@@ -337,25 +337,25 @@ final class MorphToDirectiveTest extends DBTestCase
         config(['lighthouse.shortcut_foreign_key_selection' => true]);
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->user()->associate($user);
         $task->save();
 
         $image = factory(Image::class)->make();
-        assert($image instanceof Image);
+        $this->assertInstanceOf(Image::class, $image);
         $image->imageable()->associate($task);
         $image->save();
 
         $post = factory(Post::class)->make();
-        assert($post instanceof Post);
+        $this->assertInstanceOf(Post::class, $post);
         $post->user()->associate($user->id);
         $post->save();
 
         $postImage = factory(Image::class)->make();
-        assert($postImage instanceof Image);
+        $this->assertInstanceOf(Image::class, $postImage);
         $postImage->imageable()->associate($post);
         $postImage->save();
 
@@ -441,25 +441,25 @@ final class MorphToDirectiveTest extends DBTestCase
     public function testResolveMorphToUsingUnions(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->user()->associate($user);
         $task->save();
 
         $image = factory(Image::class)->make();
-        assert($image instanceof Image);
+        $this->assertInstanceOf(Image::class, $image);
         $image->imageable()->associate($task);
         $image->save();
 
         $post = factory(Post::class)->make();
-        assert($post instanceof Post);
+        $this->assertInstanceOf(Post::class, $post);
         $post->user()->associate($user->id);
         $post->save();
 
         $postImage = factory(Image::class)->make();
-        assert($postImage instanceof Image);
+        $this->assertInstanceOf(Image::class, $postImage);
         $postImage->imageable()->associate($post);
         $postImage->save();
 
@@ -549,25 +549,25 @@ final class MorphToDirectiveTest extends DBTestCase
         config(['lighthouse.shortcut_foreign_key_selection' => true]);
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->user()->associate($user);
         $task->save();
 
         $image = factory(Image::class)->make();
-        assert($image instanceof Image);
+        $this->assertInstanceOf(Image::class, $image);
         $image->imageable()->associate($task);
         $image->save();
 
         $post = factory(Post::class)->make();
-        assert($post instanceof Post);
+        $this->assertInstanceOf(Post::class, $post);
         $post->user()->associate($user->id);
         $post->save();
 
         $postImage = factory(Image::class)->make();
-        assert($postImage instanceof Image);
+        $this->assertInstanceOf(Image::class, $postImage);
         $postImage->imageable()->associate($post);
         $postImage->save();
 
@@ -649,25 +649,25 @@ final class MorphToDirectiveTest extends DBTestCase
         config(['lighthouse.shortcut_foreign_key_selection' => true]);
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->user()->associate($user);
         $task->save();
 
         $image = factory(Image::class)->make();
-        assert($image instanceof Image);
+        $this->assertInstanceOf(Image::class, $image);
         $image->imageable()->associate($task);
         $image->save();
 
         $post = factory(Post::class)->make();
-        assert($post instanceof Post);
+        $this->assertInstanceOf(Post::class, $post);
         $post->user()->associate($user->id);
         $post->save();
 
         $postImage = factory(Image::class)->make();
-        assert($postImage instanceof Image);
+        $this->assertInstanceOf(Image::class, $postImage);
         $postImage->imageable()->associate($post);
         $postImage->save();
 
@@ -753,25 +753,25 @@ final class MorphToDirectiveTest extends DBTestCase
         config(['lighthouse.shortcut_foreign_key_selection' => true]);
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->user()->associate($user);
         $task->save();
 
         $image = factory(Image::class)->make();
-        assert($image instanceof Image);
+        $this->assertInstanceOf(Image::class, $image);
         $image->imageable()->associate($task);
         $image->save();
 
         $post = factory(Post::class)->make();
-        assert($post instanceof Post);
+        $this->assertInstanceOf(Post::class, $post);
         $post->user()->associate($user->id);
         $post->save();
 
         $postImage = factory(Image::class)->make();
-        assert($postImage instanceof Image);
+        $this->assertInstanceOf(Image::class, $postImage);
         $postImage->imageable()->associate($post);
         $postImage->save();
 
@@ -859,15 +859,15 @@ final class MorphToDirectiveTest extends DBTestCase
         config(['lighthouse.shortcut_foreign_key_selection' => true]);
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->user()->associate($user);
         $task->save();
 
         $image = factory(Image::class)->make();
-        assert($image instanceof Image);
+        $this->assertInstanceOf(Image::class, $image);
         $image->imageable()->associate($task);
         $image->save();
 
@@ -921,15 +921,15 @@ final class MorphToDirectiveTest extends DBTestCase
         config(['lighthouse.shortcut_foreign_key_selection' => true]);
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->user()->associate($user);
         $task->save();
 
         $image = factory(Image::class)->make();
-        assert($image instanceof Image);
+        $this->assertInstanceOf(Image::class, $image);
         $image->imageable()->associate($task);
         $image->save();
 
@@ -983,15 +983,15 @@ final class MorphToDirectiveTest extends DBTestCase
         config(['lighthouse.shortcut_foreign_key_selection' => true]);
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->user()->associate($user);
         $task->save();
 
         $image = factory(Image::class)->make();
-        assert($image instanceof Image);
+        $this->assertInstanceOf(Image::class, $image);
         $image->imageable()->associate($task);
         $image->save();
 
@@ -1047,15 +1047,15 @@ final class MorphToDirectiveTest extends DBTestCase
         config(['lighthouse.shortcut_foreign_key_selection' => true]);
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->user()->associate($user);
         $task->save();
 
         $image = factory(Image::class)->make();
-        assert($image instanceof Image);
+        $this->assertInstanceOf(Image::class, $image);
         $image->imageable()->associate($task);
         $image->save();
 

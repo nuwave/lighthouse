@@ -27,10 +27,10 @@ final class HasOneThroughDirectiveTest extends DBTestCase
         ';
 
         $post = factory(Post::class)->create();
-        assert($post instanceof Post);
+        $this->assertInstanceOf(Post::class, $post);
 
         $postStatus = factory(PostStatus::class)->make();
-        assert($postStatus instanceof PostStatus);
+        $this->assertInstanceOf(PostStatus::class, $postStatus);
         $postStatus->post()->associate($post);
         $postStatus->save();
 
