@@ -3,10 +3,11 @@
 namespace Nuwave\Lighthouse\Testing;
 
 use Illuminate\Container\Container;
+use PHPUnit\Framework\MockObject\Builder\InvocationMocker;
 use PHPUnit\Framework\MockObject\MockObject;
 
-// PHPUnit 9, 10, 11 have InvocationMocker in the Builder namespace
-if (class_exists(\PHPUnit\Framework\MockObject\Builder\InvocationMocker::class)) {
+// PHPUnit 9, 10, 11
+if (class_exists(InvocationMocker::class)) {
     /**
      * @mixin \PHPUnit\Framework\TestCase
      */
@@ -17,9 +18,9 @@ if (class_exists(\PHPUnit\Framework\MockObject\Builder\InvocationMocker::class))
          *
          * @param  callable|mixed|null  $resolverOrValue
          *
-         * @return \PHPUnit\Framework\MockObject\Builder\InvocationMocker<MockableResolver>
+         * @return InvocationMocker<MockableResolver>
          */
-        protected function mockResolver(mixed $resolverOrValue = null, string $key = 'default'): \PHPUnit\Framework\MockObject\Builder\InvocationMocker
+        protected function mockResolver(mixed $resolverOrValue = null, string $key = 'default'): InvocationMocker
         {
             $method = $this->mockResolverExpects($this->atLeastOnce(), $key);
 
@@ -37,9 +38,9 @@ if (class_exists(\PHPUnit\Framework\MockObject\Builder\InvocationMocker::class))
          *
          * @param  \PHPUnit\Framework\MockObject\Rule\InvocationOrder  $invocationOrder
          *
-         * @return \PHPUnit\Framework\MockObject\Builder\InvocationMocker<MockableResolver>
+         * @return InvocationMocker<MockableResolver>
          */
-        protected function mockResolverExpects(object $invocationOrder, string $key = 'default'): \PHPUnit\Framework\MockObject\Builder\InvocationMocker
+        protected function mockResolverExpects(object $invocationOrder, string $key = 'default'): InvocationMocker
         {
             /** @var MockObject&callable $mock */
             $mock = $this->createMock(MockableResolver::class);
@@ -60,7 +61,7 @@ if (class_exists(\PHPUnit\Framework\MockObject\Builder\InvocationMocker::class))
         }
     }
 } else {
-    // PHPUnit 12+ uses InvocationStubber
+    // PHPUnit 12+
     /**
      * @mixin \PHPUnit\Framework\TestCase
      */
