@@ -3,6 +3,7 @@
 namespace Tests\Integration\Execution\MutationExecutor;
 
 use Faker\Provider\Lorem;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Role;
 use Tests\Utils\Models\User;
@@ -569,6 +570,7 @@ final class BelongsToManyTest extends DBTestCase
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testUpdateWithBelongsToMany(string $action): void
     {
         $role = factory(Role::class)->make();
@@ -630,6 +632,7 @@ final class BelongsToManyTest extends DBTestCase
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testDeleteWithBelongsToMany(string $action): void
     {
         $role = factory(Role::class)->make();
@@ -681,6 +684,7 @@ final class BelongsToManyTest extends DBTestCase
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testConnectWithBelongsToMany(string $action): void
     {
         factory(User::class)->create();
@@ -729,6 +733,7 @@ final class BelongsToManyTest extends DBTestCase
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testSyncWithBelongsToMany(string $action): void
     {
         factory(User::class)->create();
@@ -776,6 +781,7 @@ final class BelongsToManyTest extends DBTestCase
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testDisconnectWithBelongsToMany(string $action): void
     {
         $role = factory(Role::class)->create();
@@ -896,6 +902,7 @@ final class BelongsToManyTest extends DBTestCase
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testDisconnectAllRelatedModelsOnEmptySync(string $action): void
     {
         $user = factory(User::class)->create();

@@ -4,6 +4,7 @@ namespace Tests\Integration\Execution\MutationExecutor;
 
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Facades\DB;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Role;
 use Tests\Utils\Models\Task;
@@ -650,6 +651,7 @@ final class BelongsToTest extends DBTestCase
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testUpdateAndDisconnectBelongsTo(string $action): void
     {
         $task = factory(Task::class)->create();
@@ -742,6 +744,7 @@ GRAPHQL
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testUpdateAndDeleteBelongsTo(string $action): void
     {
         $user = factory(User::class)->create();
@@ -833,6 +836,7 @@ GRAPHQL
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testDoesNotDeleteOrDisconnectOnFalsyValues(string $action): void
     {
         $user = factory(User::class)->create();

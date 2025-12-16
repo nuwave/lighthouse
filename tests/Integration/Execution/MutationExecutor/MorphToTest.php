@@ -4,6 +4,7 @@ namespace Tests\Integration\Execution\MutationExecutor;
 
 use GraphQL\Type\Definition\PhpEnumType;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Enums\ImageableType;
 use Tests\Utils\Models\Image;
@@ -259,6 +260,7 @@ final class MorphToTest extends DBTestCase
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testDisconnectsMorphTo(string $action): void
     {
         $task = factory(Task::class)->make();
@@ -300,6 +302,7 @@ final class MorphToTest extends DBTestCase
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testDeletesMorphTo(string $action): void
     {
         $task = factory(Task::class)->make();

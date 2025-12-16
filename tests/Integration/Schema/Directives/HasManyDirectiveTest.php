@@ -3,6 +3,7 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Role;
@@ -491,6 +492,7 @@ final class HasManyDirectiveTest extends DBTestCase
     }
 
     /** @dataProvider batchloadRelations */
+    #[DataProvider('batchloadRelations')]
     public function testQueryHasManyPaginator(bool $batchloadRelations): void
     {
         config(['lighthouse.batchload_relations' => $batchloadRelations]);

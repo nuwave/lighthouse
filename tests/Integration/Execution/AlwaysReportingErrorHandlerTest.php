@@ -4,6 +4,8 @@ namespace Tests\Integration\Execution;
 
 use GraphQL\Error\Error;
 use Nuwave\Lighthouse\Execution\AlwaysReportingErrorHandler;
+use PHPUnit\Framework\Attributes\Before;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\FakeExceptionHandler;
 use Tests\TestCase;
 use Tests\Utils\Exceptions\ClientAwareException;
@@ -13,6 +15,7 @@ final class AlwaysReportingErrorHandlerTest extends TestCase
     private FakeExceptionHandler $handler;
 
     /** @before */
+    #[Before]
     public function fakeExceptionHandling(): void
     {
         $this->afterApplicationCreated(function (): void {
@@ -45,6 +48,7 @@ final class AlwaysReportingErrorHandlerTest extends TestCase
     }
 
     /** @dataProvider nonClientSafeErrors */
+    #[DataProvider('nonClientSafeErrors')]
     public function testNonClientSafeErrors(\Exception $previousError): void
     {
         $error = new Error(previous: $previousError);
@@ -64,6 +68,7 @@ final class AlwaysReportingErrorHandlerTest extends TestCase
     }
 
     /** @dataProvider clientSafeErrors */
+    #[DataProvider('clientSafeErrors')]
     public function testClientSafeErrors(?\Exception $previousError): void
     {
         $error = new Error(previous: $previousError);
