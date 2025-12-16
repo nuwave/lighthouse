@@ -124,6 +124,8 @@ parameters:
   # Lots of work to specify the generics, little gain
   - path: tests
     message: '#Method .+ return type with generic class Illuminate\\Testing\\TestResponse does not specify its types: TResponse#'
+  - path: benchmarks
+    message: '#Method .+ return type with generic class Illuminate\\Testing\\TestResponse does not specify its types: TResponse#'
 
   # We don't care about configuration caching in our tests
   - path: tests
