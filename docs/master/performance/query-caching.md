@@ -53,7 +53,6 @@ php artisan lighthouse:clear-query-cache
 
 Other reasons to clear the query cache completely include:
 
-- you plan to upgrade the package `webonyx/graphql-php` to a new version that changes the internal representation of parsed queries
 - you have stale queries in your cache that have an inappropriate or missing TTL
 - you want to free up disk space used by cached query files
 
@@ -68,10 +67,22 @@ APQ is enabled by default, but depends on query caching being enabled.
 
 Lighthouse can cache the result of the query validation process as well.
 It only caches queries without errors.
-`QueryComplexity` validation can not be cached as it is dependent on the query, so it is always executed.
+`QueryComplexity` validation can not be cached as it depends on runtime variables, so it is always executed.
 
 Query validation caching is disabled by default.
 You can enable it by setting `validation_cache.enable` to `true` in `config/lighthouse.php`.
+
+### Cache key components
+
+The validation cache key includes:
+
+- Library versions (`webonyx/graphql-php` and `nuwave/lighthouse`) - cache is automatically invalidated when upgrading
+- Schema hash - cache is invalidated when the schema changes
+- Query hash - each unique query has its own cache entry
+- Rule configuration hash (`max_query_depth`, `disable_introspection`) - cache is invalidated when security settings change
+
+This ensures that cached validation results are automatically invalidated when any of the inputs that affect validation change.
+You do not need to manually clear the cache when upgrading these libraries.
 
 ## Testing caveats
 

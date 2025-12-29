@@ -31,6 +31,7 @@ use Nuwave\Lighthouse\Events\StartOperationOrOperations;
 use Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry;
 use Nuwave\Lighthouse\Execution\CacheableValidationRulesProvider;
 use Nuwave\Lighthouse\Execution\ErrorPool;
+use Nuwave\Lighthouse\Execution\LighthouseValidationCache;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -396,36 +397,26 @@ class GraphQL
         }
 
         if ($queryHash === null) {
-            return DocumentValidator::validate($schema, $query, $validationRules); // @phpstan-ignore return.type (TODO remove ignore when requiring a newer version of webonyx/graphql-php)
+            return DocumentValidator::validate($schema, $query, $validationRules);
         }
 
         $validationCacheConfig = $this->configRepository->get('lighthouse.validation_cache');
 
         if (! $validationCacheConfig['enable']) {
-            return DocumentValidator::validate($schema, $query, $validationRules); // @phpstan-ignore return.type (TODO remove ignore when requiring a newer version of webonyx/graphql-php)
+            return DocumentValidator::validate($schema, $query, $validationRules);
         }
 
         $cacheFactory = Container::getInstance()->make(CacheFactory::class);
         $store = $cacheFactory->store($validationCacheConfig['store']);
 
-        $cacheKey = "lighthouse:validation:{$schemaHash}:{$queryHash}";
+        // Compute a hash of rule configurations that affect validation behavior
+        $rulesConfigHash = hash('sha256', json_encode([
+            'max_query_depth' => $this->configRepository->get('lighthouse.security.max_query_depth', 0),
+            'disable_introspection' => $this->configRepository->get('lighthouse.security.disable_introspection', 0),
+        ]) ?: '');
 
-        $cachedResult = $store->get($cacheKey);
-        if ($cachedResult !== null) {
-            return $cachedResult;
-        }
+        $cache = new LighthouseValidationCache($store, $schemaHash, $queryHash, $rulesConfigHash, $validationCacheConfig['ttl']);
 
-        $result = DocumentValidator::validate($schema, $query, $validationRules);
-
-        // If there are any errors, we return them without caching them.
-        // As of webonyx/graphql-php 15.14.0, GraphQL\Error\Error is not serializable.
-        // We would have to figure out how to serialize them properly to cache them.
-        if ($result !== []) {
-            return $result; // @phpstan-ignore return.type (TODO remove ignore when requiring a newer version of webonyx/graphql-php)
-        }
-
-        $store->put($cacheKey, $result, $validationCacheConfig['ttl']);
-
-        return $result;
+        return DocumentValidator::validate($schema, $query, $validationRules, null, $cache);
     }
 }
