@@ -8,6 +8,12 @@
         "laravel",
         "laravel-graphql"
     ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/webonyx/graphql-php.git"
+        }
+    ],
     "authors": [
         {
             "name": "Christopher Moore",
@@ -40,7 +46,7 @@
         "illuminate/validation": "^9 || ^10 || ^11 || ^12",
         "laragraph/utils": "^1.5 || ^2",
         "thecodingmachine/safe": "^1 || ^2 || ^3",
-        "webonyx/graphql-php": "^15"
+        "webonyx/graphql-php": "dev-validation-cache as 15.x-dev"
     },
     "require-dev": {
         "algolia/algoliasearch-client-php": "^3",
