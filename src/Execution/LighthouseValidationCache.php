@@ -10,6 +10,14 @@ use Illuminate\Contracts\Cache\Repository as CacheRepository;
 
 class LighthouseValidationCache implements ValidationCache
 {
+    /** @var array<string> */
+    protected const RELEVANT_PACKAGES = [
+        'nuwave/lighthouse',
+        'webonyx/graphql-php',
+    ];
+
+    protected string $packagesHash;
+
     public function __construct(
         protected CacheRepository $cache,
         protected string $schemaHash,
@@ -28,11 +36,29 @@ class LighthouseValidationCache implements ValidationCache
         $this->cache->put($this->cacheKey(), true, $this->ttl);
     }
 
-    private function cacheKey(): string
+    protected function cacheKey(): string
     {
-        $versions = (InstalledVersions::getVersion('webonyx/graphql-php') ?? '')
-            . (InstalledVersions::getVersion('nuwave/lighthouse') ?? '');
+        return "lighthouse:validation:{$this->schemaHash}:{$this->queryHash}:{$this->rulesConfigHash}:{$this->packagesHash()}";
+    }
 
-        return "lighthouse:validation:{$this->schemaHash}:{$this->queryHash}:{$this->rulesConfigHash}:" . hash('sha256', $versions);
+    protected function packagesHash(): string
+    {
+        return $this->packagesHash ??= $this->buildPackagesHash();
+    }
+
+    protected function buildPackagesHash(): string
+    {
+        $versions = [];
+        foreach (self::RELEVANT_PACKAGES as $package) {
+            $versions[$package] = $this->requireVersion($package);
+        }
+
+        return hash('sha256', \Safe\json_encode($versions));
+    }
+
+    protected function requireVersion(string $package): string
+    {
+        return InstalledVersions::getVersion($package)
+            ?? throw new \RuntimeException("Could not determine version of {$package} package.");
     }
 }

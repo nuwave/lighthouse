@@ -8,12 +8,6 @@
         "laravel",
         "laravel-graphql"
     ],
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/webonyx/graphql-php.git"
-        }
-    ],
     "authors": [
         {
             "name": "Christopher Moore",
@@ -34,6 +28,7 @@
     "require": {
         "php": "^8",
         "ext-json": "*",
+        "composer-runtime-api": "^2",
         "haydenpierce/class-finder": "^0.4 || ^0.5",
         "illuminate/auth": "^9 || ^10 || ^11 || ^12",
         "illuminate/bus": "^9 || ^10 || ^11 || ^12",
@@ -85,6 +80,12 @@
         "mll-lab/laravel-graphiql": "A graphical interactive in-browser GraphQL IDE - integrated with Laravel",
         "pusher/pusher-php-server": "Required when using the Pusher Subscriptions driver"
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/webonyx/graphql-php.git"
+        }
+    ],
     "minimum-stability": "dev",
     "prefer-stable": true,
     "autoload": {

@@ -410,13 +410,24 @@ class GraphQL
         $store = $cacheFactory->store($validationCacheConfig['store']);
 
         // Compute a hash of rule configurations that affect validation behavior
-        $rulesConfigHash = hash('sha256', json_encode([
+        $rulesConfigHash = hash('sha256', \Safe\json_encode([
             'max_query_depth' => $this->configRepository->get('lighthouse.security.max_query_depth', 0),
             'disable_introspection' => $this->configRepository->get('lighthouse.security.disable_introspection', 0),
-        ]) ?: '');
+        ]));
 
-        $cache = new LighthouseValidationCache($store, $schemaHash, $queryHash, $rulesConfigHash, $validationCacheConfig['ttl']);
+        $cache = new LighthouseValidationCache(
+            cache: $store,
+            schemaHash: $schemaHash,
+            queryHash: $queryHash,
+            rulesConfigHash: $rulesConfigHash,
+            ttl: $validationCacheConfig['ttl'],
+        );
 
-        return DocumentValidator::validate($schema, $query, $validationRules, null, $cache);
+        return DocumentValidator::validate(
+            schema: $schema,
+            ast: $query,
+            rules: $validationRules,
+            cache: $cache,
+        );
     }
 }
