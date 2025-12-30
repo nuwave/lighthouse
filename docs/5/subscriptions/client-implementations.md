@@ -243,13 +243,12 @@ export const environment = new Environment({
 });
 ```
 
-
 ## Flutter/Dart
 
 To use Lighthouse's Pusher subscriptions with Flutter/Dart GQL libraries like [Ferry](https://ferrygraphql.com), you will
 need to create a custom link below:
 
-```dart
+````dart
 import 'dart:async';
 import 'dart:convert';
 
@@ -526,5 +525,4 @@ class PusherChannelsLink extends Link {
     super.dispose();
   }
 }
-```
-
+````
