@@ -35,6 +35,7 @@ use Nuwave\Lighthouse\Execution\LighthouseValidationCache;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Support\Contracts\ProvidesCacheableValidationRules;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules;
 use Nuwave\Lighthouse\Support\Utils as LighthouseUtils;
 
@@ -139,7 +140,7 @@ class GraphQL
             new StartExecution($schema, $query, $variables, $operationName, $context),
         );
 
-        if ($this->providesValidationRules instanceof CacheableValidationRulesProvider) {
+        if ($this->providesValidationRules instanceof ProvidesCacheableValidationRules) {
             $cacheableValidationRules = $this->providesValidationRules->cacheableValidationRules();
 
             $errors = $this->validateCacheableRules($cacheableValidationRules, $schema, $this->schemaBuilder->schemaHash(), $query, $queryHash);
@@ -407,27 +408,24 @@ class GraphQL
         }
 
         $cacheFactory = Container::getInstance()->make(CacheFactory::class);
-        $store = $cacheFactory->store($validationCacheConfig['store']);
+        $cacheStore = $cacheFactory->store($validationCacheConfig['cacheStore']);
 
-        // Compute a hash of rule configurations that affect validation behavior
         $rulesConfigHash = hash('sha256', \Safe\json_encode([
             'max_query_depth' => $this->configRepository->get('lighthouse.security.max_query_depth', 0),
             'disable_introspection' => $this->configRepository->get('lighthouse.security.disable_introspection', 0),
         ]));
 
-        $cache = new LighthouseValidationCache(
-            cache: $store,
-            schemaHash: $schemaHash,
-            queryHash: $queryHash,
-            rulesConfigHash: $rulesConfigHash,
-            ttl: $validationCacheConfig['ttl'],
-        );
-
         return DocumentValidator::validate(
             schema: $schema,
             ast: $query,
             rules: $validationRules,
-            cache: $cache,
+            cache: new LighthouseValidationCache(
+                cache: $cacheStore,
+                schemaHash: $schemaHash,
+                queryHash: $queryHash,
+                rulesConfigHash: $rulesConfigHash,
+                ttl: $validationCacheConfig['ttl'],
+            ),
         );
     }
 }
