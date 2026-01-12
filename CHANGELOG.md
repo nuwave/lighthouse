@@ -9,6 +9,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+- Allow to set `page: null` when calling a pagination in a graphql query https://github.com/nuwave/lighthouse/pull/2735
+
 ## v6.64.0
 
 ### Added

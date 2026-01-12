@@ -1010,4 +1010,46 @@ GRAPHQL;
         }
         ');
     }
+
+    public function testSimplePaginationWithNullPageUsesDefaultPage(): void
+    {
+        factory(User::class, 3)->create();
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID!
+            name: String!
+        }
+
+        type Query {
+            users: [User!] @paginate(type: SIMPLE)
+        }
+        ';
+
+        // This test verifies that when page is null, it uses the default value of 1
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($page: Int) {
+            users(first: 2, page: $page) {
+                paginatorInfo {
+                    currentPage
+                    count
+                }
+                data {
+                    id
+                }
+            }
+        }
+        ', [
+            'page' => null,
+        ])->assertJson([
+            'data' => [
+                'users' => [
+                    'paginatorInfo' => [
+                        'currentPage' => 1,
+                        'count' => 2,
+                    ],
+                ],
+            ],
+        ])->assertJsonCount(2, 'data.users.data');
+    }
 }
