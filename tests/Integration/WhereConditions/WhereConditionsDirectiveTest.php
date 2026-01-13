@@ -271,12 +271,12 @@ final class WhereConditionsDirectiveTest extends DBTestCase
     public function testOperatorIsNull(): void
     {
         $postWithoutBody = factory(Post::class)->make();
-        assert($postWithoutBody instanceof Post);
+        $this->assertInstanceOf(Post::class, $postWithoutBody);
         $postWithoutBody->body = null;
         $postWithoutBody->save();
 
         $postWithBody = factory(Post::class)->make();
-        assert($postWithBody instanceof Post);
+        $this->assertInstanceOf(Post::class, $postWithBody);
         $postWithBody->body = 'foobar';
         $postWithBody->save();
 
@@ -305,12 +305,12 @@ final class WhereConditionsDirectiveTest extends DBTestCase
     public function testOperatorNotNull(): void
     {
         $postWithoutBody = factory(Post::class)->make();
-        assert($postWithoutBody instanceof Post);
+        $this->assertInstanceOf(Post::class, $postWithoutBody);
         $postWithoutBody->body = null;
         $postWithoutBody->save();
 
         $postWithBody = factory(Post::class)->make();
-        assert($postWithBody instanceof Post);
+        $this->assertInstanceOf(Post::class, $postWithBody);
         $postWithBody->body = 'foobar';
         $postWithBody->save();
 
@@ -904,7 +904,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
         factory(User::class, 3)->create();
 
         $userNamedNull = factory(User::class)->make();
-        assert($userNamedNull instanceof User);
+        $this->assertInstanceOf(User::class, $userNamedNull);
         $userNamedNull->name = null;
         $userNamedNull->save();
 
