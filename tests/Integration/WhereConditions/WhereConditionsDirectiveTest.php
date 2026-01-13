@@ -270,12 +270,15 @@ final class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testOperatorIsNull(): void
     {
-        factory(Post::class)->create([
-            'body' => null,
-        ]);
-        factory(Post::class)->create([
-            'body' => 'foobar',
-        ]);
+        $postWithoutBody = factory(Post::class)->make();
+        $this->assertInstanceOf(Post::class, $postWithoutBody);
+        $postWithoutBody->body = null;
+        $postWithoutBody->save();
+
+        $postWithBody = factory(Post::class)->make();
+        $this->assertInstanceOf(Post::class, $postWithBody);
+        $postWithBody->body = 'foobar';
+        $postWithBody->save();
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -301,12 +304,15 @@ final class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testOperatorNotNull(): void
     {
-        factory(Post::class)->create([
-            'body' => null,
-        ]);
-        factory(Post::class)->create([
-            'body' => 'foobar',
-        ]);
+        $postWithoutBody = factory(Post::class)->make();
+        $this->assertInstanceOf(Post::class, $postWithoutBody);
+        $postWithoutBody->body = null;
+        $postWithoutBody->save();
+
+        $postWithBody = factory(Post::class)->make();
+        $this->assertInstanceOf(Post::class, $postWithBody);
+        $postWithBody->body = 'foobar';
+        $postWithBody->save();
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -897,9 +903,10 @@ final class WhereConditionsDirectiveTest extends DBTestCase
     {
         factory(User::class, 3)->create();
 
-        $userNamedNull = factory(User::class)->create([
-            'name' => null,
-        ]);
+        $userNamedNull = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $userNamedNull);
+        $userNamedNull->name = null;
+        $userNamedNull->save();
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -1121,6 +1128,168 @@ GRAPHQL;
                 'users' => [
                     [
                         'id' => "{$user2->id}",
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testWhereHasConditionsColumnDefaultsToString(): void
+    {
+        $user1 = factory(User::class)->create();
+
+        $post1 = factory(Post::class)->make();
+        $post1->title = 'Miss';
+        $post1->user()->associate($user1);
+        $post1->save();
+
+        $user2 = factory(User::class)->create();
+
+        $post2 = factory(Post::class)->make();
+        $post2->title = 'Hit';
+        $post2->user()->associate($user2);
+        $post2->save();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            enumColumns(
+                where: {
+                    HAS: {
+                        relation: "posts"
+                        condition: {
+                            column: "title"
+                            value: "Hit"
+                        }
+                    }
+                }
+            ) {
+                id
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'enumColumns' => [
+                    [
+                        'id' => "{$user2->id}",
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testWhereHasConditionsWithNestedHas(): void
+    {
+        $user1 = factory(User::class)->create();
+
+        $post1 = factory(Post::class)->make();
+        $post1->user()->associate($user1);
+        $post1->save();
+
+        $comment1 = factory(Comment::class)->make();
+        $comment1->comment = 'Miss';
+        $comment1->user()->associate($user1);
+        $comment1->post()->associate($post1);
+        $comment1->save();
+
+        $user2 = factory(User::class)->create();
+
+        $post2 = factory(Post::class)->make();
+        $post2->user()->associate($user2);
+        $post2->save();
+
+        $comment2 = factory(Comment::class)->make();
+        $comment2->comment = 'Hit';
+        $comment2->user()->associate($user2);
+        $comment2->post()->associate($post2);
+        $comment2->save();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            enumColumns(
+                where: {
+                    HAS: {
+                        relation: "posts"
+                        condition: {
+                            HAS: {
+                                relation: "comments"
+                                condition: {
+                                    column: "comment"
+                                    value: "Hit"
+                                }
+                            }
+                        }
+                    }
+                }
+            ) {
+                id
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'enumColumns' => [
+                    [
+                        'id' => "{$user2->id}",
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testWhereHasConditionsWithAndOr(): void
+    {
+        $user1 = factory(User::class)->create();
+
+        $post1 = factory(Post::class)->make();
+        $post1->title = 'First';
+        $post1->body = 'Alpha';
+        $post1->user()->associate($user1);
+        $post1->save();
+
+        $user2 = factory(User::class)->create();
+
+        $post2 = factory(Post::class)->make();
+        $post2->title = 'Second';
+        $post2->body = 'Beta';
+        $post2->user()->associate($user2);
+        $post2->save();
+
+        $user3 = factory(User::class)->create();
+
+        $post3 = factory(Post::class)->make();
+        $post3->title = 'Third';
+        $post3->body = 'Alpha';
+        $post3->user()->associate($user3);
+        $post3->save();
+
+        // Find users with posts where (title = 'First' OR title = 'Second') AND body = 'Alpha'
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            enumColumns(
+                where: {
+                    HAS: {
+                        relation: "posts"
+                        condition: {
+                            AND: [
+                                {
+                                    OR: [
+                                        { column: "title", value: "First" }
+                                        { column: "title", value: "Second" }
+                                    ]
+                                }
+                                { column: "body", value: "Alpha" }
+                            ]
+                        }
+                    }
+                }
+            ) {
+                id
+            }
+        }
+        ')->assertExactJson([
+            'data' => [
+                'enumColumns' => [
+                    [
+                        'id' => "{$user1->id}",
                     ],
                 ],
             ],
