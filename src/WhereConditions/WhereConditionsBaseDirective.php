@@ -57,7 +57,7 @@ abstract class WhereConditionsBaseDirective extends BaseDirective implements Arg
                     ),
                 )
                 ->setTypeDefinition(
-                    WhereConditionsServiceProvider::createWhereHasConditionsInputType(
+                    WhereConditionsServiceProvider::createHasConditionInputType(
                         $restrictedWhereConditionsName,
                         "Dynamic WHERE HAS conditions for the `{$argDefinition->name->value}` argument of the query `{$parentField->name->value}`.",
                         'String',

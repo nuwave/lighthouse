@@ -19,7 +19,7 @@ class WhereConditionsServiceProvider extends ServiceProvider
 
     public const DEFAULT_WHERE_RELATION_CONDITIONS = 'Relation';
 
-    public const DEFAULT_WHERE_HAS_CONDITIONS = 'WhereHasConditions';
+    public const DEFAULT_HAS_CONDITION = 'HasCondition';
 
     public function register(): void
     {
@@ -41,7 +41,7 @@ class WhereConditionsServiceProvider extends ServiceProvider
                 ),
             );
             $documentAST->setTypeDefinition(
-                static::createWhereHasConditionsInputType(
+                static::createHasConditionInputType(
                     static::DEFAULT_WHERE_CONDITIONS,
                     'Dynamic WHERE conditions for HAS conditions.',
                     'String',
@@ -105,10 +105,10 @@ GRAPHQL
         );
     }
 
-    public static function createWhereHasConditionsInputType(string $name, string $description, string $columnType): InputObjectTypeDefinitionNode
+    public static function createHasConditionInputType(string $name, string $description, string $columnType): InputObjectTypeDefinitionNode
     {
         $hasRelationInputName = $name . self::DEFAULT_WHERE_RELATION_CONDITIONS;
-        $name .= self::DEFAULT_WHERE_HAS_CONDITIONS;
+        $name .= self::DEFAULT_HAS_CONDITION;
 
         $operator = Container::getInstance()->make(Operator::class);
 
@@ -148,7 +148,7 @@ GRAPHQL
     {
         $hasRelationInputName = $name . self::DEFAULT_WHERE_RELATION_CONDITIONS;
         $defaultHasAmount = self::DEFAULT_HAS_AMOUNT;
-        $conditionName = $name . self::DEFAULT_WHERE_HAS_CONDITIONS;
+        $conditionName = $name . self::DEFAULT_HAS_CONDITION;
 
         $operator = Container::getInstance()->make(Operator::class);
 
