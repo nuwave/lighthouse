@@ -1026,7 +1026,6 @@ GRAPHQL;
         }
         ';
 
-        // This test verifies that when page is null, it uses the default value of 1
         $this->graphQL(/** @lang GraphQL */ '
         query ($page: Int) {
             users(first: 2, page: $page) {

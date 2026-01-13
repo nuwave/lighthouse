@@ -36,8 +36,7 @@ class PaginationArgs
                 Cursor::decode($args),
             )
             // Handles cases "paginate" and "simple", which both take the same args.
-            // Use default value 1 if page is not set or explicitly null
-            : (Arr::get($args, 'page') ?? 1);
+            : Arr::get($args, 'page') ?? 1;
 
         if ($first < 0) {
             throw new Error(self::requestedLessThanZeroItems($first));
