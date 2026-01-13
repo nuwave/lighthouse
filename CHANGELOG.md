@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.64.1
+
+### Fixed
+
+- Handle explicit `null` for `page` argument in paginated queries https://github.com/nuwave/lighthouse/pull/2735
+
 ## v6.64.0
 
 ### Added
