@@ -13,6 +13,24 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Use `String` type for `HAS.condition.column` in `@whereConditions` instead of incorrectly inheriting the parent's column enum type https://github.com/nuwave/lighthouse/pull/2725
 
+## v6.64.1
+
+### Fixed
+
+- Handle explicit `null` for `page` argument in paginated queries https://github.com/nuwave/lighthouse/pull/2735
+
+## v6.64.0
+
+### Added
+
+- Support PHPUnit 12 with `Nuwave\Lighthouse\Testing\MocksResolvers` https://github.com/nuwave/lighthouse/pull/2730
+
+## v6.63.2
+
+### Fixed
+
+- Make Automatic Persisted Queries work with hybrid cache mode https://github.com/nuwave/lighthouse/pull/2727
+
 ## v6.63.1
 
 ### Fixed

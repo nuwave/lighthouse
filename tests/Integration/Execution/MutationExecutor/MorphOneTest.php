@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Execution\MutationExecutor;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Image;
 use Tests\Utils\Models\Task;
@@ -216,6 +217,7 @@ final class MorphOneTest extends DBTestCase
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testUpdateWithNewMorphOne(string $action): void
     {
         factory(Task::class)->create();
@@ -252,6 +254,7 @@ final class MorphOneTest extends DBTestCase
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testUpdateWithUpsertMorphOne(string $action): void
     {
         factory(Task::class)->create();
@@ -289,10 +292,11 @@ final class MorphOneTest extends DBTestCase
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testUpdateAndUpdateMorphOne(string $action): void
     {
         $task = factory(Task::class)->create();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
 
         $task->images()
             ->save(
@@ -332,10 +336,11 @@ final class MorphOneTest extends DBTestCase
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testUpdateAndDeleteMorphOne(string $action): void
     {
         $task = factory(Task::class)->create();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
 
         $task->images()
             ->save(
@@ -372,10 +377,10 @@ final class MorphOneTest extends DBTestCase
     public function testNestedConnectMorphOne(): void
     {
         $task = factory(Task::class)->create();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
 
         $image = factory(Image::class)->create();
-        assert($image instanceof Image);
+        $this->assertInstanceOf(Image::class, $image);
 
         $this->graphQL(/** @lang GraphQL */ '
         mutation ($input: UpdateTaskInput!) {

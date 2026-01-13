@@ -72,7 +72,7 @@ final class ASTHelperTest extends TestCase
 
         $firstNameField = ASTHelper::firstByName($objectType1->fields, 'first_name');
 
-        assert($firstNameField instanceof FieldDefinitionNode);
+        $this->assertInstanceOf(FieldDefinitionNode::class, $firstNameField);
         $this->assertCount(1, $firstNameField->directives);
     }
 
@@ -270,7 +270,7 @@ final class ASTHelperTest extends TestCase
                 ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
             ): void {
                 $directiveInstance = ASTHelper::addDirectiveToNode('@foo', $fieldDefinition);
-                assert($directiveInstance instanceof FieldManipulator);
+                TestCase::assertInstanceOf(FieldManipulator::class, $directiveInstance);
 
                 $directiveInstance->manipulateFieldDefinition($documentAST, $fieldDefinition, $parentType);
             }
@@ -286,13 +286,13 @@ final class ASTHelperTest extends TestCase
         $documentAST = $astBuilder->documentAST();
 
         $queryType = $documentAST->types[RootType::QUERY];
-        assert($queryType instanceof ObjectTypeDefinitionNode);
+        $this->assertInstanceOf(ObjectTypeDefinitionNode::class, $queryType);
 
         $fieldType = $queryType->fields[0];
-        assert($fieldType instanceof FieldDefinitionNode); // @phpstan-ignore instanceof.alwaysTrue (aids IDE)
+        $this->assertInstanceOf(FieldDefinitionNode::class, $fieldType); // @phpstan-ignore method.alreadyNarrowedType (aids IDE)
 
         $typeType = $fieldType->type;
-        assert($typeType instanceof NamedTypeNode);
+        $this->assertInstanceOf(NamedTypeNode::class, $typeType);
 
         $this->assertSame('Int', $typeType->name->value);
     }
@@ -331,7 +331,7 @@ final class ASTHelperTest extends TestCase
                 ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
             ): void {
                 $directiveInstance = ASTHelper::addDirectiveToNode('@foo', $argDefinition);
-                assert($directiveInstance instanceof ArgManipulator);
+                TestCase::assertInstanceOf(ArgManipulator::class, $directiveInstance);
 
                 $directiveInstance->manipulateArgDefinition($documentAST, $argDefinition, $parentField, $parentType);
             }
@@ -348,16 +348,16 @@ final class ASTHelperTest extends TestCase
         $documentAST = $astBuilder->documentAST();
 
         $queryType = $documentAST->types[RootType::QUERY];
-        assert($queryType instanceof ObjectTypeDefinitionNode);
+        $this->assertInstanceOf(ObjectTypeDefinitionNode::class, $queryType);
 
         $fieldType = $queryType->fields[0];
-        assert($fieldType instanceof FieldDefinitionNode); // @phpstan-ignore instanceof.alwaysTrue (aids IDE)
+        $this->assertInstanceOf(FieldDefinitionNode::class, $fieldType); // @phpstan-ignore method.alreadyNarrowedType (aids IDE)
 
         $argumentType = $fieldType->arguments[0];
-        assert($argumentType instanceof InputValueDefinitionNode); // @phpstan-ignore instanceof.alwaysTrue (aids IDE)
+        $this->assertInstanceOf(InputValueDefinitionNode::class, $argumentType); // @phpstan-ignore method.alreadyNarrowedType (aids IDE)
 
         $typeType = $argumentType->type;
-        assert($typeType instanceof NamedTypeNode);
+        $this->assertInstanceOf(NamedTypeNode::class, $typeType);
 
         $this->assertSame('Int', $typeType->name->value);
     }
@@ -394,7 +394,7 @@ final class ASTHelperTest extends TestCase
                 InputObjectTypeDefinitionNode &$parentInput,
             ): void {
                 $directiveInstance = ASTHelper::addDirectiveToNode('@foo', $inputField);
-                assert($directiveInstance instanceof InputFieldManipulator);
+                TestCase::assertInstanceOf(InputFieldManipulator::class, $directiveInstance);
 
                 $directiveInstance->manipulateInputFieldDefinition($documentAST, $inputField, $parentInput);
             }
@@ -415,13 +415,13 @@ final class ASTHelperTest extends TestCase
         $documentAST = $astBuilder->documentAST();
 
         $inputType = $documentAST->types['Input'];
-        assert($inputType instanceof InputObjectTypeDefinitionNode);
+        $this->assertInstanceOf(InputObjectTypeDefinitionNode::class, $inputType);
 
         $fieldType = $inputType->fields[0];
-        assert($fieldType instanceof InputValueDefinitionNode); // @phpstan-ignore instanceof.alwaysTrue (aids IDE)
+        $this->assertInstanceOf(InputValueDefinitionNode::class, $fieldType); // @phpstan-ignore method.alreadyNarrowedType (aids IDE)
 
         $typeType = $fieldType->type;
-        assert($typeType instanceof NamedTypeNode);
+        $this->assertInstanceOf(NamedTypeNode::class, $typeType);
 
         $this->assertSame('Int', $typeType->name->value);
     }

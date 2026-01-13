@@ -4,6 +4,7 @@ namespace Tests\Unit\Schema\Directives;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use Tests\TestCase;
+use Tests\Utils\MockableFoo;
 
 final class MethodDirectiveTest extends TestCase
 {
@@ -110,9 +111,7 @@ final class MethodDirectiveTest extends TestCase
 
     private function mockFoo(): MockObject
     {
-        $foo = $this->getMockBuilder(\stdClass::class)
-            ->addMethods(['bar'])
-            ->getMock();
+        $foo = $this->createMock(MockableFoo::class);
 
         $this->mockResolver($foo);
 

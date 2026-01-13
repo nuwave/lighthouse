@@ -36,10 +36,10 @@ final class AsyncDirectiveTest extends DBTestCase
         $jobs = $queue->pushed(AsyncMutation::class);
         $this->assertCount(1, $jobs);
         foreach ($jobs as $job) {
-            assert($job instanceof AsyncMutation);
+            $this->assertInstanceOf(AsyncMutation::class, $job);
 
             $jobCycledThroughSerialization = unserialize(serialize($job));
-            assert($jobCycledThroughSerialization instanceof AsyncMutation);
+            $this->assertInstanceOf(AsyncMutation::class, $jobCycledThroughSerialization);
             Container::getInstance()->call([$jobCycledThroughSerialization, 'handle']);
         }
     }
@@ -68,11 +68,11 @@ final class AsyncDirectiveTest extends DBTestCase
         $jobs = $queue->pushed(AsyncMutation::class);
         $this->assertCount(1, $jobs);
         foreach ($jobs as $job) {
-            assert($job instanceof AsyncMutation);
+            $this->assertInstanceOf(AsyncMutation::class, $job);
             $this->assertSame('custom', $job->queue);
 
             $jobCycledThroughSerialization = unserialize(serialize($job));
-            assert($jobCycledThroughSerialization instanceof AsyncMutation);
+            $this->assertInstanceOf(AsyncMutation::class, $jobCycledThroughSerialization);
             Container::getInstance()->call([$jobCycledThroughSerialization, 'handle']);
         }
     }

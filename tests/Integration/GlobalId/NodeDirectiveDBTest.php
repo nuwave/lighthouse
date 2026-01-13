@@ -4,6 +4,7 @@ namespace Tests\Integration\GlobalId;
 
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\GlobalId\GlobalId;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
@@ -167,6 +168,7 @@ final class NodeDirectiveDBTest extends DBTestCase
     }
 
     /** @dataProvider modelNodeDirectiveStyles */
+    #[DataProvider('modelNodeDirectiveStyles')]
     public function testResolveModelsNodes(string $directiveDefinition): void
     {
         $this->schema .= /** @lang GraphQL */ "

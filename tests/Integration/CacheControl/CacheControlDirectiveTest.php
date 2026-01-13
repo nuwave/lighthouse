@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\CacheControl;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
@@ -63,6 +64,7 @@ final class CacheControlDirectiveTest extends DBTestCase
     }
 
     /** @dataProvider rootScalarDataProvider */
+    #[DataProvider('rootScalarDataProvider')]
     public function testRootScalar(string $query, string $expectedHeaderString): void
     {
         $this->mockResolver(1);
@@ -135,6 +137,7 @@ final class CacheControlDirectiveTest extends DBTestCase
     }
 
     /** @dataProvider argumentsDataProvider */
+    #[DataProvider('argumentsDataProvider')]
     public function testDirectiveArguments(string $directive, string $expectedHeaderString): void
     {
         $this->mockResolver([
@@ -174,6 +177,7 @@ final class CacheControlDirectiveTest extends DBTestCase
     }
 
     /** @dataProvider nestedQueryDataProvider */
+    #[DataProvider('nestedQueryDataProvider')]
     public function testUseDirectiveNested(string $query, string $expectedHeaderString): void
     {
         $this->schema = /** @lang GraphQL */ '
@@ -205,7 +209,7 @@ final class CacheControlDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $tasks = factory(Task::class, 3)->make();
         $user->tasks()->saveMany($tasks);
@@ -214,7 +218,7 @@ final class CacheControlDirectiveTest extends DBTestCase
         $user->posts()->saveMany($posts);
 
         $team = factory(Team::class)->create();
-        assert($team instanceof Team);
+        $this->assertInstanceOf(Team::class, $team);
 
         $users = factory(User::class, 3)->make();
         $team->users()->saveMany($users);
@@ -336,7 +340,7 @@ final class CacheControlDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $tasks = factory(Task::class, 3)->make();
         $user->tasks()->saveMany($tasks);
@@ -362,6 +366,7 @@ final class CacheControlDirectiveTest extends DBTestCase
     }
 
     /** @dataProvider typeLevelCacheDataProvider */
+    #[DataProvider('typeLevelCacheDataProvider')]
     public function testTypeLevelCache(string $query, string $expectedHeaderString): void
     {
         $this->schema = /** @lang GraphQL */ '
@@ -382,7 +387,7 @@ final class CacheControlDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $tasks = factory(Task::class, 3)->make();
         $user->tasks()->saveMany($tasks);

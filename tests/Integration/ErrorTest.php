@@ -10,6 +10,7 @@ use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Laragraph\Utils\BadRequestGraphQLException;
 use Nuwave\Lighthouse\Events\StartExecution;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 final class ErrorTest extends TestCase
@@ -51,6 +52,7 @@ final class ErrorTest extends TestCase
     }
 
     /** @dataProvider parseSourceLocations */
+    #[DataProvider('parseSourceLocations')]
     public function testReturnsFullGraphQLError(bool $parseSourceLocations): void
     {
         $config = $this->app->make(ConfigRepository::class);

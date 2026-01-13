@@ -196,10 +196,10 @@ final class MorphToManyDirectiveTest extends DBTestCase
     public function testResolveMorphToManyUsingInterfaces(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $post = factory(Post::class)->make();
-        assert($post instanceof Post);
+        $this->assertInstanceOf(Post::class, $post);
         $post->user()->associate($user);
         $post->save();
 
@@ -213,7 +213,7 @@ final class MorphToManyDirectiveTest extends DBTestCase
             });
 
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        \PHPUnit\Framework\Assert::assertInstanceOf(Task::class, $task);
         $task->user()->associate($user);
         $task->save();
 

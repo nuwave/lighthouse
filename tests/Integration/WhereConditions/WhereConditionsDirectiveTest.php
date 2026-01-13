@@ -59,12 +59,12 @@ final class WhereConditionsDirectiveTest extends DBTestCase
     public function testBetweenWithMultipleVariables(): void
     {
         $user1 = factory(User::class)->create();
-        assert($user1 instanceof User);
+        $this->assertInstanceOf(User::class, $user1);
         $user1->date_of_birth = Carbon::createStrict(2000, 1, 1);
         $user1->save();
 
         $user2 = factory(User::class)->create();
-        assert($user2 instanceof User);
+        $this->assertInstanceOf(User::class, $user2);
         $user2->date_of_birth = Carbon::createStrict(1995, 1, 1);
         $user2->save();
 
@@ -97,12 +97,12 @@ final class WhereConditionsDirectiveTest extends DBTestCase
     public function testBetweenWithOneVariable(): void
     {
         $user1 = factory(User::class)->create();
-        assert($user1 instanceof User);
+        $this->assertInstanceOf(User::class, $user1);
         $user1->date_of_birth = Carbon::createStrict(2000, 1, 1);
         $user1->save();
 
         $user2 = factory(User::class)->create();
-        assert($user2 instanceof User);
+        $this->assertInstanceOf(User::class, $user2);
         $user2->date_of_birth = Carbon::createStrict(1995, 1, 1);
         $user2->save();
 
@@ -134,12 +134,12 @@ final class WhereConditionsDirectiveTest extends DBTestCase
     public function testBetweenWithLiteralValues(): void
     {
         $user1 = factory(User::class)->create();
-        assert($user1 instanceof User);
+        $this->assertInstanceOf(User::class, $user1);
         $user1->date_of_birth = Carbon::createStrict(2000, 1, 1);
         $user1->save();
 
         $user2 = factory(User::class)->create();
-        assert($user2 instanceof User);
+        $this->assertInstanceOf(User::class, $user2);
         $user2->date_of_birth = Carbon::createStrict(1995, 1, 1);
         $user2->save();
 
@@ -206,12 +206,12 @@ final class WhereConditionsDirectiveTest extends DBTestCase
     public function testOperatorNotLike(): void
     {
         $user1 = factory(User::class)->make();
-        assert($user1 instanceof User);
+        $this->assertInstanceOf(User::class, $user1);
         $user1->name = 'foo';
         $user1->save();
 
         $user2 = factory(User::class)->make();
-        assert($user2 instanceof User);
+        $this->assertInstanceOf(User::class, $user2);
         $user2->name = 'bar';
         $user2->save();
 
@@ -950,7 +950,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
     public function testOnlyAllowsWhitelistedColumns(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $this->graphQL(/** @lang GraphQL */ '
         query ($id: Mixed!) {
@@ -994,7 +994,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
     public function testUseColumnEnumsArg(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $this->graphQL(/** @lang GraphQL */ '
         query ($id: Mixed!) {
@@ -1023,7 +1023,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
     public function testIgnoreNullCondition(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -1057,7 +1057,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
         ';
 
         $location = factory(Location::class)->make();
-        assert($location instanceof Location);
+        $this->assertInstanceOf(Location::class, $location);
         $location->extra = [
             'value' => 'exampleValue',
         ];
@@ -1103,12 +1103,12 @@ final class WhereConditionsDirectiveTest extends DBTestCase
 GRAPHQL;
 
         $user1 = factory(User::class)->make();
-        assert($user1 instanceof User);
+        $this->assertInstanceOf(User::class, $user1);
         $user1->name = 'foo';
         $user1->save();
 
         $user2 = factory(User::class)->make();
-        assert($user2 instanceof User);
+        $this->assertInstanceOf(User::class, $user2);
         $user2->name = 'foofoo';
         $user2->save();
 

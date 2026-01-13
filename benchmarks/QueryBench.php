@@ -3,27 +3,50 @@
 namespace Benchmarks;
 
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Tests\TestCase;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Testing\TestResponse;
 
 /** @BeforeMethods({"setUp"}) */
-abstract class QueryBench extends TestCase
+abstract class QueryBench
 {
+    protected BenchmarkTestCase $testCase;
+
+    /** GraphQL schema. */
+    protected string $schema;
+
     /** Cached graphQL endpoint. */
     protected string $graphQLEndpoint;
 
-    public function __construct() // @phpstan-ignore method.parentMethodFinalByPhpDoc (yeah this is hacky)
-    {
-        parent::__construct(static::class);
-    }
-
     public function setUp(): void
     {
-        parent::setUp();
+        $this->testCase = new BenchmarkTestCase('benchmark');
+        $this->testCase->setSchema($this->schema);
+        $this->testCase->setUp();
 
-        $config = $this->app->make(ConfigRepository::class);
-
+        $config = $this->config();
         $routeName = $config->get('lighthouse.route.name');
         $this->graphQLEndpoint = route($routeName);
+    }
+
+    /**
+     * Execute a GraphQL query.
+     *
+     * @param  array<string, mixed>  $variables
+     * @param  array<string, mixed>  $extraParams
+     */
+    protected function graphQL(string $query, array $variables = [], array $extraParams = []): TestResponse
+    {
+        return $this->testCase->graphQL($query, $variables, $extraParams);
+    }
+
+    protected function app(): Application
+    {
+        return $this->testCase->app();
+    }
+
+    protected function config(): ConfigRepository
+    {
+        return $this->app()->make(ConfigRepository::class);
     }
 
     /**
@@ -45,7 +68,7 @@ abstract class QueryBench extends TestCase
     {
         $this->setUp();
 
-        $configRepository = $this->app->make(ConfigRepository::class);
+        $configRepository = $this->config();
 
         if ($params[0]) {
             $configRepository->set('lighthouse.field_middleware', []);

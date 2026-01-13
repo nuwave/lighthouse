@@ -28,6 +28,10 @@ parameters:
   - tests/Utils/Enums/ImageableType.php
   - tests/Utils/Enums/ImageableType.php
   ignoreErrors:
+  # PHPUnit 10+ attributes don't exist in PHPUnit 9.x
+  - path: tests
+    message: '#Attribute class PHPUnit\\Framework\\Attributes\\.+ does not exist\.#'
+
   # PHPStan does not get it
   - '#Parameter \#1 \$callback of static method Closure::fromCallable\(\) expects callable\(\): mixed, array{object, .*} given\.#'
 
@@ -59,8 +63,12 @@ parameters:
   - '#Method .+ should return Illuminate\\Database\\Eloquent\\Relations\\(HasOneThrough|HasManyThrough)<(.+), .+> but returns Illuminate\\Database\\Eloquent\\Relations\\\1<\2>.#'
   - '#Return type of call to method Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany<.+>::save\(\) contains unresolvable type\.#'
 
-  # Different between PHPUnit versions
-  - '#PHPDoc tag @return contains generic type PHPUnit\\Framework\\MockObject\\Builder\\InvocationMocker<stdClass> but class PHPUnit\\Framework\\MockObject\\Builder\\InvocationMocker is not generic.#'
+  # PHPUnit version compatibility - InvocationMocker (PHPUnit 9-11) vs InvocationStubber (PHPUnit 12+)
+  # The MocksResolvers trait uses conditional definition based on PHPUnit version
+  - '#PHPDoc tag @return contains generic type PHPUnit\\Framework\\MockObject\\Builder\\InvocationMocker<.+> but class PHPUnit\\Framework\\MockObject\\Builder\\InvocationMocker is not generic.#'
+  - path: src/Testing/MocksResolvers.php
+    message: '#(class|has invalid return type) PHPUnit\\Framework\\MockObject\\Builder\\InvocationMocker#'
+  - '#Call to method (with|willReturn|willReturnCallback|willReturnMap|willReturnArgument|willReturnSelf|willReturnOnConsecutiveCalls|willThrowException|method|id|after|withAnyParameters|will)\(\) on an unknown class PHPUnit\\Framework\\MockObject\\Builder\\InvocationMocker\.#'
 
   # This test cheats and uses reflection to make assertions
   - path: tests/Unit/Schema/Directives/BaseDirectiveTest.php
@@ -119,6 +127,8 @@ parameters:
 
   # Lots of work to specify the generics, little gain
   - path: tests
+    message: '#Method .+ return type with generic class Illuminate\\Testing\\TestResponse does not specify its types: TResponse#'
+  - path: benchmarks
     message: '#Method .+ return type with generic class Illuminate\\Testing\\TestResponse does not specify its types: TResponse#'
 
   # We don't care about configuration caching in our tests

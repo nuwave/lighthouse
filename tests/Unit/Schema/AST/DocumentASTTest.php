@@ -101,7 +101,7 @@ final class DocumentASTTest extends TestCase
         $reserialized = unserialize(
             serialize($documentAST),
         );
-        assert($reserialized instanceof DocumentAST);
+        $this->assertInstanceOf(DocumentAST::class, $reserialized);
 
         $queryType = $reserialized->types[RootType::QUERY];
         $this->assertInstanceOf(ObjectTypeDefinitionNode::class, $queryType);
