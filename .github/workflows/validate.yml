@@ -217,6 +217,20 @@ jobs:
       - name: "Upload to Codecov"
         uses: codecov/codecov-action@v2
 
+  audit:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: audit
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - run: make setup
+
+      - run: make audit
+
   benchmarks:
     runs-on: ubuntu-latest
 
