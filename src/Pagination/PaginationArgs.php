@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Pagination;
 
@@ -19,7 +17,7 @@ class PaginationArgs
 {
     public function __construct(
         public int $page,
-        public int $first,
+        public mixed $first,
         public PaginationType $type,
     ) {}
 
@@ -40,7 +38,9 @@ class PaginationArgs
             // Handles cases "paginate" and "simple", which both take the same args.
             : Arr::get($args, 'page') ?? 1;
 
-
+        if ($first && $first < 0) {
+            throw new Error(self::requestedLessThanZeroItems($first));
+        }
 
         // Make sure the maximum pagination count is not exceeded
         if (
@@ -85,7 +85,7 @@ class PaginationArgs
         // the total counts, following queries may need them - and use the same cached value.
         $hasCacheDirective = $resolveInfo->argumentSet
             ->directives
-            ->contains(static fn(Directive $directive): bool => $directive instanceof CacheDirective);
+            ->contains(static fn (Directive $directive): bool => $directive instanceof CacheDirective);
         if ($hasCacheDirective) {
             return $proposedType;
         }
@@ -126,9 +126,10 @@ class PaginationArgs
             ? 'simplePaginate'
             : 'paginate';
 
-        if ($methodName == 'paginate' && $this->first < 0) {
+        if ($methodName == 'paginate' && $this->first === null) {
             $results = $builder->get(['*']);
             $total = $results->count();
+
             return new NegativePerPageLengthAwarePaginator($results, $total);
         }
 
