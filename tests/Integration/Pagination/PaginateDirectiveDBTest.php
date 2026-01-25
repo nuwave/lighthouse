@@ -23,7 +23,9 @@ final class PaginateDirectiveDBTest extends DBTestCase
     {
         factory(User::class, 3)->create();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema
+            /** @lang GraphQL */
+            = '
         type User {
             id: ID!
         }
@@ -33,7 +35,9 @@ final class PaginateDirectiveDBTest extends DBTestCase
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(
+            /** @lang GraphQL */
+            '
         {
             users(first: 2) {
                 paginatorInfo {
@@ -46,7 +50,8 @@ final class PaginateDirectiveDBTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        ',
+        )->assertJson([
             'data' => [
                 'users' => [
                     'paginatorInfo' => [
@@ -64,7 +69,9 @@ final class PaginateDirectiveDBTest extends DBTestCase
     {
         factory(User::class, 2)->create();
 
-        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        $this->schema
+            /** @lang GraphQL */
+            = <<<GRAPHQL
         type User {
             id: ID!
         }
@@ -75,7 +82,9 @@ final class PaginateDirectiveDBTest extends DBTestCase
 GRAPHQL;
 
         // The custom builder is supposed to change the sort order
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(
+            /** @lang GraphQL */
+            '
         {
             users(first: 1) {
                 data {
@@ -83,7 +92,8 @@ GRAPHQL;
                 }
             }
         }
-        ')->assertJson([
+        ',
+        )->assertJson([
             'data' => [
                 'users' => [
                     'data' => [
@@ -104,7 +114,9 @@ GRAPHQL;
         $posts = factory(Post::class, 2)->create();
         $user->posts()->saveMany($posts);
 
-        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        $this->schema
+            /** @lang GraphQL */
+            = <<<GRAPHQL
         type Post {
             id: ID!
         }
@@ -120,7 +132,9 @@ GRAPHQL;
 GRAPHQL;
 
         // The custom builder is supposed to change the sort order
-        $this->graphQL(/** @lang GraphQL */ "
+        $this->graphQL(
+            /** @lang GraphQL */
+            "
         {
             user(id: {$user->id}) {
                 posts(first: 10) {
@@ -130,7 +144,8 @@ GRAPHQL;
                 }
             }
         }
-        ")->assertJson([
+        ",
+        )->assertJson([
             'data' => [
                 'user' => [
                     'posts' => [
@@ -173,7 +188,9 @@ GRAPHQL;
             ->andReturn(new EloquentCollection([$post]))
             ->once();
 
-        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        $this->schema
+            /** @lang GraphQL */
+            = <<<GRAPHQL
         type Post {
             id: ID!
         }
@@ -185,7 +202,9 @@ GRAPHQL;
         }
 GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(
+            /** @lang GraphQL */
+            '
         query ($first: Int!, $page: Int!, $id: ID!) {
             posts(first: $first, page: $page, id: $id) {
                 data {
@@ -193,11 +212,13 @@ GRAPHQL;
                 }
             }
         }
-        ', [
-            'first' => $first,
-            'page' => $page,
-            'id' => $post->id,
-        ])->assertJson([
+        ',
+            [
+                'first' => $first,
+                'page' => $page,
+                'id' => $post->id,
+            ],
+        )->assertJson([
             'data' => [
                 'posts' => [
                     'data' => [
@@ -222,7 +243,9 @@ GRAPHQL;
         $unnamedUser->name = null;
         $unnamedUser->save();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema
+            /** @lang GraphQL */
+            = '
         type User {
             id: String!
         }
@@ -232,7 +255,9 @@ GRAPHQL;
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(
+            /** @lang GraphQL */
+            '
         {
             users(first: 5) {
                 paginatorInfo {
@@ -245,7 +270,8 @@ GRAPHQL;
                 }
             }
         }
-        ')->assertExactJson([
+        ',
+        )->assertExactJson([
             'data' => [
                 'users' => [
                     'paginatorInfo' => [
@@ -306,7 +332,9 @@ GRAPHQL;
             $comment->save();
         }
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema
+            /** @lang GraphQL */
+            = '
         type User {
             posts: [Post!]! @paginate
         }
@@ -324,7 +352,9 @@ GRAPHQL;
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(
+            /** @lang GraphQL */
+            '
         {
             users(first: 2, page: 1) {
                 paginatorInfo {
@@ -352,7 +382,8 @@ GRAPHQL;
                 }
             }
         }
-        ')->assertJson([
+        ',
+        )->assertJson([
             'data' => [
                 'users' => [
                     'paginatorInfo' => [
@@ -385,7 +416,9 @@ GRAPHQL;
     {
         factory(User::class, 3)->create();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema
+            /** @lang GraphQL */
+            = '
         type User {
             id: ID!
         }
@@ -395,7 +428,9 @@ GRAPHQL;
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(
+            /** @lang GraphQL */
+            '
         {
             users(first: 2) {
                 pageInfo {
@@ -408,7 +443,8 @@ GRAPHQL;
                 }
             }
         }
-        ')->assertJson([
+        ',
+        )->assertJson([
             'data' => [
                 'users' => [
                     'pageInfo' => [
@@ -421,7 +457,9 @@ GRAPHQL;
 
     public function testQueriesConnectionWithNoData(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema
+            /** @lang GraphQL */
+            = '
         type User {
             id: ID!
         }
@@ -431,7 +469,9 @@ GRAPHQL;
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(
+            /** @lang GraphQL */
+            '
         {
             users(first: 5) {
                 pageInfo {
@@ -451,7 +491,8 @@ GRAPHQL;
                 }
             }
         }
-        ')->assertExactJson([
+        ',
+        )->assertExactJson([
             'data' => [
                 'users' => [
                     'pageInfo' => [
@@ -472,7 +513,9 @@ GRAPHQL;
 
     public function testQueriesPaginationWithNoData(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema
+            /** @lang GraphQL */
+            = '
         type User {
             id: ID!
         }
@@ -482,7 +525,9 @@ GRAPHQL;
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(
+            /** @lang GraphQL */
+            '
         {
             users(first: 5) {
                 paginatorInfo {
@@ -500,7 +545,8 @@ GRAPHQL;
                 }
             }
         }
-        ')->assertExactJson([
+        ',
+        )->assertExactJson([
             'data' => [
                 'users' => [
                     'paginatorInfo' => [
@@ -524,7 +570,9 @@ GRAPHQL;
         $amount = 3;
         factory(User::class, $amount)->create();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema
+            /** @lang GraphQL */
+            = '
         type User {
             id: ID!
         }
@@ -534,7 +582,9 @@ GRAPHQL;
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(
+            /** @lang GraphQL */
+            '
         {
             users(first: 0) {
                 paginatorInfo {
@@ -552,7 +602,8 @@ GRAPHQL;
                 }
             }
         }
-        ')->assertExactJson([
+        ',
+        )->assertExactJson([
             'data' => [
                 'users' => [
                     'paginatorInfo' => [
@@ -576,7 +627,9 @@ GRAPHQL;
         $user = factory(User::class)->create();
         $this->assertInstanceOf(User::class, $user);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema
+            /** @lang GraphQL */
+            = '
         type User {
             id: ID!
         }
@@ -587,7 +640,9 @@ GRAPHQL;
         ';
 
         $this->assertQueryCountMatches(1, function () use ($user): void {
-            $this->graphQL(/** @lang GraphQL */ '
+            $this->graphQL(
+                /** @lang GraphQL */
+                '
             {
                 users(first: 1) {
                     data {
@@ -595,7 +650,8 @@ GRAPHQL;
                     }
                 }
             }
-            ')->assertJson([
+            ',
+            )->assertJson([
                 'data' => [
                     'users' => [
                         'data' => [
@@ -614,7 +670,9 @@ GRAPHQL;
         $user = factory(User::class)->create();
         $this->assertInstanceOf(User::class, $user);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema
+            /** @lang GraphQL */
+            = '
         type User {
             id: ID!
         }
@@ -625,7 +683,9 @@ GRAPHQL;
         ';
 
         $this->assertQueryCountMatches(1, function () use ($user): void {
-            $this->graphQL(/** @lang GraphQL */ '
+            $this->graphQL(
+                /** @lang GraphQL */
+                '
             {
                 users(first: 1) {
                     edges {
@@ -635,7 +695,8 @@ GRAPHQL;
                     }
                 }
             }
-            ')->assertJson([
+            ',
+            )->assertJson([
                 'data' => [
                     'users' => [
                         'edges' => [
@@ -655,7 +716,9 @@ GRAPHQL;
     {
         $users = factory(User::class, 3)->create();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema
+            /** @lang GraphQL */
+            = '
         type User {
             id: ID!
         }
@@ -666,7 +729,9 @@ GRAPHQL;
         ';
 
         $this->assertQueryCountMatches(2, function () use ($users): void {
-            $this->graphQL(/** @lang GraphQL */ '
+            $this->graphQL(
+                /** @lang GraphQL */
+                '
             query ($after: String!) {
                 users(first: 2, after: $after) {
                     pageInfo {
@@ -686,9 +751,11 @@ GRAPHQL;
                     }
                 }
             }
-            ', [
-                'after' => Cursor::encode(2),
-            ])->assertJson([
+            ',
+                [
+                    'after' => Cursor::encode(2),
+                ],
+            )->assertJson([
                 'data' => [
                     'users' => [
                         'pageInfo' => [
@@ -718,7 +785,9 @@ GRAPHQL;
     {
         $users = factory(User::class, 3)->create();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema
+            /** @lang GraphQL */
+            = '
         type User {
             id: ID!
         }
@@ -731,7 +800,9 @@ GRAPHQL;
         $cursor = Cursor::encode(2);
 
         $this->assertQueryCountMatches(1, function () use ($users): void {
-            $this->graphQL(/** @lang GraphQL */ '
+            $this->graphQL(
+                /** @lang GraphQL */
+                '
             query ($after: String!) {
                 users(first: 2, after: $after) {
                     edges {
@@ -741,9 +812,11 @@ GRAPHQL;
                     }
                 }
             }
-            ', [
-                'after' => Cursor::encode(2),
-            ])->assertJson([
+            ',
+                [
+                    'after' => Cursor::encode(2),
+                ],
+            )->assertJson([
                 'data' => [
                     'users' => [
                         'edges' => [
@@ -763,7 +836,9 @@ GRAPHQL;
     {
         factory(User::class, 2)->create();
 
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema
+            /** @lang GraphQL */
+            .= '
         type User {
             id: ID!
         }
@@ -773,7 +848,9 @@ GRAPHQL;
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(
+            /** @lang GraphQL */
+            '
         {
             users(first: 1) {
                 data {
@@ -781,14 +858,17 @@ GRAPHQL;
                 }
             }
         }
-        ')->assertJsonCount(1, 'data.users.data');
+        ',
+        )->assertJsonCount(1, 'data.users.data');
     }
 
     public function testDefaultPaginationCount(): void
     {
         factory(User::class, 3)->create();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema
+            /** @lang GraphQL */
+            = '
         type User {
             id: ID!
         }
@@ -798,7 +878,9 @@ GRAPHQL;
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(
+            /** @lang GraphQL */
+            '
         {
             users {
                 paginatorInfo {
@@ -811,7 +893,8 @@ GRAPHQL;
                 }
             }
         }
-        ')->assertJson([
+        ',
+        )->assertJson([
             'data' => [
                 'users' => [
                     'paginatorInfo' => [
@@ -829,7 +912,9 @@ GRAPHQL;
         $defaultCount = 2;
         config(['lighthouse.pagination.default_count' => $defaultCount]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema
+            /** @lang GraphQL */
+            = '
         type User {
             id: ID!
             name: String!
@@ -840,7 +925,9 @@ GRAPHQL;
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(
+            /** @lang GraphQL */
+            '
         {
             users {
                 data {
@@ -848,14 +935,17 @@ GRAPHQL;
                 }
             }
         }
-        ')->assertJsonCount($defaultCount, 'data.users.data');
+        ',
+        )->assertJsonCount($defaultCount, 'data.users.data');
     }
 
     public function testIsUnlimitedByMaxCountFromDirective(): void
     {
         config(['lighthouse.pagination.max_count' => 5]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema
+            /** @lang GraphQL */
+            = '
         type User {
             id: ID!
             name: String!
@@ -867,7 +957,9 @@ GRAPHQL;
         ';
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(
+                /** @lang GraphQL */
+                '
             {
                 users(first: 10) {
                     data {
@@ -876,7 +968,8 @@ GRAPHQL;
                     }
                 }
             }
-            ')
+            ',
+            )
             ->assertGraphQLErrorFree();
     }
 
@@ -885,7 +978,9 @@ GRAPHQL;
         config(['lighthouse.pagination.default_count' => 10]);
         factory(User::class, 3)->create();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema
+            /** @lang GraphQL */
+            = '
         type User {
             id: ID!
             name: String!
@@ -899,7 +994,9 @@ GRAPHQL;
 
         // "paginate" fires 2 queries: One for data, one for counting.
         $this->assertQueryCountMatches(2, function (): void {
-            $this->graphQL(/** @lang GraphQL */ '
+            $this->graphQL(
+                /** @lang GraphQL */
+                '
             {
                 usersPaginated {
                     paginatorInfo {
@@ -910,12 +1007,15 @@ GRAPHQL;
                     }
                 }
             }
-            ')->assertJsonCount(3, 'data.usersPaginated.data');
+            ',
+            )->assertJsonCount(3, 'data.usersPaginated.data');
         });
 
         // "simplePaginate" only fires one query for the data.
         $this->assertQueryCountMatches(1, function (): void {
-            $this->graphQL(/** @lang GraphQL */ '
+            $this->graphQL(
+                /** @lang GraphQL */
+                '
             {
                 usersSimplePaginated {
                     data {
@@ -923,7 +1023,8 @@ GRAPHQL;
                     }
                 }
             }
-            ')->assertJsonCount(3, 'data.usersSimplePaginated.data');
+            ',
+            )->assertJsonCount(3, 'data.usersSimplePaginated.data');
         });
     }
 
@@ -932,7 +1033,9 @@ GRAPHQL;
         config(['lighthouse.pagination.default_count' => 10]);
         factory(User::class, 3)->create();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema
+            /** @lang GraphQL */
+            = '
         type User {
             id: ID!
             name: String!
@@ -943,7 +1046,9 @@ GRAPHQL;
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(
+            /** @lang GraphQL */
+            '
         {
             users {
                 paginatorInfo {
@@ -955,7 +1060,8 @@ GRAPHQL;
                 }
             }
         }
-        ')->assertJson([
+        ',
+        )->assertJson([
             'data' => [
                 'users' => [
                     'paginatorInfo' => [
@@ -975,7 +1081,9 @@ GRAPHQL;
         $this->expectNotToPerformAssertions();
         factory(User::class, 3)->create();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema
+            /** @lang GraphQL */
+            = '
         type User {
             id: ID!
         }
@@ -985,7 +1093,9 @@ GRAPHQL;
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(
+            /** @lang GraphQL */
+            '
         {
             users(first: 2) {
                 data {
@@ -993,9 +1103,12 @@ GRAPHQL;
                 }
             }
         }
-        ');
+        ',
+        );
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(
+            /** @lang GraphQL */
+            '
         {
             users(first: 2) {
                 paginatorInfo {
@@ -1008,14 +1121,17 @@ GRAPHQL;
                 }
             }
         }
-        ');
+        ',
+        );
     }
 
     public function testSimplePaginationWithNullPageUsesDefaultPage(): void
     {
         factory(User::class, 3)->create();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema
+            /** @lang GraphQL */
+            = '
         type User {
             id: ID!
             name: String!
@@ -1026,7 +1142,9 @@ GRAPHQL;
         }
         ';
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(
+            /** @lang GraphQL */
+            '
         query ($page: Int) {
             users(first: 2, page: $page) {
                 paginatorInfo {
@@ -1038,9 +1156,11 @@ GRAPHQL;
                 }
             }
         }
-        ', [
-            'page' => null,
-        ])->assertJson([
+        ',
+            [
+                'page' => null,
+            ],
+        )->assertJson([
             'data' => [
                 'users' => [
                     'paginatorInfo' => [
@@ -1050,5 +1170,51 @@ GRAPHQL;
                 ],
             ],
         ])->assertJsonCount(2, 'data.users.data');
+    }
+
+    public function testPaginateWithFirstNullReturnsAllItems(): void
+    {
+        factory(User::class, 100)->create();
+
+        $this->schema
+            /** @lang GraphQL */
+            = '
+        type User {
+            id: ID!
+        }
+
+        type Query {
+            users: [User!]! @paginate
+        }
+        ';
+
+        $this->graphQL(
+            /** @lang GraphQL */
+            '
+        {
+            users(first: null) {
+                paginatorInfo {
+                    count
+                    total
+                    currentPage
+                }
+                data {
+                    id
+                }
+            }
+        }
+        ',
+        )->assertJson([
+            'data' => [
+                'users' => [
+                    'paginatorInfo' => [
+                        'count' => 100,
+                        'total' => 100,
+                        'currentPage' => 1,
+                    ],
+                    'data' => [],
+                ],
+            ],
+        ])->assertJsonCount(100, 'data.users.data');
     }
 }
