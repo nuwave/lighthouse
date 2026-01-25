@@ -25,6 +25,7 @@ module.exports = [
       "eloquent/polymorphic-relationships",
       "eloquent/soft-deleting",
       "eloquent/nested-mutations",
+      "eloquent/strictly-typed-searching-and-sorting",
       "eloquent/complex-where-conditions",
     ],
   },
