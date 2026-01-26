@@ -17,7 +17,7 @@ class PaginationArgs
 {
     public function __construct(
         public int $page,
-        public int $first,
+        public mixed $first,
         public PaginationType $type,
     ) {}
 
@@ -38,7 +38,7 @@ class PaginationArgs
             // Handles cases "paginate" and "simple", which both take the same args.
             : Arr::get($args, 'page') ?? 1;
 
-        if ($first < 0) {
+        if ($first && $first < 0) {
             throw new Error(self::requestedLessThanZeroItems($first));
         }
 
@@ -125,6 +125,13 @@ class PaginationArgs
         $methodName = $this->type->isSimple()
             ? 'simplePaginate'
             : 'paginate';
+
+        if ($methodName == 'paginate' && $this->first === null) {
+            $results = $builder->get(['*']);
+            $total = $results->count();
+
+            return new NegativePerPageLengthAwarePaginator($results, $total);
+        }
 
         if ($builder instanceof ScoutBuilder) {
             return $builder->{$methodName}($this->first, 'page', $this->page);
