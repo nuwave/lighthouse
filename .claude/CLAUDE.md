@@ -85,3 +85,19 @@ Tests use `Tests\Utils\` namespace for test fixtures (Models, Queries, Mutations
 - Never use `final` in `src/`,  always in `tests/`
 - Full namespace in PHPDoc (`@var \Full\Namespace\Class`), imports in code
 - Code elements with `@api` have stability guarantees between major versions
+
+## Pull Requests
+
+Follow the [PR template](.github/PULL_REQUEST_TEMPLATE.md):
+- Link related issues
+- Add or update tests
+- Document user-facing changes in `/docs`
+- Update `CHANGELOG.md`
+
+### Changelog
+
+Add entries to the `## Unreleased` section in [CHANGELOG.md](/CHANGELOG.md).
+Use categories: `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`.
+End each entry with a link to the PR.
+
+See [CONTRIBUTING.md](/CONTRIBUTING.md) for full guidelines.
