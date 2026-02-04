@@ -98,6 +98,6 @@ Follow the [PR template](.github/PULL_REQUEST_TEMPLATE.md):
 
 Add entries to the `## Unreleased` section in [CHANGELOG.md](/CHANGELOG.md).
 Use categories: `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`.
-End each entry with a link to the PR.
+End each entry with a full PR URL: `https://github.com/nuwave/lighthouse/pull/<number>`.
 
 See [CONTRIBUTING.md](/CONTRIBUTING.md) for full guidelines.
