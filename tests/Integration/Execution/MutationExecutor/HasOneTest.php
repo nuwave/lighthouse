@@ -425,6 +425,54 @@ final class HasOneTest extends DBTestCase
 
     /** @dataProvider existingModelMutations */
     #[DataProvider('existingModelMutations')]
+    public function testUpdateAndUpsertExistingHasOneWithoutID(string $action): void
+    {
+        $task = factory(Task::class)->create();
+        $this->assertInstanceOf(Task::class, $task);
+
+        $task->post()
+            ->save(
+                factory(Post::class)->create(),
+            );
+
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+        mutation {
+            {$action}Task(input: {
+                id: 1
+                name: "foo"
+                post: {
+                    upsert: {
+                        title: "bar"
+                    }
+                }
+            }) {
+                id
+                name
+                post {
+                    id
+                    title
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                "{$action}Task" => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'post' => [
+                        'id' => '1',
+                        'title' => 'bar',
+                    ],
+                ],
+            ],
+        ]);
+
+        // Assert that the existing post was updated, not a new one created
+        $this->assertSame(1, Post::count());
+    }
+
+    /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testUpdateAndDeleteHasOne(string $action): void
     {
         $task = factory(Task::class)->create();
