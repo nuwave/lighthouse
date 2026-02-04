@@ -54,7 +54,7 @@ class ContextSerializer implements SerializesContext
                 $rawRequest['server'],
                 $rawRequest['content'],
             );
-            $request->setUserResolver(fn () => $this->getRestoredPropertyValue($rawUser));
+            $request->setUserResolver(fn (): mixed => $this->getRestoredPropertyValue($rawUser));
         } else {
             $request = null;
         }

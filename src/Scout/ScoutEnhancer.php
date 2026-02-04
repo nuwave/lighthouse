@@ -73,7 +73,7 @@ class ScoutEnhancer
 
         foreach ($this->argumentsWithScoutBuilderDirectives as $argument) {
             foreach ($argument->directives as $directive) {
-                if (! ($directive instanceof ScoutBuilderDirective)) {
+                if (! $directive instanceof ScoutBuilderDirective) {
                     continue;
                 }
 
