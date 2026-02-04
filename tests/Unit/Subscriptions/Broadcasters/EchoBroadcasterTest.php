@@ -50,8 +50,7 @@ final class EchoBroadcasterTest extends TestCase
 
     public function testAuthorized(): void
     {
-        $broadcastManager = $this->createMock(BroadcastManager::class);
-        $redisBroadcaster = new EchoBroadcaster($broadcastManager);
+        $redisBroadcaster = new EchoBroadcaster($this->createMock(BroadcastManager::class));
 
         $request = new Request();
         $request['channel_name'] = 'abc';
@@ -65,8 +64,7 @@ final class EchoBroadcasterTest extends TestCase
 
     public function testUnauthorized(): void
     {
-        $broadcastManager = $this->createMock(BroadcastManager::class);
-        $redisBroadcaster = new EchoBroadcaster($broadcastManager);
+        $redisBroadcaster = new EchoBroadcaster($this->createMock(BroadcastManager::class));
 
         $response = $redisBroadcaster->unauthorized(new Request());
         $this->assertSame(403, $response->getStatusCode());
