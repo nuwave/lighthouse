@@ -333,6 +333,42 @@ final class HasOneTest extends DBTestCase
 
     /** @dataProvider existingModelMutations */
     #[DataProvider('existingModelMutations')]
+    public function testCreateHasOneWhenAlreadyExists(string $action): void
+    {
+        $task = factory(Task::class)->create();
+        $this->assertInstanceOf(Task::class, $task);
+
+        $task->post()
+            ->save(
+                factory(Post::class)->create(),
+            );
+
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+        mutation {
+            {$action}Task(input: {
+                id: 1
+                name: "foo"
+                post: {
+                    create: {
+                        title: "bar"
+                    }
+                }
+            }) {
+                id
+                name
+                post {
+                    id
+                    title
+                }
+            }
+        }
+        GRAPHQL)->assertGraphQLErrorMessage('Cannot create a related model: a Post already exists for this Task. Use upsert to modify the existing model.');
+
+        $this->assertSame(1, Post::count());
+    }
+
+    /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testUpdateAndUpdateHasOne(string $action): void
     {
         $task = factory(Task::class)->create();
