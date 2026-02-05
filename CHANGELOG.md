@@ -12,6 +12,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Fixed
 
 - Fix `upsert` for `HasOne` creating a new record instead of updating when no `id` is provided in the input https://github.com/nuwave/lighthouse/pull/2742
+- Throw error when using `create` on `HasOne` relation when a related model already exists https://github.com/nuwave/lighthouse/pull/2742
 
 ## v6.64.2
 
