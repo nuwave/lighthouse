@@ -1,5 +1,5 @@
-dcphp=$$(echo "docker-compose exec php")
-dcnode=$$(echo "docker-compose exec node")
+dcphp=$$(echo "docker compose exec php")
+dcnode=$$(echo "docker compose exec node")
 
 .PHONY: it
 it: vendor fix stan test ## Run useful checks before commits
@@ -14,11 +14,11 @@ setup: build docs/node_modules vendor ## Prepare the local environment
 .PHONY: build
 build: ## Build the local Docker containers
 	# Using short options of `id` to ensure compatibility with macOS, see https://github.com/nuwave/lighthouse/pull/2504
-	docker-compose build --pull --build-arg USER_ID=$(shell id -u) --build-arg GROUP_ID=$(shell id -g)
+	docker compose build --pull --build-arg USER_ID=$(shell id -u) --build-arg GROUP_ID=$(shell id -g)
 
 .PHONY: up
-up: ## Bring up the docker-compose stack
-	docker-compose up --detach
+up: ## Bring up the docker compose stack
+	docker compose up --detach
 
 .PHONY: fix
 fix: rector php-cs-fixer prettier ## Automatically refactor and format code
