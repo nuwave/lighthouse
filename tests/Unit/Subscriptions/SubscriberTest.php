@@ -29,7 +29,7 @@ final class SubscriberTest extends TestCase
     {
         $args = ['foo' => 'bar'];
 
-        $resolveInfo = $this->createMock(ResolveInfo::class);
+        $resolveInfo = $this->createStub(ResolveInfo::class);
         $fieldName = 'baz';
         $resolveInfo->fieldName = $fieldName;
 
@@ -58,7 +58,7 @@ final class SubscriberTest extends TestCase
     {
         $args = ['foo' => 'bar'];
 
-        $resolveInfo = $this->createMock(ResolveInfo::class);
+        $resolveInfo = $this->createStub(ResolveInfo::class);
         $fieldName = 'baz';
         $resolveInfo->fieldName = $fieldName;
 
