@@ -30,8 +30,8 @@ final class OrderByDirectiveDBTest extends DBTestCase
 
     public function testOrderByTheGivenColumnAndSortOrderASC(): void
     {
-        factory(User::class)->create(['name' => 'B']);
-        factory(User::class)->create(['name' => 'A']);
+        $this->createUser('B');
+        $this->createUser('A');
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -62,8 +62,8 @@ final class OrderByDirectiveDBTest extends DBTestCase
 
     public function testOrderByTheGivenFieldAndSortOrderDESC(): void
     {
-        factory(User::class)->create(['name' => 'B']);
-        factory(User::class)->create(['name' => 'A']);
+        $this->createUser('B');
+        $this->createUser('A');
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -94,9 +94,9 @@ final class OrderByDirectiveDBTest extends DBTestCase
 
     public function testOrderByMultipleColumns(): void
     {
-        factory(User::class)->create(['name' => 'B', 'team_id' => 2]);
-        factory(User::class)->create(['name' => 'A', 'team_id' => 5]);
-        factory(User::class)->create(['name' => 'C', 'team_id' => 2]);
+        $this->createUser('B', 2);
+        $this->createUser('A', 5);
+        $this->createUser('C', 2);
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -138,8 +138,8 @@ final class OrderByDirectiveDBTest extends DBTestCase
 
     public function testOrderWithRestrictedColumns(): void
     {
-        factory(User::class)->create(['name' => 'B']);
-        factory(User::class)->create(['name' => 'A']);
+        $this->createUser('B');
+        $this->createUser('A');
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -170,8 +170,8 @@ final class OrderByDirectiveDBTest extends DBTestCase
 
     public function testUseColumnEnumsArg(): void
     {
-        factory(User::class)->create(['name' => 'B']);
-        factory(User::class)->create(['name' => 'A']);
+        $this->createUser('B');
+        $this->createUser('A');
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -440,5 +440,16 @@ final class OrderByDirectiveDBTest extends DBTestCase
                 ],
             ],
         ]);
+    }
+
+    private function createUser(string $name, ?int $teamId = null): User
+    {
+        $user = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $user);
+        $user->name = $name;
+        $user->team_id = $teamId;
+        $user->save();
+
+        return $user;
     }
 }

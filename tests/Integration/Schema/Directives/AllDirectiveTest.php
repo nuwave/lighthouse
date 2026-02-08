@@ -91,10 +91,13 @@ final class AllDirectiveTest extends DBTestCase
 
     public function testGetAllAsNestedField(): void
     {
-        factory(Post::class, 2)->create([
-            // Do not create those, as they would create more users
-            'task_id' => 1,
-        ]);
+        factory(Post::class, 2)
+            ->create()
+            ->each(static function (Post $post): void {
+                // Do not create those, as they would create more users.
+                $post->task_id = 1;
+                $post->save();
+            });
 
         $this->schema = /** @lang GraphQL */ '
         type User {

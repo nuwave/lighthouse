@@ -26,9 +26,12 @@ final class FieldBuilderDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
-        $ownedPosts = factory(Post::class, 3)->create([
-            'user_id' => $user->getKey(),
-        ]);
+        $this->assertInstanceOf(User::class, $user);
+        $ownedPosts = factory(Post::class, 3)->create();
+        $ownedPosts->each(static function (Post $post) use ($user): void {
+            $post->user()->associate($user);
+            $post->save();
+        });
         factory(Post::class, 3)->create();
 
         $this->be($user);
@@ -60,9 +63,12 @@ final class FieldBuilderDirectiveTest extends DBTestCase
         }
         ';
         $user = factory(User::class)->create();
-        $ownedPosts = factory(Post::class, 3)->create([
-            'user_id' => $user->getKey(),
-        ]);
+        $this->assertInstanceOf(User::class, $user);
+        $ownedPosts = factory(Post::class, 3)->create();
+        $ownedPosts->each(static function (Post $post) use ($user): void {
+            $post->user()->associate($user);
+            $post->save();
+        });
         factory(Post::class, 3)->create();
 
         $authFactory = $this->app->make(AuthFactory::class);

@@ -339,10 +339,13 @@ final class CacheDirectiveTest extends DBTestCase
     public function testCacheHasManyResolver(): void
     {
         $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
 
-        factory(Post::class, 3)->create([
-            'user_id' => $user->getKey(),
-        ]);
+        $posts = factory(Post::class, 3)->create();
+        $posts->each(static function (Post $post) use ($user): void {
+            $post->user()->associate($user);
+            $post->save();
+        });
 
         $this->schema = /** @lang GraphQL */ '
         type Post {
@@ -406,9 +409,12 @@ final class CacheDirectiveTest extends DBTestCase
         config(['lighthouse.cache_directive_tags' => true]);
 
         $user = factory(User::class)->create();
-        factory(Post::class, 3)->create([
-            'user_id' => $user->getKey(),
-        ]);
+        $this->assertInstanceOf(User::class, $user);
+        $posts = factory(Post::class, 3)->create();
+        $posts->each(static function (Post $post) use ($user): void {
+            $post->user()->associate($user);
+            $post->save();
+        });
 
         $tags = ['lighthouse:User:1', 'lighthouse:User:1:posts'];
 

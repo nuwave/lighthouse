@@ -73,9 +73,11 @@ final class AggregateDirectiveTest extends DBTestCase
         ';
 
         factory(Task::class, 3)->create();
-        $completed = factory(Task::class, 2)->create([
-            'completed_at' => now(),
-        ]);
+        $completed = factory(Task::class, 2)->create();
+        $completed->each(static function (Task $task): void {
+            $task->completed_at = now();
+            $task->save();
+        });
 
         $this->graphQL(/** @lang GraphQL */ '
         {

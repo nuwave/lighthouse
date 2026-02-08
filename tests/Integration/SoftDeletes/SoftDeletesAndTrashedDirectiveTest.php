@@ -245,9 +245,9 @@ final class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
         $user = factory(User::class)->create();
 
         /** @var Task $taskToRemove */
-        $taskToRemove = $user->tasks()->save(
-            factory(Task::class)->make(),
-        );
+        $taskToRemove = factory(Task::class)->make();
+        $taskToRemove->user()->associate($user);
+        $taskToRemove->save();
         $taskToRemove->delete();
 
         $user->tasks()->saveMany(
