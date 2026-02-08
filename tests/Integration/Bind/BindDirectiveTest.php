@@ -307,7 +307,7 @@ final class BindDirectiveTest extends DBTestCase
     {
         $this->rethrowGraphQLErrors();
 
-        $users = factory(User::class, 2)->create();
+        $users = factory(User::class, 2)->make();
         $users->each(static function (User $user): void {
             $user->name = 'John Doe';
             $user->save();
@@ -458,7 +458,7 @@ final class BindDirectiveTest extends DBTestCase
     {
         $this->rethrowGraphQLErrors();
 
-        $users = factory(User::class, 2)->create();
+        $users = factory(User::class, 2)->make();
         $users->each(static function (User $user): void {
             $user->name = 'John Doe';
             $user->save();
@@ -703,7 +703,7 @@ final class BindDirectiveTest extends DBTestCase
     {
         $this->rethrowGraphQLErrors();
 
-        $users = factory(User::class, 2)->create();
+        $users = factory(User::class, 2)->make();
         $users->each(static function (User $user): void {
             $user->name = 'Jane Doe';
             $user->save();
@@ -878,7 +878,7 @@ final class BindDirectiveTest extends DBTestCase
     {
         $this->rethrowGraphQLErrors();
 
-        $users = factory(User::class, 2)->create();
+        $users = factory(User::class, 2)->make();
         $users->each(static function (User $user): void {
             $user->name = 'Jane Doe';
             $user->save();

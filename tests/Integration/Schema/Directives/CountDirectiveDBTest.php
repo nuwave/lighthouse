@@ -59,7 +59,7 @@ final class CountDirectiveDBTest extends DBTestCase
         ';
 
         factory(Task::class, 3)->create();
-        $completed = factory(Task::class, 2)->create();
+        $completed = factory(Task::class, 2)->make();
         $completed->each(static function (Task $task): void {
             $task->completed_at = now();
             $task->save();
@@ -90,7 +90,7 @@ final class CountDirectiveDBTest extends DBTestCase
 
         factory(User::class, 3)->create()
             ->each(static function (User $user, int $index): void {
-                $tasks = factory(Task::class, 3 - $index)->create();
+                $tasks = factory(Task::class, 3 - $index)->make();
                 $tasks->each(static function (Task $task) use ($user): void {
                     $task->user()->associate($user);
                     $task->save();
@@ -136,7 +136,7 @@ final class CountDirectiveDBTest extends DBTestCase
 
         $user = factory(User::class)->create();
         $this->assertInstanceOf(User::class, $user);
-        $tasks = factory(Task::class, 3)->create();
+        $tasks = factory(Task::class, 3)->make();
         $tasks->each(static function (Task $task) use ($user): void {
             $task->user()->associate($user);
             $task->save();
@@ -171,13 +171,13 @@ final class CountDirectiveDBTest extends DBTestCase
 
         /** @var User $user */
         $user = factory(User::class)->create();
-        $tasks = factory(Task::class, 3)->create();
+        $tasks = factory(Task::class, 3)->make();
         $tasks->each(static function (Task $task) use ($user): void {
             $task->user()->associate($user);
             $task->save();
         });
 
-        $completedTask = factory(Task::class)->state('completed')->create();
+        $completedTask = factory(Task::class)->state('completed')->make();
         $this->assertInstanceOf(Task::class, $completedTask);
         $completedTask->user()->associate($user);
         $completedTask->save();

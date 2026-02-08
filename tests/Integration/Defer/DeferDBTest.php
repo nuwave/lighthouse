@@ -153,7 +153,7 @@ final class DeferDBTest extends DBTestCase
         $companies = factory(Company::class, 2)
             ->create()
             ->each(static function (Company $company): void {
-                $users = factory(User::class, 3)->create();
+                $users = factory(User::class, 3)->make();
                 $users->each(static function (User $user) use ($company): void {
                     $user->company()->associate($company);
                     $user->save();

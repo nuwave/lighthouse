@@ -27,7 +27,7 @@ final class FieldBuilderDirectiveTest extends DBTestCase
 
         $user = factory(User::class)->create();
         $this->assertInstanceOf(User::class, $user);
-        $ownedPosts = factory(Post::class, 3)->create();
+        $ownedPosts = factory(Post::class, 3)->make();
         $ownedPosts->each(static function (Post $post) use ($user): void {
             $post->user()->associate($user);
             $post->save();
@@ -64,7 +64,7 @@ final class FieldBuilderDirectiveTest extends DBTestCase
         ';
         $user = factory(User::class)->create();
         $this->assertInstanceOf(User::class, $user);
-        $ownedPosts = factory(Post::class, 3)->create();
+        $ownedPosts = factory(Post::class, 3)->make();
         $ownedPosts->each(static function (Post $post) use ($user): void {
             $post->user()->associate($user);
             $post->save();

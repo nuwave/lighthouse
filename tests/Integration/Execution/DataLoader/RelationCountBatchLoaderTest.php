@@ -13,7 +13,7 @@ final class RelationCountBatchLoaderTest extends DBTestCase
         $users = factory(User::class, 2)
             ->create()
             ->each(static function (User $user): void {
-                $tasks = factory(Task::class, 3)->create();
+                $tasks = factory(Task::class, 3)->make();
                 $tasks->each(static function (Task $task) use ($user): void {
                     $task->user()->associate($user);
                     $task->save();
