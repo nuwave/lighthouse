@@ -430,6 +430,60 @@ final class DeleteDirectiveTest extends DBTestCase
         $this->assertNull(Post::find($post->id));
     }
 
+    public function testDeleteHasOneThroughNestedArgResolverFiresModelEvents(): void
+    {
+        $task = factory(Task::class)->create();
+        $this->assertInstanceOf(Task::class, $task);
+
+        $post = factory(Post::class)->make();
+        $this->assertInstanceOf(Post::class, $post);
+        $task->post()->save($post);
+
+        $deletingCalled = false;
+        Post::deleting(static function () use (&$deletingCalled): void {
+            $deletingCalled = true;
+        });
+
+        $this->schema .= /** @lang GraphQL */ '
+        type Mutation {
+            updateTask(
+                id: ID!
+                deletePost: Boolean @delete(relation: "post")
+            ): Task! @update
+        }
+
+        type Task {
+            id: ID!
+            post: Post
+        }
+
+        type Post {
+            id: ID!
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation ($id: ID!) {
+            updateTask(id: $id, deletePost: true) {
+                id
+            }
+        }
+        ', [
+            'id' => $task->id,
+        ])->assertJson([
+            'data' => [
+                'updateTask' => [
+                    'id' => "{$task->id}",
+                ],
+            ],
+        ]);
+
+        $this->assertTrue(
+            $deletingCalled,
+            'Deleting the related model must trigger model events.',
+        );
+    }
+
     public function testDeleteBelongsToThroughNestedArgResolver(): void
     {
         $user = factory(User::class)->create();
@@ -480,6 +534,61 @@ final class DeleteDirectiveTest extends DBTestCase
 
         $this->assertNull($task->refresh()->user_id);
         $this->assertNull(User::find($user->id));
+    }
+
+    public function testDeleteBelongsToThroughNestedArgResolverFiresModelEvents(): void
+    {
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
+
+        $task = factory(Task::class)->make();
+        $this->assertInstanceOf(Task::class, $task);
+        $task->user()->associate($user);
+        $task->save();
+
+        $deletingCalled = false;
+        User::deleting(static function () use (&$deletingCalled): void {
+            $deletingCalled = true;
+        });
+
+        $this->schema .= /** @lang GraphQL */ '
+        type Mutation {
+            updateTask(
+                id: ID!
+                deleteUser: Boolean @delete(relation: "user")
+            ): Task! @update
+        }
+
+        type Task {
+            id: ID!
+            user: User
+        }
+
+        type User {
+            id: ID!
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation ($id: ID!) {
+            updateTask(id: $id, deleteUser: true) {
+                id
+            }
+        }
+        ', [
+            'id' => $task->id,
+        ])->assertJson([
+            'data' => [
+                'updateTask' => [
+                    'id' => "{$task->id}",
+                ],
+            ],
+        ]);
+
+        $this->assertTrue(
+            $deletingCalled,
+            'Deleting the related model must trigger model events.',
+        );
     }
 
     public function testDeletingReturnsFalseTriggersException(): void

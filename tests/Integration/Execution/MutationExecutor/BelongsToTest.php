@@ -794,6 +794,49 @@ GRAPHQL
         );
     }
 
+    /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
+    public function testDeleteBelongsToFiresModelEvents(string $action): void
+    {
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
+
+        $task = $user->tasks()->save(
+            factory(Task::class)->make(),
+        );
+        $this->assertInstanceOf(Task::class, $task);
+
+        $deletingCalled = false;
+        User::deleting(static function () use (&$deletingCalled): void {
+            $deletingCalled = true;
+        });
+
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+        mutation {
+            {$action}Task(input: {
+                id: {$task->id}
+                user: {
+                    delete: true
+                }
+            }) {
+                id
+            }
+        }
+GRAPHQL
+        )->assertJson([
+            'data' => [
+                "{$action}Task" => [
+                    'id' => "{$task->id}",
+                ],
+            ],
+        ]);
+
+        $this->assertTrue(
+            $deletingCalled,
+            'Deleting the related model must trigger model events.',
+        );
+    }
+
     public function testCreateUsingUpsertAndDeleteBelongsTo(): void
     {
         factory(User::class)->create();
