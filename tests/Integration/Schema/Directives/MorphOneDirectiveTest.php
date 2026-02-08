@@ -35,14 +35,17 @@ final class MorphOneDirectiveTest extends DBTestCase
         parent::setUp();
 
         $this->user = factory(User::class)->create();
-        $this->task = factory(Task::class)->create([
-            'user_id' => $this->user->id,
-        ]);
-        $this->image = $this->task
-            ->images()
-            ->save(
-                factory(Image::class)->create(),
-            );
+        $this->assertInstanceOf(User::class, $this->user);
+
+        $this->task = factory(Task::class)->make();
+        $this->assertInstanceOf(Task::class, $this->task);
+        $this->task->user()->associate($this->user);
+        $this->task->save();
+
+        $this->image = factory(Image::class)->make();
+        $this->assertInstanceOf(Image::class, $this->image);
+        $this->image->imageable()->associate($this->task);
+        $this->image->save();
     }
 
     public function testResolveMorphOneRelationship(): void

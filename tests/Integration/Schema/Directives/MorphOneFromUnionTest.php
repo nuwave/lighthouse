@@ -19,19 +19,21 @@ final class MorphOneFromUnionTest extends DBTestCase
         /** @var Contractor $contractor */
         $contractor = factory(Contractor::class)->create();
 
-        $companyId = factory(Company::class)->create()->getKey();
-        $teamId = factory(Team::class)->create()->getKey();
+        $company = factory(Company::class)->create();
+        $this->assertInstanceOf(Company::class, $company);
+        $team = factory(Team::class)->create();
+        $this->assertInstanceOf(Team::class, $team);
 
-        /** @var User $employeeUser */
-        $employeeUser = factory(User::class)->create([
-            'company_id' => $companyId,
-            'team_id' => $teamId,
-        ]);
-        /** @var User $contractorUser */
-        $contractorUser = factory(User::class)->create([
-            'company_id' => $companyId,
-            'team_id' => $teamId,
-        ]);
+        $employeeUser = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $employeeUser);
+        $employeeUser->company()->associate($company);
+        $employeeUser->team()->associate($team);
+        $employeeUser->save();
+        $contractorUser = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $contractorUser);
+        $contractorUser->company()->associate($company);
+        $contractorUser->team()->associate($team);
+        $contractorUser->save();
 
         $employee->user()->save($employeeUser);
         $contractor->user()->save($contractorUser);

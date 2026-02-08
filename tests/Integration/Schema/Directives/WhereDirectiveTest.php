@@ -42,8 +42,13 @@ final class WhereDirectiveTest extends DBTestCase
 
     public function testIgnoreNull(): void
     {
-        $userWithoutEmail = factory(User::class)->create(['email' => null]);
+        $userWithoutEmail = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $userWithoutEmail);
+        $userWithoutEmail->email = null;
+        $userWithoutEmail->save();
+
         $userWithEmail = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $userWithEmail);
 
         $this->schema = /** @lang GraphQL */ '
         scalar DateTime @scalar(class: "Nuwave\\\Lighthouse\\\Schema\\\Types\\\Scalars\\\DateTime")

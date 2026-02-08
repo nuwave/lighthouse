@@ -14,7 +14,10 @@ final class UpdateDirectiveTest extends DBTestCase
 {
     public function testUpdateFromFieldArguments(): void
     {
-        factory(Company::class)->create(['name' => 'foo']);
+        $company = factory(Company::class)->make();
+        $this->assertInstanceOf(Company::class, $company);
+        $company->name = 'foo';
+        $company->save();
 
         $this->schema .= /** @lang GraphQL */ '
         type Company {
@@ -54,7 +57,10 @@ final class UpdateDirectiveTest extends DBTestCase
 
     public function testUpdateFromInputObject(): void
     {
-        factory(Company::class)->create(['name' => 'foo']);
+        $company = factory(Company::class)->make();
+        $this->assertInstanceOf(Company::class, $company);
+        $company->name = 'foo';
+        $company->save();
 
         $this->schema .= /** @lang GraphQL */ '
         type Company {
@@ -119,7 +125,10 @@ final class UpdateDirectiveTest extends DBTestCase
 
     public function testUpdateWithCustomPrimaryKey(): void
     {
-        factory(Category::class)->create(['name' => 'foo']);
+        $category = factory(Category::class)->make();
+        $this->assertInstanceOf(Category::class, $category);
+        $category->name = 'foo';
+        $category->save();
 
         $this->schema .= /** @lang GraphQL */ '
         type Category {
@@ -159,7 +168,10 @@ final class UpdateDirectiveTest extends DBTestCase
 
     public function testUpdateWithCustomPrimaryKeyAsId(): void
     {
-        factory(Category::class)->create(['name' => 'foo']);
+        $category = factory(Category::class)->make();
+        $this->assertInstanceOf(Category::class, $category);
+        $category->name = 'foo';
+        $category->save();
 
         $this->schema .= /** @lang GraphQL */ '
         type Category {
@@ -199,7 +211,10 @@ final class UpdateDirectiveTest extends DBTestCase
 
     public function testDoesNotUpdateWithFailingRelationship(): void
     {
-        factory(User::class)->create(['name' => 'Original']);
+        $user = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $user);
+        $user->name = 'Original';
+        $user->save();
 
         $this->schema .= /** @lang GraphQL */ '
         type Task {
@@ -259,10 +274,13 @@ final class UpdateDirectiveTest extends DBTestCase
 
     public function testNestedArgResolver(): void
     {
-        factory(User::class)->create();
-        factory(Task::class)->create([
-            'id' => 3,
-        ]);
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
+
+        $task = factory(Task::class)->make();
+        $this->assertInstanceOf(Task::class, $task);
+        $task->id = 3;
+        $task->save();
 
         $this->schema .= /** @lang GraphQL */ '
         type Mutation {
@@ -325,13 +343,18 @@ final class UpdateDirectiveTest extends DBTestCase
 
     public function testNestedUpdateOnInputList(): void
     {
-        factory(User::class)->create();
-        factory(Task::class)->create([
-            'id' => 3,
-        ]);
-        factory(Task::class)->create([
-            'id' => 4,
-        ]);
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
+
+        $taskA = factory(Task::class)->make();
+        $this->assertInstanceOf(Task::class, $taskA);
+        $taskA->id = 3;
+        $taskA->save();
+
+        $taskB = factory(Task::class)->make();
+        $this->assertInstanceOf(Task::class, $taskB);
+        $taskB->id = 4;
+        $taskB->save();
 
         $this->schema .= /** @lang GraphQL */ '
         type Mutation {

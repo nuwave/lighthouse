@@ -143,7 +143,7 @@ final class MorphToDirectiveTest extends DBTestCase
 
         $post = factory(Post::class)->make();
         $this->assertInstanceOf(Post::class, $post);
-        $post->user()->associate($user->id);
+        $post->user()->associate($user);
         $post->save();
 
         $postImage = factory(Image::class)->make();
@@ -249,7 +249,7 @@ final class MorphToDirectiveTest extends DBTestCase
 
         $post = factory(Post::class)->make();
         $this->assertInstanceOf(Post::class, $post);
-        $post->user()->associate($user->id);
+        $post->user()->associate($user);
         $post->save();
 
         $postImage = factory(Image::class)->make();
@@ -351,7 +351,7 @@ final class MorphToDirectiveTest extends DBTestCase
 
         $post = factory(Post::class)->make();
         $this->assertInstanceOf(Post::class, $post);
-        $post->user()->associate($user->id);
+        $post->user()->associate($user);
         $post->save();
 
         $postImage = factory(Image::class)->make();
@@ -455,7 +455,7 @@ final class MorphToDirectiveTest extends DBTestCase
 
         $post = factory(Post::class)->make();
         $this->assertInstanceOf(Post::class, $post);
-        $post->user()->associate($user->id);
+        $post->user()->associate($user);
         $post->save();
 
         $postImage = factory(Image::class)->make();
@@ -563,7 +563,7 @@ final class MorphToDirectiveTest extends DBTestCase
 
         $post = factory(Post::class)->make();
         $this->assertInstanceOf(Post::class, $post);
-        $post->user()->associate($user->id);
+        $post->user()->associate($user);
         $post->save();
 
         $postImage = factory(Image::class)->make();
@@ -663,7 +663,7 @@ final class MorphToDirectiveTest extends DBTestCase
 
         $post = factory(Post::class)->make();
         $this->assertInstanceOf(Post::class, $post);
-        $post->user()->associate($user->id);
+        $post->user()->associate($user);
         $post->save();
 
         $postImage = factory(Image::class)->make();
@@ -767,7 +767,7 @@ final class MorphToDirectiveTest extends DBTestCase
 
         $post = factory(Post::class)->make();
         $this->assertInstanceOf(Post::class, $post);
-        $post->user()->associate($user->id);
+        $post->user()->associate($user);
         $post->save();
 
         $postImage = factory(Image::class)->make();

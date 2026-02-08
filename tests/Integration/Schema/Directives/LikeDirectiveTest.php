@@ -9,9 +9,9 @@ final class LikeDirectiveTest extends DBTestCase
 {
     public function testLikeClientsCanPassWildcards(): void
     {
-        factory(User::class)->create(['name' => 'Alan']);
-        factory(User::class)->create(['name' => 'Alex']);
-        factory(User::class)->create(['name' => 'Aaron']);
+        $this->createUserWithName('Alan');
+        $this->createUserWithName('Alex');
+        $this->createUserWithName('Aaron');
 
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -45,9 +45,9 @@ final class LikeDirectiveTest extends DBTestCase
 
     public function testLikeWithWildcardsInTemplate(): void
     {
-        factory(User::class)->create(['name' => 'Alan']);
-        factory(User::class)->create(['name' => 'Alex']);
-        factory(User::class)->create(['name' => 'Aaron']);
+        $this->createUserWithName('Alan');
+        $this->createUserWithName('Alex');
+        $this->createUserWithName('Aaron');
 
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -81,10 +81,10 @@ final class LikeDirectiveTest extends DBTestCase
 
     public function testLikeClientWildcardsAreEscapedFromTemplate(): void
     {
-        factory(User::class)->create(['name' => 'Aaron']);
-        factory(User::class)->create(['name' => 'Aar%on']);
-        factory(User::class)->create(['name' => 'Aar%']);
-        factory(User::class)->create(['name' => 'Aar%toomuch']);
+        $this->createUserWithName('Aaron');
+        $this->createUserWithName('Aar%on');
+        $this->createUserWithName('Aar%');
+        $this->createUserWithName('Aar%toomuch');
 
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -116,8 +116,8 @@ final class LikeDirectiveTest extends DBTestCase
 
     public function testLikeOnField(): void
     {
-        factory(User::class)->create(['name' => 'Alex']);
-        factory(User::class)->create(['name' => 'Aaron']);
+        $this->createUserWithName('Alex');
+        $this->createUserWithName('Aaron');
 
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -145,5 +145,15 @@ final class LikeDirectiveTest extends DBTestCase
                 ],
             ],
         ]);
+    }
+
+    private function createUserWithName(string $name): User
+    {
+        $user = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $user);
+        $user->name = $name;
+        $user->save();
+
+        return $user;
     }
 }

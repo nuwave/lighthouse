@@ -109,7 +109,10 @@ final class CreateDirectiveTest extends DBTestCase
 
     public function testDoesNotCreateWithFailingRelationship(): void
     {
-        factory(Task::class)->create(['name' => 'Uniq']);
+        $task = factory(Task::class)->make();
+        $this->assertInstanceOf(Task::class, $task);
+        $task->name = 'Uniq';
+        $task->save();
 
         $config = $this->app->make(ConfigRepository::class);
         $config->set('app.debug', false);
@@ -176,7 +179,10 @@ final class CreateDirectiveTest extends DBTestCase
 
     public function testCreatesOnPartialFailureWithTransactionsDisabled(): void
     {
-        factory(Task::class)->create(['name' => 'Uniq']);
+        $task = factory(Task::class)->make();
+        $this->assertInstanceOf(Task::class, $task);
+        $task->name = 'Uniq';
+        $task->save();
 
         $config = $this->app->make(ConfigRepository::class);
         $config->set('app.debug', false);
