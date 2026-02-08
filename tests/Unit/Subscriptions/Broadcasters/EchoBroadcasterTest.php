@@ -26,7 +26,7 @@ final class EchoBroadcasterTest extends TestCase
                 && $event->data === 'foo'));
 
         $redisBroadcaster = new EchoBroadcaster($broadcastManager);
-        $subscriber = $this->createMock(Subscriber::class);
+        $subscriber = $this->createStub(Subscriber::class);
         $subscriber->channel = 'test-123';
 
         $redisBroadcaster->broadcast($subscriber, 'foo');
@@ -42,7 +42,7 @@ final class EchoBroadcasterTest extends TestCase
             ));
 
         $redisBroadcaster = new EchoBroadcaster($broadcastManager);
-        $subscriber = $this->createMock(Subscriber::class);
+        $subscriber = $this->createStub(Subscriber::class);
         $subscriber->channel = 'private-test-123';
 
         $redisBroadcaster->broadcast($subscriber, 'foo');
@@ -50,7 +50,7 @@ final class EchoBroadcasterTest extends TestCase
 
     public function testAuthorized(): void
     {
-        $redisBroadcaster = new EchoBroadcaster($this->createMock(BroadcastManager::class));
+        $redisBroadcaster = new EchoBroadcaster($this->createStub(BroadcastManager::class));
 
         $request = new Request();
         $request['channel_name'] = 'abc';
@@ -64,7 +64,7 @@ final class EchoBroadcasterTest extends TestCase
 
     public function testUnauthorized(): void
     {
-        $redisBroadcaster = new EchoBroadcaster($this->createMock(BroadcastManager::class));
+        $redisBroadcaster = new EchoBroadcaster($this->createStub(BroadcastManager::class));
 
         $response = $redisBroadcaster->unauthorized(new Request());
         $this->assertSame(403, $response->getStatusCode());
