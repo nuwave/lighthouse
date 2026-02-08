@@ -27,7 +27,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $this->be($user);
 
         $rolesCount = 2;
@@ -62,7 +62,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $this->be($user);
 
         $rolesCount = 2;
@@ -98,7 +98,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $this->be($user);
 
         $rolesCount = 4;
@@ -169,7 +169,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $this->be($user);
 
         $roles = factory(Role::class, 3)->create();
@@ -226,7 +226,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $this->be($user);
 
         $roles = factory(Role::class, 3)->create();
@@ -286,7 +286,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $this->be($user);
 
         $roles = factory(Role::class, 3)->create();
@@ -308,9 +308,8 @@ final class BelongsToManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')
-        ->assertJsonPath('data.user.roles.edges.*.pivot', array_fill(0, 2, $meta))
-        ->assertJsonCount(2, 'data.user.roles.edges');
+        ')->assertJsonPath('data.user.roles.edges.*.pivot', array_fill(0, 2, $meta))
+            ->assertJsonCount(2, 'data.user.roles.edges');
     }
 
     public function testQueryBelongsToManyPivot(): void
@@ -335,7 +334,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $this->be($user);
 
         $rolesCount = 2;
@@ -406,7 +405,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $this->be($user);
 
         $roles = factory(Role::class, 3)->create();
@@ -460,7 +459,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
 
         $users = factory(User::class, 2)->create();
         foreach ($users as $user) {
-            assert($user instanceof User);
+            $this->assertInstanceOf(User::class, $user);
             $user->roles()->attach($roles);
         }
 
@@ -517,7 +516,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $this->be($user);
 
         $roles = factory(Role::class, 3)->create();

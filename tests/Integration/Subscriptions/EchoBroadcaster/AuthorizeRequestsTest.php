@@ -13,7 +13,7 @@ final class AuthorizeRequestsTest extends TestCase
     use TestsRedis;
     use EnablesSubscriptionServiceProvider;
 
-    protected string $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ <<<'GRAPHQL'
     type Task {
         id: ID!
         name: String!
@@ -22,7 +22,7 @@ final class AuthorizeRequestsTest extends TestCase
     type Subscription {
         taskUpdated(id: ID!): Task
     }
-    ' . self::PLACEHOLDER_QUERY;
+    GRAPHQL . self::PLACEHOLDER_QUERY;
 
     public function testEchoClientAuthorizesSuccessfully(): void
     {
@@ -106,7 +106,7 @@ final class AuthorizeRequestsTest extends TestCase
             ->assertForbidden();
     }
 
-    protected function querySubscription(): TestResponse
+    private function querySubscription(): TestResponse
     {
         return $this->graphQL(/** @lang GraphQL */ '
         subscription {

@@ -32,6 +32,7 @@ use Nuwave\Lighthouse\Support\Utils;
  *     directives: array<int, array<string, mixed>>,
  *     classNameToObjectTypeName: ClassNameToObjectTypeName,
  *     schemaExtensions: array<int, array<string, mixed>>,
+ *     hash: string,
  * }
  *
  * @implements \Illuminate\Contracts\Support\Arrayable<string, mixed>
@@ -45,6 +46,8 @@ class DocumentAST implements Arrayable
     public const CLASS_NAME_TO_OBJECT_TYPE_NAME = 'classNameToObjectTypeName';
 
     public const SCHEMA_EXTENSIONS = 'schemaExtensions';
+
+    public const HASH = 'hash';
 
     /**
      * The types within the schema.
@@ -85,8 +88,11 @@ class DocumentAST implements Arrayable
      */
     public array $classNameToObjectTypeNames = [];
 
-    /** @var array<int,SchemaExtensionNode> */
+    /** @var array<int, SchemaExtensionNode> */
     public array $schemaExtensions = [];
+
+    /** A hash of the schema. */
+    public string $hash;
 
     /** Create a new DocumentAST instance from a schema. */
     public static function fromSource(string $schema): self
@@ -104,6 +110,7 @@ class DocumentAST implements Arrayable
         }
 
         $instance = new static();
+        $instance->hash = hash('sha256', $schema);
 
         foreach ($documentNode->definitions as $definition) {
             if ($definition instanceof TypeDefinitionNode) {
@@ -195,6 +202,7 @@ class DocumentAST implements Arrayable
             self::DIRECTIVES => array_map([AST::class, 'toArray'], $this->directives),
             self::CLASS_NAME_TO_OBJECT_TYPE_NAME => $this->classNameToObjectTypeNames,
             self::SCHEMA_EXTENSIONS => array_map([AST::class, 'toArray'], $this->schemaExtensions),
+            self::HASH => $this->hash,
         ];
     }
 
@@ -231,9 +239,10 @@ class DocumentAST implements Arrayable
             self::DIRECTIVES => $directives,
             self::CLASS_NAME_TO_OBJECT_TYPE_NAME => $this->classNameToObjectTypeNames,
             self::SCHEMA_EXTENSIONS => $schemaExtensions,
+            self::HASH => $this->hash,
         ] = $ast;
 
-        // Utilize the NodeList for lazy unserialization for performance gains.
+        // Use the NodeList for lazy unserialization for performance gains.
         // Until they are accessed by name, they are kept in their array form.
 
         // @phpstan-ignore-next-line Since we start from the array form, the generic type does not match
@@ -264,7 +273,7 @@ class DocumentAST implements Arrayable
                 continue;
             }
 
-            if (\is_array($value)) {
+            if (is_array($value)) {
                 $value = isset($value[0]) || $value === []
                     ? new NodeList($value)
                     : AST::fromArray($value);

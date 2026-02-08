@@ -10,12 +10,12 @@ final class WhereNullDirectiveTest extends DBTestCase
     public function testWhereNull(): void
     {
         $notNull = factory(User::class)->make();
-        assert($notNull instanceof User);
+        $this->assertInstanceOf(User::class, $notNull);
         $notNull->name = 'foo';
         $notNull->save();
 
         $null = factory(User::class)->make();
-        assert($null instanceof User);
+        $this->assertInstanceOf(User::class, $null);
         $null->name = null;
         $null->save();
 

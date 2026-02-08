@@ -99,7 +99,7 @@ GRAPHQL;
     public function testSpecifyCustomBuilderForRelation(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $posts = factory(Post::class, 2)->create();
         $user->posts()->saveMany($posts);
@@ -153,7 +153,7 @@ GRAPHQL;
         $this->setUpScoutEngine();
 
         $post = factory(Post::class)->create();
-        assert($post instanceof Post);
+        $this->assertInstanceOf(Post::class, $post);
 
         $this->engine->shouldReceive('map')
             ->withArgs(static fn (ScoutBuilder $builder): bool => $builder->wheres === ['id' => "{$post->id}"]
@@ -213,12 +213,12 @@ GRAPHQL;
     public function testPaginateWithScopes(): void
     {
         $namedUser = factory(User::class)->make();
-        assert($namedUser instanceof User);
+        $this->assertInstanceOf(User::class, $namedUser);
         $namedUser->name = 'A named user';
         $namedUser->save();
 
         $unnamedUser = factory(User::class)->make();
-        assert($unnamedUser instanceof User);
+        $this->assertInstanceOf(User::class, $unnamedUser);
         $unnamedUser->name = null;
         $unnamedUser->save();
 
@@ -267,13 +267,14 @@ GRAPHQL;
     public static function builder(): EloquentBuilder
     {
         return User::query()
-            ->orderBy('id', 'DESC');
+            ->orderByDesc('id');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\Relation<\Tests\Utils\Models\Post> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\Post, \Tests\Utils\Models\User> */
     public static function builderForRelation(User $parent): Relation
     {
-        return $parent->posts()->orderBy('id', 'DESC');
+        return $parent->posts()
+            ->orderByDesc('id');
     }
 
     public static function builderForScoutBuilder(): ScoutBuilder
@@ -287,20 +288,20 @@ GRAPHQL;
         $users = factory(User::class, 3)->create();
 
         $firstUser = $users->first();
-        assert($firstUser instanceof User);
+        $this->assertInstanceOf(User::class, $firstUser);
 
         $posts = factory(Post::class, 3)->make();
         foreach ($posts as $post) {
-            assert($post instanceof Post);
+            $this->assertInstanceOf(Post::class, $post);
             $post->user()->associate($firstUser);
             $post->save();
         }
 
         $firstPost = $posts->first();
-        assert($firstPost instanceof Post);
+        $this->assertInstanceOf(Post::class, $firstPost);
 
         foreach (factory(Comment::class, 3)->make() as $comment) {
-            assert($comment instanceof Comment);
+            $this->assertInstanceOf(Comment::class, $comment);
             $comment->post()->associate($firstPost);
             $comment->save();
         }
@@ -573,7 +574,7 @@ GRAPHQL;
     public function testQueriesPaginationWithoutPaginatorInfo(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -611,7 +612,7 @@ GRAPHQL;
     public function testQueriesConnectionWithoutPageInfo(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -1008,5 +1009,46 @@ GRAPHQL;
             }
         }
         ');
+    }
+
+    public function testSimplePaginationWithNullPageUsesDefaultPage(): void
+    {
+        factory(User::class, 3)->create();
+
+        $this->schema = /** @lang GraphQL */ '
+        type User {
+            id: ID!
+            name: String!
+        }
+
+        type Query {
+            users: [User!] @paginate(type: SIMPLE)
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($page: Int) {
+            users(first: 2, page: $page) {
+                paginatorInfo {
+                    currentPage
+                    count
+                }
+                data {
+                    id
+                }
+            }
+        }
+        ', [
+            'page' => null,
+        ])->assertJson([
+            'data' => [
+                'users' => [
+                    'paginatorInfo' => [
+                        'currentPage' => 1,
+                        'count' => 2,
+                    ],
+                ],
+            ],
+        ])->assertJsonCount(2, 'data.users.data');
     }
 }

@@ -144,9 +144,7 @@ class ASTBuilder
                 $extendedObjectLikeType = Parser::objectTypeDefinition(/** @lang GraphQL */ "type {$typeName}");
                 $this->documentAST->setTypeDefinition($extendedObjectLikeType);
             } else {
-                throw new DefinitionException(
-                    $this->missingBaseDefinition($typeName, $typeExtension),
-                );
+                throw new DefinitionException($this->missingBaseDefinition($typeName, $typeExtension));
             }
         }
 

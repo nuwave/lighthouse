@@ -268,7 +268,6 @@ class TypeRegistry
             ->associatedOfType($definition, TypeMiddleware::class)
             ->all();
         foreach ($typeMiddlewareDirectives as $typeMiddlewareDirective) {
-            assert($typeMiddlewareDirective instanceof TypeMiddleware);
             $typeMiddlewareDirective->handleNode($typeValue);
         }
 

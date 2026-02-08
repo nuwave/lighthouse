@@ -211,7 +211,7 @@ final class AllDirectiveTest extends DBTestCase
     public function testSpecifyCustomBuilderForRelation(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $posts = factory(Post::class, 2)->make();
         $user->posts()->saveMany($posts);
@@ -261,7 +261,7 @@ final class AllDirectiveTest extends DBTestCase
         $this->setUpScoutEngine();
 
         $post = factory(Post::class)->create();
-        assert($post instanceof Post);
+        $this->assertInstanceOf(Post::class, $post);
 
         $this->engine->shouldReceive('map')
             ->withArgs(static fn (ScoutBuilder $builder): bool => $builder->wheres === ['id' => "{$post->id}"]
@@ -304,13 +304,14 @@ GRAPHQL;
     public static function builder(): EloquentBuilder
     {
         return User::query()
-            ->orderBy('id', 'DESC');
+            ->orderByDesc('id');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\Relation<\Tests\Utils\Models\Post> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\Post, \Tests\Utils\Models\User> */
     public static function builderForRelation(User $parent): Relation
     {
-        return $parent->posts()->orderBy('id', 'DESC');
+        return $parent->posts()
+            ->orderByDesc('id');
     }
 
     public static function builderForScoutBuilder(): ScoutBuilder

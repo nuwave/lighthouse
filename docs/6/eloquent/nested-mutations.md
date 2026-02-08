@@ -107,8 +107,7 @@ input CreateUserInput {
 }
 ```
 
-To create a new model and connect it to an existing model,
-just pass the ID of the model you want to associate.
+To create a new model and connect it to an existing model, pass the ID of the model you want to associate.
 
 ```graphql
 mutation {
@@ -192,7 +191,7 @@ input UpdateUserBelongsTo {
 
 You must pass a truthy value to `disconnect` and `delete` for them to actually run.
 This structure was chosen as it is consistent with updating `BelongsToMany` relationships
-and allows the query string to be mostly static, taking a variable value to control its behaviour.
+and allows the query string to be mostly static, taking a variable value to control its behavior.
 
 ```graphql
 mutation UpdatePost($disconnectAuthor: Boolean) {
@@ -562,7 +561,7 @@ mutation {
 }
 ```
 
-The behaviour for `upsert` is a mix between updating and creating,
+The behavior for `upsert` is a mix between updating and creating,
 it will produce the needed action regardless of whether the model exists or not.
 
 ## MorphMany
@@ -601,8 +600,7 @@ input UpsertAuthorInput {
 }
 ```
 
-Just pass the ID of the models you want to associate or their full information
-to create a new relation.
+Pass the ID of the models you want to associate or their full information to create a new relation.
 
 ```graphql
 mutation {
@@ -706,7 +704,7 @@ Laravel's `sync()`, `syncWithoutDetach()` or `connect()` methods allow you to pa
 an array where the keys are IDs of related models and the values are pivot data.
 
 Lighthouse exposes this capability through the nested operations on many-to-many relations.
-Instead of passing just a list of ids, you can define an `input` type that also contains pivot data.
+Instead of passing just a list of IDs, you can define an `input` type that also contains pivot data.
 It must contain a field called `id` to contain the ID of the related model,
 all other fields will be inserted into the pivot table.
 

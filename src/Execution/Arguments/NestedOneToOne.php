@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
+use GraphQL\Error\Error;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
@@ -22,21 +23,28 @@ class NestedOneToOne implements ArgResolver
         assert($relation instanceof HasOne || $relation instanceof MorphOne);
 
         if ($args->has('create')) {
-            $saveModel = new ResolveNested(new SaveModel());
+            if ($relation->exists()) {
+                $relatedClass = class_basename($relation->getRelated());
+                $parentClass = class_basename($model);
+
+                throw new Error("Cannot create a related model: a {$relatedClass} already exists for this {$parentClass}. Use upsert to modify the existing model.");
+            }
+
+            $saveModel = new ResolveNested(new SaveModel($relation));
 
             $saveModel($relation->make(), $args->arguments['create']->value);
         }
 
         if ($args->has('update')) {
-            $updateModel = new ResolveNested(new UpdateModel(new SaveModel()));
+            $updateModel = new ResolveNested(new UpdateModel(new SaveModel($relation)));
 
             $updateModel($relation->make(), $args->arguments['update']->value);
         }
 
         if ($args->has('upsert')) {
-            $upsertModel = new ResolveNested(new UpsertModel(new SaveModel()));
+            $upsertModel = new ResolveNested(new UpsertModel(new SaveModel($relation)));
 
-            $upsertModel($relation->make(), $args->arguments['upsert']->value);
+            $upsertModel($relation->first() ?? $relation->make(), $args->arguments['upsert']->value);
         }
 
         if ($args->has('delete')) {

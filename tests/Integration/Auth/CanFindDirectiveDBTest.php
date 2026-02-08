@@ -10,6 +10,7 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
+use Tests\Utils\Mutations\ThrowWhenInvoked;
 use Tests\Utils\Policies\UserPolicy;
 
 final class CanFindDirectiveDBTest extends DBTestCase
@@ -21,7 +22,7 @@ final class CanFindDirectiveDBTest extends DBTestCase
         $this->be($admin);
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -59,7 +60,7 @@ final class CanFindDirectiveDBTest extends DBTestCase
         $this->be($admin);
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -210,6 +211,37 @@ final class CanFindDirectiveDBTest extends DBTestCase
         ]);
     }
 
+    public function testDoesntConcealResolverException(): void
+    {
+        $admin = new User();
+        $admin->name = UserPolicy::ADMIN;
+        $this->be($admin);
+
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Mutation {
+            throwWhenInvoked(id: ID!): User
+                @canFind(ability: "view", find: "id", action: EXCEPTION_NOT_AUTHORIZED)
+        }
+
+        type User {
+            name: String!
+        }
+        ' . self::PLACEHOLDER_QUERY;
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation ($id: ID!) {
+            throwWhenInvoked(id: $id) {
+                name
+            }
+        }
+        ', [
+            'id' => $user->getKey(),
+        ])->assertGraphQLErrorMessage(ThrowWhenInvoked::ERROR_MESSAGE);
+    }
+
     public function testFailsToFindSpecificModelWithFindOrFailFalse(): void
     {
         $user = new User();
@@ -273,7 +305,7 @@ final class CanFindDirectiveDBTest extends DBTestCase
     public function testFindUsingNestedInputWithDotNotation(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $this->be($user);
 
         $this->schema = /** @lang GraphQL */ '
@@ -318,10 +350,10 @@ final class CanFindDirectiveDBTest extends DBTestCase
         $this->be($admin);
 
         $author = factory(User::class)->create();
-        assert($author instanceof User);
+        $this->assertInstanceOf(User::class, $author);
 
         $post = factory(Post::class)->make();
-        assert($post instanceof Post);
+        $this->assertInstanceOf(Post::class, $post);
         $post->user()->associate($author);
         $post->save();
 
@@ -359,12 +391,12 @@ final class CanFindDirectiveDBTest extends DBTestCase
         $this->be($admin);
 
         $postA = factory(Post::class)->make();
-        assert($postA instanceof Post);
+        $this->assertInstanceOf(Post::class, $postA);
         $postA->user()->associate($admin);
         $postA->save();
 
         $postB = factory(Post::class)->make();
-        assert($postB instanceof Post);
+        $this->assertInstanceOf(Post::class, $postB);
         $postB->user()->associate($admin);
         $postB->save();
 
@@ -409,7 +441,7 @@ final class CanFindDirectiveDBTest extends DBTestCase
         $this->be($admin);
 
         $task = factory(Task::class)->create();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->delete();
 
         $this->schema = /** @lang GraphQL */ '

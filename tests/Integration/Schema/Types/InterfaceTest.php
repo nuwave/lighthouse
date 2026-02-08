@@ -218,7 +218,7 @@ GRAPHQL;
     public function testUseCustomTypeResolver(): void
     {
         $this->schema = /** @lang GraphQL */ <<<GRAPHQL
-        interface Nameable @interface(resolveType: "{$this->qualifyTestResolver('resolveType')}"){
+        interface Nameable @interface(resolveType: "{$this->qualifyTestResolver('resolveType')}") {
             name: String!
         }
 
@@ -230,7 +230,7 @@ GRAPHQL;
         type Query {
             namedThings: Nameable @field(resolver: "{$this->qualifyTestResolver('fetchGuy')}")
         }
-GRAPHQL;
+        GRAPHQL;
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -315,7 +315,7 @@ GRAPHQL;
         type Query {
             foo: String
         }
-GRAPHQL;
+        GRAPHQL;
 
         $result = $this->graphQL(/** @lang GraphQL */ '
         {

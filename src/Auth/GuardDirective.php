@@ -17,9 +17,7 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator;
 use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
 
-/**
- * @see \Illuminate\Auth\Middleware\Authenticate
- */
+/** @see \Illuminate\Auth\Middleware\Authenticate */
 class GuardDirective extends BaseDirective implements FieldMiddleware, TypeManipulator, TypeExtensionManipulator
 {
     public function __construct(
@@ -92,11 +90,11 @@ GRAPHQL;
 
     public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition): void
     {
-        ASTHelper::addDirectiveToFields($this->directiveNode, $typeDefinition);
+        ASTHelper::addDirectiveToFields($this->directiveNode, $typeDefinition); // @phpstan-ignore argument.type (ensured by the allowed locations and schema validation)
     }
 
     public function manipulateTypeExtension(DocumentAST &$documentAST, TypeExtensionNode &$typeExtension): void
     {
-        ASTHelper::addDirectiveToFields($this->directiveNode, $typeExtension);
+        ASTHelper::addDirectiveToFields($this->directiveNode, $typeExtension); // @phpstan-ignore argument.type (ensured by the allowed locations and schema validation)
     }
 }

@@ -66,7 +66,7 @@ final class MorphOneDirectiveTest extends DBTestCase
         ';
 
         $this->graphQL(/** @lang GraphQL */ '
-        query ($id: ID!){
+        query ($id: ID!) {
             task(id: $id) {
                 id
                 name
@@ -111,7 +111,7 @@ final class MorphOneDirectiveTest extends DBTestCase
         ';
 
         $this->graphQL(/** @lang GraphQL */ '
-        query ($id: ID!){
+        query ($id: ID!) {
             task(id: $id) {
                 id
                 name

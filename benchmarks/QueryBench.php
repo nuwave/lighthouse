@@ -3,27 +3,50 @@
 namespace Benchmarks;
 
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Tests\TestCase;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Testing\TestResponse;
 
-/**
- * @BeforeMethods({"setUp"})
- */
-abstract class QueryBench extends TestCase
+/** @BeforeMethods({"setUp"}) */
+abstract class QueryBench
 {
+    protected BenchmarkTestCase $testCase;
+
+    /** GraphQL schema. */
+    protected string $schema;
+
     /** Cached graphQL endpoint. */
     protected string $graphQLEndpoint;
 
-    public function __construct()
-    {
-        parent::__construct(static::class);
-    }
-
     public function setUp(): void
     {
-        parent::setUp();
+        $this->testCase = new BenchmarkTestCase('benchmark');
+        $this->testCase->setSchema($this->schema);
+        $this->testCase->setUp();
 
-        $routeName = config('lighthouse.route.name');
+        $config = $this->config();
+        $routeName = $config->get('lighthouse.route.name');
         $this->graphQLEndpoint = route($routeName);
+    }
+
+    /**
+     * Execute a GraphQL query.
+     *
+     * @param  array<string, mixed>  $variables
+     * @param  array<string, mixed>  $extraParams
+     */
+    protected function graphQL(string $query, array $variables = [], array $extraParams = []): TestResponse
+    {
+        return $this->testCase->graphQL($query, $variables, $extraParams);
+    }
+
+    protected function app(): Application
+    {
+        return $this->testCase->app();
+    }
+
+    protected function config(): ConfigRepository
+    {
+        return $this->app()->make(ConfigRepository::class);
     }
 
     /**
@@ -37,15 +60,39 @@ abstract class QueryBench extends TestCase
     }
 
     /**
-     * Define environment setup.
+     * Set up function with the performance tuning.
      *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param  array{0: bool, 1: bool, 2: bool}  $params Performance tuning parameters
      */
-    protected function getEnvironmentSetUp($app): void
+    public function setPerformanceTuning(array $params): void
     {
-        parent::getEnvironmentSetUp($app);
+        $this->setUp();
 
-        $config = $app->make(ConfigRepository::class);
-        $config->set('lighthouse.field_middleware', []);
+        $configRepository = $this->config();
+
+        if ($params[0]) {
+            $configRepository->set('lighthouse.field_middleware', []);
+        }
+
+        $configRepository->set('lighthouse.query_cache.enable', $params[1]);
+        $configRepository->set('lighthouse.validation_cache.enable', $params[2]);
+    }
+
+    /**
+     * Indexes:
+     *  0: Remove all middlewares
+     *  1: Enable query cache
+     *  2: Enable validation cache
+     *
+     * @return array<string, array{0: bool, 1: bool, 2: bool}>
+     */
+    public function providePerformanceTuning(): array
+    {
+        return [
+            'nothing' => [false, false, false],
+            'query cache' => [false, true, false],
+            'query + validation cache' => [false, true, true],
+            'everything' => [true, true, true],
+        ];
     }
 }

@@ -16,7 +16,7 @@ final class BelongsToDirectiveTest extends DBTestCase
         $company = factory(Company::class)->create();
 
         $user = factory(User::class)->make();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $user->company()->associate($company);
         $user->save();
 
@@ -60,7 +60,7 @@ final class BelongsToDirectiveTest extends DBTestCase
         $company = factory(Company::class)->create();
 
         $user = factory(User::class)->make();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $user->company()->associate($company);
         $user->save();
 
@@ -105,7 +105,7 @@ final class BelongsToDirectiveTest extends DBTestCase
         $team = factory(Team::class)->create();
 
         $user = factory(User::class)->make();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $user->company()->associate($company);
         $user->team()->associate($team);
         $user->save();
@@ -307,15 +307,15 @@ final class BelongsToDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testShortcutsForeignKey(): void
+    public function testShortcutsForeignKeySelectID(): void
     {
         config(['lighthouse.shortcut_foreign_key_selection' => true]);
 
         $company = factory(Company::class)->create();
-        assert($company instanceof Company);
+        $this->assertInstanceOf(Company::class, $company);
 
         $user = factory(User::class)->make();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $user->company()->associate($company);
         $user->save();
 
@@ -358,15 +358,171 @@ final class BelongsToDirectiveTest extends DBTestCase
         });
     }
 
+    public function testShortcutsForeignKeySelectTypename(): void
+    {
+        config(['lighthouse.shortcut_foreign_key_selection' => true]);
+
+        $company = factory(Company::class)->create();
+        $this->assertInstanceOf(Company::class, $company);
+
+        $user = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $user);
+        $user->company()->associate($company);
+        $user->save();
+
+        $user->setRelations([]);
+
+        $this->be($user);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Company {
+            id: ID!
+        }
+
+        type User {
+            company: Company @belongsTo
+        }
+
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $this->assertNoQueriesExecuted(function (): void {
+            $this->graphQL(/** @lang GraphQL */ '
+            {
+                user {
+                    company {
+                        __typename
+                    }
+                }
+            }
+            ')->assertJson([
+                'data' => [
+                    'user' => [
+                        'company' => [
+                            '__typename' => 'Company',
+                        ],
+                    ],
+                ],
+            ]);
+        });
+    }
+
+    public function testShortcutsForeignKeySelectIDAndTypename(): void
+    {
+        config(['lighthouse.shortcut_foreign_key_selection' => true]);
+
+        $company = factory(Company::class)->create();
+        $this->assertInstanceOf(Company::class, $company);
+
+        $user = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $user);
+        $user->company()->associate($company);
+        $user->save();
+
+        $user->setRelations([]);
+
+        $this->be($user);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Company {
+            id: ID!
+        }
+
+        type User {
+            company: Company @belongsTo
+        }
+
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $this->assertNoQueriesExecuted(function () use ($company): void {
+            $this->graphQL(/** @lang GraphQL */ '
+            {
+                user {
+                    company {
+                        __typename
+                        id
+                    }
+                }
+            }
+            ')->assertJson([
+                'data' => [
+                    'user' => [
+                        'company' => [
+                            '__typename' => 'Company',
+                            'id' => $company->id,
+                        ],
+                    ],
+                ],
+            ]);
+        });
+    }
+
+    public function testDoesNotShortcutForeignKeyIfQueryHasFieldSelection(): void
+    {
+        config(['lighthouse.shortcut_foreign_key_selection' => true]);
+
+        $company = factory(Company::class)->create();
+        $this->assertInstanceOf(Company::class, $company);
+
+        $user = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $user);
+        $user->company()->associate($company);
+        $user->save();
+
+        $this->be($user);
+
+        $this->schema = /** @lang GraphQL */ '
+        type Company {
+            id: ID!
+            name: String!
+        }
+
+        type User {
+            company: Company @belongsTo
+        }
+
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $this->assertQueryCountMatches(1, function () use ($company): void {
+            $this->graphQL(/** @lang GraphQL */ '
+            {
+                user {
+                    company {
+                        id
+                        name
+                    }
+                }
+            }
+            ')->assertJson([
+                'data' => [
+                    'user' => [
+                        'company' => [
+                            'id' => $company->id,
+                            'name' => $company->name,
+                        ],
+                    ],
+                ],
+            ]);
+        });
+    }
+
     public function testDoesNotShortcutForeignKeyIfQueryHasConditions(): void
     {
         config(['lighthouse.shortcut_foreign_key_selection' => true]);
 
         $company = factory(Company::class)->create();
-        assert($company instanceof Company);
+        $this->assertInstanceOf(Company::class, $company);
 
         $user = factory(User::class)->make();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $user->company()->associate($company);
         $user->save();
 

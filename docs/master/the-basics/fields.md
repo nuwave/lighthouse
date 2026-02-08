@@ -44,7 +44,9 @@ the name of the field you want to generate.
 
 For example, this is how you generate a class for the field `hello`:
 
-    php artisan lighthouse:query Hello
+```shell
+php artisan lighthouse:query Hello
+```
 
 Now your schema can be queried.
 
@@ -67,7 +69,7 @@ This query will return the following response:
 ## Fields with arguments
 
 As we learned, _every_ field has a resolver function associated with it.
-Just like functions, fields can take arguments to control their behaviour.
+Just like functions, fields can take arguments to control their behavior.
 
 Let's construct a query that greets the user. We add a required argument `name`
 that is used to construct the greeting.
@@ -189,7 +191,7 @@ function resolveUserId(User $user): string
 ```
 
 Writing out each such resolver would be pretty repetitive.
-We can utilize the fourth and final resolver argument `ResolveInfo`, which will give us access
+We can use the fourth and final resolver argument `ResolveInfo`, which will give us access
 to the requested field name, to dynamically access the matching property.
 
 ```php
@@ -214,16 +216,18 @@ If you need to implement custom resolvers for fields that are not on one of the
 root types `Query` or `Mutation`, you can create a resolver class using the built-in `artisan` command `lighthouse:field`.
 For example, this is how you generate a class for the field `name` on type `User`:
 
-    php artisan lighthouse:field User.name
+```shell
+php artisan lighthouse:field User.name
+```
 
 ## Resolver precedence
 
 Lighthouse uses the following logic to locate field resolvers.
 
 First, it checks if the field definition in the schema is annotated with a [FieldResolver](../custom-directives/field-directives.md#fieldresolver)
-directive. If so, it uses the resolver that is provided by the directive.
+directive. If so, it uses the resolver provided by the directive.
 
-The interface [`\Nuwave\Lighthouse\Support\Contracts\ProvidesResolver`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ProvidesResolver.php)
+The interface [`Nuwave\Lighthouse\Support\Contracts\ProvidesResolver`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ProvidesResolver.php)
 is expected to provide a resolver in case no resolver directive is defined for a field.
 When the field is defined on the root `Subscription` type, the [`Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ProvidesSubscriptionResolver.php)
 interface is used instead.

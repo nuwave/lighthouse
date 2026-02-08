@@ -72,7 +72,7 @@ final class ASTHelperTest extends TestCase
 
         $firstNameField = ASTHelper::firstByName($objectType1->fields, 'first_name');
 
-        assert($firstNameField instanceof FieldDefinitionNode);
+        $this->assertInstanceOf(FieldDefinitionNode::class, $firstNameField);
         $this->assertCount(1, $firstNameField->directives);
     }
 
@@ -179,10 +179,9 @@ final class ASTHelperTest extends TestCase
     public function testExtractDirectiveDefinitionAllowsAuxiliaryTypes(): void
     {
         $directive = ASTHelper::extractDirectiveDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
-directive @foo on OBJECT
-scalar Bar
-GRAPHQL
-        );
+        directive @foo on OBJECT
+        scalar Bar
+        GRAPHQL);
         $this->assertSame('foo', $directive->name->value);
     }
 
@@ -190,28 +189,25 @@ GRAPHQL
     {
         $this->expectException(DefinitionException::class);
         ASTHelper::extractDirectiveDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
-invalid GraphQL
-GRAPHQL
-        );
+        invalid GraphQL
+        GRAPHQL);
     }
 
     public function testThrowsIfMissingDirectiveDefinitions(): void
     {
         $this->expectException(DefinitionException::class);
         ASTHelper::extractDirectiveDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
-scalar Foo
-GRAPHQL
-        );
+        scalar Foo
+        GRAPHQL);
     }
 
     public function testThrowsOnMultipleDirectiveDefinitions(): void
     {
         $this->expectException(DefinitionException::class);
         ASTHelper::extractDirectiveDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
-directive @foo on OBJECT
-directive @bar on OBJECT
-GRAPHQL
-        );
+        directive @foo on OBJECT
+        directive @bar on OBJECT
+        GRAPHQL);
     }
 
     public function testUnderlyingTypeKnowsStandardTypes(): void
@@ -274,7 +270,7 @@ GRAPHQL
                 ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
             ): void {
                 $directiveInstance = ASTHelper::addDirectiveToNode('@foo', $fieldDefinition);
-                assert($directiveInstance instanceof FieldManipulator);
+                TestCase::assertInstanceOf(FieldManipulator::class, $directiveInstance);
 
                 $directiveInstance->manipulateFieldDefinition($documentAST, $fieldDefinition, $parentType);
             }
@@ -290,15 +286,15 @@ GRAPHQL
         $documentAST = $astBuilder->documentAST();
 
         $queryType = $documentAST->types[RootType::QUERY];
-        assert($queryType instanceof ObjectTypeDefinitionNode);
+        $this->assertInstanceOf(ObjectTypeDefinitionNode::class, $queryType);
 
         $fieldType = $queryType->fields[0];
-        assert($fieldType instanceof FieldDefinitionNode);
+        $this->assertInstanceOf(FieldDefinitionNode::class, $fieldType); // @phpstan-ignore method.alreadyNarrowedType (aids IDE)
 
         $typeType = $fieldType->type;
-        assert($typeType instanceof NamedTypeNode);
+        $this->assertInstanceOf(NamedTypeNode::class, $typeType);
 
-        $this->assertSame($typeType->name->value, 'Int');
+        $this->assertSame('Int', $typeType->name->value);
     }
 
     public function testDynamicallyAddedArgManipulatorDirective(): void
@@ -335,7 +331,7 @@ GRAPHQL
                 ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
             ): void {
                 $directiveInstance = ASTHelper::addDirectiveToNode('@foo', $argDefinition);
-                assert($directiveInstance instanceof ArgManipulator);
+                TestCase::assertInstanceOf(ArgManipulator::class, $directiveInstance);
 
                 $directiveInstance->manipulateArgDefinition($documentAST, $argDefinition, $parentField, $parentType);
             }
@@ -352,18 +348,18 @@ GRAPHQL
         $documentAST = $astBuilder->documentAST();
 
         $queryType = $documentAST->types[RootType::QUERY];
-        assert($queryType instanceof ObjectTypeDefinitionNode);
+        $this->assertInstanceOf(ObjectTypeDefinitionNode::class, $queryType);
 
         $fieldType = $queryType->fields[0];
-        assert($fieldType instanceof FieldDefinitionNode);
+        $this->assertInstanceOf(FieldDefinitionNode::class, $fieldType); // @phpstan-ignore method.alreadyNarrowedType (aids IDE)
 
         $argumentType = $fieldType->arguments[0];
-        assert($argumentType instanceof InputValueDefinitionNode);
+        $this->assertInstanceOf(InputValueDefinitionNode::class, $argumentType); // @phpstan-ignore method.alreadyNarrowedType (aids IDE)
 
         $typeType = $argumentType->type;
-        assert($typeType instanceof NamedTypeNode);
+        $this->assertInstanceOf(NamedTypeNode::class, $typeType);
 
-        $this->assertSame($typeType->name->value, 'Int');
+        $this->assertSame('Int', $typeType->name->value);
     }
 
     public function testDynamicallyAddedInputFieldManipulatorDirective(): void
@@ -398,7 +394,7 @@ GRAPHQL
                 InputObjectTypeDefinitionNode &$parentInput,
             ): void {
                 $directiveInstance = ASTHelper::addDirectiveToNode('@foo', $inputField);
-                assert($directiveInstance instanceof InputFieldManipulator);
+                TestCase::assertInstanceOf(InputFieldManipulator::class, $directiveInstance);
 
                 $directiveInstance->manipulateInputFieldDefinition($documentAST, $inputField, $parentInput);
             }
@@ -419,14 +415,14 @@ GRAPHQL
         $documentAST = $astBuilder->documentAST();
 
         $inputType = $documentAST->types['Input'];
-        assert($inputType instanceof InputObjectTypeDefinitionNode);
+        $this->assertInstanceOf(InputObjectTypeDefinitionNode::class, $inputType);
 
         $fieldType = $inputType->fields[0];
-        assert($fieldType instanceof InputValueDefinitionNode);
+        $this->assertInstanceOf(InputValueDefinitionNode::class, $fieldType); // @phpstan-ignore method.alreadyNarrowedType (aids IDE)
 
         $typeType = $fieldType->type;
-        assert($typeType instanceof NamedTypeNode);
+        $this->assertInstanceOf(NamedTypeNode::class, $typeType);
 
-        $this->assertSame($typeType->name->value, 'Int');
+        $this->assertSame('Int', $typeType->name->value);
     }
 }

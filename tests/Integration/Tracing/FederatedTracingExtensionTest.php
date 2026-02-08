@@ -4,6 +4,7 @@ namespace Tests\Integration\Tracing;
 
 use GraphQL\Error\DebugFlag;
 use Illuminate\Contracts\Config\Repository;
+use Illuminate\Support\Carbon;
 use Nuwave\Lighthouse\Federation\FederationServiceProvider;
 use Nuwave\Lighthouse\Tracing\FederatedTracing\FederatedTracing;
 use Nuwave\Lighthouse\Tracing\FederatedTracing\Proto\Trace;
@@ -129,11 +130,11 @@ final class FederatedTracingExtensionTest extends TestCase
         $trace1Data = $this->decodeFtv1Record($result->json('0.extensions.ftv1'));
         $trace2Data = $this->decodeFtv1Record($result->json('1.extensions.ftv1'));
 
-        $startTime1 = $trace1Data['startTime'];
-        $endTime1 = $trace1Data['endTime'];
+        $startTime1 = Carbon::parse($trace1Data['startTime']);
+        $endTime1 = Carbon::parse($trace1Data['endTime']);
 
-        $startTime2 = $trace2Data['startTime'];
-        $endTime2 = $trace2Data['endTime'];
+        $startTime2 = Carbon::parse($trace2Data['startTime']);
+        $endTime2 = Carbon::parse($trace2Data['endTime']);
 
         // Guaranteed by the usleep() in $this->resolve()
         $this->assertGreaterThan($startTime1, $endTime1);
@@ -194,7 +195,7 @@ final class FederatedTracingExtensionTest extends TestCase
     }
 
     /** @return array<string,mixed> */
-    protected function decodeFtv1Record(string $encoded): array
+    private function decodeFtv1Record(string $encoded): array
     {
         $decoded = \Safe\base64_decode($encoded);
 

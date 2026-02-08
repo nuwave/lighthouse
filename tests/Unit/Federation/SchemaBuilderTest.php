@@ -52,7 +52,7 @@ final class SchemaBuilderTest extends TestCase
         $this->assertSchemaHasQueryTypeWithFederationFields($schema);
     }
 
-    protected function assertSchemaHasQueryTypeWithFederationFields(Schema $schema): void
+    private function assertSchemaHasQueryTypeWithFederationFields(Schema $schema): void
     {
         $queryType = $schema->getQueryType();
         $this->assertInstanceOf(ObjectType::class, $queryType);
@@ -64,8 +64,9 @@ final class SchemaBuilderTest extends TestCase
     /**
      * At least one type needs to be defined with the @key directive.
      *
-     * We could also just don't add the type definition below if no entities match. So the user is responsible
-     * by himself to ad the _Entity union. In this case GraphQL itself will throw an exception if the union is missing.
+     * We could also just not add the type definition below if no entities match,
+     * so the user themselves is responsible to add the _Entity union.
+     * In this case, GraphQL validation will throw an exception if the union is missing.
      */
     public function testThrowsIfNoTypeHasKeyDirective(): void
     {

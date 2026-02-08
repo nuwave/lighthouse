@@ -2,7 +2,6 @@
 
 namespace Tests;
 
-use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 use GraphQL\Error\DebugFlag;
 use GraphQL\Type\Schema;
 use Illuminate\Console\Application as ConsoleApplication;
@@ -13,6 +12,7 @@ use Illuminate\Redis\RedisServiceProvider;
 use Laravel\Scout\ScoutServiceProvider as LaravelScoutServiceProvider;
 use Nuwave\Lighthouse\Async\AsyncServiceProvider;
 use Nuwave\Lighthouse\Auth\AuthServiceProvider as LighthouseAuthServiceProvider;
+use Nuwave\Lighthouse\Bind\BindServiceProvider;
 use Nuwave\Lighthouse\Cache\CacheServiceProvider;
 use Nuwave\Lighthouse\CacheControl\CacheControlServiceProvider;
 use Nuwave\Lighthouse\GlobalId\GlobalIdServiceProvider;
@@ -33,7 +33,6 @@ use Tests\Utils\Policies\AuthServiceProvider;
 
 abstract class TestCase extends TestbenchTestCase
 {
-    use ArraySubsetAsserts;
     use MakesGraphQLRequests;
     use MocksResolvers;
     use UsesTestSchema;
@@ -47,11 +46,10 @@ abstract class TestCase extends TestbenchTestCase
 
     /** A dummy query type definition that is added to tests by default. */
     public const PLACEHOLDER_QUERY = /** @lang GraphQL */ <<<'GRAPHQL'
-type Query {
-  foo: Int
-}
-
-GRAPHQL;
+    type Query {
+      foo: Int
+    }
+    GRAPHQL;
 
     protected function setUp(): void
     {
@@ -81,6 +79,7 @@ GRAPHQL;
             LighthouseServiceProvider::class,
             AsyncServiceProvider::class,
             LighthouseAuthServiceProvider::class,
+            BindServiceProvider::class,
             CacheServiceProvider::class,
             CacheControlServiceProvider::class,
             GlobalIdServiceProvider::class,
@@ -210,6 +209,18 @@ GRAPHQL;
         $schemaBuilder = $this->app->make(SchemaBuilder::class);
 
         return $schemaBuilder->schema();
+    }
+
+    /** Assert that SDL contains the given string, accounting for different forward slash escaping - see https://github.com/webonyx/graphql-php/releases/tag/v15.22.2. */
+    protected function assertSdlContainsString(string $expected, string $sdl): void
+    {
+        // Try both the original string and the escaped version
+        $escapedExpected = str_replace('/', '\/', $expected);
+
+        $this->assertTrue(
+            str_contains($sdl, $expected) || str_contains($sdl, $escapedExpected),
+            "SDL does not contain expected string. Expected either:\n- {$expected}\n- {$escapedExpected}\n\nActual SDL:\n{$sdl}",
+        );
     }
 
     /** Get a fully qualified reference to a method that is defined on the test class. */

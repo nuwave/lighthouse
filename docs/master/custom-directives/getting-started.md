@@ -16,10 +16,12 @@ The class name of a directive must follow the following pattern:
 Let's implement a simple `@upperCase` directive as a part of this introduction.
 Use the artisan generator command to create it:
 
-    php artisan lighthouse:directive --argument upperCase
+```shell
+php artisan lighthouse:directive --argument upperCase
+```
 
 That will create a class called `UpperCaseDirective` that extends the
-abstract class `\Nuwave\Lighthouse\Schema\Directives\BaseDirective`.
+abstract class `Nuwave\Lighthouse\Schema\Directives\BaseDirective`.
 
 ```php
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -34,16 +36,16 @@ final class UpperCaseDirective extends BaseDirective
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-"""
-A description of what this directive does.
-"""
-directive @upperCase(
-    """
-    Directives can have arguments to parameterize them.
-    """
-    someArg: String
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-GRAPHQL;
+        """
+        A description of what this directive does.
+        """
+        directive @upperCase(
+            """
+            Directives can have arguments to parameterize them.
+            """
+            someArg: String
+        ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+        GRAPHQL;
     }
 }
 ```

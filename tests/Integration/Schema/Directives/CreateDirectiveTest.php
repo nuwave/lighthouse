@@ -92,7 +92,7 @@ final class CreateDirectiveTest extends DBTestCase
 
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
-            createTag(name: "foobar"){
+            createTag(name: "foobar") {
                 name
                 default_string
             }

@@ -4,6 +4,7 @@ namespace Tests\Integration\Execution\MutationExecutor;
 
 use GraphQL\Type\Definition\PhpEnumType;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Enums\ImageableType;
 use Tests\Utils\Models\Image;
@@ -94,7 +95,7 @@ final class MorphToTest extends DBTestCase
     public function testConnectsMorphTo(): void
     {
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->name = 'first_task';
         $task->save();
 
@@ -142,7 +143,7 @@ final class MorphToTest extends DBTestCase
         $typeRegistry->register($phpEnumType);
 
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->name = 'first_task';
         $task->save();
 
@@ -182,7 +183,7 @@ final class MorphToTest extends DBTestCase
     public function testConnectsMorphToWithUpsert(): void
     {
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->name = 'first_task';
         $task->save();
 
@@ -259,15 +260,17 @@ final class MorphToTest extends DBTestCase
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testDisconnectsMorphTo(string $action): void
     {
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->name = 'first_task';
         $task->save();
 
-        $image = $task->image()->make();
-        assert($image instanceof Image);
+        $image = factory(Image::class)->make();
+        $this->assertInstanceOf(Image::class, $image);
+        $image->imageable()->associate($task);
         $image->url = 'bar';
         $image->save();
 
@@ -299,15 +302,17 @@ final class MorphToTest extends DBTestCase
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testDeletesMorphTo(string $action): void
     {
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->name = 'first_task';
         $task->save();
 
-        $image = $task->image()->make();
-        assert($image instanceof Image);
+        $image = factory(Image::class)->make();
+        $this->assertInstanceOf(Image::class, $image);
+        $image->imageable()->associate($task);
         $image->url = 'bar';
         $image->save();
 

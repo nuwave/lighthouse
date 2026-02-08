@@ -12,7 +12,7 @@ Reference a class implementing a scalar definition.
 """
 directive @scalar(
   """
-  Reference to a class that extends `\GraphQL\Type\Definition\ScalarType`.
+  Reference to a class that extends `GraphQL\Type\Definition\ScalarType`.
   """
   class: String!
 ) on SCALAR

@@ -14,12 +14,13 @@ final class ScopeDirectiveTest extends DBTestCase
     {
         factory(Task::class)->times(2)->create();
 
-        /** @var Task $taskWithTag */
         $taskWithTag = factory(Task::class)->create();
+        $this->assertInstanceOf(Task::class, $taskWithTag);
 
-        /** @var Tag $tag */
-        $tag = factory(Tag::class)->make();
-        $taskWithTag->tags()->save($tag);
+        $tag = factory(Tag::class)->create();
+        $this->assertInstanceOf(Tag::class, $tag);
+
+        $taskWithTag->tags()->attach($tag);
 
         $this->schema = /** @lang GraphQL */ '
         type Query {
@@ -62,11 +63,12 @@ final class ScopeDirectiveTest extends DBTestCase
     {
         factory(Task::class)->times(2)->create();
 
-        /** @var Task $taskWithTag */
         $taskWithTag = factory(Task::class)->create();
+        $this->assertInstanceOf(Task::class, $taskWithTag);
 
-        /** @var Tag $tag */
-        $tag = factory(Tag::class)->make();
+        $tag = factory(Tag::class)->create();
+        $this->assertInstanceOf(Tag::class, $tag);
+
         $taskWithTag->tags()->save($tag);
 
         $this->schema = /** @lang GraphQL */ '
@@ -101,12 +103,12 @@ final class ScopeDirectiveTest extends DBTestCase
     public function testWorksWithCustomQueryBuilders(): void
     {
         $named = factory(User::class)->make();
-        assert($named instanceof User);
+        $this->assertInstanceOf(User::class, $named);
         $named->name = 'foo';
         $named->save();
 
         $unnamed = factory(User::class)->make();
-        assert($unnamed instanceof User);
+        $this->assertInstanceOf(User::class, $unnamed);
         $unnamed->name = null;
         $unnamed->save();
 

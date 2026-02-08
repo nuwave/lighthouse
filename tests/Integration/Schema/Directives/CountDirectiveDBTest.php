@@ -370,13 +370,13 @@ final class CountDirectiveDBTest extends DBTestCase
         $tasks = $user->tasks()->saveMany(
             factory(Task::class)->times(2)->make(),
         );
-        assert($tasks instanceof Collection);
+        $this->assertInstanceOf(Collection::class, $tasks);
 
         $task1 = $tasks[0];
-        assert($task1 instanceof Task);
+        $this->assertInstanceOf(Task::class, $task1);
 
         $task2 = $tasks[1];
-        assert($task2 instanceof Task);
+        $this->assertInstanceOf(Task::class, $task2);
 
         $this->be($user);
 
@@ -430,12 +430,12 @@ final class CountDirectiveDBTest extends DBTestCase
         ';
 
         $notNull = factory(Task::class)->make();
-        assert($notNull instanceof Task);
+        $this->assertInstanceOf(Task::class, $notNull);
         $notNull->difficulty = null;
         $notNull->save();
 
         $notNull = factory(Task::class)->make();
-        assert($notNull instanceof Task);
+        $this->assertInstanceOf(Task::class, $notNull);
         $notNull->difficulty = 2;
         $notNull->save();
 
@@ -458,13 +458,13 @@ final class CountDirectiveDBTest extends DBTestCase
         }
         ';
         foreach (factory(Task::class, 2)->make() as $task) {
-            assert($task instanceof Task);
+            $this->assertInstanceOf(Task::class, $task);
             $task->difficulty = 1;
             $task->save();
         }
 
         $other = factory(Task::class)->make();
-        assert($other instanceof Task);
+        $this->assertInstanceOf(Task::class, $other);
         $other->difficulty = 2;
         $other->save();
 

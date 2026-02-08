@@ -3,6 +3,7 @@
 namespace Tests\Integration\Execution\MutationExecutor;
 
 use Faker\Provider\Lorem;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Role;
 use Tests\Utils\Models\User;
@@ -259,8 +260,7 @@ final class BelongsToManyTest extends DBTestCase
             ],
         ]);
 
-        $role = Role::firstOrFail();
-        assert($role instanceof Role);
+        $role = Role::query()->firstOrFail();
         $this->assertCount(2, $role->users()->get());
         $this->assertSame('is_user', $role->name);
     }
@@ -290,8 +290,7 @@ final class BelongsToManyTest extends DBTestCase
                 }
             }
         }
-GRAPHQL
-        )->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'upsertRole' => [
                     'id' => '1',
@@ -310,8 +309,7 @@ GRAPHQL
             ],
         ]);
 
-        $role = Role::firstOrFail();
-        assert($role instanceof Role);
+        $role = Role::query()->firstOrFail();
         $this->assertCount(2, $role->users()->get());
         $this->assertSame('is_user', $role->name);
     }
@@ -319,12 +317,12 @@ GRAPHQL
     public function testCreateAndConnectWithBelongsToMany(): void
     {
         $user = factory(User::class)->make();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $user->name = 'user_one';
         $user->save();
 
         $user = factory(User::class)->make();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $user->name = 'user_two';
         $user->save();
 
@@ -367,12 +365,12 @@ GRAPHQL
     public function testUpsertUsingCreationAndConnectWithBelongsToMany(): void
     {
         $user = factory(User::class)->make();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $user->name = 'user_one';
         $user->save();
 
         $user = factory(User::class)->make();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $user->name = 'user_two';
         $user->save();
 
@@ -416,7 +414,7 @@ GRAPHQL
     public function testCreateWithBelongsToMany(): void
     {
         $role = factory(Role::class)->make();
-        assert($role instanceof Role);
+        $this->assertInstanceOf(Role::class, $role);
         $role->name = 'is_admin';
         $role->save();
 
@@ -463,8 +461,7 @@ GRAPHQL
             ],
         ]);
 
-        $role = Role::firstOrFail();
-        assert($role instanceof Role);
+        $role = Role::query()->firstOrFail();
         $this->assertCount(2, $role->users()->get());
         $this->assertSame('is_user', $role->name);
     }
@@ -511,7 +508,7 @@ GRAPHQL
     public function testUpsertUsingCreationWithBelongsToMany(): void
     {
         $role = factory(Role::class)->make();
-        assert($role instanceof Role);
+        $this->assertInstanceOf(Role::class, $role);
         $role->name = 'is_admin';
         $role->save();
 
@@ -560,8 +557,7 @@ GRAPHQL
             ],
         ]);
 
-        $role = Role::firstOrFail();
-        assert($role instanceof Role);
+        $role = Role::query()->firstOrFail();
         $this->assertCount(2, $role->users()->get());
         $this->assertSame('is_user', $role->name);
     }
@@ -574,10 +570,11 @@ GRAPHQL
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testUpdateWithBelongsToMany(string $action): void
     {
         $role = factory(Role::class)->make();
-        assert($role instanceof Role);
+        $this->assertInstanceOf(Role::class, $role);
         $role->name = 'is_admin';
         $role->save();
 
@@ -629,17 +626,17 @@ GRAPHQL
             ],
         ]);
 
-        $role = Role::firstOrFail();
-        assert($role instanceof Role);
+        $role = Role::query()->firstOrFail();
         $this->assertCount(2, $role->users()->get());
         $this->assertSame('is_user', $role->name);
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testDeleteWithBelongsToMany(string $action): void
     {
         $role = factory(Role::class)->make();
-        assert($role instanceof Role);
+        $this->assertInstanceOf(Role::class, $role);
         $role->name = 'is_admin';
         $role->save();
 
@@ -678,8 +675,7 @@ GRAPHQL
             ],
         ]);
 
-        $role = Role::firstOrFail();
-        assert($role instanceof Role);
+        $role = Role::query()->firstOrFail();
         $this->assertCount(1, $role->users()->get());
         $this->assertSame('is_user', $role->name);
 
@@ -688,12 +684,13 @@ GRAPHQL
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testConnectWithBelongsToMany(string $action): void
     {
         factory(User::class)->create();
 
         $role = factory(Role::class)->create();
-        assert($role instanceof Role);
+        $this->assertInstanceOf(Role::class, $role);
 
         $role->users()
             ->attach(
@@ -731,18 +728,18 @@ GRAPHQL
             ],
         ]);
 
-        $role = Role::firstOrFail();
-        assert($role instanceof Role);
+        $role = Role::query()->firstOrFail();
         $this->assertCount(2, $role->users()->get());
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testSyncWithBelongsToMany(string $action): void
     {
         factory(User::class)->create();
 
         $role = factory(Role::class)->create();
-        assert($role instanceof Role);
+        $this->assertInstanceOf(Role::class, $role);
         $role->users()
             ->attach(
                 factory(User::class)->create(),
@@ -779,16 +776,16 @@ GRAPHQL
             ],
         ]);
 
-        $role = Role::firstOrFail();
-        assert($role instanceof Role);
+        $role = Role::query()->firstOrFail();
         $this->assertCount(2, $role->users()->get());
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testDisconnectWithBelongsToMany(string $action): void
     {
         $role = factory(Role::class)->create();
-        assert($role instanceof Role);
+        $this->assertInstanceOf(Role::class, $role);
 
         $role->users()
             ->attach(
@@ -822,8 +819,7 @@ GRAPHQL
             ],
         ]);
 
-        $role = Role::firstOrFail();
-        assert($role instanceof Role);
+        $role = Role::query()->firstOrFail();
         $this->assertCount(1, $role->users()->get());
 
         $this->assertNotNull(User::find(1));
@@ -906,13 +902,14 @@ GRAPHQL
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testDisconnectAllRelatedModelsOnEmptySync(string $action): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $role = factory(Role::class)->make();
-        assert($role instanceof Role);
+        $this->assertInstanceOf(Role::class, $role);
         $user->roles()->save($role);
 
         $this->assertCount(1, $role->users);
@@ -949,7 +946,7 @@ GRAPHQL
     public function testConnectUserWithRoleAndPivotMetaByUsingSync(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         factory(Role::class)->create();
 
@@ -1009,7 +1006,7 @@ GRAPHQL
     public function testConnectUserWithRoleAndPivotMetaByUsingSyncWithoutDetach(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         factory(Role::class)->create();
         $role2 = factory(Role::class)->create();

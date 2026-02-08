@@ -528,7 +528,7 @@ final class DeferTest extends TestCase
         ]);
 
         $this->graphQL(/** @lang GraphQL */ '
-        query ($include: Boolean!, $skip: Boolean!){
+        query ($include: Boolean!, $skip: Boolean!) {
             userInclude: user {
                 name
                 parent @defer @include(if: false) {

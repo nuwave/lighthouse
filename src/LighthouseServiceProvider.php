@@ -14,6 +14,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\Console\CacheCommand;
 use Nuwave\Lighthouse\Console\ClearCacheCommand;
+use Nuwave\Lighthouse\Console\ClearQueryCacheCommand;
+use Nuwave\Lighthouse\Console\ClearSchemaCacheCommand;
 use Nuwave\Lighthouse\Console\DirectiveCommand;
 use Nuwave\Lighthouse\Console\FieldCommand;
 use Nuwave\Lighthouse\Console\IdeHelperCommand;
@@ -27,11 +29,11 @@ use Nuwave\Lighthouse\Console\UnionCommand;
 use Nuwave\Lighthouse\Console\ValidateSchemaCommand;
 use Nuwave\Lighthouse\Console\ValidatorCommand;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
+use Nuwave\Lighthouse\Execution\CacheableValidationRulesProvider;
 use Nuwave\Lighthouse\Execution\ContextFactory;
 use Nuwave\Lighthouse\Execution\ContextSerializer;
 use Nuwave\Lighthouse\Execution\ErrorPool;
 use Nuwave\Lighthouse\Execution\SingleResponse;
-use Nuwave\Lighthouse\Execution\ValidationRulesProvider;
 use Nuwave\Lighthouse\Http\Responses\ResponseStream;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
@@ -56,6 +58,8 @@ class LighthouseServiceProvider extends ServiceProvider
     protected const COMMANDS = [
         CacheCommand::class,
         ClearCacheCommand::class,
+        ClearQueryCacheCommand::class,
+        ClearSchemaCacheCommand::class,
         DirectiveCommand::class,
         FieldCommand::class,
         IdeHelperCommand::class,
@@ -94,20 +98,18 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->app->bind(ProvidesSubscriptionResolver::class, static fn (): ProvidesSubscriptionResolver => new class() implements ProvidesSubscriptionResolver {
             public function provideSubscriptionResolver(FieldValue $fieldValue): \Closure
             {
-                throw new \Exception(
-                    'Add the SubscriptionServiceProvider to your config/app.php to enable subscriptions.',
-                );
+                throw new \Exception('Register the SubscriptionServiceProvider to enable subscriptions.');
             }
         });
 
-        $this->app->bind(ProvidesValidationRules::class, ValidationRulesProvider::class);
-
-        $this->commands(self::COMMANDS);
+        $this->app->bind(ProvidesValidationRules::class, CacheableValidationRulesProvider::class);
     }
 
     public function boot(ConfigRepository $configRepository, EventsDispatcher $dispatcher): void
     {
         $dispatcher->listen(RegisterDirectiveNamespaces::class, static fn (): string => __NAMESPACE__ . '\\Schema\\Directives');
+
+        $this->commands(self::COMMANDS);
 
         $this->publishes([
             __DIR__ . '/lighthouse.php' => $this->app->configPath() . '/lighthouse.php',

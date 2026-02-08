@@ -62,7 +62,7 @@ final class MorphToManyTest extends DBTestCase
     public function testCreateATaskWithExistingTagsByUsingConnect(): void
     {
         $tag = factory(Tag::class)->make();
-        assert($tag instanceof Tag);
+        $this->assertInstanceOf(Tag::class, $tag);
         $tag->name = 'php';
         $tag->save();
 
@@ -124,7 +124,7 @@ final class MorphToManyTest extends DBTestCase
     public function testUpsertATaskWithExistingTagsByUsingConnect(): void
     {
         $tag = factory(Tag::class)->make();
-        assert($tag instanceof Tag);
+        $this->assertInstanceOf(Tag::class, $tag);
         $tag->name = 'php';
         $tag->save();
 
@@ -158,7 +158,7 @@ final class MorphToManyTest extends DBTestCase
     public function testCreateATaskWithExistingTagsByUsingSync(): void
     {
         $tag = factory(Tag::class)->make();
-        assert($tag instanceof Tag);
+        $this->assertInstanceOf(Tag::class, $tag);
         $tag->name = 'php';
         $tag->save();
 
@@ -191,7 +191,7 @@ final class MorphToManyTest extends DBTestCase
     public function testUpsertATaskWithExistingTagsByUsingSync(): void
     {
         $tag = factory(Tag::class)->make();
-        assert($tag instanceof Tag);
+        $this->assertInstanceOf(Tag::class, $tag);
         $tag->name = 'php';
         $tag->save();
 
@@ -348,8 +348,7 @@ final class MorphToManyTest extends DBTestCase
                 }
             }
         }
-GRAPHQL
-        )->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'upsertTask' => [
                     'id' => 1,

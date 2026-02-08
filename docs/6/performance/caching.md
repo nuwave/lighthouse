@@ -121,13 +121,8 @@ to override certain methods, or implement the interface from scratch.
 
 **Experimental: not enabled by default, not guaranteed to be stable.**
 
-Add the service provider to your `config/app.php`:
-
-```php
-'providers' => [
-    \Nuwave\Lighthouse\CacheControl\CacheControlServiceProvider::class,
-],
-```
+Register the service provider `Nuwave\Lighthouse\CacheControl\CacheControlServiceProvider`,
+see [registering providers in Laravel](https://laravel.com/docs/providers#registering-providers).
 
 You can change the [`Cache-Control` header](https://developer.mozilla.org/de/docs/Web/HTTP/Headers/Cache-Control) of your response
 regardless of [@cache](../api-reference/directives.md#cache)

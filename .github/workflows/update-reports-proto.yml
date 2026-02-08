@@ -1,11 +1,11 @@
-name: "Update reports.proto"
+name: "Update `reports.proto`"
 on:
   workflow_dispatch:
   schedule:
     - cron: "0 0 * * 0"
 
 jobs:
-  proto:
+  update-reports-proto:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -22,7 +22,7 @@ jobs:
 
       - uses: peter-evans/create-pull-request@v5
         with:
-          title: 'Updated `reports.proto`'
-          commit_message: Updated `reports.proto`
-          branch: patch/update-reports-proto
+          title: Update `reports.proto`
+          commit-message: Update `reports.proto`
+          branch: update-reports-proto
           delete-branch: true

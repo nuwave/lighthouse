@@ -2,10 +2,7 @@
 
 namespace Tests\Unit\Schema\AST;
 
-use GraphQL\Language\AST\DirectiveDefinitionNode;
-use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use GraphQL\Language\AST\SchemaExtensionNode;
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Exceptions\SchemaSyntaxErrorException;
@@ -18,16 +15,21 @@ final class DocumentASTTest extends TestCase
 {
     public function testParsesSimpleSchema(): void
     {
-        $documentAST = DocumentAST::fromSource(/** @lang GraphQL */ '
+        $schema = /** @lang GraphQL */ '
         type Query {
             foo: Int
         }
-        ');
+        ';
+        // calculated as hash('sha256', $schema)
+        $schemaHash = '99fd7bd3f58a98d8932c1f5d1da718707f6f471e93d96e0bc913436445a947ac';
+        $documentAST = DocumentAST::fromSource($schema);
 
         $this->assertInstanceOf(
             ObjectTypeDefinitionNode::class,
             $documentAST->types[RootType::QUERY],
         );
+
+        $this->assertSame($schemaHash, $documentAST->hash);
     }
 
     public function testThrowsOnInvalidSchema(): void
@@ -99,17 +101,20 @@ final class DocumentASTTest extends TestCase
         $reserialized = unserialize(
             serialize($documentAST),
         );
-        assert($reserialized instanceof DocumentAST);
+        $this->assertInstanceOf(DocumentAST::class, $reserialized);
 
         $queryType = $reserialized->types[RootType::QUERY];
         $this->assertInstanceOf(ObjectTypeDefinitionNode::class, $queryType);
 
-        $this->assertInstanceOf(DirectiveDefinitionNode::class, $reserialized->directives['foo']);
+        $this->assertArrayHasKey('foo', $reserialized->directives);
 
         $this->assertSame(['Query'], $reserialized->classNameToObjectTypeNames[User::class]);
 
+        $this->assertArrayHasKey(0, $reserialized->schemaExtensions);
+
         $schemaExtension = $reserialized->schemaExtensions[0];
-        $this->assertInstanceOf(SchemaExtensionNode::class, $schemaExtension);
-        $this->assertInstanceOf(DirectiveNode::class, $schemaExtension->directives[0]);
+        $this->assertArrayHasKey(0, $schemaExtension->directives); // @phpstan-ignore method.impossibleType (NodeList not understood by earlier deps)
+
+        $this->assertSame($documentAST->hash, $reserialized->hash);
     }
 }

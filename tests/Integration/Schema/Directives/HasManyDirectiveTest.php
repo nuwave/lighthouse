@@ -3,6 +3,7 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Role;
@@ -30,13 +31,13 @@ final class HasManyDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $tasks = factory(Task::class, 3)->make();
         $user->tasks()->saveMany($tasks);
 
         $ignoredViaGlobalScope = factory(Task::class)->make();
-        assert($ignoredViaGlobalScope instanceof Task);
+        $this->assertInstanceOf(Task::class, $ignoredViaGlobalScope);
         $ignoredViaGlobalScope->name = Task::CLEANING;
         $user->tasks()->save($ignoredViaGlobalScope);
 
@@ -75,7 +76,7 @@ final class HasManyDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $tasks = factory(Task::class, 3)->make();
         $user->tasks()->saveMany($tasks);
@@ -110,13 +111,13 @@ final class HasManyDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $tasks = factory(Task::class, 3)->make();
         $user->tasks()->saveMany($tasks);
 
         $firstTask = $tasks->first();
-        assert($firstTask instanceof Task);
+        $this->assertInstanceOf(Task::class, $firstTask);
 
         $this
             ->graphQL(/** @lang GraphQL */ '
@@ -152,22 +153,22 @@ final class HasManyDirectiveTest extends DBTestCase
         ';
 
         $user1 = factory(User::class)->create();
-        assert($user1 instanceof User);
+        $this->assertInstanceOf(User::class, $user1);
 
         $tasks1 = factory(Task::class, 3)->make();
         $user1->tasks()->saveMany($tasks1);
 
         $user2 = factory(User::class)->create();
-        assert($user2 instanceof User);
+        $this->assertInstanceOf(User::class, $user2);
 
         $tasks2 = factory(Task::class, 3)->make();
         $user2->tasks()->saveMany($tasks2);
 
         $firstTask = $tasks1->first();
-        assert($firstTask instanceof Task);
+        $this->assertInstanceOf(Task::class, $firstTask);
 
         $lastTask = $tasks2->last();
-        assert($lastTask instanceof Task);
+        $this->assertInstanceOf(Task::class, $lastTask);
 
         $this
             ->graphQL(/** @lang GraphQL */ '
@@ -228,22 +229,22 @@ final class HasManyDirectiveTest extends DBTestCase
         ';
 
         $user1 = factory(User::class)->create();
-        assert($user1 instanceof User);
+        $this->assertInstanceOf(User::class, $user1);
 
         $tasks1 = factory(Task::class, 3)->make();
         $user1->tasks()->saveMany($tasks1);
 
         $user2 = factory(User::class)->create();
-        assert($user2 instanceof User);
+        $this->assertInstanceOf(User::class, $user2);
 
         $tasks2 = factory(Task::class, 3)->make();
         $user2->tasks()->saveMany($tasks2);
 
         $firstTask = $tasks1->first();
-        assert($firstTask instanceof Task);
+        $this->assertInstanceOf(Task::class, $firstTask);
 
         $lastTask = $tasks2->last();
-        assert($lastTask instanceof Task);
+        $this->assertInstanceOf(Task::class, $lastTask);
 
         $this
             ->graphQL(/** @lang GraphQL */ '
@@ -315,7 +316,7 @@ final class HasManyDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $tasksCount = 3;
         $tasks = factory(Task::class, $tasksCount)->make();
@@ -373,11 +374,11 @@ final class HasManyDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $posts = factory(Post::class, 2)->make();
         foreach ($posts as $post) {
-            assert($post instanceof Post);
+            $this->assertInstanceOf(Post::class, $post);
             $post->user()->associate($user);
             $post->save();
         }
@@ -386,7 +387,7 @@ final class HasManyDirectiveTest extends DBTestCase
 
         $roles = factory(Role::class, 3)->make();
         foreach ($roles as $role) {
-            assert($role instanceof Role);
+            $this->assertInstanceOf(Role::class, $role);
             $user->roles()->save($role);
         }
 
@@ -474,7 +475,7 @@ final class HasManyDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $tasks = factory(Task::class, 3)->make();
         $user->tasks()->saveMany($tasks);
@@ -491,12 +492,13 @@ final class HasManyDirectiveTest extends DBTestCase
     }
 
     /** @dataProvider batchloadRelations */
+    #[DataProvider('batchloadRelations')]
     public function testQueryHasManyPaginator(bool $batchloadRelations): void
     {
         config(['lighthouse.batchload_relations' => $batchloadRelations]);
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $tasks = factory(Task::class, 3)->make();
         $user->tasks()->saveMany($tasks);
@@ -574,7 +576,7 @@ final class HasManyDirectiveTest extends DBTestCase
     public function testDoesNotRequireModelClassForPaginatedHasMany(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $tasks = factory(Task::class, 3)->make();
         $user->tasks()->saveMany($tasks);
@@ -628,7 +630,7 @@ final class HasManyDirectiveTest extends DBTestCase
         config(['lighthouse.pagination.max_count' => 1]);
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $tasks = factory(Task::class, 3)->make();
         $user->tasks()->saveMany($tasks);
@@ -667,7 +669,7 @@ final class HasManyDirectiveTest extends DBTestCase
         config(['lighthouse.pagination.max_count' => 1]);
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $tasks = factory(Task::class, 3)->make();
         $user->tasks()->saveMany($tasks);
@@ -704,7 +706,7 @@ final class HasManyDirectiveTest extends DBTestCase
     public function testRejectsPaginationWithNegativeCount(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $tasks = factory(Task::class, 3)->make();
         $user->tasks()->saveMany($tasks);
@@ -745,7 +747,7 @@ final class HasManyDirectiveTest extends DBTestCase
         config(['lighthouse.pagination.max_count' => 1]);
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $tasks = factory(Task::class, 3)->make();
         $user->tasks()->saveMany($tasks);
@@ -789,7 +791,7 @@ final class HasManyDirectiveTest extends DBTestCase
         config(['lighthouse.pagination.max_count' => 2]);
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $tasks = factory(Task::class, 3)->make();
         $user->tasks()->saveMany($tasks);
@@ -831,7 +833,7 @@ final class HasManyDirectiveTest extends DBTestCase
         config(['lighthouse.pagination.max_count' => 2]);
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $tasks = factory(Task::class, 3)->make();
         $user->tasks()->saveMany($tasks);
@@ -873,7 +875,7 @@ final class HasManyDirectiveTest extends DBTestCase
     public function testQueryHasManyPaginatorWithADefaultCount(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $tasks = factory(Task::class, 3)->make();
         $user->tasks()->saveMany($tasks);
@@ -925,7 +927,7 @@ final class HasManyDirectiveTest extends DBTestCase
     public function testQueryHasManyRelayConnection(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $tasks = factory(Task::class, 3)->make();
         $user->tasks()->saveMany($tasks);
@@ -975,7 +977,7 @@ final class HasManyDirectiveTest extends DBTestCase
     public function testQueryHasManyRelayConnectionWithADefaultCount(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $tasks = factory(Task::class, 3)->make();
         $user->tasks()->saveMany($tasks);
@@ -1025,7 +1027,7 @@ final class HasManyDirectiveTest extends DBTestCase
     public function testQueryHasManyNestedRelationships(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $tasks = factory(Task::class, 3)->make();
         $user->tasks()->saveMany($tasks);
@@ -1080,21 +1082,21 @@ final class HasManyDirectiveTest extends DBTestCase
                 ],
             ],
         ])->assertJsonCount(2, 'data.user.tasks.edges')
-        ->assertJsonCount(2, 'data.user.tasks.edges.0.node.user.tasks.edges');
+            ->assertJsonCount(2, 'data.user.tasks.edges.0.node.user.tasks.edges');
     }
 
     public function testQueryHasManySelfReferencingRelationships(): void
     {
         $post1 = factory(Post::class)->create();
-        assert($post1 instanceof Post);
+        $this->assertInstanceOf(Post::class, $post1);
 
         $post2 = factory(Post::class)->make();
-        assert($post2 instanceof Post);
+        $this->assertInstanceOf(Post::class, $post2);
         $post2->parent()->associate($post1);
         $post2->save();
 
         $post3 = factory(Post::class)->make();
-        assert($post3 instanceof Post);
+        $this->assertInstanceOf(Post::class, $post3);
         $post3->parent()->associate($post2);
         $post3->save();
 
@@ -1169,7 +1171,7 @@ final class HasManyDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $tasks = factory(Task::class, 3)->make();
         $user->tasks()->saveMany($tasks);
@@ -1205,7 +1207,7 @@ final class HasManyDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $tasks = factory(Task::class, 3)->make();
         $user->tasks()->saveMany($tasks);
@@ -1241,7 +1243,7 @@ final class HasManyDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $tasks = factory(Task::class, 3)->make();
         $user->tasks()->saveMany($tasks);
@@ -1274,7 +1276,7 @@ final class HasManyDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->make();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $user->name = UserPolicy::ADMIN;
         $user->save();
 
@@ -1313,7 +1315,7 @@ final class HasManyDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->make();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $user->name = UserPolicy::ADMIN;
         $user->save();
 
@@ -1352,7 +1354,7 @@ final class HasManyDirectiveTest extends DBTestCase
         ';
 
         $user = factory(User::class)->make();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $user->name = UserPolicy::ADMIN;
         $user->save();
 

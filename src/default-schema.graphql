@@ -19,7 +19,7 @@ type Query {
     ): [User!]! @paginate(defaultCount: 10)
 }
 
-"Account of a person who utilizes this application."
+"Account of a person who uses this application."
 type User {
     "Unique primary key."
     id: ID!

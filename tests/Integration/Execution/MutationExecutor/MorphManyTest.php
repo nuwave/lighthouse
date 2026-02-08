@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Execution\MutationExecutor;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Image;
 use Tests\Utils\Models\Task;
@@ -154,10 +155,10 @@ final class MorphManyTest extends DBTestCase
     public function testCreateWithConnectMorphMany(): void
     {
         $image1 = factory(Image::class)->create();
-        assert($image1 instanceof Image);
+        $this->assertInstanceOf(Image::class, $image1);
 
         $this->graphQL(/** @lang GraphQL */ '
-            mutation ($input: CreateTaskInput!){
+            mutation ($input: CreateTaskInput!) {
                 createTask(input: $input) {
                     id
                     name
@@ -265,6 +266,7 @@ final class MorphManyTest extends DBTestCase
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testUpdateWithNewMorphMany(string $action): void
     {
         factory(Task::class)->create();
@@ -304,10 +306,11 @@ GRAPHQL
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testUpdateAndUpdateMorphMany(string $action): void
     {
         $task = factory(Task::class)->create();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
 
         $task->images()
             ->save(
@@ -350,10 +353,11 @@ GRAPHQL
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testUpdateAndUpsertMorphMany(string $action): void
     {
         $task = factory(Task::class)->create();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
 
         $task->images()
             ->save(
@@ -395,10 +399,11 @@ GRAPHQL
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testUpdateAndDeleteMorphMany(string $action): void
     {
         $task = factory(Task::class)->create();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
 
         $task->images()
             ->save(
@@ -433,13 +438,14 @@ GRAPHQL
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testUpdateAndConnectMorphMany(string $action): void
     {
         $task = factory(Task::class)->create();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
 
         $image = factory(Image::class)->create();
-        assert($image instanceof Image);
+        $this->assertInstanceOf(Image::class, $image);
 
         $upperAction = ucfirst($action);
         $actionInput = "{$upperAction}TaskInput";
@@ -482,13 +488,14 @@ GRAPHQL
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testUpdateAndDisconnectMorphMany(string $action): void
     {
         $task = factory(Task::class)->create();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
 
         $image = factory(Image::class)->make();
-        assert($image instanceof Image);
+        $this->assertInstanceOf(Image::class, $image);
         $task->images()->save($image);
 
         $upperAction = ucfirst($action);
@@ -530,13 +537,14 @@ GRAPHQL
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testDisconnectModelEventsMorphMany(string $action): void
     {
         $task = factory(Task::class)->create();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
 
         $image = factory(Image::class)->make();
-        assert($image instanceof Image);
+        $this->assertInstanceOf(Image::class, $image);
         $task->images()->save($image);
 
         $upperAction = ucfirst($action);

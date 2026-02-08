@@ -19,7 +19,7 @@ $dispatcher->listen(
 ```
 
 When your schema is defined within files and you want to use `#import` to combine them,
-you can use the `\Nuwave\Lighthouse\Schema\Source\SchemaStitcher` to load your file:
+you can use the `Nuwave\Lighthouse\Schema\Source\SchemaStitcher` to load your file:
 
 ```php
 $stitcher = new \Nuwave\Lighthouse\Schema\Source\SchemaStitcher(__DIR__ . '/path/to/schema.graphql');

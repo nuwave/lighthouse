@@ -9,9 +9,7 @@ use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 class NestedMorphTo implements ArgResolver
 {
     public function __construct(
-        /**
-         * @var \Illuminate\Database\Eloquent\Relations\MorphTo<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model>  $relation
-         */
+        /** @var \Illuminate\Database\Eloquent\Relations\MorphTo<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model>  $relation */
         protected MorphTo $relation,
     ) {}
 

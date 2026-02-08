@@ -151,9 +151,11 @@ input UpdateUserInput @validator {
 ```
 
 We need to back that with a validator class. Lighthouse uses a simple naming convention for validator classes,
-just use the name of the input type and append `Validator`:
+use the name of the input type and append `Validator`:
 
-    php artisan lighthouse:validator UpdateUserInputValidator
+```shell
+php artisan lighthouse:validator UpdateUserInputValidator
+```
 
 The resulting class will be placed in your configured validator namespace. Let's go ahead
 and define the validation rules for the input:
@@ -314,12 +316,12 @@ By default, Lighthouse enables all default query validation rules from `webonyx/
 This covers fundamental checks, e.g. queried fields match the schema, variables have values of the correct type.
 
 If you want to add custom rules or change which ones are used, you can bind a custom implementation
-of the interface `\Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules` through a service provider.
+of the interface `Nuwave\Lighthouse\Support\Contracts\ProvidesCacheableValidationRules` through a service provider.
 
 ```php
 use Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules;
 
-final class MyCustomRulesProvider implements ProvidesValidationRules {}
+final class MyCustomRulesProvider implements ProvidesCacheableValidationRules {}
 
-$this->app->bind(ProvidesValidationRules::class, MyCustomRulesProvider::class);
+$this->app->bind(ProvidesCacheableValidationRules::class, MyCustomRulesProvider::class);
 ```

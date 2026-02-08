@@ -196,14 +196,14 @@ final class MorphToManyDirectiveTest extends DBTestCase
     public function testResolveMorphToManyUsingInterfaces(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $post = factory(Post::class)->make();
-        assert($post instanceof Post);
+        $this->assertInstanceOf(Post::class, $post);
         $post->user()->associate($user);
         $post->save();
 
-        /** @var \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\Tag> $postTags */
+        /** @var \Illuminate\Database\Eloquent\Collection<array-key, \Tests\Utils\Models\Tag> $postTags */
         $postTags = factory(Tag::class, 3)
             ->create()
             ->map(static function (Tag $tag) use ($post): Tag {
@@ -213,11 +213,11 @@ final class MorphToManyDirectiveTest extends DBTestCase
             });
 
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        \PHPUnit\Framework\Assert::assertInstanceOf(Task::class, $task);
         $task->user()->associate($user);
         $task->save();
 
-        /** @var \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\Tag> $taskTags */
+        /** @var \Illuminate\Database\Eloquent\Collection<array-key, \Tests\Utils\Models\Tag> $taskTags */
         $taskTags = factory(Tag::class, 3)
             ->create()
             ->map(static function (Tag $tag) use ($task): Tag {
@@ -265,7 +265,7 @@ final class MorphToManyDirectiveTest extends DBTestCase
         GRAPHQL;
 
         $this->graphQL(/** @lang GraphQL */ '
-        query ($userId: ID!){
+        query ($userId: ID!) {
             user (id: $userId) {
                 id
                 posts {

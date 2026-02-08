@@ -4,6 +4,7 @@ namespace Tests\Integration\Execution\MutationExecutor;
 
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Facades\DB;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Role;
 use Tests\Utils\Models\Task;
@@ -293,8 +294,40 @@ final class BelongsToTest extends DBTestCase
                 }
             }
         }
-GRAPHQL
-        )->assertJson([
+        GRAPHQL)->assertJson([
+            'data' => [
+                'upsertTask' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'user' => [
+                        'id' => '1',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testUpsertBelongsToWithIDNull(): void
+    {
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            upsertTask(input: {
+                name: "foo"
+                user: {
+                    upsert: {
+                        id: null
+                        name: "New User"
+                    }
+                }
+            }) {
+                id
+                name
+                user {
+                    id
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
             'data' => [
                 'upsertTask' => [
                     'id' => '1',
@@ -377,7 +410,7 @@ GRAPHQL
     public function testCreateAndUpdateBelongsTo(): void
     {
         $user = factory(User::class)->make();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $user->name = 'foo';
         $user->save();
 
@@ -417,7 +450,7 @@ GRAPHQL
     public function testUpsertUsingCreateAndUpdateBelongsTo(): void
     {
         $user = factory(User::class)->make();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $user->name = 'foo';
         $user->save();
 
@@ -507,7 +540,7 @@ GRAPHQL
         ' . self::PLACEHOLDER_QUERY;
 
         $user = factory(User::class)->make();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $user->name = 'foo';
         $user->company()->dissociate();
         $user->team()->dissociate();
@@ -572,7 +605,7 @@ GRAPHQL
     public function testUpsertUsingCreateAndUpdateUsingUpsertBelongsTo(): void
     {
         $user = factory(User::class)->make();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $user->name = 'foo';
         $user->save();
 
@@ -618,10 +651,11 @@ GRAPHQL
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testUpdateAndDisconnectBelongsTo(string $action): void
     {
         $task = factory(Task::class)->create();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
 
         $task->user()->create();
 
@@ -657,20 +691,19 @@ GRAPHQL
             'Must not delete the second model.',
         );
 
-        $task = Task::findOrFail(1);
-        assert($task instanceof Task);
+        $task = Task::query()->findOrFail(1);
         $this->assertNull($task->user, 'Must disconnect the parent relationship.');
     }
 
     public function testCreateUsingUpsertAndDisconnectBelongsTo(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $task = $user->tasks()->save(
             factory(Task::class)->make(),
         );
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
 
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -711,15 +744,16 @@ GRAPHQL
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testUpdateAndDeleteBelongsTo(string $action): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $task = $user->tasks()->save(
             factory(Task::class)->make(),
         );
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
@@ -802,15 +836,16 @@ GRAPHQL
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testDoesNotDeleteOrDisconnectOnFalsyValues(string $action): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $task = $user->tasks()->save(
             factory(Task::class)->make(),
         );
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
@@ -1013,8 +1048,7 @@ GRAPHQL
         ]);
 
         // The first User has the first Role.
-        $role = Role::firstOrFail();
-        assert($role instanceof Role);
+        $role = Role::query()->firstOrFail();
         $this->assertSame([1], $role->users()->pluck('users.id')->toArray());
 
         // Create another User.

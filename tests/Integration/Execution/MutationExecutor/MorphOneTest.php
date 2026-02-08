@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Execution\MutationExecutor;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Image;
 use Tests\Utils\Models\Task;
@@ -162,8 +163,7 @@ final class MorphOneTest extends DBTestCase
                 }
             }
         }
-GRAPHQL
-        )->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'upsertTask' => [
                     'id' => '1',
@@ -217,6 +217,7 @@ GRAPHQL
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testUpdateWithNewMorphOne(string $action): void
     {
         factory(Task::class)->create();
@@ -253,6 +254,7 @@ GRAPHQL
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testUpdateWithUpsertMorphOne(string $action): void
     {
         factory(Task::class)->create();
@@ -290,10 +292,11 @@ GRAPHQL
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testUpdateAndUpdateMorphOne(string $action): void
     {
         $task = factory(Task::class)->create();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
 
         $task->images()
             ->save(
@@ -333,10 +336,11 @@ GRAPHQL
     }
 
     /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testUpdateAndDeleteMorphOne(string $action): void
     {
         $task = factory(Task::class)->create();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
 
         $task->images()
             ->save(
@@ -365,6 +369,48 @@ GRAPHQL
                     'id' => '1',
                     'name' => 'foo',
                     'image' => null,
+                ],
+            ],
+        ]);
+    }
+
+    public function testNestedConnectMorphOne(): void
+    {
+        $task = factory(Task::class)->create();
+        $this->assertInstanceOf(Task::class, $task);
+
+        $image = factory(Image::class)->create();
+        $this->assertInstanceOf(Image::class, $image);
+
+        $this->graphQL(/** @lang GraphQL */ '
+        mutation ($input: UpdateTaskInput!) {
+            updateTask(input: $input) {
+                id
+                name
+                image {
+                    url
+                }
+            }
+        }
+        ', [
+            'input' => [
+                'id' => $task->id,
+                'name' => 'foo',
+                'image' => [
+                    'upsert' => [
+                        'id' => $image->id,
+                        'url' => 'foo',
+                    ],
+                ],
+            ],
+        ])->assertJson([
+            'data' => [
+                'updateTask' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'image' => [
+                        'url' => 'foo',
+                    ],
                 ],
             ],
         ]);

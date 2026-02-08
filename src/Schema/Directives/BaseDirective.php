@@ -217,9 +217,7 @@ abstract class BaseDirective implements Directive
             count($argumentParts) > 2
             || empty($argumentParts[0])
         ) {
-            throw new DefinitionException(
-                "Directive '{$this->name()}' must have an argument '{$argumentName}' in the form 'ClassName@methodName' or 'ClassName'",
-            );
+            throw new DefinitionException("Directive '{$this->name()}' must have an argument '{$argumentName}' in the form 'ClassName@methodName' or 'ClassName'");
         }
 
         /** @var array{0: string, 1?: string} $argumentParts */

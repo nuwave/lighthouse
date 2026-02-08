@@ -14,12 +14,12 @@ use Tests\Utils\ModelsSecondary\Category as CategorySecondary;
 use Tests\Utils\ModelsSecondary\OnlyHere;
 
 /**
- * This class does test the internal behaviour of the BaseDirective class.
+ * This class does test the internal behavior of the BaseDirective class.
  *
  * While typically considered an anti-pattern, the BaseDirective is meant
  * to be extended by other directives and offers basic utilities that
  * are commonly used in directives. As users may also extend it to create
- * custom directives, its behaviour should be stable and well-defined.
+ * custom directives, its behavior should be stable and well-defined.
  */
 final class BaseDirectiveTest extends TestCase
 {
@@ -262,7 +262,7 @@ final class BaseDirectiveTest extends TestCase
         );
     }
 
-    protected function constructFieldDirective(string $definition): BaseDirective
+    private function constructFieldDirective(string $definition): BaseDirective
     {
         $fieldDefinition = Parser::fieldDefinition($definition);
 

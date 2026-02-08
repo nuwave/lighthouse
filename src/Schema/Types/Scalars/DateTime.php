@@ -11,7 +11,7 @@ class DateTime extends DateScalar
         return $carbon->toDateTimeString();
     }
 
-    protected function parse(mixed $value): Carbon
+    protected function parse(string $value): Carbon
     {
         // @phpstan-ignore-next-line We know the format to be good, so this can never return `false`
         return Carbon::createFromFormat(Carbon::DEFAULT_TO_STRING_FORMAT, $value);

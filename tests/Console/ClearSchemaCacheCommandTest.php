@@ -3,11 +3,11 @@
 namespace Tests\Console;
 
 use Illuminate\Filesystem\Filesystem;
-use Nuwave\Lighthouse\Console\ClearCacheCommand;
+use Nuwave\Lighthouse\Console\ClearSchemaCacheCommand;
 use Tests\TestCase;
 use Tests\TestsSchemaCache;
 
-final class ClearCacheCommandTest extends TestCase
+final class ClearSchemaCacheCommandTest extends TestCase
 {
     use TestsSchemaCache;
 
@@ -32,7 +32,7 @@ final class ClearCacheCommandTest extends TestCase
         $filesystem->put($path, 'foo');
         $this->assertTrue($filesystem->exists($path));
 
-        $this->commandTester(new ClearCacheCommand())->execute([]);
+        $this->commandTester(new ClearSchemaCacheCommand())->execute([]);
         $this->assertFalse($filesystem->exists($path));
     }
 }
