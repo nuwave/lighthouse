@@ -801,10 +801,10 @@ GRAPHQL
         $user = factory(User::class)->create();
         $this->assertInstanceOf(User::class, $user);
 
-        $task = $user->tasks()->save(
-            factory(Task::class)->make(),
-        );
+        $task = factory(Task::class)->make();
         $this->assertInstanceOf(Task::class, $task);
+        $task->user()->associate($user);
+        $task->save();
 
         $deletingCalled = false;
         User::deleting(static function () use (&$deletingCalled): void {
@@ -839,7 +839,8 @@ GRAPHQL
 
     public function testCreateUsingUpsertAndDeleteBelongsTo(): void
     {
-        factory(User::class)->create();
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
 
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -885,10 +886,10 @@ GRAPHQL
         $user = factory(User::class)->create();
         $this->assertInstanceOf(User::class, $user);
 
-        $task = $user->tasks()->save(
-            factory(Task::class)->make(),
-        );
+        $task = factory(Task::class)->make();
         $this->assertInstanceOf(Task::class, $task);
+        $task->user()->associate($user);
+        $task->save();
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {

@@ -365,7 +365,8 @@ final class DeleteDirectiveTest extends DBTestCase
 
         $post = factory(Post::class)->make();
         $this->assertInstanceOf(Post::class, $post);
-        $task->post()->save($post);
+        $post->task()->associate($task);
+        $post->save();
 
         $this->schema .= /** @lang GraphQL */ '
         type Mutation {
