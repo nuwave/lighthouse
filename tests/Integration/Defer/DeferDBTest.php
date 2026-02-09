@@ -33,7 +33,7 @@ final class DeferDBTest extends DBTestCase
 
         $this->mockResolver($user);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Company {
             name: String!
         }
@@ -46,11 +46,11 @@ final class DeferDBTest extends DBTestCase
         type Query {
             user: User @mock
         }
-        ';
+        GRAPHQL;
 
         $this->countQueries($queryCount);
 
-        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 email
@@ -59,7 +59,7 @@ final class DeferDBTest extends DBTestCase
                 }
             }
         }
-        ');
+        GRAPHQL);
 
         $this->assertSame(1, $queryCount);
         $this->assertCount(2, $chunks);
@@ -91,7 +91,7 @@ final class DeferDBTest extends DBTestCase
 
         $this->mockResolver($user);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Company {
             name: String!
             users: [User] @hasMany
@@ -105,11 +105,11 @@ final class DeferDBTest extends DBTestCase
         type Query {
             user: User @mock
         }
-        ';
+        GRAPHQL;
 
         $this->countQueries($queryCount);
 
-        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 email
@@ -121,7 +121,7 @@ final class DeferDBTest extends DBTestCase
                 }
             }
         }
-        ');
+        GRAPHQL);
 
         $this->assertSame(2, $queryCount);
         $this->assertCount(3, $chunks);
@@ -162,7 +162,7 @@ final class DeferDBTest extends DBTestCase
 
         $this->mockResolver($companies);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Company {
             name: String!
             users: [User] @hasMany
@@ -176,11 +176,11 @@ final class DeferDBTest extends DBTestCase
         type Query {
             companies: [Company] @mock
         }
-        ';
+        GRAPHQL;
 
         $this->countQueries($queryCount);
 
-        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             companies {
                 name
@@ -192,7 +192,7 @@ final class DeferDBTest extends DBTestCase
                 }
             }
         }
-        ');
+        GRAPHQL);
 
         $this->assertSame(2, $queryCount);
         $this->assertCount(3, $chunks);

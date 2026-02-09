@@ -14,7 +14,7 @@ final class InDirectiveTest extends DBTestCase
 
         factory(User::class)->create();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -22,18 +22,18 @@ final class InDirectiveTest extends DBTestCase
         type Query {
             users(ids: [ID!] @in(key: "id")): [User!]! @all
         }
-        ';
+        GRAPHQL;
 
         $user1ID = (string) $user1->id;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($ids: [ID!]) {
                 users(ids: $ids) {
                     id
                 }
             }
-            ', [
+            GRAPHQL, [
                 'ids' => [$user1ID],
             ])
             ->assertJson([
@@ -51,7 +51,7 @@ final class InDirectiveTest extends DBTestCase
     {
         $users = factory(User::class, 2)->create();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -59,16 +59,16 @@ final class InDirectiveTest extends DBTestCase
         type Query {
             users(ids: [ID!] @in(key: "id")): [User!]! @all
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($ids: [ID!]) {
                 users(ids: $ids) {
                     id
                 }
             }
-            ', [
+            GRAPHQL, [
                 'ids' => null,
             ])
             ->assertJsonCount($users->count(), 'data.users');
@@ -78,7 +78,7 @@ final class InDirectiveTest extends DBTestCase
     {
         factory(User::class, 2)->create();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -86,16 +86,16 @@ final class InDirectiveTest extends DBTestCase
         type Query {
             users(ids: [ID] @in(key: "id")): [User!]! @all
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($ids: [ID]) {
                 users(ids: $ids) {
                     id
                 }
             }
-            ', [
+            GRAPHQL, [
                 'ids' => [null],
             ])
             ->assertJsonCount(0, 'data.users');
@@ -105,7 +105,7 @@ final class InDirectiveTest extends DBTestCase
     {
         factory(User::class, 2)->create();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -113,16 +113,16 @@ final class InDirectiveTest extends DBTestCase
         type Query {
             users(ids: [ID!] @in(key: "id")): [User!]! @all
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($ids: [ID!]) {
                 users(ids: $ids) {
                     id
                 }
             }
-            ', [
+            GRAPHQL, [
                 'ids' => [],
             ])
             ->assertJsonCount(0, 'data.users');

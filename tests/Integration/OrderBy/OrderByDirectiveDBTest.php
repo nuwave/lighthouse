@@ -9,7 +9,7 @@ use Tests\Utils\Models\User;
 
 final class OrderByDirectiveDBTest extends DBTestCase
 {
-    protected string $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ <<<'GRAPHQL'
     type Query {
         users(
             orderBy: _ @orderBy
@@ -26,14 +26,14 @@ final class OrderByDirectiveDBTest extends DBTestCase
     enum UserColumn {
         NAME @enum(value: "name")
     }
-    ';
+    GRAPHQL;
 
     public function testOrderByTheGivenColumnAndSortOrderASC(): void
     {
         $this->createUser('B');
         $this->createUser('A');
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 orderBy: [
@@ -46,7 +46,7 @@ final class OrderByDirectiveDBTest extends DBTestCase
                 name
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [
@@ -65,7 +65,7 @@ final class OrderByDirectiveDBTest extends DBTestCase
         $this->createUser('B');
         $this->createUser('A');
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 orderBy: [
@@ -78,7 +78,7 @@ final class OrderByDirectiveDBTest extends DBTestCase
                 name
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [
@@ -98,7 +98,7 @@ final class OrderByDirectiveDBTest extends DBTestCase
         $this->createUser('A', 5);
         $this->createUser('C', 2);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 orderBy: [
@@ -116,7 +116,7 @@ final class OrderByDirectiveDBTest extends DBTestCase
                 name
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [
@@ -141,7 +141,7 @@ final class OrderByDirectiveDBTest extends DBTestCase
         $this->createUser('B');
         $this->createUser('A');
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 orderByRestricted: [
@@ -154,7 +154,7 @@ final class OrderByDirectiveDBTest extends DBTestCase
                 name
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [
@@ -173,7 +173,7 @@ final class OrderByDirectiveDBTest extends DBTestCase
         $this->createUser('B');
         $this->createUser('A');
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 orderByRestrictedEnum: [
@@ -186,7 +186,7 @@ final class OrderByDirectiveDBTest extends DBTestCase
                 name
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [
@@ -204,7 +204,7 @@ final class OrderByDirectiveDBTest extends DBTestCase
     {
         $this->expectException(DefinitionException::class);
 
-        $this->buildSchema(/** @lang GraphQL */ '
+        $this->buildSchema(/** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             users(
                 orderBy: _ @orderBy(columns: ["name"], columnsEnum: "UserColumn")
@@ -219,7 +219,7 @@ final class OrderByDirectiveDBTest extends DBTestCase
         enum UserColumn {
             NAME @enum(value: "name")
         }
-        ');
+        GRAPHQL);
     }
 
     public function testOrderColumnOnField(): void
@@ -234,7 +234,7 @@ final class OrderByDirectiveDBTest extends DBTestCase
         $userB->name = 'B';
         $userB->save();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             latestUsers: [User!]!
                 @all
@@ -244,15 +244,15 @@ final class OrderByDirectiveDBTest extends DBTestCase
         type User {
             name: String
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             latestUsers {
                 name
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'latestUsers' => [
                     [
@@ -268,7 +268,7 @@ final class OrderByDirectiveDBTest extends DBTestCase
 
     public function testOrderByRelationCount(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             users(
                 orderBy: _ @orderBy(relations: [
@@ -282,7 +282,7 @@ final class OrderByDirectiveDBTest extends DBTestCase
         type User {
             id: Int!
         }
-        ';
+        GRAPHQL;
 
         $userA = factory(User::class)->create();
         $this->assertInstanceOf(User::class, $userA);
@@ -297,7 +297,7 @@ final class OrderByDirectiveDBTest extends DBTestCase
             factory(Task::class, 2)->create(),
         );
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 orderBy: [
@@ -310,7 +310,7 @@ final class OrderByDirectiveDBTest extends DBTestCase
                 id
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [
@@ -323,7 +323,7 @@ final class OrderByDirectiveDBTest extends DBTestCase
             ],
         ]);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 orderBy: [
@@ -336,7 +336,7 @@ final class OrderByDirectiveDBTest extends DBTestCase
                 id
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [
@@ -352,7 +352,7 @@ final class OrderByDirectiveDBTest extends DBTestCase
 
     public function testOrderByRelationAggregate(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             users(
                 orderBy: _ @orderBy(relations: [
@@ -371,7 +371,7 @@ final class OrderByDirectiveDBTest extends DBTestCase
         enum UserColumn {
             NAME @enum(value: "name")
         }
-        ';
+        GRAPHQL;
 
         $userA = factory(User::class)->create();
         $this->assertInstanceOf(User::class, $userA);
@@ -389,7 +389,7 @@ final class OrderByDirectiveDBTest extends DBTestCase
         $taskB1->difficulty = 2;
         $userB->tasks()->save($taskB1);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 orderBy: [
@@ -402,7 +402,7 @@ final class OrderByDirectiveDBTest extends DBTestCase
                 id
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [
@@ -415,7 +415,7 @@ final class OrderByDirectiveDBTest extends DBTestCase
             ],
         ]);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 orderBy: [
@@ -428,7 +428,7 @@ final class OrderByDirectiveDBTest extends DBTestCase
                 id
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [

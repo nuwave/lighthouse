@@ -9,7 +9,7 @@ use Tests\Utils\Models\Task;
 
 final class MorphManyTest extends DBTestCase
 {
-    protected string $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ <<<'GRAPHQL'
     type Task {
         id: ID!
         name: String!
@@ -81,11 +81,11 @@ final class MorphManyTest extends DBTestCase
         id: ID
         url: String
     }
-    ' . self::PLACEHOLDER_QUERY;
+    GRAPHQL . self::PLACEHOLDER_QUERY;
 
     public function testCreateWithNewMorphMany(): void
     {
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createTask(input: {
                 name: "foo"
@@ -102,7 +102,7 @@ final class MorphManyTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'createTask' => [
                     'id' => '1',
@@ -119,7 +119,7 @@ final class MorphManyTest extends DBTestCase
 
     public function testCreateWithUpsertMorphMany(): void
     {
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createTask(input: {
                 name: "foo"
@@ -137,7 +137,7 @@ final class MorphManyTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'createTask' => [
                     'id' => '1',
@@ -157,7 +157,7 @@ final class MorphManyTest extends DBTestCase
         $image1 = factory(Image::class)->create();
         $this->assertInstanceOf(Image::class, $image1);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             mutation ($input: CreateTaskInput!) {
                 createTask(input: $input) {
                     id
@@ -167,7 +167,7 @@ final class MorphManyTest extends DBTestCase
                     }
                 }
             }
-        ', [
+        GRAPHQL, [
             'input' => [
                 'name' => 'foo',
                 'images' => [
@@ -192,7 +192,7 @@ final class MorphManyTest extends DBTestCase
 
     public function testUpsertMorphManyWithoutId(): void
     {
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             upsertTask(input: {
                 name: "foo"
@@ -210,7 +210,7 @@ final class MorphManyTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'upsertTask' => [
                     'id' => '1',
@@ -230,7 +230,7 @@ final class MorphManyTest extends DBTestCase
     {
         factory(Task::class)->create();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             updateTask(input: {
                 id: 1
@@ -248,7 +248,7 @@ final class MorphManyTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'updateTask' => [
                     'name' => 'foo',
@@ -289,7 +289,7 @@ final class MorphManyTest extends DBTestCase
                 }
             }
         }
-GRAPHQL
+        GRAPHQL,
         )->assertJson([
             'data' => [
                 "{$action}Task" => [
@@ -336,7 +336,7 @@ GRAPHQL
                 }
             }
         }
-GRAPHQL
+        GRAPHQL,
         )->assertJson([
             'data' => [
                 "{$action}Task" => [

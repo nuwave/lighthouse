@@ -14,7 +14,7 @@ final class ForceDeleteDirectiveTest extends DBTestCase
     {
         factory(Task::class)->create();
 
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Task {
             id: ID!
         }
@@ -22,15 +22,15 @@ final class ForceDeleteDirectiveTest extends DBTestCase
         type Mutation {
             forceDeleteTask(id: ID! @whereKey): Task @forceDelete
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             forceDeleteTask(id: 1) {
                 id
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'forceDeleteTask' => [
                     'id' => 1,
@@ -46,7 +46,7 @@ final class ForceDeleteDirectiveTest extends DBTestCase
         $task = factory(Task::class)->create();
         $task->delete();
 
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Task {
             id: ID!
         }
@@ -54,15 +54,15 @@ final class ForceDeleteDirectiveTest extends DBTestCase
         type Mutation {
             forceDeleteTask(id: ID! @whereKey): Task @forceDelete
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             forceDeleteTask(id: 1) {
                 id
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'forceDeleteTask' => [
                     'id' => 1,
@@ -77,7 +77,7 @@ final class ForceDeleteDirectiveTest extends DBTestCase
     {
         factory(Task::class, 2)->create();
 
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Task {
             id: ID!
             name: String
@@ -86,15 +86,15 @@ final class ForceDeleteDirectiveTest extends DBTestCase
         type Mutation {
             forceDeleteTasks(id: [ID!]! @whereKey): [Task!]! @forceDelete
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             forceDeleteTasks(id: [1, 2]) {
                 name
             }
         }
-        ')->assertJsonCount(2, 'data.forceDeleteTasks');
+        GRAPHQL)->assertJsonCount(2, 'data.forceDeleteTasks');
 
         $this->assertCount(0, Task::withTrashed()->get());
     }
@@ -110,7 +110,7 @@ final class ForceDeleteDirectiveTest extends DBTestCase
         $user->tasks()->save($task);
         $task->delete();
 
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Task {
             id: ID!
             name: String
@@ -121,15 +121,15 @@ final class ForceDeleteDirectiveTest extends DBTestCase
                 @can(ability: "delete", query: true)
                 @forceDelete
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             forceDeleteTasks(id: 1) {
                 name
             }
         }
-        ')->assertJsonCount(1, 'data.forceDeleteTasks');
+        GRAPHQL)->assertJsonCount(1, 'data.forceDeleteTasks');
 
         $this->assertCount(0, Task::withTrashed()->get());
     }
@@ -145,7 +145,7 @@ final class ForceDeleteDirectiveTest extends DBTestCase
         $user->tasks()->save($task);
         $task->delete();
 
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Task {
             id: ID!
             name: String
@@ -158,15 +158,15 @@ final class ForceDeleteDirectiveTest extends DBTestCase
                 # The order has to be like this, otherwise @forceDelete will throw
                 @softDeletes
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             forceDeleteTasks(id: 1, trashed: WITH) {
                 name
             }
         }
-        ')->assertJsonCount(1, 'data.forceDeleteTasks');
+        GRAPHQL)->assertJsonCount(1, 'data.forceDeleteTasks');
 
         $this->assertCount(0, Task::withTrashed()->get());
     }
@@ -174,7 +174,7 @@ final class ForceDeleteDirectiveTest extends DBTestCase
     public function testRejectsUsingDirectiveWithNonSoftDeleteModels(): void
     {
         $this->expectExceptionMessage(ForceDeleteDirective::MODEL_NOT_USING_SOFT_DELETES);
-        $this->buildSchema(/** @lang GraphQL */ '
+        $this->buildSchema(/** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -182,6 +182,6 @@ final class ForceDeleteDirectiveTest extends DBTestCase
         type Query {
             deleteUser(id: ID! @whereKey): User @forceDelete
         }
-        ');
+        GRAPHQL);
     }
 }

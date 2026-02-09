@@ -46,7 +46,7 @@ final class MorphOneFromUnionTest extends DBTestCase
         $employee->colors()->save($employeeColor);
         $contractor->colors()->save($contractorColor);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         interface Person {
             id: ID!
             user: User! @morphOne
@@ -81,9 +81,9 @@ final class MorphOneFromUnionTest extends DBTestCase
         type Query {
             colors: [Color!]! @all
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             colors {
                 id
@@ -101,7 +101,7 @@ final class MorphOneFromUnionTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'colors' => [
                     [

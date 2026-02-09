@@ -15,35 +15,35 @@ final class CountDirectiveDBTest extends DBTestCase
 {
     public function testRequiresARelationOrModelArgument(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             tasks: Int @count
         }
-        ';
+        GRAPHQL;
 
         $this->expectException(DefinitionException::class);
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             tasks
         }
-        ');
+        GRAPHQL);
     }
 
     public function testCountModel(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             tasks_count: Int @count(model: "Task")
         }
-        ';
+        GRAPHQL;
 
         factory(Task::class, 3)->create();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             tasks_count
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'tasks_count' => 3,
             ],
@@ -52,11 +52,11 @@ final class CountDirectiveDBTest extends DBTestCase
 
     public function testCountModelWithScopes(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             completed_tasks: Int @count(model: "Task", scopes: ["completed"])
         }
-        ';
+        GRAPHQL;
 
         factory(Task::class, 3)->create();
         $completed = factory(Task::class, 2)->make();
@@ -65,11 +65,11 @@ final class CountDirectiveDBTest extends DBTestCase
             $task->save();
         });
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             completed_tasks
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'completed_tasks' => 2,
             ],
@@ -78,7 +78,7 @@ final class CountDirectiveDBTest extends DBTestCase
 
     public function testCountRelationAndEagerLoadsTheCount(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             users: [User!] @all
         }
@@ -86,7 +86,7 @@ final class CountDirectiveDBTest extends DBTestCase
         type User {
             tasks_count: Int @count(relation: "tasks")
         }
-        ';
+        GRAPHQL;
 
         factory(User::class, 3)->create()
             ->each(static function (User $user, int $index): void {
@@ -98,13 +98,13 @@ final class CountDirectiveDBTest extends DBTestCase
             });
 
         $this->assertQueryCountMatches(2, function (): void {
-            $this->graphQL(/** @lang GraphQL */ '
+            $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 users {
                     tasks_count
                 }
             }
-            ')->assertExactJson([
+            GRAPHQL)->assertExactJson([
                 'data' => [
                     'users' => [
                         [
@@ -124,7 +124,7 @@ final class CountDirectiveDBTest extends DBTestCase
 
     public function testCountRelationThatIsNotSuffixedWithCount(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             user: User! @first
         }
@@ -132,7 +132,7 @@ final class CountDirectiveDBTest extends DBTestCase
         type User {
             tasks: Int @count(relation: "tasks")
         }
-        ';
+        GRAPHQL;
 
         $user = factory(User::class)->create();
         $this->assertInstanceOf(User::class, $user);
@@ -142,13 +142,13 @@ final class CountDirectiveDBTest extends DBTestCase
             $task->save();
         });
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 tasks
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'user' => [
                     'tasks' => 3,
@@ -159,7 +159,7 @@ final class CountDirectiveDBTest extends DBTestCase
 
     public function testCountRelationWithScopesApplied(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             user: User @first
         }
@@ -167,7 +167,7 @@ final class CountDirectiveDBTest extends DBTestCase
         type User {
             completed_tasks: Int! @count(relation: "tasks", scopes: ["completed"])
         }
-        ';
+        GRAPHQL;
 
         /** @var User $user */
         $user = factory(User::class)->create();
@@ -182,13 +182,13 @@ final class CountDirectiveDBTest extends DBTestCase
         $completedTask->user()->associate($user);
         $completedTask->save();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 completed_tasks
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'user' => [
                     'completed_tasks' => 1,
@@ -199,7 +199,7 @@ final class CountDirectiveDBTest extends DBTestCase
 
     public function testCountPolymorphicRelation(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             activity: [Activity!] @all
         }
@@ -220,7 +220,7 @@ final class CountDirectiveDBTest extends DBTestCase
             id: ID
             content: ActivityContent! @morphTo
         }
-        ';
+        GRAPHQL;
 
         /** @var User $user */
         $user = factory(User::class)->create();
@@ -265,7 +265,7 @@ final class CountDirectiveDBTest extends DBTestCase
                 factory(Image::class, 4)->make(),
             );
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             activity {
                 id
@@ -284,7 +284,7 @@ final class CountDirectiveDBTest extends DBTestCase
                 }
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'activity' => [
                     [
@@ -320,17 +320,17 @@ final class CountDirectiveDBTest extends DBTestCase
     {
         factory(User::class)->times(3)->create();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             users: Int! @count(model: "User")
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'users' => 3,
             ],
@@ -348,7 +348,7 @@ final class CountDirectiveDBTest extends DBTestCase
 
         $this->be($user);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             taskCount: Int! @count(relation: "tasks")
         }
@@ -356,15 +356,15 @@ final class CountDirectiveDBTest extends DBTestCase
         type Query {
             user: User @auth
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 taskCount
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
                     'taskCount' => 4,
@@ -391,7 +391,7 @@ final class CountDirectiveDBTest extends DBTestCase
 
         $this->be($user);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             tasks: [Task!]! @hasMany
             taskCount: Int! @count(relation: "tasks")
@@ -404,9 +404,9 @@ final class CountDirectiveDBTest extends DBTestCase
         type Query {
             user: User @auth
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 tasks {
@@ -415,7 +415,7 @@ final class CountDirectiveDBTest extends DBTestCase
                 taskCount
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
                     'tasks' => [
@@ -434,11 +434,11 @@ final class CountDirectiveDBTest extends DBTestCase
 
     public function testCountModelWithColumns(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             tasks: Int @count(model: "Task", columns: ["difficulty"])
         }
-        ';
+        GRAPHQL;
 
         $notNull = factory(Task::class)->make();
         $this->assertInstanceOf(Task::class, $notNull);
@@ -450,11 +450,11 @@ final class CountDirectiveDBTest extends DBTestCase
         $notNull->difficulty = 2;
         $notNull->save();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             tasks
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'tasks' => 1,
             ],
@@ -463,11 +463,11 @@ final class CountDirectiveDBTest extends DBTestCase
 
     public function testCountModelWithColumnsAndDistinct(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             tasks: Int @count(model: "Task", distinct: true, columns: ["difficulty"])
         }
-        ';
+        GRAPHQL;
         foreach (factory(Task::class, 2)->make() as $task) {
             $this->assertInstanceOf(Task::class, $task);
             $task->difficulty = 1;
@@ -479,11 +479,11 @@ final class CountDirectiveDBTest extends DBTestCase
         $other->difficulty = 2;
         $other->save();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             tasks
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'tasks' => 2,
             ],

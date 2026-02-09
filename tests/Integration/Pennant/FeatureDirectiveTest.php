@@ -42,7 +42,7 @@ final class FeatureDirectiveTest extends TestCase
 
     public function testUnavailableWhenFeatureIsInactive(): void
     {
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             fieldWhenActive: String!
                 @feature(name: "new-api", when: ACTIVE)
@@ -50,7 +50,7 @@ final class FeatureDirectiveTest extends TestCase
         }
         GRAPHQL;
 
-        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             fieldWhenActive
         }
@@ -61,7 +61,7 @@ final class FeatureDirectiveTest extends TestCase
 
     public function testUnavailableWhenFeatureIsInactiveWithDefaultFeatureState(): void
     {
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             fieldWhenActive: String!
                 @feature(name: "new-api")
@@ -69,7 +69,7 @@ final class FeatureDirectiveTest extends TestCase
         }
         GRAPHQL;
 
-        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             fieldWhenActive
         }
@@ -81,7 +81,7 @@ final class FeatureDirectiveTest extends TestCase
     public function testUnavailableWhenFeatureIsActive(): void
     {
         Feature::define('new-api', static fn (): bool => true);
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             fieldWhenInactive: String!
                 @feature(name: "new-api", when: INACTIVE)
@@ -89,7 +89,7 @@ final class FeatureDirectiveTest extends TestCase
         }
         GRAPHQL;
 
-        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             fieldWhenInactive
         }
@@ -103,7 +103,7 @@ final class FeatureDirectiveTest extends TestCase
         Feature::define('new-api', static fn (): bool => true);
         $fieldValue = 'active';
         $this->mockResolver(static fn (): string => $fieldValue);
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             fieldWhenActive: String!
                 @feature(name: "new-api", when: ACTIVE)
@@ -111,7 +111,7 @@ final class FeatureDirectiveTest extends TestCase
         }
         GRAPHQL;
 
-        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             fieldWhenActive
         }
@@ -130,7 +130,7 @@ final class FeatureDirectiveTest extends TestCase
         Feature::define('new-api', static fn (): bool => true);
         $fieldValue = 'active';
         $this->mockResolver(static fn (): string => $fieldValue);
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             fieldWhenActive: String!
                 @feature(name: "new-api")
@@ -138,7 +138,7 @@ final class FeatureDirectiveTest extends TestCase
         }
         GRAPHQL;
 
-        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             fieldWhenActive
         }
@@ -156,7 +156,7 @@ final class FeatureDirectiveTest extends TestCase
     {
         $fieldValue = 'inactive';
         $this->mockResolver(static fn (): string => $fieldValue);
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             fieldWhenInactive: String!
                 @feature(name: "new-api", when: INACTIVE)
@@ -164,7 +164,7 @@ final class FeatureDirectiveTest extends TestCase
         }
         GRAPHQL;
 
-        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             fieldWhenInactive
         }

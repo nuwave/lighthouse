@@ -11,7 +11,7 @@ final class WithCountDirectiveTest extends DBTestCase
 {
     public function testEagerLoadsRelationCount(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             users: [User!] @all
         }
@@ -21,7 +21,7 @@ final class WithCountDirectiveTest extends DBTestCase
                 @withCount(relation: "tasks")
                 @method
         }
-        ';
+        GRAPHQL;
 
         factory(User::class, 3)->create()
             ->each(static function (User $user): void {
@@ -33,13 +33,13 @@ final class WithCountDirectiveTest extends DBTestCase
             });
 
         $this->assertQueryCountMatches(2, function (): void {
-            $this->graphQL(/** @lang GraphQL */ '
+            $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 users {
                     tasksCountLoaded
                 }
             }
-            ')->assertExactJson([
+            GRAPHQL)->assertExactJson([
                 'data' => [
                     'users' => [
                         [
@@ -59,7 +59,7 @@ final class WithCountDirectiveTest extends DBTestCase
 
     public function testFailsToEagerLoadRelationCountWithoutRelation(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             users: [User!] @all
         }
@@ -67,17 +67,17 @@ final class WithCountDirectiveTest extends DBTestCase
         type User {
             name: String! @withCount
         }
-        ';
+        GRAPHQL;
 
         factory(User::class)->create();
 
         $this->expectException(DefinitionException::class);
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users {
                 name
             }
         }
-        ');
+        GRAPHQL);
     }
 }

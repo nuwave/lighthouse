@@ -9,7 +9,7 @@ final class FirstDirectiveTest extends DBTestCase
 {
     public function testReturnsASingleUser(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             name: String!
@@ -18,7 +18,7 @@ final class FirstDirectiveTest extends DBTestCase
         type Query {
             user(id: ID @eq): User @first(model: "User")
         }
-        ';
+        GRAPHQL;
 
         $userA = factory(User::class)->create();
         $this->assertInstanceOf(User::class, $userA);
@@ -29,13 +29,13 @@ final class FirstDirectiveTest extends DBTestCase
         $userC = factory(User::class)->create();
         $this->assertInstanceOf(User::class, $userC);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($id: ID!) {
             user(id: $id) {
                 id
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $userB->id,
         ])->assertJson([
             'data' => [
@@ -48,7 +48,7 @@ final class FirstDirectiveTest extends DBTestCase
 
     public function testReturnsASingleUserWhenMultiplesMatch(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             name: String!
@@ -57,7 +57,7 @@ final class FirstDirectiveTest extends DBTestCase
         type Query {
             user(name: String @eq): User @first(model: "User")
         }
-        ';
+        GRAPHQL;
 
         $userA1 = factory(User::class)->create();
         $this->assertInstanceOf(User::class, $userA1);
@@ -74,13 +74,13 @@ final class FirstDirectiveTest extends DBTestCase
         $userB->name = 'B';
         $userB->save();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user(name: "A") {
                 id
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
                     'id' => $userA1->id,

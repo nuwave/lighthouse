@@ -13,16 +13,16 @@ use Tests\TestCase;
 
 final class FederatedTracingExtensionTest extends TestCase
 {
-    protected string $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ <<<'GRAPHQL'
     type Query {
         foo: Foo!
     }
 
     type Foo @key(fields: "id") {
-        id: String! @field(resolver: "Tests\\\Integration\\\Tracing\\\FederatedTracingExtensionTest@resolve")
-        bar: String! @field(resolver: "Tests\\\Integration\\\Tracing\\\FederatedTracingExtensionTest@throw")
+        id: String! @field(resolver: "Tests\\Integration\\Tracing\\FederatedTracingExtensionTest@resolve")
+        bar: String! @field(resolver: "Tests\\Integration\\Tracing\\FederatedTracingExtensionTest@throw")
     }
-    ';
+    GRAPHQL;
 
     protected function getPackageProviders($app): array
     {
@@ -45,11 +45,11 @@ final class FederatedTracingExtensionTest extends TestCase
     public function testHeaderIsRequiredToEnableTracing(): void
     {
         $response = $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 foo { id }
             }
-            ');
+            GRAPHQL);
 
         $response->assertJsonMissingPath('extensions.ftv1');
     }
@@ -57,11 +57,11 @@ final class FederatedTracingExtensionTest extends TestCase
     public function testAddFtv1ExtensionMetaToResult(): void
     {
         $response = $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 foo { id }
             }
-            ',
+            GRAPHQL,
                 headers: ['apollo-federation-include-trace' => FederatedTracing::V1],
             );
 
@@ -152,11 +152,11 @@ final class FederatedTracingExtensionTest extends TestCase
     public function testReportErrorsToResult(): void
     {
         $response = $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 foo { bar }
             }
-            ',
+            GRAPHQL,
                 headers: ['apollo-federation-include-trace' => FederatedTracing::V1],
             );
 

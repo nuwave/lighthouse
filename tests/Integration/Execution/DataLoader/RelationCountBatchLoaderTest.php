@@ -20,7 +20,7 @@ final class RelationCountBatchLoaderTest extends DBTestCase
                 });
             });
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Task {
             id: ID
             name: String
@@ -37,15 +37,15 @@ final class RelationCountBatchLoaderTest extends DBTestCase
             user(id: ID! @eq): User @find
             users: [User!]! @all
         }
-        ';
+        GRAPHQL;
 
-        $query = /** @lang GraphQL */ '
+        $query = /** @lang GraphQL */ <<<'GRAPHQL'
         query ($id: ID!) {
             user(id: $id) {
                 tasks_count
             }
         }
-        ';
+        GRAPHQL;
 
         $this
             ->postGraphQL([

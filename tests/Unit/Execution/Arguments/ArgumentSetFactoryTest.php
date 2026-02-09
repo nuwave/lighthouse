@@ -18,11 +18,11 @@ final class ArgumentSetFactoryTest extends TestCase
 {
     public function testSimpleField(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(bar: Int): Int
         }
-        ';
+        GRAPHQL;
 
         $argumentSet = $this->rootQueryArgumentSet([
             'bar' => 123,
@@ -36,11 +36,11 @@ final class ArgumentSetFactoryTest extends TestCase
 
     public function testNullableList(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(bar: [Int!]): Int
         }
-        ';
+        GRAPHQL;
 
         $argumentSet = $this->rootQueryArgumentSet([
             'bar' => null,
@@ -54,7 +54,7 @@ final class ArgumentSetFactoryTest extends TestCase
 
     public function testItsListsAllTheWayDown(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(bar:
                 # Level 1
@@ -72,7 +72,7 @@ final class ArgumentSetFactoryTest extends TestCase
                 ]
             ): Int
         }
-        ';
+        GRAPHQL;
 
         // Level 1
         $barValue = [
@@ -125,7 +125,7 @@ final class ArgumentSetFactoryTest extends TestCase
 
     public function testNullableInputObject(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(bar: Bar): Int
         }
@@ -133,7 +133,7 @@ final class ArgumentSetFactoryTest extends TestCase
         input Bar {
             baz: ID
         }
-        ';
+        GRAPHQL;
 
         $argumentSet = $this->rootQueryArgumentSet([
             'bar' => null,
@@ -147,11 +147,11 @@ final class ArgumentSetFactoryTest extends TestCase
 
     public function testWithUndefined(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(bar: ID): Int
         }
-        ';
+        GRAPHQL;
 
         $argumentSet = $this->rootQueryArgumentSet([]);
 

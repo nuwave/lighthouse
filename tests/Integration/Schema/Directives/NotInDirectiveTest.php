@@ -15,7 +15,7 @@ final class NotInDirectiveTest extends DBTestCase
         $user2 = factory(User::class)->create();
         $this->assertInstanceOf(User::class, $user2);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -23,19 +23,19 @@ final class NotInDirectiveTest extends DBTestCase
         type Query {
             users(notIDs: [ID!] @notIn(key: "id")): [User!]! @all
         }
-        ';
+        GRAPHQL;
 
         $user1ID = (string) $user1->id;
         $user2ID = (string) $user2->id;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($notIDs: [ID!]) {
                 users(notIDs: $notIDs) {
                     id
                 }
             }
-            ', [
+            GRAPHQL, [
                 'notIDs' => [$user1ID],
             ])
             ->assertJson([
@@ -53,7 +53,7 @@ final class NotInDirectiveTest extends DBTestCase
     {
         $users = factory(User::class, 2)->create();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -61,16 +61,16 @@ final class NotInDirectiveTest extends DBTestCase
         type Query {
             users(notIDs: [ID!] @notIn(key: "id")): [User!]! @all
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($notIDs: [ID!]) {
                 users(notIDs: $notIDs) {
                     id
                 }
             }
-            ', [
+            GRAPHQL, [
                 'notIDs' => null,
             ])
             ->assertJsonCount($users->count(), 'data.users');
@@ -80,7 +80,7 @@ final class NotInDirectiveTest extends DBTestCase
     {
         factory(User::class, 2)->create();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -88,16 +88,16 @@ final class NotInDirectiveTest extends DBTestCase
         type Query {
             users(notIDs: [ID] @notIn(key: "id")): [User!]! @all
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($notIDs: [ID]) {
                 users(notIDs: $notIDs) {
                     id
                 }
             }
-            ', [
+            GRAPHQL, [
                 'notIDs' => [null],
             ])
             ->assertJsonCount(0, 'data.users');
@@ -107,7 +107,7 @@ final class NotInDirectiveTest extends DBTestCase
     {
         $users = factory(User::class, 2)->create();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -115,16 +115,16 @@ final class NotInDirectiveTest extends DBTestCase
         type Query {
             users(notIDs: [ID!] @notIn(key: "id")): [User!]! @all
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($notIDs: [ID!]) {
                 users(notIDs: $notIDs) {
                     id
                 }
             }
-            ', [
+            GRAPHQL, [
                 'notIDs' => [],
             ])
             ->assertJsonCount($users->count(), 'data.users');

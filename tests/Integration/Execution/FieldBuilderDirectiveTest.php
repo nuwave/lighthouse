@@ -9,21 +9,21 @@ use Tests\Utils\Models\User;
 
 final class FieldBuilderDirectiveTest extends DBTestCase
 {
-    protected string $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ <<<'GRAPHQL'
     type Post {
         id: Int!
     }
-    ';
+    GRAPHQL;
 
     public function testLimitPostByAuthenticatedUser(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             posts: [Post!]!
                 @all
                 @whereAuth(relation: "user")
         }
-        ';
+        GRAPHQL;
 
         $user = factory(User::class)->create();
         $this->assertInstanceOf(User::class, $user);
@@ -36,13 +36,13 @@ final class FieldBuilderDirectiveTest extends DBTestCase
 
         $this->be($user);
 
-        $response = $this->graphQL(/** @lang GraphQL */ '
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query {
             posts {
                 id
             }
         }
-        ');
+        GRAPHQL);
 
         $this->assertSame(
             $ownedPosts->pluck('id')->all(),
@@ -52,7 +52,7 @@ final class FieldBuilderDirectiveTest extends DBTestCase
 
     public function testChangeGuard(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             posts: [Post!]!
                 @all
@@ -61,7 +61,7 @@ final class FieldBuilderDirectiveTest extends DBTestCase
                     guards: ["web"]
                 )
         }
-        ';
+        GRAPHQL;
         $user = factory(User::class)->create();
         $this->assertInstanceOf(User::class, $user);
         $ownedPosts = factory(Post::class, 3)->make();
@@ -75,13 +75,13 @@ final class FieldBuilderDirectiveTest extends DBTestCase
         $authFactory->guard('web')->setUser($user);
 
         $response = $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query {
                 posts {
                     id
                 }
             }
-            ');
+            GRAPHQL);
 
         $this->assertSame(
             $ownedPosts->pluck('id')->all(),

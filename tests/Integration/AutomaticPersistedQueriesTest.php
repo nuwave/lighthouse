@@ -149,11 +149,11 @@ final class AutomaticPersistedQueriesTest extends TestCase
         $config->set('lighthouse.query_cache.enable', true);
         $config->set('lighthouse.persisted_queries', false);
 
-        $query = /** @lang GraphQL */ '
+        $query = /** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ';
+        GRAPHQL;
 
         $sha256 = hash('sha256', $query);
 
@@ -192,11 +192,11 @@ final class AutomaticPersistedQueriesTest extends TestCase
         $config->set('lighthouse.query_cache.enable', false);
         $config->set('lighthouse.persisted_queries', true);
 
-        $query = /** @lang GraphQL */ '
+        $query = /** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ';
+        GRAPHQL;
 
         $sha256 = hash('sha256', $query);
 

@@ -10,7 +10,7 @@ final class CanRootDirectiveTest extends CanDirectiveTestBase
 {
     public static function getSchema(string $commonArgs): string
     {
-        return /** @lang GraphQL */ "
+        return /** @lang GraphQL */ <<<GRAPHQL
             type Query {
                 user: User!
                     @mock
@@ -19,18 +19,18 @@ final class CanRootDirectiveTest extends CanDirectiveTestBase
             type User {
                 name(foo: String): String @canRoot({$commonArgs})
             }
-        ";
+        GRAPHQL;
     }
 
     protected function getQuery(): string
     {
-        return /** @lang GraphQL */ '
+        return /** @lang GraphQL */ <<<'GRAPHQL'
             query ($foo: String) {
                 user {
                     name (foo: $foo)
                 }
             }
-        ';
+        GRAPHQL;
     }
 
     public function testThrowsIfNotAuthorized(): void
@@ -156,7 +156,7 @@ final class CanRootDirectiveTest extends CanDirectiveTestBase
 
         $this->mockResolver(fn (): User => $this->resolveUser());
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
             type Query {
                 user: User!
                     @canRoot(ability: "globalAdmin")
@@ -166,7 +166,7 @@ final class CanRootDirectiveTest extends CanDirectiveTestBase
             type User {
                 name(foo: String): String
             }
-        ';
+        GRAPHQL;
 
         $this->query()->assertJson([
             'data' => [

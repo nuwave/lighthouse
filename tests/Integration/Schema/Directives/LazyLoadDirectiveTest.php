@@ -13,22 +13,22 @@ final class LazyLoadDirectiveTest extends DBTestCase
     {
         $this->expectException(DefinitionException::class);
 
-        $this->buildSchema(/** @lang GraphQL */ '
+        $this->buildSchema(/** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: ID @lazyLoad
         }
-        ');
+        GRAPHQL);
     }
 
     public function testLazyLoadRelationArgumentMustNotBeEmptyList(): void
     {
         $this->expectException(DefinitionException::class);
 
-        $this->buildSchema(/** @lang GraphQL */ '
+        $this->buildSchema(/** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: ID @lazyLoad(relations: [])
         }
-        ');
+        GRAPHQL);
     }
 
     public function testLazyLoadRelationsOnConnections(): void
@@ -39,7 +39,7 @@ final class LazyLoadDirectiveTest extends DBTestCase
         $tasks = factory(Task::class, 3)->make();
         $user->tasks()->saveMany($tasks);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             tasks: [Task!]!
                 @lazyLoad(relations: ["user"])
@@ -54,9 +54,9 @@ final class LazyLoadDirectiveTest extends DBTestCase
         type Query {
             user: User @first
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 tasks(first: 1) {
@@ -68,7 +68,7 @@ final class LazyLoadDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
                     'tasks' => [
@@ -89,7 +89,7 @@ final class LazyLoadDirectiveTest extends DBTestCase
     {
         factory(User::class)->create();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             tasks: [Task!]! @hasMany
             tasksLoaded: Boolean! @method
@@ -102,9 +102,9 @@ final class LazyLoadDirectiveTest extends DBTestCase
         type Query {
             users: [User!]! @paginate @lazyLoad(relations: ["tasks"])
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(first: 1) {
                 data {
@@ -112,7 +112,7 @@ final class LazyLoadDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'users' => [
                     'data' => [

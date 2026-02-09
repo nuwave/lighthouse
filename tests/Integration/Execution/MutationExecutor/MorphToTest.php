@@ -12,7 +12,7 @@ use Tests\Utils\Models\Task;
 
 final class MorphToTest extends DBTestCase
 {
-    protected string $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ <<<'GRAPHQL'
     type Task {
         id: ID
         name: String
@@ -90,7 +90,7 @@ final class MorphToTest extends DBTestCase
         disconnect: Boolean
         delete: Boolean
     }
-    ' . self::PLACEHOLDER_QUERY;
+    GRAPHQL . self::PLACEHOLDER_QUERY;
 
     public function testConnectsMorphTo(): void
     {
@@ -99,13 +99,13 @@ final class MorphToTest extends DBTestCase
         $task->name = 'first_task';
         $task->save();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createImage(input: {
                 url: "foo"
                 imageable: {
                     connect: {
-                        type: "Tests\\\Utils\\\Models\\\Task"
+                        type: "Tests\\Utils\\Models\\Task"
                         id: 1
                     }
                 }
@@ -118,7 +118,7 @@ final class MorphToTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'createImage' => [
                     'id' => '1',
@@ -147,7 +147,7 @@ final class MorphToTest extends DBTestCase
         $task->name = 'first_task';
         $task->save();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createImageWithEnumType(input: {
                 url: "foo"
@@ -166,7 +166,7 @@ final class MorphToTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'createImageWithEnumType' => [
                     'id' => '1',
@@ -187,14 +187,14 @@ final class MorphToTest extends DBTestCase
         $task->name = 'first_task';
         $task->save();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             upsertImage(input: {
                 id: 1
                 url: "foo"
                 imageable: {
                     connect: {
-                        type: "Tests\\\Utils\\\Models\\\Task"
+                        type: "Tests\\Utils\\Models\\Task"
                         id: 1
                     }
                 }
@@ -207,7 +207,7 @@ final class MorphToTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'upsertImage' => [
                     'id' => '1',
@@ -225,7 +225,7 @@ final class MorphToTest extends DBTestCase
     {
         factory(Image::class)->create();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             updateImage(input: {
                 id: 1
@@ -242,7 +242,7 @@ final class MorphToTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'updateImage' => [
                     'url' => 'foo',

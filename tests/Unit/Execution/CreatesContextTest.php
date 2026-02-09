@@ -30,17 +30,17 @@ final class CreatesContextTest extends TestCase
             return $context->foo();
         });
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             context: String @mock
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             context
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'context' => FooContext::FROM_FOO_CONTEXT,
             ],

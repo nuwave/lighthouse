@@ -36,7 +36,7 @@ final class InterfaceTest extends DBTestCase
         }
 GRAPHQL;
 
-        $result = $this->graphQL(/** @lang GraphQL */ '
+        $result = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             namedThings {
                 name
@@ -45,7 +45,7 @@ GRAPHQL;
                 }
             }
         }
-        ')->assertJsonStructure([
+        GRAPHQL)->assertJsonStructure([
             'data' => [
                 'namedThings' => [
                     [
@@ -86,7 +86,7 @@ GRAPHQL;
         }
 GRAPHQL;
 
-        $result = $this->graphQL(/** @lang GraphQL */ '
+        $result = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             namedThings {
                 name
@@ -95,7 +95,7 @@ GRAPHQL;
                 }
             }
         }
-        ')->assertJsonStructure([
+        GRAPHQL)->assertJsonStructure([
             'data' => [
                 'namedThings' => [
                     [
@@ -136,13 +136,13 @@ GRAPHQL;
 GRAPHQL;
 
         $this->expectNotToPerformAssertions();
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             namedThings {
                 name
             }
         }
-        ');
+        GRAPHQL);
     }
 
     public function testThrowsOnAmbiguousSchemaMapping(): void
@@ -171,13 +171,13 @@ GRAPHQL;
         $this->expectExceptionObject(
             TypeRegistry::unresolvableAbstractTypeMapping(User::class, ['Foo', 'Team']),
         );
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             namedThings {
                 name
             }
         }
-        ');
+        GRAPHQL);
     }
 
     public function testThrowsOnNonOverlappingSchemaMapping(): void
@@ -206,13 +206,13 @@ GRAPHQL;
         $this->expectExceptionObject(
             TypeRegistry::unresolvableAbstractTypeMapping(User::class, []),
         );
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             namedThings {
                 name
             }
         }
-        ');
+        GRAPHQL);
     }
 
     public function testUseCustomTypeResolver(): void
@@ -232,7 +232,7 @@ GRAPHQL;
         }
         GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             namedThings {
                 name
@@ -241,7 +241,7 @@ GRAPHQL;
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'namedThings' => $this->fetchGuy(),
             ],
@@ -272,7 +272,7 @@ GRAPHQL;
         }
 GRAPHQL;
 
-        $result = $this->graphQL(/** @lang GraphQL */ '
+        $result = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             __schema {
                 types {
@@ -284,7 +284,7 @@ GRAPHQL;
                 }
             }
         }
-        ');
+        GRAPHQL);
 
         $interface = (new Collection($result->json('data.__schema.types')))
             ->firstWhere('name', 'Nameable');
@@ -317,7 +317,7 @@ GRAPHQL;
         }
         GRAPHQL;
 
-        $result = $this->graphQL(/** @lang GraphQL */ '
+        $result = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             __type(name: "HasPosts") {
                 name
@@ -333,7 +333,7 @@ GRAPHQL;
                 }
             }
         }
-        ');
+        GRAPHQL);
 
         $this->assertSame('HasPosts', $result->json('data.__type.name'));
         $this->assertSame('INTERFACE', $result->json('data.__type.kind'));

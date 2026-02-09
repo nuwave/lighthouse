@@ -9,7 +9,7 @@ use Tests\Utils\Models\Task;
 
 final class MorphOneTest extends DBTestCase
 {
-    protected string $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ <<<'GRAPHQL'
     type Task {
         id: ID!
         name: String!
@@ -76,11 +76,11 @@ final class MorphOneTest extends DBTestCase
         id: ID
         url: String
     }
-    ' . self::PLACEHOLDER_QUERY;
+    GRAPHQL . self::PLACEHOLDER_QUERY;
 
     public function testCreateWithNewMorphOne(): void
     {
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createTask(input: {
                 name: "foo"
@@ -97,7 +97,7 @@ final class MorphOneTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'createTask' => [
                     'id' => '1',
@@ -112,7 +112,7 @@ final class MorphOneTest extends DBTestCase
 
     public function testCreateWithUpsertMorphOne(): void
     {
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createTask(input: {
                 name: "foo"
@@ -130,7 +130,7 @@ final class MorphOneTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'createTask' => [
                     'id' => '1',
@@ -181,7 +181,7 @@ final class MorphOneTest extends DBTestCase
     {
         factory(Task::class)->create();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             updateTask(input: {
                 id: 1
@@ -199,7 +199,7 @@ final class MorphOneTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'updateTask' => [
                     'name' => 'foo',
@@ -382,7 +382,7 @@ final class MorphOneTest extends DBTestCase
         $image = factory(Image::class)->create();
         $this->assertInstanceOf(Image::class, $image);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation ($input: UpdateTaskInput!) {
             updateTask(input: $input) {
                 id
@@ -392,7 +392,7 @@ final class MorphOneTest extends DBTestCase
                 }
             }
         }
-        ', [
+        GRAPHQL, [
             'input' => [
                 'id' => $task->id,
                 'name' => 'foo',

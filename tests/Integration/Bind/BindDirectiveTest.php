@@ -21,7 +21,7 @@ final class BindDirectiveTest extends DBTestCase
 
     public function testSchemaValidationFailsWhenClassArgumentDefinedOnFieldArgumentIsNotAClass(): void
     {
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
             }
@@ -29,23 +29,23 @@ final class BindDirectiveTest extends DBTestCase
             type Query {
                 user(user: ID! @bind(class: "NotAClass")): User! @mock
             }
-            GRAPHQL;
+        GRAPHQL;
 
         $this->expectExceptionObject(new DefinitionException(
             '@bind argument `class` defined on `user.user` must be an existing class, received `NotAClass`.',
         ));
-        $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 user(user: "1") {
                     id
                 }
             }
-            GRAPHQL);
+        GRAPHQL);
     }
 
     public function testSchemaValidationFailsWhenClassArgumentDefinedOnInputFieldIsNotAClass(): void
     {
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
             }
@@ -57,27 +57,25 @@ final class BindDirectiveTest extends DBTestCase
             type Mutation {
                 removeUsers(input: RemoveUsersInput!): Boolean! @mock
             }
-            GRAPHQL;
+        GRAPHQL;
 
         $this->expectExceptionObject(new DefinitionException(
             '@bind argument `class` defined on `RemoveUsersInput.users` must be an existing class, received `NotAClass`.',
         ));
-        $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             mutation ($input: RemoveUsersInput!) {
                 removeUsers(input: $input)
             }
-            GRAPHQL,
-            [
-                'input' => [
-                    'users' => ['1'],
-                ],
+        GRAPHQL, [
+            'input' => [
+                'users' => ['1'],
             ],
-        );
+        ]);
     }
 
     public function testSchemaValidationFailsWhenClassArgumentDefinedOnFieldArgumentIsNotAModelOrCallableClass(): void
     {
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
             }
@@ -85,23 +83,23 @@ final class BindDirectiveTest extends DBTestCase
             type Query {
                 user(user: ID! @bind(class: "stdClass")): User! @mock
             }
-            GRAPHQL;
+        GRAPHQL;
 
         $this->expectExceptionObject(new DefinitionException(
             '@bind argument `class` defined on `user.user` must extend Illuminate\Database\Eloquent\Model or define the method `__invoke`, but `stdClass` does neither.',
         ));
-        $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 user(user: "1") {
                     id
                 }
             }
-            GRAPHQL);
+        GRAPHQL);
     }
 
     public function testSchemaValidationFailsWhenClassArgumentDefinedOnInputFieldIsNotAModelOrCallableClass(): void
     {
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
             }
@@ -113,22 +111,20 @@ final class BindDirectiveTest extends DBTestCase
             type Mutation {
                 removeUsers(input: RemoveUsersInput!): Boolean! @mock
             }
-            GRAPHQL;
+        GRAPHQL;
 
         $this->expectExceptionObject(new DefinitionException(
             '@bind argument `class` defined on `RemoveUsersInput.users` must extend Illuminate\Database\Eloquent\Model or define the method `__invoke`, but `stdClass` does neither.',
         ));
-        $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             mutation ($input: RemoveUsersInput!) {
                 removeUsers(input: $input)
             }
-            GRAPHQL,
-            [
-                'input' => [
-                    'users' => ['1'],
-                ],
+        GRAPHQL, [
+            'input' => [
+                'users' => ['1'],
             ],
-        );
+        ]);
     }
 
     public function testModelBindingOnFieldArgument(): void
@@ -137,7 +133,7 @@ final class BindDirectiveTest extends DBTestCase
 
         $this->mockResolver(fn (mixed $root, array $args): User => $args['user']);
 
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
             }
@@ -145,17 +141,17 @@ final class BindDirectiveTest extends DBTestCase
             type Query {
                 user(user: ID! @bind(class: "Tests\\Utils\\Models\\User")): User! @mock
             }
-            GRAPHQL;
+        GRAPHQL;
 
-        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($id: ID!) {
                 user(user: $id) {
                     id
                 }
             }
-            GRAPHQL,
-            ['id' => $user->getKey()],
-        );
+        GRAPHQL, [
+            'id' => $user->getKey(),
+        ]);
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [
@@ -168,7 +164,7 @@ final class BindDirectiveTest extends DBTestCase
 
     public function testMissingModelBindingOnFieldArgument(): void
     {
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
             }
@@ -176,15 +172,15 @@ final class BindDirectiveTest extends DBTestCase
             type Query {
                 user(user: ID! @bind(class: "Tests\\Utils\\Models\\User")): User! @mock
             }
-            GRAPHQL;
+        GRAPHQL;
 
-        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 user(user: "1") {
                     id
                 }
             }
-            GRAPHQL);
+        GRAPHQL);
         $response->assertOk();
         $response->assertGraphQLValidationError('user', trans('validation.exists', ['attribute' => 'user']));
     }
@@ -192,7 +188,7 @@ final class BindDirectiveTest extends DBTestCase
     public function testMissingOptionalModelBindingOnFieldArgument(): void
     {
         $this->mockResolver(fn (mixed $root, array $args) => $args['user']);
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
             }
@@ -202,17 +198,17 @@ final class BindDirectiveTest extends DBTestCase
                     user: ID! @bind(class: "Tests\\Utils\\Models\\User", required: false)
                 ): User @mock
             }
-            GRAPHQL;
+        GRAPHQL;
 
-        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($id: ID!) {
                 user(user: $id) {
                     id
                 }
             }
-            GRAPHQL,
-            ['id' => '1'],
-        );
+        GRAPHQL, [
+            'id' => '1',
+        ]);
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [
@@ -227,7 +223,7 @@ final class BindDirectiveTest extends DBTestCase
 
         $this->mockResolver(fn (mixed $root, array $args) => $args['user']);
 
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
             }
@@ -237,17 +233,17 @@ final class BindDirectiveTest extends DBTestCase
                     user: String! @bind(class: "Tests\\Utils\\Models\\User", column: "email")
                 ): User @mock
             }
-            GRAPHQL;
+        GRAPHQL;
 
-        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($email: String!) {
                 user(user: $email) {
                     id
                 }
             }
-            GRAPHQL,
-            ['email' => $user->email],
-        );
+        GRAPHQL, [
+            'email' => $user->email,
+        ]);
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [
@@ -269,7 +265,7 @@ final class BindDirectiveTest extends DBTestCase
             return $args['user'];
         });
 
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
             }
@@ -279,17 +275,17 @@ final class BindDirectiveTest extends DBTestCase
                     user: ID! @bind(class: "Tests\\Utils\\Models\\User", with: ["company"])
                 ): User @mock
             }
-            GRAPHQL;
+        GRAPHQL;
 
-        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($id: ID!) {
                 user(user: $id) {
                     id
                 }
             }
-            GRAPHQL,
-            ['id' => $user->getKey()],
-        );
+        GRAPHQL, [
+            'id' => $user->getKey(),
+        ]);
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [
@@ -313,7 +309,7 @@ final class BindDirectiveTest extends DBTestCase
             $user->save();
         });
 
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
             }
@@ -323,17 +319,17 @@ final class BindDirectiveTest extends DBTestCase
                     user: String! @bind(class: "Tests\\Utils\\Models\\User", column: "name")
                 ): User @mock
             }
-            GRAPHQL;
+        GRAPHQL;
 
-        $makeRequest = fn (): TestResponse => $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $makeRequest = fn (): TestResponse => $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($name: String!) {
                 user(user: $name) {
                     id
                 }
             }
-            GRAPHQL,
-            ['name' => $users->first()->name],
-        );
+        GRAPHQL, [
+            'name' => $users->first()->name,
+        ]);
         $this->assertThrowsMultipleRecordsFoundException($makeRequest, $users->count());
     }
 
@@ -348,7 +344,7 @@ final class BindDirectiveTest extends DBTestCase
             return true;
         });
 
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
             }
@@ -358,15 +354,15 @@ final class BindDirectiveTest extends DBTestCase
                     users: [ID!]! @bind(class: "Tests\\Utils\\Models\\User")
                 ): Boolean! @mock
             }
-            GRAPHQL . self::PLACEHOLDER_QUERY;
+        GRAPHQL . self::PLACEHOLDER_QUERY;
 
-        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             mutation ($users: [ID!]!) {
                 removeUsers(users: $users)
             }
-            GRAPHQL,
-            ['users' => $users->map(fn (User $user): int => $user->getKey())],
-        );
+        GRAPHQL, [
+            'users' => $users->map(fn (User $user): int => $user->getKey()),
+        ]);
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [
@@ -385,7 +381,7 @@ final class BindDirectiveTest extends DBTestCase
     {
         $user = factory(User::class)->create();
 
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
             }
@@ -395,17 +391,15 @@ final class BindDirectiveTest extends DBTestCase
                     users: [ID!]! @bind(class: "Tests\\Utils\\Models\\User")
                 ): Boolean! @mock
             }
-            GRAPHQL . self::PLACEHOLDER_QUERY;
+        GRAPHQL . self::PLACEHOLDER_QUERY;
 
-        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             mutation ($users: [ID!]!) {
                 removeUsers(users: $users)
             }
-            GRAPHQL,
-            [
-                'users' => [$user->getKey(), '10'],
-            ],
-        );
+        GRAPHQL, [
+            'users' => [$user->getKey(), '10'],
+        ]);
         $response->assertOk();
         $response->assertGraphQLValidationError('users.1', trans('validation.exists', ['attribute' => 'users.1']));
     }
@@ -421,7 +415,7 @@ final class BindDirectiveTest extends DBTestCase
             return true;
         });
 
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
             }
@@ -431,17 +425,15 @@ final class BindDirectiveTest extends DBTestCase
                     users: [ID!]! @bind(class: "Tests\\Utils\\Models\\User", required: false)
                 ): Boolean! @mock
             }
-            GRAPHQL . self::PLACEHOLDER_QUERY;
+        GRAPHQL . self::PLACEHOLDER_QUERY;
 
-        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             mutation ($users: [ID!]!) {
                 removeUsers(users: $users)
             }
-            GRAPHQL,
-            [
-                'users' => [$user->getKey(), '10'],
-            ],
-        );
+        GRAPHQL, [
+            'users' => [$user->getKey(), '10'],
+        ]);
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [
@@ -464,7 +456,7 @@ final class BindDirectiveTest extends DBTestCase
             $user->save();
         });
 
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
             }
@@ -474,17 +466,15 @@ final class BindDirectiveTest extends DBTestCase
                     users: [String!]! @bind(class: "Tests\\Utils\\Models\\User", column: "name")
                 ): Boolean! @mock
             }
-            GRAPHQL . self::PLACEHOLDER_QUERY;
+        GRAPHQL . self::PLACEHOLDER_QUERY;
 
-        $makeRequest = fn (): TestResponse => $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $makeRequest = fn (): TestResponse => $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             mutation ($users: [String!]!) {
                 removeUsers(users: $users)
             }
-            GRAPHQL,
-            [
-                'users' => [$users->first()->name],
-            ],
-        );
+        GRAPHQL, [
+            'users' => [$users->first()->name],
+        ]);
         $this->assertThrowsMultipleRecordsFoundException($makeRequest, $users->count());
     }
 
@@ -494,7 +484,7 @@ final class BindDirectiveTest extends DBTestCase
 
         $this->mockResolver(fn (mixed $root, array $args): User => $args['input']['user']);
 
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
             }
@@ -506,21 +496,19 @@ final class BindDirectiveTest extends DBTestCase
             type Query {
                 user(input: UserInput!): User! @mock
             }
-            GRAPHQL;
+        GRAPHQL;
 
-        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($input: UserInput!) {
                 user(input: $input) {
                     id
                 }
             }
-            GRAPHQL,
-            [
-                'input' => [
-                    'user' => $user->getKey(),
-                ],
+        GRAPHQL, [
+            'input' => [
+                'user' => $user->getKey(),
             ],
-        );
+        ]);
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [
@@ -533,7 +521,7 @@ final class BindDirectiveTest extends DBTestCase
 
     public function testMissingModelBindingOnInputField(): void
     {
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
             }
@@ -545,21 +533,19 @@ final class BindDirectiveTest extends DBTestCase
             type Query {
                 user(input: UserInput!): User! @mock
             }
-            GRAPHQL;
+        GRAPHQL;
 
-        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($input: UserInput!) {
                 user(input: $input) {
                     id
                 }
             }
-            GRAPHQL,
-            [
-                'input' => [
-                    'user' => '1',
-                ],
+        GRAPHQL, [
+            'input' => [
+                'user' => '1',
             ],
-        );
+        ]);
         $response->assertOk();
         $response->assertGraphQLValidationError('input.user', trans('validation.exists', [
             'attribute' => 'input.user',
@@ -570,7 +556,7 @@ final class BindDirectiveTest extends DBTestCase
     {
         $this->mockResolver(fn (mixed $root, array $args) => $args['input']['user']);
 
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
             }
@@ -582,21 +568,19 @@ final class BindDirectiveTest extends DBTestCase
             type Query {
                 user(input: UserInput!): User @mock
             }
-            GRAPHQL;
+        GRAPHQL;
 
-        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($input: UserInput!) {
                 user(input: $input) {
                     id
                 }
             }
-            GRAPHQL,
-            [
-                'input' => [
-                    'user' => '1',
-                ],
+        GRAPHQL, [
+            'input' => [
+                'user' => '1',
             ],
-        );
+        ]);
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [
@@ -611,7 +595,7 @@ final class BindDirectiveTest extends DBTestCase
 
         $this->mockResolver(fn (mixed $root, array $args) => $args['input']['user']);
 
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
             }
@@ -623,21 +607,19 @@ final class BindDirectiveTest extends DBTestCase
             type Query {
                 user(input: UserInput!): User @mock
             }
-            GRAPHQL;
+        GRAPHQL;
 
-        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($input: UserInput!) {
                 user(input: $input) {
                     id
                 }
             }
-            GRAPHQL,
-            [
-                'input' => [
-                    'user' => $user->email,
-                ],
+        GRAPHQL, [
+            'input' => [
+                'user' => $user->email,
             ],
-        );
+        ]);
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [
@@ -659,7 +641,7 @@ final class BindDirectiveTest extends DBTestCase
             return $args['input']['user'];
         });
 
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
             }
@@ -671,21 +653,19 @@ final class BindDirectiveTest extends DBTestCase
             type Query {
                 user(input: UserInput!): User @mock
             }
-            GRAPHQL;
+        GRAPHQL;
 
-        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($input: UserInput!) {
                 user(input: $input) {
                     id
                 }
             }
-            GRAPHQL,
-            [
-                'input' => [
-                    'user' => $user->getKey(),
-                ],
+        GRAPHQL, [
+            'input' => [
+                'user' => $user->getKey(),
             ],
-        );
+        ]);
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [
@@ -709,7 +689,7 @@ final class BindDirectiveTest extends DBTestCase
             $user->save();
         });
 
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
             }
@@ -721,21 +701,19 @@ final class BindDirectiveTest extends DBTestCase
             type Query {
                 user(input: UserInput!): User @mock
             }
-            GRAPHQL;
+        GRAPHQL;
 
-        $makeRequest = fn (): TestResponse => $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $makeRequest = fn (): TestResponse => $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($input: UserInput!) {
                 user(input: $input) {
                     id
                 }
             }
-            GRAPHQL,
-            [
-                'input' => [
-                    'user' => $users->first()->name,
-                ],
+        GRAPHQL, [
+            'input' => [
+                'user' => $users->first()->name,
             ],
-        );
+        ]);
         $this->assertThrowsMultipleRecordsFoundException($makeRequest, $users->count());
     }
 
@@ -750,7 +728,7 @@ final class BindDirectiveTest extends DBTestCase
             return true;
         });
 
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
             }
@@ -762,19 +740,17 @@ final class BindDirectiveTest extends DBTestCase
             type Mutation {
                 removeUsers(input: RemoveUsersInput!): Boolean! @mock
             }
-            GRAPHQL . self::PLACEHOLDER_QUERY;
+        GRAPHQL . self::PLACEHOLDER_QUERY;
 
-        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             mutation ($input: RemoveUsersInput!) {
                 removeUsers(input: $input)
             }
-            GRAPHQL,
-            [
-                'input' => [
-                    'users' => $users->map(fn (User $user): int => $user->getKey()),
-                ],
+        GRAPHQL, [
+            'input' => [
+                'users' => $users->map(fn (User $user): int => $user->getKey()),
             ],
-        );
+        ]);
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [
@@ -794,7 +770,7 @@ final class BindDirectiveTest extends DBTestCase
     {
         $user = factory(User::class)->create();
 
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
             }
@@ -806,19 +782,17 @@ final class BindDirectiveTest extends DBTestCase
             type Mutation {
                 removeUsers(input: RemoveUsersInput!): Boolean! @mock
             }
-            GRAPHQL . self::PLACEHOLDER_QUERY;
+        GRAPHQL . self::PLACEHOLDER_QUERY;
 
-        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             mutation ($input: RemoveUsersInput!) {
                 removeUsers(input: $input)
             }
-            GRAPHQL,
-            [
-                'input' => [
-                    'users' => [$user->getKey(), '10'],
-                ],
+        GRAPHQL, [
+            'input' => [
+                'users' => [$user->getKey(), '10'],
             ],
-        );
+        ]);
         $response->assertOk();
         $response->assertGraphQLValidationError('input.users.1', trans('validation.exists', [
             'attribute' => 'input.users.1',
@@ -836,7 +810,7 @@ final class BindDirectiveTest extends DBTestCase
             return true;
         });
 
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
             }
@@ -848,19 +822,17 @@ final class BindDirectiveTest extends DBTestCase
             type Mutation {
                 removeUsers(input: RemoveUsersInput!): Boolean! @mock
             }
-            GRAPHQL . self::PLACEHOLDER_QUERY;
+        GRAPHQL . self::PLACEHOLDER_QUERY;
 
-        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             mutation ($input: RemoveUsersInput!) {
                 removeUsers(input: $input)
             }
-            GRAPHQL,
-            [
-                'input' => [
-                    'users' => [$user->getKey(), '10'],
-                ],
+        GRAPHQL, [
+            'input' => [
+                'users' => [$user->getKey(), '10'],
             ],
-        );
+        ]);
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [
@@ -884,7 +856,7 @@ final class BindDirectiveTest extends DBTestCase
             $user->save();
         });
 
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
             }
@@ -896,19 +868,17 @@ final class BindDirectiveTest extends DBTestCase
             type Mutation {
                 removeUsers(input: RemoveUsersInput!): Boolean! @mock
             }
-            GRAPHQL . self::PLACEHOLDER_QUERY;
+        GRAPHQL . self::PLACEHOLDER_QUERY;
 
-        $makeRequest = fn (): TestResponse => $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $makeRequest = fn (): TestResponse => $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             mutation ($input: RemoveUsersInput!) {
                 removeUsers(input: $input)
             }
-            GRAPHQL,
-            [
-                'input' => [
-                    'users' => [$users->first()->name],
-                ],
+        GRAPHQL, [
+            'input' => [
+                'users' => [$users->first()->name],
             ],
-        );
+        ]);
         $this->assertThrowsMultipleRecordsFoundException($makeRequest, $users->count());
     }
 
@@ -919,7 +889,7 @@ final class BindDirectiveTest extends DBTestCase
 
         $this->mockResolver(fn (mixed $root, array $args): User => $args['user']);
 
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
             }
@@ -927,17 +897,17 @@ final class BindDirectiveTest extends DBTestCase
             type Query {
                 user(user: ID! @bind(class: "Tests\\Utils\\Bind\\SpyCallableClassBinding")): User! @mock
             }
-            GRAPHQL;
+        GRAPHQL;
 
-        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($id: ID!) {
                 user(user: $id) {
                     id
                 }
             }
-            GRAPHQL,
-            ['id' => $user->getKey()],
-        );
+        GRAPHQL, [
+            'id' => $user->getKey(),
+        ]);
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [
@@ -952,7 +922,7 @@ final class BindDirectiveTest extends DBTestCase
     {
         $this->instance(SpyCallableClassBinding::class, new SpyCallableClassBinding(null));
 
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
             }
@@ -962,17 +932,17 @@ final class BindDirectiveTest extends DBTestCase
                     user: ID! @bind(class: "Tests\\Utils\\Bind\\SpyCallableClassBinding")
                 ): User @mock
             }
-            GRAPHQL;
+        GRAPHQL;
 
-        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($id: ID!) {
                 user(user: $id) {
                     id
                 }
             }
-            GRAPHQL,
-            ['id' => '1'],
-        );
+        GRAPHQL, [
+            'id' => '1',
+        ]);
         $response->assertOk();
         $response->assertGraphQLValidationError('user', trans('validation.exists', ['attribute' => 'user']));
     }
@@ -983,7 +953,7 @@ final class BindDirectiveTest extends DBTestCase
 
         $this->mockResolver(fn (mixed $root, array $args) => $args['user']);
 
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
             }
@@ -993,17 +963,17 @@ final class BindDirectiveTest extends DBTestCase
                     user: ID! @bind(class: "Tests\\Utils\\Bind\\SpyCallableClassBinding", required: false)
                 ): User @mock
             }
-            GRAPHQL;
+        GRAPHQL;
 
-        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($id: ID!) {
                 user(user: $id) {
                     id
                 }
             }
-            GRAPHQL,
-            ['id' => '1'],
-        );
+        GRAPHQL, [
+            'id' => '1',
+        ]);
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [
@@ -1019,7 +989,7 @@ final class BindDirectiveTest extends DBTestCase
 
         $this->mockResolver(fn (mixed $root, array $args) => $args['user']);
 
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
             }
@@ -1034,17 +1004,17 @@ final class BindDirectiveTest extends DBTestCase
                     )
                 ): User @mock
             }
-            GRAPHQL;
+        GRAPHQL;
 
-        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($id: ID!) {
                 user(user: $id) {
                     id
                 }
             }
-            GRAPHQL,
-            ['id' => '1'],
-        );
+        GRAPHQL, [
+            'id' => '1',
+        ]);
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [
@@ -1065,7 +1035,7 @@ final class BindDirectiveTest extends DBTestCase
 
         $this->mockResolver(fn (mixed $root, array $args): User => $args['input']['user']);
 
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
             }
@@ -1077,21 +1047,19 @@ final class BindDirectiveTest extends DBTestCase
             type Query {
                 user(input: UserInput!): User! @mock
             }
-            GRAPHQL;
+        GRAPHQL;
 
-        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($input: UserInput!) {
                 user(input: $input) {
                     id
                 }
             }
-            GRAPHQL,
-            [
-                'input' => [
-                    'user' => $user->getKey(),
-                ],
+        GRAPHQL, [
+            'input' => [
+                'user' => $user->getKey(),
             ],
-        );
+        ]);
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [
@@ -1106,7 +1074,7 @@ final class BindDirectiveTest extends DBTestCase
     {
         $this->instance(SpyCallableClassBinding::class, new SpyCallableClassBinding(null));
 
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
             }
@@ -1118,21 +1086,19 @@ final class BindDirectiveTest extends DBTestCase
             type Query {
                 user(input: UserInput!): User! @mock
             }
-            GRAPHQL;
+        GRAPHQL;
 
-        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($input: UserInput!) {
                 user(input: $input) {
                     id
                 }
             }
-            GRAPHQL,
-            [
-                'input' => [
-                    'user' => '1',
-                ],
+        GRAPHQL, [
+            'input' => [
+                'user' => '1',
             ],
-        );
+        ]);
         $response->assertOk();
         $response->assertGraphQLValidationError('input.user', trans('validation.exists', ['attribute' => 'input.user']));
     }
@@ -1143,7 +1109,7 @@ final class BindDirectiveTest extends DBTestCase
 
         $this->mockResolver(fn (mixed $root, array $args) => $args['input']['user']);
 
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
             }
@@ -1155,21 +1121,19 @@ final class BindDirectiveTest extends DBTestCase
             type Query {
                 user(input: UserInput!): User @mock
             }
-            GRAPHQL;
+        GRAPHQL;
 
-        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($input: UserInput!) {
                 user(input: $input) {
                     id
                 }
             }
-            GRAPHQL,
-            [
-                'input' => [
-                    'user' => '1',
-                ],
+        GRAPHQL, [
+            'input' => [
+                'user' => '1',
             ],
-        );
+        ]);
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [
@@ -1185,7 +1149,7 @@ final class BindDirectiveTest extends DBTestCase
 
         $this->mockResolver(fn (mixed $root, array $args) => $args['input']['user']);
 
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
             }
@@ -1202,21 +1166,19 @@ final class BindDirectiveTest extends DBTestCase
             type Query {
                 user(input: UserInput!): User @mock
             }
-            GRAPHQL;
+        GRAPHQL;
 
-        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($input: UserInput!) {
                 user(input: $input) {
                     id
                 }
             }
-            GRAPHQL,
-            [
-                'input' => [
-                    'user' => '1',
-                ],
+        GRAPHQL, [
+            'input' => [
+                'user' => '1',
             ],
-        );
+        ]);
 
         $response->assertGraphQLErrorFree();
         $response->assertJson([
@@ -1243,7 +1205,7 @@ final class BindDirectiveTest extends DBTestCase
             return true;
         });
 
-        $this->schema =  /* @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema =  /** @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
             }
@@ -1258,18 +1220,16 @@ final class BindDirectiveTest extends DBTestCase
                     company: ID! @bind(class: "Tests\\Utils\\Models\\Company")
                 ): Boolean! @mock
             }
-            GRAPHQL . self::PLACEHOLDER_QUERY;
+        GRAPHQL . self::PLACEHOLDER_QUERY;
 
-        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             mutation ($user: ID!, $company: ID!) {
                 addUserToCompany(user: $user, company: $company)
             }
-            GRAPHQL,
-            [
-                'user' => $user->getKey(),
-                'company' => $company->getKey(),
-            ],
-        );
+        GRAPHQL, [
+            'user' => $user->getKey(),
+            'company' => $company->getKey(),
+        ]);
         $response->assertGraphQLErrorFree();
         $response->assertJson([
             'data' => [

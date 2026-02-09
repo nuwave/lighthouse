@@ -20,11 +20,11 @@ final class ManipulateResultTest extends TestCase
             },
         );
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'foo' => Foo::THE_ANSWER + 1,
             ],

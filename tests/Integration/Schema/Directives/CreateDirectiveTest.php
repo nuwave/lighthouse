@@ -13,7 +13,7 @@ final class CreateDirectiveTest extends DBTestCase
 {
     public function testCreateFromFieldArguments(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Company {
             id: ID!
             name: String!
@@ -22,16 +22,16 @@ final class CreateDirectiveTest extends DBTestCase
         type Mutation {
             createCompany(name: String): Company @create
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createCompany(name: "foo") {
                 id
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'createCompany' => [
                     'id' => '1',
@@ -43,7 +43,7 @@ final class CreateDirectiveTest extends DBTestCase
 
     public function testCreateFromInputObject(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Company {
             id: ID!
             name: String!
@@ -56,9 +56,9 @@ final class CreateDirectiveTest extends DBTestCase
         input CreateCompanyInput {
             name: String
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createCompany(input: {
                 name: "foo"
@@ -67,7 +67,7 @@ final class CreateDirectiveTest extends DBTestCase
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'createCompany' => [
                     'id' => '1',
@@ -79,7 +79,7 @@ final class CreateDirectiveTest extends DBTestCase
 
     public function testCreatesAnEntryWithDatabaseDefaultsAndReturnsItImmediately(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Mutation {
             createTag(name: String): Tag @create
         }
@@ -88,16 +88,16 @@ final class CreateDirectiveTest extends DBTestCase
             name: String!
             default_string: String!
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createTag(name: "foobar") {
                 name
                 default_string
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'createTag' => [
                     'name' => 'foobar',
@@ -117,7 +117,7 @@ final class CreateDirectiveTest extends DBTestCase
         $config = $this->app->make(ConfigRepository::class);
         $config->set('app.debug', false);
 
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Task {
             id: ID!
             name: String!
@@ -146,9 +146,9 @@ final class CreateDirectiveTest extends DBTestCase
             name: String
             user: ID
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createUser(input: {
                 name: "foo"
@@ -166,7 +166,7 @@ final class CreateDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')
+        GRAPHQL)
             ->assertJson([
                 'data' => [
                     'createUser' => null,
@@ -188,7 +188,7 @@ final class CreateDirectiveTest extends DBTestCase
         $config->set('app.debug', false);
         $config->set('lighthouse.transactional_mutations', false);
 
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Task {
             id: ID!
             name: String!
@@ -217,9 +217,9 @@ final class CreateDirectiveTest extends DBTestCase
             name: String
             user: ID
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createUser(input: {
                 name: "foo"
@@ -237,7 +237,7 @@ final class CreateDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')
+        GRAPHQL)
             // TODO allow partial success
 //            ->assertJson([
 //                'data' => [
@@ -254,7 +254,7 @@ final class CreateDirectiveTest extends DBTestCase
 
     public function testDoesNotFailWhenPropertyNameMatchesModelsNativeMethods(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Task {
             id: ID!
             name: String!
@@ -284,9 +284,9 @@ final class CreateDirectiveTest extends DBTestCase
             name: String
             guard: String
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createUser(input: {
                 name: "foo"
@@ -302,7 +302,7 @@ final class CreateDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'createUser' => [
                     'tasks' => [
@@ -317,7 +317,7 @@ final class CreateDirectiveTest extends DBTestCase
 
     public function testNestedArgResolverHasMany(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Mutation {
             createUser(input: CreateUserInput! @spread): User @create
         }
@@ -339,9 +339,9 @@ final class CreateDirectiveTest extends DBTestCase
         input CreateTaskInput {
             name: String
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createUser(input: {
                 name: "foo"
@@ -355,7 +355,7 @@ final class CreateDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'createUser' => [
                     'name' => 'foo',
@@ -371,7 +371,7 @@ final class CreateDirectiveTest extends DBTestCase
 
     public function testNestedArgResolverForOptionalBelongsTo(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Mutation {
             createTask(input: CreateTaskInput! @spread): Task @create
         }
@@ -393,9 +393,9 @@ final class CreateDirectiveTest extends DBTestCase
         input CreateUserInput {
             name: String
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createTask(input: {
                 name: "task"
@@ -409,7 +409,7 @@ final class CreateDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'createTask' => [
                     'name' => 'task',
@@ -423,7 +423,7 @@ final class CreateDirectiveTest extends DBTestCase
 
     public function testCreateTwice(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Task {
             id: ID!
             name: String!
@@ -451,9 +451,9 @@ final class CreateDirectiveTest extends DBTestCase
         input CreateTaskInput {
             name: String
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createUser(input: {
                 name: "foo"
@@ -466,7 +466,7 @@ final class CreateDirectiveTest extends DBTestCase
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'createUser' => [
                     'name' => 'foo',
@@ -474,7 +474,7 @@ final class CreateDirectiveTest extends DBTestCase
             ],
         ]);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createUser(input: {
                 name: "bar"
@@ -487,7 +487,7 @@ final class CreateDirectiveTest extends DBTestCase
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'createUser' => [
                     'name' => 'bar',
@@ -498,7 +498,7 @@ final class CreateDirectiveTest extends DBTestCase
 
     public function testCreateTwiceWithCreateDirective(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Task {
             id: ID!
             name: String!
@@ -522,9 +522,9 @@ final class CreateDirectiveTest extends DBTestCase
         input CreateTaskInput {
             name: String
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createUser(input: {
                 name: "foo"
@@ -543,7 +543,7 @@ final class CreateDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'createUser' => [
                     'name' => 'foo',
@@ -564,7 +564,7 @@ final class CreateDirectiveTest extends DBTestCase
     {
         config(['lighthouse.force_fill' => false]);
 
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Company {
             name: String!
         }
@@ -572,16 +572,16 @@ final class CreateDirectiveTest extends DBTestCase
         type Mutation {
             createCompany(name: String): Company @create
         }
-        ';
+        GRAPHQL;
 
         $this->expectException(MassAssignmentException::class);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createCompany(name: "foo") {
                 name
             }
         }
-        ');
+        GRAPHQL);
     }
 }
