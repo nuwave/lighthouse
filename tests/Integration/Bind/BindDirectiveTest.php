@@ -307,7 +307,11 @@ final class BindDirectiveTest extends DBTestCase
     {
         $this->rethrowGraphQLErrors();
 
-        $users = factory(User::class, 2)->create(['name' => 'John Doe']);
+        $users = factory(User::class, 2)->make();
+        $users->each(static function (User $user): void {
+            $user->name = 'John Doe';
+            $user->save();
+        });
 
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type User {
@@ -454,7 +458,11 @@ final class BindDirectiveTest extends DBTestCase
     {
         $this->rethrowGraphQLErrors();
 
-        $users = factory(User::class, 2)->create(['name' => 'John Doe']);
+        $users = factory(User::class, 2)->make();
+        $users->each(static function (User $user): void {
+            $user->name = 'John Doe';
+            $user->save();
+        });
 
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type User {
@@ -695,7 +703,11 @@ final class BindDirectiveTest extends DBTestCase
     {
         $this->rethrowGraphQLErrors();
 
-        $users = factory(User::class, 2)->create(['name' => 'Jane Doe']);
+        $users = factory(User::class, 2)->make();
+        $users->each(static function (User $user): void {
+            $user->name = 'Jane Doe';
+            $user->save();
+        });
 
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type User {
@@ -866,7 +878,11 @@ final class BindDirectiveTest extends DBTestCase
     {
         $this->rethrowGraphQLErrors();
 
-        $users = factory(User::class, 2)->create(['name' => 'Jane Doe']);
+        $users = factory(User::class, 2)->make();
+        $users->each(static function (User $user): void {
+            $user->name = 'Jane Doe';
+            $user->save();
+        });
 
         $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
             type User {

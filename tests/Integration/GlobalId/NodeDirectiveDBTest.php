@@ -177,9 +177,11 @@ final class NodeDirectiveDBTest extends DBTestCase
         }
         ";
 
-        $user = factory(User::class)->create([
-            'name' => 'Sepp',
-        ]);
+        $user = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $user);
+        $user->name = 'Sepp';
+        $user->save();
+
         $globalId = $this->globalIdResolver->encode('User', $user->getKey());
 
         $this->graphQL(/** @lang GraphQL */ "

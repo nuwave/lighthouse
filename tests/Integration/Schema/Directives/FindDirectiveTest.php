@@ -10,9 +10,9 @@ final class FindDirectiveTest extends DBTestCase
 {
     public function testReturnsSingleUser(): void
     {
-        factory(User::class)->create(['name' => 'A']);
-        $userB = factory(User::class)->create(['name' => 'B']);
-        factory(User::class)->create(['name' => 'C']);
+        $this->createUserWithName('A');
+        $userB = $this->createUserWithName('B');
+        $this->createUserWithName('C');
 
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -40,8 +40,8 @@ final class FindDirectiveTest extends DBTestCase
 
     public function testDefaultsToFieldTypeIfNoModelIsSupplied(): void
     {
-        $userA = factory(User::class)->create(['name' => 'A']);
-        factory(User::class)->create(['name' => 'B']);
+        $userA = $this->createUserWithName('A');
+        $this->createUserWithName('B');
 
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -67,9 +67,9 @@ final class FindDirectiveTest extends DBTestCase
 
     public function testCannotFetchIfMultipleModelsMatch(): void
     {
-        factory(User::class)->create(['name' => 'A']);
-        factory(User::class)->create(['name' => 'A']);
-        factory(User::class)->create(['name' => 'B']);
+        $this->createUserWithName('A');
+        $this->createUserWithName('A');
+        $this->createUserWithName('B');
 
         $this->schema = /** @lang GraphQL */ '
         type User {
@@ -93,11 +93,11 @@ final class FindDirectiveTest extends DBTestCase
 
     public function testUseScopes(): void
     {
-        $companyA = factory(Company::class)->create(['name' => 'CompanyA']);
-        $companyB = factory(Company::class)->create(['name' => 'CompanyB']);
-        $userA = factory(User::class)->create(['name' => 'A', 'company_id' => $companyA->id]);
-        factory(User::class)->create(['name' => 'A', 'company_id' => $companyB->id]);
-        factory(User::class)->create(['name' => 'B', 'company_id' => $companyA->id]);
+        $companyA = $this->createCompanyWithName('CompanyA');
+        $companyB = $this->createCompanyWithName('CompanyB');
+        $userA = $this->createUserWithNameAndCompany('A', $companyA);
+        $this->createUserWithNameAndCompany('A', $companyB);
+        $this->createUserWithNameAndCompany('B', $companyA);
 
         $this->schema = /** @lang GraphQL */ '
         type Company {
@@ -161,10 +161,8 @@ final class FindDirectiveTest extends DBTestCase
     public function testReturnsCustomAttributes(): void
     {
         $company = factory(Company::class)->create();
-        $user = factory(User::class)->create([
-            'name' => 'A',
-            'company_id' => $company->id,
-        ]);
+        $this->assertInstanceOf(Company::class, $company);
+        $user = $this->createUserWithNameAndCompany('A', $company);
 
         $this->schema = '
         type User {
@@ -195,5 +193,36 @@ final class FindDirectiveTest extends DBTestCase
                 ],
             ],
         ]);
+    }
+
+    private function createCompanyWithName(string $name): Company
+    {
+        $company = factory(Company::class)->make();
+        $this->assertInstanceOf(Company::class, $company);
+        $company->name = $name;
+        $company->save();
+
+        return $company;
+    }
+
+    private function createUserWithName(string $name): User
+    {
+        $user = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $user);
+        $user->name = $name;
+        $user->save();
+
+        return $user;
+    }
+
+    private function createUserWithNameAndCompany(string $name, Company $company): User
+    {
+        $user = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $user);
+        $user->name = $name;
+        $user->company()->associate($company);
+        $user->save();
+
+        return $user;
     }
 }

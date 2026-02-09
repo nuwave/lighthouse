@@ -59,9 +59,11 @@ final class CountDirectiveDBTest extends DBTestCase
         ';
 
         factory(Task::class, 3)->create();
-        factory(Task::class, 2)->create([
-            'completed_at' => now(),
-        ]);
+        $completed = factory(Task::class, 2)->make();
+        $completed->each(static function (Task $task): void {
+            $task->completed_at = now();
+            $task->save();
+        });
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -88,9 +90,11 @@ final class CountDirectiveDBTest extends DBTestCase
 
         factory(User::class, 3)->create()
             ->each(static function (User $user, int $index): void {
-                factory(Task::class, 3 - $index)->create([
-                    'user_id' => $user->getKey(),
-                ]);
+                $tasks = factory(Task::class, 3 - $index)->make();
+                $tasks->each(static function (Task $task) use ($user): void {
+                    $task->user()->associate($user);
+                    $task->save();
+                });
             });
 
         $this->assertQueryCountMatches(2, function (): void {
@@ -130,9 +134,13 @@ final class CountDirectiveDBTest extends DBTestCase
         }
         ';
 
-        factory(Task::class, 3)->create([
-            'user_id' => factory(User::class)->create(),
-        ]);
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
+        $tasks = factory(Task::class, 3)->make();
+        $tasks->each(static function (Task $task) use ($user): void {
+            $task->user()->associate($user);
+            $task->save();
+        });
 
         $this->graphQL(/** @lang GraphQL */ '
         {
@@ -163,13 +171,16 @@ final class CountDirectiveDBTest extends DBTestCase
 
         /** @var User $user */
         $user = factory(User::class)->create();
-        factory(Task::class, 3)->create([
-            'user_id' => $user->getKey(),
-        ]);
+        $tasks = factory(Task::class, 3)->make();
+        $tasks->each(static function (Task $task) use ($user): void {
+            $task->user()->associate($user);
+            $task->save();
+        });
 
-        factory(Task::class)->state('completed')->create([
-            'user_id' => $user->getKey(),
-        ]);
+        $completedTask = factory(Task::class)->state('completed')->make();
+        $this->assertInstanceOf(Task::class, $completedTask);
+        $completedTask->user()->associate($user);
+        $completedTask->save();
 
         $this->graphQL(/** @lang GraphQL */ '
         {

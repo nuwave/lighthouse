@@ -23,16 +23,10 @@ final class SearchDirectiveTest extends DBTestCase
     public function testSearch(): void
     {
         /** @var Post $postA */
-        $postA = factory(Post::class)->create([
-            'title' => 'great title',
-        ]);
+        $postA = $this->createPostWithTitle('great title');
         /** @var Post $postB */
-        $postB = factory(Post::class)->create([
-            'title' => 'Really great title',
-        ]);
-        factory(Post::class)->create([
-            'title' => 'bad title',
-        ]);
+        $postB = $this->createPostWithTitle('Really great title');
+        $this->createPostWithTitle('bad title');
 
         $this->engine
             ->shouldReceive('map')
@@ -197,16 +191,10 @@ final class SearchDirectiveTest extends DBTestCase
     public function testSearchWithinCustomIndex(): void
     {
         /** @var Post $postA */
-        $postA = factory(Post::class)->create([
-            'title' => 'great title',
-        ]);
+        $postA = $this->createPostWithTitle('great title');
         /** @var Post $postB */
-        $postB = factory(Post::class)->create([
-            'title' => 'Really great title',
-        ]);
-        factory(Post::class)->create([
-            'title' => 'bad title',
-        ]);
+        $postB = $this->createPostWithTitle('Really great title');
+        $this->createPostWithTitle('bad title');
 
         $myIndex = 'my.index';
 
@@ -355,16 +343,10 @@ final class SearchDirectiveTest extends DBTestCase
     public function testHandlesScoutBuilderPaginationArguments(): void
     {
         /** @var Post $postA */
-        $postA = factory(Post::class)->create([
-            'title' => 'great title',
-        ]);
+        $postA = $this->createPostWithTitle('great title');
         /** @var Post $postB */
-        $postB = factory(Post::class)->create([
-            'title' => 'Really great title',
-        ]);
-        factory(Post::class)->create([
-            'title' => 'bad title',
-        ]);
+        $postB = $this->createPostWithTitle('Really great title');
+        $this->createPostWithTitle('bad title');
 
         $this->engine->shouldReceive('map')
             ->andReturn(
@@ -415,5 +397,15 @@ final class SearchDirectiveTest extends DBTestCase
                 ],
             ],
         ]);
+    }
+
+    private function createPostWithTitle(string $title): Post
+    {
+        $post = factory(Post::class)->make();
+        $this->assertInstanceOf(Post::class, $post);
+        $post->title = $title;
+        $post->save();
+
+        return $post;
     }
 }

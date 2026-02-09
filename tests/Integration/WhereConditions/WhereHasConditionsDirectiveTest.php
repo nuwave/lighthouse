@@ -90,9 +90,10 @@ final class WhereHasConditionsDirectiveTest extends DBTestCase
 
     public function testExistenceWithEmptyCondition(): void
     {
-        factory(User::class)->create([
-            'company_id' => null,
-        ]);
+        $userWithoutCompany = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $userWithoutCompany);
+        $userWithoutCompany->company_id = null;
+        $userWithoutCompany->save();
 
         factory(User::class)->create();
 

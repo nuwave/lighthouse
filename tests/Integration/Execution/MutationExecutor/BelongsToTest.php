@@ -85,7 +85,8 @@ final class BelongsToTest extends DBTestCase
 
     public function testCreateAndConnectWithBelongsTo(): void
     {
-        factory(User::class)->create();
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
 
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -143,7 +144,8 @@ final class BelongsToTest extends DBTestCase
 
     public function testUpsertUsingCreateAndConnectWithBelongsTo(): void
     {
-        factory(User::class)->create();
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
 
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -176,7 +178,8 @@ final class BelongsToTest extends DBTestCase
 
     public function testAllowsNullOperations(): void
     {
-        factory(User::class)->create();
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
 
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -700,10 +703,10 @@ GRAPHQL
         $user = factory(User::class)->create();
         $this->assertInstanceOf(User::class, $user);
 
-        $task = $user->tasks()->save(
-            factory(Task::class)->make(),
-        );
+        $task = factory(Task::class)->make();
         $this->assertInstanceOf(Task::class, $task);
+        $task->user()->associate($user);
+        $task->save();
 
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -750,10 +753,10 @@ GRAPHQL
         $user = factory(User::class)->create();
         $this->assertInstanceOf(User::class, $user);
 
-        $task = $user->tasks()->save(
-            factory(Task::class)->make(),
-        );
+        $task = factory(Task::class)->make();
         $this->assertInstanceOf(Task::class, $task);
+        $task->user()->associate($user);
+        $task->save();
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
@@ -796,7 +799,8 @@ GRAPHQL
 
     public function testCreateUsingUpsertAndDeleteBelongsTo(): void
     {
-        factory(User::class)->create();
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
 
         $this->graphQL(/** @lang GraphQL */ '
         mutation {
@@ -842,10 +846,10 @@ GRAPHQL
         $user = factory(User::class)->create();
         $this->assertInstanceOf(User::class, $user);
 
-        $task = $user->tasks()->save(
-            factory(Task::class)->make(),
-        );
+        $task = factory(Task::class)->make();
         $this->assertInstanceOf(Task::class, $task);
+        $task->user()->associate($user);
+        $task->save();
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
@@ -1052,7 +1056,8 @@ GRAPHQL
         $this->assertSame([1], $role->users()->pluck('users.id')->toArray());
 
         // Create another User.
-        factory(User::class)->create();
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
 
         $this->graphQL(/** @lang GraphQL */ '
         mutation {

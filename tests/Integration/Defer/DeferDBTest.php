@@ -153,9 +153,11 @@ final class DeferDBTest extends DBTestCase
         $companies = factory(Company::class, 2)
             ->create()
             ->each(static function (Company $company): void {
-                factory(User::class, 3)->create([
-                    'company_id' => $company->getKey(),
-                ]);
+                $users = factory(User::class, 3)->make();
+                $users->each(static function (User $user) use ($company): void {
+                    $user->company()->associate($company);
+                    $user->save();
+                });
             });
 
         $this->mockResolver($companies);

@@ -22,14 +22,17 @@ final class WhereJsonContainsDirectiveDBTest extends DBTestCase
         $nestedBar = \Safe\json_encode([
             'nested' => 'bar',
         ]);
-        factory(User::class)->create([
-            'name' => $nestedBar,
+        $userWithBar = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $userWithBar);
+        $userWithBar->name = $nestedBar;
+        $userWithBar->save();
+
+        $userWithBaz = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $userWithBaz);
+        $userWithBaz->name = \Safe\json_encode([
+            'nested' => 'baz',
         ]);
-        factory(User::class)->create([
-            'name' => \Safe\json_encode([
-                'nested' => 'baz',
-            ]),
-        ]);
+        $userWithBaz->save();
 
         $this->graphQL(/** @lang GraphQL */ '
         {
