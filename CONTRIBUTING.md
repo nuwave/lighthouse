@@ -128,6 +128,16 @@ $user = User::create([
 ]);
 ```
 
+### GraphQL strings in tests
+
+Use a consistent representation for GraphQL literals in tests:
+
+- Use `/** @lang GraphQL */` before GraphQL string literals.
+- Use nowdoc (`<<<'GRAPHQL'`) for static GraphQL content.
+- Use heredoc (`<<<GRAPHQL`) only when interpolation is required.
+- Prefer nowdoc/heredoc over quoted multiline strings.
+- For schema/assertion cases where whitespace matters, keep indentation deliberate and stable.
+
 ## Working with proto files
 
 Lighthouse uses [protobuf](https://developers.google.com/protocol-buffers) files for [federated tracing](src/Tracing/FederatedTracing/reports.proto).

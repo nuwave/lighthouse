@@ -77,6 +77,14 @@ Multiple service providers for optional features (auto-discovered via composer.j
 
 Tests use `Tests\Utils\` namespace for test fixtures (Models, Queries, Mutations, etc.).
 
+### GraphQL string style in tests
+
+- Always annotate GraphQL literals with `/** @lang GraphQL */`.
+- Default to nowdoc: `<<<'GRAPHQL'`.
+- Use heredoc: `<<<GRAPHQL` only if interpolation is required.
+- Avoid quoted multiline GraphQL strings.
+- Preserve intentional indentation/whitespace in schema and assertion-sensitive tests.
+
 ## Code Style
 
 - PHPStan level 8
