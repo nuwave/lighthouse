@@ -15,11 +15,11 @@ final class ThrottleDirectiveTest extends TestCase
 {
     public function testNamedLimiter(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: Int @throttle(name: "test")
         }
-        ';
+        GRAPHQL;
 
         $queriedKeys = [];
 
@@ -46,11 +46,11 @@ final class ThrottleDirectiveTest extends TestCase
 
         $this->app->singleton(RateLimiter::class, static fn (): RateLimiter => $rateLimiter);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'foo' => Foo::THE_ANSWER,
             ],
@@ -62,11 +62,11 @@ final class ThrottleDirectiveTest extends TestCase
 
     public function testUnlimitedNamedLimiter(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: Int @throttle(name: "test")
         }
-        ';
+        GRAPHQL;
 
         $rateLimiter = $this->createMock(RateLimiter::class);
         $rateLimiter->expects($this->atLeast(1))
@@ -82,11 +82,11 @@ final class ThrottleDirectiveTest extends TestCase
 
         $this->app->singleton(RateLimiter::class, static fn (): RateLimiter => $rateLimiter);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'foo' => Foo::THE_ANSWER,
             ],
@@ -95,11 +95,11 @@ final class ThrottleDirectiveTest extends TestCase
 
     public function testWithNullRequest(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: Int @throttle(name: "test")
         }
-        ';
+        GRAPHQL;
 
         $rateLimiter = $this->createMock(RateLimiter::class);
         $rateLimiter->expects($this->atLeast(1))
@@ -122,11 +122,11 @@ final class ThrottleDirectiveTest extends TestCase
 
         $this->app->singleton(RateLimiter::class, static fn (): RateLimiter => $rateLimiter);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'foo' => Foo::THE_ANSWER,
             ],

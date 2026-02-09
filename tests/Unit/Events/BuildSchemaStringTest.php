@@ -27,28 +27,28 @@ final class BuildSchemaStringTest extends TestCase
             }
         ");
 
-        $this->schema = /** @lang GraphQL */ "
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type Query {
-            foo: String @field(resolver: \"{$this->qualifyTestResolver('resolveFoo')}\")
+            foo: String @field(resolver: "{$this->qualifyTestResolver('resolveFoo')}")
         }
-        ";
+        GRAPHQL;
 
-        $queryForBaseSchema = /** @lang GraphQL */ '
+        $queryForBaseSchema = /** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ';
+        GRAPHQL;
         $this->graphQL($queryForBaseSchema)->assertJson([
             'data' => [
                 'foo' => 'foo',
             ],
         ]);
 
-        $queryForAdditionalSchema = /** @lang GraphQL */ '
+        $queryForAdditionalSchema = /** @lang GraphQL */ <<<'GRAPHQL'
         {
             sayHello
         }
-        ';
+        GRAPHQL;
         $this->graphQL($queryForAdditionalSchema)->assertJson([
             'data' => [
                 'sayHello' => 'hello',

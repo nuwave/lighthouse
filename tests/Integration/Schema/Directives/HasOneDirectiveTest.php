@@ -17,7 +17,7 @@ final class HasOneDirectiveTest extends DBTestCase
         $post = factory(Post::class)->create();
         $this->assertInstanceOf(Post::class, $post);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Post {
             id: Int
         }
@@ -29,9 +29,9 @@ final class HasOneDirectiveTest extends DBTestCase
         type Query {
             tasks: [Task!]! @all
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             tasks {
                 post {
@@ -39,7 +39,7 @@ final class HasOneDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'tasks' => [
                     [

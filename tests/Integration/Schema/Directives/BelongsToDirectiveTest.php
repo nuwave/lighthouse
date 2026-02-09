@@ -22,7 +22,7 @@ final class BelongsToDirectiveTest extends DBTestCase
 
         $this->be($user);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Company {
             name: String!
         }
@@ -34,9 +34,9 @@ final class BelongsToDirectiveTest extends DBTestCase
         type Query {
             user: User @auth
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 company {
@@ -44,7 +44,7 @@ final class BelongsToDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
                     'company' => [
@@ -66,7 +66,7 @@ final class BelongsToDirectiveTest extends DBTestCase
 
         $this->be($user);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Company {
             name: String!
         }
@@ -78,9 +78,9 @@ final class BelongsToDirectiveTest extends DBTestCase
         type Query {
             user: User @auth
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 account {
@@ -88,7 +88,7 @@ final class BelongsToDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
                     'account' => [
@@ -112,7 +112,7 @@ final class BelongsToDirectiveTest extends DBTestCase
 
         $this->be($user);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Company {
             name: String!
         }
@@ -129,9 +129,9 @@ final class BelongsToDirectiveTest extends DBTestCase
         type Query {
             user: User @auth
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 company {
@@ -142,7 +142,7 @@ final class BelongsToDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
                     'company' => [
@@ -160,7 +160,7 @@ final class BelongsToDirectiveTest extends DBTestCase
     {
         $products = factory(Product::class, 2)->create();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Color {
             id: ID!
             name: String
@@ -177,9 +177,9 @@ final class BelongsToDirectiveTest extends DBTestCase
         type Query {
             products: [Product] @paginate
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             products(first: 2) {
                 data{
@@ -193,7 +193,7 @@ final class BelongsToDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'products' => [
                     'data' => [
@@ -223,7 +223,7 @@ final class BelongsToDirectiveTest extends DBTestCase
         $child->parent()->associate($parent);
         $child->save();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Post {
             id: Int!
             parent: Post @belongsTo
@@ -232,10 +232,10 @@ final class BelongsToDirectiveTest extends DBTestCase
         type Query {
             posts: [Post!]! @all
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 posts {
                     id
@@ -244,7 +244,7 @@ final class BelongsToDirectiveTest extends DBTestCase
                     }
                 }
             }
-            ')
+            GRAPHQL)
             ->assertJson([
                 'data' => [
                     'posts' => [
@@ -274,7 +274,7 @@ final class BelongsToDirectiveTest extends DBTestCase
 
         $this->be($user);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Company {
             id: ID! @rename(attribute: "uuid")
         }
@@ -286,9 +286,9 @@ final class BelongsToDirectiveTest extends DBTestCase
         type Query {
             user: User @auth
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 company {
@@ -296,7 +296,7 @@ final class BelongsToDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
                     'company' => [
@@ -323,7 +323,7 @@ final class BelongsToDirectiveTest extends DBTestCase
 
         $this->be($user);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Company {
             id: ID!
         }
@@ -335,10 +335,10 @@ final class BelongsToDirectiveTest extends DBTestCase
         type Query {
             user: User @auth
         }
-        ';
+        GRAPHQL;
 
         $this->assertNoQueriesExecuted(function () use ($company): void {
-            $this->graphQL(/** @lang GraphQL */ '
+            $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 user {
                     company {
@@ -346,7 +346,7 @@ final class BelongsToDirectiveTest extends DBTestCase
                     }
                 }
             }
-            ')->assertJson([
+            GRAPHQL)->assertJson([
                 'data' => [
                     'user' => [
                         'company' => [
@@ -374,7 +374,7 @@ final class BelongsToDirectiveTest extends DBTestCase
 
         $this->be($user);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Company {
             id: ID!
         }
@@ -386,10 +386,10 @@ final class BelongsToDirectiveTest extends DBTestCase
         type Query {
             user: User @auth
         }
-        ';
+        GRAPHQL;
 
         $this->assertNoQueriesExecuted(function (): void {
-            $this->graphQL(/** @lang GraphQL */ '
+            $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 user {
                     company {
@@ -397,7 +397,7 @@ final class BelongsToDirectiveTest extends DBTestCase
                     }
                 }
             }
-            ')->assertJson([
+            GRAPHQL)->assertJson([
                 'data' => [
                     'user' => [
                         'company' => [
@@ -425,7 +425,7 @@ final class BelongsToDirectiveTest extends DBTestCase
 
         $this->be($user);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Company {
             id: ID!
         }
@@ -437,10 +437,10 @@ final class BelongsToDirectiveTest extends DBTestCase
         type Query {
             user: User @auth
         }
-        ';
+        GRAPHQL;
 
         $this->assertNoQueriesExecuted(function () use ($company): void {
-            $this->graphQL(/** @lang GraphQL */ '
+            $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 user {
                     company {
@@ -449,7 +449,7 @@ final class BelongsToDirectiveTest extends DBTestCase
                     }
                 }
             }
-            ')->assertJson([
+            GRAPHQL)->assertJson([
                 'data' => [
                     'user' => [
                         'company' => [
@@ -476,7 +476,7 @@ final class BelongsToDirectiveTest extends DBTestCase
 
         $this->be($user);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Company {
             id: ID!
             name: String!
@@ -489,10 +489,10 @@ final class BelongsToDirectiveTest extends DBTestCase
         type Query {
             user: User @auth
         }
-        ';
+        GRAPHQL;
 
         $this->assertQueryCountMatches(1, function () use ($company): void {
-            $this->graphQL(/** @lang GraphQL */ '
+            $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 user {
                     company {
@@ -501,7 +501,7 @@ final class BelongsToDirectiveTest extends DBTestCase
                     }
                 }
             }
-            ')->assertJson([
+            GRAPHQL)->assertJson([
                 'data' => [
                     'user' => [
                         'company' => [
@@ -528,7 +528,7 @@ final class BelongsToDirectiveTest extends DBTestCase
 
         $this->be($user);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Company {
             id: ID!
         }
@@ -540,10 +540,10 @@ final class BelongsToDirectiveTest extends DBTestCase
         type Query {
             user: User @auth
         }
-        ';
+        GRAPHQL;
 
         $this->assertQueryCountMatches(1, function () use ($company): void {
-            $this->graphQL(/** @lang GraphQL */ '
+            $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($name: String) {
                 user {
                     company(name: $name) {
@@ -551,7 +551,7 @@ final class BelongsToDirectiveTest extends DBTestCase
                     }
                 }
             }
-            ', [
+            GRAPHQL, [
                 'name' => "{$company->name} no match",
             ])->assertJson([
                 'data' => [

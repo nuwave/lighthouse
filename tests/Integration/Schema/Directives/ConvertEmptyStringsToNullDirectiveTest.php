@@ -9,19 +9,19 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
 {
     public function testOnArgument(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(bar: String @convertEmptyStringsToNull): String @mock
         }
-        ';
+        GRAPHQL;
 
         $this->mockResolver(static fn ($_, array $args): ?string => $args['bar']);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo(bar: "")
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'foo' => null,
             ],
@@ -30,19 +30,19 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
 
     public function testOnArgumentWithMatrix(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(bar: [[[String]]] @convertEmptyStringsToNull): [[[String]]] @mock
         }
-        ';
+        GRAPHQL;
 
         $this->mockResolver(static fn ($_, array $args): ?array => $args['bar']);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo(bar: [[["", null, "baz"]]])
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'foo' => [[[null, null, 'baz']]],
             ],
@@ -53,7 +53,7 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
     {
         $this->mockResolver(static fn ($_, array $args): array => $args);
 
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Foo {
             foo: String
             bar: [String]!
@@ -69,9 +69,9 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
                 qux: Int!
             ): Foo! @convertEmptyStringsToNull @mock
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo(
                 foo: ""
@@ -85,7 +85,7 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
                 qux
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'foo' => [
                     'foo' => null,
@@ -101,7 +101,7 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
     {
         $this->mockResolver(static fn ($_, array $args): array => $args);
 
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Foo {
             foo: String!
             bar: [String!]!
@@ -115,9 +115,9 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
                 baz: [[[String!]]]
             ): Foo! @convertEmptyStringsToNull @mock
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo(
                 foo: ""
@@ -129,7 +129,7 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
                 baz
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'foo' => [
                     'foo' => '',
@@ -142,19 +142,19 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
 
     public function testConvertsNonNullableArgumentsWhenUsedOnArgument(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(bar: String! @convertEmptyStringsToNull): String @mock
         }
-        ';
+        GRAPHQL;
 
         $this->mockResolver(static fn ($_, array $args): ?string => $args['bar']);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo(bar: "")
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'foo' => null,
             ],
@@ -163,25 +163,25 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
 
     public function testConvertsEmptyStringToNullWithFieldDirective(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(bar: String): FooResponse
                 @convertEmptyStringsToNull
-                @field(resolver: "Tests\\\Utils\\\Mutations\\\ReturnReceivedInput")
+                @field(resolver: "Tests\\Utils\\Mutations\\ReturnReceivedInput")
         }
 
         type FooResponse {
             bar: String
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo(bar: "") {
                 bar
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'foo' => [
                     'bar' => null,
@@ -196,24 +196,24 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
             ConvertEmptyStringsToNullDirective::class,
         ]]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(bar: String): FooResponse
-                @field(resolver: "Tests\\\Utils\\\Mutations\\\ReturnReceivedInput")
+                @field(resolver: "Tests\\Utils\\Mutations\\ReturnReceivedInput")
         }
 
         type FooResponse {
             bar: String
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo(bar: "") {
                 bar
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'foo' => [
                     'bar' => null,
@@ -224,11 +224,11 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
 
     public function testConvertsEmptyStringToNullWithFieldDirectiveAndInputType(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(input: FooInput): FooInputResponse
                 @convertEmptyStringsToNull
-                @field(resolver: "Tests\\\Utils\\\Mutations\\\ReturnReceivedInput")
+                @field(resolver: "Tests\\Utils\\Mutations\\ReturnReceivedInput")
         }
 
         input FooInput {
@@ -242,9 +242,9 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
         type FooResponse {
             bar: String
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo(input: {
                 bar: ""
@@ -254,7 +254,7 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
                 }
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'foo' => [
                     'input' => [
@@ -271,10 +271,10 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
             ConvertEmptyStringsToNullDirective::class,
         ]]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(input: FooInput): FooInputResponse
-                @field(resolver: "Tests\\\Utils\\\Mutations\\\ReturnReceivedInput")
+                @field(resolver: "Tests\\Utils\\Mutations\\ReturnReceivedInput")
         }
 
         input FooInput {
@@ -288,9 +288,9 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
         type FooResponse {
             bar: String
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo(input: {
                 bar: ""
@@ -300,7 +300,7 @@ final class ConvertEmptyStringsToNullDirectiveTest extends TestCase
                 }
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'foo' => [
                     'input' => [

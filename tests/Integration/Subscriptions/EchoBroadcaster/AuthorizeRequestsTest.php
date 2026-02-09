@@ -108,13 +108,13 @@ final class AuthorizeRequestsTest extends TestCase
 
     private function querySubscription(): TestResponse
     {
-        return $this->graphQL(/** @lang GraphQL */ '
+        return $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         subscription {
             taskUpdated(id: 123) {
                 id
                 name
             }
         }
-        ');
+        GRAPHQL);
     }
 }

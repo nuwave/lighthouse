@@ -7,11 +7,11 @@ use Tests\TestCase;
 
 final class ApolloTracingExtensionTest extends TestCase
 {
-    protected string $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ <<<'GRAPHQL'
     type Query {
-        foo: String! @field(resolver: "Tests\\\Integration\\\Tracing\\\ApolloTracingExtensionTest@resolve")
+        foo: String! @field(resolver: "Tests\\Integration\\Tracing\\ApolloTracingExtensionTest@resolve")
     }
-    ';
+    GRAPHQL;
 
     protected function getPackageProviders($app): array
     {
@@ -24,11 +24,11 @@ final class ApolloTracingExtensionTest extends TestCase
     public function testAddTracingExtensionMetaToResult(): void
     {
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 foo
             }
-            ')
+            GRAPHQL)
             ->assertJsonStructure([
                 'extensions' => [
                     'tracing' => [
@@ -43,11 +43,11 @@ final class ApolloTracingExtensionTest extends TestCase
     public function testAddTracingExtensionMetaToBatchedResults(): void
     {
         $postData = [
-            'query' => /** @lang GraphQL */ '
+            'query' => /** @lang GraphQL */ <<<'GRAPHQL'
                 {
                     foo
                 }
-                ',
+            GRAPHQL,
         ];
         $expectedResponse = [
             'extensions' => [

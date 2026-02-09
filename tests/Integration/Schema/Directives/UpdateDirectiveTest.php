@@ -19,7 +19,7 @@ final class UpdateDirectiveTest extends DBTestCase
         $company->name = 'foo';
         $company->save();
 
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Company {
             id: ID!
             name: String!
@@ -31,9 +31,9 @@ final class UpdateDirectiveTest extends DBTestCase
                 name: String
             ): Company @update
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             updateCompany(
                 id: 1
@@ -43,7 +43,7 @@ final class UpdateDirectiveTest extends DBTestCase
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'updateCompany' => [
                     'id' => '1',
@@ -62,7 +62,7 @@ final class UpdateDirectiveTest extends DBTestCase
         $company->name = 'foo';
         $company->save();
 
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Company {
             id: ID!
             name: String!
@@ -78,9 +78,9 @@ final class UpdateDirectiveTest extends DBTestCase
             id: ID!
             name: String
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             updateCompany(input: {
                 id: 1
@@ -90,7 +90,7 @@ final class UpdateDirectiveTest extends DBTestCase
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'updateCompany' => [
                     'id' => '1',
@@ -104,7 +104,7 @@ final class UpdateDirectiveTest extends DBTestCase
 
     public function testThrowsWhenMissingPrimaryKey(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Company {
             id: ID!
         }
@@ -112,15 +112,15 @@ final class UpdateDirectiveTest extends DBTestCase
         type Mutation {
             updateCompany: Company @update
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             updateCompany {
                 id
             }
         }
-        ')->assertGraphQLErrorMessage(UpdateModel::MISSING_PRIMARY_KEY_FOR_UPDATE);
+        GRAPHQL)->assertGraphQLErrorMessage(UpdateModel::MISSING_PRIMARY_KEY_FOR_UPDATE);
     }
 
     public function testUpdateWithCustomPrimaryKey(): void
@@ -130,7 +130,7 @@ final class UpdateDirectiveTest extends DBTestCase
         $category->name = 'foo';
         $category->save();
 
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Category {
             category_id: ID!
             name: String!
@@ -142,9 +142,9 @@ final class UpdateDirectiveTest extends DBTestCase
                 name: String
             ): Category @update
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             updateCategory(
                 category_id: 1
@@ -154,7 +154,7 @@ final class UpdateDirectiveTest extends DBTestCase
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'updateCategory' => [
                     'category_id' => '1',
@@ -173,7 +173,7 @@ final class UpdateDirectiveTest extends DBTestCase
         $category->name = 'foo';
         $category->save();
 
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Category {
             id: ID! @rename(attribute: "category_id")
             name: String!
@@ -185,9 +185,9 @@ final class UpdateDirectiveTest extends DBTestCase
                 name: String
             ): Category @update
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             updateCategory(
                 id: 1
@@ -197,7 +197,7 @@ final class UpdateDirectiveTest extends DBTestCase
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'updateCategory' => [
                     'id' => '1',
@@ -216,7 +216,7 @@ final class UpdateDirectiveTest extends DBTestCase
         $user->name = 'Original';
         $user->save();
 
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Task {
             id: ID!
             name: String!
@@ -245,10 +245,10 @@ final class UpdateDirectiveTest extends DBTestCase
         input CreateTaskInput {
             thisFieldDoesNotExist: String
         }
-        ';
+        GRAPHQL;
 
         $this->expectException(QueryException::class);
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             updateUser(input: {
                 id: 1
@@ -267,7 +267,7 @@ final class UpdateDirectiveTest extends DBTestCase
                 }
             }
         }
-        ');
+        GRAPHQL);
 
         $this->assertSame('Original', User::firstOrFail()->name);
     }
@@ -282,7 +282,7 @@ final class UpdateDirectiveTest extends DBTestCase
         $task->id = 3;
         $task->save();
 
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Mutation {
             updateUser(input: UpdateUserInput! @spread): User @update
         }
@@ -307,9 +307,9 @@ final class UpdateDirectiveTest extends DBTestCase
             id: Int
             name: String
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             updateUser(input: {
                 id: 1
@@ -326,7 +326,7 @@ final class UpdateDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'updateUser' => [
                     'name' => 'foo',
@@ -356,7 +356,7 @@ final class UpdateDirectiveTest extends DBTestCase
         $taskB->id = 4;
         $taskB->save();
 
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Mutation {
             updateUser(input: UpdateUserInput! @spread): User @update
         }
@@ -381,9 +381,9 @@ final class UpdateDirectiveTest extends DBTestCase
             id: Int
             name: String
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             updateUser(input: {
                 id: 1
@@ -406,7 +406,7 @@ final class UpdateDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'updateUser' => [
                     'name' => 'foo',

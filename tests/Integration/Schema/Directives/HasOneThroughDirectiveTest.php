@@ -10,7 +10,7 @@ final class HasOneThroughDirectiveTest extends DBTestCase
 {
     public function testQueryHasOneThroughRelationship(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             tasks: [Task!]! @all
         }
@@ -24,7 +24,7 @@ final class HasOneThroughDirectiveTest extends DBTestCase
             id: ID!
             status: String
         }
-        ';
+        GRAPHQL;
 
         $post = factory(Post::class)->create();
         $this->assertInstanceOf(Post::class, $post);
@@ -34,7 +34,7 @@ final class HasOneThroughDirectiveTest extends DBTestCase
         $postStatus->post()->associate($post);
         $postStatus->save();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             tasks {
                 id
@@ -44,7 +44,7 @@ final class HasOneThroughDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'tasks' => [
                     [

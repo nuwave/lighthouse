@@ -16,27 +16,27 @@ final class ThrottleDirectiveTest extends TestCase
 {
     public function testWrongLimiterName(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: Int @throttle(name: "test")
         }
-        ';
+        GRAPHQL;
 
         $this->expectException(DefinitionException::class);
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ');
+        GRAPHQL);
     }
 
     public function testNamedLimiterReturnsRequest(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: Int @throttle(name: "test")
         }
-        ';
+        GRAPHQL;
 
         $rateLimiter = $this->app->make(RateLimiter::class);
         $rateLimiter->for(
@@ -45,26 +45,26 @@ final class ThrottleDirectiveTest extends TestCase
         );
 
         $this->expectException(DefinitionException::class);
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ');
+        GRAPHQL);
     }
 
     public function testNamedLimiter(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: Int @throttle(name: "test")
         }
-        ';
+        GRAPHQL;
 
-        $query = /** @lang GraphQL */ '
+        $query = /** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ';
+        GRAPHQL;
 
         $rateLimiter = $this->app->make(RateLimiter::class);
         $rateLimiter->for(
@@ -85,17 +85,17 @@ final class ThrottleDirectiveTest extends TestCase
 
     public function testLimitClears(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: Int @throttle(name: "test")
         }
-        ';
+        GRAPHQL;
 
-        $query = /** @lang GraphQL */ '
+        $query = /** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ';
+        GRAPHQL;
 
         $rateLimiter = $this->app->make(RateLimiter::class);
         $rateLimiter->for(
@@ -128,17 +128,17 @@ final class ThrottleDirectiveTest extends TestCase
 
     public function testInlineLimiter(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: Int @throttle(maxAttempts: 1)
         }
-        ';
+        GRAPHQL;
 
-        $query = /** @lang GraphQL */ '
+        $query = /** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ';
+        GRAPHQL;
 
         $faker = Factory::create()->unique();
         $ip = $faker->ipv4;

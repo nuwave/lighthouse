@@ -16,18 +16,18 @@ final class AsyncDirectiveTest extends DBTestCase
     {
         $this->mockResolver(static fn (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) => null);
 
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Mutation {
             fooAsync: Boolean! @mock @async
         }
-        ';
+        GRAPHQL;
 
         $queue = Queue::fake();
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             fooAsync
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'fooAsync' => true,
             ],
@@ -48,18 +48,18 @@ final class AsyncDirectiveTest extends DBTestCase
     {
         $this->mockResolver(static fn (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) => null);
 
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Mutation {
             fooAsync: Boolean! @mock @async(queue: "custom")
         }
-        ';
+        GRAPHQL;
 
         $queue = Queue::fake();
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             fooAsync
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'fooAsync' => true,
             ],
@@ -82,10 +82,10 @@ final class AsyncDirectiveTest extends DBTestCase
         $this->expectExceptionObject(new DefinitionException(
             'The @async directive must only be used on root mutation fields, found it on Query.foo.',
         ));
-        $this->buildSchema(/** @lang GraphQL */ '
+        $this->buildSchema(/** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: Boolean! @async
         }
-        ');
+        GRAPHQL);
     }
 }

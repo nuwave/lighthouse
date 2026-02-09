@@ -13,7 +13,7 @@ final class LikeDirectiveTest extends DBTestCase
         $this->createUserWithName('Alex');
         $this->createUserWithName('Aaron');
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             name: String!
         }
@@ -23,15 +23,15 @@ final class LikeDirectiveTest extends DBTestCase
                 name: String! @like
             ): [User!]! @all
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(name: "Al%") {
                 name
             }
         }
-        ')->assertJsonFragment([
+        GRAPHQL)->assertJsonFragment([
             'users' => [
                 [
                     'name' => 'Alan',
@@ -49,7 +49,7 @@ final class LikeDirectiveTest extends DBTestCase
         $this->createUserWithName('Alex');
         $this->createUserWithName('Aaron');
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             name: String!
         }
@@ -59,15 +59,15 @@ final class LikeDirectiveTest extends DBTestCase
                 name: String! @like(template: "%{}%")
             ): [User!]! @all
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(name: "l") {
                 name
             }
         }
-        ')->assertJsonFragment([
+        GRAPHQL)->assertJsonFragment([
             'users' => [
                 [
                     'name' => 'Alan',
@@ -86,7 +86,7 @@ final class LikeDirectiveTest extends DBTestCase
         $this->createUserWithName('Aar%');
         $this->createUserWithName('Aar%toomuch');
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             name: String!
@@ -97,15 +97,15 @@ final class LikeDirectiveTest extends DBTestCase
                 name: String! @like(template: "%{}__")
             ): [User!] @all
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(name: "ar%") {
                 name
             }
         }
-        ')->assertJsonFragment([
+        GRAPHQL)->assertJsonFragment([
             'users' => [
                 [
                     'name' => 'Aar%on',
@@ -119,7 +119,7 @@ final class LikeDirectiveTest extends DBTestCase
         $this->createUserWithName('Alex');
         $this->createUserWithName('Aaron');
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             name: String!
@@ -130,15 +130,15 @@ final class LikeDirectiveTest extends DBTestCase
                 @all
                 @like(key: "name", value: "%ex")
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users {
                 name
             }
         }
-        ')->assertJsonFragment([
+        GRAPHQL)->assertJsonFragment([
             'users' => [
                 [
                     'name' => 'Alex',

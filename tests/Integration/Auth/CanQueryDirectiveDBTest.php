@@ -20,7 +20,7 @@ final class CanQueryDirectiveDBTest extends DBTestCase
         $user = factory(User::class)->create();
         $this->assertInstanceOf(User::class, $user);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             user(name: String! @eq): User
                 @canQuery(ability: "view")
@@ -30,15 +30,15 @@ final class CanQueryDirectiveDBTest extends DBTestCase
         type User {
             name: String!
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($name: String!) {
             user(name: $name) {
                 name
             }
         }
-        ', [
+        GRAPHQL, [
             'name' => $user->name,
         ])->assertJson([
             'data' => [
@@ -59,7 +59,7 @@ final class CanQueryDirectiveDBTest extends DBTestCase
             $this->never(),
         );
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             user(id: ID! @whereKey): User
                 @canQuery(ability: "view", query: true)
@@ -69,15 +69,15 @@ final class CanQueryDirectiveDBTest extends DBTestCase
         type User {
             id: ID!
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user(id: "not-present") {
                 id
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => null,
             ],
@@ -93,7 +93,7 @@ final class CanQueryDirectiveDBTest extends DBTestCase
         $user = factory(User::class)->create();
         $this->assertInstanceOf(User::class, $user);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Mutation {
             throwWhenInvoked(id: ID!): User
                 @canQuery(ability: "view", action: EXCEPTION_NOT_AUTHORIZED)
@@ -102,15 +102,15 @@ final class CanQueryDirectiveDBTest extends DBTestCase
         type User {
             name: String!
         }
-        ' . self::PLACEHOLDER_QUERY;
+        GRAPHQL . self::PLACEHOLDER_QUERY;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation ($id: ID!) {
             throwWhenInvoked(id: $id) {
                 name
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $user->getKey(),
         ])->assertGraphQLErrorMessage(ThrowWhenInvoked::ERROR_MESSAGE);
     }
@@ -131,7 +131,7 @@ final class CanQueryDirectiveDBTest extends DBTestCase
         $postB->user()->associate($admin);
         $postB->save();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Mutation {
             deletePosts(ids: [ID!]! @whereKey): [Post!]!
                 @canQuery(ability: "delete")
@@ -141,15 +141,15 @@ final class CanQueryDirectiveDBTest extends DBTestCase
         type Post {
             title: String!
         }
-        ' . self::PLACEHOLDER_QUERY;
+        GRAPHQL . self::PLACEHOLDER_QUERY;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation ($ids: [ID!]!) {
             deletePosts(ids: $ids) {
                 title
             }
         }
-        ', [
+        GRAPHQL, [
             'ids' => [$postA->id, $postB->id],
         ])->assertJson([
             'data' => [
@@ -175,7 +175,7 @@ final class CanQueryDirectiveDBTest extends DBTestCase
         $this->assertInstanceOf(Task::class, $task);
         $task->delete();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             task(id: ID! @whereKey): Task
                 @canQuery(ability: "adminOnly")
@@ -186,15 +186,15 @@ final class CanQueryDirectiveDBTest extends DBTestCase
         type Task {
             name: String!
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($id: ID!) {
             task(id: $id, trashed: WITH) {
                 name
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $task->id,
         ])->assertJson([
             'data' => [

@@ -15,7 +15,7 @@ final class CanRootDirectiveDBTest extends DBTestCase
         $admin->name = UserPolicy::ADMIN;
         $this->be($admin);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Mutation {
             throwWhenInvoked: Task
         }
@@ -23,14 +23,14 @@ final class CanRootDirectiveDBTest extends DBTestCase
         type Task {
             name: String! @canRoot(ability: "adminOnly", action: EXCEPTION_NOT_AUTHORIZED)
         }
-        ' . self::PLACEHOLDER_QUERY;
+        GRAPHQL . self::PLACEHOLDER_QUERY;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             throwWhenInvoked {
                 name
             }
         }
-        ')->assertGraphQLErrorMessage(ThrowWhenInvoked::ERROR_MESSAGE);
+        GRAPHQL)->assertGraphQLErrorMessage(ThrowWhenInvoked::ERROR_MESSAGE);
     }
 }

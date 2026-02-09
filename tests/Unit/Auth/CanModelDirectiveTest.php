@@ -6,7 +6,7 @@ final class CanModelDirectiveTest extends CanDirectiveTestBase
 {
     public static function getSchema(string $commonArgs): string
     {
-        return /** @lang GraphQL */ "
+        return /** @lang GraphQL */ <<<GRAPHQL
             type Query {
                 user(foo: String): User
                     @canModel({$commonArgs})
@@ -16,6 +16,6 @@ final class CanModelDirectiveTest extends CanDirectiveTestBase
             type User {
                 name: String
             }
-        ";
+        GRAPHQL;
     }
 }

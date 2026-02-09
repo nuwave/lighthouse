@@ -10,7 +10,7 @@ use Tests\Utils\Models\User;
 
 final class BelongsToManyTest extends DBTestCase
 {
-    protected string $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ <<<'GRAPHQL'
     type Role {
         id: ID!
         name: String
@@ -106,11 +106,11 @@ final class BelongsToManyTest extends DBTestCase
         id: ID! # role ID
         meta: String
     }
-    ' . self::PLACEHOLDER_QUERY;
+    GRAPHQL . self::PLACEHOLDER_QUERY;
 
     public function testSyncWithoutDetaching(): void
     {
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createUser(input: {
                 name: "user1"
@@ -144,7 +144,7 @@ final class BelongsToManyTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'createUser' => [
                     'id' => '1',
@@ -174,7 +174,7 @@ final class BelongsToManyTest extends DBTestCase
 
     public function testCreateWithNewBelongsToMany(): void
     {
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createRole(input: {
                 name: "foobar"
@@ -197,7 +197,7 @@ final class BelongsToManyTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'createRole' => [
                     'id' => '1',
@@ -215,7 +215,7 @@ final class BelongsToManyTest extends DBTestCase
 
     public function testUpsertWithBelongsToManyOnNonExistentData(): void
     {
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             upsertRole(input: {
                 id: 1
@@ -241,7 +241,7 @@ final class BelongsToManyTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'upsertRole' => [
                     'id' => '1',
@@ -326,7 +326,7 @@ final class BelongsToManyTest extends DBTestCase
         $user->name = 'user_two';
         $user->save();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createRole(input: {
                 name: "foobar"
@@ -342,7 +342,7 @@ final class BelongsToManyTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'createRole' => [
                     'id' => '1',
@@ -374,7 +374,7 @@ final class BelongsToManyTest extends DBTestCase
         $user->name = 'user_two';
         $user->save();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             upsertRole(input: {
                 id: 1
@@ -391,7 +391,7 @@ final class BelongsToManyTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'upsertRole' => [
                     'id' => '1',
@@ -418,7 +418,7 @@ final class BelongsToManyTest extends DBTestCase
         $role->name = 'is_admin';
         $role->save();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             updateRole(input: {
                 id: 1
@@ -442,7 +442,7 @@ final class BelongsToManyTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'updateRole' => [
                     'id' => '1',
@@ -470,7 +470,7 @@ final class BelongsToManyTest extends DBTestCase
     {
         factory(Role::class)->create();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             updateRole(input: {
                 id: 1
@@ -494,7 +494,7 @@ final class BelongsToManyTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'updateRole' => [
                     'id' => '1',
@@ -512,7 +512,7 @@ final class BelongsToManyTest extends DBTestCase
         $role->name = 'is_admin';
         $role->save();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             updateRole(input: {
                 id: 1
@@ -538,7 +538,7 @@ final class BelongsToManyTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'updateRole' => [
                     'id' => '1',
@@ -830,7 +830,7 @@ final class BelongsToManyTest extends DBTestCase
     {
         factory(User::class, 2)->create();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createRole(input: {
                 name: "foobar"
@@ -845,7 +845,7 @@ final class BelongsToManyTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'createRole' => [
                     'id' => '1',
@@ -867,7 +867,7 @@ final class BelongsToManyTest extends DBTestCase
     {
         factory(User::class, 2)->create();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             upsertRole(input: {
                 id: 1
@@ -883,7 +883,7 @@ final class BelongsToManyTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'upsertRole' => [
                     'id' => '1',
@@ -914,7 +914,7 @@ final class BelongsToManyTest extends DBTestCase
 
         $this->assertCount(1, $role->users);
 
-        $this->graphQL(/** @lang GraphQL */ "
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
             {$action}Role(input: {
                 id: 1
@@ -929,7 +929,7 @@ final class BelongsToManyTest extends DBTestCase
                 }
             }
         }
-        ")->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 "{$action}Role" => [
                     'id' => '1',
@@ -955,7 +955,7 @@ final class BelongsToManyTest extends DBTestCase
 
         $meta = Lorem::sentence();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation ($meta: String) {
             pivotsUpdateUser(input: {
                 id: 1,
@@ -979,7 +979,7 @@ final class BelongsToManyTest extends DBTestCase
                 }
             }
         }
-        ', [
+        GRAPHQL, [
             'meta' => $meta,
         ])->assertJson([
             'data' => [
@@ -1014,7 +1014,7 @@ final class BelongsToManyTest extends DBTestCase
 
         $meta = Lorem::sentence();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation ($meta: String) {
             pivotsUpdateUser(input: {
                 id: 1,
@@ -1034,7 +1034,7 @@ final class BelongsToManyTest extends DBTestCase
                 }
             }
         }
-        ', [
+        GRAPHQL, [
             'meta' => $meta,
         ])->assertJson([
             'data' => [
@@ -1063,7 +1063,7 @@ final class BelongsToManyTest extends DBTestCase
 
         $meta = Lorem::sentence();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation ($meta: String) {
             pivotsUpdateUser(input: {
                 id: 1,
@@ -1083,7 +1083,7 @@ final class BelongsToManyTest extends DBTestCase
                 }
             }
         }
-        ', [
+        GRAPHQL, [
             'meta' => $meta,
         ])->assertJson([
             'data' => [

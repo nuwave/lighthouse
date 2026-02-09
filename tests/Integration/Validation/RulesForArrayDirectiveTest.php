@@ -8,29 +8,29 @@ final class RulesForArrayDirectiveTest extends TestCase
 {
     public function testValidatesListSize(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(
                 list: [String]
                     @rulesForArray(apply: ["min:1"])
             ): ID
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 foo(
                     list: []
                 )
             }
-            ')
+            GRAPHQL)
             ->assertGraphQLValidationKeys(['list']);
     }
 
     public function testValidatesListSizeOfInputObjects(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(
                 list: [Foo]
@@ -41,16 +41,16 @@ final class RulesForArrayDirectiveTest extends TestCase
         input Foo {
             bar: ID
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 foo(
                     list: []
                 )
             }
-            ')
+            GRAPHQL)
             ->assertGraphQLValidationKeys(['list']);
     }
 }

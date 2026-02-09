@@ -17,7 +17,7 @@ final class RelationBatchLoaderTest extends DBTestCase
 {
     public function testResolveBatchedFieldsFromBatchedRequests(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Task {
             id: ID
         }
@@ -29,7 +29,7 @@ final class RelationBatchLoaderTest extends DBTestCase
         type Query {
             user(id: ID! @eq): User @find
         }
-        ';
+        GRAPHQL;
 
         $userCount = 2;
         $tasksPerUser = 3;
@@ -41,7 +41,7 @@ final class RelationBatchLoaderTest extends DBTestCase
                 );
             });
 
-        $query = /** @lang GraphQL */ '
+        $query = /** @lang GraphQL */ <<<'GRAPHQL'
         query User($id: ID!) {
             user(id: $id) {
                 tasks {
@@ -49,7 +49,7 @@ final class RelationBatchLoaderTest extends DBTestCase
                 }
             }
         }
-        ';
+        GRAPHQL;
 
         $this
             ->postGraphQL([
@@ -75,7 +75,7 @@ final class RelationBatchLoaderTest extends DBTestCase
     #[DataProvider('batchloadRelationsSetting')]
     public function testBatchloadRelations(bool $batchloadRelations, int $expectedQueryCount): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Task {
             id: ID
         }
@@ -87,7 +87,7 @@ final class RelationBatchLoaderTest extends DBTestCase
         type Query {
             users: [User!]! @all
         }
-        ';
+        GRAPHQL;
 
         $userCount = 2;
         $tasksPerUser = 3;
@@ -103,7 +103,7 @@ final class RelationBatchLoaderTest extends DBTestCase
 
         $this->assertQueryCountMatches($expectedQueryCount, function () use ($userCount, $tasksPerUser): void {
             $this
-                ->graphQL(/** @lang GraphQL */ '
+                ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
                 {
                     users {
                         tasks {
@@ -111,7 +111,7 @@ final class RelationBatchLoaderTest extends DBTestCase
                         }
                     }
                 }
-                ')
+                GRAPHQL)
                 ->assertJsonCount($userCount, 'data.users')
                 ->assertJsonCount($tasksPerUser, 'data.users.0.tasks')
                 ->assertJsonCount($tasksPerUser, 'data.users.1.tasks');
@@ -120,7 +120,7 @@ final class RelationBatchLoaderTest extends DBTestCase
 
     public function testDoesNotBatchloadRelationsWithDifferentDatabaseConnections(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type AlternateConnection {
             id: ID
         }
@@ -132,7 +132,7 @@ final class RelationBatchLoaderTest extends DBTestCase
         type Query {
             users: [User!]! @all
         }
-        ';
+        GRAPHQL;
 
         $userCount = 2;
         $alternateConnectionsPerUser = 3;
@@ -147,7 +147,7 @@ final class RelationBatchLoaderTest extends DBTestCase
         $this->countQueries($queryCount);
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 users {
                     alternateConnections {
@@ -155,7 +155,7 @@ final class RelationBatchLoaderTest extends DBTestCase
                     }
                 }
             }
-            ')
+            GRAPHQL)
             ->assertJsonCount($userCount, 'data.users')
             ->assertJsonCount($alternateConnectionsPerUser, 'data.users.0.alternateConnections')
             ->assertJsonCount($alternateConnectionsPerUser, 'data.users.1.alternateConnections');
@@ -165,7 +165,7 @@ final class RelationBatchLoaderTest extends DBTestCase
 
     public function testDoesNotBatchloadRelationsWithNullDatabaseConnections(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type NullConnection {
             users: [User!]! @hasMany
         }
@@ -177,7 +177,7 @@ final class RelationBatchLoaderTest extends DBTestCase
         type Query {
             nullConnections: [NullConnection!]! @all
         }
-        ';
+        GRAPHQL;
 
         $nullConnectionsCount = 2;
         $usersPerNullConnection = 3;
@@ -193,7 +193,7 @@ final class RelationBatchLoaderTest extends DBTestCase
 
         $this->assertQueryCountMatches(2, function () use ($nullConnectionsCount, $usersPerNullConnection): void {
             $this
-                ->graphQL(/** @lang GraphQL */ '
+                ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
                 {
                     nullConnections {
                         users {
@@ -201,7 +201,7 @@ final class RelationBatchLoaderTest extends DBTestCase
                         }
                     }
                 }
-                ')
+                GRAPHQL)
                 ->assertJsonCount($nullConnectionsCount, 'data.nullConnections')
                 ->assertJsonCount($usersPerNullConnection, 'data.nullConnections.0.users')
                 ->assertJsonCount($usersPerNullConnection, 'data.nullConnections.1.users');
@@ -217,7 +217,7 @@ final class RelationBatchLoaderTest extends DBTestCase
 
     public function testCombineEagerLoadsThatAreTheSame(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Task {
             id: ID
         }
@@ -230,12 +230,12 @@ final class RelationBatchLoaderTest extends DBTestCase
         type Query {
             users: [User!]! @all
         }
-        ';
+        GRAPHQL;
 
         factory(User::class, 2)->create();
 
         $this->assertQueryCountMatches(2, function (): void {
-            $this->graphQL(/** @lang GraphQL */ '
+            $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 users {
                     tasks {
@@ -243,21 +243,21 @@ final class RelationBatchLoaderTest extends DBTestCase
                     }
                 }
             }
-            ');
+            GRAPHQL);
         });
 
         $this->assertQueryCountMatches(2, function (): void {
-            $this->graphQL(/** @lang GraphQL */ '
+            $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 users {
                     name
                 }
             }
-            ');
+            GRAPHQL);
         });
 
         $this->assertQueryCountMatches(2, function (): void {
-            $this->graphQL(/** @lang GraphQL */ '
+            $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 users {
                     name
@@ -266,13 +266,13 @@ final class RelationBatchLoaderTest extends DBTestCase
                     }
                 }
             }
-            ');
+            GRAPHQL);
         });
     }
 
     public function testSplitsEagerLoadsByScopes(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Task {
             id: ID
         }
@@ -285,12 +285,12 @@ final class RelationBatchLoaderTest extends DBTestCase
         type Query {
             users: [User!]! @all
         }
-        ';
+        GRAPHQL;
 
         factory(User::class, 2)->create();
 
         $this->assertQueryCountMatches(3, function (): void {
-            $this->graphQL(/** @lang GraphQL */ '
+            $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 users {
                     name
@@ -299,13 +299,13 @@ final class RelationBatchLoaderTest extends DBTestCase
                     }
                 }
             }
-            ');
+            GRAPHQL);
         });
     }
 
     public function testSplitsEagerLoadsWithArguments(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Task {
             id: ID
         }
@@ -318,12 +318,12 @@ final class RelationBatchLoaderTest extends DBTestCase
         type Query {
             users: [User!]! @all
         }
-        ';
+        GRAPHQL;
 
         factory(User::class, 2)->create();
 
         $this->assertQueryCountMatches(3, function (): void {
-            $this->graphQL(/** @lang GraphQL */ '
+            $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 users {
                     name
@@ -332,13 +332,13 @@ final class RelationBatchLoaderTest extends DBTestCase
                     }
                 }
             }
-            ');
+            GRAPHQL);
         });
     }
 
     public function testTwoBatchLoadedQueriesWithDifferentResults(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Task {
             id: ID
         }
@@ -350,7 +350,7 @@ final class RelationBatchLoaderTest extends DBTestCase
         type Query {
             user(id: ID! @eq): User @find
         }
-        ';
+        GRAPHQL;
 
         factory(User::class, 2)
             ->create()
@@ -361,7 +361,7 @@ final class RelationBatchLoaderTest extends DBTestCase
             });
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 user(id: 1) {
                     tasks {
@@ -369,7 +369,7 @@ final class RelationBatchLoaderTest extends DBTestCase
                     }
                 }
             }
-            ')
+            GRAPHQL)
             ->assertJson([
                 'data' => [
                     'user' => [
@@ -389,7 +389,7 @@ final class RelationBatchLoaderTest extends DBTestCase
             ]);
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 user(id: 2) {
                     tasks {
@@ -397,7 +397,7 @@ final class RelationBatchLoaderTest extends DBTestCase
                     }
                 }
             }
-            ')
+            GRAPHQL)
             ->assertJson([
                 'data' => [
                     'user' => [
@@ -420,7 +420,7 @@ final class RelationBatchLoaderTest extends DBTestCase
     /** @return never */
     public function testCombineEagerLoadsThatAreTheSameRecursively(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             task(id: Int! @eq): Task @find
         }
@@ -437,7 +437,7 @@ final class RelationBatchLoaderTest extends DBTestCase
         type User {
             id: ID!
         }
-        ';
+        GRAPHQL;
 
         $user = factory(User::class)->create();
         $this->assertInstanceOf(User::class, $user);
@@ -456,7 +456,7 @@ final class RelationBatchLoaderTest extends DBTestCase
         $this->countQueries($queryCount);
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($id: Int!) {
                 task(id: $id) {
                     name
@@ -467,7 +467,7 @@ final class RelationBatchLoaderTest extends DBTestCase
                     }
                 }
             }
-            ', [
+            GRAPHQL, [
                 'id' => $task->id,
             ])
             ->assertJson([
@@ -491,7 +491,7 @@ final class RelationBatchLoaderTest extends DBTestCase
 
     public function testBatchLoaderWithExpiredCacheEntry(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             posts: [Post!]! @all @cache(maxAge: 20)
         }
@@ -509,7 +509,7 @@ final class RelationBatchLoaderTest extends DBTestCase
         type User {
             id: ID!
         }
-        ';
+        GRAPHQL;
 
         $user1 = factory(User::class)->create();
         $this->assertInstanceOf(User::class, $user1);
@@ -539,7 +539,7 @@ final class RelationBatchLoaderTest extends DBTestCase
             $comment->save();
         }
 
-        $firstRequest = $this->graphQL(/** @lang GraphQL */ '
+        $firstRequest = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query {
             posts {
                 comments {
@@ -549,7 +549,7 @@ final class RelationBatchLoaderTest extends DBTestCase
                 }
             }
         }
-        ');
+        GRAPHQL);
 
         Cache::forget(
             (new CacheKeyAndTagsGenerator())->key(
@@ -563,7 +563,7 @@ final class RelationBatchLoaderTest extends DBTestCase
             ),
         );
 
-        $secondRequest = $this->graphQL(/** @lang GraphQL */ '
+        $secondRequest = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query {
             posts {
                 comments {
@@ -573,7 +573,7 @@ final class RelationBatchLoaderTest extends DBTestCase
                 }
             }
         }
-        ');
+        GRAPHQL);
 
         $this->assertSame($firstRequest->json(), $secondRequest->json());
     }

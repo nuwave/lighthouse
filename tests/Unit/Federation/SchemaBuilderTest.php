@@ -20,7 +20,7 @@ final class SchemaBuilderTest extends TestCase
 
     public function testFederatedSchema(): void
     {
-        $schema = $this->buildSchema(/** @lang GraphQL */ '
+        $schema = $this->buildSchema(/** @lang GraphQL */ <<<'GRAPHQL'
         type Foo @key(fields: "id") {
             id: ID!
             foo: String!
@@ -29,7 +29,7 @@ final class SchemaBuilderTest extends TestCase
         type Query {
             foo: Int
         }
-        ');
+        GRAPHQL);
 
         $this->assertTrue($schema->hasType('_Entity'));
         $this->assertTrue($schema->hasType('_Service'));
@@ -42,12 +42,12 @@ final class SchemaBuilderTest extends TestCase
 
     public function testAddsQueryTypeIfNotDefined(): void
     {
-        $schema = $this->buildSchema(/** @lang GraphQL */ '
+        $schema = $this->buildSchema(/** @lang GraphQL */ <<<'GRAPHQL'
         type Foo @key(fields: "id") {
             id: ID!
             foo: String!
         }
-        ');
+        GRAPHQL);
 
         $this->assertSchemaHasQueryTypeWithFederationFields($schema);
     }

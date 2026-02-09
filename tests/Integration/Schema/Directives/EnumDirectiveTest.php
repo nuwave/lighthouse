@@ -14,7 +14,7 @@ final class EnumDirectiveTest extends TestCase
             return 'Not active';
         });
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         enum Status {
             ACTIVE @enum(value: "Active internal")
             INACTIVE @enum(value: "Not active")
@@ -23,14 +23,14 @@ final class EnumDirectiveTest extends TestCase
         type Query {
             status(status: Status!): Status! @mock
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 status(status: ACTIVE)
             }
-            ')
+            GRAPHQL)
             ->assertExactJson([
                 'data' => [
                     'status' => 'INACTIVE',

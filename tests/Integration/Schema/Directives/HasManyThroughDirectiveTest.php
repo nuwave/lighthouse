@@ -12,7 +12,7 @@ final class HasManyThroughDirectiveTest extends DBTestCase
 {
     public function testQueryHasManyThroughRelationship(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Post {
             id: ID!
         }
@@ -24,7 +24,7 @@ final class HasManyThroughDirectiveTest extends DBTestCase
         type Query {
             task: Task! @first
         }
-        ';
+        GRAPHQL;
 
         $user = factory(User::class)->create();
         $this->assertInstanceOf(User::class, $user);
@@ -46,7 +46,7 @@ final class HasManyThroughDirectiveTest extends DBTestCase
             $comment->save();
         }
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             task {
                 postComments {
@@ -54,6 +54,6 @@ final class HasManyThroughDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertJsonCount(2, 'data.task.postComments');
+        GRAPHQL)->assertJsonCount(2, 'data.task.postComments');
     }
 }

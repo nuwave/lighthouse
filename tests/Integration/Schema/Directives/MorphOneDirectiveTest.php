@@ -50,7 +50,7 @@ final class MorphOneDirectiveTest extends DBTestCase
 
     public function testResolveMorphOneRelationship(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Image {
             id: ID!
         }
@@ -66,9 +66,9 @@ final class MorphOneDirectiveTest extends DBTestCase
                 id: ID! @eq
             ): Task @find
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($id: ID!) {
             task(id: $id) {
                 id
@@ -78,7 +78,7 @@ final class MorphOneDirectiveTest extends DBTestCase
                 }
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $this->task->id,
         ])->assertJson([
             'data' => [
@@ -95,7 +95,7 @@ final class MorphOneDirectiveTest extends DBTestCase
 
     public function testResolveMorphOneWithCustomName(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Image {
             id: ID!
         }
@@ -111,9 +111,9 @@ final class MorphOneDirectiveTest extends DBTestCase
                 id: ID! @eq
             ): Task @find
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($id: ID!) {
             task(id: $id) {
                 id
@@ -123,7 +123,7 @@ final class MorphOneDirectiveTest extends DBTestCase
                 }
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $this->task->id,
         ])->assertJson([
             'data' => [

@@ -9,7 +9,7 @@ use Tests\Utils\Models\Task;
 
 final class HasOneTest extends DBTestCase
 {
-    protected string $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ <<<'GRAPHQL'
     type Task {
         id: ID!
         name: String!
@@ -77,11 +77,11 @@ final class HasOneTest extends DBTestCase
         id: ID
         title: String
     }
-    ' . self::PLACEHOLDER_QUERY;
+    GRAPHQL . self::PLACEHOLDER_QUERY;
 
     public function testCreateWithNewHasOne(): void
     {
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createTask(input: {
                 name: "foo"
@@ -99,7 +99,7 @@ final class HasOneTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'createTask' => [
                     'id' => '1',
@@ -115,7 +115,7 @@ final class HasOneTest extends DBTestCase
 
     public function testUpsertWithNewHasOne(): void
     {
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createTask(input: {
                 name: "foo"
@@ -134,7 +134,7 @@ final class HasOneTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'createTask' => [
                     'id' => '1',
@@ -150,7 +150,7 @@ final class HasOneTest extends DBTestCase
 
     public function testCreateUsingUpsertWithNewHasOne(): void
     {
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             upsertTask(input: {
                 id: 2
@@ -170,7 +170,7 @@ final class HasOneTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'upsertTask' => [
                     'id' => '2',
@@ -186,7 +186,7 @@ final class HasOneTest extends DBTestCase
 
     public function testUpsertHasOneWithoutID(): void
     {
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             upsertTask(input: {
                 name: "foo"
@@ -204,7 +204,7 @@ final class HasOneTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'upsertTask' => [
                     'id' => '1',
@@ -220,7 +220,7 @@ final class HasOneTest extends DBTestCase
 
     public function testUpsertHasOneWithIDNull(): void
     {
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             upsertTask(input: {
                 name: "foo"
@@ -239,7 +239,7 @@ final class HasOneTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'upsertTask' => [
                     'id' => '1',
