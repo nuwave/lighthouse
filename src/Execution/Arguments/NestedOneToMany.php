@@ -3,9 +3,7 @@
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
 class NestedOneToMany implements ArgResolver
@@ -15,27 +13,14 @@ class NestedOneToMany implements ArgResolver
     ) {}
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  ArgumentSet  $args
      */
-    public function __invoke($parent, $args): void
+    public function __invoke($model, $args): void
     {
-        $relation = $parent->{$this->relationName}();
+        $relation = $model->{$this->relationName}();
         assert($relation instanceof HasMany || $relation instanceof MorphMany);
 
-        static::createUpdateUpsert($args, $relation);
-        static::connectDisconnect($args, $relation);
-
-        if ($args->has('delete')) {
-            $relation->getRelated()::destroy(
-                $args->arguments['delete']->toPlain(),
-            );
-        }
-    }
-
-    /** @param  \Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>  $relation */
-    public static function createUpdateUpsert(ArgumentSet $args, Relation $relation): void
-    {
         if ($args->has('create')) {
             $saveModel = new ResolveNested(new SaveModel($relation));
 
@@ -62,11 +47,7 @@ class NestedOneToMany implements ArgResolver
                 $upsertModel($relation->make(), $childArgs);
             }
         }
-    }
 
-    /** @param  \Illuminate\Database\Eloquent\Relations\HasOneOrMany<\Illuminate\Database\Eloquent\Model>  $relation */
-    public static function connectDisconnect(ArgumentSet $args, HasOneOrMany $relation): void
-    {
         if ($args->has('connect')) {
             $children = $relation
                 ->make()
@@ -90,6 +71,12 @@ class NestedOneToMany implements ArgResolver
                 $child->setAttribute($relation->getForeignKeyName(), null);
                 $child->save();
             }
+        }
+
+        if ($args->has('delete')) {
+            $relation->getRelated()::destroy(
+                $args->arguments['delete']->toPlain(),
+            );
         }
     }
 }

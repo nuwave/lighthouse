@@ -1,4 +1,4 @@
-name: "Build protobuf"
+name: "Generate proto code"
 on:
   push:
     branches:
@@ -8,30 +8,22 @@ on:
       - 'buf.gen.yaml'
 
 jobs:
-  proto:
+  generate-proto-code:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
 
-      - uses: shivammathur/setup-php@v2
+      - uses: bufbuild/buf-action@v1
         with:
-          coverage: none
-          extensions: mbstring
-          php-version: 8.3
-
-      - run: composer install --no-interaction --no-progress --no-suggest
-
-      - uses: bufbuild/buf-setup-action@v1
+          setup_only: true
 
       - run: |
           buf generate
           rm -rf src/Tracing/FederatedTracing/Proto
           mv proto-tmp/Nuwave/Lighthouse/Tracing/FederatedTracing/Proto src/Tracing/FederatedTracing/Proto
           rm -rf proto-tmp
-
-      - run: vendor/bin/php-cs-fixer fix src/Tracing/FederatedTracing/Proto
 
       - run: git pull
 

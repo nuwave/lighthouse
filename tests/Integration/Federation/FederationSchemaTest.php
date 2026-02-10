@@ -9,8 +9,8 @@ use Tests\TestCase;
 final class FederationSchemaTest extends TestCase
 {
     private const FEDERATION_V2_SCHEMA_EXTENSION = /** @lang GraphQL */ <<<'GRAPHQL'
-extend schema @link(url: "https:\/\/specs.apollo.dev\/federation\/v2.3", import: ["@composeDirective", "@extends", "@external", "@inaccessible", "@interfaceObject", "@key", "@override", "@provides", "@requires", "@shareable", "@tag"])
-GRAPHQL;
+        extend schema @link(url: "https://specs.apollo.dev/federation/v2.3", import: ["@composeDirective", "@extends", "@external", "@inaccessible", "@interfaceObject", "@key", "@override", "@provides", "@requires", "@shareable", "@tag"])
+        GRAPHQL;
 
     protected function getPackageProviders($app): array
     {
@@ -23,19 +23,17 @@ GRAPHQL;
     public function testServiceQueryShouldReturnValidSdl(): void
     {
         $typeFoo = /** @lang GraphQL */ <<<'GRAPHQL'
-type Foo @key(fields: "id") {
-  id: ID! @external
-  foo: String!
-}
-
-GRAPHQL;
+        type Foo @key(fields: "id") {
+          id: ID! @external
+          foo: String!
+        }
+        GRAPHQL;
 
         $typeQuery = /** @lang GraphQL */ <<<'GRAPHQL'
-type Query {
-  foo: Int!
-}
-
-GRAPHQL;
+        type Query {
+          foo: Int!
+        }
+        GRAPHQL;
 
         $this->schema = $typeFoo . $typeQuery;
 
@@ -48,24 +46,25 @@ GRAPHQL;
     public function testServiceQueryShouldReturnValidSdlWithoutQuery(): void
     {
         $typeFoo = /** @lang GraphQL */ <<<'GRAPHQL'
-type Foo @key(fields: "id") {
-  id: ID! @external
-  foo: String!
-}
-
-GRAPHQL;
+        type Foo @key(fields: "id") {
+          id: ID! @external
+          foo: String!
+        }
+        GRAPHQL;
 
         $this->schema = $typeFoo;
 
         $sdl = $this->_serviceSdl();
 
         $this->assertStringContainsString($typeFoo, $sdl);
-        $this->assertStringNotContainsString(/** @lang GraphQL */ 'type Query', $sdl);
+        $this->assertStringNotContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
+        type Query
+        GRAPHQL, $sdl);
     }
 
     public function testFederatedSchemaShouldContainCorrectEntityUnion(): void
     {
-        $schema = $this->buildSchema(/** @lang GraphQL */ '
+        $schema = $this->buildSchema(/** @lang GraphQL */ <<<'GRAPHQL'
         type Foo @key(fields: "id") {
           id: ID! @external
           foo: String!
@@ -79,7 +78,7 @@ GRAPHQL;
         type Query {
           foo: Int!
         }
-        ');
+        GRAPHQL);
 
         $_Entity = $schema->getType('_Entity');
         $this->assertInstanceOf(UnionType::class, $_Entity);
@@ -92,40 +91,40 @@ GRAPHQL;
     public function testServiceQueryShouldReturnFederationV2SchemaExtension(): void
     {
         $schemaExtension = /** @lang GraphQL */ <<<'GRAPHQL'
-extend schema @link(url: "https:\/\/specs.apollo.dev\/federation\/v2.3", import: ["@composeDirective", "@extends", "@external", "@inaccessible", "@interfaceObject", "@key", "@override", "@provides", "@requires", "@shareable", "@tag"])
-GRAPHQL;
+        extend schema @link(url: "https://specs.apollo.dev/federation/v2.3", import: ["@composeDirective", "@extends", "@external", "@inaccessible", "@interfaceObject", "@key", "@override", "@provides", "@requires", "@shareable", "@tag"])
+        GRAPHQL;
 
         $typeFoo = /** @lang GraphQL */ <<<'GRAPHQL'
-type Foo @key(fields: "id") {
-  id: ID!
-}
-GRAPHQL;
+        type Foo @key(fields: "id") {
+          id: ID!
+        }
+        GRAPHQL;
 
         $this->schema = "{$schemaExtension} {$typeFoo}";
 
         $sdl = $this->_serviceSdl();
 
-        $this->assertStringContainsString($schemaExtension, $sdl);
+        $this->assertSdlContainsString($schemaExtension, $sdl);
         $this->assertStringContainsString($typeFoo, $sdl);
     }
 
     public function testServiceQueryShouldReturnFederationV2ComposedDirectives(): void
     {
         $schemaExtension = /** @lang GraphQL */ <<<'GRAPHQL'
-extend schema @link(url: "https:\/\/specs.apollo.dev\/federation\/v2.3", import: ["@composeDirective"]) @link(url: "https:\/\/myspecs.dev\/myCustomDirective\/v1.0", import: ["@foo", "@bar"]) @composeDirective(name: "@foo") @composeDirective(name: "@bar")
-GRAPHQL;
+        extend schema @link(url: "https://specs.apollo.dev/federation/v2.3", import: ["@composeDirective"]) @link(url: "https://myspecs.dev/myCustomDirective/v1.0", import: ["@foo", "@bar"]) @composeDirective(name: "@foo") @composeDirective(name: "@bar")
+        GRAPHQL;
 
         $typeFoo = /** @lang GraphQL */ <<<'GRAPHQL'
-type Foo @key(fields: "id") {
-  id: ID!
-}
-GRAPHQL;
+        type Foo @key(fields: "id") {
+          id: ID!
+        }
+        GRAPHQL;
 
         $this->schema = "{$schemaExtension} {$typeFoo}";
 
         $sdl = $this->_serviceSdl();
 
-        $this->assertStringContainsString($schemaExtension, $sdl);
+        $this->assertSdlContainsString($schemaExtension, $sdl);
         $this->assertStringContainsString('directive @foo on FIELD_DEFINITION', $sdl);
         $this->assertStringContainsString('directive @bar on FIELD_DEFINITION', $sdl);
         $this->assertStringContainsString($typeFoo, $sdl);
@@ -176,15 +175,15 @@ GRAPHQL;
         $this->assertStringContainsString('type SimplePaginatorInfo @shareable {', $sdl);
     }
 
-    protected function _serviceSdl(): string
+    private function _serviceSdl(): string
     {
-        $response = $this->graphQL(/** @lang GraphQL */ '
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             _service {
                 sdl
             }
         }
-        ');
+        GRAPHQL);
 
         return $response->json('data._service.sdl');
     }

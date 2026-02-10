@@ -227,7 +227,7 @@ $spy->shouldNotHaveReceived('broadcast', function (Subscriber $subscriber, $broa
 Lighthouse conveniently provides additional assertions as mixins to the `TestResponse` class.
 Make sure to [generate the latest IDE-helper file](../api-reference/commands.md#ide-helper) to get proper autocompletion:
 
-```bash
+```shell
 php artisan lighthouse:ide-helper
 ```
 
@@ -282,8 +282,7 @@ $this->graphQL(/** @lang GraphQL */ '
 
 Lighthouse allows you to [upload files](../digging-deeper/file-uploads.md) through GraphQL.
 
-Since multipart form requests are tricky to construct, you can just use the `multipartGraphQL`
-helper method.
+Since multipart form requests are tricky to construct, you can use the `multipartGraphQL` helper method.
 
 ```php
 $operations = [
@@ -313,7 +312,7 @@ $this->multipartGraphQL($operations, $map, $file);
 If you create or manipulate parts of your schema programmatically, you might
 want to test that. You can use introspection to query your final schema in tests.
 
-Lighthouse uses the introspection query from [`\GraphQL\Type\Introspection::getIntrospectionQuery()`](https://github.com/webonyx/graphql-php/blob/master/src/Type/Introspection.php).
+Lighthouse uses the introspection query from [`GraphQL\Type\Introspection::getIntrospectionQuery()`](https://github.com/webonyx/graphql-php/blob/master/src/Type/Introspection.php).
 
 The `introspect()` helper method runs the full introspection query against your schema.
 

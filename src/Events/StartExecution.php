@@ -18,31 +18,19 @@ class StartExecution
     public Carbon $moment;
 
     public function __construct(
-        /**
-         * The parsed schema.
-         */
+        /** The parsed schema. */
         public Schema $schema,
-
-        /**
-         * The client given parsed query string.
-         */
+        /** The client given parsed query string. */
         public DocumentNode $query,
-
         /**
          * The client given variables, neither validated nor transformed.
          *
          * @var array<string, mixed>|null
          */
         public ?array $variables,
-
-        /**
-         * The client given operation name.
-         */
+        /** The client given operation name. */
         public ?string $operationName,
-
-        /**
-         * The context for the operation.
-         */
+        /** The context for the operation. */
         public GraphQLContext $context,
     ) {
         $this->moment = Carbon::now();

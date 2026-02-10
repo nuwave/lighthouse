@@ -6,13 +6,13 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Nuwave\Lighthouse\Execution\Arguments\SaveModel;
 use Nuwave\Lighthouse\Execution\Arguments\UpsertModel;
 
-class UpsertDirective extends MutationExecutorDirective
+class UpsertDirective extends OneModelMutationDirective
 {
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Create or update an Eloquent model with the input values of the field.
+Create or update an Eloquent model with the given arguments.
 """
 directive @upsert(
   """

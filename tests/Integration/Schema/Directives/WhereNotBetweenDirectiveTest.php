@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Schema\Directives;
+namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
@@ -11,8 +11,8 @@ final class WhereNotBetweenDirectiveTest extends DBTestCase
     {
         $users = factory(User::class, 2)->create();
 
-        $this->schema = /** @lang GraphQL */ '
-        scalar DateTime @scalar(class: "Nuwave\\\Lighthouse\\\Schema\\\Types\\\Scalars\\\DateTime")
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
 
         type User {
             id: ID!
@@ -27,16 +27,16 @@ final class WhereNotBetweenDirectiveTest extends DBTestCase
             from: DateTime!
             to: DateTime!
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 users(notCreatedBetween: null) {
                     id
                 }
             }
-            ')
+            GRAPHQL)
             ->assertGraphQLErrorFree()
             ->assertJsonCount($users->count(), 'data.users');
     }

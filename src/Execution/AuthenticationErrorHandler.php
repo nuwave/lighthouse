@@ -6,9 +6,7 @@ use GraphQL\Error\Error;
 use Illuminate\Auth\AuthenticationException as LaravelAuthenticationException;
 use Nuwave\Lighthouse\Exceptions\AuthenticationException;
 
-/**
- * Wrap native Laravel authentication exceptions, adding structured data to extensions.
- */
+/** Wrap native Laravel authentication exceptions, adding structured data to extensions. */
 class AuthenticationErrorHandler implements ErrorHandler
 {
     public function __invoke(?Error $error, \Closure $next): ?array

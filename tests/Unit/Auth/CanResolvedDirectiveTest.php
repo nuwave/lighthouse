@@ -10,7 +10,7 @@ final class CanResolvedDirectiveTest extends CanDirectiveTestBase
 {
     public static function getSchema(string $commonArgs): string
     {
-        return /** @lang GraphQL */ "
+        return /** @lang GraphQL */ <<<GRAPHQL
             type Query {
                 user(foo: String): User
                     @canResolved({$commonArgs})
@@ -20,7 +20,7 @@ final class CanResolvedDirectiveTest extends CanDirectiveTestBase
             type User {
                 name: String
             }
-        ";
+        GRAPHQL;
     }
 
     public function testThrowsIfNotAuthorized(): void

@@ -10,18 +10,17 @@ use Tests\TestCase;
 final class PrintFederationSchemaCommandTest extends TestCase
 {
     protected const SCHEMA_TYPE = /** @lang GraphQL */ <<<'GRAPHQL'
-type Foo @key(fields: "id") {
-  id: ID! @external
-  foo: String!
-}
-
-GRAPHQL;
+    type Foo @key(fields: "id") {
+      id: ID! @external
+      foo: String!
+    }
+    GRAPHQL;
 
     protected const SCHEMA_QUERY = /** @lang GraphQL */ <<<'GRAPHQL'
-type Query {
-  foo: Int!
-}
-GRAPHQL;
+    type Query {
+      foo: Int!
+    }
+    GRAPHQL;
 
     protected function getPackageProviders($app): array
     {

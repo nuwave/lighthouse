@@ -13,12 +13,14 @@ final class RelationCountBatchLoaderTest extends DBTestCase
         $users = factory(User::class, 2)
             ->create()
             ->each(static function (User $user): void {
-                factory(Task::class, 3)->create([
-                    'user_id' => $user->getKey(),
-                ]);
+                $tasks = factory(Task::class, 3)->make();
+                $tasks->each(static function (Task $task) use ($user): void {
+                    $task->user()->associate($user);
+                    $task->save();
+                });
             });
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Task {
             id: ID
             name: String
@@ -35,15 +37,15 @@ final class RelationCountBatchLoaderTest extends DBTestCase
             user(id: ID! @eq): User @find
             users: [User!]! @all
         }
-        ';
+        GRAPHQL;
 
-        $query = /** @lang GraphQL */ '
+        $query = /** @lang GraphQL */ <<<'GRAPHQL'
         query ($id: ID!) {
             user(id: $id) {
                 tasks_count
             }
         }
-        ';
+        GRAPHQL;
 
         $this
             ->postGraphQL([

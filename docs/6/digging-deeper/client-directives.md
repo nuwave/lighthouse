@@ -1,6 +1,6 @@
 # Client Directives
 
-Client directives allow clients to change the behaviour of query execution.
+Client directives allow clients to change the behavior of query execution.
 
 > Client directives must not be used within your schema definition.
 

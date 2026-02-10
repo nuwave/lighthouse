@@ -1,12 +1,14 @@
 parameters:
   level: 8 # TODO level up to max
+  bootstrapFiles:
+  - phpstan-bootstrap.php
   stubFiles:
   - _ide_helper.php
   paths:
   - benchmarks
   - src
   - tests
-  # Temporarily comment out before running rector, do not forget to put it back in
+  # Does not work with rector, comment in to diagnose potential issues with Octane
   #checkOctaneCompatibility: true
   reportUnmatchedIgnoredErrors: false # As long as we support multiple Laravel versions at once, there will be some dead spots
   # Install https://plugins.jetbrains.com/plugin/7677-awesome-console to make those links clickable
@@ -22,16 +24,23 @@ parameters:
   - src/Tracing/FederatedTracing/Proto # Generated classes from protobuf
   # Ignore errors caused by the absence of Lumen in the dev dependencies
   - tests/Unit/Testing/TestingTraitDummyLumen.php
+  # Native enums
+  - tests/Utils/Enums/ImageableType.php
+  - tests/Utils/Enums/ImageableType.php
   ignoreErrors:
+  # PHPUnit 10+ attributes don't exist in PHPUnit 9.x
+  - path: tests
+    message: '#Attribute class PHPUnit\\Framework\\Attributes\\.+ does not exist\.#'
+
   # PHPStan does not get it
   - '#Parameter \#1 \$callback of static method Closure::fromCallable\(\) expects callable\(\): mixed, array{object, .*} given\.#'
 
-  # Some parts of Laravel are just really magical
-  - '#Parameter \#1 \$response of static method Nuwave\\Lighthouse\\Testing\\TestResponseUtils::extractValidationErrors\(\) expects Illuminate\\Testing\\TestResponse, \$this\(Nuwave\\Lighthouse\\Testing\\TestResponseMixin\) given\.#'
-  - path: tests/database/factories/*
+  # Some parts of Laravel are really magical
+  - '#Parameter \#1 \$response of static method Nuwave\\Lighthouse\\Testing\\TestResponseUtils::extractValidationErrors\(\) expects Illuminate\\Testing\\TestResponse<Symfony\\Component\\HttpFoundation\\Response>, \$this\(Nuwave\\Lighthouse\\Testing\\TestResponseMixin\) given\.#'
+  - path: tests/database/factories
     message: '#Variable \$factory might not be defined#'
 
-  # Mixins are magical
+  # Mixins magically rebind $this to be something else and do other funky stuff
   - path: src/Testing/TestResponseMixin.php
     message: '#Method Nuwave\\Lighthouse\\Testing\\TestResponseMixin::assertGraphQLErrorMessage\(\) invoked with 1 parameter, 0 required\.#'
   - path: src/Testing/TestResponseMixin.php
@@ -39,8 +48,27 @@ parameters:
   - path: src/Testing/TestResponseMixin.php
     message: '#Anonymous function should return Illuminate\\Testing\\TestResponse but returns .*#'
 
+  # Recognition of mixin methods is broken in some PHPStan/Larastan versions
+  - '#Call to an undefined method Illuminate\\Testing\\TestResponse::(assertGraphQLValidationError|assertGraphQLValidationKeys|assertGraphQLValidationPasses|assertGraphQLError|assertGraphQLErrorMessage|assertGraphQLDebugMessage|assertGraphQLErrorFree|assertGraphQLSubscriptionAuthorized|assertGraphQLSubscriptionNotAuthorized|graphQLSubscriptionMock|graphQLSubscriptionChannelName|assertGraphQLBroadcasted|assertGraphQLNotBroadcasted)\(\)\.#'
+
   # Relation forwards calls to Builder
   - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Builder<Illuminate\\Database\\Eloquent\\Model>|Illuminate\\Database\\Eloquent\\Relations\\Relation<Illuminate\\Database\\Eloquent\\Model>|Illuminate\\Database\\Query\\Builder::(orderBy|where|whereIn|whereNotIn|whereBetween|whereJsonContains|whereNotBetween)\(\)\.#'
+
+  # Laravel 11 changes a lot of generics
+  - '#generic class (Illuminate\\Database\\Eloquent\\Builder|Laravel\\Scout\\Builder)( but)? does not specify its types#'
+  - '#contains generic type Illuminate\\Testing\\TestResponse<.+> but class Illuminate\\Testing\\TestResponse is not generic\.#'
+  - '#Generic type Illuminate\\.+ specifies \d template types, but (class|interface) Illuminate\\.+ supports only \d: .+#'
+  - '#Method .+ should return Illuminate\\Database\\Eloquent\\Relations\\(HasOne|HasMany|BelongsToMany|MorphOne|MorphMany|MorphToMany)<(.+), .+> but returns Illuminate\\Database\\Eloquent\\Relations\\\1<\2>.#'
+  - '#Method .+ should return Illuminate\\Database\\Eloquent\\Relations\\(BelongsTo|MorphTo)<(.+), \$this\((.+)\)> but returns Illuminate\\Database\\Eloquent\\Relations\\\1<\2, \3>.#'
+  - '#Method .+ should return Illuminate\\Database\\Eloquent\\Relations\\(HasOneThrough|HasManyThrough)<(.+), .+> but returns Illuminate\\Database\\Eloquent\\Relations\\\1<\2>.#'
+  - '#Return type of call to method Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany<.+>::save\(\) contains unresolvable type\.#'
+
+  # PHPUnit version compatibility - InvocationMocker (PHPUnit 9-11) vs InvocationStubber (PHPUnit 12+)
+  # The MocksResolvers trait uses conditional definition based on PHPUnit version
+  - '#PHPDoc tag @return contains generic type PHPUnit\\Framework\\MockObject\\Builder\\InvocationMocker<.+> but class PHPUnit\\Framework\\MockObject\\Builder\\InvocationMocker is not generic.#'
+  - path: src/Testing/MocksResolvers.php
+    message: '#(class|has invalid return type) PHPUnit\\Framework\\MockObject\\Builder\\InvocationMocker#'
+  - '#Call to method (with|willReturn|willReturnCallback|willReturnMap|willReturnArgument|willReturnSelf|willReturnOnConsecutiveCalls|willThrowException|method|id|after|withAnyParameters|will)\(\) on an unknown class PHPUnit\\Framework\\MockObject\\Builder\\InvocationMocker\.#'
 
   # This test cheats and uses reflection to make assertions
   - path: tests/Unit/Schema/Directives/BaseDirectiveTest.php
@@ -48,6 +76,9 @@ parameters:
 
   # This is a library, so it should be extendable
   - '#Unsafe usage of new static.*#'
+
+  # Possible footgun, but people who extend Lighthouse classes should know what they are doing
+  - '#Cannot unset property .+ because it might have hooks in a subclass\.#'
 
   # Ease transition for non-nullable properties towards native types https://github.com/phpstan/phpstan/issues/5150
   - '#Property .* in isset\(\) is not nullable\.#'
@@ -74,9 +105,8 @@ parameters:
     message: '#Call to method version\(\) on an unknown class Laravel\\Lumen\\Application.#'
   - path: src/Subscriptions/SubscriptionRouter.php
     messages:
-      - '#Parameter \$router of method Nuwave\\Lighthouse\\Subscriptions\\SubscriptionRouter::pusher\(\) has invalid type Laravel\\Lumen\\Routing\\Router\.#'
+      - '#Parameter \$router of method Nuwave\\Lighthouse\\Subscriptions\\SubscriptionRouter::.+\(\) has invalid type Laravel\\Lumen\\Routing\\Router\.#'
       - '#Call to method post\(\) on an unknown class Laravel\\Lumen\\Routing\\Router\.#'
-      - '#Parameter \$router of method Nuwave\\Lighthouse\\Subscriptions\\SubscriptionRouter::echoRoutes\(\) has invalid type Laravel\\Lumen\\Routing\\Router\.#'
   - path: src/Http/routes.php
     messages:
       - '#PHPDoc tag @var for variable \$router contains unknown class Laravel\\Lumen\\Routing\\Router\.#'
@@ -95,3 +125,18 @@ parameters:
   - path: src/Testing/TestResponseMixin.php
     message: '#Unable to resolve the template type TValue in call to method static method Illuminate\\Support\\Arr::first\(\)#'
 
+  # Lots of work to specify the generics, little gain
+  - path: tests
+    message: '#Method .+ return type with generic class Illuminate\\Testing\\TestResponse does not specify its types: TResponse#'
+  - path: benchmarks
+    message: '#Method .+ return type with generic class Illuminate\\Testing\\TestResponse does not specify its types: TResponse#'
+
+  # We don't care about configuration caching in our tests
+  - path: tests
+    message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+  # This is actually a config file, just not recognized as such
+  - path: src/lighthouse.php
+    message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+
+  # Allows assert() calls to assist IDE autocompletion
+  - message: '#Call to function assert\(\) with true will always evaluate to true\.#'

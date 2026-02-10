@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
@@ -33,9 +34,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * Relations
  * @property-read \Tests\Utils\Models\Activity $activity
  * @property-read \Tests\Utils\Models\Image $image
- * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Image> $images
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\Image> $images
  * @property-read \Tests\Utils\Models\Post|null $post
- * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Tag> $tags
+ * @property-read \Tests\Utils\Models\Comment|null $postComments
+ * @property-read \Tests\Utils\Models\PostStatus|null $postStatus
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\Tag> $tags
  * @property-read \Tests\Utils\Models\User|null $user
  */
 final class Task extends Model
@@ -49,48 +52,54 @@ final class Task extends Model
         parent::boot();
 
         // This is used to test that this scope works in all kinds of queries
-        static::addGlobalScope('no_cleaning', static function (EloquentBuilder $builder): void {
+        self::addGlobalScope('no_cleaning', static function (EloquentBuilder $builder): void {
             $builder->where('name', '!=', self::CLEANING);
         });
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Tests\Utils\Models\Activity> */
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Tests\Utils\Models\Activity, $this> */
     public function activity(): MorphMany
     {
         return $this->morphMany(Activity::class, 'content');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\MorphOne<\Tests\Utils\Models\Image> */
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphOne<\Tests\Utils\Models\Image, $this> */
     public function image(): MorphOne
     {
         return $this->morphOne(Image::class, 'imageable');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Tests\Utils\Models\Image> */
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Tests\Utils\Models\Image, $this> */
     public function images(): MorphMany
     {
         return $this->morphMany(Image::class, 'imageable');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Tests\Utils\Models\Post> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Tests\Utils\Models\Post, $this> */
     public function post(): HasOne
     {
         return $this->hasOne(Post::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\Tests\Utils\Models\Comment> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\Tests\Utils\Models\Comment, \Tests\Utils\Models\Post, $this> */
     public function postComments(): HasManyThrough
     {
         return $this->hasManyThrough(Comment::class, Post::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\MorphToMany<\Tests\Utils\Models\Tag> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOneThrough<\Tests\Utils\Models\PostStatus, \Tests\Utils\Models\Post, $this> */
+    public function postStatus(): HasOneThrough
+    {
+        return $this->hasOneThrough(PostStatus::class, Post::class, 'task_id', 'post_id');
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphToMany<\Tests\Utils\Models\Tag, $this> */
     public function tags(): MorphToMany
     {
         return $this->morphToMany(Tag::class, 'taggable');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\User, self> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\User, $this> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

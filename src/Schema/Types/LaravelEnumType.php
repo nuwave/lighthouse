@@ -2,12 +2,12 @@
 
 namespace Nuwave\Lighthouse\Schema\Types;
 
-use BenSampo\Enum\Enum;
+use BenSampo\Enum\Enum as BenSampoEnum;
 use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\EnumType;
 
 /**
- * A convenience wrapper for registering enums programmatically.
+ * A convenience wrapper for registering enums from bensampo/laravel-enum programmatically.
  *
  * @template TValue
  * @template TEnum of \BenSampo\Enum\Enum<TValue>
@@ -35,7 +35,7 @@ class LaravelEnumType extends EnumType
         }
 
         // @phpstan-ignore-next-line not necessary with full static validation
-        if (! is_subclass_of($enumClass, Enum::class)) {
+        if (! is_subclass_of($enumClass, BenSampoEnum::class)) {
             throw self::classMustExtendBenSampoEnumEnum($enumClass);
         }
 
@@ -46,10 +46,8 @@ class LaravelEnumType extends EnumType
             'name' => $name ?? class_basename($enumClass),
             'description' => $this->enumClassDescription($enumClass),
             'values' => array_map(
-                /**
-                 * @return array<string, mixed> Used to construct a \GraphQL\Type\Definition\EnumValueDefinition
-                 */
-                function (Enum $enum): array {
+                /** @return array<string, mixed> Used to construct a \GraphQL\Type\Definition\EnumValueDefinition */
+                function (BenSampoEnum $enum): array {
                     $key = $enum->key;
                     if (! $key) {
                         throw static::enumMustHaveKey($enum);
@@ -74,13 +72,13 @@ class LaravelEnumType extends EnumType
 
     public static function classMustExtendBenSampoEnumEnum(string $enumClass): \InvalidArgumentException
     {
-        $baseClass = Enum::class;
+        $baseClass = BenSampoEnum::class;
 
         return new \InvalidArgumentException("Class {$enumClass} must extend {$baseClass}.");
     }
 
     /** @param  \BenSampo\Enum\Enum<mixed>  $value */
-    public static function enumMustHaveKey(Enum $value): \InvalidArgumentException
+    public static function enumMustHaveKey(BenSampoEnum $value): \InvalidArgumentException
     {
         $class = $value::class;
 
@@ -132,7 +130,7 @@ class LaravelEnumType extends EnumType
     }
 
     /** @param  TEnum  $enum */
-    protected function enumValueDescription(Enum $enum): ?string
+    protected function enumValueDescription(BenSampoEnum $enum): ?string
     {
         return $enum->description;
     }
@@ -140,7 +138,7 @@ class LaravelEnumType extends EnumType
     /** Overwrite the native EnumType serialization, as this class does not hold plain values. */
     public function serialize($value): string
     {
-        if (! $value instanceof Enum) {
+        if (! $value instanceof BenSampoEnum) {
             $value = $this->enumClass::fromValue($value);
         }
 

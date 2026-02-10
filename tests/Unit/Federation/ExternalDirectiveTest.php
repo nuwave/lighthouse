@@ -21,7 +21,7 @@ final class ExternalDirectiveTest extends TestCase
 
         $this->mockResolver($id);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: Foo! @mock
         }
@@ -29,15 +29,15 @@ final class ExternalDirectiveTest extends TestCase
         type Foo @key(fields: "id") {
             id: ID! @external
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo {
                 id
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'foo' => [
                     'id' => $id,
@@ -52,7 +52,7 @@ final class ExternalDirectiveTest extends TestCase
         $two = 2;
         $this->mockResolver([$one, $two]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foos: [Foo!]! @mock
         }
@@ -60,15 +60,15 @@ final class ExternalDirectiveTest extends TestCase
         type Foo @key(fields: "id") {
             id: ID! @external
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foos {
                 id
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'foos' => [
                     [
@@ -90,7 +90,7 @@ final class ExternalDirectiveTest extends TestCase
         ];
         $this->mockResolver($foo);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: Foo! @mock
         }
@@ -99,16 +99,16 @@ final class ExternalDirectiveTest extends TestCase
             id: ID! @external
             someFieldWeOwn: String!
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo {
                 id
                 someFieldWeOwn
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'foo' => $foo,
             ],

@@ -13,12 +13,12 @@ class NestedManyToMany implements ArgResolver
     ) {}
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  ArgumentSet  $args
      */
-    public function __invoke($parent, $args): void
+    public function __invoke($model, $args): void
     {
-        $relation = $parent->{$this->relationName}();
+        $relation = $model->{$this->relationName}();
         assert($relation instanceof BelongsToMany);
 
         if ($args->has('sync')) {
@@ -33,7 +33,32 @@ class NestedManyToMany implements ArgResolver
             );
         }
 
-        NestedOneToMany::createUpdateUpsert($args, $relation);
+        if ($args->has('create')) {
+            $saveModel = new ResolveNested(new SaveModel($relation));
+
+            foreach ($args->arguments['create']->value as $childArgs) {
+                // @phpstan-ignore-next-line Relation&Builder mixin not recognized
+                $saveModel($relation->make(), $childArgs);
+            }
+        }
+
+        if ($args->has('update')) {
+            $updateModel = new ResolveNested(new UpdateModel(new SaveModel($relation)));
+
+            foreach ($args->arguments['update']->value as $childArgs) {
+                // @phpstan-ignore-next-line Relation&Builder mixin not recognized
+                $updateModel($relation->make(), $childArgs);
+            }
+        }
+
+        if ($args->has('upsert')) {
+            $upsertModel = new ResolveNested(new UpsertModel(new SaveModel($relation)));
+
+            foreach ($args->arguments['upsert']->value as $childArgs) {
+                // @phpstan-ignore-next-line Relation&Builder mixin not recognized
+                $upsertModel($relation->make(), $childArgs);
+            }
+        }
 
         if ($args->has('delete')) {
             $ids = $args->arguments['delete']->toPlain();
@@ -72,8 +97,8 @@ class NestedManyToMany implements ArgResolver
             return [];
         }
 
-        // Since GraphQL inputs are monomorphic, we can just look at the first
-        // given value and can deduce the value of all given args.
+        // Since GraphQL inputs are monomorphic, we can look at the first
+        // given value for an argument and deduce the type of all values.
         $exemplaryValue = $values[0];
 
         // We assume that the values contain pivot information

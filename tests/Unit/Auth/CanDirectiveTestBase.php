@@ -14,13 +14,13 @@ abstract class CanDirectiveTestBase extends TestCase
 
     protected function getQuery(): string
     {
-        return /** @lang GraphQL */ '
+        return /** @lang GraphQL */ <<<'GRAPHQL'
             query ($foo: String) {
                 user(foo: $foo) {
                     name
                 }
             }
-        ';
+        GRAPHQL;
     }
 
     protected function query(?string $foo = null): TestResponse

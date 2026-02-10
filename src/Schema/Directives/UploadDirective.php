@@ -43,7 +43,7 @@ GRAPHQL;
             return null;
         }
 
-        if (! ($argumentValue instanceof UploadedFile)) {
+        if (! $argumentValue instanceof UploadedFile) {
             $uploadedFileClass = UploadedFile::class;
             throw new \InvalidArgumentException("Expected argument `{$this->nodeName()}` to be instanceof {$uploadedFileClass}.");
         }

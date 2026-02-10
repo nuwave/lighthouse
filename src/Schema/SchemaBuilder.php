@@ -28,6 +28,11 @@ class SchemaBuilder
         );
     }
 
+    public function schemaHash(): string
+    {
+        return $this->astBuilder->documentAST()->hash;
+    }
+
     /** Build an executable schema from an AST. */
     protected function build(DocumentAST $documentAST): Schema
     {
@@ -61,9 +66,7 @@ class SchemaBuilder
 
         // Enables introspection to list all types in the schema
         $config->setTypes(
-            /**
-             * @return array<string, \GraphQL\Type\Definition\Type>
-             */
+            /** @return array<string, \GraphQL\Type\Definition\Type> */
             fn (): array => $this->typeRegistry->possibleTypes(),
         );
 

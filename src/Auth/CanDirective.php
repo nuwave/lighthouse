@@ -161,7 +161,7 @@ GRAPHQL;
     protected function modelsToCheck(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): iterable
     {
         if ($this->directiveArgValue('query')) {
-            return $resolveInfo
+            return $resolveInfo // @phpstan-ignore return.type (generic of Builder type is erased through enhanceBuilder)
                 ->enhanceBuilder(
                     $this->getModelClass()::query(),
                     $this->directiveArgValue('scopes', []),

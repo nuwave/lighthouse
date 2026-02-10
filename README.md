@@ -1,6 +1,6 @@
 <div align="center">
-  <a href="https://www.lighthouse-php.com">
-    <img src="./logo.png" alt=lighthouse-logo" width="150" height="150">
+  <a href="https://lighthouse-php.com">
+    <img src="logo.png" alt=lighthouse-logo" width="150" height="150">
   </a>
 </div>
 
@@ -32,7 +32,7 @@ The site includes the latest docs for each major version of Lighthouse.
 You can find docs for specific versions by looking at the contents of [/docs/master](/docs/master)
 at that point in the git history: `https://github.com/nuwave/lighthouse/tree/<SPECIFIC-TAG>/docs/master`.
 
-## Get involved
+## Get Involved
 
 - Have a question? [Get your answer using GitHub discussions](https://github.com/nuwave/lighthouse/discussions/new?category=q-a)
 - Talk to other users? [Start a discussion](https://github.com/nuwave/lighthouse/discussions/new?category=general)
@@ -47,7 +47,7 @@ Lighthouse follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Only the current major version receives new features and bugfixes.
 
 Updating between minor versions will not require changes to PHP code or the GraphQL schema
-and cause no breaking behavioural changes for consumers of the GraphQL API.
+and cause no breaking behavioral changes for consumers of the GraphQL API.
 However, only code elements marked with `@api` will remain compatible - all other code in
 Lighthouse is considered internal and is thus subject to change.
 
