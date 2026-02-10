@@ -25,11 +25,11 @@ final class BaseDirectiveTest extends TestCase
 {
     public function testGetsModelClassFromDirective(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type User @model(class: "Team") {
             id: ID
         }
-        ';
+        GRAPHQL;
 
         $directive = $this->constructFieldDirective('foo: User @dummy');
 
@@ -41,11 +41,11 @@ final class BaseDirectiveTest extends TestCase
 
     public function testDefaultsToFieldTypeForTheModelClass(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID
         }
-        ';
+        GRAPHQL;
 
         $directive = $this->constructFieldDirective('foo: User @dummy');
 
@@ -75,11 +75,11 @@ final class BaseDirectiveTest extends TestCase
 
     public function testThrowsIfTheClassIsNotAModel(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Exception {
             id: ID
         }
-        ';
+        GRAPHQL;
 
         $directive = $this->constructFieldDirective('foo: Exception @dummy');
 
@@ -89,11 +89,11 @@ final class BaseDirectiveTest extends TestCase
 
     public function testResolvesAModelThatIsNamedLikeABaseClass(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Closure {
             id: ID
         }
-        ';
+        GRAPHQL;
 
         $directive = $this->constructFieldDirective('foo: Closure @dummy');
 
@@ -105,11 +105,11 @@ final class BaseDirectiveTest extends TestCase
 
     public function testPrefersThePrimaryModelNamespace(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Category {
             id: ID
         }
-        ';
+        GRAPHQL;
 
         $directive = $this->constructFieldDirective('foo: Category @dummy');
 
@@ -121,11 +121,11 @@ final class BaseDirectiveTest extends TestCase
 
     public function testAllowsOverwritingTheDefaultModel(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type OnlyHere {
             id: ID
         }
-        ';
+        GRAPHQL;
 
         $directive = $this->constructFieldDirective('foo: OnlyHere @dummy(model: "Tests\\\Utils\\\ModelsSecondary\\\Category")');
 
@@ -137,11 +137,11 @@ final class BaseDirectiveTest extends TestCase
 
     public function testResolvesFromTheSecondaryModelNamespace(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type OnlyHere {
             id: ID
         }
-        ';
+        GRAPHQL;
 
         $directive = $this->constructFieldDirective('foo: OnlyHere @dummy');
 
