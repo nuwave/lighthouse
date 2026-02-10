@@ -28,7 +28,7 @@ final class PusherBroadcasterTest extends TestCase
         $config = $this->app->make(ConfigRepository::class);
         $config->set('broadcasting.connections.pusher.log', true);
 
-        $subscriber = $this->createMock(Subscriber::class);
+        $subscriber = $this->createStub(Subscriber::class);
         $subscriber->channel = 'test-123';
 
         $this->broadcast($subscriber);
@@ -47,13 +47,13 @@ final class PusherBroadcasterTest extends TestCase
         $config = $this->app->make(ConfigRepository::class);
         $config->set('broadcasting.connections.pusher.log', false);
 
-        $subscriber = $this->createMock(Subscriber::class);
+        $subscriber = $this->createStub(Subscriber::class);
         $subscriber->channel = 'test-123';
 
         $this->broadcast($subscriber);
     }
 
-    /** @param  \Nuwave\Lighthouse\Subscriptions\Subscriber&\PHPUnit\Framework\MockObject\MockObject  $subscriber */
+    /** @param  \Nuwave\Lighthouse\Subscriptions\Subscriber&\PHPUnit\Framework\MockObject\Stub  $subscriber */
     private function broadcast(object $subscriber): void
     {
         $broadcastDriverManager = $this->app->make(BroadcastDriverManager::class);

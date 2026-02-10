@@ -11,7 +11,7 @@ For this project specifically, follow these steps:
 1. Fork the project
 2. Clone the repository
 3. [Set up the project](#setup)
-4. Create a branch
+4. Create a branch without a category prefix (for example, `fix-foo`, not `fix/foo`)
 5. Code according to the [guidelines](#code-guidelines) and [style](#code-style)
 6. [Test your changes](#testing)
 7. Commit and push
@@ -127,6 +127,16 @@ $user = User::create([
     'name' => 'Sepp',
 ]);
 ```
+
+### GraphQL strings in tests
+
+Use a consistent representation for GraphQL literals in tests:
+
+- Use `/** @lang GraphQL */` before GraphQL string literals.
+- Use nowdoc (`<<<'GRAPHQL'`) for static GraphQL content.
+- Use heredoc (`<<<GRAPHQL`) only when interpolation is required.
+- Prefer nowdoc/heredoc over quoted multiline strings.
+- For schema/assertion cases where whitespace matters, keep indentation deliberate and stable.
 
 ## Working with proto files
 

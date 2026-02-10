@@ -8,7 +8,7 @@ final class CreateManyDirectiveTest extends DBTestCase
 {
     public function testCreateFromFieldArguments(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Company {
             id: ID!
             name: String!
@@ -21,9 +21,9 @@ final class CreateManyDirectiveTest extends DBTestCase
         type Mutation {
             createCompanies(inputs: [CreateCompanyInput!]!): [Company!]! @createMany
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createCompanies(inputs: [
                 {
@@ -37,7 +37,7 @@ final class CreateManyDirectiveTest extends DBTestCase
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'createCompanies' => [
                     [

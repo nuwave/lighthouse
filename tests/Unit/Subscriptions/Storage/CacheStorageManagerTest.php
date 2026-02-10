@@ -34,7 +34,9 @@ final class CacheStorageManagerTest extends TestCase
 
     public function testStoreAndRetrieveByChannel(): void
     {
-        $subscriber = $this->subscriber(/** @lang GraphQL */ '{ me }');
+        $subscriber = $this->subscriber(/** @lang GraphQL */ <<<'GRAPHQL'
+        { me }
+        GRAPHQL);
         $this->storage->storeSubscriber($subscriber, 'foo');
 
         $this->assertSubscriberIsSame(
@@ -46,13 +48,19 @@ final class CacheStorageManagerTest extends TestCase
     public function testStoreAndRetrieveByTopics(): void
     {
         $fooTopic = 'foo';
-        $fooSubscriber1 = $this->subscriber(/** @lang GraphQL */ '{ me }');
-        $fooSubscriber2 = $this->subscriber(/** @lang GraphQL */ '{ viewer }');
+        $fooSubscriber1 = $this->subscriber(/** @lang GraphQL */ <<<'GRAPHQL'
+        { me }
+        GRAPHQL);
+        $fooSubscriber2 = $this->subscriber(/** @lang GraphQL */ <<<'GRAPHQL'
+        { viewer }
+        GRAPHQL);
         $this->storage->storeSubscriber($fooSubscriber1, $fooTopic);
         $this->storage->storeSubscriber($fooSubscriber2, $fooTopic);
 
         $barTopic = 'bar';
-        $barSubscriber = $this->subscriber(/** @lang GraphQL */ '{ bar }');
+        $barSubscriber = $this->subscriber(/** @lang GraphQL */ <<<'GRAPHQL'
+        { bar }
+        GRAPHQL);
         $this->storage->storeSubscriber($barSubscriber, $barTopic);
 
         $fooSubscribers = $this->storage->subscribersByTopic($fooTopic);
@@ -64,8 +72,12 @@ final class CacheStorageManagerTest extends TestCase
 
     public function testDeleteSubscribersInCache(): void
     {
-        $subscriber1 = $this->subscriber(/** @lang GraphQL */ '{ me }');
-        $subscriber2 = $this->subscriber(/** @lang GraphQL */ '{ viewer }');
+        $subscriber1 = $this->subscriber(/** @lang GraphQL */ <<<'GRAPHQL'
+        { me }
+        GRAPHQL);
+        $subscriber2 = $this->subscriber(/** @lang GraphQL */ <<<'GRAPHQL'
+        { viewer }
+        GRAPHQL);
 
         $topic = 'foo';
         $this->storage->storeSubscriber($subscriber1, $topic);

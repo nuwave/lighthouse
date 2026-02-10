@@ -25,8 +25,8 @@ final class WhereBetweenDirectiveTest extends DBTestCase
         $user3->created_at = Carbon::createStrict(2024);
         $user3->save();
 
-        $this->schema = /** @lang GraphQL */ '
-        scalar DateTime @scalar(class: "Nuwave\\\Lighthouse\\\Schema\\\Types\\\Scalars\\\DateTime")
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
 
         type User {
             id: ID!
@@ -40,16 +40,16 @@ final class WhereBetweenDirectiveTest extends DBTestCase
             from: DateTime!
             to: DateTime!
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 users(createdBetween: { from: "2022-06-06 00:00:00", to: "2023-06-06 00:00:00" }) {
                     id
                 }
             }
-            ')
+            GRAPHQL)
             ->assertExactJson([
                 'data' => [
                     'users' => [
@@ -65,8 +65,8 @@ final class WhereBetweenDirectiveTest extends DBTestCase
     {
         $users = factory(User::class, 2)->create();
 
-        $this->schema = /** @lang GraphQL */ '
-        scalar DateTime @scalar(class: "Nuwave\\\Lighthouse\\\Schema\\\Types\\\Scalars\\\DateTime")
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
 
         type User {
             id: ID!
@@ -80,16 +80,16 @@ final class WhereBetweenDirectiveTest extends DBTestCase
             from: DateTime!
             to: DateTime!
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 users(createdBetween: null) {
                     id
                 }
             }
-            ')
+            GRAPHQL)
             ->assertGraphQLErrorFree()
             ->assertJsonCount($users->count(), 'data.users');
     }

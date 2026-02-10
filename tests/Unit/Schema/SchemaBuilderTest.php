@@ -26,13 +26,13 @@ final class SchemaBuilderTest extends TestCase
     public function testGeneratesWithEmptyQueryType(): void
     {
         $this
-            ->buildSchema(/** @lang GraphQL */ '
+            ->buildSchema(/** @lang GraphQL */ <<<'GRAPHQL'
             type Query
 
             extend type Query {
                 foo: Int
             }
-            ')
+            GRAPHQL)
             ->assertValid();
 
         $this->expectNotToPerformAssertions();
@@ -40,7 +40,7 @@ final class SchemaBuilderTest extends TestCase
 
     public function testGeneratesWithEmptyMutationType(): void
     {
-        $schema = $this->buildSchema(/** @lang GraphQL */ '
+        $schema = $this->buildSchema(/** @lang GraphQL */ <<<'GRAPHQL'
         type Query
 
         type Mutation
@@ -48,7 +48,7 @@ final class SchemaBuilderTest extends TestCase
         extend type Mutation {
             foo(bar: String! baz: String): String
         }
-        ');
+        GRAPHQL);
 
         $mutationObjectType = $schema->getType(RootType::MUTATION);
         $this->assertInstanceOf(ObjectType::class, $mutationObjectType);
@@ -58,7 +58,7 @@ final class SchemaBuilderTest extends TestCase
 
     public function testResolveEnumTypes(): void
     {
-        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
+        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ <<<'GRAPHQL'
         "Role description"
         enum Role {
             "Company administrator."
@@ -67,7 +67,7 @@ final class SchemaBuilderTest extends TestCase
             "Company employee."
             EMPLOYEE @enum(value: "employee")
         }
-        ');
+        GRAPHQL);
 
         $enumType = $schema->getType('Role');
         $this->assertInstanceOf(EnumType::class, $enumType);
@@ -83,7 +83,7 @@ final class SchemaBuilderTest extends TestCase
 
     public function testResolveInterfaceTypes(): void
     {
-        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
+        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ <<<'GRAPHQL'
         """
         int
         """
@@ -91,7 +91,7 @@ final class SchemaBuilderTest extends TestCase
             "bar is baz"
             bar: String!
         }
-        ');
+        GRAPHQL);
 
         $interfaceType = $schema->getType('Foo');
         $this->assertInstanceOf(InterfaceType::class, $interfaceType);
@@ -102,7 +102,7 @@ final class SchemaBuilderTest extends TestCase
 
     public function testResolveObjectTypes(): void
     {
-        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
+        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ <<<'GRAPHQL'
         "asdf"
         type Foo {
             "bar attribute of Foo"
@@ -111,7 +111,7 @@ final class SchemaBuilderTest extends TestCase
                 baz: Boolean = false
             ): String!
         }
-        ');
+        GRAPHQL);
 
         $foo = $schema->getType('Foo');
         $this->assertInstanceOf(ObjectType::class, $foo);
@@ -129,14 +129,14 @@ final class SchemaBuilderTest extends TestCase
 
     public function testResolveInputObjectTypes(): void
     {
-        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
+        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ <<<'GRAPHQL'
         "bla"
         input CreateFoo {
             "xyz"
             foo: String!
             bar: Int = 123
         }
-        ');
+        GRAPHQL);
 
         $inputObjectType = $schema->getType('CreateFoo');
         $this->assertInstanceOf(InputObjectType::class, $inputObjectType);
@@ -149,11 +149,11 @@ final class SchemaBuilderTest extends TestCase
 
     public function testResolveMutations(): void
     {
-        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
+        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ <<<'GRAPHQL'
         type Mutation {
             foo(bar: String! baz: String): String
         }
-        ');
+        GRAPHQL);
 
         $mutationObjectType = $schema->getType(RootType::MUTATION);
         $this->assertInstanceOf(ObjectType::class, $mutationObjectType);
@@ -173,7 +173,7 @@ final class SchemaBuilderTest extends TestCase
 
     public function testExtendObjectTypes(): void
     {
-        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
+        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ <<<'GRAPHQL'
         type Foo {
             bar: String!
         }
@@ -181,7 +181,7 @@ final class SchemaBuilderTest extends TestCase
         extend type Foo {
             baz: String!
         }
-        ');
+        GRAPHQL);
 
         $objectType = $schema->getType('Foo');
         $this->assertInstanceOf(ObjectType::class, $objectType);
@@ -192,7 +192,7 @@ final class SchemaBuilderTest extends TestCase
 
     public function testExtendTypes(): void
     {
-        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
+        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ <<<'GRAPHQL'
         type Foo {
             foo: String!
         }
@@ -201,7 +201,7 @@ final class SchemaBuilderTest extends TestCase
             "yo?"
             bar: String!
         }
-        ');
+        GRAPHQL);
 
         $type = $schema->getType('Foo');
         $this->assertInstanceOf(ObjectType::class, $type);
@@ -211,7 +211,7 @@ final class SchemaBuilderTest extends TestCase
 
     public function testResolvesEnumDefaultValuesToInternalValues(): void
     {
-        $schema = $this->buildSchema(/** @lang GraphQL */ '
+        $schema = $this->buildSchema(/** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(
                 bar: Baz = FOOBAR
@@ -221,7 +221,7 @@ final class SchemaBuilderTest extends TestCase
         enum Baz {
             FOOBAR @enum(value: "internal")
         }
-        ');
+        GRAPHQL);
 
         $queryType = $schema->getQueryType();
         $this->assertInstanceOf(ObjectType::class, $queryType);

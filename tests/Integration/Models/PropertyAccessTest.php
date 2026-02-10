@@ -16,7 +16,7 @@ final class PropertyAccessTest extends DBTestCase
         $user->name = $name;
         $user->save();
 
-        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             name: String!
@@ -27,13 +27,13 @@ final class PropertyAccessTest extends DBTestCase
         }
         GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($id: ID!) {
             user(id: $id) {
                 name
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $user->id,
         ])->assertJson([
             'data' => [
@@ -49,7 +49,7 @@ final class PropertyAccessTest extends DBTestCase
         $user = factory(User::class)->create();
         $this->assertInstanceOf(User::class, $user);
 
-        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             laravel_function_property: String!
@@ -60,13 +60,13 @@ final class PropertyAccessTest extends DBTestCase
         }
         GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($id: ID!) {
             user(id: $id) {
                 laravel_function_property
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $user->id,
         ])->assertJson([
             'data' => [
@@ -83,7 +83,7 @@ final class PropertyAccessTest extends DBTestCase
         $user = factory(User::class)->create();
         $this->assertInstanceOf(User::class, $user);
 
-        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             php_property: String
@@ -94,13 +94,13 @@ final class PropertyAccessTest extends DBTestCase
         }
         GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($id: ID!) {
             user(id: $id) {
                 php_property
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $user->id,
         ])->assertJson([
             'data' => [
@@ -118,7 +118,7 @@ final class PropertyAccessTest extends DBTestCase
         $user = factory(User::class)->create();
         $this->assertInstanceOf(User::class, $user);
 
-        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             incrementing: String!
@@ -129,13 +129,13 @@ final class PropertyAccessTest extends DBTestCase
         }
         GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($id: ID!) {
             user(id: $id) {
                 incrementing
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $user->id,
         ])->assertJson([
             'data' => [
@@ -152,7 +152,7 @@ final class PropertyAccessTest extends DBTestCase
         $user = factory(User::class)->create();
         $this->assertInstanceOf(User::class, $user);
 
-        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             exists: Boolean
@@ -163,13 +163,13 @@ final class PropertyAccessTest extends DBTestCase
         }
         GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($id: ID!) {
             user(id: $id) {
                 exists
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $user->id,
         ])->assertJson([
             'data' => [
@@ -186,7 +186,7 @@ final class PropertyAccessTest extends DBTestCase
         $user = factory(User::class)->create();
         $this->assertInstanceOf(User::class, $user);
 
-        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             expensive_property: Int!
@@ -197,13 +197,13 @@ final class PropertyAccessTest extends DBTestCase
         }
         GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($id: ID!) {
             user(id: $id) {
                 expensive_property
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $user->id,
         ])->assertJson([
             'data' => [

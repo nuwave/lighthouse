@@ -26,7 +26,7 @@ final class LimitDirectiveTest extends DBTestCase
     {
         factory(User::class, 2)->create();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -34,7 +34,7 @@ final class LimitDirectiveTest extends DBTestCase
         type Query {
             users(limit: Int @limit): [User!]! @all
         }
-        ';
+        GRAPHQL;
 
         $queries = [];
         DB::listen(static function (QueryExecuted $query) use (&$queries): void {
@@ -42,13 +42,13 @@ final class LimitDirectiveTest extends DBTestCase
         });
 
         $limit = 1;
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($limit: Int) {
             users(limit: $limit) {
                 id
             }
         }
-        ', [
+        GRAPHQL, [
             'limit' => $limit,
         ])->assertJsonCount($limit, 'data.users');
         $this->assertSame([
@@ -60,7 +60,7 @@ final class LimitDirectiveTest extends DBTestCase
     {
         factory(User::class, 2)->create();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -68,7 +68,7 @@ final class LimitDirectiveTest extends DBTestCase
         type Query {
             users(limit: Int @limit(builder: true)): [User!]! @all
         }
-        ';
+        GRAPHQL;
 
         $queries = [];
         DB::listen(static function (QueryExecuted $query) use (&$queries): void {
@@ -76,13 +76,13 @@ final class LimitDirectiveTest extends DBTestCase
         });
 
         $limit = 1;
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($limit: Int) {
             users(limit: $limit) {
                 id
             }
         }
-        ', [
+        GRAPHQL, [
             'limit' => $limit,
         ])->assertJsonCount($limit, 'data.users');
         $this->assertSame([
@@ -102,7 +102,7 @@ final class LimitDirectiveTest extends DBTestCase
         // @phpstan-ignore-next-line https://github.com/phpstan/phpstan-phpunit/issues/52
         factory(User::class, 2)->create();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -114,10 +114,10 @@ final class LimitDirectiveTest extends DBTestCase
         type Query {
             users(filter: UserFilter): [User!]! @all
         }
-        ';
+        GRAPHQL;
 
         $limit = 1;
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($limit: Int) {
             users(filter: {
                 limit: $limit
@@ -125,7 +125,7 @@ final class LimitDirectiveTest extends DBTestCase
                 id
             }
         }
-        ', [
+        GRAPHQL, [
             'limit' => $limit,
         ])->assertJsonCount($limit, 'data.users');
     }
@@ -141,7 +141,7 @@ final class LimitDirectiveTest extends DBTestCase
             );
         }
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             tasks(limit: Int @limit): [Task!]! @hasMany
@@ -154,11 +154,11 @@ final class LimitDirectiveTest extends DBTestCase
         type Query {
             users: [User!]! @all
         }
-        ';
+        GRAPHQL;
 
         $limit = 1;
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($limit: Int) {
                 users {
                     id
@@ -167,7 +167,7 @@ final class LimitDirectiveTest extends DBTestCase
                     }
                 }
             }
-            ', [
+            GRAPHQL, [
                 'limit' => $limit,
             ])
             ->assertJsonCount($limit, 'data.users.0.tasks')
@@ -186,7 +186,7 @@ final class LimitDirectiveTest extends DBTestCase
             );
         }
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID! @cacheKey
             tasks(limit: Int @limit): [Task!]! @hasMany @cache
@@ -199,10 +199,10 @@ final class LimitDirectiveTest extends DBTestCase
         type Query {
             user: [User!]! @all
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 user {
                     id
@@ -211,7 +211,7 @@ final class LimitDirectiveTest extends DBTestCase
                     }
                 }
             }
-            ');
+            GRAPHQL);
 
         $cache = $this->app->make(CacheRepository::class);
 
@@ -233,7 +233,7 @@ final class LimitDirectiveTest extends DBTestCase
         $this->assertSame(3, $task->id);
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 user {
                     id
@@ -242,7 +242,7 @@ final class LimitDirectiveTest extends DBTestCase
                     }
                 }
             }
-            ')
+            GRAPHQL)
             ->assertJson([
                 'data' => [
                     'user' => [

@@ -19,7 +19,7 @@ final class WhereDirectiveTest extends DBTestCase
         $bar->name = 'bar';
         $bar->save();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -27,26 +27,31 @@ final class WhereDirectiveTest extends DBTestCase
         type Query {
             usersBeginningWithF: [User!]! @all @where(key: "name", operator: "like", value: "f%")
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 usersBeginningWithF {
                     id
                 }
             }
-            ')
+            GRAPHQL)
             ->assertJsonCount(1, 'data.usersBeginningWithF');
     }
 
     public function testIgnoreNull(): void
     {
-        $userWithoutEmail = factory(User::class)->create(['email' => null]);
-        $userWithEmail = factory(User::class)->create();
+        $userWithoutEmail = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $userWithoutEmail);
+        $userWithoutEmail->email = null;
+        $userWithoutEmail->save();
 
-        $this->schema = /** @lang GraphQL */ '
-        scalar DateTime @scalar(class: "Nuwave\\\Lighthouse\\\Schema\\\Types\\\Scalars\\\DateTime")
+        $userWithEmail = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $userWithEmail);
+
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
 
         type User {
             id: ID!
@@ -57,10 +62,10 @@ final class WhereDirectiveTest extends DBTestCase
             usersIgnoreNull(email: String @where(ignoreNull: true)): [User!]! @all
             usersExplicitNull(email: String @where): [User!]! @all
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 usersIgnoreNull(email: null) {
                     id
@@ -70,7 +75,7 @@ final class WhereDirectiveTest extends DBTestCase
                     id
                 }
             }
-            ')
+            GRAPHQL)
             ->assertGraphQLErrorFree()
             ->assertJsonCount(2, 'data.usersIgnoreNull')
             ->assertJsonPath('data.usersIgnoreNull', [

@@ -19,7 +19,7 @@ final class WhereNotNullDirectiveTest extends DBTestCase
         $null->name = null;
         $null->save();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -27,16 +27,16 @@ final class WhereNotNullDirectiveTest extends DBTestCase
         type Query {
             users(nameIsNotNull: Boolean @whereNotNull(key: "name")): [User!]! @all
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 users {
                     id
                 }
             }
-            ')
+            GRAPHQL)
             ->assertJson([
                 'data' => [
                     'users' => [
@@ -51,13 +51,13 @@ final class WhereNotNullDirectiveTest extends DBTestCase
             ]);
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 users(nameIsNotNull: null) {
                     id
                 }
             }
-            ')
+            GRAPHQL)
             ->assertJson([
                 'data' => [
                     'users' => [
@@ -72,13 +72,13 @@ final class WhereNotNullDirectiveTest extends DBTestCase
             ]);
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 users(nameIsNotNull: true) {
                     id
                 }
             }
-            ')
+            GRAPHQL)
             ->assertJson([
                 'data' => [
                     'users' => [
@@ -90,13 +90,13 @@ final class WhereNotNullDirectiveTest extends DBTestCase
             ]);
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 users(nameIsNotNull: false) {
                     id
                 }
             }
-            ')
+            GRAPHQL)
             ->assertJson([
                 'data' => [
                     'users' => [

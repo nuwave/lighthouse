@@ -17,7 +17,7 @@ use Tests\Utils\Models\User;
 
 final class WhereConditionsDirectiveTest extends DBTestCase
 {
-    protected string $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ <<<'GRAPHQL'
     type User {
         id: ID!
         name: String
@@ -46,7 +46,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
         ID @enum(value: "id")
         NAME @enum(value: "name")
     }
-    ';
+    GRAPHQL;
 
     protected function getPackageProviders($app): array
     {
@@ -68,7 +68,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
         $user2->date_of_birth = Carbon::createStrict(1995, 1, 1);
         $user2->save();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($dobMin: Mixed, $dobMax: Mixed) {
             users(
                 where: {
@@ -80,7 +80,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ', [
+        GRAPHQL, [
             'dobMin' => '1990-01-01',
             'dobMax' => '1999-01-01',
         ])->assertExactJson([
@@ -106,7 +106,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
         $user2->date_of_birth = Carbon::createStrict(1995, 1, 1);
         $user2->save();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($dates: Mixed) {
             users(
                 where: {
@@ -118,7 +118,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ', [
+        GRAPHQL, [
             'dates' => ['1990-01-01', '1999-01-01'],
         ])->assertExactJson([
             'data' => [
@@ -143,7 +143,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
         $user2->date_of_birth = Carbon::createStrict(1995, 1, 1);
         $user2->save();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query {
                 users(
                     where: {
@@ -155,7 +155,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
                     id
                 }
             }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [
@@ -170,7 +170,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
     {
         factory(User::class, 2)->create();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 where: {
@@ -181,14 +181,14 @@ final class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertJsonCount(1, 'data.users');
+        GRAPHQL)->assertJsonCount(1, 'data.users');
     }
 
     public function testOverwritesTheOperator(): void
     {
         factory(User::class, 3)->create();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 where: {
@@ -200,7 +200,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertJsonCount(2, 'data.users');
+        GRAPHQL)->assertJsonCount(2, 'data.users');
     }
 
     public function testOperatorNotLike(): void
@@ -215,7 +215,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
         $user2->name = 'bar';
         $user2->save();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 where: {
@@ -227,7 +227,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [
@@ -242,7 +242,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
     {
         factory(User::class, 5)->create();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 where: {
@@ -254,7 +254,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [
@@ -270,14 +270,17 @@ final class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testOperatorIsNull(): void
     {
-        factory(Post::class)->create([
-            'body' => null,
-        ]);
-        factory(Post::class)->create([
-            'body' => 'foobar',
-        ]);
+        $postWithoutBody = factory(Post::class)->make();
+        $this->assertInstanceOf(Post::class, $postWithoutBody);
+        $postWithoutBody->body = null;
+        $postWithoutBody->save();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $postWithBody = factory(Post::class)->make();
+        $this->assertInstanceOf(Post::class, $postWithBody);
+        $postWithBody->body = 'foobar';
+        $postWithBody->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             posts(
                 where: {
@@ -288,7 +291,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'posts' => [
                     [
@@ -301,14 +304,17 @@ final class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testOperatorNotNull(): void
     {
-        factory(Post::class)->create([
-            'body' => null,
-        ]);
-        factory(Post::class)->create([
-            'body' => 'foobar',
-        ]);
+        $postWithoutBody = factory(Post::class)->make();
+        $this->assertInstanceOf(Post::class, $postWithoutBody);
+        $postWithoutBody->body = null;
+        $postWithoutBody->save();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $postWithBody = factory(Post::class)->make();
+        $this->assertInstanceOf(Post::class, $postWithBody);
+        $postWithBody->body = 'foobar';
+        $postWithBody->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             posts(
                 where: {
@@ -319,7 +325,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'posts' => [
                     [
@@ -334,7 +340,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
     {
         factory(User::class, 5)->create();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 where: {
@@ -346,7 +352,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [
@@ -364,7 +370,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
     {
         factory(User::class, 3)->create();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 where: {
@@ -385,14 +391,14 @@ final class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertJsonCount(1, 'data.users');
+        GRAPHQL)->assertJsonCount(1, 'data.users');
     }
 
     public function testAddsNestedOr(): void
     {
         factory(User::class, 5)->create();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 where: {
@@ -420,7 +426,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [
@@ -441,7 +447,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
     {
         factory(User::class, 5)->create();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 where: {
@@ -470,7 +476,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [
@@ -531,7 +537,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
         $commentFive->comment = 'none';
         $commentFive->save();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 where: {
@@ -560,7 +566,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [
@@ -592,7 +598,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
         $commentTwo->comment = 'none';
         $commentTwo->save();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 where: {
@@ -604,7 +610,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [
@@ -643,7 +649,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
             $commentBatchTwo->save();
         }
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 where: {
@@ -656,7 +662,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [
@@ -692,7 +698,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
             $commentBatchTwo->save();
         }
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 where: {
@@ -706,7 +712,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [
@@ -738,7 +744,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
         $commentTwo->comment = 'none';
         $commentTwo->save();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 where: {
@@ -754,7 +760,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [
@@ -786,7 +792,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
         $commentTwo->comment = 'none';
         $commentTwo->save();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 where: {
@@ -803,7 +809,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [
@@ -840,7 +846,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
         $task->user_id = 2;
         $task->save();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 where: {
@@ -862,7 +868,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [
@@ -875,13 +881,13 @@ final class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testRejectsInvalidColumnName(): void
     {
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 where: {
                     AND: [
                         {
-                            column: "Robert\'); DROP TABLE Students;--"
+                            column: "Robert'); DROP TABLE Students;--"
                             value: "https://xkcd.com/327/"
                         }
                     ]
@@ -890,18 +896,19 @@ final class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertGraphQLErrorMessage(WhereConditionsHandler::invalidColumnName("Robert'); DROP TABLE Students;--"));
+        GRAPHQL)->assertGraphQLErrorMessage(WhereConditionsHandler::invalidColumnName("Robert'); DROP TABLE Students;--"));
     }
 
     public function testQueryForNull(): void
     {
         factory(User::class, 3)->create();
 
-        $userNamedNull = factory(User::class)->create([
-            'name' => null,
-        ]);
+        $userNamedNull = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $userNamedNull);
+        $userNamedNull->name = null;
+        $userNamedNull->save();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 where: {
@@ -913,7 +920,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'users' => [
                     [
@@ -927,7 +934,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testRequiresAValueForAColumn(): void
     {
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 where: {
@@ -937,7 +944,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertGraphQLError(SQLOperator::missingValueForColumn('no_value'));
+        GRAPHQL)->assertGraphQLError(SQLOperator::missingValueForColumn('no_value'));
     }
 
     public function testOnlyAllowsWhitelistedColumns(): void
@@ -945,7 +952,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
         $user = factory(User::class)->create();
         $this->assertInstanceOf(User::class, $user);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($id: Mixed!) {
             whitelistedColumns(
                 where: {
@@ -956,7 +963,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $user->id,
         ])->assertExactJson([
             'data' => [
@@ -989,7 +996,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
         $user = factory(User::class)->create();
         $this->assertInstanceOf(User::class, $user);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($id: Mixed!) {
             enumColumns(
                 where: {
@@ -1000,7 +1007,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $user->id,
         ])->assertExactJson([
             'data' => [
@@ -1018,7 +1025,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
         $user = factory(User::class)->create();
         $this->assertInstanceOf(User::class, $user);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 where: null
@@ -1026,7 +1033,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [
@@ -1039,7 +1046,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testWhereConditionOnJSONColumn(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type Location {
             id: Int!
         }
@@ -1047,7 +1054,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
         type Query {
             locations(where: _ @whereConditions): [Location!]! @all
         }
-        ';
+        GRAPHQL;
 
         $location = factory(Location::class)->make();
         $this->assertInstanceOf(Location::class, $location);
@@ -1058,7 +1065,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
 
         factory(Location::class)->create();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             locations(
                 where: {
@@ -1069,7 +1076,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'locations' => [
                     [
@@ -1093,7 +1100,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
                 handler: "{$this->qualifyTestResolver('valueTwiceHandler')}")
             ): [User!]! @all
         }
-GRAPHQL;
+        GRAPHQL;
 
         $user1 = factory(User::class)->make();
         $this->assertInstanceOf(User::class, $user1);
@@ -1105,7 +1112,7 @@ GRAPHQL;
         $user2->name = 'foofoo';
         $user2->save();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 where: {
@@ -1116,11 +1123,173 @@ GRAPHQL;
                 id
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [
                         'id' => "{$user2->id}",
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testWhereHasConditionsColumnDefaultsToString(): void
+    {
+        $user1 = factory(User::class)->create();
+
+        $post1 = factory(Post::class)->make();
+        $post1->title = 'Miss';
+        $post1->user()->associate($user1);
+        $post1->save();
+
+        $user2 = factory(User::class)->create();
+
+        $post2 = factory(Post::class)->make();
+        $post2->title = 'Hit';
+        $post2->user()->associate($user2);
+        $post2->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            enumColumns(
+                where: {
+                    HAS: {
+                        relation: "posts"
+                        condition: {
+                            column: "title"
+                            value: "Hit"
+                        }
+                    }
+                }
+            ) {
+                id
+            }
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'enumColumns' => [
+                    [
+                        'id' => "{$user2->id}",
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testWhereHasConditionsWithNestedHas(): void
+    {
+        $user1 = factory(User::class)->create();
+
+        $post1 = factory(Post::class)->make();
+        $post1->user()->associate($user1);
+        $post1->save();
+
+        $comment1 = factory(Comment::class)->make();
+        $comment1->comment = 'Miss';
+        $comment1->user()->associate($user1);
+        $comment1->post()->associate($post1);
+        $comment1->save();
+
+        $user2 = factory(User::class)->create();
+
+        $post2 = factory(Post::class)->make();
+        $post2->user()->associate($user2);
+        $post2->save();
+
+        $comment2 = factory(Comment::class)->make();
+        $comment2->comment = 'Hit';
+        $comment2->user()->associate($user2);
+        $comment2->post()->associate($post2);
+        $comment2->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            enumColumns(
+                where: {
+                    HAS: {
+                        relation: "posts"
+                        condition: {
+                            HAS: {
+                                relation: "comments"
+                                condition: {
+                                    column: "comment"
+                                    value: "Hit"
+                                }
+                            }
+                        }
+                    }
+                }
+            ) {
+                id
+            }
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'enumColumns' => [
+                    [
+                        'id' => "{$user2->id}",
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testWhereHasConditionsWithAndOr(): void
+    {
+        $user1 = factory(User::class)->create();
+
+        $post1 = factory(Post::class)->make();
+        $post1->title = 'First';
+        $post1->body = 'Alpha';
+        $post1->user()->associate($user1);
+        $post1->save();
+
+        $user2 = factory(User::class)->create();
+
+        $post2 = factory(Post::class)->make();
+        $post2->title = 'Second';
+        $post2->body = 'Beta';
+        $post2->user()->associate($user2);
+        $post2->save();
+
+        $user3 = factory(User::class)->create();
+
+        $post3 = factory(Post::class)->make();
+        $post3->title = 'Third';
+        $post3->body = 'Alpha';
+        $post3->user()->associate($user3);
+        $post3->save();
+
+        // Find users with posts where (title = 'First' OR title = 'Second') AND body = 'Alpha'
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            enumColumns(
+                where: {
+                    HAS: {
+                        relation: "posts"
+                        condition: {
+                            AND: [
+                                {
+                                    OR: [
+                                        { column: "title", value: "First" }
+                                        { column: "title", value: "Second" }
+                                    ]
+                                }
+                                { column: "body", value: "Alpha" }
+                            ]
+                        }
+                    }
+                }
+            ) {
+                id
+            }
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'enumColumns' => [
+                    [
+                        'id' => "{$user1->id}",
                     ],
                 ],
             ],

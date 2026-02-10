@@ -19,7 +19,7 @@ final class PaginateDirectiveTest extends TestCase
 {
     public function testIncludesPaginatorInfoTypeInSchema(): void
     {
-        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
+        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             name: String!
@@ -28,10 +28,10 @@ final class PaginateDirectiveTest extends TestCase
         extend type Query {
             users: [User!]! @paginate
         }
-        ');
+        GRAPHQL);
         $schemaString = SchemaPrinter::doPrint($schema);
 
-        $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
+        $this->assertStringContainsString(/** @lang GraphQL */ <<<GRAPHQL
         "Information about pagination using a fully featured paginator."
         type PaginatorInfo {
           "Number of items in the current page."
@@ -63,7 +63,7 @@ final class PaginateDirectiveTest extends TestCase
 
     public function testIncludesSimplePaginatorInfoTypeInSchema(): void
     {
-        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
+        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             name: String!
@@ -72,10 +72,10 @@ final class PaginateDirectiveTest extends TestCase
         extend type Query {
             users: [User!]! @paginate(type: SIMPLE)
         }
-        ');
+        GRAPHQL);
         $schemaString = SchemaPrinter::doPrint($schema);
 
-        $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
+        $this->assertStringContainsString(/** @lang GraphQL */ <<<GRAPHQL
         "Information about pagination using a simple paginator."
         type SimplePaginatorInfo {
           "Number of items in the current page."
@@ -101,7 +101,7 @@ final class PaginateDirectiveTest extends TestCase
 
     public function testIncludesPageInfoTypeInSchema(): void
     {
-        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
+        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             name: String!
@@ -110,10 +110,10 @@ final class PaginateDirectiveTest extends TestCase
         extend type Query {
             users: [User!]! @paginate(type: CONNECTION)
         }
-        ');
+        GRAPHQL);
         $schemaString = SchemaPrinter::doPrint($schema);
 
-        $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
+        $this->assertStringContainsString(/** @lang GraphQL */ <<<GRAPHQL
         "Information about pagination using a Relay style cursor connection."
         type PageInfo {
           "When paginating forwards, are there more items?"
@@ -155,7 +155,7 @@ final class PaginateDirectiveTest extends TestCase
 
     public function testManipulatesPaginator(): void
     {
-        $schema = $this->buildSchema(/** @lang GraphQL */ '
+        $schema = $this->buildSchema(/** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -163,7 +163,7 @@ final class PaginateDirectiveTest extends TestCase
         type Query {
             users: [User!]! @paginate
         }
-        ');
+        GRAPHQL);
         $schemaString = SchemaPrinter::doPrint($schema);
 
         $this->assertStringContainsString(/** @lang GraphQL */ <<<GRAPHQL
@@ -176,12 +176,11 @@ type Query {
     page: Int
   ): UserPaginator!
 }
-GRAPHQL
-            ,
+GRAPHQL,
             $schemaString,
         );
 
-        $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
+        $this->assertStringContainsString(/** @lang GraphQL */ <<<GRAPHQL
         "A paginated list of User items."
         type UserPaginator {
           "Pagination information about the list of items."
@@ -195,7 +194,7 @@ GRAPHQL
 
     public function testManipulatesSimplePaginator(): void
     {
-        $schema = $this->buildSchema(/** @lang GraphQL */ '
+        $schema = $this->buildSchema(/** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -203,7 +202,7 @@ GRAPHQL
         type Query {
             users: [User!]! @paginate(type: SIMPLE)
         }
-        ');
+        GRAPHQL);
         $schemaString = SchemaPrinter::doPrint($schema);
 
         $this->assertStringContainsString(/** @lang GraphQL */ <<<GRAPHQL
@@ -216,12 +215,11 @@ type Query {
     page: Int
   ): UserSimplePaginator!
 }
-GRAPHQL
-            ,
+GRAPHQL,
             $schemaString,
         );
 
-        $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
+        $this->assertStringContainsString(/** @lang GraphQL */ <<<GRAPHQL
         "A paginated list of User items."
         type UserSimplePaginator {
           "Pagination information about the list of items."
@@ -235,7 +233,7 @@ GRAPHQL
 
     public function testManipulatesConnection(): void
     {
-        $schema = $this->buildSchema(/** @lang GraphQL */ '
+        $schema = $this->buildSchema(/** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -243,7 +241,7 @@ GRAPHQL
         type Query {
             users: [User!]! @paginate(type: CONNECTION)
         }
-        ');
+        GRAPHQL);
         $schemaString = SchemaPrinter::doPrint($schema);
 
         $this->assertStringContainsString(/** @lang GraphQL */ <<<GRAPHQL
@@ -256,12 +254,11 @@ type Query {
     after: String
   ): UserConnection!
 }
-GRAPHQL
-            ,
+GRAPHQL,
             $schemaString,
         );
 
-        $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
+        $this->assertStringContainsString(/** @lang GraphQL */ <<<GRAPHQL
         "A paginated list of User edges."
         type UserConnection {
           "Pagination information about the list of edges."
@@ -272,7 +269,7 @@ GRAPHQL
         }
         GRAPHQL, $schemaString);
 
-        $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
+        $this->assertStringContainsString(/** @lang GraphQL */ <<<GRAPHQL
         "An edge that contains a node of type User and a cursor."
         type UserEdge {
           "The User node."
@@ -294,7 +291,7 @@ GRAPHQL
 
     protected function getConnectionQueryField(string $type): FieldDefinition
     {
-        $schema = $this->buildSchema(/** @lang GraphQL */ "
+        $schema = $this->buildSchema(/** @lang GraphQL */ <<<GRAPHQL
         type User {
             name: String
         }
@@ -302,7 +299,7 @@ GRAPHQL
         type Query {
             users: [User!]! @paginate(type: {$type})
         }
-        ");
+        GRAPHQL);
 
         $queryType = $schema->getQueryType();
         $this->assertInstanceOf(ObjectType::class, $queryType);
@@ -312,7 +309,7 @@ GRAPHQL
 
     public function testOnlyRegistersOneTypeForMultiplePaginators(): void
     {
-        $schema = $this->buildSchema(/** @lang GraphQL */ '
+        $schema = $this->buildSchema(/** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             name: String
             usersPaginated: [User!]! @paginate
@@ -325,7 +322,7 @@ GRAPHQL
             usersConnection: [User!]! @paginate(type: CONNECTION)
             usersSimplePaginated: [User!]! @paginate(type: SIMPLE)
         }
-        ');
+        GRAPHQL);
         $typeMap = $schema->getTypeMap();
 
         $this->assertArrayHasKey('UserPaginator', $typeMap);
@@ -335,7 +332,7 @@ GRAPHQL
 
     public function testRegistersPaginatorFromTypeExtensionField(): void
     {
-        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
+        $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             name: String!
@@ -344,7 +341,7 @@ GRAPHQL
         extend type Query {
             users: [User!]! @paginate
         }
-        ');
+        GRAPHQL);
         $typeMap = $schema->getTypeMap();
 
         $this->assertArrayHasKey('UserPaginator', $typeMap);
@@ -358,7 +355,7 @@ GRAPHQL
         config(['lighthouse.pagination.max_count' => 5]);
 
         $queryType = $this
-            ->buildSchema(/** @lang GraphQL */ '
+            ->buildSchema(/** @lang GraphQL */ <<<'GRAPHQL'
             type Query {
                 defaultPaginated: [User!]! @paginate
                 defaultRelay: [User!]! @paginate(type: CONNECTION)
@@ -371,7 +368,7 @@ GRAPHQL
             type User {
                 id: ID!
             }
-            ')
+            GRAPHQL)
             ->getQueryType();
         $this->assertInstanceOf(ObjectType::class, $queryType);
 
@@ -416,7 +413,7 @@ GRAPHQL
     {
         config(['lighthouse.pagination.max_count' => 5]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             name: String!
@@ -425,9 +422,9 @@ GRAPHQL
         type Query {
             users: [User!]! @paginate(maxCount: 6)
         }
-        ';
+        GRAPHQL;
 
-        $result = $this->graphQL(/** @lang GraphQL */ '
+        $result = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(first: 10) {
                 data {
@@ -436,7 +433,7 @@ GRAPHQL
                 }
             }
         }
-        ');
+        GRAPHQL);
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(6, 10),
@@ -459,7 +456,7 @@ GRAPHQL
         }
         GRAPHQL;
 
-        $result = $this->graphQL(/** @lang GraphQL */ '
+        $result = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(first: 10) {
                 data {
@@ -468,7 +465,7 @@ GRAPHQL
                 }
             }
         }
-        ');
+        GRAPHQL);
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(6, 10),
@@ -480,7 +477,7 @@ GRAPHQL
     {
         config(['lighthouse.pagination.max_count' => 5]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             name: String!
@@ -491,9 +488,9 @@ GRAPHQL
             usersConnection: [User!]! @paginate(type: CONNECTION)
             usersSimplePaginated: [User!]! @paginate(type: SIMPLE)
         }
-        ';
+        GRAPHQL;
 
-        $resultFromDefaultPagination = $this->graphQL(/** @lang GraphQL */ '
+        $resultFromDefaultPagination = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             usersPaginated(first: 10) {
                 data {
@@ -502,14 +499,14 @@ GRAPHQL
                 }
             }
         }
-        ');
+        GRAPHQL);
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(5, 10),
             $resultFromDefaultPagination->json('errors.0.message'),
         );
 
-        $resultFromRelayPagination = $this->graphQL(/** @lang GraphQL */ '
+        $resultFromRelayPagination = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             usersConnection(first: 10) {
                 edges {
@@ -520,14 +517,14 @@ GRAPHQL
                 }
             }
         }
-        ');
+        GRAPHQL);
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(5, 10),
             $resultFromRelayPagination->json('errors.0.message'),
         );
 
-        $resultFromSimplePagination = $this->graphQL(/** @lang GraphQL */ '
+        $resultFromSimplePagination = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             usersSimplePaginated(first: 10) {
                 data {
@@ -536,7 +533,7 @@ GRAPHQL
                 }
             }
         }
-        ');
+        GRAPHQL);
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(5, 10),
@@ -548,7 +545,7 @@ GRAPHQL
     {
         config(['lighthouse.pagination.default_count' => 2]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             name: String!
@@ -557,10 +554,10 @@ GRAPHQL
         type Query {
             users: [User!]! @paginate(defaultCount: null)
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 users {
                     data {
@@ -568,13 +565,13 @@ GRAPHQL
                     }
                 }
             }
-            ')
+            GRAPHQL)
             ->assertGraphQLErrorMessage('Field "users" argument "first" of type "Int!" is required but not provided.');
     }
 
     public function testThrowsWhenPaginationWithNegativeCountIsRequested(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             name: String!
@@ -583,10 +580,10 @@ GRAPHQL
         type Query {
             users: [User!]! @paginate
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 users(first: -1) {
                     data {
@@ -594,21 +591,21 @@ GRAPHQL
                     }
                 }
             }
-            ')
+            GRAPHQL)
             ->assertGraphQLErrorMessage(PaginationArgs::requestedLessThanZeroItems(-1));
     }
 
     public function testDoesNotRequireModelWhenUsingBuilder(): void
     {
-        $schema = $this->buildSchema(/** @lang GraphQL */ "
+        $schema = $this->buildSchema(/** @lang GraphQL */ <<<GRAPHQL
             type Query {
-                users: [NotAnActualModelName!]! @paginate(builder: \"{$this->qualifyTestResolver('testDoesNotRequireModelWhenUsingBuilder')}\")
+                users: [NotAnActualModelName!]! @paginate(builder: "{$this->qualifyTestResolver('testDoesNotRequireModelWhenUsingBuilder')}")
             }
 
             type NotAnActualModelName {
                 id: ID!
             }
-            ");
+        GRAPHQL);
 
         $paginator = $schema->getType('NotAnActualModelNamePaginator');
         $this->assertInstanceOf(ObjectType::class, $paginator);
@@ -618,16 +615,16 @@ GRAPHQL
     {
         $this->expectExceptionObject(new DefinitionException('Failed to find class NonexistingClass in namespaces [] for directive @paginate.'));
 
-        $this->buildSchema(/** @lang GraphQL */ '
+        $this->buildSchema(/** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             users: [Query!]! @paginate(builder: "NonexistingClass@notFound")
         }
-        ');
+        GRAPHQL);
     }
 
     public function testAllowsMultiplePaginatedFieldsOfTheSameModel(): void
     {
-        $schema = $this->buildSchema(/** @lang GraphQL */ '
+        $schema = $this->buildSchema(/** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             users: [User!]! @paginate
             users2: [User!]! @paginate
@@ -636,7 +633,7 @@ GRAPHQL
         type User {
             id: ID
         }
-        ');
+        GRAPHQL);
 
         $userPaginator = $schema->getType('UserPaginator');
         $this->assertInstanceOf(ObjectType::class, $userPaginator);
@@ -649,7 +646,7 @@ GRAPHQL
 
     public function testDisallowFirstNull(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -657,9 +654,9 @@ GRAPHQL
         type Query {
             users: [User!]! @paginate(defaultCount: 2)
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(first: null) {
                 data {
@@ -667,12 +664,12 @@ GRAPHQL
                 }
             }
         }
-        ')->assertGraphQLErrorMessage('Expected value of type "Int!", found null.');
+        GRAPHQL)->assertGraphQLErrorMessage('Expected value of type "Int!", found null.');
     }
 
     public function testQueriesFirst0SimplePaginator(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -680,9 +677,9 @@ GRAPHQL
         type Query {
             users: [User!]! @paginate
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(first: 0) {
                 data {
@@ -690,7 +687,7 @@ GRAPHQL
                 }
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     'data' => [],
@@ -718,17 +715,17 @@ GRAPHQL
 
     public function testPaginatorResolver(): void
     {
-        $this->buildSchema(/* @lang GraphQL */ "
+        $this->buildSchema(/** @lang GraphQL */ <<<GRAPHQL
         type Query {
-            users: [User!]! @paginate(resolver: \"{$this->qualifyTestResolver('returnPaginatedDataInsteadOfBuilder')}\")
+            users: [User!]! @paginate(resolver: "{$this->qualifyTestResolver('returnPaginatedDataInsteadOfBuilder')}")
         }
 
         type User {
             id: ID
         }
-        ");
+        GRAPHQL);
 
-        $this->graphQL(/* @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(first: 5) {
                 paginatorInfo {
@@ -739,7 +736,7 @@ GRAPHQL
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'users' => [
                     'paginatorInfo' => [
@@ -758,11 +755,11 @@ GRAPHQL
     {
         $this->expectExceptionObject(new DefinitionException('Failed to find class NonexistingClass in namespaces [] for directive @paginate.'));
 
-        $this->buildSchema(/** @lang GraphQL */ '
+        $this->buildSchema(/** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             users: [Query!]! @paginate(resolver: "NonexistingClass@notFound")
         }
-        ');
+        GRAPHQL);
     }
 
     public function testCustomizeQueryComplexityResolver(): void
@@ -770,18 +767,18 @@ GRAPHQL
         $max = 42;
         $this->setMaxQueryComplexity($max);
 
-        $this->buildSchema(/* @lang GraphQL */ "
+        $this->buildSchema(/** @lang GraphQL */ <<<GRAPHQL
         type Query {
-            users(complexity: Int!): [User!]! @paginate(complexityResolver: \"{$this->qualifyTestResolver('complexityResolver')}\")
+            users(complexity: Int!): [User!]! @paginate(complexityResolver: "{$this->qualifyTestResolver('complexityResolver')}")
         }
 
         type User {
             id: ID
         }
-        ");
+        GRAPHQL);
 
         $complexity = 123;
-        $this->graphQL(/* @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($complexity: Int!) {
             users(first: 5, complexity: $complexity) {
                 data {
@@ -789,7 +786,7 @@ GRAPHQL
                 }
             }
         }
-        ', [
+        GRAPHQL, [
             'complexity' => $complexity,
         ])->assertGraphQLErrorMessage(QueryComplexity::maxQueryComplexityErrorMessage($max, $complexity));
     }

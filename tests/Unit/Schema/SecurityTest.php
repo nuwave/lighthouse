@@ -13,7 +13,7 @@ final class SecurityTest extends TestCase
     {
         config(['lighthouse.security.max_query_complexity' => 1]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             user: User @first
         }
@@ -21,7 +21,7 @@ final class SecurityTest extends TestCase
         type User {
             name: String
         }
-        ';
+        GRAPHQL;
 
         $this->assertMaxQueryComplexityIs1();
     }
@@ -30,7 +30,7 @@ final class SecurityTest extends TestCase
     {
         config(['lighthouse.security.max_query_depth' => 1]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             user: User @first
         }
@@ -39,7 +39,7 @@ final class SecurityTest extends TestCase
             name: String
             user: User
         }
-        ';
+        GRAPHQL;
 
         $this->assertMaxQueryDepthIs1();
     }
@@ -53,20 +53,20 @@ final class SecurityTest extends TestCase
 
     private function assertMaxQueryComplexityIs1(): void
     {
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 name
             }
         }
-        ')->assertGraphQLErrorMessage(
+        GRAPHQL)->assertGraphQLErrorMessage(
             QueryComplexity::maxQueryComplexityErrorMessage(1, 2),
         );
     }
 
     private function assertMaxQueryDepthIs1(): void
     {
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 user {
@@ -76,14 +76,14 @@ final class SecurityTest extends TestCase
                 }
             }
         }
-        ')->assertGraphQLErrorMessage(
+        GRAPHQL)->assertGraphQLErrorMessage(
             QueryDepth::maxQueryDepthErrorMessage(1, 2),
         );
     }
 
     private function assertIntrospectionIsDisabled(): void
     {
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             __schema {
                 queryType {
@@ -91,7 +91,7 @@ final class SecurityTest extends TestCase
                 }
             }
         }
-        ')->assertGraphQLErrorMessage(
+        GRAPHQL)->assertGraphQLErrorMessage(
             DisableIntrospection::introspectionDisabledMessage(),
         );
     }

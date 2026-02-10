@@ -32,7 +32,7 @@ final class SchemaCacheTest extends TestCase
 
     public function testSchemaCachingWithUnionType(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: Foo @mock
         }
@@ -46,14 +46,14 @@ final class SchemaCacheTest extends TestCase
         type Color {
             id: ID
         }
-        ';
+        GRAPHQL;
         $this->cacheSchema();
 
         $comment = new Comment();
         $comment->comment = 'foo';
         $this->mockResolver($comment);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo {
                 ... on Comment {
@@ -61,7 +61,7 @@ final class SchemaCacheTest extends TestCase
                 }
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'foo' => [
                     'comment' => $comment->comment,
@@ -80,11 +80,11 @@ final class SchemaCacheTest extends TestCase
 
         $this->expectException(\AssertionError::class);
         $this->expectExceptionMessage("The schema cache file at {$path} is expected to return an array.");
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ');
+        GRAPHQL);
     }
 
     private function cacheSchema(): void

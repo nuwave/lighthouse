@@ -24,7 +24,7 @@ final class CanFindDirectiveDBTest extends DBTestCase
         $user = factory(User::class)->create();
         $this->assertInstanceOf(User::class, $user);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             user(id: ID! @whereKey): User
                 @canFind(ability: "view", find: "id")
@@ -34,15 +34,15 @@ final class CanFindDirectiveDBTest extends DBTestCase
         type User {
             name: String!
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($id: ID!) {
             user(id: $id) {
                 name
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $user->getKey(),
         ])->assertJson([
             'data' => [
@@ -62,7 +62,7 @@ final class CanFindDirectiveDBTest extends DBTestCase
         $user = factory(User::class)->create();
         $this->assertInstanceOf(User::class, $user);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             account(id: ID! @whereKey): Account
                 @canFind(ability: "view", find: "id", model: "User")
@@ -72,15 +72,15 @@ final class CanFindDirectiveDBTest extends DBTestCase
         type Account {
             name: String!
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($id: ID!) {
             account(id: $id) {
                 name
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $user->getKey(),
         ])->assertJson([
             'data' => [
@@ -101,7 +101,7 @@ final class CanFindDirectiveDBTest extends DBTestCase
             $this->never(),
         );
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             user(id: ID! @whereKey): User
                 @canFind(ability: "view", find: "id")
@@ -111,15 +111,15 @@ final class CanFindDirectiveDBTest extends DBTestCase
         type User {
             name: String!
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user(id: "not-present") {
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => null,
             ],
@@ -141,7 +141,7 @@ final class CanFindDirectiveDBTest extends DBTestCase
             $this->never(),
         );
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             user(id: ID! @whereKey): User
                 @canFind(ability: "view", find: "id")
@@ -151,18 +151,18 @@ final class CanFindDirectiveDBTest extends DBTestCase
         type User {
             name: String!
         }
-        ';
+        GRAPHQL;
 
         $this->rethrowGraphQLErrors();
 
         try {
-            $this->graphQL(/** @lang GraphQL */ '
+            $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 user(id: "not-present") {
                     name
                 }
             }
-            ');
+            GRAPHQL);
         } catch (Error $error) {
             $previous = $error->getPrevious();
 
@@ -181,7 +181,7 @@ final class CanFindDirectiveDBTest extends DBTestCase
             $this->never(),
         );
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             user(id: ID! @whereKey): User
                 @canFind(ability: "view", find: "id", action: EXCEPTION_NOT_AUTHORIZED)
@@ -191,15 +191,15 @@ final class CanFindDirectiveDBTest extends DBTestCase
         type User {
             name: String!
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user(id: "not-present") {
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => null,
             ],
@@ -220,7 +220,7 @@ final class CanFindDirectiveDBTest extends DBTestCase
         $user = factory(User::class)->create();
         $this->assertInstanceOf(User::class, $user);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Mutation {
             throwWhenInvoked(id: ID!): User
                 @canFind(ability: "view", find: "id", action: EXCEPTION_NOT_AUTHORIZED)
@@ -229,15 +229,15 @@ final class CanFindDirectiveDBTest extends DBTestCase
         type User {
             name: String!
         }
-        ' . self::PLACEHOLDER_QUERY;
+        GRAPHQL . self::PLACEHOLDER_QUERY;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation ($id: ID!) {
             throwWhenInvoked(id: $id) {
                 name
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $user->getKey(),
         ])->assertGraphQLErrorMessage(ThrowWhenInvoked::ERROR_MESSAGE);
     }
@@ -250,7 +250,7 @@ final class CanFindDirectiveDBTest extends DBTestCase
 
         $this->mockResolver(null);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             user(id: ID! @whereKey): User
                 @canFind(ability: "view", find: "id", findOrFail: false)
@@ -260,15 +260,15 @@ final class CanFindDirectiveDBTest extends DBTestCase
         type User {
             name: String!
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user(id: "not-present") {
                 name
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'user' => null,
             ],
@@ -281,7 +281,7 @@ final class CanFindDirectiveDBTest extends DBTestCase
         $user->name = UserPolicy::ADMIN;
         $this->be($user);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             user(id: ID): User
                 @canFind(ability: "view", find: "some.path")
@@ -291,15 +291,15 @@ final class CanFindDirectiveDBTest extends DBTestCase
         type User {
             name: String!
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 name
             }
         }
-        ')->assertGraphQLError(CanDirective::missingKeyToFindModel('some.path'));
+        GRAPHQL)->assertGraphQLError(CanDirective::missingKeyToFindModel('some.path'));
     }
 
     public function testFindUsingNestedInputWithDotNotation(): void
@@ -308,7 +308,7 @@ final class CanFindDirectiveDBTest extends DBTestCase
         $this->assertInstanceOf(User::class, $user);
         $this->be($user);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             user(input: FindUserInput!): User
                 @canFind(ability: "view", find: "input.id")
@@ -322,9 +322,9 @@ final class CanFindDirectiveDBTest extends DBTestCase
         input FindUserInput {
           id: ID!
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($id: ID!) {
             user(input: {
               id: $id
@@ -332,7 +332,7 @@ final class CanFindDirectiveDBTest extends DBTestCase
                 name
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $user->id,
         ])->assertJson([
             'data' => [
@@ -361,7 +361,7 @@ final class CanFindDirectiveDBTest extends DBTestCase
             $this->never(),
         );
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             post(foo: ID! @whereKey): Post
                 @canFind(ability: "view", find: "foo")
@@ -371,15 +371,15 @@ final class CanFindDirectiveDBTest extends DBTestCase
         type Post {
             title: String!
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($foo: ID!) {
             post(foo: $foo) {
                 title
             }
         }
-        ', [
+        GRAPHQL, [
             'foo' => $post->id,
         ])->assertGraphQLErrorMessage(AuthorizationException::MESSAGE);
     }
@@ -400,7 +400,7 @@ final class CanFindDirectiveDBTest extends DBTestCase
         $postB->user()->associate($admin);
         $postB->save();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Mutation {
             deletePosts(ids: [ID!]! @whereKey): [Post!]!
                 @canFind(ability: "delete", find: "ids")
@@ -410,15 +410,15 @@ final class CanFindDirectiveDBTest extends DBTestCase
         type Post {
             title: String!
         }
-        ' . self::PLACEHOLDER_QUERY;
+        GRAPHQL . self::PLACEHOLDER_QUERY;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation ($ids: [ID!]!) {
             deletePosts(ids: $ids) {
                 title
             }
         }
-        ', [
+        GRAPHQL, [
             'ids' => [$postA->id, $postB->id],
         ])->assertJson([
             'data' => [
@@ -444,7 +444,7 @@ final class CanFindDirectiveDBTest extends DBTestCase
         $this->assertInstanceOf(Task::class, $task);
         $task->delete();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             task(id: ID! @whereKey): Task
                 @canFind(ability: "adminOnly", find: "id")
@@ -455,15 +455,15 @@ final class CanFindDirectiveDBTest extends DBTestCase
         type Task {
             name: String!
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($id: ID!) {
             task(id: $id, trashed: WITH) {
                 name
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $task->id,
         ])->assertJson([
             'data' => [

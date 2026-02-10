@@ -17,7 +17,7 @@ final class DeleteDirectiveTest extends DBTestCase
         $user = factory(User::class)->create();
         $this->assertInstanceOf(User::class, $user);
 
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -25,15 +25,15 @@ final class DeleteDirectiveTest extends DBTestCase
         type Mutation {
             deleteUser(id: ID! @whereKey): User @delete
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation ($id: ID!) {
             deleteUser(id: $id) {
                 id
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $user->id,
         ])->assertJson([
             'data' => [
@@ -48,7 +48,7 @@ final class DeleteDirectiveTest extends DBTestCase
 
     public function testDeleteNotFound(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -56,15 +56,15 @@ final class DeleteDirectiveTest extends DBTestCase
         type Mutation {
             deleteUser(id: ID! @whereKey): User @delete
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             deleteUser(id: "non-existing") {
                 id
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'deleteUser' => null,
             ],
@@ -76,7 +76,7 @@ final class DeleteDirectiveTest extends DBTestCase
         $users = factory(User::class, 2)->create();
         $this->assertInstanceOf(EloquentCollection::class, $users);
 
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -84,15 +84,15 @@ final class DeleteDirectiveTest extends DBTestCase
         type Mutation {
             deleteUsers(ids: [ID!]! @whereKey): [User!]! @delete
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation ($ids: [ID!]!) {
             deleteUsers(ids: $ids) {
                 id
             }
         }
-        ', [
+        GRAPHQL, [
             'ids' => $users->pluck('id'),
         ])->assertJsonCount(2, 'data.deleteUsers');
 
@@ -111,7 +111,7 @@ final class DeleteDirectiveTest extends DBTestCase
         $bar->name = 'bar';
         $bar->save();
 
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -119,15 +119,15 @@ final class DeleteDirectiveTest extends DBTestCase
         type Mutation {
             deleteUsers(name: String! @eq): [User!]! @delete
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation ($name: String!) {
             deleteUsers(name: $name) {
                 id
             }
         }
-        ', [
+        GRAPHQL, [
             'name' => $foo->name,
         ])->assertJson([
             'data' => [
@@ -154,7 +154,7 @@ final class DeleteDirectiveTest extends DBTestCase
         $unnamed->name = null;
         $unnamed->save();
 
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -162,15 +162,15 @@ final class DeleteDirectiveTest extends DBTestCase
         type Mutation {
             deleteUser(id: ID! @whereKey): User @delete(scopes: ["named"])
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation ($id: ID!) {
             deleteUser(id: $id) {
                 id
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $named->id,
         ])->assertJson([
             'data' => [
@@ -180,13 +180,13 @@ final class DeleteDirectiveTest extends DBTestCase
             ],
         ]);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation ($id: ID!) {
             deleteUser(id: $id) {
                 id
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $unnamed->id,
         ])->assertJson([
             'data' => [
@@ -197,7 +197,7 @@ final class DeleteDirectiveTest extends DBTestCase
 
     public function testDeletesMultipleNonExisting(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -205,15 +205,15 @@ final class DeleteDirectiveTest extends DBTestCase
         type Mutation {
             deleteUsers(ids: [ID!]! @whereKey): [User!]! @delete
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             deleteUsers(ids: ["non-existing"]) {
                 id
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'deleteUsers' => [],
             ],
@@ -222,7 +222,7 @@ final class DeleteDirectiveTest extends DBTestCase
 
     public function testDeletesMultipleEmptyInput(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -230,15 +230,15 @@ final class DeleteDirectiveTest extends DBTestCase
         type Mutation {
             deleteUsers(ids: [ID!]! @whereKey): [User!]! @delete
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             deleteUsers(ids: []) {
                 id
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'deleteUsers' => [],
             ],
@@ -247,7 +247,7 @@ final class DeleteDirectiveTest extends DBTestCase
 
     public function testDeleteRequiresAtLeastOneArgument(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -255,20 +255,20 @@ final class DeleteDirectiveTest extends DBTestCase
         type Mutation {
             deleteUser(id: ID @whereKey, email: String @eq): User @delete
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             deleteUser {
                 id
             }
         }
-        ')->assertGraphQLError(ModifyModelExistenceDirective::wouldModifyAll());
+        GRAPHQL)->assertGraphQLError(ModifyModelExistenceDirective::wouldModifyAll());
     }
 
     public function testDoesNotAcceptArgumentWithoutArgBuilderDirective(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -276,22 +276,22 @@ final class DeleteDirectiveTest extends DBTestCase
         type Mutation {
             deleteUser(id: ID): User @delete
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             deleteUser(id: 1) {
                 id
             }
         }
-        ')->assertGraphQLError(ModifyModelExistenceDirective::wouldModifyAll());
+        GRAPHQL)->assertGraphQLError(ModifyModelExistenceDirective::wouldModifyAll());
     }
 
     public function testRequiresRelationWhenUsingAsArgResolver(): void
     {
         $this->expectException(DefinitionException::class);
 
-        $this->buildSchema(/** @lang GraphQL */ '
+        $this->buildSchema(/** @lang GraphQL */ <<<'GRAPHQL'
         type Mutation {
             updateUser(deleteTasks: Tasks @delete): User @update
         }
@@ -299,7 +299,7 @@ final class DeleteDirectiveTest extends DBTestCase
         type User {
             id: ID!
         }
-        ' . self::PLACEHOLDER_QUERY);
+        GRAPHQL . self::PLACEHOLDER_QUERY);
     }
 
     public function testUseNestedArgResolverDelete(): void
@@ -314,7 +314,7 @@ final class DeleteDirectiveTest extends DBTestCase
             $task->save();
         }
 
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Mutation {
             updateUser(
                 id: ID
@@ -330,9 +330,9 @@ final class DeleteDirectiveTest extends DBTestCase
         type Task {
             id: ID!
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation ($id: ID!, $deleteTasks: [ID!]!) {
             updateUser(id: $id, deleteTasks: $deleteTasks) {
                 id
@@ -341,7 +341,7 @@ final class DeleteDirectiveTest extends DBTestCase
                 }
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $user->id,
             'deleteTasks' => [$tasks[1]->id],
         ])->assertExactJson([
@@ -365,9 +365,10 @@ final class DeleteDirectiveTest extends DBTestCase
 
         $post = factory(Post::class)->make();
         $this->assertInstanceOf(Post::class, $post);
-        $task->post()->save($post);
+        $post->task()->associate($task);
+        $post->save();
 
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Mutation {
             updateTask(
                 id: ID
@@ -383,9 +384,9 @@ final class DeleteDirectiveTest extends DBTestCase
         type Post {
             id: ID!
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation ($id: ID!) {
             updateTask(id: $id, deletePost: false) {
                 id
@@ -394,7 +395,7 @@ final class DeleteDirectiveTest extends DBTestCase
                 }
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $task->id,
         ])->assertExactJson([
             'data' => [
@@ -407,7 +408,7 @@ final class DeleteDirectiveTest extends DBTestCase
             ],
         ]);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation ($id: ID!) {
             updateTask(id: $id, deletePost: true) {
                 id
@@ -416,7 +417,7 @@ final class DeleteDirectiveTest extends DBTestCase
                 }
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $task->id,
         ])->assertExactJson([
             'data' => [
@@ -440,7 +441,7 @@ final class DeleteDirectiveTest extends DBTestCase
         $task->user()->associate($user);
         $task->save();
 
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Mutation {
             updateTask(
                 id: ID!
@@ -456,9 +457,9 @@ final class DeleteDirectiveTest extends DBTestCase
         type User {
             id: ID!
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation ($id: ID!) {
             updateTask(id: $id, deleteUser: true) {
                 id
@@ -467,7 +468,7 @@ final class DeleteDirectiveTest extends DBTestCase
                 }
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $task->id,
         ])->assertExactJson([
             'data' => [
@@ -489,7 +490,7 @@ final class DeleteDirectiveTest extends DBTestCase
         $user = factory(User::class)->create();
         $this->assertInstanceOf(User::class, $user);
 
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -497,15 +498,15 @@ final class DeleteDirectiveTest extends DBTestCase
         type Mutation {
             deleteUser(id: ID! @whereKey): User @delete
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation ($id: ID!) {
             deleteUser(id: $id) {
                 id
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $user->id,
         ])->assertGraphQLError(ModifyModelExistenceDirective::couldNotModify($user));
     }

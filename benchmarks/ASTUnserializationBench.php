@@ -25,9 +25,9 @@ final class ASTUnserializationBench
     }
     GRAPHQL;
 
-    protected string $documentNode;
+    private string $documentNode;
 
-    protected string $documentAST;
+    private string $documentAST;
 
     public function prepareSchema(): void
     {

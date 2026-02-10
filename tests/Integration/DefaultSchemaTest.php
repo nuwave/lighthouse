@@ -48,24 +48,24 @@ final class DefaultSchemaTest extends DBTestCase
     public function testFindRequiresExactlyOneArgument(): void
     {
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 user {
                     id
                 }
             }
-            ')
+            GRAPHQL)
             ->assertGraphQLValidationError('email', 'The email field is required when id is not present.')
             ->assertGraphQLValidationError('id', 'The id field is required when email is not present.');
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 user(id: 1, email: "foo@bar.baz") {
                     id
                 }
             }
-            ')
+            GRAPHQL)
             ->assertGraphQLValidationError('email', 'The email field prohibits id from being present.')
             ->assertGraphQLValidationError('id', 'The id field prohibits email from being present.');
     }
@@ -76,13 +76,13 @@ final class DefaultSchemaTest extends DBTestCase
         $user = factory(User::class)->create();
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($id: ID!) {
                 user(id: $id) {
                     id
                 }
             }
-            ', [
+            GRAPHQL, [
                 'id' => $user->id,
             ])
             ->assertExactJson([
@@ -97,7 +97,7 @@ final class DefaultSchemaTest extends DBTestCase
     public function testEmptyUsers(): void
     {
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 users {
                     data {
@@ -105,7 +105,7 @@ final class DefaultSchemaTest extends DBTestCase
                     }
                 }
             }
-            ')
+            GRAPHQL)
             ->assertExactJson([
                 'data' => [
                     'users' => [
@@ -121,7 +121,7 @@ final class DefaultSchemaTest extends DBTestCase
         factory(User::class)->times($amount)->create();
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 users {
                     data {
@@ -129,7 +129,7 @@ final class DefaultSchemaTest extends DBTestCase
                     }
                 }
             }
-            ')
+            GRAPHQL)
             ->assertJsonCount(2, 'data.users.data');
     }
 
@@ -156,7 +156,7 @@ final class DefaultSchemaTest extends DBTestCase
 
     private function usersByName(string $name): TestResponse
     {
-        return $this->graphQL(/** @lang GraphQL */ '
+        return $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($name: String!) {
                 users(name: $name) {
                     data {
@@ -164,7 +164,7 @@ final class DefaultSchemaTest extends DBTestCase
                     }
                 }
             }
-            ',
+        GRAPHQL,
             [
                 'name' => $name,
             ],

@@ -66,7 +66,7 @@ final class RedisStorageManagerTest extends TestCase
     public function testSubscriberByChannel(): void
     {
         /** @var \PHPUnit\Framework\MockObject\MockObject&\Illuminate\Contracts\Config\Repository $config */
-        $config = $this->createMock(ConfigRepository::class);
+        $config = $this->createStub(ConfigRepository::class);
         $redisConnection = $this->createMock(RedisConnection::class);
         $redisFactory = $this->mockRedisFactory($redisConnection);
 
@@ -85,7 +85,7 @@ final class RedisStorageManagerTest extends TestCase
 
     public function testDeleteSubscriber(): void
     {
-        $config = $this->createMock(ConfigRepository::class);
+        $config = $this->createStub(ConfigRepository::class);
         $redisConnection = $this->createMock(RedisConnection::class);
         $redisFactory = $this->mockRedisFactory($redisConnection);
 
@@ -183,7 +183,7 @@ final class RedisStorageManagerTest extends TestCase
 
     public function testSubscribersByTopic(): void
     {
-        $config = $this->createMock(ConfigRepository::class);
+        $config = $this->createStub(ConfigRepository::class);
         $redisConnection = $this->createMock(RedisConnection::class);
         $redisFactory = $this->mockRedisFactory($redisConnection);
 

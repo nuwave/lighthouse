@@ -20,11 +20,11 @@ final class FederationEntitiesModelTest extends DBTestCase
 
     public function testCallsEntityResolverModel(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User @key(fields: "id") {
           id: ID! @external
         }
-        ';
+        GRAPHQL;
 
         $user = factory(User::class)->create();
 
@@ -33,7 +33,7 @@ final class FederationEntitiesModelTest extends DBTestCase
             'id' => (string) $user->getKey(),
         ];
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($representations: [_Any!]!) {
             _entities(representations: $representations) {
                 __typename
@@ -42,7 +42,7 @@ final class FederationEntitiesModelTest extends DBTestCase
                 }
             }
         }
-        ', [
+        GRAPHQL, [
             'representations' => [
                 $userRepresentation,
             ],
@@ -57,7 +57,7 @@ final class FederationEntitiesModelTest extends DBTestCase
 
     public function testCallsNestedEntityResolverModel(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User @key(fields: "company { id }") {
           id: ID! @external
           company: Company! @belongsTo
@@ -66,7 +66,7 @@ final class FederationEntitiesModelTest extends DBTestCase
         type Company {
             id: ID!
         }
-        ';
+        GRAPHQL;
 
         $company = factory(Company::class)->create();
         $this->assertInstanceOf(Company::class, $company);
@@ -84,7 +84,7 @@ final class FederationEntitiesModelTest extends DBTestCase
             ],
         ];
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($representations: [_Any!]!) {
             _entities(representations: $representations) {
                 __typename
@@ -93,7 +93,7 @@ final class FederationEntitiesModelTest extends DBTestCase
                 }
             }
         }
-        ', [
+        GRAPHQL, [
             'representations' => [
                 $userRepresentation,
             ],
@@ -111,11 +111,11 @@ final class FederationEntitiesModelTest extends DBTestCase
 
     public function testCallsEntityResolverModelWithGlobalId(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User @key(fields: "id") {
           id: ID! @external @globalId
         }
-        ';
+        GRAPHQL;
 
         $user = factory(User::class)->create();
 
@@ -124,7 +124,7 @@ final class FederationEntitiesModelTest extends DBTestCase
             'id' => $this->app->get(GlobalId::class)->encode('User', $user->getKey()),
         ];
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($representations: [_Any!]!) {
             _entities(representations: $representations) {
                 __typename
@@ -133,7 +133,7 @@ final class FederationEntitiesModelTest extends DBTestCase
                 }
             }
         }
-        ', [
+        GRAPHQL, [
             'representations' => [
                 $userRepresentation,
             ],
@@ -148,12 +148,12 @@ final class FederationEntitiesModelTest extends DBTestCase
 
     public function testHydratesExternalFields(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User @key(fields: "id") {
           id: ID!
           externallyProvided: String! @external
         }
-        ';
+        GRAPHQL;
 
         $user = factory(User::class)->create();
         $this->assertInstanceOf(User::class, $user);
@@ -164,7 +164,7 @@ final class FederationEntitiesModelTest extends DBTestCase
             'externallyProvided' => 'some value that we know nothing about',
         ];
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($representations: [_Any!]!) {
             _entities(representations: $representations) {
                 __typename
@@ -174,7 +174,7 @@ final class FederationEntitiesModelTest extends DBTestCase
                 }
             }
         }
-        ', [
+        GRAPHQL, [
             'representations' => [
                 $userRepresentation,
             ],

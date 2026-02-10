@@ -10,7 +10,7 @@ final class HasManyDirectiveTest extends DBTestCase
 {
     public function testUsesEdgeTypeForRelayConnections(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             tasks: [Task!]! @hasMany (
                 type: CONNECTION
@@ -31,7 +31,7 @@ final class HasManyDirectiveTest extends DBTestCase
         type Query {
             user: User @auth
         }
-        ';
+        GRAPHQL;
 
         $expectedConnectionName = 'TaskEdgeConnection';
 
@@ -57,7 +57,7 @@ final class HasManyDirectiveTest extends DBTestCase
     {
         $this->expectExceptionObject(new DefinitionException('Found invalid pagination type: foo'));
 
-        $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
+        $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             tasks(first: Int! after: Int): [Task!]! @hasMany(type: "foo")
         }
@@ -65,6 +65,6 @@ final class HasManyDirectiveTest extends DBTestCase
         type Task {
             foo: String
         }
-        ');
+        GRAPHQL);
     }
 }

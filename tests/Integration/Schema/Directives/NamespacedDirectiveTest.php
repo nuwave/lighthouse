@@ -8,7 +8,7 @@ final class NamespacedDirectiveTest extends DBTestCase
 {
     public function testCRUDModelDirectives(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             user: UserQueries! @namespaced
         }
@@ -32,10 +32,10 @@ final class NamespacedDirectiveTest extends DBTestCase
             id: ID!
             name: String!
         }
-        ';
+        GRAPHQL;
 
         $name = 'foo';
-        $createUserResponse = $this->graphQL(/** @lang GraphQL */ '
+        $createUserResponse = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation ($name: String!) {
             user {
                 create(name: $name) {
@@ -44,7 +44,7 @@ final class NamespacedDirectiveTest extends DBTestCase
                 }
             }
         }
-        ', [
+        GRAPHQL, [
             'name' => $name,
         ]);
         $createUserResponse->assertJson([
@@ -58,7 +58,7 @@ final class NamespacedDirectiveTest extends DBTestCase
         ]);
         $userID = $createUserResponse->json('data.user.create.id');
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($id: ID!) {
             user {
                 find(id: $id) {
@@ -69,7 +69,7 @@ final class NamespacedDirectiveTest extends DBTestCase
                 }
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $userID,
         ])->assertExactJson([
             'data' => [
@@ -87,7 +87,7 @@ final class NamespacedDirectiveTest extends DBTestCase
         ]);
 
         $newName = 'bar';
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation ($id: ID!, $name: String) {
             user {
                 update(id: $id, name: $name) {
@@ -96,7 +96,7 @@ final class NamespacedDirectiveTest extends DBTestCase
                 }
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $userID,
             'name' => $newName,
         ])->assertExactJson([
@@ -110,7 +110,7 @@ final class NamespacedDirectiveTest extends DBTestCase
             ],
         ]);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation ($id: ID!) {
             user {
                 delete(id: $id) {
@@ -119,7 +119,7 @@ final class NamespacedDirectiveTest extends DBTestCase
                 }
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $userID,
         ])->assertExactJson([
             'data' => [

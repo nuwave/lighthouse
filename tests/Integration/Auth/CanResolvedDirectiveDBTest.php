@@ -17,7 +17,7 @@ final class CanResolvedDirectiveDBTest extends DBTestCase
 
         $user = factory(User::class)->create();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             users: [User!]!
                 @canResolved(ability: "view")
@@ -27,9 +27,9 @@ final class CanResolvedDirectiveDBTest extends DBTestCase
         type User {
             name: String
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(first: 2) {
                 data {
@@ -37,7 +37,7 @@ final class CanResolvedDirectiveDBTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'users' => [
                     'data' => [
@@ -63,7 +63,7 @@ final class CanResolvedDirectiveDBTest extends DBTestCase
         $user->company()->associate($company);
         $user->save();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             company: Company @first
         }
@@ -77,9 +77,9 @@ final class CanResolvedDirectiveDBTest extends DBTestCase
         type User {
             name: String
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             company {
                 users {
@@ -87,7 +87,7 @@ final class CanResolvedDirectiveDBTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'company' => [
                     'users' => [
@@ -108,7 +108,7 @@ final class CanResolvedDirectiveDBTest extends DBTestCase
 
         $user = factory(User::class)->create();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             user(id: ID! @whereKey): User
                 @canResolved(ability: "view")
@@ -118,15 +118,15 @@ final class CanResolvedDirectiveDBTest extends DBTestCase
         type User {
             name: String!
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user(id: "not-present") {
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => null,
             ],

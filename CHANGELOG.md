@@ -9,6 +9,25 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.64.3
+
+### Fixed
+
+- Fix `upsert` for `HasOne` creating a new record instead of updating when no `id` is provided in the input https://github.com/nuwave/lighthouse/pull/2742
+- Throw error when using `create` on `HasOne` relation when a related model already exists https://github.com/nuwave/lighthouse/pull/2742
+
+## v6.64.2
+
+### Fixed
+
+- Use `String` type for `HAS.condition.column` in `@whereConditions` instead of incorrectly inheriting the parent's column enum type https://github.com/nuwave/lighthouse/pull/2725
+
+## v6.64.1
+
+### Fixed
+
+- Handle explicit `null` for `page` argument in paginated queries https://github.com/nuwave/lighthouse/pull/2735
+
 ## v6.64.0
 
 ### Added

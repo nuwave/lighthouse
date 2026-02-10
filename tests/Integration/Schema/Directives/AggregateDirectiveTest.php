@@ -13,41 +13,41 @@ final class AggregateDirectiveTest extends DBTestCase
 {
     public function testRequiresARelationOrModelArgument(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             tasks: Int @aggregate
         }
-        ';
+        GRAPHQL;
 
         $this->expectException(DefinitionException::class);
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             tasks
         }
-        ');
+        GRAPHQL);
     }
 
     public function testAggregateModel(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             sum: Int! @aggregate(model: "Task", function: SUM, column: "difficulty")
             avg: Float! @aggregate(model: "Task", function: AVG, column: "difficulty")
             min: Int! @aggregate(model: "Task", function: MIN, column: "difficulty")
             max: Int! @aggregate(model: "Task", function: MAX, column: "difficulty")
         }
-        ';
+        GRAPHQL;
 
         $tasks = factory(Task::class, 3)->create();
 
-        $response = $this->graphQL(/** @lang GraphQL */ '
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             sum
             avg
             min
             max
         }
-        ');
+        GRAPHQL);
 
         $response->assertJson([
             'data' => [
@@ -66,22 +66,24 @@ final class AggregateDirectiveTest extends DBTestCase
 
     public function testSumModelWithScopes(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             finished: Int! @aggregate(model: "Task", function: SUM, column: "difficulty", scopes: ["completed"])
         }
-        ';
+        GRAPHQL;
 
         factory(Task::class, 3)->create();
-        $completed = factory(Task::class, 2)->create([
-            'completed_at' => now(),
-        ]);
+        $completed = factory(Task::class, 2)->create();
+        $completed->each(static function (Task $task): void {
+            $task->completed_at = now();
+            $task->save();
+        });
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             finished
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'finished' => $completed->sum('difficulty'),
             ],
@@ -90,7 +92,7 @@ final class AggregateDirectiveTest extends DBTestCase
 
     public function testSumRelationEagerLoad(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             users: [User!] @all
         }
@@ -98,7 +100,7 @@ final class AggregateDirectiveTest extends DBTestCase
         type User {
             workload: Int! @aggregate(relation: "tasks", function: SUM, column: "difficulty")
         }
-        ';
+        GRAPHQL;
 
         factory(User::class, 3)
             ->create()
@@ -111,13 +113,13 @@ final class AggregateDirectiveTest extends DBTestCase
             });
 
         $this->assertQueryCountMatches(2, function (): void {
-            $this->graphQL(/** @lang GraphQL */ '
+            $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 users {
                     workload
                 }
             }
-            ')->assertExactJson([
+            GRAPHQL)->assertExactJson([
                 'data' => [
                     'users' => [
                         [
@@ -137,7 +139,7 @@ final class AggregateDirectiveTest extends DBTestCase
 
     public function testSumRelationWithScopes(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             user: User @first
         }
@@ -145,7 +147,7 @@ final class AggregateDirectiveTest extends DBTestCase
         type User {
             finished: Int! @aggregate(relation: "tasks", function: SUM, column: "difficulty", scopes: ["completed"])
         }
-        ';
+        GRAPHQL;
 
         $user = factory(User::class)->create();
         $this->assertInstanceOf(User::class, $user);
@@ -157,13 +159,13 @@ final class AggregateDirectiveTest extends DBTestCase
         $this->assertInstanceOf(Task::class, $completed);
         $user->tasks()->save($completed);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 finished
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'user' => [
                     'finished' => $completed->difficulty,
@@ -174,7 +176,7 @@ final class AggregateDirectiveTest extends DBTestCase
 
     public function testMultipleAggregatesOnSameRelationWithAliases(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             difficulty(
                 minimum: Int @where(key: "difficulty", operator: ">=")
@@ -185,7 +187,7 @@ final class AggregateDirectiveTest extends DBTestCase
         type Query {
             users: [User!]! @all
         }
-        ';
+        GRAPHQL;
 
         $user1 = factory(User::class)->create();
         $this->assertInstanceOf(User::class, $user1);
@@ -214,14 +216,14 @@ final class AggregateDirectiveTest extends DBTestCase
         $user2->tasks()->save($high2);
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query {
                 users {
                     lowDifficulty: difficulty(maximum: 9000)
                     highDifficulty: difficulty(minimum: 9000)
                 }
             }
-            ')
+            GRAPHQL)
             ->assertExactJson([
                 'data' => [
                     'users' => [
@@ -240,14 +242,14 @@ final class AggregateDirectiveTest extends DBTestCase
 
     public function testAggregateWithBuilder(): void
     {
-        $this->schema = /** @lang GraphQL */ "
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type Query {
             sum(
                 difficulty: Int! @eq
                 exclude: ID!
-            ): Int! @aggregate(builder: \"{$this->qualifyTestResolver('builder')}\", function: SUM, column: \"difficulty\")
+            ): Int! @aggregate(builder: "{$this->qualifyTestResolver('builder')}", function: SUM, column: "difficulty")
         }
-        ";
+        GRAPHQL;
 
         $difficulty = 5;
 
@@ -271,11 +273,11 @@ final class AggregateDirectiveTest extends DBTestCase
         $task4->difficulty = $difficulty;
         $task4->save();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($difficulty: Int!, $exclude: ID!) {
             sum(difficulty: $difficulty, exclude: $exclude)
         }
-        ', [
+        GRAPHQL, [
             'difficulty' => $difficulty,
             'exclude' => $task4->id,
         ])->assertJson([

@@ -9,8 +9,8 @@ use Tests\TestCase;
 final class FederationSchemaTest extends TestCase
 {
     private const FEDERATION_V2_SCHEMA_EXTENSION = /** @lang GraphQL */ <<<'GRAPHQL'
-    extend schema @link(url: "https://specs.apollo.dev/federation/v2.3", import: ["@composeDirective", "@extends", "@external", "@inaccessible", "@interfaceObject", "@key", "@override", "@provides", "@requires", "@shareable", "@tag"])
-    GRAPHQL;
+        extend schema @link(url: "https://specs.apollo.dev/federation/v2.3", import: ["@composeDirective", "@extends", "@external", "@inaccessible", "@interfaceObject", "@key", "@override", "@provides", "@requires", "@shareable", "@tag"])
+        GRAPHQL;
 
     protected function getPackageProviders($app): array
     {
@@ -57,12 +57,14 @@ final class FederationSchemaTest extends TestCase
         $sdl = $this->_serviceSdl();
 
         $this->assertStringContainsString($typeFoo, $sdl);
-        $this->assertStringNotContainsString(/** @lang GraphQL */ 'type Query', $sdl);
+        $this->assertStringNotContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
+        type Query
+        GRAPHQL, $sdl);
     }
 
     public function testFederatedSchemaShouldContainCorrectEntityUnion(): void
     {
-        $schema = $this->buildSchema(/** @lang GraphQL */ '
+        $schema = $this->buildSchema(/** @lang GraphQL */ <<<'GRAPHQL'
         type Foo @key(fields: "id") {
           id: ID! @external
           foo: String!
@@ -76,7 +78,7 @@ final class FederationSchemaTest extends TestCase
         type Query {
           foo: Int!
         }
-        ');
+        GRAPHQL);
 
         $_Entity = $schema->getType('_Entity');
         $this->assertInstanceOf(UnionType::class, $_Entity);
@@ -175,13 +177,13 @@ final class FederationSchemaTest extends TestCase
 
     private function _serviceSdl(): string
     {
-        $response = $this->graphQL(/** @lang GraphQL */ '
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             _service {
                 sdl
             }
         }
-        ');
+        GRAPHQL);
 
         return $response->json('data._service.sdl');
     }
