@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to coding agents when working with code in this repository.
 
 ## Project Overview
 
@@ -12,13 +12,12 @@ It integrates `webonyx/graphql-php` with Laravel's ecosystem.
 The project uses Docker + Make for a reproducible development environment.
 
 ```bash
-make setup          # Initial setup: build containers, install dependencies
-make                # Run all checks before committing (fix, stan, test)
+make setup          # Initial setup: build containers, install dependencies, generate agent config
+make it             # Run all checks before committing (fix, stan, test)
 make fix            # Auto-format code (rector, php-cs-fixer, prettier)
 make stan           # Static analysis with PHPStan
 make test           # Run PHPUnit tests
 make bench          # Run PHPBench benchmarks
-make php            # Shell into PHP container
 ```
 
 ### Running a Single Test
@@ -90,7 +89,7 @@ Tests use `Tests\Utils\` namespace for test fixtures (Models, Queries, Mutations
 - PHPStan level 8
 - php-cs-fixer with `mll-lab/php-cs-fixer-config` (risky rules)
 - `protected` over `private` for extensibility
-- Never use `final` in `src/`,  always in `tests/`
+- Never use `final` in `src/`, always in `tests/`
 - Full namespace in PHPDoc (`@var \Full\Namespace\Class`), imports in code
 - Code elements with `@api` have stability guarantees between major versions
 
