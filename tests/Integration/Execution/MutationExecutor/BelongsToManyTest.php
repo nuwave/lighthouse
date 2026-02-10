@@ -9,7 +9,7 @@ use Tests\Utils\Models\User;
 
 final class BelongsToManyTest extends DBTestCase
 {
-    protected string $schema = /** @lang GraphQL */ <<<'GRAPHQL'
+    protected string $schema = /** @lang GraphQL */ '
     type Role {
         id: ID!
         name: String
@@ -109,7 +109,7 @@ final class BelongsToManyTest extends DBTestCase
 
     public function testSyncWithoutDetaching(): void
     {
-        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createUser(input: {
                 name: "user1"
@@ -143,8 +143,8 @@ final class BelongsToManyTest extends DBTestCase
                 }
             }
         }
-        GRAPHQL)->assertJson([
-            GRAPHQLdata' => [
+        ')->assertJson([
+            'data' => [
                 'createUser' => [
                     'id' => '1',
                 ],
@@ -173,7 +173,7 @@ final class BelongsToManyTest extends DBTestCase
 
     public function testCreateWithNewBelongsToMany(): void
     {
-        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createRole(input: {
                 name: "foobar"
@@ -196,7 +196,7 @@ final class BelongsToManyTest extends DBTestCase
                 }
             }
         }
-        GRAPHQL)->assertJson([
+        ')->assertJson([
             'data' => [
                 'createRole' => [
                     'id' => '1',
@@ -214,7 +214,7 @@ final class BelongsToManyTest extends DBTestCase
 
     public function testUpsertWithBelongsToManyOnNonExistentData(): void
     {
-        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             upsertRole(input: {
                 id: 1
@@ -240,7 +240,7 @@ final class BelongsToManyTest extends DBTestCase
                 }
             }
         }
-        GRAPHQL)->assertJson([
+        ')->assertJson([
             'data' => [
                 'upsertRole' => [
                     'id' => '1',
@@ -328,7 +328,7 @@ GRAPHQL
         $user->name = 'user_two';
         $user->save();
 
-        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createRole(input: {
                 name: "foobar"
@@ -344,7 +344,7 @@ GRAPHQL
                 }
             }
         }
-        GRAPHQL)->assertJson([
+        ')->assertJson([
             'data' => [
                 'createRole' => [
                     'id' => '1',
@@ -376,7 +376,7 @@ GRAPHQL
         $user->name = 'user_two';
         $user->save();
 
-        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             upsertRole(input: {
                 id: 1
@@ -393,7 +393,7 @@ GRAPHQL
                 }
             }
         }
-        GRAPHQL)->assertJson([
+        ')->assertJson([
             'data' => [
                 'upsertRole' => [
                     'id' => '1',
@@ -420,7 +420,7 @@ GRAPHQL
         $role->name = 'is_admin';
         $role->save();
 
-        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             updateRole(input: {
                 id: 1
@@ -444,7 +444,7 @@ GRAPHQL
                 }
             }
         }
-        GRAPHQL)->assertJson([
+        ')->assertJson([
             'data' => [
                 'updateRole' => [
                     'id' => '1',
@@ -473,7 +473,7 @@ GRAPHQL
     {
         factory(Role::class)->create();
 
-        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             updateRole(input: {
                 id: 1
@@ -497,7 +497,7 @@ GRAPHQL
                 }
             }
         }
-        GRAPHQL)->assertJson([
+        ')->assertJson([
             'data' => [
                 'updateRole' => [
                     'id' => '1',
@@ -515,7 +515,7 @@ GRAPHQL
         $role->name = 'is_admin';
         $role->save();
 
-        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             updateRole(input: {
                 id: 1
@@ -541,7 +541,7 @@ GRAPHQL
                 }
             }
         }
-        GRAPHQL)->assertJson([
+        ')->assertJson([
             'data' => [
                 'updateRole' => [
                     'id' => '1',
@@ -893,7 +893,7 @@ GRAPHQL
     {
         factory(User::class, 2)->create();
 
-        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createRole(input: {
                 name: "foobar"
@@ -908,7 +908,7 @@ GRAPHQL
                 }
             }
         }
-        GRAPHQL)->assertJson([
+        ')->assertJson([
             'data' => [
                 'createRole' => [
                     'id' => '1',
@@ -930,7 +930,7 @@ GRAPHQL
     {
         factory(User::class, 2)->create();
 
-        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             upsertRole(input: {
                 id: 1
@@ -946,7 +946,7 @@ GRAPHQL
                 }
             }
         }
-        GRAPHQL)->assertJson([
+        ')->assertJson([
             'data' => [
                 'upsertRole' => [
                     'id' => '1',
@@ -976,7 +976,7 @@ GRAPHQL
 
         $this->assertCount(1, $role->users);
 
-        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+        $this->graphQL(/** @lang GraphQL */ "
         mutation {
             {$action}Role(input: {
                 id: 1
@@ -991,7 +991,7 @@ GRAPHQL
                 }
             }
         }
-        GRAPHQL)->assertJson([
+        ")->assertJson([
             'data' => [
                 "{$action}Role" => [
                     'id' => '1',
@@ -1017,7 +1017,7 @@ GRAPHQL
 
         $meta = Lorem::sentence();
 
-        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        $this->graphQL(/** @lang GraphQL */ '
         mutation ($meta: String) {
             pivotsUpdateUser(input: {
                 id: 1,
@@ -1041,7 +1041,7 @@ GRAPHQL
                 }
             }
         }
-        GRAPHQL, [
+        ', [
             'meta' => $meta,
         ])->assertJson([
             'data' => [
@@ -1076,7 +1076,7 @@ GRAPHQL
 
         $meta = Lorem::sentence();
 
-        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        $this->graphQL(/** @lang GraphQL */ '
         mutation ($meta: String) {
             pivotsUpdateUser(input: {
                 id: 1,
@@ -1096,7 +1096,7 @@ GRAPHQL
                 }
             }
         }
-        GRAPHQL, [
+        ', [
             'meta' => $meta,
         ])->assertJson([
             'data' => [
@@ -1125,7 +1125,7 @@ GRAPHQL
 
         $meta = Lorem::sentence();
 
-        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        $this->graphQL(/** @lang GraphQL */ '
         mutation ($meta: String) {
             pivotsUpdateUser(input: {
                 id: 1,
@@ -1145,7 +1145,7 @@ GRAPHQL
                 }
             }
         }
-        GRAPHQL, [
+        ', [
             'meta' => $meta,
         ])->assertJson([
             'data' => [

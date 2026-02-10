@@ -10,7 +10,7 @@ use Tests\Utils\Models\User;
 
 final class HasManyTest extends DBTestCase
 {
-    protected string $schema = /** @lang GraphQL */ <<<'GRAPHQL'
+    protected string $schema = /** @lang GraphQL */ '
     type Task {
         id: ID!
         name: String!
@@ -86,7 +86,7 @@ final class HasManyTest extends DBTestCase
 
     public function testCreateWithNewHasMany(): void
     {
-        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createUser(input: {
                 name: "foo"
@@ -106,8 +106,8 @@ final class HasManyTest extends DBTestCase
                 }
             }
         }
-        GRAPHQL)->assertJson([
-            GRAPHQLdata' => [
+        ')->assertJson([
+            'data' => [
                 'createUser' => [
                     'id' => '1',
                     'name' => 'foo',
@@ -130,7 +130,7 @@ final class HasManyTest extends DBTestCase
         $task2 = factory(Task::class)->create();
         assert($task2 instanceof Task);
 
-        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        $this->graphQL(/** @lang GraphQL */ '
             mutation ($input: CreateUserInput!) {
                 createUser(input: $input) {
                     name
@@ -140,7 +140,7 @@ final class HasManyTest extends DBTestCase
                     }
                 }
             }
-            GRAPHQL,
+            ',
             [
                 'input' => [
                     'name' => 'foo',
@@ -175,7 +175,7 @@ final class HasManyTest extends DBTestCase
     {
         factory(User::class)->create();
 
-        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             updateUser(input: {
                 id: 1
@@ -193,7 +193,7 @@ final class HasManyTest extends DBTestCase
                 }
             }
         }
-        GRAPHQL)->assertJson([
+        ')->assertJson([
             'data' => [
                 'updateUser' => [
                     'name' => 'foo',
@@ -205,7 +205,7 @@ final class HasManyTest extends DBTestCase
 
     public function testUpsertWithNewHasMany(): void
     {
-        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             createUser(input: {
                 name: "foo"
@@ -224,7 +224,7 @@ final class HasManyTest extends DBTestCase
                 }
             }
         }
-        GRAPHQL)->assertJson([
+        ')->assertJson([
             'data' => [
                 'createUser' => [
                     'id' => '1',
@@ -242,7 +242,7 @@ final class HasManyTest extends DBTestCase
 
     public function testUpsertHasManyWithoutId(): void
     {
-        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             upsertUser(input: {
                 name: "foo"
@@ -260,7 +260,7 @@ final class HasManyTest extends DBTestCase
                 }
             }
         }
-        GRAPHQL)->assertJson([
+        ')->assertJson([
             'data' => [
                 'upsertUser' => [
                     'id' => '1',
@@ -278,7 +278,7 @@ final class HasManyTest extends DBTestCase
 
     public function testCreateUsingUpsertWithNewHasMany(): void
     {
-        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             upsertUser(input: {
                 id: 1
@@ -298,7 +298,7 @@ final class HasManyTest extends DBTestCase
                 }
             }
         }
-        GRAPHQL)->assertJson([
+        ')->assertJson([
             'data' => [
                 'upsertUser' => [
                     'id' => '1',
@@ -567,7 +567,7 @@ GRAPHQL
 
         $actionInputName = ucfirst($action);
 
-        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+        $this->graphQL(/** @lang GraphQL */ "
             mutation (\$input: {$actionInputName}UserInput!) {
                 {$action}User(input: \$input) {
                     id
@@ -578,7 +578,7 @@ GRAPHQL
                     }
                 }
             }
-            GRAPHQL,
+            ",
             [
                 'input' => [
                     'id' => $user->id,
@@ -628,7 +628,7 @@ GRAPHQL
 
         $actionInputName = ucfirst($action);
 
-        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+        $this->graphQL(/** @lang GraphQL */ "
             mutation (\$input: {$actionInputName}UserInput!) {
                 {$action}User(input: \$input) {
                     id
@@ -639,7 +639,7 @@ GRAPHQL
                     }
                 }
             }
-        GRAPHQL, [
+        ", [
             'input' => [
                 'id' => $user->id,
                 'name' => 'foo',
@@ -669,7 +669,7 @@ GRAPHQL
 
     public function testUpsertAcrossPivotTableOverrideExistingModel(): void
     {
-        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ '
         type User {
             id: ID!
             name: String!
@@ -707,7 +707,7 @@ GRAPHQL
         ' . self::PLACEHOLDER_QUERY;
 
         // Create the first User with a Role.
-        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             upsertUser(input: {
                 name: "foo"
@@ -725,8 +725,8 @@ GRAPHQL
                 }
             }
         }
-        GRAPHQL)->assertJson([
-            GRAPHQLdata' => [
+        ')->assertJson([
+            'data' => [
                 'upsertUser' => [
                     'id' => '1',
                     'name' => 'foo',
@@ -748,7 +748,7 @@ GRAPHQL
         // Create another User.
         factory(User::class)->create();
 
-        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        $this->graphQL(/** @lang GraphQL */ '
         mutation {
             upsertUser(input: {
                 id: "1"
@@ -771,7 +771,7 @@ GRAPHQL
                 }
             }
         }
-        GRAPHQL)->assertJson([
+        ')->assertJson([
             'data' => [
                 'upsertUser' => [
                     'id' => '1',
@@ -786,7 +786,7 @@ GRAPHQL
 
     public function testConnectModelWithCustomKey(): void
     {
-        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ '
         type Query {
             user: User @first
         }
@@ -822,11 +822,11 @@ GRAPHQL
             connect: [ID!]
             disconnect: [ID!]
         }
-        GRAPHQL;
+        ';
 
         factory(CustomPrimaryKey::class, 3)->create();
 
-        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        $this->graphQL(/** @lang GraphQL */ '
             mutation {
                 createUser(input: {
                     name: "foo"
@@ -841,7 +841,7 @@ GRAPHQL
                     }
                 }
             }
-        GRAPHQL)->assertJson([
+        ')->assertJson([
             'data' => [
                 'createUser' => [
                     'id' => '1',
@@ -861,7 +861,7 @@ GRAPHQL
             ],
         ]);
 
-        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        $this->graphQL(/** @lang GraphQL */ '
             mutation {
                 updateUser(input: {
                     id: "1"
@@ -877,7 +877,7 @@ GRAPHQL
                     }
                 }
             }
-        GRAPHQL)->assertJson([
+        ')->assertJson([
             'data' => [
                 'updateUser' => [
                     'id' => '1',
