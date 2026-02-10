@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Changed
+
+- Override the default field resolver `GraphQL\Executor\Executor::defaultFieldResolver()` with `Nuwave\Lighthouse\LighthouseServiceProvider::defaultFieldResolver()` https://github.com/nuwave/lighthouse/pull/2693
+
 ## v6.64.3
 
 ### Fixed

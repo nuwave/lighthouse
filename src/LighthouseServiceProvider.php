@@ -6,9 +6,12 @@ use GraphQL\Error\ClientAware;
 use GraphQL\Error\Error;
 use GraphQL\Error\ProvidesExtensions;
 use GraphQL\Executor\ExecutionResult;
+use GraphQL\Executor\Executor;
+use GraphQL\Utils\Utils;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\ServiceProvider;
@@ -33,6 +36,7 @@ use Nuwave\Lighthouse\Execution\CacheableValidationRulesProvider;
 use Nuwave\Lighthouse\Execution\ContextFactory;
 use Nuwave\Lighthouse\Execution\ContextSerializer;
 use Nuwave\Lighthouse\Execution\ErrorPool;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Execution\SingleResponse;
 use Nuwave\Lighthouse\Http\Responses\ResponseStream;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
@@ -47,6 +51,7 @@ use Nuwave\Lighthouse\Support\AppVersion;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules;
@@ -146,6 +151,37 @@ class LighthouseServiceProvider extends ServiceProvider
                 return new JsonResponse($serializableResult);
             });
         }
+
+        Executor::setDefaultFieldResolver([static::class, 'defaultFieldResolver']); // @phpstan-ignore argument.type (callable not recognized)
+    }
+
+    /**
+     * The default field resolver for GraphQL queries.
+     *
+     * This method is used to resolve fields on the object-like value returned by a resolver.
+     * It checks if the value is an Eloquent model and retrieves the attribute or property accordingly.
+     * Otherwise, it falls back to the default behavior from webonyx/graphql-php's default field resolver.
+     *
+     * @see \GraphQL\Executor\Executor::defaultFieldResolver()
+     *
+     * @param  array<string, mixed>  $args
+     */
+    public static function defaultFieldResolver(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): mixed
+    {
+        $fieldName = $resolveInfo->fieldName;
+
+        if ($root instanceof Model) {
+            $property = $root->getAttribute($fieldName);
+            if ($property === null && property_exists($root, $fieldName)) {
+                $property = $root->{$fieldName};
+            }
+        } else {
+            $property = Utils::extractKey($root, $fieldName);
+        }
+
+        return $property instanceof \Closure
+            ? $property($root, $args, $context, $resolveInfo)
+            : $property;
     }
 
     protected function loadRoutesFrom($path): void
