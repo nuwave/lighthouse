@@ -28,6 +28,10 @@ GRAPHQL;
 
     public function handleBuilder(Builder $builder, $value): Builder
     {
+        if ($value === null) {
+            return $builder;
+        }
+
         return $builder->whereNotBetween(
             $this->directiveArgValue('key', $this->nodeName()),
             $value,

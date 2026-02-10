@@ -13,15 +13,13 @@ use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 class SaveModel implements ArgResolver
 {
     public function __construct(
-        /**
-         * @var \Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>|null $parentRelation
-         */
+        /** @var \Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>|null $parentRelation */
         protected ?Relation $parentRelation = null,
     ) {}
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
+     * @param  Model  $model
+     * @param  ArgumentSet  $args
      */
     public function __invoke($model, $args): Model
     {
@@ -73,13 +71,13 @@ class SaveModel implements ArgResolver
         $model->save();
 
         if ($this->parentRelation instanceof BelongsTo) {
-            $parentModel = $this->parentRelation->associate($model);
+            $childModel = $this->parentRelation->associate($model);
 
-            // If the parent Model does not exist (still to be saved),
+            // If the child Model does not exist (still to be saved),
             // a save could break any pending belongsTo relations that still
-            // needs to be created and associated with the parent model
-            if ($parentModel->exists) {
-                $parentModel->save();
+            // need to be created and associated with it.
+            if ($childModel->exists) {
+                $childModel->save();
             }
         }
 

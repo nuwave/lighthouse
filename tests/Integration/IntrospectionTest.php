@@ -9,7 +9,7 @@ use Tests\Utils\Scalars\Email;
 
 final class IntrospectionTest extends TestCase
 {
-    /** @var \Nuwave\Lighthouse\Schema\TypeRegistry */
+    /** @var TypeRegistry */
     protected $typeRegistry;
 
     protected function setUp(): void
@@ -21,11 +21,11 @@ final class IntrospectionTest extends TestCase
 
     public function testFindsTypesFromSchema(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Foo {
             bar: Int
         }
-        ';
+        GRAPHQL;
 
         $this->assertNotNull(
             $this->introspectType('Foo'),

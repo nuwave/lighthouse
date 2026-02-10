@@ -34,7 +34,7 @@ final class MorphToManyDirectiveTest extends DBTestCase
 
     public function testResolveMorphToManyRelationship(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type Tag {
             id: ID!
             name: String!
@@ -55,9 +55,9 @@ final class MorphToManyDirectiveTest extends DBTestCase
                 id: ID! @eq
             ): Post @find
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($id: ID!) {
             post(id: $id) {
                 id
@@ -67,7 +67,7 @@ final class MorphToManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $this->post->id,
         ])->assertJson([
             'data' => [
@@ -86,7 +86,7 @@ final class MorphToManyDirectiveTest extends DBTestCase
 
     public function testResolveMorphToManyRelationshipWithRelayConnection(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type Tag {
             id: ID!
             name: String!
@@ -102,9 +102,9 @@ final class MorphToManyDirectiveTest extends DBTestCase
                 id: ID! @eq
             ): Post @find
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($id: ID!) {
             post(id: $id) {
                 id
@@ -120,7 +120,7 @@ final class MorphToManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $this->post->id,
         ])->assertJson([
             'data' => [
@@ -143,7 +143,7 @@ final class MorphToManyDirectiveTest extends DBTestCase
 
     public function testResolveMorphToManyWithCustomName(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type Tag {
             id: ID!
             name: String!
@@ -164,9 +164,9 @@ final class MorphToManyDirectiveTest extends DBTestCase
                 id: ID! @eq
             ): Post @find
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($id: ID!) {
             post(id: $id) {
                 id
@@ -176,7 +176,7 @@ final class MorphToManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $this->post->id,
         ])->assertJson([
             'data' => [
@@ -196,14 +196,14 @@ final class MorphToManyDirectiveTest extends DBTestCase
     public function testResolveMorphToManyUsingInterfaces(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $post = factory(Post::class)->make();
-        assert($post instanceof Post);
+        $this->assertInstanceOf(Post::class, $post);
         $post->user()->associate($user);
         $post->save();
 
-        /** @var \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\Tag> $postTags */
+        /** @var \Illuminate\Database\Eloquent\Collection<array-key, \Tests\Utils\Models\Tag> $postTags */
         $postTags = factory(Tag::class, 3)
             ->create()
             ->map(static function (Tag $tag) use ($post): Tag {
@@ -213,11 +213,11 @@ final class MorphToManyDirectiveTest extends DBTestCase
             });
 
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        \PHPUnit\Framework\Assert::assertInstanceOf(Task::class, $task);
         $task->user()->associate($user);
         $task->save();
 
-        /** @var \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\Tag> $taskTags */
+        /** @var \Illuminate\Database\Eloquent\Collection<array-key, \Tests\Utils\Models\Tag> $taskTags */
         $taskTags = factory(Tag::class, 3)
             ->create()
             ->map(static function (Tag $tag) use ($task): Tag {
@@ -226,8 +226,8 @@ final class MorphToManyDirectiveTest extends DBTestCase
                 return $tag;
             });
 
-        $this->schema = /** @lang GraphQL */ '
-        interface Tag @interface(resolveType: "' . $this->qualifyTestResolver('resolveType') . '") {
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        interface Tag @interface(resolveType: "{$this->qualifyTestResolver('resolveType')}") {
             id: ID!
         }
 
@@ -262,10 +262,10 @@ final class MorphToManyDirectiveTest extends DBTestCase
                 id: ID! @eq
             ): User @find
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
-        query ($userId: ID!){
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        query ($userId: ID!) {
             user (id: $userId) {
                 id
                 posts {
@@ -298,7 +298,7 @@ final class MorphToManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ', [
+        GRAPHQL, [
             'userId' => $user->id,
         ])->assertJson([
             'data' => [

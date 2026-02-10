@@ -10,17 +10,17 @@ final class ResolverProviderTest extends TestCase
 {
     public function testRootQuery(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: Int!
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'foo' => Foo::THE_ANSWER,
             ],
@@ -32,7 +32,7 @@ final class ResolverProviderTest extends TestCase
         $id = '123';
         $this->mockResolver(['id' => $id]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             user: User @mock
         }
@@ -41,16 +41,16 @@ final class ResolverProviderTest extends TestCase
             id: ID!
             nonRootClassResolver: String!
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 id
                 nonRootClassResolver
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
                     'id' => $id,
@@ -60,7 +60,7 @@ final class ResolverProviderTest extends TestCase
         ]);
     }
 
-    /** @see https://graphql-rules.com/rules/mutation-payload-query */
+    /** @see https://github.com/graphql-rules/graphql-rules/blob/master/docs/rules/06-mutations/mutation-payload-query.md */
     public function testRootQueryMutationPayload(): void
     {
         $fooResult = 1;
@@ -68,7 +68,7 @@ final class ResolverProviderTest extends TestCase
         $barResult = 2;
         $this->mockResolver($barResult, 'bar');
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             bar: Int! @mock(key: "bar")
         }
@@ -81,9 +81,9 @@ final class ResolverProviderTest extends TestCase
             result: Int!
             query: Query!
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             foo {
                 result
@@ -92,7 +92,7 @@ final class ResolverProviderTest extends TestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'foo' => [
                     'result' => $fooResult,

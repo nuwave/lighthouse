@@ -28,7 +28,7 @@ final class DeferTest extends TestCase
 
     public function testAddsTheDeferClientDirective(): void
     {
-        $introspection = $this->graphQL(/** @lang GraphQL */ '
+        $introspection = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query IntrospectionQuery {
           __schema {
             directives {
@@ -36,7 +36,7 @@ final class DeferTest extends TestCase
             }
           }
         }
-        ');
+        GRAPHQL);
 
         $this->assertContains(
             'defer',
@@ -53,7 +53,7 @@ final class DeferTest extends TestCase
             ],
         ]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             name: String!
             parent: User
@@ -62,9 +62,9 @@ final class DeferTest extends TestCase
         type Query {
             user: User @mock
         }
-        ';
+        GRAPHQL;
 
-        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 name
@@ -73,7 +73,7 @@ final class DeferTest extends TestCase
                 }
             }
         }
-        ');
+        GRAPHQL);
 
         $this->assertSame(
             [
@@ -110,7 +110,7 @@ final class DeferTest extends TestCase
         ];
         $this->mockResolver($data);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             name: String!
             parent: User
@@ -119,9 +119,9 @@ final class DeferTest extends TestCase
         type Query {
             user: User @mock
         }
-        ';
+        GRAPHQL;
 
-        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 name
@@ -133,7 +133,7 @@ final class DeferTest extends TestCase
                 }
             }
         }
-        ');
+        GRAPHQL);
 
         $this->assertCount(3, $chunks);
 
@@ -160,7 +160,7 @@ final class DeferTest extends TestCase
             ],
         ]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             name: String!
             parent: User
@@ -173,9 +173,9 @@ final class DeferTest extends TestCase
         type Mutation {
             updateUser(name: String!): User @mock
         }
-        ';
+        GRAPHQL;
 
-        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             updateUser(
                 name: "Foo"
@@ -186,7 +186,7 @@ final class DeferTest extends TestCase
                 }
             }
         }
-        ');
+        GRAPHQL);
 
         $this->assertSame(
             [
@@ -228,7 +228,7 @@ final class DeferTest extends TestCase
         ];
         $this->mockResolver($data);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Post {
             title: String
             author: User
@@ -241,9 +241,9 @@ final class DeferTest extends TestCase
         type Query {
             posts: [Post] @mock
         }
-        ';
+        GRAPHQL;
 
-        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             posts {
                 title
@@ -252,7 +252,7 @@ final class DeferTest extends TestCase
                 }
             }
         }
-        ');
+        GRAPHQL);
 
         $this->assertCount(2, $chunks);
 
@@ -290,7 +290,7 @@ final class DeferTest extends TestCase
         ];
         $this->mockResolver($data);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Comment {
             message: String
         }
@@ -308,9 +308,9 @@ final class DeferTest extends TestCase
         type Query {
             posts: [Post] @mock
         }
-        ';
+        GRAPHQL;
 
-        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             posts {
                 title
@@ -322,7 +322,7 @@ final class DeferTest extends TestCase
                 }
             }
         }
-        ');
+        GRAPHQL);
 
         $this->assertCount(2, $chunks);
 
@@ -357,7 +357,7 @@ final class DeferTest extends TestCase
         ];
         $this->mockResolver($data);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             name: String!
             parent: User
@@ -366,14 +366,14 @@ final class DeferTest extends TestCase
         type Query {
             user: User @mock
         }
-        ';
+        GRAPHQL;
 
         $defer = $this->app->make(Defer::class);
 
         // Set max execution time to now so we immediately resolve deferred fields
         $defer->setMaxExecutionTime(microtime(true));
 
-        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 name
@@ -385,7 +385,7 @@ final class DeferTest extends TestCase
                 }
             }
         }
-        ');
+        GRAPHQL);
 
         // If we didn't hit the max execution time we would have 3 items in the array
         $this->assertCount(2, $chunks);
@@ -413,7 +413,7 @@ final class DeferTest extends TestCase
         ];
         $this->mockResolver($data);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             name: String!
             parent: User
@@ -422,13 +422,13 @@ final class DeferTest extends TestCase
         type Query {
             user: User @mock
         }
-        ';
+        GRAPHQL;
 
         $defer = $this->app->make(Defer::class);
 
         $defer->setMaxNestedFields(1);
 
-        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 name
@@ -440,7 +440,7 @@ final class DeferTest extends TestCase
                 }
             }
         }
-        ');
+        GRAPHQL);
 
         $this->assertCount(2, $chunks);
 
@@ -463,7 +463,7 @@ final class DeferTest extends TestCase
             ],
         ]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             name: String!
             parent: User!
@@ -472,9 +472,9 @@ final class DeferTest extends TestCase
         type Query {
             user: User @mock
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 name
@@ -483,7 +483,7 @@ final class DeferTest extends TestCase
                 }
             }
         }
-        ')->assertGraphQLErrorMessage(DeferrableDirective::THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_NON_NULLABLE_FIELD);
+        GRAPHQL)->assertGraphQLErrorMessage(DeferrableDirective::THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_NON_NULLABLE_FIELD);
     }
 
     public function testDoesNotDeferWithIncludeAndSkipDirectives(): void
@@ -496,7 +496,7 @@ final class DeferTest extends TestCase
             'skipped',
         );
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         directive @include(if: Boolean!) on FIELD
         directive @skip(if: Boolean!) on FIELD
 
@@ -508,9 +508,9 @@ final class DeferTest extends TestCase
         type Query {
             user: User @mock
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 name
@@ -519,7 +519,7 @@ final class DeferTest extends TestCase
                 }
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'user' => [
                     'name' => 'John Doe',
@@ -527,8 +527,8 @@ final class DeferTest extends TestCase
             ],
         ]);
 
-        $this->graphQL(/** @lang GraphQL */ '
-        query ($include: Boolean!, $skip: Boolean!){
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        query ($include: Boolean!, $skip: Boolean!) {
             userInclude: user {
                 name
                 parent @defer @include(if: false) {
@@ -554,7 +554,7 @@ final class DeferTest extends TestCase
                 }
             }
         }
-        ', [
+        GRAPHQL, [
             'include' => false,
             'skip' => true,
         ])->assertExactJson([
@@ -585,7 +585,7 @@ final class DeferTest extends TestCase
         ];
         $this->mockResolver($data);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             name: String!
             parent: User
@@ -594,9 +594,9 @@ final class DeferTest extends TestCase
         type Query {
             user: User @mock
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         fragment UserWithParent on User {
             name
             parent {
@@ -611,7 +611,7 @@ final class DeferTest extends TestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => $data,
             ],
@@ -624,7 +624,7 @@ final class DeferTest extends TestCase
             $this->never(),
         );
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             name: String!
             parent: User
@@ -633,15 +633,15 @@ final class DeferTest extends TestCase
         type Mutation {
             updateUser(name: String!): User @mock
         }
-        ' . self::PLACEHOLDER_QUERY;
+        GRAPHQL . self::PLACEHOLDER_QUERY;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation UpdateUser {
             updateUser(name: "John Doe") @defer {
                 name
             }
         }
-        ')->assertGraphQLErrorMessage(DeferrableDirective::THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_ROOT_MUTATION_FIELD);
+        GRAPHQL)->assertGraphQLErrorMessage(DeferrableDirective::THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_ROOT_MUTATION_FIELD);
     }
 
     public function testDoesNotDeferFieldsIfFalse(): void
@@ -654,7 +654,7 @@ final class DeferTest extends TestCase
         ];
         $this->mockResolver($data);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             name: String!
             parent: User
@@ -663,9 +663,9 @@ final class DeferTest extends TestCase
         type Query {
             user: User @mock
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 name
@@ -674,7 +674,7 @@ final class DeferTest extends TestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => $data,
             ],
@@ -695,7 +695,7 @@ final class DeferTest extends TestCase
             'throw',
         );
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             name: String!
             parent: User @mock(key: "throw")
@@ -704,9 +704,9 @@ final class DeferTest extends TestCase
         type Query {
             user: User @mock
         }
-        ';
+        GRAPHQL;
 
-        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 name
@@ -715,7 +715,7 @@ final class DeferTest extends TestCase
                 }
             }
         }
-        ');
+        GRAPHQL);
 
         $this->assertCount(2, $chunks);
 

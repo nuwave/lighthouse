@@ -7,33 +7,34 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Tests\DBTestCase;
+use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
 final class BuilderDirectiveTest extends DBTestCase
 {
     public function testCallsCustomBuilderMethod(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type Query {
             users(
-                limit: Int @builder(method: "' . $this->qualifyTestResolver('limit') . '")
+                limit: Int @builder(method: "{$this->qualifyTestResolver('limit')}")
             ): [User!]! @all
         }
 
         type User {
             id: ID
         }
-        ';
+        GRAPHQL;
 
         factory(User::class, 2)->create();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(limit: 1) {
                 id
             }
         }
-        ')->assertJsonCount(1, 'data.users');
+        GRAPHQL)->assertJsonCount(1, 'data.users');
     }
 
     public function testCallsCustomBuilderMethodOnFieldCheckWithArgs(): void
@@ -53,23 +54,24 @@ final class BuilderDirectiveTest extends DBTestCase
             })
             ->andReturn(User::query());
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type Query {
-            users(arg1 : String, arg2 : String): [User!]! @all @builder(method: "' . $this->qualifyTestResolver('limit') . '" value: 1)
+            users(arg1 : String, arg2 : String): [User!]! @all
+                @builder(method: "{$this->qualifyTestResolver('limit')}" value: 1)
         }
 
         type User {
             id: ID
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(arg1: "Hello", arg2: "World") {
                 id
             }
         }
-        ');
+        GRAPHQL);
     }
 
     public function testCallsCustomBuilderMethodOnFieldCheckWithoutArgs(): void
@@ -87,73 +89,142 @@ final class BuilderDirectiveTest extends DBTestCase
             })
             ->andReturn(User::query());
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type Query {
-            users(arg1 : String, arg2 : String): [User!]! @all @builder(method: "' . $this->qualifyTestResolver('limit') . '" value: 1)
+            users(arg1 : String, arg2 : String): [User!]! @all
+                @builder(method: "{$this->qualifyTestResolver('limit')}" value: 1)
         }
 
         type User {
             id: ID
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users {
                 id
             }
         }
-        ');
+        GRAPHQL);
     }
 
     public function testCallsCustomBuilderMethodOnFieldWithValue(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type Query {
-            users: [User!]! @all @builder(method: "' . $this->qualifyTestResolver('limit') . '" value: 1)
+            users: [User!]! @all
+            @builder(method: "{$this->qualifyTestResolver('limit')}" value: 1)
         }
 
         type User {
             id: ID
         }
-        ';
+        GRAPHQL;
 
         factory(User::class, 2)->create();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users {
                 id
             }
         }
-        ')->assertJsonCount(1, 'data.users');
+        GRAPHQL)->assertJsonCount(1, 'data.users');
     }
 
     public function testCallsCustomBuilderMethodOnFieldWithoutValue(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type Query {
-            users: [User!]! @all @builder(method: "' . $this->qualifyTestResolver('limit') . '")
+            users: [User!]! @all @builder(method: "{$this->qualifyTestResolver('limit')}")
         }
 
         type User {
             id: ID
         }
-        ';
+        GRAPHQL;
 
         factory(User::class, 3)->create();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users {
                 id
             }
         }
-        ')->assertJsonCount(2, 'data.users');
+        GRAPHQL)->assertJsonCount(2, 'data.users');
+    }
+
+    public function testCallsCustomBuilderMethodOnFieldWithSpecificModel(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        type Query {
+            users: [User!]! @all
+        }
+
+        type User {
+            id: ID
+            tasks: [Task!]! @hasMany(type: SIMPLE) @builder(method: "{$this->qualifyTestResolver('specificModel')}")
+        }
+
+        type Task {
+            id: ID
+        }
+        GRAPHQL;
+
+        $users = factory(User::class, 2)->create();
+
+        foreach ($users as $user) {
+            $this->assertInstanceOf(User::class, $user);
+
+            $userName = $user->name;
+            assert(is_string($userName), 'set by UserFactory');
+
+            $taskWithSameName = factory(Task::class)->make();
+            $this->assertInstanceOf(Task::class, $taskWithSameName);
+            $taskWithSameName->name = $userName;
+            $taskWithSameName->user()->associate($user);
+            $taskWithSameName->save();
+
+            $taskWithOtherName = factory(Task::class)->make();
+            $this->assertInstanceOf(Task::class, $taskWithOtherName);
+            $taskWithOtherName->name = "Different from {$userName}";
+            $taskWithOtherName->user()->associate($user);
+            $taskWithOtherName->save();
+        }
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            users {
+                id
+                tasks(first: 10) {
+                    data {
+                        id
+                    }
+                }
+            }
+        }
+        GRAPHQL)
+            ->assertJsonCount(1, 'data.users.0.tasks.data')
+            ->assertJsonCount(1, 'data.users.1.tasks.data');
     }
 
     public static function limit(Builder $builder, ?int $value): Builder
     {
         return $builder->limit($value ?? 2);
+    }
+
+    /**
+     * @param  \Illuminate\Database\Eloquent\Builder<\Tests\Utils\Models\User>  $builder
+     *
+     * @return \Illuminate\Database\Eloquent\Builder<\Tests\Utils\Models\User>
+     */
+    public static function specificModel(
+        EloquentBuilder $builder,
+        ?int $value,
+        User $user,
+    ): EloquentBuilder {
+        return $builder->where('name', $user->name);
     }
 }

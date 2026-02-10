@@ -10,10 +10,9 @@ final class CreateTestbenchTagsTable extends Migration
     public function up(): void
     {
         Schema::create('tags', function (Blueprint $table): void {
-            $table->increments('id');
+            $table->id();
             $table->string('name');
             $table->string('default_string')->default(Constants::TAGS_DEFAULT_STRING);
-
             $table->timestamps();
         });
     }

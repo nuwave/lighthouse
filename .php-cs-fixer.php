@@ -1,15 +1,15 @@
 <?php declare(strict_types=1);
 
-use function MLL\PhpCsFixerConfig\risky;
-
 $finder = PhpCsFixer\Finder::create()
-    ->notPath('vendor')
     ->in(__DIR__)
     ->name('*.php')
+    ->notPath('src/Tracing/FederatedTracing/Proto')
+    ->notPath('vendor')
+    ->notPath('phpstan-tmp-dir')
     ->ignoreDotFiles(false)
     ->ignoreVCS(true);
 
-return risky($finder, [
+return MLL\PhpCsFixerConfig\risky($finder, [
     'general_phpdoc_annotation_remove' => [
         'annotations' => [
             'throws',
@@ -23,9 +23,10 @@ return risky($finder, [
             'parameters',
         ],
     ],
-    'yoda_style' => [
-        'equal' => false,
-        'identical' => false,
-        'less_and_greater' => false,
+    'fully_qualified_strict_types' => [
+        'phpdoc_tags' => [],
     ],
+    'Laravel/laravel_phpdoc_alignment' => true,
+])->registerCustomFixers([
+    new Tests\LaravelPhpdocAlignmentFixer(),
 ]);

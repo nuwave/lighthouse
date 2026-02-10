@@ -1,0 +1,28 @@
+name: "Update `reports.proto`"
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * 0"
+
+jobs:
+  update-reports-proto:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
+      - run: curl -sSfo src/Tracing/FederatedTracing/reports.proto https://usage-reporting.api.apollographql.com/proto/reports.proto
+
+      - run: |
+          sed -i 's/ \[(js_use_toArray) = true]//g' src/Tracing/FederatedTracing/reports.proto
+          sed -i 's/ \[(js_preEncoded) = true]//g' src/Tracing/FederatedTracing/reports.proto
+          sed -i '3 i option php_namespace = "Nuwave\\\\Lighthouse\\\\Tracing\\\\FederatedTracing\\\\Proto";' src/Tracing/FederatedTracing/reports.proto
+          sed -i '4 i option php_metadata_namespace = "Nuwave\\\\Lighthouse\\\\Tracing\\\\FederatedTracing\\\\Proto\\\\Metadata";' src/Tracing/FederatedTracing/reports.proto
+
+      - uses: peter-evans/create-pull-request@v5
+        with:
+          title: Update `reports.proto`
+          commit-message: Update `reports.proto`
+          branch: update-reports-proto
+          delete-branch: true

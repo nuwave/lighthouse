@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\GlobalId;
 
 use GraphQL\Error\Error;
 use GraphQL\Type\Definition\Type;
-use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -19,7 +18,7 @@ class NodeRegistry
      *
      * @var array<string, NodeResolverFn>
      */
-    protected array $nodeResolver = [];
+    protected array $nodeResolverFns = [];
 
     /**
      * The stashed current type.
@@ -43,7 +42,7 @@ class NodeRegistry
      */
     public function registerNode(string $typeName, callable $resolver): self
     {
-        $this->nodeResolver[$typeName] = $resolver;
+        $this->nodeResolverFns[$typeName] = $resolver;
 
         return $this;
     }
@@ -59,16 +58,12 @@ class NodeRegistry
 
         // This check forces Lighthouse to eagerly load the type, which might not have
         // happened if the client only references it indirectly through an interface.
-        // Loading the type in turn causes the TypeMiddleware to run and thus register
-        // the type in the NodeRegistry.
-        if (! $this->typeRegistry->has($decodedType)) {
-            throw new Error("[{$decodedType}] is not a type and cannot be resolved.");
-        }
-
-        // Check if we have a resolver registered for the given type
-        if (! $resolver = Arr::get($this->nodeResolver, $decodedType)) {
-            throw new Error("[{$decodedType}] is not a registered node and cannot be resolved.");
-        }
+        // Loading the type in turn causes the TypeMiddleware to run and thus register the type in the NodeRegistry.
+        $this->typeRegistry->has($decodedType)
+            ?: throw new Error("[{$decodedType}] is not a type and cannot be resolved.");
+        // We can not continue without a resolver.
+        $resolver = $this->nodeResolverFns[$decodedType]
+            ?? throw new Error("[{$decodedType}] is not a registered node and cannot be resolved.");
 
         // Stash the decoded type, as it will later be used to determine the correct return type of the node query
         $this->currentType = $decodedType;

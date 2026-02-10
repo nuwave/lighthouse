@@ -124,15 +124,70 @@ return [
         'enable' => env('LIGHTHOUSE_QUERY_CACHE_ENABLE', true),
 
         /*
+         * Configures which mechanism to use for the query cache.
+         * - store: use an external shared cache through a Laravel cache store like Redis or Memcached
+         * - opcache: store parsed queries in PHP files on the local filesystem to leverage OPcache
+         * - hybrid: leverage OPcache, but use a shared cache store when local files are not found
+         */
+        'mode' => env('LIGHTHOUSE_QUERY_CACHE_MODE', 'store'),
+
+        /*
+         * Specifies the path where the PHP files are stored when using opcache or hybrid mode.
+         * The given path must be a folder, as every query will produce its own file.
+         */
+        'opcache_path' => env('LIGHTHOUSE_QUERY_CACHE_OPCACHE_PATH', base_path('bootstrap/cache')),
+
+        /*
          * Allows using a specific cache store, uses the app's default if set to null.
+         * Not relevant when using opcache mode.
          */
         'store' => env('LIGHTHOUSE_QUERY_CACHE_STORE', null),
 
         /*
          * Duration in seconds the query should remain cached, null means forever.
+         * Not relevant when using opcache mode.
          */
         'ttl' => env('LIGHTHOUSE_QUERY_CACHE_TTL', 24 * 60 * 60),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Validation Cache
+    |--------------------------------------------------------------------------
+    |
+    | Caches the result of validating queries to boost performance on subsequent requests.
+    |
+    */
+
+    'validation_cache' => [
+        /*
+         * Setting to true enables validation caching.
+         */
+        'enable' => env('LIGHTHOUSE_VALIDATION_CACHE_ENABLE', false),
+
+        /*
+         * Allows using a specific cache store, uses the app's default if set to null.
+         */
+        'store' => env('LIGHTHOUSE_VALIDATION_CACHE_STORE', null),
+
+        /*
+         * Duration in seconds the validation result should remain cached, null means forever.
+         */
+        'ttl' => env('LIGHTHOUSE_VALIDATION_CACHE_TTL', 24 * 60 * 60),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Parse source location
+    |--------------------------------------------------------------------------
+    |
+    | Should the source location be included in the AST nodes resulting from query parsing?
+    | Setting this to `false` improves performance, but omits the key `locations` from errors,
+    | see https://spec.graphql.org/October2021/#sec-Errors.Error-result-format.
+    |
+    */
+
+    'parse_source_location' => true,
 
     /*
     |--------------------------------------------------------------------------
@@ -300,8 +355,10 @@ return [
     | Transactional Mutations
     |--------------------------------------------------------------------------
     |
-    | If set to true, built-in directives that mutate models will be
-    | wrapped in a transaction to ensure atomicity.
+    | If set to true, the execution of built-in directives that mutate models
+    | will be wrapped in a transaction to ensure atomicity.
+    | The transaction is committed after the root field resolves,
+    | thus errors in nested fields do not cause a rollback.
     |
     */
 
@@ -383,6 +440,11 @@ return [
         'storage_ttl' => env('LIGHTHOUSE_SUBSCRIPTION_STORAGE_TTL', null),
 
         /*
+         * Encrypt subscription channels by prefixing their names with "private-encrypted-"?
+         */
+        'encrypted_channels' => env('LIGHTHOUSE_SUBSCRIPTION_ENCRYPTED', false),
+
+        /*
          * Default subscription broadcaster.
          */
         'broadcaster' => env('LIGHTHOUSE_BROADCASTER', 'pusher'),
@@ -394,15 +456,20 @@ return [
             'log' => [
                 'driver' => 'log',
             ],
-            'pusher' => [
-                'driver' => 'pusher',
-                'routes' => Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class . '@pusher',
-                'connection' => 'pusher',
-            ],
             'echo' => [
                 'driver' => 'echo',
                 'connection' => env('LIGHTHOUSE_SUBSCRIPTION_REDIS_CONNECTION', 'default'),
                 'routes' => Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class . '@echoRoutes',
+            ],
+            'pusher' => [
+                'driver' => 'pusher',
+                'connection' => 'pusher',
+                'routes' => Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class . '@pusher',
+            ],
+            'reverb' => [
+                'driver' => 'pusher',
+                'connection' => 'reverb',
+                'routes' => Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class . '@reverb',
             ],
         ],
 
@@ -452,5 +519,28 @@ return [
          * Location of resolver classes when resolving the `_entities` field.
          */
         'entities_resolver_namespace' => 'App\\GraphQL\\Entities',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Tracing
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for tracing support.
+    |
+    */
+
+    'tracing' => [
+        /*
+         * Driver used for tracing.
+         *
+         * Accepts the fully qualified class name of a class that implements Nuwave\Lighthouse\Tracing\Tracing.
+         * Lighthouse provides:
+         * - Nuwave\Lighthouse\Tracing\ApolloTracing\ApolloTracing::class
+         * - Nuwave\Lighthouse\Tracing\FederatedTracing\FederatedTracing::class
+         *
+         * In Lighthouse v7 the default will be changed to 'Nuwave\Lighthouse\Tracing\FederatedTracing\FederatedTracing::class'.
+         */
+        'driver' => Nuwave\Lighthouse\Tracing\ApolloTracing\ApolloTracing::class,
     ],
 ];

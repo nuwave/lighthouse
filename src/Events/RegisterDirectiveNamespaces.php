@@ -12,6 +12,4 @@ namespace Nuwave\Lighthouse\Events;
  *
  * @see \Nuwave\Lighthouse\Schema\DirectiveLocator::namespaces()
  */
-class RegisterDirectiveNamespaces
-{
-}
+class RegisterDirectiveNamespaces {}

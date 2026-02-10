@@ -6,6 +6,8 @@ use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Redis\Factory as RedisFactory;
 use Illuminate\Redis\Connections\Connection as RedisConnection;
 use Nuwave\Lighthouse\Subscriptions\Storage\RedisStorageManager;
+use PHPUnit\Framework\Constraint\Callback;
+use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\MockObject\MockObject;
 use Tests\EnablesSubscriptionServiceProvider;
 use Tests\TestCase;
@@ -15,18 +17,64 @@ final class RedisStorageManagerTest extends TestCase
 {
     use EnablesSubscriptionServiceProvider;
 
+    /**
+     * TODO remove when an official replacement for withConsecutive is available.
+     *
+     * @see https://github.com/sebastianbergmann/phpunit/issues/4026#issuecomment-1418205424
+     *
+     * @param  array<mixed>  $firstCallArguments
+     * @param  array<mixed>  ...$consecutiveCallsArguments
+     *
+     * @return iterable<int, \PHPUnit\Framework\Constraint\Callback<mixed>>
+     */
+    private function withConsecutive(array $firstCallArguments, array ...$consecutiveCallsArguments): iterable
+    {
+        foreach ($consecutiveCallsArguments as $consecutiveCallArguments) {
+            $this->assertSameSize($firstCallArguments, $consecutiveCallArguments, 'Each expected arguments list need to have the same size.');
+        }
+
+        $allConsecutiveCallsArguments = [$firstCallArguments, ...$consecutiveCallsArguments];
+
+        $numberOfArguments = count($firstCallArguments);
+        $argumentList = [];
+        for ($argumentPosition = 0; $argumentPosition < $numberOfArguments; ++$argumentPosition) {
+            $argumentList[$argumentPosition] = array_column($allConsecutiveCallsArguments, $argumentPosition);
+        }
+
+        $mockedMethodCall = 0;
+        $callbackCall = 0;
+        foreach ($argumentList as $index => $argument) {
+            yield new Callback(
+                static function (mixed $actualArgument) use ($argumentList, &$mockedMethodCall, &$callbackCall, $index, $numberOfArguments): bool {
+                    $expected = $argumentList[$index][$mockedMethodCall] ?? null;
+
+                    ++$callbackCall;
+                    $mockedMethodCall = (int) ($callbackCall / $numberOfArguments);
+
+                    if ($expected instanceof Constraint) {
+                        self::assertThat($actualArgument, $expected);
+                    } else {
+                        self::assertEquals($expected, $actualArgument);
+                    }
+
+                    return true;
+                },
+            );
+        }
+    }
+
     public function testSubscriberByChannel(): void
     {
         /** @var \PHPUnit\Framework\MockObject\MockObject&\Illuminate\Contracts\Config\Repository $config */
-        $config = $this->createMock(ConfigRepository::class);
+        $config = $this->createStub(ConfigRepository::class);
         $redisConnection = $this->createMock(RedisConnection::class);
-        $redisFactory = $this->getRedisFactory($redisConnection);
+        $redisFactory = $this->mockRedisFactory($redisConnection);
 
         $channel = 'test-channel';
         $subscriber = new DummySubscriber($channel, 'test-topic');
         $redisConnection->expects($this->once())
             ->method('command')
-            ->with('get', ['graphql.subscriber.' . $channel])
+            ->with('get', ["graphql.subscriber.{$channel}"])
             ->willReturn(serialize($subscriber));
 
         $manager = new RedisStorageManager($config, $redisFactory);
@@ -37,22 +85,24 @@ final class RedisStorageManagerTest extends TestCase
 
     public function testDeleteSubscriber(): void
     {
-        $config = $this->createMock(ConfigRepository::class);
+        $config = $this->createStub(ConfigRepository::class);
         $redisConnection = $this->createMock(RedisConnection::class);
-        $redisFactory = $this->getRedisFactory($redisConnection);
+        $redisFactory = $this->mockRedisFactory($redisConnection);
 
         $channel = 'test-channel';
-        $prefixedChannel = 'graphql.subscriber.' . $channel;
+        $prefixedChannel = "graphql.subscriber.{$channel}";
         $subscriber = new DummySubscriber($channel, 'test-topic');
         $redisConnection->expects($this->exactly(3))
             ->method('command')
-            ->withConsecutive(
+            ->with(...$this->withConsecutive(
                 ['get', [$prefixedChannel]],
                 ['del', [$prefixedChannel]],
-                ['srem', ['graphql.topic.' . $subscriber->topic, $channel]],
-            )
+                ['srem', ["graphql.topic.{$subscriber->topic}", $channel]],
+            ))
             ->willReturnOnConsecutiveCalls(
                 serialize($subscriber),
+                true,
+                true,
             );
 
         $manager = new RedisStorageManager($config, $redisFactory);
@@ -64,7 +114,7 @@ final class RedisStorageManagerTest extends TestCase
     {
         $config = $this->createMock(ConfigRepository::class);
         $redisConnection = $this->createMock(RedisConnection::class);
-        $redisFactory = $this->getRedisFactory($redisConnection);
+        $redisFactory = $this->mockRedisFactory($redisConnection);
 
         $ttl = '1000';
         $config->method('get')->willReturn($ttl);
@@ -78,7 +128,7 @@ final class RedisStorageManagerTest extends TestCase
         $topicKey = 'graphql.topic.some-topic';
         $redisConnection->expects($this->exactly(3))
             ->method('command')
-            ->withConsecutive(
+            ->with(...$this->withConsecutive(
                 ['sadd', [
                     $topicKey,
                     $channel,
@@ -92,17 +142,17 @@ final class RedisStorageManagerTest extends TestCase
                     $ttl,
                     serialize($subscriberUnderTopic),
                 ]],
-            );
+            ));
 
         $manager = new RedisStorageManager($config, $redisFactory);
         $manager->storeSubscriber($subscriber, $storedTopic);
     }
 
-    public function testStoreSubscriberWithoutTtl(): void
+    public function testStoreSubscriberWithoutTTL(): void
     {
         $config = $this->createMock(ConfigRepository::class);
         $redisConnection = $this->createMock(RedisConnection::class);
-        $redisFactory = $this->getRedisFactory($redisConnection);
+        $redisFactory = $this->mockRedisFactory($redisConnection);
 
         $ttl = null;
         $config->method('get')->willReturn($ttl);
@@ -116,7 +166,7 @@ final class RedisStorageManagerTest extends TestCase
         $topicKey = 'graphql.topic.some-topic';
         $redisConnection->expects($this->exactly(2))
             ->method('command')
-            ->withConsecutive(
+            ->with(...$this->withConsecutive(
                 ['sadd', [
                     $topicKey,
                     $channel,
@@ -125,7 +175,7 @@ final class RedisStorageManagerTest extends TestCase
                     'graphql.subscriber.private-lighthouse-foo',
                     serialize($subscriberUnderTopic),
                 ]],
-            );
+            ));
 
         $manager = new RedisStorageManager($config, $redisFactory);
         $manager->storeSubscriber($subscriber, $storedTopic);
@@ -133,9 +183,9 @@ final class RedisStorageManagerTest extends TestCase
 
     public function testSubscribersByTopic(): void
     {
-        $config = $this->createMock(ConfigRepository::class);
+        $config = $this->createStub(ConfigRepository::class);
         $redisConnection = $this->createMock(RedisConnection::class);
-        $redisFactory = $this->getRedisFactory($redisConnection);
+        $redisFactory = $this->mockRedisFactory($redisConnection);
 
         $topic = 'bar';
 
@@ -147,18 +197,20 @@ final class RedisStorageManagerTest extends TestCase
             $subscriber2,
         ];
 
-        $redisConnection->expects($this->exactly(2))
+        $redisConnection->expects($this->exactly(3))
             ->method('command')
-            ->withConsecutive(
+            ->with(...$this->withConsecutive(
                 ['smembers', ["graphql.topic.{$topic}"]],
                 ['mget', [[
                     'graphql.subscriber.foo1',
                     'graphql.subscriber.foo2',
                     'graphql.subscriber.foo3',
+                    'graphql.subscriber.foo4',
                 ]]],
-            )
+                ['srem', ["graphql.topic.{$topic}", 'foo3', 'foo4']],
+            ))
             ->willReturnOnConsecutiveCalls(
-                ['foo1', 'foo2', 'foo3'],
+                ['foo1', 'foo2', 'foo3', 'foo4'],
                 [
                     serialize($subscriber1),
                     serialize($subscriber2),
@@ -169,6 +221,7 @@ final class RedisStorageManagerTest extends TestCase
                     // mget non-existing-entry
                     false,
                 ],
+                null,
             );
 
         $this->assertEquals(
@@ -185,7 +238,7 @@ final class RedisStorageManagerTest extends TestCase
      *
      * @return \PHPUnit\Framework\MockObject\MockObject&\Illuminate\Contracts\Redis\Factory
      */
-    protected function getRedisFactory(MockObject $redisConnection): MockObject
+    private function mockRedisFactory(MockObject $redisConnection): MockObject
     {
         $redisFactory = $this->createMock(RedisFactory::class);
         $redisFactory->expects($this->once())

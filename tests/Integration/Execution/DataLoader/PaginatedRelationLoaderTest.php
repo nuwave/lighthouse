@@ -17,13 +17,13 @@ final class PaginatedRelationLoaderTest extends DBTestCase
     public function testLoadRelationshipsWithLimitsOnCollection(): void
     {
         $user1 = factory(User::class)->create();
-        assert($user1 instanceof User);
+        $this->assertInstanceOf(User::class, $user1);
         $user1->tasks()->saveMany(
             factory(Task::class, 5)->make(),
         );
 
         $user2 = factory(User::class)->create();
-        assert($user2 instanceof User);
+        $this->assertInstanceOf(User::class, $user2);
         $user2->tasks()->saveMany(
             factory(Task::class, 2)->make(),
         );
@@ -37,33 +37,33 @@ final class PaginatedRelationLoaderTest extends DBTestCase
         ))->load($users);
 
         $firstUser = $users[0];
-        assert($firstUser instanceof User);
+        \PHPUnit\Framework\Assert::assertInstanceOf(User::class, $firstUser);
         $tasksPaginator = $firstUser->tasks;
-        assert($tasksPaginator instanceof LengthAwarePaginator);
+        \PHPUnit\Framework\Assert::assertInstanceOf(LengthAwarePaginator::class, $tasksPaginator);
         $this->assertCount($pageSize, $tasksPaginator);
         $firstTask = $tasksPaginator[0];
-        assert($firstTask instanceof Task);
+        \PHPUnit\Framework\Assert::assertInstanceOf(Task::class, $firstTask);
         $this->assertEquals($firstUser->getKey(), $firstTask->user_id);
 
         $secondUser = $users[1];
-        assert($secondUser instanceof User);
+        \PHPUnit\Framework\Assert::assertInstanceOf(User::class, $secondUser);
         $this->assertCount(2, $secondUser->tasks);
         $secondTask = $secondUser->tasks[0];
-        assert($secondTask instanceof Task);
+        \PHPUnit\Framework\Assert::assertInstanceOf(Task::class, $secondTask);
         $this->assertEquals($secondUser->getKey(), $secondTask->user_id);
     }
 
     public function testLoadCountOnCollection(): void
     {
         $user1 = factory(User::class)->create();
-        assert($user1 instanceof User);
+        $this->assertInstanceOf(User::class, $user1);
         $firstTasksCount = 1;
         $user1->tasks()->saveMany(
             factory(Task::class, $firstTasksCount)->make(),
         );
 
         $user2 = factory(User::class)->create();
-        assert($user2 instanceof User);
+        $this->assertInstanceOf(User::class, $user2);
         $secondTasksCount = 3;
         $user2->tasks()->saveMany(
             factory(Task::class, $secondTasksCount)->make(),
@@ -78,18 +78,18 @@ final class PaginatedRelationLoaderTest extends DBTestCase
         ))->load($users);
 
         $firstUser = $users[0];
-        assert($firstUser instanceof User);
+        \PHPUnit\Framework\Assert::assertInstanceOf(User::class, $firstUser);
         $this->assertSame($firstTasksCount, $firstUser->getAttributes()['tasks_count'] ?? null);
 
         $secondUser = $users[1];
-        assert($secondUser instanceof User);
+        \PHPUnit\Framework\Assert::assertInstanceOf(User::class, $secondUser);
         $this->assertSame($secondTasksCount, $secondUser->getAttributes()['tasks_count'] ?? null);
     }
 
     public function testLoadsMultipleRelations(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $user->tasks()->saveMany(
             factory(Task::class, 2)->make(),
@@ -113,7 +113,7 @@ final class PaginatedRelationLoaderTest extends DBTestCase
         ))->load($users);
 
         $firstUser = $users[0];
-        assert($firstUser instanceof User);
+        \PHPUnit\Framework\Assert::assertInstanceOf(User::class, $firstUser);
 
         $this->assertTrue($firstUser->relationLoaded('tasks'));
         $this->assertTrue($firstUser->relationLoaded('posts'));
@@ -122,7 +122,7 @@ final class PaginatedRelationLoaderTest extends DBTestCase
     public function testHandleSoftDeletes(): void
     {
         $user1 = factory(User::class)->create();
-        assert($user1 instanceof User);
+        $this->assertInstanceOf(User::class, $user1);
 
         $tasksUser1 = 3;
         $user1->tasks()->saveMany(
@@ -134,7 +134,7 @@ final class PaginatedRelationLoaderTest extends DBTestCase
         $softDeletedTaskUser1->delete();
 
         $user2 = factory(User::class)->create();
-        assert($user2 instanceof User);
+        $this->assertInstanceOf(User::class, $user2);
 
         $tasksUser2 = 4;
         $user2->tasks()->saveMany(
@@ -154,12 +154,12 @@ final class PaginatedRelationLoaderTest extends DBTestCase
         ))->load($users);
 
         $firstUser = $users[0];
-        assert($firstUser instanceof User);
+        \PHPUnit\Framework\Assert::assertInstanceOf(User::class, $firstUser);
         $this->assertTrue($firstUser->relationLoaded('tasks'));
         $this->assertCount($tasksUser1, $firstUser->tasks);
 
         $secondUser = $users[1];
-        assert($secondUser instanceof User);
+        \PHPUnit\Framework\Assert::assertInstanceOf(User::class, $secondUser);
         $this->assertTrue($secondUser->relationLoaded('tasks'));
         $this->assertCount($tasksUser2, $secondUser->tasks);
     }
@@ -167,10 +167,11 @@ final class PaginatedRelationLoaderTest extends DBTestCase
     public function testGetsPolymorphicRelationship(): void
     {
         $task = factory(Task::class)->create();
-        assert($task instanceof Task);
-        $task->tags()->saveMany(
-            factory(Tag::class, 3)->make(),
-        );
+        $this->assertInstanceOf(Task::class, $task);
+
+        foreach (factory(Tag::class, 3)->make() as $tag) {
+            $task->tags()->save($tag);
+        }
 
         $this->assertCount(3, $task->tags);
 
@@ -184,11 +185,11 @@ final class PaginatedRelationLoaderTest extends DBTestCase
         ))->load($tasks);
 
         $firstTask = $tasks[0];
-        assert($firstTask instanceof Task);
+        \PHPUnit\Framework\Assert::assertInstanceOf(Task::class, $firstTask);
         $this->assertCount($first, $firstTask->tags);
     }
 
-    protected function makePaginationArgs(int $first): PaginationArgs
+    private function makePaginationArgs(int $first): PaginationArgs
     {
         $paginatorArgs = new PaginationArgs(1, $first, new PaginationType('SIMPLE'));
         $paginatorArgs->first = $first;

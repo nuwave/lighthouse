@@ -121,17 +121,14 @@ to override certain methods, or implement the interface from scratch.
 
 **Experimental: not enabled by default, not guaranteed to be stable.**
 
-Add the service provider to your `config/app.php`:
-
-```php
-'providers' => [
-    \Nuwave\Lighthouse\CacheControl\CacheControlServiceProvider::class,
-],
-```
+Register the service provider `Nuwave\Lighthouse\CacheControl\CacheControlServiceProvider`,
+see [registering providers in Laravel](https://laravel.com/docs/providers#registering-providers).
 
 You can change the [`Cache-Control` header](https://developer.mozilla.org/de/docs/Web/HTTP/Headers/Cache-Control) of your response
 regardless of [@cache](../api-reference/directives.md#cache)
 by adding the [@cacheControl](../api-reference/directives.md#cachecontrol) directive to a field.
+The directive can be defined on the field-level or type-level.
+Note that field-level settings override type-level settings.
 
 The final header settings are calculated based on these rules:
 
@@ -153,7 +150,7 @@ type User {
   tasks: [Task!]! @hasMany @cacheControl(maxAge: 50, scope: PUBLIC)
 }
 
-type Company {
+type Company @cacheControl(maxAge: 40, scope: PUBLIC) {
   users: [User!]! @hasMany @cacheControl(maxAge: 25, scope: PUBLIC)
 }
 
@@ -199,7 +196,7 @@ The Cache-Control headers for some queries will be:
 
 # Cache-Control header: no-cache, private
 {
-  # no-cache, private
+  # 40, PUBLIC
   companies {
     # 25, PUBLIC
     users {
@@ -212,7 +209,7 @@ The Cache-Control headers for some queries will be:
   }
 }
 
-# Cache-Control header: maxAge: 10, private
+# Cache-Control header: maxAge: 10, public
 {
   # 15, PUBLIC
   publicCompanies {

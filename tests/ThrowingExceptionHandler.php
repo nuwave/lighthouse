@@ -7,9 +7,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class ThrowingExceptionHandler implements ExceptionHandler
 {
-    public function report(\Throwable $e): void
-    {
-    }
+    public function report(\Throwable $e): void {}
 
     public function shouldReport(\Throwable $e): bool
     {

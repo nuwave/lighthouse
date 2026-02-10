@@ -66,8 +66,7 @@ GRAPHQL;
         $modelArg = $this->directiveArgValue('model');
         if (is_string($modelArg)) {
             return function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg): int {
-                $query = $this
-                    ->namespaceModelClass($modelArg)::query();
+                $query = $this->namespaceModelClass($modelArg)::query();
 
                 $this->makeBuilderDecorator($root, $args, $context, $resolveInfo)($query);
 

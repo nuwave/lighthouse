@@ -7,12 +7,12 @@ use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
 final class Nested extends BaseDirective implements ArgResolver
 {
-    public function __invoke(mixed $root, $args): void
-    {
-    }
+    public function __invoke(mixed $root, $args): void {}
 
     public static function definition(): string
     {
-        return /** @lang GraphQL */ 'directive @nested on FIELD_DEFINITION';
+        return /** @lang GraphQL */ <<<'GRAPHQL'
+        directive @nested on FIELD_DEFINITION
+        GRAPHQL;
     }
 }

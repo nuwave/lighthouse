@@ -15,7 +15,7 @@ final class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
         $taskToRemove = $tasks[2];
         $taskToRemove->delete();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Task {
             id: ID!
         }
@@ -23,15 +23,15 @@ final class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
         type Query {
             tasks: [Task!]! @all @softDeletes
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             tasks(trashed: ONLY) {
                 id
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'tasks' => [
                     [
@@ -41,29 +41,29 @@ final class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
             ],
         ]);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             tasks(trashed: WITH) {
                 id
             }
         }
-        ')->assertJsonCount(3, 'data.tasks');
+        GRAPHQL)->assertJsonCount(3, 'data.tasks');
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             tasks(trashed: WITHOUT) {
                 id
             }
         }
-        ')->assertJsonCount(2, 'data.tasks');
+        GRAPHQL)->assertJsonCount(2, 'data.tasks');
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             tasks {
                 id
             }
         }
-        ')->assertJsonCount(2, 'data.tasks');
+        GRAPHQL)->assertJsonCount(2, 'data.tasks');
     }
 
     public function testNullDoesNothing(): void
@@ -75,7 +75,7 @@ final class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
 
         $leftoverTask = $tasks[1];
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Task {
             id: ID!
         }
@@ -83,15 +83,15 @@ final class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
         type Query {
             tasks: [Task!]! @all @softDeletes
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             tasks(trashed: null) {
                 id
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'tasks' => [
                     [
@@ -104,11 +104,11 @@ final class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
 
     public function testWithFindDirective(): void
     {
-        /** @var \Tests\Utils\Models\Task $taskToRemove */
+        /** @var Task $taskToRemove */
         $taskToRemove = factory(Task::class)->create();
         $taskToRemove->delete();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Task {
             id: ID!
         }
@@ -116,15 +116,15 @@ final class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
         type Query {
             task(id: ID! @eq): Task @find @softDeletes
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             task(id: 1, trashed: ONLY) {
                 id
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'task' => [
                     'id' => $taskToRemove->id,
@@ -132,13 +132,13 @@ final class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
             ],
         ]);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             task(id: 1, trashed: WITH) {
                 id
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'task' => [
                     'id' => $taskToRemove->id,
@@ -146,25 +146,25 @@ final class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
             ],
         ]);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             task(id: 1, trashed: WITHOUT) {
                 id
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'task' => null,
             ],
         ]);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             task(id: 1) {
                 id
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'task' => null,
             ],
@@ -174,11 +174,11 @@ final class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
     public function testWithPaginateDirective(): void
     {
         $tasks = factory(Task::class, 3)->create();
-        /** @var \Tests\Utils\Models\Task $taskToRemove */
+        /** @var Task $taskToRemove */
         $taskToRemove = $tasks[2];
         $taskToRemove->delete();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Task {
             id: ID!
         }
@@ -186,9 +186,9 @@ final class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
         type Query {
             tasks: [Task!]! @paginate @softDeletes
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             tasks(first: 10, trashed: ONLY) {
                 data {
@@ -196,7 +196,7 @@ final class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'tasks' => [
                     'data' => [
@@ -208,7 +208,7 @@ final class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
             ],
         ]);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             tasks(first: 10, trashed: WITH) {
                 data {
@@ -216,9 +216,9 @@ final class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertJsonCount(3, 'data.tasks.data');
+        GRAPHQL)->assertJsonCount(3, 'data.tasks.data');
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             tasks(first: 10, trashed: WITHOUT) {
                 data {
@@ -226,9 +226,9 @@ final class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertJsonCount(2, 'data.tasks.data');
+        GRAPHQL)->assertJsonCount(2, 'data.tasks.data');
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             tasks(first: 10) {
                 data {
@@ -236,25 +236,25 @@ final class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertJsonCount(2, 'data.tasks.data');
+        GRAPHQL)->assertJsonCount(2, 'data.tasks.data');
     }
 
     public function testNested(): void
     {
-        /** @var \Tests\Utils\Models\User $user */
+        /** @var User $user */
         $user = factory(User::class)->create();
 
-        /** @var \Tests\Utils\Models\Task $taskToRemove */
-        $taskToRemove = $user->tasks()->save(
-            factory(Task::class)->make(),
-        );
+        /** @var Task $taskToRemove */
+        $taskToRemove = factory(Task::class)->make();
+        $taskToRemove->user()->associate($user);
+        $taskToRemove->save();
         $taskToRemove->delete();
 
         $user->tasks()->saveMany(
             factory(Task::class, 2)->make(),
         );
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Task {
             id: ID!
         }
@@ -269,9 +269,9 @@ final class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
             usersPaginated: [User!]! @paginate
             user(id: ID! @eq): User @find
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users {
                 tasks(trashed: ONLY) {
@@ -279,7 +279,7 @@ final class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'users' => [
                     [
@@ -293,7 +293,7 @@ final class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
             ],
         ]);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             usersPaginated(first: 10) {
                 data {
@@ -303,7 +303,7 @@ final class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'usersPaginated' => [
                     'data' => [
@@ -319,7 +319,7 @@ final class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
             ],
         ]);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user(id: 1) {
                 tasks(trashed: ONLY) {
@@ -327,7 +327,7 @@ final class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
                     'tasks' => [
@@ -340,7 +340,7 @@ final class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
         ]);
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 users {
                     tasksWith: tasks(trashed: WITH) {
@@ -354,13 +354,13 @@ final class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
                     }
                 }
             }
-            ')
-             ->assertJsonCount(3, 'data.users.0.tasksWith')
-             ->assertJsonCount(2, 'data.users.0.tasksWithout')
-             ->assertJsonCount(2, 'data.users.0.tasksSimple');
+            GRAPHQL)
+            ->assertJsonCount(3, 'data.users.0.tasksWith')
+            ->assertJsonCount(2, 'data.users.0.tasksWithout')
+            ->assertJsonCount(2, 'data.users.0.tasksSimple');
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 usersPaginated(first: 10) {
                     data {
@@ -376,13 +376,13 @@ final class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
                     }
                 }
             }
-            ')
-             ->assertJsonCount(3, 'data.usersPaginated.data.0.tasksWith')
-             ->assertJsonCount(2, 'data.usersPaginated.data.0.tasksWithout')
-             ->assertJsonCount(2, 'data.usersPaginated.data.0.tasksSimple');
+            GRAPHQL)
+            ->assertJsonCount(3, 'data.usersPaginated.data.0.tasksWith')
+            ->assertJsonCount(2, 'data.usersPaginated.data.0.tasksWithout')
+            ->assertJsonCount(2, 'data.usersPaginated.data.0.tasksSimple');
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 user(id: 1) {
                     tasksWith: tasks(trashed: WITH) {
@@ -396,15 +396,15 @@ final class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
                     }
                 }
             }
-            ')
-             ->assertJsonCount(3, 'data.user.tasksWith')
-             ->assertJsonCount(2, 'data.user.tasksWithout')
-             ->assertJsonCount(2, 'data.user.tasksSimple');
+            GRAPHQL)
+            ->assertJsonCount(3, 'data.user.tasksWith')
+            ->assertJsonCount(2, 'data.user.tasksWithout')
+            ->assertJsonCount(2, 'data.user.tasksSimple');
     }
 
     public function testThrowsIfModelDoesNotSupportSoftDeletesTrashed(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             trashed(trashed: Trashed @trashed): [User!]! @all
         }
@@ -412,21 +412,21 @@ final class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
         type User {
             id: ID
         }
-        ';
+        GRAPHQL;
 
         $this->expectExceptionMessage(TrashedDirective::MODEL_MUST_USE_SOFT_DELETES);
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             trashed(trashed: WITH) {
                 id
             }
         }
-        ');
+        GRAPHQL);
     }
 
     public function testThrowsIfModelDoesNotSupportSoftDeletes(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             softDeletes: [User!]! @all @softDeletes
         }
@@ -434,15 +434,15 @@ final class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
         type User {
             id: ID
         }
-        ';
+        GRAPHQL;
 
         $this->expectExceptionMessage(TrashedDirective::MODEL_MUST_USE_SOFT_DELETES);
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             softDeletes(trashed: WITH) {
                 id
             }
         }
-        ');
+        GRAPHQL);
     }
 }

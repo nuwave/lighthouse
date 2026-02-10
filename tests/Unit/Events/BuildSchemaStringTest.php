@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Events;
 
-use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Nuwave\Lighthouse\Events\BuildSchemaString;
 use Tests\TestCase;
 
@@ -10,7 +10,7 @@ final class BuildSchemaStringTest extends TestCase
 {
     public function testInjectsSourceSchemaIntoEvent(): void
     {
-        $dispatcher = $this->app->make(Dispatcher::class);
+        $dispatcher = $this->app->make(EventsDispatcher::class);
         $dispatcher->listen(BuildSchemaString::class, function (BuildSchemaString $buildSchemaString): void {
             $this->assertSame(self::PLACEHOLDER_QUERY, $buildSchemaString->userSchema);
         });
@@ -20,35 +20,35 @@ final class BuildSchemaStringTest extends TestCase
 
     public function testAddAdditionalSchemaThroughEvent(): void
     {
-        $dispatcher = $this->app->make(Dispatcher::class);
+        $dispatcher = $this->app->make(EventsDispatcher::class);
         $dispatcher->listen(BuildSchemaString::class, fn (): string => "
             extend type Query {
                 sayHello: String @field(resolver: \"{$this->qualifyTestResolver('resolveSayHello')}\")
             }
         ");
 
-        $this->schema = /** @lang GraphQL */ "
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type Query {
-            foo: String @field(resolver: \"{$this->qualifyTestResolver('resolveFoo')}\")
+            foo: String @field(resolver: "{$this->qualifyTestResolver('resolveFoo')}")
         }
-        ";
+        GRAPHQL;
 
-        $queryForBaseSchema = /** @lang GraphQL */ '
+        $queryForBaseSchema = /** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ';
+        GRAPHQL;
         $this->graphQL($queryForBaseSchema)->assertJson([
             'data' => [
                 'foo' => 'foo',
             ],
         ]);
 
-        $queryForAdditionalSchema = /** @lang GraphQL */ '
+        $queryForAdditionalSchema = /** @lang GraphQL */ <<<'GRAPHQL'
         {
             sayHello
         }
-        ';
+        GRAPHQL;
         $this->graphQL($queryForAdditionalSchema)->assertJson([
             'data' => [
                 'sayHello' => 'hello',

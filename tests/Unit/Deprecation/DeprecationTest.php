@@ -25,25 +25,24 @@ final class DeprecationTest extends TestCase
 
     protected function tearDown(): void
     {
-        DocumentValidator::removeRule(new DetectDeprecatedUsage(static function (): void {
-        }));
+        DocumentValidator::removeRule(new DetectDeprecatedUsage(static function (): void {}));
 
         parent::tearDown();
     }
 
     public function testDetectsDeprecatedFields(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: Int @deprecated
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'foo' => Foo::THE_ANSWER,
             ],
@@ -56,17 +55,17 @@ final class DeprecationTest extends TestCase
 
     public function testDetectsDeprecatedFieldWithReason(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: Int @deprecated(reason: "bar")
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'foo' => Foo::THE_ANSWER,
             ],
@@ -79,18 +78,18 @@ final class DeprecationTest extends TestCase
 
     public function testDetectsDeprecatedFieldsMultipleTimes(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: Int @deprecated
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
             bar: foo
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'foo' => Foo::THE_ANSWER,
                 'bar' => Foo::THE_ANSWER,
@@ -104,7 +103,7 @@ final class DeprecationTest extends TestCase
 
     public function testDetectsDeprecatedEnumValueUsage(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         enum Foo {
             A
             B @deprecated
@@ -113,13 +112,13 @@ final class DeprecationTest extends TestCase
         type Query {
             foo(foo: Foo): Int
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo(foo: B)
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'foo' => Foo::THE_ANSWER,
             ],
@@ -133,7 +132,7 @@ final class DeprecationTest extends TestCase
     /** @return never */
     public function testDetectsDeprecatedEnumValueUsageInVariables(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         enum Foo {
             A
             B @deprecated
@@ -142,13 +141,13 @@ final class DeprecationTest extends TestCase
         type Query {
             foo(foo: Foo): Int
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($foo: Foo!) {
             foo(foo: $foo)
         }
-        ', [
+        GRAPHQL, [
             'foo' => 'B',
         ])->assertExactJson([
             'data' => [
@@ -164,7 +163,7 @@ final class DeprecationTest extends TestCase
     {
         $this->mockResolver('B');
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         enum Foo {
             A
             B @deprecated
@@ -173,13 +172,13 @@ final class DeprecationTest extends TestCase
         type Query {
             foo: Foo @mock
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'foo' => 'B',
             ],

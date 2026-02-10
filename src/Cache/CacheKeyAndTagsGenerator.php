@@ -12,7 +12,7 @@ class CacheKeyAndTagsGenerator implements CacheKeyAndTags
 
     /**
      * @param  array<string, mixed>  $args
-     * @param  array<int, string|int> $path
+     * @param  array<int, string|int>  $path
      */
     public function key(
         ?Authenticatable $user,

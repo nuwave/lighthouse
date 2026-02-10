@@ -8,11 +8,11 @@
         "vuepress-theme-default-prefers-color-scheme": "1.0.9"
     },
     "devDependencies": {
-        "prettier": "2.2.1"
+        "prettier": "2.8.8"
     },
     "scripts": {
         "start": "vuepress dev .",
         "build": "vuepress build .",
-        "prettify": "prettier --write --tab-width=2 **/**/*.md **/*.js .vuepress/*.js"
+        "prettify": "prettier --write --tab-width=2 --list-different **/**/*.md **/*.js .vuepress/*.js"
     }
 }

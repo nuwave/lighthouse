@@ -3,26 +3,21 @@
 namespace Tests\Unit\Schema\Types\Scalars;
 
 use Nuwave\Lighthouse\Schema\Types\Scalars\Date;
-use Nuwave\Lighthouse\Schema\Types\Scalars\DateScalar;
 
-final class DateTest extends DateScalarTest
+final class DateTest extends DateScalarTestBase
 {
-    protected function scalarInstance(): DateScalar
+    protected function scalarInstance(): Date
     {
         return new Date();
     }
 
-    public function validDates(): iterable
+    public static function validDates(): iterable
     {
-        return [
-            ['2020-04-20'],
-        ];
+        yield ['2020-04-20'];
     }
 
-    public function canonicalizeDates(): iterable
+    public static function canonicalizeDates(): iterable
     {
-        return [
-            ['2020-4-20', '2020-04-20'],
-        ];
+        yield ['2020-4-20', '2020-04-20'];
     }
 }

@@ -14,22 +14,22 @@ use Tests\Utils\ModelsSecondary\Category as CategorySecondary;
 use Tests\Utils\ModelsSecondary\OnlyHere;
 
 /**
- * This class does test the internal behaviour of the BaseDirective class.
+ * This class does test the internal behavior of the BaseDirective class.
  *
  * While typically considered an anti-pattern, the BaseDirective is meant
  * to be extended by other directives and offers basic utilities that
  * are commonly used in directives. As users may also extend it to create
- * custom directives, its behaviour should be stable and well-defined.
+ * custom directives, its behavior should be stable and well-defined.
  */
 final class BaseDirectiveTest extends TestCase
 {
     public function testGetsModelClassFromDirective(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
-        type User @model(class: "Team") {
-            id: ID
-        }
-        ';
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+                type User @model(class: "Team") {
+                    id: ID
+                }
+        GRAPHQL;
 
         $directive = $this->constructFieldDirective('foo: User @dummy');
 
@@ -39,13 +39,13 @@ final class BaseDirectiveTest extends TestCase
         );
     }
 
-    public function testDefaultsToFieldTypeForTheModelClass(): void
+    public function testDefaultsToFieldTypeForTheModelClassIfObject(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
-        type User {
-            id: ID
-        }
-        ';
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+                type User {
+                    id: ID
+                }
+        GRAPHQL;
 
         $directive = $this->constructFieldDirective('foo: User @dummy');
 
@@ -53,6 +53,56 @@ final class BaseDirectiveTest extends TestCase
             User::class,
             $directive->getModelClass(),
         );
+    }
+
+    public function testDefaultsToFieldTypeForTheModelClassIfInterface(): void
+    {
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+                interface User {
+                    id: ID
+                }
+        GRAPHQL;
+
+        $directive = $this->constructFieldDirective('foo: User @dummy');
+
+        $this->assertSame(
+            User::class,
+            $directive->getModelClass(),
+        );
+    }
+
+    public function testDefaultsToFieldTypeForTheModelClassIfUnion(): void
+    {
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+                union User = Admin | Member
+        
+                type Admin {
+                    id: ID
+                }
+        
+                type Member {
+                    id: ID
+                }
+        GRAPHQL;
+
+        $directive = $this->constructFieldDirective('foo: User @dummy');
+
+        $this->assertSame(
+            User::class,
+            $directive->getModelClass(),
+        );
+    }
+
+    public function testDoesntDefaultToFieldTypeForTheModelClassIfScalar(): void
+    {
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+                scalar User
+        GRAPHQL;
+
+        $directive = $this->constructFieldDirective('foo: User @dummy');
+
+        $this->expectException(DefinitionException::class);
+        $directive->getModelClass();
     }
 
     public function testThrowsIfTheClassIsNotInTheSchema(): void
@@ -75,11 +125,11 @@ final class BaseDirectiveTest extends TestCase
 
     public function testThrowsIfTheClassIsNotAModel(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
-        type Exception {
-            id: ID
-        }
-        ';
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+                type Exception {
+                    id: ID
+                }
+        GRAPHQL;
 
         $directive = $this->constructFieldDirective('foo: Exception @dummy');
 
@@ -89,11 +139,11 @@ final class BaseDirectiveTest extends TestCase
 
     public function testResolvesAModelThatIsNamedLikeABaseClass(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
-        type Closure {
-            id: ID
-        }
-        ';
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+                type Closure {
+                    id: ID
+                }
+        GRAPHQL;
 
         $directive = $this->constructFieldDirective('foo: Closure @dummy');
 
@@ -105,11 +155,11 @@ final class BaseDirectiveTest extends TestCase
 
     public function testPrefersThePrimaryModelNamespace(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
-        type Category {
-            id: ID
-        }
-        ';
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+                type Category {
+                    id: ID
+                }
+        GRAPHQL;
 
         $directive = $this->constructFieldDirective('foo: Category @dummy');
 
@@ -121,11 +171,11 @@ final class BaseDirectiveTest extends TestCase
 
     public function testAllowsOverwritingTheDefaultModel(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
-        type OnlyHere {
-            id: ID
-        }
-        ';
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+                type OnlyHere {
+                    id: ID
+                }
+        GRAPHQL;
 
         $directive = $this->constructFieldDirective('foo: OnlyHere @dummy(model: "Tests\\\Utils\\\ModelsSecondary\\\Category")');
 
@@ -137,11 +187,11 @@ final class BaseDirectiveTest extends TestCase
 
     public function testResolvesFromTheSecondaryModelNamespace(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
-        type OnlyHere {
-            id: ID
-        }
-        ';
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+                type OnlyHere {
+                    id: ID
+                }
+        GRAPHQL;
 
         $directive = $this->constructFieldDirective('foo: OnlyHere @dummy');
 
@@ -188,14 +238,40 @@ final class BaseDirectiveTest extends TestCase
         $directive->validateMutuallyExclusiveArguments(['bar', 'baz', 'qux']);
     }
 
-    protected function constructFieldDirective(string $definition): BaseDirective
+    public function testHydrateShouldResetCachedArgs(): void
+    {
+        $directive = $this->constructFieldDirective('foo: ID @dummy(arg: "value")');
+
+        $this->assertSame(
+            'value',
+            // @phpstan-ignore-next-line protected method is called via wrapper below
+            $directive->directiveArgValue('arg'),
+        );
+
+        $field = Parser::fieldDefinition('foo: ID @dummy(arg: "new value")');
+
+        $directive->hydrate(
+            $field->directives[0],
+            $field,
+        );
+
+        $this->assertSame(
+            'new value',
+            // @phpstan-ignore-next-line protected method is called via wrapper below
+            $directive->directiveArgValue('arg'),
+        );
+    }
+
+    private function constructFieldDirective(string $definition): BaseDirective
     {
         $fieldDefinition = Parser::fieldDefinition($definition);
 
         $directive = new class() extends BaseDirective {
             public static function definition(): string
             {
-                return /** @lang GraphQL */ 'directive @base on FIELD_DEFINITION';
+                return /** @lang GraphQL */ <<<'GRAPHQL'
+                directive @base on FIELD_DEFINITION
+                GRAPHQL;
             }
 
             /**

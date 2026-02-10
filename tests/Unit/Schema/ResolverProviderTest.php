@@ -12,8 +12,7 @@ use Tests\TestCase;
 
 final class ResolverProviderTest extends TestCase
 {
-    /** @var \Nuwave\Lighthouse\Schema\ResolverProvider */
-    protected $resolverProvider;
+    protected ResolverProvider $resolverProvider;
 
     protected function setUp(): void
     {
@@ -54,13 +53,13 @@ final class ResolverProviderTest extends TestCase
         $this->resolverProvider->provideResolver($fieldValue);
     }
 
-    protected function constructFieldValue(string $fieldDefinition, string $parentTypeName = RootType::QUERY): FieldValue
+    private function constructFieldValue(string $fieldDefinition, string $parentTypeName = RootType::QUERY): FieldValue
     {
-        $queryType = Parser::objectTypeDefinition(/** @lang GraphQL */ "
+        $queryType = Parser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
         type {$parentTypeName} {
             {$fieldDefinition}
         }
-        ");
+        GRAPHQL);
 
         $typeValue = new TypeValue($queryType);
 

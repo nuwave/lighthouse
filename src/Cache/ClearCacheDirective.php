@@ -39,7 +39,7 @@ directive @clearCache(
 ) repeatable on FIELD_DEFINITION
 
 """
-Options for the `id` argument on `@clearCache`.
+Options for the `idSource` argument of `@clearCache`.
 
 Exactly one of the fields must be given.
 """
@@ -77,7 +77,8 @@ GRAPHQL;
                     ? $this->cacheKeyAndTags->fieldTag($type, $id, $field)
                     : $this->cacheKeyAndTags->parentTag($type, $id);
 
-                $this->cacheRepository->tags([$tag])->flush();
+                $this->cacheRepository->tags([$tag])
+                    ->flush();
             }
 
             return $result;

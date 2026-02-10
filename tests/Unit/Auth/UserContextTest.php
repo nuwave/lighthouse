@@ -15,7 +15,7 @@ final class UserContextTest extends TestCase
     {
         parent::setUp();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             name: String!
         }
@@ -23,7 +23,7 @@ final class UserContextTest extends TestCase
         type Query {
             user: User @mock
         }
-        ';
+        GRAPHQL;
 
         $this->mockResolver(static fn ($_, array $args, GraphQLContext $context): ?Authenticatable => $context->user());
     }
@@ -34,13 +34,13 @@ final class UserContextTest extends TestCase
         $user->name = 'foo';
         $this->be($user);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
                     'name' => $user->name,
@@ -51,13 +51,13 @@ final class UserContextTest extends TestCase
 
     public function testResolveGuestUserUsingContext(): void
     {
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => null,
             ],
@@ -87,13 +87,13 @@ final class UserContextTest extends TestCase
         $authFactory = $this->app->make(AuthFactory::class);
         $authFactory->guard('api')->setUser($user);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
                     'name' => $user->name,

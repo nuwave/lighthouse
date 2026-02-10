@@ -63,11 +63,11 @@ class DirectiveLocator
                 // Built-in and plugin defined directives come next
                 $this->eventsDispatcher->dispatch(new RegisterDirectiveNamespaces()),
             ]))
-            ->flatten()
-            ->filter()
-            // Ensure built-in directives come last
-            ->sortBy(static fn (string $namespace): int => (int) str_starts_with($namespace, 'Nuwave\\Lighthouse'))
-            ->all();
+                ->flatten()
+                ->filter()
+                // Ensure built-in directives come last
+                ->sortBy(static fn (string $namespace): int => (int) str_starts_with($namespace, 'Nuwave\\Lighthouse'))
+                ->all();
     }
 
     /**
@@ -80,10 +80,10 @@ class DirectiveLocator
         $directives = [];
 
         foreach ($this->namespaces() as $directiveNamespace) {
+            /** @var array<class-string> $classesInNamespace */
             $classesInNamespace = ClassFinder::getClassesInNamespace($directiveNamespace);
 
             foreach ($classesInNamespace as $class) {
-                assert(class_exists($class));
                 $reflection = new \ReflectionClass($class);
                 if (! $reflection->isInstantiable()) {
                     continue;
@@ -219,8 +219,7 @@ class DirectiveLocator
          *
          * @var \Illuminate\Support\Collection<int, TDirective> $associatedOfType
          */
-        $associatedOfType = $this
-            ->associated($node)
+        $associatedOfType = $this->associated($node)
             ->filter(Utils::instanceofMatcher($directiveClass));
 
         return $associatedOfType;

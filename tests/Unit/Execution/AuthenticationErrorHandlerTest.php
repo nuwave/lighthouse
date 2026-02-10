@@ -15,7 +15,7 @@ final class AuthenticationErrorHandlerTest extends TestCase
         $handler = new AuthenticationErrorHandler();
 
         $authenticationException = new LaravelAuthenticationException('Unauthenticated.', ['user']);
-        $original = new Error('foo', null, null, [], null, $authenticationException);
+        $original = new Error(message: 'foo', previous: $authenticationException);
 
         $error = null;
         $next = static function (Error $e) use (&$error): void {

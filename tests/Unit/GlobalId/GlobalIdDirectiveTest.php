@@ -9,7 +9,7 @@ use Tests\Utils\Queries\Foo;
 
 final class GlobalIdDirectiveTest extends TestCase
 {
-    /** @var \Nuwave\Lighthouse\GlobalId\GlobalId */
+    /** @var GlobalId */
     protected $globalId;
 
     protected function setUp(): void
@@ -21,17 +21,17 @@ final class GlobalIdDirectiveTest extends TestCase
 
     public function testDecodesGlobalId(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: String! @globalId
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'foo' => $this->globalId->encode(RootType::QUERY, Foo::THE_ANSWER),
             ],
@@ -42,27 +42,27 @@ final class GlobalIdDirectiveTest extends TestCase
     {
         $this->mockResolver(static fn ($_, array $args): ?string => $args['bar'] ?? null);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(bar: String @globalId): String @mock
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'foo' => null,
             ],
         ]);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo(bar: null)
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'foo' => null,
             ],
@@ -73,17 +73,17 @@ final class GlobalIdDirectiveTest extends TestCase
     {
         $this->mockResolver();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: String @mock @globalId
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'foo' => null,
             ],
@@ -94,7 +94,7 @@ final class GlobalIdDirectiveTest extends TestCase
     {
         $this->mockResolver(static fn ($_, array $args): array => $args['input']['bar']);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(input: FooInput!): [String!]! @mock
         }
@@ -102,18 +102,18 @@ final class GlobalIdDirectiveTest extends TestCase
         input FooInput {
             bar: String! @globalId
         }
-        ';
+        GRAPHQL;
 
         $globalId = $this->globalId->encode('foo', 'bar');
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($bar: String!) {
                 foo(input: {
                     bar: $bar
                 })
             }
-            ', [
+            GRAPHQL, [
                 'bar' => $globalId,
             ])
             ->assertJson([
@@ -127,7 +127,7 @@ final class GlobalIdDirectiveTest extends TestCase
     {
         $this->mockResolver(static fn ($_, array $args): array => $args);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(
                 type: ID! @globalId(decode: TYPE)
@@ -141,23 +141,23 @@ final class GlobalIdDirectiveTest extends TestCase
             id: ID!
             array: [String!]!
         }
-        ';
+        GRAPHQL;
 
         $globalId = $this->globalId->encode('Foo', 'bar');
 
-        $this->graphQL(/** @lang GraphQL */ "
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         {
             foo(
-                type: \"{$globalId}\"
-                id: \"{$globalId}\"
-                array: \"{$globalId}\"
+                type: "{$globalId}"
+                id: "{$globalId}"
+                array: "{$globalId}"
             ) {
                 id
                 type
                 array
             }
         }
-        ")->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'foo' => [
                     'type' => 'Foo',

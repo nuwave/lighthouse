@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\CacheControl;
 
+use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\FieldNode;
 use GraphQL\Language\AST\NodeKind;
 use GraphQL\Language\Visitor;
@@ -9,7 +10,7 @@ use GraphQL\Type\Definition\NamedType;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Type\Definition\WrappingType;
 use GraphQL\Utils\TypeInfo;
-use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\Events\EndRequest;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
@@ -24,7 +25,7 @@ class CacheControlServiceProvider extends ServiceProvider
         $this->app->singleton(CacheControl::class);
     }
 
-    public function boot(Dispatcher $dispatcher): void
+    public function boot(EventsDispatcher $dispatcher): void
     {
         $dispatcher->listen(RegisterDirectiveNamespaces::class, static fn (): string => __NAMESPACE__);
         $dispatcher->listen(StartExecution::class, function (StartExecution $startExecution): void {
@@ -33,7 +34,7 @@ class CacheControlServiceProvider extends ServiceProvider
 
             // @phpstan-ignore-next-line NodeVisitor does not know about the mapping between node kind and node type
             $visitorWithTypeInfo = Visitor::visitWithTypeInfo($typeInfo, [
-                NodeKind::FIELD => static function (FieldNode $_) use ($typeInfo, $cacheControl): void {
+                NodeKind::FIELD => function (FieldNode $_) use ($typeInfo, $cacheControl): void {
                     $field = $typeInfo->getFieldDef();
                     if ($field === null) {
                         return;
@@ -43,15 +44,7 @@ class CacheControlServiceProvider extends ServiceProvider
                         ? ASTHelper::directiveDefinition($field->astNode, 'cacheControl')
                         : null;
                     if ($cacheControlDirective !== null) {
-                        if (! ASTHelper::directiveArgValue($cacheControlDirective, 'inheritMaxAge')) {
-                            $cacheControl->addMaxAge(
-                                ASTHelper::directiveArgValue($cacheControlDirective, 'maxAge') ?? 0,
-                            );
-                        }
-
-                        if (ASTHelper::directiveArgValue($cacheControlDirective, 'scope') === 'PRIVATE') {
-                            $cacheControl->setPrivate();
-                        }
+                        $this->setCacheValues($cacheControlDirective, $cacheControl);
                     } else {
                         $parent = $typeInfo->getParentType();
                         assert($parent instanceof NamedType);
@@ -65,7 +58,12 @@ class CacheControlServiceProvider extends ServiceProvider
                                 $nodeType = $nodeType->getInnermostType();
                             }
 
-                            if (! $nodeType instanceof ScalarType) {
+                            $cacheControlDirective = isset($nodeType->astNode)
+                                ? ASTHelper::directiveDefinition($nodeType->astNode, 'cacheControl')
+                                : null;
+                            if ($cacheControlDirective !== null) {
+                                $this->setCacheValues($cacheControlDirective, $cacheControl);
+                            } elseif (! $nodeType instanceof ScalarType) {
                                 $cacheControl->addMaxAge(0);
                             }
                         }
@@ -91,5 +89,19 @@ class CacheControlServiceProvider extends ServiceProvider
 
             $this->app->forgetInstance(CacheControl::class);
         });
+    }
+
+    /** Set HTTP cache header values based on the @cacheControl directive. */
+    private function setCacheValues(DirectiveNode $cacheControlDirective, CacheControl $cacheControl): void
+    {
+        if (! ASTHelper::directiveArgValue($cacheControlDirective, 'inheritMaxAge')) {
+            $cacheControl->addMaxAge(
+                ASTHelper::directiveArgValue($cacheControlDirective, 'maxAge') ?? 0,
+            );
+        }
+
+        if (ASTHelper::directiveArgValue($cacheControlDirective, 'scope') === 'PRIVATE') {
+            $cacheControl->setPrivate();
+        }
     }
 }

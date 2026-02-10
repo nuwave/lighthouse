@@ -14,8 +14,7 @@ use Tests\Utils\Models\User;
 
 final class CacheDirectiveTest extends DBTestCase
 {
-    /** @var \Illuminate\Contracts\Cache\Repository */
-    protected $cache;
+    protected CacheRepository $cache;
 
     protected function getEnvironmentSetUp($app): void
     {
@@ -31,7 +30,7 @@ final class CacheDirectiveTest extends DBTestCase
             'name' => 'foobar',
         ]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             name: String @cache
@@ -40,15 +39,15 @@ final class CacheDirectiveTest extends DBTestCase
         type Query {
             user: User @mock
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
                     'name' => 'foobar',
@@ -61,7 +60,7 @@ final class CacheDirectiveTest extends DBTestCase
 
     public function testCacheKeyIsValidOnFieldDefinition(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
             type User {
                 id: ID!
                 name: String @cache
@@ -71,7 +70,7 @@ final class CacheDirectiveTest extends DBTestCase
             type Query {
                 user: User @first
             }
-        ';
+        GRAPHQL;
 
         $schemaValidator = $this->app->make(SchemaValidator::class);
 
@@ -88,7 +87,7 @@ final class CacheDirectiveTest extends DBTestCase
             'email' => 'foo@bar.com',
         ]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             name: String @cache
@@ -98,15 +97,15 @@ final class CacheDirectiveTest extends DBTestCase
         type Query {
             user: User @mock
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
                     'name' => 'foobar',
@@ -125,7 +124,7 @@ final class CacheDirectiveTest extends DBTestCase
             'email_name' => 'foo@bar.com',
         ]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             name: String @cache
@@ -135,15 +134,15 @@ final class CacheDirectiveTest extends DBTestCase
         type Query {
             user: User @mock
         }
-        ';
+        GRAPHQL;
 
-        $response = $this->graphQL(/** @lang GraphQL */ '
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
                     'name' => 'foobar',
@@ -161,7 +160,7 @@ final class CacheDirectiveTest extends DBTestCase
             'name' => 'foobar',
         ]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID! @rename(attribute: "id_")
             name: String @cache
@@ -170,15 +169,15 @@ final class CacheDirectiveTest extends DBTestCase
         type Query {
             user: User @mock
         }
-        ';
+        GRAPHQL;
 
-        $response = $this->graphQL(/** @lang GraphQL */ '
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
                     'name' => 'foobar',
@@ -200,7 +199,7 @@ final class CacheDirectiveTest extends DBTestCase
             'name' => 'foobar',
         ]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             name: String @cache(private: true)
@@ -209,15 +208,15 @@ final class CacheDirectiveTest extends DBTestCase
         type Query {
             user: User @mock
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
                     'name' => 'foobar',
@@ -235,7 +234,7 @@ final class CacheDirectiveTest extends DBTestCase
             'name' => 'foobar',
         ]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Post {
             id: ID!
         }
@@ -248,15 +247,15 @@ final class CacheDirectiveTest extends DBTestCase
         type Query {
             user: User @mock
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
                     'name' => 'foobar',
@@ -274,7 +273,7 @@ final class CacheDirectiveTest extends DBTestCase
             'name' => 'foobar',
         ]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             name: String @cache(private: true)
@@ -283,15 +282,15 @@ final class CacheDirectiveTest extends DBTestCase
         type Query {
             user: User @mock
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
                     'name' => 'foobar',
@@ -306,7 +305,7 @@ final class CacheDirectiveTest extends DBTestCase
     {
         factory(User::class, 5)->create();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             name: String!
@@ -315,9 +314,9 @@ final class CacheDirectiveTest extends DBTestCase
         type Query {
             users: [User] @paginate(type: PAGINATOR, model: "User") @cache
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(first: 5) {
                 paginatorInfo {
@@ -329,7 +328,7 @@ final class CacheDirectiveTest extends DBTestCase
                 }
             }
         }
-        ');
+        GRAPHQL);
 
         $result = $this->cache->get('lighthouse:Query::users:first:5');
 
@@ -340,12 +339,15 @@ final class CacheDirectiveTest extends DBTestCase
     public function testCacheHasManyResolver(): void
     {
         $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
 
-        factory(Post::class, 3)->create([
-            'user_id' => $user->getKey(),
-        ]);
+        $posts = factory(Post::class, 3)->make();
+        $posts->each(static function (Post $post) use ($user): void {
+            $post->user()->associate($user);
+            $post->save();
+        });
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Post {
             id: ID!
             title: String
@@ -360,11 +362,11 @@ final class CacheDirectiveTest extends DBTestCase
         type Query {
             user(id: ID! @eq): User @find(model: "User")
         }
-        ';
+        GRAPHQL;
 
-        $query = /** @lang GraphQL */ '
-        {
-            user(id: ' . $user->getKey() . ') {
+        $query = /** @lang GraphQL */ <<<'GRAPHQL'
+        query ($id: ID!) {
+            user(id: $id) {
                 id
                 name
                 posts(first: 3) {
@@ -374,7 +376,7 @@ final class CacheDirectiveTest extends DBTestCase
                 }
             }
         }
-        ';
+        GRAPHQL;
 
         $dbQueryCountForPost = 0;
         DB::listen(static function (QueryExecuted $query) use (&$dbQueryCountForPost): void {
@@ -383,13 +385,17 @@ final class CacheDirectiveTest extends DBTestCase
             }
         });
 
-        $firstResponse = $this->graphQL($query);
+        $firstResponse = $this->graphQL($query, [
+            'id' => $user->getKey(),
+        ]);
 
         $posts = $this->cache->get("lighthouse:User:{$user->getKey()}:posts:first:3");
         $this->assertInstanceOf(LengthAwarePaginator::class, $posts);
         $this->assertCount(3, $posts);
 
-        $cachedResponse = $this->graphQL($query);
+        $cachedResponse = $this->graphQL($query, [
+            'id' => $user->getKey(),
+        ]);
 
         $this->assertSame(1, $dbQueryCountForPost, 'This query should only run once and be cached on the second run.');
         $this->assertSame(
@@ -403,13 +409,16 @@ final class CacheDirectiveTest extends DBTestCase
         config(['lighthouse.cache_directive_tags' => true]);
 
         $user = factory(User::class)->create();
-        factory(Post::class, 3)->create([
-            'user_id' => $user->getKey(),
-        ]);
+        $this->assertInstanceOf(User::class, $user);
+        $posts = factory(Post::class, 3)->make();
+        $posts->each(static function (Post $post) use ($user): void {
+            $post->user()->associate($user);
+            $post->save();
+        });
 
         $tags = ['lighthouse:User:1', 'lighthouse:User:1:posts'];
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Post {
             id: ID!
             title: String
@@ -424,11 +433,11 @@ final class CacheDirectiveTest extends DBTestCase
         type Query {
             user(id: ID! @eq): User @find(model: "User") @cache
         }
-        ';
+        GRAPHQL;
 
-        $query = /** @lang GraphQL */ '
-        {
-            user(id: ' . $user->getKey() . ') {
+        $query = /** @lang GraphQL */ <<<'GRAPHQL'
+        query ($id: ID!) {
+            user(id: $id) {
                 id
                 name
                 posts(first: 3) {
@@ -438,7 +447,7 @@ final class CacheDirectiveTest extends DBTestCase
                 }
             }
         }
-        ';
+        GRAPHQL;
 
         $dbQueryCountForPost = 0;
         DB::listen(static function (QueryExecuted $query) use (&$dbQueryCountForPost): void {
@@ -447,7 +456,9 @@ final class CacheDirectiveTest extends DBTestCase
             }
         });
 
-        $firstResponse = $this->graphQL($query);
+        $firstResponse = $this->graphQL($query, [
+            'id' => $user->getKey(),
+        ]);
 
         $posts = $this->cache
             ->tags($tags)
@@ -455,7 +466,9 @@ final class CacheDirectiveTest extends DBTestCase
         $this->assertInstanceOf(LengthAwarePaginator::class, $posts);
         $this->assertCount(3, $posts);
 
-        $cachedResponse = $this->graphQL($query);
+        $cachedResponse = $this->graphQL($query, [
+            'id' => $user->getKey(),
+        ]);
 
         $this->assertSame(1, $dbQueryCountForPost, 'This query should only run once and be cached on the second run.');
         $this->assertSame(
@@ -473,7 +486,7 @@ final class CacheDirectiveTest extends DBTestCase
             'field_integer' => 1,
         ]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             field_boolean: Boolean @cache
@@ -484,7 +497,7 @@ final class CacheDirectiveTest extends DBTestCase
         type Query {
             user: User @mock
         }
-        ';
+        GRAPHQL;
 
         $this->cache->setMultiple([
             'lighthouse:User:1:field_boolean' => false,
@@ -492,7 +505,7 @@ final class CacheDirectiveTest extends DBTestCase
             'lighthouse:User:1:field_integer' => 0,
         ]);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 field_boolean
@@ -500,7 +513,7 @@ final class CacheDirectiveTest extends DBTestCase
                 field_integer
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
                     'field_boolean' => false,

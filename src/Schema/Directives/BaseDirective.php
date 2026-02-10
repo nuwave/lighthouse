@@ -64,6 +64,8 @@ abstract class BaseDirective implements Directive
         $this->directiveNode = $directiveNode;
         $this->definitionNode = $definitionNode;
 
+        unset($this->directiveArgs);
+
         return $this;
     }
 
@@ -88,7 +90,7 @@ abstract class BaseDirective implements Directive
     }
 
     /**
-     * Get a Closure that is defined through an argument on the directive.
+     * Get a Closure that is defined through an argument of the directive.
      *
      * @api
      */
@@ -116,7 +118,7 @@ abstract class BaseDirective implements Directive
     }
 
     /**
-     * Get the value of an argument on the directive.
+     * Get the value of an argument of the directive.
      *
      * @api
      *
@@ -146,11 +148,8 @@ abstract class BaseDirective implements Directive
      */
     protected function getModelClass(string $argumentName = 'model'): string
     {
-        $model = $this->directiveArgValue($argumentName, ASTHelper::modelName($this->definitionNode));
-
-        if (! $model) {
-            throw new DefinitionException("Could not determine a model name for the '@{$this->name()}' directive on '{$this->nodeName()}.");
-        }
+        $model = $this->directiveArgValue($argumentName, ASTHelper::modelName($this->definitionNode))
+            ?? throw new DefinitionException("Could not determine a model name for the '@{$this->name()}' directive on '{$this->nodeName()}'.");
 
         return $this->namespaceModelClass($model);
     }
@@ -168,7 +167,7 @@ abstract class BaseDirective implements Directive
     protected function namespaceClassName(
         string $classCandidate,
         array $namespacesToTry = [],
-        callable $determineMatch = null,
+        ?callable $determineMatch = null,
     ): string {
         $namespaceForDirective = ASTHelper::namespaceForDirective(
             $this->definitionNode,
@@ -218,9 +217,7 @@ abstract class BaseDirective implements Directive
             count($argumentParts) > 2
             || empty($argumentParts[0])
         ) {
-            throw new DefinitionException(
-                "Directive '{$this->name()}' must have an argument '{$argumentName}' in the form 'ClassName@methodName' or 'ClassName'",
-            );
+            throw new DefinitionException("Directive '{$this->name()}' must have an argument '{$argumentName}' in the form 'ClassName@methodName' or 'ClassName'");
         }
 
         /** @var array{0: string, 1?: string} $argumentParts */

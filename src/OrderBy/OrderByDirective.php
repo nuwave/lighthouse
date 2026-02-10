@@ -70,7 +70,7 @@ directive @orderBy(
 ) on ARGUMENT_DEFINITION | FIELD_DEFINITION
 
 """
-Options for the `direction` argument on `@orderBy`.
+Options for the `direction` argument of `@orderBy`.
 """
 enum OrderByDirection {
     """
@@ -85,7 +85,7 @@ enum OrderByDirection {
 }
 
 """
-Options for the `relations` argument on `@orderBy`.
+Options for the `relations` argument of `@orderBy`.
 """
 input OrderByRelation {
     """
@@ -124,6 +124,8 @@ GRAPHQL;
                 }
 
                 $relation = array_key_first($orderByClause);
+                assert(is_string($relation));
+
                 $relationSnake = Str::snake($relation);
 
                 $relationValues = Arr::first($orderByClause);
@@ -134,7 +136,8 @@ GRAPHQL;
 
                     $column = "{$relationSnake}_count";
                 } else {
-                    $operator = 'with' . ucfirst($aggregate);
+                    $upperAggregate = ucfirst($aggregate);
+                    $operator = "with{$upperAggregate}";
                     $relationColumn = $relationValues['column'];
                     $builder->{$operator}($relation, $relationColumn);
 
@@ -246,8 +249,8 @@ GRAPHQL;
 
             $documentAST->setTypeDefinition(Parser::inputObjectTypeDefinition("{$inputMerged}}"));
         } else {
-            $restrictedOrderByName = $qualifiedOrderByPrefix . 'OrderByClause';
-            $argDefinition->type = Parser::typeReference('[' . $restrictedOrderByName . '!]');
+            $restrictedOrderByName = "{$qualifiedOrderByPrefix}OrderByClause";
+            $argDefinition->type = Parser::typeReference("[{$restrictedOrderByName}!]");
 
             $documentAST->setTypeDefinition(
                 OrderByServiceProvider::createOrderByClauseInput(

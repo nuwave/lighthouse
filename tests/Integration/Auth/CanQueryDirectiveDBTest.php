@@ -1,0 +1,207 @@
+<?php declare(strict_types=1);
+
+namespace Tests\Integration\Auth;
+
+use Tests\DBTestCase;
+use Tests\Utils\Models\Post;
+use Tests\Utils\Models\Task;
+use Tests\Utils\Models\User;
+use Tests\Utils\Mutations\ThrowWhenInvoked;
+use Tests\Utils\Policies\UserPolicy;
+
+final class CanQueryDirectiveDBTest extends DBTestCase
+{
+    public function testQueriesForSpecificModelWithQuery(): void
+    {
+        $admin = new User();
+        $admin->name = UserPolicy::ADMIN;
+        $this->be($admin);
+
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
+
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Query {
+            user(name: String! @eq): User
+                @canQuery(ability: "view")
+                @first
+        }
+
+        type User {
+            name: String!
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        query ($name: String!) {
+            user(name: $name) {
+                name
+            }
+        }
+        GRAPHQL, [
+            'name' => $user->name,
+        ])->assertJson([
+            'data' => [
+                'user' => [
+                    'name' => $user->name,
+                ],
+            ],
+        ]);
+    }
+
+    public function testFailsToFindSpecificModelWithQuery(): void
+    {
+        $admin = new User();
+        $admin->name = UserPolicy::ADMIN;
+        $this->be($admin);
+
+        $this->mockResolverExpects(
+            $this->never(),
+        );
+
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Query {
+            user(id: ID! @whereKey): User
+                @canQuery(ability: "view", query: true)
+                @find
+        }
+
+        type User {
+            id: ID!
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            user(id: "not-present") {
+                id
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'user' => null,
+            ],
+        ]);
+    }
+
+    public function testDoesntConcealResolverException(): void
+    {
+        $admin = new User();
+        $admin->name = UserPolicy::ADMIN;
+        $this->be($admin);
+
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
+
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Mutation {
+            throwWhenInvoked(id: ID!): User
+                @canQuery(ability: "view", action: EXCEPTION_NOT_AUTHORIZED)
+        }
+
+        type User {
+            name: String!
+        }
+        GRAPHQL . self::PLACEHOLDER_QUERY;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($id: ID!) {
+            throwWhenInvoked(id: $id) {
+                name
+            }
+        }
+        GRAPHQL, [
+            'id' => $user->getKey(),
+        ])->assertGraphQLErrorMessage(ThrowWhenInvoked::ERROR_MESSAGE);
+    }
+
+    public function testHandleMultipleModelsWithQuery(): void
+    {
+        $admin = new User();
+        $admin->name = UserPolicy::ADMIN;
+        $this->be($admin);
+
+        $postA = factory(Post::class)->make();
+        $this->assertInstanceOf(Post::class, $postA);
+        $postA->user()->associate($admin);
+        $postA->save();
+
+        $postB = factory(Post::class)->make();
+        $this->assertInstanceOf(Post::class, $postB);
+        $postB->user()->associate($admin);
+        $postB->save();
+
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Mutation {
+            deletePosts(ids: [ID!]! @whereKey): [Post!]!
+                @canQuery(ability: "delete")
+                @delete
+        }
+
+        type Post {
+            title: String!
+        }
+        GRAPHQL . self::PLACEHOLDER_QUERY;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($ids: [ID!]!) {
+            deletePosts(ids: $ids) {
+                title
+            }
+        }
+        GRAPHQL, [
+            'ids' => [$postA->id, $postB->id],
+        ])->assertJson([
+            'data' => [
+                'deletePosts' => [
+                    [
+                        'title' => $postA->title,
+                    ],
+                    [
+                        'title' => $postB->title,
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testWorksWithSoftDeletesWithQuery(): void
+    {
+        $admin = new User();
+        $admin->name = UserPolicy::ADMIN;
+        $this->be($admin);
+
+        $task = factory(Task::class)->create();
+        $this->assertInstanceOf(Task::class, $task);
+        $task->delete();
+
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Query {
+            task(id: ID! @whereKey): Task
+                @canQuery(ability: "adminOnly")
+                @softDeletes
+                @find
+        }
+
+        type Task {
+            name: String!
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        query ($id: ID!) {
+            task(id: $id, trashed: WITH) {
+                name
+            }
+        }
+        GRAPHQL, [
+            'id' => $task->id,
+        ])->assertJson([
+            'data' => [
+                'task' => [
+                    'name' => $task->name,
+                ],
+            ],
+        ]);
+    }
+}

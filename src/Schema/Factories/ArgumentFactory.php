@@ -3,15 +3,12 @@
 namespace Nuwave\Lighthouse\Schema\Factories;
 
 use GraphQL\Language\AST\InputValueDefinitionNode;
-use GraphQL\Type\Definition\InputType;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Container\Container;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\ExecutableTypeNodeConverter;
 
-/**
- * @phpstan-import-type ArgumentConfig from \GraphQL\Type\Definition\Argument
- */
+/** @phpstan-import-type ArgumentConfig from \GraphQL\Type\Definition\Argument */
 class ArgumentFactory
 {
     /**
@@ -46,12 +43,12 @@ class ArgumentFactory
     {
         $definitionNodeConverter = Container::getInstance()->make(ExecutableTypeNodeConverter::class);
         $type = $definitionNodeConverter->convert($definitionNode->type);
-        assert($type instanceof Type && $type instanceof InputType);
 
         $config = [
             'name' => $definitionNode->name->value,
-            'description' => $definitionNode->description->value ?? null,
+            'description' => $definitionNode->description?->value,
             'type' => $type,
+            'deprecationReason' => ASTHelper::deprecationReason($definitionNode),
             'astNode' => $definitionNode,
         ];
 

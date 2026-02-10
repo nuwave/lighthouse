@@ -61,7 +61,7 @@ class FieldFactory
                 $fieldValue->getField()->arguments,
             ),
             'resolve' => $fieldValue->finishResolver($resolver),
-            'description' => $fieldDefinitionNode->description->value ?? null,
+            'description' => $fieldDefinitionNode->description?->value,
             'complexity' => $this->complexity($fieldValue),
             'deprecationReason' => ASTHelper::deprecationReason($fieldDefinitionNode),
             'astNode' => $fieldDefinitionNode,
@@ -115,13 +115,13 @@ class FieldFactory
     protected function defaultResolver(FieldValue $fieldValue): callable
     {
         if ($fieldValue->getParentName() === RootType::SUBSCRIPTION) {
-            /** @var \Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver $providesSubscriptionResolver */
+            /** @var ProvidesSubscriptionResolver $providesSubscriptionResolver */
             $providesSubscriptionResolver = Container::getInstance()->make(ProvidesSubscriptionResolver::class);
 
             return $providesSubscriptionResolver->provideSubscriptionResolver($fieldValue);
         }
 
-        /** @var \Nuwave\Lighthouse\Support\Contracts\ProvidesResolver $providesResolver */
+        /** @var ProvidesResolver $providesResolver */
         $providesResolver = Container::getInstance()->make(ProvidesResolver::class);
 
         return $providesResolver->provideResolver($fieldValue);

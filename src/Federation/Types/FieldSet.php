@@ -10,15 +10,9 @@ use GraphQL\Type\Definition\ScalarType;
  */
 class FieldSet extends ScalarType
 {
-    public function serialize(mixed $value): void
-    {
-    }
+    public function serialize(mixed $value): void {}
 
-    public function parseValue(mixed $value): void
-    {
-    }
+    public function parseValue(mixed $value): void {}
 
-    public function parseLiteral(Node $valueNode, array $variables = null): void
-    {
-    }
+    public function parseLiteral(Node $valueNode, ?array $variables = null): void {}
 }

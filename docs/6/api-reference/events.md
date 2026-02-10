@@ -1,6 +1,6 @@
 # Events
 
-All events reside in the namespace `\Nuwave\Lighthouse\Events`.
+All events reside in the namespace `Nuwave\Lighthouse\Events`.
 
 ## Lifecycle Events
 
@@ -93,9 +93,7 @@ class BuildSchemaString
  *
  * @see \Nuwave\Lighthouse\Schema\DirectiveLocator::namespaces()
  */
-class RegisterDirectiveNamespaces
-{
-}
+class RegisterDirectiveNamespaces {}
 ```
 
 ### ManipulateAST
@@ -177,6 +175,8 @@ class StartExecution
 ### BuildExtensionsResponse
 
 ```php
+use GraphQL\Executor\ExecutionResult;
+
 /**
  * Fires after a query was resolved.
  *
@@ -185,25 +185,25 @@ class StartExecution
  */
 class BuildExtensionsResponse
 {
+    public function __construct(
+        /** The result of resolving a single operation. */
+        public ExecutionResult $result,
+        /** The calculated query complexity score of the operation, only available if the validation rule is enabled. */
+        public ?int $queryComplexity,
+    ) {}
 }
 ```
 
 ```php
 namespace Nuwave\Lighthouse\Execution;
 
-/**
- * May be returned from listeners of @see \Nuwave\Lighthouse\Events\BuildExtensionsResponse.
- */
+/** May be returned from listeners of @see \Nuwave\Lighthouse\Events\BuildExtensionsResponse. */
 class ExtensionsResponse
 {
     public function __construct(
-        /**
-         * Will be used as the key in the response map.
-         */
+        /** Will be used as the key in the response map. */
         public string $key,
-        /**
-         * JSON-encodable content of the extension.
-         */
+        /** JSON-encodable content of the extension. */
         public mixed $content,
     ) {}
 }

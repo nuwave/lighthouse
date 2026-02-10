@@ -9,6 +9,7 @@ use GraphQL\Language\Parser;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\RootType;
@@ -104,10 +105,12 @@ GRAPHQL;
             $queryType = $documentAST->types[RootType::QUERY];
             assert($queryType instanceof ObjectTypeDefinitionNode);
 
-            $queryType->fields[] = Parser::fieldDefinition(/** @lang GraphQL */ <<<GRAPHQL
-              node(id: ID! @globalId): Node @field(resolver: "{$nodeRegistryClass}@resolve")
-            GRAPHQL
-            );
+            if (! ASTHelper::hasNode($queryType->fields, 'node')) {
+                $queryType->fields[] = Parser::fieldDefinition(/** @lang GraphQL */ <<<GRAPHQL
+                  node(id: ID! @globalId): Node @field(resolver: "{$nodeRegistryClass}@resolve")
+                GRAPHQL
+                );
+            }
         }
     }
 }

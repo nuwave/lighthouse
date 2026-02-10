@@ -16,9 +16,7 @@ final class FooContext implements GraphQLContext
         return null;
     }
 
-    public function setUser(?Authenticatable $user): void
-    {
-    }
+    public function setUser(?Authenticatable $user): void {}
 
     public function request(): ?Request
     {

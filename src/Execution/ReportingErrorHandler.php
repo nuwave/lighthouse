@@ -5,9 +5,7 @@ namespace Nuwave\Lighthouse\Execution;
 use GraphQL\Error\Error;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 
-/**
- * Report errors through the default exception handler configured in Laravel.
- */
+/** Report non-client-safe errors through the default Laravel exception handler. */
 class ReportingErrorHandler implements ErrorHandler
 {
     public function __construct(
@@ -20,16 +18,17 @@ class ReportingErrorHandler implements ErrorHandler
             return $next(null);
         }
 
-        // Client-safe errors are assumed to be something that a client can handle
-        // or is expected to happen, e.g. wrong syntax, authentication or validation
+        // Client-safe errors are assumed to be something that:
+        // - a client can understand and handle
+        // - were caused by client misuse, e.g. wrong syntax, authentication, validation
+        // Thus, they are typically not actionable for server developers.
         if ($error->isClientSafe()) {
             return $next($error);
         }
 
-        $previous = $error->getPrevious();
-        if ($previous !== null) {
-            $this->exceptionHandler->report($previous);
-        }
+        $this->exceptionHandler->report(
+            $error->getPrevious() ?? $error,
+        );
 
         return $next($error);
     }

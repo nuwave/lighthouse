@@ -48,7 +48,7 @@ See [this issue](https://github.com/nuwave/lighthouse/issues/900) for further di
 ## Security considerations
 
 Lighthouse has no mechanism for fine-grained permissions of nested mutation operations.
-Field directives such as [@can](../api-reference/directives.md#can) apply to the whole field.
+Field directives such as the [@can\* family of directives](../api-reference/directives.md#can-family-of-directives) apply to the whole field.
 
 Make sure that fields with nested mutations are only available to users who are allowed
 to execute all reachable nested mutations.
@@ -59,7 +59,7 @@ We will start of by defining a mutation to create a post.
 
 ```graphql
 type Mutation {
-  createPost(input: CreatePostInput! @spread): Post @create
+  createPost(input: CreatePostInput! @spread): Post! @create
 }
 ```
 
@@ -86,7 +86,7 @@ A nested `BelongsTo` relationship exposes the following operations:
 - `disconnect` the related model
 - `delete` the related model and the association to it
 
-Both `disconnect` and `delete` don't make much sense in the context of an update.
+Both `disconnect` and `delete` don't make much sense when creating a new model.
 You can control what operations are possible by defining just what you need in the `input`.
 We choose to expose the following operations on the related `User` model:
 
@@ -107,8 +107,7 @@ input CreateUserInput {
 }
 ```
 
-To create a new model and connect it to an existing model,
-just pass the ID of the model you want to associate.
+To create a new model and connect it to an existing model, pass the ID of the model you want to associate.
 
 ```graphql
 mutation {
@@ -171,7 +170,7 @@ but `delete` also removes the author model itself.
 
 ```graphql
 type Mutation {
-  updatePost(input: UpdatePostInput! @spread): Post @update
+  updatePost(input: UpdatePostInput! @spread): Post! @update
 }
 
 input UpdatePostInput {
@@ -192,7 +191,7 @@ input UpdateUserBelongsTo {
 
 You must pass a truthy value to `disconnect` and `delete` for them to actually run.
 This structure was chosen as it is consistent with updating `BelongsToMany` relationships
-and allows the query string to be mostly static, taking a variable value to control its behaviour.
+and allows the query string to be mostly static, taking a variable value to control its behavior.
 
 ```graphql
 mutation UpdatePost($disconnectAuthor: Boolean) {
@@ -276,7 +275,7 @@ type Image {
 }
 
 type Mutation {
-  updateImage(input: UpdateImageInput! @spread): Image @update
+  updateImage(input: UpdateImageInput! @spread): Image! @update
 }
 
 input UpdateImageInput {
@@ -364,7 +363,7 @@ We will start off by defining a mutation to update a `User`.
 
 ```graphql
 type Mutation {
-  updateUser(input: UpdateUserInput! @spread): User @update
+  updateUser(input: UpdateUserInput! @spread): User! @update
 }
 ```
 
@@ -431,7 +430,7 @@ We will start off by defining a mutation to create an `User`.
 
 ```graphql
 type Mutation {
-  createUser(input: CreateUserInput! @spread): User @create
+  createUser(input: CreateUserInput! @spread): User! @create
 }
 ```
 
@@ -506,7 +505,7 @@ The following example covers the full range of possible operations:
 
 ```graphql
 type Mutation {
-  updateUser(input: UpdateUserInput! @spread): User @update
+  updateUser(input: UpdateUserInput! @spread): User! @update
 }
 
 input UpdateUserInput {
@@ -562,7 +561,7 @@ mutation {
 }
 ```
 
-The behaviour for `upsert` is a mix between updating and creating,
+The behavior for `upsert` is a mix between updating and creating,
 it will produce the needed action regardless of whether the model exists or not.
 
 ## MorphMany
@@ -576,7 +575,7 @@ as attaching existing ones.
 
 ```graphql
 type Mutation {
-  createPost(input: CreatePostInput! @spread): Post @create
+  createPost(input: CreatePostInput! @spread): Post! @create
 }
 
 input CreatePostInput {
@@ -601,8 +600,7 @@ input UpsertAuthorInput {
 }
 ```
 
-Just pass the ID of the models you want to associate or their full information
-to create a new relation.
+Pass the ID of the models you want to associate or their full information to create a new relation.
 
 ```graphql
 mutation {
@@ -706,13 +704,13 @@ Laravel's `sync()`, `syncWithoutDetach()` or `connect()` methods allow you to pa
 an array where the keys are IDs of related models and the values are pivot data.
 
 Lighthouse exposes this capability through the nested operations on many-to-many relations.
-Instead of passing just a list of ids, you can define an `input` type that also contains pivot data.
+Instead of passing just a list of IDs, you can define an `input` type that also contains pivot data.
 It must contain a field called `id` to contain the ID of the related model,
 all other fields will be inserted into the pivot table.
 
 ```graphql
 type Mutation {
-  updateUser(input: UpdateUserInput! @spread): User @update
+  updateUser(input: UpdateUserInput! @spread): User! @update
 }
 
 input UpdateUserInput {

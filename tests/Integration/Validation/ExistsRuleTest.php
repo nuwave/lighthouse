@@ -10,17 +10,17 @@ final class ExistsRuleTest extends DBTestCase
 {
     public function testExistsRule(): void
     {
-        /** @var \Tests\Utils\Models\User $userValid */
+        /** @var User $userValid */
         $userValid = factory(User::class)->make();
         $userValid->name = 'Admin';
         $userValid->save();
 
-        /** @var \Tests\Utils\Models\User $userInvalid */
+        /** @var User $userInvalid */
         $userInvalid = factory(User::class)->make();
         $userInvalid->name = 'Tester';
         $userInvalid->save();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             callbackUser(id: ID! @eq): User @validator @find
             macroUser(id: ID! @eq): User @validator @find
@@ -29,7 +29,7 @@ final class ExistsRuleTest extends DBTestCase
         type User {
             id: ID!
         }
-        ';
+        GRAPHQL;
 
         $this->macroUser($userValid)
             ->assertGraphQLValidationPasses();
@@ -44,28 +44,28 @@ final class ExistsRuleTest extends DBTestCase
             ->assertGraphQLValidationError('id', 'The selected id is invalid.');
     }
 
-    protected function macroUser(User $user): TestResponse
+    private function macroUser(User $user): TestResponse
     {
-        return $this->graphQL(/** @lang GraphQL */ '
+        return $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($id: ID!) {
             macroUser(id: $id) {
                 id
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $user->id,
         ]);
     }
 
-    protected function callbackUser(User $user): TestResponse
+    private function callbackUser(User $user): TestResponse
     {
-        return $this->graphQL(/** @lang GraphQL */ '
+        return $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($id: ID!) {
             callbackUser(id: $id) {
                 id
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $user->id,
         ]);
     }

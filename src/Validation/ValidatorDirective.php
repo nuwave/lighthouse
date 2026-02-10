@@ -94,15 +94,12 @@ GRAPHQL;
         FieldDefinitionNode &$fieldDefinition,
         ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
     ): void {
+        $parentName = $parentType->name->value;
+        $upperFieldName = ucfirst($fieldDefinition->name->value);
+
         $this->setFullClassnameOnDirective(
             $fieldDefinition,
-            $this->directiveArgValue(
-                'class',
-                $parentType->name->value
-                    . '\\'
-                    . ucfirst($fieldDefinition->name->value)
-                    . 'Validator',
-            ),
+            $this->directiveArgValue('class', "{$parentName}\\{$upperFieldName}Validator"),
         );
     }
 
@@ -113,7 +110,7 @@ GRAPHQL;
      *
      * @param  (\GraphQL\Language\AST\TypeDefinitionNode&\GraphQL\Language\AST\Node)|\GraphQL\Language\AST\FieldDefinitionNode  $definition
      */
-    protected function setFullClassnameOnDirective(Node &$definition, string $classCandidate): void
+    protected function setFullClassnameOnDirective(Node $definition, string $classCandidate): void
     {
         $validatorClass = $this->namespaceValidatorClass($classCandidate);
 

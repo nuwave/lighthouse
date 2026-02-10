@@ -14,37 +14,39 @@ final class MorphOneFromUnionTest extends DBTestCase
 {
     public function testResolveMorphOneRelationshipOnInterface(): void
     {
-        /** @var \Tests\Utils\Models\Employee $employee */
+        /** @var Employee $employee */
         $employee = factory(Employee::class)->create();
-        /** @var \Tests\Utils\Models\Contractor $contractor */
+        /** @var Contractor $contractor */
         $contractor = factory(Contractor::class)->create();
 
-        $companyId = factory(Company::class)->create()->getKey();
-        $teamId = factory(Team::class)->create()->getKey();
+        $company = factory(Company::class)->create();
+        $this->assertInstanceOf(Company::class, $company);
+        $team = factory(Team::class)->create();
+        $this->assertInstanceOf(Team::class, $team);
 
-        /** @var \Tests\Utils\Models\User $employeeUser */
-        $employeeUser = factory(User::class)->create([
-            'company_id' => $companyId,
-            'team_id' => $teamId,
-        ]);
-        /** @var \Tests\Utils\Models\User $contractorUser */
-        $contractorUser = factory(User::class)->create([
-            'company_id' => $companyId,
-            'team_id' => $teamId,
-        ]);
+        $employeeUser = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $employeeUser);
+        $employeeUser->company()->associate($company);
+        $employeeUser->team()->associate($team);
+        $employeeUser->save();
+        $contractorUser = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $contractorUser);
+        $contractorUser->company()->associate($company);
+        $contractorUser->team()->associate($team);
+        $contractorUser->save();
 
         $employee->user()->save($employeeUser);
         $contractor->user()->save($contractorUser);
 
-        /** @var \Tests\Utils\Models\Color $employeeColor */
+        /** @var Color $employeeColor */
         $employeeColor = factory(Color::class)->create();
-        /** @var \Tests\Utils\Models\Color $contractorColor */
+        /** @var Color $contractorColor */
         $contractorColor = factory(Color::class)->create();
 
         $employee->colors()->save($employeeColor);
         $contractor->colors()->save($contractorColor);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         interface Person {
             id: ID!
             user: User! @morphOne
@@ -79,9 +81,9 @@ final class MorphOneFromUnionTest extends DBTestCase
         type Query {
             colors: [Color!]! @all
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             colors {
                 id
@@ -99,7 +101,7 @@ final class MorphOneFromUnionTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'colors' => [
                     [

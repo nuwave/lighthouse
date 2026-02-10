@@ -9,17 +9,23 @@ and allow them to apply complex, dynamic WHERE conditions to queries.
 
 ## Setup
 
-Add the service provider to your `config/app.php`:
+For Laravel 11 and higher, add the service provider to your `bootstrap/providers.php`:
 
 ```php
-'providers' => [
+return [
+    // ...
     \Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider::class,
-],
+]
 ```
+
+For other versions, register the service provider `Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider`,
+see [registering providers in Laravel](https://laravel.com/docs/providers#registering-providers).
 
 Install the dependency [mll-lab/graphql-php-scalars](https://github.com/mll-lab/graphql-php-scalars):
 
-    composer require mll-lab/graphql-php-scalars
+```shell
+composer require mll-lab/graphql-php-scalars
+```
 
 ## Usage
 
@@ -89,7 +95,7 @@ The blank type named `_` will be changed to the actual type.
 Here are the types that will be included in the compiled schema:
 
 ```graphql
-"Dynamic WHERE conditions for the `where` argument on the query `people`."
+"Dynamic WHERE conditions for the `where` argument of the query `people`."
 input QueryPeopleWhereWhereConditions {
   "The column that is used for the condition."
   column: QueryPeopleWhereColumn
@@ -110,7 +116,7 @@ input QueryPeopleWhereWhereConditions {
   HAS: QueryPeopleWhereWhereConditionsRelation
 }
 
-"Allowed column names for the `where` argument on the query `people`."
+"Allowed column names for the `where` argument of the query `people`."
 enum QueryPeopleWhereColumn {
   AGE @enum(value: "age")
   TYPE @enum(value: "type")
@@ -294,7 +300,7 @@ type Role {
 Again, Lighthouse will auto-generate an `input` and `enum` definition for your query:
 
 ```graphql
-"Dynamic WHERE conditions for the `hasRole` argument on the query `people`."
+"Dynamic WHERE conditions for the `hasRole` argument of the query `people`."
 input QueryPeopleHasRoleWhereConditions {
   "The column that is used for the condition."
   column: QueryPeopleHasRoleColumn
@@ -312,7 +318,7 @@ input QueryPeopleHasRoleWhereConditions {
   OR: [QueryPeopleHasRoleWhereConditions!]
 }
 
-"Allowed column names for the `hasRole` argument on the query `people`."
+"Allowed column names for the `hasRole` argument of the query `people`."
 enum QueryPeopleHasRoleColumn {
   NAME @enum(value: "name")
   ACCESS_LEVEL @enum(value: "access_level")
@@ -358,7 +364,7 @@ If Lighthouse's default `SQLOperator` does not fit your use case, you can regist
 This may be necessary if your database uses different SQL operators then Lighthouse's default,
 or you want to extend/restrict the allowed operators.
 
-First create a class that implements `\Nuwave\Lighthouse\WhereConditions\Operator`. For example:
+First create a class that implements `Nuwave\Lighthouse\WhereConditions\Operator`. For example:
 
 ```php
 namespace App\GraphQL;
@@ -391,21 +397,12 @@ final class GraphQLServiceProvider extends ServiceProvider
 }
 ```
 
-Don't forget to register your new service provider in `config/app.php`.
-Make sure to add it after Lighthouse's `\Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider::class`:
+Don't forget to [register your new service provider in Laravel](https://laravel.com/docs/providers#registering-providers).
+Make sure to add it after Lighthouse's service provider:
 
 ```diff
-'providers' => [
-    /*
-     * Package Service Providers...
-     */
     \Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider::class,
-
-    /*
-     * Application Service Providers...
-     */
 +   \App\GraphQL\GraphQLServiceProvider::class,
-],
 ```
 
 ## Custom handler

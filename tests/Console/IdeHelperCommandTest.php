@@ -18,10 +18,8 @@ final class IdeHelperCommandTest extends TestCase
 
         $config = $app->make(ConfigRepository::class);
         $config->set('lighthouse.namespaces.directives', [
-            // Contains an overwritten UnionDirective
-            'Tests\\Console',
-            // We need to ensure this does not throw an error
-            'Empty\\Because\\The\\User\\Has\\Not\\Created\\Custom\\Directives\\Yet',
+            'Tests\\Console', // Contains an overwritten UnionDirective
+            'Empty\\Because\\The\\User\\Has\\Not\\Created\\Custom\\Directives\\Yet', // We need to ensure this does not throw an error
         ]);
     }
 
@@ -42,9 +40,7 @@ final class IdeHelperCommandTest extends TestCase
 
         $this->artisan('lighthouse:ide-helper');
 
-        /*
-         * Schema directives
-         */
+        // Schema directives
 
         $schemaDirectives = \Safe\file_get_contents(IdeHelperCommand::schemaDirectivesPath());
 
@@ -64,9 +60,7 @@ final class IdeHelperCommandTest extends TestCase
         );
         $this->assertStringContainsString(UnionDirective::class, $schemaDirectives);
 
-        /*
-         * Programmatic types
-         */
+        // Programmatic types
 
         $programmaticTypes = \Safe\file_get_contents(IdeHelperCommand::programmaticTypesPath());
 
@@ -76,9 +70,7 @@ final class IdeHelperCommandTest extends TestCase
             'Generates definitions for programmatically registered types',
         );
 
-        /*
-         * PHP Ide Helper
-         */
+        // PHP Ide Helper
 
         $ideHelper = \Safe\file_get_contents(IdeHelperCommand::phpIdeHelperPath());
 

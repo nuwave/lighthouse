@@ -2,7 +2,6 @@
 
 namespace Tests;
 
-use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 use GraphQL\Error\DebugFlag;
 use GraphQL\Type\Schema;
 use Illuminate\Console\Application as ConsoleApplication;
@@ -11,7 +10,9 @@ use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Redis\RedisServiceProvider;
 use Laravel\Scout\ScoutServiceProvider as LaravelScoutServiceProvider;
+use Nuwave\Lighthouse\Async\AsyncServiceProvider;
 use Nuwave\Lighthouse\Auth\AuthServiceProvider as LighthouseAuthServiceProvider;
+use Nuwave\Lighthouse\Bind\BindServiceProvider;
 use Nuwave\Lighthouse\Cache\CacheServiceProvider;
 use Nuwave\Lighthouse\CacheControl\CacheControlServiceProvider;
 use Nuwave\Lighthouse\GlobalId\GlobalIdServiceProvider;
@@ -26,13 +27,12 @@ use Nuwave\Lighthouse\Testing\MocksResolvers;
 use Nuwave\Lighthouse\Testing\TestingServiceProvider;
 use Nuwave\Lighthouse\Testing\UsesTestSchema;
 use Nuwave\Lighthouse\Validation\ValidationServiceProvider;
-use Orchestra\Testbench\TestCase as BaseTestCase;
+use Orchestra\Testbench\TestCase as TestbenchTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use Tests\Utils\Policies\AuthServiceProvider;
 
-abstract class TestCase extends BaseTestCase
+abstract class TestCase extends TestbenchTestCase
 {
-    use ArraySubsetAsserts;
     use MakesGraphQLRequests;
     use MocksResolvers;
     use UsesTestSchema;
@@ -46,11 +46,10 @@ abstract class TestCase extends BaseTestCase
 
     /** A dummy query type definition that is added to tests by default. */
     public const PLACEHOLDER_QUERY = /** @lang GraphQL */ <<<'GRAPHQL'
-type Query {
-  foo: Int
-}
-
-GRAPHQL;
+    type Query {
+      foo: Int
+    }
+    GRAPHQL;
 
     protected function setUp(): void
     {
@@ -59,8 +58,13 @@ GRAPHQL;
         // This default is only valid for testing Lighthouse itself and thus
         // is not defined in the reusable test trait.
         $this->schema ??= self::PLACEHOLDER_QUERY;
-
         $this->setUpTestSchema();
+
+        // Using qualifyTestResolver() requires instantiation of the test class through the container.
+        // https://laravel.com/docs/container#binding-primitives
+        $this->app->when(static::class)
+            ->needs('$name')
+            ->give('TestName');
     }
 
     /** @return array<class-string<\Illuminate\Support\ServiceProvider>> */
@@ -73,7 +77,9 @@ GRAPHQL;
 
             // Lighthouse's own
             LighthouseServiceProvider::class,
+            AsyncServiceProvider::class,
             LighthouseAuthServiceProvider::class,
+            BindServiceProvider::class,
             CacheServiceProvider::class,
             CacheControlServiceProvider::class,
             GlobalIdServiceProvider::class,
@@ -164,6 +170,8 @@ GRAPHQL;
             'prefix' => 'lighthouse-test-',
         ]);
 
+        $config->set('pennant.default', 'array');
+
         // Defaults to "algolia", which is not needed in our test setup
         $config->set('scout.driver', null);
 
@@ -203,8 +211,20 @@ GRAPHQL;
         return $schemaBuilder->schema();
     }
 
+    /** Assert that SDL contains the given string, accounting for different forward slash escaping - see https://github.com/webonyx/graphql-php/releases/tag/v15.22.2. */
+    protected function assertSdlContainsString(string $expected, string $sdl): void
+    {
+        // Try both the original string and the escaped version
+        $escapedExpected = str_replace('/', '\/', $expected);
+
+        $this->assertTrue(
+            str_contains($sdl, $expected) || str_contains($sdl, $escapedExpected),
+            "SDL does not contain expected string. Expected either:\n- {$expected}\n- {$escapedExpected}\n\nActual SDL:\n{$sdl}",
+        );
+    }
+
     /** Get a fully qualified reference to a method that is defined on the test class. */
-    protected function qualifyTestResolver(string $method): string
+    protected static function qualifyTestResolver(string $method): string
     {
         $escapedClass = addslashes(static::class);
 

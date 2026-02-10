@@ -13,7 +13,7 @@ final class AuthorizeRequestsTest extends TestCase
     use TestsRedis;
     use EnablesSubscriptionServiceProvider;
 
-    protected string $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ <<<'GRAPHQL'
     type Task {
         id: ID!
         name: String!
@@ -22,7 +22,7 @@ final class AuthorizeRequestsTest extends TestCase
     type Subscription {
         taskUpdated(id: ID!): Task
     }
-    ' . self::PLACEHOLDER_QUERY;
+    GRAPHQL . self::PLACEHOLDER_QUERY;
 
     public function testEchoClientAuthorizesSuccessfully(): void
     {
@@ -48,7 +48,7 @@ final class AuthorizeRequestsTest extends TestCase
         $channel = $response->json('extensions.lighthouse_subscriptions.channel');
         $this
             ->postJson('graphql/subscriptions/auth', [
-                'channel_name' => 'presence-' . $channel,
+                'channel_name' => "presence-{$channel}",
             ])
             ->assertSuccessful()
             ->assertJsonStructure([
@@ -65,7 +65,7 @@ final class AuthorizeRequestsTest extends TestCase
         $channel = $response->json('extensions.lighthouse_subscriptions.channel');
         $this
             ->postJson('graphql/subscriptions/auth', [
-                'channel_name' => 'anything-before-' . $channel,
+                'channel_name' => "anything-before-{$channel}",
             ])
             ->assertForbidden();
     }
@@ -77,7 +77,7 @@ final class AuthorizeRequestsTest extends TestCase
         $channel = $response->json('extensions.lighthouse_subscriptions.channel');
         $this
             ->postJson('graphql/subscriptions/auth', [
-                'channel_name' => $channel . 'plain-wrong',
+                'channel_name' => "{$channel}plain-wrong",
             ])
             ->assertForbidden();
     }
@@ -106,15 +106,15 @@ final class AuthorizeRequestsTest extends TestCase
             ->assertForbidden();
     }
 
-    protected function querySubscription(): TestResponse
+    private function querySubscription(): TestResponse
     {
-        return $this->graphQL(/** @lang GraphQL */ '
+        return $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         subscription {
             taskUpdated(id: 123) {
                 id
                 name
             }
         }
-        ');
+        GRAPHQL);
     }
 }

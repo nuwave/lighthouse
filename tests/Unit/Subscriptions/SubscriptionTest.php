@@ -29,11 +29,11 @@ final class SubscriptionTest extends TestCase
     public function testBroadcastSubscriptionFromField(): void
     {
         $subscriptionField = 'onPostCreated';
-        $this->schema .= /** @lang GraphQL */ "
+        $this->schema .= /** @lang GraphQL */ <<<GRAPHQL
         type Subscription {
             {$subscriptionField}: ID
         }
-        ";
+        GRAPHQL;
 
         $broadcaster = $this->createMock(SubscriptionBroadcaster::class);
         $this->app->instance(BroadcastsSubscriptions::class, $broadcaster);
@@ -84,11 +84,11 @@ final class SubscriptionTest extends TestCase
 
     public function testThrowsOnInvalidSubscriptionField(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Subscription {
             foo: ID @mock
         }
-        ';
+        GRAPHQL;
 
         $this->expectException(\InvalidArgumentException::class);
 
