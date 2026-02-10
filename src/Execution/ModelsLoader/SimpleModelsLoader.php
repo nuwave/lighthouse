@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Execution\ModelsLoader;
 
@@ -7,33 +7,17 @@ use Illuminate\Database\Eloquent\Model;
 
 class SimpleModelsLoader implements ModelsLoader
 {
-    /**
-     * @var string
-     */
-    protected $relation;
-
-    /**
-     * @var \Closure
-     */
-    protected $decorateBuilder;
-
-    public function __construct(string $relation, \Closure $decorateBuilder)
-    {
-        $this->relation = $relation;
-        $this->decorateBuilder = $decorateBuilder;
-    }
+    public function __construct(
+        protected string $relation,
+        protected \Closure $decorateBuilder,
+    ) {}
 
     public function load(EloquentCollection $parents): void
     {
         $parents->load([$this->relation => $this->decorateBuilder]);
     }
 
-    /**
-     * Extract the relation that was loaded.
-     *
-     * @return mixed the model's relation
-     */
-    public function extract(Model $model)
+    public function extract(Model $model): mixed
     {
         // Dot notation may be used to eager load nested relations
         $parts = explode('.', $this->relation);

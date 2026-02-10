@@ -1,7 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
 class WhereNotBetweenDirective extends BaseDirective implements ArgBuilderDirective
@@ -10,7 +13,7 @@ class WhereNotBetweenDirective extends BaseDirective implements ArgBuilderDirect
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Verify that a column's value lies outside of two values.
+Verify that a column's value lies outside two values.
 
 The type of the input value this is defined upon should be
 an `input` object with two fields.
@@ -25,11 +28,15 @@ directive @whereNotBetween(
 GRAPHQL;
     }
 
-    public function handleBuilder($builder, $value): object
+    public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, $value): QueryBuilder|EloquentBuilder|Relation
     {
+        if ($value === null) {
+            return $builder;
+        }
+
         return $builder->whereNotBetween(
             $this->directiveArgValue('key', $this->nodeName()),
-            $value
+            $value,
         );
     }
 }

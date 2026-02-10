@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Events;
 
@@ -11,15 +11,8 @@ namespace Nuwave\Lighthouse\Events;
  */
 class BuildSchemaString
 {
-    /**
-     * The root schema that was defined by the user.
-     *
-     * @var string
-     */
-    public $userSchema;
-
-    public function __construct(string $userSchema)
-    {
-        $this->userSchema = $userSchema;
-    }
+    public function __construct(
+        /** The root schema that was defined by the user. */
+        public string $userSchema,
+    ) {}
 }

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Utils\Directives;
 
@@ -9,10 +9,10 @@ final class FooDirective extends BaseDirective
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-"""
-Maximum bar.
-"""
-directive @foo on FIELD_DEFINITION
-GRAPHQL;
+        """
+        Maximum bar.
+        """
+        directive @foo on FIELD_DEFINITION
+        GRAPHQL;
     }
 }

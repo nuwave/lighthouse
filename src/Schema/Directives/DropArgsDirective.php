@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
@@ -28,9 +28,7 @@ GRAPHQL;
     protected function drop(ArgumentSet &$argumentSet): ArgumentSet
     {
         foreach ($argumentSet->arguments as $name => $argument) {
-            $maybeDropDirective = $argument->directives->first(function (Directive $directive): bool {
-                return $directive instanceof DropDirective;
-            });
+            $maybeDropDirective = $argument->directives->first(static fn (Directive $directive): bool => $directive instanceof DropDirective);
 
             if ($maybeDropDirective instanceof DropDirective) {
                 unset($argumentSet->arguments[$name]);
@@ -39,12 +37,12 @@ GRAPHQL;
                 // We look for further ArgumentSet instances, they
                 // might be contained within an array.
                 Utils::applyEach(
-                    function ($value) {
+                    function ($value): void {
                         if ($value instanceof ArgumentSet) {
                             $this->drop($value);
                         }
                     },
-                    $argument->value
+                    $argument->value,
                 );
             }
         }

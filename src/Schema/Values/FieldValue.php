@@ -1,13 +1,15 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Values;
 
 use GraphQL\Deferred;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo as BaseResolveInfo;
+use Illuminate\Container\Container;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Execution\Utils\FieldPath;
+use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 /**
@@ -20,7 +22,13 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 class FieldValue
 {
     /**
-     * @var array<string, array{0: array<string, mixed>, 1: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet}>
+     * @var array<
+     *   string,
+     *   array{
+     *     0: array<string, mixed>,
+     *     1: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet,
+     *   }
+     * >
      */
     protected static array $transformedResolveArgs = [];
 
@@ -31,20 +39,13 @@ class FieldValue
      */
     protected array $argumentSetTransformers = [];
 
-    /**
-     * @var array<int, ResolverWrapper>
-     */
+    /** @var array<int, ResolverWrapper> */
     protected array $resolverWrappers = [];
 
     public function __construct(
-        /**
-         * The parent type of the field.
-         */
+        /** The parent type of the field. */
         protected TypeValue $parent,
-
-        /**
-         * The underlying AST definition of the Field.
-         */
+        /** The underlying AST definition of the field. */
         protected FieldDefinitionNode $field,
     ) {}
 
@@ -53,9 +54,7 @@ class FieldValue
         self::$transformedResolveArgs = [];
     }
 
-    /**
-     * Get the underlying AST definition for the field.
-     */
+    /** Get the underlying AST definition for the field. */
     public function getField(): FieldDefinitionNode
     {
         return $this->field;
@@ -74,6 +73,22 @@ class FieldValue
     public function getParentName(): string
     {
         return $this->parent->getTypeDefinitionName();
+    }
+
+    /** @return array<int, string> */
+    public function parentNamespaces(): array
+    {
+        $parentName = $this->getParentName();
+
+        return match ($parentName) {
+            RootType::QUERY => (array) config('lighthouse.namespaces.queries'),
+            RootType::MUTATION => (array) config('lighthouse.namespaces.mutations'),
+            RootType::SUBSCRIPTION => (array) config('lighthouse.namespaces.subscriptions'),
+            default => array_map(
+                static fn (string $typesNamespace): string => "{$typesNamespace}\\{$parentName}",
+                (array) config('lighthouse.namespaces.types'),
+            ),
+        };
     }
 
     /**
@@ -114,13 +129,10 @@ class FieldValue
      */
     public function resultHandler(callable $handle): void
     {
-        $this->wrapResolver(fn (callable $resolver) => function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $handle): mixed {
+        $this->wrapResolver(static fn (callable $resolver): \Closure => static function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $handle): mixed {
             $resolved = $resolver($root, $args, $context, $resolveInfo);
-
             if ($resolved instanceof Deferred) {
-                return $resolved->then(static function ($result) use ($handle, $args, $context, $resolveInfo) {
-                    return $handle($result, $args, $context, $resolveInfo);
-                });
+                return $resolved->then(static fn (mixed $result): mixed => $handle($result, $args, $context, $resolveInfo));
             }
 
             return $handle($resolved, $args, $context, $resolveInfo);
@@ -154,26 +166,25 @@ class FieldValue
             $resolver = $wrapper($resolver);
         }
 
-        return function ($root, array $args, GraphQLContext $context, BaseResolveInfo $baseResolveInfo) use ($resolver): mixed {
+        return function (mixed $root, array $baseArgs, GraphQLContext $context, BaseResolveInfo $baseResolveInfo) use ($resolver): mixed {
             $path = FieldPath::withoutLists($baseResolveInfo->path);
 
             if (! isset(self::$transformedResolveArgs[$path])) {
-                $argumentSetFactory = app(ArgumentSetFactory::class);
-                assert($argumentSetFactory instanceof ArgumentSetFactory);
-                $argumentSet = $argumentSetFactory->fromResolveInfo($args, $baseResolveInfo);
+                $argumentSetFactory = Container::getInstance()->make(ArgumentSetFactory::class);
 
+                $argumentSet = $argumentSetFactory->fromResolveInfo($baseArgs, $baseResolveInfo);
                 foreach ($this->argumentSetTransformers as $transform) {
                     $argumentSet = $transform($argumentSet, $baseResolveInfo);
                 }
 
-                self::$transformedResolveArgs[$path] = [$argumentSet->toArray(), $argumentSet];
+                $args = $argumentSet->toArray();
+
+                self::$transformedResolveArgs[$path] = [$args, $argumentSet];
+            } else {
+                [$args, $argumentSet] = self::$transformedResolveArgs[$path];
             }
 
-            [$args, $argumentSet] = self::$transformedResolveArgs[$path];
-            $resolveInfo = new ResolveInfo($baseResolveInfo, $argumentSet);
-            $resolveInfo->argumentSet = $argumentSet;
-
-            return ($resolver)($root, $args, $context, $resolveInfo);
+            return ($resolver)($root, $args, $context, new ResolveInfo($baseResolveInfo, $argumentSet));
         };
     }
 }

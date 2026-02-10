@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Testing;
 
@@ -12,7 +12,7 @@ class RethrowingErrorHandler implements ErrorHandler
 {
     public function __invoke(?Error $error, \Closure $next): ?array
     {
-        if (null === $error) {
+        if ($error === null) {
             return $next(null);
         }
 

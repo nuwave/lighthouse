@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Testing;
 
@@ -7,12 +7,8 @@ use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 
 trait UsesTestSchema
 {
-    /**
-     * The schema that Lighthouse will use.
-     *
-     * @var string
-     */
-    protected $schema;
+    /** The schema that Lighthouse will use. */
+    protected string $schema;
 
     protected function setUpTestSchema(): void
     {
@@ -24,7 +20,7 @@ trait UsesTestSchema
                 }
 
                 return new TestSchemaProvider($this->schema);
-            }
+            },
         );
     }
 }

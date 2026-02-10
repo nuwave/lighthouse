@@ -1,8 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests;
 
-use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 use GraphQL\Error\DebugFlag;
 use GraphQL\Type\Schema;
 use Illuminate\Console\Application as ConsoleApplication;
@@ -11,7 +10,9 @@ use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Redis\RedisServiceProvider;
 use Laravel\Scout\ScoutServiceProvider as LaravelScoutServiceProvider;
+use Nuwave\Lighthouse\Async\AsyncServiceProvider;
 use Nuwave\Lighthouse\Auth\AuthServiceProvider as LighthouseAuthServiceProvider;
+use Nuwave\Lighthouse\Bind\BindServiceProvider;
 use Nuwave\Lighthouse\Cache\CacheServiceProvider;
 use Nuwave\Lighthouse\CacheControl\CacheControlServiceProvider;
 use Nuwave\Lighthouse\GlobalId\GlobalIdServiceProvider;
@@ -26,13 +27,12 @@ use Nuwave\Lighthouse\Testing\MocksResolvers;
 use Nuwave\Lighthouse\Testing\TestingServiceProvider;
 use Nuwave\Lighthouse\Testing\UsesTestSchema;
 use Nuwave\Lighthouse\Validation\ValidationServiceProvider;
-use Orchestra\Testbench\TestCase as BaseTestCase;
+use Orchestra\Testbench\TestCase as TestbenchTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use Tests\Utils\Policies\AuthServiceProvider;
 
-abstract class TestCase extends BaseTestCase
+abstract class TestCase extends TestbenchTestCase
 {
-    use ArraySubsetAsserts;
     use MakesGraphQLRequests;
     use MocksResolvers;
     use UsesTestSchema;
@@ -44,32 +44,30 @@ abstract class TestCase extends BaseTestCase
      */
     protected $app;
 
-    /**
-     * A dummy query type definition that is added to tests by default.
-     */
+    /** A dummy query type definition that is added to tests by default. */
     public const PLACEHOLDER_QUERY = /** @lang GraphQL */ <<<'GRAPHQL'
-type Query {
-  foo: Int
-}
+    type Query {
+      foo: Int
+    }
+    GRAPHQL;
 
-GRAPHQL;
-
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         // This default is only valid for testing Lighthouse itself and thus
         // is not defined in the reusable test trait.
-        if (! isset($this->schema)) {
-            $this->schema = self::PLACEHOLDER_QUERY;
-        }
-
+        $this->schema ??= self::PLACEHOLDER_QUERY;
         $this->setUpTestSchema();
+
+        // Using qualifyTestResolver() requires instantiation of the test class through the container.
+        // https://laravel.com/docs/container#binding-primitives
+        $this->app->when(static::class)
+            ->needs('$name')
+            ->give('TestName');
     }
 
-    /**
-     * @return array<class-string<\Illuminate\Support\ServiceProvider>>
-     */
+    /** @return array<class-string<\Illuminate\Support\ServiceProvider>> */
     protected function getPackageProviders($app): array
     {
         return [
@@ -79,7 +77,9 @@ GRAPHQL;
 
             // Lighthouse's own
             LighthouseServiceProvider::class,
+            AsyncServiceProvider::class,
             LighthouseAuthServiceProvider::class,
+            BindServiceProvider::class,
             CacheServiceProvider::class,
             CacheControlServiceProvider::class,
             GlobalIdServiceProvider::class,
@@ -111,6 +111,9 @@ GRAPHQL;
             'subscriptions' => [
                 'Tests\\Utils\\Subscriptions',
             ],
+            'types' => [
+                'Tests\\Utils\\Types',
+            ],
             'interfaces' => [
                 'Tests\\Utils\\Interfaces',
                 'Tests\\Utils\\InterfacesSecondary',
@@ -137,10 +140,10 @@ GRAPHQL;
             DebugFlag::INCLUDE_DEBUG_MESSAGE
             | DebugFlag::INCLUDE_TRACE
             // | Debug::RETHROW_INTERNAL_EXCEPTIONS
-            | DebugFlag::RETHROW_UNSAFE_EXCEPTIONS
+            | DebugFlag::RETHROW_UNSAFE_EXCEPTIONS,
         );
 
-        $config->set('lighthouse.guard', null);
+        $config->set('lighthouse.guards', null);
 
         $config->set('lighthouse.subscriptions', [
             'version' => 1,
@@ -167,6 +170,8 @@ GRAPHQL;
             'prefix' => 'lighthouse-test-',
         ]);
 
+        $config->set('pennant.default', 'array');
+
         // Defaults to "algolia", which is not needed in our test setup
         $config->set('scout.driver', null);
 
@@ -174,7 +179,7 @@ GRAPHQL;
             'entities_resolver_namespace' => 'Tests\\Utils\\Entities',
         ]);
 
-        $config->set('lighthouse.cache.enable', false);
+        $config->set('lighthouse.schema_cache.enable', false);
     }
 
     /**
@@ -185,24 +190,18 @@ GRAPHQL;
      */
     protected function resolveApplicationExceptionHandler($app): void
     {
-        $app->singleton(ExceptionHandler::class, function () {
-            return new ThrowingExceptionHandler();
-        });
+        $app->singleton(ExceptionHandler::class, static fn (): ThrowingExceptionHandler => new ThrowingExceptionHandler());
     }
 
-    /**
-     * Build an executable schema from a SDL string, adding on a default Query type.
-     */
+    /** Build an executable schema from a SDL string, adding on a default Query type. */
     protected function buildSchemaWithPlaceholderQuery(string $schema): Schema
     {
         return $this->buildSchema(
-            $schema . self::PLACEHOLDER_QUERY
+            $schema . self::PLACEHOLDER_QUERY,
         );
     }
 
-    /**
-     * Build an executable schema from an SDL string.
-     */
+    /** Build an executable schema from an SDL string. */
     protected function buildSchema(string $schema): Schema
     {
         $this->schema = $schema;
@@ -212,12 +211,24 @@ GRAPHQL;
         return $schemaBuilder->schema();
     }
 
-    /**
-     * Get a fully qualified reference to a method that is defined on the test class.
-     */
-    protected function qualifyTestResolver(string $method): string
+    /** Assert that SDL contains the given string, accounting for different forward slash escaping - see https://github.com/webonyx/graphql-php/releases/tag/v15.22.2. */
+    protected function assertSdlContainsString(string $expected, string $sdl): void
     {
-        return addslashes(static::class) . '@' . $method;
+        // Try both the original string and the escaped version
+        $escapedExpected = str_replace('/', '\/', $expected);
+
+        $this->assertTrue(
+            str_contains($sdl, $expected) || str_contains($sdl, $escapedExpected),
+            "SDL does not contain expected string. Expected either:\n- {$expected}\n- {$escapedExpected}\n\nActual SDL:\n{$sdl}",
+        );
+    }
+
+    /** Get a fully qualified reference to a method that is defined on the test class. */
+    protected static function qualifyTestResolver(string $method): string
+    {
+        $escapedClass = addslashes(static::class);
+
+        return "{$escapedClass}@{$method}";
     }
 
     protected function commandTester(Command $command): CommandTester

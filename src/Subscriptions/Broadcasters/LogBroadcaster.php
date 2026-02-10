@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Subscriptions\Broadcasters;
 
@@ -11,26 +11,20 @@ use Nuwave\Lighthouse\Subscriptions\Subscriber;
 class LogBroadcaster implements Broadcaster
 {
     /**
-     * The user-defined configuration options.
-     *
-     * @var array<string, mixed>
-     */
-    protected $config = [];
-
-    /**
      * A map from channel names to data.
      *
      * @var array<string, mixed>
      */
-    protected $broadcasts = [];
+    protected array $broadcasts = [];
 
-    /**
-     * @param  array<string, mixed>  $config
-     */
-    public function __construct(array $config = [])
-    {
-        $this->config = $config;
-    }
+    public function __construct(
+        /**
+         * The user-defined configuration options.
+         *
+         * @var array<string, mixed> $config
+         */
+        protected array $config = [],
+    ) {}
 
     public function authorized(Request $request): JsonResponse
     {
@@ -53,15 +47,13 @@ class LogBroadcaster implements Broadcaster
         ], 200);
     }
 
-    public function broadcast(Subscriber $subscriber, $data): void
+    public function broadcast(Subscriber $subscriber, mixed $data): void
     {
         $this->broadcasts[$subscriber->channel] = $data;
     }
 
-    /**
-     * @return mixed The data that is being broadcast
-     */
-    public function broadcasts(?string $key = null)
+    /** @return mixed The data that is being broadcast */
+    public function broadcasts(?string $key = null): mixed
     {
         return Arr::get($this->broadcasts, $key);
     }

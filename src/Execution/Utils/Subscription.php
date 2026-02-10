@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Execution\Utils;
 
@@ -10,12 +10,8 @@ use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry;
 
 class Subscription
 {
-    /**
-     * Broadcast subscription to client(s).
-     *
-     * @throws \InvalidArgumentException
-     */
-    public static function broadcast(string $subscriptionField, $root, ?bool $shouldQueue = null): void
+    /** Broadcast subscription to client(s). */
+    public static function broadcast(string $subscriptionField, mixed $root, ?bool $shouldQueue = null): void
     {
         // Ensure we have a schema and registered subscription fields
         // in the event we are calling this method in code.
@@ -28,7 +24,7 @@ class Subscription
         }
 
         // Default to the configuration setting if not specified
-        if (null === $shouldQueue) {
+        if ($shouldQueue === null) {
             $shouldQueue = config('lighthouse.subscriptions.queue_broadcasts', false);
         }
 
@@ -41,9 +37,9 @@ class Subscription
             } else {
                 $broadcaster->broadcast($subscription, $subscriptionField, $root);
             }
-        } catch (\Throwable $e) {
+        } catch (\Throwable $throwable) {
             $exceptionHandler = Container::getInstance()->make(SubscriptionExceptionHandler::class);
-            $exceptionHandler->handleBroadcastError($e);
+            $exceptionHandler->handleBroadcastError($throwable);
         }
     }
 }

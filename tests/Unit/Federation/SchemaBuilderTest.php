@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Federation;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Schema;
-use Nuwave\Lighthouse\Exceptions\FederationException;
+use Nuwave\Lighthouse\Federation\FederationException;
 use Nuwave\Lighthouse\Federation\FederationServiceProvider;
 use Tests\TestCase;
 
@@ -14,13 +14,13 @@ final class SchemaBuilderTest extends TestCase
     {
         return array_merge(
             parent::getPackageProviders($app),
-            [FederationServiceProvider::class]
+            [FederationServiceProvider::class],
         );
     }
 
     public function testFederatedSchema(): void
     {
-        $schema = $this->buildSchema(/** @lang GraphQL */ '
+        $schema = $this->buildSchema(/** @lang GraphQL */ <<<'GRAPHQL'
         type Foo @key(fields: "id") {
             id: ID!
             foo: String!
@@ -29,7 +29,7 @@ final class SchemaBuilderTest extends TestCase
         type Query {
             foo: Int
         }
-        ');
+        GRAPHQL);
 
         $this->assertTrue($schema->hasType('_Entity'));
         $this->assertTrue($schema->hasType('_Service'));
@@ -42,17 +42,17 @@ final class SchemaBuilderTest extends TestCase
 
     public function testAddsQueryTypeIfNotDefined(): void
     {
-        $schema = $this->buildSchema(/** @lang GraphQL */ '
+        $schema = $this->buildSchema(/** @lang GraphQL */ <<<'GRAPHQL'
         type Foo @key(fields: "id") {
             id: ID!
             foo: String!
         }
-        ');
+        GRAPHQL);
 
         $this->assertSchemaHasQueryTypeWithFederationFields($schema);
     }
 
-    protected function assertSchemaHasQueryTypeWithFederationFields(Schema $schema): void
+    private function assertSchemaHasQueryTypeWithFederationFields(Schema $schema): void
     {
         $queryType = $schema->getQueryType();
         $this->assertInstanceOf(ObjectType::class, $queryType);
@@ -64,8 +64,9 @@ final class SchemaBuilderTest extends TestCase
     /**
      * At least one type needs to be defined with the @key directive.
      *
-     * We could also just don't add the type definition below if no entities match. So the user is responsible
-     * by himself to ad the _Entity union. In this case GraphQL itself will throw an exception if the union is missing.
+     * We could also just not add the type definition below if no entities match,
+     * so the user themselves is responsible to add the _Entity union.
+     * In this case, GraphQL validation will throw an exception if the union is missing.
      */
     public function testThrowsIfNoTypeHasKeyDirective(): void
     {

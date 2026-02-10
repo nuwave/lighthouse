@@ -1,14 +1,20 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Testing;
 
 use GraphQL\Error\ClientAware;
+use Illuminate\Container\Container;
+use Illuminate\Support\Arr;
 use Illuminate\Testing\TestResponse;
+use Mockery\LegacyMockInterface;
+use Mockery\MockInterface;
+use Nuwave\Lighthouse\Subscriptions\BroadcastDriverManager;
+use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
+use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @mixin \Illuminate\Testing\TestResponse
- */
+/** @mixin \Illuminate\Testing\TestResponse<*> */
 class TestResponseMixin
 {
     public function assertGraphQLValidationError(): \Closure
@@ -20,13 +26,13 @@ class TestResponseMixin
             Assert::assertArrayHasKey(
                 $key,
                 $validation,
-                "Expected the query to return validation errors for field `{$key}`."
+                "Expected the query to return validation errors for field `{$key}`.",
             );
 
             Assert::assertContains(
                 $message,
                 $validation[$key],
-                "Expected the query to return validation error message `{$message}` for field `{$key}`."
+                "Expected the query to return validation error message `{$message}` for field `{$key}`.",
             );
 
             return $this;
@@ -42,7 +48,7 @@ class TestResponseMixin
             Assert::assertSame(
                 $keys,
                 array_keys($validation),
-                'Expected the query to return validation errors for specific fields.'
+                'Expected the query to return validation errors for specific fields.',
             );
 
             return $this;
@@ -76,11 +82,9 @@ class TestResponseMixin
             $messages = $this->json('errors.*.message');
 
             Assert::assertIsArray($messages, 'Expected the GraphQL response to contain errors, got none.');
-            Assert::assertContains(
-                $message,
-                $messages,
-                "Expected the GraphQL response to contain error message `{$message}`, got: " . \Safe\json_encode($messages)
-            );
+
+            $messagesString = \Safe\json_encode($messages);
+            Assert::assertContains($message, $messages, "Expected the GraphQL response to contain error message \"{$message}\", got: {$messagesString}.");
 
             return $this;
         };
@@ -92,11 +96,9 @@ class TestResponseMixin
             $messages = $this->json('errors.*.extensions.debugMessage');
 
             Assert::assertIsArray($messages, 'Expected the GraphQL response to contain errors, got none.');
-            Assert::assertContains(
-                $message,
-                $messages,
-                "Expected the GraphQL response to contain debug message `{$message}`, got: " . \Safe\json_encode($messages)
-            );
+
+            $messagesString = \Safe\json_encode($messages);
+            Assert::assertContains($message, $messages, "Expected the GraphQL response to contain debug message \"{$message}\", got: {$messagesString}.");
 
             return $this;
         };
@@ -106,10 +108,98 @@ class TestResponseMixin
     {
         return function (): TestResponse {
             $errors = $this->json('errors');
-            Assert::assertNull(
-                $errors,
-                'Expected the GraphQL response to contain no errors, got: ' . \Safe\json_encode($errors)
-            );
+            $errorsString = \Safe\json_encode($errors);
+            Assert::assertNull($errors, "Expected the GraphQL response to contain no errors, got: {$errorsString}.");
+
+            return $this;
+        };
+    }
+
+    public function assertGraphQLSubscriptionAuthorized(): \Closure
+    {
+        return function (TestCase $testClassInstance): TestResponse {
+            Assert::assertTrue(method_exists($testClassInstance, 'postJson'), 'Expected the given $testClassInstance to use the trait Illuminate\\Foundation\\Testing\\Concerns\\MakesHttpRequests.');
+
+            $testClassInstance
+                // @phpstan-ignore-next-line present in \Illuminate\Foundation\Testing\Concerns\MakesHttpRequests
+                ->postJson('graphql/subscriptions/auth', [
+                    'channel_name' => $this->json('extensions.lighthouse_subscriptions.channel'),
+                ])
+                ->assertSuccessful()
+                ->assertExactJson([
+                    'message' => 'ok',
+                ]);
+
+            return $this;
+        };
+    }
+
+    public function assertGraphQLSubscriptionNotAuthorized(): \Closure
+    {
+        return function (TestCase $testClassInstance): TestResponse {
+            Assert::assertTrue(method_exists($testClassInstance, 'postJson'), 'Expected the given $testClassInstance to use the trait Illuminate\\Foundation\\Testing\\Concerns\\MakesHttpRequests.');
+
+            $testClassInstance
+                // @phpstan-ignore-next-line present in \Illuminate\Foundation\Testing\Concerns\MakesHttpRequests
+                ->postJson('graphql/subscriptions/auth', [
+                    'channel_name' => $this->json('extensions.lighthouse_subscriptions.channel'),
+                ])
+                ->assertForbidden();
+
+            return $this;
+        };
+    }
+
+    public function graphQLSubscriptionMock(): \Closure
+    {
+        return function (): MockInterface {
+            $broadcastDriverManager = Container::getInstance()->make(BroadcastDriverManager::class);
+
+            $broadcastDriver = $broadcastDriverManager->driver();
+            assert($broadcastDriver instanceof Broadcaster && $broadcastDriver instanceof MockInterface);
+
+            return $broadcastDriver;
+        };
+    }
+
+    public function graphQLSubscriptionChannelName(): \Closure
+    {
+        return fn (): string => $this->json('extensions.lighthouse_subscriptions.channel');
+    }
+
+    public function assertGraphQLBroadcasted(): \Closure
+    {
+        return function (array $data): TestResponse {
+            $channel = $this->json('extensions.lighthouse_subscriptions.channel');
+
+            $mock = $this->graphQLSubscriptionMock();
+            assert($mock instanceof LegacyMockInterface); // @phpstan-ignore-line mixins are magical
+
+            $broadcastedData = [];
+            $mock->shouldHaveReceived('broadcast', static function (Subscriber $subscriber, array $data) use ($channel, &$broadcastedData): bool {
+                Assert::assertArrayHasKey('data', $data);
+                if ($channel === $subscriber->channel) {
+                    $broadcastedData[] = Arr::first($data['data']); // @phpstan-ignore argument.templateType
+                }
+
+                return true;
+            });
+
+            Assert::assertEquals($broadcastedData, $data, 'Broadcasted data pattern does not match your expected definition.');
+
+            return $this;
+        };
+    }
+
+    public function assertGraphQLNotBroadcasted(): \Closure
+    {
+        return function (): TestResponse {
+            $channel = $this->json('extensions.lighthouse_subscriptions.channel');
+
+            $mock = $this->graphQLSubscriptionMock();
+            assert($mock instanceof LegacyMockInterface); // @phpstan-ignore-line mixins are magical
+
+            $mock->shouldNotHaveReceived('broadcast', static fn (Subscriber $subscriber, $data): bool => $channel !== $subscriber->channel);
 
             return $this;
         };

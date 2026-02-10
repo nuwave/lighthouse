@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\GlobalId;
 
@@ -13,15 +13,9 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgSan
 {
     public const NAME = 'globalId';
 
-    /**
-     * @var \Nuwave\Lighthouse\GlobalId\GlobalId
-     */
-    protected $globalId;
-
-    public function __construct(GlobalId $globalId)
-    {
-        $this->globalId = $globalId;
-    }
+    public function __construct(
+        protected GlobalId $globalId,
+    ) {}
 
     public static function definition(): string
     {
@@ -67,37 +61,31 @@ GRAPHQL;
         $type = $fieldValue->getParentName();
 
         $fieldValue->resultHandler(
-            fn ($result): ?string => null === $result
-            ? null
-            : $this->globalId->encode($type, $result)
+            fn ($result): ?string => $result === null
+                ? null
+                : $this->globalId->encode($type, $result),
         );
     }
 
     /**
      * Decodes a global id given as an argument.
      *
-     * @param  string|null  $argumentValue
-     *
      * @return string|array{0: string, 1: string}|null
      */
-    public function sanitize($argumentValue)
+    public function sanitize(mixed $argumentValue): string|array|null
     {
-        if (null === $argumentValue) {
+        if ($argumentValue === null) {
             return null;
         }
 
         $decode = $this->directiveArgValue('decode');
-        if (null !== $decode) {
-            switch ($decode) {
-                case 'TYPE':
-                    return $this->globalId->decodeType($argumentValue);
-                case 'ID':
-                    return $this->globalId->decodeID($argumentValue);
-                case 'ARRAY':
-                    return $this->globalId->decode($argumentValue);
-                default:
-                    throw new DefinitionException("The decode argument of the @{$this->name()} directive can only be TYPE, ARRAY or ID, got {$decode}.");
-            }
+        if ($decode !== null) {
+            return match ($decode) {
+                'TYPE' => $this->globalId->decodeType($argumentValue),
+                'ID' => $this->globalId->decodeID($argumentValue),
+                'ARRAY' => $this->globalId->decode($argumentValue),
+                default => throw new DefinitionException("The decode argument of the @{$this->name()} directive can only be TYPE, ARRAY or ID, got {$decode}."),
+            };
         }
 
         return $this->globalId->decode($argumentValue);

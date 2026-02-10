@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Schema\Types;
 
@@ -13,12 +13,9 @@ use Tests\Utils\LaravelEnums\PartiallyDeprecated;
 
 final class LaravelEnumTypeTest extends TestCase
 {
-    /**
-     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
-     */
-    protected $typeRegistry;
+    protected TypeRegistry $typeRegistry;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -76,9 +73,8 @@ enum PartiallyDeprecated {
   "Deprecated with reason"
   DEPRECATED_WITH_REASON @deprecated(reason: "some reason")
 }
-GRAPHQL
-                ,
-                SchemaPrinter::printType($enumType)
+GRAPHQL,
+                SchemaPrinter::printType($enumType),
             );
         } else {
             $this->assertSame(/** @lang GraphQL */ <<<GRAPHQL
@@ -92,35 +88,32 @@ enum PartiallyDeprecated {
   "Deprecated with reason"
   DEPRECATED_WITH_REASON @deprecated(reason: "some reason")
 }
-GRAPHQL
-                ,
-                SchemaPrinter::printType($enumType)
+GRAPHQL,
+                SchemaPrinter::printType($enumType),
             );
         }
     }
 
     public function testReceivesEnumInstanceInternally(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(bar: AOrB): Boolean @mock
         }
-        ';
+        GRAPHQL;
 
         $this->typeRegistry->register(
-            new LaravelEnumType(AOrB::class)
+            new LaravelEnumType(AOrB::class),
         );
 
         $this->mockResolver()
-            ->with(null, new Callback(function (array $args): bool {
-                return $args['bar'] instanceof AOrB;
-            }));
+            ->with(null, new Callback(static fn (array $args): bool => $args['bar'] instanceof AOrB));
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo(bar: A)
         }
-        ');
+        GRAPHQL);
     }
 
     public function testClassDoesNotExist(): void

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
@@ -26,12 +26,8 @@ scalar EnumValue
 GRAPHQL;
     }
 
-    /**
-     * Get the internal value of the enum key.
-     *
-     * @return mixed|null
-     */
-    public function value()
+    /** Get the internal value of the enum key. */
+    public function value(): mixed
     {
         return $this->directiveArgValue('value');
     }

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Utils\Policies;
 
@@ -8,6 +8,6 @@ final class TeamPolicy
 {
     public function onlyTeams(?Team $user): bool
     {
-        return null !== $user;
+        return $user !== null;
     }
 }

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Execution\ModelsLoader;
 
@@ -9,13 +9,13 @@ interface ModelsLoader
 {
     /**
      * Load the result onto the given parent models.
+     *
+     * @template TModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Collection<array-key, TModel>  $parents
      */
     public function load(EloquentCollection $parents): void;
 
-    /**
-     * Extract the result of loading from the given model.
-     *
-     * @return mixed Whatever was loaded
-     */
-    public function extract(Model $model);
+    /** Extract the result of loading from the given model. */
+    public function extract(Model $model): mixed;
 }

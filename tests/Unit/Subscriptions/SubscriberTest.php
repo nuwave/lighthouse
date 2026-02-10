@@ -1,20 +1,21 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Subscriptions;
 
 use GraphQL\Language\AST\OperationDefinitionNode;
+use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Http\Request;
+use Nuwave\Lighthouse\Execution\HttpGraphQLContext;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
-use Nuwave\Lighthouse\Schema\Context;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
+use Tests\EnablesSubscriptionServiceProvider;
 use Tests\TestCase;
 use Tests\TestsSerialization;
-use Tests\TestsSubscriptions;
 
 final class SubscriberTest extends TestCase
 {
     use TestsSerialization;
-    use TestsSubscriptions;
+    use EnablesSubscriptionServiceProvider;
 
     protected function getEnvironmentSetUp($app): void
     {
@@ -28,23 +29,66 @@ final class SubscriberTest extends TestCase
     {
         $args = ['foo' => 'bar'];
 
-        $resolveInfo = $this->createMock(ResolveInfo::class);
+        $resolveInfo = $this->createStub(ResolveInfo::class);
         $fieldName = 'baz';
         $resolveInfo->fieldName = $fieldName;
+
         $resolveInfo->operation = new OperationDefinitionNode([]);
         $resolveInfo->fragments = [];
-        $context = new Context(new Request());
+
+        $context = new HttpGraphQLContext(new Request());
 
         $subscriber = new Subscriber($args, $context, $resolveInfo);
+
         $topic = 'topic';
         $subscriber->topic = $topic;
 
+        $channel = $subscriber->channel;
+
         $serialized = unserialize(serialize($subscriber));
 
-        assert($serialized instanceof Subscriber);
+        $this->assertInstanceOf(Subscriber::class, $serialized);
         $this->assertSame($args, $serialized->args);
-        $this->assertNotNull($serialized->channel);
+        $this->assertSame($channel, $serialized->channel);
         $this->assertSame($topic, $serialized->topic);
         $this->assertSame($fieldName, $serialized->fieldName);
+    }
+
+    public function testEncryptedChannels(): void
+    {
+        $args = ['foo' => 'bar'];
+
+        $resolveInfo = $this->createStub(ResolveInfo::class);
+        $fieldName = 'baz';
+        $resolveInfo->fieldName = $fieldName;
+
+        $resolveInfo->operation = new OperationDefinitionNode([]);
+        $resolveInfo->fragments = [];
+
+        $context = new HttpGraphQLContext(new Request());
+
+        $config = $this->app->make(ConfigRepository::class);
+
+        $config->set('lighthouse.subscriptions.encrypted_channels', true);
+
+        $encryptedSubscriber = new Subscriber($args, $context, $resolveInfo);
+
+        $topic = 'topic';
+        $encryptedSubscriber->topic = $topic;
+
+        $channel = $encryptedSubscriber->channel;
+
+        $this->assertStringStartsWith('private-encrypted-lighthouse-', $channel);
+
+        $config->set('lighthouse.subscriptions.encrypted_channels', false);
+
+        $encryptedSubscriber = new Subscriber($args, $context, $resolveInfo);
+
+        $topic = 'topic';
+        $encryptedSubscriber->topic = $topic;
+
+        $channel = $encryptedSubscriber->channel;
+
+        $this->assertStringStartsWith('private-lighthouse-', $channel);
     }
 }

@@ -1,8 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Scout;
 
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Laravel\Scout\Builder as ScoutBuilder;
 use Laravel\Scout\Searchable;
 use Nuwave\Lighthouse\Execution\Arguments\Argument;
@@ -10,53 +12,45 @@ use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Utils;
 
+/**
+ * @template TModel of \Illuminate\Database\Eloquent\Model
+ */
 class ScoutEnhancer
 {
-    /**
-     * @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet
-     */
-    protected $argumentSet;
-
-    /**
-     * @var \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation|\Laravel\Scout\Builder
-     */
-    protected $builder;
-
     /**
      * Provide the actual search value.
      *
      * @var array<Argument>
      */
-    protected $searchArguments = [];
+    protected array $searchArguments = [];
 
     /**
      * Should not be there when @search is used.
      *
      * @var array<Argument>
      */
-    protected $argumentsWithOnlyArgBuilders = [];
+    protected array $argumentsWithOnlyArgBuilders = [];
 
     /**
      * Can enhance the scout builders.
      *
      * @var array<Argument>
      */
-    protected $argumentsWithScoutBuilderDirectives = [];
+    protected array $argumentsWithScoutBuilderDirectives = [];
 
-    /**
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation|\Laravel\Scout\Builder  $builder
-     */
-    public function __construct(ArgumentSet $argumentSet, object $builder)
-    {
-        $this->argumentSet = $argumentSet;
-        $this->builder = $builder;
-
+    public function __construct(
+        protected ArgumentSet $argumentSet,
+        /**
+         * @var \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<TModel>|\Illuminate\Database\Eloquent\Relations\Relation<TModel>|\Laravel\Scout\Builder $builder
+         */
+        protected QueryBuilder|EloquentBuilder|Relation|ScoutBuilder $builder,
+    ) {
         $this->gather($this->argumentSet);
     }
 
     public function hasSearchArguments(): bool
     {
-        return count($this->searchArguments) > 0;
+        return $this->searchArguments !== [];
     }
 
     public function canEnhanceBuilder(): bool
@@ -70,19 +64,25 @@ class ScoutEnhancer
         return $this->hasSearchArguments();
     }
 
-    public function enhanceBuilder(): ScoutBuilder
+    /** @param  (callable(\Nuwave\Lighthouse\Scout\ScoutBuilderDirective): bool)|null  $directiveFilter */
+    public function enhanceBuilder(?callable $directiveFilter = null): ScoutBuilder
     {
         $scoutBuilder = $this->builder instanceof ScoutBuilder
             ? $this->builder
             : $this->enhanceEloquentBuilder();
 
         foreach ($this->argumentsWithScoutBuilderDirectives as $argument) {
-            $scoutBuilderDirective = $argument
-                ->directives
-                ->first(Utils::instanceofMatcher(ScoutBuilderDirective::class));
-            assert($scoutBuilderDirective instanceof ScoutBuilderDirective);
+            foreach ($argument->directives as $directive) {
+                if (! $directive instanceof ScoutBuilderDirective) {
+                    continue;
+                }
 
-            $scoutBuilderDirective->handleScoutBuilder($scoutBuilder, $argument->toPlain());
+                if ($directiveFilter !== null && ! $directiveFilter($directive)) {
+                    continue;
+                }
+
+                $directive->handleScoutBuilder($scoutBuilder, $argument->toPlain());
+            }
         }
 
         return $scoutBuilder;
@@ -116,12 +116,12 @@ class ScoutEnhancer
             }
 
             Utils::applyEach(
-                function ($value) {
+                function ($value): void {
                     if ($value instanceof ArgumentSet) {
                         $this->gather($value);
                     }
                 },
-                $argument->value
+                $argument->value,
             );
         }
     }
@@ -131,22 +131,24 @@ class ScoutEnhancer
         if (count($this->searchArguments) > 1) {
             throw new ScoutException('Found more than 1 argument with @search.');
         }
+
         $searchArgument = $this->searchArguments[0];
 
-        if (count($this->argumentsWithOnlyArgBuilders) > 0) {
+        if ($this->argumentsWithOnlyArgBuilders !== []) {
             throw new ScoutException('Found arg builder arguments that do not work with @search.');
         }
 
         if (! $this->builder instanceof EloquentBuilder) {
             $eloquentBuilderClass = EloquentBuilder::class;
-            $thisBuilderClass = get_class($this->builder);
+            $thisBuilderClass = $this->builder::class;
             throw new ScoutException("Can only get Model from {$eloquentBuilderClass}, got: {$thisBuilderClass}.");
         }
+
         $model = $this->builder->getModel();
 
         $searchableTraitClass = Searchable::class;
         if (! Utils::classUsesTrait($model, $searchableTraitClass)) {
-            $modelClass = get_class($model);
+            $modelClass = $model::class;
             throw new ScoutException("Model class {$modelClass} does not implement trait {$searchableTraitClass}.");
         }
 

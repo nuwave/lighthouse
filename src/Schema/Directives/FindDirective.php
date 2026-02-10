@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
@@ -34,7 +34,7 @@ GRAPHQL;
 
     public function resolveField(FieldValue $fieldValue): callable
     {
-        return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ?Model {
+        return function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ?Model {
             $results = $resolveInfo
                 ->enhanceBuilder(
                     $this->getModelClass()::query(),
@@ -42,7 +42,7 @@ GRAPHQL;
                     $root,
                     $args,
                     $context,
-                    $resolveInfo
+                    $resolveInfo,
                 )
                 ->get();
 
@@ -50,7 +50,7 @@ GRAPHQL;
                 throw new Error('The query returned more than one result.');
             }
 
-            return $results->first();
+            return $results->first(); // @phpstan-ignore return.type (generic of Builder type is erased through enhanceBuilder)
         };
     }
 }

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
@@ -13,33 +13,14 @@ class BroadcastSubscriptionJob implements ShouldQueue
     use Queueable;
     use SerializesModels;
 
-    /**
-     * The subscription field that was requested.
-     *
-     * @var \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription
-     */
-    public $subscription;
-
-    /**
-     * The name of the field.
-     *
-     * @var string
-     */
-    public $fieldName;
-
-    /**
-     * The root element to be passed when resolving the subscription.
-     *
-     * @var mixed user defined
-     */
-    public $root;
-
-    public function __construct(GraphQLSubscription $subscription, string $fieldName, $root)
-    {
-        $this->subscription = $subscription;
-        $this->fieldName = $fieldName;
-        $this->root = $root;
-    }
+    public function __construct(
+        /** The subscription field that was requested. */
+        public GraphQLSubscription $subscription,
+        /** The name of the field. */
+        public string $fieldName,
+        /** The root element to be passed when resolving the subscription. */
+        public mixed $root,
+    ) {}
 
     public function handle(BroadcastsSubscriptions $broadcaster): void
     {

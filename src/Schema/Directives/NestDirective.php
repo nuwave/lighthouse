@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
@@ -23,18 +23,15 @@ GRAPHQL;
     /**
      * Delegate to nested arg resolvers.
      *
-     * @param  mixed  $root  the result of the parent resolver
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>  $args  the slice of arguments that belongs to this nested resolver
      */
-    public function __invoke($root, $args)
+    public function __invoke(mixed $root, $args): mixed
     {
         $resolveNested = new ResolveNested();
 
         return Utils::mapEach(
-            static function (ArgumentSet $argumentSet) use ($resolveNested, $root) {
-                return $resolveNested($root, $argumentSet);
-            },
-            $args
+            static fn (ArgumentSet $argumentSet): mixed => $resolveNested($root, $argumentSet),
+            $args,
         );
     }
 }

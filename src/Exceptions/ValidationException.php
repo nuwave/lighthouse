@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Exceptions;
 
@@ -11,24 +11,16 @@ class ValidationException extends \Exception implements ClientAware, ProvidesExt
 {
     public const KEY = 'validation';
 
-    /**
-     * @var \Illuminate\Contracts\Validation\Validator
-     */
-    protected $validator;
-
-    public function __construct(string $message, Validator $validator)
-    {
+    public function __construct(
+        string $message,
+        protected Validator $validator,
+    ) {
         parent::__construct($message);
-
-        $this->validator = $validator;
     }
 
     public static function fromLaravel(LaravelValidationException $laravelException): self
     {
-        return new static(
-            $laravelException->getMessage(),
-            $laravelException->validator
-        );
+        return new static($laravelException->getMessage(), $laravelException->validator);
     }
 
     /**
@@ -41,7 +33,7 @@ class ValidationException extends \Exception implements ClientAware, ProvidesExt
     public static function withMessages(array $messages): self
     {
         return static::fromLaravel(
-            LaravelValidationException::withMessages($messages)
+            LaravelValidationException::withMessages($messages),
         );
     }
 
@@ -50,9 +42,7 @@ class ValidationException extends \Exception implements ClientAware, ProvidesExt
         return true;
     }
 
-    /**
-     * @return array{validation: array<string, array<int, string>>}
-     */
+    /** @return array{validation: array<string, array<int, string>>} */
     public function getExtensions(): array
     {
         return [

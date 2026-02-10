@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration;
 
@@ -31,11 +31,11 @@ final class RouteRegistrationTest extends TestCase
         $routes = $router->getRoutes();
 
         $graphqlRoute = $routes->getByName('graphql');
-        assert($graphqlRoute instanceof Route);
+        $this->assertInstanceOf(Route::class, $graphqlRoute);
 
-        $this->assertEquals(
+        $this->assertSame(
             ['GET', 'POST', 'HEAD'],
-            $graphqlRoute->methods()
+            $graphqlRoute->methods(),
         );
         $this->assertSame('foo', $graphqlRoute->getPrefix());
     }

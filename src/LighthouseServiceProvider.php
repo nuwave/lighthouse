@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse;
 
@@ -7,17 +7,17 @@ use GraphQL\Error\Error;
 use GraphQL\Error\ProvidesExtensions;
 use GraphQL\Executor\ExecutionResult;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
-use Illuminate\Foundation\Application as LaravelApplication;
+use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
-use Laravel\Lumen\Application as LumenApplication;
 use Nuwave\Lighthouse\Console\CacheCommand;
 use Nuwave\Lighthouse\Console\ClearCacheCommand;
+use Nuwave\Lighthouse\Console\ClearQueryCacheCommand;
+use Nuwave\Lighthouse\Console\ClearSchemaCacheCommand;
 use Nuwave\Lighthouse\Console\DirectiveCommand;
+use Nuwave\Lighthouse\Console\FieldCommand;
 use Nuwave\Lighthouse\Console\IdeHelperCommand;
 use Nuwave\Lighthouse\Console\InterfaceCommand;
 use Nuwave\Lighthouse\Console\MutationCommand;
@@ -28,10 +28,13 @@ use Nuwave\Lighthouse\Console\SubscriptionCommand;
 use Nuwave\Lighthouse\Console\UnionCommand;
 use Nuwave\Lighthouse\Console\ValidateSchemaCommand;
 use Nuwave\Lighthouse\Console\ValidatorCommand;
+use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
+use Nuwave\Lighthouse\Execution\CacheableValidationRulesProvider;
 use Nuwave\Lighthouse\Execution\ContextFactory;
+use Nuwave\Lighthouse\Execution\ContextSerializer;
 use Nuwave\Lighthouse\Execution\ErrorPool;
 use Nuwave\Lighthouse\Execution\SingleResponse;
-use Nuwave\Lighthouse\Execution\ValidationRulesProvider;
+use Nuwave\Lighthouse\Http\Responses\ResponseStream;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\ResolverProvider;
@@ -41,26 +44,24 @@ use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\AppVersion;
-use Nuwave\Lighthouse\Support\Compatibility\LaravelMiddlewareAdapter;
-use Nuwave\Lighthouse\Support\Compatibility\LumenMiddlewareAdapter;
-use Nuwave\Lighthouse\Support\Compatibility\MiddlewareAdapter;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules;
-use Nuwave\Lighthouse\Support\Http\Responses\ResponseStream;
+use Nuwave\Lighthouse\Support\Contracts\SerializesContext;
 
 class LighthouseServiceProvider extends ServiceProvider
 {
-    /**
-     * @var array<int, class-string<\Illuminate\Console\Command>>
-     */
-    public const COMMANDS = [
+    /** @var array<int, class-string<\Illuminate\Console\Command>> */
+    protected const COMMANDS = [
         CacheCommand::class,
         ClearCacheCommand::class,
+        ClearQueryCacheCommand::class,
+        ClearSchemaCacheCommand::class,
         DirectiveCommand::class,
+        FieldCommand::class,
         IdeHelperCommand::class,
         InterfaceCommand::class,
         MutationCommand::class,
@@ -83,89 +84,67 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->app->singleton(DirectiveLocator::class);
         $this->app->singleton(TypeRegistry::class);
         $this->app->singleton(ErrorPool::class);
-        $this->app->singleton(CreatesContext::class, ContextFactory::class);
-        $this->app->singleton(CanStreamResponse::class, ResponseStream::class);
 
+        $this->app->bind(CanStreamResponse::class, ResponseStream::class);
+        $this->app->bind(CreatesContext::class, ContextFactory::class);
+        $this->app->bind(SerializesContext::class, ContextSerializer::class);
         $this->app->bind(CreatesResponse::class, SingleResponse::class);
 
-        $this->app->singleton(SchemaSourceProvider::class, static function (): SchemaStitcher {
-            return new SchemaStitcher(
-                config('lighthouse.schema.register', '')
-            );
-        });
+        $this->app->singleton(SchemaSourceProvider::class, static fn (): SchemaStitcher => new SchemaStitcher(
+            config('lighthouse.schema_path', ''),
+        ));
 
         $this->app->bind(ProvidesResolver::class, ResolverProvider::class);
-        $this->app->bind(ProvidesSubscriptionResolver::class, static function (): ProvidesSubscriptionResolver {
-            return new class() implements ProvidesSubscriptionResolver {
-                public function provideSubscriptionResolver(FieldValue $fieldValue): \Closure
-                {
-                    throw new \Exception(
-                        'Add the SubscriptionServiceProvider to your config/app.php to enable subscriptions.'
-                    );
-                }
-            };
+        $this->app->bind(ProvidesSubscriptionResolver::class, static fn (): ProvidesSubscriptionResolver => new class() implements ProvidesSubscriptionResolver {
+            public function provideSubscriptionResolver(FieldValue $fieldValue): \Closure
+            {
+                throw new \Exception('Register the SubscriptionServiceProvider to enable subscriptions.');
+            }
         });
 
-        $this->app->bind(ProvidesValidationRules::class, ValidationRulesProvider::class);
-
-        $this->app->singleton(MiddlewareAdapter::class, static function (Container $app): MiddlewareAdapter {
-            // prefer using fully-qualified class names here when referring to Laravel-only or Lumen-only classes
-            if ($app instanceof LaravelApplication) {
-                return new LaravelMiddlewareAdapter(
-                    $app->get(Router::class)
-                );
-            }
-
-            if ($app instanceof LumenApplication) {
-                return new LumenMiddlewareAdapter();
-            }
-
-            throw new \Exception(
-                'Could not correctly determine Laravel framework flavor, got ' . get_class($app) . '.'
-            );
-        });
-
-        $this->commands(self::COMMANDS);
+        $this->app->bind(ProvidesValidationRules::class, CacheableValidationRulesProvider::class);
     }
 
-    public function boot(ConfigRepository $configRepository): void
+    public function boot(ConfigRepository $configRepository, EventsDispatcher $dispatcher): void
     {
+        $dispatcher->listen(RegisterDirectiveNamespaces::class, static fn (): string => __NAMESPACE__ . '\\Schema\\Directives');
+
+        $this->commands(self::COMMANDS);
+
         $this->publishes([
             __DIR__ . '/lighthouse.php' => $this->app->configPath() . '/lighthouse.php',
         ], 'lighthouse-config');
 
         $this->publishes([
-            __DIR__ . '/default-schema.graphql' => $configRepository->get('lighthouse.schema.register'),
+            __DIR__ . '/default-schema.graphql' => $configRepository->get('lighthouse.schema_path'),
         ], 'lighthouse-schema');
 
-        $this->loadRoutesFrom(__DIR__ . '/Support/Http/routes.php');
+        $this->loadRoutesFrom(__DIR__ . '/Http/routes.php');
 
         $exceptionHandler = $this->app->make(ExceptionHandlerContract::class);
         // @phpstan-ignore-next-line larastan overly eager assumes this will always be a concrete instance
         if ($exceptionHandler instanceof ExceptionHandler) {
-            $exceptionHandler->renderable(
-                function (ClientAware $error) {
-                    assert($error instanceof \Throwable);
+            $exceptionHandler->renderable(function (ClientAware $error): JsonResponse {
+                assert($error instanceof \Throwable);
 
-                    if (! $error instanceof Error) {
-                        $error = new Error(
-                            $error->getMessage(),
-                            null,
-                            null,
-                            [],
-                            null,
-                            $error,
-                            $error instanceof ProvidesExtensions ? $error->getExtensions() : []
-                        );
-                    }
-
-                    $graphQL = $this->app->make(GraphQL::class);
-                    $executionResult = new ExecutionResult(null, [$error]);
-                    $serializableResult = $graphQL->serializable($executionResult);
-
-                    return new JsonResponse($serializableResult);
+                if (! $error instanceof Error) {
+                    $error = new Error(
+                        $error->getMessage(),
+                        null,
+                        null,
+                        [],
+                        null,
+                        $error,
+                        $error instanceof ProvidesExtensions ? $error->getExtensions() : [],
+                    );
                 }
-            );
+
+                $graphQL = $this->app->make(GraphQL::class);
+                $executionResult = new ExecutionResult(null, [$error]);
+                $serializableResult = $graphQL->toSerializableArray($executionResult);
+
+                return new JsonResponse($serializableResult);
+            });
         }
     }
 

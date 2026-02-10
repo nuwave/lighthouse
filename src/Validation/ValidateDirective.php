@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Validation;
 
@@ -25,17 +25,15 @@ GRAPHQL;
 
     public function handleField(FieldValue $fieldValue): void
     {
-        $fieldValue->addArgumentSetTransformer(function (ArgumentSet $argumentSet, ResolveInfo $resolveInfo): ArgumentSet {
+        $fieldValue->addArgumentSetTransformer(static function (ArgumentSet $argumentSet, ResolveInfo $resolveInfo): ArgumentSet {
             $rulesGatherer = new RulesGatherer($argumentSet);
-
             $validationFactory = Container::getInstance()->make(ValidationFactory::class);
             $validator = $validationFactory->make(
                 $argumentSet->toArray(),
                 $rulesGatherer->rules,
                 $rulesGatherer->messages,
-                $rulesGatherer->attributes
+                $rulesGatherer->attributes,
             );
-
             if ($validator->fails()) {
                 $path = implode('.', $resolveInfo->path);
 

@@ -1,9 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Auth;
 
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective;
@@ -11,15 +13,9 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class WhereAuthDirective extends BaseDirective implements FieldBuilderDirective
 {
-    /**
-     * @var \Illuminate\Contracts\Auth\Factory
-     */
-    protected $authFactory;
-
-    public function __construct(AuthFactory $authFactory)
-    {
-        $this->authFactory = $authFactory;
-    }
+    public function __construct(
+        protected AuthFactory $authFactory,
+    ) {}
 
     public static function definition(): string
     {
@@ -34,33 +30,42 @@ directive @whereAuth(
   relation: String!
 
   """
-  Specify which guard to use, e.g. "api".
+  Specify which guards to use, e.g. ["api"].
   When not defined, the default from `lighthouse.php` is used.
   """
-  guard: String
+  guards: [String!]
 ) on FIELD_DEFINITION
 GRAPHQL;
     }
 
-    public function handleFieldBuilder(object $builder, $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): object
+    public function handleFieldBuilder(QueryBuilder|EloquentBuilder|Relation $builder, mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): QueryBuilder|EloquentBuilder|Relation
     {
         assert($builder instanceof EloquentBuilder);
 
-        // @phpstan-ignore-next-line Mixins are magic
         return $builder->whereHas(
             $this->directiveArgValue('relation'),
-            function (object $query): void {
-                assert($query instanceof EloquentBuilder);
-
-                $guard = $this->directiveArgValue('guard', AuthServiceProvider::guard());
-
-                $userId = $this
-                    ->authFactory
-                    ->guard($guard)
-                    ->id();
-
-                $query->whereKey($userId);
-            }
+            function (EloquentBuilder $query): void {
+                $guards = $this->directiveArgValue('guards', AuthServiceProvider::guards());
+                $query->whereKey($this->authenticatedUserID($guards));
+            },
         );
+    }
+
+    /**
+     * Return the ID of the first logged-in user to any of the given guards.
+     *
+     * @param  array<string>  $guards
+     */
+    protected function authenticatedUserID(array $guards): int|string|null
+    {
+        foreach ($guards as $guard) {
+            $id = $this->authFactory->guard($guard)
+                ->id();
+            if ($id !== null) {
+                return $id;
+            }
+        }
+
+        return null;
     }
 }

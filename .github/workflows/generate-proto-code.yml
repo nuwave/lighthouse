@@ -1,0 +1,32 @@
+name: "Generate proto code"
+on:
+  push:
+    branches:
+      - '*'
+    paths:
+      - '**.proto'
+      - 'buf.gen.yaml'
+
+jobs:
+  generate-proto-code:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
+      - uses: bufbuild/buf-action@v1
+        with:
+          setup_only: true
+
+      - run: |
+          buf generate
+          rm -rf src/Tracing/FederatedTracing/Proto
+          mv proto-tmp/Nuwave/Lighthouse/Tracing/FederatedTracing/Proto src/Tracing/FederatedTracing/Proto
+          rm -rf proto-tmp
+
+      - run: git pull
+
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Apply proto changes

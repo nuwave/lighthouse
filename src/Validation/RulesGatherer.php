@@ -1,8 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Validation;
 
-use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationRuleParser;
@@ -44,9 +43,7 @@ class RulesGatherer
         $this->gatherRulesRecursively($argumentSet, []);
     }
 
-    /**
-     * @param  array<int|string>  $argumentPath
-     */
+    /** @param  array<int|string>  $argumentPath */
     protected function gatherRulesRecursively(ArgumentSet $argumentSet, array $argumentPath): void
     {
         $this->gatherRulesForArgumentSet($argumentSet, $argumentSet->directives, $argumentPath);
@@ -55,20 +52,19 @@ class RulesGatherer
             $nestedPath = array_merge($argumentPath, [$name]);
 
             $directivesForArray = $argument->directives->filter(
-                Utils::instanceofMatcher(ArgDirectiveForArray::class)
+                Utils::instanceofMatcher(ArgDirectiveForArray::class),
             );
             $this->gatherRulesForArgument($argument, $directivesForArray, $nestedPath);
 
             $directivesForArgument = $argument->directives->filter(
-                Utils::instanceofMatcher(ArgDirective::class)
+                Utils::instanceofMatcher(ArgDirective::class),
             );
 
-            if (
-                $argument->type instanceof ListType
-                && is_array($argument->value)
-            ) {
-                foreach ($argument->value as $index => $value) {
-                    $this->handleArgumentValue($value, $directivesForArgument, array_merge($nestedPath, [$index]));
+            if ($argument->type instanceof ListType) {
+                if (is_array($argument->value)) {
+                    foreach ($argument->value as $index => $value) {
+                        $this->handleArgumentValue($value, $directivesForArgument, array_merge($nestedPath, [$index]));
+                    }
                 }
             } else {
                 $this->handleArgumentValue($argument->value, $directivesForArgument, $nestedPath);
@@ -77,7 +73,7 @@ class RulesGatherer
     }
 
     /**
-     * @param  \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive>  $directives
+     * @param  \Illuminate\Support\Collection<int, \Nuwave\Lighthouse\Support\Contracts\Directive>  $directives
      * @param  array<int|string>  $path
      */
     protected function gatherRulesForArgumentSet(ArgumentSet $argumentSet, Collection $directives, array $path): void
@@ -95,11 +91,11 @@ class RulesGatherer
     }
 
     /**
-     * @param  mixed  $value  Any argument value is possible
-     * @param  \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive>  $directives
+     * @param  mixed  $value  any argument value is possible
+     * @param  \Illuminate\Support\Collection<int, \Nuwave\Lighthouse\Support\Contracts\Directive>  $directives
      * @param  array<int|string>  $path
      */
-    protected function gatherRulesForArgument($value, Collection $directives, array $path): void
+    protected function gatherRulesForArgument(mixed $value, Collection $directives, array $path): void
     {
         foreach ($directives as $directive) {
             if ($directive instanceof ArgumentValidation) {
@@ -115,7 +111,7 @@ class RulesGatherer
 
     /**
      * @param  \Nuwave\Lighthouse\Execution\Arguments\Argument|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|mixed  $value
-     * @param  \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive>  $directives
+     * @param  \Illuminate\Support\Collection<int, \Nuwave\Lighthouse\Support\Contracts\Directive>  $directives
      * @param  array<int|string>  $path
      */
     protected function handleArgumentValue($value, Collection $directives, array $path): void
@@ -127,55 +123,49 @@ class RulesGatherer
         }
     }
 
-    /**
-     * @param  array<int|string>  $argumentPath
-     */
+    /** @param  array<int|string>  $argumentPath */
     protected function extractValidationForArgumentSet(ArgumentSetValidation $directive, array $argumentPath): void
     {
         $qualifiedRulesList = array_map(
-            function (array $rules) use ($argumentPath): array {
-                return $this->qualifyArgumentReferences($rules, $argumentPath);
-            },
-            $directive->rules()
+            fn (array $rules): array => $this->qualifyArgumentReferences($rules, $argumentPath),
+            $directive->rules(),
         );
 
         $this->rules = array_merge_recursive(
             $this->rules,
-            $this->wrap($qualifiedRulesList, $argumentPath)
+            $this->wrap($qualifiedRulesList, $argumentPath),
         );
 
         $this->messages += $this->wrap($directive->messages(), $argumentPath);
 
         $this->attributes = array_merge(
             $this->attributes,
-            $this->wrap($directive->attributes(), $argumentPath)
+            $this->wrap($directive->attributes(), $argumentPath),
         );
     }
 
-    /**
-     * @param  array<int|string>  $argumentPath
-     */
+    /** @param  array<int|string>  $argumentPath */
     protected function extractValidationForArgument(ArgumentValidation $directive, array $argumentPath): void
     {
         $qualifiedRules = $this->qualifyArgumentReferences(
             $directive->rules(),
             // The last element is the name of the argument the rule is defined upon.
             // We want the qualified path to start from the parent level.
-            array_slice($argumentPath, 0, -1)
+            array_slice($argumentPath, 0, -1),
         );
 
         $this->rules = array_merge_recursive(
             $this->rules,
-            [implode('.', $argumentPath) => $qualifiedRules]
+            [implode('.', $argumentPath) => $qualifiedRules],
         );
 
         $this->messages += $this->wrap($directive->messages(), $argumentPath);
 
         $attribute = $directive->attribute();
-        if (null !== $attribute) {
+        if ($attribute !== null) {
             $this->attributes = array_merge(
                 $this->attributes,
-                [implode('.', $argumentPath) => $attribute]
+                [implode('.', $argumentPath) => $attribute],
             );
         }
     }
@@ -219,6 +209,7 @@ class RulesGatherer
                 if ($rule instanceof WithReferenceRule) {
                     $rule->setArgumentPath($argumentPath);
                 }
+
                 continue;
             }
 
@@ -233,7 +224,7 @@ class RulesGatherer
             $name = $parsed[0];
             $args = $parsed[1];
 
-            if ('WithReference' === $name) {
+            if ($name === 'WithReference') {
                 $indexes = explode('_', $args[1]);
                 array_splice($args, 1, 1);
                 foreach ($indexes as $index) {
@@ -249,7 +240,7 @@ class RulesGatherer
             }
 
             // Those rule lists are a subset of https://github.com/illuminate/validation/blob/8079fd53dee983e7c52d1819ae3b98c71a64fbc0/Validator.php#L206-L236
-            // using the docs to know which ones reference other fields: https://laravel.com/docs/8.x/validation#available-validation-rules
+            // using the docs to know which ones reference other fields: https://laravel.com/docs/validation#available-validation-rules.
             // We do not handle the Exclude* rules, those mutate the input and are not supported.
 
             // Rules where the first argument is a field reference
@@ -277,10 +268,8 @@ class RulesGatherer
                 'RequiredWithoutAll',
             ])) {
                 $args = array_map(
-                    static function (string $field) use ($argumentPath): string {
-                        return implode('.', array_merge($argumentPath, [$field]));
-                    },
-                    $args
+                    static fn (string $field): string => implode('.', array_merge($argumentPath, [$field])),
+                    $args,
                 );
             }
 
@@ -293,7 +282,7 @@ class RulesGatherer
             ])) {
                 try {
                     Carbon::parse($args[0]);
-                } catch (\Throwable $argumentIsNotADate) {
+                } catch (\Throwable) {
                     $args[0] = implode('.', array_merge($argumentPath, [$args[0]]));
                 }
             }

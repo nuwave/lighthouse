@@ -1,7 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use GraphQL\Deferred;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
@@ -63,9 +64,8 @@ GRAPHQL;
     {
         $modelArg = $this->directiveArgValue('model');
         if (is_string($modelArg)) {
-            return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg): int {
-                $query = $this
-                    ->namespaceModelClass($modelArg)::query();
+            return function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelArg): int {
+                $query = $this->namespaceModelClass($modelArg)::query();
 
                 $this->makeBuilderDecorator($root, $args, $context, $resolveInfo)($query);
 
@@ -84,27 +84,22 @@ GRAPHQL;
 
         $relation = $this->directiveArgValue('relation');
         if (is_string($relation)) {
-            return function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
+            return function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Deferred {
                 $relationBatchLoader = BatchLoaderRegistry::instance(
-                    array_merge(
-                        $this->qualifyPath($args, $resolveInfo),
-                        ['count']
-                    ),
+                    [...$this->qualifyPath($args, $resolveInfo), 'count'],
                     fn (): RelationBatchLoader => new RelationBatchLoader(
-                        new CountModelsLoader($this->relation(), $this->makeBuilderDecorator($parent, $args, $context, $resolveInfo))
-                    )
+                        new CountModelsLoader($this->relation(), $this->makeBuilderDecorator($parent, $args, $context, $resolveInfo)),
+                    ),
                 );
 
                 return $relationBatchLoader->load($parent);
             };
         }
 
-        throw new DefinitionException(
-            "A `model` or `relation` argument must be assigned to the '{$this->name()}' directive on '{$this->nodeName()}'."
-        );
+        throw new DefinitionException("A `model` or `relation` argument must be assigned to the '{$this->name()}' directive on '{$this->nodeName()}'.");
     }
 
-    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType)
+    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType): void
     {
         $this->validateMutuallyExclusiveArguments(['model', 'relation']);
     }

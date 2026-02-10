@@ -1,10 +1,12 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\SoftDeletes;
 
 use GraphQL\Error\Error;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Laravel\Scout\Builder as ScoutBuilder;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Scout\ScoutBuilderDirective;
@@ -24,60 +26,52 @@ directive @trashed on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 GRAPHQL;
     }
 
-    public function handleBuilder($builder, $value): object
+    public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, $value): QueryBuilder|EloquentBuilder|Relation
     {
         if (! $builder instanceof EloquentBuilder) {
-            $notEloquentBuilder = get_class($builder);
+            $notEloquentBuilder = $builder::class;
             throw new \Exception("Can not get model from builder of class: {$notEloquentBuilder}");
         }
 
         $model = $builder->getModel();
         $this->assertModelUsesSoftDeletes($model);
 
-        if (null === $value) {
+        if ($value === null) {
             return $builder;
         }
 
-        /** @see \Illuminate\Database\Eloquent\SoftDeletes */
-        switch ($value) {
-            case 'with':
-                // @phpstan-ignore-next-line because it involves mixins
-                return $builder->withTrashed();
-            case 'only':
-                // @phpstan-ignore-next-line because it involves mixins
-                return $builder->onlyTrashed();
-            case 'without':
-                // @phpstan-ignore-next-line because it involves mixins
-                return $builder->withoutTrashed();
-            default:
-                throw new Error("Unexpected value for Trashed filter: {$value}");
-        }
+        return match ($value) {
+            // @phpstan-ignore-next-line mixin not understood
+            'with' => $builder->withTrashed(),
+            // @phpstan-ignore-next-line mixin not understood
+            'only' => $builder->onlyTrashed(),
+            // @phpstan-ignore-next-line mixin not understood
+            'without' => $builder->withoutTrashed(),
+            default => throw new Error("Unexpected value for Trashed filter: {$value}"),
+        };
     }
 
-    public function handleScoutBuilder(ScoutBuilder $builder, $value): ScoutBuilder
+    public function handleScoutBuilder(ScoutBuilder $builder, mixed $value): ScoutBuilder
     {
         $model = $builder->model;
         $this->assertModelUsesSoftDeletes($model);
 
-        if (null === $value) {
+        if ($value === null) {
             return $builder;
         }
 
-        switch ($value) {
-            case 'with':
-                return $builder->withTrashed();
-            case 'only':
-                return $builder->onlyTrashed();
-            default:
-                throw new Error("Unexpected value for Trashed filter: {$value}");
-        }
+        return match ($value) {
+            'with' => $builder->withTrashed(),
+            'only' => $builder->onlyTrashed(),
+            default => throw new Error("Unexpected value for Trashed filter: {$value}"),
+        };
     }
 
     protected function assertModelUsesSoftDeletes(Model $model): void
     {
         SoftDeletesServiceProvider::assertModelUsesSoftDeletes(
-            get_class($model),
-            self::MODEL_MUST_USE_SOFT_DELETES
+            $model::class,
+            self::MODEL_MUST_USE_SOFT_DELETES,
         );
     }
 }

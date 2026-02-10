@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Events;
 
@@ -14,58 +14,25 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
  */
 class StartExecution
 {
-    /**
-     * The parsed schema.
-     *
-     * @var \GraphQL\Type\Schema
-     */
-    public $schema;
+    /** The point in time when the query execution started. */
+    public Carbon $moment;
 
-    /**
-     * The client given parsed query string.
-     *
-     * @var \GraphQL\Language\AST\DocumentNode
-     */
-    public $query;
-
-    /**
-     * The client given variables, neither validated nor transformed.
-     *
-     * @var array<string, mixed>|null
-     */
-    public $variables;
-
-    /**
-     * The client given operation name.
-     *
-     * @var string|null
-     */
-    public $operationName;
-
-    /**
-     * The context for the operation.
-     *
-     * @var \Nuwave\Lighthouse\Support\Contracts\GraphQLContext
-     */
-    public $context;
-
-    /**
-     * The point in time when the query execution started.
-     *
-     * @var \Illuminate\Support\Carbon
-     */
-    public $moment;
-
-    /**
-     * @param  array<string, mixed>|null  $variables
-     */
-    public function __construct(Schema $schema, DocumentNode $query, ?array $variables, ?string $operationName, GraphQLContext $context)
-    {
-        $this->schema = $schema;
-        $this->query = $query;
-        $this->variables = $variables;
-        $this->operationName = $operationName;
-        $this->context = $context;
+    public function __construct(
+        /** The parsed schema. */
+        public Schema $schema,
+        /** The client given parsed query string. */
+        public DocumentNode $query,
+        /**
+         * The client given variables, neither validated nor transformed.
+         *
+         * @var array<string, mixed>|null
+         */
+        public ?array $variables,
+        /** The client given operation name. */
+        public ?string $operationName,
+        /** The context for the operation. */
+        public GraphQLContext $context,
+    ) {
         $this->moment = Carbon::now();
     }
 }

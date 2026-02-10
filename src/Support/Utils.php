@@ -1,8 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Support;
 
 use Illuminate\Container\Container;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
@@ -31,7 +32,7 @@ class Utils
         }
 
         foreach ($namespacesToTry as $namespace) {
-            $className = $namespace . '\\' . $classCandidate;
+            $className = "{$namespace}\\{$classCandidate}";
 
             if ($determineMatch($className)) {
                 assert(class_exists($className));
@@ -48,8 +49,6 @@ class Utils
      *
      * @param  class-string  $className  this class is resolved through the container
      * @param  string  $methodName  the method that gets passed the arguments of the closure
-     *
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     public static function constructResolver(string $className, string $methodName): \Closure
     {
@@ -68,10 +67,8 @@ class Utils
      *
      * @param  mixed  $object  object with protected member
      * @param  string  $memberName  name of object's protected member
-     *
-     * @return mixed value of object's protected member
      */
-    public static function accessProtected($object, string $memberName)
+    public static function accessProtected(mixed $object, string $memberName): mixed
     {
         $property = new \ReflectionProperty($object, $memberName);
         $property->setAccessible(true);
@@ -85,10 +82,8 @@ class Utils
      * @param  mixed  $object  object with protected method
      * @param  string  $methodName  name of object's protected method
      * @param  array<mixed>  ...$args  zero or more parameters to be passed to the method
-     *
-     * @return mixed result of calling the method
      */
-    public static function callProtected($object, string $methodName, array ...$args)
+    public static function callProtected(mixed $object, string $methodName, array ...$args): mixed
     {
         $property = new \ReflectionMethod($object, $methodName);
         $property->setAccessible(true);
@@ -99,11 +94,12 @@ class Utils
     /**
      * Map a value or each value in an array.
      *
+     * @param  callable(mixed): mixed  $callback
      * @param  mixed|array<mixed>  $valueOrValues
      *
      * @return mixed|array<mixed>
      */
-    public static function mapEach(\Closure $callback, $valueOrValues)
+    public static function mapEach(callable $callback, mixed $valueOrValues): mixed
     {
         if (is_array($valueOrValues)) {
             return array_map($callback, $valueOrValues);
@@ -115,16 +111,18 @@ class Utils
     /**
      * Map a value or each value in an array.
      *
+     * @param  callable(mixed): mixed  $callback
      * @param  mixed|array<mixed>  $valueOrValues
      *
      * @return mixed|array<mixed>
      */
-    public static function mapEachRecursive(\Closure $callback, $valueOrValues)
+    public static function mapEachRecursive(callable $callback, mixed $valueOrValues): mixed
     {
         if (is_array($valueOrValues)) {
-            return array_map(function ($value) use ($callback) {
-                return static::mapEachRecursive($callback, $value);
-            }, $valueOrValues);
+            return array_map(
+                static fn ($value): mixed => static::mapEachRecursive($callback, $value),
+                $valueOrValues,
+            );
         }
 
         return $callback($valueOrValues);
@@ -133,9 +131,10 @@ class Utils
     /**
      * Apply a callback to a value or each value in an iterable.
      *
+     * @param  callable(mixed): mixed  $callback
      * @param  mixed|iterable<mixed>  $valueOrValues
      */
-    public static function applyEach(\Closure $callback, $valueOrValues): void
+    public static function applyEach(callable $callback, mixed $valueOrValues): void
     {
         if (is_iterable($valueOrValues)) {
             foreach ($valueOrValues as $value) {
@@ -153,11 +152,11 @@ class Utils
      *
      * @param  object|class-string  $class
      */
-    public static function classUsesTrait($class, string $trait): bool
+    public static function classUsesTrait(object|string $class, string $trait): bool
     {
         return in_array(
             $trait,
-            class_uses_recursive($class)
+            class_uses_recursive($class),
         );
     }
 
@@ -170,9 +169,7 @@ class Utils
      */
     public static function instanceofMatcher(string $classLike): \Closure
     {
-        return function ($object) use ($classLike): bool {
-            return $object instanceof $classLike;
-        };
+        return static fn (mixed $object): bool => $object instanceof $classLike;
     }
 
     /**
@@ -203,5 +200,23 @@ class Utils
         return preg_match('/^[a-zA-Z_]/', $name)
             ? $name
             : "_{$name}";
+    }
+
+    /**
+     * Write the contents to a file atomically.
+     *
+     * This is done by writing to a temporary file first and then renaming it.
+     *
+     * It circumvents the following issues:
+     * - large files not being written completely before being read
+     * - partial writes from other processes while we expect to read what we wrote
+     */
+    public static function atomicPut(Filesystem $filesystem, string $path, string $contents): void
+    {
+        $randomSuffix = bin2hex(random_bytes(6));
+        $tempPath = "{$path}.{$randomSuffix}";
+
+        $filesystem->put(path: $tempPath, contents: $contents);
+        $filesystem->move(path: $tempPath, target: $path);
     }
 }

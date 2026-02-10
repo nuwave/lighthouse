@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Support\Traits;
 
@@ -20,18 +20,14 @@ use Nuwave\Lighthouse\Support\Utils;
  */
 trait GeneratesColumnsEnum
 {
-    /**
-     * Check whether the directive constrains allowed columns.
-     */
+    /** Check whether the directive constrains allowed columns. */
     protected function hasAllowedColumns(): bool
     {
         $hasColumns = ! is_null($this->directiveArgValue('columns'));
         $hasColumnsEnum = ! is_null($this->directiveArgValue('columnsEnum'));
 
         if ($hasColumns && $hasColumnsEnum) {
-            throw new DefinitionException(
-                "The @{$this->name()} directive can only have one of the following arguments: `columns`, `columnsEnum`."
-            );
+            throw new DefinitionException("The @{$this->name()} directive can only have one of the following arguments: `columns`, `columnsEnum`.");
         }
 
         return $hasColumns || $hasColumnsEnum;
@@ -46,7 +42,7 @@ trait GeneratesColumnsEnum
         DocumentAST &$documentAST,
         InputValueDefinitionNode &$argDefinition,
         FieldDefinitionNode &$parentField,
-        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
     ): string {
         $columnsEnum = $this->directiveArgValue('columnsEnum');
         if (! is_null($columnsEnum)) {
@@ -62,8 +58,8 @@ trait GeneratesColumnsEnum
                     $parentField,
                     $parentType,
                     $this->directiveArgValue('columns'),
-                    $allowedColumnsEnumName
-                )
+                    $allowedColumnsEnumName,
+                ),
             );
 
         return $allowedColumnsEnumName;
@@ -79,7 +75,7 @@ trait GeneratesColumnsEnum
         FieldDefinitionNode &$parentField,
         ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
         array $allowedColumns,
-        string $allowedColumnsEnumName
+        string $allowedColumnsEnumName,
     ): EnumTypeDefinitionNode {
         $enumValues = array_map(
             static function (string $columnName): string {
@@ -89,7 +85,7 @@ trait GeneratesColumnsEnum
 {$enumName} @enum(value: "{$columnName}")
 GRAPHQL;
             },
-            $allowedColumns
+            $allowedColumns,
         );
 
         $enumValuesString = implode("\n", $enumValues);

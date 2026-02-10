@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
@@ -9,6 +9,7 @@ use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry;
@@ -29,20 +30,14 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
 {
     use RelationDirectiveHelpers;
 
-    /**
-     * @var array<string, mixed>
-     */
-    protected $lighthouseConfig;
+    /** @var array<string, mixed> */
+    protected array $lighthouseConfig = [];
 
-    /**
-     * @var \Illuminate\Database\ConnectionResolverInterface
-     */
-    protected $database;
-
-    public function __construct(ConfigRepository $configRepository, ConnectionResolverInterface $database)
-    {
+    public function __construct(
+        protected ConnectionResolverInterface $database,
+        ConfigRepository $configRepository,
+    ) {
         $this->lighthouseConfig = $configRepository->get('lighthouse');
-        $this->database = $database;
     }
 
     public function resolveField(FieldValue $fieldValue): callable
@@ -51,7 +46,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
 
         return function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($relationName) {
             $decorateBuilder = $this->makeBuilderDecorator($parent, $args, $context, $resolveInfo);
-            $paginationArgs = $this->paginationArgs($args);
+            $paginationArgs = $this->paginationArgs($args, $resolveInfo);
 
             $relation = $parent->{$relationName}();
             assert($relation instanceof Relation);
@@ -60,15 +55,26 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
             // that we know to be present on the parent model.
             if (
                 $this->lighthouseConfig['shortcut_foreign_key_selection']
-                && ['id' => true] === $resolveInfo->getFieldSelection()
+                && (array_diff(array_keys($resolveInfo->getFieldSelection()), ['id', '__typename']) === [])
                 && $relation instanceof BelongsTo
-                && [] === $args
+                && $args === []
             ) {
                 $id = $parent->getAttribute($relation->getForeignKeyName());
 
-                return null === $id
-                    ? null
-                    : ['id' => $id];
+                if ($id === null) {
+                    return null;
+                }
+
+                // If the relation is polymorphic, instantiate and hydrate the model instance.
+                // This allows TypeRegistry::typeResolverFallback to resolve the correct type.
+                if ($relation instanceof MorphTo) {
+                    $model = $relation->getModel();
+                    $model->id = $id; // @phpstan-ignore property.notFound (assuming we have an id property, as it is queried through GraphQL)
+
+                    return $model;
+                }
+
+                return ['id' => $id];
             }
 
             if (
@@ -78,11 +84,11 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
             ) {
                 $relationBatchLoader = BatchLoaderRegistry::instance(
                     $this->qualifyPath($args, $resolveInfo),
-                    fn (): RelationBatchLoader => new RelationBatchLoader(
-                        null === $paginationArgs
+                    static fn (): RelationBatchLoader => new RelationBatchLoader(
+                        $paginationArgs === null
                             ? new SimpleModelsLoader($relationName, $decorateBuilder)
-                            : new PaginatedModelsLoader($relationName, $decorateBuilder, $paginationArgs)
-                    )
+                            : new PaginatedModelsLoader($relationName, $decorateBuilder, $paginationArgs),
+                    ),
                 );
 
                 return $relationBatchLoader->load($parent);
@@ -90,7 +96,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
 
             $decorateBuilder($relation);
 
-            return null !== $paginationArgs
+            return $paginationArgs !== null
                 ? $paginationArgs->applyToBuilder($relation)
                 : $relation->getResults();
         };
@@ -99,13 +105,13 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
     public function manipulateFieldDefinition(
         DocumentAST &$documentAST,
         FieldDefinitionNode &$fieldDefinition,
-        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
     ): void {
         $paginationType = $this->paginationType();
 
         // We default to not changing the field if no pagination type is set explicitly.
         // This makes sense for relations, as there should not be too many entries.
-        if (null === $paginationType) {
+        if ($paginationType === null) {
             return;
         }
 
@@ -116,7 +122,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
             try {
                 $modelClass = $this->namespaceModelClass($relatedModelName);
                 $paginationManipulator->setModelClass($modelClass);
-            } catch (DefinitionException $e) {
+            } catch (DefinitionException) {
                 /** @see \Tests\Integration\Schema\Directives\HasManyDirectiveTest::testDoesNotRequireModelClassForPaginatedHasMany() */
             }
         }
@@ -127,19 +133,16 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
             $parentType,
             $this->paginationDefaultCount(),
             $this->paginationMaxCount(),
-            $this->edgeType($documentAST)
+            $this->edgeType($documentAST),
         );
     }
 
-    /**
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
-     */
     protected function edgeType(DocumentAST $documentAST): ?ObjectTypeDefinitionNode
     {
         if ($edgeTypeName = $this->directiveArgValue('edgeType')) {
             $edgeType = $documentAST->types[$edgeTypeName] ?? null;
             if (! $edgeType instanceof ObjectTypeDefinitionNode) {
-                throw new DefinitionException("The edgeType argument on {$this->nodeName()} must reference an existing object type definition.");
+                throw new DefinitionException("The `edgeType` argument of @{$this->name()} on {$this->nodeName()} must reference an existing object type definition.");
             }
 
             return $edgeType;
@@ -148,15 +151,13 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
         return null;
     }
 
-    /**
-     * @param  array<string, mixed>  $args
-     */
-    protected function paginationArgs(array $args): ?PaginationArgs
+    /** @param  array<string, mixed>  $args */
+    protected function paginationArgs(array $args, ResolveInfo $resolveInfo): ?PaginationArgs
     {
         $paginationType = $this->paginationType();
 
-        return null !== $paginationType
-            ? PaginationArgs::extractArgs($args, $paginationType, $this->paginationMaxCount())
+        return $paginationType !== null
+            ? PaginationArgs::extractArgs($args, $resolveInfo, $paginationType, $this->paginationMaxCount())
             : null;
     }
 
@@ -164,7 +165,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
     {
         $type = $this->directiveArgValue('type');
 
-        return null !== $type
+        return $type !== null
             ? new PaginationType($type)
             : null;
     }
@@ -179,6 +180,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
         return $this->directiveArgValue('defaultCount', $this->lighthouseConfig['pagination']['default_count']);
     }
 
+    /** @param  \Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>  $relation */
     protected function isSameConnection(Relation $relation): bool
     {
         $default = $this->database->getDefaultConnection();

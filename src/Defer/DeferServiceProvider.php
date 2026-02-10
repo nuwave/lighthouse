@@ -1,9 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Defer;
 
 use GraphQL\Language\Parser;
-use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
@@ -19,36 +19,19 @@ class DeferServiceProvider extends ServiceProvider
         $this->app->singleton(CreatesResponse::class, Defer::class);
     }
 
-    public function boot(Dispatcher $dispatcher): void
+    public function boot(EventsDispatcher $dispatcher): void
     {
-        $dispatcher->listen(
-            RegisterDirectiveNamespaces::class,
-            static function (): string {
-                return __NAMESPACE__;
-            }
-        );
-
-        $dispatcher->listen(
-            ManipulateAST::class,
-            function (ManipulateAST $manipulateAST): void {
-                $this->handleManipulateAST($manipulateAST);
-            }
-        );
-
-        $dispatcher->listen(
-            StartExecution::class,
-            Defer::class . '@handleStartExecution'
-        );
+        $dispatcher->listen(RegisterDirectiveNamespaces::class, static fn (): string => __NAMESPACE__);
+        $dispatcher->listen(ManipulateAST::class, fn (ManipulateAST $manipulateAST) => $this->handleManipulateAST($manipulateAST));
+        $dispatcher->listen(StartExecution::class, Defer::class . '@handleStartExecution');
     }
 
-    /**
-     * Set the tracing directive on all fields of the query to enable tracing them.
-     */
+    /** Set the tracing directive on all fields of the query to enable tracing them. */
     public function handleManipulateAST(ManipulateAST $manipulateAST): void
     {
         ASTHelper::attachDirectiveToObjectTypeFields(
             $manipulateAST->documentAST,
-            Parser::constDirective(/** @lang GraphQL */ '@deferrable')
+            Parser::constDirective(/** @lang GraphQL */ '@deferrable'),
         );
 
         $manipulateAST->documentAST->setDirectiveDefinition(
@@ -60,7 +43,7 @@ Must not be placed upon:
 - Mutation root fields
 """
 directive @defer(if: Boolean = true) on FIELD
-')
+'),
         );
     }
 }

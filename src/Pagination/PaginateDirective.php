@@ -1,10 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Pagination;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -75,6 +76,13 @@ directive @paginate(
   Setting this to `null` means the count is unrestricted.
   """
   maxCount: Int
+
+  """
+  Reference a function to customize the complexity score calculation.
+  Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
+  """
+  complexityResolver: String
 ) on FIELD_DEFINITION
 
 """
@@ -113,7 +121,7 @@ GRAPHQL;
             $this->getResolverFromArgument('builder');
         } else {
             $paginationManipulator->setModelClass(
-                $this->getModelClass()
+                $this->getModelClass(),
             );
         }
 
@@ -122,35 +130,38 @@ GRAPHQL;
             $fieldDefinition,
             $parentType,
             $this->defaultCount(),
-            $this->paginateMaxCount()
+            $this->paginateMaxCount(),
         );
     }
 
     public function resolveField(FieldValue $fieldValue): callable
     {
-        return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Paginator {
+        return function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Paginator {
+            $paginationArgs = PaginationArgs::extractArgs($args, $resolveInfo, $this->paginationType(), $this->paginateMaxCount());
+
             if ($this->directiveHasArgument('resolver')) {
-                // This is done only for validation
-                PaginationArgs::extractArgs($args, $this->paginationType(), $this->paginateMaxCount());
-
                 $paginator = $this->getResolverFromArgument('resolver')($root, $args, $context, $resolveInfo);
-
                 assert(
                     $paginator instanceof Paginator,
-                    "The method referenced by the resolver argument of the @{$this->name()} directive on {$this->nodeName()} must return a Paginator."
+                    "The method referenced by the resolver argument of the @{$this->name()} directive on {$this->nodeName()} must return a Paginator.",
                 );
+
+                if ($paginationArgs->first === 0) {
+                    if ($paginator instanceof LengthAwarePaginator) {
+                        return new ZeroPerPageLengthAwarePaginator($paginator->total(), $paginationArgs->page);
+                    }
+
+                    return new ZeroPerPagePaginator($paginationArgs->page);
+                }
 
                 return $paginator;
             }
 
             if ($this->directiveHasArgument('builder')) {
-                $builderResolver = $this->getResolverFromArgument('builder');
-
-                $query = $builderResolver($root, $args, $context, $resolveInfo);
-
+                $query = $this->getResolverFromArgument('builder')($root, $args, $context, $resolveInfo);
                 assert(
                     $query instanceof QueryBuilder || $query instanceof EloquentBuilder || $query instanceof ScoutBuilder || $query instanceof Relation,
-                    "The method referenced by the builder argument of the @{$this->name()} directive on {$this->nodeName()} must return a Builder or Relation."
+                    "The method referenced by the builder argument of the @{$this->name()} directive on {$this->nodeName()} must return a Builder or Relation.",
                 );
             } else {
                 $query = $this->getModelClass()::query();
@@ -162,39 +173,17 @@ GRAPHQL;
                 $root,
                 $args,
                 $context,
-                $resolveInfo
+                $resolveInfo,
             );
-
-            $paginationArgs = PaginationArgs::extractArgs($args, $this->paginationType(), $this->paginateMaxCount());
-
-            $paginationArgs->type = $this->optimalPaginationType($resolveInfo);
 
             return $paginationArgs->applyToBuilder($query);
         };
     }
 
-    protected function optimalPaginationType(ResolveInfo $resolveInfo): PaginationType
-    {
-        $type = $this->paginationType();
-
-        // Already the optimal type
-        if ($type->isSimple()) {
-            return $type;
-        }
-
-        // If the page info is not requested, we can save a database query by using
-        // the simple paginator - it does not query total counts.
-        if (! isset($resolveInfo->getFieldSelection()[$type->infoFieldName()])) {
-            return new PaginationType(PaginationType::SIMPLE);
-        }
-
-        return $type;
-    }
-
     protected function paginationType(): PaginationType
     {
         return new PaginationType(
-            $this->directiveArgValue('type', PaginationType::PAGINATOR)
+            $this->directiveArgValue('type', PaginationType::PAGINATOR),
         );
     }
 
@@ -210,15 +199,15 @@ GRAPHQL;
 
     public function complexityResolver(FieldValue $fieldValue): callable
     {
+        if ($this->directiveHasArgument('complexityResolver')) {
+            return $this->getResolverFromArgument('complexityResolver');
+        }
+
         return static function (int $childrenComplexity, array $args): int {
             /**
-             * @see PaginationManipulator::countArgument().
+             * @see PaginationManipulator::countArgument()
              */
-            $first = $args['first'] ?? null;
-
-            $expectedNumberOfChildren = is_int($first)
-                ? $first
-                : 1;
+            $expectedNumberOfChildren = $args['first'] ?? 1;
 
             return
                 // Default complexity for this field itself

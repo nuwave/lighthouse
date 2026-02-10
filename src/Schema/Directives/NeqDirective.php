@@ -1,7 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
 class NeqDirective extends BaseDirective implements ArgBuilderDirective
@@ -10,7 +13,7 @@ class NeqDirective extends BaseDirective implements ArgBuilderDirective
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Use the client given value to add an not-equal conditional to a database query.
+Use the client given value to add a not-equal conditional to a database query.
 """
 directive @neq(
   """
@@ -22,12 +25,12 @@ directive @neq(
 GRAPHQL;
     }
 
-    public function handleBuilder($builder, $value): object
+    public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, $value): QueryBuilder|EloquentBuilder|Relation
     {
         return $builder->where(
             $this->directiveArgValue('key', $this->nodeName()),
             '<>',
-            $value
+            $value,
         );
     }
 }

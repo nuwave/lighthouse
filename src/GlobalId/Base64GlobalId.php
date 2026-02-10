@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\GlobalId;
 
@@ -11,21 +11,21 @@ namespace Nuwave\Lighthouse\GlobalId;
  * 2. Glue them together, separated by a colon, e.g. "User:123"
  * 3. base64_encode the result
  *
- * This can then be reversed to uniquely identify an entity in our
- * schema, just by looking at a single ID.
+ * This can then be reversed to uniquely identify an entity in our schema,
+ * just by looking at a single ID.
  */
 class Base64GlobalId implements GlobalId
 {
-    public function encode(string $type, $id): string
+    public function encode(string $type, int|string $id): string
     {
-        return base64_encode($type . ':' . $id);
+        return base64_encode("{$type}:{$id}");
     }
 
     public function decode(string $globalID): array
     {
         $parts = explode(':', \Safe\base64_decode($globalID));
 
-        if (2 !== count($parts)) {
+        if (count($parts) !== 2) {
             throw new GlobalIdException("Unexpectedly found more then 2 segments when decoding global id: {$globalID}.");
         }
 

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Execution\Arguments;
 
@@ -18,11 +18,11 @@ final class ArgumentSetFactoryTest extends TestCase
 {
     public function testSimpleField(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(bar: Int): Int
         }
-        ';
+        GRAPHQL;
 
         $argumentSet = $this->rootQueryArgumentSet([
             'bar' => 123,
@@ -36,11 +36,11 @@ final class ArgumentSetFactoryTest extends TestCase
 
     public function testNullableList(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(bar: [Int!]): Int
         }
-        ';
+        GRAPHQL;
 
         $argumentSet = $this->rootQueryArgumentSet([
             'bar' => null,
@@ -54,7 +54,7 @@ final class ArgumentSetFactoryTest extends TestCase
 
     public function testItsListsAllTheWayDown(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(bar:
                 # Level 1
@@ -72,7 +72,7 @@ final class ArgumentSetFactoryTest extends TestCase
                 ]
             ): Int
         }
-        ';
+        GRAPHQL;
 
         // Level 1
         $barValue = [
@@ -102,30 +102,30 @@ final class ArgumentSetFactoryTest extends TestCase
         $this->assertSame($barValue, $bar->value);
 
         $firstLevel = $bar->type;
-        assert($firstLevel instanceof ListType);
+        $this->assertInstanceOf(ListType::class, $firstLevel);
         $this->assertFalse($firstLevel->nonNull);
 
         $secondLevel = $firstLevel->type;
-        assert($secondLevel instanceof ListType);
+        $this->assertInstanceOf(ListType::class, $secondLevel);
         $this->assertTrue($secondLevel->nonNull);
 
         $thirdLevel = $secondLevel->type;
-        assert($thirdLevel instanceof ListType);
+        $this->assertInstanceOf(ListType::class, $thirdLevel);
         $this->assertFalse($thirdLevel->nonNull);
 
         $fourthLevel = $thirdLevel->type;
-        assert($fourthLevel instanceof ListType);
+        $this->assertInstanceOf(ListType::class, $fourthLevel);
         $this->assertTrue($fourthLevel->nonNull);
 
         $finalLevel = $fourthLevel->type;
-        assert($finalLevel instanceof NamedType);
+        $this->assertInstanceOf(NamedType::class, $finalLevel);
         $this->assertSame(Type::INT, $finalLevel->name);
         $this->assertFalse($finalLevel->nonNull);
     }
 
     public function testNullableInputObject(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(bar: Bar): Int
         }
@@ -133,7 +133,7 @@ final class ArgumentSetFactoryTest extends TestCase
         input Bar {
             baz: ID
         }
-        ';
+        GRAPHQL;
 
         $argumentSet = $this->rootQueryArgumentSet([
             'bar' => null,
@@ -147,11 +147,11 @@ final class ArgumentSetFactoryTest extends TestCase
 
     public function testWithUndefined(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(bar: ID): Int
         }
-        ';
+        GRAPHQL;
 
         $argumentSet = $this->rootQueryArgumentSet([]);
 
@@ -163,21 +163,19 @@ final class ArgumentSetFactoryTest extends TestCase
         $this->assertNull($bar->value);
     }
 
-    /**
-     * @param  array<string, mixed>  $args
-     */
-    protected function rootQueryArgumentSet(array $args): ArgumentSet
+    /** @param  array<string, mixed>  $args */
+    private function rootQueryArgumentSet(array $args): ArgumentSet
     {
         $astBuilder = $this->app->make(ASTBuilder::class);
         $documentAST = $astBuilder->documentAST();
 
         $queryType = $documentAST->types[RootType::QUERY];
-        assert($queryType instanceof ObjectTypeDefinitionNode);
+        $this->assertInstanceOf(ObjectTypeDefinitionNode::class, $queryType);
 
         $fields = $queryType->fields;
 
         $fooField = ASTHelper::firstByName($fields, 'foo');
-        assert($fooField instanceof FieldDefinitionNode);
+        $this->assertInstanceOf(FieldDefinitionNode::class, $fooField);
 
         $factory = $this->app->make(ArgumentSetFactory::class);
 

@@ -1,26 +1,24 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Support;
 
 use Nuwave\Lighthouse\Support\Utils;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 final class UtilsTest extends TestCase
 {
-    /**
-     * @dataProvider nameToEnumValueName
-     */
+    /** @dataProvider nameToEnumValueName */
+    #[DataProvider('nameToEnumValueName')]
     public function testToEnumValueName(string $name, string $enumValueName): void
     {
         $this->assertSame(
             $enumValueName,
-            Utils::toEnumValueName($name)
+            Utils::toEnumValueName($name),
         );
     }
 
-    /**
-     * @return iterable<array{string, string}>
-     */
+    /** @return iterable<array{string, string}> */
     public static function nameToEnumValueName(): iterable
     {
         yield ['column_name', 'COLUMN_NAME'];

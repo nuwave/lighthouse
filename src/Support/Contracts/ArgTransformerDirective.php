@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Support\Contracts;
 
@@ -11,5 +11,5 @@ interface ArgTransformerDirective extends Directive
      *
      * @return mixed the transformed value
      */
-    public function transform($argumentValue);
+    public function transform(mixed $argumentValue): mixed;
 }

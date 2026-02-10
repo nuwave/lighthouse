@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Events;
 
@@ -11,27 +11,17 @@ use Symfony\Component\HttpFoundation\Response;
  * Can be used for logging or for measuring and monitoring
  * the time a request takes to resolve.
  *
- * @see \Nuwave\Lighthouse\Support\Http\Controllers\GraphQLController
+ * @see \Nuwave\Lighthouse\Http\GraphQLController
  */
 class EndRequest
 {
-    /**
-     * The response that is about to be sent to the client.
-     *
-     * @var \Symfony\Component\HttpFoundation\Response
-     */
-    public $response;
+    /** The point in time when the response was ready. */
+    public Carbon $moment;
 
-    /**
-     * The point in time when the response was ready.
-     *
-     * @var \Illuminate\Support\Carbon
-     */
-    public $moment;
-
-    public function __construct(Response $response)
-    {
-        $this->response = $response;
+    public function __construct(
+        /** The response that is about to be sent to the client. */
+        public Response $response,
+    ) {
         $this->moment = Carbon::now();
     }
 }

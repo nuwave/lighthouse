@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Utils\Unions;
 
@@ -7,26 +7,14 @@ use Nuwave\Lighthouse\Schema\TypeRegistry;
 
 final class CustomStuff
 {
-    /**
-     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
-     */
-    private $typeRegistry;
+    public function __construct(
+        private TypeRegistry $typeRegistry,
+    ) {}
 
-    public function __construct(TypeRegistry $typeRegistry)
+    public function resolveType(mixed $root): Type
     {
-        $this->typeRegistry = $typeRegistry;
-    }
+        $classBasename = class_basename($root);
 
-    /**
-     * Decide which GraphQL type a resolved value has.
-     *
-     * @param  mixed  $rootValue  The value that was resolved by the field. Usually an Eloquent model.
-     */
-    public function resolveType($rootValue): Type
-    {
-        return $this->typeRegistry->get(
-            // Add prefix
-            'Custom' . class_basename($rootValue)
-        );
+        return $this->typeRegistry->get("Custom{$classBasename}");
     }
 }

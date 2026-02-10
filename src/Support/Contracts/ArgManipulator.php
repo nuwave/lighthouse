@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Support\Contracts;
 
@@ -10,15 +10,11 @@ use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 
 interface ArgManipulator extends Directive
 {
-    /**
-     * Manipulate the AST.
-     *
-     * @return void
-     */
+    /** Manipulate the AST. */
     public function manipulateArgDefinition(
         DocumentAST &$documentAST,
         InputValueDefinitionNode &$argDefinition,
         FieldDefinitionNode &$parentField,
-        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType
-    );
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
+    ): void;
 }

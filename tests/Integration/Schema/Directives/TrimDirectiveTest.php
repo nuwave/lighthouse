@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Schema\Directives;
 
@@ -8,19 +8,19 @@ final class TrimDirectiveTest extends TestCase
 {
     public function testTrimsStringArgument(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(bar: String! @trim): String! @mock
         }
-        ';
+        GRAPHQL;
 
-        $this->mockResolver(fn ($_, array $args): string => $args['bar']);
+        $this->mockResolver(static fn ($_, array $args): string => $args['bar']);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo(bar: "    foo     ")
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'foo' => 'foo',
             ],
@@ -29,7 +29,7 @@ final class TrimDirectiveTest extends TestCase
 
     public function testTrimsInputArgument(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         input FooInput {
             bar: String!
         }
@@ -37,17 +37,17 @@ final class TrimDirectiveTest extends TestCase
         type Query {
             foo(input: FooInput! @trim @spread): String! @mock
         }
-        ';
+        GRAPHQL;
 
-        $this->mockResolver(fn ($_, array $args): string => $args['bar']);
+        $this->mockResolver(static fn ($_, array $args): string => $args['bar']);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo(input: {
                 bar: "    foo     "
             })
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'foo' => 'foo',
             ],
@@ -58,7 +58,7 @@ final class TrimDirectiveTest extends TestCase
     {
         $this->mockResolver(static fn ($_, array $args): array => $args);
 
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Foo {
             foo: String!
             bar: [String!]!
@@ -74,9 +74,9 @@ final class TrimDirectiveTest extends TestCase
         type Query {
             foo(input: FooInput! @spread): Foo! @trim @mock
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo(input: {
                 foo: " foo "
@@ -88,7 +88,7 @@ final class TrimDirectiveTest extends TestCase
                 baz
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'foo' => [
                     'foo' => 'foo',

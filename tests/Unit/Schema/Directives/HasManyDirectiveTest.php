@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Schema\Directives;
 
@@ -10,7 +10,7 @@ final class HasManyDirectiveTest extends DBTestCase
 {
     public function testUsesEdgeTypeForRelayConnections(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             tasks: [Task!]! @hasMany (
                 type: CONNECTION
@@ -31,12 +31,12 @@ final class HasManyDirectiveTest extends DBTestCase
         type Query {
             user: User @auth
         }
-        ';
+        GRAPHQL;
 
         $expectedConnectionName = 'TaskEdgeConnection';
 
         $this->assertNotEmpty(
-            $this->introspectType($expectedConnectionName)
+            $this->introspectType($expectedConnectionName),
         );
 
         $user = $this->introspectType('User');
@@ -45,13 +45,11 @@ final class HasManyDirectiveTest extends DBTestCase
         /** @var array<string, mixed> $user */
         $tasks = Arr::first(
             $user['fields'],
-            function (array $field): bool {
-                return 'tasks' === $field['name'];
-            }
+            static fn (array $field): bool => $field['name'] === 'tasks',
         );
         $this->assertSame(
             $expectedConnectionName,
-            $tasks['type']['ofType']['name']
+            $tasks['type']['ofType']['name'] ?? 0,
         );
     }
 
@@ -59,7 +57,7 @@ final class HasManyDirectiveTest extends DBTestCase
     {
         $this->expectExceptionObject(new DefinitionException('Found invalid pagination type: foo'));
 
-        $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
+        $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             tasks(first: Int! after: Int): [Task!]! @hasMany(type: "foo")
         }
@@ -67,6 +65,6 @@ final class HasManyDirectiveTest extends DBTestCase
         type Task {
             foo: String
         }
-        ');
+        GRAPHQL);
     }
 }

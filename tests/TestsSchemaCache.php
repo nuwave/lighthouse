@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests;
 
@@ -10,8 +10,8 @@ trait TestsSchemaCache
     protected function setUpSchemaCache(): void
     {
         $config = $this->app->make(ConfigRepository::class);
-        $config->set('lighthouse.cache.enable', true);
-        $config->set('lighthouse.cache.path', $this->schemaCachePath());
+        $config->set('lighthouse.schema_cache.enable', true);
+        $config->set('lighthouse.schema_cache.path', $this->schemaCachePath());
     }
 
     protected function schemaCachePath(): string
@@ -23,18 +23,5 @@ trait TestsSchemaCache
     {
         $filesystem = $this->app->make(Filesystem::class);
         $filesystem->delete($this->schemaCachePath());
-    }
-
-    /**
-     * Data provider for the different cache versions.
-     *
-     * @return array<int, array{int}>
-     */
-    public static function cacheVersions(): array
-    {
-        return [
-            [1],
-            [2],
-        ];
     }
 }

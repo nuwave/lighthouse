@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Utils\Policies;
 
@@ -9,9 +9,7 @@ use Tests\Utils\Models\User;
 
 final class AuthServiceProvider extends LaravelAuthServiceProvider
 {
-    /**
-     * @var array<class-string<\Illuminate\Database\Eloquent\Model>, class-string>
-     */
+    /** @var array<class-string<\Illuminate\Database\Eloquent\Model>, class-string> */
     protected $policies = [
         User::class => UserPolicy::class,
         Post::class => PostPolicy::class,

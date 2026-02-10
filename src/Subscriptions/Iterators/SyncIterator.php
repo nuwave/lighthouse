@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Subscriptions\Iterators;
 
@@ -7,17 +7,17 @@ use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator;
 
 class SyncIterator implements SubscriptionIterator
 {
-    public function process(Collection $subscribers, \Closure $handleSubscriber, \Closure $handleError = null): void
+    public function process(Collection $subscribers, \Closure $handleSubscriber, ?\Closure $handleError = null): void
     {
         $subscribers->each(static function ($item) use ($handleSubscriber, $handleError): void {
             try {
                 $handleSubscriber($item);
-            } catch (\Exception $e) {
-                if (null === $handleError) {
-                    throw $e;
+            } catch (\Exception $exception) {
+                if ($handleError === null) {
+                    throw $exception;
                 }
 
-                $handleError($e);
+                $handleError($exception);
             }
         });
     }

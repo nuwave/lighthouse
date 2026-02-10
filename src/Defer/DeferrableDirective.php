@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Defer;
 
@@ -17,7 +17,9 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 class DeferrableDirective extends BaseDirective implements FieldMiddleware
 {
     public const THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_ROOT_MUTATION_FIELD = 'The @defer directive cannot be used on a root mutation field.';
+
     public const THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_NON_NULLABLE_FIELD = 'The @defer directive cannot be used on a Non-Nullable field.';
+
     public const DEFER_DIRECTIVE_NAME = 'defer';
 
     public static function definition(): string
@@ -32,15 +34,15 @@ GRAPHQL;
     }
 
     public function __construct(
-        protected Defer $defer
+        protected Defer $defer,
     ) {}
 
     public function handleField(FieldValue $fieldValue): void
     {
         $fieldType = $fieldValue->getField()->type;
 
-        $fieldValue->wrapResolver(fn (callable $resolver) => function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $fieldType) {
-            $wrappedResolver = fn (): mixed => $resolver($root, $args, $context, $resolveInfo);
+        $fieldValue->wrapResolver(fn (callable $resolver): \Closure => function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $fieldType) {
+            $wrappedResolver = static fn (): mixed => $resolver($root, $args, $context, $resolveInfo);
             $path = implode('.', $resolveInfo->path);
 
             if ($this->shouldDefer($fieldType, $resolveInfo)) {
@@ -51,19 +53,16 @@ GRAPHQL;
         });
     }
 
-    /**
-     * Determine if field should be deferred.
-     *
-     * @throws \GraphQL\Error\Error
-     */
+    /** Determine if the field should be deferred. */
     protected function shouldDefer(TypeNode $fieldType, ResolveInfo $resolveInfo): bool
     {
         $defers = (new ClientDirective(self::DEFER_DIRECTIVE_NAME))->forField($resolveInfo);
 
         if ($this->anyFieldHasDefer($defers)) {
-            if (RootType::MUTATION === $resolveInfo->parentType->name) {
+            if ($resolveInfo->parentType->name === RootType::MUTATION) {
                 throw new Error(self::THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_ROOT_MUTATION_FIELD);
             }
+
             if ($fieldType instanceof NonNullTypeNode) {
                 throw new Error(self::THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_NON_NULLABLE_FIELD);
             }
@@ -72,34 +71,26 @@ GRAPHQL;
         // Following the semantics of Apollo:
         // All declarations of a field have to contain @defer for the field to be deferred
         foreach ($defers as $defer) {
-            if (null === $defer || $defer === [Directive::IF_ARGUMENT_NAME => false]) {
+            if ($defer === null || $defer === [Directive::IF_ARGUMENT_NAME => false]) {
                 return false;
             }
         }
 
         $skips = (new ClientDirective(Directive::SKIP_NAME))->forField($resolveInfo);
-        foreach ($skips as $skip) {
-            if ($skip === [Directive::IF_ARGUMENT_NAME => true]) {
-                return false;
-            }
+        if (in_array([Directive::IF_ARGUMENT_NAME => true], $skips, true)) {
+            return false;
         }
 
         $includes = (new ClientDirective(Directive::INCLUDE_NAME))->forField($resolveInfo);
 
-        return ! in_array(
-            [Directive::IF_ARGUMENT_NAME => false],
-            $includes,
-            true
-        );
+        return ! in_array([Directive::IF_ARGUMENT_NAME => false], $includes, true);
     }
 
-    /**
-     * @param  array<array<string, mixed>|null>  $defers
-     */
+    /** @param  array<array<string, mixed>|null>  $defers */
     protected function anyFieldHasDefer(array $defers): bool
     {
         foreach ($defers as $defer) {
-            if (null !== $defer) {
+            if ($defer !== null) {
                 return true;
             }
         }

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
@@ -34,14 +34,14 @@ GRAPHQL;
 
     public function resolveField(FieldValue $fieldValue): callable
     {
-        return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ?Model {
+        return function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ?Model {
             $builder = $resolveInfo->enhanceBuilder(
                 $this->getModelClass()::query(),
                 $this->directiveArgValue('scopes', []),
                 $root,
                 $args,
                 $context,
-                $resolveInfo
+                $resolveInfo,
             );
             assert($builder instanceof EloquentBuilder);
 

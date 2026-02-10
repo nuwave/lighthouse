@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Exceptions;
 
@@ -15,9 +15,7 @@ class AuthenticationException extends IlluminateAuthenticationException implemen
         return true;
     }
 
-    /**
-     * @return array{guards: array<string>}
-     */
+    /** @return array{guards: array<string>} */
     public function getExtensions(): array
     {
         return [

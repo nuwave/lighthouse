@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Auth;
 
@@ -17,23 +17,18 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator;
 use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
 
-/**
- * @see \Illuminate\Auth\Middleware\Authenticate
- */
+/** @see \Illuminate\Auth\Middleware\Authenticate */
 class GuardDirective extends BaseDirective implements FieldMiddleware, TypeManipulator, TypeExtensionManipulator
 {
-    protected AuthFactory $auth;
-
-    public function __construct(AuthFactory $auth)
-    {
-        $this->auth = $auth;
-    }
+    public function __construct(
+        protected AuthFactory $authFactory,
+    ) {}
 
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Run authentication through one or more guards.
+Run authentication through one or more guards from `config/auth.php`.
 
 This is run per field and may allow unauthenticated
 users to still receive partial results.
@@ -52,9 +47,9 @@ GRAPHQL;
 
     public function handleField(FieldValue $fieldValue): void
     {
-        $fieldValue->wrapResolver(fn (callable $resolver) => function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
-            $with = $this->directiveArgValue('with', (array) AuthServiceProvider::guard());
-            $context->setUser($this->authenticate($with));
+        $fieldValue->wrapResolver(fn (callable $resolver): \Closure => function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
+            $guards = $this->directiveArgValue('with', AuthServiceProvider::guards());
+            $context->setUser($this->authenticate($guards));
 
             return $resolver($root, $args, $context, $resolveInfo);
         });
@@ -64,17 +59,15 @@ GRAPHQL;
      * Determine if the user is logged in to any of the given guards.
      *
      * @param  array<string|null>  $guards
-     *
-     * @throws \Illuminate\Auth\AuthenticationException
      */
     protected function authenticate(array $guards): Authenticatable
     {
         foreach ($guards as $guard) {
-            $user = $this->auth->guard($guard)->user();
+            $user = $this->authFactory->guard($guard)->user();
 
-            if ($user) {
+            if ($user !== null) {
                 // @phpstan-ignore-next-line passing null works fine here
-                $this->auth->shouldUse($guard);
+                $this->authFactory->shouldUse($guard);
 
                 return $user;
             }
@@ -88,8 +81,6 @@ GRAPHQL;
      *
      * @param  array<string|null>  $guards
      *
-     * @throws \Illuminate\Auth\AuthenticationException
-     *
      * @return never
      */
     protected function unauthenticated(array $guards): void
@@ -99,11 +90,11 @@ GRAPHQL;
 
     public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition): void
     {
-        ASTHelper::addDirectiveToFields($this->directiveNode, $typeDefinition);
+        ASTHelper::addDirectiveToFields($this->directiveNode, $typeDefinition); // @phpstan-ignore argument.type (ensured by the allowed locations and schema validation)
     }
 
     public function manipulateTypeExtension(DocumentAST &$documentAST, TypeExtensionNode &$typeExtension): void
     {
-        ASTHelper::addDirectiveToFields($this->directiveNode, $typeExtension);
+        ASTHelper::addDirectiveToFields($this->directiveNode, $typeExtension); // @phpstan-ignore argument.type (ensured by the allowed locations and schema validation)
     }
 }

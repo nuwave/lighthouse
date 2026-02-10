@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema;
 
@@ -28,7 +28,7 @@ class DirectiveLocator
      *
      * @var array<int, string>
      */
-    protected $directiveNamespaces;
+    protected array $directiveNamespaces;
 
     /**
      * A map from short directive names to full class names.
@@ -41,17 +41,11 @@ class DirectiveLocator
      *
      * @var array<string, class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>>
      */
-    protected $resolvedClassnames = [];
+    protected array $resolvedClassnames = [];
 
-    /**
-     * @var \Illuminate\Contracts\Events\Dispatcher
-     */
-    protected $eventsDispatcher;
-
-    public function __construct(EventsDispatcher $eventsDispatcher)
-    {
-        $this->eventsDispatcher = $eventsDispatcher;
-    }
+    public function __construct(
+        protected EventsDispatcher $eventsDispatcher,
+    ) {}
 
     /**
      * A list of namespaces with directives in descending priority.
@@ -60,25 +54,20 @@ class DirectiveLocator
      */
     public function namespaces(): array
     {
-        if (null === $this->directiveNamespaces) {
-            $this->directiveNamespaces
-                // When looking for a directive by name, the namespaces are tried in order
-                = (new Collection([
-                    // User defined directives (top priority)
-                    config('lighthouse.namespaces.directives'),
+        return $this->directiveNamespaces
+            // When looking for a directive by name, the namespaces are tried in order
+            ??= (new Collection([
+                // User defined directives come first
+                config('lighthouse.namespaces.directives'),
 
-                    // Plugin developers defined directives
-                    $this->eventsDispatcher->dispatch(new RegisterDirectiveNamespaces()),
-
-                    // Lighthouse defined directives
-                    'Nuwave\\Lighthouse\\Schema\\Directives',
-                ]))
+                // Built-in and plugin defined directives come next
+                $this->eventsDispatcher->dispatch(new RegisterDirectiveNamespaces()),
+            ]))
                 ->flatten()
                 ->filter()
+                // Ensure built-in directives come last
+                ->sortBy(static fn (string $namespace): int => (int) str_starts_with($namespace, 'Nuwave\\Lighthouse'))
                 ->all();
-        }
-
-        return $this->directiveNamespaces;
     }
 
     /**
@@ -103,14 +92,9 @@ class DirectiveLocator
                 if (! is_a($class, Directive::class, true)) {
                     continue;
                 }
-                $name = self::directiveName($class);
 
-                // The directive was already found, so we do not add it twice
-                if (isset($directives[$name])) {
-                    continue;
-                }
-
-                $directives[$name] = $class;
+                // Only add the first directive that was found
+                $directives[self::directiveName($class)] ??= $class;
             }
         }
 
@@ -133,9 +117,7 @@ class DirectiveLocator
         return $definitions;
     }
 
-    /**
-     * Create a directive by the given directive name.
-     */
+    /** Create a directive by the given directive name. */
     public function create(string $directiveName): Directive
     {
         $directiveClass = $this->resolve($directiveName);
@@ -146,26 +128,26 @@ class DirectiveLocator
     /**
      * Resolve the class for a given directive name.
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
-     *
      * @return class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>
      */
     public function resolve(string $directiveName): string
     {
-        // Bail to respect the priority of namespaces, the first resolved directive is kept
         if (array_key_exists($directiveName, $this->resolvedClassnames)) {
             return $this->resolvedClassnames[$directiveName];
         }
 
-        foreach ($this->namespaces() as $baseNamespace) {
-            $directiveClass = $baseNamespace . '\\' . static::className($directiveName);
+        foreach ($this->namespaces() as $directiveNamespace) {
+            $directiveClass = $directiveNamespace . '\\' . static::className($directiveName);
 
             if (class_exists($directiveClass)) {
-                if (! is_a($directiveClass, Directive::class, true)) {
-                    throw new DirectiveException("Class {$directiveClass} must implement the interface " . Directive::class);
+                $directiveInterface = Directive::class;
+                if (! is_a($directiveClass, $directiveInterface, true)) {
+                    throw new DirectiveException("Class {$directiveClass} must implement the interface {$directiveInterface}.");
                 }
+
                 $this->resolvedClassnames[$directiveName] = $directiveClass;
 
+                // Bail to respect the priority of namespaces, the first resolved directive is kept
                 return $directiveClass;
             }
         }
@@ -173,29 +155,23 @@ class DirectiveLocator
         throw new DirectiveException("No directive found for `{$directiveName}`");
     }
 
-    /**
-     * Returns the expected class name for a directive name.
-     */
+    /** Returns the expected class name for a directive name. */
     protected static function className(string $directiveName): string
     {
         return Str::studly($directiveName) . 'Directive';
     }
 
-    /**
-     * Returns the expected directive name for a class name.
-     */
+    /** Returns the expected directive name for a class name. */
     public static function directiveName(string $className): string
     {
         $baseName = basename(str_replace('\\', '/', $className));
 
         return lcfirst(
-            Str::beforeLast($baseName, 'Directive')
+            Str::beforeLast($baseName, 'Directive'),
         );
     }
 
-    /**
-     * @param  class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>  $directiveClass
-     */
+    /** @param  class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>  $directiveClass */
     public function setResolved(string $directiveName, string $directiveClass): self
     {
         $this->resolvedClassnames[$directiveName] = $directiveClass;
@@ -206,13 +182,12 @@ class DirectiveLocator
     /**
      * Get all directives that are associated with an AST node.
      *
-     * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive>
+     * @return \Illuminate\Support\Collection<int, \Nuwave\Lighthouse\Support\Contracts\Directive>
      */
     public function associated(Node $node): Collection
     {
-        // @phpstan-ignore-next-line https://github.com/phpstan/phpstan/issues/8474
         if (! property_exists($node, 'directives')) {
-            throw new \Exception('Expected Node class with property `directives`, got: ' . get_class($node));
+            throw new \Exception('Expected Node class with property `directives`, got: ' . $node::class);
         }
 
         return (new Collection($node->directives))
@@ -235,17 +210,16 @@ class DirectiveLocator
      *
      * @param  class-string<TDirective>  $directiveClass
      *
-     * @return \Illuminate\Support\Collection<TDirective>
+     * @return \Illuminate\Support\Collection<int, TDirective>
      */
     public function associatedOfType(Node $node, string $directiveClass): Collection
     {
         /**
          * Ensured by instanceofMatcher.
          *
-         * @var \Illuminate\Support\Collection<TDirective> $associatedOfType
+         * @var \Illuminate\Support\Collection<int, TDirective> $associatedOfType
          */
-        $associatedOfType = $this
-            ->associated($node)
+        $associatedOfType = $this->associated($node)
             ->filter(Utils::instanceofMatcher($directiveClass));
 
         return $associatedOfType;
@@ -261,8 +235,6 @@ class DirectiveLocator
      *
      * @param  class-string<TDirective>  $directiveClass
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
-     *
      * @return TDirective|null
      */
     public function exclusiveOfType(Node $node, string $directiveClass): ?Directive
@@ -270,24 +242,22 @@ class DirectiveLocator
         $directives = $this->associatedOfType($node, $directiveClass);
 
         if ($directives->count() > 1) {
+            if (! property_exists($node, 'name')) {
+                $unnamedNode = $node::class;
+                throw new \Exception("Expected Node class with property `name`, got: {$unnamedNode}.");
+            }
+
             $directiveNames = $directives
-                ->map(function (Directive $directive): string {
+                ->map(static function (Directive $directive): string {
                     $definition = ASTHelper::extractDirectiveDefinition(
-                        $directive::definition()
+                        $directive::definition(),
                     );
 
-                    return '@' . $definition->name->value;
+                    return "@{$definition->name->value}";
                 })
                 ->implode(', ');
 
-            // @phpstan-ignore-next-line https://github.com/phpstan/phpstan/issues/8474
-            if (! property_exists($node, 'name')) {
-                throw new \Exception('Expected Node class with property `name`, got: ' . get_class($node));
-            }
-
-            throw new DirectiveException(
-                "Node {$node->name->value} can only have one directive of type {$directiveClass} but found [{$directiveNames}]."
-            );
+            throw new DirectiveException("Node {$node->name->value} can only have one directive of type {$directiveClass} but found [{$directiveNames}].");
         }
 
         return $directives->first();

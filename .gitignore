@@ -6,13 +6,25 @@
 .idea
 .vscode
 phpunit.xml
+.gitpod.yml
 
 # Generated files
 .phpunit.result.cache
 .php-cs-fixer.cache
 build
+phpstan-tmp-dir
+proto-tmp
 
 # composer
 composer.phar
 composer.lock
 vendor
+
+# lnai
+.ai/.lnai-manifest.json
+
+# lnai-generated
+.claude/CLAUDE.md
+.claude/settings.json
+AGENTS.md
+# end lnai-generated

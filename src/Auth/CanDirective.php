@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Auth;
 
@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
+use Nuwave\Lighthouse\Exceptions\ClientSafeModelNotFoundException;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\Resolved;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
@@ -28,10 +29,11 @@ use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Utils;
 
+/** @deprecated TODO remove with v7 */
 class CanDirective extends BaseDirective implements FieldMiddleware, FieldManipulator
 {
     public function __construct(
-        protected Gate $gate
+        protected Gate $gate,
     ) {}
 
     public static function definition(): string
@@ -53,7 +55,7 @@ directive @can(
   Check the policy against the model instances returned by the field resolver.
   Only use this if the field does not mutate data, it is run before checking.
 
-  Mutually exclusive with `query` and `find`.
+  Mutually exclusive with `query`, `find`, and `root`.
   """
   resolved: Boolean! = false
 
@@ -73,6 +75,8 @@ directive @can(
 
   You may pass arbitrary GraphQL literals,
   e.g.: [1, 2, 3] or { foo: "bar" }
+
+  CanArgs pseudo-scalar is defined in BaseCanDirective.
   """
   args: CanArgs
 
@@ -80,7 +84,7 @@ directive @can(
   Query for specific model instances to check the policy against, using arguments
   with directives that add constraints to the query builder, such as `@eq`.
 
-  Mutually exclusive with `resolved` and `find`.
+  Mutually exclusive with `resolved`, `find`, and `root`.
   """
   query: Boolean! = false
 
@@ -95,27 +99,32 @@ directive @can(
 
   You may pass the string in dot notation to use nested inputs.
 
-  Mutually exclusive with `resolved` and `query`.
+  Mutually exclusive with `resolved`, `query`, and `root`.
   """
   find: String
-) repeatable on FIELD_DEFINITION
 
-"""
-Any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
-"""
-scalar CanArgs
+  """
+  Should the query fail when the models of `find` were not found?
+  """
+  findOrFail: Boolean! = true
+
+  """
+  If your policy should check against the root value.
+
+  Mutually exclusive with `resolved`, `query`, and `find`.
+  """
+  root: Boolean! = false
+) repeatable on FIELD_DEFINITION
 GRAPHQL;
     }
 
-    /**
-     * Ensure the user is authorized to access this field.
-     */
+    /** Ensure the user is authorized to access this field. */
     public function handleField(FieldValue $fieldValue): void
     {
         $ability = $this->directiveArgValue('ability');
         $resolved = $this->directiveArgValue('resolved');
 
-        $fieldValue->wrapResolver(fn (callable $resolver) => function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $ability, $resolved) {
+        $fieldValue->wrapResolver(fn (callable $resolver): \Closure => function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $ability, $resolved) {
             $gate = $this->gate->forUser($context->user());
             $checkArguments = $this->buildCheckArguments($args);
 
@@ -132,7 +141,7 @@ GRAPHQL;
                         }, $modelOrModels);
 
                         return $modelLike;
-                    }
+                    },
                 );
             }
 
@@ -147,36 +156,36 @@ GRAPHQL;
     /**
      * @param  array<string, mixed>  $args
      *
-     * @throws \GraphQL\Error\Error
-     *
      * @return iterable<\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>>
      */
-    protected function modelsToCheck($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): iterable
+    protected function modelsToCheck(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): iterable
     {
         if ($this->directiveArgValue('query')) {
-            return $resolveInfo
+            return $resolveInfo // @phpstan-ignore return.type (generic of Builder type is erased through enhanceBuilder)
                 ->enhanceBuilder(
                     $this->getModelClass()::query(),
                     $this->directiveArgValue('scopes', []),
                     $root,
                     $args,
                     $context,
-                    $resolveInfo
+                    $resolveInfo,
                 )
                 ->get();
         }
 
+        if ($this->directiveArgValue('root')) {
+            return [$root];
+        }
+
         if ($find = $this->directiveArgValue('find')) {
-            $findValue = Arr::get($args, $find);
-            if (null === $findValue) {
-                throw self::missingKeyToFindModel($find);
-            }
+            $findValue = Arr::get($args, $find)
+                ?? throw self::missingKeyToFindModel($find);
 
             $queryBuilder = $this->getModelClass()::query();
 
             $argumentSetDirectives = $resolveInfo->argumentSet->directives;
             $directivesContainsForceDelete = $argumentSetDirectives->contains(
-                Utils::instanceofMatcher(ForceDeleteDirective::class)
+                Utils::instanceofMatcher(ForceDeleteDirective::class),
             );
             if ($directivesContainsForceDelete) {
                 /** @see \Illuminate\Database\Eloquent\SoftDeletes */
@@ -185,7 +194,7 @@ GRAPHQL;
             }
 
             $directivesContainsRestore = $argumentSetDirectives->contains(
-                Utils::instanceofMatcher(RestoreDirective::class)
+                Utils::instanceofMatcher(RestoreDirective::class),
             );
             if ($directivesContainsRestore) {
                 /** @see \Illuminate\Database\Eloquent\SoftDeletes */
@@ -201,17 +210,23 @@ GRAPHQL;
                     $args,
                     $context,
                     $resolveInfo,
-                    Utils::instanceofMatcher(TrashedDirective::class)
+                    Utils::instanceofMatcher(TrashedDirective::class),
                 );
                 assert($enhancedBuilder instanceof EloquentBuilder);
 
-                $modelOrModels = $enhancedBuilder->findOrFail($findValue);
-            } catch (ModelNotFoundException $exception) {
-                throw new Error($exception->getMessage());
+                $modelOrModels = $this->directiveArgValue('findOrFail', true)
+                    ? $enhancedBuilder->findOrFail($findValue)
+                    : $enhancedBuilder->find($findValue);
+            } catch (ModelNotFoundException $modelNotFoundException) {
+                throw ClientSafeModelNotFoundException::fromLaravel($modelNotFoundException);
             }
 
             if ($modelOrModels instanceof Model) {
-                $modelOrModels = [$modelOrModels];
+                return [$modelOrModels];
+            }
+
+            if ($modelOrModels === null) {
+                return [];
             }
 
             return $modelOrModels;
@@ -227,26 +242,22 @@ GRAPHQL;
 
     /**
      * @param  string|array<string>  $ability
-     * @param  string|\Illuminate\Database\Eloquent\Model|null  $model
      * @param  array<int, mixed>  $arguments
-     *
-     * @throws \Nuwave\Lighthouse\Exceptions\AuthorizationException
      */
-    protected function authorize(Gate $gate, $ability, $model, array $arguments): void
+    protected function authorize(Gate $gate, string|array $ability, string|Model|null $model, array $arguments): void
     {
         // The signature of the second argument `$arguments` of `Gate::check`
         // should be [modelClassName, additionalArg, additionalArg...]
         array_unshift($arguments, $model);
 
         Utils::applyEach(
-            function ($ability) use ($gate, $arguments) {
+            static function ($ability) use ($gate, $arguments): void {
                 $response = $gate->inspect($ability, $arguments);
-
                 if ($response->denied()) {
                     throw new AuthorizationException($response->message(), $response->code());
                 }
             },
-            $ability
+            $ability,
         );
     }
 
@@ -273,11 +284,11 @@ GRAPHQL;
         return $checkArguments;
     }
 
-    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType)
+    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType): void
     {
-        $this->validateMutuallyExclusiveArguments(['resolved', 'query', 'find']);
+        $this->validateMutuallyExclusiveArguments(['resolved', 'query', 'find', 'root']);
 
-        if ($this->directiveHasArgument('resolved') && RootType::MUTATION === $parentType->name->value) {
+        if ($this->directiveHasArgument('resolved') && $parentType->name->value === RootType::MUTATION) {
             throw self::resolvedIsUnsafeInMutations($fieldDefinition->name->value);
         }
     }

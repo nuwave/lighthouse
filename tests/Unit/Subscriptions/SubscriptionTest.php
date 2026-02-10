@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Subscriptions;
 
@@ -11,29 +11,29 @@ use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
+use Tests\EnablesSubscriptionServiceProvider;
 use Tests\TestCase;
-use Tests\TestsSubscriptions;
 
 final class SubscriptionTest extends TestCase
 {
-    use TestsSubscriptions;
+    use EnablesSubscriptionServiceProvider;
 
     protected function getPackageProviders($app): array
     {
         return array_merge(
             parent::getPackageProviders($app),
-            [SubscriptionServiceProvider::class]
+            [SubscriptionServiceProvider::class],
         );
     }
 
     public function testBroadcastSubscriptionFromField(): void
     {
         $subscriptionField = 'onPostCreated';
-        $this->schema .= /** @lang GraphQL */ "
+        $this->schema .= /** @lang GraphQL */ <<<GRAPHQL
         type Subscription {
             {$subscriptionField}: ID
         }
-        ";
+        GRAPHQL;
 
         $broadcaster = $this->createMock(SubscriptionBroadcaster::class);
         $this->app->instance(BroadcastsSubscriptions::class, $broadcaster);
@@ -46,7 +46,7 @@ final class SubscriptionTest extends TestCase
             ->with(
                 $this->isInstanceOf(GraphQLSubscription::class),
                 $subscriptionField,
-                $root
+                $root,
             );
 
         Subscription::broadcast($subscriptionField, $root);
@@ -84,11 +84,11 @@ final class SubscriptionTest extends TestCase
 
     public function testThrowsOnInvalidSubscriptionField(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Subscription {
             foo: ID @mock
         }
-        ';
+        GRAPHQL;
 
         $this->expectException(\InvalidArgumentException::class);
 

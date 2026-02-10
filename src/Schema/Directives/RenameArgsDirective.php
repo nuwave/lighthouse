@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
@@ -32,17 +32,15 @@ GRAPHQL;
             // We look for further ArgumentSet instances, they
             // might be contained within an array.
             Utils::applyEach(
-                function ($value) {
+                function ($value): void {
                     if ($value instanceof ArgumentSet) {
                         $this->rename($value);
                     }
                 },
-                $argument->value
+                $argument->value,
             );
 
-            $maybeRenameDirective = $argument->directives->first(function (Directive $directive): bool {
-                return $directive instanceof RenameDirective;
-            });
+            $maybeRenameDirective = $argument->directives->first(static fn (Directive $directive): bool => $directive instanceof RenameDirective);
 
             if ($maybeRenameDirective instanceof RenameDirective) {
                 $argumentSet->arguments[$maybeRenameDirective->attributeArgValue()] = $argument;

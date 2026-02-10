@@ -1,12 +1,13 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Schema\Directives;
 
+use Carbon\Carbon;
+use Faker\Factory;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Response;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Exceptions\RateLimitException;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
@@ -15,99 +16,148 @@ final class ThrottleDirectiveTest extends TestCase
 {
     public function testWrongLimiterName(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: Int @throttle(name: "test")
         }
-        ';
+        GRAPHQL;
 
         $this->expectException(DefinitionException::class);
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ');
+        GRAPHQL);
     }
 
     public function testNamedLimiterReturnsRequest(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: Int @throttle(name: "test")
         }
-        ';
+        GRAPHQL;
 
         $rateLimiter = $this->app->make(RateLimiter::class);
         $rateLimiter->for(
             'test',
-            static fn (): Response => response('Custom response...', 429)
+            static fn (): Response => response('Custom response...', 429),
         );
 
-        $this->expectException(DirectiveException::class);
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->expectException(DefinitionException::class);
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ');
+        GRAPHQL);
     }
 
     public function testNamedLimiter(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: Int @throttle(name: "test")
         }
-        ';
+        GRAPHQL;
+
+        $query = /** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            foo
+        }
+        GRAPHQL;
 
         $rateLimiter = $this->app->make(RateLimiter::class);
         $rateLimiter->for(
             'test',
-            static fn () => Limit::perMinute(1)
+            static fn (): Limit => Limit::perMinute(1),
         );
 
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            foo
-        }
-        ')->assertJson([
+        $this->graphQL($query)->assertJson([
             'data' => [
                 'foo' => Foo::THE_ANSWER,
             ],
         ]);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL($query)->assertGraphQLError(
+            new RateLimitException('Query.foo'),
+        );
+    }
+
+    public function testLimitClears(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Query {
+            foo: Int @throttle(name: "test")
+        }
+        GRAPHQL;
+
+        $query = /** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ')->assertGraphQLError(
-            new RateLimitException('Query.foo')
+        GRAPHQL;
+
+        $rateLimiter = $this->app->make(RateLimiter::class);
+        $rateLimiter->for(
+            'test',
+            static fn (): Limit => Limit::perMinute(1),
         );
+
+        $knownDate = Carbon::createStrict(2020, 1, 1, 1); // arbitrary known date
+        $this->travelTo($knownDate);
+
+        $this->graphQL($query)->assertJson([
+            'data' => [
+                'foo' => Foo::THE_ANSWER,
+            ],
+        ]);
+
+        $this->graphQL($query)->assertGraphQLError(
+            new RateLimitException('Query.foo'),
+        );
+
+        // wait two minutes and assert that the limit is reset
+        $this->travel(2)->minutes();
+
+        $this->graphQL($query)->assertJson([
+            'data' => [
+                'foo' => Foo::THE_ANSWER,
+            ],
+        ]);
     }
 
     public function testInlineLimiter(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: Int @throttle(maxAttempts: 1)
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $query = /** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ')->assertJson([
+        GRAPHQL;
+
+        $faker = Factory::create()->unique();
+        $ip = $faker->ipv4;
+        $ip2 = $faker->ipv4;
+
+        $this->graphQL(query: $query, headers: ['REMOTE_ADDR' => $ip])->assertJson([
             'data' => [
                 'foo' => Foo::THE_ANSWER,
             ],
         ]);
 
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            foo
-        }
-        ')->assertGraphQLError(
-            new RateLimitException('Query.foo')
+        $this->graphQL(query: $query, headers: ['REMOTE_ADDR' => $ip])->assertGraphQLError(
+            new RateLimitException('Query.foo'),
         );
+
+        $this->graphQL(query: $query, headers: ['REMOTE_ADDR' => $ip2])->assertJson([
+            'data' => [
+                'foo' => Foo::THE_ANSWER,
+            ],
+        ]);
     }
 }

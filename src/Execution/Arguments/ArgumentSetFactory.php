@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
@@ -8,33 +8,19 @@ use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
 
 class ArgumentSetFactory
 {
-    /**
-     * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST
-     */
-    protected $documentAST;
-
-    /**
-     * @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentTypeNodeConverter
-     */
-    protected $argumentTypeNodeConverter;
-
-    /**
-     * @var \Nuwave\Lighthouse\Schema\DirectiveLocator
-     */
-    protected $directiveLocator;
+    protected DocumentAST $documentAST;
 
     public function __construct(
         ASTBuilder $astBuilder,
-        ArgumentTypeNodeConverter $argumentTypeNodeConverter,
-        DirectiveLocator $directiveLocator
+        protected ArgumentTypeNodeConverter $argumentTypeNodeConverter,
+        protected DirectiveLocator $directiveLocator,
     ) {
         $this->documentAST = $astBuilder->documentAST();
-        $this->argumentTypeNodeConverter = $argumentTypeNodeConverter;
-        $this->directiveLocator = $directiveLocator;
     }
 
     /**
@@ -44,10 +30,8 @@ class ArgumentSetFactory
      */
     public function fromResolveInfo(array $args, ResolveInfo $resolveInfo): ArgumentSet
     {
-        $definition = $resolveInfo->fieldDefinition->astNode;
-        if (! $definition) {
-            throw new DefinitionException('Can not handle programmatic object types due to missing AST.');
-        }
+        $definition = $resolveInfo->fieldDefinition->astNode
+            ?? throw new DefinitionException('Can not handle programmatic object types due to missing AST.');
 
         return $this->wrapArgs($definition, $args);
     }
@@ -96,19 +80,15 @@ class ArgumentSetFactory
         return $argumentDefinitionMap;
     }
 
-    /**
-     * Wrap a single client-given argument with type information.
-     *
-     * @param  mixed  $value  the client given value
-     */
-    protected function wrapInArgument($value, InputValueDefinitionNode $definition): Argument
+    /** Wrap a single client-given argument with type information. */
+    protected function wrapInArgument(mixed $value, InputValueDefinitionNode $definition): Argument
     {
         $type = $this->argumentTypeNodeConverter->convert($definition->type);
 
         $argument = new Argument();
-        $argument->directives = $this->directiveLocator->associated($definition);
-        $argument->type = $type;
         $argument->value = $this->wrapWithType($value, $type);
+        $argument->type = $type;
+        $argument->directives = $this->directiveLocator->associated($definition);
 
         return $argument;
     }
@@ -117,14 +97,13 @@ class ArgumentSetFactory
      * Wrap a client-given value with information from a type.
      *
      * @param  mixed|array<mixed>  $valueOrValues
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ListType|\Nuwave\Lighthouse\Execution\Arguments\NamedType  $type
      *
      * @return array|mixed|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet
      */
-    protected function wrapWithType($valueOrValues, $type)
+    protected function wrapWithType(mixed $valueOrValues, ListType|NamedType $type)
     {
         // No need to recurse down further if the value is null
-        if (null === $valueOrValues) {
+        if ($valueOrValues === null) {
             return null;
         }
 
@@ -147,15 +126,13 @@ class ArgumentSetFactory
     /**
      * Wrap a client-given value with information from a named type.
      *
-     * @param  mixed  $value  the client given value
-     *
-     * @return \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|mixed
+     * @return ArgumentSet|mixed
      */
-    protected function wrapWithNamedType($value, NamedType $namedType)
+    protected function wrapWithNamedType(mixed $value, NamedType $namedType)
     {
         // This might be null if the type is
-        // - created outside of the schema string
-        // - one of the built in types
+        // - created outside the schema string
+        // - one of the built-in types
         $typeDef = $this->documentAST->types[$namedType->name] ?? null;
 
         // We recurse down only if the type is an Input
@@ -163,7 +140,7 @@ class ArgumentSetFactory
             return $this->wrapArgs($typeDef, $value);
         }
 
-        // Otherwise, we just return the value as is and are done with that subtree
+        // Otherwise, we return the value as is and are done with that subtree
         return $value;
     }
 }

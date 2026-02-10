@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Schema\Directives;
 
@@ -14,9 +14,12 @@ final class UpdateDirectiveTest extends DBTestCase
 {
     public function testUpdateFromFieldArguments(): void
     {
-        factory(Company::class)->create(['name' => 'foo']);
+        $company = factory(Company::class)->make();
+        $this->assertInstanceOf(Company::class, $company);
+        $company->name = 'foo';
+        $company->save();
 
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Company {
             id: ID!
             name: String!
@@ -28,9 +31,9 @@ final class UpdateDirectiveTest extends DBTestCase
                 name: String
             ): Company @update
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             updateCompany(
                 id: 1
@@ -40,7 +43,7 @@ final class UpdateDirectiveTest extends DBTestCase
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'updateCompany' => [
                     'id' => '1',
@@ -54,9 +57,12 @@ final class UpdateDirectiveTest extends DBTestCase
 
     public function testUpdateFromInputObject(): void
     {
-        factory(Company::class)->create(['name' => 'foo']);
+        $company = factory(Company::class)->make();
+        $this->assertInstanceOf(Company::class, $company);
+        $company->name = 'foo';
+        $company->save();
 
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Company {
             id: ID!
             name: String!
@@ -72,9 +78,9 @@ final class UpdateDirectiveTest extends DBTestCase
             id: ID!
             name: String
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             updateCompany(input: {
                 id: 1
@@ -84,7 +90,7 @@ final class UpdateDirectiveTest extends DBTestCase
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'updateCompany' => [
                     'id' => '1',
@@ -98,7 +104,7 @@ final class UpdateDirectiveTest extends DBTestCase
 
     public function testThrowsWhenMissingPrimaryKey(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Company {
             id: ID!
         }
@@ -106,22 +112,25 @@ final class UpdateDirectiveTest extends DBTestCase
         type Mutation {
             updateCompany: Company @update
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             updateCompany {
                 id
             }
         }
-        ')->assertGraphQLErrorMessage(UpdateModel::MISSING_PRIMARY_KEY_FOR_UPDATE);
+        GRAPHQL)->assertGraphQLErrorMessage(UpdateModel::MISSING_PRIMARY_KEY_FOR_UPDATE);
     }
 
     public function testUpdateWithCustomPrimaryKey(): void
     {
-        factory(Category::class)->create(['name' => 'foo']);
+        $category = factory(Category::class)->make();
+        $this->assertInstanceOf(Category::class, $category);
+        $category->name = 'foo';
+        $category->save();
 
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Category {
             category_id: ID!
             name: String!
@@ -133,9 +142,9 @@ final class UpdateDirectiveTest extends DBTestCase
                 name: String
             ): Category @update
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             updateCategory(
                 category_id: 1
@@ -145,7 +154,7 @@ final class UpdateDirectiveTest extends DBTestCase
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'updateCategory' => [
                     'category_id' => '1',
@@ -159,9 +168,12 @@ final class UpdateDirectiveTest extends DBTestCase
 
     public function testUpdateWithCustomPrimaryKeyAsId(): void
     {
-        factory(Category::class)->create(['name' => 'foo']);
+        $category = factory(Category::class)->make();
+        $this->assertInstanceOf(Category::class, $category);
+        $category->name = 'foo';
+        $category->save();
 
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Category {
             id: ID! @rename(attribute: "category_id")
             name: String!
@@ -173,9 +185,9 @@ final class UpdateDirectiveTest extends DBTestCase
                 name: String
             ): Category @update
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             updateCategory(
                 id: 1
@@ -185,7 +197,7 @@ final class UpdateDirectiveTest extends DBTestCase
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'updateCategory' => [
                     'id' => '1',
@@ -199,9 +211,12 @@ final class UpdateDirectiveTest extends DBTestCase
 
     public function testDoesNotUpdateWithFailingRelationship(): void
     {
-        factory(User::class)->create(['name' => 'Original']);
+        $user = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $user);
+        $user->name = 'Original';
+        $user->save();
 
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Task {
             id: ID!
             name: String!
@@ -230,10 +245,10 @@ final class UpdateDirectiveTest extends DBTestCase
         input CreateTaskInput {
             thisFieldDoesNotExist: String
         }
-        ';
+        GRAPHQL;
 
         $this->expectException(QueryException::class);
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             updateUser(input: {
                 id: 1
@@ -252,19 +267,22 @@ final class UpdateDirectiveTest extends DBTestCase
                 }
             }
         }
-        ');
+        GRAPHQL);
 
         $this->assertSame('Original', User::firstOrFail()->name);
     }
 
     public function testNestedArgResolver(): void
     {
-        factory(User::class)->create();
-        factory(Task::class)->create([
-            'id' => 3,
-        ]);
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
 
-        $this->schema .= /** @lang GraphQL */ '
+        $task = factory(Task::class)->make();
+        $this->assertInstanceOf(Task::class, $task);
+        $task->id = 3;
+        $task->save();
+
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Mutation {
             updateUser(input: UpdateUserInput! @spread): User @update
         }
@@ -289,9 +307,9 @@ final class UpdateDirectiveTest extends DBTestCase
             id: Int
             name: String
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             updateUser(input: {
                 id: 1
@@ -308,7 +326,7 @@ final class UpdateDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'updateUser' => [
                     'name' => 'foo',
@@ -325,15 +343,20 @@ final class UpdateDirectiveTest extends DBTestCase
 
     public function testNestedUpdateOnInputList(): void
     {
-        factory(User::class)->create();
-        factory(Task::class)->create([
-            'id' => 3,
-        ]);
-        factory(Task::class)->create([
-            'id' => 4,
-        ]);
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
 
-        $this->schema .= /** @lang GraphQL */ '
+        $taskA = factory(Task::class)->make();
+        $this->assertInstanceOf(Task::class, $taskA);
+        $taskA->id = 3;
+        $taskA->save();
+
+        $taskB = factory(Task::class)->make();
+        $this->assertInstanceOf(Task::class, $taskB);
+        $taskB->id = 4;
+        $taskB->save();
+
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Mutation {
             updateUser(input: UpdateUserInput! @spread): User @update
         }
@@ -358,9 +381,9 @@ final class UpdateDirectiveTest extends DBTestCase
             id: Int
             name: String
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             updateUser(input: {
                 id: 1
@@ -383,7 +406,7 @@ final class UpdateDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'updateUser' => [
                     'name' => 'foo',

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -9,11 +9,9 @@ final class CreateTestbenchLocationsTable extends Migration
     public function up(): void
     {
         Schema::create('locations', function (Blueprint $table): void {
-            $table->increments('id');
-
-            $table->unsignedInteger('parent_id')->nullable();
+            $table->id();
+            $table->unsignedBigInteger('parent_id')->nullable();
             $table->json('extra')->nullable();
-
             $table->timestamps();
         });
     }

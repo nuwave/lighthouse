@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Utils\Policies;
 
@@ -11,13 +11,13 @@ final class TaskPolicy
 
     public function adminOnly(User $user): bool
     {
-        return self::ADMIN === $user->name;
+        return $user->name === self::ADMIN;
     }
 
     public function delete(User $user, Task $task): bool
     {
         $taskUser = $task->user;
-        if (null === $taskUser) {
+        if ($taskUser === null) {
             return false;
         }
 

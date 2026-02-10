@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Support;
 
@@ -9,41 +9,36 @@ use Nuwave\Lighthouse\Exceptions\InvalidDriverException;
  * NOTE: Implementation pulled from \Illuminate\Cache\CacheManager. Purpose is
  * to serve as a base class to easily generate a manager that creates drivers
  * with configuration options.
+ *
+ * @phpstan-type CustomCreator callable(\Illuminate\Container\Container $app, array<string, mixed> $config): object
  */
 abstract class DriverManager
 {
-    /**
-     * The application instance.
-     *
-     * @var \Illuminate\Container\Container
-     */
-    protected $app;
-
     /**
      * The array of resolved drivers.
      *
      * @var array<string, object>
      */
-    protected $drivers = [];
+    protected array $drivers = [];
 
     /**
      * The registered custom driver creators.
      *
-     * @var array<string, \Closure>
+     * @var array<string, CustomCreator>
      */
-    protected $customCreators = [];
+    protected array $customCreators = [];
 
-    public function __construct(Application $app)
-    {
-        $this->app = $app;
-    }
+    public function __construct(
+        /** The application instance. */
+        protected Application $app,
+    ) {}
 
     /**
      * Get a driver instance by name.
      *
      * @return object the driver instance
      */
-    public function driver(?string $name = null)
+    public function driver(?string $name = null): object
     {
         $name = $name ?: $this->getDefaultDriver();
 
@@ -55,22 +50,19 @@ abstract class DriverManager
      *
      * @return object the resolved driver
      */
-    protected function get(string $name)
+    protected function get(string $name): object
     {
-        return $this->drivers[$name] ?? $this->resolve($name);
+        return $this->drivers[$name]
+            ?? $this->resolve($name);
     }
 
-    /**
-     * Get the default driver name.
-     */
+    /** Get the default driver name. */
     public function getDefaultDriver(): string
     {
         return $this->app['config'][$this->driverKey()];
     }
 
-    /**
-     * Set the default driver name.
-     */
+    /** Set the default driver name. */
     public function setDefaultDriver(string $name): void
     {
         $this->app['config'][$this->driverKey()] = $name;
@@ -85,14 +77,16 @@ abstract class DriverManager
     {
         return $this->app['config']->get(
             "{$this->configKey()}.{$name}",
-            ['driver' => $name]
+            ['driver' => $name],
         );
     }
 
     /**
      * Register a custom driver creator callback.
+     *
+     * @param  CustomCreator  $callback
      */
-    public function extend(string $driver, \Closure $callback): self
+    public function extend(string $driver, callable $callback): self
     {
         $this->customCreators[$driver] = $callback;
 
@@ -102,11 +96,9 @@ abstract class DriverManager
     /**
      * Resolve the given driver.
      *
-     * @throws \InvalidArgumentException
-     *
      * @return object the resolved driver
      */
-    protected function resolve(string $name)
+    protected function resolve(string $name): object
     {
         $config = $this->getConfig($name);
 
@@ -114,7 +106,8 @@ abstract class DriverManager
             return $this->validateDriver($this->callCustomCreator($config));
         }
 
-        $driverMethod = 'create' . ucfirst($config['driver']) . 'Driver';
+        $upperDriver = ucfirst($config['driver']);
+        $driverMethod = "create{$upperDriver}Driver";
 
         if (method_exists($this, $driverMethod)) {
             return $this->validateDriver($this->{$driverMethod}($config));
@@ -130,26 +123,19 @@ abstract class DriverManager
      *
      * @return object the created driver
      */
-    protected function callCustomCreator(array $config)
+    protected function callCustomCreator(array $config): object
     {
         return $this->customCreators[$config['driver']]($this->app, $config);
     }
 
-    /**
-     * Validate driver implements the proper interface.
-     *
-     * @param  object  $driver
-     *
-     * @throws \Nuwave\Lighthouse\Exceptions\InvalidDriverException
-     *
-     * @return object
-     */
-    protected function validateDriver($driver)
+    /** Validate driver implements the proper interface. */
+    protected function validateDriver(object $driver): object
     {
         $interface = $this->interface();
 
-        if (! (new \ReflectionClass($driver))->implementsInterface($interface)) {
-            throw new InvalidDriverException(get_class($driver) . " does not implement {$interface}");
+        if (! $driver instanceof $interface) {
+            $driverClass = $driver::class;
+            throw new InvalidDriverException("{$driverClass} does not implement {$interface}.");
         }
 
         return $driver;
@@ -159,32 +145,18 @@ abstract class DriverManager
      * Dynamically call the default driver instance.
      *
      * @param  array<mixed>  $parameters
-     *
-     * @return mixed whatever the driver returned
      */
-    public function __call(string $method, array $parameters)
+    public function __call(string $method, array $parameters): mixed
     {
         return $this->driver()->$method(...$parameters);
     }
 
-    /**
-     * Get configuration key.
-     *
-     * @return string
-     */
-    abstract protected function configKey();
+    /** Get configuration key. */
+    abstract protected function configKey(): string;
 
-    /**
-     * Get configuration driver key.
-     *
-     * @return string
-     */
-    abstract protected function driverKey();
+    /** Get configuration driver key. */
+    abstract protected function driverKey(): string;
 
-    /**
-     * The interface the driver should implement.
-     *
-     * @return string
-     */
-    abstract protected function interface();
+    /** The interface the driver should implement. */
+    abstract protected function interface(): string;
 }

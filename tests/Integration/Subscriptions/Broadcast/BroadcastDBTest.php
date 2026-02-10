@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Subscriptions\Broadcast;
 
@@ -6,14 +6,14 @@ use Mockery\MockInterface;
 use Nuwave\Lighthouse\Execution\Utils\Subscription;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionBroadcaster;
 use Tests\DBTestCase;
-use Tests\TestsSubscriptions;
+use Tests\EnablesSubscriptionServiceProvider;
 use Tests\Utils\Models\Task;
 
 final class BroadcastDBTest extends DBTestCase
 {
-    use TestsSubscriptions;
+    use EnablesSubscriptionServiceProvider;
 
-    protected $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ <<<'GRAPHQL'
     type Task {
         id: ID!
         name: String!
@@ -30,9 +30,9 @@ final class BroadcastDBTest extends DBTestCase
     type Subscription {
         taskUpdated: Task
     }
-    ';
+    GRAPHQL;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -53,13 +53,13 @@ final class BroadcastDBTest extends DBTestCase
             ->shouldReceive('broadcast')
             ->once();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             subscription UserUpdated {
                 taskUpdated {
                     name
                 }
             }
-        ');
+        GRAPHQL);
 
         Subscription::broadcast('taskUpdated', []);
     }
@@ -70,20 +70,20 @@ final class BroadcastDBTest extends DBTestCase
             ->shouldReceive('broadcast')
             ->once();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             subscription TaskUpdated {
                 taskUpdated {
                     name
                 }
             }
-        ');
+        GRAPHQL);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             mutation {
                 updateTask(id: 1, name: "New name") {
                     name
                 }
             }
-        ');
+        GRAPHQL);
     }
 }

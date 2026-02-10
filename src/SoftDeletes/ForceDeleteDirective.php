@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\SoftDeletes;
 
@@ -45,19 +45,17 @@ GRAPHQL;
 
     protected function modifyExistence(Model $model): bool
     {
-        /** @see \Illuminate\Database\Eloquent\SoftDeletes */
-        // @phpstan-ignore-next-line because it involves mixins
         return (bool) $model->forceDelete();
     }
 
     public function manipulateFieldDefinition(
         DocumentAST &$documentAST,
         FieldDefinitionNode &$fieldDefinition,
-        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
     ): void {
         SoftDeletesServiceProvider::assertModelUsesSoftDeletes(
             $this->getModelClass(),
-            self::MODEL_NOT_USING_SOFT_DELETES
+            self::MODEL_NOT_USING_SOFT_DELETES,
         );
     }
 }

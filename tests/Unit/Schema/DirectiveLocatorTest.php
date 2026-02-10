@@ -1,10 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Schema;
 
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Directives\FieldDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
@@ -14,12 +15,9 @@ use Tests\TestCase;
 
 final class DirectiveLocatorTest extends TestCase
 {
-    /**
-     * @var \Nuwave\Lighthouse\Schema\DirectiveLocator
-     */
-    protected $directiveLocator;
+    private DirectiveLocator $directiveLocator;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -30,67 +28,67 @@ final class DirectiveLocatorTest extends TestCase
     {
         $this->assertInstanceOf(
             FieldDirective::class,
-            $this->directiveLocator->create('field')
+            $this->directiveLocator->create('field'),
         );
     }
 
     public function testHydratesBaseDirectives(): void
     {
-        $fieldDefinition = Parser::fieldDefinition(/** @lang GraphQL */ '
-            foo: String @field
-        ');
+        $fieldDefinition = Parser::fieldDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
+                    foo: String @field
+        GRAPHQL);
 
         $fieldDirective = $this
             ->directiveLocator
             ->associated($fieldDefinition)
             ->first();
-        assert($fieldDirective instanceof FieldDirective);
+        $this->assertInstanceOf(FieldDirective::class, $fieldDirective);
 
         $this->assertSame(
             $fieldDefinition,
-            Utils::accessProtected($fieldDirective, 'definitionNode')
+            Utils::accessProtected($fieldDirective, 'definitionNode'),
         );
     }
 
     public function testSkipsHydrationForNonBaseDirectives(): void
     {
-        $fieldDefinition = Parser::fieldDefinition(/** @lang GraphQL */ '
-            foo: String @foo
-        ');
+        $fieldDefinition = Parser::fieldDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
+                    foo: String @foo
+        GRAPHQL);
 
         $directive = new class() implements FieldMiddleware {
             public static function definition(): string
             {
-                return /** @lang GraphQL */ 'foo';
+                return /** @lang GraphQL */ <<<'GRAPHQL'
+                foo
+                GRAPHQL;
             }
 
-            public function handleField(FieldValue $fieldValue): void
-            {
-            }
+            public function handleField(FieldValue $fieldValue): void {}
         };
 
-        $this->directiveLocator->setResolved('foo', get_class($directive));
+        $this->directiveLocator->setResolved('foo', $directive::class);
 
         $directive = $this
             ->directiveLocator
             ->associated($fieldDefinition)
             ->first();
 
-        $this->assertFalse(property_exists($directive, 'definitionNode'));
+        $this->assertNotInstanceOf(BaseDirective::class, $directive);
     }
 
     public function testThrowsIfDirectiveNameCanNotBeResolved(): void
     {
         $this->expectException(DirectiveException::class);
 
-        $this->directiveLocator->create('bar');
+        $this->directiveLocator->create('foobar');
     }
 
     public function testCreateSingleDirective(): void
     {
-        $fieldDefinition = Parser::fieldDefinition(/** @lang GraphQL */ '
-            foo: [Foo!]! @hasMany
-        ');
+        $fieldDefinition = Parser::fieldDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
+                    foo: [Foo!]! @hasMany
+        GRAPHQL);
 
         $resolver = $this->directiveLocator->exclusiveOfType($fieldDefinition, FieldResolver::class);
         $this->assertInstanceOf(FieldResolver::class, $resolver);
@@ -101,18 +99,18 @@ final class DirectiveLocatorTest extends TestCase
         $this->expectException(DirectiveException::class);
         $this->expectExceptionMessage("Node bar can only have one directive of type Nuwave\Lighthouse\Support\Contracts\FieldResolver but found [@hasMany, @belongsTo].");
 
-        $fieldDefinition = Parser::fieldDefinition(/** @lang GraphQL */ '
-            bar: [Bar!]! @hasMany @belongsTo
-        ');
+        $fieldDefinition = Parser::fieldDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
+                    bar: [Bar!]! @hasMany @belongsTo
+        GRAPHQL);
 
         $this->directiveLocator->exclusiveOfType($fieldDefinition, FieldResolver::class);
     }
 
     public function testCreateMultipleDirectives(): void
     {
-        $fieldDefinition = Parser::fieldDefinition(/** @lang GraphQL */ '
-            bar: String @can(if: ["viewBar"]) @event
-        ');
+        $fieldDefinition = Parser::fieldDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
+                    bar: String @can(if: ["viewBar"]) @event
+        GRAPHQL);
 
         $middleware = $this->directiveLocator->associatedOfType($fieldDefinition, FieldMiddleware::class);
         $this->assertCount(2, $middleware);

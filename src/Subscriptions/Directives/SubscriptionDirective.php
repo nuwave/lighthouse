@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Subscriptions\Directives;
 
@@ -20,11 +20,11 @@ class SubscriptionDirective extends BaseDirective implements Directive
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Reference a class to handle the broadcasting of a subscription to clients.
-The given class must extend `\Nuwave\Lighthouse\Schema\Types\GraphQLSubscription`.
+The given class must extend `Nuwave\Lighthouse\Schema\Types\GraphQLSubscription`.
 """
 directive @subscription(
   """
-  A reference to a subclass of `\Nuwave\Lighthouse\Schema\Types\GraphQLSubscription`.
+  A reference to a subclass of `Nuwave\Lighthouse\Schema\Types\GraphQLSubscription`.
   """
   class: String!
 ) on FIELD_DEFINITION

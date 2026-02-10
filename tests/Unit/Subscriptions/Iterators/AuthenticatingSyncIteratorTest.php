@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Subscriptions\Iterators;
 
@@ -9,7 +9,7 @@ use Nuwave\Lighthouse\Subscriptions\Iterators\AuthenticatingSyncIterator;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionGuard;
 
-final class AuthenticatingSyncIteratorTest extends IteratorTest
+final class AuthenticatingSyncIteratorTest extends IteratorTestBase
 {
     public function testIsWellBehavedIterator(): void
     {
@@ -33,8 +33,9 @@ final class AuthenticatingSyncIteratorTest extends IteratorTest
                 return $subscriber;
             });
 
-        $guard = \Mockery::mock(SubscriptionGuard::class, static function (MockInterface $mock) use ($subscribers) {
-            $subscribers->each(static function (Subscriber $subscriber) use ($mock) {
+        // @phpstan-ignore argument.type (callable for parameter 2 not recognized)
+        $guard = \Mockery::mock(SubscriptionGuard::class, static function (MockInterface $mock) use ($subscribers): void {
+            $subscribers->each(static function (Subscriber $subscriber) use ($mock): void {
                 $user = $subscriber->context->user();
 
                 $mock
@@ -53,12 +54,9 @@ final class AuthenticatingSyncIteratorTest extends IteratorTest
             });
         });
 
-        /** @var \Illuminate\Auth\AuthManager $authManager */
         $authManager = $this->app->make(AuthManager::class);
 
-        $authManager->extend(SubscriptionGuard::GUARD_NAME, static function () use ($guard) {
-            return $guard;
-        });
+        $authManager->extend(SubscriptionGuard::GUARD_NAME, static fn (): SubscriptionGuard => $guard);
 
         $processedItems = [];
         $authenticatedUsers = [];
@@ -70,7 +68,7 @@ final class AuthenticatingSyncIteratorTest extends IteratorTest
             static function (Subscriber $subscriber) use (&$processedItems, &$authenticatedUsers, $authManager): void {
                 $processedItems[] = $subscriber;
                 $authenticatedUsers[] = $authManager->user();
-            }
+            },
         );
 
         $this->assertCount($subscriberCount, $processedItems);
@@ -81,15 +79,9 @@ final class AuthenticatingSyncIteratorTest extends IteratorTest
 
 final class AuthenticatingSyncIteratorAuthenticatableStub implements Authenticatable
 {
-    /**
-     * @var int
-     */
-    private $id;
-
-    public function __construct(int $id)
-    {
-        $this->id = $id;
-    }
+    public function __construct(
+        private int $id,
+    ) {}
 
     public function getAuthIdentifierName()
     {
@@ -101,21 +93,24 @@ final class AuthenticatingSyncIteratorAuthenticatableStub implements Authenticat
         return $this->id;
     }
 
-    public function getAuthPassword()
+    public function getAuthPassword(): string
     {
         return '';
     }
 
-    public function getRememberToken()
+    public function getAuthPasswordName(): string
     {
         return '';
     }
 
-    public function setRememberToken($value)
+    public function getRememberToken(): string
     {
+        return '';
     }
 
-    public function getRememberTokenName()
+    public function setRememberToken($value): void {}
+
+    public function getRememberTokenName(): string
     {
         return '';
     }

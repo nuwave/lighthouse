@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Schema\Directives;
 
@@ -10,16 +10,16 @@ final class WhereDirectiveTest extends DBTestCase
     public function testAttachWhereFilterFromField(): void
     {
         $foo = factory(User::class)->make();
-        assert($foo instanceof User);
+        $this->assertInstanceOf(User::class, $foo);
         $foo->name = 'foo';
         $foo->save();
 
         $bar = factory(User::class)->make();
-        assert($bar instanceof User);
+        $this->assertInstanceOf(User::class, $bar);
         $bar->name = 'bar';
         $bar->save();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -27,16 +27,64 @@ final class WhereDirectiveTest extends DBTestCase
         type Query {
             usersBeginningWithF: [User!]! @all @where(key: "name", operator: "like", value: "f%")
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 usersBeginningWithF {
                     id
                 }
             }
-            ')
+            GRAPHQL)
             ->assertJsonCount(1, 'data.usersBeginningWithF');
+    }
+
+    public function testIgnoreNull(): void
+    {
+        $userWithoutEmail = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $userWithoutEmail);
+        $userWithoutEmail->email = null;
+        $userWithoutEmail->save();
+
+        $userWithEmail = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $userWithEmail);
+
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
+
+        type User {
+            id: ID!
+            email: String
+        }
+
+        type Query {
+            usersIgnoreNull(email: String @where(ignoreNull: true)): [User!]! @all
+            usersExplicitNull(email: String @where): [User!]! @all
+        }
+        GRAPHQL;
+
+        $this
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+            {
+                usersIgnoreNull(email: null) {
+                    id
+                }
+
+                usersExplicitNull(email: null) {
+                    id
+                }
+            }
+            GRAPHQL)
+            ->assertGraphQLErrorFree()
+            ->assertJsonCount(2, 'data.usersIgnoreNull')
+            ->assertJsonPath('data.usersIgnoreNull', [
+                ['id' => (string) $userWithoutEmail->id],
+                ['id' => (string) $userWithEmail->id],
+            ])
+            ->assertJsonCount(1, 'data.usersExplicitNull')
+            ->assertJsonPath('data.usersExplicitNull', [[
+                'id' => (string) $userWithoutEmail->id,
+            ]]);
     }
 }

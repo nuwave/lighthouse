@@ -1,8 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Subscriptions\Storage;
 
+use GraphQL\Utils\Utils;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
+use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
@@ -10,47 +12,37 @@ use Nuwave\Lighthouse\Subscriptions\Subscriber;
 
 class CacheStorageManager implements StoresSubscriptions
 {
-    /**
-     * The cache key for topics.
-     *
-     * @var string
-     */
+    /** The cache key for topics. */
     public const TOPIC_KEY = 'graphql.topic';
 
-    /**
-     * The cache key for subscribers.
-     *
-     * @var string
-     */
+    /** The cache key for subscribers. */
     public const SUBSCRIBER_KEY = 'graphql.subscriber';
 
-    /**
-     * The cache to store channels and topics.
-     *
-     * @var \Illuminate\Contracts\Cache\Repository
-     */
-    protected $cache;
+    /** The cache to store channels and topics. */
+    protected CacheRepository $cache;
 
-    /**
-     * The time to live for items in the cache.
-     *
-     * @var int|null
-     */
-    protected $ttl;
+    /** The time to live for items in the cache. */
+    protected ?int $ttl = null;
 
     public function __construct(CacheFactory $cacheFactory, ConfigRepository $config)
     {
         $storage = $config->get('lighthouse.subscriptions.storage') ?? 'file';
         if (! is_string($storage)) {
-            throw new \Exception('Config setting lighthouse.subscriptions.storage must be a string or `null`, got: ' . \Safe\json_encode($storage));
+            $notStringOrNull = Utils::printSafe($storage);
+            throw new \Exception("Expected config option lighthouse.subscriptions.storage to be a string or null, got: {$notStringOrNull}.");
         }
+
         $this->cache = $cacheFactory->store($storage);
 
         $ttl = $config->get('lighthouse.subscriptions.storage_ttl');
-        if (! is_null($ttl) && ! is_int($ttl)) {
-            throw new \Exception('Config setting lighthouse.subscriptions.storage_ttl must be a int or `null`, got: ' . \Safe\json_encode($ttl));
+        if (is_int($ttl) || is_null($ttl)) {
+            $this->ttl = $ttl;
+        } elseif (is_string($ttl) && is_numeric($ttl)) {
+            $this->ttl = (int) $ttl;
+        } else {
+            $notIntOrNumericString = Utils::printSafe($ttl);
+            throw new \Exception("Expected config option lighthouse.subscriptions.storage_ttl to be an int, null or a numeric string, got: {$notIntOrNumericString}.");
         }
-        $this->ttl = $ttl;
     }
 
     public function subscriberByChannel(string $channel): ?Subscriber
@@ -60,11 +52,8 @@ class CacheStorageManager implements StoresSubscriptions
 
     public function subscribersByTopic(string $topic): Collection
     {
-        return $this
-            ->retrieveTopic(self::topicKey($topic))
-            ->map(function (string $channel): ?Subscriber {
-                return $this->subscriberByChannel($channel);
-            })
+        return $this->retrieveTopic(self::topicKey($topic))
+            ->map(fn (string $channel): ?Subscriber => $this->subscriberByChannel($channel))
             ->filter();
     }
 
@@ -74,7 +63,7 @@ class CacheStorageManager implements StoresSubscriptions
         $this->addSubscriberToTopic($subscriber);
 
         $channelKey = self::channelKey($subscriber->channel);
-        if (null === $this->ttl) {
+        if ($this->ttl === null) {
             $this->cache->forever($channelKey, $subscriber);
         } else {
             $this->cache->put($channelKey, $subscriber, $this->ttl);
@@ -85,7 +74,7 @@ class CacheStorageManager implements StoresSubscriptions
     {
         $subscriber = $this->cache->pull(self::channelKey($channel));
 
-        if (null !== $subscriber) {
+        if ($subscriber !== null) {
             $this->removeSubscriberFromTopic($subscriber);
         }
 
@@ -95,11 +84,11 @@ class CacheStorageManager implements StoresSubscriptions
     /**
      * Store a topic (list of channels) in the cache.
      *
-     * @param  \Illuminate\Support\Collection<string>  $topic
+     * @param  \Illuminate\Support\Collection<int, string>  $topic
      */
     protected function storeTopic(string $key, Collection $topic): void
     {
-        if (null === $this->ttl) {
+        if ($this->ttl === null) {
             $this->cache->forever($key, $topic);
         } else {
             $this->cache->put($key, $topic, $this->ttl);
@@ -109,16 +98,14 @@ class CacheStorageManager implements StoresSubscriptions
     /**
      * Retrieve a topic (list of channels) from the cache.
      *
-     * @return \Illuminate\Support\Collection<string>
+     * @return \Illuminate\Support\Collection<int, string>
      */
     protected function retrieveTopic(string $key): Collection
     {
         return $this->cache->get($key, new Collection());
     }
 
-    /**
-     * Add the subscriber to the topic they subscribe to.
-     */
+    /** Add the subscriber to the topic they subscribe to. */
     protected function addSubscriberToTopic(Subscriber $subscriber): void
     {
         $topicKey = self::topicKey($subscriber->topic);
@@ -128,19 +115,14 @@ class CacheStorageManager implements StoresSubscriptions
         $this->storeTopic($topicKey, $topic);
     }
 
-    /**
-     * Remove the subscriber from the topic they are subscribed to.
-     */
+    /** Remove the subscriber from the topic they are subscribed to. */
     protected function removeSubscriberFromTopic(Subscriber $subscriber): void
     {
         $topicKey = self::topicKey($subscriber->topic);
         $channelKeyToRemove = self::channelKey($subscriber->channel);
 
-        $topicWithoutSubscriber = $this
-            ->retrieveTopic($topicKey)
-            ->reject(function (string $channel) use ($channelKeyToRemove): bool {
-                return self::channelKey($channel) === $channelKeyToRemove;
-            });
+        $topicWithoutSubscriber = $this->retrieveTopic($topicKey)
+            ->reject(static fn (string $channel): bool => self::channelKey($channel) === $channelKeyToRemove);
 
         if ($topicWithoutSubscriber->isEmpty()) {
             $this->cache->forget($topicKey);

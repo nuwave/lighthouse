@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Tracing;
 
@@ -12,7 +12,7 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 class TracingDirective extends BaseDirective implements FieldMiddleware
 {
     public function __construct(
-        protected Tracing $tracing
+        protected Tracing $tracing,
     ) {}
 
     public static function definition(): string
@@ -28,12 +28,12 @@ GRAPHQL;
 
     public function handleField(FieldValue $fieldValue): void
     {
-        $fieldValue->wrapResolver(fn (callable $resolver) => function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
+        $fieldValue->wrapResolver(fn (callable $resolver): \Closure => function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
             $start = $this->tracing->timestamp();
             $result = $resolver($root, $args, $context, $resolveInfo);
-            $end = $this->tracing->timestamp();
 
-            Resolved::handle($result, function () use ($resolveInfo, $start, $end): void {
+            Resolved::handle($result, function () use ($resolveInfo, $start): void {
+                $end = $this->tracing->timestamp();
                 $this->tracing->record($resolveInfo, $start, $end);
             });
 

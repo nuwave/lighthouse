@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration;
 
@@ -15,7 +15,7 @@ final class CustomDefaultResolverTest extends TestCase
             'bar' => 'should not be returned',
         ]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: Foo @mock
         }
@@ -23,21 +23,19 @@ final class CustomDefaultResolverTest extends TestCase
         type Foo {
             bar: Int
         }
-        ';
+        GRAPHQL;
 
         $previous = Executor::getDefaultFieldResolver();
 
-        Executor::setDefaultFieldResolver(function (): int {
-            return self::CUSTOM_RESOLVER_RESULT;
-        });
+        Executor::setDefaultFieldResolver(static fn (): int => self::CUSTOM_RESOLVER_RESULT);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo {
                 bar
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'foo' => [
                     'bar' => self::CUSTOM_RESOLVER_RESULT,

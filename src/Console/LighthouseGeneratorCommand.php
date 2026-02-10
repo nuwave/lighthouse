@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Console;
 
@@ -16,26 +16,22 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
     protected function getNameInput(): string
     {
         $name = $this->argument('name');
-        if (! is_string($name)) {
-            throw new \InvalidArgumentException('You must the name for the class to generate.');
+        if (! is_string($name)) { // @phpstan-ignore function.alreadyNarrowedType (necessary in some dependency versions)
+            throw new \InvalidArgumentException('You must specify the name for the class to generate.');
         }
 
         return ucfirst(trim($name));
     }
 
-    /**
-     * @param  string  $rootNamespace
-     */
+    /** @param  string  $rootNamespace */
     protected function getDefaultNamespace($rootNamespace): string
     {
-        $namespaces = config('lighthouse.namespaces.' . $this->namespaceConfigKey());
+        $namespaces = config("lighthouse.namespaces.{$this->namespaceConfigKey()}");
 
         return static::commonNamespace((array) $namespaces);
     }
 
-    /**
-     * Get the config key that holds the default namespaces for the class.
-     */
+    /** Get the config key that holds the default namespaces for the class. */
     abstract protected function namespaceConfigKey(): string;
 
     /**
@@ -47,13 +43,11 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
      */
     public static function commonNamespace(array $namespaces): string
     {
-        if ([] === $namespaces) {
-            throw new \InvalidArgumentException(
-                'A default namespace is required for code generation.'
-            );
+        if ($namespaces === []) {
+            throw new \InvalidArgumentException('A default namespace is required for code generation.');
         }
 
-        if (1 === count($namespaces)) {
+        if (count($namespaces) === 1) {
             return reset($namespaces);
         }
 
@@ -84,8 +78,8 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
         }
 
         // We could not determine a common part of the configured namespaces,
-        // so we just assume the user will prefer the first one in the list.
-        if ([] === $matching) {
+        // so we assume the user will prefer the first one in the list.
+        if ($matching === []) {
             return $preferredNamespaceFallback;
         }
 

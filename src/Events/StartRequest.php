@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Events;
 
@@ -11,27 +11,17 @@ use Illuminate\Support\Carbon;
  * Can be used for logging or for measuring and monitoring
  * the time a request takes to resolve.
  *
- * @see \Nuwave\Lighthouse\Support\Http\Controllers\GraphQLController
+ * @see \Nuwave\Lighthouse\Http\GraphQLController
  */
 class StartRequest
 {
-    /**
-     * The request sent from the client.
-     *
-     * @var \Illuminate\Http\Request
-     */
-    public $request;
+    /** The point in time when the request started. */
+    public Carbon $moment;
 
-    /**
-     * The point in time when the request started.
-     *
-     * @var \Illuminate\Support\Carbon
-     */
-    public $moment;
-
-    public function __construct(Request $request)
-    {
-        $this->request = $request;
+    public function __construct(
+        /** The request sent from the client. */
+        public Request $request,
+    ) {
         $this->moment = Carbon::now();
     }
 }

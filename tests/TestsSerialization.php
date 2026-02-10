@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests;
 
@@ -6,15 +6,15 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Http\Request;
-use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Support\Contracts\SerializesContext;
 use Tests\Utils\Models\User;
 
 trait TestsSerialization
 {
     protected function fakeContextSerializer(): void
     {
-        $contextSerializer = new class() implements ContextSerializer {
+        $contextSerializer = new class() implements SerializesContext {
             public function serialize(GraphQLContext $context): string
             {
                 return 'foo';
@@ -28,19 +28,17 @@ trait TestsSerialization
                         return new User();
                     }
 
+                    public function setUser(?Authenticatable $user): void {}
+
                     public function request(): Request
                     {
                         return new Request();
-                    }
-
-                    public function setUser(?Authenticatable $user): void
-                    {
                     }
                 };
             }
         };
 
-        Container::getInstance()->instance(ContextSerializer::class, $contextSerializer);
+        Container::getInstance()->instance(SerializesContext::class, $contextSerializer);
     }
 
     protected function useSerializingArrayStore(): void

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
@@ -20,7 +20,7 @@ class ArgPartitioner
      *
      * @return array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>
      */
-    public static function nestedArgResolvers(ArgumentSet $argumentSet, $root): array
+    public static function nestedArgResolvers(ArgumentSet $argumentSet, mixed $root): array
     {
         $model = $root instanceof Model
             ? new \ReflectionClass($root)
@@ -32,9 +32,7 @@ class ArgPartitioner
 
         return static::partition(
             $argumentSet,
-            static function (string $name, Argument $argument): bool {
-                return null !== $argument->resolver;
-            }
+            static fn (string $name, Argument $argument): bool => isset($argument->resolver),
         );
     }
 
@@ -66,23 +64,19 @@ class ArgPartitioner
     public static function relationMethods(
         ArgumentSet $argumentSet,
         Model $model,
-        string $relationClass
+        string $relationClass,
     ): array {
         $modelReflection = new \ReflectionClass($model);
 
         [$relations, $remaining] = static::partition(
             $argumentSet,
-            static function (string $name) use ($modelReflection, $relationClass): bool {
-                return static::methodReturnsRelation($modelReflection, $name, $relationClass);
-            }
+            static fn (string $name): bool => static::methodReturnsRelation($modelReflection, $name, $relationClass),
         );
 
         $nonNullRelations = new ArgumentSet();
         $nonNullRelations->arguments = array_filter(
             $relations->arguments,
-            static function (Argument $argument): bool {
-                return null !== $argument->value;
-            }
+            static fn (Argument $argument): bool => $argument->value !== null,
         );
 
         return [$nonNullRelations, $remaining];
@@ -90,23 +84,24 @@ class ArgPartitioner
 
     /**
      * Attach a nested argument resolver to an argument.
+     *
+     * @param  \ReflectionClass<\Illuminate\Database\Eloquent\Model>|null  $model
      */
     protected static function attachNestedArgResolver(string $name, Argument &$argument, ?\ReflectionClass $model): void
     {
         $resolverDirective = $argument->directives->first(
-            Utils::instanceofMatcher(ArgResolver::class)
+            Utils::instanceofMatcher(ArgResolver::class),
         );
+        assert($resolverDirective instanceof ArgResolver || $resolverDirective === null);
 
-        if ($resolverDirective) {
+        if ($resolverDirective !== null) {
             $argument->resolver = $resolverDirective;
 
             return;
         }
 
         if (isset($model)) {
-            $isRelation = static function (string $relationClass) use ($model, $name): bool {
-                return static::methodReturnsRelation($model, $name, $relationClass);
-            };
+            $isRelation = static fn (string $relationClass): bool => static::methodReturnsRelation($model, $name, $relationClass);
 
             if (
                 $isRelation(HasOne::class)
@@ -147,9 +142,11 @@ class ArgPartitioner
      * - the first one contains all arguments for which the predicate matched
      * - the second one contains all arguments for which the predicate did not match
      *
+     * @param  callable(string $name, \Nuwave\Lighthouse\Execution\Arguments\Argument $argument): bool  $predicate
+     *
      * @return array{0: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet, 1: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet}
      */
-    public static function partition(ArgumentSet $argumentSet, \Closure $predicate): array
+    public static function partition(ArgumentSet $argumentSet, callable $predicate): array
     {
         $matched = new ArgumentSet();
         $notMatched = new ArgumentSet();
@@ -170,11 +167,13 @@ class ArgPartitioner
 
     /**
      * Does a method on the model return a relation of the given class?
+     *
+     * @param  \ReflectionClass<\Illuminate\Database\Eloquent\Model>  $modelReflection
      */
     public static function methodReturnsRelation(
         \ReflectionClass $modelReflection,
         string $name,
-        string $relationClass
+        string $relationClass,
     ): bool {
         if (! $modelReflection->hasMethod($name)) {
             return false;
@@ -192,7 +191,7 @@ class ArgPartitioner
         }
 
         if (! class_exists($returnType->getName())) {
-            throw new DefinitionException('Class ' . $returnType->getName() . ' does not exist, did you forget to import the Eloquent relation class?');
+            throw new DefinitionException("Class {$returnType->getName()} does not exist, did you forget to import the Eloquent relation class?");
         }
 
         return is_a($returnType->getName(), $relationClass, true);

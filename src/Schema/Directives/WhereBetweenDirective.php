@@ -1,7 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
 class WhereBetweenDirective extends BaseDirective implements ArgBuilderDirective
@@ -25,11 +28,15 @@ directive @whereBetween(
 GRAPHQL;
     }
 
-    public function handleBuilder($builder, $value): object
+    public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, $value): QueryBuilder|EloquentBuilder|Relation
     {
+        if ($value === null) {
+            return $builder;
+        }
+
         return $builder->whereBetween(
             $this->directiveArgValue('key', $this->nodeName()),
-            $value
+            $value,
         );
     }
 }

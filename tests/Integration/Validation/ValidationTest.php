@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Validation;
 
@@ -28,42 +28,85 @@ final class ValidationTest extends TestCase
     public function testRunsValidationBeforeCallingTheResolver(): void
     {
         $this->mockResolverExpects(
-            $this->never()
+            $this->never(),
         );
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             doNotCall(
                 bar: String @rules(apply: ["required"])
             ): String @mock
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 doNotCall
             }
-            ')
+            GRAPHQL)
             ->assertGraphQLValidationKeys(['bar']);
     }
 
     public function testFullValidationError(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(
                 bar: String @rules(apply: ["required"])
             ): Int
         }
-        ';
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            foo
+        }
+        GRAPHQL)->assertExactJson([
+            'errors' => [
+                [
+                    'message' => 'Validation failed for the field [foo].',
+                    'extensions' => [
+                        ValidationException::KEY => [
+                            'bar' => [
+                                'The bar field is required.',
+                            ],
+                        ],
+                    ],
+                    'locations' => [
+                        [
+                            'line' => 2,
+                            'column' => 5,
+                        ],
+                    ],
+                    'path' => ['foo'],
+                ],
+            ],
+            'data' => [
+                'foo' => null,
+            ],
+        ]);
+    }
+
+    public function testFullValidationErrorWithoutLocationParse(): void
+    {
+        $config = $this->app->make(ConfigRepository::class);
+        $config->set('lighthouse.parse_source_location', false);
+
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Query {
+            foo(
+                bar: String @rules(apply: ["required"])
+            ): Int
+        }
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 foo
             }
-            ')
+            GRAPHQL)
             ->assertExactJson([
                 'errors' => [
                     [
@@ -73,12 +116,6 @@ final class ValidationTest extends TestCase
                                 'bar' => [
                                     'The bar field is required.',
                                 ],
-                            ],
-                        ],
-                        'locations' => [
-                            [
-                                'line' => 3,
-                                'column' => 17,
                             ],
                         ],
                         'path' => ['foo'],
@@ -92,7 +129,7 @@ final class ValidationTest extends TestCase
 
     public function testRunsOnNonRootFields(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: Foo @mock
         }
@@ -103,7 +140,7 @@ final class ValidationTest extends TestCase
                 required: Int @rules(apply: ["required"])
             ): Int
         }
-        ';
+        GRAPHQL;
 
         $this->mockResolver([
             'bar' => 123,
@@ -111,14 +148,14 @@ final class ValidationTest extends TestCase
         ]);
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 foo {
                     bar
                     baz
                 }
             }
-            ')
+            GRAPHQL)
             ->assertJson([
                 'data' => [
                     'foo' => [
@@ -144,24 +181,24 @@ final class ValidationTest extends TestCase
 
     public function testCombinedRulesChangeTheirSemantics(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(
                 bar: Int @rules(apply: ["min:42"])
                 baz: Int @rules(apply: ["int", "min:42"])
             ): ID
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 foo(
                     bar: 21
                     baz: 21
                 )
             }
-            ')
+            GRAPHQL)
             ->assertGraphQLValidationError('bar', AppVersion::atLeast(10.0)
                 ? 'The bar field must be at least 42 characters.'
                 : 'The bar must be at least 42 characters.')
@@ -172,7 +209,7 @@ final class ValidationTest extends TestCase
 
     public function testValidatesDifferentPathsIndividually(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(
                 bar: String @rules(apply: ["email"])
@@ -184,10 +221,10 @@ final class ValidationTest extends TestCase
             baz: String @rules(apply: ["email"])
             input: BazInput
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 foo(
                     bar: "invalid email"
@@ -203,7 +240,7 @@ final class ValidationTest extends TestCase
                     ]
                 )
             }
-            ')
+            GRAPHQL)
             ->assertGraphQLValidationKeys([
                 'bar',
                 'input.0.baz',
@@ -213,17 +250,17 @@ final class ValidationTest extends TestCase
 
     public function testValidatesListContents(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(
                 list: [String]
                     @rules(apply: ["required", "email"])
             ): ID
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 foo(
                     list: [
@@ -233,7 +270,7 @@ final class ValidationTest extends TestCase
                     ]
                 )
             }
-            ')
+            GRAPHQL)
             ->assertGraphQLValidationKeys([
                 'list.0',
                 'list.2',
@@ -242,9 +279,9 @@ final class ValidationTest extends TestCase
 
     public function testSanitizeValidateTransform(): void
     {
-        $this->mockResolver(fn ($_, array $args): string => $args['password']);
+        $this->mockResolver(static fn ($_, array $args): string => $args['password']);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             password(
                 password: String
@@ -253,24 +290,24 @@ final class ValidationTest extends TestCase
                     @hash
             ): String @mock
         }
-        ';
+        GRAPHQL;
 
-        $validPasswordResult = $this->graphQL(/** @lang GraphQL */ '
+        $validPasswordResult = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             password(password: " 1234567 ")
         }
-        ');
+        GRAPHQL);
         $password = $validPasswordResult->json('data.password');
 
         $this->assertNotSame(' 1234567 ', $password);
         $this->assertTrue(password_verify('1234567', $password));
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 password(password: " 1234 ")
             }
-            ')
+            GRAPHQL)
             ->assertJson([
                 'data' => [
                     'password' => null,
@@ -281,7 +318,7 @@ final class ValidationTest extends TestCase
 
     public function testValidatesRulesOnInputObjectFields(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(
                 input: FooInput
@@ -291,10 +328,10 @@ final class ValidationTest extends TestCase
         input FooInput {
             email: String @rules(apply: ["email"])
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 foo(
                     input: {
@@ -302,11 +339,11 @@ final class ValidationTest extends TestCase
                     }
                 )
             }
-            ')
+            GRAPHQL)
             ->assertGraphQLValidationKeys(['input.email']);
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 foo(
                     input: {
@@ -314,13 +351,13 @@ final class ValidationTest extends TestCase
                     }
                 )
             }
-            ')
+            GRAPHQL)
             ->assertGraphQLValidationPasses();
     }
 
     public function testCombinesArgumentValidationWhenGrouped(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(
                 bar: String
@@ -328,24 +365,24 @@ final class ValidationTest extends TestCase
                     @rules(apply: ["max:3"])
             ): Int
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 foo(bar: "f")
             }
-            ')
+            GRAPHQL)
             ->assertGraphQLValidationError('bar', AppVersion::atLeast(10.0)
                 ? 'The bar field must be at least 2 characters.'
                 : 'The bar must be at least 2 characters.');
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 foo(bar: "fasdf")
             }
-            ')
+            GRAPHQL)
             ->assertGraphQLValidationError('bar', AppVersion::atLeast(10.0)
                 ? 'The bar field must not be greater than 3 characters.'
                 : 'The bar must not be greater than 3 characters.');
@@ -353,7 +390,7 @@ final class ValidationTest extends TestCase
 
     public function testSingleFieldReferencesAreQualified(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(input: Custom): String
         }
@@ -362,10 +399,10 @@ final class ValidationTest extends TestCase
             foo: String
             bar: String @rules(apply: ["required_if:foo,baz"])
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 foo(
                     input: {
@@ -373,11 +410,11 @@ final class ValidationTest extends TestCase
                     }
                 )
             }
-            ')
+            GRAPHQL)
             ->assertGraphQLValidationPasses();
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 foo(
                     input: {
@@ -385,13 +422,13 @@ final class ValidationTest extends TestCase
                     }
                 )
             }
-            ')
+            GRAPHQL)
             ->assertGraphQLValidationError('input.bar', 'The input.bar field is required when input.foo is baz.');
     }
 
     public function testOptionalFieldReferencesAreQualified(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(input: Custom): String
         }
@@ -400,10 +437,10 @@ final class ValidationTest extends TestCase
             foo: String @rules(apply: ["after:2018-01-01"])
             bar: String @rules(apply: ["after:foo"])
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 foo(
                     input: {
@@ -412,11 +449,11 @@ final class ValidationTest extends TestCase
                     }
                 )
             }
-            ')
+            GRAPHQL)
             ->assertGraphQLValidationPasses();
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 foo(
                     input: {
@@ -425,7 +462,7 @@ final class ValidationTest extends TestCase
                     }
                 )
             }
-            ')
+            GRAPHQL)
             ->assertGraphQLValidationError('input.foo', AppVersion::atLeast(10.0)
                 ? 'The input.foo field must be a date after 2018-01-01.'
                 : 'The input.foo must be a date after 2018-01-01.')
@@ -436,17 +473,15 @@ final class ValidationTest extends TestCase
 
     public function testCustomValidationWithReferencesAreQualified(): void
     {
-        ValidatorFactory::extendDependent('equal_field', function ($attribute, $value, $parameters, Validator $validator) {
+        ValidatorFactory::extendDependent('equal_field', static function ($attribute, $value, $parameters, Validator $validator): bool {
             $reference = Arr::get($validator->getData(), $parameters[0]);
 
             return $reference === $value;
         }, 'The :attribute must be equal to :other.');
 
-        ValidatorFactory::replacer('equal_field', function (string $message, string $attribute, string $rule, array $parameters) {
-            return str_replace(':other', implode(', ', $parameters), $message);
-        });
+        ValidatorFactory::replacer('equal_field', static fn (string $message, string $attribute, string $rule, array $parameters): string => str_replace(':other', implode(', ', $parameters), $message));
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(input: Custom): String
         }
@@ -456,10 +491,10 @@ final class ValidationTest extends TestCase
             bar: Int @rules(apply: ["with_reference:equal_field,0,foo"])
             baz: Int @rules(apply: ["with_reference:equal_field,0_1,foo,bar"])
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 foo(
                     input: {
@@ -469,11 +504,11 @@ final class ValidationTest extends TestCase
                     }
                 )
             }
-            ')
+            GRAPHQL)
             ->assertGraphQLValidationPasses();
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 foo(
                     input: {
@@ -483,7 +518,7 @@ final class ValidationTest extends TestCase
                     }
                 )
             }
-            ')
+            GRAPHQL)
             ->assertGraphQLValidationError('input.bar', 'The input.bar must be equal to input.foo.')
             ->assertGraphQLValidationError('input.baz', 'The input.baz must be equal to input.foo, input.bar.');
     }
@@ -492,19 +527,19 @@ final class ValidationTest extends TestCase
     {
         config(['app.debug' => true]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(input: Custom): String
         }
 
-        input Custom @validator(class: "Tests\\\\Utils\\\\Validators\\\\EqualFieldCustomRuleValidator") {
+        input Custom @validator(class: "Tests\\Utils\\Validators\\EqualFieldCustomRuleValidator") {
             foo: Int
             bar: Int
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 foo(
                     input: {
@@ -513,13 +548,13 @@ final class ValidationTest extends TestCase
                     }
                 )
             }
-            ')
+            GRAPHQL)
             ->assertGraphQLValidationError('input.bar', 'input');
     }
 
     public function testMultipleFieldReferencesAreQualified(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(input: Custom): String
         }
@@ -529,10 +564,10 @@ final class ValidationTest extends TestCase
             bar: String @rules(apply: ["required_without_all:foo,baz"])
             baz: String
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 foo(
                     input: {
@@ -540,34 +575,34 @@ final class ValidationTest extends TestCase
                     }
                 )
             }
-            ')
+            GRAPHQL)
             ->assertGraphQLValidationPasses();
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 foo(
                     input: {}
                 )
             }
-            ')
+            GRAPHQL)
             ->assertGraphQLValidationError('input.bar', 'The input.bar field is required when none of input.foo / input.baz are present.');
     }
 
     public function testClosureRulesAreUsed(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(input: Custom): String
         }
 
-        input Custom @validator(class: "Tests\\\\Utils\\\\Validators\\\\FooClosureValidator") {
+        input Custom @validator(class: "Tests\\Utils\\Validators\\FooClosureValidator") {
             foo: String!
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 foo(
                     input: {
@@ -575,11 +610,11 @@ final class ValidationTest extends TestCase
                     }
                 )
             }
-            ')
+            GRAPHQL)
             ->assertGraphQLValidationPasses();
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 foo(
                     input: {
@@ -587,13 +622,13 @@ final class ValidationTest extends TestCase
                     }
                 )
             }
-            ')
+            GRAPHQL)
             ->assertGraphQLValidationError('input.foo', FooClosureValidator::notFoo('input.foo'));
     }
 
     public function testReturnsMultipleValidationErrorsPerField(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(
                 input: FooInput
@@ -603,10 +638,10 @@ final class ValidationTest extends TestCase
         input FooInput {
             email: String @rules(apply: ["email", "min:16"])
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 foo(
                     input: {
@@ -614,7 +649,7 @@ final class ValidationTest extends TestCase
                     }
                 )
             }
-            ')
+            GRAPHQL)
             ->assertGraphQLValidationError('input.email', AppVersion::atLeast(10.0)
                 ? 'The input.email field must be a valid email address.'
                 : 'The input.email must be a valid email address.')

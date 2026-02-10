@@ -1,7 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Validation;
 
+use Illuminate\Testing\TestResponse;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
@@ -9,17 +10,17 @@ final class ExistsRuleTest extends DBTestCase
 {
     public function testExistsRule(): void
     {
-        /** @var \Tests\Utils\Models\User $userValid */
+        /** @var User $userValid */
         $userValid = factory(User::class)->make();
         $userValid->name = 'Admin';
         $userValid->save();
 
-        /** @var \Tests\Utils\Models\User $userInvalid */
+        /** @var User $userInvalid */
         $userInvalid = factory(User::class)->make();
         $userInvalid->name = 'Tester';
         $userInvalid->save();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             callbackUser(id: ID! @eq): User @validator @find
             macroUser(id: ID! @eq): User @validator @find
@@ -28,7 +29,7 @@ final class ExistsRuleTest extends DBTestCase
         type User {
             id: ID!
         }
-        ';
+        GRAPHQL;
 
         $this->macroUser($userValid)
             ->assertGraphQLValidationPasses();
@@ -43,34 +44,28 @@ final class ExistsRuleTest extends DBTestCase
             ->assertGraphQLValidationError('id', 'The selected id is invalid.');
     }
 
-    /**
-     * @return \Illuminate\Testing\TestResponse
-     */
-    protected function macroUser(User $user)
+    private function macroUser(User $user): TestResponse
     {
-        return $this->graphQL(/** @lang GraphQL */ '
+        return $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($id: ID!) {
             macroUser(id: $id) {
                 id
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $user->id,
         ]);
     }
 
-    /**
-     * @return \Illuminate\Testing\TestResponse
-     */
-    protected function callbackUser(User $user)
+    private function callbackUser(User $user): TestResponse
     {
-        return $this->graphQL(/** @lang GraphQL */ '
+        return $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($id: ID!) {
             callbackUser(id: $id) {
                 id
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $user->id,
         ]);
     }

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Subscriptions\Broadcasters;
 
@@ -11,20 +11,14 @@ use Nuwave\Lighthouse\Subscriptions\Subscriber;
 
 class EchoBroadcaster implements Broadcaster
 {
-    /**
-     * @var \Illuminate\Broadcasting\BroadcastManager
-     */
-    protected $broadcaster;
+    public function __construct(
+        protected BroadcastManager $broadcaster,
+    ) {}
 
-    public function __construct(BroadcastManager $broadcaster)
-    {
-        $this->broadcaster = $broadcaster;
-    }
-
-    public function broadcast(Subscriber $subscriber, $data): void
+    public function broadcast(Subscriber $subscriber, mixed $data): void
     {
         $this->broadcaster->event(
-            new EchoSubscriptionEvent($subscriber->channel, $data)
+            new EchoSubscriptionEvent($subscriber->channel, $data),
         );
     }
 
@@ -32,7 +26,7 @@ class EchoBroadcaster implements Broadcaster
     {
         $userId = md5(
             $request->input('channel_name')
-            . $request->input('socket_id')
+            . $request->input('socket_id'),
         );
 
         return new JsonResponse([

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
@@ -25,18 +25,14 @@ directive @trim on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITI
 GRAPHQL;
     }
 
-    /**
-     * Remove whitespace from the beginning and end of a given input.
-     */
-    public function sanitize($argumentValue)
+    /** Remove whitespace from the beginning and end of a given input. */
+    public function sanitize(mixed $argumentValue): mixed
     {
         return Utils::mapEach(
-            function ($value) {
-                return $value instanceof ArgumentSet
-                    ? $this->transformArgumentSet($value)
-                    : $this->transformLeaf($value);
-            },
-            $argumentValue
+            fn (mixed $value): mixed => $value instanceof ArgumentSet
+                ? $this->transformArgumentSet($value)
+                : $this->transformLeaf($value),
+            $argumentValue,
         );
     }
 
@@ -59,7 +55,7 @@ GRAPHQL;
      *
      * @return mixed The transformed value
      */
-    protected function transformLeaf($value)
+    protected function transformLeaf(mixed $value): mixed
     {
         if (is_string($value)) {
             return trim($value);

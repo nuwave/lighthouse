@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\WhereConditions;
 
@@ -9,25 +9,22 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
 
 class WhereConditionsHandler
 {
-    /**
-     * @var \Nuwave\Lighthouse\WhereConditions\Operator
-     */
-    protected $operator;
-
-    public function __construct(Operator $operator)
-    {
-        $this->operator = $operator;
-    }
+    public function __construct(
+        protected Operator $operator,
+    ) {}
 
     /**
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
+     * @template TModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<TModel>  $builder
      * @param  array<string, mixed>  $whereConditions
+     * @param  TModel|null  $model
      */
     public function __invoke(
         object $builder,
         array $whereConditions,
-        Model $model = null,
-        string $boolean = 'and'
+        ?Model $model = null,
+        string $boolean = 'and',
     ): void {
         if ($builder instanceof EloquentBuilder) {
             $model = $builder->getModel();
@@ -35,23 +32,23 @@ class WhereConditionsHandler
 
         if ($andConnectedConditions = $whereConditions['AND'] ?? null) {
             $builder->whereNested(
-                function ($builder) use ($andConnectedConditions, $model): void {
+                function (QueryBuilder|EloquentBuilder $builder) use ($andConnectedConditions, $model): void {
                     foreach ($andConnectedConditions as $condition) {
                         $this->__invoke($builder, $condition, $model);
                     }
                 },
-                $boolean
+                $boolean,
             );
         }
 
         if ($orConnectedConditions = $whereConditions['OR'] ?? null) {
             $builder->whereNested(
-                function ($builder) use ($orConnectedConditions, $model): void {
+                function (QueryBuilder|EloquentBuilder $builder) use ($orConnectedConditions, $model): void {
                     foreach ($orConnectedConditions as $condition) {
                         $this->__invoke($builder, $condition, $model, 'or');
                     }
                 },
-                $boolean
+                $boolean,
             );
         }
 
@@ -61,67 +58,56 @@ class WhereConditionsHandler
                 $hasRelationConditions['relation'],
                 $hasRelationConditions['operator'],
                 $hasRelationConditions['amount'],
-                $hasRelationConditions['condition'] ?? null
+                $hasRelationConditions['condition'] ?? null,
             );
-
-            // @phpstan-ignore-next-line Simply wrong, maybe from Larastan?
             $builder->addNestedWhereQuery($nestedBuilder, $boolean);
         }
 
         if ($column = $whereConditions['column'] ?? null) {
             $this->assertValidColumnReference($column);
-
             $this->operator->applyConditions($builder, $whereConditions, $boolean);
         }
     }
 
-    /**
-     * @param  array<string, mixed>|null  $condition
-     */
+    /** @param  array<string, mixed>|null  $condition */
     public function handleHasCondition(
         Model $model,
         string $relation,
         string $operator,
         int $amount,
-        ?array $condition = null
+        ?array $condition = null,
     ): QueryBuilder {
         return $model
             ->newQuery()
             ->whereHas(
                 $relation,
                 $condition
-                    ? function ($builder) use ($condition): void {
+                    ? function (EloquentBuilder $builder) use ($condition): void {
                         $this->__invoke(
                             $builder,
                             $this->prefixConditionWithTableName(
                                 $condition,
-                                $builder->getModel()
+                                $builder->getModel(),
                             ),
-                            $builder->getModel()
+                            $builder->getModel(),
                         );
                     }
-                    : null,
+                : null,
                 $operator,
-                $amount
+                $amount,
             )
             ->getQuery();
     }
 
-    /**
-     * Ensure the column name is well formed to prevent SQL injection.
-     *
-     * @throws \GraphQL\Error\Error
-     */
+    /** Ensure the column name is well formed to prevent SQL injection. */
     protected function assertValidColumnReference(string $column): void
     {
         // A valid column reference:
         // - must not start with a digit, dot or hyphen
         // - must contain only alphanumerics, digits, underscores, dots, hyphens or JSON references
         $match = \Safe\preg_match('/^(?![0-9.-])([A-Za-z0-9_.-]|->)*$/', $column);
-        if (0 === $match) {
-            throw new Error(
-                self::invalidColumnName($column)
-            );
+        if ($match === 0) {
+            throw new Error(self::invalidColumnName($column));
         }
     }
 
@@ -143,7 +129,7 @@ class WhereConditionsHandler
     protected function prefixConditionWithTableName(array $condition, Model $model): array
     {
         if (isset($condition['column'])) {
-            $condition['column'] = $model->getTable() . '.' . $condition['column'];
+            $condition['column'] = "{$model->getTable()}.{$condition['column']}";
         }
 
         return $condition;

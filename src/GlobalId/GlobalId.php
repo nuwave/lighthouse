@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\GlobalId;
 
@@ -7,12 +7,8 @@ namespace Nuwave\Lighthouse\GlobalId;
  */
 interface GlobalId
 {
-    /**
-     * Glue together a type and an id to create a global id.
-     *
-     * @param  string|int  $id
-     */
-    public function encode(string $type, $id): string;
+    /** Glue together a type and an id to create a global id. */
+    public function encode(string $type, int|string $id): string;
 
     /**
      * Split a global id into the type and the id it contains.
@@ -21,13 +17,9 @@ interface GlobalId
      */
     public function decode(string $globalID): array;
 
-    /**
-     * Decode the Global ID and get just the ID.
-     */
+    /** Decode the Global ID and get just the ID. */
     public function decodeID(string $globalID): string;
 
-    /**
-     * Decode the Global ID and get just the type.
-     */
+    /** Decode the Global ID and get just the type. */
     public function decodeType(string $globalID): string;
 }

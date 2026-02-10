@@ -1,9 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Schema\Directives;
 
 use GraphQL\Validator\Rules\QueryComplexity;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
+use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
+use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
 
@@ -13,10 +15,18 @@ final class ComplexityDirectiveTest extends TestCase
 
     public function testDefaultComplexity(): void
     {
+        $eventsDispatcher = $this->app->make(EventsDispatcher::class);
+
+        /** @var array<int, BuildExtensionsResponse> $events */
+        $events = [];
+        $eventsDispatcher->listen(BuildExtensionsResponse::class, static function (BuildExtensionsResponse $event) use (&$events): void {
+            $events[] = $event;
+        });
+
         $max = 1;
         $this->setMaxQueryComplexity($max);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             posts: [Post!]! @all
         }
@@ -24,15 +34,23 @@ final class ComplexityDirectiveTest extends TestCase
         type Post {
             title: String
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             posts {
                 title
             }
         }
-        ')->assertGraphQLErrorMessage(QueryComplexity::maxQueryComplexityErrorMessage($max, 2));
+        GRAPHQL)->assertGraphQLErrorMessage(QueryComplexity::maxQueryComplexityErrorMessage($max, 2));
+
+        $this->assertCount(1, $events);
+
+        // TODO remove this check when updating the required version of webonyx/graphql-php
+        if (method_exists(QueryComplexity::class, 'getQueryComplexity')) { // @phpstan-ignore function.alreadyNarrowedType (depends on the used library version)
+            $event = $events[0];
+            $this->assertSame(2, $event->queryComplexity);
+        }
     }
 
     public function testKnowsPagination(): void
@@ -40,7 +58,7 @@ final class ComplexityDirectiveTest extends TestCase
         $max = 1;
         $this->setMaxQueryComplexity($max);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             posts: [Post!]! @paginate
         }
@@ -48,12 +66,12 @@ final class ComplexityDirectiveTest extends TestCase
         type Post {
             title: String
         }
-        ';
+        GRAPHQL;
 
         // 1 + (2 for data & title * 10 first items)
         $expectedCount = 21;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             posts(first: 10) {
                 data {
@@ -61,7 +79,7 @@ final class ComplexityDirectiveTest extends TestCase
                 }
             }
         }
-        ')->assertGraphQLErrorMessage(QueryComplexity::maxQueryComplexityErrorMessage($max, $expectedCount));
+        GRAPHQL)->assertGraphQLErrorMessage(QueryComplexity::maxQueryComplexityErrorMessage($max, $expectedCount));
     }
 
     public function testIgnoresFirstArgumentUnrelatedToPagination(): void
@@ -69,7 +87,7 @@ final class ComplexityDirectiveTest extends TestCase
         $max = 1;
         $this->setMaxQueryComplexity($max);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             posts(first: String!): [Post!]! @all
         }
@@ -77,15 +95,15 @@ final class ComplexityDirectiveTest extends TestCase
         type Post {
             title: String
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             posts(first: "named like the generated argument of @paginate, but should not increase complexity here") {
                 title
             }
         }
-        ')->assertGraphQLErrorMessage(QueryComplexity::maxQueryComplexityErrorMessage($max, 2));
+        GRAPHQL)->assertGraphQLErrorMessage(QueryComplexity::maxQueryComplexityErrorMessage($max, 2));
     }
 
     public function testCustomComplexityResolver(): void
@@ -99,11 +117,11 @@ final class ComplexityDirectiveTest extends TestCase
         }
 GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ')->assertGraphQLErrorMessage(QueryComplexity::maxQueryComplexityErrorMessage($max, self::CUSTOM_COMPLEXITY));
+        GRAPHQL)->assertGraphQLErrorMessage(QueryComplexity::maxQueryComplexityErrorMessage($max, self::CUSTOM_COMPLEXITY));
     }
 
     public function testResolvesComplexityResolverThroughDefaultNamespace(): void
@@ -115,13 +133,13 @@ GRAPHQL;
         type Query {
             foo: Int @complexity(resolver: "Foo@complexity")
         }
-GRAPHQL;
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ')->assertGraphQLErrorMessage(QueryComplexity::maxQueryComplexityErrorMessage($max, Foo::THE_ANSWER));
+        GRAPHQL)->assertGraphQLErrorMessage(QueryComplexity::maxQueryComplexityErrorMessage($max, Foo::THE_ANSWER));
     }
 
     public static function complexity(): int
@@ -129,7 +147,7 @@ GRAPHQL;
         return self::CUSTOM_COMPLEXITY;
     }
 
-    protected function setMaxQueryComplexity(int $max): void
+    private function setMaxQueryComplexity(int $max): void
     {
         $config = $this->app->make(ConfigRepository::class);
         $config->set('lighthouse.security.max_query_complexity', $max);

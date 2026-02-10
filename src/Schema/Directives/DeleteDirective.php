@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
@@ -60,17 +60,17 @@ GRAPHQL;
     /**
      * Delete one or more related models.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  Model  $model
      * @param  mixed|array<mixed>  $idOrIds
      */
-    public function __invoke($parent, $idOrIds): void
+    public function __invoke($model, $idOrIds): void
     {
         $relationName = $this->directiveArgValue(
             'relation',
             // Use the name of the argument if no explicit relation name is given
-            $this->nodeName()
+            $this->nodeName(),
         );
-        $relation = $parent->{$relationName}();
+        $relation = $model->{$relationName}();
         assert($relation instanceof Relation);
 
         // Those types of relations may only have one related model attached to
@@ -90,13 +90,10 @@ GRAPHQL;
                     $relation->getParent()->save();
                 }
 
-                // @phpstan-ignore-next-line Builder mixin is not understood
                 $relation->delete();
             }
         } else {
-            // @phpstan-ignore-next-line Relation&Builder mixin not recognized
-            $related = $relation->make();
-            assert($related instanceof Model);
+            $related = $relation->make(); // @phpstan-ignore method.notFound (Relation delegates to Builder)
             $related::destroy($idOrIds);
         }
     }
@@ -105,8 +102,8 @@ GRAPHQL;
         DocumentAST &$documentAST,
         InputValueDefinitionNode &$argDefinition,
         FieldDefinitionNode &$parentField,
-        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType
-    ) {
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
+    ): void {
         if (! $this->directiveArgValue('relation')) {
             throw new DefinitionException('The @delete directive requires "relation" to be set when used as an argument resolver.');
         }

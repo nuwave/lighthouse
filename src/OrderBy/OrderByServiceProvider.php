@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\OrderBy;
 
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
-use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
@@ -13,73 +13,61 @@ class OrderByServiceProvider extends ServiceProvider
 {
     public const DEFAULT_ORDER_BY_CLAUSE = 'OrderByClause';
 
-    /**
-     * Bootstrap any application services.
-     */
-    public function boot(Dispatcher $dispatcher): void
+    public function boot(EventsDispatcher $dispatcher): void
     {
-        $dispatcher->listen(
-            RegisterDirectiveNamespaces::class,
-            static function (): string {
-                return __NAMESPACE__;
-            }
-        );
+        $dispatcher->listen(RegisterDirectiveNamespaces::class, static fn (): string => __NAMESPACE__);
+        $dispatcher->listen(ManipulateAST::class, static function (ManipulateAST $manipulateAST): void {
+            $documentAST = $manipulateAST->documentAST;
+            $documentAST->setTypeDefinition(
+                Parser::enumTypeDefinition(/* @lang GraphQL */ '
+                    "Directions for ordering a list of records."
+                    enum SortOrder {
+                        "Sort records in ascending order."
+                        ASC
 
-        $dispatcher->listen(
-            ManipulateAST::class,
-            function (ManipulateAST $manipulateAST): void {
-                $documentAST = $manipulateAST->documentAST;
-                $documentAST->setTypeDefinition(
-                    Parser::enumTypeDefinition(/* @lang GraphQL */ '
-                        "Directions for ordering a list of records."
-                        enum SortOrder {
-                            "Sort records in ascending order."
-                            ASC
+                        "Sort records in descending order."
+                        DESC
+                    }
+                '),
+            );
+            $documentAST->setTypeDefinition(
+                Parser::enumTypeDefinition(/* @lang GraphQL */ '
+                    "Aggregate functions when ordering by a relation without specifying a column."
+                    enum OrderByRelationAggregateFunction {
+                        "Amount of items."
+                        COUNT @enum(value: "count")
+                    }
+                '),
+            );
+            $documentAST->setTypeDefinition(
+                Parser::enumTypeDefinition(/* @lang GraphQL */ '
+                    "Aggregate functions when ordering by a relation that may specify a column."
+                    enum OrderByRelationWithColumnAggregateFunction {
+                        "Average."
+                        AVG @enum(value: "avg")
 
-                            "Sort records in descending order."
-                            DESC
-                        }
-                    ')
-                );
-                $documentAST->setTypeDefinition(
-                    Parser::enumTypeDefinition(/* @lang GraphQL */ '
-                        "Aggregate functions when ordering by a relation without specifying a column."
-                        enum OrderByRelationAggregateFunction {
-                            "Amount of items."
-                            COUNT @enum(value: "count")
-                        }
-                    ')
-                );
-                $documentAST->setTypeDefinition(
-                    Parser::enumTypeDefinition(/* @lang GraphQL */ '
-                        "Aggregate functions when ordering by a relation that may specify a column."
-                        enum OrderByRelationWithColumnAggregateFunction {
-                            "Average."
-                            AVG @enum(value: "avg")
+                        "Minimum."
+                        MIN @enum(value: "min")
 
-                            "Minimum."
-                            MIN @enum(value: "min")
+                        "Maximum."
+                        MAX @enum(value: "max")
 
-                            "Maximum."
-                            MAX @enum(value: "max")
+                        "Sum."
+                        SUM @enum(value: "sum")
 
-                            "Sum."
-                            SUM @enum(value: "sum")
-
-                            "Amount of items."
-                            COUNT @enum(value: "count")
-                        }
-                    ')
-                );
-                $documentAST->setTypeDefinition(
-                    static::createOrderByClauseInput(
-                        static::DEFAULT_ORDER_BY_CLAUSE,
-                        'Allows ordering a list of records.',
-                        'String'
-                    )
-                );
-            }
-        );
+                        "Amount of items."
+                        COUNT @enum(value: "count")
+                    }
+                '),
+            );
+            $documentAST->setTypeDefinition(
+                static::createOrderByClauseInput(
+                    static::DEFAULT_ORDER_BY_CLAUSE,
+                    'Allows ordering a list of records.',
+                    'String',
+                ),
+            );
+        });
     }
 
     public static function createOrderByClauseInput(string $name, string $description, string $columnType): InputObjectTypeDefinitionNode

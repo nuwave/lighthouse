@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Schema\Directives;
 
@@ -13,23 +13,23 @@ final class DropDirectiveTest extends TestCase
                 null,
                 [
                     'bar' => 'something',
-                ]
+                ],
             );
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(
                 baz: String @drop
                 bar: String
             ): Boolean @mock
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo(baz: "something", bar: "something")
         }
-        ');
+        GRAPHQL);
     }
 
     public function testDropListOfInputs(): void
@@ -41,10 +41,10 @@ final class DropDirectiveTest extends TestCase
                     'input' => [
                         ['bar' => 'something'],
                     ],
-                ]
+                ],
             );
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(
                 input: [FooInput]
@@ -55,9 +55,9 @@ final class DropDirectiveTest extends TestCase
             baz: String @drop
             bar: String
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo(
                 input: [
@@ -68,6 +68,6 @@ final class DropDirectiveTest extends TestCase
                 ]
             )
         }
-        ');
+        GRAPHQL);
     }
 }

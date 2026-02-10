@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Federation;
 
@@ -18,11 +18,18 @@ use GraphQL\Type\Definition\UnionType;
 use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
 use Illuminate\Support\Arr;
+use Nuwave\Lighthouse\Federation\Directives\ComposeDirectiveDirective;
 use Nuwave\Lighthouse\Federation\Directives\ExtendsDirective;
 use Nuwave\Lighthouse\Federation\Directives\ExternalDirective;
+use Nuwave\Lighthouse\Federation\Directives\InaccessibleDirective;
+use Nuwave\Lighthouse\Federation\Directives\InterfaceObjectDirective;
 use Nuwave\Lighthouse\Federation\Directives\KeyDirective;
+use Nuwave\Lighthouse\Federation\Directives\LinkDirective;
+use Nuwave\Lighthouse\Federation\Directives\OverrideDirective;
 use Nuwave\Lighthouse\Federation\Directives\ProvidesDirective;
 use Nuwave\Lighthouse\Federation\Directives\RequiresDirective;
+use Nuwave\Lighthouse\Federation\Directives\ShareableDirective;
+use Nuwave\Lighthouse\Federation\Directives\TagDirective;
 use Nuwave\Lighthouse\Schema\RootType;
 
 class FederationPrinter
@@ -45,6 +52,13 @@ class FederationPrinter
         KeyDirective::NAME,
         ProvidesDirective::NAME,
         RequiresDirective::NAME,
+        ShareableDirective::NAME,
+        InaccessibleDirective::NAME,
+        InterfaceObjectDirective::NAME,
+        OverrideDirective::NAME,
+        TagDirective::NAME,
+        LinkDirective::NAME,
+        ComposeDirectiveDirective::NAME,
     ];
 
     public static function print(Schema $schema): string
@@ -61,11 +75,9 @@ class FederationPrinter
 
         $queryFieldsWithoutFederation = array_filter(
             $originalQueryType->getFields(),
-            static function (FieldDefinition $field): bool {
-                return ! in_array($field->name, static::FEDERATION_FIELDS);
-            }
+            static fn (FieldDefinition $field): bool => ! in_array($field->name, static::FEDERATION_FIELDS),
         );
-        $newQueryType = count($queryFieldsWithoutFederation) > 0
+        $newQueryType = $queryFieldsWithoutFederation !== []
             ? new ObjectType([
                 'name' => RootType::QUERY,
                 'fields' => $queryFieldsWithoutFederation,
@@ -80,14 +92,19 @@ class FederationPrinter
 
         $config->setTypes($types);
 
+        $federationDirectives = array_merge(
+            static::FEDERATION_DIRECTIVES,
+            FederationHelper::directivesToCompose($schema),
+        );
+
         $config->setDirectives(array_filter(
             $schema->getDirectives(),
-            static function (Directive $directive): bool {
-                return ! in_array($directive->name, static::FEDERATION_DIRECTIVES);
-            }
+            static fn (Directive $directive): bool => ! in_array($directive->name, $federationDirectives),
         ));
 
-        $printDirectives = static function ($definition): string {
+        $config->setExtensionASTNodes($schema->extensionASTNodes);
+
+        $printDirectives = static function ($definition) use ($federationDirectives): string {
             assert(
                 $definition instanceof EnumType
                 || $definition instanceof InputObjectType
@@ -98,40 +115,35 @@ class FederationPrinter
                 || $definition instanceof EnumValueDefinition
                 || $definition instanceof Argument
                 || $definition instanceof FieldDefinition
-                || $definition instanceof InputObjectField
+                || $definition instanceof InputObjectField,
             );
 
             $astNode = $definition->astNode;
 
             if ($astNode instanceof ObjectTypeDefinitionNode) {
-                $federationDirectives = [];
+                $directivesToPrint = [];
                 foreach ($astNode->directives as $directive) {
                     $name = $directive->name->value;
 
-                    if (KeyDirective::NAME === $name
-                        || ExtendsDirective::NAME === $name
-                    ) {
-                        $federationDirectives[] = $directive;
+                    if (in_array($name, $federationDirectives)) {
+                        $directivesToPrint[] = $directive;
                     }
                 }
 
-                return SchemaPrinter::printDirectives($federationDirectives);
+                return SchemaPrinter::printDirectives($directivesToPrint);
             }
 
             if ($astNode instanceof FieldDefinitionNode) {
-                $federationDirectives = [];
+                $directivesToPrint = [];
                 foreach ($astNode->directives as $directive) {
                     $name = $directive->name->value;
 
-                    if (ProvidesDirective::NAME === $name
-                        || RequiresDirective::NAME === $name
-                        || ExternalDirective::NAME === $name
-                    ) {
-                        $federationDirectives[] = $directive;
+                    if (in_array($name, $federationDirectives)) {
+                        $directivesToPrint[] = $directive;
                     }
                 }
 
-                return SchemaPrinter::printDirectives($federationDirectives);
+                return SchemaPrinter::printDirectives($directivesToPrint);
             }
 
             return '';
@@ -139,8 +151,7 @@ class FederationPrinter
 
         return SchemaPrinter::doPrint(
             new Schema($config),
-            // @phpstan-ignore-next-line We extended the SchemaPrinter to allow for this option
-            ['printDirectives' => $printDirectives]
+            ['printDirectives' => $printDirectives],
         );
     }
 }

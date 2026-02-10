@@ -1,15 +1,18 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Subscriptions\Storage;
 
+use GraphQL\Utils\Utils;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Redis\Factory as RedisFactory;
+use Illuminate\Redis\Connections\Connection as RedisConnection;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 
 /**
  * Stores subscribers and topics in redis.
+ *
  * - Topics are subscriptions like "userCreated" or "userDeleted".
  * - Subscribers are clients that are listening to channels like "private-lighthouse-a7ef3d".
  *
@@ -25,44 +28,46 @@ class RedisStorageManager implements StoresSubscriptions
 
     public const SUBSCRIBER_KEY = 'graphql.subscriber';
 
-    /**
-     * @var \Illuminate\Redis\Connections\Connection
-     */
-    protected $connection;
+    protected RedisConnection $connection;
 
-    /**
-     * The time to live in seconds for items in the cache.
-     *
-     * @var int|null
-     */
-    protected $ttl;
+    /** The time to live in seconds for items in the cache. */
+    protected ?int $ttl = null;
 
     public function __construct(ConfigRepository $config, RedisFactory $redis)
     {
         $this->connection = $redis->connection(
-            $config->get('lighthouse.subscriptions.broadcasters.echo.connection') ?? 'default'
+            $config->get('lighthouse.subscriptions.broadcasters.echo.connection') ?? 'default',
         );
-        $this->ttl = $config->get('lighthouse.subscriptions.storage_ttl');
+        $ttl = $config->get('lighthouse.subscriptions.storage_ttl');
+        if (is_int($ttl) || is_null($ttl)) {
+            $this->ttl = $ttl;
+        } elseif (is_string($ttl) && is_numeric($ttl)) {
+            $this->ttl = (int) $ttl;
+        } else {
+            $notIntOrNumericString = Utils::printSafe($ttl);
+            throw new \Exception("Expected config option lighthouse.subscriptions.storage_ttl to be an int, null or a numeric string, got: {$notIntOrNumericString}.");
+        }
     }
 
     public function subscriberByChannel(string $channel): ?Subscriber
     {
         return $this->getSubscriber(
-            $this->channelKey($channel)
+            $this->channelKey($channel),
         );
     }
 
-    /**
-     * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Subscriptions\Subscriber>
-     */
+    /** @return \Illuminate\Support\Collection<int, \Nuwave\Lighthouse\Subscriptions\Subscriber> */
     public function subscribersByTopic(string $topic): Collection
     {
         // As explained in storeSubscriber, we use redis sets to store the names of subscribers of a topic.
         // We can retrieve all members of a set using the command smembers.
         $subscriberIds = $this->connection->command('smembers', [$this->topicKey($topic)]);
-        if (0 === count($subscriberIds)) {
+        if ($subscriberIds === []) {
             return new Collection();
         }
+
+        // Store all keys as missing keys to remove the ones which are expired later.
+        $missingKeys = $subscriberIds;
 
         // Since we store the individual subscribers with a prefix,
         // but not in the set, we have to add the prefix here.
@@ -72,22 +77,37 @@ class RedisStorageManager implements StoresSubscriptions
         // This is like using multiple get calls (getSubscriber uses the get command).
         $subscribers = $this->connection->command('mget', [$subscriberIds]);
 
-        return (new Collection($subscribers))
+        $subscribersCollection = (new Collection($subscribers))
             ->filter()
-            ->map(function (?string $subscriber): ?Subscriber {
-                // Some entries may be expired
-                if (null === $subscriber) {
+            ->map(static function (?string $subscriber) use (&$missingKeys): ?Subscriber {
+                // Some entries may be expired.
+                if ($subscriber === null) {
                     return null;
                 }
 
-                // Other entries may contain invalid values
+                // Other entries may contain invalid values.
                 try {
-                    return unserialize($subscriber);
-                } catch (\ErrorException $e) {
+                    $subscriber = unserialize($subscriber);
+
+                    // This key exists so remove it from the list of missing keys.
+                    $missingKeys = array_diff($missingKeys, [$subscriber->channel]);
+
+                    return $subscriber;
+                } catch (\ErrorException) {
                     return null;
                 }
             })
             ->filter();
+
+        // Remove expired subscribers from the set of subscribers of this topic.
+        if ($missingKeys !== []) {
+            $this->connection->command('srem', [
+                $this->topicKey($topic),
+                ...$missingKeys,
+            ]);
+        }
+
+        return $subscribersCollection;
     }
 
     public function storeSubscriber(Subscriber $subscriber, string $topic): void
@@ -95,7 +115,7 @@ class RedisStorageManager implements StoresSubscriptions
         $subscriber->topic = $topic;
 
         // In contrast to the CacheStorageManager, we use redis sets.
-        // Instead of reading the entire list, adding the subscriber and storing the list;
+        // Instead of reading the entire list, adding the subscriber, and storing the list;
         // we simply add the name of the subscriber to the set of subscribers of this topic using the sadd command...
         $topicKey = $this->topicKey($topic);
         $this->connection->command('sadd', [
@@ -103,20 +123,21 @@ class RedisStorageManager implements StoresSubscriptions
             $subscriber->channel,
         ]);
         // ...and refresh the ttl of this set as well.
-        if (null !== $this->ttl) {
+        if ($this->ttl !== null) {
             $this->connection->command('expire', [$topicKey, $this->ttl]);
         }
 
-        // Lastly, we store the subscriber as a serialized string...
+        // Lastly, we store the subscriber as a serialized string.
         $setCommand = 'set';
         $setArguments = [
             $this->channelKey($subscriber->channel),
             serialize($subscriber),
         ];
-        if (null !== $this->ttl) {
+        if ($this->ttl !== null) {
             $setCommand = 'setex';
             array_splice($setArguments, 1, 0, [$this->ttl]);
         }
+
         $this->connection->command($setCommand, $setArguments);
     }
 
@@ -125,7 +146,7 @@ class RedisStorageManager implements StoresSubscriptions
         $key = $this->channelKey($channel);
         $subscriber = $this->getSubscriber($key);
 
-        if (null !== $subscriber) {
+        if ($subscriber !== null) {
             // Like in storeSubscriber (but in reverse), we delete the subscriber...
             $this->connection->command('del', [$key]);
             // ...and remove it from the set of subscribers of this topic.
@@ -149,11 +170,11 @@ class RedisStorageManager implements StoresSubscriptions
 
     protected function channelKey(string $channel): string
     {
-        return self::SUBSCRIBER_KEY . '.' . $channel;
+        return self::SUBSCRIBER_KEY . ".{$channel}";
     }
 
     protected function topicKey(string $topic): string
     {
-        return self::TOPIC_KEY . '.' . $topic;
+        return self::TOPIC_KEY . ".{$topic}";
     }
 }

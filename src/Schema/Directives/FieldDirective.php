@@ -1,8 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Utils;
@@ -32,7 +31,7 @@ GRAPHQL;
 
         $namespacedClassName = $this->namespaceClassName(
             $className,
-            RootType::defaultNamespaces($fieldValue->getParentName())
+            $fieldValue->parentNamespaces(),
         );
 
         return Utils::constructResolver($namespacedClassName, $methodName);

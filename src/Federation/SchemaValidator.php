@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Federation;
 
@@ -10,7 +10,6 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Utils\Utils;
 use Nuwave\Lighthouse\Events\ValidateSchema;
-use Nuwave\Lighthouse\Exceptions\FederationException;
 use Nuwave\Lighthouse\Federation\Directives\ExtendsDirective;
 use Nuwave\Lighthouse\Federation\Directives\ExternalDirective;
 use Nuwave\Lighthouse\Federation\Directives\KeyDirective;
@@ -19,15 +18,9 @@ use Nuwave\Lighthouse\Schema\DirectiveLocator;
 
 class SchemaValidator
 {
-    /**
-     * @var \Nuwave\Lighthouse\Schema\DirectiveLocator
-     */
-    protected $directiveLocator;
-
-    public function __construct(DirectiveLocator $directiveLocator)
-    {
-        $this->directiveLocator = $directiveLocator;
-    }
+    public function __construct(
+        protected DirectiveLocator $directiveLocator,
+    ) {}
 
     public function handle(ValidateSchema $validateSchema): void
     {
@@ -43,7 +36,7 @@ class SchemaValidator
     protected function validateObjectType(ObjectType $type): void
     {
         $ast = $type->astNode;
-        if (null !== $ast) {
+        if ($ast !== null) {
             $directives = $this->directiveLocator->associated($ast);
 
             foreach ($directives as $directive) {
@@ -54,9 +47,6 @@ class SchemaValidator
         }
     }
 
-    /**
-     * @throws \Nuwave\Lighthouse\Exceptions\FederationException
-     */
     protected function validateKeySelectionSet(SelectionSetNode $selectionSet, ObjectType $type, ObjectTypeDefinitionNode $typeAST): void
     {
         foreach ($selectionSet->selections as $selection) {
@@ -67,14 +57,12 @@ class SchemaValidator
             try {
                 // Throws if the field is not defined
                 $field = $type->getField($selection->name->value);
-            } catch (InvariantViolation $i) {
-                throw new FederationException($i->getMessage(), $i->getCode(), $i);
+            } catch (InvariantViolation $invariantViolation) {
+                throw new FederationException($invariantViolation->getMessage(), $invariantViolation->getCode(), $invariantViolation);
             }
 
-            $fieldASTNode = $field->astNode;
-            if (null === $fieldASTNode) {
-                throw new FederationException("Missing AST node for {$type->name}.{$field->name}.");
-            }
+            $fieldASTNode = $field->astNode
+                ?? throw new FederationException("Missing AST node for {$type->name}.{$field->name}.");
 
             if (
                 ASTHelper::hasDirective($typeAST, ExtendsDirective::NAME)
@@ -84,17 +72,15 @@ class SchemaValidator
             }
 
             $nestedSelection = $selection->selectionSet;
-            if (null !== $nestedSelection) {
+            if ($nestedSelection !== null) {
                 $fieldType = Type::getNamedType($field->getType());
                 if (! $fieldType instanceof ObjectType) {
                     $notObjectType = Utils::printSafe($fieldType);
                     throw new FederationException("Expected type of field {$type->name}.{$field->name} with subselection to be object type, got: {$notObjectType}.");
                 }
 
-                $fieldTypeASTNode = $fieldType->astNode;
-                if (null === $fieldTypeASTNode) {
-                    throw new FederationException("Missing AST node for {$fieldType->name}.");
-                }
+                $fieldTypeASTNode = $fieldType->astNode
+                    ?? throw new FederationException("Missing AST node for {$fieldType->name}.");
 
                 $this->validateKeySelectionSet($nestedSelection, $fieldType, $fieldTypeASTNode);
             }

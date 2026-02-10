@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Deprecation;
 
@@ -19,27 +19,19 @@ use GraphQL\Validator\Rules\ValidationRule;
  */
 class DetectDeprecatedUsage extends ValidationRule
 {
-    /**
-     * @var array<string, \Nuwave\Lighthouse\Deprecation\DeprecatedUsage>
-     */
-    protected $deprecations = [];
+    /** @var array<string, \Nuwave\Lighthouse\Deprecation\DeprecatedUsage> */
+    protected array $deprecations = [];
 
-    /**
-     * @var DeprecationHandler
-     */
+    /** @var DeprecationHandler */
     protected $deprecationHandler;
 
-    /**
-     * @param DeprecationHandler $deprecationHandler
-     */
+    /** @param  DeprecationHandler  $deprecationHandler */
     public function __construct(callable $deprecationHandler)
     {
         $this->deprecationHandler = $deprecationHandler;
     }
 
-    /**
-     * @param DeprecationHandler $deprecationHandler
-     */
+    /** @param  DeprecationHandler  $deprecationHandler */
     public static function handle(callable $deprecationHandler): void
     {
         DocumentValidator::addRule(new static($deprecationHandler));
@@ -47,15 +39,16 @@ class DetectDeprecatedUsage extends ValidationRule
 
     public function getVisitor(QueryValidationContext $context): array
     {
+        // @phpstan-ignore-next-line NodeVisitor does not know about the mapping between node kind and node type
         return [
-            NodeKind::FIELD => function (FieldNode $node) use ($context): void {
+            NodeKind::FIELD => function (FieldNode $_) use ($context): void {
                 $field = $context->getFieldDef();
-                if (null === $field) {
+                if ($field === null) {
                     return;
                 }
 
                 $deprecationReason = $field->deprecationReason;
-                if (null !== $deprecationReason) {
+                if ($deprecationReason !== null) {
                     $parent = $context->getParentType();
                     if (! $parent instanceof NamedType) {
                         return;
@@ -76,7 +69,7 @@ class DetectDeprecatedUsage extends ValidationRule
                 }
 
                 $deprecationReason = $value->deprecationReason;
-                if (null !== $deprecationReason) {
+                if ($deprecationReason !== null) {
                     $this->registerDeprecation("{$enum->name}.{$value->name}", $deprecationReason);
                 }
             },
@@ -90,10 +83,7 @@ class DetectDeprecatedUsage extends ValidationRule
 
     protected function registerDeprecation(string $element, string $reason): void
     {
-        if (! isset($this->deprecations[$element])) {
-            $this->deprecations[$element] = new DeprecatedUsage($reason);
-        }
-
-        ++$this->deprecations[$element]->count;
+        $usage = $this->deprecations[$element] ??= new DeprecatedUsage($reason);
+        ++$usage->count;
     }
 }

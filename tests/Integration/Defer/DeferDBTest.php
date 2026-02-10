@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Defer;
 
@@ -15,17 +15,17 @@ final class DeferDBTest extends DBTestCase
     {
         return array_merge(
             parent::getPackageProviders($app),
-            [DeferServiceProvider::class]
+            [DeferServiceProvider::class],
         );
     }
 
     public function testDeferBelongsToFields(): void
     {
         $company = factory(Company::class)->create();
-        assert($company instanceof Company);
+        $this->assertInstanceOf(Company::class, $company);
 
         $user = factory(User::class)->make();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $user->company()->associate($company);
         $user->save();
 
@@ -33,7 +33,7 @@ final class DeferDBTest extends DBTestCase
 
         $this->mockResolver($user);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Company {
             name: String!
         }
@@ -46,11 +46,11 @@ final class DeferDBTest extends DBTestCase
         type Query {
             user: User @mock
         }
-        ';
+        GRAPHQL;
 
         $this->countQueries($queryCount);
 
-        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 email
@@ -59,7 +59,7 @@ final class DeferDBTest extends DBTestCase
                 }
             }
         }
-        ');
+        GRAPHQL);
 
         $this->assertSame(1, $queryCount);
         $this->assertCount(2, $chunks);
@@ -76,22 +76,22 @@ final class DeferDBTest extends DBTestCase
     public function testDeferNestedRelationshipFields(): void
     {
         $company = factory(Company::class)->create();
-        assert($company instanceof Company);
+        $this->assertInstanceOf(Company::class, $company);
 
         $users = factory(User::class, 5)->make();
         foreach ($users as $user) {
-            assert($user instanceof User);
+            $this->assertInstanceOf(User::class, $user);
             $user->company()->associate($company);
             $user->save();
         }
 
         $user = $users[0];
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $user->setRelations([]);
 
         $this->mockResolver($user);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Company {
             name: String!
             users: [User] @hasMany
@@ -105,11 +105,11 @@ final class DeferDBTest extends DBTestCase
         type Query {
             user: User @mock
         }
-        ';
+        GRAPHQL;
 
         $this->countQueries($queryCount);
 
-        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 email
@@ -121,7 +121,7 @@ final class DeferDBTest extends DBTestCase
                 }
             }
         }
-        ');
+        GRAPHQL);
 
         $this->assertSame(2, $queryCount);
         $this->assertCount(3, $chunks);
@@ -140,29 +140,29 @@ final class DeferDBTest extends DBTestCase
         $this->assertCount(5, $deferredUsers['user.company.users']['data']);
         $this->assertSame(
             $users
-                ->map(function (User $user): array {
-                    return ['email' => $user->email];
-                })
+                ->map(static fn (User $user): array => ['email' => $user->email])
                 ->values()
                 ->all(),
-            $deferredUsers['user.company.users']['data']
+            $deferredUsers['user.company.users']['data'],
         );
     }
 
     public function testDeferNestedListFields(): void
     {
-        /** @var \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Company> $companies */
+        /** @var \Illuminate\Database\Eloquent\Collection<array-key, \Tests\Utils\Models\Company> $companies */
         $companies = factory(Company::class, 2)
             ->create()
-            ->each(function (Company $company): void {
-                factory(User::class, 3)->create([
-                    'company_id' => $company->getKey(),
-                ]);
+            ->each(static function (Company $company): void {
+                $users = factory(User::class, 3)->make();
+                $users->each(static function (User $user) use ($company): void {
+                    $user->company()->associate($company);
+                    $user->save();
+                });
             });
 
         $this->mockResolver($companies);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Company {
             name: String!
             users: [User] @hasMany
@@ -176,11 +176,11 @@ final class DeferDBTest extends DBTestCase
         type Query {
             companies: [Company] @mock
         }
-        ';
+        GRAPHQL;
 
         $this->countQueries($queryCount);
 
-        $chunks = $this->streamGraphQL(/** @lang GraphQL */ '
+        $chunks = $this->streamGraphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             companies {
                 name
@@ -192,7 +192,7 @@ final class DeferDBTest extends DBTestCase
                 }
             }
         }
-        ');
+        GRAPHQL);
 
         $this->assertSame(2, $queryCount);
         $this->assertCount(3, $chunks);
@@ -211,7 +211,6 @@ final class DeferDBTest extends DBTestCase
         $this->assertNull(Arr::get($deferredCompanies, 'data.companies.1.users'));
 
         $deferredUsers = $chunks[1];
-        // @phpstan-ignore-next-line type of model is known
         $companies->each(function (Company $company, int $i) use ($deferredUsers): void {
             $key = "companies.{$i}.users";
             $this->assertArrayHasKey($key, $deferredUsers);
@@ -219,14 +218,12 @@ final class DeferDBTest extends DBTestCase
             $this->assertSame(
                 $company->users
                     // @phpstan-ignore-next-line type of model is known
-                    ->map(function (User $user): array {
-                        return [
-                            'email' => $user->email,
-                            'company' => null,
-                        ];
-                    })
+                    ->map(static fn (User $user): array => [
+                        'email' => $user->email,
+                        'company' => null,
+                    ])
                     ->all(),
-                $deferredUsers[$key]['data']
+                $deferredUsers[$key]['data'],
             );
         });
 
@@ -240,7 +237,7 @@ final class DeferDBTest extends DBTestCase
 
             $this->assertContains(
                 $item['name'],
-                $companies->pluck('name')->all()
+                $companies->pluck('name')->all(),
             );
         });
     }

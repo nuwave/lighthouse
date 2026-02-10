@@ -1,35 +1,32 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Schema\Factories;
 
 use GraphQL\Language\DirectiveLocation;
 use GraphQL\Language\Parser;
 use GraphQL\Type\Definition\Type;
+use Nuwave\Lighthouse\Schema\AST\FallbackTypeNodeConverter;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
-use Nuwave\Lighthouse\Schema\FallbackTypeNodeConverter;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\TestCase;
 
 final class DirectiveFactoryTest extends TestCase
 {
-    /**
-     * @var \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory
-     */
-    protected $directiveFactory;
+    protected DirectiveFactory $directiveFactory;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $typeRegistry = $this->app->make(TypeRegistry::class);
         $this->directiveFactory = new DirectiveFactory(
-            new FallbackTypeNodeConverter($typeRegistry)
+            new FallbackTypeNodeConverter($typeRegistry),
         );
     }
 
     public function testConvertDirectiveFromNodeToExecutable(): void
     {
-        $node = Parser::directiveDefinition(/** @lang GraphQL */ '
+        $node = Parser::directiveDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
         "foo description"
         directive @foo(
             """
@@ -38,7 +35,7 @@ final class DirectiveFactoryTest extends TestCase
             """
             baz: Int
         ) repeatable on OBJECT
-        ');
+        GRAPHQL);
         $executable = $this->directiveFactory->handle($node);
 
         $this->assertSame('foo description', $executable->description);

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse;
 
@@ -13,12 +13,15 @@ use GraphQL\Server\Helper as GraphQLHelper;
 use GraphQL\Server\OperationParams;
 use GraphQL\Server\RequestError;
 use GraphQL\Type\Schema;
+use GraphQL\Validator\DocumentValidator;
+use GraphQL\Validator\Rules\QueryComplexity;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
+use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Cache\QueryCache;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
 use Nuwave\Lighthouse\Events\EndExecution;
 use Nuwave\Lighthouse\Events\EndOperationOrOperations;
@@ -26,6 +29,7 @@ use Nuwave\Lighthouse\Events\ManipulateResult;
 use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Events\StartOperationOrOperations;
 use Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry;
+use Nuwave\Lighthouse\Execution\CacheableValidationRulesProvider;
 use Nuwave\Lighthouse\Execution\ErrorPool;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -36,45 +40,13 @@ use Nuwave\Lighthouse\Support\Utils as LighthouseUtils;
 /**
  * The main entrypoint to GraphQL execution.
  *
+ * @api
+ *
  * @phpstan-import-type ErrorsHandler from \GraphQL\Executor\ExecutionResult
+ * @phpstan-import-type SerializableResult from \GraphQL\Executor\ExecutionResult
  */
 class GraphQL
 {
-    /**
-     * @var \Nuwave\Lighthouse\Schema\SchemaBuilder
-     */
-    protected $schemaBuilder;
-
-    /**
-     * @var \Illuminate\Pipeline\Pipeline
-     */
-    protected $pipeline;
-
-    /**
-     * @var \Illuminate\Contracts\Events\Dispatcher
-     */
-    protected $eventDispatcher;
-
-    /**
-     * @var \Nuwave\Lighthouse\Execution\ErrorPool
-     */
-    protected $errorPool;
-
-    /**
-     * @var \Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules
-     */
-    protected $providesValidationRules;
-
-    /**
-     * @var \GraphQL\Server\Helper
-     */
-    protected $graphQLHelper;
-
-    /**
-     * @var \Illuminate\Contracts\Config\Repository
-     */
-    protected $configRepository;
-
     /**
      * Lazily initialized.
      *
@@ -83,168 +55,79 @@ class GraphQL
     protected $errorsHandler;
 
     public function __construct(
-        SchemaBuilder $schemaBuilder,
-        Pipeline $pipeline,
-        EventDispatcher $eventDispatcher,
-        ErrorPool $errorPool,
-        ProvidesValidationRules $providesValidationRules,
-        GraphQLHelper $graphQLHelper,
-        ConfigRepository $configRepository
-    ) {
-        $this->schemaBuilder = $schemaBuilder;
-        $this->pipeline = $pipeline;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->errorPool = $errorPool;
-        $this->providesValidationRules = $providesValidationRules;
-        $this->graphQLHelper = $graphQLHelper;
-        $this->configRepository = $configRepository;
-    }
-
-    /**
-     * Run one or more GraphQL operations against the schema.
-     *
-     * @param  \GraphQL\Server\OperationParams|array<int, \GraphQL\Server\OperationParams>  $operationOrOperations
-     *
-     * @return array<string, mixed>|array<int, array<string, mixed>>
-     */
-    public function executeOperationOrOperations($operationOrOperations, GraphQLContext $context): array
-    {
-        $this->eventDispatcher->dispatch(
-            new StartOperationOrOperations($operationOrOperations)
-        );
-
-        $resultOrResults = LighthouseUtils::mapEach(
-            /**
-             * @return array<string, mixed>
-             */
-            function (OperationParams $operationParams) use ($context): array {
-                return $this->executeOperation($operationParams, $context);
-            },
-            $operationOrOperations
-        );
-
-        $this->eventDispatcher->dispatch(
-            new EndOperationOrOperations($resultOrResults)
-        );
-
-        return $resultOrResults;
-    }
-
-    /**
-     * Run a single GraphQL operation against the schema and get a result.
-     *
-     * @return array<string, mixed>
-     */
-    public function executeOperation(OperationParams $params, GraphQLContext $context): array
-    {
-        $errors = $this->graphQLHelper->validateOperationParams($params);
-
-        if (count($errors) > 0) {
-            $errors = array_map(
-                static function (RequestError $err): Error {
-                    return Error::createLocatedError($err);
-                },
-                $errors
-            );
-
-            return $this->serializable(
-                new ExecutionResult(null, $errors)
-            );
-        }
-
-        $queryString = $params->query;
-        if (is_string($queryString)) {
-            $result = $this->parseAndExecuteQuery(
-                $queryString,
-                $context,
-                $params->variables,
-                null,
-                $params->operation
-            );
-        } else {
-            try {
-                $result = $this->executeParsedQuery(
-                    $this->loadPersistedQuery($params->queryId),
-                    $context,
-                    $params->variables,
-                    null,
-                    $params->operation
-                );
-            } catch (Error $error) {
-                return $this->serializable(
-                    new ExecutionResult(null, [$error])
-                );
-            }
-        }
-
-        return $this->serializable($result);
-    }
+        protected SchemaBuilder $schemaBuilder,
+        protected Pipeline $pipeline,
+        protected EventsDispatcher $eventDispatcher,
+        protected ErrorPool $errorPool,
+        protected ProvidesValidationRules $providesValidationRules,
+        protected GraphQLHelper $graphQLHelper,
+        protected ConfigRepository $configRepository,
+        protected QueryCache $queryCache,
+    ) {}
 
     /**
      * Parses query and executes it.
      *
-     * @param array<string, mixed>|null $variables
-     * @param mixed|null $rootValue
+     * @api
+     *
+     * @param  array<string, mixed>|null  $variables
+     *
+     * @return array<string, mixed>
      */
-    public function parseAndExecuteQuery(
+    public function executeQueryString(
         string $query,
         GraphQLContext $context,
         ?array $variables = [],
-        $rootValue = null,
-        ?string $operationName = null
-    ): ExecutionResult {
+        mixed $root = null,
+        ?string $operationName = null,
+    ): array {
+        $queryHash = hash('sha256', $query);
+
         try {
-            $parsedQuery = $this->parse($query);
+            $parsedQuery = $this->parse($query, $queryHash);
         } catch (SyntaxError $syntaxError) {
-            return new ExecutionResult(null, [$syntaxError]);
+            return $this->toSerializableArray(
+                new ExecutionResult(null, [$syntaxError]),
+            );
         }
 
-        return $this->executeParsedQuery($parsedQuery, $context, $variables, $rootValue, $operationName);
+        return $this->executeParsedQuery($parsedQuery, $context, $variables, $root, $operationName, $queryHash);
     }
 
     /**
-     * Parse the given query string into a DocumentNode.
+     * Execute a GraphQL query on the Lighthouse schema and return the serializable result.
      *
-     * Caches the parsed result if the query cache is enabled in the configuration.
+     * @api
      *
-     * @throws SyntaxError
-     */
-    public function parse(string $query): DocumentNode
-    {
-        $cacheConfig = $this->configRepository->get('lighthouse.query_cache');
-
-        if (! $cacheConfig['enable']) {
-            return Parser::parse($query);
-        }
-
-        $cacheFactory = Container::getInstance()->make(CacheFactory::class);
-        $store = $cacheFactory->store($cacheConfig['store']);
-
-        return $store->remember(
-            'lighthouse:query:' . hash('sha256', $query),
-            $cacheConfig['ttl'],
-            static function () use ($query): DocumentNode {
-                return Parser::parse($query);
-            }
-        );
-    }
-
-    /**
-     * Execute a GraphQL query on the Lighthouse schema and return the raw result.
+     * @param  array<string, mixed>|null  $variables
      *
-     * To render the @see \GraphQL\Executor\ExecutionResult
-     * you will probably want to call `->toArray($debug)` on it,
-     * with $debug being a combination of flags in @see \GraphQL\Error\DebugFlag
-     *
-     * @param array<string, mixed>|null $variables
-     * @param mixed|null $rootValue
+     * @return array<string, mixed>
      */
     public function executeParsedQuery(
         DocumentNode $query,
         GraphQLContext $context,
         ?array $variables = [],
-        $rootValue = null,
-        ?string $operationName = null
+        mixed $root = null,
+        ?string $operationName = null,
+        ?string $queryHash = null,
+    ): array {
+        $result = $this->executeParsedQueryRaw($query, $context, $variables, $root, $operationName, $queryHash);
+
+        return $this->toSerializableArray($result);
+    }
+
+    /**
+     * Execute a GraphQL query on the Lighthouse schema and return the raw result.
+     *
+     * @param  array<string, mixed>|null  $variables
+     */
+    public function executeParsedQueryRaw(
+        DocumentNode $query,
+        GraphQLContext $context,
+        ?array $variables = [],
+        mixed $root = null,
+        ?string $operationName = null,
+        ?string $queryHash = null,
     ): ExecutionResult {
         // Building the executable schema might take a while to do,
         // so we do it before we fire the StartExecution event.
@@ -252,28 +135,46 @@ class GraphQL
         $schema = $this->schemaBuilder->schema();
 
         $this->eventDispatcher->dispatch(
-            new StartExecution($schema, $query, $variables, $operationName, $context)
+            new StartExecution($schema, $query, $variables, $operationName, $context),
         );
+
+        if ($this->providesValidationRules instanceof CacheableValidationRulesProvider) {
+            $cacheableValidationRules = $this->providesValidationRules->cacheableValidationRules();
+
+            $errors = $this->validateCacheableRules($cacheableValidationRules, $schema, $this->schemaBuilder->schemaHash(), $query, $queryHash);
+            if ($errors !== []) {
+                return new ExecutionResult(null, $errors);
+            }
+        }
+
+        $validationRules = $this->providesValidationRules->validationRules();
 
         $result = GraphQLBase::executeQuery(
             $schema,
             $query,
-            $rootValue,
+            $root,
             $context,
             $variables,
             $operationName,
             null,
-            $this->providesValidationRules->validationRules()
+            $validationRules,
         );
+
+        $queryComplexityRule = $validationRules[QueryComplexity::class] ?? null;
+        $queryComplexity = $queryComplexityRule instanceof QueryComplexity
+            // TODO remove this check when updating the required version of webonyx/graphql-php
+            && method_exists($queryComplexityRule, 'getQueryComplexity') // @phpstan-ignore function.alreadyNarrowedType (depends on the used library version)
+                ? $queryComplexityRule->getQueryComplexity()
+                : null;
 
         /** @var array<\Nuwave\Lighthouse\Execution\ExtensionsResponse|null> $extensionsResponses */
         $extensionsResponses = (array) $this->eventDispatcher->dispatch(
-            new BuildExtensionsResponse()
+            new BuildExtensionsResponse($result, $queryComplexity),
         );
 
         foreach ($extensionsResponses as $extensionsResponse) {
-            if (null !== $extensionsResponse) {
-                $result->extensions[$extensionsResponse->key()] = $extensionsResponse->content();
+            if ($extensionsResponse !== null) {
+                $result->extensions[$extensionsResponse->key] = $extensionsResponse->content;
             }
         }
 
@@ -283,11 +184,11 @@ class GraphQL
 
         // Allow listeners to manipulate the result after each resolved query
         $this->eventDispatcher->dispatch(
-            new ManipulateResult($result)
+            new ManipulateResult($result),
         );
 
         $this->eventDispatcher->dispatch(
-            new EndExecution($result)
+            new EndExecution($result),
         );
 
         $this->cleanUpAfterExecution();
@@ -296,11 +197,108 @@ class GraphQL
     }
 
     /**
-     * Convert the result to a serializable array.
+     * Run one or more GraphQL operations against the schema.
+     *
+     * @api
+     *
+     * @param  \GraphQL\Server\OperationParams|array<int, \GraphQL\Server\OperationParams>  $operationOrOperations
+     *
+     * @return array<string, mixed>|array<int, array<string, mixed>>
+     */
+    public function executeOperationOrOperations(OperationParams|array $operationOrOperations, GraphQLContext $context): array
+    {
+        $this->eventDispatcher->dispatch(
+            new StartOperationOrOperations($operationOrOperations),
+        );
+
+        $resultOrResults = LighthouseUtils::mapEach(
+            /** @return array<string, mixed> */
+            fn (OperationParams $operationParams): array => $this->executeOperation($operationParams, $context),
+            $operationOrOperations,
+        );
+
+        $this->eventDispatcher->dispatch(
+            new EndOperationOrOperations($resultOrResults),
+        );
+
+        return $resultOrResults;
+    }
+
+    /**
+     * Run a single GraphQL operation against the schema and get a result.
+     *
+     * @api
      *
      * @return array<string, mixed>
      */
-    public function serializable(ExecutionResult $result): array
+    public function executeOperation(OperationParams $params, GraphQLContext $context): array
+    {
+        $errors = $this->graphQLHelper->validateOperationParams($params);
+
+        if ($errors !== []) {
+            $errors = array_map(
+                static fn (RequestError $err): Error => Error::createLocatedError($err),
+                $errors,
+            );
+
+            return $this->toSerializableArray(
+                new ExecutionResult(null, $errors),
+            );
+        }
+
+        $queryString = $params->query;
+
+        try {
+            if (is_string($queryString)) {
+                return $this->executeQueryString(
+                    $queryString,
+                    $context,
+                    $params->variables,
+                    null,
+                    $params->operation,
+                );
+            }
+
+            return $this->executeParsedQuery(
+                $this->loadPersistedQuery($params->queryId),
+                $context,
+                $params->variables,
+                null,
+                $params->operation,
+                $params->queryId,
+            );
+        } catch (\Throwable $throwable) {
+            return $this->toSerializableArray(
+                new ExecutionResult(null, [Error::createLocatedError($throwable)]),
+            );
+        }
+    }
+
+    /**
+     * Parse the given query string into a DocumentNode.
+     *
+     * Caches the parsed result if the query cache is enabled in the configuration.
+     *
+     * @api
+     */
+    public function parse(string $query, string $hash): DocumentNode
+    {
+        return $this->queryCache->isEnabled()
+            ? $this->queryCache->fromCacheOrParse(
+                $hash,
+                fn (): DocumentNode => $this->parseQuery($query),
+            )
+            : $this->parseQuery($query);
+    }
+
+    /**
+     * Convert the result to a serializable array.
+     *
+     * @api
+     *
+     * @return SerializableResult
+     */
+    public function toSerializableArray(ExecutionResult $result): array
     {
         $result->setErrorsHandler($this->errorsHandler());
 
@@ -310,46 +308,57 @@ class GraphQL
     /**
      * Loads persisted query from the query cache.
      *
-     * @throws Error if this feature is disabled or no query is found
+     * @api
      */
-    protected function loadPersistedQuery(string $sha256hash): DocumentNode
+    public function loadPersistedQuery(string $sha256hash): DocumentNode
     {
         $lighthouseConfig = $this->configRepository->get('lighthouse');
-        $cacheConfig = $lighthouseConfig['query_cache'] ?? null;
         if (
-            ! ($lighthouseConfig['persisted_queries'] ?? false)
-            || ! ($cacheConfig['enable'] ?? false)
+            ! $lighthouseConfig['persisted_queries']
+            || ! $this->queryCache->isEnabled()
         ) {
             // https://github.com/apollographql/apollo-server/blob/37a5c862261806817a1d71852c4e1d9cdb59eab2/packages/apollo-server-errors/src/index.ts#L240-L248
-            throw new Error(
-                'PersistedQueryNotSupported',
-                null,
-                null,
-                [],
-                null,
-                null,
-                ['code' => 'PERSISTED_QUERY_NOT_SUPPORTED']
-            );
+            throw new Error(message: 'PersistedQueryNotSupported', extensions: ['code' => 'PERSISTED_QUERY_NOT_SUPPORTED']);
         }
 
-        $cacheFactory = Container::getInstance()->make(CacheFactory::class);
-        $store = $cacheFactory->store($cacheConfig['store']);
-
-        $document = $store->get("lighthouse:query:{$sha256hash}");
-        if (null === $document) {
+        return $this->queryCache->fromCacheOrParse(
+            hash: $sha256hash,
             // https://github.com/apollographql/apollo-server/blob/37a5c862261806817a1d71852c4e1d9cdb59eab2/packages/apollo-server-errors/src/index.ts#L230-L239
-            throw new Error(
-                'PersistedQueryNotFound',
-                null,
-                null,
-                [],
-                null,
-                null,
-                ['code' => 'PERSISTED_QUERY_NOT_FOUND']
-            );
-        }
+            parse: fn () => throw new Error(message: 'PersistedQueryNotFound', extensions: ['code' => 'PERSISTED_QUERY_NOT_FOUND']),
+        );
+    }
 
-        return $document;
+    /** @return ErrorsHandler */
+    protected function errorsHandler(): callable
+    {
+        // @phpstan-ignore-next-line callable is not recognized correctly and can not be type-hinted to match
+        return $this->errorsHandler ??= function (array $errors, callable $formatter): array {
+            // User defined error handlers, implementing \Nuwave\Lighthouse\Execution\ErrorHandler.
+            // This allows the user to register multiple handlers and pipe the errors through.
+            $handlers = [];
+            foreach ($this->configRepository->get('lighthouse.error_handlers', []) as $handlerClass) {
+                $handlers[] = Container::getInstance()->make($handlerClass);
+            }
+
+            return (new Collection($errors))
+                ->map(fn (Error $error): ?array => $this->pipeline
+                    ->send($error)
+                    ->through($handlers)
+                    ->then(static fn (?Error $error): ?array => $error === null
+                        ? null
+                        : $formatter($error)))
+                ->filter()
+                ->all();
+        };
+    }
+
+    protected function debugFlag(): int
+    {
+        return $this->configRepository->get('app.debug')
+            // If Laravel debugging is enabled, we fetch the debug level from the Lighthouse configuration.
+            ? (int) $this->configRepository->get('lighthouse.debug')
+            // If Laravel debugging is disabled, do not add GraphQL specific debugging info either.
+            : DebugFlag::NONE;
     }
 
     protected function cleanUpAfterExecution(): void
@@ -359,47 +368,64 @@ class GraphQL
         $this->errorPool->clear();
     }
 
-    /**
-     * @return ErrorsHandler
-     */
-    protected function errorsHandler(): callable
+    protected function parseQuery(string $query): DocumentNode
     {
-        if (! isset($this->errorsHandler)) {
-            // @phpstan-ignore-next-line callable is not recognized correctly and can not be type-hinted to match
-            return $this->errorsHandler = function (array $errors, callable $formatter): array {
-                // User defined error handlers, implementing \Nuwave\Lighthouse\Execution\ErrorHandler
-                // This allows the user to register multiple handlers and pipe the errors through.
-                $handlers = [];
-                foreach ($this->configRepository->get('lighthouse.error_handlers', []) as $handlerClass) {
-                    $handlers[] = Container::getInstance()->make($handlerClass);
-                }
-
-                return (new Collection($errors))
-                    ->map(function (Error $error) use ($handlers, $formatter): ?array {
-                        return $this->pipeline
-                            ->send($error)
-                            ->through($handlers)
-                            ->then(
-                                fn (?Error $error): ?array => null === $error
-                                ? null
-                                : $formatter($error)
-                            );
-                    })
-                    ->filter()
-                    ->all();
-            };
-        }
-
-        return $this->errorsHandler;
+        return Parser::parse($query, [
+            'noLocation' => ! $this->configRepository->get('lighthouse.parse_source_location'),
+        ]);
     }
 
-    protected function debugFlag(): int
-    {
-        // If debugging is set to false globally, do not add GraphQL specific
-        // debugging info either. If it is true, then we fetch the debug
-        // level from the Lighthouse configuration.
-        return $this->configRepository->get('app.debug')
-            ? (int) $this->configRepository->get('lighthouse.debug')
-            : DebugFlag::NONE;
+    /**
+     * Provides a result for cacheable validation rules by running them or retrieving it from the cache.
+     *
+     * @param  array<string, \GraphQL\Validator\Rules\ValidationRule>  $validationRules
+     *
+     * @return list<\GraphQL\Error\Error>
+     */
+    protected function validateCacheableRules(
+        array $validationRules,
+        Schema $schema,
+        string $schemaHash,
+        DocumentNode $query,
+        ?string $queryHash,
+    ): array {
+        foreach ($validationRules as $rule) {
+            if ($rule instanceof QueryComplexity) {
+                throw new \InvalidArgumentException('The QueryComplexity rule must not be registered in cacheableValidationRules, as it depends on variables.');
+            }
+        }
+
+        if ($queryHash === null) {
+            return DocumentValidator::validate($schema, $query, $validationRules); // @phpstan-ignore return.type (TODO remove ignore when requiring a newer version of webonyx/graphql-php)
+        }
+
+        $validationCacheConfig = $this->configRepository->get('lighthouse.validation_cache');
+
+        if (! $validationCacheConfig['enable']) {
+            return DocumentValidator::validate($schema, $query, $validationRules); // @phpstan-ignore return.type (TODO remove ignore when requiring a newer version of webonyx/graphql-php)
+        }
+
+        $cacheFactory = Container::getInstance()->make(CacheFactory::class);
+        $store = $cacheFactory->store($validationCacheConfig['store']);
+
+        $cacheKey = "lighthouse:validation:{$schemaHash}:{$queryHash}";
+
+        $cachedResult = $store->get($cacheKey);
+        if ($cachedResult !== null) {
+            return $cachedResult;
+        }
+
+        $result = DocumentValidator::validate($schema, $query, $validationRules);
+
+        // If there are any errors, we return them without caching them.
+        // As of webonyx/graphql-php 15.14.0, GraphQL\Error\Error is not serializable.
+        // We would have to figure out how to serialize them properly to cache them.
+        if ($result !== []) {
+            return $result; // @phpstan-ignore return.type (TODO remove ignore when requiring a newer version of webonyx/graphql-php)
+        }
+
+        $store->put($cacheKey, $result, $validationCacheConfig['ttl']);
+
+        return $result;
     }
 }

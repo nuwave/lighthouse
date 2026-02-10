@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Schema\Directives;
 
@@ -14,12 +14,14 @@ final class UpsertDirectiveTest extends DBTestCase
     public function testNestedArgResolver(): void
     {
         factory(User::class)->create();
-        factory(Task::class)->create([
-            'id' => 1,
-            'name' => 'old',
-        ]);
 
-        $this->schema .= /** @lang GraphQL */ '
+        $task = factory(Task::class)->create();
+        $this->assertInstanceOf(Task::class, $task);
+        $task->id = 1;
+        $task->name = 'old';
+        $task->save();
+
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Mutation {
             updateUser(input: UpdateUserInput! @spread): User @update
         }
@@ -44,9 +46,9 @@ final class UpsertDirectiveTest extends DBTestCase
             id: Int
             name: String
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             updateUser(input: {
                 id: 1
@@ -69,7 +71,7 @@ final class UpsertDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'updateUser' => [
                     'name' => 'foo',
@@ -91,7 +93,8 @@ final class UpsertDirectiveTest extends DBTestCase
     public function testNestedInsertOnInputList(): void
     {
         factory(User::class)->create();
-        $this->schema .= /** @lang GraphQL */ '
+
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Mutation {
             updateUser(input: UpdateUserInput! @spread): User @update
         }
@@ -116,9 +119,9 @@ final class UpsertDirectiveTest extends DBTestCase
             id: Int
             name: String
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             updateUser(input: {
                 id: 1
@@ -137,7 +140,8 @@ final class UpsertDirectiveTest extends DBTestCase
                     name
                 }
             }
-        }')->assertJson([
+        }
+        GRAPHQL)->assertJson([
             'data' => [
                 'updateUser' => [
                     'name' => 'foo',
@@ -158,14 +162,14 @@ final class UpsertDirectiveTest extends DBTestCase
     {
         $this->schema .= /** @lang GraphQL */ <<<GRAPHQL
         type Mutation {
-            upsertUser(input: UpsertUserInput! @spread): IUser @upsert
+            upsertUser(input: UpsertUserInput! @spread): IUser! @upsert
         }
 
         interface IUser
-        @interface(resolveType: "{$this->qualifyTestResolver('resolveType')}")
-        @model(class: "Tests\\\\Utils\\\\Models\\\\User") {
-            name: String
-        }
+            @interface(resolveType: "{$this->qualifyTestResolver('resolveType')}")
+            @model(class: "Tests\\\\Utils\\\\Models\\\\User") {
+                name: String
+            }
 
         type Admin implements IUser {
             id: ID!
@@ -177,7 +181,7 @@ final class UpsertDirectiveTest extends DBTestCase
         }
 GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             upsertUser(input: {
                 name: "foo"
@@ -188,7 +192,7 @@ GRAPHQL;
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'upsertUser' => [
                     'id' => 1,

@@ -1,12 +1,12 @@
+<!-- Link to related issues this PR resolves, e.g. "Resolves #236"-->
+ 
 - [ ] Added or updated tests
 - [ ] Documented user facing changes
 - [ ] Updated CHANGELOG.md
 
-<!-- Link to related issues this PR resolves, e.g. "Resolves #236"-->
-
 **Changes**
 
-<!-- Detail the changes in behaviour this PR introduces. -->
+<!-- Detail the changes in behavior this PR introduces. -->
 
 **Breaking changes**
 

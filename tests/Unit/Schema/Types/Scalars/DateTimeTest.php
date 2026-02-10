@@ -1,28 +1,23 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Schema\Types\Scalars;
 
-use Nuwave\Lighthouse\Schema\Types\Scalars\DateScalar;
 use Nuwave\Lighthouse\Schema\Types\Scalars\DateTime;
 
-final class DateTimeTest extends DateScalarTest
+final class DateTimeTest extends DateScalarTestBase
 {
-    protected function scalarInstance(): DateScalar
+    protected function scalarInstance(): DateTime
     {
         return new DateTime();
     }
 
-    public function validDates(): iterable
+    public static function validDates(): iterable
     {
-        return [
-            ['2020-04-20 23:51:15'],
-        ];
+        yield ['2020-04-20 23:51:15'];
     }
 
-    public function canonicalizeDates(): iterable
+    public static function canonicalizeDates(): iterable
     {
-        return [
-            ['2020-4-20 23:51:15', '2020-04-20 23:51:15'],
-        ];
+        yield ['2020-4-20 23:51:15', '2020-04-20 23:51:15'];
     }
 }

@@ -1,11 +1,14 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Federation;
 
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Events\ManipulateAST;
-use Nuwave\Lighthouse\Exceptions\FederationException;
+use Nuwave\Lighthouse\Federation\Resolvers\Entities;
+use Nuwave\Lighthouse\Federation\Resolvers\Service;
+use Nuwave\Lighthouse\Federation\Types\Any;
+use Nuwave\Lighthouse\Federation\Types\FieldSet;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\RootType;
 
@@ -23,24 +26,18 @@ class ASTManipulator
 
     protected function addScalars(DocumentAST &$documentAST): void
     {
-        $documentAST->setTypeDefinition(
-            Parser::scalarTypeDefinition(/** @lang GraphQL */ '
-            scalar _Any @scalar(class: "Nuwave\\\Lighthouse\\\Federation\\\Types\\\Any")
-            ')
-        );
+        $anyClass = addslashes(Any::class);
+        $documentAST->setTypeDefinition(Parser::scalarTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
+            scalar _Any @scalar(class: "{$anyClass}")
+        GRAPHQL));
 
-        $documentAST->setTypeDefinition(
-            Parser::scalarTypeDefinition(/** @lang GraphQL */ '
-            scalar _FieldSet @scalar(class: "Nuwave\\\Lighthouse\\\Federation\\\Types\\\FieldSet")
-            ')
-        );
+        $fieldSetClass = addslashes(FieldSet::class);
+        $documentAST->setTypeDefinition(Parser::scalarTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
+            scalar _FieldSet @scalar(class: "{$fieldSetClass}")
+        GRAPHQL));
     }
 
-    /**
-     * Combine object types with @key into the _Entity union.
-     *
-     * @throws \Nuwave\Lighthouse\Exceptions\FederationException
-     */
+    /** Combine object types with @key into the _Entity union. */
     protected function addEntityUnion(DocumentAST &$documentAST): void
     {
         /** @var array<int, string> $entities */
@@ -52,14 +49,14 @@ class ASTManipulator
             }
 
             foreach ($type->directives as $directive) {
-                if ('key' === $directive->name->value) {
+                if ($directive->name->value === 'key') {
                     $entities[] = $type->name->value;
                     break;
                 }
             }
         }
 
-        if (0 === count($entities)) {
+        if ($entities === []) {
             throw new FederationException('There must be at least one type using the @key directive when federation is enabled.');
         }
 
@@ -67,30 +64,30 @@ class ASTManipulator
         $documentAST->setTypeDefinition(
             Parser::unionTypeDefinition(/** @lang GraphQL */ "
             union _Entity = {$entitiesString}
-            ")
+            "),
         );
     }
 
     protected function addRootFields(DocumentAST &$documentAST): void
     {
-        // In federation it is fine for a schema to not have a user-defined root query type,
+        // In federation, it is fine for a schema to not have a user-defined root query type,
         // since we add two federation related fields to it here.
-        if (! isset($documentAST->types[RootType::QUERY])) {
-            $documentAST->types[RootType::QUERY] = Parser::objectTypeDefinition(/** @lang GraphQL */ 'type Query');
-        }
+        $documentAST->types[RootType::QUERY] ??= Parser::objectTypeDefinition(/** @lang GraphQL */ 'type Query');
 
         $queryType = $documentAST->types[RootType::QUERY];
         assert($queryType instanceof ObjectTypeDefinitionNode);
 
-        $queryType->fields[] = Parser::fieldDefinition(/** @lang GraphQL */ '
-        _entities(
-            representations: [_Any!]!
-        ): [_Entity]! @field(resolver: "Nuwave\\\Lighthouse\\\Federation\\\Resolvers\\\Entities")
-        ');
+        $entitiesClass = addslashes(Entities::class);
+        $queryType->fields[] = Parser::fieldDefinition(/** @lang GraphQL */ <<<GRAPHQL
+            _entities(
+                representations: [_Any!]!
+            ): [_Entity]! @field(resolver: "{$entitiesClass}")
+        GRAPHQL);
 
-        $queryType->fields[] = Parser::fieldDefinition(/** @lang GraphQL */ '
-        _service: _Service! @field(resolver: "Nuwave\\\Lighthouse\\\Federation\\\Resolvers\\\Service")
-        ');
+        $serviceClass = addslashes(Service::class);
+        $queryType->fields[] = Parser::fieldDefinition(/** @lang GraphQL */ <<<GRAPHQL
+           _service: _Service! @field(resolver: "{$serviceClass}")
+        GRAPHQL);
     }
 
     protected function addServiceType(DocumentAST &$documentAST): void
@@ -100,7 +97,7 @@ class ASTManipulator
             type _Service {
                 sdl: String
             }
-            ')
+            '),
         );
     }
 }

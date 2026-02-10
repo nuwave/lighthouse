@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
@@ -15,10 +15,8 @@ abstract class TypeNodeConverter
      * Convert an AST type to an executable type.
      *
      * @param  \GraphQL\Language\AST\TypeNode&\GraphQL\Language\AST\Node  $node
-     *
-     * @return mixed the executable type
      */
-    public function convert(TypeNode $node)
+    public function convert(TypeNode $node): mixed
     {
         return $this->convertWrappedTypeNode($node);
     }
@@ -28,10 +26,8 @@ abstract class TypeNodeConverter
      *
      * @param  \GraphQL\Language\AST\TypeNode&\GraphQL\Language\AST\Node  $node
      * @param  array<string>  $wrappers
-     *
-     * @return mixed the wrapped type
      */
-    protected function convertWrappedTypeNode(TypeNode $node, array $wrappers = [])
+    protected function convertWrappedTypeNode(TypeNode $node, array $wrappers = []): mixed
     {
         // Recursively unwrap the type and save the wrappers
         $nodeKind = $node->kind;
@@ -42,9 +38,10 @@ abstract class TypeNodeConverter
 
             return $this->convertWrappedTypeNode(
                 $node->type,
-                $wrappers
+                $wrappers,
             );
         }
+
         assert($node instanceof NamedTypeNode);
 
         // Re-wrap the type by applying the wrappers in the reversed order
@@ -52,42 +49,26 @@ abstract class TypeNodeConverter
             ->reverse()
             ->reduce(
                 function ($type, string $kind) {
-                    if (NodeKind::NON_NULL_TYPE === $kind) {
+                    if ($kind === NodeKind::NON_NULL_TYPE) {
                         return $this->nonNull($type);
                     }
 
-                    if (NodeKind::LIST_TYPE === $kind) {
+                    if ($kind === NodeKind::LIST_TYPE) {
                         return $this->listOf($type);
                     }
 
                     return $type;
                 },
-                $this->namedType($node->name->value)
+                $this->namedType($node->name->value),
             );
     }
 
-    /**
-     * Wrap or mark the type as non-null.
-     *
-     * @param  mixed  $type  the type to wrap
-     *
-     * @return mixed the type wrapped with non-null
-     */
-    abstract protected function nonNull($type);
+    /** Wrap or mark the type as non-null. */
+    abstract protected function nonNull(mixed $type): mixed;
 
-    /**
-     * Wrap or mark the type as a list.
-     *
-     * @param  mixed  $type  the type to wrap
-     *
-     * @return mixed the type wrapped as a list
-     */
-    abstract protected function listOf($type);
+    /** Wrap or mark the type as a list. */
+    abstract protected function listOf(mixed $type): mixed;
 
-    /**
-     * Get the named type for the given node name.
-     *
-     * @return mixed representation of the type with the given name
-     */
-    abstract protected function namedType(string $nodeName);
+    /** Get the named type for the given node name. */
+    abstract protected function namedType(string $nodeName): mixed;
 }

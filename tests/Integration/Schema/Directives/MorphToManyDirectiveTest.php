@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Schema\Directives;
 
@@ -14,17 +14,12 @@ final class MorphToManyDirectiveTest extends DBTestCase
 {
     use WithFaker;
 
-    /**
-     * @var \Tests\Utils\Models\Post
-     */
-    protected $post;
+    protected Post $post;
 
-    /**
-     * @var \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection
-     */
-    protected $postTags;
+    /** @var \Illuminate\Support\Collection<int, \Tests\Utils\Models\Tag> */
+    protected Collection $postTags;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -39,7 +34,7 @@ final class MorphToManyDirectiveTest extends DBTestCase
 
     public function testResolveMorphToManyRelationship(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type Tag {
             id: ID!
             name: String!
@@ -60,9 +55,9 @@ final class MorphToManyDirectiveTest extends DBTestCase
                 id: ID! @eq
             ): Post @find
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($id: ID!) {
             post(id: $id) {
                 id
@@ -72,18 +67,18 @@ final class MorphToManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $this->post->id,
         ])->assertJson([
             'data' => [
                 'post' => [
                     'id' => $this->post->id,
-                    'tags' => $this->postTags->map(function (Tag $tag) {
-                        return [
+                    'tags' => $this->postTags
+                        ->map(static fn (Tag $tag): array => [
                             'id' => $tag->id,
                             'name' => $tag->name,
-                        ];
-                    })->toArray(),
+                        ])
+                        ->toArray(),
                 ],
             ],
         ]);
@@ -91,7 +86,7 @@ final class MorphToManyDirectiveTest extends DBTestCase
 
     public function testResolveMorphToManyRelationshipWithRelayConnection(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type Tag {
             id: ID!
             name: String!
@@ -107,9 +102,9 @@ final class MorphToManyDirectiveTest extends DBTestCase
                 id: ID! @eq
             ): Post @find
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($id: ID!) {
             post(id: $id) {
                 id
@@ -125,21 +120,21 @@ final class MorphToManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $this->post->id,
         ])->assertJson([
             'data' => [
                 'post' => [
                     'id' => $this->post->id,
                     'tags' => [
-                        'edges' => $this->postTags->map(function (Tag $tag) {
-                            return [
+                        'edges' => $this->postTags
+                            ->map(static fn (Tag $tag): array => [
                                 'node' => [
                                     'id' => $tag->id,
                                     'name' => $tag->name,
                                 ],
-                            ];
-                        })->toArray(),
+                            ])
+                            ->toArray(),
                     ],
                 ],
             ],
@@ -148,7 +143,7 @@ final class MorphToManyDirectiveTest extends DBTestCase
 
     public function testResolveMorphToManyWithCustomName(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type Tag {
             id: ID!
             name: String!
@@ -169,9 +164,9 @@ final class MorphToManyDirectiveTest extends DBTestCase
                 id: ID! @eq
             ): Post @find
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($id: ID!) {
             post(id: $id) {
                 id
@@ -181,18 +176,18 @@ final class MorphToManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $this->post->id,
         ])->assertJson([
             'data' => [
                 'post' => [
                     'id' => $this->post->id,
-                    'customTags' => $this->postTags->map(function (Tag $tag) {
-                        return [
+                    'customTags' => $this->postTags
+                        ->map(static fn (Tag $tag): array => [
                             'id' => $tag->id,
                             'name' => $tag->name,
-                        ];
-                    })->toArray(),
+                        ])
+                        ->toArray(),
                 ],
             ],
         ]);
@@ -200,31 +195,39 @@ final class MorphToManyDirectiveTest extends DBTestCase
 
     public function testResolveMorphToManyUsingInterfaces(): void
     {
-        /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
-        /** @var \Tests\Utils\Models\Post $post */
-        $post = factory(Post::class)->create([
-            'user_id' => $user->id,
-        ]);
-        /** @var \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Tag> $postTags */
-        $postTags = factory(Tag::class, 3)->create()->map(function (Tag $tag) use ($post) {
-            $post->tags()->attach($tag);
+        $this->assertInstanceOf(User::class, $user);
 
-            return $tag;
-        });
-        /** @var \Tests\Utils\Models\Task $task */
-        $task = factory(Task::class)->create([
-            'user_id' => $user->id,
-        ]);
-        /** @var \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Tag> $taskTags */
-        $taskTags = factory(Tag::class, 3)->create()->map(function (Tag $tag) use ($task) {
-            $task->tags()->attach($tag);
+        $post = factory(Post::class)->make();
+        $this->assertInstanceOf(Post::class, $post);
+        $post->user()->associate($user);
+        $post->save();
 
-            return $tag;
-        });
+        /** @var \Illuminate\Database\Eloquent\Collection<array-key, \Tests\Utils\Models\Tag> $postTags */
+        $postTags = factory(Tag::class, 3)
+            ->create()
+            ->map(static function (Tag $tag) use ($post): Tag {
+                $post->tags()->attach($tag);
 
-        $this->schema = /** @lang GraphQL */ '
-        interface Tag @interface(resolveType: "' . $this->qualifyTestResolver('resolveType') . '") {
+                return $tag;
+            });
+
+        $task = factory(Task::class)->make();
+        \PHPUnit\Framework\Assert::assertInstanceOf(Task::class, $task);
+        $task->user()->associate($user);
+        $task->save();
+
+        /** @var \Illuminate\Database\Eloquent\Collection<array-key, \Tests\Utils\Models\Tag> $taskTags */
+        $taskTags = factory(Tag::class, 3)
+            ->create()
+            ->map(static function (Tag $tag) use ($task): Tag {
+                $task->tags()->attach($tag);
+
+                return $tag;
+            });
+
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        interface Tag @interface(resolveType: "{$this->qualifyTestResolver('resolveType')}") {
             id: ID!
         }
 
@@ -259,10 +262,10 @@ final class MorphToManyDirectiveTest extends DBTestCase
                 id: ID! @eq
             ): User @find
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
-        query ($userId: ID!){
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        query ($userId: ID!) {
             user (id: $userId) {
                 id
                 posts {
@@ -295,7 +298,7 @@ final class MorphToManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ', [
+        GRAPHQL, [
             'userId' => $user->id,
         ])->assertJson([
             'data' => [
@@ -305,13 +308,10 @@ final class MorphToManyDirectiveTest extends DBTestCase
                         [
                             'id' => $post->id,
                             'tags' => $postTags
-                                // @phpstan-ignore-next-line model type is known
-                                ->map(function (Tag $tag): array {
-                                    return [
-                                        'id' => $tag->id,
-                                        'name' => $tag->name,
-                                    ];
-                                })
+                                ->map(static fn (Tag $tag): array => [
+                                    'id' => $tag->id,
+                                    'name' => $tag->name,
+                                ])
                                 ->all(),
                         ],
                     ],
@@ -319,13 +319,10 @@ final class MorphToManyDirectiveTest extends DBTestCase
                         [
                             'id' => $task->id,
                             'tags' => $taskTags
-                                // @phpstan-ignore-next-line model type is known
-                                ->map(function (Tag $tag): array {
-                                    return [
-                                        'id' => $tag->id,
-                                        'title' => $tag->name,
-                                    ];
-                                })
+                                ->map(static fn (Tag $tag): array => [
+                                    'id' => $tag->id,
+                                    'title' => $tag->name,
+                                ])
                                 ->toArray(),
                         ],
                     ],
@@ -334,8 +331,10 @@ final class MorphToManyDirectiveTest extends DBTestCase
         ]);
     }
 
-    public static function resolveType($root): string
+    public static function resolveType(Tag $root): string
     {
-        return $root->posts()->count() ? 'PostTag' : 'TaskTag';
+        return $root->posts()->exists()
+            ? 'PostTag'
+            : 'TaskTag';
     }
 }
