@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Schema\Directives;
 
@@ -35,7 +35,7 @@ final class BaseDirectiveTest extends TestCase
 
         $this->assertSame(
             Team::class,
-            $directive->getModelClass()
+            $directive->getModelClass(),
         );
     }
 
@@ -51,7 +51,7 @@ final class BaseDirectiveTest extends TestCase
 
         $this->assertSame(
             User::class,
-            $directive->getModelClass()
+            $directive->getModelClass(),
         );
     }
 
@@ -69,7 +69,7 @@ final class BaseDirectiveTest extends TestCase
 
         $this->assertSame(
             Team::class,
-            $directive->getModelClass()
+            $directive->getModelClass(),
         );
     }
 
@@ -99,7 +99,7 @@ final class BaseDirectiveTest extends TestCase
 
         $this->assertSame(
             Closure::class,
-            $directive->getModelClass()
+            $directive->getModelClass(),
         );
     }
 
@@ -115,7 +115,7 @@ final class BaseDirectiveTest extends TestCase
 
         $this->assertSame(
             Category::class,
-            $directive->getModelClass()
+            $directive->getModelClass(),
         );
     }
 
@@ -131,7 +131,7 @@ final class BaseDirectiveTest extends TestCase
 
         $this->assertSame(
             CategorySecondary::class,
-            $directive->getModelClass()
+            $directive->getModelClass(),
         );
     }
 
@@ -147,7 +147,7 @@ final class BaseDirectiveTest extends TestCase
 
         $this->assertSame(
             OnlyHere::class,
-            $directive->getModelClass()
+            $directive->getModelClass(),
         );
     }
 
@@ -158,13 +158,13 @@ final class BaseDirectiveTest extends TestCase
         $this->assertSame(
             'argValue',
             // @phpstan-ignore-next-line protected method is called via wrapper below
-            $directive->directiveArgValue('argName')
+            $directive->directiveArgValue('argName'),
         );
 
         $this->assertSame(
             'argValue2',
             // @phpstan-ignore-next-line protected method is called via wrapper below
-            $directive->directiveArgValue('argName2')
+            $directive->directiveArgValue('argName2'),
         );
     }
 
@@ -182,7 +182,7 @@ final class BaseDirectiveTest extends TestCase
         $directive = $this->constructFieldDirective('foo: ID @dummy(bar: 1, baz: 2)');
 
         $this->expectExceptionObject(
-            new DefinitionException('The arguments [bar, baz, qux] for @base are mutually exclusive, found [bar, baz] on foo.')
+            new DefinitionException('The arguments [bar, baz, qux] for @base are mutually exclusive, found [bar, baz] on foo.'),
         );
         // @phpstan-ignore-next-line protected method is called via wrapper below
         $directive->validateMutuallyExclusiveArguments(['bar', 'baz', 'qux']);
@@ -213,7 +213,7 @@ final class BaseDirectiveTest extends TestCase
 
         $directive->hydrate(
             $fieldDefinition->directives->get(0),
-            $fieldDefinition
+            $fieldDefinition,
         );
 
         return $directive;
