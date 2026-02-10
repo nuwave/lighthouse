@@ -84,7 +84,7 @@ final class MorphManyTest extends DBTestCase
 
     public function testCreateWithNewMorphMany(): void
     {
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createTask(input: {
                 name: "foo"
@@ -102,7 +102,7 @@ final class MorphManyTest extends DBTestCase
             }
         }
         GRAPHQL)->assertJson([
-            'data' => [
+            GRAPHQLdata' => [
                 'createTask' => [
                     'id' => '1',
                     'name' => 'foo',

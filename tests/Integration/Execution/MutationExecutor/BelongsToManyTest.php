@@ -109,7 +109,7 @@ final class BelongsToManyTest extends DBTestCase
 
     public function testSyncWithoutDetaching(): void
     {
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createUser(input: {
                 name: "user1"
@@ -144,7 +144,7 @@ final class BelongsToManyTest extends DBTestCase
             }
         }
         GRAPHQL)->assertJson([
-            'data' => [
+            GRAPHQLdata' => [
                 'createUser' => [
                     'id' => '1',
                 ],

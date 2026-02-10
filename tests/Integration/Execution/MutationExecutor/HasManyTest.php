@@ -86,7 +86,7 @@ final class HasManyTest extends DBTestCase
 
     public function testCreateWithNewHasMany(): void
     {
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createUser(input: {
                 name: "foo"
@@ -107,7 +107,7 @@ final class HasManyTest extends DBTestCase
             }
         }
         GRAPHQL)->assertJson([
-            'data' => [
+            GRAPHQLdata' => [
                 'createUser' => [
                     'id' => '1',
                     'name' => 'foo',
@@ -707,7 +707,7 @@ GRAPHQL
         ' . self::PLACEHOLDER_QUERY;
 
         // Create the first User with a Role.
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             upsertUser(input: {
                 name: "foo"
@@ -726,7 +726,7 @@ GRAPHQL
             }
         }
         GRAPHQL)->assertJson([
-            'data' => [
+            GRAPHQLdata' => [
                 'upsertUser' => [
                     'id' => '1',
                     'name' => 'foo',
