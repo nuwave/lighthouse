@@ -205,7 +205,7 @@ GRAPHQL;
 
     public function testDirectUpsertByIdentifyingColumn(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             email: String!
@@ -215,9 +215,9 @@ GRAPHQL;
         type Mutation {
             upsertUser(name: String!, email: String!): User @upsert(identifyingColumns: ["email"])
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             upsertUser(
                 email: "foo@te.st"
@@ -227,7 +227,7 @@ GRAPHQL;
                 email
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'upsertUser' => [
                     'email' => 'foo@te.st',
@@ -241,7 +241,7 @@ GRAPHQL;
         $this->assertSame('bar', $user->name);
         $this->assertSame('foo@te.st', $user->email);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             upsertUser(
                 email: "foo@te.st"
@@ -251,7 +251,7 @@ GRAPHQL;
                 email
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'upsertUser' => [
                     'email' => 'foo@te.st',
