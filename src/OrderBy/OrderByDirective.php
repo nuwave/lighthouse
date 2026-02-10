@@ -125,6 +125,8 @@ GRAPHQL;
                 }
 
                 $relation = array_key_first($orderByClause);
+                assert(is_string($relation));
+
                 $relationSnake = Str::snake($relation);
 
                 $relationValues = Arr::first($orderByClause);

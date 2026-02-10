@@ -7,6 +7,8 @@ use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Foundation\Application;
 use Nuwave\Lighthouse\CacheControl\CacheControlServiceProvider;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Federation\FederationHelper;
@@ -367,8 +369,9 @@ GRAPHQL
      */
     private function maybeInheritCacheControlDirective(): string
     {
-        // Not using Illuminate\Container\Container::getInstance() here as it causes PHPStan issues
-        if (app()->providerIsLoaded(CacheControlServiceProvider::class)) {
+        $app = Container::getInstance();
+        assert($app instanceof Application);
+        if ($app->providerIsLoaded(CacheControlServiceProvider::class)) {
             return /** @lang GraphQL */ '@cacheControl(inheritMaxAge: true)';
         }
 
@@ -378,7 +381,9 @@ GRAPHQL
     /** If federation v2 is used, add the @shareable directive to the pagination generic types. */
     private function maybeAddShareableDirective(): string
     {
-        if (app()->providerIsLoaded(FederationServiceProvider::class) && FederationHelper::isUsingFederationV2($this->documentAST)) {
+        $app = Container::getInstance();
+        assert($app instanceof Application);
+        if ($app->providerIsLoaded(FederationServiceProvider::class) && FederationHelper::isUsingFederationV2($this->documentAST)) {
             return /** @lang GraphQL */ '@shareable';
         }
 

@@ -37,7 +37,7 @@ class FieldCommand extends FieldGeneratorCommand
     protected function nameParts(): array
     {
         $name = $this->argument('name');
-        if (! is_string($name)) {
+        if (! is_string($name)) { // @phpstan-ignore function.alreadyNarrowedType (necessary in some dependency versions)
             throw new \InvalidArgumentException('You must specify the name for the class to generate.');
         }
 

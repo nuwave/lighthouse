@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Nuwave\Lighthouse\Execution\Arguments\SaveModel;
 
-class CreateDirective extends MutationExecutorDirective
+class CreateDirective extends OneModelMutationDirective
 {
     public static function definition(): string
     {

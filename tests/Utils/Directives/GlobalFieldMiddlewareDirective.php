@@ -12,17 +12,17 @@ final class GlobalFieldMiddlewareDirective extends BaseDirective implements Fiel
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-directive @globalFieldMiddleware on FIELD_DEFINITION
-GRAPHQL;
+        directive @globalFieldMiddleware on FIELD_DEFINITION
+        GRAPHQL;
     }
 
     public function handleField(FieldValue $fieldValue): void
     {
         $fieldValue->wrapResolver(
             fn (): callable
-            // Must not crash
-            => fn (): bool => $this->definitionNode instanceof FieldDefinitionNode
-                && $this->directiveArgValue('random') === null,
+                // Must not crash
+                => fn (): bool => $this->definitionNode instanceof FieldDefinitionNode
+                    && $this->directiveArgValue('random') === null,
         );
     }
 }

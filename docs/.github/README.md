@@ -97,8 +97,7 @@ See [Tagging a new version](#tagging-a-new-version) for how they are released.
 When you improve the docs, consider if the change you are making applies to
 multiple versions of Lighthouse.
 
-Just change the relevant parts of each separate docs folder and commit it all
-in a single PR.
+Change the relevant parts of each docs folder and commit it all in a single PR.
 
 ### Tagging a new version
 

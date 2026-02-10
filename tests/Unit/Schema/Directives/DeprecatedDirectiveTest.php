@@ -11,10 +11,10 @@ final class DeprecatedDirectiveTest extends TestCase
     public function testRemoveDeprecatedFieldsFromIntrospection(): void
     {
         $reason = 'Use `bar` field';
-        $this->schema = /** @lang GraphQL */ "
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type Query {
             withReason: String @mock
-                @deprecated(reason: \"{$reason}\")
+                @deprecated(reason: "{$reason}")
             withDefaultReason: String @mock
                 @deprecated
             notDeprecated: String @mock
@@ -24,9 +24,9 @@ final class DeprecatedDirectiveTest extends TestCase
             DEPRECATED @deprecated
             NOT_DEPRECATED
         }
-        ";
+        GRAPHQL;
 
-        $introspectionQuery = /** @lang GraphQL */ '
+        $introspectionQuery = /** @lang GraphQL */ <<<'GRAPHQL'
         query ($includeDeprecated: Boolean!) {
             __schema {
                 queryType {
@@ -46,7 +46,7 @@ final class DeprecatedDirectiveTest extends TestCase
                 }
             }
         }
-        ';
+        GRAPHQL;
         $withoutDeprecatedIntrospection = $this->graphQL(
             $introspectionQuery,
             [

@@ -36,8 +36,6 @@ class FederationHelper
 
         foreach ($schema->extensionASTNodes as $extension) {
             foreach ($extension->directives as $directive) {
-                assert($directive instanceof DirectiveNode);
-
                 $schemaDirectives[] = $directive;
             }
         }

@@ -10,22 +10,21 @@ type Subscription {
 
 The quickest way to define such a field is through the `artisan` generator command:
 
-    php artisan lighthouse:subscription PostUpdated
+```shell
+php artisan lighthouse:subscription PostUpdated
+```
 
-Lighthouse will look for a class with the capitalized name of the field that
-is defined within the default subscription namespace.
-For example, the field `postUpdated` should have a corresponding class at
-`App\GraphQL\Subscriptions\PostUpdated`.
+Lighthouse will look for a class matching the capitalized name of the field within the default subscription namespace.
+For example, the field `postUpdated` should have a corresponding class at `App\GraphQL\Subscriptions\PostUpdated`.
 
-All subscription field classes **must** implement the abstract class
-`Nuwave\Lighthouse\Schema\Types\GraphQLSubscription` and implement two methods:
-`authorize` and `filter`.
+All subscription field classes **must** implement the abstract class `Nuwave\Lighthouse\Schema\Types\GraphQLSubscription`
+and implement the two methods `authorize` and `filter`.
 
 ```php
 namespace App\GraphQL\Subscriptions;
 
-use App\User;
-use App\Post;
+use App\Models\User;
+use App\Models\Post;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
@@ -44,7 +43,7 @@ final class PostUpdated extends GraphQLSubscription
     }
 
     /**
-     * @param  \App\Post  $root
+     * @param  \App\Models\Post  $root
      */
     public function filter(Subscriber $subscriber, mixed $root): bool
     {
@@ -62,7 +61,7 @@ final class PostUpdated extends GraphQLSubscription
     }
 
     /**
-     * @param  \App\Post  $root
+     * @param  \App\Models\Post  $root
      */
     public function decodeTopic(string $fieldName, mixed $root): string
     {
@@ -73,7 +72,7 @@ final class PostUpdated extends GraphQLSubscription
     }
 
     /**
-     * @param  \App\Post  $root
+     * @param  \App\Models\Post  $root
      */
     public function resolve(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Post
     {

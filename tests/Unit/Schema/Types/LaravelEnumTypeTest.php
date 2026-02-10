@@ -73,8 +73,7 @@ enum PartiallyDeprecated {
   "Deprecated with reason"
   DEPRECATED_WITH_REASON @deprecated(reason: "some reason")
 }
-GRAPHQL
-                ,
+GRAPHQL,
                 SchemaPrinter::printType($enumType),
             );
         } else {
@@ -89,8 +88,7 @@ enum PartiallyDeprecated {
   "Deprecated with reason"
   DEPRECATED_WITH_REASON @deprecated(reason: "some reason")
 }
-GRAPHQL
-                ,
+GRAPHQL,
                 SchemaPrinter::printType($enumType),
             );
         }
@@ -98,11 +96,11 @@ GRAPHQL
 
     public function testReceivesEnumInstanceInternally(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(bar: AOrB): Boolean @mock
         }
-        ';
+        GRAPHQL;
 
         $this->typeRegistry->register(
             new LaravelEnumType(AOrB::class),
@@ -111,11 +109,11 @@ GRAPHQL
         $this->mockResolver()
             ->with(null, new Callback(static fn (array $args): bool => $args['bar'] instanceof AOrB));
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo(bar: A)
         }
-        ');
+        GRAPHQL);
     }
 
     public function testClassDoesNotExist(): void

@@ -6,46 +6,24 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Execution\Arguments\ResolveNested;
-use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Execution\TransactionalMutations;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Utils;
 
-abstract class MutationExecutorDirective extends BaseDirective implements FieldResolver, ArgResolver
+abstract class ModelMutationDirective extends BaseDirective implements FieldResolver, ArgResolver
 {
     public function __construct(
         protected TransactionalMutations $transactionalMutations,
     ) {}
 
-    public function resolveField(FieldValue $fieldValue): callable
-    {
-        $modelClass = $this->getModelClass();
-
-        return function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelClass): Model {
-            $model = new $modelClass();
-
-            return $this->transactionalMutations->execute(
-                function () use ($model, $resolveInfo): Model {
-                    $mutated = $this->executeMutation($model, $resolveInfo->argumentSet);
-                    assert($mutated instanceof Model);
-
-                    return $mutated->refresh();
-                },
-                $model->getConnectionName(),
-            );
-        };
-    }
-
     /**
-     * @param  Model  $parent
+     * @param  Model  $model
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>  $args
      *
      * @return \Illuminate\Database\Eloquent\Model|array<\Illuminate\Database\Eloquent\Model>
      */
-    public function __invoke($parent, $args): mixed
+    public function __invoke($model, $args): mixed
     {
         $relationName = $this->directiveArgValue(
             'relation',
@@ -53,12 +31,10 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
             $this->nodeName(),
         );
 
-        $relation = $parent->{$relationName}();
+        $relation = $model->{$relationName}();
         assert($relation instanceof Relation);
 
-        // @phpstan-ignore-next-line Relation&Builder mixin not recognized
-        $related = $relation->make();
-        assert($related instanceof Model);
+        $related = $relation->make(); // @phpstan-ignore method.notFound (Relation delegates to Builder)
 
         return $this->executeMutation($related, $args, $relation);
     }

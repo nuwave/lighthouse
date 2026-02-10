@@ -20,17 +20,17 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
  *
  * Relations
  * @property-read \Tests\Utils\Models\User $user
- * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Color> $colors
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\Color> $colors
  */
 final class Employee extends Model
 {
-    /** @return \Illuminate\Database\Eloquent\Relations\MorphOne<\Tests\Utils\Models\User> */
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphOne<\Tests\Utils\Models\User, $this> */
     public function user(): MorphOne
     {
         return $this->morphOne(User::class, 'person');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Tests\Utils\Models\Color> */
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Tests\Utils\Models\Color, $this> */
     public function colors(): MorphMany
     {
         return $this->morphMany(Color::class, 'creator');

@@ -30,8 +30,8 @@ type User {
 
 ## Global Object Identification
 
-You may rebind the `\Nuwave\Lighthouse\Support\Contracts\GlobalId` interface to add your
-own mechanism of encoding/decoding global ids.
+You may rebind the `Nuwave\Lighthouse\Support\Contracts\GlobalId` interface to add your
+own mechanism of encoding/decoding global IDs.
 
 [Global Object Identification](https://relay.dev/graphql/objectidentification.htm)
 
@@ -42,8 +42,7 @@ Directives:
 
 ## Input Object Mutations
 
-Lighthouse makes it easy to follow the principle of using a
-single field argument called `input`, just use the [@spread](../api-reference/directives.md#spread) directive.
+To follow the principle of using a single field argument called `input`, use the [@spread](../api-reference/directives.md#spread) directive.
 
 ```graphql
 type Mutation {

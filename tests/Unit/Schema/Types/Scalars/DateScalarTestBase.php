@@ -10,11 +10,13 @@ use GraphQL\Language\AST\IntValueNode;
 use GraphQL\Language\AST\StringValueNode;
 use Illuminate\Support\Carbon as IlluminateCarbon;
 use Nuwave\Lighthouse\Schema\Types\Scalars\DateScalar;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 abstract class DateScalarTestBase extends TestCase
 {
     /** @dataProvider invalidDateValues */
+    #[DataProvider('invalidDateValues')]
     public function testThrowsIfSerializingInvalidDates(mixed $value): void
     {
         $dateScalar = $this->scalarInstance();
@@ -24,6 +26,7 @@ abstract class DateScalarTestBase extends TestCase
     }
 
     /** @dataProvider invalidDateValues */
+    #[DataProvider('invalidDateValues')]
     public function testThrowsIfParseValueInvalidDate(mixed $value): void
     {
         $dateScalar = $this->scalarInstance();
@@ -34,23 +37,31 @@ abstract class DateScalarTestBase extends TestCase
 
     public function testReturnsIlluminateSupportCarbonAsIs(): void
     {
-        $this->assertTrue(
-            $this->scalarInstance()->parseValue(IlluminateCarbon::now())->isValid(),
-        );
+        $original = IlluminateCarbon::now();
+        $parsed = $this->scalarInstance()->parseValue($original);
+        $this->assertSame($original, $parsed);
     }
 
-    public function testConvertsCarbonCarbonToIlluminateSupportCarbon(): void
+    /** @dataProvider dateTimeInterfaceInstances */
+    #[DataProvider('dateTimeInterfaceInstances')]
+    public function testConvertsDateTimeInterfaceToIlluminateSupportCarbon(\DateTimeInterface $original): void
     {
-        $this->assertTrue(
-            $this->scalarInstance()->parseValue(CarbonCarbon::now())->isValid(),
-        );
+        $parsed = $this->scalarInstance()->parseValue($original);
+        $this->assertSame($original->getTimestamp(), $parsed->getTimestamp());
+        $this->assertTrue($parsed->isValid());
     }
 
-    public function testConvertsCarbonCarbonImmutableToIlluminateSupportCarbon(): void
+    /** @return iterable<array{\DateTimeInterface}> */
+    public static function dateTimeInterfaceInstances(): iterable
     {
-        $this->assertTrue(
-            $this->scalarInstance()->parseValue(CarbonCarbonImmutable::now())->isValid(),
-        );
+        yield 'native DateTime' => [new \DateTime()]; // @phpstan-ignore-line theCodingMachineSafe.class (we want to use the native DateTime to ensure it specifically works)
+        yield 'safe DateTime' => [new \Safe\DateTime()];
+
+        yield 'native DateTimeImmutable' => [new \DateTimeImmutable()]; // @phpstan-ignore-line theCodingMachineSafe.class (we want to use the native DateTime to ensure it specifically works)
+        yield 'safe DateTimeImmutable' => [new \Safe\DateTimeImmutable()];
+
+        yield 'Carbon' => [CarbonCarbon::now()];
+        yield 'CarbonImmutable' => [CarbonCarbonImmutable::now()];
     }
 
     /**
@@ -67,6 +78,7 @@ abstract class DateScalarTestBase extends TestCase
     }
 
     /** @dataProvider validDates */
+    #[DataProvider('validDates')]
     public function testParsesValueString(string $date): void
     {
         $this->assertTrue(
@@ -75,6 +87,7 @@ abstract class DateScalarTestBase extends TestCase
     }
 
     /** @dataProvider validDates */
+    #[DataProvider('validDates')]
     public function testParsesLiteral(string $date): void
     {
         $dateLiteral = new StringValueNode(
@@ -103,6 +116,7 @@ abstract class DateScalarTestBase extends TestCase
     }
 
     /** @dataProvider canonicalizeDates */
+    #[DataProvider('canonicalizeDates')]
     public function testCanonicalizesValidDateString(string $date, string $canonical): void
     {
         $result = $this->scalarInstance()->serialize($date);

@@ -31,23 +31,23 @@ final class ASTBuilderTest extends TestCase
 
     public function testMergeTypeExtensionFields(): void
     {
-        $this->schema = /** @lang GraphQL */ '
-        type Query {
-            foo: String
-        }
-
-        extend type Query {
-            bar: Int!
-        }
-
-        extend type Query {
-            baz: Boolean
-        }
-        ';
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+                type Query {
+                    foo: String
+                }
+        
+                extend type Query {
+                    bar: Int!
+                }
+        
+                extend type Query {
+                    baz: Boolean
+                }
+        GRAPHQL;
         $documentAST = $this->astBuilder->documentAST();
 
         $queryType = $documentAST->types[RootType::QUERY];
-        assert($queryType instanceof ObjectTypeDefinitionNode);
+        $this->assertInstanceOf(ObjectTypeDefinitionNode::class, $queryType);
 
         $this->assertCount(3, $queryType->fields);
     }
@@ -57,82 +57,84 @@ final class ASTBuilderTest extends TestCase
         $directive = new class() extends BaseDirective {
             public static function definition(): string
             {
-                return /** @lang GraphQL */ 'directive @foo repeatable on OBJECT';
+                return /** @lang GraphQL */ <<<'GRAPHQL'
+                directive @foo repeatable on OBJECT
+                GRAPHQL;
             }
         };
 
         $directiveLocator = $this->app->make(DirectiveLocator::class);
         $directiveLocator->setResolved('foo', $directive::class);
 
-        $this->schema = /** @lang GraphQL */ '
-        type MyType {
-            field: String
-        }
-
-        extend type MyType @foo
-
-        extend type MyType @foo
-        ';
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+                type MyType {
+                    field: String
+                }
+        
+                extend type MyType @foo
+        
+                extend type MyType @foo
+        GRAPHQL;
         $documentAST = $this->astBuilder->documentAST();
 
         $myType = $documentAST->types['MyType'];
-        assert($myType instanceof ObjectTypeDefinitionNode);
+        $this->assertInstanceOf(ObjectTypeDefinitionNode::class, $myType);
 
         $this->assertCount(2, $myType->directives);
     }
 
     public function testAllowsExtendingUndefinedRootTypes(): void
     {
-        $this->schema = /** @lang GraphQL */ '
-        extend type Query {
-            foo: ID
-        }
-
-        extend type Mutation {
-            bar: ID
-        }
-
-        extend type Subscription {
-            baz: ID
-        }
-        ';
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+                extend type Query {
+                    foo: ID
+                }
+        
+                extend type Mutation {
+                    bar: ID
+                }
+        
+                extend type Subscription {
+                    baz: ID
+                }
+        GRAPHQL;
         $documentAST = $this->astBuilder->documentAST();
 
         $queryType = $documentAST->types[RootType::QUERY];
-        assert($queryType instanceof ObjectTypeDefinitionNode);
+        $this->assertInstanceOf(ObjectTypeDefinitionNode::class, $queryType);
 
         $this->assertCount(1, $queryType->fields);
 
         $mutationType = $documentAST->types[RootType::MUTATION];
-        assert($mutationType instanceof ObjectTypeDefinitionNode);
+        $this->assertInstanceOf(ObjectTypeDefinitionNode::class, $mutationType);
 
         $this->assertCount(1, $mutationType->fields);
 
         $subscriptionType = $documentAST->types[RootType::SUBSCRIPTION];
-        assert($subscriptionType instanceof ObjectTypeDefinitionNode);
+        $this->assertInstanceOf(ObjectTypeDefinitionNode::class, $subscriptionType);
 
         $this->assertCount(1, $subscriptionType->fields);
     }
 
     public function testMergeInputExtensionFields(): void
     {
-        $this->schema = /** @lang GraphQL */ '
-        input Inputs {
-            foo: String
-        }
-
-        extend input Inputs {
-            bar: Int!
-        }
-
-        extend input Inputs {
-            baz: Boolean
-        }
-        ';
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+                input Inputs {
+                    foo: String
+                }
+        
+                extend input Inputs {
+                    bar: Int!
+                }
+        
+                extend input Inputs {
+                    baz: Boolean
+                }
+        GRAPHQL;
         $documentAST = $this->astBuilder->documentAST();
 
         $inputs = $documentAST->types['Inputs'];
-        assert($inputs instanceof InputObjectTypeDefinitionNode);
+        $this->assertInstanceOf(InputObjectTypeDefinitionNode::class, $inputs);
 
         $this->assertCount(3, $inputs->fields);
     }
@@ -142,49 +144,51 @@ final class ASTBuilderTest extends TestCase
         $directive = new class() extends BaseDirective {
             public static function definition(): string
             {
-                return /** @lang GraphQL */ 'directive @foo repeatable on INPUT_OBJECT';
+                return /** @lang GraphQL */ <<<'GRAPHQL'
+                directive @foo repeatable on INPUT_OBJECT
+                GRAPHQL;
             }
         };
 
         $directiveLocator = $this->app->make(DirectiveLocator::class);
         $directiveLocator->setResolved('foo', $directive::class);
 
-        $this->schema = /** @lang GraphQL */ '
-        input MyInput {
-            field: String
-        }
-
-        extend input MyInput @foo
-
-        extend input MyInput @foo
-        ';
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+                input MyInput {
+                    field: String
+                }
+        
+                extend input MyInput @foo
+        
+                extend input MyInput @foo
+        GRAPHQL;
         $documentAST = $this->astBuilder->documentAST();
 
         $myInput = $documentAST->types['MyInput'];
-        assert($myInput instanceof InputObjectTypeDefinitionNode);
+        $this->assertInstanceOf(InputObjectTypeDefinitionNode::class, $myInput);
 
         $this->assertCount(2, $myInput->directives);
     }
 
     public function testMergeInterfaceExtensionFields(): void
     {
-        $this->schema = /** @lang GraphQL */ '
-        interface Named {
-          name: String!
-        }
-
-        extend interface Named {
-          bar: Int!
-        }
-
-        extend interface Named {
-          baz: Boolean
-        }
-        ';
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+                interface Named {
+                  name: String!
+                }
+        
+                extend interface Named {
+                  bar: Int!
+                }
+        
+                extend interface Named {
+                  baz: Boolean
+                }
+        GRAPHQL;
         $documentAST = $this->astBuilder->documentAST();
 
         $named = $documentAST->types['Named'];
-        assert($named instanceof InterfaceTypeDefinitionNode);
+        $this->assertInstanceOf(InterfaceTypeDefinitionNode::class, $named);
 
         $this->assertCount(3, $named->fields);
     }
@@ -194,26 +198,28 @@ final class ASTBuilderTest extends TestCase
         $directive = new class() extends BaseDirective {
             public static function definition(): string
             {
-                return /** @lang GraphQL */ 'directive @foo repeatable on INTERFACE';
+                return /** @lang GraphQL */ <<<'GRAPHQL'
+                directive @foo repeatable on INTERFACE
+                GRAPHQL;
             }
         };
 
         $directiveLocator = $this->app->make(DirectiveLocator::class);
         $directiveLocator->setResolved('foo', $directive::class);
 
-        $this->schema = /** @lang GraphQL */ '
-        interface MyInterface {
-            field: String
-        }
-
-        extend interface MyInterface @foo
-
-        extend interface MyInterface @foo
-        ';
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+                interface MyInterface {
+                    field: String
+                }
+        
+                extend interface MyInterface @foo
+        
+                extend interface MyInterface @foo
+        GRAPHQL;
         $documentAST = $this->astBuilder->documentAST();
 
         $myInterface = $documentAST->types['MyInterface'];
-        assert($myInterface instanceof InterfaceTypeDefinitionNode);
+        $this->assertInstanceOf(InterfaceTypeDefinitionNode::class, $myInterface);
 
         $this->assertCount(2, $myInterface->directives);
     }
@@ -223,48 +229,50 @@ final class ASTBuilderTest extends TestCase
         $directive = new class() extends BaseDirective {
             public static function definition(): string
             {
-                return /** @lang GraphQL */ 'directive @foo repeatable on SCALAR';
+                return /** @lang GraphQL */ <<<'GRAPHQL'
+                directive @foo repeatable on SCALAR
+                GRAPHQL;
             }
         };
 
         $directiveLocator = $this->app->make(DirectiveLocator::class);
         $directiveLocator->setResolved('foo', $directive::class);
 
-        $this->schema = /** @lang GraphQL */ '
-        scalar MyScalar
-
-        extend scalar MyScalar @foo
-
-        extend scalar MyScalar @foo
-        ';
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+                scalar MyScalar
+        
+                extend scalar MyScalar @foo
+        
+                extend scalar MyScalar @foo
+        GRAPHQL;
         $documentAST = $this->astBuilder->documentAST();
 
         $myScalar = $documentAST->types['MyScalar'];
-        assert($myScalar instanceof ScalarTypeDefinitionNode);
+        $this->assertInstanceOf(ScalarTypeDefinitionNode::class, $myScalar);
 
         $this->assertCount(2, $myScalar->directives);
     }
 
     public function testMergeEnumExtensionFields(): void
     {
-        $this->schema = /** @lang GraphQL */ '
-        enum MyEnum {
-            ONE
-            TWO
-        }
-
-        extend enum MyEnum {
-            THREE
-        }
-
-        extend enum MyEnum {
-            FOUR
-        }
-        ';
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+                enum MyEnum {
+                    ONE
+                    TWO
+                }
+        
+                extend enum MyEnum {
+                    THREE
+                }
+        
+                extend enum MyEnum {
+                    FOUR
+                }
+        GRAPHQL;
         $documentAST = $this->astBuilder->documentAST();
 
         $myEnum = $documentAST->types['MyEnum'];
-        assert($myEnum instanceof EnumTypeDefinitionNode);
+        $this->assertInstanceOf(EnumTypeDefinitionNode::class, $myEnum);
 
         $this->assertCount(4, $myEnum->values);
     }
@@ -274,48 +282,50 @@ final class ASTBuilderTest extends TestCase
         $directive = new class() extends BaseDirective {
             public static function definition(): string
             {
-                return /** @lang GraphQL */ 'directive @foo repeatable on ENUM';
+                return /** @lang GraphQL */ <<<'GRAPHQL'
+                directive @foo repeatable on ENUM
+                GRAPHQL;
             }
         };
 
         $directiveLocator = $this->app->make(DirectiveLocator::class);
         $directiveLocator->setResolved('foo', $directive::class);
 
-        $this->schema = /** @lang GraphQL */ '
-        enum MyEnum {
-            ONE
-            TWO
-        }
-
-        extend enum MyEnum @foo
-
-        extend enum MyEnum @foo
-        ';
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+                enum MyEnum {
+                    ONE
+                    TWO
+                }
+        
+                extend enum MyEnum @foo
+        
+                extend enum MyEnum @foo
+        GRAPHQL;
         $documentAST = $this->astBuilder->documentAST();
 
         $myEnum = $documentAST->types['MyEnum'];
-        assert($myEnum instanceof EnumTypeDefinitionNode);
+        $this->assertInstanceOf(EnumTypeDefinitionNode::class, $myEnum);
 
         $this->assertCount(2, $myEnum->directives);
     }
 
     public function testMergeUnionExtensionFields(): void
     {
-        $this->schema = /** @lang GraphQL */ '
-            type Foo
-            type Bar
-            type Baz
-
-            union MyUnion = Foo
-
-            extend union MyUnion = Bar
-
-            extend union MyUnion = Baz
-        ';
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+                    type Foo
+                    type Bar
+                    type Baz
+        
+                    union MyUnion = Foo
+        
+                    extend union MyUnion = Bar
+        
+                    extend union MyUnion = Baz
+        GRAPHQL;
         $documentAST = $this->astBuilder->documentAST();
 
         $myUnion = $documentAST->types['MyUnion'];
-        assert($myUnion instanceof UnionTypeDefinitionNode);
+        $this->assertInstanceOf(UnionTypeDefinitionNode::class, $myUnion);
 
         $this->assertCount(3, $myUnion->types);
     }
@@ -325,16 +335,18 @@ final class ASTBuilderTest extends TestCase
         $directive = new class() extends BaseDirective {
             public static function definition(): string
             {
-                return /** @lang GraphQL */ 'directive @foo repeatable on SCALAR';
+                return /** @lang GraphQL */ <<<'GRAPHQL'
+                directive @foo repeatable on SCALAR
+                GRAPHQL;
             }
         };
 
         $directiveLocator = $this->app->make(DirectiveLocator::class);
         $directiveLocator->setResolved('foo', $directive::class);
 
-        $this->schema = /** @lang GraphQL */ '
-        extend scalar MyScalar @foo
-        ';
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+                extend scalar MyScalar @foo
+        GRAPHQL;
 
         $this->expectExceptionObject(new DefinitionException('Could not find a base definition MyScalar of kind ' . NodeKind::SCALAR_TYPE_EXTENSION . ' to extend.'));
         $this->astBuilder->documentAST();
@@ -342,15 +354,15 @@ final class ASTBuilderTest extends TestCase
 
     public function testDoesNotAllowExtendingUndefinedTypes(): void
     {
-        $this->schema = /** @lang GraphQL */ '
-        type Query {
-            foo: String
-        }
-
-        extend type Foo {
-            foo: Int
-        }
-        ';
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+                type Query {
+                    foo: String
+                }
+        
+                extend type Foo {
+                    foo: Int
+                }
+        GRAPHQL;
 
         $this->expectExceptionObject(new DefinitionException('Could not find a base definition Foo of kind ' . NodeKind::OBJECT_TYPE_EXTENSION . ' to extend.'));
         $this->astBuilder->documentAST();
@@ -358,11 +370,11 @@ final class ASTBuilderTest extends TestCase
 
     public function testDoesNotAllowExtendingUndefinedUnions(): void
     {
-        $this->schema = /** @lang GraphQL */ '
-        union MyFirstEnum = String
-
-        extend union MySecondUnion = Int
-        ';
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+                union MyFirstEnum = String
+        
+                extend union MySecondUnion = Int
+        GRAPHQL;
 
         $this->expectExceptionObject(new DefinitionException('Could not find a base definition MySecondUnion of kind ' . NodeKind::UNION_TYPE_EXTENSION . ' to extend.'));
         $this->astBuilder->documentAST();
@@ -370,15 +382,15 @@ final class ASTBuilderTest extends TestCase
 
     public function testDoesNotAllowDuplicateFieldsOnTypeExtensions(): void
     {
-        $this->schema = /** @lang GraphQL */ '
-        type Query {
-            foo: String
-        }
-
-        extend type Query {
-            foo: Int
-        }
-        ';
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+                type Query {
+                    foo: String
+                }
+        
+                extend type Query {
+                    foo: Int
+                }
+        GRAPHQL;
 
         $this->expectExceptionObject(new DefinitionException(ASTHelper::duplicateDefinition('foo')));
         $this->astBuilder->documentAST();
@@ -386,15 +398,15 @@ final class ASTBuilderTest extends TestCase
 
     public function testDoesNotAllowDuplicateFieldsOnInputExtensions(): void
     {
-        $this->schema = /** @lang GraphQL */ '
-        input Inputs {
-            foo: String
-        }
-
-        extend input Inputs {
-            foo: Int
-        }
-        ';
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+                input Inputs {
+                    foo: String
+                }
+        
+                extend input Inputs {
+                    foo: Int
+                }
+        GRAPHQL;
 
         $this->expectExceptionObject(new DefinitionException(ASTHelper::duplicateDefinition('foo')));
         $this->astBuilder->documentAST();
@@ -402,15 +414,15 @@ final class ASTBuilderTest extends TestCase
 
     public function testDoesNotAllowDuplicateFieldsOnInterfaceExtensions(): void
     {
-        $this->schema = /** @lang GraphQL */ '
-        interface Named {
-            foo: String
-        }
-
-        extend interface Named{
-            foo: Int
-        }
-        ';
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+                interface Named {
+                    foo: String
+                }
+        
+                extend interface Named{
+                    foo: Int
+                }
+        GRAPHQL;
 
         $this->expectExceptionObject(new DefinitionException(ASTHelper::duplicateDefinition('foo')));
         $this->astBuilder->documentAST();
@@ -418,17 +430,17 @@ final class ASTBuilderTest extends TestCase
 
     public function testDoesNotAllowDuplicateValuesOnEnumExtensions(): void
     {
-        $this->schema = /** @lang GraphQL */ '
-        enum MyEnum {
-            ONE
-            TWO
-        }
-
-        extend enum MyEnum {
-            TWO
-            THREE
-        }
-        ';
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+                enum MyEnum {
+                    ONE
+                    TWO
+                }
+        
+                extend enum MyEnum {
+                    TWO
+                    THREE
+                }
+        GRAPHQL;
 
         $this->expectExceptionObject(new DefinitionException(ASTHelper::duplicateDefinition('TWO')));
         $this->astBuilder->documentAST();
@@ -436,14 +448,14 @@ final class ASTBuilderTest extends TestCase
 
     public function testDoesNotAllowDuplicateTypesOnUnionExtensions(): void
     {
-        $this->schema = /** @lang GraphQL */ '
-        type Foo
-        type Bar
-
-        union MyUnion = Foo | Bar
-
-        extend union MyUnion = Bar
-        ';
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+                type Foo
+                type Bar
+        
+                union MyUnion = Foo | Bar
+        
+                extend union MyUnion = Bar
+        GRAPHQL;
 
         $this->expectExceptionObject(new DefinitionException(ASTHelper::duplicateDefinition('Bar')));
         $this->astBuilder->documentAST();
@@ -451,15 +463,15 @@ final class ASTBuilderTest extends TestCase
 
     public function testDoesNotAllowMergingNonMatchingTypes(): void
     {
-        $this->schema = /** @lang GraphQL */ '
-        type Foo {
-            bar: ID
-        }
-
-        extend interface Foo {
-            baz: ID
-        }
-        ';
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+                type Foo {
+                    bar: ID
+                }
+        
+                extend interface Foo {
+                    baz: ID
+                }
+        GRAPHQL;
 
         $this->expectExceptionObject(new DefinitionException('The type extension Foo of kind ' . NodeKind::INTERFACE_TYPE_EXTENSION . ' can not extend a definition of kind ' . NodeKind::OBJECT_TYPE_DEFINITION . '.'));
         $this->astBuilder->documentAST();
@@ -467,27 +479,27 @@ final class ASTBuilderTest extends TestCase
 
     public function testMergeTypeExtensionInterfaces(): void
     {
-        $this->schema = /** @lang GraphQL */ '
-        type User implements Emailable {
-            email: String!
-        }
-
-        interface Emailable {
-            email: String!
-        }
-
-        interface Nameable {
-            name: String!
-        }
-
-        extend type User implements Nameable {
-            name: String!
-        }
-        ';
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+                type User implements Emailable {
+                    email: String!
+                }
+        
+                interface Emailable {
+                    email: String!
+                }
+        
+                interface Nameable {
+                    name: String!
+                }
+        
+                extend type User implements Nameable {
+                    name: String!
+                }
+        GRAPHQL;
         $documentAST = $this->astBuilder->documentAST();
 
         $userType = $documentAST->types['User'];
-        assert($userType instanceof ObjectTypeDefinitionNode);
+        $this->assertInstanceOf(ObjectTypeDefinitionNode::class, $userType);
 
         $interfaces = new Collection($userType->interfaces);
         $this->assertCount(2, $interfaces);

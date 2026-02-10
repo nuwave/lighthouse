@@ -160,7 +160,8 @@ and the value `true` is returned - thus the fields return type must be `Boolean!
 
 Once a [queue worker](https://laravel.com/docs/queues#running-the-queue-worker) picks up the job,
 it will actually execute the underlying field resolver.
-The result is not checked for errors, ensure your GraphQL error handling reports relevant exceptions.
+Errors that occur during execution are reported through the Laravel exception handler.
+The handlers in the `config/lighthouse.php` option `error_handlers` are not called.
 """
 directive @async(
   """
@@ -366,8 +367,8 @@ type User {
 
 ### Retrieving Intermediate Table Columns
 
-You may want to allow accessing data that describes the relation between the models
-and is stored in the intermediate table - see [retrieving intermediate table columns in Laravel](https://laravel.com/docs/eloquent-relationships#retrieving-intermediate-table-columns).
+You may want to allow accessing data that describes the relation between the models and is stored in the intermediate table.
+See [retrieving intermediate table columns in Laravel](https://laravel.com/docs/eloquent-relationships#retrieving-intermediate-table-columns).
 
 Just like in Laravel, you can access the `pivot` attribute on the models (or its alias).
 Even though this attribute is always present when querying the model through the relation,
@@ -459,6 +460,157 @@ type RoleEdge {
 }
 ```
 
+## @bind
+
+```graphql
+"""
+Replace argument values with the corresponding model (or some other value) before passing them to the resolver.
+For example, instead of injecting a user's ID, you can inject the entire User model instance that matches the given ID.
+This eliminates the need to manually query for the instance inside the resolver.
+
+This works analogues to [Laravel's Route Model Binding](https://laravel.com/docs/routing#route-model-binding).
+"""
+directive @bind(
+  """
+  Specify the fully qualified class name of the binding to use.
+  This can be either an Eloquent model, or a class that defines a method `__invoke` that resolves the value.
+  """
+  class: String!
+
+  """
+  Specify the column name of a unique identifier to use when binding Eloquent models.
+  By default, "id" is used as the primary key column.
+  """
+  column: String! = "id"
+
+  """
+  Specify the relations to eager-load when binding Eloquent models.
+  """
+  with: [String!]! = []
+
+  """
+  Specify whether the binding should be considered required.
+  When set to `true`, a validation error will be thrown if the value (or any of the list values) can not be resolved.
+  The field resolver will not be invoked in this case.
+  When set to `false`, argument values that can not be resolved will be passed to the resolver as `null`.
+  When the argument is a list, individual values that can not be resolved will be filtered out.
+  """
+  required: Boolean! = true
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
+
+### Basic usage
+
+```graphql
+type Mutation {
+  addUserToCompany(
+    user: ID! @bind(class: "App\\Models\\User")
+    company: ID! @bind(class: "App\\Models\\Company")
+  ): Boolean!
+}
+```
+
+```php
+namespace App\GraphQL\Mutations;
+
+final class AddUserToCompany
+{
+    /**
+     * @param array{
+     *   user: \App\Models\User,
+     *   company: \App\Models\Company,
+     * } $args
+     */
+    public function __invoke(mixed $root, array $args): bool
+    {
+        $user = $args['user'];
+        $user->associate($args['company']);
+
+        return $user->save();
+    }
+}
+```
+
+### Binding instances that are not Eloquent models
+
+To bind instances that are not Eloquent models, callable classes can be used instead:
+
+```graphql
+type Mutation {
+  updateCompanyInfo(
+    company: ID! @bind(class: "App\\Http\\GraphQL\\Bindings\\CompanyBinding")
+  ): Boolean!
+}
+```
+
+```php
+namespace App\GraphQL\Bindings;
+
+use App\External\Company;
+use App\External\CompanyRepository;
+use Nuwave\Lighthouse\Bind\BindDefinition;
+
+final class CompanyBinding
+{
+    public function __construct(
+        private CompanyRepository $companyRepository,
+    ) {}
+
+    public function __invoke(string $value, BindDefinition $definition): ?Company
+    {
+        if ($definition->required) {
+            return $this->companyRepository->findOrFail($value);
+        }
+
+        return $this->companyRepository->find($value);
+    }
+}
+```
+
+### Binding a collection of instances
+
+When the `@bind` directive is defined on an argument or input field with an array value,
+it can be used to resolve a collection of instances.
+
+```graphql
+type Mutation {
+  addUsersToCompany(
+    users: [ID!]! @bind(class: "App\\Models\\User")
+    company: ID! @bind(class: "App\\Models\\Company")
+  ): [User!]!
+}
+```
+
+```php
+namespace App\GraphQL\Mutations;
+
+use App\Models\User;
+
+final class AddUsersToCompany
+{
+    /**
+     * @param array{
+     *     users: \Illuminate\Database\Eloquent\Collection<int, \App\Models\User>,
+     *     company: \App\Models\Company,
+     * } $args
+     *
+     * @return \Illuminate\Database\Eloquent\Collection<int, \App\Models\User>
+     */
+    public function __invoke(mixed $root, array $args): Collection
+    {
+        return $args['users']
+            ->map(function (User $user) use ($args): ?User {
+                $user->associate($args['company']);
+
+                return $user->save()
+                    ? $user
+                    : null;
+            })
+            ->filter();
+    }
+}
+```
+
 ## @broadcast
 
 ```graphql
@@ -490,7 +642,7 @@ type Mutation {
 }
 ```
 
-You may override the default queueing behaviour from the configuration by
+You may override the default queueing behavior from the configuration by
 passing the `shouldQueue` argument.
 
 ```graphql
@@ -746,7 +898,7 @@ directive @canFind(
 ) repeatable on FIELD_DEFINITION
 ```
 
-### canRoot
+### @canModel
 
 ```graphql
 """
@@ -754,7 +906,7 @@ Check a Laravel Policy to ensure the current user is authorized to access a fiel
 
 Check the policy against the root model.
 """
-directive @canRoot(
+directive @canModel(
   """
   The model name to check against.
   """
@@ -895,7 +1047,10 @@ final class ComplexityAnalyzer
 
 ```graphql
 """
-Replaces `""` with `null`.
+Replaces incoming empty strings `""` with `null`.
+
+When used upon fields, empty strings for non-nullable inputs will pass unchanged.
+Only explicitly placing this on non-nullable inputs will force the conversion.
 """
 directive @convertEmptyStringsToNull on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 ```
@@ -1018,7 +1173,7 @@ Use it on a root mutation field that returns an instance of the Model.
 
 ```graphql
 type Mutation {
-  createPost(title: String!): Post @create
+  createPost(title: String!): Post! @create
 }
 ```
 
@@ -1027,7 +1182,7 @@ to spread out the nested values before applying it to the resolver.
 
 ```graphql
 type Mutation {
-  createPost(input: CreatePostInput! @spread): Post @create
+  createPost(input: CreatePostInput! @spread): Post! @create
 }
 
 input CreatePostInput {
@@ -1040,11 +1195,45 @@ or is located in a non-default namespace, set it with the `model` argument.
 
 ```graphql
 type Mutation {
-  createPost(title: String!): Post @create(model: "Foo\\Bar\\MyPost")
+  createPost(title: String!): Post! @create(model: "Foo\\Bar\\MyPost")
 }
 ```
 
 This directive can also be used as a [nested arg resolver](../concepts/arg-resolvers.md).
+
+## @createMany
+
+```graphql
+"""
+Create multiple new Eloquent models with the given arguments.
+"""
+directive @createMany(
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model detection does not work.
+  """
+  model: String
+
+  """
+  Specify the name of the relation on the parent model.
+  This is only needed when using this directive as a nested arg
+  resolver and if the name of the relation is not the arg name.
+  """
+  relation: String
+) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
+
+When used on a field, it must have exactly one argument where the type is a non-null list of input objects.
+
+```graphql
+type Mutation {
+  createPosts(inputs: [CreatePostInput!]!): [Post!]! @createMany
+}
+
+input CreatePostInput {
+  title: String!
+}
+```
 
 ## @delete
 
@@ -1112,7 +1301,7 @@ type Mutation {
 ```
 
 If the model relates to a single other model through a `HasOne`, `MorphOne`, `BelongsTo` or
-`MorphTo` relationship, you can just pass a Boolean instead of an ID, as there is only one
+`MorphTo` relationship, you can pass a Boolean instead of an ID, as there is only one
 possible model that can be deleted.
 
 ```graphql
@@ -1130,17 +1319,16 @@ Marks an element of a GraphQL schema as no longer supported.
 """
 directive @deprecated(
   """
-  Explains why this element was deprecated, usually also including a
-  suggestion for how to access supported similar data.
-  Formatted in [Markdown](https://commonmark.org).
+  Explains why this element was deprecated.
+  It is also beneficial to suggest what to use instead.
+  Formatted in Markdown, as specified by [CommonMark](https://commonmark.org).
   """
   reason: String = "No longer supported"
-) on FIELD_DEFINITION | ENUM_VALUE
+) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | ENUM_VALUE
 ```
 
-You can mark fields as deprecated by adding the [@deprecated](#deprecated) directive.
-It is recommended to provide a `reason` for the deprecation, as well as a suggestion on
-how to move forward.
+You can indicate schema elements are no longer supported by adding the [@deprecated](#deprecated) directive.
+It is recommended to provide a `reason` for the deprecation, as well as suggest a replacement.
 
 ```graphql
 type Query {
@@ -1171,7 +1359,7 @@ type User {
 }
 
 type Mutation {
-  createUser(email: String!, foo: String @drop): User @create
+  createUser(email: String!, foo: String @drop): User! @create
 }
 ```
 
@@ -1210,13 +1398,8 @@ enum FeatureState {
 ```
 
 Requires the installation of [Laravel Pennant](https://laravel.com/docs/pennant)
-and manual registration of the service provider in `config/app.php`:
-
-```php
-'providers' => [
-    \Nuwave\Lighthouse\Pennant\PennantServiceProvider::class,
-],
-```
+and manual registration of the service provider `Nuwave\Lighthouse\Pennant\PennantServiceProvider`,
+see [registering providers in Laravel](https://laravel.com/docs/providers#registering-providers).
 
 ## @field
 
@@ -1241,7 +1424,7 @@ If you pass only a class name, the method name defaults to `__invoke`.
 
 ```graphql
 type Mutation {
-  createPost(title: String!): Post
+  createPost(title: String!): Post!
     @field(resolver: "App\\GraphQL\\Mutations\\PostMutator@create")
 }
 ```
@@ -1546,8 +1729,8 @@ type Mutation {
 }
 ```
 
-You may rebind the `\Nuwave\Lighthouse\Support\Contracts\GlobalId` interface to add your
-own mechanism of encoding/decoding global ids.
+You may rebind the `Nuwave\Lighthouse\Support\Contracts\GlobalId` interface to add your
+own mechanism of encoding/decoding global IDs.
 
 ## @guard
 
@@ -1703,7 +1886,7 @@ type User {
 }
 ```
 
-If the name of the relationship on the Eloquent model is different than the field name,
+If the name of the relationship on the Eloquent model differs from the field name,
 you can override it by setting `relation`.
 
 ```graphql
@@ -1806,12 +1989,47 @@ type User {
 }
 ```
 
-If the name of the relationship on the Eloquent model is different than the field name,
+If the name of the relationship on the Eloquent model differs from the field name,
 you can override it by setting `relation`.
 
 ```graphql
 type User {
   phone: Phone @hasOne(relation: "telephone")
+}
+```
+
+## @hasOneThrough
+
+```graphql
+"""
+Corresponds to [the Eloquent relationship HasOneThrough](https://laravel.com/docs/eloquent-relationships#has-one-through).
+"""
+directive @hasOneThrough(
+  """
+  Specify the relationship method name in the model class,
+  if it is named different from the field in the schema.
+  """
+  relation: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+) on FIELD_DEFINITION
+```
+
+```graphql
+type Mechanic {
+  carOwner: Owner! @hasOneThrough
+}
+```
+
+If the name of the relationship on the Eloquent model differs from the field name,
+you can override it by setting `relation`.
+
+```graphql
+type Mechanic {
+  carOwner: Owner! @hasOneThrough(relation: "owner")
 }
 ```
 
@@ -1867,9 +2085,9 @@ automatically used for creating new models and cannot be manipulated.
 
 ```graphql
 type Mutation {
-  createPost(title: String!, content: String!): Post
-    @create
+  createPost(title: String!, content: String!): Post!
     @inject(context: "user.id", name: "user_id")
+    @create
 }
 ```
 
@@ -1878,9 +2096,9 @@ set a nested argument.
 
 ```graphql
 type Mutation {
-  createTask(input: CreateTaskInput!): Task
-    @create
+  createTask(input: CreateTaskInput!): Task!
     @inject(context: "user.id", name: "input.user_id")
+    @create
 }
 ```
 
@@ -1936,7 +2154,7 @@ final class Commentable
      */
     public function resolveType(mixed $root, GraphQLContext $context, ResolveInfo $resolveInfo): Type
     {
-        // TODO implement your own resolver logic - if the default is fine, just delete this class
+        // TODO implement your own resolver logic - if the default is fine, delete this class
     }
 }
 ```
@@ -2020,15 +2238,23 @@ directive @like(
 ```graphql
 """
 Allow clients to specify the maximum number of results to return when used on an argument,
-or statically limits them when used on a field.
+or statically limit them when used on a field.
 
-This directive does not influence the number of results the resolver queries internally,
-but limits how much of it is returned to clients.
+By default, this directive does not influence the number of results the resolver queries internally,
+but limits how much of it is returned to clients. Use the `builder` argument to change this.
 """
-directive @limit on ARGUMENT_DEFINITION | FIELD_DEFINITION
+directive @limit(
+  """
+  You may set this to `true` if the field uses a query builder,
+  then this directive will apply a LIMIT clause to it.
+  Typically, this option should only be used for root fields,
+  as it may cause wrong results with batched relation queries.
+  """
+  builder: Boolean! = false
+) on ARGUMENT_DEFINITION | FIELD_DEFINITION
 ```
 
-Place this on any argument to a field that returns a list of results.
+You may place this on any argument to a field that returns a list of results.
 
 ```graphql
 type Query {
@@ -2040,7 +2266,7 @@ Lighthouse will return at most the number of results that the client requested.
 
 ```graphql
 {
-  users(limit: 5) {
+  users(limit: 4) {
     name
   }
 }
@@ -2053,9 +2279,18 @@ Lighthouse will return at most the number of results that the client requested.
       { "name": "Never" },
       { "name": "more" },
       { "name": "than" },
-      { "name": "5" }
+      { "name": "4" }
     ]
   }
+}
+```
+
+If your field is resolved through a database query, you may add the `builder` argument to apply
+an actual `LIMIT` clause to your SQL:
+
+```graphql
+type Query {
+  users(limit: Int @limit(builder: true)): [User!]! @all
 }
 ```
 
@@ -2448,7 +2683,7 @@ This may be useful to logically group arg resolvers.
 
 ```graphql
 type Mutation {
-  createUser(name: String, tasks: UserTasksOperations @nest): User @create
+  createUser(name: String, tasks: UserTasksOperations @nest): User! @create
 }
 
 input UserTasksOperations {
@@ -3027,7 +3262,7 @@ final class Blog
 
 ### Custom resolver
 
-You can provide your own function that resolves the field by directly returning data in a `\Illuminate\Contracts\Pagination\Paginator` instance.
+You can provide your own function that resolves the field by directly returning data in a `Illuminate\Contracts\Pagination\Paginator` instance.
 
 This is mutually exclusive with `builder` and `model`. Not compatible with `scopes` and builder arguments such as [@eq](#eq).
 
@@ -3250,7 +3485,7 @@ Reference a class implementing a scalar definition.
 """
 directive @scalar(
   """
-  Reference to a class that extends `\GraphQL\Type\Definition\ScalarType`.
+  Reference to a class that extends `GraphQL\Type\Definition\ScalarType`.
   """
   class: String!
 ) on SCALAR
@@ -3334,13 +3569,8 @@ directive @search(
 ```
 
 Requires the installation of [Laravel Scout](https://laravel.com/docs/scout)
-and manual registration of the service provider in `config/app.php`:
-
-```php
-'providers' => [
-    \Nuwave\Lighthouse\Scout\ScoutServiceProvider::class,
-],
-```
+and manual registration of the service provider `Nuwave\Lighthouse\Scout\ScoutServiceProvider`,
+see [registering providers in Laravel](https://laravel.com/docs/providers#registering-providers).
 
 The `search()` method of the model is called with the value of the argument,
 using the driver you configured for Scout.
@@ -3426,7 +3656,7 @@ You may use [@spread](#spread) on field arguments or on input object fields:
 
 ```graphql
 type Mutation {
-  updatePost(id: ID!, input: PostInput! @spread): Post @update
+  updatePost(id: ID!, input: PostInput! @spread): Post! @update
 }
 
 input PostInput {
@@ -3474,11 +3704,11 @@ have been applied, e.g. validation, transformation.
 ```graphql
 """
 Reference a class to handle the broadcasting of a subscription to clients.
-The given class must extend `\Nuwave\Lighthouse\Schema\Types\GraphQLSubscription`.
+The given class must extend `Nuwave\Lighthouse\Schema\Types\GraphQLSubscription`.
 """
 directive @subscription(
   """
-  A reference to a subclass of `\Nuwave\Lighthouse\Schema\Types\GraphQLSubscription`.
+  A reference to a subclass of `Nuwave\Lighthouse\Schema\Types\GraphQLSubscription`.
   """
   class: String!
 ) on FIELD_DEFINITION
@@ -3648,7 +3878,7 @@ final class Person
      */
     public function resolveType(mixed $root, GraphQLContext $context, ResolveInfo $resolveInfo): Type
     {
-        // TODO implement your own resolver logic - if the default is fine, just delete this class
+        // TODO implement your own resolver logic - if the default is fine, delete this class
     }
 }
 ```
@@ -3657,7 +3887,7 @@ final class Person
 
 ```graphql
 """
-Update an Eloquent model with the input values of the field.
+Update an Eloquent model with the given arguments.
 """
 directive @update(
   """
@@ -3679,7 +3909,7 @@ Use it on a root mutation field that returns an instance of the Model.
 
 ```graphql
 type Mutation {
-  updatePost(id: ID!, content: String): Post @update
+  updatePost(id: ID!, content: String): Post! @update
 }
 ```
 
@@ -3688,7 +3918,7 @@ Client libraries such as Apollo base their caching mechanism on that assumption.
 
 ```graphql
 type Mutation {
-  updatePost(id: ID! @rename(attribute: "post_id"), content: String): Post
+  updatePost(id: ID! @rename(attribute: "post_id"), content: String): Post!
     @update
 }
 ```
@@ -3698,11 +3928,46 @@ or is located in a non-default namespace, set it with the `model` argument.
 
 ```graphql
 type Mutation {
-  updateAuthor(id: ID!, name: String): Author @update(model: "App\\User")
+  updateAuthor(id: ID!, name: String): Author! @update(model: "App\\User")
 }
 ```
 
 This directive can also be used as a [nested arg resolver](../concepts/arg-resolvers.md).
+
+## @updateMany
+
+```graphql
+"""
+Update multiple Eloquent models with the given arguments.
+"""
+directive @updateMany(
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model detection does not work.
+  """
+  model: String
+
+  """
+  Specify the name of the relation on the parent model.
+  This is only needed when using this directive as a nested arg
+  resolver and if the name of the relation is not the arg name.
+  """
+  relation: String
+) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
+
+When used on a field, it must have exactly one argument where the type is a non-null list of input objects.
+
+```graphql
+type Mutation {
+  updatePosts(inputs: [UpdatePostInput!]!): [Post!]! @updateMany
+}
+
+input UpdatePostInput {
+  id: ID!
+  title: String
+}
+```
 
 ## @upload
 
@@ -3738,7 +4003,7 @@ For example, you want to pass in a user avatar, have that file uploaded and the 
 type Mutation {
   createUser(
     avatar: Upload @upload(disk: "public", path: "images/avatars", public: true)
-  ): User @create
+  ): User! @create
 }
 
 type User {
@@ -3750,7 +4015,7 @@ type User {
 
 ```graphql
 """
-Create or update an Eloquent model with the input values of the field.
+Create or update an Eloquent model with the given arguments.
 """
 directive @upsert(
   """
@@ -3774,11 +4039,46 @@ In case no `id` is specified, an auto-generated fresh ID will be used instead.
 
 ```graphql
 type Mutation {
-  upsertPost(post_id: ID!, content: String): Post @upsert
+  upsertPost(id: ID, content: String!): Post! @upsert
 }
 ```
 
 This directive can also be used as a [nested arg resolver](../concepts/arg-resolvers.md).
+
+## @upsertMany
+
+```graphql
+"""
+Create or update multiple Eloquent models with given arguments.
+"""
+directive @upsertMany(
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model detection does not work.
+  """
+  model: String
+
+  """
+  Specify the name of the relation on the parent model.
+  This is only needed when using this directive as a nested arg
+  resolver and if the name of the relation is not the arg name.
+  """
+  relation: String
+) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
+
+When used on a field, it must have exactly one argument where the type is a non-null list of input objects.
+
+```graphql
+type Mutation {
+  upsertPosts(inputs: [UpsertPostInput!]!): [Post!]! @upsertMany
+}
+
+input UpsertPostInput {
+  id: ID
+  title: String!
+}
+```
 
 ## @validator
 
@@ -4158,8 +4458,7 @@ type User {
 }
 ```
 
-If you just want to return the relation itself as-is,
-look into [handling Eloquent relationships](../eloquent/relationships.md).
+If you just want to return the relation itself as-is, look into [handling Eloquent relationships](../eloquent/relationships.md).
 
 ## @withCount
 
@@ -4193,3 +4492,45 @@ type User {
 ```
 
 If you just want to return the count itself as-is, use [@count](#count).
+
+## @withoutGlobalScopes
+
+```graphql
+"""
+Omit any number of global scopes from the query builder.
+
+This directive should be used on arguments of type `Boolean`.
+The scopes will be removed only if `true` is passed by the client.
+"""
+directive @withoutGlobalScopes(
+  """
+  The names of the global scopes to omit.
+  """
+  names: [String!]!
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
+
+> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
+> Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
+
+```php
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+
+final class Post extends Model
+{
+    protected static function booted(): void
+    {
+        self::addGlobalScope('scheduled', fn (Builder $query): Builder => $query
+            ->whereNotNull('schedule_at'));
+    }
+}
+```
+
+```graphql
+type Query {
+  posts(
+    includeUnscheduled: Boolean @withoutGlobalScopes(names: ["scheduled"])
+  ): [Post!]! @all
+}
+```

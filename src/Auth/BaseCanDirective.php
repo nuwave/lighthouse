@@ -46,7 +46,7 @@ abstract class BaseCanDirective extends BaseDirective implements FieldMiddleware
   """
   Value to return if the user is not authorized and `action` is `RETURN_VALUE`.
   """
-  returnValue: CanArgs
+  returnValue: CanReturnValue
 GRAPHQL;
     }
 
@@ -54,9 +54,16 @@ GRAPHQL;
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
+Any constant literal value.
+See https://graphql.github.io/graphql-spec/draft/#sec-Input-Values.
 """
 scalar CanArgs
+
+"""
+Any constant literal value.
+See https://graphql.github.io/graphql-spec/draft/#sec-Input-Values.
+"""
+scalar CanReturnValue
 
 enum CanAction {
     """
@@ -70,7 +77,7 @@ enum CanAction {
     EXCEPTION_NOT_AUTHORIZED
 
     """
-    Return the value specified in `value` argument to conceal the real error.
+    Return the value specified in the `returnValue` directive argument to conceal the real error.
     """
     RETURN_VALUE
 }
@@ -86,9 +93,18 @@ GRAPHQL;
             $gate = $this->gate->forUser($context->user());
             $checkArguments = $this->buildCheckArguments($args);
             $authorizeModel = fn (mixed $model) => $this->authorizeModel($gate, $ability, $model, $checkArguments);
+            $hasResolved = false;
+            $trackedResolver = static function () use (&$hasResolved, $resolver) {
+                $hasResolved = true;
+
+                return $resolver(...func_get_args());
+            };
 
             try {
-                return $this->authorizeRequest($root, $args, $context, $resolveInfo, $resolver, $authorizeModel);
+                $resolved = $this->authorizeRequest($root, $args, $context, $resolveInfo, $trackedResolver, $authorizeModel);
+                if ($hasResolved) {
+                    return $resolved;
+                }
             } catch (\Throwable $throwable) {
                 $action = $this->directiveArgValue('action');
                 if ($action === 'EXCEPTION_NOT_AUTHORIZED') {
@@ -101,11 +117,18 @@ GRAPHQL;
 
                 throw $throwable;
             }
+
+            // Try to resolve the field outside the authorization try-catch block to avoid catching resolver exceptions.
+            return $resolver($root, $args, $context, $resolveInfo);
         });
     }
 
     /**
-     * Authorizes request and resolves the field.
+     * Authorizes request and optionally resolves the field.
+     *
+     * This method is called inside the authorization try-catch block.
+     * Resolving the field here is optional, it will be done outside the try-catch block if not resolved here.
+     * Resolving inside this method means any exceptions thrown by the resolver will be caught and handled according to the `action` argument.
      *
      * @phpstan-import-type Resolver from \Nuwave\Lighthouse\Schema\Values\FieldValue as Resolver
      *

@@ -8,7 +8,7 @@ final class NestDirectiveTest extends DBTestCase
 {
     public function testNestDelegates(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Mutation {
             createUser(
                 name: String
@@ -32,9 +32,9 @@ final class NestDirectiveTest extends DBTestCase
             name: String
             tasks: [Task!]! @hasMany
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createUser(
                 name: "foo"
@@ -50,7 +50,7 @@ final class NestDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'createUser' => [
                     'name' => 'foo',

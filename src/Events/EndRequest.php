@@ -19,9 +19,7 @@ class EndRequest
     public Carbon $moment;
 
     public function __construct(
-        /**
-         * The response that is about to be sent to the client.
-         */
+        /** The response that is about to be sent to the client. */
         public Response $response,
     ) {
         $this->moment = Carbon::now();

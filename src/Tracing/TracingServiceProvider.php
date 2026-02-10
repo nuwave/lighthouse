@@ -4,7 +4,7 @@ namespace Nuwave\Lighthouse\Tracing;
 
 use GraphQL\Language\Parser;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
@@ -21,7 +21,7 @@ class TracingServiceProvider extends ServiceProvider
         $this->app->scoped(Tracing::class, static fn (Application $app): Tracing => $app->make(config('lighthouse.tracing.driver')));
     }
 
-    public function boot(Dispatcher $dispatcher): void
+    public function boot(EventsDispatcher $dispatcher): void
     {
         $dispatcher->listen(RegisterDirectiveNamespaces::class, static fn (): string => __NAMESPACE__);
         $dispatcher->listen(ManipulateAST::class, static fn (ManipulateAST $manipulateAST) => ASTHelper::attachDirectiveToObjectTypeFields(

@@ -12,7 +12,7 @@ final class EqDirectiveTest extends DBTestCase
     {
         $users = factory(User::class, 2)->create();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -20,16 +20,16 @@ final class EqDirectiveTest extends DBTestCase
         type Query {
             users(id: ID @eq): [User!]! @all
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($id: ID) {
                 users(id: $id) {
                     id
                 }
             }
-            ', [
+            GRAPHQL, [
                 'id' => $users->first()->getKey(),
             ])
             ->assertJsonCount(1, 'data.users');
@@ -39,7 +39,7 @@ final class EqDirectiveTest extends DBTestCase
     {
         $users = factory(User::class, 2)->create();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -51,10 +51,10 @@ final class EqDirectiveTest extends DBTestCase
         input UserInput {
             id: ID @eq
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($id: ID) {
                 users(
                     input: {
@@ -64,7 +64,7 @@ final class EqDirectiveTest extends DBTestCase
                     id
                 }
             }
-            ', [
+            GRAPHQL, [
                 'id' => $users->first()->getKey(),
             ])
             ->assertJsonCount(1, 'data.users');
@@ -74,7 +74,7 @@ final class EqDirectiveTest extends DBTestCase
     {
         $users = factory(User::class, 2)->create();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -86,10 +86,10 @@ final class EqDirectiveTest extends DBTestCase
         input UserInput {
             id: ID @eq
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($id: ID) {
                 users(
                     input: [
@@ -101,7 +101,7 @@ final class EqDirectiveTest extends DBTestCase
                     id
                 }
             }
-            ', [
+            GRAPHQL, [
                 'id' => $users->first()->getKey(),
             ])
             ->assertJsonCount(1, 'data.users');
@@ -111,24 +111,24 @@ final class EqDirectiveTest extends DBTestCase
     {
         $users = factory(User::class, 2)->create();
 
-        $this->schema = /** @lang GraphQL */ "
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type User {
             id: ID!
         }
 
         type Query {
-            users: [User!]! @all @eq(key: \"id\", value: {$users->first()->getKey()})
+            users: [User!]! @all @eq(key: "id", value: {$users->first()->getKey()})
         }
-        ";
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 users {
                     id
                 }
             }
-            ')
+            GRAPHQL)
             ->assertJsonCount(1, 'data.users');
     }
 
@@ -136,7 +136,7 @@ final class EqDirectiveTest extends DBTestCase
     {
         $this->expectException(DefinitionException::class);
 
-        $this->buildSchema(/** @lang GraphQL */ '
+        $this->buildSchema(/** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -144,14 +144,14 @@ final class EqDirectiveTest extends DBTestCase
         type Query {
             users: [User!]! @all @eq
         }
-        ');
+        GRAPHQL);
     }
 
     public function testEqOnFieldRequiresKey(): void
     {
         $this->expectException(DefinitionException::class);
 
-        $this->buildSchema(/** @lang GraphQL */ '
+        $this->buildSchema(/** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -159,6 +159,6 @@ final class EqDirectiveTest extends DBTestCase
         type Query {
             users: [User!]! @all @eq(value: 3)
         }
-        ');
+        GRAPHQL);
     }
 }

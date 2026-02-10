@@ -1,12 +1,12 @@
 # Implementing Your Own Directives
 
 As you grow your GraphQL schema, you may find the need for more specialized functionality.
-Learn how you can abstract logic in a composable and reusable manner by using custom directives.
-
-Directives are implemented as PHP classes, each directive available
-in the schema corresponds to a single class.
+You can abstract logic in a composable and reusable manner by using custom directives.
 
 ## Naming Convention
+
+Directives are implemented as PHP classes.
+Each directive available in the schema corresponds to a single class.
 
 Directive names themselves are typically defined in **camelCase**.
 The class name of a directive must follow the following pattern:
@@ -16,10 +16,12 @@ The class name of a directive must follow the following pattern:
 Let's implement a simple `@upperCase` directive as a part of this introduction.
 Use the artisan generator command to create it:
 
-    php artisan lighthouse:directive --argument upperCase
+```shell
+php artisan lighthouse:directive --argument upperCase
+```
 
 That will create a class called `UpperCaseDirective` that extends the
-abstract class `\Nuwave\Lighthouse\Schema\Directives\BaseDirective`.
+abstract class `Nuwave\Lighthouse\Schema\Directives\BaseDirective`.
 
 ```php
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -34,16 +36,16 @@ final class UpperCaseDirective extends BaseDirective
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
-"""
-A description of what this directive does.
-"""
-directive @upperCase(
-    """
-    Directives can have arguments to parameterize them.
-    """
-    someArg: String
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-GRAPHQL;
+        """
+        A description of what this directive does.
+        """
+        directive @upperCase(
+            """
+            Directives can have arguments to parameterize them.
+            """
+            someArg: String
+        ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+        GRAPHQL;
     }
 }
 ```
@@ -51,12 +53,11 @@ GRAPHQL;
 ## Directive Interfaces
 
 At this point, the directive does not do anything.
-Depending on what your directive should do, you can pick one or more of the provided
-directive interfaces to add functionality. They serve as the point of contact to Lighthouse.
+Depending on what your directive should do, you can pick one or more of the provided directive interfaces to add functionality.
+They serve as the point of contact to Lighthouse.
 
 In this case, our directive needs to run after the actual resolver.
-Just like [Laravel Middleware](https://laravel.com/docs/middleware),
-we can wrap around it by using the `FieldMiddleware` directive.
+Just like [Laravel Middleware](https://laravel.com/docs/middleware), we can wrap around it by using the `FieldMiddleware` directive.
 
 ```php
 namespace App\GraphQL\Directives;
@@ -86,6 +87,9 @@ final class UpperCaseDirective extends BaseDirective implements FieldMiddleware
     }
 }
 ```
+
+Given there are a lot of use cases for custom directives, the documentation does not provide examples for most interfaces.
+It is advised to look at the Lighthouse source code to find directives that implement certain interfaces to learn more.
 
 ## Register Directives
 

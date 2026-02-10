@@ -39,42 +39,44 @@ final class MorphManyDirectiveTest extends DBTestCase
         parent::setUp();
 
         $this->user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $this->user);
 
-        $this->task = factory(Task::class)->create([
-            'user_id' => $this->user->id,
-        ]);
+        $this->task = factory(Task::class)->make();
+        $this->assertInstanceOf(Task::class, $this->task);
+        $this->task->user()->associate($this->user);
+        $this->task->save();
+
         $this->taskImages = Collection::times(10, function (): Image {
-            $image = $this->task
-                ->images()
-                ->save(
-                    factory(Image::class)->create(),
-                );
-
-            if ($image === false) {
-                throw new \Exception('Failed to save Image');
-            }
+            $image = factory(Image::class)->make();
+            $this->assertInstanceOf(Image::class, $image);
+            $image->imageable()->associate($this->task);
+            $image->save();
 
             return $image;
         });
 
-        $this->post = factory(Post::class)->create([
-            'user_id' => $this->user->id,
-        ]);
+        $this->post = factory(Post::class)->make();
+        $this->assertInstanceOf(Post::class, $this->post);
+        $this->post->user()->associate($this->user);
+        $this->post->save();
+
         // @phpstan-ignore-next-line generic false-positive
         $this->postImages = Collection::times(
             $this->faker()->numberBetween(1, 10),
-            fn (): Image => $this->post
-                ->images()
-                ->save(
-                    factory(Image::class)->create(),
-                )
-                ?: throw new \Exception('Failed to save Image'),
+            function (): Image {
+                $image = factory(Image::class)->make();
+                $this->assertInstanceOf(Image::class, $image);
+                $image->imageable()->associate($this->post);
+                $image->save();
+
+                return $image;
+            },
         );
     }
 
     public function testQueryMorphManyRelationship(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Post {
             id: ID!
             title: String!
@@ -100,9 +102,9 @@ final class MorphManyDirectiveTest extends DBTestCase
                 id: ID! @eq
             ): Task @find
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ "
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         {
             post(id: {$this->post->id}) {
                 id
@@ -120,7 +122,7 @@ final class MorphManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ")->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'post' => [
                     'id' => $this->post->id,
@@ -147,7 +149,7 @@ final class MorphManyDirectiveTest extends DBTestCase
 
     public function testQueryMorphManyPaginator(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Post {
             id: ID!
             title: String!
@@ -164,9 +166,9 @@ final class MorphManyDirectiveTest extends DBTestCase
                 id: ID! @eq
             ): Post @find
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ "
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         {
             post(id: {$this->post->id}) {
                 id
@@ -183,7 +185,7 @@ final class MorphManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ")->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'post' => [
                     'id' => $this->post->id,
@@ -205,7 +207,7 @@ final class MorphManyDirectiveTest extends DBTestCase
     {
         config(['lighthouse.pagination.max_count' => 1]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Post {
             id: ID!
             title: String!
@@ -221,9 +223,9 @@ final class MorphManyDirectiveTest extends DBTestCase
                 id: ID! @eq
             ): Post @find
         }
-        ';
+        GRAPHQL;
 
-        $result = $this->graphQL(/** @lang GraphQL */ "
+        $result = $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         {
             post(id: {$this->post->id}) {
                 id
@@ -235,7 +237,7 @@ final class MorphManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ");
+        GRAPHQL);
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(3, 10),
@@ -247,7 +249,7 @@ final class MorphManyDirectiveTest extends DBTestCase
     {
         config(['lighthouse.pagination.max_count' => 2]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Post {
             id: ID!
             title: String!
@@ -263,9 +265,9 @@ final class MorphManyDirectiveTest extends DBTestCase
                 id: ID! @eq
             ): Post @find
         }
-        ';
+        GRAPHQL;
 
-        $result = $this->graphQL(/** @lang GraphQL */ "
+        $result = $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         {
             post(id: {$this->post->id}) {
                 id
@@ -277,7 +279,7 @@ final class MorphManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ");
+        GRAPHQL);
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(2, 10),
@@ -289,7 +291,7 @@ final class MorphManyDirectiveTest extends DBTestCase
     {
         config(['lighthouse.pagination.max_count' => 1]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Post {
             id: ID!
             title: String!
@@ -305,10 +307,10 @@ final class MorphManyDirectiveTest extends DBTestCase
                 id: ID! @eq
             ): Post @find
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ "
+            ->graphQL(/** @lang GraphQL */ <<<GRAPHQL
             {
                 post(id: {$this->post->id}) {
                     id
@@ -320,13 +322,13 @@ final class MorphManyDirectiveTest extends DBTestCase
                     }
                 }
             }
-            ")
+            GRAPHQL)
             ->assertGraphQLErrorFree();
     }
 
     public function testHandlesPaginationWithCountZero(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Post {
             id: ID!
             title: String!
@@ -342,10 +344,10 @@ final class MorphManyDirectiveTest extends DBTestCase
                 id: ID! @eq
             ): Post @find
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($id: ID!) {
                 post(id: $id) {
                     images(first: 0) {
@@ -364,7 +366,7 @@ final class MorphManyDirectiveTest extends DBTestCase
                     }
                 }
             }
-            ', [
+            GRAPHQL, [
                 'id' => $this->post->id,
             ])
             ->assertExactJson([
@@ -389,7 +391,7 @@ final class MorphManyDirectiveTest extends DBTestCase
 
     public function testQueryMorphManyPaginatorWithADefaultCount(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Task {
             id: ID!
             name: String!
@@ -405,9 +407,9 @@ final class MorphManyDirectiveTest extends DBTestCase
                 id: ID! @eq
             ): Task @find
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ "
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         {
             task(id: {$this->task->id}) {
                 id
@@ -424,7 +426,7 @@ final class MorphManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ")->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'task' => [
                     'id' => $this->task->id,
@@ -443,7 +445,7 @@ final class MorphManyDirectiveTest extends DBTestCase
 
     public function testQueryMorphManyRelayConnection(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Task {
             id: ID!
             name: String!
@@ -459,9 +461,9 @@ final class MorphManyDirectiveTest extends DBTestCase
                 id: ID! @eq
             ): Task @find
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ "
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         {
             task(id: {$this->task->id}) {
                 id
@@ -478,7 +480,7 @@ final class MorphManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ")->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'task' => [
                     'id' => $this->task->id,
@@ -497,7 +499,7 @@ final class MorphManyDirectiveTest extends DBTestCase
     {
         config(['lighthouse.pagination.max_count' => 1]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Task {
             id: ID!
             name: String!
@@ -513,9 +515,9 @@ final class MorphManyDirectiveTest extends DBTestCase
                 id: ID! @eq
             ): Task @find
         }
-        ';
+        GRAPHQL;
 
-        $result = $this->graphQL(/** @lang GraphQL */ "
+        $result = $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         {
             task(id: {$this->task->id}) {
                 id
@@ -529,7 +531,7 @@ final class MorphManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ");
+        GRAPHQL);
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(3, 10),
@@ -541,7 +543,7 @@ final class MorphManyDirectiveTest extends DBTestCase
     {
         config(['lighthouse.pagination.max_count' => 2]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Task {
             id: ID!
             name: String!
@@ -557,9 +559,9 @@ final class MorphManyDirectiveTest extends DBTestCase
                 id: ID! @eq
             ): Task @find
         }
-        ';
+        GRAPHQL;
 
-        $result = $this->graphQL(/** @lang GraphQL */ "
+        $result = $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         {
             task(id: {$this->task->id}) {
                 id
@@ -573,7 +575,7 @@ final class MorphManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ");
+        GRAPHQL);
 
         $this->assertSame(
             PaginationArgs::requestedTooManyItems(2, 10),
@@ -583,7 +585,7 @@ final class MorphManyDirectiveTest extends DBTestCase
 
     public function testQueryMorphManyRelayConnectionWithADefaultCount(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Task {
             id: ID!
             name: String!
@@ -599,9 +601,9 @@ final class MorphManyDirectiveTest extends DBTestCase
                 id: ID! @eq
             ): Task @find
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ "
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         {
             task(id: {$this->task->id}) {
                 id
@@ -618,7 +620,7 @@ final class MorphManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ")->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'task' => [
                     'id' => $this->task->id,

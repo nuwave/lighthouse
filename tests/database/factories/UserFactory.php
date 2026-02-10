@@ -7,8 +7,8 @@ use Tests\Utils\Models\User;
 
 /** @var Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(User::class, static fn (Faker $faker): array => [
-    'company_id' => static fn () => factory(Company::class)->create()->getKey(),
-    'team_id' => static fn () => factory(Team::class)->create()->getKey(),
+    'company_id' => factory(Company::class),
+    'team_id' => factory(Team::class),
     'name' => $faker->name,
     'email' => $faker->unique()->safeEmail,
     'password' => '$2y$10$TKh8H1.PfQx37YgCzwiKb.KjNyWgaHb9cbcoQgdIVFlYg7B77UdFm', // secret

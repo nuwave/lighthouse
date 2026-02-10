@@ -43,9 +43,7 @@ GRAPHQL;
     /** @param  array<string, mixed>  $args */
     public static function defaultComplexityResolver(int $childrenComplexity, array $args): int
     {
-        /**
-         * Assuming pagination, @see PaginationManipulator::countArgument().
-         */
+        /** Assuming pagination, @see PaginationManipulator::countArgument(). */
         $first = $args['first'] ?? null;
 
         $expectedNumberOfChildren = is_int($first)

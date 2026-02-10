@@ -6,17 +6,17 @@ These directives can generally be applied to [type definitions](../the-basics/ty
 
 ## TypeManipulator
 
-The [`\Nuwave\Lighthouse\Support\Contracts\TypeManipulator`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/TypeManipulator.php)
+The [`Nuwave\Lighthouse\Support\Contracts\TypeManipulator`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/TypeManipulator.php)
 interface can be used to manipulate the AST from a type definition node.
 
 ## TypeMiddleware
 
-The [`\Nuwave\Lighthouse\Support\Contracts\TypeMiddleware`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/TypeMiddleware.php)
+The [`Nuwave\Lighthouse\Support\Contracts\TypeMiddleware`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/TypeMiddleware.php)
 interface allows access to an AST node as it is converted to an executable type.
 
 ## TypeResolver
 
-The [`\Nuwave\Lighthouse\Support\Contracts\TypeResolver`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/TypeResolver.php)
+The [`Nuwave\Lighthouse\Support\Contracts\TypeResolver`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/TypeResolver.php)
 interface can be used for custom conversion from AST values to an executable type.
 
 ## Type Extension Directives
@@ -25,5 +25,5 @@ These directives can generally be applied to [type extensions](https://graphql.g
 
 ## TypeExtensionManipulator
 
-The [`\Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/TypeExtensionManipulator.php)
+The [`Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/TypeExtensionManipulator.php)
 interface can be used to manipulate the AST from a type extension node.

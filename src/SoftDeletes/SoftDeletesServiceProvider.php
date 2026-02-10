@@ -3,7 +3,7 @@
 namespace Nuwave\Lighthouse\SoftDeletes;
 
 use GraphQL\Language\Parser;
-use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\Events\ManipulateAST;
@@ -27,7 +27,7 @@ class SoftDeletesServiceProvider extends ServiceProvider
         }
     }
 
-    public function boot(Dispatcher $dispatcher): void
+    public function boot(EventsDispatcher $dispatcher): void
     {
         $dispatcher->listen(RegisterDirectiveNamespaces::class, static fn (): string => __NAMESPACE__);
         $dispatcher->listen(ManipulateAST::class, static function (ManipulateAST $manipulateAST): void {

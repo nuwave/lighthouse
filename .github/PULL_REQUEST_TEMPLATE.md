@@ -6,7 +6,7 @@
 
 **Changes**
 
-<!-- Detail the changes in behaviour this PR introduces. -->
+<!-- Detail the changes in behavior this PR introduces. -->
 
 **Breaking changes**
 

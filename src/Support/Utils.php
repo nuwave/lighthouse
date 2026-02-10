@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Support;
 
 use Illuminate\Container\Container;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
@@ -199,5 +200,23 @@ class Utils
         return preg_match('/^[a-zA-Z_]/', $name)
             ? $name
             : "_{$name}";
+    }
+
+    /**
+     * Write the contents to a file atomically.
+     *
+     * This is done by writing to a temporary file first and then renaming it.
+     *
+     * It circumvents the following issues:
+     * - large files not being written completely before being read
+     * - partial writes from other processes while we expect to read what we wrote
+     */
+    public static function atomicPut(Filesystem $filesystem, string $path, string $contents): void
+    {
+        $randomSuffix = bin2hex(random_bytes(6));
+        $tempPath = "{$path}.{$randomSuffix}";
+
+        $filesystem->put(path: $tempPath, contents: $contents);
+        $filesystem->move(path: $tempPath, target: $path);
     }
 }

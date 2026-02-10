@@ -1,7 +1,6 @@
 # Extending Lighthouse
 
-Lighthouse offers various extension points which can be utilized by package developers
-as well as end users.
+Lighthouse offers various extension points which can be used by package and application developers.
 
 ## The Event System
 
@@ -18,13 +17,13 @@ Add your custom directives to Lighthouse by listening for the [`RegisterDirectiv
 ```php
 namespace SomeVendor\SomePackage;
 
-use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 
 final class SomePackageServiceProvider extends ServiceProvider
 {
-    public function boot(Dispatcher $dispatcher): void
+    public function boot(EventsDispatcher $dispatcher): void
     {
         $dispatcher->listen(
             RegisterDirectiveNamespaces::class,
@@ -38,13 +37,14 @@ final class SomePackageServiceProvider extends ServiceProvider
 
 Lighthouse will fall back to using [webonyx's default resolver](https://webonyx.github.io/graphql-php/data-fetching/#default-field-resolver)
 for non-root fields, [see resolver precedence](../the-basics/fields.md#resolver-precedence).
-You may overwrite this by passing a `callable` to `GraphQL\Executor\Executor::setDefaultFieldResolver()`.
+
+You may override this by calling `GraphQL\Executor\Executor::setDefaultFieldResolver()` in your service provider's `boot()` method.
 
 ## Use a custom `GraphQLContext`
 
 The context is the third argument of any resolver function.
 
-You may replace the default `\Nuwave\Lighthouse\Schema\Context` with your own
+You may replace the default `Nuwave\Lighthouse\Schema\Context` with your own
 implementation of the interface `Nuwave\Lighthouse\Support\Contracts\GraphQLContext`.
 The following example is just a starting point of what you can do:
 
@@ -73,8 +73,8 @@ final class MyContext implements GraphQLContext
 }
 ```
 
-You need a factory that creates an instance of `\Nuwave\Lighthouse\Support\Contracts\GraphQLContext`.
-This factory class needs to implement `\Nuwave\Lighthouse\Support\Contracts\CreatesContext`.
+You need a factory that creates an instance of `Nuwave\Lighthouse\Support\Contracts\GraphQLContext`.
+This factory class needs to implement `Nuwave\Lighthouse\Support\Contracts\CreatesContext`.
 
 ```php
 namespace App\GraphQL;

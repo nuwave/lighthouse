@@ -42,40 +42,38 @@ final class FeatureDirectiveTest extends TestCase
 
     public function testUnavailableWhenFeatureIsInactive(): void
     {
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
-            type Query {
-                fieldWhenActive: String!
-                    @feature(name: "new-api", when: ACTIVE)
-                    @mock
-            }
-            GRAPHQL;
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Query {
+            fieldWhenActive: String!
+                @feature(name: "new-api", when: ACTIVE)
+                @mock
+        }
+        GRAPHQL;
 
-        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
-            {
-                fieldWhenActive
-            }
-            GRAPHQL,
-        );
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            fieldWhenActive
+        }
+        GRAPHQL);
 
         $this->assertCannotQueryFieldErrorMessage($response, 'fieldWhenActive');
     }
 
     public function testUnavailableWhenFeatureIsInactiveWithDefaultFeatureState(): void
     {
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
-            type Query {
-                fieldWhenActive: String!
-                    @feature(name: "new-api")
-                    @mock
-            }
-            GRAPHQL;
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Query {
+            fieldWhenActive: String!
+                @feature(name: "new-api")
+                @mock
+        }
+        GRAPHQL;
 
-        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
-            {
-                fieldWhenActive
-            }
-            GRAPHQL,
-        );
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            fieldWhenActive
+        }
+        GRAPHQL);
 
         $this->assertCannotQueryFieldErrorMessage($response, 'fieldWhenActive');
     }
@@ -83,20 +81,19 @@ final class FeatureDirectiveTest extends TestCase
     public function testUnavailableWhenFeatureIsActive(): void
     {
         Feature::define('new-api', static fn (): bool => true);
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
-            type Query {
-                fieldWhenInactive: String!
-                    @feature(name: "new-api", when: INACTIVE)
-                    @mock
-            }
-            GRAPHQL;
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Query {
+            fieldWhenInactive: String!
+                @feature(name: "new-api", when: INACTIVE)
+                @mock
+        }
+        GRAPHQL;
 
-        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
-            {
-                fieldWhenInactive
-            }
-            GRAPHQL,
-        );
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            fieldWhenInactive
+        }
+        GRAPHQL);
 
         $this->assertCannotQueryFieldErrorMessage($response, 'fieldWhenInactive');
     }
@@ -106,20 +103,19 @@ final class FeatureDirectiveTest extends TestCase
         Feature::define('new-api', static fn (): bool => true);
         $fieldValue = 'active';
         $this->mockResolver(static fn (): string => $fieldValue);
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
-            type Query {
-                fieldWhenActive: String!
-                    @feature(name: "new-api", when: ACTIVE)
-                    @mock
-            }
-            GRAPHQL;
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Query {
+            fieldWhenActive: String!
+                @feature(name: "new-api", when: ACTIVE)
+                @mock
+        }
+        GRAPHQL;
 
-        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
-            {
-                fieldWhenActive
-            }
-            GRAPHQL,
-        );
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            fieldWhenActive
+        }
+        GRAPHQL);
 
         $response->assertGraphQLErrorFree();
         $response->assertJson([
@@ -134,20 +130,19 @@ final class FeatureDirectiveTest extends TestCase
         Feature::define('new-api', static fn (): bool => true);
         $fieldValue = 'active';
         $this->mockResolver(static fn (): string => $fieldValue);
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
-            type Query {
-                fieldWhenActive: String!
-                    @feature(name: "new-api")
-                    @mock
-            }
-            GRAPHQL;
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Query {
+            fieldWhenActive: String!
+                @feature(name: "new-api")
+                @mock
+        }
+        GRAPHQL;
 
-        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
-            {
-                fieldWhenActive
-            }
-            GRAPHQL,
-        );
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            fieldWhenActive
+        }
+        GRAPHQL);
 
         $response->assertGraphQLErrorFree();
         $response->assertJson([
@@ -161,20 +156,19 @@ final class FeatureDirectiveTest extends TestCase
     {
         $fieldValue = 'inactive';
         $this->mockResolver(static fn (): string => $fieldValue);
-        $this->schema = /* @lang GraphQL */ <<<'GRAPHQL'
-            type Query {
-                fieldWhenInactive: String!
-                    @feature(name: "new-api", when: INACTIVE)
-                    @mock
-            }
-            GRAPHQL;
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Query {
+            fieldWhenInactive: String!
+                @feature(name: "new-api", when: INACTIVE)
+                @mock
+        }
+        GRAPHQL;
 
-        $response = $this->graphQL(/* @lang GraphQL */ <<<'GRAPHQL'
-            {
-                fieldWhenInactive
-            }
-            GRAPHQL,
-        );
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            fieldWhenInactive
+        }
+        GRAPHQL);
 
         $response->assertGraphQLErrorFree();
         $response->assertJson([
