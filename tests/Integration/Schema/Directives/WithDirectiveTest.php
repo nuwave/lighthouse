@@ -15,7 +15,7 @@ final class WithDirectiveTest extends DBTestCase
 {
     public function testEagerLoadsRelation(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             user: User @first
         }
@@ -25,7 +25,7 @@ final class WithDirectiveTest extends DBTestCase
                 @with(relation: "tasks")
                 @method
         }
-        ';
+        GRAPHQL;
 
         $user = factory(User::class)->create();
         assert($user instanceof User);
@@ -41,13 +41,13 @@ final class WithDirectiveTest extends DBTestCase
             $user->tasksLoaded(),
         );
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 tasksLoaded
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'user' => [
                     'tasksLoaded' => true,
@@ -58,7 +58,7 @@ final class WithDirectiveTest extends DBTestCase
 
     public function testEagerLoadsNestedRelation(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             user: User @first
         }
@@ -68,7 +68,7 @@ final class WithDirectiveTest extends DBTestCase
                 @with(relation: "posts.comments")
                 @method
         }
-        ';
+        GRAPHQL;
 
         $user = factory(User::class)->create();
         assert($user instanceof User);
@@ -90,13 +90,13 @@ final class WithDirectiveTest extends DBTestCase
             $user->postsCommentsLoaded(),
         );
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 postsCommentsLoaded
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
                     'postsCommentsLoaded' => true,
@@ -107,7 +107,7 @@ final class WithDirectiveTest extends DBTestCase
 
     public function testEagerLoadsPolymorphicRelations(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             activity: [Activity!] @all
         }
@@ -132,7 +132,7 @@ final class WithDirectiveTest extends DBTestCase
         type Image {
             id: ID
         }
-        ';
+        GRAPHQL;
 
         $user = factory(User::class)->create();
         assert($user instanceof User);
@@ -182,7 +182,7 @@ final class WithDirectiveTest extends DBTestCase
                 factory(Image::class, 4)->make(),
             );
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             activity {
                 id
@@ -205,7 +205,7 @@ final class WithDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'activity' => [
                     [
@@ -245,7 +245,7 @@ final class WithDirectiveTest extends DBTestCase
 
     public function testEagerLoadsMultipleRelationsAtOnce(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             user: User @first
         }
@@ -256,7 +256,7 @@ final class WithDirectiveTest extends DBTestCase
                 @with(relation: "posts.comments")
                 @method
         }
-        ';
+        GRAPHQL;
 
         $user = factory(User::class)->create();
         assert($user instanceof User);
@@ -284,13 +284,13 @@ final class WithDirectiveTest extends DBTestCase
             $user->tasksAndPostsCommentsLoaded(),
         );
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 tasksAndPostsCommentsLoaded
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
                     'tasksAndPostsCommentsLoaded' => true,
@@ -301,7 +301,7 @@ final class WithDirectiveTest extends DBTestCase
 
     public function testEagerLoadsMultipleNestedRelationsAtOnce(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             user: User @first
         }
@@ -312,7 +312,7 @@ final class WithDirectiveTest extends DBTestCase
                 @with(relation: "posts.comments")
                 @method
         }
-        ';
+        GRAPHQL;
 
         $user = factory(User::class)->create();
         assert($user instanceof User);
@@ -352,13 +352,13 @@ final class WithDirectiveTest extends DBTestCase
             $user->postTasksAndPostsCommentsLoaded(),
         );
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 postTasksAndPostsCommentsLoaded
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
                     'postTasksAndPostsCommentsLoaded' => true,
@@ -371,10 +371,10 @@ final class WithDirectiveTest extends DBTestCase
     {
         $this->expectException(DefinitionException::class);
 
-        $this->buildSchema(/** @lang GraphQL */ '
+        $this->buildSchema(/** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: Int @with(relation: "tasks")
         }
-        ');
+        GRAPHQL);
     }
 }
