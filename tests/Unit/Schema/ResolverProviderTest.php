@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 namespace Tests\Unit\Schema;
 
@@ -12,7 +12,9 @@ use Tests\TestCase;
 
 final class ResolverProviderTest extends TestCase
 {
-    /** @var \Nuwave\Lighthouse\Schema\ResolverProvider */
+    /**
+     * @var \Nuwave\Lighthouse\Schema\ResolverProvider
+     */
     protected $resolverProvider;
 
     public function setUp(): void
@@ -66,7 +68,7 @@ final class ResolverProviderTest extends TestCase
 
         return new FieldValue(
             $typeValue,
-            $queryType->fields->get(0),
+            $queryType->fields->get(0)
         );
     }
 }
