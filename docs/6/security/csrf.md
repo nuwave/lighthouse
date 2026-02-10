@@ -3,7 +3,7 @@
 To learn about cross-site request forgeries, see [Laravel docs](https://laravel.com/docs/csrf).
 
 Lighthouse provides mitigation against CSRF attacks through the `Nuwave\Lighthouse\Http\Middleware\EnsureXHR` middleware.
-Just add it as the first middleware for the Lighthouse route in `config/lighthouse.php`:
+Add it as the first middleware for the Lighthouse route in `config/lighthouse.php`:
 
 ```php
     'route' => [

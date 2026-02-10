@@ -5,10 +5,10 @@ namespace Nuwave\Lighthouse\Support\Contracts;
 interface ProvidesValidationRules
 {
     /**
-     * A set of rules for query validation step.
+     * Rules to use for query validation.
      *
-     * Returning `null` enables all available rules.
-     * Empty array skips query validation entirely.
+     * Returning `null` enables all available rules,
+     * returning `[]` skips query validation entirely.
      *
      * @return array<string, \GraphQL\Validator\Rules\ValidationRule>|null
      */

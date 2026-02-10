@@ -3,7 +3,7 @@
 Lighthouse comes with sensible configuration defaults and works right out of the box.
 Should you feel the need to change your configuration, you need to publish the configuration file first.
 
-```bash
+```shell
 php artisan vendor:publish --tag=lighthouse-config
 ```
 

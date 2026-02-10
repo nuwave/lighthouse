@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
+use Nuwave\Lighthouse\Exceptions\ClientSafeModelNotFoundException;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\Resolved;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
@@ -28,6 +29,7 @@ use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Utils;
 
+/** @deprecated TODO remove with v7 */
 class CanDirective extends BaseDirective implements FieldMiddleware, FieldManipulator
 {
     public function __construct(
@@ -53,7 +55,7 @@ directive @can(
   Check the policy against the model instances returned by the field resolver.
   Only use this if the field does not mutate data, it is run before checking.
 
-  Mutually exclusive with `query` and `find`.
+  Mutually exclusive with `query`, `find`, and `root`.
   """
   resolved: Boolean! = false
 
@@ -73,6 +75,8 @@ directive @can(
 
   You may pass arbitrary GraphQL literals,
   e.g.: [1, 2, 3] or { foo: "bar" }
+
+  CanArgs pseudo-scalar is defined in BaseCanDirective.
   """
   args: CanArgs
 
@@ -80,7 +84,7 @@ directive @can(
   Query for specific model instances to check the policy against, using arguments
   with directives that add constraints to the query builder, such as `@eq`.
 
-  Mutually exclusive with `resolved` and `find`.
+  Mutually exclusive with `resolved`, `find`, and `root`.
   """
   query: Boolean! = false
 
@@ -95,7 +99,7 @@ directive @can(
 
   You may pass the string in dot notation to use nested inputs.
 
-  Mutually exclusive with `resolved` and `query`.
+  Mutually exclusive with `resolved`, `query`, and `root`.
   """
   find: String
 
@@ -103,12 +107,14 @@ directive @can(
   Should the query fail when the models of `find` were not found?
   """
   findOrFail: Boolean! = true
-) repeatable on FIELD_DEFINITION
 
-"""
-Any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
-"""
-scalar CanArgs
+  """
+  If your policy should check against the root value.
+
+  Mutually exclusive with `resolved`, `query`, and `find`.
+  """
+  root: Boolean! = false
+) repeatable on FIELD_DEFINITION
 GRAPHQL;
     }
 
@@ -155,7 +161,7 @@ GRAPHQL;
     protected function modelsToCheck(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): iterable
     {
         if ($this->directiveArgValue('query')) {
-            return $resolveInfo
+            return $resolveInfo // @phpstan-ignore return.type (generic of Builder type is erased through enhanceBuilder)
                 ->enhanceBuilder(
                     $this->getModelClass()::query(),
                     $this->directiveArgValue('scopes', []),
@@ -165,6 +171,10 @@ GRAPHQL;
                     $resolveInfo,
                 )
                 ->get();
+        }
+
+        if ($this->directiveArgValue('root')) {
+            return [$root];
         }
 
         if ($find = $this->directiveArgValue('find')) {
@@ -208,7 +218,7 @@ GRAPHQL;
                     ? $enhancedBuilder->findOrFail($findValue)
                     : $enhancedBuilder->find($findValue);
             } catch (ModelNotFoundException $modelNotFoundException) {
-                throw new Error($modelNotFoundException->getMessage());
+                throw ClientSafeModelNotFoundException::fromLaravel($modelNotFoundException);
             }
 
             if ($modelOrModels instanceof Model) {
@@ -276,7 +286,7 @@ GRAPHQL;
 
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType): void
     {
-        $this->validateMutuallyExclusiveArguments(['resolved', 'query', 'find']);
+        $this->validateMutuallyExclusiveArguments(['resolved', 'query', 'find', 'root']);
 
         if ($this->directiveHasArgument('resolved') && $parentType->name->value === RootType::MUTATION) {
             throw self::resolvedIsUnsafeInMutations($fieldDefinition->name->value);

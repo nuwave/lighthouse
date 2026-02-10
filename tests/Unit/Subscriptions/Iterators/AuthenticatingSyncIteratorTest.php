@@ -33,6 +33,7 @@ final class AuthenticatingSyncIteratorTest extends IteratorTestBase
                 return $subscriber;
             });
 
+        // @phpstan-ignore argument.type (callable for parameter 2 not recognized)
         $guard = \Mockery::mock(SubscriptionGuard::class, static function (MockInterface $mock) use ($subscribers): void {
             $subscribers->each(static function (Subscriber $subscriber) use ($mock): void {
                 $user = $subscriber->context->user();
@@ -53,7 +54,6 @@ final class AuthenticatingSyncIteratorTest extends IteratorTestBase
             });
         });
 
-        /** @var \Illuminate\Auth\AuthManager $authManager */
         $authManager = $this->app->make(AuthManager::class);
 
         $authManager->extend(SubscriptionGuard::GUARD_NAME, static fn (): SubscriptionGuard => $guard);
@@ -79,7 +79,9 @@ final class AuthenticatingSyncIteratorTest extends IteratorTestBase
 
 final class AuthenticatingSyncIteratorAuthenticatableStub implements Authenticatable
 {
-    public function __construct(private int $id) {}
+    public function __construct(
+        private int $id,
+    ) {}
 
     public function getAuthIdentifierName()
     {
@@ -91,19 +93,24 @@ final class AuthenticatingSyncIteratorAuthenticatableStub implements Authenticat
         return $this->id;
     }
 
-    public function getAuthPassword()
+    public function getAuthPassword(): string
     {
         return '';
     }
 
-    public function getRememberToken()
+    public function getAuthPasswordName(): string
+    {
+        return '';
+    }
+
+    public function getRememberToken(): string
     {
         return '';
     }
 
     public function setRememberToken($value): void {}
 
-    public function getRememberTokenName()
+    public function getRememberTokenName(): string
     {
         return '';
     }

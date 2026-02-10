@@ -18,8 +18,10 @@ directive @rules(
   This can either be a reference to [Laravel's built-in validation rules](https://laravel.com/docs/validation#available-validation-rules),
   or the fully qualified class name of a custom validation rule.
 
-  Rules that mutate the incoming arguments, such as `exclude_if`, are not supported
-  by Lighthouse. Use ArgTransformerDirectives or FieldMiddlewareDirectives instead.
+  Validation rules that mutate the given input value are _not_ supported:
+  - `exclude_if`
+  - `exclude_unless`
+  Use ArgTransformerDirectives or FieldMiddlewareDirectives instead.
   """
   apply: [String!]!
 

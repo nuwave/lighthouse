@@ -9,12 +9,10 @@ final class CreateTestbenchCommentsTable extends Migration
     public function up(): void
     {
         Schema::create('comments', function (Blueprint $table): void {
-            $table->increments('id');
+            $table->id();
             $table->string('comment');
-
-            $table->unsignedInteger('user_id');
-            $table->unsignedInteger('post_id');
-
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('post_id');
             $table->timestamps();
         });
     }

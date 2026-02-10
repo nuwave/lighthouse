@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Deferred;
+use GraphQL\Executor\Promise\Adapter\SyncPromise;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry;
 use Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader;
@@ -22,7 +23,7 @@ abstract class WithRelationDirective extends BaseDirective implements FieldMiddl
     public function handleField(FieldValue $fieldValue): void
     {
         $fieldValue->wrapResolver(
-            fn (callable $resolver): \Closure => fn (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): \GraphQL\Executor\Promise\Adapter\SyncPromise => $this
+            fn (callable $resolver): \Closure => fn (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): SyncPromise => $this
                 ->loadRelation($parent, $args, $context, $resolveInfo)
                 ->then(static fn (): mixed => $resolver($parent, $args, $context, $resolveInfo)),
         );

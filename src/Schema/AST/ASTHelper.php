@@ -71,9 +71,7 @@ class ASTHelper
                 $oldName = $definition->name->value;
                 $collisionOccurred = in_array($oldName, $newNames);
                 if ($collisionOccurred && ! $overwriteDuplicates) {
-                    throw new DefinitionException(
-                        static::duplicateDefinition($oldName),
-                    );
+                    throw new DefinitionException(static::duplicateDefinition($oldName));
                 }
 
                 return $collisionOccurred;
@@ -112,7 +110,7 @@ class ASTHelper
     /** Unwrap lists and non-nulls and get the name of the contained type. */
     public static function getUnderlyingTypeName(Node $definition): string
     {
-        $namedType = self::getUnderlyingNamedTypeNode($definition);
+        $namedType = static::getUnderlyingNamedTypeNode($definition);
 
         return $namedType->name->value;
     }
@@ -130,7 +128,7 @@ class ASTHelper
             || $node instanceof FieldDefinitionNode
             || $node instanceof InputValueDefinitionNode
         ) {
-            return self::getUnderlyingNamedTypeNode($node->type);
+            return static::getUnderlyingNamedTypeNode($node->type);
         }
 
         throw new DefinitionException("The node '{$node->kind}' does not have a type associated with it.");
@@ -139,11 +137,11 @@ class ASTHelper
     /**
      * Extract a named argument from a given directive node.
      *
-     * @param mixed $default is returned if the directive does not have the argument
+     * @param  mixed  $default is returned if the directive does not have the argument
      */
     public static function directiveArgValue(DirectiveNode $directive, string $name, mixed $default = null): mixed
     {
-        $arg = self::firstByName($directive->arguments, $name);
+        $arg = static::firstByName($directive->arguments, $name);
 
         return $arg !== null
             ? AST::valueFromASTUntyped($arg->value)
@@ -172,27 +170,60 @@ class ASTHelper
         return AST::valueFromAST($defaultValue, $argumentType);
     }
 
-    /**
-     * Get a directive with the given name if it is defined upon the node.
-     *
-     * As of now, directives may only be used once per location.
-     */
+    /** Get a directive with the given name if it is defined upon the node, assuming it is only used once. */
     public static function directiveDefinition(Node $definitionNode, string $name): ?DirectiveNode
     {
+        foreach (static::directiveDefinitions($definitionNode, $name) as $directive) {
+            return $directive;
+        }
+
+        return null;
+    }
+
+    /**
+     * Get all directives with the given name if it is defined upon the node.
+     *
+     * @return iterable<\GraphQL\Language\AST\DirectiveNode>
+     */
+    public static function directiveDefinitions(Node $definitionNode, string $name): iterable
+    {
         if (! property_exists($definitionNode, 'directives')) {
-            throw new \Exception('Expected Node class with property `directives`, got: ' . $definitionNode::class);
+            $nodeClassWithoutDirectives = $definitionNode::class;
+            throw new \Exception("Expected Node class with property `directives`, got: {$nodeClassWithoutDirectives}.");
         }
 
         /** @var \GraphQL\Language\AST\NodeList<\GraphQL\Language\AST\DirectiveNode> $directives */
         $directives = $definitionNode->directives;
 
-        return self::firstByName($directives, $name);
+        return static::filterByName($directives, $name);
     }
 
     /** Check if a node has a directive with the given name on it. */
     public static function hasDirective(Node $definitionNode, string $name): bool
     {
-        return self::directiveDefinition($definitionNode, $name) !== null;
+        return static::directiveDefinition($definitionNode, $name) !== null;
+    }
+
+    /**
+     * Out of a list of nodes, get the ones that matches the given name.
+     *
+     * @template TNode of \GraphQL\Language\AST\Node
+     *
+     * @param  iterable<TNode>  $nodes
+     *
+     * @return iterable<TNode>
+     */
+    public static function filterByName(iterable $nodes, string $name): iterable
+    {
+        foreach ($nodes as $node) {
+            if (! property_exists($node, 'name')) {
+                throw new \Exception('Expected a Node with a name property, got: ' . $node::class);
+            }
+
+            if ($node->name->value === $name) {
+                yield $node;
+            }
+        }
     }
 
     /**
@@ -206,17 +237,21 @@ class ASTHelper
      */
     public static function firstByName(iterable $nodes, string $name): ?Node
     {
-        foreach ($nodes as $node) {
-            if (! property_exists($node, 'name')) {
-                throw new \Exception('Expected a Node with a name property, got: ' . $node::class);
-            }
-
-            if ($node->name->value === $name) {
-                return $node;
-            }
+        foreach (static::filterByName($nodes, $name) as $node) {
+            return $node;
         }
 
         return null;
+    }
+
+    /**
+     * Does the given list of nodes contain a node with the given name?
+     *
+     * @param  iterable<\GraphQL\Language\AST\Node>  $nodes
+     */
+    public static function hasNode(iterable $nodes, string $name): bool
+    {
+        return static::firstByName($nodes, $name) !== null;
     }
 
     /** Directives might have an additional namespace associated with them, @see \Nuwave\Lighthouse\Schema\Directives\NamespaceDirective. */
@@ -244,23 +279,23 @@ class ASTHelper
     /** Checks the given type to see whether it implements the given interface. */
     public static function typeImplementsInterface(ObjectTypeDefinitionNode $type, string $interfaceName): bool
     {
-        return self::firstByName($type->interfaces, $interfaceName) !== null;
+        return static::hasNode($type->interfaces, $interfaceName);
     }
 
-    public static function addDirectiveToFields(DirectiveNode $directiveNode, ObjectTypeDefinitionNode|ObjectTypeExtensionNode|InterfaceTypeDefinitionNode|InterfaceTypeExtensionNode &$typeWithFields): void
+    public static function addDirectiveToFields(DirectiveNode $directiveNode, ObjectTypeDefinitionNode|ObjectTypeExtensionNode|InterfaceTypeDefinitionNode|InterfaceTypeExtensionNode $typeWithFields): void
     {
         $name = $directiveNode->name->value;
 
         $directiveLocator = Container::getInstance()->make(DirectiveLocator::class);
         $directive = $directiveLocator->resolve($name);
-        $directiveDefinition = self::extractDirectiveDefinition($directive::definition());
+        $directiveDefinition = static::extractDirectiveDefinition($directive::definition());
 
         foreach ($typeWithFields->fields as $fieldDefinition) {
             // If the field already has the same directive defined, and it is not
             // a repeatable directive, skip over it.
             // Field directives are more specific than those defined on a type.
             if (
-                self::hasDirective($fieldDefinition, $name)
+                static::hasDirective($fieldDefinition, $name)
                 && ! $directiveDefinition->repeatable
             ) {
                 continue;
@@ -290,7 +325,7 @@ class ASTHelper
     }
 
     /** Given a collection of directives, returns the string value for the deprecation reason. */
-    public static function deprecationReason(EnumValueDefinitionNode|FieldDefinitionNode $node): ?string
+    public static function deprecationReason(EnumValueDefinitionNode|FieldDefinitionNode|InputValueDefinitionNode $node): ?string
     {
         $deprecated = Values::getDirectiveValues(
             DirectiveDefinition::deprecatedDirective(),
@@ -305,11 +340,7 @@ class ASTHelper
         try {
             $document = Parser::parse($definitionString);
         } catch (SyntaxError $syntaxError) {
-            throw new DefinitionException(
-                "Encountered syntax error while parsing this directive definition:\n\n{$definitionString}",
-                $syntaxError->getCode(),
-                $syntaxError,
-            );
+            throw new DefinitionException("Encountered syntax error while parsing this directive definition:\n\n{$definitionString}", $syntaxError->getCode(), $syntaxError);
         }
 
         /** @var \GraphQL\Language\AST\DirectiveDefinitionNode|null $directive */

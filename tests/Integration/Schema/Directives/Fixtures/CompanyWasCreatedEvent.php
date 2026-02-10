@@ -6,5 +6,7 @@ use Tests\Utils\Models\Company;
 
 final class CompanyWasCreatedEvent
 {
-    public function __construct(public Company $company) {}
+    public function __construct(
+        public Company $company,
+    ) {}
 }

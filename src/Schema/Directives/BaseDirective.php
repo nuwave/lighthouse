@@ -64,6 +64,8 @@ abstract class BaseDirective implements Directive
         $this->directiveNode = $directiveNode;
         $this->definitionNode = $definitionNode;
 
+        unset($this->directiveArgs);
+
         return $this;
     }
 
@@ -88,7 +90,7 @@ abstract class BaseDirective implements Directive
     }
 
     /**
-     * Get a Closure that is defined through an argument on the directive.
+     * Get a Closure that is defined through an argument of the directive.
      *
      * @api
      */
@@ -116,11 +118,11 @@ abstract class BaseDirective implements Directive
     }
 
     /**
-     * Get the value of an argument on the directive.
+     * Get the value of an argument of the directive.
      *
      * @api
      *
-     * @param mixed $default Use this over `??` to preserve explicit `null`
+     * @param  mixed  $default Use this over `??` to preserve explicit `null`
      *
      * @return mixed The argument value or the default
      */
@@ -165,7 +167,7 @@ abstract class BaseDirective implements Directive
     protected function namespaceClassName(
         string $classCandidate,
         array $namespacesToTry = [],
-        callable $determineMatch = null,
+        ?callable $determineMatch = null,
     ): string {
         $namespaceForDirective = ASTHelper::namespaceForDirective(
             $this->definitionNode,
@@ -215,9 +217,7 @@ abstract class BaseDirective implements Directive
             count($argumentParts) > 2
             || empty($argumentParts[0])
         ) {
-            throw new DefinitionException(
-                "Directive '{$this->name()}' must have an argument '{$argumentName}' in the form 'ClassName@methodName' or 'ClassName'",
-            );
+            throw new DefinitionException("Directive '{$this->name()}' must have an argument '{$argumentName}' in the form 'ClassName@methodName' or 'ClassName'");
         }
 
         /** @var array{0: string, 1?: string} $argumentParts */

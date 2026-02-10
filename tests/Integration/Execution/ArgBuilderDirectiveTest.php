@@ -8,19 +8,19 @@ use Tests\Utils\Models\User;
 
 final class ArgBuilderDirectiveTest extends DBTestCase
 {
-    protected string $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ <<<'GRAPHQL'
     type User {
         id: ID!
         name: String
         email: String
     }
-    ';
+    GRAPHQL;
 
     public function testAttachNeqFilterToQuery(): void
     {
         $users = factory(User::class, 3)->create();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -28,19 +28,19 @@ final class ArgBuilderDirectiveTest extends DBTestCase
         type Query {
             users(id: ID @neq): [User!]! @all
         }
-        ';
+        GRAPHQL;
 
         $user = $users->first();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($id: ID) {
                 users(id: $id) {
                     id
                 }
             }
-            ', [
+            GRAPHQL, [
                 'id' => $user->id,
             ])
             ->assertJsonCount(2, 'data.users');
@@ -49,14 +49,14 @@ final class ArgBuilderDirectiveTest extends DBTestCase
     public function testAttachInFilterToQuery(): void
     {
         $user1 = factory(User::class)->create();
-        assert($user1 instanceof User);
+        $this->assertInstanceOf(User::class, $user1);
 
         factory(User::class, 3)->create();
 
         $user2 = factory(User::class)->create();
-        assert($user2 instanceof User);
+        $this->assertInstanceOf(User::class, $user2);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -64,16 +64,16 @@ final class ArgBuilderDirectiveTest extends DBTestCase
         type Query {
             users(include: [Int] @in(key: "id")): [User!]! @all
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($ids: [Int]) {
                 users(include: $ids) {
                     id
                 }
             }
-            ', [
+            GRAPHQL, [
                 'ids' => [
                     $user1->id,
                     $user2->id,
@@ -85,14 +85,14 @@ final class ArgBuilderDirectiveTest extends DBTestCase
     public function testAttachNotInFilterToQuery(): void
     {
         $user1 = factory(User::class)->create();
-        assert($user1 instanceof User);
+        $this->assertInstanceOf(User::class, $user1);
 
         factory(User::class, 3)->create();
 
         $user2 = factory(User::class)->create();
-        assert($user2 instanceof User);
+        $this->assertInstanceOf(User::class, $user2);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -100,16 +100,16 @@ final class ArgBuilderDirectiveTest extends DBTestCase
         type Query {
             users(exclude: [Int] @notIn(key: "id")): [User!]! @all
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($ids: [Int]) {
                 users(exclude: $ids) {
                     id
                 }
             }
-            ', [
+            GRAPHQL, [
                 'ids' => [
                     $user1->id,
                     $user2->id,
@@ -122,7 +122,7 @@ final class ArgBuilderDirectiveTest extends DBTestCase
     {
         $users = factory(User::class, 3)->create();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -130,19 +130,19 @@ final class ArgBuilderDirectiveTest extends DBTestCase
         type Query {
             users(id: Int @where(operator: ">")): [User!]! @all
         }
-        ';
+        GRAPHQL;
 
         $user = $users->first();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($userId: Int) {
                 users(id: $userId) {
                     id
                 }
             }
-            ', [
+            GRAPHQL, [
                 'userId' => $user->id,
             ])
             ->assertJsonCount(2, 'data.users');
@@ -152,7 +152,7 @@ final class ArgBuilderDirectiveTest extends DBTestCase
     {
         factory(User::class, 5)->create();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -163,9 +163,9 @@ final class ArgBuilderDirectiveTest extends DBTestCase
                 end: Int @where(key: "id", operator: "<")
             ): [User!]! @all
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 start: 1
@@ -174,12 +174,12 @@ final class ArgBuilderDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertJsonCount(3, 'data.users');
+        GRAPHQL)->assertJsonCount(3, 'data.users');
     }
 
     public function testAttachWhereBetweenFilterToQuery(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -189,16 +189,16 @@ final class ArgBuilderDirectiveTest extends DBTestCase
                 createdBetween: [String!]! @whereBetween(key: "created_at")
             ): [User!]! @all
         }
-        ';
+        GRAPHQL;
 
         factory(User::class, 2)->create();
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $user->created_at = now()->subDay();
         $user->save();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($between: [String!]!) {
             users(
                 createdBetween: $between
@@ -206,7 +206,7 @@ final class ArgBuilderDirectiveTest extends DBTestCase
                 id
             }
         }
-        ', [
+        GRAPHQL, [
             'between' => [
                 now()->subDay()->startOfDay()->format('Y-m-d H:i:s'),
                 now()->subDay()->endOfDay()->format('Y-m-d H:i:s'),
@@ -216,7 +216,7 @@ final class ArgBuilderDirectiveTest extends DBTestCase
 
     public function testUseInputObjectsForWhereBetweenFilter(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             users(
                 created: TimeRange @whereBetween(key: "created_at")
@@ -227,16 +227,16 @@ final class ArgBuilderDirectiveTest extends DBTestCase
             start: String!
             end: String!
         }
-        ';
+        GRAPHQL;
 
         factory(User::class, 2)->create();
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $user->created_at = now()->subDay();
         $user->save();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($start: String!, $end: String!) {
             users(
                 created: {
@@ -247,7 +247,7 @@ final class ArgBuilderDirectiveTest extends DBTestCase
                 id
             }
         }
-        ', [
+        GRAPHQL, [
             'start' => now()->subDay()->startOfDay()->format('Y-m-d H:i:s'),
             'end' => now()->subDay()->endOfDay()->format('Y-m-d H:i:s'),
         ])->assertJsonCount(1, 'data.users');
@@ -255,22 +255,22 @@ final class ArgBuilderDirectiveTest extends DBTestCase
 
     public function testAttachWhereNotBetweenFilterToQuery(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             users(
                 notCreatedBetween: [String!]! @whereNotBetween(key: "created_at")
             ): [User!]! @all
         }
-        ';
+        GRAPHQL;
 
         factory(User::class, 2)->create();
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $user->created_at = now()->subDay();
         $user->save();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($between: [String!]!) {
             users(
                 notCreatedBetween: $between
@@ -278,7 +278,7 @@ final class ArgBuilderDirectiveTest extends DBTestCase
                 id
             }
         }
-        ', [
+        GRAPHQL, [
             'between' => [
                 now()->subDay()->startOfDay()->format('Y-m-d H:i:s'),
                 now()->subDay()->endOfDay()->format('Y-m-d H:i:s'),
@@ -288,85 +288,85 @@ final class ArgBuilderDirectiveTest extends DBTestCase
 
     public function testAttachWhereClauseFilterToQuery(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             users(
                 created_at: String! @where(clause: "whereYear")
             ): [User!]! @all
         }
-        ';
+        GRAPHQL;
 
         factory(User::class, 2)->create();
 
         $oneYearAgo = now()->subYear();
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $user->created_at = $oneYearAgo;
         $user->save();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($created_at: String!) {
             users(created_at: $created_at) {
                 id
             }
         }
-        ', [
+        GRAPHQL, [
             'created_at' => $oneYearAgo->format('Y'),
         ])->assertJsonCount(1, 'data.users');
     }
 
     public function testOnlyProcessesFilledArguments(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             users(
                 id: ID @eq
                 name: String @where(operator: "like")
             ): [User!]! @all
         }
-        ';
+        GRAPHQL;
 
         $users = factory(User::class, 3)->create();
 
         $user = $users->first();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($name: String) {
             users(name: $name) {
                 id
             }
         }
-        ', [
+        GRAPHQL, [
             'name' => $user->name,
         ])->assertJsonCount(1, 'data.users');
     }
 
     public function testDoesNotProcessUnusedVariable(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             users(
                 ids: [ID!] @in
             ): [User!]! @all
         }
-        ';
+        GRAPHQL;
 
         factory(User::class, 3)->create();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($ids: [ID!]) {
             users(ids: $ids) {
                 id
             }
         }
-        ')->assertJsonCount(3, 'data.users');
+        GRAPHQL)->assertJsonCount(3, 'data.users');
     }
 
     public function testAttachMultipleWhereFiltersToQuery(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             posts(
                 content: String
@@ -378,34 +378,34 @@ final class ArgBuilderDirectiveTest extends DBTestCase
         type Post {
             id: Int!
         }
-        ';
+        GRAPHQL;
 
         $content = 'foo';
 
         $onlyTitle = factory(Post::class)->make();
-        assert($onlyTitle instanceof Post);
+        $this->assertInstanceOf(Post::class, $onlyTitle);
         $onlyTitle->title = $content;
         $onlyTitle->save();
 
         $onlyBody = factory(Post::class)->make();
-        assert($onlyBody instanceof Post);
+        $this->assertInstanceOf(Post::class, $onlyBody);
         $onlyBody->body = $content;
         $onlyBody->save();
 
         $titleAndBody = factory(Post::class)->make();
-        assert($titleAndBody instanceof Post);
+        $this->assertInstanceOf(Post::class, $titleAndBody);
         $titleAndBody->title = $content;
         $titleAndBody->body = $content;
         $titleAndBody->save();
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($content: String) {
                 posts(content: $content) {
                     id
                 }
             }
-            ', [
+            GRAPHQL, [
                 'content' => $content,
             ])
             ->assertExactJson([

@@ -7,7 +7,7 @@ use Laravel\Lumen\Routing\Router;
 
 class SubscriptionRouter
 {
-    /** Register the routes for pusher based subscriptions. */
+    /** Register the routes for Pusher based subscriptions. */
     public function pusher(Registrar|Router $router): void
     {
         $router->post('graphql/subscriptions/auth', [
@@ -21,6 +21,16 @@ class SubscriptionRouter
         ]);
     }
 
+    /** Register the routes for Laravel Reverb based subscriptions. */
+    public function reverb(Registrar|Router $router): void
+    {
+        $router->post('graphql/subscriptions/auth', [
+            'as' => 'lighthouse.subscriptions.auth',
+            'uses' => SubscriptionController::class . '@authorize',
+        ]);
+    }
+
+    /** Register the routes for Laravel Echo based subscriptions. */
     public function echoRoutes(Registrar|Router $router): void
     {
         $router->post('graphql/subscriptions/auth', [

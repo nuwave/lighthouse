@@ -6,7 +6,7 @@ use Illuminate\Http\UploadedFile;
 
 final class Upload
 {
-    /** @param  array<string, mixed> $args */
+    /** @param  array<string, mixed>  $args */
     public function __invoke(mixed $root, array $args): bool
     {
         return isset($args['file'])

@@ -41,17 +41,17 @@ final class AttemptAuthenticationTest extends TestCase
                 new Callback(fn (GraphQLContext $context): bool => $this->user === null),
             );
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: ID @mock
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ');
+        GRAPHQL);
     }
 
     public function testAttemptsAuthenticationUser(): void
@@ -65,16 +65,16 @@ final class AttemptAuthenticationTest extends TestCase
                 new Callback(fn (GraphQLContext $context): bool => $this->user === $context->user()),
             );
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: ID @mock
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ');
+        GRAPHQL);
     }
 }

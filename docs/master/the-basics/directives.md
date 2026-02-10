@@ -12,7 +12,7 @@ Those are called _directives_ and are the primary way to add functionality to yo
 Directives always begin with an `@` symbol, followed by a unique name. They may be used
 at specified parts of the GraphQL schema.
 
-This example directive `@upperCase` may be used on field definitions to UPPERCASE the result.
+This example directive `@upperCase` may be used on field definitions to convert the result to UPPER CASE.
 
 ```graphql
 directive @upperCase on FIELD_DEFINITION

@@ -4,7 +4,7 @@ The following section teaches you how to install Lighthouse in your project.
 
 ## Install via composer
 
-```bash
+```shell
 composer require nuwave/lighthouse
 ```
 
@@ -13,7 +13,7 @@ composer require nuwave/lighthouse
 Lighthouse includes a default schema to get you going right away. Publish
 it using the following `artisan` command:
 
-```bash
+```shell
 php artisan vendor:publish --tag=lighthouse-schema
 ```
 
@@ -21,7 +21,7 @@ php artisan vendor:publish --tag=lighthouse-schema
 
 To use the included lighthouse config, copy it over to your config folder.
 
-```bash
+```shell
 mkdir --parents config
 cp vendor/nuwave/lighthouse/src/lighthouse.php config/
 ```
@@ -46,7 +46,7 @@ the section `extra.laravel.providers` contains the default service providers.
 To get you going right away in Lumen, copy over the included default schema.
 It uses pagination and validation, so you need to register the service providers.
 
-```bash
+```shell
 mkdir --parents graphql
 cp vendor/nuwave/lighthouse/src/default-schema.graphql graphql/schema.graphql
 ```
@@ -58,11 +58,10 @@ $app->register(\Nuwave\Lighthouse\Validation\ValidationServiceProvider::class);
 
 ## IDE Support
 
-Lighthouse makes heavy use of the SDL and utilizes schema directives.
-To improve your editing experience, you can generate a definition file
-[with an artisan command](../api-reference/commands.md#ide-helper):
+Lighthouse makes heavy use of the SDL and uses schema directives.
+To improve your editing experience, you can generate a definition file [with an artisan command](../api-reference/commands.md#ide-helper):
 
-```bash
+```shell
 php artisan lighthouse:ide-helper
 ```
 
@@ -73,7 +72,7 @@ For Phpstorm, we recommend [the GraphQL plugin](https://plugins.jetbrains.com/pl
 To make use of the amazing tooling around GraphQL, we recommend
 installing [GraphiQL](https://github.com/mll-lab/laravel-graphiql).
 
-```bash
+```shell
 composer require mll-lab/laravel-graphiql
 ```
 

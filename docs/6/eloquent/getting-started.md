@@ -18,7 +18,7 @@ Popular client libraries such as Apollo provide out-of-the-box caching if you fo
 
 ## Retrieving Models
 
-Instead of defining your own resolver manually, you can just rely on Lighthouse to build the Query for you.
+Instead of defining your own resolver manually, you can rely on Lighthouse to build the Query for you.
 
 ```graphql
 type Query {
@@ -99,11 +99,11 @@ And can be queried like this:
 Lighthouse provides directives such as [@eq](../api-reference/directives.md#eq)
 to enhance your queries with additional constraints.
 
-The following field definition allows clients to fetch a single User by ID.
+The following field definition allows clients to find a user by their email:
 
 ```graphql
 type Query {
-  user(id: ID! @eq): User @find
+  user(email: String! @eq): User @find
 }
 ```
 
@@ -111,7 +111,8 @@ Query the field like this:
 
 ```graphql
 {
-  user(id: 69) {
+  user(email: "chuck@nor.ris") {
+    id
     name
   }
 }
@@ -123,6 +124,7 @@ If found, the result will look like this:
 {
   "data": {
     "user": {
+      "id": "69420",
       "name": "Chuck Norris"
     }
   }
@@ -201,13 +203,15 @@ The newly created user is returned as a result:
 }
 ```
 
+To create multiple models at once, use the [@createMany](../api-reference/directives.md#createMany) directive.
+
 ## Update
 
 You can update a model with the [@update](../api-reference/directives.md#update) directive.
 
 ```graphql
 type Mutation {
-  updateUser(id: ID!, name: String): User @update
+  updateUser(id: ID!, name: String): User! @update
 }
 ```
 
@@ -243,6 +247,8 @@ The update may fail to find the model you provided and return `null`:
 }
 ```
 
+To update multiple models at once, use the [@updateMany](../api-reference/directives.md#updatemany) directive.
+
 ## Upsert
 
 Use the [@upsert](../api-reference/directives.md#upsert) directive to update a model with
@@ -250,12 +256,11 @@ a given `id` or create it if it does not exist.
 
 ```graphql
 type Mutation {
-  upsertUser(id: ID!, name: String!, email: String): User @upsert
+  upsertUser(id: ID, name: String!, email: String): User! @upsert
 }
 ```
 
 Since upsert can create or update your data, your input should mark the minimum required fields as non-nullable.
-The `id` must always be required.
 
 ```graphql
 mutation {
@@ -278,6 +283,8 @@ mutation {
   }
 }
 ```
+
+To upsert multiple models at once, use the [@upsertMany](../api-reference/directives.md#upsertmany) directive.
 
 ## Delete
 

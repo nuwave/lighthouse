@@ -13,9 +13,7 @@ class HttpGraphQLContext implements GraphQLContext
     public ?Authenticatable $user = null;
 
     public function __construct(
-        /**
-         * An instance of the incoming HTTP request.
-         */
+        /** An instance of the incoming HTTP request. */
         public Request $request,
     ) {
         foreach (AuthServiceProvider::guards() as $guard) {

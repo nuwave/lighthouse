@@ -9,7 +9,7 @@ final class FirstDirectiveTest extends DBTestCase
 {
     public function testReturnsASingleUser(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             name: String!
@@ -18,22 +18,29 @@ final class FirstDirectiveTest extends DBTestCase
         type Query {
             user(id: ID @eq): User @first(model: "User")
         }
-        ';
+        GRAPHQL;
 
-        factory(User::class)->create(['name' => 'A']);
-        $userB = factory(User::class)->create(['name' => 'B']);
-        factory(User::class)->create(['name' => 'C']);
+        $userA = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $userA);
 
-        $this->graphQL("
-        {
-            user(id: {$userB->id}){
-                name
+        $userB = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $userB);
+
+        $userC = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $userC);
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        query ($id: ID!) {
+            user(id: $id) {
+                id
             }
         }
-        ")->assertJson([
+        GRAPHQL, [
+            'id' => $userB->id,
+        ])->assertJson([
             'data' => [
                 'user' => [
-                    'name' => 'B',
+                    'id' => $userB->id,
                 ],
             ],
         ]);
@@ -41,7 +48,7 @@ final class FirstDirectiveTest extends DBTestCase
 
     public function testReturnsASingleUserWhenMultiplesMatch(): void
     {
-        $this->schema = '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             name: String!
@@ -50,22 +57,33 @@ final class FirstDirectiveTest extends DBTestCase
         type Query {
             user(name: String @eq): User @first(model: "User")
         }
-        ';
+        GRAPHQL;
 
-        $userA = factory(User::class)->create(['name' => 'A']);
-        factory(User::class)->create(['name' => 'A']);
-        factory(User::class)->create(['name' => 'B']);
+        $userA1 = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $userA1);
+        $userA1->name = 'A';
+        $userA1->save();
 
-        $this->graphQL('
+        $userA2 = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $userA2);
+        $userA2->name = 'A';
+        $userA2->save();
+
+        $userB = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $userB);
+        $userB->name = 'B';
+        $userB->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user(name: "A") {
                 id
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
-                    'id' => $userA->id,
+                    'id' => $userA1->id,
                 ],
             ],
         ]);

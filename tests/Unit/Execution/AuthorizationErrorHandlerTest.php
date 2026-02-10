@@ -15,7 +15,7 @@ final class AuthorizationErrorHandlerTest extends TestCase
         $handler = new AuthorizationErrorHandler();
 
         $authorizationException = new LaravelAuthorizationException();
-        $original = new Error('foo', null, null, [], null, $authorizationException);
+        $original = new Error(message: 'foo', previous: $authorizationException);
 
         $error = null;
         $next = static function (Error $e) use (&$error): void {

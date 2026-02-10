@@ -9,19 +9,26 @@ Much of the credit should be given to the [Ruby implementation](https://github.c
 
 ## Setup
 
-Add the service provider to your `config/app.php`:
+Register the service provider `Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider`,
+see [registering providers in Laravel](https://laravel.com/docs/providers#registering-providers).
 
-```php
-'providers' => [
-    \Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider::class,
-],
-```
-
-If you want to use the Pusher driver, you need to install the [Pusher PHP Library](https://github.com/pusher/pusher-http-php) for interacting with the Pusher HTTP API.
+If you want to use [the Pusher driver](https://laravel.com/docs/11.x/broadcasting#pusher-channels), you need to install the [Pusher PHP Library](https://github.com/pusher/pusher-http-php)
+for interacting with the Pusher HTTP API.
 
     composer require pusher/pusher-php-server
 
-If you want to use the Laravel Echo driver, you need to set the env `LIGHTHOUSE_BROADCASTER=echo`.
+If you want to use [the Laravel Echo driver](https://laravel.com/docs/broadcasting#client-side-installation),
+you need to set the env `LIGHTHOUSE_BROADCASTER=echo`.
+
+When using subscriptions with [Laravel Octane](https://laravel.com/docs/octane),
+add the following to your `config/octane.php`:
+
+```php
+    'warm' => [
+        ...Octane::defaultServicesToWarm(),
+        Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry::class,
+    ],
+```
 
 ### Empty Response Optimization
 
@@ -37,6 +44,25 @@ Unless you delete a subscription, it will continue to broadcast events after the
 
 The easiest way to expire subscriptions automatically is to use the env `LIGHTHOUSE_SUBSCRIPTION_STORAGE_TTL`
 to set an expiration time in seconds (e.g. `LIGHTHOUSE_SUBSCRIPTION_STORAGE_TTL=3600` to expire in one hour).
+
+## Encrypted Subscriptions
+
+Lighthouse supports encrypted subscriptions for the drivers Pusher and Echo.
+The main goal is to ensure that all data in a private-encrypted channel is encrypted in transit.
+
+To enable encrypted subscriptions, set `subscriptions.encrypted_channels` to `true` in `config/lighthouse.php`.
+
+For Pusher, the shared secret can be updated in `config/broadcasting.php`:
+
+```php
+// in config/broadcasting.php
+'options' => [
+  'useTLS' => true,
+  'encryption_master_key_base64' => 'YOUR_MASTER_KEY', // generate this with, e.g. 'openssl rand -base64 32'
+],
+```
+
+More details on how to enable encryption are defined in the [Pusher documentation](https://pusher.com/docs/channels/using_channels/encrypted-channels).
 
 ### Pusher Expiration Webhook
 

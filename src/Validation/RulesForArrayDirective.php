@@ -18,6 +18,11 @@ directive @rulesForArray(
   Specify the validation rules to apply to the field.
   This can either be a reference to any of Laravel's built-in validation rules: https://laravel.com/docs/validation#available-validation-rules,
   or the fully qualified class name of a custom validation rule.
+
+  Validation rules that mutate the given input values are _not_ supported:
+  - `exclude_if`
+  - `exclude_unless`
+  Use ArgTransformerDirectives or FieldMiddlewareDirectives instead.
   """
   apply: [String!]!
 

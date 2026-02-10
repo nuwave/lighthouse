@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $id
  *
  * Relations
- * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\User> $users
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\User> $users
  */
 final class NullConnection extends Model
 {
@@ -22,7 +22,7 @@ final class NullConnection extends Model
         return null;
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\User> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\User, $this> */
     public function users(): HasMany
     {
         return $this->hasMany(User::class, 'company_id');

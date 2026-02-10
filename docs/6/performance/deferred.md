@@ -9,13 +9,8 @@ Lighthouse adds support for [the `@defer` directive](https://github.com/graphql/
 
 ## Setup
 
-Add the service provider to your `config/app.php`:
-
-```php
-'providers' => [
-    \Nuwave\Lighthouse\Defer\DeferServiceProvider::class,
-],
-```
+Register the service provider `Nuwave\Lighthouse\Defer\DeferServiceProvider`,
+see [registering providers in Laravel](https://laravel.com/docs/providers#registering-providers).
 
 ## Configuration
 

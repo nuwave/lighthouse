@@ -20,11 +20,11 @@ final class ClearCacheDirectiveTest extends TestCase
 
     public function testClearCacheForEntireType(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Mutation {
             foo: Int! @clearCache(type: "Foo")
         }
-        ' . self::PLACEHOLDER_QUERY;
+        GRAPHQL . self::PLACEHOLDER_QUERY;
 
         $taggedCache = $this->cache->tags(['lighthouse:Foo:']);
 
@@ -33,22 +33,22 @@ final class ClearCacheDirectiveTest extends TestCase
 
         $this->assertTrue($taggedCache->has($key));
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             foo
         }
-        ')->assertGraphQLErrorFree();
+        GRAPHQL)->assertGraphQLErrorFree();
 
         $this->assertFalse($taggedCache->has($key));
     }
 
     public function testClearCacheForAllFieldsOfType(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Mutation {
             foo: Int! @clearCache(type: "Foo", field: "bar")
         }
-        ' . self::PLACEHOLDER_QUERY;
+        GRAPHQL . self::PLACEHOLDER_QUERY;
 
         $taggedCache = $this->cache->tags(['lighthouse:Foo::bar']);
 
@@ -57,22 +57,22 @@ final class ClearCacheDirectiveTest extends TestCase
 
         $this->assertTrue($taggedCache->has($key));
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             foo
         }
-        ')->assertGraphQLErrorFree();
+        GRAPHQL)->assertGraphQLErrorFree();
 
         $this->assertFalse($taggedCache->has($key));
     }
 
     public function testClearCacheForTypeWithIDByArgument(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Mutation {
-            foo(id: Int!): Int! @clearCache(type: "Foo", idSource: { argument: "id" })
+            foo(id: ID!): Int! @clearCache(type: "Foo", idSource: { argument: "id" })
         }
-        ' . self::PLACEHOLDER_QUERY;
+        GRAPHQL . self::PLACEHOLDER_QUERY;
 
         $taggedCache = $this->cache->tags(['lighthouse:Foo:1']);
 
@@ -81,26 +81,26 @@ final class ClearCacheDirectiveTest extends TestCase
 
         $this->assertTrue($taggedCache->has($key));
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             foo(id: 1)
         }
-        ')->assertGraphQLErrorFree();
+        GRAPHQL)->assertGraphQLErrorFree();
 
         $this->assertFalse($taggedCache->has($key));
     }
 
     public function testClearCacheForTypeWithIDByArgumentNestedPath(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         input FooInput {
-            id: Int!
+            id: ID!
         }
 
         type Mutation {
             foo(input: FooInput!): Int! @clearCache(type: "Foo", idSource: { argument: "input.id" })
         }
-        ' . self::PLACEHOLDER_QUERY;
+        GRAPHQL . self::PLACEHOLDER_QUERY;
 
         $taggedCache = $this->cache->tags(['lighthouse:Foo:1']);
 
@@ -109,11 +109,11 @@ final class ClearCacheDirectiveTest extends TestCase
 
         $this->assertTrue($taggedCache->has($key));
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             foo(input: { id: 1 })
         }
-        ')->assertGraphQLErrorFree();
+        GRAPHQL)->assertGraphQLErrorFree();
 
         $this->assertFalse($taggedCache->has($key));
     }
@@ -124,7 +124,7 @@ final class ClearCacheDirectiveTest extends TestCase
             'bar' => 2,
         ]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Foo {
             bar: Int!
         }
@@ -134,7 +134,7 @@ final class ClearCacheDirectiveTest extends TestCase
                 @mock
                 @clearCache(type: "Foo", idSource: { field: "bar" })
         }
-        ' . self::PLACEHOLDER_QUERY;
+        GRAPHQL . self::PLACEHOLDER_QUERY;
 
         $taggedCache = $this->cache->tags(['lighthouse:Foo:2']);
 
@@ -143,13 +143,13 @@ final class ClearCacheDirectiveTest extends TestCase
 
         $this->assertTrue($taggedCache->has($key));
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             foo {
                 bar
             }
         }
-        ')->assertGraphQLErrorFree();
+        GRAPHQL)->assertGraphQLErrorFree();
 
         $this->assertFalse($taggedCache->has($key));
     }
@@ -166,7 +166,7 @@ final class ClearCacheDirectiveTest extends TestCase
             ],
         ]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Foo {
             bar: Int!
         }
@@ -176,7 +176,7 @@ final class ClearCacheDirectiveTest extends TestCase
                 @mock
                 @clearCache(type: "Foo", idSource: { field: "*.bar" })
         }
-        ' . self::PLACEHOLDER_QUERY;
+        GRAPHQL . self::PLACEHOLDER_QUERY;
 
         $taggedCache1 = $this->cache->tags(['lighthouse:Foo:1']);
         $taggedCache2 = $this->cache->tags(['lighthouse:Foo:2']);
@@ -188,13 +188,13 @@ final class ClearCacheDirectiveTest extends TestCase
         $this->assertTrue($taggedCache1->has($key));
         $this->assertTrue($taggedCache2->has($key));
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             foos {
                 bar
             }
         }
-        ')->assertGraphQLErrorFree();
+        GRAPHQL)->assertGraphQLErrorFree();
 
         $this->assertFalse($taggedCache1->has($key));
         $this->assertFalse($taggedCache2->has($key));
@@ -208,7 +208,7 @@ final class ClearCacheDirectiveTest extends TestCase
             ],
         ]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Bar {
             baz: Int!
         }
@@ -222,7 +222,7 @@ final class ClearCacheDirectiveTest extends TestCase
                 @mock
                 @clearCache(type: "Foo", idSource: { field: "bar.baz" })
         }
-        ' . self::PLACEHOLDER_QUERY;
+        GRAPHQL . self::PLACEHOLDER_QUERY;
 
         $taggedCache = $this->cache->tags(['lighthouse:Foo:3']);
 
@@ -231,7 +231,7 @@ final class ClearCacheDirectiveTest extends TestCase
 
         $this->assertTrue($taggedCache->has($key));
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             foo {
                 bar {
@@ -239,18 +239,18 @@ final class ClearCacheDirectiveTest extends TestCase
                 }
             }
         }
-        ')->assertGraphQLErrorFree();
+        GRAPHQL)->assertGraphQLErrorFree();
 
         $this->assertFalse($taggedCache->has($key));
     }
 
     public function testClearCacheForTypeWithIDByArgumentForField(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Mutation {
-            foo(id: Int!): Int! @clearCache(type: "Foo", idSource: { argument: "id" }, field: "baz")
+            foo(id: ID!): Int! @clearCache(type: "Foo", idSource: { argument: "id" }, field: "baz")
         }
-        ' . self::PLACEHOLDER_QUERY;
+        GRAPHQL . self::PLACEHOLDER_QUERY;
 
         $taggedCache = $this->cache->tags(['lighthouse:Foo:1:baz']);
 
@@ -259,11 +259,11 @@ final class ClearCacheDirectiveTest extends TestCase
 
         $this->assertTrue($taggedCache->has($key));
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             foo(id: 1)
         }
-        ')->assertGraphQLErrorFree();
+        GRAPHQL)->assertGraphQLErrorFree();
 
         $this->assertFalse($taggedCache->has($key));
     }

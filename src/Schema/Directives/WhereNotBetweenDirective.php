@@ -30,6 +30,10 @@ GRAPHQL;
 
     public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, $value): QueryBuilder|EloquentBuilder|Relation
     {
+        if ($value === null) {
+            return $builder;
+        }
+
         return $builder->whereNotBetween(
             $this->directiveArgValue('key', $this->nodeName()),
             $value,

@@ -16,7 +16,7 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
     protected function getNameInput(): string
     {
         $name = $this->argument('name');
-        if (! is_string($name)) {
+        if (! is_string($name)) { // @phpstan-ignore function.alreadyNarrowedType (necessary in some dependency versions)
             throw new \InvalidArgumentException('You must specify the name for the class to generate.');
         }
 
@@ -78,7 +78,7 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
         }
 
         // We could not determine a common part of the configured namespaces,
-        // so we just assume the user will prefer the first one in the list.
+        // so we assume the user will prefer the first one in the list.
         if ($matching === []) {
             return $preferredNamespaceFallback;
         }

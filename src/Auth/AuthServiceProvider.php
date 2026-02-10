@@ -4,13 +4,13 @@ namespace Nuwave\Lighthouse\Auth;
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 
 class AuthServiceProvider extends ServiceProvider
 {
-    public function boot(Dispatcher $dispatcher): void
+    public function boot(EventsDispatcher $dispatcher): void
     {
         $dispatcher->listen(RegisterDirectiveNamespaces::class, static fn (): string => __NAMESPACE__);
     }

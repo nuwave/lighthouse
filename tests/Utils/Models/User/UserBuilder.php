@@ -8,12 +8,14 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 /** @extends \Illuminate\Database\Eloquent\Builder<\Tests\Utils\Models\User> */
 final class UserBuilder extends Builder
 {
-    /** @param  array{company: string} $args */
+    /** @param  array{company: string}  $args */
     public function companyName(array $args): self
     {
-        return $this->where(fn (self $builder) => $builder
-            ->whereHas('company', static fn (EloquentBuilder $q): EloquentBuilder => $q
-            ->where('name', $args['company'])));
+        return $this->where(
+            static fn (self $builder): UserBuilder => $builder
+                ->whereHas('company', static fn (EloquentBuilder $q): EloquentBuilder => $q
+                    ->where('name', $args['company'])),
+        );
     }
 
     public function named(): self

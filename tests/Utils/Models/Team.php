@@ -18,11 +18,11 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @property \Illuminate\Support\Carbon $updated_at
  *
  * Relations
- * @property-read \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\User> $users
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\User> $users
  */
 final class Team extends Authenticatable
 {
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\User> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Tests\Utils\Models\User, $this> */
     public function users(): HasMany
     {
         return $this->hasMany(User::class);

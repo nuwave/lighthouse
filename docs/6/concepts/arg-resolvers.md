@@ -67,7 +67,7 @@ function createTaskWithNotes(mixed $root, array $args): \App\Models\Task {
     $task = \App\Models\Task::create($args);
 
     // If the client actually passed notes, create and attach them
-    if($notes) {
+    if ($notes) {
         foreach($notes as $note) {
             $task->notes()->create($note);
         }
@@ -77,8 +77,8 @@ function createTaskWithNotes(mixed $root, array $args): \App\Models\Task {
 }
 ```
 
-In this contrived example, the function is still pretty simple. However, separation of concerns
-is already violated: A single function is responsible for creating both tasks and notes.
+In this contrived example, the function is still quite small.
+However, separation of concerns is already violated: A single function is responsible for creating both tasks and notes.
 
 We might want to extend our schema to support more operations in the future, such as updating
 a task and creating, updating or deleting notes or other, more deeply nested relations.
@@ -86,7 +86,7 @@ Such changes would force us to duplicate code and increase the complexity of our
 
 ## Solution
 
-Ideally, we would want to write small and focused functions that each deal with just
+Ideally, we would want to write small and focused functions that deal with just
 a part of the given input arguments. The execution engine should traverse the given
 input and take care of calling the appropriate functions with their respective arguments.
 
@@ -205,4 +205,4 @@ final class CreateDirective extends BaseDirective implements FieldResolver, ArgR
 }
 ```
 
-You may define your own nested arg resolver directives by implementing [`ArgResolver`](../custom-directives/argument-directives.md#argresolver).
+You may define your own nested arg resolver directives by implementing [`ArgResolver`](../custom-directives/field-argument-directives#argresolver).
