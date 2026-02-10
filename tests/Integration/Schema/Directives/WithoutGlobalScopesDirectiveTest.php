@@ -11,16 +11,16 @@ final class WithoutGlobalScopesDirectiveTest extends DBTestCase
     public function testOmitsScopesWhenArgumentValueIsTrue(): void
     {
         $scheduledPodcast = factory(Podcast::class)->make();
-        assert($scheduledPodcast instanceof Podcast);
+        $this->assertInstanceOf(Podcast::class, $scheduledPodcast);
         $scheduledPodcast->schedule_at = Carbon::tomorrow();
         $scheduledPodcast->save();
 
         $unscheduledPodcast = factory(Podcast::class)->make();
-        assert($unscheduledPodcast instanceof Podcast);
+        $this->assertInstanceOf(Podcast::class, $unscheduledPodcast);
         $unscheduledPodcast->schedule_at = null;
         $unscheduledPodcast->save();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             podcasts(
                 includeUnscheduled: Boolean @withoutGlobalScopes(names: ["scheduled"])
@@ -30,22 +30,22 @@ final class WithoutGlobalScopesDirectiveTest extends DBTestCase
         type Podcast {
             id: ID!
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             podcasts {
                 id
             }
         }
-        ')->assertJsonCount(1, 'data.podcasts');
+        GRAPHQL)->assertJsonCount(1, 'data.podcasts');
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             podcasts(includeUnscheduled: true) {
                 id
             }
         }
-        ')->assertJsonCount(2, 'data.podcasts');
+        GRAPHQL)->assertJsonCount(2, 'data.podcasts');
     }
 }

@@ -117,14 +117,14 @@ use GraphQL\Deferred;
 final class UserPostsBatchLoader
 {
     /**
-     * Map from user ids to users.
+     * Map from user IDs to users.
      *
      * @var array<int, \App\Models\User>
      */
     protected array $users = [];
 
     /**
-     * Map from user ids to posts.
+     * Map from user IDs to posts.
      *
      * @var array<int, array<int, \App\Models\Post>>
      */

@@ -112,7 +112,7 @@ class ResolveInfo extends BaseResolveInfo
             $value = $argument->toPlain();
 
             foreach ($argument->directives as $directive) {
-                if (! ($directive instanceof ArgBuilderDirective)) {
+                if (! $directive instanceof ArgBuilderDirective) {
                     continue;
                 }
 

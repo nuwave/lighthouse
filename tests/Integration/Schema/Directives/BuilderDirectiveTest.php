@@ -28,13 +28,13 @@ final class BuilderDirectiveTest extends DBTestCase
 
         factory(User::class, 2)->create();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(limit: 1) {
                 id
             }
         }
-        ')->assertJsonCount(1, 'data.users');
+        GRAPHQL)->assertJsonCount(1, 'data.users');
     }
 
     public function testCallsCustomBuilderMethodOnFieldCheckWithArgs(): void
@@ -65,13 +65,13 @@ final class BuilderDirectiveTest extends DBTestCase
         }
         GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(arg1: "Hello", arg2: "World") {
                 id
             }
         }
-        ');
+        GRAPHQL);
     }
 
     public function testCallsCustomBuilderMethodOnFieldCheckWithoutArgs(): void
@@ -100,13 +100,13 @@ final class BuilderDirectiveTest extends DBTestCase
         }
         GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users {
                 id
             }
         }
-        ');
+        GRAPHQL);
     }
 
     public function testCallsCustomBuilderMethodOnFieldWithValue(): void
@@ -124,13 +124,13 @@ final class BuilderDirectiveTest extends DBTestCase
 
         factory(User::class, 2)->create();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users {
                 id
             }
         }
-        ')->assertJsonCount(1, 'data.users');
+        GRAPHQL)->assertJsonCount(1, 'data.users');
     }
 
     public function testCallsCustomBuilderMethodOnFieldWithoutValue(): void
@@ -147,13 +147,13 @@ final class BuilderDirectiveTest extends DBTestCase
 
         factory(User::class, 3)->create();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users {
                 id
             }
         }
-        ')->assertJsonCount(2, 'data.users');
+        GRAPHQL)->assertJsonCount(2, 'data.users');
     }
 
     public function testCallsCustomBuilderMethodOnFieldWithSpecificModel(): void
@@ -176,25 +176,25 @@ final class BuilderDirectiveTest extends DBTestCase
         $users = factory(User::class, 2)->create();
 
         foreach ($users as $user) {
-            assert($user instanceof User);
+            $this->assertInstanceOf(User::class, $user);
 
             $userName = $user->name;
             assert(is_string($userName), 'set by UserFactory');
 
             $taskWithSameName = factory(Task::class)->make();
-            assert($taskWithSameName instanceof Task);
+            $this->assertInstanceOf(Task::class, $taskWithSameName);
             $taskWithSameName->name = $userName;
             $taskWithSameName->user()->associate($user);
             $taskWithSameName->save();
 
             $taskWithOtherName = factory(Task::class)->make();
-            assert($taskWithOtherName instanceof Task);
+            $this->assertInstanceOf(Task::class, $taskWithOtherName);
             $taskWithOtherName->name = "Different from {$userName}";
             $taskWithOtherName->user()->associate($user);
             $taskWithOtherName->save();
         }
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users {
                 id
@@ -205,7 +205,7 @@ final class BuilderDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')
+        GRAPHQL)
             ->assertJsonCount(1, 'data.users.0.tasks.data')
             ->assertJsonCount(1, 'data.users.1.tasks.data');
     }

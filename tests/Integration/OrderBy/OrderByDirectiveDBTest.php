@@ -2,7 +2,6 @@
 
 namespace Tests\Integration\OrderBy;
 
-use Illuminate\Support\Carbon;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
@@ -10,7 +9,7 @@ use Tests\Utils\Models\User;
 
 final class OrderByDirectiveDBTest extends DBTestCase
 {
-    protected string $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ <<<'GRAPHQL'
     type Query {
         users(
             orderBy: _ @orderBy
@@ -27,14 +26,14 @@ final class OrderByDirectiveDBTest extends DBTestCase
     enum UserColumn {
         NAME @enum(value: "name")
     }
-    ';
+    GRAPHQL;
 
     public function testOrderByTheGivenColumnAndSortOrderASC(): void
     {
-        factory(User::class)->create(['name' => 'B']);
-        factory(User::class)->create(['name' => 'A']);
+        $this->createUser('B');
+        $this->createUser('A');
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 orderBy: [
@@ -47,7 +46,7 @@ final class OrderByDirectiveDBTest extends DBTestCase
                 name
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [
@@ -63,10 +62,10 @@ final class OrderByDirectiveDBTest extends DBTestCase
 
     public function testOrderByTheGivenFieldAndSortOrderDESC(): void
     {
-        factory(User::class)->create(['name' => 'B']);
-        factory(User::class)->create(['name' => 'A']);
+        $this->createUser('B');
+        $this->createUser('A');
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 orderBy: [
@@ -79,7 +78,7 @@ final class OrderByDirectiveDBTest extends DBTestCase
                 name
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [
@@ -95,11 +94,11 @@ final class OrderByDirectiveDBTest extends DBTestCase
 
     public function testOrderByMultipleColumns(): void
     {
-        factory(User::class)->create(['name' => 'B', 'team_id' => 2]);
-        factory(User::class)->create(['name' => 'A', 'team_id' => 5]);
-        factory(User::class)->create(['name' => 'C', 'team_id' => 2]);
+        $this->createUser('B', 2);
+        $this->createUser('A', 5);
+        $this->createUser('C', 2);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 orderBy: [
@@ -117,7 +116,7 @@ final class OrderByDirectiveDBTest extends DBTestCase
                 name
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [
@@ -139,10 +138,10 @@ final class OrderByDirectiveDBTest extends DBTestCase
 
     public function testOrderWithRestrictedColumns(): void
     {
-        factory(User::class)->create(['name' => 'B']);
-        factory(User::class)->create(['name' => 'A']);
+        $this->createUser('B');
+        $this->createUser('A');
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 orderByRestricted: [
@@ -155,7 +154,7 @@ final class OrderByDirectiveDBTest extends DBTestCase
                 name
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [
@@ -171,10 +170,10 @@ final class OrderByDirectiveDBTest extends DBTestCase
 
     public function testUseColumnEnumsArg(): void
     {
-        factory(User::class)->create(['name' => 'B']);
-        factory(User::class)->create(['name' => 'A']);
+        $this->createUser('B');
+        $this->createUser('A');
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 orderByRestrictedEnum: [
@@ -187,7 +186,7 @@ final class OrderByDirectiveDBTest extends DBTestCase
                 name
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [
@@ -205,7 +204,7 @@ final class OrderByDirectiveDBTest extends DBTestCase
     {
         $this->expectException(DefinitionException::class);
 
-        $this->buildSchema(/** @lang GraphQL */ '
+        $this->buildSchema(/** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             users(
                 orderBy: _ @orderBy(columns: ["name"], columnsEnum: "UserColumn")
@@ -220,18 +219,22 @@ final class OrderByDirectiveDBTest extends DBTestCase
         enum UserColumn {
             NAME @enum(value: "name")
         }
-        ');
+        GRAPHQL);
     }
 
     public function testOrderColumnOnField(): void
     {
-        $now = Carbon::now();
-        factory(User::class)->create(['name' => 'A']);
+        $userA = factory(User::class)->make();
+        $userA->name = 'A';
+        $userA->save();
 
-        Carbon::setTestNow($now->addYear());
-        factory(User::class)->create(['name' => 'B']);
+        $this->travel(1)->year();
 
-        $this->schema = /** @lang GraphQL */ '
+        $userB = factory(User::class)->make();
+        $userB->name = 'B';
+        $userB->save();
+
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             latestUsers: [User!]!
                 @all
@@ -241,15 +244,15 @@ final class OrderByDirectiveDBTest extends DBTestCase
         type User {
             name: String
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             latestUsers {
                 name
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'latestUsers' => [
                     [
@@ -265,7 +268,7 @@ final class OrderByDirectiveDBTest extends DBTestCase
 
     public function testOrderByRelationCount(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             users(
                 orderBy: _ @orderBy(relations: [
@@ -279,13 +282,13 @@ final class OrderByDirectiveDBTest extends DBTestCase
         type User {
             id: Int!
         }
-        ';
+        GRAPHQL;
 
         $userA = factory(User::class)->create();
-        assert($userA instanceof User);
+        $this->assertInstanceOf(User::class, $userA);
 
         $userB = factory(User::class)->create();
-        assert($userB instanceof User);
+        $this->assertInstanceOf(User::class, $userB);
 
         $userA->tasks()->saveMany(
             factory(Task::class, 1)->create(),
@@ -294,7 +297,7 @@ final class OrderByDirectiveDBTest extends DBTestCase
             factory(Task::class, 2)->create(),
         );
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 orderBy: [
@@ -307,7 +310,7 @@ final class OrderByDirectiveDBTest extends DBTestCase
                 id
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [
@@ -320,7 +323,7 @@ final class OrderByDirectiveDBTest extends DBTestCase
             ],
         ]);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 orderBy: [
@@ -333,7 +336,7 @@ final class OrderByDirectiveDBTest extends DBTestCase
                 id
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [
@@ -349,7 +352,7 @@ final class OrderByDirectiveDBTest extends DBTestCase
 
     public function testOrderByRelationAggregate(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             users(
                 orderBy: _ @orderBy(relations: [
@@ -368,25 +371,25 @@ final class OrderByDirectiveDBTest extends DBTestCase
         enum UserColumn {
             NAME @enum(value: "name")
         }
-        ';
+        GRAPHQL;
 
         $userA = factory(User::class)->create();
-        assert($userA instanceof User);
+        $this->assertInstanceOf(User::class, $userA);
 
         $userB = factory(User::class)->create();
-        assert($userB instanceof User);
+        $this->assertInstanceOf(User::class, $userB);
 
         $taskA1 = factory(Task::class)->make();
-        assert($taskA1 instanceof Task);
+        $this->assertInstanceOf(Task::class, $taskA1);
         $taskA1->difficulty = 1;
         $userA->tasks()->save($taskA1);
 
         $taskB1 = factory(Task::class)->make();
-        assert($taskB1 instanceof Task);
+        $this->assertInstanceOf(Task::class, $taskB1);
         $taskB1->difficulty = 2;
         $userB->tasks()->save($taskB1);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 orderBy: [
@@ -399,7 +402,7 @@ final class OrderByDirectiveDBTest extends DBTestCase
                 id
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [
@@ -412,7 +415,7 @@ final class OrderByDirectiveDBTest extends DBTestCase
             ],
         ]);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 orderBy: [
@@ -425,7 +428,7 @@ final class OrderByDirectiveDBTest extends DBTestCase
                 id
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [
@@ -437,5 +440,16 @@ final class OrderByDirectiveDBTest extends DBTestCase
                 ],
             ],
         ]);
+    }
+
+    private function createUser(string $name, ?int $teamId = null): User
+    {
+        $user = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $user);
+        $user->name = $name;
+        $user->team_id = $teamId;
+        $user->save();
+
+        return $user;
     }
 }

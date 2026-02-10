@@ -25,7 +25,7 @@ final class Post extends Model
 }
 ```
 
-Just add fields to your type that are named just like the relationships:
+Add fields to your type that are named just like the relationships:
 
 ```graphql
 type Post {

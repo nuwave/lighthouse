@@ -4,6 +4,7 @@ namespace Tests\Unit\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Http\Middleware\EnsureXHR;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Tests\TestCase;
@@ -60,6 +61,7 @@ final class EnsureXHRTest extends TestCase
     }
 
     /** @dataProvider formContentTypes */
+    #[DataProvider('formContentTypes')]
     public function testForbidFormContentType(string $contentType): void
     {
         $middleware = new EnsureXHR();

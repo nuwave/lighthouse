@@ -4,14 +4,13 @@ namespace Tests\Integration;
 
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Filesystem\Filesystem;
-use Nuwave\Lighthouse\Exceptions\InvalidSchemaCacheContentsException;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Tests\TestCase;
 use Tests\TestsSchemaCache;
 use Tests\TestsSerialization;
 use Tests\Utils\Models\Comment;
 
-final class SchemaCachingTest extends TestCase
+final class SchemaCacheTest extends TestCase
 {
     use TestsSerialization;
     use TestsSchemaCache;
@@ -33,7 +32,7 @@ final class SchemaCachingTest extends TestCase
 
     public function testSchemaCachingWithUnionType(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: Foo @mock
         }
@@ -47,14 +46,14 @@ final class SchemaCachingTest extends TestCase
         type Color {
             id: ID
         }
-        ';
+        GRAPHQL;
         $this->cacheSchema();
 
         $comment = new Comment();
         $comment->comment = 'foo';
         $this->mockResolver($comment);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo {
                 ... on Comment {
@@ -62,7 +61,7 @@ final class SchemaCachingTest extends TestCase
                 }
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'foo' => [
                     'comment' => $comment->comment,
@@ -79,15 +78,16 @@ final class SchemaCachingTest extends TestCase
         $path = $config->get('lighthouse.schema_cache.path');
         $filesystem->put($path, '');
 
-        $this->expectExceptionObject(new InvalidSchemaCacheContentsException($path, 1));
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->expectException(\AssertionError::class);
+        $this->expectExceptionMessage("The schema cache file at {$path} is expected to return an array.");
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ');
+        GRAPHQL);
     }
 
-    protected function cacheSchema(): void
+    private function cacheSchema(): void
     {
         $astBuilder = $this->app->make(ASTBuilder::class);
         $astBuilder->documentAST();

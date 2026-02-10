@@ -9,11 +9,11 @@ use Tests\TestCase;
 
 final class ReportingErrorHandlerTest extends TestCase
 {
-    protected string $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ <<<'GRAPHQL'
     type Query {
         foo: ID @mock
     }
-    ';
+    GRAPHQL;
 
     public function testReportsNonClientSafeErrors(): void
     {
@@ -27,11 +27,11 @@ final class ReportingErrorHandlerTest extends TestCase
             ->with($exception);
         $this->app->singleton(ExceptionHandler::class, static fn (): MockObject => $handler);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ');
+        GRAPHQL);
     }
 
     public function testDoesNotReportClientSafeErrors(): void
@@ -46,10 +46,10 @@ final class ReportingErrorHandlerTest extends TestCase
             ->with($error);
         $this->app->singleton(ExceptionHandler::class, static fn (): MockObject => $handler);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ');
+        GRAPHQL);
     }
 }

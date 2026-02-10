@@ -14,9 +14,7 @@ class EndExecution
     public Carbon $moment;
 
     public function __construct(
-        /**
-         * The result of resolving a single operation.
-         */
+        /** The result of resolving a single operation. */
         public ExecutionResult $result,
     ) {
         $this->moment = Carbon::now();

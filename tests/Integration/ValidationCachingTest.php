@@ -6,7 +6,6 @@ use Illuminate\Cache\Events\KeyWritten;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
@@ -21,11 +20,11 @@ final class ValidationCachingTest extends TestCase
 
         $event = Event::fake();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'foo' => Foo::THE_ANSWER,
             ],
@@ -36,11 +35,11 @@ final class ValidationCachingTest extends TestCase
         $event->assertDispatchedTimes(KeyWritten::class, 1);
 
         // second request should be hit
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'foo' => Foo::THE_ANSWER,
             ],
@@ -59,34 +58,11 @@ final class ValidationCachingTest extends TestCase
 
         $event = Event::fake();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ')->assertExactJson([
-            'data' => [
-                'foo' => Foo::THE_ANSWER,
-            ],
-        ]);
-
-        $event->assertDispatchedTimes(CacheMissed::class, 0);
-        $event->assertDispatchedTimes(CacheHit::class, 0);
-        $event->assertDispatchedTimes(KeyWritten::class, 0);
-    }
-
-    public function testConfigMissing(): void
-    {
-        $config = $this->app->make(ConfigRepository::class);
-        $config->set('lighthouse.query_cache.enable', false);
-        $config->set('lighthouse.validation_cache', null);
-
-        $event = Event::fake();
-
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            foo
-        }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'foo' => Foo::THE_ANSWER,
             ],
@@ -105,11 +81,11 @@ final class ValidationCachingTest extends TestCase
 
         $event = Event::fake();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             bar
         }
-        ')->assertGraphQLErrorMessage('Cannot query field "bar" on type "Query".');
+        GRAPHQL)->assertGraphQLErrorMessage('Cannot query field "bar" on type "Query".');
 
         $event->assertDispatchedTimes(CacheMissed::class, 1);
         $event->assertDispatchedTimes(CacheHit::class, 0);
@@ -124,22 +100,22 @@ final class ValidationCachingTest extends TestCase
 
         $event = Event::fake();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'foo' => Foo::THE_ANSWER,
             ],
         ]);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
             foo
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'foo' => Foo::THE_ANSWER,
             ],
@@ -158,11 +134,11 @@ final class ValidationCachingTest extends TestCase
 
         $event = Event::fake();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'foo' => Foo::THE_ANSWER,
             ],
@@ -184,11 +160,11 @@ final class ValidationCachingTest extends TestCase
         $config->set('lighthouse.query_cache.enable', false);
         $config->set('lighthouse.validation_cache.enable', true);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'foo' => Foo::THE_ANSWER,
             ],
@@ -207,11 +183,11 @@ final class ValidationCachingTest extends TestCase
 
         $event = Event::fake();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'foo' => Foo::THE_ANSWER,
             ],
@@ -222,11 +198,10 @@ final class ValidationCachingTest extends TestCase
         $event->assertDispatchedTimes(KeyWritten::class, 1);
 
         $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
-type Query {
-  bar: String
-}
-
-GRAPHQL;
+        type Query {
+          bar: String
+        }
+        GRAPHQL;
         // refresh container, but keep the same cache
         $cacheFactory = $this->app->make(CacheFactory::class);
 
@@ -240,11 +215,11 @@ GRAPHQL;
         $config->set('lighthouse.query_cache.enable', false);
         $config->set('lighthouse.validation_cache.enable', true);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ')->assertGraphQLErrorMessage('Cannot query field "foo" on type "Query".');
+        GRAPHQL)->assertGraphQLErrorMessage('Cannot query field "foo" on type "Query".');
 
         $event->assertDispatchedTimes(CacheMissed::class, 2);
         $event->assertDispatchedTimes(CacheHit::class, 0);

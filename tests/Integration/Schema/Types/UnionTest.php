@@ -5,6 +5,7 @@ namespace Tests\Integration\Schema\Types;
 use GraphQL\Error\InvariantViolation;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
@@ -12,6 +13,7 @@ use Tests\Utils\Models\User;
 final class UnionTest extends DBTestCase
 {
     /** @dataProvider withAndWithoutCustomTypeResolver */
+    #[DataProvider('withAndWithoutCustomTypeResolver')]
     public function testResolveUnionTypes(string $schema, string $query): void
     {
         // This creates a user with it
@@ -60,18 +62,18 @@ final class UnionTest extends DBTestCase
         }
 GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            stuff {
-                ... on Foo {
-                    name
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+                {
+                    stuff {
+                        ... on Foo {
+                            name
+                        }
+                        ... on Post {
+                            title
+                        }
+                    }
                 }
-                ... on Post {
-                    title
-                }
-            }
-        }
-        ')->assertJsonStructure([
+        GRAPHQL)->assertJsonStructure([
             'data' => [
                 'stuff' => [
                     [
@@ -89,8 +91,7 @@ GRAPHQL;
     {
         $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ <<<GRAPHQL
         union Stuff = String
-
-GRAPHQL
+GRAPHQL . "\n",
         );
 
         $this->expectExceptionObject(new InvariantViolation(
@@ -126,18 +127,18 @@ GRAPHQL;
         $this->expectExceptionObject(
             TypeRegistry::unresolvableAbstractTypeMapping(User::class, ['Foo', 'Post']),
         );
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            stuff {
-                ... on Foo {
-                    name
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+                {
+                    stuff {
+                        ... on Foo {
+                            name
+                        }
+                        ... on Post {
+                            title
+                        }
+                    }
                 }
-                ... on Post {
-                    title
-                }
-            }
-        }
-        ');
+        GRAPHQL);
     }
 
     public function testThrowsOnNonOverlappingSchemaMapping(): void
@@ -167,15 +168,15 @@ GRAPHQL;
         $this->expectExceptionObject(
             TypeRegistry::unresolvableAbstractTypeMapping(User::class, []),
         );
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            stuff {
-                ... on Post {
-                    title
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+                {
+                    stuff {
+                        ... on Post {
+                            title
+                        }
+                    }
                 }
-            }
-        }
-        ');
+        GRAPHQL);
     }
 
     /** @return \Illuminate\Support\Collection<int, \Tests\Utils\Models\User|\Tests\Utils\Models\Post> */
@@ -204,13 +205,15 @@ GRAPHQL;
             : '';
 
         $customResolver = $withCustomTypeResolver
-            ? /** @lang GraphQL */ '@union(resolveType: "Tests\\\\Utils\\\\Unions\\\\CustomStuff@resolveType")'
+            ? /** @lang GraphQL */ <<<'GRAPHQL'
+            @union(resolveType: "Tests\\Utils\\Unions\\CustomStuff@resolveType")
+            GRAPHQL
             : '';
 
         $fetchResultsResolver = self::qualifyTestResolver('fetchResults');
 
         return [
-/** @lang GraphQL */ "
+/** @lang GraphQL */ <<<GRAPHQL
             union Stuff {$customResolver} = {$prefix}User | {$prefix}Post
 
             type {$prefix}User {
@@ -222,10 +225,10 @@ GRAPHQL;
             }
 
             type Query {
-                stuff: [Stuff!]! @field(resolver: \"{$fetchResultsResolver}\")
+                stuff: [Stuff!]! @field(resolver: "{$fetchResultsResolver}")
             }
-            ",
-/** @lang GraphQL */ "
+GRAPHQL,
+/** @lang GraphQL */ <<<GRAPHQL
             {
                 stuff {
                     ... on {$prefix}User {
@@ -236,7 +239,7 @@ GRAPHQL;
                     }
                 }
             }
-            ",
+GRAPHQL,
         ];
     }
 }

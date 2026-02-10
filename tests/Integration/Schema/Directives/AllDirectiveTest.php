@@ -22,7 +22,7 @@ final class AllDirectiveTest extends DBTestCase
         $count = 2;
         factory(User::class, $count)->create();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -30,15 +30,15 @@ final class AllDirectiveTest extends DBTestCase
         type Query {
             users: [User!]! @all
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users {
                 id
             }
         }
-        ')->assertJsonCount($count, 'data.users');
+        GRAPHQL)->assertJsonCount($count, 'data.users');
     }
 
     public function testExplicitModelName(): void
@@ -46,7 +46,7 @@ final class AllDirectiveTest extends DBTestCase
         $count = 2;
         factory(User::class, $count)->create();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Foo {
             id: ID!
         }
@@ -54,15 +54,15 @@ final class AllDirectiveTest extends DBTestCase
         type Query {
             foos: [Foo!]! @all(model: "User")
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foos {
                 id
             }
         }
-        ')->assertJsonCount($count, 'data.foos');
+        GRAPHQL)->assertJsonCount($count, 'data.foos');
     }
 
     public function testRenamedModelWithModelDirective(): void
@@ -70,7 +70,7 @@ final class AllDirectiveTest extends DBTestCase
         $count = 2;
         factory(User::class, $count)->create();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Foo @model(class: "User") {
             id: ID!
         }
@@ -78,25 +78,28 @@ final class AllDirectiveTest extends DBTestCase
         type Query {
             foos: [Foo!]! @all
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foos {
                 id
             }
         }
-        ')->assertJsonCount($count, 'data.foos');
+        GRAPHQL)->assertJsonCount($count, 'data.foos');
     }
 
     public function testGetAllAsNestedField(): void
     {
-        factory(Post::class, 2)->create([
-            // Do not create those, as they would create more users
-            'task_id' => 1,
-        ]);
+        factory(Post::class, 2)
+            ->create()
+            ->each(static function (Post $post): void {
+                // Do not create those, as they would create more users.
+                $post->task_id = 1;
+                $post->save();
+            });
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             posts: [Post!]! @all
         }
@@ -108,9 +111,9 @@ final class AllDirectiveTest extends DBTestCase
         type Query {
             users: [User!]! @all
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users {
                 posts {
@@ -118,7 +121,7 @@ final class AllDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'users' => [
                     [
@@ -151,7 +154,7 @@ final class AllDirectiveTest extends DBTestCase
         $users = factory(User::class, 3)->create();
         $userName = $users->first()->name;
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             name: String!
@@ -160,16 +163,16 @@ final class AllDirectiveTest extends DBTestCase
         type Query {
             users(name: String @neq): [User!]! @all
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ "
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         {
-            users(name: \"{$userName}\") {
+            users(name: "{$userName}") {
                 id
                 name
             }
         }
-        ")->assertJsonCount(2, 'data.users');
+        GRAPHQL)->assertJsonCount(2, 'data.users');
     }
 
     public function testSpecifyCustomBuilder(): void
@@ -188,13 +191,13 @@ final class AllDirectiveTest extends DBTestCase
         GRAPHQL;
 
         // The custom builder is supposed to change the sort order
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users {
                 id
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'users' => [
                     [
@@ -211,7 +214,7 @@ final class AllDirectiveTest extends DBTestCase
     public function testSpecifyCustomBuilderForRelation(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $posts = factory(Post::class, 2)->make();
         $user->posts()->saveMany($posts);
@@ -232,7 +235,7 @@ final class AllDirectiveTest extends DBTestCase
         GRAPHQL;
 
         // The custom builder is supposed to change the sort order
-        $this->graphQL(/** @lang GraphQL */ "
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         {
             user(id: {$user->id}) {
                 posts {
@@ -240,7 +243,7 @@ final class AllDirectiveTest extends DBTestCase
                 }
             }
         }
-        ")->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'user' => [
                     'posts' => [
@@ -261,7 +264,7 @@ final class AllDirectiveTest extends DBTestCase
         $this->setUpScoutEngine();
 
         $post = factory(Post::class)->create();
-        assert($post instanceof Post);
+        $this->assertInstanceOf(Post::class, $post);
 
         $this->engine->shouldReceive('map')
             ->withArgs(static fn (ScoutBuilder $builder): bool => $builder->wheres === ['id' => "{$post->id}"]
@@ -281,13 +284,13 @@ final class AllDirectiveTest extends DBTestCase
         }
 GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($id: ID!) {
             posts(id: $id) {
                 id
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $post->id,
         ])->assertJson([
             'data' => [

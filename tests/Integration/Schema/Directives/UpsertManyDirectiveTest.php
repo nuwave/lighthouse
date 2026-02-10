@@ -16,12 +16,12 @@ final class UpsertManyDirectiveTest extends DBTestCase
         factory(User::class)->create();
 
         $task = factory(Task::class)->create();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->id = 1;
         $task->name = 'old';
         $task->save();
 
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Mutation {
             updateUser(input: UpdateUserInput! @spread): User @update
         }
@@ -46,9 +46,9 @@ final class UpsertManyDirectiveTest extends DBTestCase
             id: Int
             name: String
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             updateUser(input: {
                 id: 1
@@ -71,7 +71,7 @@ final class UpsertManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'updateUser' => [
                     'name' => 'foo',
@@ -94,7 +94,7 @@ final class UpsertManyDirectiveTest extends DBTestCase
     {
         factory(User::class)->create();
 
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Mutation {
             updateUser(input: UpdateUserInput! @spread): User @update
         }
@@ -119,9 +119,9 @@ final class UpsertManyDirectiveTest extends DBTestCase
             id: Int
             name: String
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             updateUser(input: {
                 id: 1
@@ -140,7 +140,8 @@ final class UpsertManyDirectiveTest extends DBTestCase
                     name
                 }
             }
-        }')->assertJson([
+        }
+        GRAPHQL)->assertJson([
             'data' => [
                 'updateUser' => [
                     'name' => 'foo',
@@ -180,7 +181,7 @@ final class UpsertManyDirectiveTest extends DBTestCase
         }
 GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             upsertUsers(inputs: [
                 {
@@ -196,7 +197,7 @@ GRAPHQL;
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'upsertUsers' => [
                     [

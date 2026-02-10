@@ -16,15 +16,15 @@ final class RedisStorageManagerTest extends TestCase
     use EnablesSubscriptionServiceProvider;
 
     protected string $schema = /** @lang GraphQL */ <<<'GRAPHQL'
-    type Task {
-        id: ID!
-        name: String!
-    }
-
-    type Subscription {
-        taskUpdated(id: ID!): Task
-        taskCreated: Task
-    }
+        type Task {
+            id: ID!
+            name: String!
+        }
+    
+        type Subscription {
+            taskUpdated(id: ID!): Task
+            taskCreated: Task
+        }
     GRAPHQL . self::PLACEHOLDER_QUERY;
 
     public function testSubscriptionStoredWithPrefix(): void
@@ -111,15 +111,17 @@ final class RedisStorageManagerTest extends TestCase
     }
 
     /** @param  array<string, mixed>  $headers */
-    protected function querySubscription(string $topic = /** @lang GraphQL */ 'taskUpdated(id: 123)', array $headers = []): TestResponse
+    private function querySubscription(string $topic = /** @lang GraphQL */ <<<'GRAPHQL'
+    taskUpdated(id: 123)
+    GRAPHQL, array $headers = []): TestResponse
     {
-        return $this->graphQL(/** @lang GraphQL */ "
+        return $this->graphQL(/** @lang GraphQL */ query: "
         subscription {
             {$topic} {
                 id
                 name
             }
         }
-        ", [], [], $headers);
+        ", headers: $headers);
     }
 }

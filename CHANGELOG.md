@@ -13,6 +13,105 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Override the default field resolver `GraphQL\Executor\Executor::defaultFieldResolver()` with `Nuwave\Lighthouse\LighthouseServiceProvider::defaultFieldResolver()` https://github.com/nuwave/lighthouse/pull/2693
 
+## v6.64.3
+
+### Fixed
+
+- Fix `upsert` for `HasOne` creating a new record instead of updating when no `id` is provided in the input https://github.com/nuwave/lighthouse/pull/2742
+- Throw error when using `create` on `HasOne` relation when a related model already exists https://github.com/nuwave/lighthouse/pull/2742
+
+## v6.64.2
+
+### Fixed
+
+- Use `String` type for `HAS.condition.column` in `@whereConditions` instead of incorrectly inheriting the parent's column enum type https://github.com/nuwave/lighthouse/pull/2725
+
+## v6.64.1
+
+### Fixed
+
+- Handle explicit `null` for `page` argument in paginated queries https://github.com/nuwave/lighthouse/pull/2735
+
+## v6.64.0
+
+### Added
+
+- Support PHPUnit 12 with `Nuwave\Lighthouse\Testing\MocksResolvers` https://github.com/nuwave/lighthouse/pull/2730
+
+## v6.63.2
+
+### Fixed
+
+- Make Automatic Persisted Queries work with hybrid cache mode https://github.com/nuwave/lighthouse/pull/2727
+
+## v6.63.1
+
+### Fixed
+
+- Use atomic file writes for query cache https://github.com/nuwave/lighthouse/pull/2716
+
+## v6.63.0
+
+### Added
+
+- Add a file based query cache to leverage OPcache for improved performance https://github.com/nuwave/lighthouse/pull/2713
+
+### Deprecated
+
+- Deprecate command `lighthouse:clear-cache` in favor of `lighthouse:clear-schema-cache` https://github.com/nuwave/lighthouse/pull/2713
+
+## v6.62.3
+
+### Fixed
+
+- Allow serializing any `DateTimeInterface` instance in date scalars https://github.com/nuwave/lighthouse/pull/2711
+
+## v6.62.2
+
+### Changed
+
+- Simplify cache configuration access https://github.com/nuwave/lighthouse/pull/2706
+
+## v6.62.1
+
+### Fixed
+
+- Write schema cache to temporary file before atomically updating it https://github.com/nuwave/lighthouse/pull/2703
+
+## v6.62.0
+
+### Changed
+
+- Refresh schema cache lazily when GraphQL requests are made through `MakesGraphQLRequests` https://github.com/nuwave/lighthouse/pull/2702
+
+### Deprecated
+
+- Deprecate Lumen support https://github.com/nuwave/lighthouse/pull/2702
+
+## v6.61.1
+
+### Fixed
+
+- Improve `@can` directive docs https://github.com/nuwave/lighthouse/commit/70bea571382dae21165d81887fc4a9c0bdb91dee
+
+## v6.61.0
+
+### Added
+
+- Add option `--sort` to command `lighthouse:print-schema` https://github.com/nuwave/lighthouse/pull/2696
+
+## v6.60.0
+
+### Changed
+
+- Allow combining `@lazyLoad` and `@paginate` https://github.com/nuwave/lighthouse/pull/2695
+
+## v6.59.0
+
+### Added
+
+- Add method `ASTCache::path()` https://github.com/nuwave/lighthouse/pull/2694
+
 ## v6.58.0
 
 ### Changed
@@ -1710,7 +1809,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Apply error handling and debug settings consistently https://github.com/nuwave/lighthouse/pull/1749
 - Fix typo `comparision` to `comparison` in generated input types for `@whereHas`
-- Fix redis `mget` being called with an empty list of subscriber ids https://github.com/nuwave/lighthouse/pull/1759
+- Fix redis `mget` being called with an empty list of subscriber IDs https://github.com/nuwave/lighthouse/pull/1759
 - Fix `lighthouse:clear-cache` not clearing cache when a custom cache store is used https://github.com/nuwave/lighthouse/pull/1788
 - Fix subscription storage in redis for predis users https://github.com/nuwave/lighthouse/pull/1814
 - Prepend rule arguments that refer to other arguments with the full path https://github.com/nuwave/lighthouse/pull/1739
@@ -2302,7 +2401,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Fixed
 
-- Fix broken behaviour when using union types with schema caching https://github.com/nuwave/lighthouse/pull/1015
+- Fix broken behavior when using union types with schema caching https://github.com/nuwave/lighthouse/pull/1015
 
 ## v4.4.2
 
@@ -2459,7 +2558,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
   can be used to change the argument name https://github.com/nuwave/lighthouse/pull/852
 - Rename `ArgValidationDirective` to `ProvidesRules` and drop `get` prefix from the methods within https://github.com/nuwave/lighthouse/pull/846
 - Make the argument used for finding a model to check `@can` against configurable.
-  The previous behaviour of implicitly using the `id` argument for finding a specific
+  The previous behavior of implicitly using the `id` argument for finding a specific
   model to authorize against now no longer works. https://github.com/nuwave/lighthouse/pull/856
 - Change the `Nuwave\Lighthouse\Schema\Types\LaravelEnumType` wrapper to map
   to Enum instances internally https://github.com/nuwave/lighthouse/pull/908

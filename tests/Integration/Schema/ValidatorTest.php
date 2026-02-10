@@ -10,7 +10,7 @@ final class ValidatorTest extends TestCase
 {
     public function testOutputTypeUsedAsInput(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(foo: Foo): Int
         }
@@ -18,7 +18,7 @@ final class ValidatorTest extends TestCase
         type Foo {
             foo: Int
         }
-        ';
+        GRAPHQL;
 
         $schemaValidator = $this->app->make(SchemaValidator::class);
 

@@ -45,7 +45,6 @@
     "require-dev": {
         "algolia/algoliasearch-client-php": "^3",
         "bensampo/laravel-enum": "^5 || ^6",
-        "dms/phpunit-arraysubset-asserts": "^0.4 || ^0.5 || dev-add-phpunit-11-support",
         "ergebnis/composer-normalize": "^2.2.2",
         "fakerphp/faker": "^1.21",
         "google/protobuf": "^3.21",
@@ -55,7 +54,7 @@
         "laravel/pennant": "^1",
         "laravel/scout": "^8 || ^9 || ^10",
         "mattiasgeniar/phpunit-query-count-assertions": "^1.1",
-        "mll-lab/graphql-php-scalars": "^6",
+        "mll-lab/graphql-php-scalars": "^6.4.1",
         "mll-lab/php-cs-fixer-config": "^5",
         "mockery/mockery": "^1.5",
         "nesbot/carbon": "^2.62.1 || ^3.8.4",
@@ -65,7 +64,7 @@
         "phpstan/phpstan": "^1.12.18 || ^2",
         "phpstan/phpstan-mockery": "^1.1.3 || ^2",
         "phpstan/phpstan-phpunit": "^1.1.1 || ^2",
-        "phpunit/phpunit": "^9.6.4 || ^10 || ^11",
+        "phpunit/phpunit": "^9.6.4 || ^10 || ^11 || ^12",
         "predis/predis": "^1.1 || ^2.1",
         "pusher/pusher-php-server": "^5 || ^6 || ^7.0.2",
         "rector/rector": "^1 || ^2",
@@ -80,12 +79,6 @@
         "mll-lab/laravel-graphiql": "A graphical interactive in-browser GraphQL IDE - integrated with Laravel",
         "pusher/pusher-php-server": "Required when using the Pusher Subscriptions driver"
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/pieterocp/phpunit-arraysubset-asserts"
-        }
-    ],
     "minimum-stability": "dev",
     "prefer-stable": true,
     "autoload": {
@@ -97,10 +90,7 @@
         "psr-4": {
             "Benchmarks\\": "benchmarks/",
             "Tests\\": "tests/"
-        },
-        "files": [
-            "vendor/dms/phpunit-arraysubset-asserts/src/ArraySubsetAsserts.php"
-        ]
+        }
     },
     "config": {
         "allow-plugins": {

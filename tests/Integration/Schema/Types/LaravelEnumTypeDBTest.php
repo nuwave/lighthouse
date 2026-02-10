@@ -21,7 +21,7 @@ final class LaravelEnumTypeDBTest extends DBTestCase
 
     public function testUseLaravelEnumType(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             withEnum(type: AOrB @eq): WithEnum @find
         }
@@ -33,7 +33,7 @@ final class LaravelEnumTypeDBTest extends DBTestCase
         type WithEnum {
             type: AOrB
         }
-        ';
+        GRAPHQL;
 
         $this->typeRegistry->register(
             new LaravelEnumType(AOrB::class),
@@ -43,27 +43,27 @@ final class LaravelEnumTypeDBTest extends DBTestCase
             'type' => 'A',
         ];
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createWithEnum(type: A) {
                 type
             }
         }
-        ')->assertJsonFragment($typeA);
+        GRAPHQL)->assertJsonFragment($typeA);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             withEnum(type: A) {
                 type
             }
         }
-        ')->assertJsonFragment($typeA);
+        GRAPHQL)->assertJsonFragment($typeA);
     }
 
     public function testWhereJsonContainsUsingEnumType(): void
     {
         // We use the "name" field to store the "type" JSON
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             withEnum(
                 type: AOrB @whereJsonContains(key: "name")
@@ -73,7 +73,7 @@ final class LaravelEnumTypeDBTest extends DBTestCase
         type WithEnum {
             name: String
         }
-        ';
+        GRAPHQL;
 
         $this->typeRegistry->register(
             new LaravelEnumType(AOrB::class),
@@ -85,13 +85,13 @@ final class LaravelEnumTypeDBTest extends DBTestCase
         $withEnum->name = $encodedType;
         $withEnum->save();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             withEnum(type: A) {
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'withEnum' => [
                     'name' => $encodedType,
@@ -102,7 +102,7 @@ final class LaravelEnumTypeDBTest extends DBTestCase
 
     public function testScopeUsingEnumType(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             withEnum(
                 byType: AOrB @scope
@@ -112,7 +112,7 @@ final class LaravelEnumTypeDBTest extends DBTestCase
         type WithEnum {
             type: AOrB
         }
-        ';
+        GRAPHQL;
 
         $this->typeRegistry->register(
             new LaravelEnumType(AOrB::class),
@@ -124,13 +124,13 @@ final class LaravelEnumTypeDBTest extends DBTestCase
         $withEnum->type = $a;
         $withEnum->save();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($type: AOrB) {
             withEnum(byType: $type) {
                 type
             }
         }
-        ', [
+        GRAPHQL, [
             'type' => $a->key,
         ])->assertJson([
             'data' => [

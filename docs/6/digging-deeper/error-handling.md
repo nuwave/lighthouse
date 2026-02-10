@@ -89,7 +89,7 @@ final class CustomException extends Exception implements ClientAware, ProvidesEx
 }
 ```
 
-Now you can just throw that Exception somewhere in your code, for example your resolver,
+Now you can throw that Exception somewhere in your code, for example in your resolver,
 and it will display additional error output.
 
 ```php

@@ -18,7 +18,7 @@ Popular client libraries such as Apollo provide out-of-the-box caching if you fo
 
 ## Retrieving Models
 
-Instead of defining your own resolver manually, you can just rely on Lighthouse to build the Query for you.
+Instead of defining your own resolver manually, you can rely on Lighthouse to build the Query for you.
 
 ```graphql
 type Query {

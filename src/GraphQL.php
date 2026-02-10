@@ -21,6 +21,7 @@ use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Cache\QueryCache;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
 use Nuwave\Lighthouse\Events\EndExecution;
 use Nuwave\Lighthouse\Events\EndOperationOrOperations;
@@ -61,6 +62,7 @@ class GraphQL
         protected ProvidesValidationRules $providesValidationRules,
         protected GraphQLHelper $graphQLHelper,
         protected ConfigRepository $configRepository,
+        protected QueryCache $queryCache,
     ) {}
 
     /**
@@ -281,20 +283,12 @@ class GraphQL
      */
     public function parse(string $query, string $hash): DocumentNode
     {
-        $cacheConfig = $this->configRepository->get('lighthouse.query_cache');
-
-        if (! $cacheConfig['enable']) {
-            return $this->parseQuery($query);
-        }
-
-        $cacheFactory = Container::getInstance()->make(CacheFactory::class);
-        $store = $cacheFactory->store($cacheConfig['store']);
-
-        return $store->remember(
-            "lighthouse:query:{$hash}",
-            $cacheConfig['ttl'],
-            fn (): DocumentNode => $this->parseQuery($query),
-        );
+        return $this->queryCache->isEnabled()
+            ? $this->queryCache->fromCacheOrParse(
+                $hash,
+                fn (): DocumentNode => $this->parseQuery($query),
+            )
+            : $this->parseQuery($query);
     }
 
     /**
@@ -319,21 +313,19 @@ class GraphQL
     public function loadPersistedQuery(string $sha256hash): DocumentNode
     {
         $lighthouseConfig = $this->configRepository->get('lighthouse');
-        $cacheConfig = $lighthouseConfig['query_cache'] ?? null;
         if (
-            ! ($lighthouseConfig['persisted_queries'] ?? false)
-            || ! ($cacheConfig['enable'] ?? false)
+            ! $lighthouseConfig['persisted_queries']
+            || ! $this->queryCache->isEnabled()
         ) {
             // https://github.com/apollographql/apollo-server/blob/37a5c862261806817a1d71852c4e1d9cdb59eab2/packages/apollo-server-errors/src/index.ts#L240-L248
-            throw new Error('PersistedQueryNotSupported', null, null, [], null, null, ['code' => 'PERSISTED_QUERY_NOT_SUPPORTED']);
+            throw new Error(message: 'PersistedQueryNotSupported', extensions: ['code' => 'PERSISTED_QUERY_NOT_SUPPORTED']);
         }
 
-        $cacheFactory = Container::getInstance()->make(CacheFactory::class);
-        $store = $cacheFactory->store($cacheConfig['store']);
-
-        return $store->get("lighthouse:query:{$sha256hash}")
+        return $this->queryCache->fromCacheOrParse(
+            hash: $sha256hash,
             // https://github.com/apollographql/apollo-server/blob/37a5c862261806817a1d71852c4e1d9cdb59eab2/packages/apollo-server-errors/src/index.ts#L230-L239
-            ?? throw new Error('PersistedQueryNotFound', null, null, [], null, null, ['code' => 'PERSISTED_QUERY_NOT_FOUND']);
+            parse: fn () => throw new Error(message: 'PersistedQueryNotFound', extensions: ['code' => 'PERSISTED_QUERY_NOT_FOUND']),
+        );
     }
 
     /** @return ErrorsHandler */
@@ -407,17 +399,17 @@ class GraphQL
             return DocumentValidator::validate($schema, $query, $validationRules); // @phpstan-ignore return.type (TODO remove ignore when requiring a newer version of webonyx/graphql-php)
         }
 
-        $cacheConfig = $this->configRepository->get('lighthouse.validation_cache');
+        $validationCacheConfig = $this->configRepository->get('lighthouse.validation_cache');
 
-        if (! isset($cacheConfig['enable']) || ! $cacheConfig['enable']) {
+        if (! $validationCacheConfig['enable']) {
             return DocumentValidator::validate($schema, $query, $validationRules); // @phpstan-ignore return.type (TODO remove ignore when requiring a newer version of webonyx/graphql-php)
         }
 
+        $cacheFactory = Container::getInstance()->make(CacheFactory::class);
+        $store = $cacheFactory->store($validationCacheConfig['store']);
+
         $cacheKey = "lighthouse:validation:{$schemaHash}:{$queryHash}";
 
-        $cacheFactory = Container::getInstance()->make(CacheFactory::class);
-
-        $store = $cacheFactory->store($cacheConfig['store']);
         $cachedResult = $store->get($cacheKey);
         if ($cachedResult !== null) {
             return $cachedResult;
@@ -432,7 +424,7 @@ class GraphQL
             return $result; // @phpstan-ignore return.type (TODO remove ignore when requiring a newer version of webonyx/graphql-php)
         }
 
-        $store->put($cacheKey, $result, $cacheConfig['ttl']);
+        $store->put($cacheKey, $result, $validationCacheConfig['ttl']);
 
         return $result;
     }

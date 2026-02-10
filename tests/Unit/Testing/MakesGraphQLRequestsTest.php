@@ -32,26 +32,26 @@ final class MakesGraphQLRequestsTest extends TestCase
             throw $error;
         });
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: ID @mock
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ')->assertGraphQLError($error);
+        GRAPHQL)->assertGraphQLError($error);
 
         $this->rethrowGraphQLErrors();
 
         $this->expectExceptionObject($error);
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ');
+        GRAPHQL);
     }
 
     public function testGraphQLWithHeaders(): void
@@ -62,22 +62,24 @@ final class MakesGraphQLRequestsTest extends TestCase
             $request = $this->app->make(Request::class);
         });
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: ID @mock
         }
-        ';
+        GRAPHQL;
 
         $key = 'foo';
         $value = 'bar';
 
         $this->graphQL(
             /** @lang GraphQL */
-            '
+            <<<'GRAPHQL'
+
             {
                 foo
             }
-            ',
+            
+            GRAPHQL,
             [],
             [],
             [$key => $value],

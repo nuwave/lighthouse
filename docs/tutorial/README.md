@@ -5,7 +5,7 @@ sidebar: auto
 # Tutorial
 
 This is an introductory tutorial for building a GraphQL server with Lighthouse.
-While we try to keep it beginner friendly, we recommend familiarizing yourself
+While we try to keep it beginner-friendly, we recommend familiarizing yourself
 with [GraphQL](https://graphql.org) and [Laravel](https://laravel.com) first.
 
 The source code of the finished project is available at [nuwave/lighthouse-tutorial](https://github.com/nuwave/lighthouse-tutorial).
@@ -25,7 +25,7 @@ makes it easier to evolve APIs over time, and enables powerful developer tools.
 
 GraphQL has been released only as a [_specification_](https://facebook.github.io/graphql).
 This means that GraphQL is in fact not more than a long document that describes in detail
-the behaviour of a GraphQL server.
+the behavior of a GraphQL server.
 
 GraphQL has its own type system that’s used to define the schema of an API.
 The syntax for writing schemas is called [Schema Definition Language](https://www.prisma.io/blog/graphql-sdl-schema-definition-language-6755bcb9ce51) or short **SDL**.
@@ -386,11 +386,9 @@ Visit `/graphiql` and try the following query:
 }
 ```
 
-You should get a list of all the posts in your database,
-together with all of its comments and the name of the author.
+You should get a list of all the posts in your database, together with all of its comments and the name of the author.
 
-Hopefully, this example showed you a glimpse of the power of GraphQL
-and how you can serve your own GraphQL API with Lighthouse.
+Hopefully, this example could demonstrate the power of GraphQL and how you can serve your own GraphQL API with Lighthouse.
 
 ## Next Steps
 

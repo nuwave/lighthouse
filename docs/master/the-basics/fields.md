@@ -69,7 +69,7 @@ This query will return the following response:
 ## Fields with arguments
 
 As we learned, _every_ field has a resolver function associated with it.
-Just like functions, fields can take arguments to control their behaviour.
+Just like functions, fields can take arguments to control their behavior.
 
 Let's construct a query that greets the user. We add a required argument `name`
 that is used to construct the greeting.

@@ -34,9 +34,7 @@ class RelationBatchLoader
     /**
      * Schedule loading a relation off of a concrete model.
      *
-     * This returns effectively a promise that will resolve to
-     * the result of loading the relation.
-     *
+     * This returns what is essentially a promise that resolves to the result of loading the relation.
      * As a side effect, the model will then hold the relation.
      */
     public function load(Model $model): Deferred

@@ -13,19 +13,19 @@ final class MorphToDirectiveTest extends DBTestCase
     public function testResolveMorphToRelationship(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->user()->associate($user);
         $task->save();
 
         $image = factory(Image::class)->make();
-        assert($image instanceof Image);
+        $this->assertInstanceOf(Image::class, $image);
         $image->imageable()->associate($task);
         $image->save();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Image {
             id: ID!
             imageable: Task! @morphTo
@@ -41,9 +41,9 @@ final class MorphToDirectiveTest extends DBTestCase
                 id: ID! @eq
             ): Image @find
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($id: ID!) {
             image(id: $id) {
                 id
@@ -53,7 +53,7 @@ final class MorphToDirectiveTest extends DBTestCase
                 }
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $image->id,
         ])->assertJson([
             'data' => [
@@ -71,19 +71,19 @@ final class MorphToDirectiveTest extends DBTestCase
     public function testResolveMorphToWithCustomName(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->user()->associate($user);
         $task->save();
 
         $image = factory(Image::class)->make();
-        assert($image instanceof Image);
+        $this->assertInstanceOf(Image::class, $image);
         $image->imageable()->associate($task);
         $image->save();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Image {
             id: ID!
             customImageable: Task! @morphTo(relation: "imageable")
@@ -99,9 +99,9 @@ final class MorphToDirectiveTest extends DBTestCase
                 id: ID! @eq
             ): Image @find
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($id: ID!) {
             image(id: $id) {
                 id
@@ -111,7 +111,7 @@ final class MorphToDirectiveTest extends DBTestCase
                 }
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $image->id,
         ])->assertJson([
             'data' => [
@@ -129,29 +129,29 @@ final class MorphToDirectiveTest extends DBTestCase
     public function testResolveMorphToUsingInterfaces(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->user()->associate($user);
         $task->save();
 
         $image = factory(Image::class)->make();
-        assert($image instanceof Image);
+        $this->assertInstanceOf(Image::class, $image);
         $image->imageable()->associate($task);
         $image->save();
 
         $post = factory(Post::class)->make();
-        assert($post instanceof Post);
-        $post->user()->associate($user->id);
+        $this->assertInstanceOf(Post::class, $post);
+        $post->user()->associate($user);
         $post->save();
 
         $postImage = factory(Image::class)->make();
-        assert($postImage instanceof Image);
+        $this->assertInstanceOf(Image::class, $postImage);
         $postImage->imageable()->associate($post);
         $postImage->save();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         interface Imageable {
             id: ID!
         }
@@ -176,9 +176,9 @@ final class MorphToDirectiveTest extends DBTestCase
                 id: ID! @eq
             ): Image @find
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($taskImage: ID!, $postImage: ID!) {
             taskImage: image(id: $taskImage) {
                 id
@@ -207,7 +207,7 @@ final class MorphToDirectiveTest extends DBTestCase
                 }
             }
         }
-        ', [
+        GRAPHQL, [
             'taskImage' => $image->id,
             'postImage' => $postImage->id,
         ])->assertJson([
@@ -235,29 +235,29 @@ final class MorphToDirectiveTest extends DBTestCase
         config(['lighthouse.shortcut_foreign_key_selection' => true]);
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->user()->associate($user);
         $task->save();
 
         $image = factory(Image::class)->make();
-        assert($image instanceof Image);
+        $this->assertInstanceOf(Image::class, $image);
         $image->imageable()->associate($task);
         $image->save();
 
         $post = factory(Post::class)->make();
-        assert($post instanceof Post);
-        $post->user()->associate($user->id);
+        $this->assertInstanceOf(Post::class, $post);
+        $post->user()->associate($user);
         $post->save();
 
         $postImage = factory(Image::class)->make();
-        assert($postImage instanceof Image);
+        $this->assertInstanceOf(Image::class, $postImage);
         $postImage->imageable()->associate($post);
         $postImage->save();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         interface Imageable {
             id: ID!
         }
@@ -282,10 +282,10 @@ final class MorphToDirectiveTest extends DBTestCase
                 id: ID! @eq
             ): Image @find
         }
-        ';
+        GRAPHQL;
 
         $this->assertQueryCountMatches(2, function () use ($image, $postImage, $task, $post): void {
-            $this->graphQL(/** @lang GraphQL */ '
+            $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
                 query ($taskImage: ID!, $postImage: ID!) {
                     taskImage: image(id: $taskImage) {
                         id
@@ -310,7 +310,7 @@ final class MorphToDirectiveTest extends DBTestCase
                         }
                     }
                 }
-            ', [
+            GRAPHQL, [
                 'taskImage' => $image->id,
                 'postImage' => $postImage->id,
             ])->assertJson([
@@ -337,29 +337,29 @@ final class MorphToDirectiveTest extends DBTestCase
         config(['lighthouse.shortcut_foreign_key_selection' => true]);
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->user()->associate($user);
         $task->save();
 
         $image = factory(Image::class)->make();
-        assert($image instanceof Image);
+        $this->assertInstanceOf(Image::class, $image);
         $image->imageable()->associate($task);
         $image->save();
 
         $post = factory(Post::class)->make();
-        assert($post instanceof Post);
-        $post->user()->associate($user->id);
+        $this->assertInstanceOf(Post::class, $post);
+        $post->user()->associate($user);
         $post->save();
 
         $postImage = factory(Image::class)->make();
-        assert($postImage instanceof Image);
+        $this->assertInstanceOf(Image::class, $postImage);
         $postImage->imageable()->associate($post);
         $postImage->save();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         interface Imageable {
             id: ID!
         }
@@ -384,10 +384,10 @@ final class MorphToDirectiveTest extends DBTestCase
                 id: ID! @eq
             ): Image @find
         }
-        ';
+        GRAPHQL;
 
         $this->assertQueryCountMatches(2, function () use ($image, $postImage, $task, $post): void {
-            $this->graphQL(/** @lang GraphQL */ '
+            $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
                 query ($taskImage: ID!, $postImage: ID!) {
                     taskImage: image(id: $taskImage) {
                         id
@@ -414,7 +414,7 @@ final class MorphToDirectiveTest extends DBTestCase
                         }
                     }
                 }
-            ', [
+            GRAPHQL, [
                 'taskImage' => $image->id,
                 'postImage' => $postImage->id,
             ])->assertJson([
@@ -441,29 +441,29 @@ final class MorphToDirectiveTest extends DBTestCase
     public function testResolveMorphToUsingUnions(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->user()->associate($user);
         $task->save();
 
         $image = factory(Image::class)->make();
-        assert($image instanceof Image);
+        $this->assertInstanceOf(Image::class, $image);
         $image->imageable()->associate($task);
         $image->save();
 
         $post = factory(Post::class)->make();
-        assert($post instanceof Post);
-        $post->user()->associate($user->id);
+        $this->assertInstanceOf(Post::class, $post);
+        $post->user()->associate($user);
         $post->save();
 
         $postImage = factory(Image::class)->make();
-        assert($postImage instanceof Image);
+        $this->assertInstanceOf(Image::class, $postImage);
         $postImage->imageable()->associate($post);
         $postImage->save();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         union Imageable = Task | Post
 
         type Task {
@@ -486,9 +486,9 @@ final class MorphToDirectiveTest extends DBTestCase
                 id: ID! @eq
             ): Image @find
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($taskImage: ID!, $postImage: ID!) {
             taskImage: image(id: $taskImage) {
                 id
@@ -519,7 +519,7 @@ final class MorphToDirectiveTest extends DBTestCase
                 }
             }
         }
-        ', [
+        GRAPHQL, [
             'taskImage' => $image->id,
             'postImage' => $postImage->id,
         ])->assertJson([
@@ -549,29 +549,29 @@ final class MorphToDirectiveTest extends DBTestCase
         config(['lighthouse.shortcut_foreign_key_selection' => true]);
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->user()->associate($user);
         $task->save();
 
         $image = factory(Image::class)->make();
-        assert($image instanceof Image);
+        $this->assertInstanceOf(Image::class, $image);
         $image->imageable()->associate($task);
         $image->save();
 
         $post = factory(Post::class)->make();
-        assert($post instanceof Post);
-        $post->user()->associate($user->id);
+        $this->assertInstanceOf(Post::class, $post);
+        $post->user()->associate($user);
         $post->save();
 
         $postImage = factory(Image::class)->make();
-        assert($postImage instanceof Image);
+        $this->assertInstanceOf(Image::class, $postImage);
         $postImage->imageable()->associate($post);
         $postImage->save();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         union Imageable = Task | Post
 
         type Task {
@@ -594,10 +594,10 @@ final class MorphToDirectiveTest extends DBTestCase
                 id: ID! @eq
             ): Image @find
         }
-        ';
+        GRAPHQL;
 
         $this->assertQueryCountMatches(2, function () use ($image, $postImage, $task, $post): void {
-            $this->graphQL(/** @lang GraphQL */ '
+            $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
                 query ($taskImage: ID!, $postImage: ID!) {
                     taskImage: image(id: $taskImage) {
                         id
@@ -622,7 +622,7 @@ final class MorphToDirectiveTest extends DBTestCase
                         }
                     }
                 }
-            ', [
+            GRAPHQL, [
                 'taskImage' => $image->id,
                 'postImage' => $postImage->id,
             ])->assertJson([
@@ -649,29 +649,29 @@ final class MorphToDirectiveTest extends DBTestCase
         config(['lighthouse.shortcut_foreign_key_selection' => true]);
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->user()->associate($user);
         $task->save();
 
         $image = factory(Image::class)->make();
-        assert($image instanceof Image);
+        $this->assertInstanceOf(Image::class, $image);
         $image->imageable()->associate($task);
         $image->save();
 
         $post = factory(Post::class)->make();
-        assert($post instanceof Post);
-        $post->user()->associate($user->id);
+        $this->assertInstanceOf(Post::class, $post);
+        $post->user()->associate($user);
         $post->save();
 
         $postImage = factory(Image::class)->make();
-        assert($postImage instanceof Image);
+        $this->assertInstanceOf(Image::class, $postImage);
         $postImage->imageable()->associate($post);
         $postImage->save();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         union Imageable = Task | Post
 
         type Task {
@@ -694,10 +694,10 @@ final class MorphToDirectiveTest extends DBTestCase
                 id: ID! @eq
             ): Image @find
         }
-        ';
+        GRAPHQL;
 
         $this->assertQueryCountMatches(2, function () use ($image, $postImage, $task, $post): void {
-            $this->graphQL(/** @lang GraphQL */ '
+            $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
                 query ($taskImage: ID!, $postImage: ID!) {
                     taskImage: image(id: $taskImage) {
                         id
@@ -724,7 +724,7 @@ final class MorphToDirectiveTest extends DBTestCase
                         }
                     }
                 }
-            ', [
+            GRAPHQL, [
                 'taskImage' => $image->id,
                 'postImage' => $postImage->id,
             ])->assertJson([
@@ -753,29 +753,29 @@ final class MorphToDirectiveTest extends DBTestCase
         config(['lighthouse.shortcut_foreign_key_selection' => true]);
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->user()->associate($user);
         $task->save();
 
         $image = factory(Image::class)->make();
-        assert($image instanceof Image);
+        $this->assertInstanceOf(Image::class, $image);
         $image->imageable()->associate($task);
         $image->save();
 
         $post = factory(Post::class)->make();
-        assert($post instanceof Post);
-        $post->user()->associate($user->id);
+        $this->assertInstanceOf(Post::class, $post);
+        $post->user()->associate($user);
         $post->save();
 
         $postImage = factory(Image::class)->make();
-        assert($postImage instanceof Image);
+        $this->assertInstanceOf(Image::class, $postImage);
         $postImage->imageable()->associate($post);
         $postImage->save();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         union Imageable = Task | Post
 
         type Task {
@@ -798,10 +798,10 @@ final class MorphToDirectiveTest extends DBTestCase
                 id: ID! @eq
             ): Image @find
         }
-        ';
+        GRAPHQL;
 
         $this->assertQueryCountMatches(4, function () use ($image, $postImage, $task, $post): void {
-            $this->graphQL(/** @lang GraphQL */ '
+            $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
                 query ($taskImage: ID!, $postImage: ID!) {
                     taskImage: image(id: $taskImage) {
                         id
@@ -830,7 +830,7 @@ final class MorphToDirectiveTest extends DBTestCase
                         }
                     }
                 }
-            ', [
+            GRAPHQL, [
                 'taskImage' => $image->id,
                 'postImage' => $postImage->id,
             ])->assertJson([
@@ -859,19 +859,19 @@ final class MorphToDirectiveTest extends DBTestCase
         config(['lighthouse.shortcut_foreign_key_selection' => true]);
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->user()->associate($user);
         $task->save();
 
         $image = factory(Image::class)->make();
-        assert($image instanceof Image);
+        $this->assertInstanceOf(Image::class, $image);
         $image->imageable()->associate($task);
         $image->save();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Image {
             id: ID!
             imageable: Task! @morphTo
@@ -887,10 +887,10 @@ final class MorphToDirectiveTest extends DBTestCase
                 id: ID! @eq
             ): Image @find
         }
-        ';
+        GRAPHQL;
 
         $this->assertQueryCountMatches(1, function () use ($image, $task): void {
-            $this->graphQL(/** @lang GraphQL */ '
+            $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
                 query ($id: ID!) {
                     image(id: $id) {
                         id
@@ -899,7 +899,7 @@ final class MorphToDirectiveTest extends DBTestCase
                         }
                     }
                 }
-                ',
+            GRAPHQL,
                 [
                     'id' => $image->id,
                 ],
@@ -921,19 +921,19 @@ final class MorphToDirectiveTest extends DBTestCase
         config(['lighthouse.shortcut_foreign_key_selection' => true]);
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->user()->associate($user);
         $task->save();
 
         $image = factory(Image::class)->make();
-        assert($image instanceof Image);
+        $this->assertInstanceOf(Image::class, $image);
         $image->imageable()->associate($task);
         $image->save();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Image {
             id: ID!
             imageable: Task! @morphTo
@@ -949,10 +949,10 @@ final class MorphToDirectiveTest extends DBTestCase
                 id: ID! @eq
             ): Image @find
         }
-        ';
+        GRAPHQL;
 
         $this->assertQueryCountMatches(1, function () use ($image): void {
-            $this->graphQL(/** @lang GraphQL */ '
+            $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
                 query ($id: ID!) {
                     image(id: $id) {
                         id
@@ -961,7 +961,7 @@ final class MorphToDirectiveTest extends DBTestCase
                         }
                     }
                 }
-                ',
+            GRAPHQL,
                 [
                     'id' => $image->id,
                 ],
@@ -983,19 +983,19 @@ final class MorphToDirectiveTest extends DBTestCase
         config(['lighthouse.shortcut_foreign_key_selection' => true]);
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->user()->associate($user);
         $task->save();
 
         $image = factory(Image::class)->make();
-        assert($image instanceof Image);
+        $this->assertInstanceOf(Image::class, $image);
         $image->imageable()->associate($task);
         $image->save();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Image {
             id: ID!
             imageable: Task! @morphTo
@@ -1011,10 +1011,10 @@ final class MorphToDirectiveTest extends DBTestCase
                 id: ID! @eq
             ): Image @find
         }
-        ';
+        GRAPHQL;
 
         $this->assertQueryCountMatches(1, function () use ($image, $task): void {
-            $this->graphQL(/** @lang GraphQL */ '
+            $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
                 query ($id: ID!) {
                     image(id: $id) {
                         id
@@ -1024,7 +1024,7 @@ final class MorphToDirectiveTest extends DBTestCase
                         }
                     }
                 }
-                ',
+            GRAPHQL,
                 [
                     'id' => $image->id,
                 ],
@@ -1047,19 +1047,19 @@ final class MorphToDirectiveTest extends DBTestCase
         config(['lighthouse.shortcut_foreign_key_selection' => true]);
 
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        $this->assertInstanceOf(Task::class, $task);
         $task->user()->associate($user);
         $task->save();
 
         $image = factory(Image::class)->make();
-        assert($image instanceof Image);
+        $this->assertInstanceOf(Image::class, $image);
         $image->imageable()->associate($task);
         $image->save();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Image {
             id: ID!
             imageable: Task! @morphTo
@@ -1075,10 +1075,10 @@ final class MorphToDirectiveTest extends DBTestCase
                 id: ID! @eq
             ): Image @find
         }
-        ';
+        GRAPHQL;
 
         $this->assertQueryCountMatches(2, function () use ($image, $task): void {
-            $this->graphQL(/** @lang GraphQL */ '
+            $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
                 query ($id: ID!) {
                     image(id: $id) {
                         id
@@ -1088,7 +1088,7 @@ final class MorphToDirectiveTest extends DBTestCase
                         }
                     }
                 }
-                ',
+            GRAPHQL,
                 [
                     'id' => $image->id,
                 ],

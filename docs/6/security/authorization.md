@@ -39,8 +39,7 @@ type Note {
 }
 ```
 
-Now, authenticated users can query for items that belong to them and are naturally
-limited to seeing just those.
+Now, authenticated users can query for items that belong to them and are naturally limited to seeing just those.
 
 ```graphql
 {

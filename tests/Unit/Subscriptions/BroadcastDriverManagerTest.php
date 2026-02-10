@@ -65,7 +65,7 @@ final class BroadcastDriverManagerTest extends TestCase
         });
 
         $resolvedBroadcaster = $this->broadcastDriverManager->driver('foo');
-        assert($resolvedBroadcaster instanceof Broadcaster);
+        \PHPUnit\Framework\Assert::assertInstanceOf(Broadcaster::class, $resolvedBroadcaster);
 
         $this->assertSame(['driver' => 'foo'], $broadcasterConfig);
         $this->assertSame($broadcaster, $resolvedBroadcaster);

@@ -10,16 +10,16 @@ final class WhereNullDirectiveTest extends DBTestCase
     public function testWhereNull(): void
     {
         $notNull = factory(User::class)->make();
-        assert($notNull instanceof User);
+        $this->assertInstanceOf(User::class, $notNull);
         $notNull->name = 'foo';
         $notNull->save();
 
         $null = factory(User::class)->make();
-        assert($null instanceof User);
+        $this->assertInstanceOf(User::class, $null);
         $null->name = null;
         $null->save();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
@@ -27,16 +27,16 @@ final class WhereNullDirectiveTest extends DBTestCase
         type Query {
             users(nameIsNull: Boolean @whereNull(key: "name")): [User!]! @all
         }
-        ';
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 users {
                     id
                 }
             }
-            ')
+            GRAPHQL)
             ->assertJson([
                 'data' => [
                     'users' => [
@@ -51,13 +51,13 @@ final class WhereNullDirectiveTest extends DBTestCase
             ]);
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 users(nameIsNull: null) {
                     id
                 }
             }
-            ')
+            GRAPHQL)
             ->assertJson([
                 'data' => [
                     'users' => [
@@ -72,13 +72,13 @@ final class WhereNullDirectiveTest extends DBTestCase
             ]);
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 users(nameIsNull: true) {
                     id
                 }
             }
-            ')
+            GRAPHQL)
             ->assertJson([
                 'data' => [
                     'users' => [
@@ -90,13 +90,13 @@ final class WhereNullDirectiveTest extends DBTestCase
             ]);
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 users(nameIsNull: false) {
                     id
                 }
             }
-            ')
+            GRAPHQL)
             ->assertJson([
                 'data' => [
                     'users' => [

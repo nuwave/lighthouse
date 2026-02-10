@@ -21,11 +21,12 @@ The new default fields resolver is expected to be mostly compatible with the pre
 
 ### Leverage automatic test trait setup
 
-Methods you need to explicitly call to set up test traits were removed in favor of automatically set up test traits.
-Keep in mind they only work when your test class extends `Illuminate\Foundation\Testing\TestCase`.
+Methods you need to explicitly call to set up test traits were removed in favor of automatic setup.
 
-- Just remove calls to `Nuwave\Lighthouse\Testing\RefreshesSchemaCache::bootRefreshesSchemaCache()`.
+- Remove calls to `Nuwave\Lighthouse\Testing\RefreshesSchemaCache::bootRefreshesSchemaCache()`.
+  This only works when your test class uses the trait `Nuwave\Lighthouse\Testing\MakesGraphQLRequests`.
 - Replace calls to `Nuwave\Lighthouse\Testing\MakesGraphQLRequests::setUpSubscriptionEnvironment()` with ` use Nuwave\Lighthouse\Testing\TestsSubscriptions`.
+  This only works when your test class extends `Illuminate\Foundation\Testing\TestCase`.
 
 ### `EnsureXHR` is enabled in the default configuration
 
@@ -62,6 +63,15 @@ type Post {
 -   sensitiveInformation: String @can(root: true, ability: "admin")
 +   sensitiveInformation: String @canRoot(ability: "admin")
 }
+```
+
+### Replace `lighthouse:clear-cache` with `lighthouse:clear-schema-cache`
+
+The Artisan command `lighthouse:clear-cache` was renamed to `lighthouse:clear-schema-cache`.
+
+```diff
+-php artisan lighthouse:clear-cache
++php artisan lighthouse:clear-schema-cache
 ```
 
 ## v5 to v6
@@ -201,7 +211,7 @@ public function scopeByType(Builder $builder, int $aOrB): Builder
 ```
 
 In the future, Lighthouse will pass the actual Enum instance along. You can opt in to
-the new behaviour before upgrading by setting `unbox_bensampo_enum_enum_instances` to `false`. 
+the new behavior before upgrading by setting `unbox_bensampo_enum_enum_instances` to `false`. 
 
 ```php
 public function scopeByType(Builder $builder, AOrB $aOrB): Builder
@@ -351,7 +361,7 @@ abstract class TestCase extends BaseTestCase
 ### Schema caching v1 removal
 
 Schema caching now uses v2 only. That means, the schema cache will be
-written to a php file that OPCache will pick up instead of being written
+written to a php file that OPcache will pick up instead of being written
 to the configured cache driver. This significantly reduces memory usage.
 
 If you had previously depended on the presence of the schema in your
@@ -475,16 +485,16 @@ definition that formally describes them.
 +    public static function definition(): string
 +    {
 +        return /** @lang GraphQL */ <<<'GRAPHQL'
-+"""
-+A description of what this directive does.
-+"""
-+directive @trim(
-+    """
-+    Directives can have arguments to parameterize them.
-+    """
-+    someArg: String
-+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-+GRAPHQL;
++        """
++        A description of what this directive does.
++        """
++        directive @trim(
++            """
++            Directives can have arguments to parameterize them.
++            """
++            someArg: String
++        ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
++        GRAPHQL;
 +    }
 ```
 
@@ -558,7 +568,7 @@ type Mutation {
 ### `@method` passes down just ordered arguments
 
 Instead of passing down the usual resolver arguments, the `@method` directive will
-now pass just the arguments given to a field. This behaviour could previously be
+now pass just the arguments given to a field. This behavior could previously be
 enabled through the `passOrdered` option, which is now removed.
 
 ```graphql
@@ -665,7 +675,7 @@ own implementation of `Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubsc
 Calling `register()` on the `Nuwave\Lighthouse\Schema\TypeRegistry` now throws when passing
 a type that was already registered, as this most likely is an error.
 
-If you want to previous behaviour of overwriting existing types, use `overwrite()` instead.
+If you want to previous behavior of overwriting existing types, use `overwrite()` instead.
 
 ```diff
 $typeRegistry = app(\Nuwave\Lighthouse\Schema\TypeRegistry::class);

@@ -31,17 +31,17 @@ final class GlobalErrorRendererTest extends TestCase
 
     public function testCatchesErrorWithExtensions(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: ID
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'errors' => [
                 [
                     'message' => self::MESSAGE,

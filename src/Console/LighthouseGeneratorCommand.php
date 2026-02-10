@@ -78,7 +78,7 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
         }
 
         // We could not determine a common part of the configured namespaces,
-        // so we just assume the user will prefer the first one in the list.
+        // so we assume the user will prefer the first one in the list.
         if ($matching === []) {
             return $preferredNamespaceFallback;
         }

@@ -34,7 +34,7 @@ final class MorphToManyDirectiveTest extends DBTestCase
 
     public function testResolveMorphToManyRelationship(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type Tag {
             id: ID!
             name: String!
@@ -55,9 +55,9 @@ final class MorphToManyDirectiveTest extends DBTestCase
                 id: ID! @eq
             ): Post @find
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($id: ID!) {
             post(id: $id) {
                 id
@@ -67,7 +67,7 @@ final class MorphToManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $this->post->id,
         ])->assertJson([
             'data' => [
@@ -86,7 +86,7 @@ final class MorphToManyDirectiveTest extends DBTestCase
 
     public function testResolveMorphToManyRelationshipWithRelayConnection(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type Tag {
             id: ID!
             name: String!
@@ -102,9 +102,9 @@ final class MorphToManyDirectiveTest extends DBTestCase
                 id: ID! @eq
             ): Post @find
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($id: ID!) {
             post(id: $id) {
                 id
@@ -120,7 +120,7 @@ final class MorphToManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $this->post->id,
         ])->assertJson([
             'data' => [
@@ -143,7 +143,7 @@ final class MorphToManyDirectiveTest extends DBTestCase
 
     public function testResolveMorphToManyWithCustomName(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type Tag {
             id: ID!
             name: String!
@@ -164,9 +164,9 @@ final class MorphToManyDirectiveTest extends DBTestCase
                 id: ID! @eq
             ): Post @find
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($id: ID!) {
             post(id: $id) {
                 id
@@ -176,7 +176,7 @@ final class MorphToManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ', [
+        GRAPHQL, [
             'id' => $this->post->id,
         ])->assertJson([
             'data' => [
@@ -196,10 +196,10 @@ final class MorphToManyDirectiveTest extends DBTestCase
     public function testResolveMorphToManyUsingInterfaces(): void
     {
         $user = factory(User::class)->create();
-        assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $post = factory(Post::class)->make();
-        assert($post instanceof Post);
+        $this->assertInstanceOf(Post::class, $post);
         $post->user()->associate($user);
         $post->save();
 
@@ -213,7 +213,7 @@ final class MorphToManyDirectiveTest extends DBTestCase
             });
 
         $task = factory(Task::class)->make();
-        assert($task instanceof Task);
+        \PHPUnit\Framework\Assert::assertInstanceOf(Task::class, $task);
         $task->user()->associate($user);
         $task->save();
 
@@ -264,7 +264,7 @@ final class MorphToManyDirectiveTest extends DBTestCase
         }
         GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         query ($userId: ID!) {
             user (id: $userId) {
                 id
@@ -298,7 +298,7 @@ final class MorphToManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ', [
+        GRAPHQL, [
             'userId' => $user->id,
         ])->assertJson([
             'data' => [

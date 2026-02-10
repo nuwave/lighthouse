@@ -19,6 +19,8 @@ class WhereConditionsServiceProvider extends ServiceProvider
 
     public const DEFAULT_WHERE_RELATION_CONDITIONS = 'Relation';
 
+    public const DEFAULT_HAS_CONDITION = 'HasCondition';
+
     public function register(): void
     {
         $this->app->bind(Operator::class, SQLOperator::class);
@@ -35,6 +37,13 @@ class WhereConditionsServiceProvider extends ServiceProvider
                 static::createWhereConditionsInputType(
                     static::DEFAULT_WHERE_CONDITIONS,
                     'Dynamic WHERE conditions for queries.',
+                    'String',
+                ),
+            );
+            $documentAST->setTypeDefinition(
+                static::createHasConditionInputType(
+                    static::DEFAULT_WHERE_CONDITIONS,
+                    'Dynamic WHERE conditions for HAS conditions.',
                     'String',
                 ),
             );
@@ -96,10 +105,50 @@ GRAPHQL
         );
     }
 
+    public static function createHasConditionInputType(string $name, string $description, string $columnType): InputObjectTypeDefinitionNode
+    {
+        $hasRelationInputName = $name . self::DEFAULT_WHERE_RELATION_CONDITIONS;
+        $name .= self::DEFAULT_HAS_CONDITION;
+
+        $operator = Container::getInstance()->make(Operator::class);
+
+        $operatorName = Parser::enumTypeDefinition(
+            $operator->enumDefinition(),
+        )
+            ->name
+            ->value;
+        $operatorDefault = $operator->default();
+
+        return Parser::inputObjectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
+            "{$description}"
+            input {$name} {
+                "The column that is used for the condition."
+                column: {$columnType}
+
+                "The operator that is used for the condition."
+                operator: {$operatorName} = {$operatorDefault}
+
+                "The value that is used for the condition."
+                value: Mixed
+
+                "A set of conditions that requires all conditions to match."
+                AND: [{$name}!]
+
+                "A set of conditions that requires at least one condition to match."
+                OR: [{$name}!]
+
+                "Check whether a relation exists. Extra conditions or a minimum amount can be applied."
+                HAS: {$hasRelationInputName}
+            }
+GRAPHQL
+        );
+    }
+
     public static function createHasConditionsInputType(string $name, string $description): InputObjectTypeDefinitionNode
     {
         $hasRelationInputName = $name . self::DEFAULT_WHERE_RELATION_CONDITIONS;
         $defaultHasAmount = self::DEFAULT_HAS_AMOUNT;
+        $conditionName = $name . self::DEFAULT_HAS_CONDITION;
 
         $operator = Container::getInstance()->make(Operator::class);
 
@@ -123,7 +172,7 @@ GRAPHQL
                 amount: Int = {$defaultHasAmount}
 
                 "Additional condition logic."
-                condition: {$name}
+                condition: {$conditionName}
             }
 GRAPHQL
         );

@@ -30,74 +30,74 @@ final class TypeRegistryTest extends TestCase
 
     public function testSetsEnumValueThroughDirective(): void
     {
-        $enumNode = Parser::enumTypeDefinition(/** @lang GraphQL */ '
+        $enumNode = Parser::enumTypeDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
         enum Role {
             ADMIN @enum(value: 123)
         }
-        ');
+        GRAPHQL);
 
         $enumType = $this->typeRegistry->handle($enumNode);
-        assert($enumType instanceof EnumType);
+        $this->assertInstanceOf(EnumType::class, $enumType);
 
         $this->assertSame('Role', $enumType->name);
 
         $enumValueDefinition = $enumType->getValue('ADMIN');
-        assert($enumValueDefinition instanceof EnumValueDefinition);
+        $this->assertInstanceOf(EnumValueDefinition::class, $enumValueDefinition);
 
         $this->assertSame(123, $enumValueDefinition->value);
     }
 
     public function testDefaultsEnumValueToItsName(): void
     {
-        $enumNode = Parser::enumTypeDefinition(/** @lang GraphQL */ '
+        $enumNode = Parser::enumTypeDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
         enum Role {
             EMPLOYEE
         }
-        ');
+        GRAPHQL);
 
         $enumType = $this->typeRegistry->handle($enumNode);
-        assert($enumType instanceof EnumType);
+        $this->assertInstanceOf(EnumType::class, $enumType);
 
         $this->assertSame('Role', $enumType->name);
 
         $enumValueDefinition = $enumType->getValue('EMPLOYEE');
-        assert($enumValueDefinition instanceof EnumValueDefinition);
+        $this->assertInstanceOf(EnumValueDefinition::class, $enumValueDefinition);
 
         $this->assertSame('EMPLOYEE', $enumValueDefinition->value);
     }
 
     public function testTransformScalars(): void
     {
-        $scalarNode = Parser::scalarTypeDefinition(/** @lang GraphQL */ '
+        $scalarNode = Parser::scalarTypeDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
         scalar Email
-        ');
+        GRAPHQL);
 
         $scalarType = $this->typeRegistry->handle($scalarNode);
-        assert($scalarType instanceof ScalarType);
+        $this->assertInstanceOf(ScalarType::class, $scalarType);
 
         $this->assertSame('Email', $scalarType->name);
     }
 
     public function testPointToScalarClassThroughDirective(): void
     {
-        $scalarNode = Parser::scalarTypeDefinition(/** @lang GraphQL */ '
-        scalar DateTime @scalar(class: "Nuwave\\\Lighthouse\\\Schema\\\Types\\\Scalars\\\DateTime")
-        ');
+        $scalarNode = Parser::scalarTypeDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
+        scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
+        GRAPHQL);
 
         $scalarType = $this->typeRegistry->handle($scalarNode);
-        assert($scalarType instanceof ScalarType);
+        $this->assertInstanceOf(ScalarType::class, $scalarType);
 
         $this->assertSame('DateTime', $scalarType->name);
     }
 
     public function testPointToScalarClassThroughDirectiveWithoutNamespace(): void
     {
-        $scalarNode = Parser::scalarTypeDefinition(/** @lang GraphQL */ '
+        $scalarNode = Parser::scalarTypeDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
         scalar SomeEmail @scalar(class: "Email")
-        ');
+        GRAPHQL);
 
         $scalarType = $this->typeRegistry->handle($scalarNode);
-        assert($scalarType instanceof ScalarType);
+        $this->assertInstanceOf(ScalarType::class, $scalarType);
 
         $this->assertSame('SomeEmail', $scalarType->name);
     }
@@ -112,14 +112,14 @@ final class TypeRegistryTest extends TestCase
         ]);
         $this->typeRegistry->overwrite($bar);
 
-        $interfaceNode = Parser::interfaceTypeDefinition(/** @lang GraphQL */ '
+        $interfaceNode = Parser::interfaceTypeDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
         interface Foo implements Bar {
             bar: String
         }
-        ');
+        GRAPHQL);
 
         $interfaceType = $this->typeRegistry->handle($interfaceNode);
-        assert($interfaceType instanceof InterfaceType);
+        $this->assertInstanceOf(InterfaceType::class, $interfaceType);
 
         $this->assertSame('Foo', $interfaceType->name);
         $this->assertArrayHasKey('bar', $interfaceType->getFields());
@@ -128,40 +128,40 @@ final class TypeRegistryTest extends TestCase
 
     public function testResolvesInterfaceThoughNamespace(): void
     {
-        $interfaceNode = Parser::interfaceTypeDefinition(/** @lang GraphQL */ '
+        $interfaceNode = Parser::interfaceTypeDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
         interface Nameable {
             bar: String
         }
-        ');
+        GRAPHQL);
 
         $interfaceType = $this->typeRegistry->handle($interfaceNode);
-        assert($interfaceType instanceof InterfaceType);
+        $this->assertInstanceOf(InterfaceType::class, $interfaceType);
 
         $this->assertSame('Nameable', $interfaceType->name);
     }
 
     public function testResolvesInterfaceThoughSecondaryNamespace(): void
     {
-        $interfaceNode = Parser::interfaceTypeDefinition(/** @lang GraphQL */ '
+        $interfaceNode = Parser::interfaceTypeDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
         interface Bar {
             bar: String
         }
-        ');
+        GRAPHQL);
 
         $interfaceType = $this->typeRegistry->handle($interfaceNode);
-        assert($interfaceType instanceof InterfaceType);
+        $this->assertInstanceOf(InterfaceType::class, $interfaceType);
 
         $this->assertSame('Bar', $interfaceType->name);
     }
 
     public function testTransformUnions(): void
     {
-        $unionNode = Parser::unionTypeDefinition(/** @lang GraphQL */ '
+        $unionNode = Parser::unionTypeDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
         union Foo = Bar
-        ');
+        GRAPHQL);
 
         $unionType = $this->typeRegistry->handle($unionNode);
-        assert($unionType instanceof UnionType);
+        $this->assertInstanceOf(UnionType::class, $unionType);
 
         $this->assertSame('Foo', $unionType->name);
         $this->assertInstanceOf(\Closure::class, $unionType->config['resolveType'] ?? null);
@@ -169,14 +169,14 @@ final class TypeRegistryTest extends TestCase
 
     public function testTransformObjectTypes(): void
     {
-        $objectTypeNode = Parser::objectTypeDefinition(/** @lang GraphQL */ '
+        $objectTypeNode = Parser::objectTypeDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             foo(bar: String! @hash): String!
         }
-        ');
+        GRAPHQL);
 
         $objectType = $this->typeRegistry->handle($objectTypeNode);
-        assert($objectType instanceof ObjectType);
+        $this->assertInstanceOf(ObjectType::class, $objectType);
 
         $this->assertSame('User', $objectType->name);
         $this->assertArrayHasKey('foo', $objectType->getFields());
@@ -184,14 +184,14 @@ final class TypeRegistryTest extends TestCase
 
     public function testTransformInputObjectTypes(): void
     {
-        $inputNode = Parser::inputObjectTypeDefinition(/** @lang GraphQL */ '
+        $inputNode = Parser::inputObjectTypeDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
         input UserInput {
             foo: String!
         }
-        ');
+        GRAPHQL);
 
         $inputObjectType = $this->typeRegistry->handle($inputNode);
-        assert($inputObjectType instanceof InputObjectType);
+        $this->assertInstanceOf(InputObjectType::class, $inputObjectType);
 
         $this->assertSame('UserInput', $inputObjectType->name);
         $this->assertArrayHasKey('foo', $inputObjectType->getFields());
@@ -299,11 +299,11 @@ final class TypeRegistryTest extends TestCase
     {
         $documentTypeName = 'Foo';
 
-        $this->schema = /** @lang GraphQL */ "
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type {$documentTypeName} {
             foo: ID
         }
-        " . self::PLACEHOLDER_QUERY;
+        GRAPHQL . self::PLACEHOLDER_QUERY;
 
         $this->app->forgetInstance(ASTBuilder::class);
         $astBuilder = $this->app->make(ASTBuilder::class);
@@ -335,11 +335,11 @@ final class TypeRegistryTest extends TestCase
     {
         $documentTypeName = 'Foo';
 
-        $this->schema = /** @lang GraphQL */ "
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type {$documentTypeName} {
             foo: ID
         }
-        " . self::PLACEHOLDER_QUERY;
+        GRAPHQL . self::PLACEHOLDER_QUERY;
 
         $this->app->forgetInstance(ASTBuilder::class);
         $astBuilder = $this->app->make(ASTBuilder::class);
