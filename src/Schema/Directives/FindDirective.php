@@ -50,7 +50,7 @@ GRAPHQL;
                 throw new Error('The query returned more than one result.');
             }
 
-            return $results->first();
+            return $results->first(); // @phpstan-ignore return.type (generic of Builder type is erased through enhanceBuilder)
         };
     }
 }

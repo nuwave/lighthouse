@@ -44,8 +44,7 @@ type Mutation {
 
 ### Query just what you need
 
-In a GraphQL query, the client can get all the data they need - and no more -
-all in a single request.
+In a GraphQL query, the client can get all the data they need, and no more, all in a single request.
 
 ```graphql
 query PostsWithAuthor {
@@ -60,8 +59,7 @@ query PostsWithAuthor {
 
 ### Get predictable results
 
-A GraphQL server can tell clients about its schema, so they will always
-know exactly what they will get.
+A GraphQL server can tell clients about its schema, so they will always know exactly what they will get.
 
 ```json
 {

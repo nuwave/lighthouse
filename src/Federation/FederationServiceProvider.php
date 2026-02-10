@@ -2,7 +2,7 @@
 
 namespace Nuwave\Lighthouse\Federation;
 
-use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
@@ -15,7 +15,7 @@ class FederationServiceProvider extends ServiceProvider
         $this->app->singleton(EntityResolverProvider::class);
     }
 
-    public function boot(Dispatcher $dispatcher): void
+    public function boot(EventsDispatcher $dispatcher): void
     {
         $dispatcher->listen(RegisterDirectiveNamespaces::class, static fn (): string => __NAMESPACE__ . '\\Directives');
         $dispatcher->listen(ManipulateAST::class, ASTManipulator::class);

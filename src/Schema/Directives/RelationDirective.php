@@ -9,6 +9,7 @@ use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\BatchLoader\BatchLoaderRegistry;
@@ -45,7 +46,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
 
         return function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($relationName) {
             $decorateBuilder = $this->makeBuilderDecorator($parent, $args, $context, $resolveInfo);
-            $paginationArgs = $this->paginationArgs($args);
+            $paginationArgs = $this->paginationArgs($args, $resolveInfo);
 
             $relation = $parent->{$relationName}();
             assert($relation instanceof Relation);
@@ -54,15 +55,26 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
             // that we know to be present on the parent model.
             if (
                 $this->lighthouseConfig['shortcut_foreign_key_selection']
-                && ['id' => true] === $resolveInfo->getFieldSelection()
+                && (array_diff(array_keys($resolveInfo->getFieldSelection()), ['id', '__typename']) === [])
                 && $relation instanceof BelongsTo
                 && $args === []
             ) {
                 $id = $parent->getAttribute($relation->getForeignKeyName());
 
-                return $id === null
-                    ? null
-                    : ['id' => $id];
+                if ($id === null) {
+                    return null;
+                }
+
+                // If the relation is polymorphic, instantiate and hydrate the model instance.
+                // This allows TypeRegistry::typeResolverFallback to resolve the correct type.
+                if ($relation instanceof MorphTo) {
+                    $model = $relation->getModel();
+                    $model->id = $id; // @phpstan-ignore property.notFound (assuming we have an id property, as it is queried through GraphQL)
+
+                    return $model;
+                }
+
+                return ['id' => $id];
             }
 
             if (
@@ -140,12 +152,12 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
     }
 
     /** @param  array<string, mixed>  $args */
-    protected function paginationArgs(array $args): ?PaginationArgs
+    protected function paginationArgs(array $args, ResolveInfo $resolveInfo): ?PaginationArgs
     {
         $paginationType = $this->paginationType();
 
         return $paginationType !== null
-            ? PaginationArgs::extractArgs($args, $paginationType, $this->paginationMaxCount())
+            ? PaginationArgs::extractArgs($args, $resolveInfo, $paginationType, $this->paginationMaxCount())
             : null;
     }
 

@@ -10,14 +10,14 @@ class Argument
     /**
      * The value given by the client.
      *
-     * @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>|mixed|array<mixed>
+     * @var ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>|mixed|array<mixed>
      */
     public mixed $value;
 
     /**
      * The type of the argument.
      */
-    public ListType|NamedType $type;
+    public ListType|NamedType|null $type = null;
 
     /**
      * A list of directives associated with that argument.
@@ -26,7 +26,7 @@ class Argument
      */
     public Collection $directives;
 
-    /** An argument may have a resolver that handles its given value. */
+    /** A resolver that handles the given value. */
     public ?ArgResolver $resolver = null;
 
     public function __construct()
@@ -57,7 +57,7 @@ class Argument
     /**
      * Convert the given value to plain PHP values recursively.
      *
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>|mixed|array<mixed>  $value
+     * @param  ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>|mixed|array<mixed>  $value
      *
      * @return mixed|array<mixed>
      */

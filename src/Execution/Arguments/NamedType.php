@@ -8,9 +8,7 @@ class NamedType
     public bool $nonNull = false;
 
     public function __construct(
-        /**
-         * The name of the type as defined in the schema.
-         */
+        /** The name of the type as defined in the schema. */
         public string $name,
     ) {}
 }

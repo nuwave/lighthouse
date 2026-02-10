@@ -36,7 +36,7 @@ final class PostUpdatedSubscription extends GraphQLSubscription
 
 ## Only To Others
 
-When building an application that utilizes event broadcasting, you may occasionally need to broadcast an event to all subscribers of a channel except for the current user.
+When building an application that uses event broadcasting, you may occasionally need to broadcast an event to all subscribers of a channel except for the current user.
 You may accomplish this using the filter function, this following snippet is equivalent to [the `toOthers()` method from Laravel's broadcast helper](https://laravel.com/docs/9.x/broadcasting#only-to-others).
 
 ```php

@@ -5,39 +5,36 @@ namespace Benchmarks;
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 
-/**
- * @BeforeMethods({"prepareSchema"})
- */
-class ASTUnserializationBench
+/** @BeforeMethods({"prepareSchema"}) */
+final class ASTUnserializationBench
 {
     public const SCHEMA = /** @lang GraphQL */ <<<'GRAPHQL'
-type Query {
-  query1: String
-  query2: String
-}
+    type Query {
+      query1: String
+      query2: String
+    }
 
-type Mutation {
-  mutation1: Int
-  mutation2: Int
-}
+    type Mutation {
+      mutation1: Int
+      mutation2: Int
+    }
 
-type Foo {
-  foo1: Boolean
-  foo2: Boolean
-}
-GRAPHQL;
+    type Foo {
+      foo1: Boolean
+      foo2: Boolean
+    }
+    GRAPHQL;
 
-    protected string $documentNode;
+    private string $documentNode;
 
-    protected string $documentAST;
+    private string $documentAST;
 
     public function prepareSchema(): void
     {
         $this->documentNode = serialize(
             Parser::parse(
                 self::SCHEMA,
-                // Ignore location since it only bloats the AST
-                ['noLocation' => true],
+                ['noLocation' => true], // Ignore location since it only bloats the AST
             ),
         );
 

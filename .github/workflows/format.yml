@@ -8,15 +8,15 @@ jobs:
   composer-normalize:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
 
       - uses: shivammathur/setup-php@v2
         with:
+          php-version: 8.3
           coverage: none
           extensions: mbstring
-          php-version: 8.2
 
       - run: composer install --no-interaction --no-progress --no-suggest
 
@@ -29,7 +29,7 @@ jobs:
   prettier:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
 
@@ -45,15 +45,15 @@ jobs:
   php-cs-fixer:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
 
       - uses: shivammathur/setup-php@v2
         with:
+          php-version: 8.3
           coverage: none
           extensions: mbstring
-          php-version: 8.2
 
       - run: composer install --no-interaction --no-progress --no-suggest
 

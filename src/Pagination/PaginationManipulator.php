@@ -7,8 +7,12 @@ use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Foundation\Application;
 use Nuwave\Lighthouse\CacheControl\CacheControlServiceProvider;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Federation\FederationHelper;
+use Nuwave\Lighthouse\Federation\FederationServiceProvider;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\ModelDirective;
@@ -52,9 +56,9 @@ class PaginationManipulator
         PaginationType $paginationType,
         FieldDefinitionNode &$fieldDefinition,
         ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
-        int $defaultCount = null,
-        int $maxCount = null,
-        ObjectTypeDefinitionNode $edgeType = null,
+        ?int $defaultCount = null,
+        ?int $maxCount = null,
+        ?ObjectTypeDefinitionNode $edgeType = null,
     ): void {
         if ($paginationType->isConnection()) {
             $this->registerConnection($fieldDefinition, $parentType, $paginationType, $defaultCount, $maxCount, $edgeType);
@@ -69,11 +73,11 @@ class PaginationManipulator
         FieldDefinitionNode &$fieldDefinition,
         ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
         PaginationType $paginationType,
-        int $defaultCount = null,
-        int $maxCount = null,
-        ObjectTypeDefinitionNode $edgeType = null,
+        ?int $defaultCount = null,
+        ?int $maxCount = null,
+        ?ObjectTypeDefinitionNode $edgeType = null,
     ): void {
-        $pageInfoNode = self::pageInfo();
+        $pageInfoNode = $this->pageInfo();
         if (! isset($this->documentAST->types[$pageInfoNode->getName()->value])) {
             $this->documentAST->setTypeDefinition($pageInfoNode);
         }
@@ -161,10 +165,10 @@ GRAPHQL
         FieldDefinitionNode &$fieldDefinition,
         ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
         PaginationType $paginationType,
-        int $defaultCount = null,
-        int $maxCount = null,
+        ?int $defaultCount = null,
+        ?int $maxCount = null,
     ): void {
-        $paginatorInfoNode = self::paginatorInfo();
+        $paginatorInfoNode = $this->paginatorInfo();
         if (! isset($this->documentAST->types[$paginatorInfoNode->getName()->value])) {
             $this->documentAST->setTypeDefinition($paginatorInfoNode);
         }
@@ -201,10 +205,10 @@ GRAPHQL
         FieldDefinitionNode &$fieldDefinition,
         ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
         PaginationType $paginationType,
-        int $defaultCount = null,
-        int $maxCount = null,
+        ?int $defaultCount = null,
+        ?int $maxCount = null,
     ): void {
-        $simplePaginatorInfoNode = self::simplePaginatorInfo();
+        $simplePaginatorInfoNode = $this->simplePaginatorInfo();
         if (! isset($this->documentAST->types[$simplePaginatorInfoNode->getName()->value])) {
             $this->documentAST->setTypeDefinition($simplePaginatorInfoNode);
         }
@@ -238,7 +242,7 @@ GRAPHQL
     }
 
     /** Build the count argument definition string, considering default and max values. */
-    protected static function countArgument(int $defaultCount = null, int $maxCount = null): string
+    protected static function countArgument(?int $defaultCount = null, ?int $maxCount = null): string
     {
         $description = '"Limits number of fetched items.';
         if ($maxCount) {
@@ -266,11 +270,11 @@ GRAPHQL
         return $typeNode;
     }
 
-    protected static function paginatorInfo(): ObjectTypeDefinitionNode
+    protected function paginatorInfo(): ObjectTypeDefinitionNode
     {
-        return Parser::objectTypeDefinition(/** @lang GraphQL */ '
+        return Parser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
             "Information about pagination using a fully featured paginator."
-            type PaginatorInfo {
+            type PaginatorInfo {$this->maybeAddShareableDirective()} {
               "Number of items in the current page."
               count: Int!
 
@@ -295,14 +299,14 @@ GRAPHQL
               "Number of total available items."
               total: Int!
             }
-        ');
+        GRAPHQL);
     }
 
-    protected static function simplePaginatorInfo(): ObjectTypeDefinitionNode
+    protected function simplePaginatorInfo(): ObjectTypeDefinitionNode
     {
-        return Parser::objectTypeDefinition(/** @lang GraphQL */ '
+        return Parser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
             "Information about pagination using a simple paginator."
-            type SimplePaginatorInfo {
+            type SimplePaginatorInfo {$this->maybeAddShareableDirective()} {
               "Number of items in the current page."
               count: Int!
 
@@ -321,14 +325,14 @@ GRAPHQL
               "Are there more pages after this one?"
               hasMorePages: Boolean!
             }
-        ');
+            GRAPHQL);
     }
 
-    protected static function pageInfo(): ObjectTypeDefinitionNode
+    protected function pageInfo(): ObjectTypeDefinitionNode
     {
-        return Parser::objectTypeDefinition(/** @lang GraphQL */ '
+        return Parser::objectTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
             "Information about pagination using a Relay style cursor connection."
-            type PageInfo {
+            type PageInfo {$this->maybeAddShareableDirective()} {
               "When paginating forwards, are there more items?"
               hasNextPage: Boolean!
 
@@ -353,7 +357,7 @@ GRAPHQL
               "Index of the last available page."
               lastPage: Int!
             }
-        ');
+            GRAPHQL);
     }
 
     /**
@@ -365,9 +369,22 @@ GRAPHQL
      */
     private function maybeInheritCacheControlDirective(): string
     {
-        // Not using Illuminate\Container\Container::getInstance() here as it causes PHPStan issues
-        if (app()->providerIsLoaded(CacheControlServiceProvider::class)) {
+        $app = Container::getInstance();
+        assert($app instanceof Application);
+        if ($app->providerIsLoaded(CacheControlServiceProvider::class)) {
             return /** @lang GraphQL */ '@cacheControl(inheritMaxAge: true)';
+        }
+
+        return '';
+    }
+
+    /** If federation v2 is used, add the @shareable directive to the pagination generic types. */
+    private function maybeAddShareableDirective(): string
+    {
+        $app = Container::getInstance();
+        assert($app instanceof Application);
+        if ($app->providerIsLoaded(FederationServiceProvider::class) && FederationHelper::isUsingFederationV2($this->documentAST)) {
+            return /** @lang GraphQL */ '@shareable';
         }
 
         return '';

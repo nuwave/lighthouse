@@ -97,7 +97,7 @@ and thus executes before them.
 extend type Query {
   user: User!
     @guard
-    @can(ability: "adminOnly")
+    @canModel(ability: "adminOnly")
   ...
 }
 ```
@@ -105,7 +105,7 @@ extend type Query {
 ## Get the current user
 
 Lighthouse provides a really simple way to fetch the information of the currently authenticated user.
-Just add a field that returns your `User` type and decorate it with the [@auth](../api-reference/directives.md#auth) directive.
+Add a field that returns your `User` type and decorate it with the [@auth](../api-reference/directives.md#auth) directive.
 
 ```graphql
 type Query {
@@ -201,7 +201,7 @@ final class Logout
     public function __invoke($_, array $args): ?User
     {
         // Plain Laravel: Auth::guard()
-        // Laravel Sanctum: Auth::guard(config('sanctum.guard', 'web'))
+        // Laravel Sanctum: Auth::guard(Arr::first(config('sanctum.guard', 'web')))
         $guard = ?;
 
         $user = $guard->user();

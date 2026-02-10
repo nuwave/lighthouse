@@ -3,6 +3,7 @@
 namespace Tests\Unit\Schema\AST;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\NamedTypeNode;
@@ -19,23 +20,24 @@ use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\RootType;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
+use Nuwave\Lighthouse\Support\Contracts\InputFieldManipulator;
 use Tests\TestCase;
 
 final class ASTHelperTest extends TestCase
 {
     public function testThrowsWhenMergingUniqueNodeListWithCollision(): void
     {
-        $objectType1 = Parser::objectTypeDefinition(/** @lang GraphQL */ '
-        type User {
-            email: String
-        }
-        ');
+        $objectType1 = Parser::objectTypeDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
+                type User {
+                    email: String
+                }
+        GRAPHQL);
 
-        $objectType2 = Parser::objectTypeDefinition(/** @lang GraphQL */ '
-        type User {
-            email(bar: String): Int
-        }
-        ');
+        $objectType2 = Parser::objectTypeDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
+                type User {
+                    email(bar: String): Int
+                }
+        GRAPHQL);
 
         $this->expectException(DefinitionException::class);
         ASTHelper::mergeUniqueNodeList(
@@ -46,19 +48,19 @@ final class ASTHelperTest extends TestCase
 
     public function testMergesUniqueNodeListsWithOverwrite(): void
     {
-        $objectType1 = Parser::objectTypeDefinition(/** @lang GraphQL */ '
-        type User {
-            first_name: String
-            email: String
-        }
-        ');
+        $objectType1 = Parser::objectTypeDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
+                type User {
+                    first_name: String
+                    email: String
+                }
+        GRAPHQL);
 
-        $objectType2 = Parser::objectTypeDefinition(/** @lang GraphQL */ '
-        type User {
-            first_name: String @foo
-            last_name: String
-        }
-        ');
+        $objectType2 = Parser::objectTypeDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
+                type User {
+                    first_name: String @foo
+                    last_name: String
+                }
+        GRAPHQL);
 
         $objectType1->fields = ASTHelper::mergeUniqueNodeList(
             $objectType1->fields,
@@ -70,13 +72,15 @@ final class ASTHelperTest extends TestCase
 
         $firstNameField = ASTHelper::firstByName($objectType1->fields, 'first_name');
 
-        assert($firstNameField instanceof FieldDefinitionNode);
+        $this->assertInstanceOf(FieldDefinitionNode::class, $firstNameField);
         $this->assertCount(1, $firstNameField->directives);
     }
 
     public function testExtractStringArguments(): void
     {
-        $directive = Parser::constDirective(/** @lang GraphQL */ '@foo(bar: "baz")');
+        $directive = Parser::constDirective(/** @lang GraphQL */ <<<'GRAPHQL'
+        @foo(bar: "baz")
+        GRAPHQL);
         $this->assertSame(
             'baz',
             ASTHelper::directiveArgValue($directive, 'bar'),
@@ -85,7 +89,9 @@ final class ASTHelperTest extends TestCase
 
     public function testExtractBooleanArguments(): void
     {
-        $directive = Parser::constDirective(/** @lang GraphQL */ '@foo(bar: true)');
+        $directive = Parser::constDirective(/** @lang GraphQL */ <<<'GRAPHQL'
+        @foo(bar: true)
+        GRAPHQL);
         $this->assertTrue(
             ASTHelper::directiveArgValue($directive, 'bar'),
         );
@@ -93,7 +99,9 @@ final class ASTHelperTest extends TestCase
 
     public function testExtractArrayArguments(): void
     {
-        $directive = Parser::constDirective(/** @lang GraphQL */ '@foo(bar: ["one", "two"])');
+        $directive = Parser::constDirective(/** @lang GraphQL */ <<<'GRAPHQL'
+        @foo(bar: ["one", "two"])
+        GRAPHQL);
         $this->assertSame(
             ['one', 'two'],
             ASTHelper::directiveArgValue($directive, 'bar'),
@@ -102,7 +110,9 @@ final class ASTHelperTest extends TestCase
 
     public function testExtractObjectArguments(): void
     {
-        $directive = Parser::constDirective(/** @lang GraphQL */ '@foo(bar: { baz: "foobar" })');
+        $directive = Parser::constDirective(/** @lang GraphQL */ <<<'GRAPHQL'
+        @foo(bar: { baz: "foobar" })
+        GRAPHQL);
         $this->assertSame(
             ['baz' => 'foobar'],
             ASTHelper::directiveArgValue($directive, 'bar'),
@@ -111,7 +121,9 @@ final class ASTHelperTest extends TestCase
 
     public function testReturnsNullForNonExistingArgumentOnDirective(): void
     {
-        $directive = Parser::constDirective(/** @lang GraphQL */ '@foo');
+        $directive = Parser::constDirective(/** @lang GraphQL */ <<<'GRAPHQL'
+        @foo
+        GRAPHQL);
         $this->assertNull(
             ASTHelper::directiveArgValue($directive, 'bar'),
         );
@@ -119,25 +131,27 @@ final class ASTHelperTest extends TestCase
 
     public function testChecksWhetherTypeImplementsInterface(): void
     {
-        $type = Parser::objectTypeDefinition(/** @lang GraphQL */ '
-        type Foo implements Bar {
-            baz: String
-        }
-        ');
+        $type = Parser::objectTypeDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
+                type Foo implements Bar {
+                    baz: String
+                }
+        GRAPHQL);
         $this->assertTrue(ASTHelper::typeImplementsInterface($type, 'Bar'));
         $this->assertFalse(ASTHelper::typeImplementsInterface($type, 'FakeInterface'));
     }
 
     public function testAddDirectiveToFields(): void
     {
-        $object = Parser::objectTypeDefinition(/** @lang GraphQL */ '
-        type Query {
-            foo: Int
-        }
-        ');
+        $object = Parser::objectTypeDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
+                type Query {
+                    foo: Int
+                }
+        GRAPHQL);
 
         ASTHelper::addDirectiveToFields(
-            Parser::constDirective(/** @lang GraphQL */ '@guard'),
+            Parser::constDirective(/** @lang GraphQL */ <<<'GRAPHQL'
+            @guard
+            GRAPHQL),
             $object,
         );
 
@@ -149,15 +163,17 @@ final class ASTHelperTest extends TestCase
 
     public function testPrefersFieldDirectivesOverTypeDirectives(): void
     {
-        $object = Parser::objectTypeDefinition(/** @lang GraphQL */ '
-        type Query {
-            foo: Int @complexity(resolver: "Foo")
-            bar: String
-        }
-        ');
+        $object = Parser::objectTypeDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
+                type Query {
+                    foo: Int @complexity(resolver: "Foo")
+                    bar: String
+                }
+        GRAPHQL);
 
         ASTHelper::addDirectiveToFields(
-            Parser::constDirective(/** @lang GraphQL */ '@complexity'),
+            Parser::constDirective(/** @lang GraphQL */ <<<'GRAPHQL'
+            @complexity
+            GRAPHQL),
             $object,
         );
 
@@ -170,17 +186,18 @@ final class ASTHelperTest extends TestCase
 
     public function testExtractDirectiveDefinition(): void
     {
-        $directive = ASTHelper::extractDirectiveDefinition(/** @lang GraphQL */ 'directive @foo on OBJECT');
+        $directive = ASTHelper::extractDirectiveDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
+        directive @foo on OBJECT
+        GRAPHQL);
         $this->assertSame('foo', $directive->name->value);
     }
 
     public function testExtractDirectiveDefinitionAllowsAuxiliaryTypes(): void
     {
         $directive = ASTHelper::extractDirectiveDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
-directive @foo on OBJECT
-scalar Bar
-GRAPHQL
-        );
+                directive @foo on OBJECT
+                scalar Bar
+        GRAPHQL);
         $this->assertSame('foo', $directive->name->value);
     }
 
@@ -188,28 +205,25 @@ GRAPHQL
     {
         $this->expectException(DefinitionException::class);
         ASTHelper::extractDirectiveDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
-invalid GraphQL
-GRAPHQL
-        );
+                invalid GraphQL
+        GRAPHQL);
     }
 
     public function testThrowsIfMissingDirectiveDefinitions(): void
     {
         $this->expectException(DefinitionException::class);
         ASTHelper::extractDirectiveDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
-scalar Foo
-GRAPHQL
-        );
+                scalar Foo
+        GRAPHQL);
     }
 
     public function testThrowsOnMultipleDirectiveDefinitions(): void
     {
         $this->expectException(DefinitionException::class);
         ASTHelper::extractDirectiveDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
-directive @foo on OBJECT
-directive @bar on OBJECT
-GRAPHQL
-        );
+                directive @foo on OBJECT
+                directive @bar on OBJECT
+        GRAPHQL);
     }
 
     public function testUnderlyingTypeKnowsStandardTypes(): void
@@ -245,7 +259,9 @@ GRAPHQL
         $directive = new class() extends BaseDirective implements FieldManipulator {
             public static function definition(): string
             {
-                return /** @lang GraphQL */ 'directive @foo on FIELD_DEFINITION';
+                return /** @lang GraphQL */ <<<'GRAPHQL'
+                directive @foo on FIELD_DEFINITION
+                GRAPHQL;
             }
 
             public function manipulateFieldDefinition(
@@ -263,7 +279,9 @@ GRAPHQL
         $dynamicDirective = new class() extends BaseDirective implements FieldManipulator {
             public static function definition(): string
             {
-                return /** @lang GraphQL */ 'directive @dynamic on FIELD_DEFINITION';
+                return /** @lang GraphQL */ <<<'GRAPHQL'
+                directive @dynamic on FIELD_DEFINITION
+                GRAPHQL;
             }
 
             public function manipulateFieldDefinition(
@@ -272,7 +290,7 @@ GRAPHQL
                 ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
             ): void {
                 $directiveInstance = ASTHelper::addDirectiveToNode('@foo', $fieldDefinition);
-                assert($directiveInstance instanceof FieldManipulator);
+                TestCase::assertInstanceOf(FieldManipulator::class, $directiveInstance);
 
                 $directiveInstance->manipulateFieldDefinition($documentAST, $fieldDefinition, $parentType);
             }
@@ -280,23 +298,23 @@ GRAPHQL
 
         $directiveLocator->setResolved('dynamic', $dynamicDirective::class);
 
-        $this->schema = /** @lang GraphQL */ '
-        type Query {
-            foo: String @dynamic
-        }
-        ';
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+                type Query {
+                    foo: String @dynamic
+                }
+        GRAPHQL;
         $documentAST = $astBuilder->documentAST();
 
         $queryType = $documentAST->types[RootType::QUERY];
-        assert($queryType instanceof ObjectTypeDefinitionNode);
+        $this->assertInstanceOf(ObjectTypeDefinitionNode::class, $queryType);
 
         $fieldType = $queryType->fields[0];
-        assert($fieldType instanceof FieldDefinitionNode);
+        $this->assertInstanceOf(FieldDefinitionNode::class, $fieldType); // @phpstan-ignore method.alreadyNarrowedType (aids IDE)
 
         $typeType = $fieldType->type;
-        assert($typeType instanceof NamedTypeNode);
+        $this->assertInstanceOf(NamedTypeNode::class, $typeType);
 
-        $this->assertSame($typeType->name->value, 'Int');
+        $this->assertSame('Int', $typeType->name->value);
     }
 
     public function testDynamicallyAddedArgManipulatorDirective(): void
@@ -304,7 +322,9 @@ GRAPHQL
         $directive = new class() extends BaseDirective implements ArgManipulator {
             public static function definition(): string
             {
-                return /** @lang GraphQL */ 'directive @foo on ARGUMENT_DEFINITION';
+                return /** @lang GraphQL */ <<<'GRAPHQL'
+                directive @foo on ARGUMENT_DEFINITION
+                GRAPHQL;
             }
 
             public function manipulateArgDefinition(
@@ -323,7 +343,9 @@ GRAPHQL
         $dynamicDirective = new class() extends BaseDirective implements ArgManipulator {
             public static function definition(): string
             {
-                return /** @lang GraphQL */ 'directive @dynamic on ARGUMENT_DEFINITION';
+                return /** @lang GraphQL */ <<<'GRAPHQL'
+                directive @dynamic on ARGUMENT_DEFINITION
+                GRAPHQL;
             }
 
             public function manipulateArgDefinition(
@@ -333,8 +355,7 @@ GRAPHQL
                 ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
             ): void {
                 $directiveInstance = ASTHelper::addDirectiveToNode('@foo', $argDefinition);
-
-                assert($directiveInstance instanceof ArgManipulator);
+                TestCase::assertInstanceOf(ArgManipulator::class, $directiveInstance);
 
                 $directiveInstance->manipulateArgDefinition($documentAST, $argDefinition, $parentField, $parentType);
             }
@@ -342,26 +363,94 @@ GRAPHQL
 
         $directiveLocator->setResolved('dynamic', $dynamicDirective::class);
 
-        $this->schema = /** @lang GraphQL */ '
-        type Query {
-            foo(name: String @dynamic): String
-        }
-        ';
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+                type Query {
+                    foo(name: String @dynamic): String
+                }
+        GRAPHQL;
         $astBuilder = $this->app->make(ASTBuilder::class);
         $documentAST = $astBuilder->documentAST();
 
         $queryType = $documentAST->types[RootType::QUERY];
-        assert($queryType instanceof ObjectTypeDefinitionNode);
+        $this->assertInstanceOf(ObjectTypeDefinitionNode::class, $queryType);
 
         $fieldType = $queryType->fields[0];
-        assert($fieldType instanceof FieldDefinitionNode);
+        $this->assertInstanceOf(FieldDefinitionNode::class, $fieldType); // @phpstan-ignore method.alreadyNarrowedType (aids IDE)
 
         $argumentType = $fieldType->arguments[0];
-        assert($argumentType instanceof InputValueDefinitionNode);
+        $this->assertInstanceOf(InputValueDefinitionNode::class, $argumentType); // @phpstan-ignore method.alreadyNarrowedType (aids IDE)
 
         $typeType = $argumentType->type;
-        assert($typeType instanceof NamedTypeNode);
+        $this->assertInstanceOf(NamedTypeNode::class, $typeType);
 
-        $this->assertSame($typeType->name->value, 'Int');
+        $this->assertSame('Int', $typeType->name->value);
+    }
+
+    public function testDynamicallyAddedInputFieldManipulatorDirective(): void
+    {
+        $directive = new class() extends BaseDirective implements InputFieldManipulator {
+            public static function definition(): string
+            {
+                return /** @lang GraphQL */ <<<'GRAPHQL'
+                directive @foo on INPUT_FIELD_DEFINITION
+                GRAPHQL;
+            }
+
+            public function manipulateInputFieldDefinition(
+                DocumentAST &$documentAST,
+                InputValueDefinitionNode &$inputField,
+                InputObjectTypeDefinitionNode &$parentInput,
+            ): void {
+                $inputField->type = Parser::namedType('Int');
+            }
+        };
+
+        $directiveLocator = $this->app->make(DirectiveLocator::class);
+        $directiveLocator->setResolved('foo', $directive::class);
+
+        $dynamicDirective = new class() extends BaseDirective implements InputFieldManipulator {
+            public static function definition(): string
+            {
+                return /** @lang GraphQL */ <<<'GRAPHQL'
+                directive @dynamic on INPUT_FIELD_DEFINITION
+                GRAPHQL;
+            }
+
+            public function manipulateInputFieldDefinition(
+                DocumentAST &$documentAST,
+                InputValueDefinitionNode &$inputField,
+                InputObjectTypeDefinitionNode &$parentInput,
+            ): void {
+                $directiveInstance = ASTHelper::addDirectiveToNode('@foo', $inputField);
+                TestCase::assertInstanceOf(InputFieldManipulator::class, $directiveInstance);
+
+                $directiveInstance->manipulateInputFieldDefinition($documentAST, $inputField, $parentInput);
+            }
+        };
+
+        $directiveLocator->setResolved('dynamic', $dynamicDirective::class);
+
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+                input Input {
+                    name: String @dynamic
+                }
+        
+                type Query {
+                    foo(name: Input): String
+                }
+        GRAPHQL;
+        $astBuilder = $this->app->make(ASTBuilder::class);
+        $documentAST = $astBuilder->documentAST();
+
+        $inputType = $documentAST->types['Input'];
+        $this->assertInstanceOf(InputObjectTypeDefinitionNode::class, $inputType);
+
+        $fieldType = $inputType->fields[0];
+        $this->assertInstanceOf(InputValueDefinitionNode::class, $fieldType); // @phpstan-ignore method.alreadyNarrowedType (aids IDE)
+
+        $typeType = $fieldType->type;
+        $this->assertInstanceOf(NamedTypeNode::class, $typeType);
+
+        $this->assertSame('Int', $typeType->name->value);
     }
 }

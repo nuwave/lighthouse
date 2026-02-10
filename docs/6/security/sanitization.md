@@ -6,7 +6,7 @@ it is most practical to modify the given input to ensure it is valid or safe to 
 
 ## Single arguments
 
-A great way to deal with single values is to use an [`ArgTransformerDirective`](../custom-directives/argument-directives.md#argtransformerdirective).
+A great way to deal with single values is to use an [`ArgTransformerDirective`](../custom-directives/field-argument-directives#argtransformerdirective).
 Lighthouse offers a few built-in options, but it is also really easy to build your own.
 
 Here is how you can remove whitespace of a given input string by using

@@ -7,9 +7,8 @@ use Illuminate\Support\Arr;
 /**
  * Encode and decode pagination cursors.
  *
- * Currently, the underlying pagination Query uses offset based navigation, so
- * this basically just encodes an offset. This is enough to satisfy the constraints
- * that Relay has, but not a clean permanent solution.
+ * Currently, the underlying pagination Query uses offset based navigation, so this basically just encodes an offset.
+ * This is enough to satisfy the constraints that Relay has, but not a clean permanent solution.
  *
  * TODO Implement actual cursor pagination https://github.com/nuwave/lighthouse/issues/311
  */

@@ -23,7 +23,7 @@ class WhereConditionsHandler
     public function __invoke(
         object $builder,
         array $whereConditions,
-        Model $model = null,
+        ?Model $model = null,
         string $boolean = 'and',
     ): void {
         if ($builder instanceof EloquentBuilder) {
@@ -31,9 +31,8 @@ class WhereConditionsHandler
         }
 
         if ($andConnectedConditions = $whereConditions['AND'] ?? null) {
-            // // @phpstan-ignore-next-line forwarding to Builder
             $builder->whereNested(
-                function ($builder) use ($andConnectedConditions, $model): void {
+                function (QueryBuilder|EloquentBuilder $builder) use ($andConnectedConditions, $model): void {
                     foreach ($andConnectedConditions as $condition) {
                         $this->__invoke($builder, $condition, $model);
                     }
@@ -43,9 +42,8 @@ class WhereConditionsHandler
         }
 
         if ($orConnectedConditions = $whereConditions['OR'] ?? null) {
-            // // @phpstan-ignore-next-line forwarding to Builder
             $builder->whereNested(
-                function ($builder) use ($orConnectedConditions, $model): void {
+                function (QueryBuilder|EloquentBuilder $builder) use ($orConnectedConditions, $model): void {
                     foreach ($orConnectedConditions as $condition) {
                         $this->__invoke($builder, $condition, $model, 'or');
                     }
@@ -62,7 +60,6 @@ class WhereConditionsHandler
                 $hasRelationConditions['amount'],
                 $hasRelationConditions['condition'] ?? null,
             );
-            // // @phpstan-ignore-next-line forwarding to Builder
             $builder->addNestedWhereQuery($nestedBuilder, $boolean);
         }
 
@@ -78,14 +75,14 @@ class WhereConditionsHandler
         string $relation,
         string $operator,
         int $amount,
-        array $condition = null,
+        ?array $condition = null,
     ): QueryBuilder {
         return $model
             ->newQuery()
             ->whereHas(
                 $relation,
                 $condition
-                    ? function ($builder) use ($condition): void {
+                    ? function (EloquentBuilder $builder) use ($condition): void {
                         $this->__invoke(
                             $builder,
                             $this->prefixConditionWithTableName(
@@ -95,7 +92,7 @@ class WhereConditionsHandler
                             $builder->getModel(),
                         );
                     }
-                    : null,
+                : null,
                 $operator,
                 $amount,
             )

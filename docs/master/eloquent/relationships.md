@@ -25,7 +25,7 @@ final class Post extends Model
 }
 ```
 
-Just add fields to your type that are named just like the relationships:
+Add fields to your type that are named just like the relationships:
 
 ```graphql
 type Post {
@@ -106,6 +106,16 @@ The inverse works the same.
 ```graphql
 type Role {
   users: [User!]! @belongsToMany
+}
+```
+
+## Has One Through
+
+Use the [@hasOneThrough](../api-reference/directives.md#hasonethrough) directive to define a [has-one-through relationship](https://laravel.com/docs/eloquent-relationships#has-one-through).
+
+```graphql
+type Mechanic {
+  carOwner: Owner! @hasOneThrough
 }
 ```
 

@@ -3,11 +3,13 @@
 namespace Tests\Unit\Support;
 
 use Nuwave\Lighthouse\Support\Utils;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 final class UtilsTest extends TestCase
 {
     /** @dataProvider nameToEnumValueName */
+    #[DataProvider('nameToEnumValueName')]
     public function testToEnumValueName(string $name, string $enumValueName): void
     {
         $this->assertSame(

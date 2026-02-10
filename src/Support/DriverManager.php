@@ -29,9 +29,7 @@ abstract class DriverManager
     protected array $customCreators = [];
 
     public function __construct(
-        /**
-         * The application instance.
-         */
+        /** The application instance. */
         protected Application $app,
     ) {}
 
@@ -40,7 +38,7 @@ abstract class DriverManager
      *
      * @return object the driver instance
      */
-    public function driver(string $name = null): object
+    public function driver(?string $name = null): object
     {
         $name = $name ?: $this->getDefaultDriver();
 

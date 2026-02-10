@@ -5,6 +5,7 @@ namespace Tests\Integration\Validation;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Support\AppVersion;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
 use Tests\Utils\Rules\FooBarRule;
@@ -22,20 +23,20 @@ final class RulesDirectiveTest extends TestCase
 
     public function testRequired(): void
     {
-        $this->schema = /** @lang GraphQL */ '
-        type Query {
-            foo(
-                required: String @rules(apply: ["required"])
-            ): Int
-        }
-        ';
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+                type Query {
+                    foo(
+                        required: String @rules(apply: ["required"])
+                    ): Int
+                }
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
-            {
-                foo(required: "foo")
-            }
-            ')
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+                        {
+                            foo(required: "foo")
+                        }
+            GRAPHQL)
             ->assertJson([
                 'data' => [
                     'foo' => Foo::THE_ANSWER,
@@ -43,11 +44,11 @@ final class RulesDirectiveTest extends TestCase
             ]);
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
-            {
-                foo
-            }
-            ')
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+                        {
+                            foo
+                        }
+            GRAPHQL)
             ->assertGraphQLValidationKeys(['required']);
     }
 
@@ -57,24 +58,24 @@ final class RulesDirectiveTest extends TestCase
         $this->markTestSkipped('Not working right now, not sure how it can be fixed.');
 
         // @phpstan-ignore-next-line https://github.com/phpstan/phpstan-phpunit/issues/52
-        $this->schema = /** @lang GraphQL */ '
-        "A date string with format `Y-m-d`, e.g. `2011-05-23`."
-        scalar Date @scalar(class: "Nuwave\\\\Lighthouse\\\\Schema\\\\Types\\\\Scalars\\\\Date")
-
-        type Query {
-            foo(
-                bar: Date @rules(apply: ["different:baz"])
-                baz: Date
-            ): Int
-        }
-        ';
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+                "A date string with format `Y-m-d`, e.g. `2011-05-23`."
+                scalar Date @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Date")
+        
+                type Query {
+                    foo(
+                        bar: Date @rules(apply: ["different:baz"])
+                        baz: Date
+                    ): Int
+                }
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
-            {
-                foo(bar: "2020-05-15", baz: "1999-12-01")
-            }
-            ')
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+                        {
+                            foo(bar: "2020-05-15", baz: "1999-12-01")
+                        }
+            GRAPHQL)
             ->assertJson([
                 'data' => [
                     'foo' => Foo::THE_ANSWER,
@@ -82,34 +83,34 @@ final class RulesDirectiveTest extends TestCase
             ]);
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
-            {
-                foo(bar: "2020-05-15", baz: "2020-05-15")
-            }
-            ')
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+                        {
+                            foo(bar: "2020-05-15", baz: "2020-05-15")
+                        }
+            GRAPHQL)
             ->assertGraphQLValidationKeys(['bar']);
     }
 
     public function testDateBefore(): void
     {
-        $this->schema = /** @lang GraphQL */ '
-        "A date string with format `Y-m-d`, e.g. `2011-05-23`."
-        scalar Date @scalar(class: "Nuwave\\\\Lighthouse\\\\Schema\\\\Types\\\\Scalars\\\\Date")
-
-        type Query {
-            foo(
-                early: Date @rules(apply: ["before:late"])
-                late: Date
-            ): Int
-        }
-        ';
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+                "A date string with format `Y-m-d`, e.g. `2011-05-23`."
+                scalar Date @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Date")
+        
+                type Query {
+                    foo(
+                        early: Date @rules(apply: ["before:late"])
+                        late: Date
+                    ): Int
+                }
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
-            {
-                foo(early: "1999-12-01", late: "2020-05-15")
-            }
-            ')
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+                        {
+                            foo(early: "1999-12-01", late: "2020-05-15")
+                        }
+            GRAPHQL)
             ->assertExactJson([
                 'data' => [
                     'foo' => Foo::THE_ANSWER,
@@ -117,105 +118,105 @@ final class RulesDirectiveTest extends TestCase
             ]);
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
-            {
-                foo(early: "2020-05-15", late: "1999-05-15")
-            }
-            ')
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+                        {
+                            foo(early: "2020-05-15", late: "1999-05-15")
+                        }
+            GRAPHQL)
             ->assertGraphQLValidationKeys(['early']);
     }
 
     public function testCustomMessages(): void
     {
-        $this->schema = /** @lang GraphQL */ '
-        type Query {
-            foo(
-                bar: ID @rules(
-                    apply: ["required"]
-                    messages: [
-                        {
-                            rule: "required",
-                            message: "custom message"
-                        }
-                    ]
-                )
-            ): String
-        }
-        ';
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+                type Query {
+                    foo(
+                        bar: ID @rules(
+                            apply: ["required"]
+                            messages: [
+                                {
+                                    rule: "required",
+                                    message: "custom message"
+                                }
+                            ]
+                        )
+                    ): String
+                }
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
-            {
-                foo
-            }
-            ')
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+                        {
+                            foo
+                        }
+            GRAPHQL)
             ->assertGraphQLValidationError('bar', 'custom message');
     }
 
     public function testCustomMessagesWithMap(): void
     {
-        $this->schema = /** @lang GraphQL */ '
-        type Query {
-            foo(
-                bar: ID @rules(
-                    apply: ["required"]
-                    messages: {
-                        required: "custom message"
-                    }
-                )
-            ): String
-        }
-        ';
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+                type Query {
+                    foo(
+                        bar: ID @rules(
+                            apply: ["required"]
+                            messages: {
+                                required: "custom message"
+                            }
+                        )
+                    ): String
+                }
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
-            {
-                foo
-            }
-            ')
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+                        {
+                            foo
+                        }
+            GRAPHQL)
             ->assertGraphQLValidationError('bar', 'custom message');
     }
 
     public function testCustomAttributes(): void
     {
-        $this->schema = /** @lang GraphQL */ '
-        input FooInput {
-            name: String @rules(
-                apply: ["required"]
-                attribute: "name"
-            )
-            type: FooTypeInput
-        }
-
-        input FooTypeInput {
-            name: String @rules(
-                apply: ["required"]
-                attribute: "name"
-            )
-            type: String @rules(apply: ["required"])
-        }
-
-        type Query {
-            foo(
-                bar: ID @rules(
-                    apply: ["required"]
-                    attribute: "baz"
-                )
-                emails: [String] @rulesForArray(
-                    apply: ["min:3"]
-                    attribute: "email list"
-                )
-                input: FooInput
-            ): String
-        }
-        ';
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+                input FooInput {
+                    name: String @rules(
+                        apply: ["required"]
+                        attribute: "name"
+                    )
+                    type: FooTypeInput
+                }
+        
+                input FooTypeInput {
+                    name: String @rules(
+                        apply: ["required"]
+                        attribute: "name"
+                    )
+                    type: String @rules(apply: ["required"])
+                }
+        
+                type Query {
+                    foo(
+                        bar: ID @rules(
+                            apply: ["required"]
+                            attribute: "baz"
+                        )
+                        emails: [String] @rulesForArray(
+                            apply: ["min:3"]
+                            attribute: "email list"
+                        )
+                        input: FooInput
+                    ): String
+                }
+        GRAPHQL;
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
-            {
-                foo(emails: [], input: {type: {}})
-            }
-            ')
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+                        {
+                            foo(emails: [], input: { type: {} })
+                        }
+            GRAPHQL)
             ->assertGraphQLValidationError('bar', 'The baz field is required.')
             ->assertGraphQLValidationError('emails', AppVersion::atLeast(10.0)
                 ? 'The email list field must have at least 3 items.'
@@ -227,28 +228,28 @@ final class RulesDirectiveTest extends TestCase
 
     public function testUsesCustomRuleClass(): void
     {
-        $this->schema = /** @lang GraphQL */ '
-        type Query {
-            withCustomRuleClass(
-                rules: String @rules(apply: ["Tests\\\\Utils\\\\Rules\\\\FooBarRule"])
-                rulesForArray: [String!]! @rulesForArray(apply: ["Tests\\\\Utils\\\\Rules\\\\FooBarRule"])
-            ): ID @mock
-        }
-        ';
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+                type Query {
+                    withCustomRuleClass(
+                        rules: String @rules(apply: ["Tests\\Utils\\Rules\\FooBarRule"])
+                        rulesForArray: [String!]! @rulesForArray(apply: ["Tests\\Utils\\Rules\\FooBarRule"])
+                    ): ID @mock
+                }
+        GRAPHQL;
 
         $this->mockResolverExpects(
             $this->never(),
         );
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
-            {
-                withCustomRuleClass(
-                    rules: "baz"
-                    rulesForArray: []
-                )
-            }
-            ',
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+                        {
+                            withCustomRuleClass(
+                                rules: "baz"
+                                rulesForArray: []
+                            )
+                        }
+            GRAPHQL,
             )
             ->assertJsonFragment([
                 'rules' => [
@@ -261,49 +262,119 @@ final class RulesDirectiveTest extends TestCase
     }
 
     /** @dataProvider invalidApplyArguments */
+    #[DataProvider('invalidApplyArguments')]
     public function testValidateApplyArgument(string $applyArgument): void
     {
         $this->expectException(DefinitionException::class);
-        $this->buildSchema(/** @lang GraphQL */ "
-        type Query {
-            foo(bar: ID @rules(apply: {$applyArgument})): ID
-        }
-        ");
+        $this->buildSchema(/** @lang GraphQL */ <<<GRAPHQL
+                type Query {
+                    foo(bar: ID @rules(apply: {$applyArgument})): ID
+                }
+        GRAPHQL);
     }
 
-    /** @return array<array<int, string>> */
-    public static function invalidApplyArguments(): array
+    /** @return iterable<array{string}> */
+    public static function invalidApplyArguments(): iterable
     {
-        return [
-            [/** @lang GraphQL */ '123'],
-            [/** @lang GraphQL */ '"123"'],
-            [/** @lang GraphQL */ '[]'],
-            [/** @lang GraphQL */ '[123]'],
-        ];
+        yield [/** @lang GraphQL */ <<<'GRAPHQL'
+        123
+        GRAPHQL];
+        yield [/** @lang GraphQL */ <<<'GRAPHQL'
+        "123"
+        GRAPHQL];
+        yield [/** @lang GraphQL */ <<<'GRAPHQL'
+        []
+        GRAPHQL];
+        yield [/** @lang GraphQL */ <<<'GRAPHQL'
+        [123]
+        GRAPHQL];
     }
 
     /** @dataProvider invalidMessageArguments */
+    #[DataProvider('invalidMessageArguments')]
     public function testValidateMessageArgument(string $messageArgument): void
     {
         $this->expectException(DefinitionException::class);
-        $this->buildSchema(/** @lang GraphQL */ "
-        type Query {
-            foo(bar: ID @rules(apply: [\"email\"], messages: {$messageArgument})): ID
-        }
-        ");
+        $this->buildSchema(/** @lang GraphQL */ <<<GRAPHQL
+                type Query {
+                    foo(bar: ID @rules(apply: ["email"], messages: {$messageArgument})): ID
+                }
+        GRAPHQL);
     }
 
-    /** @return array<array<int, string>> */
-    public static function invalidMessageArguments(): array
+    /** @return iterable<array{string}> */
+    public static function invalidMessageArguments(): iterable
     {
-        return [
-            [/** @lang GraphQL */ '"foo"'],
-            [/** @lang GraphQL */ '{foo: 3}'],
-            [/** @lang GraphQL */ '[1, 2]'],
-            [/** @lang GraphQL */ '[{foo: 3}]'],
-            [/** @lang GraphQL */ '[{rule: "email"}]'],
-            [/** @lang GraphQL */ '[{rule: "email", message: null}]'],
-            [/** @lang GraphQL */ '[{rule: 3, message: "asfd"}]'],
-        ];
+        yield [/** @lang GraphQL */ <<<'GRAPHQL'
+        "foo"
+        GRAPHQL];
+        yield [/** @lang GraphQL */ <<<'GRAPHQL'
+        {foo: 3}
+        GRAPHQL];
+        yield [/** @lang GraphQL */ <<<'GRAPHQL'
+        [1, 2]
+        GRAPHQL];
+        yield [/** @lang GraphQL */ <<<'GRAPHQL'
+        [{foo: 3}]
+        GRAPHQL];
+        yield [/** @lang GraphQL */ <<<'GRAPHQL'
+        [{rule: "email"}]
+        GRAPHQL];
+        yield [/** @lang GraphQL */ <<<'GRAPHQL'
+        [{rule: "email", message: null}]
+        GRAPHQL];
+        yield [/** @lang GraphQL */ <<<'GRAPHQL'
+        [{rule: 3, message: "asfd"}]
+        GRAPHQL];
+    }
+
+    public function testValidateElementsOfListType(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+                type Query {
+                    foo(
+                        bar: [String]
+                        @rules(
+                            apply: ["required"]
+                        )
+                    ): String
+                }
+        GRAPHQL;
+
+        $this
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+                        {
+                            foo(
+                                bar: ["", null, "bar"]
+                            )
+                        }
+            GRAPHQL)
+            ->assertGraphQLValidationKeys(['bar.0', 'bar.1']);
+
+        $this
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+                        {
+                            foo(
+                                bar: []
+                            )
+                        }
+            GRAPHQL)
+            ->assertJson([
+                'data' => [
+                    'foo' => Foo::THE_ANSWER,
+                ],
+            ]);
+
+        $this
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+                        {
+                            foo
+                        }
+            GRAPHQL)
+            ->assertJson([
+                'data' => [
+                    'foo' => Foo::THE_ANSWER,
+                ],
+            ]);
     }
 }
