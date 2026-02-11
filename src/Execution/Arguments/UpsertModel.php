@@ -19,7 +19,7 @@ class UpsertModel implements ArgResolver
 
     /**
      * @param  callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver  $previous
-     * @param  array<string>|null  $identifyingColumns
+     * @param  array<int, string>|null  $identifyingColumns
      */
     public function __construct(
         callable $previous,
@@ -78,7 +78,11 @@ class UpsertModel implements ArgResolver
         return ($this->previous)($model, $args);
     }
 
-    /** @return array<string, mixed>|null */
+    /**
+     * @param  array<int, string>  $identifyingColumns
+     *
+     * @return array<string, mixed>|null
+     */
     protected function identifyingColumnValues(ArgumentSet $args, array $identifyingColumns): ?array
     {
         $identifyingValues = array_intersect_key(
