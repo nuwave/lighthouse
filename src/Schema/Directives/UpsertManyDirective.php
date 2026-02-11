@@ -85,10 +85,8 @@ GRAPHQL;
     {
         $identifyingColumns = $this->directiveArgValue('identifyingColumns');
 
-        if (! is_array($identifyingColumns) || $identifyingColumns !== []) {
-            return;
+        if ($identifyingColumns === []) {
+            throw new DefinitionException("Must specify non-empty list of columns in `identifyingColumns` argument of `@{$this->name()}` directive on `{$location}`.");
         }
-
-        throw new DefinitionException("Must specify non-empty list of columns in `identifyingColumns` argument of `@{$this->name()}` directive on `{$location}`.");
     }
 }
