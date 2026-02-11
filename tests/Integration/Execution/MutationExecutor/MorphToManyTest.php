@@ -2,8 +2,10 @@
 
 namespace Tests\Integration\Execution\MutationExecutor;
 
+use Nuwave\Lighthouse\Execution\Arguments\UpsertModel;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Tag;
+use Tests\Utils\Models\Task;
 
 final class MorphToManyTest extends DBTestCase
 {
@@ -220,6 +222,37 @@ final class MorphToManyTest extends DBTestCase
                 ],
             ],
         ]);
+    }
+
+    public function testNestedUpsertByIDDoesNotModifyUnrelatedMorphToManyModel(): void
+    {
+        $taskA = factory(Task::class)->create();
+        $taskB = factory(Task::class)->create();
+        $tagA = factory(Tag::class)->create();
+
+        $taskA->tags()->attach($tagA);
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($taskID: ID!, $tagID: ID!) {
+            upsertTask(input: {
+                id: $taskID
+                name: "task-b"
+                tags: {
+                    upsert: [{ id: $tagID, name: "hacked" }]
+                }
+            }) {
+                id
+            }
+        }
+        GRAPHQL, [
+            'taskID' => $taskB->id,
+            'tagID' => $tagA->id,
+        ])->assertGraphQLErrorMessage(UpsertModel::CANNOT_UPSERT_UNRELATED_MODEL);
+
+        $tagA->refresh();
+        $this->assertNotSame('hacked', $tagA->name);
+        $this->assertCount(1, $taskA->tags()->whereKey($tagA->id)->get());
+        $this->assertCount(0, $taskB->tags()->whereKey($tagA->id)->get());
     }
 
     public function testCreateANewTagRelationByUsingCreate(): void

@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Execution\MutationExecutor;
 
+use Nuwave\Lighthouse\Execution\Arguments\UpsertModel;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Image;
@@ -224,6 +225,38 @@ final class MorphManyTest extends DBTestCase
                 ],
             ],
         ]);
+    }
+
+    public function testNestedUpsertByIDDoesNotModifyUnrelatedMorphManyModel(): void
+    {
+        $taskA = factory(Task::class)->create();
+        $taskB = factory(Task::class)->create();
+
+        $imageA = factory(Image::class)->make();
+        $imageA->url = 'from-task-a';
+        $imageA->imageable()->associate($taskA);
+        $imageA->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($taskID: ID!, $imageID: ID!) {
+            upsertTask(input: {
+                id: $taskID
+                name: "task-b"
+                images: {
+                    upsert: [{ id: $imageID, url: "hacked" }]
+                }
+            }) {
+                id
+            }
+        }
+        GRAPHQL, [
+            'taskID' => $taskB->id,
+            'imageID' => $imageA->id,
+        ])->assertGraphQLErrorMessage(UpsertModel::CANNOT_UPSERT_UNRELATED_MODEL);
+
+        $imageA->refresh();
+        $this->assertSame('from-task-a', $imageA->url);
+        $this->assertSame($taskA->id, $imageA->imageable_id);
     }
 
     public function testAllowsNullOperations(): void

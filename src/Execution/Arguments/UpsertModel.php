@@ -2,17 +2,26 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
+use GraphQL\Error\Error;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
 class UpsertModel implements ArgResolver
 {
+    public const CANNOT_UPSERT_UNRELATED_MODEL = 'Cannot upsert a model that is not related to the given parent.';
+
     /** @var callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver */
     protected $previous;
 
-    /** @param  callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver  $previous */
-    public function __construct(callable $previous)
-    {
+    /**
+     * @param  callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver  $previous
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>|null  $parentRelation
+     */
+    public function __construct(
+        callable $previous,
+        protected ?Relation $parentRelation = null,
+    ) {
         $this->previous = $previous;
     }
 
@@ -26,8 +35,15 @@ class UpsertModel implements ArgResolver
 
         $id = $this->retrieveID($model, $args);
         if ($id) {
-            $existingModel = $model->newQuery()
+            $existingModel = $this->queryBuilder($model)
                 ->find($id);
+            if (
+                $existingModel === null
+                && $this->parentRelation !== null
+                && $model->newQuery()->find($id) !== null
+            ) {
+                throw new Error(self::CANNOT_UPSERT_UNRELATED_MODEL);
+            }
 
             if ($existingModel !== null) {
                 $model = $existingModel;
@@ -55,5 +71,12 @@ class UpsertModel implements ArgResolver
         }
 
         return null;
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model> */
+    protected function queryBuilder(Model $model)
+    {
+        return $this->parentRelation?->getQuery()
+            ?? $model->newQuery();
     }
 }
