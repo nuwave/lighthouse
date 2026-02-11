@@ -12,8 +12,6 @@ class UpsertModel implements ArgResolver
 {
     public const MISSING_IDENTIFYING_COLUMNS_FOR_UPSERT = 'All configured identifying columns must be present and non-null for upsert.';
 
-    public const CANNOT_UPSERT_UNRELATED_MODEL = 'Cannot upsert a model that is not related to the given parent.';
-
     /** @var callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver */
     protected $previous;
 
@@ -44,13 +42,6 @@ class UpsertModel implements ArgResolver
                 ?? throw new Error(self::MISSING_IDENTIFYING_COLUMNS_FOR_UPSERT);
 
             $existingModel = $this->queryBuilder($model)->firstWhere($identifyingColumns);
-            if (
-                $existingModel === null
-                && $this->parentRelation !== null
-                && $model->newQuery()->where($identifyingColumns)->exists()
-            ) {
-                throw new Error(self::CANNOT_UPSERT_UNRELATED_MODEL);
-            }
 
             if ($existingModel !== null) {
                 $model = $existingModel;
@@ -61,14 +52,6 @@ class UpsertModel implements ArgResolver
             $id = $this->retrieveID($model, $args);
             if ($id) {
                 $existingModel = $this->queryBuilder($model)->find($id);
-                if (
-                    $existingModel === null
-                    && $this->parentRelation !== null
-                    && $model->newQuery()->find($id) !== null
-                ) {
-                    throw new Error(self::CANNOT_UPSERT_UNRELATED_MODEL);
-                }
-
                 if ($existingModel !== null) {
                     $model = $existingModel;
                 }
@@ -94,8 +77,8 @@ class UpsertModel implements ArgResolver
             return null;
         }
 
-        foreach ($identifyingValues as $identifyingColumn) {
-            if ($identifyingColumn === null) {
+        foreach ($identifyingValues as $identifyingValue) {
+            if ($identifyingValue === null) {
                 return null;
             }
         }
