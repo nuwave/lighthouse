@@ -21,10 +21,9 @@ final class UpsertDirectiveTest extends DBTestCase
         $user->save();
 
         $task = factory(Task::class)->make();
-        $task->id = 1;
-        $task->user()->associate($user);
-        $task->save();
         $this->assertInstanceOf(Task::class, $task);
+        $task->user()->associate($user);
+        $task->id = 1;
         $task->name = 'old';
         $task->save();
 
