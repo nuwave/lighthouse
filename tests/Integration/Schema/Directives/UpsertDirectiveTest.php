@@ -467,8 +467,7 @@ GRAPHQL;
         }
         GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */
-            <<<'GRAPHQL'
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation ($userID: Int!, $taskID: Int!) {
             updateUser(input: {
                 id: $userID
@@ -525,8 +524,7 @@ GRAPHQL;
         }
         GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */
-            <<<'GRAPHQL'
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation ($userID: Int!) {
             updateUser(input: {
                 id: $userID
