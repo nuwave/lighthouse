@@ -15,12 +15,10 @@ class UpsertModel implements ArgResolver
     /** @var callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver */
     protected $previous;
 
-    /**
-     * @param  callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver  $previous
-     * @param  array<string>|null  $identifyingColumns
-     */
+    /** @param  callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver  $previous */
     public function __construct(
         callable $previous,
+        /** @var array<string>|null */
         protected ?array $identifyingColumns = null,
         /** @var \Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>|null $parentRelation */
         protected ?Relation $parentRelation = null,
