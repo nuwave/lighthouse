@@ -25,7 +25,7 @@ directive @upsert(
   Specify the columns by which to upsert the model.
   This is optional, defaults to the ID or model Key.
   """
-  identifyingColumns: [String!] = []
+  identifyingColumns: [String!]
 
   """
   Specify the name of the relation on the parent model.

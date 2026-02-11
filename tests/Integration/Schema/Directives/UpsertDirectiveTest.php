@@ -7,7 +7,6 @@ use Illuminate\Container\Container;
 use Nuwave\Lighthouse\Execution\Arguments\UpsertModel;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\DBTestCase;
-use Tests\Utils\Models\Company;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
@@ -273,85 +272,71 @@ GRAPHQL;
 
     public function testDirectUpsertByIdentifyingColumns(): void
     {
-        $company = factory(Company::class)->make();
-        $company->id = 1;
-        $company->save();
+        $user = factory(User::class)->make();
+        $user->name = 'bar';
+        $user->email = 'foo@te.st';
+        $user->password = 'old-password';
+        $user->save();
 
-        $this->schema
-            /** @lang GraphQL */
-            .= '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             email: String!
             name: String!
-            company_id: ID!
         }
 
         type Mutation {
-            upsertUser(name: String!, email: String!, company_id:ID!): User @upsert(identifyingColumns: ["name", "company_id"])
+            upsertUser(name: String!, email: String!, password: String!): User @upsert(identifyingColumns: ["name", "email"])
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(
-            /** @lang GraphQL */
-            '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             upsertUser(
                 email: "foo@te.st"
                 name: "bar"
-                company_id: 1
+                password: "new-password"
             ) {
                 name
                 email
-                company_id
             }
         }
-        ',
-        )->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'upsertUser' => [
                     'email' => 'foo@te.st',
                     'name' => 'bar',
-                    'company_id' => 1,
                 ],
             ],
         ]);
 
+        $this->assertSame(1, User::count());
         $user = User::firstOrFail();
+        $this->assertSame('new-password', $user->password);
 
-        $this->assertSame('bar', $user->name);
-        $this->assertSame('foo@te.st', $user->email);
-        $this->assertSame(1, $user->company_id);
-
-        $this->graphQL(
-            /** @lang GraphQL */
-            '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             upsertUser(
-                email: "bar@te.st"
+                email: "foo@te.st"
                 name: "bar"
-                company_id: 1
+                password: "newer-password"
             ) {
                 name
                 email
-                company_id
             }
         }
-        ',
-        )->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'upsertUser' => [
-                    'email' => 'bar@te.st',
+                    'email' => 'foo@te.st',
                     'name' => 'bar',
-                    'company_id' => $company->id,
                 ],
             ],
         ]);
 
+        $this->assertSame(1, User::count());
         $user->refresh();
-
-        $this->assertSame('bar', $user->name);
-        $this->assertSame('bar@te.st', $user->email);
+        $this->assertSame('newer-password', $user->password);
     }
 
     public function testDirectUpsertByIdentifyingColumnsRequiresAllConfiguredColumns(): void
