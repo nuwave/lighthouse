@@ -4026,9 +4026,9 @@ directive @upsert(
 
   """
   Specify the columns by which to upsert the model.
-  This is optional, defaults to the ID or model key.
+  Optional, by default `id` or the primary key of the model are used.
   """
-  identifyingColumns: [String!] = []
+  identifyingColumns: [String!]
 
   """
   Specify the name of the relation on the parent model.
@@ -4075,9 +4075,9 @@ directive @upsertMany(
 
   """
   Specify the columns by which to upsert the model.
-  This is optional, defaults to the ID or model key.
+  Optional, by default `id` or the primary key of the model are used.
   """
-  identifyingColumns: [String!] = []
+  identifyingColumns: [String!]
 
   """
   Specify the name of the relation on the parent model.

@@ -4,6 +4,7 @@ namespace Tests\Integration\Schema\Directives;
 
 use GraphQL\Type\Definition\Type;
 use Illuminate\Container\Container;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\Arguments\UpsertModel;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\DBTestCase;
@@ -318,6 +319,35 @@ GRAPHQL;
             }
         }
         GRAPHQL)->assertGraphQLErrorMessage(UpsertModel::MISSING_IDENTIFYING_COLUMNS_FOR_UPSERT);
+    }
+
+    public function testDirectUpsertManyByIdentifyingColumnsMustNotBeEmpty(): void
+    {
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type User {
+            id: ID!
+            email: String!
+            name: String!
+        }
+
+        input UpsertUserInput {
+            email: String!
+            name: String!
+        }
+
+        type Mutation {
+            upsertUsers(inputs: [UpsertUserInput!]!): [User!]! @upsertMany(identifyingColumns: [])
+        }
+        GRAPHQL;
+
+        $this->expectException(DefinitionException::class);
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            upsertUsers(inputs: [{ email: "foo@te.st", name: "bar" }]) {
+                id
+            }
+        }
+        GRAPHQL);
     }
 
     public function testNestedUpsertManyByIdDoesNotModifySiblingParentsRelatedModel(): void

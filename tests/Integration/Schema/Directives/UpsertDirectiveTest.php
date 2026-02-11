@@ -4,6 +4,7 @@ namespace Tests\Integration\Schema\Directives;
 
 use GraphQL\Type\Definition\Type;
 use Illuminate\Container\Container;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\Arguments\UpsertModel;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\DBTestCase;
@@ -209,6 +210,10 @@ GRAPHQL;
 
     public function testDirectUpsertByIdentifyingColumn(): void
     {
+        $email = 'foo@te.st';
+        $originalName = 'bar';
+        $updatedName = 'foo';
+
         $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
@@ -222,52 +227,123 @@ GRAPHQL;
         GRAPHQL;
 
         $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
-        mutation {
+        mutation ($email: String!, $name: String!) {
             upsertUser(
-                email: "foo@te.st"
-                name: "bar"
+                email: $email
+                name: $name
             ) {
                 name
                 email
             }
         }
-        GRAPHQL)->assertJson([
+        GRAPHQL, [
+            'email' => $email,
+            'name' => $originalName,
+        ])->assertJson([
             'data' => [
                 'upsertUser' => [
-                    'email' => 'foo@te.st',
-                    'name' => 'bar',
+                    'email' => $email,
+                    'name' => $originalName,
                 ],
             ],
         ]);
 
         $user = User::firstOrFail();
 
-        $this->assertSame('bar', $user->name);
-        $this->assertSame('foo@te.st', $user->email);
+        $this->assertSame($originalName, $user->name);
+        $this->assertSame($email, $user->email);
 
         $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
-        mutation {
+        mutation ($email: String!, $name: String!) {
             upsertUser(
-                email: "foo@te.st"
-                name: "foo"
+                email: $email
+                name: $name
             ) {
                 name
                 email
             }
         }
-        GRAPHQL)->assertJson([
+        GRAPHQL, [
+            'email' => $email,
+            'name' => $updatedName,
+        ])->assertJson([
             'data' => [
                 'upsertUser' => [
-                    'email' => 'foo@te.st',
-                    'name' => 'foo',
+                    'email' => $email,
+                    'name' => $updatedName,
                 ],
             ],
         ]);
 
         $user->refresh();
 
-        $this->assertSame('foo', $user->name);
-        $this->assertSame('foo@te.st', $user->email);
+        $this->assertSame($updatedName, $user->name);
+        $this->assertSame($email, $user->email);
+    }
+
+    public function testDirectUpsertByIdentifyingColumnsMustNotBeEmpty(): void
+    {
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type User {
+            id: ID!
+            email: String!
+            name: String!
+        }
+
+        type Mutation {
+            upsertUser(name: String!, email: String!): User @upsert(identifyingColumns: [])
+        }
+        GRAPHQL;
+
+        $this->expectException(DefinitionException::class);
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            upsertUser(
+                email: "foo@te.st"
+                name: "bar"
+            ) {
+                id
+            }
+        }
+        GRAPHQL);
+    }
+
+    public function testNestedUpsertByIdentifyingColumnsMustNotBeEmpty(): void
+    {
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Mutation {
+            updateUser(input: UpdateUserInput! @spread): User @update
+        }
+
+        type Task {
+            id: Int
+            name: String!
+        }
+
+        type User {
+            id: Int
+            tasks: [Task!]! @hasMany
+        }
+
+        input UpdateUserInput {
+            id: Int
+            tasks: [UpdateTaskInput!] @upsert(relation: "tasks", identifyingColumns: [])
+        }
+
+        input UpdateTaskInput {
+            id: Int
+            name: String
+        }
+        GRAPHQL;
+
+        $this->expectException(DefinitionException::class);
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            updateUser(input: {id: 1}) {
+                id
+            }
+        }
+        GRAPHQL);
     }
 
     public function testDirectUpsertByIdentifyingColumns(): void
