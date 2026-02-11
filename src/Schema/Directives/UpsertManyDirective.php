@@ -22,6 +22,12 @@ directive @upsertMany(
   model: String
 
   """
+  Specify the columns by which to upsert the model.
+  This is optional, defaults to the ID or model Key.
+  """
+  identifyingColumns: [String!] = []
+
+  """
   Specify the name of the relation on the parent model.
   This is only needed when using this directive as a nested arg
   resolver and if the name of the relation is not the arg name.
@@ -33,6 +39,10 @@ GRAPHQL;
 
     protected function makeExecutionFunction(?Relation $parentRelation = null): callable
     {
-        return new UpsertModel(new SaveModel($parentRelation));
+        return new UpsertModel(
+            new SaveModel($parentRelation),
+            $this->directiveArgValue('identifyingColumns'),
+            $parentRelation,
+        );
     }
 }

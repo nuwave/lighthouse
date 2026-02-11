@@ -260,6 +260,15 @@ type Mutation {
 }
 ```
 
+If you want to identify records by custom fields, pass `identifyingColumns`:
+
+```graphql
+type Mutation {
+  upsertUser(name: String!, email: String!): User!
+    @upsert(identifyingColumns: ["email"])
+}
+```
+
 Since upsert can create or update your data, your input should mark the minimum required fields as non-nullable.
 
 ```graphql

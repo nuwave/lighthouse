@@ -11,7 +11,11 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
-- Add support for identifyingColumns on upserts https://github.com/nuwave/lighthouse/pull/2426
+- Add support for `identifyingColumns` on `@upsert` and `@upsertMany` https://github.com/nuwave/lighthouse/pull/2426
+
+### Changed
+
+- Scope nested `@upsert` and `@upsertMany` lookups to their parent relation https://github.com/nuwave/lighthouse/pull/2426
 
 ## v6.64.3
 

@@ -2,22 +2,32 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
+use GraphQL\Error\Error;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
 class UpsertModel implements ArgResolver
 {
+    public const MISSING_IDENTIFYING_COLUMNS_FOR_UPSERT = 'All configured identifying columns must be present and non-null for upsert.';
+
+    public const CANNOT_UPSERT_UNRELATED_MODEL = 'Cannot upsert a model that is not related to the given parent.';
+
     /** @var callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver */
     protected $previous;
 
-    /** @var array<string> */
-    protected array $identifyingColumns;
-
-    /** @param  callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver  $previous */
-    public function __construct(callable $previous, ?array $identifyingColumns)
-    {
+    /**
+     * @param  callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver  $previous
+     * @param  array<string>|null  $identifyingColumns
+     */
+    public function __construct(
+        callable $previous,
+        protected ?array $identifyingColumns = null,
+        /** @var \Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>|null $parentRelation */
+        protected ?Relation $parentRelation = null,
+    ) {
         $this->previous = $previous;
-        $this->identifyingColumns = $identifyingColumns ?? [];
     }
 
     /**
@@ -29,15 +39,18 @@ class UpsertModel implements ArgResolver
         // TODO consider Laravel native ->upsert(), available from 8.10
         $existingModel = null;
 
-        if (! empty($this->identifyingColumns)) {
-            $existingModel = $model
-                ->newQuery()
-                ->firstWhere(
-                    array_intersect_key(
-                        $args->toArray(),
-                        array_flip($this->identifyingColumns),
-                    ),
-                );
+        if ($this->identifyingColumns) {
+            $identifyingColumns = $this->identifyingColumnValues($args, $this->identifyingColumns)
+                ?? throw new Error(self::MISSING_IDENTIFYING_COLUMNS_FOR_UPSERT);
+
+            $existingModel = $this->queryBuilder($model)->firstWhere($identifyingColumns);
+            if (
+                $existingModel === null
+                && $this->parentRelation !== null
+                && $model->newQuery()->where($identifyingColumns)->exists()
+            ) {
+                throw new Error(self::CANNOT_UPSERT_UNRELATED_MODEL);
+            }
 
             if ($existingModel !== null) {
                 $model = $existingModel;
@@ -47,9 +60,14 @@ class UpsertModel implements ArgResolver
         if ($existingModel === null) {
             $id = $this->retrieveID($model, $args);
             if ($id) {
-                $existingModel = $model
-                    ->newQuery()
-                    ->find($id);
+                $existingModel = $this->queryBuilder($model)->find($id);
+                if (
+                    $existingModel === null
+                    && $this->parentRelation !== null
+                    && $model->newQuery()->find($id) !== null
+                ) {
+                    throw new Error(self::CANNOT_UPSERT_UNRELATED_MODEL);
+                }
 
                 if ($existingModel !== null) {
                     $model = $existingModel;
@@ -58,6 +76,27 @@ class UpsertModel implements ArgResolver
         }
 
         return ($this->previous)($model, $args);
+    }
+
+    /** @return array<string, mixed>|null */
+    protected function identifyingColumnValues(ArgumentSet $args, array $identifyingColumns): ?array
+    {
+        $identifyingValues = array_intersect_key(
+            $args->toArray(),
+            array_flip($identifyingColumns),
+        );
+
+        if (count($identifyingValues) !== count($identifyingColumns)) {
+            return null;
+        }
+
+        foreach ($identifyingValues as $identifyingColumn) {
+            if ($identifyingColumn === null) {
+                return null;
+            }
+        }
+
+        return $identifyingValues;
     }
 
     /** @return mixed The value of the ID or null */
@@ -78,5 +117,12 @@ class UpsertModel implements ArgResolver
         }
 
         return null;
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model> */
+    protected function queryBuilder(Model $model): EloquentBuilder
+    {
+        return $this->parentRelation?->getQuery()
+            ?? $model->newQuery();
     }
 }

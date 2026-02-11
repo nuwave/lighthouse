@@ -4,6 +4,7 @@ namespace Tests\Integration\Schema\Directives;
 
 use GraphQL\Type\Definition\Type;
 use Illuminate\Container\Container;
+use Nuwave\Lighthouse\Execution\Arguments\UpsertModel;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Company;
@@ -14,11 +15,15 @@ final class UpsertDirectiveTest extends DBTestCase
 {
     public function testNestedArgResolver(): void
     {
-        factory(User::class)->create();
+        $user = factory(User::class)->make();
+        $user->id = 1;
+        $user->save();
 
-        $task = factory(Task::class)->create();
-        $this->assertInstanceOf(Task::class, $task);
+        $task = factory(Task::class)->make();
         $task->id = 1;
+        $task->user()->associate($user);
+        $task->save();
+        $this->assertInstanceOf(Task::class, $task);
         $task->name = 'old';
         $task->save();
 
@@ -268,7 +273,9 @@ GRAPHQL;
 
     public function testDirectUpsertByIdentifyingColumns(): void
     {
-        $company = factory(Company::class)->create(['id' => 1]);
+        $company = factory(Company::class)->make();
+        $company->id = 1;
+        $company->save();
 
         $this->schema
             /** @lang GraphQL */
@@ -345,6 +352,212 @@ GRAPHQL;
 
         $this->assertSame('bar', $user->name);
         $this->assertSame('bar@te.st', $user->email);
+    }
+
+    public function testDirectUpsertByIdentifyingColumnsRequiresAllConfiguredColumns(): void
+    {
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type User {
+            id: ID!
+            email: String
+            name: String
+        }
+
+        type Mutation {
+            upsertUser(name: String!, email: String): User @upsert(identifyingColumns: ["name", "email"])
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            upsertUser(name: "foo") {
+                id
+            }
+        }
+        GRAPHQL)->assertGraphQLErrorMessage(UpsertModel::MISSING_IDENTIFYING_COLUMNS_FOR_UPSERT);
+    }
+
+    public function testUpsertByIdentifyingColumnWithInputSpread(): void
+    {
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type User {
+            id: ID!
+            email: String!
+            name: String!
+        }
+
+        input UpsertUserInput {
+            email: String!
+            name: String!
+        }
+
+        type Mutation {
+            upsertUser(input: UpsertUserInput! @spread): User! @upsert(identifyingColumns: ["email"])
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            upsertUser(input: {
+                email: "foo@te.st"
+                name: "bar"
+            }) {
+                email
+                name
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'upsertUser' => [
+                    'email' => 'foo@te.st',
+                    'name' => 'bar',
+                ],
+            ],
+        ]);
+
+        $this->assertSame(1, User::count());
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            upsertUser(input: {
+                email: "foo@te.st"
+                name: "baz"
+            }) {
+                email
+                name
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'upsertUser' => [
+                    'email' => 'foo@te.st',
+                    'name' => 'baz',
+                ],
+            ],
+        ]);
+
+        $this->assertSame(1, User::count());
+        $this->assertSame('baz', User::firstOrFail()->name);
+    }
+
+    public function testNestedUpsertByIdDoesNotModifySiblingParentsRelatedModel(): void
+    {
+        $userA = factory(User::class)->create();
+        $userB = factory(User::class)->create();
+        $taskA = factory(Task::class)->make();
+        $taskA->name = 'from-user-a';
+        $taskA->user()->associate($userA);
+        $taskA->save();
+
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Mutation {
+            updateUser(input: UpdateUserInput! @spread): User @update
+        }
+
+        type Task {
+            id: Int
+            name: String!
+        }
+
+        type User {
+            id: Int
+            tasks: [Task!]! @hasMany
+        }
+
+        input UpdateUserInput {
+            id: Int
+            tasks: [UpdateTaskInput!] @upsert(relation: "tasks")
+        }
+
+        input UpdateTaskInput {
+            id: Int
+            name: String
+        }
+        GRAPHQL;
+
+        $this->graphQL(
+            /** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($userID: Int!, $taskID: Int!) {
+            updateUser(input: {
+                id: $userID
+                tasks: [{ id: $taskID, name: "hacked" }]
+            }) {
+                id
+            }
+        }
+        GRAPHQL,
+            [
+                'userID' => $userB->id,
+                'taskID' => $taskA->id,
+            ],
+        )->assertGraphQLErrorMessage(UpsertModel::CANNOT_UPSERT_UNRELATED_MODEL);
+
+        $taskA->refresh();
+        $this->assertSame($userA->id, $taskA->user_id);
+        $this->assertSame('from-user-a', $taskA->name);
+    }
+
+    public function testNestedUpsertByIdentifyingColumnDoesNotModifySiblingParentsRelatedModel(): void
+    {
+        $userA = factory(User::class)->create();
+        $userB = factory(User::class)->create();
+        $taskA = factory(Task::class)->make();
+        $taskA->name = 'same-name';
+        $taskA->difficulty = 1;
+        $taskA->user()->associate($userA);
+        $taskA->save();
+
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Mutation {
+            updateUser(input: UpdateUserInput! @spread): User @update
+        }
+
+        type Task {
+            id: Int
+            name: String!
+            difficulty: Int
+        }
+
+        type User {
+            id: Int
+            tasks: [Task!]! @hasMany
+        }
+
+        input UpdateUserInput {
+            id: Int
+            tasks: [UpdateTaskInput!] @upsert(relation: "tasks", identifyingColumns: ["name"])
+        }
+
+        input UpdateTaskInput {
+            id: Int
+            name: String!
+            difficulty: Int
+        }
+        GRAPHQL;
+
+        $this->graphQL(
+            /** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($userID: Int!) {
+            updateUser(input: {
+                id: $userID
+                tasks: [{ name: "same-name", difficulty: 2 }]
+            }) {
+                id
+                tasks {
+                    name
+                    difficulty
+                }
+            }
+        }
+        GRAPHQL,
+            [
+                'userID' => $userB->id,
+            ],
+        )->assertGraphQLErrorMessage(UpsertModel::CANNOT_UPSERT_UNRELATED_MODEL);
+
+        $taskA->refresh();
+        $this->assertSame($userA->id, $taskA->user_id);
+        $this->assertSame(1, $taskA->difficulty);
     }
 
     public static function resolveType(): Type
