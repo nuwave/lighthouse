@@ -76,6 +76,38 @@ Multiple service providers for optional features (auto-discovered via composer.j
 
 Tests use `Tests\Utils\` namespace for test fixtures (Models, Queries, Mutations, etc.).
 
+### Test data setup
+
+Use relations over direct access to foreign keys.
+
+```php
+$user = factory(User::class)->create();
+
+// Right
+$post = factory(Post::class)->make();
+$post->user()->associate($user);
+$post->save();
+
+// Wrong
+$post = factory(Post::class)->create([
+    'user_id' => $user->id,
+]);
+```
+
+Use properties over arrays to fill fields.
+
+```php
+// Right
+$user = new User();
+$user->name = 'Sepp';
+$user->save();
+
+// Wrong
+$user = User::create([
+    'name' => 'Sepp',
+]);
+```
+
 ### GraphQL string style in tests
 
 - Always annotate GraphQL literals with `/** @lang GraphQL */`.
