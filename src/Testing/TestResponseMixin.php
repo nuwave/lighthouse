@@ -14,7 +14,9 @@ use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-/** @mixin \Illuminate\Testing\TestResponse<*> */
+/**
+ * @mixin \Illuminate\Testing\TestResponse<*>
+ */
 class TestResponseMixin
 {
     public function assertGraphQLValidationError(): \Closure

@@ -6,7 +6,9 @@ use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Testing\TestResponse;
 
-/** @BeforeMethods({"setUp"}) */
+/**
+ * @BeforeMethods({"setUp"})
+ */
 abstract class QueryBench
 {
     protected BenchmarkTestCase $testCase;

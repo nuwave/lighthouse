@@ -5,7 +5,9 @@ namespace Benchmarks;
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 
-/** @BeforeMethods({"prepareSchema"}) */
+/**
+ * @BeforeMethods({"prepareSchema"})
+ */
 final class ASTUnserializationBench
 {
     public const SCHEMA = /** @lang GraphQL */ <<<'GRAPHQL'

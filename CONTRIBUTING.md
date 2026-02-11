@@ -106,11 +106,12 @@ $user = factory(User::class)->create();
 
 // Right
 $post = factory(Post::class)->make();
-$user->post()->save();
+$post->user()->associate($user);
+$post->save();
 
 // Wrong
-$user = factory(Post::class)->create([
-    'user_id' => $post->id,
+$post = factory(Post::class)->create([
+    'user_id' => $user->id,
 ]);
 ```
 

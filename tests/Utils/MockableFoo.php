@@ -2,7 +2,9 @@
 
 namespace Tests\Utils;
 
-/** Interface for mocking objects with a bar method. */
+/**
+ * Interface for mocking objects with a bar method.
+ */
 interface MockableFoo
 {
     public function bar(mixed ...$args): mixed;
