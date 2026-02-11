@@ -5,6 +5,7 @@ namespace Tests\Integration\OrderBy;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
+use Tests\Utils\Models\Team;
 use Tests\Utils\Models\User;
 
 final class OrderByDirectiveDBTest extends DBTestCase
@@ -94,9 +95,15 @@ final class OrderByDirectiveDBTest extends DBTestCase
 
     public function testOrderByMultipleColumns(): void
     {
-        $this->createUser('B', 2);
-        $this->createUser('A', 5);
-        $this->createUser('C', 2);
+        $teamA = factory(Team::class)->create();
+        $this->assertInstanceOf(Team::class, $teamA);
+
+        $teamB = factory(Team::class)->create();
+        $this->assertInstanceOf(Team::class, $teamB);
+
+        $this->createUser('B', $teamA);
+        $this->createUser('A', $teamB);
+        $this->createUser('C', $teamA);
 
         $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
@@ -120,15 +127,15 @@ final class OrderByDirectiveDBTest extends DBTestCase
             'data' => [
                 'users' => [
                     [
-                        'team_id' => 2,
+                        'team_id' => $teamA->id,
                         'name' => 'B',
                     ],
                     [
-                        'team_id' => 2,
+                        'team_id' => $teamA->id,
                         'name' => 'C',
                     ],
                     [
-                        'team_id' => 5,
+                        'team_id' => $teamB->id,
                         'name' => 'A',
                     ],
                 ],
@@ -442,12 +449,17 @@ final class OrderByDirectiveDBTest extends DBTestCase
         ]);
     }
 
-    private function createUser(string $name, ?int $teamId = null): User
+    private function createUser(string $name, ?Team $team = null): User
     {
         $user = factory(User::class)->make();
         $this->assertInstanceOf(User::class, $user);
         $user->name = $name;
-        $user->team_id = $teamId;
+        if ($team === null) {
+            $user->team()->dissociate();
+        } else {
+            $user->team()->associate($team);
+        }
+
         $user->save();
 
         return $user;

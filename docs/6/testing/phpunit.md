@@ -52,18 +52,19 @@ abstract class TestCase extends BaseTestCase
 The most natural way of testing your GraphQL API is to run actual GraphQL queries.
 
 The `graphQL` test helper runs a query on your GraphQL endpoint and returns a `TestResponse`.
+For GraphQL literals, prefer `/** @lang GraphQL */` plus nowdoc (`<<<'GRAPHQL'`).
 
 ```php
 public function testQueriesPosts(): void
 {
-    $response = $this->graphQL(/** @lang GraphQL */ '
+    $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
     {
         posts {
             id
             title
         }
     }
-    ');
+    GRAPHQL);
 }
 ```
 
@@ -72,13 +73,13 @@ If you want to use variables within your query, pass an associative array as the
 ```php
 public function testCreatePost(): void
 {
-    $response = $this->graphQL(/** @lang GraphQL */ '
+    $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation ($title: String!) {
             createPost(title: $title) {
                 id
             }
         }
-    ', [
+    GRAPHQL, [
         'title' => 'Automatic testing proven to reduce stress levels in developers'
     ]);
 }
@@ -89,7 +90,7 @@ You can run a subscription query the same way.
 ```php
 public function testPostsSubscription(): void
 {
-    $response = $this->graphQL(/** @lang GraphQL */ '
+    $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
     {
         subscription {
             onPostCreated {
@@ -97,7 +98,7 @@ public function testPostsSubscription(): void
             }
         }
     }
-    ');
+    GRAPHQL);
 }
 ```
 
@@ -116,14 +117,14 @@ public function testQueriesPosts(): void
 {
     $post = factory(Post::class)->create();
 
-    $this->graphQL(/** @lang GraphQL */ '
+    $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
     {
         posts {
             id
             title
         }
     }
-    ')->assertJson([
+    GRAPHQL)->assertJson([
         'data' => [
             'posts' => [
                 [
@@ -141,28 +142,33 @@ You can also extract data from the response and use it within any assertion.
 ```php
 public function testOrdersUsersByName(): void
 {
-    factory(User::class)->create(['name' => 'Oliver']);
-    factory(User::class)->create(['name' => 'Chris']);
-    factory(User::class)->create(['name' => 'Benedikt']);
+    $oliver = factory(User::class)->make();
+    $oliver->name = 'Oliver';
+    $oliver->save();
 
-    $response = $this->graphQL(/** @lang GraphQL */ '
+    $chris = factory(User::class)->make();
+    $chris->name = 'Chris';
+    $chris->save();
+
+    $benedikt = factory(User::class)->make();
+    $benedikt->name = 'Benedikt';
+    $benedikt->save();
+
+    $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
     {
         users(orderBy: "name") {
             name
         }
     }
-    ');
+    GRAPHQL);
 
     $names = $response->json("data.*.name");
 
-    $this->assertSame(
-        [
-            'Benedikt',
-            'Chris',
-            'Oliver',
-        ],
-        $names
-    );
+    $this->assertSame([
+        'Benedikt',
+        'Chris',
+        'Oliver',
+    ], $names);
 }
 ```
 
@@ -237,11 +243,11 @@ For example, you might want to ensure that validation works properly:
 
 ```php
 $this
-    ->graphQL(/** @lang GraphQL */ '
+    ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
     mutation {
         createUser(email: "invalid email")
     }
-    ')
+    GRAPHQL)
     ->assertGraphQLValidationKeys(['email']);
 ```
 
@@ -256,11 +262,11 @@ such as `assertGraphQLErrorMessage()`:
 
 ```php
 $this
-    ->graphQL(/** @lang GraphQL */ '
+    ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
     mutation {
         shouldTriggerSomeError
     }
-    ')
+    GRAPHQL)
     ->assertGraphQLErrorMessage($expectedMessage);
 ```
 
@@ -271,11 +277,11 @@ You must disable Lighthouse's error handling with `rethrowGraphQLErrors()` to en
 $this->rethrowGraphQLErrors();
 
 $this->expectException(SomethingWentWrongException::class);
-$this->graphQL(/** @lang GraphQL */ '
+$this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
 {
     oops
 }
-');
+GRAPHQL);
 ```
 
 ## Simulating File Uploads
@@ -286,11 +292,11 @@ Since multipart form requests are tricky to construct, you can use the `multipar
 
 ```php
 $operations = [
-    'query' => /** @lang GraphQL */ '
+    'query' => /** @lang GraphQL */ <<<'GRAPHQL'
         mutation ($file: Upload!) {
             upload(file: $file)
         }
-    ',
+    GRAPHQL,
     'variables' => [
         'file' => null,
     ],
@@ -343,12 +349,12 @@ When sending requests with field containing `@defer`, use the `streamGraphQL()` 
 It automatically captures the full streamed response and provides you the returned chunks.
 
 ```php
-$chunks = $this->streamGraphQL(/** @lang GraphQL */ '
+$chunks = $this->streamGraphQL(/** @lang GraphQL */ <<<'GRAPHQL'
 {
     now
     later @defer
 }
-');
+GRAPHQL);
 
 $this->assertSame(
     [
@@ -399,11 +405,11 @@ Assertions work differently as a result:
 ```php
 public function testHelloWorld(): void
 {
-    $this->graphQL(/** @lang GraphQL */ '
+    $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
     {
         hello
     }
-    ')->seeJson([
+    GRAPHQL)->seeJson([
         'data' => [
             'hello' => 'world',
         ],
