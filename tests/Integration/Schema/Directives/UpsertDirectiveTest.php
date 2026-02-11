@@ -277,9 +277,7 @@ GRAPHQL;
         $company->id = 1;
         $company->save();
 
-        $this->schema
-            /** @lang GraphQL */
-            .= '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             email: String!
@@ -288,13 +286,11 @@ GRAPHQL;
         }
 
         type Mutation {
-            upsertUser(name: String!, email: String!, company_id:ID!): User @upsert(identifyingColumns: ["name", "company_id"])
+            upsertUser(name: String!, email: String!, company_id: ID!): User @upsert(identifyingColumns: ["name", "company_id"])
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(
-            /** @lang GraphQL */
-            '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             upsertUser(
                 email: "foo@te.st"
@@ -306,8 +302,7 @@ GRAPHQL;
                 company_id
             }
         }
-        ',
-        )->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'upsertUser' => [
                     'email' => 'foo@te.st',
@@ -323,9 +318,7 @@ GRAPHQL;
         $this->assertSame('foo@te.st', $user->email);
         $this->assertSame(1, $user->company_id);
 
-        $this->graphQL(
-            /** @lang GraphQL */
-            '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             upsertUser(
                 email: "bar@te.st"
@@ -337,8 +330,7 @@ GRAPHQL;
                 company_id
             }
         }
-        ',
-        )->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'upsertUser' => [
                     'email' => 'bar@te.st',
@@ -475,8 +467,7 @@ GRAPHQL;
         }
         GRAPHQL;
 
-        $this->graphQL(
-            /** @lang GraphQL */ <<<'GRAPHQL'
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation ($userID: Int!, $taskID: Int!) {
             updateUser(input: {
                 id: $userID
@@ -485,12 +476,10 @@ GRAPHQL;
                 id
             }
         }
-        GRAPHQL,
-            [
-                'userID' => $userB->id,
-                'taskID' => $taskA->id,
-            ],
-        )->assertGraphQLErrorMessage(UpsertModel::CANNOT_UPSERT_UNRELATED_MODEL);
+        GRAPHQL, [
+            'userID' => $userB->id,
+            'taskID' => $taskA->id,
+        ])->assertGraphQLErrorMessage(UpsertModel::CANNOT_UPSERT_UNRELATED_MODEL);
 
         $taskA->refresh();
         $this->assertSame($userA->id, $taskA->user_id);
@@ -535,8 +524,7 @@ GRAPHQL;
         }
         GRAPHQL;
 
-        $this->graphQL(
-            /** @lang GraphQL */ <<<'GRAPHQL'
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation ($userID: Int!) {
             updateUser(input: {
                 id: $userID
@@ -549,11 +537,9 @@ GRAPHQL;
                 }
             }
         }
-        GRAPHQL,
-            [
-                'userID' => $userB->id,
-            ],
-        )->assertGraphQLErrorMessage(UpsertModel::CANNOT_UPSERT_UNRELATED_MODEL);
+        GRAPHQL, [
+            'userID' => $userB->id,
+        ])->assertGraphQLErrorMessage(UpsertModel::CANNOT_UPSERT_UNRELATED_MODEL);
 
         $taskA->refresh();
         $this->assertSame($userA->id, $taskA->user_id);
