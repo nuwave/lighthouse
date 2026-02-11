@@ -5,7 +5,9 @@ namespace Tests\Utils\Bind;
 use Nuwave\Lighthouse\Bind\BindDefinition;
 use PHPUnit\Framework\Assert;
 
-/** @template TReturn */
+/**
+ * @template TReturn
+ */
 final class SpyCallableClassBinding
 {
     private mixed $value = null;

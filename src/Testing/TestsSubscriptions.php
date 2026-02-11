@@ -8,7 +8,9 @@ use Nuwave\Lighthouse\Subscriptions\BroadcastDriverManager;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 
-/** Sets up the environment for testing subscriptions. */
+/**
+ * Sets up the environment for testing subscriptions.
+ */
 trait TestsSubscriptions
 {
     protected function setUpTestsSubscriptions(): void
