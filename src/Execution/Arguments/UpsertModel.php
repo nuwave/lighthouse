@@ -107,7 +107,7 @@ class UpsertModel implements ArgResolver
     /** @return \Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model> */
     protected function queryBuilder(Model $model): EloquentBuilder
     {
-        return $this->parentRelation?->getQuery()
+        return $this->parentRelation?->getQuery()->clone()
             ?? $model->newQuery();
     }
 }
