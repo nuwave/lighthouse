@@ -299,10 +299,12 @@ final class BelongsToTest extends DBTestCase
                 id
             }
         }
-        GRAPHQL, [
-            'taskID' => $task->id,
-            'userID' => $userA->id,
-        ])->assertGraphQLErrorMessage(UpsertModel::CANNOT_UPSERT_UNRELATED_MODEL);
+        GRAPHQL,
+            [
+                'taskID' => $task->id,
+                'userID' => $userA->id,
+            ],
+        )->assertGraphQLErrorMessage(UpsertModel::CANNOT_UPSERT_UNRELATED_MODEL);
 
         $userA->refresh();
         $task->refresh();

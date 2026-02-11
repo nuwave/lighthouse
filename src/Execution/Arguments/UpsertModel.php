@@ -19,12 +19,12 @@ class UpsertModel implements ArgResolver
 
     /**
      * @param  callable|\Nuwave\Lighthouse\Support\Contracts\ArgResolver  $previous
+     * @param  array<int, string>|null  $identifyingColumns
      */
     public function __construct(
         callable $previous,
-        /** @var array<int, string>|null */
         protected ?array $identifyingColumns = null,
-        /** @var \Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>|null */
+        /** @var \Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>|null $parentRelation */
         protected ?Relation $parentRelation = null,
     ) {
         $this->previous = $previous;
@@ -43,14 +43,11 @@ class UpsertModel implements ArgResolver
             $identifyingColumns = $this->identifyingColumnValues($args, $this->identifyingColumns)
                 ?? throw new Error(self::MISSING_IDENTIFYING_COLUMNS_FOR_UPSERT);
 
-            $existingModel = $this->queryBuilder($model)
-                ->firstWhere($identifyingColumns);
+            $existingModel = $this->queryBuilder($model)->firstWhere($identifyingColumns);
             if (
                 $existingModel === null
                 && $this->parentRelation !== null
-                && $model->newQuery()
-                    ->where($identifyingColumns)
-                    ->exists()
+                && $model->newQuery()->where($identifyingColumns)->exists()
             ) {
                 throw new Error(self::CANNOT_UPSERT_UNRELATED_MODEL);
             }
@@ -63,8 +60,7 @@ class UpsertModel implements ArgResolver
         if ($existingModel === null) {
             $id = $this->retrieveID($model, $args);
             if ($id) {
-                $existingModel = $this->queryBuilder($model)
-                    ->find($id);
+                $existingModel = $this->queryBuilder($model)->find($id);
                 if (
                     $existingModel === null
                     && $this->parentRelation !== null

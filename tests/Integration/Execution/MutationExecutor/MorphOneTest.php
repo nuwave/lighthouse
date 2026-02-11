@@ -412,8 +412,10 @@ final class MorphOneTest extends DBTestCase
         $task = factory(Task::class)->create();
         $this->assertInstanceOf(Task::class, $task);
 
-        $image = factory(Image::class)->create();
+        $image = factory(Image::class)->make();
         $this->assertInstanceOf(Image::class, $image);
+        $image->url = 'original';
+        $image->save();
 
         $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation ($input: UpdateTaskInput!) {
@@ -436,17 +438,10 @@ final class MorphOneTest extends DBTestCase
                     ],
                 ],
             ],
-        ])->assertJson([
-            'data' => [
-                'updateTask' => [
-                    'id' => '1',
-                    'name' => 'foo',
-                    'image' => [
-                        'url' => 'foo',
-                    ],
-                ],
-            ],
-        ]);
-    }
+        ])->assertGraphQLErrorMessage(UpsertModel::CANNOT_UPSERT_UNRELATED_MODEL);
 
+        $image->refresh();
+        $this->assertSame('original', $image->url);
+        $this->assertNull($image->imageable_id);
+    }
 }
