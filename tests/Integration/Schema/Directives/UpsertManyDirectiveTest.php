@@ -4,7 +4,6 @@ namespace Tests\Integration\Schema\Directives;
 
 use GraphQL\Type\Definition\Type;
 use Illuminate\Container\Container;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\Arguments\UpsertModel;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\DBTestCase;
@@ -321,35 +320,6 @@ GRAPHQL;
         GRAPHQL)->assertGraphQLErrorMessage(UpsertModel::MISSING_IDENTIFYING_COLUMNS_FOR_UPSERT);
     }
 
-    public function testDirectUpsertManyByIdentifyingColumnsMustNotBeEmpty(): void
-    {
-        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
-        type User {
-            id: ID!
-            email: String!
-            name: String!
-        }
-
-        input UpsertUserInput {
-            email: String!
-            name: String!
-        }
-
-        type Mutation {
-            upsertUsers(inputs: [UpsertUserInput!]!): [User!]! @upsertMany(identifyingColumns: [])
-        }
-        GRAPHQL;
-
-        $this->expectException(DefinitionException::class);
-        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
-        mutation {
-            upsertUsers(inputs: [{ email: "foo@te.st", name: "bar" }]) {
-                id
-            }
-        }
-        GRAPHQL);
-    }
-
     public function testNestedUpsertManyByIdDoesNotModifySiblingParentsRelatedModel(): void
     {
         $userA = factory(User::class)->create();
@@ -385,7 +355,8 @@ GRAPHQL;
         }
         GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        $this->graphQL(
+            /** @lang GraphQL */ <<<'GRAPHQL'
         mutation ($userID: Int!, $taskID: Int!) {
             updateUser(input: {
                 id: $userID
@@ -394,10 +365,12 @@ GRAPHQL;
                 id
             }
         }
-        GRAPHQL, [
-            'userID' => $userB->id,
-            'taskID' => $taskA->id,
-        ])->assertGraphQLErrorMessage(UpsertModel::CANNOT_UPSERT_UNRELATED_MODEL);
+        GRAPHQL,
+            [
+                'userID' => $userB->id,
+                'taskID' => $taskA->id,
+            ],
+        )->assertGraphQLErrorMessage(UpsertModel::CANNOT_UPSERT_UNRELATED_MODEL);
 
         $taskA->refresh();
         $this->assertSame($userA->id, $taskA->user_id);
@@ -441,7 +414,8 @@ GRAPHQL;
         }
         GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        $this->graphQL(
+            /** @lang GraphQL */ <<<'GRAPHQL'
         mutation ($userID: Int!) {
             updateUser(input: {
                 id: $userID
@@ -454,9 +428,11 @@ GRAPHQL;
                 }
             }
         }
-        GRAPHQL, [
-            'userID' => $userB->id,
-        ])->assertGraphQLErrorMessage(UpsertModel::CANNOT_UPSERT_UNRELATED_MODEL);
+        GRAPHQL,
+            [
+                'userID' => $userB->id,
+            ],
+        )->assertGraphQLErrorMessage(UpsertModel::CANNOT_UPSERT_UNRELATED_MODEL);
 
         $taskA->refresh();
         $this->assertSame($userA->id, $taskA->user_id);

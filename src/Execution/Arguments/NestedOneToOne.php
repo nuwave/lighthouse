@@ -42,7 +42,7 @@ class NestedOneToOne implements ArgResolver
         }
 
         if ($args->has('upsert')) {
-            $upsertModel = new ResolveNested(new UpsertModel(new SaveModel($relation), null, $relation));
+            $upsertModel = new ResolveNested(new UpsertModel(new SaveModel($relation)));
 
             $upsertModel($relation->first() ?? $relation->make(), $args->arguments['upsert']->value);
         }

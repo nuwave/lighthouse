@@ -41,7 +41,7 @@ class NestedBelongsTo implements ArgResolver
         }
 
         if ($args->has('upsert')) {
-            $upsertModel = new ResolveNested(new UpsertModel(new SaveModel(), null, $this->relation));
+            $upsertModel = new ResolveNested(new UpsertModel(new SaveModel()));
             $related = $upsertModel(
                 $this->relation->make(),
                 $args->arguments['upsert']->value,
