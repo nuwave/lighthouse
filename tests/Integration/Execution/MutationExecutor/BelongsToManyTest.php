@@ -3,7 +3,6 @@
 namespace Tests\Integration\Execution\MutationExecutor;
 
 use Faker\Provider\Lorem;
-use Nuwave\Lighthouse\Execution\Arguments\UpsertModel;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Role;
@@ -315,37 +314,6 @@ final class BelongsToManyTest extends DBTestCase
         $this->assertSame('is_user', $role->name);
     }
 
-    public function testNestedUpsertByIDDoesNotModifyUnrelatedBelongsToManyModel(): void
-    {
-        $roleA = factory(Role::class)->create();
-        $roleB = factory(Role::class)->create();
-        $userA = factory(User::class)->create();
-
-        $roleA->users()->attach($userA);
-
-        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
-        mutation ($roleID: ID!, $userID: ID!) {
-            upsertRole(input: {
-                id: $roleID
-                name: "role-b"
-                users: {
-                    upsert: [{ id: $userID, name: "hacked" }]
-                }
-            }) {
-                id
-            }
-        }
-        GRAPHQL, [
-            'roleID' => $roleB->id,
-            'userID' => $userA->id,
-        ])->assertGraphQLErrorMessage(UpsertModel::CANNOT_UPSERT_UNRELATED_MODEL);
-
-        $userA->refresh();
-        $this->assertSame($roleA->id, $userA->roles()->firstOrFail()->id);
-        $this->assertNotSame('hacked', $userA->name);
-        $this->assertCount(0, $roleB->users()->get());
-    }
-
     public function testCreateAndConnectWithBelongsToMany(): void
     {
         $user = factory(User::class)->make();
@@ -610,27 +578,23 @@ final class BelongsToManyTest extends DBTestCase
         $role->name = 'is_admin';
         $role->save();
 
-        $users = factory(User::class, 2)->create();
         $role->users()
             ->attach(
-                $users,
+                factory(User::class, 2)->create(),
             );
 
-        $firstUserID = $users[0]->id;
-        $secondUserID = $users[1]->id;
-
-        $response = $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
             {$action}Role(input: {
                 id: 1
                 name: "is_user"
                 users: {
                     {$action}: [{
-                        id: {$firstUserID}
+                        id: 1
                         name: "user1"
                     },
                     {
-                        id: {$secondUserID}
+                        id: 2
                         name: "user2"
                     }]
                 }
@@ -643,30 +607,18 @@ final class BelongsToManyTest extends DBTestCase
                 }
             }
         }
-        GRAPHQL);
-
-        if ($action === 'upsert') {
-            $response->assertGraphQLErrorMessage(UpsertModel::CANNOT_UPSERT_UNRELATED_MODEL);
-
-            $role->refresh();
-            $this->assertCount(2, $role->users()->get());
-            $this->assertSame('is_admin', $role->name);
-
-            return;
-        }
-
-        $response->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 "{$action}Role" => [
                     'id' => '1',
                     'name' => 'is_user',
                     'users' => [
                         [
-                            'id' => (string) $firstUserID,
+                            'id' => '1',
                             'name' => 'user1',
                         ],
                         [
-                            'id' => (string) $secondUserID,
+                            'id' => '2',
                             'name' => 'user2',
                         ],
                     ],

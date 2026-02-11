@@ -385,7 +385,8 @@ GRAPHQL;
         }
         GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        $this->graphQL(
+            /** @lang GraphQL */ <<<'GRAPHQL'
         mutation ($userID: Int!, $taskID: Int!) {
             updateUser(input: {
                 id: $userID
@@ -394,10 +395,12 @@ GRAPHQL;
                 id
             }
         }
-        GRAPHQL, [
-            'userID' => $userB->id,
-            'taskID' => $taskA->id,
-        ])->assertGraphQLErrorMessage(UpsertModel::CANNOT_UPSERT_UNRELATED_MODEL);
+        GRAPHQL,
+            [
+                'userID' => $userB->id,
+                'taskID' => $taskA->id,
+            ],
+        )->assertGraphQLErrorMessage(UpsertModel::CANNOT_UPSERT_UNRELATED_MODEL);
 
         $taskA->refresh();
         $this->assertSame($userA->id, $taskA->user_id);
@@ -441,7 +444,8 @@ GRAPHQL;
         }
         GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        $this->graphQL(
+            /** @lang GraphQL */ <<<'GRAPHQL'
         mutation ($userID: Int!) {
             updateUser(input: {
                 id: $userID
@@ -454,9 +458,11 @@ GRAPHQL;
                 }
             }
         }
-        GRAPHQL, [
-            'userID' => $userB->id,
-        ])->assertGraphQLErrorMessage(UpsertModel::CANNOT_UPSERT_UNRELATED_MODEL);
+        GRAPHQL,
+            [
+                'userID' => $userB->id,
+            ],
+        )->assertGraphQLErrorMessage(UpsertModel::CANNOT_UPSERT_UNRELATED_MODEL);
 
         $taskA->refresh();
         $this->assertSame($userA->id, $taskA->user_id);

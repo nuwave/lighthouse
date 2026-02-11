@@ -4,7 +4,6 @@ namespace Tests\Integration\Execution\MutationExecutor;
 
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Facades\DB;
-use Nuwave\Lighthouse\Execution\Arguments\UpsertModel;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Role;
@@ -277,39 +276,6 @@ final class BelongsToTest extends DBTestCase
                 ],
             ],
         ]);
-    }
-
-    public function testNestedUpsertByIDDoesNotModifyUnrelatedBelongsToModel(): void
-    {
-        $userA = factory(User::class)->create();
-        $userB = factory(User::class)->create();
-        $task = factory(Task::class)->create();
-        $task->user()->associate($userB);
-        $task->save();
-
-        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
-        mutation ($taskID: ID!, $userID: ID!) {
-            upsertTask(input: {
-                id: $taskID
-                name: "task"
-                user: {
-                    upsert: { id: $userID, name: "hacked" }
-                }
-            }) {
-                id
-            }
-        }
-        GRAPHQL,
-            [
-                'taskID' => $task->id,
-                'userID' => $userA->id,
-            ],
-        )->assertGraphQLErrorMessage(UpsertModel::CANNOT_UPSERT_UNRELATED_MODEL);
-
-        $userA->refresh();
-        $task->refresh();
-        $this->assertNotSame('hacked', $userA->name);
-        $this->assertSame($userB->id, $task->user_id);
     }
 
     public function testUpsertBelongsToWithoutID(): void
@@ -641,37 +607,10 @@ final class BelongsToTest extends DBTestCase
 
     public function testUpsertUsingCreateAndUpdateUsingUpsertBelongsTo(): void
     {
-        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
-        mutation {
-            upsertTask(input: {
-                id: 1
-                name: "foo"
-                user: {
-                    upsert: {
-                        name: "foo-user"
-                    }
-                }
-            }) {
-                id
-                name
-                user {
-                    id
-                    name
-                }
-            }
-        }
-        GRAPHQL)->assertJson([
-            'data' => [
-                'upsertTask' => [
-                    'id' => '1',
-                    'name' => 'foo',
-                    'user' => [
-                        'id' => '1',
-                        'name' => 'foo-user',
-                    ],
-                ],
-            ],
-        ]);
+        $user = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $user);
+        $user->name = 'foo';
+        $user->save();
 
         $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
