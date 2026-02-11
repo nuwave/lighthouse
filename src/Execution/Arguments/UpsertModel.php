@@ -32,7 +32,7 @@ class UpsertModel implements ArgResolver
      */
     public function __invoke($model, $args): mixed
     {
-        // TODO consider Laravel native ->upsert(), available from 8.10
+        // Do not use Laravel native upsert() here, as it bypasses model hydration and model events.
         $existingModel = null;
 
         if ($this->identifyingColumns) {
