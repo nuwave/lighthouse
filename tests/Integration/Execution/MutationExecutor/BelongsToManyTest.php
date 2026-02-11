@@ -609,6 +609,8 @@ final class BelongsToManyTest extends DBTestCase
         $this->assertInstanceOf(Role::class, $role);
         $role->name = 'is_admin';
         $role->save();
+        $roleID = $role->id;
+        assert(is_int($roleID));
 
         $users = factory(User::class, 2)->create();
         $role->users()
@@ -618,11 +620,23 @@ final class BelongsToManyTest extends DBTestCase
 
         $firstUserID = $users[0]->id;
         $secondUserID = $users[1]->id;
+        assert(is_int($firstUserID));
+        assert(is_int($secondUserID));
+
+        if ($action === 'upsert') {
+            $unrelatedRole = factory(Role::class)->make();
+            $this->assertInstanceOf(Role::class, $unrelatedRole);
+            $unrelatedRole->name = 'unrelated';
+            $unrelatedRole->save();
+
+            $roleID = $unrelatedRole->id;
+            assert(is_int($roleID));
+        }
 
         $response = $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
             {$action}Role(input: {
-                id: 1
+                id: {$roleID}
                 name: "is_user"
                 users: {
                     {$action}: [{
@@ -658,7 +672,7 @@ final class BelongsToManyTest extends DBTestCase
         $response->assertJson([
             'data' => [
                 "{$action}Role" => [
-                    'id' => '1',
+                    'id' => (string) $roleID,
                     'name' => 'is_user',
                     'users' => [
                         [
