@@ -251,7 +251,7 @@ final class BaseDirectiveTest extends TestCase
         $field = Parser::fieldDefinition('foo: ID @dummy(arg: "new value")');
 
         $directive->hydrate(
-            $field->directives[0],
+            $field->directives->get(0),
             $field,
         );
 
@@ -286,7 +286,7 @@ final class BaseDirectiveTest extends TestCase
         };
 
         $directive->hydrate(
-            $fieldDefinition->directives[0],
+            $fieldDefinition->directives->get(0),
             $fieldDefinition,
         );
 
