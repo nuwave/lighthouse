@@ -5,7 +5,9 @@ namespace Nuwave\Lighthouse\Execution;
 use GraphQL\Error\Error;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 
-/** Report non-client-safe errors through the default Laravel exception handler. */
+/**
+ * Report non-client-safe errors through the default Laravel exception handler.
+ */
 class ReportingErrorHandler implements ErrorHandler
 {
     public function __construct(

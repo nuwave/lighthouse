@@ -2,7 +2,9 @@
 
 namespace Nuwave\Lighthouse\Support\Contracts;
 
-/** Allows splitting validation into a cacheable first step and a non-cacheable second step. */
+/**
+ * Allows splitting validation into a cacheable first step and a non-cacheable second step.
+ */
 interface ProvidesCacheableValidationRules extends ProvidesValidationRules
 {
     /**
