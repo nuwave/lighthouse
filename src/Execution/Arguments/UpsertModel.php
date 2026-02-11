@@ -3,9 +3,7 @@
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
 use GraphQL\Error\Error;
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
 use function Safe\array_flip;
@@ -22,8 +20,6 @@ class UpsertModel implements ArgResolver
         callable $previous,
         /** @var array<string>|null */
         protected ?array $identifyingColumns = null,
-        /** @var \Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>|null $parentRelation */
-        protected ?Relation $parentRelation = null,
     ) {
         $this->previous = $previous;
     }
@@ -41,7 +37,7 @@ class UpsertModel implements ArgResolver
             $identifyingColumns = $this->identifyingColumnValues($args, $this->identifyingColumns)
                 ?? throw new Error(self::MISSING_IDENTIFYING_COLUMNS_FOR_UPSERT);
 
-            $existingModel = $this->queryBuilder($model)->firstWhere($identifyingColumns);
+            $existingModel = $model->newQuery()->firstWhere($identifyingColumns);
 
             if ($existingModel !== null) {
                 $model = $existingModel;
@@ -51,7 +47,7 @@ class UpsertModel implements ArgResolver
         if ($existingModel === null) {
             $id = $this->retrieveID($model, $args);
             if ($id) {
-                $existingModel = $this->queryBuilder($model)->find($id);
+                $existingModel = $model->newQuery()->find($id);
                 if ($existingModel !== null) {
                     $model = $existingModel;
                 }
@@ -104,12 +100,5 @@ class UpsertModel implements ArgResolver
         }
 
         return null;
-    }
-
-    /** @return \Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model> */
-    protected function queryBuilder(Model $model): EloquentBuilder
-    {
-        return $this->parentRelation?->getQuery()->clone()
-            ?? $model->newQuery();
     }
 }
