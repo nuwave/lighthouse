@@ -392,6 +392,78 @@ GRAPHQL;
         GRAPHQL . self::PLACEHOLDER_QUERY);
     }
 
+    public function testNestedUpsertByIdentifyingColumn(): void
+    {
+        $user = factory(User::class)->create();
+        $task = factory(Task::class)->make();
+        $task->name = 'existing-task';
+        $task->difficulty = 1;
+        $task->user()->associate($user);
+        $task->save();
+
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Mutation {
+            updateUser(input: UpdateUserInput! @spread): User @update
+        }
+
+        type Task {
+            id: Int
+            name: String!
+            difficulty: Int
+        }
+
+        type User {
+            id: Int
+            tasks: [Task!]! @hasMany
+        }
+
+        input UpdateUserInput {
+            id: Int
+            tasks: [UpdateTaskInput!] @upsert(relation: "tasks", identifyingColumns: ["name"])
+        }
+
+        input UpdateTaskInput {
+            name: String!
+            difficulty: Int
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+        mutation {
+            updateUser(input: {
+                id: {$user->id}
+                tasks: [
+                    {
+                        name: "existing-task"
+                        difficulty: 2
+                    }
+                ]
+            }) {
+                tasks {
+                    name
+                    difficulty
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'updateUser' => [
+                    'tasks' => [
+                        [
+                            'name' => 'existing-task',
+                            'difficulty' => 2,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $task->refresh();
+
+        $this->assertSame(2, $task->difficulty);
+        $this->assertSame(1, Task::count());
+    }
+
     public function testDirectUpsertByIdentifyingColumnsRequiresAllConfiguredColumns(): void
     {
         $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'

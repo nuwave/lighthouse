@@ -4050,6 +4050,7 @@ type Mutation {
 ```
 
 When you pass `identifyingColumns`, Lighthouse will first try to match an existing model through those columns and only then fall back to `id`.
+All configured identifying columns must be present with non-null values, otherwise the upsert fails with a GraphQL error.
 
 ```graphql
 type Mutation {
@@ -4114,6 +4115,8 @@ input UpsertUserInput {
   name: String!
 }
 ```
+
+For `@upsertMany`, all configured identifying columns must be present with non-null values for every input item, otherwise the upsert fails with a GraphQL error.
 
 ## @validator
 

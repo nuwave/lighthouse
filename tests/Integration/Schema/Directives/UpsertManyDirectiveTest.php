@@ -344,6 +344,86 @@ GRAPHQL;
         GRAPHQL . self::PLACEHOLDER_QUERY);
     }
 
+    public function testNestedUpsertManyByIdentifyingColumn(): void
+    {
+        $user = factory(User::class)->create();
+        $existingTask = factory(Task::class)->make();
+        $existingTask->name = 'existing-task-many';
+        $existingTask->difficulty = 1;
+        $existingTask->user()->associate($user);
+        $existingTask->save();
+
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Mutation {
+            updateUser(input: UpdateUserInput! @spread): User @update
+        }
+
+        type Task {
+            id: Int
+            name: String!
+            difficulty: Int
+        }
+
+        type User {
+            id: Int
+            tasks: [Task!]! @hasMany
+        }
+
+        input UpdateUserInput {
+            id: Int
+            tasks: [UpdateTaskInput!] @upsertMany(relation: "tasks", identifyingColumns: ["name"])
+        }
+
+        input UpdateTaskInput {
+            name: String!
+            difficulty: Int
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+        mutation {
+            updateUser(input: {
+                id: {$user->id}
+                tasks: [
+                    {
+                        name: "existing-task-many"
+                        difficulty: 2
+                    }
+                    {
+                        name: "new-task-many"
+                        difficulty: 3
+                    }
+                ]
+            }) {
+                tasks {
+                    name
+                    difficulty
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'updateUser' => [
+                    'tasks' => [
+                        [
+                            'name' => 'existing-task-many',
+                            'difficulty' => 2,
+                        ],
+                        [
+                            'name' => 'new-task-many',
+                            'difficulty' => 3,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $existingTask->refresh();
+
+        $this->assertSame(2, $existingTask->difficulty);
+        $this->assertSame(2, Task::count());
+    }
+
     public function testDirectUpsertManyByIdentifyingColumnsRequiresAllConfiguredColumns(): void
     {
         $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
