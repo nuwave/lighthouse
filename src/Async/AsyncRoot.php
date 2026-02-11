@@ -2,7 +2,9 @@
 
 namespace Nuwave\Lighthouse\Async;
 
-/** Used as a marker to signify we are running an async mutation. */
+/**
+ * Used as a marker to signify we are running an async mutation.
+ */
 class AsyncRoot
 {
     public static function instance(): static

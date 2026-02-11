@@ -6,7 +6,9 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
 
-/** Allows reusing test setup and helpers for benchmarks. */
+/**
+ * Allows reusing test setup and helpers for benchmarks.
+ */
 final class BenchmarkTestCase extends TestCase
 {
     public function setUp(): void

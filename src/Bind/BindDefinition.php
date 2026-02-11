@@ -8,7 +8,9 @@ use GraphQL\Language\AST\InputValueDefinitionNode;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
-/** @template-covariant TClass of object */
+/**
+ * @template-covariant TClass of object
+ */
 class BindDefinition
 {
     public function __construct(

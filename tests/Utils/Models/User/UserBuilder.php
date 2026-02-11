@@ -5,7 +5,9 @@ namespace Tests\Utils\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 
-/** @extends \Illuminate\Database\Eloquent\Builder<\Tests\Utils\Models\User> */
+/**
+ * @extends \Illuminate\Database\Eloquent\Builder<\Tests\Utils\Models\User>
+ */
 final class UserBuilder extends Builder
 {
     /** @param  array{company: string}  $args */
