@@ -52,7 +52,7 @@ class NestedManyToMany implements ArgResolver
         }
 
         if ($args->has('upsert')) {
-            $upsertModel = new ResolveNested(new UpsertModel(new SaveModel($relation)));
+            $upsertModel = new ResolveNested(new UpsertModel(new SaveModel($relation), null, $relation));
 
             foreach ($args->arguments['upsert']->value as $childArgs) {
                 // @phpstan-ignore-next-line Relation&Builder mixin not recognized

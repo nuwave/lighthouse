@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Execution\MutationExecutor;
 
+use Nuwave\Lighthouse\Execution\Arguments\UpsertModel;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\CustomPrimaryKey;
@@ -313,6 +314,38 @@ final class HasManyTest extends DBTestCase
                 ],
             ],
         ]);
+    }
+
+    public function testNestedUpsertByIDDoesNotModifyUnrelatedHasManyModel(): void
+    {
+        $userA = factory(User::class)->create();
+        $userB = factory(User::class)->create();
+
+        $taskA = factory(Task::class)->make();
+        $taskA->name = 'from-user-a';
+        $taskA->user()->associate($userA);
+        $taskA->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($userID: ID!, $taskID: ID!) {
+            upsertUser(input: {
+                id: $userID
+                name: "user-b"
+                tasks: {
+                    upsert: [{ id: $taskID, name: "hacked" }]
+                }
+            }) {
+                id
+            }
+        }
+        GRAPHQL, [
+            'userID' => $userB->id,
+            'taskID' => $taskA->id,
+        ])->assertGraphQLErrorMessage(UpsertModel::CANNOT_UPSERT_UNRELATED_MODEL);
+
+        $taskA->refresh();
+        $this->assertSame('from-user-a', $taskA->name);
+        $this->assertSame($userA->id, $taskA->user_id);
     }
 
     /** @return iterable<array{string}> */
