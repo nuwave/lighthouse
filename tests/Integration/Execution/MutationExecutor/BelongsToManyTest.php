@@ -610,14 +610,12 @@ final class BelongsToManyTest extends DBTestCase
         $role->name = 'is_admin';
         $role->save();
 
-        $users = factory(User::class, 2)->create();
-        $role->users()
-            ->attach(
-                $users,
-            );
+        $user1 = factory(User::class)->create();
+        $user2 = factory(User::class)->create();
+        $role->users()->attach([$user1, $user2]);
 
-        $firstUserID = $users[0]->id;
-        $secondUserID = $users[1]->id;
+        $firstUserID = $user1->id;
+        $secondUserID = $user2->id;
 
         $response = $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
