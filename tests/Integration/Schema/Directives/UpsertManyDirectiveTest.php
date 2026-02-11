@@ -4,6 +4,7 @@ namespace Tests\Integration\Schema\Directives;
 
 use GraphQL\Type\Definition\Type;
 use Illuminate\Container\Container;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\Arguments\UpsertModel;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\DBTestCase;
@@ -290,6 +291,57 @@ GRAPHQL;
 
         $this->assertSame(2, User::count());
         $this->assertSame('updated', User::where('email', 'foo@te.st')->firstOrFail()->name);
+    }
+
+    public function testDirectUpsertManyByIdentifyingColumnsMustNotBeEmpty(): void
+    {
+        $this->expectException(DefinitionException::class);
+        $this->buildSchema(/** @lang GraphQL */ <<<'GRAPHQL'
+        type User {
+            id: ID!
+            email: String!
+            name: String!
+        }
+
+        input UpsertUserInput {
+            email: String!
+            name: String!
+        }
+
+        type Mutation {
+            upsertUsers(inputs: [UpsertUserInput!]!): [User!]! @upsertMany(identifyingColumns: [])
+        }
+        GRAPHQL . self::PLACEHOLDER_QUERY);
+    }
+
+    public function testNestedUpsertManyByIdentifyingColumnsMustNotBeEmpty(): void
+    {
+        $this->expectException(DefinitionException::class);
+        $this->buildSchema(/** @lang GraphQL */ <<<'GRAPHQL'
+        type Mutation {
+            updateUser(input: UpdateUserInput! @spread): User @update
+        }
+
+        type Task {
+            id: Int
+            name: String!
+        }
+
+        type User {
+            id: Int
+            tasks: [Task!]! @hasMany
+        }
+
+        input UpdateUserInput {
+            id: Int
+            tasks: [UpdateTaskInput!] @upsertMany(relation: "tasks", identifyingColumns: [])
+        }
+
+        input UpdateTaskInput {
+            id: Int
+            name: String
+        }
+        GRAPHQL . self::PLACEHOLDER_QUERY);
     }
 
     public function testDirectUpsertManyByIdentifyingColumnsRequiresAllConfiguredColumns(): void
