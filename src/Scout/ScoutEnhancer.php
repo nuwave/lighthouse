@@ -2,9 +2,8 @@
 
 namespace Nuwave\Lighthouse\Scout;
 
+use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
-use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Database\Query\Builder as QueryBuilder;
 use Laravel\Scout\Builder as ScoutBuilder;
 use Laravel\Scout\Searchable;
 use Nuwave\Lighthouse\Execution\Arguments\Argument;
@@ -41,9 +40,9 @@ class ScoutEnhancer
     public function __construct(
         protected ArgumentSet $argumentSet,
         /**
-         * @var \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<TModel>|\Illuminate\Database\Eloquent\Relations\Relation<TModel>|\Laravel\Scout\Builder $builder
+         * @var \Illuminate\Contracts\Database\Query\Builder|\Laravel\Scout\Builder $builder
          */
-        protected QueryBuilder|EloquentBuilder|Relation|ScoutBuilder $builder,
+        protected Builder|ScoutBuilder $builder,
     ) {
         $this->gather($this->argumentSet);
     }

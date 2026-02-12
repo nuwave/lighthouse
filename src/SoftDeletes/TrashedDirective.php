@@ -3,10 +3,9 @@
 namespace Nuwave\Lighthouse\SoftDeletes;
 
 use GraphQL\Error\Error;
+use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Database\Query\Builder as QueryBuilder;
 use Laravel\Scout\Builder as ScoutBuilder;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Scout\ScoutBuilderDirective;
@@ -26,7 +25,7 @@ directive @trashed on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 GRAPHQL;
     }
 
-    public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, $value): QueryBuilder|EloquentBuilder|Relation
+    public function handleBuilder(Builder $builder, $value): Builder
     {
         if (! $builder instanceof EloquentBuilder) {
             $notEloquentBuilder = $builder::class;
