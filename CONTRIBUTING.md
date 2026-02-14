@@ -25,8 +25,10 @@ Before you release a new version, make sure to familiarize yourself with:
 - [Previous GitHub Releases](https://github.com/nuwave/lighthouse/releases)
 
 To create a new release, follow these steps:
-1. Consider the entries in the [`CHANGELOG unreleased section`](CHANGELOG.md#unreleased), add missing entries if needed
-2. Based on those entries and the previous version, define the next version number and add it to the [`CHANGELOG.md`](CHANGELOG.md)
+1. Consider the entries in the [`CHANGELOG unreleased section`](CHANGELOG.md#unreleased).
+Add missing entries if needed.
+2. Based on those entries and the previous version, define the next version number.
+Add it to [`CHANGELOG.md`](CHANGELOG.md).
 3. [Draft a new release](https://github.com/nuwave/lighthouse/releases/new)
 4. Add the version number as both tag and title
 5. Add the changelog entries as the description
@@ -85,7 +87,8 @@ Have a new feature?
 You can start off by writing some tests that detail the behavior you want to achieve and go from there.
 
 Fixing a bug?
-The best way to ensure it is fixed for good and never comes back is to write a failing test for it and then make it pass.
+The best way to ensure it is fixed for good is to write a failing test.
+Then make it pass so it does not come back.
 If you cannot figure out how to fix it yourself, feel free to submit a PR with a failing test.
 
 Here is how to set up Xdebug in PhpStorm: https://www.jetbrains.com/help/phpstorm/configuring-xdebug.html.
@@ -93,7 +96,7 @@ Here is how to set up Xdebug in PhpStorm: https://www.jetbrains.com/help/phpstor
 > Enabling Xdebug slows down tests by an order of magnitude.
 > Stop listening for Debug Connection to speed it back up.
 
-Set the environment variable `XDEBUG_REMOTE_HOST` to the IP of your host machine as seen from the Docker container.
+Set the environment variable `XDEBUG_REMOTE_HOST` to your host machine IP as seen from the Docker container.
 This may differ based on your setup.
 When running Docker for Desktop, it is usually `10.0.2.2`, when running from a VM it is something else.
 

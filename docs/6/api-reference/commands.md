@@ -92,7 +92,8 @@ php artisan lighthouse:print-schema
 This can be quite useful, as the root `.graphql` files do not necessarily contain the whole schema.
 Schema imports, native PHP types and schema manipulation may influence the final schema.
 
-Use the `-W` / `--write` option to output the schema to the default file storage (usually `storage/app`) as `lighthouse-schema.graphql`.
+Use the `-W` / `--write` option to output the schema to default file storage (usually `storage/app`).
+The output file is `lighthouse-schema.graphql`.
 You can output your schema in JSON format by using the `--json` flag.
 You can sort the final compiled schema by using the `--sort` flag.
 

@@ -157,7 +157,8 @@ mutation {
 ```
 
 When issuing an update, you can also allow the user to remove a relation.
-Both `disconnect` and `delete` remove the association to the author, but `delete` also removes the author model itself.
+Both `disconnect` and `delete` remove the association to the author.
+`delete` also removes the author model itself.
 
 ```graphql
 type Mutation {
@@ -200,7 +201,8 @@ mutation UpdatePost($disconnectAuthor: Boolean) {
 }
 ```
 
-The `author` relationship will only be disconnected if the value of the variable `$disconnectAuthor` is `true`, if `false` or `null` are passed, it will not change.
+The `author` relationship is disconnected only when `$disconnectAuthor` is `true`.
+If `false` or `null` is passed, it will not change.
 
 ```json
 {
@@ -354,7 +356,8 @@ type Mutation {
 }
 ```
 
-This mutation takes a single argument `input` that contains values of the `User` itself and its associated `Phone` model.
+This mutation takes a single `input` argument.
+It contains values of the `User` and its associated `Phone` model.
 
 ```graphql
 input UpdateUserInput {
@@ -420,7 +423,8 @@ type Mutation {
 }
 ```
 
-This mutation takes a single argument `input` that contains values of the `User` itself and its associated `Post` models.
+This mutation takes a single `input` argument.
+It contains values of the `User` and its associated `Post` models.
 
 ```graphql
 input CreateUserInput {

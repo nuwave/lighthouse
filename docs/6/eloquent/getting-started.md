@@ -209,7 +209,7 @@ type Mutation {
 }
 ```
 
-Since GraphQL allows you to update just parts of your data, it is best to have all arguments except `id` as optional.
+Because GraphQL allows partial updates, it is best to keep all arguments optional except `id`.
 
 ```graphql
 mutation {

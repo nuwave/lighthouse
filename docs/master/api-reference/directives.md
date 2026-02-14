@@ -131,7 +131,8 @@ directive @all(
 ) on FIELD_DEFINITION
 ```
 
-This assumes your model has the same name as the type you are returning and is defined in the default model namespace `App`.
+This assumes your model has the same name as the returned type.
+It also assumes the model is in the default namespace `App`.
 [You can change this configuration](../getting-started/configuration.md).
 
 ```graphql
@@ -255,7 +256,8 @@ final class Post extends Model
 }
 ```
 
-The directive accepts an optional `relation` argument if your relationship method has a different name than the field.
+The directive accepts an optional `relation` argument.
+Use it when your relationship method name differs from the field name.
 
 ```graphql
 type Post {
@@ -318,7 +320,8 @@ enum BelongsToManyType {
   PAGINATOR
 
   """
-  Offset-based pagination like the Laravel "Simple Pagination", which does not count the total number of records.
+  Offset-based pagination like Laravel "Simple Pagination".
+  It does not count the total number of records.
   """
   SIMPLE
 
@@ -354,7 +357,8 @@ final class User extends Model
 
 ### Rename Relation
 
-The directive accepts an optional `relation` argument if your relationship method has a different name than the field.
+The directive accepts an optional `relation` argument.
+Use it when your relationship method name differs from the field name.
 
 ```graphql
 type User {
@@ -671,13 +675,17 @@ Any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-In
 scalar BuilderValue
 ```
 
-You must point to a `method` which will receive the builder instance and can apply additional constraints to the query.
+You must point to a `method` that receives the builder instance.
+That method can apply additional constraints to the query.
 
-> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through
+> `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
-When used on an argument, the method is only called when the argument is specified (may be `null`), and its value is passed as the second parameter.
-When used on a field, the method is always called, and if the `value` argument is defined, it is passed as the second parameter.
+When used on an argument, the method is only called when the argument is specified (may be `null`).
+And its value is passed as the second parameter.
+When used on a field, the method is always called.
+And if the `value` argument is defined, it is passed as the second parameter.
 
 ```graphql
 type Query {
@@ -1061,7 +1069,8 @@ type Mutation {
 }
 ```
 
-Non-nullable arguments will _not_ be converted when this directive is used on a field, but will be converted when it is used directly on the argument.
+Non-nullable arguments will _not_ be converted when this directive is used on a field.
+But will be converted when it is used directly on the argument.
 
 ```graphql
 type Mutation {
@@ -1072,7 +1081,7 @@ type Mutation {
 }
 ```
 
-If you want this for all your fields, consider adding this directive to your global field middleware in `lighthouse.php`:
+If you want this for all your fields, add this directive to your global field middleware in `lighthouse.php`:
 
 ```php
     'field_middleware' => [
@@ -1177,7 +1186,9 @@ input CreatePostInput {
 }
 ```
 
-If the name of the Eloquent model does not match the return type of the field, or is located in a non-default namespace, set it with the `model` argument.
+If the name of the Eloquent model does not match the return type of the field, set it with the `model` argument.
+You can also use `model` when the class is in a non-default namespace.
+If the model is in a non-default namespace, also set it with the `model` argument.
 
 ```graphql
 type Mutation {
@@ -1268,7 +1279,9 @@ type Mutation {
 }
 ```
 
-If the name of the Eloquent model does not match the return type of the field, or is located in a non-default namespace, set it with the `model` argument.
+If the name of the Eloquent model does not match the return type of the field, set it with the `model` argument.
+You can also use `model` when the class is in a non-default namespace.
+If the model is in a non-default namespace, also set it with the `model` argument.
 
 ```graphql
 type Mutation {
@@ -1320,7 +1333,8 @@ type Query {
 }
 ```
 
-Deprecated elements are not included in introspection queries by default, but they can still be queried by clients.
+Deprecated elements are not included in introspection queries by default.
+But they can still be queried by clients.
 
 ## @drop
 
@@ -1331,7 +1345,8 @@ Ignore the user given value, don't pass it to the resolver.
 directive @drop on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-This is useful when you want to deprecate a field, but avoid breaking changes for clients that still pass the value.
+This is useful when you want to deprecate a field.
+But avoid breaking changes for clients that still pass the value.
 
 ```graphql
 type User {
@@ -1589,7 +1604,7 @@ Any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-In
 scalar EqValue
 ```
 
-> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 ```graphql
@@ -1831,7 +1846,8 @@ enum HasManyType {
   PAGINATOR
 
   """
-  Offset-based pagination like the Laravel "Simple Pagination", which does not count the total number of records.
+  Offset-based pagination like Laravel "Simple Pagination".
+  It does not count the total number of records.
   """
   SIMPLE
 
@@ -1858,7 +1874,7 @@ type User {
 }
 ```
 
-If the name of the relationship on the Eloquent model differs from the field name, you can override it by setting `relation`.
+If the relationship name on the Eloquent model differs from the field name, set `relation` to override it.
 
 ```graphql
 type User {
@@ -1921,7 +1937,8 @@ enum HasManyThroughType {
   PAGINATOR
 
   """
-  Offset-based pagination like the Laravel "Simple Pagination", which does not count the total number of records.
+  Offset-based pagination like Laravel "Simple Pagination".
+  It does not count the total number of records.
   """
   SIMPLE
 
@@ -1960,7 +1977,7 @@ type User {
 }
 ```
 
-If the name of the relationship on the Eloquent model differs from the field name, you can override it by setting `relation`.
+If the relationship name on the Eloquent model differs from the field name, set `relation` to override it.
 
 ```graphql
 type User {
@@ -1994,7 +2011,7 @@ type Mechanic {
 }
 ```
 
-If the name of the relationship on the Eloquent model differs from the field name, you can override it by setting `relation`.
+If the relationship name on the Eloquent model differs from the field name, set `relation` to override it.
 
 ```graphql
 type Mechanic {
@@ -2017,7 +2034,8 @@ directive @in(
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through
+> `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 ```graphql
@@ -2049,7 +2067,8 @@ directive @inject(
 ) repeatable on FIELD_DEFINITION
 ```
 
-This is useful to ensure that the authenticated user's `id` is automatically used for creating new models and cannot be manipulated.
+This ensures the authenticated user `id` is used automatically when creating new models.
+It cannot be manipulated by clients.
 
 ```graphql
 type Mutation {
@@ -2085,7 +2104,8 @@ directive @interface(
 ) on INTERFACE
 ```
 
-Make sure you read the [basics about Interfaces](../the-basics/types.md#interface) before deciding to use this directive, you probably don't need it.
+Read the [basics about Interfaces](../the-basics/types.md#interface) before deciding to use this directive.
+You probably do not need it.
 
 Set the `resolveType` argument to a function that returns the implementing Object Type.
 
@@ -2196,7 +2216,8 @@ directive @like(
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 ```
 
-> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through
+> `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 ## @limit
@@ -2299,7 +2320,8 @@ Ensure the order of the argument definition matches the parameters of your metho
 public function purchasedItemsCount(int $year, ?bool $includeReturns)
 ```
 
-Lighthouse will always pass down the same number of arguments and default to `null` if the client passes nothing.
+Lighthouse always passes down the same number of arguments.
+It defaults to `null` if the client passes nothing.
 
 ```graphql
 {
@@ -2394,7 +2416,8 @@ enum MorphManyType {
   PAGINATOR
 
   """
-  Offset-based pagination like the Laravel "Simple Pagination", which does not count the total number of records.
+  Offset-based pagination like Laravel "Simple Pagination".
+  It does not count the total number of records.
   """
   SIMPLE
 
@@ -2532,7 +2555,8 @@ enum MorphToManyType {
   PAGINATOR
 
   """
-  Offset-based pagination like the Laravel "Simple Pagination", which does not count the total number of records.
+  Offset-based pagination like Laravel "Simple Pagination".
+  It does not count the total number of records.
   """
   SIMPLE
 
@@ -2622,7 +2646,8 @@ directive @neq(
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through
+> `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 ```graphql
@@ -2724,7 +2749,8 @@ type Country @node(resolver: "App\\Countries@byId") {
 }
 ```
 
-The `resolver` argument has to specify a function which will be passed the decoded `id` and resolves to a result.
+The `resolver` argument must specify a function.
+It receives the decoded `id` and resolves to a result.
 
 ```php
 public function byId($id): array
@@ -2738,7 +2764,8 @@ public function byId($id): array
 
 [Read more](../digging-deeper/relay.md#global-object-identification).
 
-Behind the scenes, Lighthouse will decode the global ID sent from the client to find the model by its primary key in the database.
+Behind the scenes, Lighthouse decodes the global ID sent by the client.
+It then finds the model by its primary key in the database.
 
 ## @notIn
 
@@ -2755,7 +2782,8 @@ directive @notIn(
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through
+> `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 ```graphql
@@ -2846,7 +2874,8 @@ input OrderByRelation {
 }
 ```
 
-> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through
+> `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 See [ordering](../digging-deeper/ordering.md).
@@ -2924,7 +2953,8 @@ enum PaginateType {
   PAGINATOR
 
   """
-  Offset-based pagination like the Laravel "Simple Pagination", which does not count the total number of records.
+  Offset-based pagination like Laravel "Simple Pagination".
+  It does not count the total number of records.
   """
   SIMPLE
 
@@ -3063,8 +3093,9 @@ type PostEdge {
 
 ### Simple Pagination
 
-In contrast to other pagination types, `SIMPLE` pagination only fires a single database query on every request.
-This improves performance, but means that the response does not hold information about the total number of items.
+In contrast to other pagination types, `SIMPLE` pagination fires only one database query per request.
+This improves performance.
+But means that the response does not hold information about the total number of items.
 
 If you wish to use the `simplePaginate` method, set the `type` to `SIMPLE`.
 
@@ -3162,7 +3193,8 @@ query {
 
 ### Limit maximum count
 
-Lighthouse allows you to specify a global maximum for the number of items a user can request through pagination through the config.
+Lighthouse allows you to specify a global maximum for items requested through pagination.
+Configure this through the config.
 You may also overwrite this per field with the `maxCount` argument:
 
 ```graphql
@@ -3173,7 +3205,8 @@ type Query {
 
 ### Overwrite model
 
-By default, Lighthouse looks for an Eloquent model in the configured default namespace, with the same name as the returned type.
+By default, Lighthouse looks for an Eloquent model in the configured default namespace.
+It expects the same name as the returned type.
 You can overwrite this by setting the `model` argument.
 
 ```graphql
@@ -3192,7 +3225,8 @@ type Query {
 }
 ```
 
-Your method receives the typical resolver arguments and has to return an instance of `Illuminate\Database\Query\Builder`.
+Your method receives the typical resolver arguments.
+It must return an instance of `Illuminate\Database\Query\Builder`.
 
 > If you actually want to query a model and possibly its relations through nested fields,
 > make sure to return an Eloquent builder, e.g. `Post::query()`.
@@ -3481,7 +3515,8 @@ directive @scope(
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through
+> `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 ```graphql
@@ -3526,7 +3561,8 @@ directive @search(
 
 Requires the installation of [Laravel Scout](https://laravel.com/docs/scout) and manual registration of the service provider `Nuwave\Lighthouse\Scout\ScoutServiceProvider`, see [registering providers in Laravel](https://laravel.com/docs/providers#registering-providers).
 
-The `search()` method of the model is called with the value of the argument, using the driver you configured for Scout.
+The model `search()` method is called with the argument value.
+It uses the Scout driver you configured.
 
 ```graphql
 type Query {
@@ -3643,7 +3679,7 @@ mutation {
 }
 ```
 
-Internally, the arguments will be transformed into a flat structure before they are passed along to the resolver:
+Internally, the arguments are transformed into a flat structure before they are passed to the resolver:
 
 ```php
 [
@@ -3670,7 +3706,7 @@ directive @subscription(
 ) on FIELD_DEFINITION
 ```
 
-If you follow the default naming conventions for [defining subscription fields](../subscriptions/defining-fields.md) you do not need this directive.
+If you follow the default naming conventions for [defining subscription fields](../subscriptions/defining-fields.md), you do not need this directive.
 It is only useful if you need to override the default namespace.
 
 ```graphql
@@ -3713,7 +3749,8 @@ Allows use Laravel throttling on a per-field basis.
 See [Laravel doc](https://laravel.com/docs/routing#rate-limiting) on how to configure named limiters.
 
 Limiters that return `response` are not supported.
-Hashes are different from the ones of Laravel, so one can't use one named limiter to limit both Laravel route and GraphQL field.
+Hashes are different from the ones of Laravel.
+So one can't use one named limiter to limit both Laravel route and GraphQL field.
 
 ## @trashed
 
@@ -3724,7 +3761,8 @@ Allows to filter if trashed elements should be fetched.
 directive @trashed on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through
+> `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 The most convenient way to use this directive is through [@softDeletes](#softdeletes).
@@ -3766,7 +3804,7 @@ type Mutation {
 }
 ```
 
-If you want this for all your fields, consider adding this directive to your global field middleware in `lighthouse.php`:
+If you want this for all your fields, add this directive to your global field middleware in `lighthouse.php`:
 
 ```php
     'field_middleware' => [
@@ -3791,7 +3829,8 @@ directive @union(
 ) on UNION
 ```
 
-Make sure you read the [basics about Unions](../the-basics/types.md#union) before deciding to use this directive, you probably don't need it.
+Read the [basics about Unions](../the-basics/types.md#union) before deciding to use this directive.
+You probably do not need it.
 
 ```graphql
 type User {
@@ -3807,7 +3846,8 @@ union Person @union(resolveType: "App\\GraphQL\\Unions\\Person@resolveType") =
   | Employee
 ```
 
-The function receives the value of the parent field as its single argument and must resolve an Object Type from Lighthouse's `TypeRegistry`.
+The function receives the value of the parent field as its single argument.
+It must resolve an Object Type from Lighthouse `TypeRegistry`.
 
 ```php
 namespace App\GraphQL\Unions;
@@ -3875,7 +3915,9 @@ type Mutation {
 }
 ```
 
-If the name of the Eloquent model does not match the return type of the field, or is located in a non-default namespace, set it with the `model` argument.
+If the name of the Eloquent model does not match the return type of the field, set it with the `model` argument.
+You can also use `model` when the class is in a non-default namespace.
+If the model is in a non-default namespace, also set it with the `model` argument.
 
 ```graphql
 type Mutation {
@@ -4131,7 +4173,8 @@ Any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-In
 scalar WhereValue
 ```
 
-> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through
+> `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 You can specify simple operators:
@@ -4202,7 +4245,8 @@ directive @whereAuth(
 ) on FIELD_DEFINITION
 ```
 
-> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through
+> `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 The following query returns all posts that belong to the currently authenticated user.
@@ -4232,7 +4276,8 @@ directive @whereBetween(
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through
+> `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 This example defines an `input` to filter that a value is between two dates.
@@ -4274,7 +4319,8 @@ directive @whereJsonContains(
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through
+> `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 ```graphql
@@ -4342,7 +4388,8 @@ directive @whereNotBetween(
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through
+> `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 ```graphql
@@ -4379,7 +4426,8 @@ directive @whereNotNull(
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 ```
 
-> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through
+> `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 ```graphql
@@ -4409,7 +4457,8 @@ directive @whereNull(
 ) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 ```
 
-> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through
+> `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 ```graphql
@@ -4438,7 +4487,8 @@ directive @with(
 ) repeatable on FIELD_DEFINITION
 ```
 
-This can be a useful optimization for fields that are not returned directly but rather used for resolving other fields.
+This can be a useful optimization for fields that are not returned directly.
+It is useful when fields are only used to resolve other fields.
 
 ```graphql
 type User {
@@ -4446,7 +4496,7 @@ type User {
 }
 ```
 
-If you just want to return the relation itself as-is, look into [handling Eloquent relationships](../eloquent/relationships.md).
+If you just want to return the relation as-is, see [handling Eloquent relationships](../eloquent/relationships.md).
 
 ## @withCount
 
@@ -4498,7 +4548,8 @@ directive @withoutGlobalScopes(
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
+> This directive only works when the field resolver passes its builder through
+> `$resolveInfo->enhanceBuilder()`.
 > Built-in field resolver directives that query the database do this, such as [@all](#all) or [@hasMany](#hasmany).
 
 ```php

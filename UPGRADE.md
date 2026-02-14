@@ -69,7 +69,8 @@ The Artisan command `lighthouse:clear-cache` was renamed to `lighthouse:clear-sc
 ### `messages` on `@rules` and `@rulesForArray`
 
 Lighthouse previously allowed passing a map with arbitrary keys as the `messages` argument of `@rules` and `@rulesForArray`.
-Such a construct is impossible to define within the directive definition and leads to static validation errors.
+This construct is impossible to define within the directive definition.
+It leads to static validation errors.
 
 ```diff
 @rules(
@@ -88,7 +89,9 @@ Such a construct is impossible to define within the directive definition and lea
 
 ### Use filters in `@delete`, `@forceDelete` and `@restore`
 
-Whereas previously, those directives enforced the usage of a single argument and assumed that to be the ID or list of IDs of the models to modify, they now leverage argument filter directives.
+Previously, those directives enforced a single argument.
+They assumed that argument was the ID or list of IDs of models to modify.
+They now leverage argument filter directives.
 This brings them in line with other directives such as `@find` and `@all`.
 
 You will need to explicitly add `@whereKey` to the argument that contained the ID or IDs.
@@ -116,7 +119,7 @@ type Mutation {
 
 ### Specify `@guard(with: "api")` as `@guard(with: ["api"])`
 
-Due to Lighthouse's ongoing effort to provide static schema validation, the `with` argument of `@guard` must now be provided as a list of strings.
+Due to Lighthouse's ongoing effort to provide static schema validation, the `with` argument of `@guard` must now be a list of strings.
 
 ```diff
 type Mutation {
@@ -145,35 +148,40 @@ The previous version 1 contained a redundant key `channels` and is no longer sup
 }
 ```
 
-It is recommended to switch to version 2 before upgrading Lighthouse to give clients a smooth transition period.
+Switch to version 2 before upgrading Lighthouse.
+This gives clients a smooth transition period.
 
 ### Nullability of pagination results
 
 Generated result types of paginated lists are now always marked as non-nullable.
 The setting `non_null_pagination_results` was removed and now always behaves as if it were `true`.
 
-This is generally more convenient for clients, but will cause validation errors to bubble further up in the result.
+This is generally more convenient for clients.
+It causes validation errors to bubble further up in the result.
 
 ### Nullability of pagination `first`
 
-Previously, the pagination argument `first` was either marked as non-nullable, or non-nullable with a default value.
+Previously, the pagination argument `first` was either non-nullable or non-nullable with a default value.
 
 Now, it will always be marked as non-nullable, regardless if it has a default or not.
 This prevents clients from passing an invalid explicit `null`.
 
 ### Complexity calculation
 
-Prior to `v6`, overwriting the default query complexity calculation on paginated fields required the usage of `@complexity` without any arguments.
-Now, `@paginate` performs that calculation by default - with the additional change that it also includes the cost of the field itself, adding a value of `1` to represent the complexity more accurately.
+Prior to `v6`, overwriting the default query complexity calculation on paginated fields required `@complexity` without arguments.
+Now, `@paginate` performs that calculation by default.
+It also includes the cost of the field itself, adding a value of `1` for a more accurate complexity score.
 
 Using `@complexity` without the `resolver` argument is now no longer supported.
 
 ### Passing of `BenSampo\Enum\Enum` instances to `ArgBuilderDirective::handleBuilder()`
 
-Prior to `v6`, Lighthouse would extract the internal `$value` from instances of `BenSampo\Enum\Enum` before passing it to `ArgBuilderDirective::handleBuilder()` if the setting `unbox_bensampo_enum_enum_instances` was `true`.
+Prior to `v6`, Lighthouse extracted the internal `$value` from `BenSampo\Enum\Enum` instances before passing it to `ArgBuilderDirective::handleBuilder()`.
+This happened if `unbox_bensampo_enum_enum_instances` was `true`.
 
-This is generally unnecessary, because Laravel automagically calls the Enum's `__toString()` method when using it in a query.
-This might affect users who use an `ArgBuilderDirective` that delegates to a method that relies on an internal value being passed.
+This is generally unnecessary.
+Laravel automatically calls the Enum `__toString()` method when using it in a query.
+This might affect users whose `ArgBuilderDirective` delegates to a method that relies on an internal value.
 
 ```graphql
 type Query {
@@ -190,7 +198,8 @@ public function scopeByType(Builder $builder, int $aOrB): Builder
 ```
 
 In the future, Lighthouse will pass the actual Enum instance along.
-You can opt in to the new behavior before upgrading by setting `unbox_bensampo_enum_enum_instances` to `false`.
+You can opt in to the new behavior before upgrading.
+Set `unbox_bensampo_enum_enum_instances` to `false`.
 
 ```php
 public function scopeByType(Builder $builder, AOrB $aOrB): Builder
@@ -488,7 +497,7 @@ Client queries will have to be changed like this:
 }
 ```
 
-If you absolutely cannot break your clients, you can re-implement `@orderBy` in your project - it is a relatively simple `ArgManipulator` directive.
+If you absolutely cannot break your clients, you can re-implement `@orderBy` in your project. It is a relatively simple `ArgManipulator` directive.
 
 ### `@modelClass` and `@model` changed
 
@@ -517,7 +526,8 @@ You can adapt to this change in two refactoring steps that must be done in order
 
 ### Replace `@bcrypt` with `@hash`
 
-The new `@hash` directive is also used for password hashing, but respects the configuration settings of your Laravel project.
+The new `@hash` directive is also used for password hashing.
+But respects the configuration settings of your Laravel project.
 
 ```diff
 type Mutation {
@@ -555,7 +565,8 @@ This affects custom directives that implemented one of the following interfaces:
 - `Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective`
 - `Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective`
 
-Whereas those interfaces previously extended `Nuwave\Lighthouse\Support\Contracts\ArgDirective`, you now have to choose if you want them to apply to entire lists of arguments, elements within that list, or both.
+Whereas those interfaces previously extended `Nuwave\Lighthouse\Support\Contracts\ArgDirective`, you now have to choose if you want them to apply to entire lists of arguments, elements within that list.
+Or both.
 Change them as follows to make them behave like in v4:
 
 ```diff

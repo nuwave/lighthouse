@@ -21,7 +21,8 @@
 </div>
 
 Lighthouse is a GraphQL framework that integrates with your Laravel application.
-It takes the best ideas of both and combines them to solve common tasks with ease and offer flexibility when you need it.
+It combines the best ideas of both ecosystems.
+It solves common tasks with ease and offers flexibility when you need it.
 
 ## Documentation
 
@@ -44,8 +45,10 @@ Lighthouse follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 Only the current major version receives new features and bugfixes.
 
-Updating between minor versions will not require changes to PHP code or the GraphQL schema and cause no breaking behavioral changes for consumers of the GraphQL API.
-However, only code elements marked with `@api` will remain compatible - all other code in Lighthouse is considered internal and is thus subject to change.
+Updating between minor versions does not require changes to PHP code or the GraphQL schema.
+It also causes no breaking behavioral changes for consumers of the GraphQL API.
+However, only code elements marked with `@api` remain compatible.
+All other code in Lighthouse is internal and subject to change.
 
 ## Changelog
 
@@ -61,7 +64,7 @@ We welcome contributions of any kind, see how in [`CONTRIBUTING.md`](CONTRIBUTIN
 
 ## Security Vulnerabilities
 
-If you discover a security vulnerability within Lighthouse, please email Benedikt Franke via [benedikt@franke.tech](mailto:benedikt@franke.tech).
+If you discover a security vulnerability within Lighthouse, email Benedikt Franke at [benedikt@franke.tech](mailto:benedikt@franke.tech).
 
 ## Sponsors
 

@@ -51,7 +51,8 @@ type Mutation {
 
 ### Subscription
 
-Rather than providing a single response, the fields of the `Subscription` type return a stream of responses, with real-time updates.
+Instead of a single response, fields of the `Subscription` type return a stream of responses.
+Those responses provide real-time updates.
 
 ```graphql
 type Subscription {

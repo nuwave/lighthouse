@@ -19,8 +19,9 @@ As multiple checks for authentication or permissions may be required in a single
 
 Note that the `AttemptAuthentication` middleware does _not_ protect your fields from unauthenticated access, decorate them with [@guard](../api-reference/directives.md#guard) as needed.
 
-If you want to guard all your fields against unauthenticated access, you can simply add Laravel's build-in auth middleware.
-Beware that this approach does not allow any GraphQL operations for guest users, so you will have to handle login outside GraphQL.
+If you want to guard all your fields against unauthenticated access, you can simply add Laravel's built-in auth middleware.
+Beware that this approach does not allow any GraphQL operations for guest users.
+So you will have to handle login outside GraphQL.
 
 ```php
 'middleware' => [
@@ -36,7 +37,8 @@ You can configure default guards to use for authenticating GraphQL requests in `
     'guards' => ['api'],
 ```
 
-This setting is used whenever Lighthouse looks for an authenticated user, for example in directives such as [@guard](../api-reference/directives.md#guard), or when applying the `AttemptAuthentication` middleware.
+This setting is used whenever Lighthouse looks for an authenticated user, for example in directives such as [@guard](../api-reference/directives.md#guard).
+Or when applying the `AttemptAuthentication` middleware.
 When multiple guards are configured, the first one that is authenticated will be used.
 
 Stateless guards are recommended for most use cases, such as the default `api` guard.
@@ -103,7 +105,8 @@ type Query {
 }
 ```
 
-Sending the following query will return the authenticated user's info or `null` if the request is not authenticated.
+Sending the following query returns the authenticated user info.
+It returns `null` if the request is not authenticated.
 
 ```graphql
 {

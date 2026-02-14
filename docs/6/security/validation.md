@@ -12,7 +12,8 @@ type Mutation {
 }
 ```
 
-In the case of a validation error, Lighthouse will abort execution and return the validation messages as part of the response.
+If validation fails, Lighthouse aborts execution.
+It returns the validation messages as part of the response.
 
 ```graphql
 mutation {
@@ -95,7 +96,8 @@ input CreatePostInput {
 
 Using the [`unique`](https://laravel.com/docs/validation#rule-unique) validation rule can be a bit tricky.
 
-If the argument is nested within an input object, the argument path will not match the column name, so you have to specify the column name explicitly.
+If the argument is nested within an input object, the argument path will not match the column name.
+So you have to specify the column name explicitly.
 
 ```graphql
 input CreateUserInput {
@@ -246,7 +248,7 @@ input FooInput {
 ```
 
 The following mutation would pass validation.
-`notBar` references the `bar` field of `FooInput` and thus its value `1` is compared to the value `2` - which is different:
+`notBar` references the `bar` field of `FooInput` and thus its value `1` is compared to the value `2`, which is different:
 
 ```graphql
 mutation {
@@ -256,7 +258,8 @@ mutation {
 
 ### Custom Rules With References
 
-When creating custom validation rules with references, you need to tell Lighthouse which parameters are references, so it can add the full argument path:
+When creating custom validation rules with references, you need to tell Lighthouse which parameters are references.
+So it can add the full argument path:
 
 ```graphql
 input FooInput {
