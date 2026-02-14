@@ -1187,7 +1187,6 @@ input CreatePostInput {
 ```
 
 If the name of the Eloquent model does not match the return type of the field, set it with the `model` argument.
-You can also use `model` when the class is in a non-default namespace.
 If the model is in a non-default namespace, also set it with the `model` argument.
 
 ```graphql
@@ -1280,7 +1279,6 @@ type Mutation {
 ```
 
 If the name of the Eloquent model does not match the return type of the field, set it with the `model` argument.
-You can also use `model` when the class is in a non-default namespace.
 If the model is in a non-default namespace, also set it with the `model` argument.
 
 ```graphql
@@ -3917,7 +3915,6 @@ type Mutation {
 ```
 
 If the name of the Eloquent model does not match the return type of the field, set it with the `model` argument.
-You can also use `model` when the class is in a non-default namespace.
 If the model is in a non-default namespace, also set it with the `model` argument.
 
 ```graphql
