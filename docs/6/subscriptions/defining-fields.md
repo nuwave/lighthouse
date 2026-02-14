@@ -17,8 +17,7 @@ php artisan lighthouse:subscription PostUpdated
 Lighthouse will look for a class matching the capitalized name of the field within the default subscription namespace.
 For example, the field `postUpdated` should have a corresponding class at `App\GraphQL\Subscriptions\PostUpdated`.
 
-All subscription field classes **must** implement the abstract class `Nuwave\Lighthouse\Schema\Types\GraphQLSubscription`
-and implement the two methods `authorize` and `filter`.
+All subscription field classes **must** implement the abstract class `Nuwave\Lighthouse\Schema\Types\GraphQLSubscription` and implement the two methods `authorize` and `filter`.
 
 ```php
 namespace App\GraphQL\Subscriptions;
@@ -85,6 +84,4 @@ final class PostUpdated extends GraphQLSubscription
 }
 ```
 
-If the default namespaces are not working with your application structure
-or you want to be more explicit, you can use the [@subscription](../api-reference/directives.md#subscription)
-directive to point to a different class.
+If the default namespaces are not working with your application structure or you want to be more explicit, you can use the [@subscription](../api-reference/directives.md#subscription) directive to point to a different class.

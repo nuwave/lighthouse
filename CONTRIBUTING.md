@@ -25,8 +25,10 @@ Before you release a new version, make sure to familiarize yourself with:
 - [Previous GitHub Releases](https://github.com/nuwave/lighthouse/releases)
 
 To create a new release, follow these steps:
-1. Consider the entries in the [`CHANGELOG unreleased section`](CHANGELOG.md#unreleased), add missing entries if needed
-2. Based on those entries and the previous version, define the next version number and add it to the [`CHANGELOG.md`](CHANGELOG.md)
+1. Consider the entries in the [`CHANGELOG unreleased section`](CHANGELOG.md#unreleased).
+Add missing entries if needed.
+2. Based on those entries and the previous version, define the next version number.
+Add it to [`CHANGELOG.md`](CHANGELOG.md).
 3. [Draft a new release](https://github.com/nuwave/lighthouse/releases/new)
 4. Add the version number as both tag and title
 5. Add the changelog entries as the description
@@ -85,7 +87,8 @@ Have a new feature?
 You can start off by writing some tests that detail the behavior you want to achieve and go from there.
 
 Fixing a bug?
-The best way to ensure it is fixed for good and never comes back is to write a failing test for it and then make it pass.
+The best way to ensure it is fixed for good is to write a failing test.
+Then make it pass so it does not come back.
 If you cannot figure out how to fix it yourself, feel free to submit a PR with a failing test.
 
 Here is how to set up Xdebug in PhpStorm: https://www.jetbrains.com/help/phpstorm/configuring-xdebug.html.
@@ -93,7 +96,7 @@ Here is how to set up Xdebug in PhpStorm: https://www.jetbrains.com/help/phpstor
 > Enabling Xdebug slows down tests by an order of magnitude.
 > Stop listening for Debug Connection to speed it back up.
 
-Set the environment variable `XDEBUG_REMOTE_HOST` to the IP of your host machine as seen from the Docker container.
+Set the environment variable `XDEBUG_REMOTE_HOST` to your host machine IP as seen from the Docker container.
 This may differ based on your setup.
 When running Docker for Desktop, it is usually `10.0.2.2`, when running from a VM it is something else.
 
@@ -205,8 +208,8 @@ Prefer direct usage of Illuminate classes instead of helpers.
 +Arr::get($foo, 'bar');
 ```
 
-A notable exception is the `response()` helper - using DI for injecting a
-`ResponseFactory` does not work in Lumen, while `response()` works for both.
+A notable exception is the `response()` helper.
+Using DI for injecting a `ResponseFactory` does not work in Lumen, while `response()` works for both.
 
 ### Type Definitions
 
@@ -223,9 +226,8 @@ If known, add additional type information in the PHPDoc.
 function foo(array $bar): string
 ```
 
-For aggregate types such as the commonly used `Collection` class, use
-the generic type hint style. While not officially part of PHPDoc, it is understood
-by PhpStorm and most other editors.
+For aggregate types such as the commonly used `Collection` class, use the generic type hint style.
+While not officially part of PHPDoc, it is understood by PhpStorm and most other editors.
 
 ```php
 /**
@@ -237,9 +239,7 @@ function foo(): Collection
 ```
 
 Use `self` to annotate that a class returns an instance of itself (or its child).
-Use [PHPDoc type hints](https://docs.phpdoc.org/guides/types.html#keywords) to
-differentiate between cases where you return the original object instance and
-other cases where you instantiate a new class.
+Use [PHPDoc type hints](https://docs.phpdoc.org/guides/types.html#keywords) to differentiate between cases where you return the original object instance and other cases where you instantiate a new class.
 
 ```php
 class Foo
@@ -275,6 +275,24 @@ class Foo
     }
 }
 ```
+
+### Prose Formatting
+
+Use [Semantic Line Breaks](https://sembr.org) for prose in markdown files and multiline code comments.
+
+Write one sentence per line by default, instead of wrapping at a fixed column width.
+Do not split a sentence across lines at commas or clauses.
+If a sentence becomes too long, rewrite it into multiple shorter sentences.
+Keep rendered output unchanged.
+
+Apply this style to edited prose in:
+- `*.md` files
+- multiline prose comments and PHPDoc blocks
+
+Do not reflow:
+- code blocks and snippets
+- PHPDoc tags (for example `@param`, `@return`, `@throws`)
+- generated files
 
 ## Code Style
 

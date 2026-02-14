@@ -45,8 +45,7 @@ graphql/
     |-- category.graphql
 ```
 
-To import all schema files in `blog/` in one go, use wildcard import syntax
-(works like PHP's [glob function](https://php.net/manual/function.glob.php)).
+To import all schema files in `blog/` in one go, use wildcard import syntax (works like PHP's [glob function](https://php.net/manual/function.glob.php)).
 
 ```graphql
 #import blog/*.graphql
@@ -70,11 +69,10 @@ The definition is imported from `schema.graphql`:
 ```
 
 Now you want to add queries to allow fetching posts.
-While you could add it to the main `Query` type in `schema.graphql`,
-it is generally preferable to colocate queries with the type they return.
+While you could add it to the main `Query` type in `schema.graphql`, it is generally preferable to colocate queries with the type they return.
 
-Make sure `schema.graphql` contains a `Query` type. You can add an empty type
-if you don't have one there:
+Make sure `schema.graphql` contains a `Query` type.
+You can add an empty type if you don't have one there:
 
 ```graphql
 type Query
@@ -95,5 +93,4 @@ extend type Query {
 
 The fields in the `extend type` definition are merged with those of the original type.
 Apart from object types `type`, you can also extend `input`, `interface` and `enum` types.
-Lighthouse will merge the fields (or values) with the original definition and always
-produce a single type in the final schema.
+Lighthouse will merge the fields (or values) with the original definition and always produce a single type in the final schema.

@@ -2,8 +2,7 @@
 
 Some directives can be applied to field arguments or input fields (any [InputValueDefinition](https://graphql.github.io/graphql-spec/June2018/#InputValueDefinition)).
 
-As arguments may be contained within a list in the schema definition, you must specify
-what your directive should apply to in addition to its function.
+As arguments may be contained within a list in the schema definition, you must specify what your directive should apply to in addition to its function.
 
 - If it applies to the individual items within the list,
   implement the [`Nuwave\Lighthouse\Support\Contracts\ArgDirective`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ArgDirective.php) interface.
@@ -14,8 +13,7 @@ You must implement exactly one of those two interfaces in order for an argument 
 
 ## Evaluation Order
 
-The application of directives that implement the `ArgDirective` interface is
-split into three distinct phases:
+The application of directives that implement the `ArgDirective` interface is split into three distinct phases:
 
 - Sanitize: Clean the input, e.g. trim whitespace.
   Directives can hook into this phase by implementing `ArgSanitizerDirective`.
@@ -39,8 +37,7 @@ In the given example, Lighthouse will take the value of the `password` argument 
 
 ## ArgSanitizerDirective
 
-An [`Nuwave\Lighthouse\Support\Contracts\ArgSanitizerDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/ArgSanitizerDirective.php)
-takes an incoming value and returns a new value.
+An [`Nuwave\Lighthouse\Support\Contracts\ArgSanitizerDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/ArgSanitizerDirective.php) takes an incoming value and returns a new value.
 
 Let's take a look at the built-in [@trim](../api-reference/directives.md#trim) directive.
 
@@ -74,8 +71,8 @@ final class TrimDirective extends BaseDirective implements ArgSanitizerDirective
 }
 ```
 
-The `sanitize` method takes an argument which represents the actual incoming value that is given
-to an argument in a query and is expected to modify the value, if needed, and return it.
+The `sanitize` method takes an argument which represents the actual incoming value that is given to an argument in a query and is expected to modify the value, if needed.
+Return it.
 
 For example, if we have the following schema.
 
@@ -106,8 +103,7 @@ final class CreateUser
 
 ## ArgTransformerDirective
 
-An [`Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/ArgTransformerDirective.php)
-works essentially the same as an [`ArgSanitizerDirective`](#argsanitizerdirective).
+An [`Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/ArgTransformerDirective.php) works essentially the same as an [`ArgSanitizerDirective`](#argsanitizerdirective).
 Notable differences are:
 
 - The method to implement is called `transform`
@@ -115,9 +111,7 @@ Notable differences are:
 
 ## ArgBuilderDirective
 
-An [`Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/ArgBuilderDirective.php)
-directive allows using arguments passed by the client to dynamically
-modify the database query that Lighthouse creates for a field.
+An [`Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/ArgBuilderDirective.php) directive allows using arguments passed by the client to dynamically modify the database query that Lighthouse creates for a field.
 
 Currently, the following directives use arguments to modify the query:
 
@@ -139,8 +133,7 @@ type User {
 }
 ```
 
-Passing the `category` argument will select only the user's posts
-where the `category` column is equal to the value of the `category` argument.
+Passing the `category` argument will select only the user's posts where the `category` column is equal to the value of the `category` argument.
 
 So let's take a look at a simplified version of the built-in [@eq](../api-reference/directives.md#eq) directive.
 
@@ -188,8 +181,7 @@ The `handleBuilder` method takes two arguments:
 - `$value`
   The value of the argument value that [@eq](../api-reference/directives.md#eq) was applied on to.
 
-If you want to use a more complex value for manipulating a query,
-you can build a `ArgBuilderDirective` to work with lists or nested input objects.
+If you want to use a more complex value for manipulating a query, you can build a `ArgBuilderDirective` to work with lists or nested input objects.
 Lighthouse's [@whereBetween](../api-reference/directives.md#wherebetween) is one example of this.
 
 ```graphql
@@ -206,9 +198,6 @@ input DateRange {
 
 ## ArgResolver
 
-An [`Nuwave\Lighthouse\Support\Contracts\ArgResolver`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ArgResolver.php)
-directive allows you to compose resolvers for complex nested inputs, similar to the way
-that field resolvers are composed together.
+An [`Nuwave\Lighthouse\Support\Contracts\ArgResolver`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ArgResolver.php) directive allows you to compose resolvers for complex nested inputs, similar to the way that field resolvers are composed together.
 
-For an in-depth explanation of the concept of composing arg resolvers,
-read the [explanation of arg resolvers](../concepts/arg-resolvers.md).
+For an in-depth explanation of the concept of composing arg resolvers, read the [explanation of arg resolvers](../concepts/arg-resolvers.md).

@@ -16,8 +16,8 @@ class BindingExists implements InvokableRule, ValidatorAwareRule
     ) {}
 
     /**
-     * Because of backwards compatibility with Laravel 9, typehints for this method
-     * must be set through PHPDoc as the interface did not include typehints.
+     * Because of backwards compatibility with Laravel 9, this method sets typehints through PHPDoc.
+     * The interface did not include typehints.
      *
      * @see https://laravel.com/docs/9.x/validation#using-rule-objects
      *
@@ -51,8 +51,8 @@ class BindingExists implements InvokableRule, ValidatorAwareRule
     }
 
     /**
-     * Because of backwards compatibility with Laravel 9, typehints for this method
-     * must be set through PHPDoc as the interface did not include typehints.
+     * Because of backwards compatibility with Laravel 9, this method sets typehints through PHPDoc.
+     * The interface did not include typehints.
      *
      * @see https://laravel.com/docs/9.x/validation#custom-validation-rules
      *

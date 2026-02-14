@@ -1,26 +1,20 @@
 # Arg Resolvers
 
-To understand the concept behind arg resolvers, you should familiarize yourself with
-[how field resolvers are composed](https://graphql.org/learn/execution).
+To understand the concept behind arg resolvers, you should familiarize yourself with [how field resolvers are composed](https://graphql.org/learn/execution).
 
 ## Motivation
 
-Arg resolvers are an extension of the ideas behind GraphQL field execution,
-applied to input arguments. Since GraphQL queries can be used to fetch complex
-and deeply nested data from the client, it is natural to assume that such complex
-data can also be passed as the input arguments to a query.
+Arg resolvers are an extension of the ideas behind GraphQL field execution, applied to input arguments.
+Since GraphQL queries can be used to fetch complex and deeply nested data from the client, it is natural to assume that such complex data can also be passed as the input arguments to a query.
 
-GraphQL's execution engine allows you to write small and focused field resolver functions
-that only care about returning the data that it is immediately responsible for.
+GraphQL's execution engine allows you to write small and focused field resolver functions that only care about returning the data that it is immediately responsible for.
 That makes the code much simpler and avoids duplication.
 
-However, a single field resolver still has to take care of all the input arguments that
-are passed to it. Handling complex input data in a single function is hard because of their
-dynamic nature. The input given by a client might be nested arbitrarily deep
-and come in many different variations.
+However, a single field resolver still has to take care of all the input arguments that are passed to it.
+Handling complex input data in a single function is hard because of their dynamic nature.
+The input given by a client might be nested arbitrarily deep and come in many different variations.
 
-The following example shows an example mutation that is actually composed out of multiple
-distinct operations.
+The following example shows an example mutation that is actually composed out of multiple distinct operations.
 
 ```graphql
 type Mutation {
@@ -38,8 +32,7 @@ input CreateNoteInput {
 }
 ```
 
-In a single request, we can pass all data relating to a task,
-including related entities such as notes.
+In a single request, we can pass all data relating to a task, including related entities such as notes.
 
 ```graphql
 mutation CreateTaskWithNotes {
@@ -80,15 +73,13 @@ function createTaskWithNotes(mixed $root, array $args): \App\Models\Task {
 In this contrived example, the function is still quite small.
 However, separation of concerns is already violated: A single function is responsible for creating both tasks and notes.
 
-We might want to extend our schema to support more operations in the future, such as updating
-a task and creating, updating or deleting notes or other, more deeply nested relations.
+We might want to extend our schema to support more operations in the future, such as updating a task and creating, updating or deleting notes or other, more deeply nested relations.
 Such changes would force us to duplicate code and increase the complexity of our single function.
 
 ## Solution
 
-Ideally, we would want to write small and focused functions that deal with just
-a part of the given input arguments. The execution engine should traverse the given
-input and take care of calling the appropriate functions with their respective arguments.
+Ideally, we would want to write small and focused functions that deal with just a part of the given input arguments.
+The execution engine should traverse the given input and take care of calling the appropriate functions with their respective arguments.
 
 ```php
 function createTask(mixed $root, array $args): \App\Models\Task {
@@ -128,8 +119,7 @@ input CreateNoteInput {
 
 The [@create](../api-reference/directives.md#create) directive will behave differently, based on the context where it is used.
 
-On the `createTask` field, it will create a `Task` model with the given `name`, save it
-to the database and return that instance to Lighthouse.
+On the `createTask` field, it will create a `Task` model with the given `name`, save it to the database and return that instance to Lighthouse.
 
 A simplified, generic implementation of an appropriate field resolver would look something like this:
 
@@ -164,8 +154,7 @@ final class CreateDirective extends BaseDirective implements FieldResolver
 ```
 
 The arguments that are nested within `notes` will be handled as a nested argument resolver.
-For each `CreateNoteInput`, the resolver will be called with the previously created `Task`
-and create and attach a related `Note` model.
+For each `CreateNoteInput`, the resolver will be called with the previously created `Task` and create and attach a related `Note` model.
 
 We can extend our previous implementation of [@create](../api-reference/directives.md#create) by allowing it to be used as an `ArgResolver`:
 

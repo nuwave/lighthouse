@@ -51,8 +51,7 @@ This will create the following files:
 - `programmatic-types.graphql`: Schema definitions for programmatically registered types, if you have any
 - `_lighthouse_ide_helper.php`: Class definitions for some magical PHP, such as the `TestResponse` mixin
 
-A great way to keep up to date with your current version of Lighthouse
-is to add this script to your `composer.json`:
+A great way to keep up to date with your current version of Lighthouse is to add this script to your `composer.json`:
 
 ```json
 "scripts": {
@@ -62,8 +61,7 @@ is to add this script to your `composer.json`:
     ],
 ```
 
-If the generated definitions conflict with those provided by your IDE, try `--omit-built-in` to avoid redefining
-built-in directives such as `@deprecated`.
+If the generated definitions conflict with those provided by your IDE, try `--omit-built-in` to avoid redefining built-in directives such as `@deprecated`.
 
 ## interface
 
@@ -94,7 +92,8 @@ php artisan lighthouse:print-schema
 This can be quite useful, as the root `.graphql` files do not necessarily contain the whole schema.
 Schema imports, native PHP types and schema manipulation may influence the final schema.
 
-Use the `-W` / `--write` option to output the schema to the default file storage (usually `storage/app`) as `lighthouse-schema.graphql`.
+Use the `-W` / `--write` option to output the schema to default file storage (usually `storage/app`).
+The output file is `lighthouse-schema.graphql`.
 You can output your schema in JSON format by using the `--json` flag.
 You can sort the final compiled schema by using the `--sort` flag.
 

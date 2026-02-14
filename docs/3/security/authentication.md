@@ -1,7 +1,7 @@
 # Authentication
 
-You can use [standard Laravel mechanisms](https://laravel.com/docs/authentication)
-to authenticate users of your GraphQL API. Stateless guards are recommended for most use cases.
+You can use [standard Laravel mechanisms](https://laravel.com/docs/authentication) to authenticate users of your GraphQL API.
+Stateless guards are recommended for most use cases.
 
 ## Get the current user
 
@@ -14,8 +14,7 @@ type Query {
 }
 ```
 
-Sending the following query will return the authenticated user's info
-or `null` if the request is not authenticated.
+Sending the following query will return the authenticated user's info or `null` if the request is not authenticated.
 
 ```graphql
 {
@@ -28,11 +27,9 @@ or `null` if the request is not authenticated.
 
 ## Apply auth middleware
 
-Lighthouse allows you to configure global middleware that is run for every
-request to your endpoint, but also define it on a per-field basis.
+Lighthouse allows you to configure global middleware that is run for every request to your endpoint, but also define it on a per-field basis.
 
-Use the [@middleware](../api-reference/directives.md#middleware) directive to apply Laravel middleware,
-such as the `auth` middleware, to selected fields of your GraphQL endpoint.
+Use the [@middleware](../api-reference/directives.md#middleware) directive to apply Laravel middleware, such as the `auth` middleware, to selected fields of your GraphQL endpoint.
 
 ```graphql
 type Query {

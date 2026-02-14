@@ -2,8 +2,7 @@
 
 ## Client Controlled Ordering
 
-To enable clients to control the ordering, use [@orderBy](../api-reference/directives.md#orderby) on an argument of
-a field that is backed by a database query.
+To enable clients to control the ordering, use [@orderBy](../api-reference/directives.md#orderby) on an argument of a field that is backed by a database query.
 
 ```graphql
 type Query {
@@ -11,9 +10,8 @@ type Query {
 }
 ```
 
-The type of the argument can be left blank as `_` ,
-as Lighthouse will automatically generate an input that takes enumerated column names,
-together with the `SortOrder` enum, and add that to your schema:
+The type of the argument can be left blank as `_` , as Lighthouse will automatically generate an input that takes enumerated column names, together with the `SortOrder` enum.
+Add that to your schema:
 
 ```graphql
 "Order by clause for Query.posts.orderBy."

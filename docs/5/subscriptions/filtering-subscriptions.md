@@ -1,6 +1,8 @@
 # Filtering Subscriptions
 
-There are times when you'll need to filter out specific events based on the arguments provided by the client. To handle this, you can return a true/false from the `filter` function to indicate whether the client should receive the subscription. For instance, using the following example:
+There are times when you'll need to filter out specific events based on the arguments provided by the client.
+To handle this, you can return a true/false from the `filter` function to indicate whether the client should receive the subscription.
+For instance, using the following example:
 
 ```graphql
 subscription onPostUpdated($post_id: ID!) {

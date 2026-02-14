@@ -4,17 +4,16 @@ Client directives allow clients to change the behavior of query execution.
 
 > Client directives must not be used within your schema definition.
 
-The [GraphQL specification](https://graphql.github.io/graphql-spec/June2018/#sec-Type-System.Directives)
-mentions two client directives: [@skip](#skip) and [@include](#include).
+The [GraphQL specification](https://graphql.github.io/graphql-spec/June2018/#sec-Type-System.Directives) mentions two client directives.
+[@skip](#skip) and [@include](#include).
 Both are built-in to Lighthouse and work out-of-the-box.
 
 ## @skip
 
-This directive is part of the [GraphQL spec](https://graphql.github.io/graphql-spec/June2018/#sec--include)
-and is built-in to Lighthouse.
+This directive is part of the [GraphQL spec](https://graphql.github.io/graphql-spec/June2018/#sec--include) and is built-in to Lighthouse.
 
-The [@skip](#skip) directive may be provided for fields, fragment spreads, and inline fragments, and allows for conditional
-exclusion during execution as described by the `if` argument.
+The [@skip](#skip) directive may be provided for fields, fragment spreads, and inline fragments.
+Allows for conditional exclusion during execution as described by the `if` argument.
 
 ```graphql
 directive @skip(
@@ -36,11 +35,10 @@ query myQuery($someTest: Boolean) {
 
 ## @include
 
-This directive is part of the [GraphQL spec](https://graphql.github.io/graphql-spec/June2018/#sec--include)
-and is built-in to Lighthouse.
+This directive is part of the [GraphQL spec](https://graphql.github.io/graphql-spec/June2018/#sec--include) and is built-in to Lighthouse.
 
-The [@include](#include) directive may be provided for fields, fragment spreads, and inline fragments,
-and allows for conditional inclusion during execution as described by the `if` argument.
+The [@include](#include) directive may be provided for fields, fragment spreads, and inline fragments.
+Allows for conditional inclusion during execution as described by the `if` argument.
 
 ```graphql
 directive @include(
@@ -74,19 +72,17 @@ directive @example(
 ```
 
 By itself, a custom client directive does not do anything.
-Lighthouse provides a class to retrieve information about where client directives
-were placed in the query and what arguments were given to them.
+Lighthouse provides a class to retrieve information about where client directives were placed in the query and what arguments were given to them.
 
 ```php
 $clientDirective = new \Nuwave\Lighthouse\ClientDirectives\ClientDirective('example');
 ```
 
-The most common use case for a client directive is to place it on a field. There is a caveat
-to working with this that is unintuitive at first: There might be multiple nodes referencing a single
-field, and each of those may or may not have the client directive set, with possibly different arguments.
+The most common use case for a client directive is to place it on a field.
+There is a caveat to working with this that is unintuitive at first: There might be multiple nodes referencing a single field.
+Each of those may or may not have the client directive set, with possibly different arguments.
 
-The following example illustrates how a field `foo` can be referenced three times with different
-configurations of a client directive:
+The following example illustrates how a field `foo` can be referenced three times with different configurations of a client directive:
 
 ```graphql
 {
@@ -98,8 +94,7 @@ configurations of a client directive:
 }
 ```
 
-You can get all arguments for every node that is referencing the field you are currently
-resolving, passing the fourth [resolver argument `ResolveInfo $resolveInfo`](../api-reference/resolvers.md#resolver-function-signature):
+You can get all arguments for every node that is referencing the field you are currently resolving, passing the fourth [resolver argument `ResolveInfo $resolveInfo`](../api-reference/resolvers.md#resolver-function-signature):
 
 ```php
 $arguments = $clientDirective->forField($resolveInfo);
@@ -116,8 +111,8 @@ For the example query above, it will look like this:
 ]
 ```
 
-You are then free to implement whatever logic on top of that. Some client directives may require
-only one field node to have it set, whereas others might require all of them to have the same configuration.
+You are then free to implement whatever logic on top of that.
+Some client directives may require only one field node to have it set, whereas others might require all of them to have the same configuration.
 
 > There are other locations where client directives may be used on: https://spec.graphql.org/draft/#ExecutableDirectiveLocation
 > You can add a PR to Lighthouse if you need them.

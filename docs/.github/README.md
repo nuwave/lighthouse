@@ -1,7 +1,6 @@
 # Lighthouse Website
 
-The Lighthouse docs website uses [Vue Press](https://vuepress.vuejs.org),
-a minimalistic [Vue](https://vuejs.org) powered static site generator.
+The Lighthouse docs website uses [Vue Press](https://vuepress.vuejs.org), a minimalistic [Vue](https://vuejs.org) powered static site generator.
 
 ## Directory structure
 
@@ -73,10 +72,17 @@ Always use relative paths according to folder structure.
 See [configuration](../getting-started/configuration.md) for more info.
 ```
 
+### Prose formatting
+
+Use [Semantic Line Breaks](https://sembr.org) in docs prose.
+Use one sentence per line by default.
+Do not split a sentence at commas or clauses.
+If a sentence is too long, rewrite it into multiple shorter sentences.
+Do not reflow code blocks, tables, or other syntax-sensitive structures.
+
 ## Versioning
 
-The numbered directories (2, 3, ...) in `docs/` correspond to major releases of Lighthouse,
-`docs/pages/` remains the same for all versions.
+The numbered directories (2, 3, ...) in `docs/` correspond to major releases of Lighthouse, `docs/pages/` remains the same for all versions.
 
 This ensures that the docs are always in sync with the released version of Lighthouse.
 Version specific changes are handled by keeping the docs for each version separate.
@@ -94,15 +100,13 @@ See [Tagging a new version](#tagging-a-new-version) for how they are released.
 
 ### Updating existing versions
 
-When you improve the docs, consider if the change you are making applies to
-multiple versions of Lighthouse.
+When you improve the docs, consider if the change you are making applies to multiple versions of Lighthouse.
 
 Change the relevant parts of each docs folder and commit it all in a single PR.
 
 ### Tagging a new version
 
-After you finished your work on `docs/master/`, copy the updated docs
-into the directory of the current major version by running:
+After you finished your work on `docs/master/`, copy the updated docs into the directory of the current major version by running:
 
     make release
 
@@ -114,4 +118,3 @@ The docs are automatically built and deployed on pushes to `master`.
 @chrissm79 set up the deployment.
 
 When the docs are down, check https://www.netlifystatus.com for problems on their part.
-

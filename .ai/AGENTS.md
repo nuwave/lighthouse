@@ -45,7 +45,8 @@ docker compose exec php vendor/bin/phpunit tests/Unit/Path/To/TestFile.php
 
 ### Directive System
 
-Directives are the core extension mechanism. Located in `src/Schema/Directives/`.
+Directives are the core extension mechanism.
+Located in `src/Schema/Directives/`.
 
 - `BaseDirective` - Abstract base class for all directives, provides common utilities
 - Directive interfaces in `src/Support/Contracts/` define capabilities:
@@ -124,6 +125,8 @@ $user = User::create([
 - Never use `final` in `src/`, always in `tests/`
 - Full namespace in PHPDoc (`@var \Full\Namespace\Class`), imports in code
 - Code elements with `@api` have stability guarantees between major versions
+- Use [Semantic Line Breaks](https://sembr.org) for prose in markdown and multiline comments
+- Default to one sentence per line and avoid comma/clause-only line breaks
 
 ## Pull Requests
 

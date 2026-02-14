@@ -6,8 +6,7 @@ use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 
 /**
- * This directive exists as a placeholder and can be used
- * to point to a custom subscription class.
+ * This directive exists as a placeholder and can be used to point to a custom subscription class.
  *
  * @see \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription
  */

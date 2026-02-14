@@ -4,8 +4,7 @@ Lighthouse offers various extension points which can be used by package and appl
 
 ## The Event System
 
-Lighthouse offers a unified way of hooking into the complete execution lifecycle
-through [Laravel's event system](https://laravel.com/docs/events).
+Lighthouse offers a unified way of hooking into the complete execution lifecycle through [Laravel's event system](https://laravel.com/docs/events).
 You may use any Service Provider to register listeners.
 
 A complete list of all dispatched events is available [in the events API reference](../api-reference/events.md).
@@ -35,8 +34,7 @@ final class SomePackageServiceProvider extends ServiceProvider
 
 ## Changing the default resolver
 
-Lighthouse will fall back to using [webonyx's default resolver](https://webonyx.github.io/graphql-php/data-fetching/#default-field-resolver)
-for non-root fields, [see resolver precedence](../the-basics/fields.md#resolver-precedence).
+Lighthouse will fall back to using [webonyx's default resolver](https://webonyx.github.io/graphql-php/data-fetching/#default-field-resolver) for non-root fields, [see resolver precedence](../the-basics/fields.md#resolver-precedence).
 
 You may override this by calling `GraphQL\Executor\Executor::setDefaultFieldResolver()` in your service provider's `boot()` method.
 
@@ -44,8 +42,7 @@ You may override this by calling `GraphQL\Executor\Executor::setDefaultFieldReso
 
 The context is the third argument of any resolver function.
 
-You may replace the default `Nuwave\Lighthouse\Schema\Context` with your own
-implementation of the interface `Nuwave\Lighthouse\Support\Contracts\GraphQLContext`.
+You may replace the default `Nuwave\Lighthouse\Schema\Context` with your own implementation of the interface `Nuwave\Lighthouse\Support\Contracts\GraphQLContext`.
 The following example is just a starting point of what you can do:
 
 ```php

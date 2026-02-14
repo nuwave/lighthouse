@@ -12,13 +12,10 @@ The quickest way to define such a field is through the `artisan` generator comma
 
     php artisan lighthouse:subscription PostUpdated
 
-Lighthouse will look for a class with the capitalized name of the field that
-is defined within the default subscription namespace.
-For example, the field `postUpdated` should have a corresponding class at
-`App\GraphQL\Subscriptions\PostUpdated`.
+Lighthouse will look for a class with the capitalized name of the field that is defined within the default subscription namespace.
+For example, the field `postUpdated` should have a corresponding class at `App\GraphQL\Subscriptions\PostUpdated`.
 
-All subscription field classes **must** implement the abstract class
-`Nuwave\Lighthouse\Schema\Types\GraphQLSubscription` and implement two methods:
+All subscription field classes **must** implement the abstract class `Nuwave\Lighthouse\Schema\Types\GraphQLSubscription` and implement two methods.
 `authorize` and `filter`.
 
 ```php
@@ -114,6 +111,4 @@ class PostUpdated extends GraphQLSubscription
 }
 ```
 
-If the default namespaces are not working with your application structure
-or you want to be more explicit, you can use the [@subscription](../api-reference/directives.md#subscription)
-directive to point to a different class.
+If the default namespaces are not working with your application structure or you want to be more explicit, you can use the [@subscription](../api-reference/directives.md#subscription) directive to point to a different class.

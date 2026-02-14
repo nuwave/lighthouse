@@ -2,9 +2,8 @@
 
 ## Validating Arguments
 
-Lighthouse allows you to use [Laravel's validation](https://laravel.com/docs/validation) for your
-queries and mutations. The simplest way to leverage the built-in validation rules is to use the
-[@rules](../api-reference/directives.md#rules) directive.
+Lighthouse allows you to use [Laravel's validation](https://laravel.com/docs/validation) for your queries and mutations.
+The simplest way to leverage the built-in validation rules is to use the [@rules](../api-reference/directives.md#rules) directive.
 
 ```graphql
 type Mutation {
@@ -15,8 +14,7 @@ type Mutation {
 }
 ```
 
-In the case of a validation error, Lighthouse will abort execution and return the validation messages
-as part of the response.
+In the case of a validation error, Lighthouse will abort execution and return the validation messages as part of the response.
 
 ```graphql
 mutation {
@@ -58,11 +56,9 @@ You can customize the error message for a particular argument.
 
 ### Validating For Uniqueness
 
-Using the [`unique`](https://laravel.com/docs/5.8/validation#rule-unique)
-validation rule can be a bit tricky.
+Using the [`unique`](https://laravel.com/docs/5.8/validation#rule-unique) validation rule can be a bit tricky.
 
-If the argument is nested within an input object, the argument path will not
-match the column name, so you have to specify the column name explicitly.
+If the argument is nested within an input object, the argument path will not match the column name, so you have to specify the column name explicitly.
 
 ```graphql
 input CreateUserInput {
@@ -72,8 +68,7 @@ input CreateUserInput {
 
 ## Validating Arrays
 
-When you are passing in an array as an argument to a field, you might
-want to apply some validation on the array itself, using [@rulesForArray](../api-reference/directives.md#rules)
+When you are passing in an array as an argument to a field, you might want to apply some validation on the array itself, using [@rulesForArray](../api-reference/directives.md#rules)
 
 ```graphql
 type Mutation {
@@ -81,8 +76,7 @@ type Mutation {
 }
 ```
 
-You can also combine this with [@rules](../api-reference/directives.md#rules) to validate
-both the size and the contents of an argument array.
+You can also combine this with [@rules](../api-reference/directives.md#rules) to validate both the size and the contents of an argument array.
 For example, you might require a list of at least 3 valid emails to be passed.
 
 ```graphql

@@ -5,8 +5,7 @@ namespace Nuwave\Lighthouse\Execution\Utils;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Create a model key that concatenates the models fully-qualified class
- * name and key or composite key.
+ * Create a model key that concatenates the models fully-qualified class name and key or composite key.
  */
 class ModelKey
 {
