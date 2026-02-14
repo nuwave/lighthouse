@@ -104,11 +104,9 @@ public function testPostsSubscription(): void
 
 ## Assertions
 
-Now that we know how to query our server in tests, we need to make sure the
-returned results match our expectations.
+Now that we know how to query our server in tests, we need to make sure the returned results match our expectations.
 
-The returned `TestResponse` conveniently offers assertions that work quite
-well with the JSON data returned by GraphQL.
+The returned `TestResponse` conveniently offers assertions that work quite well with the JSON data returned by GraphQL.
 
 The `assertJson` method asserts that the response is a superset of the given JSON.
 
@@ -253,12 +251,9 @@ $this
 
 ## Testing Errors
 
-Depending on your debug and error handling configuration, Lighthouse catches most if
-not all errors produced within queries and includes them within the result.
+Depending on your debug and error handling configuration, Lighthouse catches most if not all errors produced within queries and includes them within the result.
 
-One way to test for errors is to examine the `TestResponse`, either by looking
-at the JSON response manually or by using the provided [assertion mixins](#testresponse-assertion-mixins)
-such as `assertGraphQLErrorMessage()`:
+One way to test for errors is to examine the `TestResponse`, either by looking at the JSON response manually or by using the provided [assertion mixins](#testresponse-assertion-mixins) such as `assertGraphQLErrorMessage()`:
 
 ```php
 $this
@@ -315,8 +310,8 @@ $this->multipartGraphQL($operations, $map, $file);
 
 ## Introspection
 
-If you create or manipulate parts of your schema programmatically, you might
-want to test that. You can use introspection to query your final schema in tests.
+If you create or manipulate parts of your schema programmatically, you might want to test that.
+You can use introspection to query your final schema in tests.
 
 Lighthouse uses the introspection query from [`GraphQL\Type\Introspection::getIntrospectionQuery()`](https://github.com/webonyx/graphql-php/blob/master/src/Type/Introspection.php).
 
@@ -382,8 +377,7 @@ $this->setUpDeferStream();
 
 ## Lumen
 
-Because the `TestResponse` class is not available in Lumen, you must use a different
-test trait:
+Because the `TestResponse` class is not available in Lumen, you must use a different test trait:
 
 ```diff
 <?php
@@ -398,8 +392,7 @@ abstract class TestCase extends Laravel\Lumen\Testing\TestCase
 }
 ```
 
-All the test helpers are called the same as in `MakesGraphQLRequest`, the only
-difference is that they return `$this` instead of a `TestResponse`.
+All the test helpers are called the same as in `MakesGraphQLRequest`, the only difference is that they return `$this` instead of a `TestResponse`.
 Assertions work differently as a result:
 
 ```php

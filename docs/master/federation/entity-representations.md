@@ -29,13 +29,15 @@ type Comment @extends @key(fields: "id") {
 ## Non-Eloquent representation
 
 If entities don't have an Eloquent relationship within the subgraph, it's necessary to specify a separate resolver that will return the required information.
-The resolver should return data containing information about the `__typename` field, which corresponds to the entity's name and the primary key that can identify the entity.
+The resolver should return data containing information about the `__typename` field.
+Corresponds to the entity's name and the primary key that can identify the entity.
 The `__typename` can either be provided as an explicit field or implicitly by returning an object with a matching class name.
 
 ### Example 1
 
-In this example, subgraph for order service has an entity called `Order`, which in turn has an entity called `Receipt`
-defined in a separate subgraph for payment service. The relationship between `Order` and `Receipt` is one-to-one.
+In this example, subgraph for order service has an entity called `Order`.
+In turn has an entity called `Receipt` defined in a separate subgraph for payment service.
+The relationship between `Order` and `Receipt` is one-to-one.
 
 ```graphql
 type Order {
@@ -70,8 +72,9 @@ final class Receipt
 
 ### Example 2
 
-In this example, subgraph for order service has an entity called `Order`, which in turn has an entity called `Product`
-defined in a separate subgraph for product service. The relationship between `Order` and `Product` is one-to-many.
+In this example, subgraph for order service has an entity called `Order`.
+In turn has an entity called `Product` defined in a separate subgraph for product service.
+The relationship between `Order` and `Product` is one-to-many.
 
 ```graphql
 type Order {
@@ -84,7 +87,8 @@ type Product @extends @key(fields: "uuid") {
 }
 ```
 
-The resolver for product in order service returns an array of arrays. Each sub-array consists of:
+The resolver for product in order service returns an array of arrays.
+Each sub-array consists of:
 
 - `__typename` - the entity name from the product service;
 - `uuid` - the primary key of a specific product.

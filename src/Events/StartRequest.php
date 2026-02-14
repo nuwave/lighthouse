@@ -8,8 +8,7 @@ use Illuminate\Support\Carbon;
 /**
  * Fires right after a request reaches the GraphQLController.
  *
- * Can be used for logging or for measuring and monitoring
- * the time a request takes to resolve.
+ * Can be used for logging or for measuring and monitoring the time a request takes to resolve.
  *
  * @see \Nuwave\Lighthouse\Http\GraphQLController
  */

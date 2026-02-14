@@ -59,8 +59,7 @@ Other reasons to clear the query cache completely include:
 
 ## Automated Persisted Queries
 
-Lighthouse supports Automatic Persisted Queries (APQ), compatible with the
-[Apollo implementation](https://www.apollographql.com/docs/apollo-server/performance/apq).
+Lighthouse supports Automatic Persisted Queries (APQ), compatible with the [Apollo implementation](https://www.apollographql.com/docs/apollo-server/performance/apq).
 
 APQ is enabled by default, but depends on query caching being enabled.
 

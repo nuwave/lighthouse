@@ -16,10 +16,8 @@ use Tests\Utils\ModelsSecondary\OnlyHere;
 /**
  * This class does test the internal behavior of the BaseDirective class.
  *
- * While typically considered an anti-pattern, the BaseDirective is meant
- * to be extended by other directives and offers basic utilities that
- * are commonly used in directives. As users may also extend it to create
- * custom directives, its behavior should be stable and well-defined.
+ * While typically considered an anti-pattern, the BaseDirective is meant to be extended by other directives and offers basic utilities that are commonly used in directives.
+ * As users may also extend it to create custom directives, its behavior should be stable and well-defined.
  */
 final class BaseDirectiveTest extends TestCase
 {

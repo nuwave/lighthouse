@@ -21,8 +21,7 @@ class DirectiveLocator
     /**
      * The paths used for locating directive classes.
      *
-     * Should be tried in the order they are contained in this array,
-     * going from the most significant to least significant.
+     * Should be tried in the order they are contained in this array, going from the most significant to least significant.
      *
      * Lazily initialized.
      *

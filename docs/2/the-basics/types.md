@@ -1,8 +1,8 @@
 # Types
 
-A GraphQL schema is made out of types. This section describes the different set of types
-and how they can be defined to work with Lighthouse. For a more in-depth reference about types,
-look into the [GraphQL documentation](https://graphql.org/learn/schema)
+A GraphQL schema is made out of types.
+This section describes the different set of types and how they can be defined to work with Lighthouse.
+For a more in-depth reference about types, look into the [GraphQL documentation](https://graphql.org/learn/schema)
 
 ## Object Type
 
@@ -26,15 +26,13 @@ type Query {
 
 ## Scalar
 
-Scalar types are the most basic elements of a GraphQL schema. There are a
-few built in scalars, such as `String` or `Int`.
+Scalar types are the most basic elements of a GraphQL schema.
+There are a few built in scalars, such as `String` or `Int`.
 
-Lighthouse provides some scalars that work well with Laravel out of the box, you can find
-them in the [default schema](../getting-started/installation.md#publish-the-default-schema).
+Lighthouse provides some scalars that work well with Laravel out of the box, you can find them in the [default schema](../getting-started/installation.md#publish-the-default-schema).
 
-Define your own scalar types by running `php artisan lighthouse:scalar <Scalar name>`
-and including it in your schema. Lighthouse will look for Scalar types in a configurable
-default namespace.
+Define your own scalar types by running `php artisan lighthouse:scalar <Scalar name>` and including it in your schema.
+Lighthouse will look for Scalar types in a configurable default namespace.
 
 ```graphql
 scalar ZipCode
@@ -57,8 +55,8 @@ scalar Email @scalar(class: "MLL\\GraphQLScalars\\Email")
 ## Enum
 
 Enums are types with a restricted set of values (similar to `enum` found in database migrations).
-They are defined as a list of `UPPERCASE` string keys. You can define the actual values through
-the [@enum](../api-reference/directives.md#enum) directive.
+They are defined as a list of `UPPERCASE` string keys.
+You can define the actual values through the [@enum](../api-reference/directives.md#enum) directive.
 
 ```graphql
 enum EmploymentStatus {
@@ -82,8 +80,8 @@ type Query {
 }
 ```
 
-In this example, the underlying values are actually integers. When the models are retrieved from
-the database, the mapping is applied and the integers are converted to the defined string keys.
+In this example, the underlying values are actually integers.
+When the models are retrieved from the database, the mapping is applied and the integers are converted to the defined string keys.
 
 ```php
 return [
@@ -129,8 +127,7 @@ The PHP internal value of the field `ADMIN` will be `string('ADMIN')`.
 ## Input
 
 Input types can be used to describe complex objects for field arguments.
-Beware that while they look similar to Object Types, they behave differently:
-The fields of an Input Type are treated similar to arguments.
+Beware that while they look similar to Object Types, they behave differently: The fields of an Input Type are treated similar to arguments.
 
 ```graphql
 input CreateUserInput {
@@ -178,21 +175,19 @@ type User implements Named {
 }
 ```
 
-Interfaces need a way of determining which concrete Object Type is returned by a
-particular query. Lighthouse provides a default type resolver that works by calling
-`class_basename($value)` on the value returned by the resolver.
+Interfaces need a way of determining which concrete Object Type is returned by a particular query.
+Lighthouse provides a default type resolver that works by calling `class_basename($value)` on the value returned by the resolver.
 
-You can also provide a custom type resolver. Run `php artisan lighthouse:interface <Interface name>` to create
-a custom interface class. It is automatically put in the default namespace where Lighthouse can discover it by itself.
+You can also provide a custom type resolver.
+Run `php artisan lighthouse:interface <Interface name>` to create a custom interface class.
+It is automatically put in the default namespace where Lighthouse can discover it by itself.
 
-Read more about them in the [GraphQL Reference](https://graphql.org/learn/schema/#interfaces) and the
-[docs for graphql-php](https://webonyx.github.io/graphql-php/type-definitions/interfaces)
+Read more about them in the [GraphQL Reference](https://graphql.org/learn/schema/#interfaces) and the [docs for graphql-php](https://webonyx.github.io/graphql-php/type-definitions/interfaces)
 
 ## Union
 
 A Union is an abstract type that simply enumerates other Object Types.
-They are similar to interfaces in that they can return different types, but they can not
-have fields defined.
+They are similar to interfaces in that they can return different types, but they can not have fields defined.
 
 ```graphql
 union Person = User | Employee
@@ -206,10 +201,8 @@ type Employee {
 }
 ```
 
-Just like Interfaces, you need a way to determine the concrete Object Type for a Union,
-based on the resolved value. If the default type resolver does not work for you, define your
-own using `php artisan lighthouse:union <Union name>`.
+Just like Interfaces, you need a way to determine the concrete Object Type for a Union, based on the resolved value.
+If the default type resolver does not work for you, define your own using `php artisan lighthouse:union <Union name>`.
 It is automatically put in the default namespace where Lighthouse can discover it by itself.
 
-Read more about them in the [GraphQL Reference](https://graphql.org/learn/schema/#union-types) and the
-[docs for graphql-php](https://webonyx.github.io/graphql-php/type-definitions/unions)
+Read more about them in the [GraphQL Reference](https://graphql.org/learn/schema/#union-types) and the [docs for graphql-php](https://webonyx.github.io/graphql-php/type-definitions/unions)

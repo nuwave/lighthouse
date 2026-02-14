@@ -17,9 +17,8 @@ class Cursor
     /**
      * Decode cursor from query arguments.
      *
-     * If no 'after' argument is provided or the contents are not a valid base64 string,
-     * this will return 0. That will effectively reset pagination, so the user gets the
-     * first slice.
+     * If no 'after' argument is provided or the contents are not a valid base64 string, this will return 0.
+     * That will effectively reset pagination, so the user gets the first slice.
      *
      * @param  array<string, mixed>  $args
      */

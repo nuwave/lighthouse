@@ -24,8 +24,8 @@ type Query {
 #import user.graphql
 ```
 
-Imports always begin on a separate line with `#import`, followed by the relative path
-to the imported file. The contents of `user.graphql` are pasted in the final schema.
+Imports always begin on a separate line with `#import`, followed by the relative path to the imported file.
+The contents of `user.graphql` are pasted in the final schema.
 
 ```graphql
 type Query {
@@ -79,8 +79,8 @@ type Query {
 }
 ```
 
-Now you want to add a few queries to actually fetch posts. You could add them to the main `Query` type
-in your main file, but that spreads the definition apart, and could also grow quite large over time.
+Now you want to add a few queries to actually fetch posts.
+You could add them to the main `Query` type in your main file, but that spreads the definition apart, and could also grow quite large over time.
 
 Another way would be to extend the `Query` type and colocate the type definition with its Queries in `post.graphql`.
 
@@ -100,5 +100,4 @@ The fields in the `extend type` definition are merged with those of the original
 ### Extending other types
 
 Apart from object types `type`, you can also extend `input`, `interface` and `enum` types.
-Lighthouse will merge the fields (or values) with the original definition and always
-produce a single type in the final schema.
+Lighthouse will merge the fields (or values) with the original definition and always produce a single type in the final schema.

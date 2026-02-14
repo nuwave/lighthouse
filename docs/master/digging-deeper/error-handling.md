@@ -1,16 +1,15 @@
 # Error Handling
 
-Most of the error handling in Lighthouse is pretty closely based upon **webonyx/graphql-php**,
-so you can find a lot of valuable information [in their documentation](https://webonyx.github.io/graphql-php/error-handling).
+Most of the error handling in Lighthouse is pretty closely based upon **webonyx/graphql-php**.
+You can find a lot of valuable information [in their documentation](https://webonyx.github.io/graphql-php/error-handling).
 
 ## User-friendly Errors
 
-In a production setting, error messages should not be shown to the user by default
-to prevent information leaking. In some cases however, you may want to display an
-explicit error message to the user.
+In a production setting, error messages should not be shown to the user by default to prevent information leaking.
+In some cases however, you may want to display an explicit error message to the user.
 
-**webonyx/graphql-php** offers the [`GraphQL\Error\ClientAware`](https://github.com/webonyx/graphql-php/blob/master/src/Error/ClientAware.php) interface, that can
-be implemented by Exceptions to control how they are rendered to the client.
+**webonyx/graphql-php** offers the [`GraphQL\Error\ClientAware`](https://github.com/webonyx/graphql-php/blob/master/src/Error/ClientAware.php) interface.
+Can be implemented by Exceptions to control how they are rendered to the client.
 
 Head over their [Error Handling docs](https://webonyx.github.io/graphql-php/error-handling) to learn more.
 
@@ -18,8 +17,7 @@ Head over their [Error Handling docs](https://webonyx.github.io/graphql-php/erro
 
 Lighthouse will catch exceptions thrown during the execution of a query and return them as part of the response.
 
-The error handler `Nuwave\Lighthouse\Execution\ReportingErrorHandler` is included in the default configuration
-and reports non-client-safe errors through the default Laravel exception handler.
+The error handler `Nuwave\Lighthouse\Execution\ReportingErrorHandler` is included in the default configuration and reports non-client-safe errors through the default Laravel exception handler.
 
 Client-safe errors are assumed to be something that:
 
@@ -28,8 +26,7 @@ Client-safe errors are assumed to be something that:
 
 Thus, they are typically not actionable for server developers.
 
-However, you can choose to report client-safe errors by replacing `Nuwave\Lighthouse\Execution\ReportingErrorHandler`
-with `Nuwave\Lighthouse\Execution\AlwaysReportingErrorHandler` in the `lighthouse.php` config:
+However, you can choose to report client-safe errors by replacing `Nuwave\Lighthouse\Execution\ReportingErrorHandler` with `Nuwave\Lighthouse\Execution\AlwaysReportingErrorHandler` in the `lighthouse.php` config:
 
 ```diff
 'error_handlers' => [
@@ -42,8 +39,7 @@ with `Nuwave\Lighthouse\Execution\AlwaysReportingErrorHandler` in the `lighthous
 
 ## Additional Error Information
 
-The interface [`GraphQL\Error\ProvidesExtensions`](https://github.com/webonyx/graphql-php/blob/master/src/Error/ProvidesExtensions.php)
-may be implemented to add more information than just an error message to the rendered error output.
+The interface [`GraphQL\Error\ProvidesExtensions`](https://github.com/webonyx/graphql-php/blob/master/src/Error/ProvidesExtensions.php) may be implemented to add more information than just an error message to the rendered error output.
 
 This custom exception contains information about the reason the exception was thrown:
 
@@ -89,8 +85,7 @@ final class CustomException extends Exception implements ClientAware, ProvidesEx
 }
 ```
 
-Now you can throw that Exception somewhere in your code, for example in your resolver,
-and it will display additional error output.
+Now you can throw that Exception somewhere in your code, for example in your resolver, and it will display additional error output.
 
 ```php
 namespace App\GraphQL\Queries;
@@ -174,11 +169,9 @@ final class CountErrorHandler implements ErrorHandler
 
 ## Partial Errors
 
-As a GraphQL query may return a partial result, you may not always want to abort
-execution immediately after an error occurred.
+As a GraphQL query may return a partial result, you may not always want to abort execution immediately after an error occurred.
 
-Use the [`ErrorPool`](https://github.com/nuwave/lighthouse/blob/master/src/Execution/ErrorPool.php)
-when you want to collect multiple errors before returning a result.
+Use the [`ErrorPool`](https://github.com/nuwave/lighthouse/blob/master/src/Execution/ErrorPool.php) when you want to collect multiple errors before returning a result.
 
 ```php
 try {

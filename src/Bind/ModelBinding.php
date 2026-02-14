@@ -45,8 +45,7 @@ class ModelBinding
     }
 
     /**
-     * Binding collections should be returned with the original values
-     * as keys to allow validating the binding when required.
+     * Binding collections should be returned with the original values as keys to allow validating the binding when required.
      *
      * @see \Nuwave\Lighthouse\Bind\BindDirective::rules()
      *

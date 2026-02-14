@@ -83,9 +83,8 @@ class NestedManyToMany implements ArgResolver
     /**
      * Generate an array for passing into sync, syncWithoutDetaching or connect method.
      *
-     * Those functions natively have the capability of passing additional
-     * data to store in the pivot table. That array expects passing the id's
-     * as keys, so we transform the passed arguments to match that.
+     * Those functions natively have the capability of passing additional data to store in the pivot table.
+     * That array expects passing the IDs as keys, so we transform the passed arguments to match that.
      *
      * @return array<mixed>
      */

@@ -51,8 +51,7 @@ This will create the following files:
 - `programmatic-types.graphql`: Schema definitions for programmatically registered types, if you have any
 - `_lighthouse_ide_helper.php`: Class definitions for some magical PHP, such as the `TestResponse` mixin
 
-A great way to keep up to date with your current version of Lighthouse
-is to add this script to your `composer.json`:
+A great way to keep up to date with your current version of Lighthouse is to add this script to your `composer.json`:
 
 ```json
 "scripts": {
@@ -62,8 +61,7 @@ is to add this script to your `composer.json`:
     ],
 ```
 
-If the generated definitions conflict with those provided by your IDE, try `--omit-built-in` to avoid redefining
-built-in directives such as `@deprecated`.
+If the generated definitions conflict with those provided by your IDE, try `--omit-built-in` to avoid redefining built-in directives such as `@deprecated`.
 
 ## interface
 

@@ -9,8 +9,7 @@ interface Directive
      *
      * @see https://spec.graphql.org/draft/#sec-Type-System.Directives
      *
-     * This must contain a single directive definition, but can also contain
-     * auxiliary types, such as enum definitions for directive arguments.
+     * This must contain a single directive definition, but can also contain auxiliary types, such as enum definitions for directive arguments.
      */
     public static function definition(): string;
 }

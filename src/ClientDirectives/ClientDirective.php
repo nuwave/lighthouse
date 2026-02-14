@@ -10,8 +10,7 @@ use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 
 /**
- * Provides information about where client directives
- * were placed in the query and what arguments were given to them.
+ * Provides information about where client directives were placed in the query and what arguments were given to them.
  *
  * TODO implement accessors for other locations https://spec.graphql.org/draft/#ExecutableDirectiveLocation
  */
@@ -27,8 +26,7 @@ class ClientDirective
      * Get the given values for a client directive.
      *
      * This returns an array of the given arguments for all field nodes.
-     * The number of items in the returned result will always be equivalent
-     * to the number of field nodes, each having one of the following values:
+     * The number of items in the returned result will always be equivalent to the number of field nodes, each having one of the following values:
      * - When a field node does not have the directive on it: null
      * - When the directive is present but has no arguments: []
      * - When the directive is present with arguments: an associative array

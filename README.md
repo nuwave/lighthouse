@@ -21,16 +21,14 @@
 </div>
 
 Lighthouse is a GraphQL framework that integrates with your Laravel application.
-It takes the best ideas of both and combines them to solve common tasks with ease
-and offer flexibility when you need it.
+It takes the best ideas of both and combines them to solve common tasks with ease and offer flexibility when you need it.
 
 ## Documentation
 
 The documentation lives at [lighthouse-php.com](https://lighthouse-php.com).
 
 The site includes the latest docs for each major version of Lighthouse.
-You can find docs for specific versions by looking at the contents of [/docs/master](/docs/master)
-at that point in the git history: `https://github.com/nuwave/lighthouse/tree/<SPECIFIC-TAG>/docs/master`.
+You can find docs for specific versions by looking at the contents of [/docs/master](/docs/master) at that point in the git history: `https://github.com/nuwave/lighthouse/tree/<SPECIFIC-TAG>/docs/master`.
 
 ## Get Involved
 
@@ -46,10 +44,8 @@ Lighthouse follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 Only the current major version receives new features and bugfixes.
 
-Updating between minor versions will not require changes to PHP code or the GraphQL schema
-and cause no breaking behavioral changes for consumers of the GraphQL API.
-However, only code elements marked with `@api` will remain compatible - all other code in
-Lighthouse is considered internal and is thus subject to change.
+Updating between minor versions will not require changes to PHP code or the GraphQL schema and cause no breaking behavioral changes for consumers of the GraphQL API.
+However, only code elements marked with `@api` will remain compatible - all other code in Lighthouse is considered internal and is thus subject to change.
 
 ## Changelog
 
@@ -65,8 +61,7 @@ We welcome contributions of any kind, see how in [`CONTRIBUTING.md`](CONTRIBUTIN
 
 ## Security Vulnerabilities
 
-If you discover a security vulnerability within Lighthouse,
-please email Benedikt Franke via [benedikt@franke.tech](mailto:benedikt@franke.tech).
+If you discover a security vulnerability within Lighthouse, please email Benedikt Franke via [benedikt@franke.tech](mailto:benedikt@franke.tech).
 
 ## Sponsors
 

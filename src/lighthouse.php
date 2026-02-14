@@ -24,8 +24,7 @@ return [
         'name' => 'graphql',
 
         /*
-         * Beware that middleware defined here runs before the GraphQL execution phase,
-         * make sure to return spec-compliant responses in case an error is thrown.
+         * Beware that middleware defined here runs before the GraphQL execution phase, make sure to return spec-compliant responses in case an error is thrown.
          */
         'middleware' => [
             // Ensures the request is not vulnerable to cross-site request forgery.

@@ -8,8 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Fires right after building the HTTP response in the GraphQLController.
  *
- * Can be used for logging or for measuring and monitoring
- * the time a request takes to resolve.
+ * Can be used for logging or for measuring and monitoring the time a request takes to resolve.
  *
  * @see \Nuwave\Lighthouse\Http\GraphQLController
  */

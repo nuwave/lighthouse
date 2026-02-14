@@ -9,9 +9,9 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
     /**
      * Get the desired class name from the input.
      *
-     * As a typical workflow would be to write the schema first and then copy-paste
-     * a field name to generate a class for it, we uppercase it so the user does
-     * not run into unnecessary errors. You're welcome.
+     * A typical workflow would be to write the schema first and then copy-paste a field name to generate a class for it.
+     * We uppercase it so the user does not run into unnecessary errors.
+     * You're welcome.
      */
     protected function getNameInput(): string
     {

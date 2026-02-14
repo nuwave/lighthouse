@@ -22,9 +22,7 @@ class PaginationManipulator
     /**
      * The class name of the model that is returned from the field.
      *
-     * Might not be present if we are creating a paginated field
-     * for a relation, as the model is not required for resolving
-     * that directive and the user may choose a different type.
+     * Might not be present if we are creating a paginated field for a relation, as the model is not required for resolving that directive and the user may choose a different type.
      *
      * @var class-string<\Illuminate\Database\Eloquent\Model>|null
      */

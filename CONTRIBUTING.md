@@ -205,8 +205,8 @@ Prefer direct usage of Illuminate classes instead of helpers.
 +Arr::get($foo, 'bar');
 ```
 
-A notable exception is the `response()` helper - using DI for injecting a
-`ResponseFactory` does not work in Lumen, while `response()` works for both.
+A notable exception is the `response()` helper.
+Using DI for injecting a `ResponseFactory` does not work in Lumen, while `response()` works for both.
 
 ### Type Definitions
 
@@ -223,9 +223,8 @@ If known, add additional type information in the PHPDoc.
 function foo(array $bar): string
 ```
 
-For aggregate types such as the commonly used `Collection` class, use
-the generic type hint style. While not officially part of PHPDoc, it is understood
-by PhpStorm and most other editors.
+For aggregate types such as the commonly used `Collection` class, use the generic type hint style.
+While not officially part of PHPDoc, it is understood by PhpStorm and most other editors.
 
 ```php
 /**
@@ -237,9 +236,7 @@ function foo(): Collection
 ```
 
 Use `self` to annotate that a class returns an instance of itself (or its child).
-Use [PHPDoc type hints](https://docs.phpdoc.org/guides/types.html#keywords) to
-differentiate between cases where you return the original object instance and
-other cases where you instantiate a new class.
+Use [PHPDoc type hints](https://docs.phpdoc.org/guides/types.html#keywords) to differentiate between cases where you return the original object instance and other cases where you instantiate a new class.
 
 ```php
 class Foo
@@ -275,6 +272,24 @@ class Foo
     }
 }
 ```
+
+### Prose Formatting
+
+Use [Semantic Line Breaks](https://sembr.org) for prose in markdown files and multiline code comments.
+
+Write one sentence per line by default, instead of wrapping at a fixed column width.
+Do not split a sentence across lines at commas or clauses.
+If a sentence becomes too long, rewrite it into multiple shorter sentences.
+Keep rendered output unchanged.
+
+Apply this style to edited prose in:
+- `*.md` files
+- multiline prose comments and PHPDoc blocks
+
+Do not reflow:
+- code blocks and snippets
+- PHPDoc tags (for example `@param`, `@return`, `@throws`)
+- generated files
 
 ## Code Style
 

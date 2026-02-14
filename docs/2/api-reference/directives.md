@@ -20,8 +20,8 @@ type Query {
 }
 ```
 
-This assumes your model has the same name as the type you are returning and is defined
-in the default model namespace `App\Models`. [You can change this configuration](../getting-started/configuration.md).
+This assumes your model has the same name as the type you are returning and is defined in the default model namespace `App\Models`.
+[You can change this configuration](../getting-started/configuration.md).
 
 If you need to use a different model for a single field, you can pass a class name as the `model` argument.
 
@@ -60,8 +60,7 @@ class Post extends Model
 }
 ```
 
-The directive accepts an optional `relation` argument if your relationship method
-has a different name than the field.
+The directive accepts an optional `relation` argument if your relationship method has a different name than the field.
 
 ```graphql
 type Post {
@@ -98,8 +97,7 @@ class User extends Model
 }
 ```
 
-The directive accepts an optional `relation` argument if your relationship method
-has a different name than the field.
+The directive accepts an optional `relation` argument if your relationship method has a different name than the field.
 
 ```graphql
 type User {
@@ -150,8 +148,7 @@ type Query {
 }
 ```
 
-You can set an expiration time in seconds
-if you want to invalidate the cache after a while.
+You can set an expiration time in seconds if you want to invalidate the cache after a while.
 
 ```graphql
 type Query {
@@ -170,7 +167,9 @@ type Query {
 
 ## @cacheKey
 
-When generating a cached result for a resolver, Lighthouse produces a unique key for each type. By default, Lighthouse will look for a field with the `ID` type to generate the key. If you'd like to use a different field (i.e., an external API id) you can mark the field with the `@cacheKey` directive.
+When generating a cached result for a resolver, Lighthouse produces a unique key for each type.
+By default, Lighthouse will look for a field with the `ID` type to generate the key.
+If you'd like to use a different field (i.e., an external API id) you can mark the field with the `@cacheKey` directive.
 
 ```graphql
 type GithubProfile {
@@ -205,7 +204,8 @@ class PostPolicy
 
 ## @complexity
 
-Place on fields to perform analysis to calculate a query complexity score before execution. [Read More](https://webonyx.github.io/graphql-php/security/#query-complexity-analysis)
+Place on fields to perform analysis to calculate a query complexity score before execution.
+[Read More](https://webonyx.github.io/graphql-php/security/#query-complexity-analysis)
 
 ```graphql
 type Query {
@@ -252,7 +252,8 @@ type Mutation {
 
 ## @delete
 
-Delete a model with a given id field. The field must be an `ID` type.
+Delete a model with a given id field.
+The field must be an `ID` type.
 
 ```graphql
 type Mutation {
@@ -270,8 +271,7 @@ type Mutation {
 ```
 
 You can also delete multiple models at once.
-Define a field that takes a list of IDs and returns a Collection of the
-deleted models.
+Define a field that takes a list of IDs and returns a Collection of the deleted models.
 
 ```graphql
 type Mutation {
@@ -283,9 +283,8 @@ type Mutation {
 
 Specify a custom resolver function for a single field.
 
-In most cases, you do not even need this directive. Make sure you read about
-the built in directives for [querying data](../the-basics/fields.md#query-data) and [mutating data](../the-basics/fields.md#mutate-data),
-as well as the convention based approach to [implementing custom resolvers](../the-basics/fields.md#custom-resolvers).
+In most cases, you do not even need this directive.
+Make sure you read about the built in directives for [querying data](../the-basics/fields.md#query-data) and [mutating data](../the-basics/fields.md#mutate-data), as well as the convention based approach to [implementing custom resolvers](../the-basics/fields.md#custom-resolvers).
 
 Pass a class and a method to the `resolver` argument and separate them with an `@` symbol.
 
@@ -296,9 +295,8 @@ type Mutation {
 }
 ```
 
-If your field is defined on the root types `Query` or `Mutation`, you can take advantage
-of the default namespaces that are defined in the [configuration](../getting-started/configuration.md). The following
-will look for a class in `App\Http\GraphQL\Queries` by default.
+If your field is defined on the root types `Query` or `Mutation`, you can take advantage of the default namespaces that are defined in the [configuration](../getting-started/configuration.md).
+The following will look for a class in `App\Http\GraphQL\Queries` by default.
 
 ```graphql
 type Query {
@@ -306,8 +304,8 @@ type Query {
 }
 ```
 
-Be aware that resolvers are not limited to root fields. A resolver can be used for basic tasks
-such as transforming the value of scalar fields, e.g. reformat a date.
+Be aware that resolvers are not limited to root fields.
+A resolver can be used for basic tasks such as transforming the value of scalar fields, e.g. reformat a date.
 
 ```graphql
 type User {
@@ -343,8 +341,8 @@ Other than [@find](#find), this will not throw an error if more than one items a
 
 ## @enum
 
-Map the underlying value to an enum key. When dealing with the Enum type in your code,
-you will receive the defined value instead of the string key.
+Map the underlying value to an enum key.
+When dealing with the Enum type in your code, you will receive the defined value instead of the string key.
 
 ```graphql
 enum Role {
@@ -364,8 +362,7 @@ type User {
 }
 ```
 
-If the name of the argument does not match the database column,
-pass the actual column name as the `key`.
+If the name of the argument does not match the database column, pass the actual column name as the `key`.
 
 ```graphql
 type User {
@@ -375,7 +372,8 @@ type User {
 
 ## @event
 
-Fire an event after a mutation has taken place. It requires the `fire` argument that should be the class name of the event you want to fire.
+Fire an event after a mutation has taken place.
+It requires the `fire` argument that should be the class name of the event you want to fire.
 
 ```graphql
 type Mutation {
@@ -395,15 +393,13 @@ type User {
 }
 ```
 
-Instead of the original ID, the `id` field will now return a base64-encoded String that globally identifies the User and can be used
-for querying the `node` endpoint.
+Instead of the original ID, the `id` field will now return a base64-encoded String that globally identifies the User and can be used for querying the `node` endpoint.
 
 ## @group
 
 Apply common settings to all fields of an Object Type.
 
-Set a common namespace for the [@field](#field) and the [@complexity](#complexity) directives
-that are defined on the fields of the defined type.
+Set a common namespace for the [@field](#field) and the [@complexity](#complexity) directives that are defined on the fields of the defined type.
 
 ```graphql
 extend type Query @group(namespace: "App\\Models") {
@@ -438,8 +434,7 @@ type User {
 }
 ```
 
-If the name of the relationship on the Eloquent model is different than the field name,
-you can override it by setting `relation`.
+If the name of the relationship on the Eloquent model is different than the field name, you can override it by setting `relation`.
 
 ```graphql
 type User {
@@ -457,8 +452,7 @@ type User {
 }
 ```
 
-If the name of the relationship on the Eloquent model is different than the field name,
-you can override it by setting `relation`.
+If the name of the relationship on the Eloquent model is different than the field name, you can override it by setting `relation`.
 
 ```graphql
 type User {
@@ -479,7 +473,8 @@ type Query {
 
 ## @inject
 
-Inject a value from the context object into the arguments. This is really useful with the `@create` directive that rely on the authenticated user's `id` that you don't want the client to fill in themselves.
+Inject a value from the context object into the arguments.
+This is really useful with the `@create` directive that rely on the authenticated user's `id` that you don't want the client to fill in themselves.
 
 ```graphql
 type Mutation {
@@ -491,8 +486,7 @@ type Mutation {
 
 ## @interface
 
-Make sure you read the [basics about Interfaces](../the-basics/types.md#interface) before deciding
-to use this directive, you probably don't need it.
+Make sure you read the [basics about Interfaces](../the-basics/types.md#interface) before deciding to use this directive, you probably don't need it.
 
 You can point Lighthouse to a custom type resolver.
 Set the `resolver` argument to a function that returns the implementing Object Type.
@@ -504,8 +498,8 @@ interface Commentable
 }
 ```
 
-The function receives the value of the parent field as its single argument and must
-return an Object Type. You can get the appropriate Object Type from Lighthouse's type registry.
+The function receives the value of the parent field as its single argument and must return an Object Type.
+You can get the appropriate Object Type from Lighthouse's type registry.
 
 ```php
 <?php
@@ -549,8 +543,8 @@ class Commentable
 ## @method
 
 Call a method on the target model.
-This comes in handy if the data is not accessible as an attribute (e.g. `$model->myData`)
-but rather via a method like `$model->myData()`. It requires the `name` argument.
+This comes in handy if the data is not accessible as an attribute (e.g. `$model->myData`) but rather via a method like `$model->myData()`.
+It requires the `name` argument.
 
 ```graphql
 type User {
@@ -560,8 +554,8 @@ type User {
 
 ## @middleware
 
-Run Laravel middleware for a specific field. This can be handy to reuse existing
-middleware.
+Run Laravel middleware for a specific field.
+This can be handy to reuse existing middleware.
 
 ```graphql
 type Query {
@@ -569,8 +563,8 @@ type Query {
 }
 ```
 
-You can define middleware just like you would in Laravel. Pass in either a fully qualified
-class name, an alias or a middleware group - or any combination of them.
+You can define middleware just like you would in Laravel.
+Pass in either a fully qualified class name, an alias or a middleware group - or any combination of them.
 
 ```graphql
 type Query {
@@ -596,9 +590,8 @@ extend type Query {
 }
 ```
 
-Other than global middleware defined in the [configuration](../getting-started/configuration.md), field middleware
-only applies to the specific field it is defined on. This has the benefit of limiting errors
-to particular fields and not failing an entire request if a middleware fails.
+Other than global middleware defined in the [configuration](../getting-started/configuration.md), field middleware only applies to the specific field it is defined on.
+This has the benefit of limiting errors to particular fields and not failing an entire request if a middleware fails.
 
 There are a few caveats to field middleware though:
 
@@ -608,8 +601,7 @@ There are a few caveats to field middleware though:
   but rather the slice of data that the particular field returned.
 - The `terminate` method of field middleware is not called.
 
-If the middleware needs to be aware of GraphQL specifics, such as the resolver arguments,
-it is often more suitable to define a custom field directive.
+If the middleware needs to be aware of GraphQL specifics, such as the resolver arguments, it is often more suitable to define a custom field directive.
 
 ## @model
 
@@ -636,8 +628,7 @@ type User {
 ## @node
 
 Store a type's resolver functions in Lighthouse's node registry.
-The `resolver` argument has to specify a function which will be passed the
-decoded `id` and resolves to a result.
+The `resolver` argument has to specify a function which will be passed the decoded `id` and resolves to a result.
 
 ```graphql
 type User @node(resolver: "App\\GraphQL\\NodeResolver@resolveUser") {
@@ -649,9 +640,8 @@ type User @node(resolver: "App\\GraphQL\\NodeResolver@resolveUser") {
 public function resolveUser(string $id): \App\User
 ```
 
-The `typeResolver` is responsible for determining the GraphQL type the result
-belongs to. Lighthouse provides a default implementation, but you can override
-it if the need arises.
+The `typeResolver` is responsible for determining the GraphQL type the result belongs to.
+Lighthouse provides a default implementation, but you can override it if the need arises.
 
 ```graphql
 type User
@@ -680,8 +670,8 @@ type Query {
 
 ## @paginate
 
-Return a paginated list. This transforms the schema definition and automatically adds
-additional arguments and inbetween types.
+Return a paginated list.
+This transforms the schema definition and automatically adds additional arguments and inbetween types.
 
 ```graphql
 type Query {
@@ -689,8 +679,7 @@ type Query {
 }
 ```
 
-The `type` of pagination defaults to `paginator`, but may also be set to a Relay
-compliant `connection`.
+The `type` of pagination defaults to `paginator`, but may also be set to a Relay compliant `connection`.
 
 ```graphql
 type Query {
@@ -698,8 +687,8 @@ type Query {
 }
 ```
 
-By default, this looks for an Eloquent model in the configured default namespace, with the same
-name as the returned type. You can overwrite this by setting the `model` argument.
+By default, this looks for an Eloquent model in the configured default namespace, with the same name as the returned type.
+You can overwrite this by setting the `model` argument.
 
 ```graphql
 type Query {
@@ -798,8 +787,7 @@ scalar DateTime
 
 Creates a full-text search argument.
 
-This directive will make an argument use [Laravel Scout](https://laravel.com/docs/scout)
-to make a full-text search, what driver you use for Scout is up to you.
+This directive will make an argument use [Laravel Scout](https://laravel.com/docs/scout) to make a full-text search, what driver you use for Scout is up to you.
 
 The `search` method of the model is called with the value of the argument.
 
@@ -838,8 +826,7 @@ type Mutation {
 
 ## @union
 
-Make sure you read the [basics about Unions](../the-basics/types.md#union) before deciding
-to use this directive, you probably don't need it.
+Make sure you read the [basics about Unions](../the-basics/types.md#union) before deciding to use this directive, you probably don't need it.
 
 You can point Lighthouse to a custom type resolver.
 Set the `resolver` argument to a function that returns the implementing Object Type.
@@ -858,8 +845,8 @@ union Person @union(resolver: "App\\GraphQL\\UnionResolver@person") =
   | Employee
 ```
 
-The function receives the value of the parent field as its single argument and must
-return an Object Type. You can get the appropriate Object Type from Lighthouse's type registry.
+The function receives the value of the parent field as its single argument and must return an Object Type.
+You can get the appropriate Object Type from Lighthouse's type registry.
 
 ```php
 <?php

@@ -151,8 +151,7 @@ GRAPHQL;
 
     /**
      * Users may register types programmatically, e.g. in service providers.
-     * In order to allow referencing those in the schema, it is useful to print
-     * those types to a helper schema, excluding types the user defined in the schema.
+     * In order to allow referencing those in the schema, it is useful to print those types to a helper schema, excluding types the user defined in the schema.
      */
     public function programmaticTypes(SchemaSourceProvider $schemaSourceProvider, ASTCache $astCache, SchemaBuilder $schemaBuilder): void
     {

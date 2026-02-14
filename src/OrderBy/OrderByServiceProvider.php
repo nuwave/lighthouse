@@ -85,11 +85,7 @@ GRAPHQL
         );
     }
 
-    /**
-     * We generate this in the same general shape as the input object with columns,
-     * even though it is unnecessarily complex for this specific case, to make it
-     * a non-breaking change when columns are added.
-     */
+    /** We generate this in the same general shape as the input object with columns, even though it is unnecessarily complex for this specific case, to make it a non-breaking change when columns are added. */
     public static function createRelationAggregateFunctionInput(string $name, string $description): InputObjectTypeDefinitionNode
     {
         return Parser::inputObjectTypeDefinition(/* @lang GraphQL */ <<<GRAPHQL

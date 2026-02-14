@@ -242,8 +242,7 @@ class TypeRegistry
     /**
      * Get the types that are currently resolved.
      *
-     * This does not return all possible types, only those that
-     * are programmatically registered or already resolved.
+     * This does not return all possible types, only those that are programmatically registered or already resolved.
      *
      * @return array<string, \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\NamedType>
      */
