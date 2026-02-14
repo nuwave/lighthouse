@@ -7,7 +7,7 @@ Those are called _directives_ and are the primary way to add functionality to yo
 
 ## Definition
 
-Directives always begin with an `@` symbol, followed by an unique name.
+Directives always begin with an `@` symbol, followed by a unique name.
 They may be used at specified parts of the GraphQL schema.
 
 This example directive `@upperCase` may be used on field definitions to UPPERCASE the result.

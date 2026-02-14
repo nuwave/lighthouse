@@ -68,7 +68,7 @@ public function testCreatePost(): void
 
 Now that we know how to query our server in tests, we need to make sure the returned results match our expectations.
 
-The returned `TestResponse` conveniently offers assertions that work quite well quite with the JSON data returned by GraphQL.
+The returned `TestResponse` conveniently offers assertions that work quite well with the JSON data returned by GraphQL.
 
 The `assertJson` method asserts that the response is a superset of the given JSON.
 
