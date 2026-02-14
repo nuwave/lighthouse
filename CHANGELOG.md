@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Specify identifying columns on nested mutation upserts with `@upsert` and `@upsertMany` https://github.com/nuwave/lighthouse/pull/2426
+
 ## v6.64.3
 
 ### Fixed
