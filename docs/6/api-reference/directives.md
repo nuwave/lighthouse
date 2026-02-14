@@ -3587,6 +3587,14 @@ implement the interface `Nuwave\Lighthouse\Scout\ScoutBuilderDirective`:
 - [@eq](#eq)
 - [@softDeletes](#softdeletes)
 
+Scout is only activated if an argument annotated with [@search](#search) is present with a string value.
+Passing `null` behaves the same as leaving the argument out and falls back to a database query.
+
+When using [@convertEmptyStringsToNull](#convertemptystringstonull), nullable `String` arguments with an empty
+string value may be converted to `null` and therefore not activate Scout.
+If you need empty-string search behavior, prefer an explicit schema contract such as a dedicated search field
+or a non-null search argument.
+
 Normally the search will be performed using the index specified by the model's `searchableAs` method.
 However, in some situation a custom index might be needed, this can be achieved by using the argument `within`.
 

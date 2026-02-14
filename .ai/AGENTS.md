@@ -131,11 +131,11 @@ Follow the [PR template](.github/PULL_REQUEST_TEMPLATE.md):
 - Link related issues
 - Add or update tests
 - Document user-facing changes in `/docs`
-- Update `CHANGELOG.md`
+- Update `CHANGELOG.md` for non-docs-only changes
 
 ### Changelog
 
-Add entries to the `## Unreleased` section in [CHANGELOG.md](/CHANGELOG.md).
+Add entries to the `## Unreleased` section in [CHANGELOG.md](/CHANGELOG.md) for non-docs-only changes.
 Use categories: `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`.
 End each entry with a full PR URL: `https://github.com/nuwave/lighthouse/pull/<number>`.
 

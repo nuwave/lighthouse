@@ -163,6 +163,7 @@ Those elements are guaranteed to not change until the next major release.
 We keep a [changelog](/CHANGELOG.md) to inform users about changes in our releases.
 
 When you change something notable, add it to the top of the file in the `Unreleased` section.
+Documentation-only changes do not require a changelog entry.
 
 Choose the appropriate type for your change:
 
