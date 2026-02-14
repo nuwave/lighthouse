@@ -13,8 +13,7 @@ php artisan lighthouse:cache
 ```
 
 The structure of the serialized schema can change between Lighthouse releases.
-In order to prevent errors, use a deployment method that atomically updates both the cache file and the dependencies, e.g.
-K8s.
+In order to prevent errors, use a deployment method that atomically updates both the cache file and the dependencies, e.g. K8s.
 
 ## Development
 

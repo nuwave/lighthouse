@@ -1,6 +1,10 @@
 ---
-home: true title: Lighthouse - A framework for serving GraphQL from Laravel heroImage.
-/logo.svg actionText: Get Started → actionLink: /latest/getting-started/installation features:
+home: true
+title: Lighthouse - A framework for serving GraphQL from Laravel
+heroImage: /logo.svg
+actionText: Get Started →
+actionLink: /latest/getting-started/installation
+features:
   - title: 📜 SDL First
     details: Use the GraphQL Schema Definition Language to describe your data and add functionality through server-side directives.
   - title: ❤ Laravel Friendly

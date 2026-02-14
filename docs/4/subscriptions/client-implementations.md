@@ -1,6 +1,6 @@
 # Client Implementations
 
-To get you up and running quickly, the following sections show how to use subcriptions with common GraphQL client libraries.
+To get you up and running quickly, the following sections show how to use subscriptions with common GraphQL client libraries.
 
 ## Apollo
 

@@ -2,8 +2,10 @@
 
 **Experimental: not enabled by default, not guaranteed to be stable.**
 
-::: warning Currently the `@defer` directive requires Apollo Client in alpha.
-Track the state of the PR here: https://github.com/apollographql/apollo-client/pull/3686#issuecomment-555534519 :::
+::: warning
+Currently the `@defer` directive requires Apollo Client in alpha.
+Track the state of the PR here: https://github.com/apollographql/apollo-client/pull/3686#issuecomment-555534519
+:::
 
 Deferring fields allows you to prioritize fetching data needed to render the most important content as fast as possible,
 and then loading the rest of the page in the background.
