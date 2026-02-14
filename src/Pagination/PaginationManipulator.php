@@ -22,7 +22,8 @@ class PaginationManipulator
     /**
      * The class name of the model that is returned from the field.
      *
-     * Might not be present if we are creating a paginated field for a relation, as the model is not required for resolving that directive and the user may choose a different type.
+     * This might not be present when creating a paginated field for a relation.
+     * The model is not required for resolving that directive, and the user may choose a different type.
      *
      * @var class-string<\Illuminate\Database\Eloquent\Model>|null
      */
@@ -362,8 +363,10 @@ GRAPHQL
      * If cache control is used, inherit the max age set in the parent field.
      *
      * Pagination adds the nested fields `paginatorInfo` and `data`.
-     * Cache control identifies this as a new entity, but it should actually not affect the HTTP cache header values.
-     * Therefore, the @cacheControl directive is applied to inherit whatever max age the parent field set.
+     * Cache control identifies this as a new entity.
+     * It should not affect HTTP cache header values.
+     * Therefore, the @cacheControl directive is applied.
+     * It inherits whatever max age the parent field set.
      */
     private function maybeInheritCacheControlDirective(): string
     {

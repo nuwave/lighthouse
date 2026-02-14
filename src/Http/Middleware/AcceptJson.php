@@ -7,7 +7,8 @@ use Illuminate\Http\Request;
 /**
  * Always set the `Accept: application/json` header.
  *
- * This makes it easier to do simple GET requests from clients with limited HTTP configuration options and always receive a proper result, even in case of unforeseen errors.
+ * This makes it easier to do simple GET requests from clients with limited HTTP configuration options.
+ * It also ensures clients receive a proper result, even in case of unforeseen errors.
  */
 class AcceptJson
 {

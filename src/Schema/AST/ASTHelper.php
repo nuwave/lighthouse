@@ -309,7 +309,8 @@ class ASTHelper
      * Create a fully qualified base for a generated name that belongs to an argument.
      *
      * We have to make sure it is unique in the schema.
-     * Even though this name becomes a bit verbose, it is also very unlikely to collide with a random user defined type.
+     * This name is a bit verbose.
+     * It is very unlikely to collide with a random user-defined type.
      *
      * @example ParentNameFieldNameArgName
      */

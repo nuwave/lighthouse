@@ -127,8 +127,10 @@ GRAPHQL;
      * Authorizes request and optionally resolves the field.
      *
      * This method is called inside the authorization try-catch block.
-     * Resolving the field here is optional, it will be done outside the try-catch block if not resolved here.
-     * Resolving inside this method means any exceptions thrown by the resolver will be caught and handled according to the `action` argument.
+     * Resolving the field here is optional.
+     * It will be done outside the try-catch block if this method does not resolve it.
+     * Resolving inside this method means any exceptions thrown by the resolver are caught.
+     * Those exceptions are handled according to the `action` argument.
      *
      * @phpstan-import-type Resolver from \Nuwave\Lighthouse\Schema\Values\FieldValue as Resolver
      *

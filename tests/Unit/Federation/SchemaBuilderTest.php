@@ -64,7 +64,8 @@ final class SchemaBuilderTest extends TestCase
     /**
      * At least one type needs to be defined with the @key directive.
      *
-     * We could also just not add the type definition below if no entities match, so the user themselves is responsible to add the _Entity union.
+     * We could also omit the type definition below when no entities match.
+     * In that case, the user is responsible for adding the _Entity union.
      * In this case, GraphQL validation will throw an exception if the union is missing.
      */
     public function testThrowsIfNoTypeHasKeyDirective(): void

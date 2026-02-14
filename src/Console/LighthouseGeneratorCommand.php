@@ -9,7 +9,8 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
     /**
      * Get the desired class name from the input.
      *
-     * A typical workflow would be to write the schema first and then copy-paste a field name to generate a class for it.
+     * A typical workflow is to write the schema first and then copy-paste a field name.
+     * This command generates a class for that field.
      * We uppercase it so the user does not run into unnecessary errors.
      * You're welcome.
      */

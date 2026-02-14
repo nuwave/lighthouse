@@ -132,7 +132,8 @@ class ArgPartitioner
     /**
      * Partition arguments based on a predicate.
      *
-     * The predicate will be called for each argument within the ArgumentSet with the following parameters:
+     * The predicate is called for each argument within the ArgumentSet.
+     * It receives the following parameters:
      * 1. The name of the argument
      * 2. The argument itself
      *

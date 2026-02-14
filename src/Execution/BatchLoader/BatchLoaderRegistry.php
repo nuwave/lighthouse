@@ -35,7 +35,8 @@ abstract class BatchLoaderRegistry
     /**
      * Remove all stored BatchLoaders.
      *
-     * This is called after Lighthouse has resolved a query, so multiple queries can be handled in a single request/session.
+     * This is called after Lighthouse has resolved a query.
+     * It allows handling multiple queries in a single request/session.
      */
     public static function forgetInstances(): void
     {
