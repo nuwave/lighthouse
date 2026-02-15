@@ -2,9 +2,8 @@
 
 ## Validating Arguments
 
-Lighthouse allows you to use [Laravel's validation](https://laravel.com/docs/validation) for your
-queries and mutations. The simplest way to leverage the built-in validation rules is to use the
-[@rules](../api-reference/directives.md#rules) directive.
+Lighthouse allows you to use [Laravel's validation](https://laravel.com/docs/validation) for your queries and mutations.
+The simplest way to leverage the built-in validation rules is to use the [@rules](../api-reference/directives.md#rules) directive.
 
 ```graphql
 type Mutation {
@@ -15,8 +14,7 @@ type Mutation {
 }
 ```
 
-In the case of a validation error, Lighthouse will abort execution and return the validation messages
-as part of the response.
+In the case of a validation error, Lighthouse will abort execution and return the validation messages as part of the response.
 
 ```graphql
 mutation {

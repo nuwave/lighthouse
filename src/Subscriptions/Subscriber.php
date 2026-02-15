@@ -16,8 +16,9 @@ class Subscriber
     /**
      * A unique key for the subscriber's channel.
      *
-     * This has to be unique for each subscriber, because each of them can send a different
-     * query and must receive a response that is specifically tailored towards that.
+     * This has to be unique for each subscriber.
+     * Each of them can send a different query.
+     * Each must receive a response tailored to that query.
      */
     public string $channel;
 

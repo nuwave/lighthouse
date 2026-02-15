@@ -39,7 +39,8 @@ class Entities
         };
 
         /**
-         * Firstly, representations are grouped by typename to allow assigning the correct resolver for each entity.
+         * First, representations are grouped by typename.
+         * That allows assigning the correct resolver for each entity.
          * Secondly, they are deduplicated based on their hash to avoid resolving the same entity twice.
          *
          * @var array<string, array<string, array<string, mixed>>> $groupedRepresentations

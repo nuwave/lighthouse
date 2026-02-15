@@ -1,12 +1,10 @@
 # Client Implementations
 
-To get you up and running quickly, the following sections show how to use subscriptions
-with common GraphQL client libraries.
+To get you up and running quickly, the following sections show how to use subscriptions with common GraphQL client libraries.
 
 ## Apollo for Pusher
 
-To use Lighthouse Pusher subscriptions with the [Apollo](https://www.apollographql.com/docs/react)
-client library you will need to create an `apollo-link`:
+To use Lighthouse Pusher subscriptions with the [Apollo](https://www.apollographql.com/docs/react) client library you will need to create an `apollo-link`:
 
 ```js
 import { ApolloLink, Observable } from "apollo-link";
@@ -134,13 +132,11 @@ const link = ApolloLink.from([pusherLink, httpLink(`${API_LOCATION}/graphql`)]);
 
 ## Apollo for Laravel Echo
 
-If you are using the Laravel Echo subscription driver with Apollo
-you can use [this apollo link](https://github.com/thekonz/apollo-lighthouse-subscription-link).
+If you are using the Laravel Echo subscription driver with Apollo you can use [this apollo link](https://github.com/thekonz/apollo-lighthouse-subscription-link).
 
 ## Relay Modern
 
-To use Lighthouse's Pusher subscriptions with Relay Modern you will
-need to create a custom handler and inject it into Relay's environment.
+To use Lighthouse's Pusher subscriptions with Relay Modern you will need to create a custom handler and inject it into Relay's environment.
 
 ```js
 import Pusher from "pusher-js";
@@ -245,8 +241,7 @@ export const environment = new Environment({
 
 ## Flutter/Dart
 
-To use Lighthouse's Pusher subscriptions with Flutter/Dart GQL libraries like [Ferry](https://ferrygraphql.com), you will
-need to create a custom link below:
+To use Lighthouse's Pusher subscriptions with Flutter/Dart GQL libraries like [Ferry](https://ferrygraphql.com), you will need to create a custom link below:
 
 ````dart
 import 'dart:async';

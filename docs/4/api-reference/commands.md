@@ -1,7 +1,7 @@
 # Artisan Commands
 
-Lighthouse provides some convenient artisan commands. All of them
-are namespaced under `lighthouse`.
+Lighthouse provides some convenient artisan commands.
+All of them are namespaced under `lighthouse`.
 
 ## cache
 
@@ -21,10 +21,8 @@ Create a class for a custom schema directive.
 
     php artisan lighthouse:directive
 
-Use the `--type`, `--field` and `--argument` options to create type, field and
-argument directives, respectively. The command will then ask you which
-interfaces the directive should implement and add the required method stubs and
-imports for you.
+Use the `--type`, `--field` and `--argument` options to create type, field and argument directives, respectively.
+The command will then ask you which interfaces the directive should implement and add the required method stubs and imports for you.
 
 ## ide-helper
 
@@ -38,8 +36,7 @@ This will create the following files:
 - `programmatic-types.graphql`: Schema definitions for programmatically registered types, if you have any
 - `_lighthouse_ide_helper.php`: Class definitions for some magical PHP, such as the `TestResponse` mixin
 
-A great way to keep up to date with your current version of Lighthouse
-is to add this script to your `composer.json`:
+A great way to keep up to date with your current version of Lighthouse is to add this script to your `composer.json`:
 
 ```json
 "scripts": {
@@ -69,12 +66,10 @@ Compile the GraphQL schema and print the result.
 
     php artisan lighthouse:print-schema
 
-This can be quite useful, as the root `.graphql` files do not necessarily
-contains the whole schema. Schema imports, native PHP types and schema manipulation
-may influence the final schema.
+This can be quite useful, as the root `.graphql` files do not necessarily contains the whole schema.
+Schema imports, native PHP types and schema manipulation may influence the final schema.
 
-Use the `-W` / `--write` option to output the schema to the default file storage
-(usually `storage/app`) as `lighthouse-schema.graphql`.
+Use the `-W` / `--write` option to output the schema to the default file storage (usually `storage/app`) as `lighthouse-schema.graphql`.
 
 You can output your schema in JSON format by using the `--json` flag.
 

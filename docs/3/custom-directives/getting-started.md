@@ -5,8 +5,7 @@ Learn how you can abstract logic in a composable and reusable manner by using cu
 
 ## Naming Conventions
 
-Directives are implemented as PHP classes, each directive available
-in the schema corresponds to a single class.
+Directives are implemented as PHP classes, each directive available in the schema corresponds to a single class.
 
 Directive names themselves are typically defined in **camelCase**.
 The class name of a directive must follow the following pattern:
@@ -43,12 +42,11 @@ class UpperCaseDirective implements Directive
 ```
 
 At this point, the directive does not do anything.
-Depending on what your directive should do, you can pick one or more of the provided
-directive interfaces to add functionality. They serve as the point of contact to Lighthouse.
+Depending on what your directive should do, you can pick one or more of the provided directive interfaces to add functionality.
+They serve as the point of contact to Lighthouse.
 
 In this case, our directive needs to run after the actual resolver.
-Just like [Laravel Middleware](https://laravel.com/docs/middleware),
-we can wrap around it by using the `FieldMiddleware` directive.
+Just like [Laravel Middleware](https://laravel.com/docs/middleware), we can wrap around it by using the `FieldMiddleware` directive.
 
 ```php
 <?php
@@ -110,13 +108,12 @@ class UpperCaseDirective implements Directive, FieldMiddleware
 
 Now that we defined and implemented the directive, how can Lighthouse find it?
 
-When Lighthouse encounters a directive within the schema, it starts looking for a matching class
-in the following order:
+When Lighthouse encounters a directive within the schema, it starts looking for a matching class in the following order:
 
 1. User-defined namespaces as configured in `config/lighthouse.php`, defaults to `App\GraphQL\Directives`
 1. The [RegisterDirectiveNamespaces](../api-reference/events.md#registerdirectivenamespaces) event is dispatched
    to gather namespaces defined by plugins, extensions or other listeners
 1. Lighthouse's built-in directive namespace
 
-This means that our directive is already registered, just by matter of defining it in the default namespace,
-and will take precedence over potential other directives with the same name.
+This means that our directive is already registered, just by matter of defining it in the default namespace.
+Will take precedence over potential other directives with the same name.

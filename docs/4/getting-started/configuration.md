@@ -11,9 +11,8 @@ The configuration file will be placed in `config/lighthouse.php`.
 
 ## CORS
 
-A GraphQL API can be consumed from multiple clients, which may or may not reside
-on the same domain as your server. Make sure you enable [Cross-Origin Resource Sharing (CORS)](https://laravel.com/docs/routing#cors)
-for your GraphQL endpoint in `config/cors.php`:
+A GraphQL API can be consumed from multiple clients, which may or may not reside on the same domain as your server.
+Make sure you enable [Cross-Origin Resource Sharing (CORS)](https://laravel.com/docs/routing#cors) for your GraphQL endpoint in `config/cors.php`:
 
 ```diff
 return [

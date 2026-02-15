@@ -119,8 +119,8 @@ class WhereConditionsHandler
     /**
      * If the condition references a column, prefix it with the table name.
      *
-     * This is important for queries which can otherwise be ambiguous, for
-     * example when multiple tables with a column "id" are involved.
+     * This is important for queries that can otherwise be ambiguous.
+     * For example, ambiguity happens when multiple tables include a column named "id".
      *
      * @param  array<string, mixed>  $condition
      *

@@ -4,9 +4,7 @@ Lighthouse offers convenient helpers to work with models that use [soft deletes]
 
 ## Filter Soft Deleted Models
 
-If your model uses the `Illuminate\Database\Eloquent\SoftDeletes` trait,
-you can add the [@softDeletes](../api-reference/directives.md#softdeletes) directive to a field
-to be able to query `onlyTrashed`, `withTrashed` or `withoutTrashed` elements.
+If your model uses the `Illuminate\Database\Eloquent\SoftDeletes` trait, you can add the [@softDeletes](../api-reference/directives.md#softdeletes) directive to a field to be able to query `onlyTrashed`, `withTrashed` or `withoutTrashed` elements.
 
 ```graphql
 type Query {
@@ -14,8 +12,7 @@ type Query {
 }
 ```
 
-Lighthouse will automatically add an argument `trashed` to the field definition
-and include the enum `Trashed`.
+Lighthouse will automatically add an argument `trashed` to the field definition and include the enum `Trashed`.
 
 ```graphql
 type Query {
@@ -44,8 +41,7 @@ You can include soft deleted models in your result with a query like this:
 
 ## Restoring Soft Deleted Models
 
-If your model uses the `Illuminate\Database\Eloquent\SoftDeletes` trait,
-you can restore your model using the [@restore](../api-reference/directives.md#restore) directive.
+If your model uses the `Illuminate\Database\Eloquent\SoftDeletes` trait, you can restore your model using the [@restore](../api-reference/directives.md#restore) directive.
 
 ```graphql
 type Mutation {
@@ -67,8 +63,7 @@ This mutation will return the restored object.
 
 ## Permanently Deleting Models
 
-To truly remove a model from the database,
-use the [@forceDelete](../api-reference/directives.md#forcedelete) directive.
+To truly remove a model from the database, use the [@forceDelete](../api-reference/directives.md#forcedelete) directive.
 Your model must use the `Illuminate\Database\Eloquent\SoftDeletes` trait.
 
 ```graphql

@@ -1,8 +1,7 @@
 # Fields
 
 To fetch data from your GraphQL endpoint, you need to define resolvers for your fields.
-Lighthouse makes this easy by providing easy to use, pre-built resolvers that work
-great together with your Eloquent models.
+Lighthouse makes this easy by providing easy to use, pre-built resolvers that work great together with your Eloquent models.
 
 ## Hello World!
 
@@ -15,8 +14,8 @@ type Query {
 }
 ```
 
-You need to implement the actual resolver next. Lighthouse looks for a class with the capitalized name of the
-field in `App\Http\GraphQL\Queries` and calls its `resolve` function.
+You need to implement the actual resolver next.
+Lighthouse looks for a class with the capitalized name of the field in `App\Http\GraphQL\Queries` and calls its `resolve` function.
 
 ```php
 <?php
@@ -75,8 +74,7 @@ type Query {
 }
 ```
 
-The [@all](../api-reference/directives.md#all) directive will assume the name of your model to be the same as
-the return type of the Field you are trying to resolve and automatically uses Eloquent to resolve the field.
+The [@all](../api-reference/directives.md#all) directive will assume the name of your model to be the same as the return type of the Field you are trying to resolve and automatically uses Eloquent to resolve the field.
 
 The following query:
 
@@ -104,7 +102,8 @@ Will return the following result:
 
 ### Query with arguments
 
-You may have noticed how every field has to have a resolver function. In many ways, fields are similar to functions.
+You may have noticed how every field has to have a resolver function.
+In many ways, fields are similar to functions.
 Just like functions, fields can take arguments to make them more flexible.
 
 The following field allows you to fetch a single User by ID.
@@ -145,8 +144,7 @@ The only difference between them is their ability to change data, apart from tha
 
 ### Create
 
-The easiest way to create data on your server is to use the [@create](../api-reference/directives.md#create) in combination
-with an existing Laravel model.
+The easiest way to create data on your server is to use the [@create](../api-reference/directives.md#create) in combination with an existing Laravel model.
 
 ```graphql
 type Mutation {
@@ -210,8 +208,7 @@ mutation {
 }
 ```
 
-Be aware that while a create operation will always return a result, provided you pass valid data, the update
-may fail to find the model you provided and return `null`:
+Be aware that while a create operation will always return a result, provided you pass valid data, the update may fail to find the model you provided and return `null`:
 
 ```json
 {
@@ -223,7 +220,8 @@ may fail to find the model you provided and return `null`:
 
 ### Delete
 
-Deleting data through your GraphQL API is really easy with the [@delete](../api-reference/directives.md#delete) directive. Dangerously easy.
+Deleting data through your GraphQL API is really easy with the [@delete](../api-reference/directives.md#delete) directive.
+Dangerously easy.
 
 ```graphql
 type Mutation {
@@ -241,7 +239,8 @@ mutation {
 }
 ```
 
-This mutation will return the deleted object, so you will have a last chance to look at the data. Use it wisely.
+This mutation will return the deleted object, so you will have a last chance to look at the data.
+Use it wisely.
 
 ```json
 {
@@ -258,8 +257,7 @@ This mutation will return the deleted object, so you will have a last chance to 
 Sometimes, the built-in directives just don't cut it - you need more control!
 Lighthouse allows you to implement your own resolver function for fields.
 
-By default, Lighthouse looks for a class with the capitalized name of the field in `App\Http\GraphQL\Queries`
-or `App\Http\GraphQL\Mutations` and calls its `resolve` function with [the usual resolver arguments](../api-reference/resolvers.md#resolver-function-signature).
+By default, Lighthouse looks for a class with the capitalized name of the field in `App\Http\GraphQL\Queries` or `App\Http\GraphQL\Mutations` and calls its `resolve` function with [the usual resolver arguments](../api-reference/resolvers.md#resolver-function-signature).
 If you stick to that convention, you will not need to specify a directive at all.
 
 For example, the following field:
@@ -289,13 +287,11 @@ class LatestPost
 }
 ```
 
-The easiest way to create such a class is to use the built in artisan commands
-`lighthouse:query` and `lighthouse:mutation`. They both take a single argument:
-the name of the field you want to generate.
+The easiest way to create such a class is to use the built in artisan commands `lighthouse:query` and `lighthouse:mutation`.
+They both take a single argument: the name of the field you want to generate.
 
 For example, this is how you generate a class for the field `latestPost`:
 
     php artisan lighthouse:query LatestPost
 
-If you need to implement custom resolvers for fields that are not on one of the
-root types `Query` or `Mutation`, you can use the [@field](../api-reference/directives.md#field) directive.
+If you need to implement custom resolvers for fields that are not on one of the root types `Query` or `Mutation`, you can use the [@field](../api-reference/directives.md#field) directive.

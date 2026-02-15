@@ -1,7 +1,7 @@
 # Artisan Commands
 
-Lighthouse provides some convenient artisan commands. All of them
-are namespaced under `lighthouse`.
+Lighthouse provides some convenient artisan commands.
+All of them are namespaced under `lighthouse`.
 
 ## clear-cache
 
@@ -27,12 +27,10 @@ Compile the final GraphQL schema and print the result.
 
     php artisan lighthouse:print-schema
 
-This can be quite useful, as the root `.graphql` files do not necessarily
-contains the whole schema. Schema imports, native PHP types and schema manipulation
-may influence the final schema.
+This can be quite useful, as the root `.graphql` files do not necessarily contains the whole schema.
+Schema imports, native PHP types and schema manipulation may influence the final schema.
 
-Use the `-W` / `--write` option to output the schema to the default file storage
-(usually `storage/app`) as `lighthouse-schema.graphql`.
+Use the `-W` / `--write` option to output the schema to the default file storage (usually `storage/app`) as `lighthouse-schema.graphql`.
 
 ## query
 

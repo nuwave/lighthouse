@@ -1,10 +1,8 @@
 # The N+1 Query Problem
 
-A common performance pitfall that comes with the nested nature of GraphQL queries
-is the so-called N+1 query problem.
+A common performance pitfall that comes with the nested nature of GraphQL queries is the so-called N+1 query problem.
 
-Let’s imagine we want to fetch a list of posts, and for each post, we want to add on the
-name of the associated author:
+Let’s imagine we want to fetch a list of posts, and for each post, we want to add on the name of the associated author:
 
 ```graphql
 {
@@ -17,19 +15,14 @@ name of the associated author:
 }
 ```
 
-Following a naive execution strategy, Lighthouse would first query a list of posts,
-then loop over that list and resolve the individual fields.
-The associated author for each post would be lazily loaded, querying the database
-once per post.
+Following a naive execution strategy, Lighthouse would first query a list of posts, then loop over that list and resolve the individual fields.
+The associated author for each post would be lazily loaded, querying the database once per post.
 
 ## Eager Loading Relationships
 
-When dealing with Laravel relationships, [eager loading](https://laravel.com/docs/eloquent-relationships#eager-loading)
-is commonly used to alleviate the N+1 query problem.
+When dealing with Laravel relationships, [eager loading](https://laravel.com/docs/eloquent-relationships#eager-loading) is commonly used to alleviate the N+1 query problem.
 
-You can leverage eager loading by informing Lighthouse of the relationships between your models,
-using directives such as [@belongsTo](../api-reference/directives.md#belongsto), [@hasMany](../api-reference/directives.md#hasmany)
-and [@with](../api-reference/directives.md#with).
+You can leverage eager loading by informing Lighthouse of the relationships between your models, using directives such as [@belongsTo](../api-reference/directives.md#belongsto), [@hasMany](../api-reference/directives.md#hasmany) and [@with](../api-reference/directives.md#with).
 
 ```graphql
 type Post {
@@ -45,13 +38,12 @@ type User {
 
 Under the hood, Lighthouse will batch the relationship queries together in a single database query.
 
-If you require a relation to be loaded for some field, but do not wish to return the relationship itself,
-you can use the [@with](../api-reference/directives.md#with) directive.
+If you require a relation to be loaded for some field.
+Do not wish to return the relationship itself, you can use the [@with](../api-reference/directives.md#with) directive.
 
 ## Custom Batch Loaders
 
-In the following example, the `User` model is associated with multiple posts, but the posts
-are part of an external service.
+In the following example, the `User` model is associated with multiple posts, but the posts are part of an external service.
 
 ```graphql
 type User {
@@ -76,12 +68,11 @@ Since we have multiple users, `User.posts` would be resolved multiple times in t
 }
 ```
 
-We want to have a batch loader for `User.posts`, since it loads posts from a third party and the
-call to fetch them is slow when run sequentially. This is assuming the posts service offers a method
-to query posts for multiple users in one call.
+We want to have a batch loader for `User.posts`, since it loads posts from a third party and the call to fetch them is slow when run sequentially.
+This is assuming the posts service offers a method to query posts for multiple users in one call.
 
-In order for Lighthouse to perform batch loading, it needs to group fields that are on the same level
-in the query tree, but nested under different indices. When looking at the query path from `posts`, they may look like:
+In order for Lighthouse to perform batch loading, it needs to group fields that are on the same level in the query tree, but nested under different indices.
+When looking at the query path from `posts`, they may look like:
 
 - `users.0.posts`
 - `users.1.posts`
@@ -107,8 +98,7 @@ function (User $user, array $args, GraphQLContext $context, ResolveInfo $resolve
 }
 ```
 
-The implementation of `UserPostsBatchLoader` is up to you, the only important thing is that the resolver
-returns an instance of `GraphQL\Deferred`, see [webonyx/graphql-php docs](https://webonyx.github.io/graphql-php/data-fetching/#solving-n1-problem).
+The implementation of `UserPostsBatchLoader` is up to you, the only important thing is that the resolver returns an instance of `GraphQL\Deferred`, see [webonyx/graphql-php docs](https://webonyx.github.io/graphql-php/data-fetching/#solving-n1-problem).
 The following example illustrates some common patterns that may be found in a batch loader implementation:
 
 ```php

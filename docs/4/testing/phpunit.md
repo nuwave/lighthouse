@@ -4,8 +4,8 @@ Lighthouse makes it easy to add automated tests through PHPUnit.
 
 ## Setup
 
-Lighthouse offers some useful test helpers that make it easy to call your API
-from within a PHPUnit test. Just add the `MakesGraphQLRequests` trait to your test class.
+Lighthouse offers some useful test helpers that make it easy to call your API from within a PHPUnit test.
+Just add the `MakesGraphQLRequests` trait to your test class.
 
 ```diff
 <?php
@@ -61,11 +61,9 @@ public function testCreatePost(): void
 
 ## Assertions
 
-Now that we know how to query our server in tests, we need to make sure the
-returned results match our expectations.
+Now that we know how to query our server in tests, we need to make sure the returned results match our expectations.
 
-The returned `TestResponse` conveniently offers assertions that work quite
-well with the JSON data returned by GraphQL.
+The returned `TestResponse` conveniently offers assertions that work quite well with the JSON data returned by GraphQL.
 
 The `assertJson` method asserts that the response is a superset of the given JSON.
 
@@ -133,7 +131,8 @@ Make sure to [generate the latest IDE-helper file](../api-reference/commands.md#
 php artisan lighthouse:ide-helper
 ```
 
-This command requires `haydenpierce/class-finder`. Install it by running:
+This command requires `haydenpierce/class-finder`.
+Install it by running:
 
 ```bash
 composer require --dev haydenpierce/class-finder
@@ -157,8 +156,7 @@ $this
 
 Lighthouse allows you to [upload files](../digging-deeper/file-uploads.md) through GraphQL.
 
-Since multipart form requests are tricky to construct, you can just use the `multipartGraphQL`
-helper method.
+Since multipart form requests are tricky to construct, you can just use the `multipartGraphQL` helper method.
 
 ```php
 $this->multipartGraphQL(
@@ -187,8 +185,8 @@ $this->multipartGraphQL(
 
 ## Introspection
 
-If you create or manipulate parts of your schema programmatically, you might
-want to test that. You can use introspection to query your final schema in tests.
+If you create or manipulate parts of your schema programmatically, you might want to test that.
+You can use introspection to query your final schema in tests.
 
 Lighthouse uses the introspection query from [`\GraphQL\Type\Introspection::getIntrospectionQuery()`](https://github.com/webonyx/graphql-php/blob/master/src/Type/Introspection.php).
 
@@ -254,8 +252,7 @@ $this->setUpDeferStream();
 
 ## Lumen
 
-Because the `TestResponse` class is not available in Lumen, you must use a different
-test trait:
+Because the `TestResponse` class is not available in Lumen, you must use a different test trait:
 
 ```diff
 <?php
@@ -270,8 +267,7 @@ abstract class TestCase extends Laravel\Lumen\Testing\TestCase
 }
 ```
 
-All the test helpers are called the same as in `MakesGraphQLRequest`, the only
-difference is that they return `$this` instead of a `TestResponse`.
+All the test helpers are called the same as in `MakesGraphQLRequest`, the only difference is that they return `$this` instead of a `TestResponse`.
 Assertions work differently as a result:
 
 ```php

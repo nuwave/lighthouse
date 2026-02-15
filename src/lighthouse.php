@@ -24,8 +24,8 @@ return [
         'name' => 'graphql',
 
         /*
-         * Beware that middleware defined here runs before the GraphQL execution phase,
-         * make sure to return spec-compliant responses in case an error is thrown.
+         * Beware that middleware defined here runs before the GraphQL execution phase.
+         * Make sure to return spec-compliant responses in case an error is thrown.
          */
         'middleware' => [
             // Ensures the request is not vulnerable to cross-site request forgery.
@@ -433,7 +433,7 @@ return [
         /*
          * Default subscription storage time to live in seconds.
          *
-         * Indicates how long a subscription can be active before it's automatically removed from storage.
+         * Indicates how long a subscription can stay active before automatic removal from storage.
          * Setting this to `null` means the subscriptions are stored forever. This may cause
          * stale subscriptions to linger indefinitely in case cleanup fails for any reason.
          */
@@ -475,7 +475,8 @@ return [
 
         /*
          * Should the subscriptions extension be excluded when the response has no subscription channel?
-         * This optimizes performance by sending less data, but clients must anticipate this appropriately.
+         * This optimizes performance by sending less data.
+         * Clients must anticipate this behavior.
          */
         'exclude_empty' => env('LIGHTHOUSE_SUBSCRIPTION_EXCLUDE_EMPTY', true),
     ],

@@ -11,8 +11,8 @@ namespace Nuwave\Lighthouse\GlobalId;
  * 2. Glue them together, separated by a colon, e.g. "User:123"
  * 3. base64_encode the result
  *
- * This can then be reversed to uniquely identify an entity in our schema,
- * just by looking at a single ID.
+ * This can then be reversed to uniquely identify an entity in our schema.
+ * A single ID is enough.
  */
 class Base64GlobalId implements GlobalId
 {

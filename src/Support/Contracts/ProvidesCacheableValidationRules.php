@@ -10,8 +10,8 @@ interface ProvidesCacheableValidationRules extends ProvidesValidationRules
     /**
      * Rules where the result depends only on the schema and the query string.
      *
-     * These rules are executed before non-cacheable rules and may not run
-     * at all when their result is already cached.
+     * These rules are executed before non-cacheable rules.
+     * They may not run at all when their result is already cached.
      *
      * @return array<string, \GraphQL\Validator\Rules\ValidationRule>
      */

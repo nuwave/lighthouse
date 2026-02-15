@@ -6,8 +6,8 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
 /**
- * An Operator handles the database or application specific bits
- * of applying WHERE conditions to a database query builder.
+ * An Operator handles database- or application-specific details for applying WHERE conditions.
+ * It applies those conditions to a database query builder.
  */
 interface Operator
 {

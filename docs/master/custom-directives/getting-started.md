@@ -20,8 +20,7 @@ Use the artisan generator command to create it:
 php artisan lighthouse:directive --argument upperCase
 ```
 
-That will create a class called `UpperCaseDirective` that extends the
-abstract class `Nuwave\Lighthouse\Schema\Directives\BaseDirective`.
+That will create a class called `UpperCaseDirective` that extends the abstract class `Nuwave\Lighthouse\Schema\Directives\BaseDirective`.
 
 ```php
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -95,13 +94,12 @@ It is advised to look at the Lighthouse source code to find directives that impl
 
 Now that we defined and implemented the directive, how can Lighthouse find it?
 
-When Lighthouse encounters a directive within the schema, it starts looking for a matching class
-in the following order:
+When Lighthouse encounters a directive within the schema, it starts looking for a matching class in the following order:
 
 1. User-defined namespaces as configured in `config/lighthouse.php`, defaults to `App\GraphQL\Directives`
 1. The [RegisterDirectiveNamespaces](../api-reference/events.md#registerdirectivenamespaces) event is dispatched
    to gather namespaces defined by plugins, extensions or other listeners
 1. Lighthouse's built-in directive namespace
 
-This means that our directive is already registered, just by matter of defining it in the default namespace,
-and will take precedence over potential other directives with the same name.
+This means that our directive is already registered, just by matter of defining it in the default namespace.
+Will take precedence over potential other directives with the same name.

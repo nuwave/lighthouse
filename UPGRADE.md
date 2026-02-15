@@ -14,9 +14,9 @@ Compare your `lighthouse.php` against the latest [default configuration](src/lig
 Methods you need to explicitly call to set up test traits were removed in favor of automatic setup.
 
 - Remove calls to `Nuwave\Lighthouse\Testing\RefreshesSchemaCache::bootRefreshesSchemaCache()`.
-  This only works when your test class uses the trait `Nuwave\Lighthouse\Testing\MakesGraphQLRequests`.
+This only works when your test class uses the trait `Nuwave\Lighthouse\Testing\MakesGraphQLRequests`.
 - Replace calls to `Nuwave\Lighthouse\Testing\MakesGraphQLRequests::setUpSubscriptionEnvironment()` with ` use Nuwave\Lighthouse\Testing\TestsSubscriptions`.
-  This only works when your test class extends `Illuminate\Foundation\Testing\TestCase`.
+This only works when your test class extends `Illuminate\Foundation\Testing\TestCase`.
 
 ### `EnsureXHR` is enabled in the default configuration
 
@@ -68,9 +68,9 @@ The Artisan command `lighthouse:clear-cache` was renamed to `lighthouse:clear-sc
 
 ### `messages` on `@rules` and `@rulesForArray`
 
-Lighthouse previously allowed passing a map with arbitrary keys as the `messages`
-argument of `@rules` and `@rulesForArray`. Such a construct is impossible to define
-within the directive definition and leads to static validation errors.
+Lighthouse previously allowed passing a map with arbitrary keys as the `messages` argument of `@rules` and `@rulesForArray`.
+This construct is impossible to define within the directive definition.
+It leads to static validation errors.
 
 ```diff
 @rules(
@@ -89,8 +89,9 @@ within the directive definition and leads to static validation errors.
 
 ### Use filters in `@delete`, `@forceDelete` and `@restore`
 
-Whereas previously, those directives enforced the usage of a single argument and assumed that
-to be the ID or list of IDs of the models to modify, they now leverage argument filter directives.
+Previously, those directives enforced a single argument.
+They assumed that argument was the ID or list of IDs of models to modify.
+They now leverage argument filter directives.
 This brings them in line with other directives such as `@find` and `@all`.
 
 You will need to explicitly add `@whereKey` to the argument that contained the ID or IDs.
@@ -106,8 +107,8 @@ type Mutation {
 
 ### Use `@globalId` over `@delete(globalId: true)`
 
-The `@delete`, `@forceDelete`, `@restore` and `@upsert` directives no longer offer the
-`globalId` argument. Use `@globalId` on the argument instead.
+The `@delete`, `@forceDelete`, `@restore` and `@upsert` directives no longer offer the `globalId` argument.
+Use `@globalId` on the argument instead.
 
 ```diff
 type Mutation {
@@ -118,8 +119,7 @@ type Mutation {
 
 ### Specify `@guard(with: "api")` as `@guard(with: ["api"])`
 
-Due to Lighthouse's ongoing effort to provide static schema validation,
-the `with` argument of `@guard` must now be provided as a list of strings.
+Due to Lighthouse's ongoing effort to provide static schema validation, the `with` argument of `@guard` must now be a list of strings.
 
 ```diff
 type Mutation {
@@ -148,43 +148,40 @@ The previous version 1 contained a redundant key `channels` and is no longer sup
 }
 ```
 
-It is recommended to switch to version 2 before upgrading Lighthouse to give clients
-a smooth transition period.
+Switch to version 2 before upgrading Lighthouse.
+This gives clients a smooth transition period.
 
 ### Nullability of pagination results
 
 Generated result types of paginated lists are now always marked as non-nullable.
 The setting `non_null_pagination_results` was removed and now always behaves as if it were `true`.
 
-This is generally more convenient for clients, but will
-cause validation errors to bubble further up in the result.
+This is generally more convenient for clients.
+It causes validation errors to bubble further up in the result.
 
 ### Nullability of pagination `first`
 
-Previously, the pagination argument `first` was either marked as non-nullable,
-or non-nullable with a default value.
+Previously, the pagination argument `first` was either non-nullable or non-nullable with a default value.
 
 Now, it will always be marked as non-nullable, regardless if it has a default or not.
 This prevents clients from passing an invalid explicit `null`.
 
 ### Complexity calculation
 
-Prior to `v6`, overwriting the default query complexity calculation on paginated fields
-required the usage of `@complexity` without any arguments. Now, `@paginate` performs that
-calculation by default - with the additional change that it also includes the cost of the
-field itself, adding a value of `1` to represent the complexity more accurately.
+Prior to `v6`, overwriting the default query complexity calculation on paginated fields required `@complexity` without arguments.
+Now, `@paginate` performs that calculation by default.
+It also includes the cost of the field itself, adding a value of `1` for a more accurate complexity score.
 
 Using `@complexity` without the `resolver` argument is now no longer supported.
 
 ### Passing of `BenSampo\Enum\Enum` instances to `ArgBuilderDirective::handleBuilder()`
 
-Prior to `v6`, Lighthouse would extract the internal `$value` from instances of
-`BenSampo\Enum\Enum` before passing it to `ArgBuilderDirective::handleBuilder()`
-if the setting `unbox_bensampo_enum_enum_instances` was `true`.
+Prior to `v6`, Lighthouse extracted the internal `$value` from `BenSampo\Enum\Enum` instances before passing it to `ArgBuilderDirective::handleBuilder()`.
+This happened if `unbox_bensampo_enum_enum_instances` was `true`.
 
-This is generally unnecessary, because Laravel automagically calls the Enum's `__toString()`
-method when using it in a query. This might affect users who use an `ArgBuilderDirective`
-that delegates to a method that relies on an internal value being passed.
+This is generally unnecessary.
+Laravel automatically calls the Enum `__toString()` method when using it in a query.
+This might affect users whose `ArgBuilderDirective` delegates to a method that relies on an internal value.
 
 ```graphql
 type Query {
@@ -200,8 +197,9 @@ public function scopeByType(Builder $builder, int $aOrB): Builder
 }
 ```
 
-In the future, Lighthouse will pass the actual Enum instance along. You can opt in to
-the new behavior before upgrading by setting `unbox_bensampo_enum_enum_instances` to `false`. 
+In the future, Lighthouse will pass the actual Enum instance along.
+You can opt in to the new behavior before upgrading.
+Set `unbox_bensampo_enum_enum_instances` to `false`.
 
 ```php
 public function scopeByType(Builder $builder, AOrB $aOrB): Builder
@@ -295,21 +293,18 @@ function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolv
 
 ### Replace `Nuwave\Lighthouse\GraphQL::executeQuery()` usage
 
-Use `executeQueryString()` for executing a string query or `executeParsedQuery()` for 
-executing an already parsed `DocumentNode` instance.
+Use `executeQueryString()` for executing a string query or `executeParsedQuery()` for executing an already parsed `DocumentNode` instance.
 
 ### Removed error extension field `category`
 
 See https://github.com/webonyx/graphql-php/blob/master/UPGRADE.md#breaking-removed-error-extension-field-category.
 
-You can [leverage `GraphQL\Error\ProvidesExtensions`](https://lighthouse-php.com/master/digging-deeper/error-handling.html#additional-error-information)
-to restore `category` in your custom exceptions. Additionally, you may [implement a custom error handler](https://lighthouse-php.com/master/digging-deeper/error-handling.html#registering-error-handlers)
-that wraps well-known third-party exceptions with your own exception that adds an appropriate `category`.
+You can [leverage `GraphQL\Error\ProvidesExtensions`](https://lighthouse-php.com/master/digging-deeper/error-handling.html#additional-error-information) to restore `category` in your custom exceptions.
+Additionally, you may [implement a custom error handler](https://lighthouse-php.com/master/digging-deeper/error-handling.html#registering-error-handlers) that wraps well-known third-party exceptions with your own exception that adds an appropriate `category`.
 
 ### Use native interface for errors with extensions
 
-Use `GraphQL\Error\ProvidesExtensions::getExtensions()` over `Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions::extensionsContent()`
-to return extra information from exceptions:
+Use `GraphQL\Error\ProvidesExtensions::getExtensions()` over `Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions::extensionsContent()` to return extra information from exceptions:
 
 ```diff
 use Exception;
@@ -350,18 +345,15 @@ abstract class TestCase extends BaseTestCase
 
 ### Schema caching v1 removal
 
-Schema caching now uses v2 only. That means, the schema cache will be
-written to a php file that OPcache will pick up instead of being written
-to the configured cache driver. This significantly reduces memory usage.
+Schema caching now uses v2 only.
+That means, the schema cache will be written to a php file that OPcache will pick up instead of being written to the configured cache driver.
+This significantly reduces memory usage.
 
-If you had previously depended on the presence of the schema in your
-cache, then you will need to change your code.
+If you had previously depended on the presence of the schema in your cache, then you will need to change your code.
 
 ### Register `ScoutServiceProvider` if you use `@search`
 
-If you use the `@search` directive in your schema,
-you will now need to register the service provider `Nuwave\Lighthouse\Scout\ScoutServiceProvider`,
-it is no longer registered by default.
+If you use the `@search` directive in your schema, you will now need to register the service provider `Nuwave\Lighthouse\Scout\ScoutServiceProvider`, it is no longer registered by default.
 See [registering providers in Laravel](https://laravel.com/docs/providers#registering-providers).
 
 ### Update `lighthouse.guard` configuration
@@ -373,8 +365,7 @@ The `lighthouse.guard` configuration key was renamed to `lighthouse.guards` and 
 + 'guards' => ['api'],
 ```
 
-If `lighthouse.guards` configuration is missing,
-the default Laravel authentication guard will be used (`auth.defaults.guard`).
+If `lighthouse.guards` configuration is missing, the default Laravel authentication guard will be used (`auth.defaults.guard`).
 
 ### Update `@auth` and `@whereAuth` directives
 
@@ -399,19 +390,18 @@ The following versions are now the minimal required versions:
 
 ### Final schema may change
 
-Parts of the final schema are automatically generated by Lighthouse. Clients that depend on
-specific fields or type names may have to adapt. The recommended process for finding breaking
-changes is:
+Parts of the final schema are automatically generated by Lighthouse.
+Clients that depend on specific fields or type names may have to adapt.
+The recommended process for finding breaking changes is:
 
 1. Print your schema before upgrading: `php artisan lighthouse:print-schema > old.graphql`
 1. Upgrade, then re-print your schema: `php artisan lighthouse:print-schema > new.graphql`
 1. Use [graphql-inspector](https://github.com/kamilkisiela/graphql-inspector) to compare your
-   changes: `graphql-inspector diff old.graphql new.graphql`
+changes: `graphql-inspector diff old.graphql new.graphql`
 
 ### Rename `resolve` to `__invoke`
 
-Field resolver classes now only support the method name `__invoke`, using
-the name `resolve` no longer works.
+Field resolver classes now only support the method name `__invoke`, using the name `resolve` no longer works.
 
 ```diff
 namespace App\GraphQL\Queries;
@@ -425,7 +415,7 @@ class SomeField
 ### Replace `@middleware` with `@guard` and specialized FieldMiddleware
 
 The `@middleware` directive has been removed, as it violates the boundary between HTTP and GraphQL request handling.
-Laravel middleware acts upon the HTTP request as a whole, whereas field middleware must only apply to a part of it. 
+Laravel middleware acts upon the HTTP request as a whole, whereas field middleware must only apply to a part of it.
 
 If you used `@middleware` for authentication, replace it with [@guard](docs/master/api-reference/directives.md#guard):
 
@@ -437,19 +427,17 @@ type Query {
 ```
 
 Note that [@guard](docs/master/api-reference/directives.md#guard) does not log in users.
-To ensure the user is logged in, add the `AttemptAuthenticate` middleware to your `lighthouse.php`
-middleware config, see the [default config](src/lighthouse.php) for an example.
+To ensure the user is logged in, add the `AttemptAuthenticate` middleware to your `lighthouse.php` middleware config, see the [default config](src/lighthouse.php) for an example.
 
 If you used `@middleware` for authorization, replace it with [@can](docs/master/api-reference/directives.md#can).
 
-Other functionality can be replaced by a custom [`FieldMiddleware`](docs/master/custom-directives/field-directives.md#fieldmiddleware)
-directive. Just like Laravel Middleware, it can wrap around individual field resolvers.
+Other functionality can be replaced by a custom [`FieldMiddleware`](docs/master/custom-directives/field-directives.md#fieldmiddleware) directive.
+Just like Laravel Middleware, it can wrap around individual field resolvers.
 
 ### Directives must have an SDL definition
 
-The interface `Nuwave\Lighthouse\Support\Contracts\Directive` now has the same functionality
-as the removed `Nuwave\Lighthouse\Support\Contracts\DefinedDirective`. If you previously
-implemented `DefinedDirective`, remove it from your directives:
+The interface `Nuwave\Lighthouse\Support\Contracts\Directive` now has the same functionality as the removed `Nuwave\Lighthouse\Support\Contracts\DefinedDirective`.
+If you previously implemented `DefinedDirective`, remove it from your directives:
 
 ```diff
 -use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
@@ -458,8 +446,7 @@ implemented `DefinedDirective`, remove it from your directives:
 +class TrimDirective extends BaseDirective implements ArgTransformerDirective
 ```
 
-Instead of just providing the name of the directive, all directives must now return an SDL
-definition that formally describes them.
+Instead of just providing the name of the directive, all directives must now return an SDL definition that formally describes them.
 
 ```diff
 -    public function name()
@@ -490,8 +477,7 @@ definition that formally describes them.
 
 ### `@orderBy` argument renamed to `column`
 
-The argument to specify the column to order by when using `@orderBy` was renamed
-to `column` to match the `@whereConditions` directive.
+The argument to specify the column to order by when using `@orderBy` was renamed to `column` to match the `@whereConditions` directive.
 
 Client queries will have to be changed like this:
 
@@ -511,14 +497,12 @@ Client queries will have to be changed like this:
 }
 ```
 
-If you absolutely cannot break your clients, you can re-implement `@orderBy` in your
-project - it is a relatively simple `ArgManipulator` directive.
+If you absolutely cannot break your clients, you can re-implement `@orderBy` in your project. It is a relatively simple `ArgManipulator` directive.
 
 ### `@modelClass` and `@model` changed
 
-The `@model` directive was repurposed to take the place of `@modelClass`. As a replacement
-for the current functionality of `@model`, the new `@node` directive was added,
-see https://github.com/nuwave/lighthouse/pull/974 for details.
+The `@model` directive was repurposed to take the place of `@modelClass`.
+As a replacement for the current functionality of `@model`, the new `@node` directive was added, see https://github.com/nuwave/lighthouse/pull/974 for details.
 
 You can adapt to this change in two refactoring steps that must be done in order:
 
@@ -542,8 +526,8 @@ You can adapt to this change in two refactoring steps that must be done in order
 
 ### Replace `@bcrypt` with `@hash`
 
-The new `@hash` directive is also used for password hashing, but respects the
-configuration settings of your Laravel project.
+The new `@hash` directive is also used for password hashing.
+But respects the configuration settings of your Laravel project.
 
 ```diff
 type Mutation {
@@ -557,9 +541,8 @@ type Mutation {
 
 ### `@method` passes down just ordered arguments
 
-Instead of passing down the usual resolver arguments, the `@method` directive will
-now pass just the arguments given to a field. This behavior could previously be
-enabled through the `passOrdered` option, which is now removed.
+Instead of passing down the usual resolver arguments, the `@method` directive will now pass just the arguments given to a field.
+This behavior could previously be enabled through the `passOrdered` option, which is now removed.
 
 ```graphql
 type User {
@@ -582,8 +565,8 @@ This affects custom directives that implemented one of the following interfaces:
 - `Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective`
 - `Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective`
 
-Whereas those interfaces previously extended `Nuwave\Lighthouse\Support\Contracts\ArgDirective`, you now
-have to choose if you want them to apply to entire lists of arguments, elements within that list, or both.
+Whereas those interfaces previously extended `Nuwave\Lighthouse\Support\Contracts\ArgDirective`, you now have to choose if you want them to apply to entire lists of arguments, elements within that list.
+Or both.
 Change them as follows to make them behave like in v4:
 
 ```diff
@@ -597,20 +580,18 @@ use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 ### `ArgDirective` run in distinct phases
 
-The application of directives that implement the `ArgDirective` interface is
-split into three distinct phases:
+The application of directives that implement the `ArgDirective` interface is split into three distinct phases:
 
 - Sanitize: Clean the input, e.g. trim whitespace.
-  Directives can hook into this phase by implementing `ArgSanitizerDirective`.
+Directives can hook into this phase by implementing `ArgSanitizerDirective`.
 - Validate: Ensure the input conforms to the expectations, e.g. check a valid email is given
 - Transform: Change the input before processing it further, e.g. hashing passwords.
-  Directives can hook into this phase by implementing `ArgTransformerDirective`
+Directives can hook into this phase by implementing `ArgTransformerDirective`
 
 ### Replace custom validation directives with validator classes
 
 The `ValidationDirective` abstract class was removed in favour of validator classes.
-They represent a more lightweight way and flexible way to reuse complex validation rules,
-not only on fields but also on input objects.
+They represent a more lightweight way and flexible way to reuse complex validation rules, not only on fields but also on input objects.
 
 To convert an existing custom validation directive to a validator class, change it as follows:
 
@@ -652,18 +633,16 @@ type Mutation {
 
 ### `Nuwave\Lighthouse\Subscriptions\Events\BroadcastSubscriptionEvent` is no longer fired
 
-The event is no longer fired, and the event class was removed. Lighthouse now uses a queued job instead.
+The event is no longer fired, and the event class was removed.
+Lighthouse now uses a queued job instead.
 
-If you manually fired the event, replace it by queuing a `Nuwave\Lighthouse\Subscriptions\BroadcastSubscriptionJob`
-or a call to `Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions::queueBroadcast()`.
+If you manually fired the event, replace it by queuing a `Nuwave\Lighthouse\Subscriptions\BroadcastSubscriptionJob` or a call to `Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions::queueBroadcast()`.
 
-In case you depend on an event being fired whenever a subscription is queued, you can bind your
-own implementation of `Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions`.
+In case you depend on an event being fired whenever a subscription is queued, you can bind your own implementation of `Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions`.
 
 ### `TypeRegistry` does not register duplicates by default
 
-Calling `register()` on the `Nuwave\Lighthouse\Schema\TypeRegistry` now throws when passing
-a type that was already registered, as this most likely is an error.
+Calling `register()` on the `Nuwave\Lighthouse\Schema\TypeRegistry` now throws when passing a type that was already registered, as this most likely is an error.
 
 If you want to previous behavior of overwriting existing types, use `overwrite()` instead.
 
@@ -688,8 +667,7 @@ If you need to revert to the old behavior of using `fill()`, you can change your
 
 ### Replace `ErrorBuffer` with `ErrorPool`
 
-Collecting partial errors is now done through the singleton `Nuwave\Lighthouse\Execution\ErrorPool`
-instead of `Nuwave\Lighthouse\Execution\ErrorBuffer`:
+Collecting partial errors is now done through the singleton `Nuwave\Lighthouse\Execution\ErrorPool` instead of `Nuwave\Lighthouse\Execution\ErrorBuffer`:
 
 ```php
 try {
@@ -704,8 +682,7 @@ return $result;
 
 ### Use native `TestResponse::json()`
 
-The `TestResponse::jsonGet()` mixin was removed in favor of the `->json()` method,
-natively supported by Laravel starting from version 5.6.
+The `TestResponse::jsonGet()` mixin was removed in favor of the `->json()` method, natively supported by Laravel starting from version 5.6.
 
 ```diff
 $response = $this->graphQL(...);
@@ -742,8 +719,7 @@ A few are different:
 
 ### Add method `defaultHasOperator` to `Nuwave\Lighthouse\WhereConditions\Operator`
 
-Since the addition of the `HAS` input in `whereCondition` mechanics,
-there has to be a default operator for the `HAS` input.
+Since the addition of the `HAS` input in `whereCondition` mechanics, there has to be a default operator for the `HAS` input.
 
 If you implement your own custom operator, implement `defaultHasOperator`.
 For example, this is the implementation of the default `Nuwave\Lighthouse\WhereConditions\SQLOperator`:
@@ -776,15 +752,14 @@ You can now discard errors by returning `null` from the handler.
 
 ### Upgrade to `mll-lab/graphql-php-scalars` v4
 
-If you use complex where condition directives, such as `@whereConditions`,
-upgrade `mll-lab/graphql-php-scalars` to v4:
+If you use complex where condition directives, such as `@whereConditions`, upgrade `mll-lab/graphql-php-scalars` to v4:
 
     composer require mll-lab/graphql-php-scalars:^4
 
 ### Subscriptions version 1 removal 
 
-Subscriptions only use version 2 now. That means, the extensions content
-will not contain the `channels` and `version` key anymore.
+Subscriptions only use version 2 now.
+That means, the extensions content will not contain the `channels` and `version` key anymore.
 
 ```diff
 {
