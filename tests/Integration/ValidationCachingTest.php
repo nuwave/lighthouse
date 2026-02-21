@@ -225,4 +225,110 @@ final class ValidationCachingTest extends TestCase
         $event->assertDispatchedTimes(CacheHit::class, 0);
         $event->assertDispatchedTimes(KeyWritten::class, 1);
     }
+
+    public function testDifferentMaxQueryDepthHasDifferentKeys(): void
+    {
+        $config = $this->app->make(ConfigRepository::class);
+        $config->set('lighthouse.query_cache.enable', false);
+        $config->set('lighthouse.validation_cache.enable', true);
+        $config->set('lighthouse.security.max_query_depth', 10);
+
+        $event = Event::fake();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo
+        }
+        ')->assertExactJson([
+            'data' => [
+                'foo' => Foo::THE_ANSWER,
+            ],
+        ]);
+
+        $event->assertDispatchedTimes(CacheMissed::class, 1);
+        $event->assertDispatchedTimes(CacheHit::class, 0);
+        $event->assertDispatchedTimes(KeyWritten::class, 1);
+
+        // refresh container, but keep the same cache
+        $cacheFactory = $this->app->make(CacheFactory::class);
+        $this->refreshApplication();
+        $this->setUp();
+
+        $this->app->instance(EventsDispatcher::class, $event);
+        $this->app->instance(CacheFactory::class, $cacheFactory);
+
+        // Change the max_query_depth configuration
+        $config = $this->app->make(ConfigRepository::class);
+        $config->set('lighthouse.query_cache.enable', false);
+        $config->set('lighthouse.validation_cache.enable', true);
+        $config->set('lighthouse.security.max_query_depth', 20);
+
+        // Same query should miss because config changed
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo
+        }
+        ')->assertExactJson([
+            'data' => [
+                'foo' => Foo::THE_ANSWER,
+            ],
+        ]);
+
+        $event->assertDispatchedTimes(CacheMissed::class, 2);
+        $event->assertDispatchedTimes(CacheHit::class, 0);
+        $event->assertDispatchedTimes(KeyWritten::class, 2);
+    }
+
+    public function testDifferentDisableIntrospectionHasDifferentKeys(): void
+    {
+        $config = $this->app->make(ConfigRepository::class);
+        $config->set('lighthouse.query_cache.enable', false);
+        $config->set('lighthouse.validation_cache.enable', true);
+        $config->set('lighthouse.security.disable_introspection', 0);
+
+        $event = Event::fake();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo
+        }
+        ')->assertExactJson([
+            'data' => [
+                'foo' => Foo::THE_ANSWER,
+            ],
+        ]);
+
+        $event->assertDispatchedTimes(CacheMissed::class, 1);
+        $event->assertDispatchedTimes(CacheHit::class, 0);
+        $event->assertDispatchedTimes(KeyWritten::class, 1);
+
+        // refresh container, but keep the same cache
+        $cacheFactory = $this->app->make(CacheFactory::class);
+        $this->refreshApplication();
+        $this->setUp();
+
+        $this->app->instance(EventsDispatcher::class, $event);
+        $this->app->instance(CacheFactory::class, $cacheFactory);
+
+        // Change the disable_introspection configuration
+        $config = $this->app->make(ConfigRepository::class);
+        $config->set('lighthouse.query_cache.enable', false);
+        $config->set('lighthouse.validation_cache.enable', true);
+        $config->set('lighthouse.security.disable_introspection', 1);
+
+        // Same query should miss because config changed
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo
+        }
+        ')->assertExactJson([
+            'data' => [
+                'foo' => Foo::THE_ANSWER,
+            ],
+        ]);
+
+        $event->assertDispatchedTimes(CacheMissed::class, 2);
+        $event->assertDispatchedTimes(CacheHit::class, 0);
+        $event->assertDispatchedTimes(KeyWritten::class, 2);
+    }
 }
