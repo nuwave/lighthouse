@@ -138,9 +138,7 @@ Passing the `category` argument will select only the user's posts where the `cat
 So let's take a look at a simplified version of the built-in [@eq](../api-reference/directives.md#eq) directive.
 
 ```php
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
-use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Contracts\Database\Query\Builder;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
 class EqDirective extends BaseDirective implements ArgBuilderDirective
@@ -164,7 +162,7 @@ class EqDirective extends BaseDirective implements ArgBuilderDirective
     /**
      * Apply a "WHERE = $value" clause.
      */
-    public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, $value): QueryBuilder|EloquentBuilder|Relation
+    public function handleBuilder(Builder $builder, $value): Builder
     {
         return $builder->where(
             $this->directiveArgValue('key', $this->nodeName()),
