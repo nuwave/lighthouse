@@ -13,6 +13,7 @@ use Nuwave\Lighthouse\Execution\BatchLoader\RelationBatchLoader;
 use Nuwave\Lighthouse\Execution\ModelsLoader\CountModelsLoader;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\Directives\Traits\RelationDirectiveHelpers;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
