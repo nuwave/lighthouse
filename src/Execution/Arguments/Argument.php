@@ -14,9 +14,7 @@ class Argument
      */
     public mixed $value;
 
-    /**
-     * The type of the argument.
-     */
+    /** The type of the argument. */
     public ListType|NamedType|null $type = null;
 
     /**
