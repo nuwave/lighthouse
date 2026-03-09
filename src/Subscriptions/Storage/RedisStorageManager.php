@@ -87,6 +87,7 @@ class RedisStorageManager implements StoresSubscriptions
 
                 // Other entries may contain invalid values.
                 try {
+                    // @phpstan-ignore theCodingMachineSafe.function (Safe\unserialize is not available in thecodingmachine/safe ^1 and ^2)
                     $subscriber = unserialize($subscriber);
 
                     // This key exists so remove it from the list of missing keys.
@@ -164,6 +165,7 @@ class RedisStorageManager implements StoresSubscriptions
         $subscriber = $this->connection->command('get', [$channelKey]);
 
         return is_string($subscriber)
+            // @phpstan-ignore theCodingMachineSafe.function (Safe\unserialize is not available in thecodingmachine/safe ^1 and ^2)
             ? unserialize($subscriber)
             : null;
     }

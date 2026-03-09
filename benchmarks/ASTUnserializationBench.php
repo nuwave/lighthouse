@@ -52,6 +52,7 @@ final class ASTUnserializationBench
      */
     public function benchUnserializeDocumentNode(): void
     {
+        // @phpstan-ignore theCodingMachineSafe.function (Safe\unserialize is not available in thecodingmachine/safe ^1 and ^2)
         unserialize($this->documentNode);
     }
 
@@ -62,6 +63,7 @@ final class ASTUnserializationBench
      */
     public function benchUnserializeDocumentAST(): void
     {
+        // @phpstan-ignore theCodingMachineSafe.function (Safe\unserialize is not available in thecodingmachine/safe ^1 and ^2)
         unserialize($this->documentAST);
     }
 }

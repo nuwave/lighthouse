@@ -98,6 +98,7 @@ final class DocumentASTTest extends TestCase
         directive @foo on FIELD
         GRAPHQL);
 
+        // @phpstan-ignore theCodingMachineSafe.function (Safe\unserialize is not available in thecodingmachine/safe ^1 and ^2)
         $reserialized = unserialize(
             serialize($documentAST),
         );
