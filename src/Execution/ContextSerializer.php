@@ -9,8 +9,6 @@ use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\SerializesContext;
 
-use function Safe\unserialize;
-
 class ContextSerializer implements SerializesContext
 {
     use SerializesAndRestoresModelIdentifiers;
@@ -44,6 +42,7 @@ class ContextSerializer implements SerializesContext
         [
             'request' => $rawRequest,
             'user' => $rawUser
+            // @phpstan-ignore theCodingMachineSafe.function (Safe\unserialize is not available in thecodingmachine/safe ^1 and ^2)
         ] = unserialize($context);
 
         if ($rawRequest) {
