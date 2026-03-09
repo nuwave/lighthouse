@@ -1,4 +1,5 @@
-name: "Validate"
+name: Validate
+
 on:
   pull_request:
   push:
@@ -17,41 +18,45 @@ env:
 jobs:
   static-analysis:
     name: PHPStan on PHP ${{ matrix.php-version }} with Laravel ${{ matrix.laravel-version }} and ${{ matrix.composer.name }} dependencies
+
+
     runs-on: ubuntu-latest
+
+
+
 
     strategy:
       fail-fast: false
       matrix:
-        php-version:
-          - "8.0"
-          - "8.1"
-          - "8.2"
-          - "8.3"
-          - "8.4"
-        laravel-version:
-          - "^9"
-          - "^10"
-          - "^11"
-          - "^12"
-        composer:
-          - name: lowest
-            arg: "--prefer-lowest --prefer-stable"
-          - name: highest
-            arg: "" # No args added as highest is default
+        php-version: ['8.0', '8.1', '8.2', '8.3', '8.4']
+        laravel-version: [^9, ^10, ^11, ^12, ^13]
+        composer: [{ name: lowest, arg: '--prefer-lowest --prefer-stable' }, { name: highest, arg: '' }]
         exclude:
-          - php-version: "8.0"
-            laravel-version: "^10"
-          - php-version: "8.0"
-            laravel-version: "^11"
-          - php-version: "8.1"
-            laravel-version: "^11"
-          - php-version: "8.0"
-            laravel-version: "^12"
-          - php-version: "8.1"
-            laravel-version: "^12"
+          - php-version: '8.0'
+            laravel-version: ^10
+          - php-version: '8.0'
+            laravel-version: ^11
+          - php-version: '8.1'
+            laravel-version: ^11
+          - php-version: '8.0'
+            laravel-version: ^12
+          - php-version: '8.1'
+            laravel-version: ^12
+          - laravel-version: ^13
+            php-version: '8.0'
+          - laravel-version: ^13
+            php-version: '8.1'
+          - laravel-version: ^13
+            php-version: '8.2'
+
+
+
 
     steps:
       - uses: actions/checkout@v4
+
+
+
 
       - uses: shivammathur/setup-php@v2
         with:
@@ -59,66 +64,73 @@ jobs:
           coverage: none
           extensions: ${{ env.REQUIRED_PHP_EXTENSIONS }}
 
-      - name: "Cache composer dependencies"
+
+
+
+      - name: Cache composer dependencies
         uses: actions/cache@v3
         with:
           path: ~/.composer/cache
           key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-os-${{ matrix.os }}-composer-${{ matrix.composer.name }}
 
-      - name: "Remove conflicting dependencies that are not needed here"
+
+
+
+      - name: Remove conflicting dependencies that are not needed here
         run: composer remove --dev --no-update phpbench/phpbench rector/rector
 
-      - name: "Remove Pennant for Laravel 9 because it is not compatible"
-        if: matrix.laravel-version == '^9'
+
+
+
+      - name: Remove Pennant for Laravel 9 because it is not compatible
+        if: "matrix.laravel-version == '^9'"
         run: composer remove --dev --no-update laravel/pennant
 
-      - run: >
-          composer require
-          illuminate/contracts:${{ matrix.laravel-version }}
-          --no-interaction
-          --prefer-dist
-          --no-progress
-          --update-with-all-dependencies
-          ${{ matrix.composer.arg }}
+
+
+
+      - run: |
+          composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress --update-with-all-dependencies ${{ matrix.composer.arg }}
+
+
+
 
       - run: vendor/bin/phpstan --verbose
 
   tests:
     name: PHPUnit on PHP ${{ matrix.php-version }} with Laravel ${{ matrix.laravel-version }} and ${{ matrix.composer.name }} dependencies
+
+
     runs-on: ${{ matrix.os }}
+
+
+
 
     strategy:
       fail-fast: false
       matrix:
-        php-version:
-          - "8.0"
-          - "8.1"
-          - "8.2"
-          - "8.3"
-          - "8.4"
-        laravel-version:
-          - "^9"
-          - "^10"
-          - "^11"
-          - "^12"
-        os:
-          - ubuntu-latest
-        composer:
-          - name: lowest
-            arg: "--prefer-lowest --prefer-stable"
-          - name: highest
-            arg: "" # No args added as highest is default
+        php-version: ['8.0', '8.1', '8.2', '8.3', '8.4']
+        laravel-version: [^9, ^10, ^11, ^12, ^13]
+        os: [ubuntu-latest]
+        composer: [{ name: lowest, arg: '--prefer-lowest --prefer-stable' }, { name: highest, arg: '' }]
         exclude:
-          - php-version: "8.0"
-            laravel-version: "^10"
-          - php-version: "8.0"
-            laravel-version: "^11"
-          - php-version: "8.1"
-            laravel-version: "^11"
-          - php-version: "8.0"
-            laravel-version: "^12"
-          - php-version: "8.1"
-            laravel-version: "^12"
+          - php-version: '8.0'
+            laravel-version: ^10
+          - php-version: '8.0'
+            laravel-version: ^11
+          - php-version: '8.1'
+            laravel-version: ^11
+          - php-version: '8.0'
+            laravel-version: ^12
+          - php-version: '8.1'
+            laravel-version: ^12
+          - laravel-version: ^13
+            php-version: '8.0'
+          - laravel-version: ^13
+            php-version: '8.1'
+          - laravel-version: ^13
+            php-version: '8.2'
+
 
     services:
       mysql:
@@ -135,8 +147,14 @@ jobs:
           - 63790:6379
         options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
+
+
+
     steps:
       - uses: actions/checkout@v4
+
+
+
 
       - uses: shivammathur/setup-php@v2
         with:
@@ -145,37 +163,52 @@ jobs:
           extensions: ${{ env.REQUIRED_PHP_EXTENSIONS }}
           ini-values: zend.assertions=1
 
-      - name: "Cache composer dependencies"
+
+
+
+      - name: Cache composer dependencies
         uses: actions/cache@v3
         with:
           path: ~/.composer/cache
           key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}-os-${{ matrix.os }}-composer-${{ matrix.composer.name }}
 
-      - name: "Remove conflicting dependencies that are not needed here"
+
+
+
+      - name: Remove conflicting dependencies that are not needed here
         run: composer remove --dev --no-update larastan/larastan phpstan/phpstan-mockery phpbench/phpbench rector/rector
 
-      - name: "Remove Pennant for Laravel 9 because it is not compatible"
-        if: matrix.laravel-version == '^9'
+
+
+
+      - name: Remove Pennant for Laravel 9 because it is not compatible
+        if: "matrix.laravel-version == '^9'"
         run: composer remove --dev --no-update laravel/pennant
 
-      - run: >
-          composer require
-          illuminate/contracts:${{ matrix.laravel-version }}
-          --no-interaction
-          --prefer-dist
-          --no-progress
-          --update-with-all-dependencies
-          ${{ matrix.composer.arg }}
+
+
+
+      - run: |
+          composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress --update-with-all-dependencies ${{ matrix.composer.arg }}
+
+
+
 
       - run: vendor/bin/phpunit
 
   coverage:
+
+
     runs-on: ubuntu-latest
+
+
+
 
     strategy:
       matrix:
-        php-version: ["8.4"]
-        laravel-version: ["^12"]
+        php-version: ['8.3', '8.4', '8.4', '8.5']
+        laravel-version: [^12, ^13]
+
 
     services:
       mysql:
@@ -192,8 +225,14 @@ jobs:
           - 63790:6379
         options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
+
+
+
     steps:
       - uses: actions/checkout@v4
+
+
+
 
       - uses: shivammathur/setup-php@v2
         with:
@@ -202,31 +241,57 @@ jobs:
           extensions: ${{ env.REQUIRED_PHP_EXTENSIONS }}
           ini-values: zend.assertions=1
 
-      - name: "Cache composer dependencies"
+
+
+
+      - name: Cache composer dependencies
         uses: actions/cache@v3
         with:
           path: ~/.composer/cache
           key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}
 
+
+
+
       - run: composer remove --dev phpbench/phpbench rector/rector --no-update
+
+
+
 
       - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
 
+
+
+
       - run: vendor/bin/phpunit --coverage-clover=coverage.xml
 
-      - name: "Upload to Codecov"
+
+
+
+      - name: Upload to Codecov
         uses: codecov/codecov-action@v2
 
   benchmarks:
+
+
     runs-on: ubuntu-latest
+
+
+
 
     strategy:
       matrix:
-        php-version: ["8.4"]
-        laravel-version: ["^12"]
+        php-version: ['8.3', '8.4', '8.4', '8.5']
+        laravel-version: [^12, ^13]
+
+
+
 
     steps:
       - uses: actions/checkout@v4
+
+
+
 
       - uses: shivammathur/setup-php@v2
         with:
@@ -234,12 +299,21 @@ jobs:
           coverage: none
           extensions: ${{ env.REQUIRED_PHP_EXTENSIONS }}
 
-      - name: "Cache composer dependencies"
+
+
+
+      - name: Cache composer dependencies
         uses: actions/cache@v3
         with:
           path: ~/.composer/cache
           key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}
 
+
+
+
       - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
+
+
+
 
       - run: vendor/bin/phpbench run --progress=none --report=aggregate
