@@ -103,6 +103,7 @@ class Subscriber
         $this->topic = $data['topic'];
 
         $documentNode = AST::fromArray(
+            // @phpstan-ignore theCodingMachineSafe.function (Safe\unserialize is not available in thecodingmachine/safe ^1 and ^2)
             unserialize($data['query']),
         );
         assert($documentNode instanceof DocumentNode, 'We know the type since it is set during construction and serialized.');
