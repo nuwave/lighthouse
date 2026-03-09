@@ -108,7 +108,7 @@ GRAPHQL;
             } catch (\Throwable $throwable) {
                 $action = $this->directiveArgValue('action');
                 if ($action === 'EXCEPTION_NOT_AUTHORIZED') {
-                    throw new AuthorizationException();
+                    throw new AuthorizationException($throwable->getMessage(), $throwable->getCode(), $throwable);
                 }
 
                 if ($action === 'RETURN_VALUE') {

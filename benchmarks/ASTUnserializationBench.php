@@ -5,6 +5,8 @@ namespace Benchmarks;
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 
+use function Safe\unserialize;
+
 /**
  * @BeforeMethods({"prepareSchema"})
  */

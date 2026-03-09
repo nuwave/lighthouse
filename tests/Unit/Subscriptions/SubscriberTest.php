@@ -12,6 +12,8 @@ use Tests\EnablesSubscriptionServiceProvider;
 use Tests\TestCase;
 use Tests\TestsSerialization;
 
+use function Safe\unserialize;
+
 final class SubscriberTest extends TestCase
 {
     use TestsSerialization;

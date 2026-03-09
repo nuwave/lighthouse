@@ -10,6 +10,8 @@ use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Tests\DBTestCase;
 
+use function Safe\unserialize;
+
 final class AsyncDirectiveTest extends DBTestCase
 {
     public function testDispatchesMutation(): void

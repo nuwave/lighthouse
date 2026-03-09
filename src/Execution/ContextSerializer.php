@@ -9,6 +9,8 @@ use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\SerializesContext;
 
+use function Safe\unserialize;
+
 class ContextSerializer implements SerializesContext
 {
     use SerializesAndRestoresModelIdentifiers;

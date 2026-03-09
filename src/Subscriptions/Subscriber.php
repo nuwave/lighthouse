@@ -11,6 +11,8 @@ use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\SerializesContext;
 
+use function Safe\unserialize;
+
 class Subscriber
 {
     /**

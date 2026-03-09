@@ -10,6 +10,8 @@ use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 
+use function Safe\unserialize;
+
 /**
  * Stores subscribers and topics in redis.
  *

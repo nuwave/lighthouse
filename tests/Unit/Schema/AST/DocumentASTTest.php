@@ -11,6 +11,8 @@ use Nuwave\Lighthouse\Schema\RootType;
 use Tests\TestCase;
 use Tests\Utils\Models\User;
 
+use function Safe\unserialize;
+
 final class DocumentASTTest extends TestCase
 {
     public function testParsesSimpleSchema(): void
