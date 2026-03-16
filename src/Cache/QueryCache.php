@@ -43,14 +43,14 @@ class QueryCache
 
     public function clear(?int $opcacheTTLHours, bool $opcacheOnly): void
     {
-        if (in_array($this->mode, ['store', 'hybrid'])
+        if (in_array($this->mode, ['store', 'hybrid'], true)
             && ! $opcacheOnly
         ) {
             $store = $this->makeCacheStore();
             $store->clear();
         }
 
-        if (in_array($this->mode, ['opcache', 'hybrid'])) {
+        if (in_array($this->mode, ['opcache', 'hybrid'], true)) {
             $files = $this->filesystem->glob($this->opcacheFilePath('*'));
 
             if (is_int($opcacheTTLHours)) {

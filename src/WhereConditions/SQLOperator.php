@@ -115,11 +115,11 @@ GRAPHQL;
 
     protected function operatorArity(string $operator): int
     {
-        if (in_array($operator, ['Null', 'NotNull'])) {
+        if (in_array($operator, ['Null', 'NotNull'], true)) {
             return 1;
         }
 
-        if (in_array($operator, ['In', 'NotIn', 'Between', 'NotBetween'])) {
+        if (in_array($operator, ['In', 'NotIn', 'Between', 'NotBetween'], true)) {
             return 2;
         }
 
