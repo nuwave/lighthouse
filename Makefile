@@ -2,8 +2,8 @@
 it: vendor fix stan test ## Run useful checks before commits
 
 .PHONY: help
-help: ## Display this list of targets with descriptions
-	@grep --extended-regexp '^[a-zA-Z0-9_-]+:.*?## .*$$' $(firstword $(MAKEFILE_LIST)) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}'
+help: ## Displays this list of targets with descriptions
+	@grep --extended-regexp '^\.?[a-zA-Z0-9_-]+:.*?## .*$$' $(firstword $(MAKEFILE_LIST)) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}'
 
 .PHONY: setup
 setup: build vendor docs/node_modules ai-sync ## Prepare the local environment
