@@ -28,16 +28,18 @@ jobs:
           - "8.2"
           - "8.3"
           - "8.4"
+          - "8.5"
         laravel-version:
           - "^9"
           - "^10"
           - "^11"
           - "^12"
+          - "^13"
         composer:
           - name: lowest
             arg: "--prefer-lowest --prefer-stable"
           - name: highest
-            arg: "" # No args added as highest is default
+            arg: ""
         exclude:
           - php-version: "8.0"
             laravel-version: "^10"
@@ -49,6 +51,12 @@ jobs:
             laravel-version: "^12"
           - php-version: "8.1"
             laravel-version: "^12"
+          - php-version: "8.0"
+            laravel-version: "^13"
+          - php-version: "8.1"
+            laravel-version: "^13"
+          - php-version: "8.2"
+            laravel-version: "^13"
 
     steps:
       - uses: actions/checkout@v4
@@ -96,18 +104,20 @@ jobs:
           - "8.2"
           - "8.3"
           - "8.4"
+          - "8.5"
         laravel-version:
           - "^9"
           - "^10"
           - "^11"
           - "^12"
+          - "^13"
         os:
           - ubuntu-latest
         composer:
           - name: lowest
             arg: "--prefer-lowest --prefer-stable"
           - name: highest
-            arg: "" # No args added as highest is default
+            arg: ""
         exclude:
           - php-version: "8.0"
             laravel-version: "^10"
@@ -119,6 +129,12 @@ jobs:
             laravel-version: "^12"
           - php-version: "8.1"
             laravel-version: "^12"
+          - php-version: "8.0"
+            laravel-version: "^13"
+          - php-version: "8.1"
+            laravel-version: "^13"
+          - php-version: "8.2"
+            laravel-version: "^13"
 
     services:
       mysql:
@@ -174,8 +190,8 @@ jobs:
 
     strategy:
       matrix:
-        php-version: ["8.4"]
-        laravel-version: ["^12"]
+        php-version: ["8.5"]
+        laravel-version: ["^13"]
 
     services:
       mysql:
@@ -222,8 +238,8 @@ jobs:
 
     strategy:
       matrix:
-        php-version: ["8.4"]
-        laravel-version: ["^12"]
+        php-version: ["8.5"]
+        laravel-version: ["^13"]
 
     steps:
       - uses: actions/checkout@v4
