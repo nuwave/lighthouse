@@ -43,8 +43,11 @@ GRAPHQL;
             $maybeRenameDirective = $argument->directives->first(static fn (Directive $directive): bool => $directive instanceof RenameDirective);
 
             if ($maybeRenameDirective instanceof RenameDirective) {
-                $argumentSet->arguments[$maybeRenameDirective->attributeArgValue()] = $argument;
-                unset($argumentSet->arguments[$name]);
+                $newName = $maybeRenameDirective->attributeArgValue();
+                $argumentSet->arguments[$newName] = $argument;
+                if ($newName !== $name) {
+                    unset($argumentSet->arguments[$name]);
+                }
             }
         }
 
