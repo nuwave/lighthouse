@@ -28,6 +28,7 @@ jobs:
           - "8.2"
           - "8.3"
           - "8.4"
+          - "8.5"
         laravel-version:
           - "^9"
           - "^10"
@@ -77,9 +78,24 @@ jobs:
         if: matrix.laravel-version == '^9'
         run: composer remove --dev --no-update laravel/pennant
 
-      - run: >
+      - name: "Remove laravel-enum for Laravel 13 because it is not compatible"
+        if: matrix.laravel-version == '^13'
+        run: composer remove --dev --no-update bensampo/laravel-enum
+
+      - if: matrix.laravel-version != '^13'
+        run: >
           composer require
           illuminate/contracts:${{ matrix.laravel-version }}
+          --no-interaction
+          --prefer-dist
+          --no-progress
+          --update-with-all-dependencies
+          ${{ matrix.composer.arg }}
+
+      - if: matrix.laravel-version == '^13'
+        run: >
+          composer require
+          laravel/framework:${{ matrix.laravel-version }}
           --no-interaction
           --prefer-dist
           --no-progress
@@ -101,6 +117,7 @@ jobs:
           - "8.2"
           - "8.3"
           - "8.4"
+          - "8.5"
         laravel-version:
           - "^9"
           - "^10"
@@ -168,9 +185,24 @@ jobs:
         if: matrix.laravel-version == '^9'
         run: composer remove --dev --no-update laravel/pennant
 
-      - run: >
+      - name: "Remove laravel-enum for Laravel 13 because it is not compatible"
+        if: matrix.laravel-version == '^13'
+        run: composer remove --dev --no-update bensampo/laravel-enum
+
+      - if: matrix.laravel-version != '^13'
+        run: >
           composer require
           illuminate/contracts:${{ matrix.laravel-version }}
+          --no-interaction
+          --prefer-dist
+          --no-progress
+          --update-with-all-dependencies
+          ${{ matrix.composer.arg }}
+
+      - if: matrix.laravel-version == '^13'
+        run: >
+          composer require
+          laravel/framework:${{ matrix.laravel-version }}
           --no-interaction
           --prefer-dist
           --no-progress
@@ -184,7 +216,7 @@ jobs:
 
     strategy:
       matrix:
-        php-version: ["8.4"]
+        php-version: ["8.5"]
         laravel-version: ["^13"]
 
     services:
@@ -220,7 +252,7 @@ jobs:
 
       - run: composer remove --dev phpbench/phpbench rector/rector --no-update
 
-      - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
+      - run: composer require laravel/framework:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
 
       - run: vendor/bin/phpunit --coverage-clover=coverage.xml
 
@@ -232,7 +264,7 @@ jobs:
 
     strategy:
       matrix:
-        php-version: ["8.4"]
+        php-version: ["8.5"]
         laravel-version: ["^13"]
 
     steps:
@@ -250,6 +282,6 @@ jobs:
           path: ~/.composer/cache
           key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}
 
-      - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
+      - run: composer require laravel/framework:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
 
       - run: vendor/bin/phpbench run --progress=none --report=aggregate
