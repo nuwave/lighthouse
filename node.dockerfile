@@ -1,7 +1,5 @@
 FROM node:22-slim
 
-RUN npm install -g npm
-
 ARG USER_ID
 ARG GROUP_ID
 
