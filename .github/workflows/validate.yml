@@ -33,6 +33,7 @@ jobs:
           - "^10"
           - "^11"
           - "^12"
+          - "^13"
         composer:
           - name: lowest
             arg: "--prefer-lowest --prefer-stable"
@@ -49,6 +50,10 @@ jobs:
             laravel-version: "^12"
           - php-version: "8.1"
             laravel-version: "^12"
+          - php-version: "8.0"
+            laravel-version: "^13"
+          - php-version: "8.1"
+            laravel-version: "^13"
 
     steps:
       - uses: actions/checkout@v4
@@ -101,6 +106,7 @@ jobs:
           - "^10"
           - "^11"
           - "^12"
+          - "^13"
         os:
           - ubuntu-latest
         composer:
@@ -119,6 +125,10 @@ jobs:
             laravel-version: "^12"
           - php-version: "8.1"
             laravel-version: "^12"
+          - php-version: "8.0"
+            laravel-version: "^13"
+          - php-version: "8.1"
+            laravel-version: "^13"
 
     services:
       mysql:
@@ -175,7 +185,7 @@ jobs:
     strategy:
       matrix:
         php-version: ["8.4"]
-        laravel-version: ["^12"]
+        laravel-version: ["^13"]
 
     services:
       mysql:
@@ -223,7 +233,7 @@ jobs:
     strategy:
       matrix:
         php-version: ["8.4"]
-        laravel-version: ["^12"]
+        laravel-version: ["^13"]
 
     steps:
       - uses: actions/checkout@v4
