@@ -18,7 +18,8 @@
       "Bash(make help)",
       "Bash(make release)",
       "Bash(make proto)",
-      "Bash(make proto/update-reports)"
+      "Bash(make proto/update-reports)",
+      "Bash(make vendor)"
     ],
     "deny": [
       "Bash(make php)",

@@ -47,7 +47,7 @@
         "bensampo/laravel-enum": "^5 || ^6",
         "ergebnis/composer-normalize": "^2.2.2",
         "fakerphp/faker": "^1.21",
-        "google/protobuf": "^3.21",
+        "google/protobuf": "^4.33.6",
         "larastan/larastan": "^2.9.14 || ^3.0.4",
         "laravel/framework": "^9 || ^10 || ^11 || ^12",
         "laravel/legacy-factories": "^1.1.1",
