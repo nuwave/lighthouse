@@ -56,7 +56,7 @@ final class AuthenticatingSyncIteratorTest extends IteratorTestBase
 
         $authManager = $this->app->make(AuthManager::class);
 
-        $authManager->extend(SubscriptionGuard::GUARD_NAME, static fn (): SubscriptionGuard => $guard);
+        $authManager->extend(SubscriptionGuard::GUARD_NAME, fn (): SubscriptionGuard => $guard);
 
         $processedItems = [];
         $authenticatedUsers = [];
