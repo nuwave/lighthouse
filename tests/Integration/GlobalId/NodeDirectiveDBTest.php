@@ -133,7 +133,7 @@ final class NodeDirectiveDBTest extends DBTestCase
     public function testTypeWithoutNodeDirective(): void
     {
         $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
-        type User @node(resolver: "Tests\\Integration\\Schema\\NodeDirectiveDBTest@resolveNode") {
+        type User @node(resolver: "Tests\\Integration\\GlobalId\\NodeDirectiveDBTest@resolveNode") {
             name: String!
         }
 
