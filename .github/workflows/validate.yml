@@ -28,11 +28,13 @@ jobs:
           - "8.2"
           - "8.3"
           - "8.4"
+          - "8.5"
         laravel-version:
           - "^9"
           - "^10"
           - "^11"
           - "^12"
+          - "^13"
         composer:
           - name: lowest
             arg: "--prefer-lowest --prefer-stable"
@@ -49,6 +51,12 @@ jobs:
             laravel-version: "^12"
           - php-version: "8.1"
             laravel-version: "^12"
+          - php-version: "8.0"
+            laravel-version: "^13"
+          - php-version: "8.1"
+            laravel-version: "^13"
+          - php-version: "8.2"
+            laravel-version: "^13"
 
     steps:
       - uses: actions/checkout@v4
@@ -74,7 +82,7 @@ jobs:
 
       - run: >
           composer require
-          illuminate/contracts:${{ matrix.laravel-version }}
+          laravel/framework:${{ matrix.laravel-version }}
           --no-interaction
           --prefer-dist
           --no-progress
@@ -96,11 +104,13 @@ jobs:
           - "8.2"
           - "8.3"
           - "8.4"
+          - "8.5"
         laravel-version:
           - "^9"
           - "^10"
           - "^11"
           - "^12"
+          - "^13"
         os:
           - ubuntu-latest
         composer:
@@ -119,6 +129,12 @@ jobs:
             laravel-version: "^12"
           - php-version: "8.1"
             laravel-version: "^12"
+          - php-version: "8.0"
+            laravel-version: "^13"
+          - php-version: "8.1"
+            laravel-version: "^13"
+          - php-version: "8.2"
+            laravel-version: "^13"
 
     services:
       mysql:
@@ -160,7 +176,7 @@ jobs:
 
       - run: >
           composer require
-          illuminate/contracts:${{ matrix.laravel-version }}
+          laravel/framework:${{ matrix.laravel-version }}
           --no-interaction
           --prefer-dist
           --no-progress
@@ -174,8 +190,8 @@ jobs:
 
     strategy:
       matrix:
-        php-version: ["8.4"]
-        laravel-version: ["^12"]
+        php-version: ["8.5"]
+        laravel-version: ["^13"]
 
     services:
       mysql:
@@ -210,7 +226,7 @@ jobs:
 
       - run: composer remove --dev phpbench/phpbench rector/rector --no-update
 
-      - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
+      - run: composer require laravel/framework:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
 
       - run: vendor/bin/phpunit --coverage-clover=coverage.xml
 
@@ -222,8 +238,8 @@ jobs:
 
     strategy:
       matrix:
-        php-version: ["8.4"]
-        laravel-version: ["^12"]
+        php-version: ["8.5"]
+        laravel-version: ["^13"]
 
     steps:
       - uses: actions/checkout@v4
@@ -240,6 +256,6 @@ jobs:
           path: ~/.composer/cache
           key: php-${{ matrix.php-version }}-composer-${{ matrix.laravel-version }}
 
-      - run: composer require illuminate/contracts:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
+      - run: composer require laravel/framework:${{ matrix.laravel-version }} --no-interaction --prefer-dist --no-progress
 
       - run: vendor/bin/phpbench run --progress=none --report=aggregate
