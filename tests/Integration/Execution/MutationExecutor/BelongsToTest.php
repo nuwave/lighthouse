@@ -797,6 +797,49 @@ final class BelongsToTest extends DBTestCase
         );
     }
 
+    /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
+    public function testDeleteBelongsToFiresModelEvents(string $action): void
+    {
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
+
+        $task = factory(Task::class)->make();
+        $this->assertInstanceOf(Task::class, $task);
+        $task->user()->associate($user);
+        $task->save();
+
+        $deletingCalled = false;
+        User::deleting(static function () use (&$deletingCalled): void {
+            $deletingCalled = true;
+        });
+
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+        mutation {
+            {$action}Task(input: {
+                id: {$task->id}
+                user: {
+                    delete: true
+                }
+            }) {
+                id
+            }
+        }
+GRAPHQL
+        )->assertJson([
+            'data' => [
+                "{$action}Task" => [
+                    'id' => "{$task->id}",
+                ],
+            ],
+        ]);
+
+        $this->assertTrue(
+            $deletingCalled,
+            'Deleting the related model must trigger model events.',
+        );
+    }
+
     public function testCreateUsingUpsertAndDeleteBelongsTo(): void
     {
         $user = factory(User::class)->create();
