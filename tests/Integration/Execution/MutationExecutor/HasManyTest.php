@@ -503,6 +503,59 @@ final class HasManyTest extends DBTestCase
 
     /** @dataProvider existingModelMutations */
     #[DataProvider('existingModelMutations')]
+    public function testDeleteHasManyWithoutRelation(string $action): void
+    {
+        $tasks = [
+            factory(Task::class)->create(),
+            factory(Task::class)->create(),
+        ];
+
+        factory(User::class)
+            ->createMany([[], []])
+            ->each(static function (User $user, int $index) use ($tasks): void {
+                $user->tasks()->save($tasks[$index]);
+            });
+
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+        mutation {
+            {$action}User(input: {
+                id: 1
+                name: "foo"
+                tasks: {
+                    delete: [{$tasks[1]->id}]
+                }
+            }) {
+                id
+                name
+                tasks {
+                    id
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                "{$action}User" => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'tasks' => [
+                        [
+                            'id' => (string) $tasks[0]->id,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $user = User::findOrFail(1);
+        $this->assertCount(1, $user->tasks);
+
+        $user = User::findOrFail(2);
+        $this->assertCount(1, $user->tasks);
+        $this->assertNotNull(Task::find($tasks[1]->id));
+    }
+
+    /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
     public function testConnectHasMany(string $action): void
     {
         $user = factory(User::class)->create();
