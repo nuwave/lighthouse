@@ -1,3 +1,6 @@
+**This repository is planned to move to [spawnia/lighthouse](https://github.com/spawnia/lighthouse).**
+**See the [announcement](https://github.com/nuwave/lighthouse/discussions/2767) for details and to share feedback.**
+
 <a href="https://lighthouse-php.com">
   <img src="logo.png" alt="Lighthouse" width="150" height="150">
 </a>
@@ -47,4 +50,3 @@ All notable changes to this project are documented in [`CHANGELOG.md`](CHANGELOG
 ## Upgrade Guide
 
 When upgrading between major versions of Lighthouse, consider [`UPGRADE.md`](UPGRADE.md).
-
