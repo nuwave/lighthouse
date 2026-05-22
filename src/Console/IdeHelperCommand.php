@@ -8,13 +8,13 @@ use GraphQL\Type\Definition\Directive as DirectiveDefinition;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Introspection;
 use GraphQL\Utils\SchemaPrinter;
-use HaydenPierce\ClassFinder\ClassFinder;
 use Illuminate\Console\Command;
 use Nuwave\Lighthouse\Schema\AST\ASTCache;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
+use Nuwave\Lighthouse\Support\ComposerClassFinder;
 use Nuwave\Lighthouse\Support\Contracts\Directive as DirectiveInterface;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -107,7 +107,7 @@ GRAPHQL;
 
         foreach ($directiveNamespaces as $directiveNamespace) {
             /** @var array<class-string> $classesInNamespace */
-            $classesInNamespace = ClassFinder::getClassesInNamespace($directiveNamespace);
+            $classesInNamespace = ComposerClassFinder::directClassesInNamespace($directiveNamespace);
 
             foreach ($classesInNamespace as $class) {
                 $reflection = new \ReflectionClass($class);

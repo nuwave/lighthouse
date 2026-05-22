@@ -9,6 +9,14 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Changed
+
+- Discover directive classes through Composer's autoload maps instead of `haydenpierce/class-finder`, making `lighthouse:ide-helper` faster https://github.com/nuwave/lighthouse/pull/2768
+
+### Removed
+
+- Dependency on `haydenpierce/class-finder` https://github.com/nuwave/lighthouse/pull/2768
+
 ## v6.66.0
 
 ### Added

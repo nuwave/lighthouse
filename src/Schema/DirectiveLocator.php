@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Schema;
 
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\Node;
-use HaydenPierce\ClassFinder\ClassFinder;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Support\Collection;
@@ -13,6 +12,7 @@ use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Support\ComposerClassFinder;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Utils;
 
@@ -81,7 +81,7 @@ class DirectiveLocator
 
         foreach ($this->namespaces() as $directiveNamespace) {
             /** @var array<class-string> $classesInNamespace */
-            $classesInNamespace = ClassFinder::getClassesInNamespace($directiveNamespace);
+            $classesInNamespace = ComposerClassFinder::directClassesInNamespace($directiveNamespace);
 
             foreach ($classesInNamespace as $class) {
                 $reflection = new \ReflectionClass($class);
