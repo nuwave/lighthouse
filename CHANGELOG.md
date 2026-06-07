@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Changed
+
+- Support `haydenpierce/class-finder` `^0.6`, which makes `lighthouse:ide-helper` and `DirectiveLocator` significantly faster https://github.com/nuwave/lighthouse/pull/2769
+
 ## v6.66.0
 
 ### Added
