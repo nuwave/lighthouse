@@ -54,14 +54,18 @@ parameters:
   # Relation forwards calls to Builder
   - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Builder<Illuminate\\Database\\Eloquent\\Model>|Illuminate\\Database\\Eloquent\\Relations\\Relation<Illuminate\\Database\\Eloquent\\Model>|Illuminate\\Database\\Query\\Builder::(orderBy|where|whereIn|whereNotIn|whereBetween|whereJsonContains|whereNotBetween)\(\)\.#'
 
-  # Laravel 11 changes a lot of generics
+  # Laravel changes its generics arity between major versions
   - '#generic class (Illuminate\\Database\\Eloquent\\Builder|Laravel\\Scout\\Builder)( but)? does not specify its types#'
   - '#contains generic type Illuminate\\Testing\\TestResponse<.+> but class Illuminate\\Testing\\TestResponse is not generic\.#'
   - '#Generic type Illuminate\\.+ specifies \d template types, but (class|interface) Illuminate\\.+ supports only \d: .+#'
+  - '#Method .+ should return Illuminate\\Database\\Eloquent\\Relations\\(BelongsToMany|MorphToMany)<(.+)> but returns Illuminate\\Database\\Eloquent\\Relations\\\1<\2, Illuminate\\Database\\Eloquent\\Relations\\Pivot>.#'
   - '#Method .+ should return Illuminate\\Database\\Eloquent\\Relations\\(HasOne|HasMany|BelongsToMany|MorphOne|MorphMany|MorphToMany)<(.+), .+> but returns Illuminate\\Database\\Eloquent\\Relations\\\1<\2>.#'
   - '#Method .+ should return Illuminate\\Database\\Eloquent\\Relations\\(BelongsTo|MorphTo)<(.+), \$this\((.+)\)> but returns Illuminate\\Database\\Eloquent\\Relations\\\1<\2, \3>.#'
   - '#Method .+ should return Illuminate\\Database\\Eloquent\\Relations\\(HasOneThrough|HasManyThrough)<(.+), .+> but returns Illuminate\\Database\\Eloquent\\Relations\\\1<\2>.#'
   - '#Return type of call to method Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany<.+>::save\(\) contains unresolvable type\.#'
+
+  # covariance/generic issue
+  - '#expects Illuminate\\Database\\Eloquent\\Collection<(.+), Illuminate\\Database\\Eloquent\\Model>, Illuminate\\Database\\Eloquent\\Collection<\1, TModel of Illuminate\\Database\\Eloquent\\Model> given.#'
 
   # PHPUnit version compatibility - InvocationMocker (PHPUnit 9-11) vs InvocationStubber (PHPUnit 12+)
   # The MocksResolvers trait uses conditional definition based on PHPUnit version
@@ -91,9 +95,6 @@ parameters:
 
   # Lumen type hints are just wrong
   - '#Parameter \#1 \$content of function response expects string, .* given\.#'
-
-  # Seems like a bug in PHPStan
-  - '#Parameter \#2 \$type of method Nuwave\\Lighthouse\\Schema\\TypeRegistry::.+Lazy\(\) expects callable\(\): GraphQL\\Type\\Definition\\Type&GraphQL\\Type\\Definition\\NamedType, Closure\(\): GraphQL\\Type\\Definition\\ObjectType given\.#'
 
   # Older versions of bensampo/laravel-enum are not generic yet
   - '#contains generic type BenSampo\\Enum\\Enum<.+> but class BenSampo\\Enum\\Enum is not generic\.#'
