@@ -27,13 +27,13 @@ class PaginatedModelsLoader implements ModelsLoader
     {
         $parents->loadCount([$this->relation => $this->decorateBuilder]);
 
-        $relation = $this->relationInstance($parents);
-        $relatedModels = $this->loadRelatedModels($parents);
+        $relation = $this->relationInstance($parents); // @phpstan-ignore argument.type (generic covariance)
+        $relatedModels = $this->loadRelatedModels($parents); // @phpstan-ignore argument.type (generic covariance)
 
         $this->hydratePivotRelation($relation, $relatedModels);
         $this->loadDefaultWith($relatedModels);
-        $this->associateRelationModels($parents, $relatedModels);
-        $this->convertRelationToPaginator($parents);
+        $this->associateRelationModels($parents, $relatedModels); // @phpstan-ignore argument.type (generic covariance)
+        $this->convertRelationToPaginator($parents); // @phpstan-ignore argument.type (generic covariance)
     }
 
     public function extract(Model $model): mixed
