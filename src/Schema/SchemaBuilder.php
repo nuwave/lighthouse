@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Schema;
 
 use GraphQL\GraphQL;
 use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
@@ -69,6 +70,23 @@ class SchemaBuilder
             /** @return array<string, \GraphQL\Type\Definition\Type> */
             fn (): array => $this->typeRegistry->possibleTypes(),
         );
+
+        // Passing scalar overrides explicitly prevents the first lookup of a built-in scalar
+        // from discovering them by resolving the lazy types callable, which would eagerly
+        // build every type in the schema, see https://github.com/nuwave/lighthouse/issues/2771.
+        // TODO remove this check when the minimum version of webonyx/graphql-php includes the method
+        if (method_exists($config, 'setScalarOverrides')) {
+            $scalarOverrides = [];
+            foreach (Type::BUILT_IN_SCALAR_NAMES as $name) {
+                if (isset($documentAST->types[$name])) {
+                    $type = $this->typeRegistry->get($name);
+                    assert($type instanceof ScalarType);
+                    $scalarOverrides[] = $type;
+                }
+            }
+
+            $config->setScalarOverrides($scalarOverrides);
+        }
 
         // There is no way to resolve directives lazily, so we convert them eagerly
         $directiveFactory = new DirectiveFactory(
