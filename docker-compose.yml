@@ -13,6 +13,7 @@ services:
       - label:disable
     depends_on:
       - mysql
+      - redis
 
   mysql:
     # TODO switch to MySQL 8 https://github.com/nuwave/lighthouse/issues/1784

@@ -18,11 +18,11 @@ fix: rector php-cs-fixer prettier ## Automatically refactor and format code
 
 .PHONY: rector
 rector: ## Refactor code with Rector
-	docker compose run --rm php vendor/bin/rector process
+	docker compose run --rm --no-deps php vendor/bin/rector process
 
 .PHONY: php-cs-fixer
 php-cs-fixer: ## Format code with php-cs-fixer
-	docker compose run --rm php vendor/bin/php-cs-fixer fix
+	docker compose run --rm --no-deps php vendor/bin/php-cs-fixer fix
 
 .PHONY: prettier
 prettier: ## Format code with prettier
@@ -30,7 +30,7 @@ prettier: ## Format code with prettier
 
 .PHONY: stan
 stan: ## Run static analysis with PHPStan
-	docker compose run --rm php vendor/bin/phpstan --verbose
+	docker compose run --rm --no-deps php vendor/bin/phpstan --verbose
 
 .PHONY: test
 test: ## Run tests with PHPUnit
@@ -41,9 +41,9 @@ bench: ## Run benchmarks with PHPBench
 	docker compose run --rm php vendor/bin/phpbench run --report=aggregate
 
 vendor: composer.json ## Install composer dependencies
-	docker compose run --rm php composer update
-	docker compose run --rm php composer validate --strict
-	docker compose run --rm php composer normalize
+	docker compose run --rm --no-deps php composer update
+	docker compose run --rm --no-deps php composer validate --strict
+	docker compose run --rm --no-deps php composer normalize
 
 .PHONY: php
 php: ## Open an interactive shell into the PHP container
@@ -71,11 +71,11 @@ ai-sync: ## Generate local agent configuration from .ai
 
 .PHONY: proto/update-reports
 proto/update-reports:
-	docker compose run --rm php curl --silent --show-error --fail --output src/Tracing/FederatedTracing/reports.proto https://usage-reporting.api.apollographql.com/proto/reports.proto
-	docker compose run --rm php sed --in-place 's/ \[(js_use_toArray) = true]//g' src/Tracing/FederatedTracing/reports.proto
-	docker compose run --rm php sed --in-place 's/ \[(js_preEncoded) = true]//g' src/Tracing/FederatedTracing/reports.proto
-	docker compose run --rm php sed --in-place '3 i option php_namespace = "Nuwave\\\\Lighthouse\\\\Tracing\\\\FederatedTracing\\\\Proto";' src/Tracing/FederatedTracing/reports.proto
-	docker compose run --rm php sed --in-place '4 i option php_metadata_namespace = "Nuwave\\\\Lighthouse\\\\Tracing\\\\FederatedTracing\\\\Proto\\\\Metadata";' src/Tracing/FederatedTracing/reports.proto
+	docker compose run --rm --no-deps php curl --silent --show-error --fail --output src/Tracing/FederatedTracing/reports.proto https://usage-reporting.api.apollographql.com/proto/reports.proto
+	docker compose run --rm --no-deps php sed --in-place 's/ \[(js_use_toArray) = true]//g' src/Tracing/FederatedTracing/reports.proto
+	docker compose run --rm --no-deps php sed --in-place 's/ \[(js_preEncoded) = true]//g' src/Tracing/FederatedTracing/reports.proto
+	docker compose run --rm --no-deps php sed --in-place '3 i option php_namespace = "Nuwave\\\\Lighthouse\\\\Tracing\\\\FederatedTracing\\\\Proto";' src/Tracing/FederatedTracing/reports.proto
+	docker compose run --rm --no-deps php sed --in-place '4 i option php_metadata_namespace = "Nuwave\\\\Lighthouse\\\\Tracing\\\\FederatedTracing\\\\Proto\\\\Metadata";' src/Tracing/FederatedTracing/reports.proto
 
 .PHONY: proto
 proto:
