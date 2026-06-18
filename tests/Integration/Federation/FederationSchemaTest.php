@@ -175,6 +175,28 @@ final class FederationSchemaTest extends TestCase
         $this->assertStringContainsString('type SimplePaginatorInfo @shareable {', $sdl);
     }
 
+    public function testServiceQueryShouldReturnFederationV2AccessControlDirectives(): void
+    {
+        $schemaExtension = /** @lang GraphQL */ <<<'GRAPHQL'
+        extend schema @link(url: "https://specs.apollo.dev/federation/v2.9", import: ["@key", "@authenticated", "@requiresScopes", "@policy"])
+        GRAPHQL;
+
+        $typeUser = /** @lang GraphQL */ <<<'GRAPHQL'
+        type User @key(fields: "id") @authenticated @requiresScopes(scopes: [["profile.read"], ["admin"]]) @policy(policies: [["read:user"], ["admin"]]) {
+          id: ID!
+          email: String! @authenticated @requiresScopes(scopes: [["email.read"]]) @policy(policies: [["email_policy"]])
+        }
+        GRAPHQL;
+
+        $this->schema = "{$schemaExtension} {$typeUser}";
+
+        $sdl = $this->_serviceSdl();
+
+        $this->assertSdlContainsString($schemaExtension, $sdl);
+        $this->assertStringContainsString('type User @key(fields: "id") @authenticated @requiresScopes(scopes: [["profile.read"], ["admin"]]) @policy(policies: [["read:user"], ["admin"]]) {', $sdl);
+        $this->assertStringContainsString('email: String! @authenticated @requiresScopes(scopes: [["email.read"]]) @policy(policies: [["email_policy"]])', $sdl);
+    }
+
     private function _serviceSdl(): string
     {
         $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
