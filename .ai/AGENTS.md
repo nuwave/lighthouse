@@ -28,8 +28,6 @@ docker compose run --rm php vendor/bin/phpunit --filter=testMethodName
 docker compose run --rm php vendor/bin/phpunit tests/Unit/Path/To/TestFile.php
 ```
 
-The `php` service is not long-running — use `docker compose run --rm` instead of `docker compose exec`.
-
 ## Architecture
 
 ### Entry Points
