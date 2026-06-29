@@ -636,6 +636,57 @@ final class CreateDirectiveTest extends DBTestCase
         ]);
     }
 
+    public function testPreSaveArgResolverTakesPrecedenceOverImplicitRelationDetection(): void
+    {
+        $user = factory(User::class)->create();
+
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Task {
+            id: ID!
+            name: String!
+            user: User @belongsTo
+        }
+
+        type User {
+            id: ID!
+        }
+
+        type Mutation {
+            createTask(input: CreateTaskInput! @spread): Task @create
+        }
+
+        input CreateTaskInput {
+            name: String!
+            user: ID @connectRelated
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+        mutation {
+            createTask(input: {
+                name: "My task"
+                user: "{$user->id}"
+            }) {
+                id
+                name
+                user {
+                    id
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'createTask' => [
+                    'id' => '1',
+                    'name' => 'My task',
+                    'user' => [
+                        'id' => "{$user->id}",
+                    ],
+                ],
+            ],
+        ]);
+    }
+
     public function testPreSaveArgResolverReceivesNullForDisassociation(): void
     {
         $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'

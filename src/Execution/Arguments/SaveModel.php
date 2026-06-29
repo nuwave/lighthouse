@@ -24,9 +24,11 @@ class SaveModel implements ArgResolver
      */
     public function __invoke($model, $args): Model
     {
+        [$preSave, $remaining] = ArgPartitioner::preSaveArgResolvers($args);
+
         // Extract $morphTo first, as MorphTo extends BelongsTo
         [$morphTo, $remaining] = ArgPartitioner::relationMethods(
-            $args,
+            $remaining,
             $model,
             MorphTo::class,
         );
@@ -36,8 +38,6 @@ class SaveModel implements ArgResolver
             $model,
             BelongsTo::class,
         );
-
-        [$preSave, $remaining] = ArgPartitioner::preSaveArgResolvers($remaining);
 
         $argsToFill = $remaining->toArray();
 
