@@ -6,6 +6,7 @@ use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Facades\DB;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\DBTestCase;
+use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Role;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
@@ -1311,5 +1312,600 @@ final class BelongsToTest extends DBTestCase
                 ],
             ],
         ]);
+    }
+
+    public function testCreateWithConnectBelongsToOnInputField(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Task {
+            id: ID!
+            name: String!
+            user: User @belongsTo
+        }
+
+        type User {
+            id: ID!
+            name: String!
+        }
+
+        type Mutation {
+            createTask(input: CreateTaskInput! @spread): Task @create
+        }
+
+        input CreateTaskInput {
+            name: String!
+            user: CreateUserRelation @belongsTo
+        }
+
+        input CreateUserRelation {
+            connect: ID
+            create: CreateUserInput
+        }
+
+        input CreateUserInput {
+            name: String!
+        }
+        GRAPHQL . self::PLACEHOLDER_QUERY;
+
+        factory(User::class)->create();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            createTask(input: {
+                name: "foo"
+                user: {
+                    connect: 1
+                }
+            }) {
+                id
+                name
+                user {
+                    id
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'createTask' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'user' => [
+                        'id' => '1',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testCreateWithNewBelongsToOnInputField(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Task {
+            id: ID!
+            name: String!
+            user: User @belongsTo
+        }
+
+        type User {
+            id: ID!
+            name: String!
+        }
+
+        type Mutation {
+            createTask(input: CreateTaskInput! @spread): Task @create
+        }
+
+        input CreateTaskInput {
+            name: String!
+            user: CreateUserRelation @belongsTo
+        }
+
+        input CreateUserRelation {
+            connect: ID
+            create: CreateUserInput
+        }
+
+        input CreateUserInput {
+            name: String!
+        }
+        GRAPHQL . self::PLACEHOLDER_QUERY;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            createTask(input: {
+                name: "foo"
+                user: {
+                    create: {
+                        name: "New User"
+                    }
+                }
+            }) {
+                id
+                name
+                user {
+                    id
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'createTask' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'user' => [
+                        'id' => '1',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testUpdateWithConnectBelongsToOnInputField(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Task {
+            id: ID!
+            name: String!
+            user: User @belongsTo
+        }
+
+        type User {
+            id: ID!
+            name: String!
+        }
+
+        type Mutation {
+            updateTask(input: UpdateTaskInput! @spread): Task @update
+        }
+
+        input UpdateTaskInput {
+            id: ID!
+            name: String
+            user: UpdateUserRelation @belongsTo
+        }
+
+        input UpdateUserRelation {
+            connect: ID
+            create: CreateUserInput
+            disconnect: Boolean
+        }
+
+        input CreateUserInput {
+            name: String!
+        }
+        GRAPHQL . self::PLACEHOLDER_QUERY;
+
+        factory(Task::class)->create();
+        factory(User::class)->create();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            updateTask(input: {
+                id: 1
+                name: "updated"
+                user: {
+                    connect: 1
+                }
+            }) {
+                id
+                name
+                user {
+                    id
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'updateTask' => [
+                    'id' => '1',
+                    'name' => 'updated',
+                    'user' => [
+                        'id' => '1',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testUpdateWithCreateBelongsToOnInputField(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Task {
+            id: ID!
+            name: String!
+            user: User @belongsTo
+        }
+
+        type User {
+            id: ID!
+            name: String!
+        }
+
+        type Mutation {
+            updateTask(input: UpdateTaskInput! @spread): Task @update
+        }
+
+        input UpdateTaskInput {
+            id: ID!
+            name: String
+            user: UpdateUserRelation @belongsTo
+        }
+
+        input UpdateUserRelation {
+            connect: ID
+            create: CreateUserInput
+            disconnect: Boolean
+        }
+
+        input CreateUserInput {
+            name: String!
+        }
+        GRAPHQL . self::PLACEHOLDER_QUERY;
+
+        factory(Task::class)->create();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            updateTask(input: {
+                id: 1
+                name: "updated"
+                user: {
+                    create: {
+                        name: "New User"
+                    }
+                }
+            }) {
+                id
+                name
+                user {
+                    id
+                    name
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'updateTask' => [
+                    'id' => '1',
+                    'name' => 'updated',
+                    'user' => [
+                        'id' => '1',
+                        'name' => 'New User',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testUpdateAndDisconnectBelongsToOnInputField(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Task {
+            id: ID!
+            name: String!
+            user: User @belongsTo
+        }
+
+        type User {
+            id: ID!
+            name: String!
+        }
+
+        type Mutation {
+            updateTask(input: UpdateTaskInput! @spread): Task @update
+        }
+
+        input UpdateTaskInput {
+            id: ID!
+            name: String
+            user: UpdateUserRelation @belongsTo
+        }
+
+        input UpdateUserRelation {
+            connect: ID
+            create: CreateUserInput
+            disconnect: Boolean
+        }
+
+        input CreateUserInput {
+            name: String!
+        }
+        GRAPHQL . self::PLACEHOLDER_QUERY;
+
+        $user = factory(User::class)->create();
+        $task = factory(Task::class)->make();
+        $task->user()->associate($user);
+        $task->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            updateTask(input: {
+                id: 1
+                name: "updated"
+                user: {
+                    disconnect: true
+                }
+            }) {
+                id
+                name
+                user {
+                    id
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'updateTask' => [
+                    'id' => '1',
+                    'name' => 'updated',
+                    'user' => null,
+                ],
+            ],
+        ]);
+    }
+
+    public function testUpsertCreatesWithConnectBelongsToOnInputField(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Task {
+            id: ID!
+            name: String!
+            user: User @belongsTo
+        }
+
+        type User {
+            id: ID!
+            name: String!
+        }
+
+        type Mutation {
+            upsertTask(input: UpsertTaskInput! @spread): Task @upsert
+        }
+
+        input UpsertTaskInput {
+            id: ID
+            name: String!
+            user: UpsertUserRelation @belongsTo
+        }
+
+        input UpsertUserRelation {
+            connect: ID
+            create: CreateUserInput
+            disconnect: Boolean
+        }
+
+        input CreateUserInput {
+            name: String!
+        }
+        GRAPHQL . self::PLACEHOLDER_QUERY;
+
+        factory(User::class)->create();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            upsertTask(input: {
+                name: "foo"
+                user: {
+                    connect: 1
+                }
+            }) {
+                id
+                name
+                user {
+                    id
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'upsertTask' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'user' => [
+                        'id' => '1',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testUpsertUpdatesWithConnectBelongsToOnInputField(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Task {
+            id: ID!
+            name: String!
+            user: User @belongsTo
+        }
+
+        type User {
+            id: ID!
+            name: String!
+        }
+
+        type Mutation {
+            upsertTask(input: UpsertTaskInput! @spread): Task @upsert
+        }
+
+        input UpsertTaskInput {
+            id: ID
+            name: String!
+            user: UpsertUserRelation @belongsTo
+        }
+
+        input UpsertUserRelation {
+            connect: ID
+            create: CreateUserInput
+            disconnect: Boolean
+        }
+
+        input CreateUserInput {
+            name: String!
+        }
+        GRAPHQL . self::PLACEHOLDER_QUERY;
+
+        $task = factory(Task::class)->create();
+        $user = factory(User::class)->create();
+
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+        mutation {
+            upsertTask(input: {
+                id: {$task->id}
+                name: "updated"
+                user: {
+                    connect: {$user->id}
+                }
+            }) {
+                id
+                name
+                user {
+                    id
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'upsertTask' => [
+                    'id' => "{$task->id}",
+                    'name' => 'updated',
+                    'user' => [
+                        'id' => "{$user->id}",
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testCreateWithNotNullForeignKeyConnectOnInputField(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Post {
+            id: ID!
+            title: String!
+            task: Task @belongsTo
+        }
+
+        type Task {
+            id: ID!
+            name: String!
+        }
+
+        type Mutation {
+            createPost(input: CreatePostInput! @spread): Post @create
+        }
+
+        input CreatePostInput {
+            title: String!
+            task: CreateTaskRelation @belongsTo
+        }
+
+        input CreateTaskRelation {
+            connect: ID
+        }
+        GRAPHQL . self::PLACEHOLDER_QUERY;
+
+        factory(Task::class)->create();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            createPost(input: {
+                title: "My Post"
+                task: {
+                    connect: 1
+                }
+            }) {
+                id
+                title
+                task {
+                    id
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'createPost' => [
+                    'id' => '1',
+                    'title' => 'My Post',
+                    'task' => [
+                        'id' => '1',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testCreateWithMismatchedFieldNameUsingRelationArgOnInputField(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Post {
+            id: ID!
+            title: String!
+            task: Task @belongsTo
+        }
+
+        type Task {
+            id: ID!
+            name: String!
+        }
+
+        type User {
+            id: ID!
+            name: String!
+        }
+
+        type Mutation {
+            createPost(input: CreatePostInput! @spread): Post @create
+        }
+
+        input CreatePostInput {
+            title: String!
+            task: CreateTaskRelation @belongsTo
+            owner: CreateUserRelation @belongsTo(relation: "user")
+        }
+
+        input CreateTaskRelation {
+            connect: ID
+        }
+
+        input CreateUserRelation {
+            connect: ID
+        }
+        GRAPHQL . self::PLACEHOLDER_QUERY;
+
+        factory(Task::class)->create();
+        $user = factory(User::class)->create();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            createPost(input: {
+                title: "My Post"
+                task: {
+                    connect: 1
+                }
+                owner: {
+                    connect: 1
+                }
+            }) {
+                id
+                title
+                task {
+                    id
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'createPost' => [
+                    'id' => '1',
+                    'title' => 'My Post',
+                    'task' => [
+                        'id' => '1',
+                    ],
+                ],
+            ],
+        ]);
+
+        $post = Post::findOrFail(1);
+        $this->assertSame($user->id, $post->user_id);
     }
 }

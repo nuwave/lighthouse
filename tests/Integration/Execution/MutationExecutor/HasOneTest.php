@@ -546,4 +546,295 @@ final class HasOneTest extends DBTestCase
             ],
         ]);
     }
+
+    public function testCreateWithNewHasOneOnInputField(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Task {
+            id: ID!
+            name: String!
+            post: Post @hasOne
+        }
+
+        type Post {
+            id: ID!
+            title: String!
+            body: String!
+        }
+
+        type Mutation {
+            createTask(input: CreateTaskInput! @spread): Task @create
+        }
+
+        input CreateTaskInput {
+            name: String!
+            post: CreatePostRelation @hasOne
+        }
+
+        input CreatePostRelation {
+            create: CreatePostInput
+        }
+
+        input CreatePostInput {
+            title: String!
+        }
+        GRAPHQL . self::PLACEHOLDER_QUERY;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            createTask(input: {
+                name: "foo"
+                post: {
+                    create: {
+                        title: "bar"
+                    }
+                }
+            }) {
+                id
+                name
+                post {
+                    id
+                    title
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'createTask' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'post' => [
+                        'id' => '1',
+                        'title' => 'bar',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testUpdateWithCreateHasOneOnInputField(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Task {
+            id: ID!
+            name: String!
+            post: Post @hasOne
+        }
+
+        type Post {
+            id: ID!
+            title: String!
+            body: String!
+        }
+
+        type Mutation {
+            updateTask(input: UpdateTaskInput! @spread): Task @update
+        }
+
+        input UpdateTaskInput {
+            id: ID!
+            name: String
+            post: UpdatePostRelation @hasOne
+        }
+
+        input UpdatePostRelation {
+            create: CreatePostInput
+            update: UpdatePostInput
+            delete: ID
+        }
+
+        input CreatePostInput {
+            title: String!
+        }
+
+        input UpdatePostInput {
+            id: ID!
+            title: String
+        }
+        GRAPHQL . self::PLACEHOLDER_QUERY;
+
+        factory(Task::class)->create();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            updateTask(input: {
+                id: 1
+                name: "updated"
+                post: {
+                    create: {
+                        title: "new post"
+                    }
+                }
+            }) {
+                id
+                name
+                post {
+                    id
+                    title
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'updateTask' => [
+                    'id' => '1',
+                    'name' => 'updated',
+                    'post' => [
+                        'id' => '1',
+                        'title' => 'new post',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testUpdateWithUpdateHasOneOnInputField(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Task {
+            id: ID!
+            name: String!
+            post: Post @hasOne
+        }
+
+        type Post {
+            id: ID!
+            title: String!
+            body: String!
+        }
+
+        type Mutation {
+            updateTask(input: UpdateTaskInput! @spread): Task @update
+        }
+
+        input UpdateTaskInput {
+            id: ID!
+            name: String
+            post: UpdatePostRelation @hasOne
+        }
+
+        input UpdatePostRelation {
+            create: CreatePostInput
+            update: UpdatePostInput
+            delete: ID
+        }
+
+        input CreatePostInput {
+            title: String!
+        }
+
+        input UpdatePostInput {
+            id: ID!
+            title: String
+        }
+        GRAPHQL . self::PLACEHOLDER_QUERY;
+
+        $task = factory(Task::class)->create();
+        $post = factory(Post::class)->make();
+        $post->title = 'original';
+        $post->task()->associate($task);
+        $post->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            updateTask(input: {
+                id: 1
+                post: {
+                    update: {
+                        id: 1
+                        title: "changed"
+                    }
+                }
+            }) {
+                id
+                post {
+                    id
+                    title
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'updateTask' => [
+                    'id' => '1',
+                    'post' => [
+                        'id' => '1',
+                        'title' => 'changed',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testUpdateWithDeleteHasOneOnInputField(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Task {
+            id: ID!
+            name: String!
+            post: Post @hasOne
+        }
+
+        type Post {
+            id: ID!
+            title: String!
+            body: String!
+        }
+
+        type Mutation {
+            updateTask(input: UpdateTaskInput! @spread): Task @update
+        }
+
+        input UpdateTaskInput {
+            id: ID!
+            name: String
+            post: UpdatePostRelation @hasOne
+        }
+
+        input UpdatePostRelation {
+            create: CreatePostInput
+            update: UpdatePostInput
+            delete: ID
+        }
+
+        input CreatePostInput {
+            title: String!
+        }
+
+        input UpdatePostInput {
+            id: ID!
+            title: String
+        }
+        GRAPHQL . self::PLACEHOLDER_QUERY;
+
+        $task = factory(Task::class)->create();
+        $post = factory(Post::class)->make();
+        $post->task()->associate($task);
+        $post->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+        mutation {
+            updateTask(input: {
+                id: 1
+                post: {
+                    delete: {$post->id}
+                }
+            }) {
+                id
+                post {
+                    id
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'updateTask' => [
+                    'id' => '1',
+                    'post' => null,
+                ],
+            ],
+        ]);
+
+        $this->assertNull(Post::find($post->id));
+    }
 }
