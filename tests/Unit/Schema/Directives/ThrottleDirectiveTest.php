@@ -113,7 +113,7 @@ final class ThrottleDirectiveTest extends TestCase
             ->method('hit');
 
         // create a context with null request
-        $this->app->singleton(CreatesContext::class, static fn (): CreatesContext => new class() implements CreatesContext {
+        $this->app->singleton(CreatesContext::class, static fn (): CreatesContext => new class implements CreatesContext {
             public function generate(?Request $request): GraphQLContext
             {
                 return new FooContext();
