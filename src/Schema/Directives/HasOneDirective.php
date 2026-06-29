@@ -2,13 +2,19 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-class HasOneDirective extends RelationDirective
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Nuwave\Lighthouse\Execution\Arguments\NestedOneToOne;
+use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
+
+class HasOneDirective extends RelationDirective implements ArgResolver
 {
     public static function definition(): string
     {
         return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Corresponds to [the Eloquent relationship HasOne](https://laravel.com/docs/eloquent-relationships#one-to-one).
+When used on an input field, handles nested mutations for the HasOne relationship.
 """
 directive @hasOne(
   """
@@ -21,7 +27,16 @@ directive @hasOne(
   Apply scopes to the underlying query.
   """
   scopes: [String!]
-) on FIELD_DEFINITION
+) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
 GRAPHQL;
+    }
+
+    public function __invoke(mixed $root, mixed $value): void
+    {
+        assert($root instanceof Model);
+        $relationName = $this->directiveArgValue('relation') ?? $this->nodeName();
+        $relation = $root->{$relationName}();
+        assert($relation instanceof HasOne);
+        (new NestedOneToOne($relationName))($root, $value);
     }
 }

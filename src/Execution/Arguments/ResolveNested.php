@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
+use Nuwave\Lighthouse\Support\Contracts\PreSaveArgResolver;
 
 class ResolveNested implements ArgResolver
 {
@@ -25,13 +26,30 @@ class ResolveNested implements ArgResolver
         [$nestedArgs, $regularArgs] = ($this->argPartitioner)($args, $root);
         assert($nestedArgs instanceof ArgumentSet);
 
+        $preSaveArgs = new ArgumentSet();
+        $postSaveArgs = new ArgumentSet();
+        foreach ($nestedArgs->arguments as $name => $nested) {
+            if ($nested->resolver instanceof PreSaveArgResolver) {
+                $preSaveArgs->arguments[$name] = $nested;
+            } else {
+                $postSaveArgs->arguments[$name] = $nested;
+            }
+        }
+
+        foreach ($preSaveArgs->arguments as $nested) {
+            $resolver = $nested->resolver;
+            assert($resolver !== null, 'Resolver must be set because we partitioned for it.');
+            $resolver($root, $nested->value);
+        }
+
         if ($this->previous !== null) {
             $root = ($this->previous)($root, $regularArgs);
         }
 
-        foreach ($nestedArgs->arguments as $nested) {
-            // @phpstan-ignore-next-line we know the resolver is there because we partitioned for it
-            ($nested->resolver)($root, $nested->value);
+        foreach ($postSaveArgs->arguments as $nested) {
+            $resolver = $nested->resolver;
+            assert($resolver !== null, 'Resolver must be set because we partitioned for it.');
+            $resolver($root, $nested->value);
         }
 
         return $root;
