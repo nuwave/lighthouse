@@ -63,8 +63,12 @@ class SaveModel implements ArgResolver
         }
 
         foreach ($preSave->arguments as $nested) {
+            if ($nested->value === null) {
+                continue;
+            }
+
             $resolver = $nested->resolver;
-            assert($resolver instanceof PreSaveArgResolver);
+            assert($resolver instanceof PreSaveArgResolver, 'Resolver must be a PreSaveArgResolver because we partitioned for it.');
             $resolver($model, $nested->value);
         }
 

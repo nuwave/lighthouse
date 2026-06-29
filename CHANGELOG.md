@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Support `@belongsTo` and `@hasOne` on `INPUT_FIELD_DEFINITION` for explicit nested mutation handling https://github.com/nuwave/lighthouse/pull/2777
+
 ## v6.67.0
 
 ### Changed

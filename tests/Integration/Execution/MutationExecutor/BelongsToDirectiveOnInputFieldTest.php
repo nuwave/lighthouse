@@ -89,6 +89,7 @@ final class BelongsToDirectiveOnInputFieldTest extends DBTestCase
     input CreatePostInput {
         title: String!
         task: CreateTaskRelation @belongsTo
+        owner: CreateUserRelation @belongsTo(relation: "user")
     }
 
     input CreateTaskRelation {
@@ -361,5 +362,44 @@ final class BelongsToDirectiveOnInputFieldTest extends DBTestCase
                 ],
             ],
         ]);
+    }
+
+    public function testCreateWithMismatchedFieldNameUsingRelationArg(): void
+    {
+        $task = factory(Task::class)->create();
+        $user = factory(User::class)->create();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            createPost(input: {
+                title: "My Post"
+                task: {
+                    connect: 1
+                }
+                owner: {
+                    connect: 1
+                }
+            }) {
+                id
+                title
+                task {
+                    id
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'createPost' => [
+                    'id' => '1',
+                    'title' => 'My Post',
+                    'task' => [
+                        'id' => '1',
+                    ],
+                ],
+            ],
+        ]);
+
+        $post = \Tests\Utils\Models\Post::findOrFail(1);
+        $this->assertSame($user->id, $post->user_id);
     }
 }

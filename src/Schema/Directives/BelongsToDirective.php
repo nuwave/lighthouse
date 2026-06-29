@@ -35,7 +35,7 @@ GRAPHQL;
 
     public function __invoke(mixed $root, mixed $value): void
     {
-        assert($root instanceof Model);
+        assert($root instanceof Model, 'BelongsToDirective is only used as an ArgResolver on Eloquent models.');
         $relationName = $this->directiveArgValue('relation') ?? $this->nodeName();
         $relation = $root->{$relationName}();
         assert(

@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Nuwave\Lighthouse\Execution\Arguments\NestedOneToOne;
+use Nuwave\Lighthouse\Execution\Arguments\ResolveNested;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
 class HasOneDirective extends RelationDirective implements ArgResolver
@@ -33,10 +34,10 @@ GRAPHQL;
 
     public function __invoke(mixed $root, mixed $value): void
     {
-        assert($root instanceof Model);
+        assert($root instanceof Model, 'HasOneDirective is only used as an ArgResolver on Eloquent models.');
         $relationName = $this->directiveArgValue('relation') ?? $this->nodeName();
         $relation = $root->{$relationName}();
-        assert($relation instanceof HasOne);
-        (new NestedOneToOne($relationName))($root, $value);
+        assert($relation instanceof HasOne, "Use @hasOne only for HasOne relations, not for: {$relationName}.");
+        (new ResolveNested(new NestedOneToOne($relationName)))($root, $value);
     }
 }
