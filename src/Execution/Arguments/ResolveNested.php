@@ -16,7 +16,7 @@ class ResolveNested implements ArgResolver
     public function __construct(?callable $previous = null, ?callable $argPartitioner = null)
     {
         $this->previous = $previous;
-        $this->argPartitioner = $argPartitioner ?? [ArgPartitioner::class, 'nestedArgResolvers'];
+        $this->argPartitioner = $argPartitioner ?? [ArgPartitioner::class, 'postSaveArgResolvers'];
     }
 
     /** @param  ArgumentSet  $args */

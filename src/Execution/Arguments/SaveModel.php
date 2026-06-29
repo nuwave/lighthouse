@@ -37,7 +37,7 @@ class SaveModel implements ArgResolver
             BelongsTo::class,
         );
 
-        [$preSave, $remaining] = ArgPartitioner::preSaveResolvers($remaining);
+        [$preSave, $remaining] = ArgPartitioner::preSaveArgResolvers($remaining);
 
         $argsToFill = $remaining->toArray();
 

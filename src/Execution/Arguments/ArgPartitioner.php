@@ -17,11 +17,14 @@ use Nuwave\Lighthouse\Support\Utils;
 class ArgPartitioner
 {
     /**
-     * Partition the arguments into nested and regular.
+     * Partition the arguments into post-save and regular.
      *
-     * @return array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>
+     * @return array{
+     *   0: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet,
+     *   1: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet,
+     * }
      */
-    public static function nestedArgResolvers(ArgumentSet $argumentSet, mixed $root): array
+    public static function postSaveArgResolvers(ArgumentSet $argumentSet, mixed $root): array
     {
         $model = $root instanceof Model
             ? new \ReflectionClass($root)
@@ -33,17 +36,24 @@ class ArgPartitioner
 
         return static::partition(
             $argumentSet,
-            static fn (string $name, Argument $argument): bool => isset($argument->resolver)
-                && ! $argument->resolver instanceof PreSaveArgResolver,
+            static function (string $name, Argument $argument): bool {
+                $resolver = $argument->resolver;
+
+                return $resolver !== null
+                    && ! $resolver instanceof PreSaveArgResolver;
+            },
         );
     }
 
     /**
-     * Partition arguments into those with PreSaveArgResolver and the rest.
+     * Partition arguments into those with a pre-save resolver and the rest.
      *
-     * @return array{0: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet, 1: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet}
+     * @return array{
+     *   0: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet,
+     *   1: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet,
+     * }
      */
-    public static function preSaveResolvers(ArgumentSet $argumentSet): array
+    public static function preSaveArgResolvers(ArgumentSet $argumentSet): array
     {
         return static::partition(
             $argumentSet,
@@ -73,7 +83,10 @@ class ArgPartitioner
      *   ]
      * ]
      *
-     * @return array{0: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet, 1: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet}
+     * @return array{
+     *   0: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet,
+     *   1: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet,
+     * }
      */
     public static function relationMethods(
         ArgumentSet $argumentSet,
@@ -158,7 +171,10 @@ class ArgPartitioner
      *
      * @param  callable(string $name, \Nuwave\Lighthouse\Execution\Arguments\Argument $argument): bool  $predicate
      *
-     * @return array{0: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet, 1: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet}
+     * @return array{
+     *   0: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet,
+     *   1: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet,
+     * }
      */
     public static function partition(ArgumentSet $argumentSet, callable $predicate): array
     {
