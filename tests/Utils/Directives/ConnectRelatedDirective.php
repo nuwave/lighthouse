@@ -16,7 +16,7 @@ final class ConnectRelatedDirective extends BaseDirective implements PreSaveArgR
         GRAPHQL;
     }
 
-    /** @param Model $parent */
+    /** @param  Model  $parent */
     public function __invoke($parent, $id): void
     {
         $relationName = $this->directiveArgValue('relation')
