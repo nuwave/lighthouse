@@ -106,7 +106,7 @@ final class AggregateDirectiveTest extends DBTestCase
             ->create()
             ->each(static function (User $user, int $index): void {
                 $task = factory(Task::class)->make();
-                \PHPUnit\Framework\Assert::assertInstanceOf(Task::class, $task);
+                self::assertInstanceOf(Task::class, $task);
                 $task->difficulty = $index;
                 $task->user()->associate($user);
                 $task->save();
