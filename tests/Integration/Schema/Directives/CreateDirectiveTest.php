@@ -635,4 +635,51 @@ final class CreateDirectiveTest extends DBTestCase
             ],
         ]);
     }
+
+    public function testPreSaveArgResolverReceivesNullForDisassociation(): void
+    {
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Task {
+            id: ID!
+            name: String!
+            user: User @belongsTo
+        }
+
+        type User {
+            id: ID!
+        }
+
+        type Mutation {
+            createTask(input: CreateTaskInput! @spread): Task @create
+        }
+
+        input CreateTaskInput {
+            name: String!
+            owner: ID @connectRelated(relation: "user")
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            createTask(input: {
+                name: "My task"
+                owner: null
+            }) {
+                id
+                name
+                user {
+                    id
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'createTask' => [
+                    'id' => '1',
+                    'name' => 'My task',
+                    'user' => null,
+                ],
+            ],
+        ]);
+    }
 }
