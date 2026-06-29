@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
+use Nuwave\Lighthouse\Support\Contracts\PreSaveArgResolver;
 use Nuwave\Lighthouse\Support\Utils;
 
 class ArgPartitioner
@@ -32,7 +33,20 @@ class ArgPartitioner
 
         return static::partition(
             $argumentSet,
-            static fn (string $name, Argument $argument): bool => isset($argument->resolver),
+            static fn (string $name, Argument $argument): bool => isset($argument->resolver) && ! $argument->resolver instanceof PreSaveArgResolver,
+        );
+    }
+
+    /**
+     * Partition arguments into those with PreSaveArgResolver and the rest.
+     *
+     * @return array{0: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet, 1: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet}
+     */
+    public static function preSaveResolvers(ArgumentSet $argumentSet): array
+    {
+        return static::partition(
+            $argumentSet,
+            static fn (string $name, Argument $argument): bool => $argument->resolver instanceof PreSaveArgResolver,
         );
     }
 

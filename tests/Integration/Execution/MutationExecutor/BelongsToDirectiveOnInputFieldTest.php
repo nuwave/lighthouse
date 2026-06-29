@@ -20,10 +20,17 @@ final class BelongsToDirectiveOnInputFieldTest extends DBTestCase
         name: String!
     }
 
+    type Post {
+        id: ID!
+        title: String!
+        task: Task @belongsTo
+    }
+
     type Mutation {
         createTask(input: CreateTaskInput! @spread): Task @create
         updateTask(input: UpdateTaskInput! @spread): Task @update
         upsertTask(input: UpsertTaskInput! @spread): Task @upsert
+        createPost(input: CreatePostInput! @spread): Post @create
     }
 
     input CreateTaskInput {
@@ -77,6 +84,15 @@ final class BelongsToDirectiveOnInputFieldTest extends DBTestCase
     input UpsertUserInput {
         id: ID
         name: String
+    }
+
+    input CreatePostInput {
+        title: String!
+        task: CreateTaskRelation @belongsTo
+    }
+
+    input CreateTaskRelation {
+        connect: ID
     }
     GRAPHQL . self::PLACEHOLDER_QUERY;
 
@@ -309,6 +325,38 @@ final class BelongsToDirectiveOnInputFieldTest extends DBTestCase
                     'name' => 'updated',
                     'user' => [
                         'id' => "{$user->id}",
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testCreateWithNotNullForeignKeyConnect(): void
+    {
+        $task = factory(Task::class)->create();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            createPost(input: {
+                title: "My Post"
+                task: {
+                    connect: 1
+                }
+            }) {
+                id
+                title
+                task {
+                    id
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'createPost' => [
+                    'id' => '1',
+                    'title' => 'My Post',
+                    'task' => [
+                        'id' => '1',
                     ],
                 ],
             ],

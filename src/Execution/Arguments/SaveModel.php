@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
+use Nuwave\Lighthouse\Support\Contracts\PreSaveArgResolver;
 
 class SaveModel implements ArgResolver
 {
@@ -36,6 +37,8 @@ class SaveModel implements ArgResolver
             BelongsTo::class,
         );
 
+        [$preSave, $remaining] = ArgPartitioner::preSaveResolvers($remaining);
+
         $argsToFill = $remaining->toArray();
 
         // Use all the remaining attributes and fill the model
@@ -57,6 +60,12 @@ class SaveModel implements ArgResolver
             assert($morphTo instanceof MorphTo);
             $morphToResolver = new ResolveNested(new NestedMorphTo($morphTo));
             $morphToResolver($model, $nestedOperations->value);
+        }
+
+        foreach ($preSave->arguments as $nested) {
+            $resolver = $nested->resolver;
+            assert($resolver instanceof PreSaveArgResolver);
+            $resolver($model, $nested->value);
         }
 
         if ($this->parentRelation instanceof HasOneOrMany) {
