@@ -585,37 +585,52 @@ final class CreateDirectiveTest extends DBTestCase
         GRAPHQL);
     }
 
-    public function testPreSaveArgResolverIsCalledBeforeSave(): void
+    public function testPreSaveArgResolverSetsForeignKeyBeforeSave(): void
     {
+        $user = factory(User::class)->create();
+
         $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
-        type Company {
+        type Task {
             id: ID!
             name: String!
+            user: User @belongsTo
+        }
+
+        type User {
+            id: ID!
         }
 
         type Mutation {
-            createCompany(input: CreateCompanyInput! @spread): Company @create
+            createTask(input: CreateTaskInput! @spread): Task @create
         }
 
-        input CreateCompanyInput {
-            name: String! @uppercase
+        input CreateTaskInput {
+            name: String!
+            owner: ID @connectRelated(relation: "user")
         }
         GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            createCompany(input: {
-                name: "foo"
+            createTask(input: {
+                name: "My task"
+                owner: "{$user->id}"
             }) {
                 id
                 name
+                user {
+                    id
+                }
             }
         }
         GRAPHQL)->assertJson([
             'data' => [
-                'createCompany' => [
+                'createTask' => [
                     'id' => '1',
-                    'name' => 'FOO',
+                    'name' => 'My task',
+                    'user' => [
+                        'id' => "{$user->id}",
+                    ],
                 ],
             ],
         ]);
