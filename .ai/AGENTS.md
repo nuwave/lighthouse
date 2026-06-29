@@ -23,10 +23,12 @@ make bench          # Run PHPBench benchmarks
 ### Running a Single Test
 
 ```bash
-docker compose exec php vendor/bin/phpunit --filter=TestClassName
-docker compose exec php vendor/bin/phpunit --filter=testMethodName
-docker compose exec php vendor/bin/phpunit tests/Unit/Path/To/TestFile.php
+docker compose run --rm php vendor/bin/phpunit --filter=TestClassName
+docker compose run --rm php vendor/bin/phpunit --filter=testMethodName
+docker compose run --rm php vendor/bin/phpunit tests/Unit/Path/To/TestFile.php
 ```
+
+The `php` service is not long-running — use `docker compose run --rm` instead of `docker compose exec`.
 
 ## Architecture
 
