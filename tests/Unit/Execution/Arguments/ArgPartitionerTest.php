@@ -25,7 +25,7 @@ final class ArgPartitionerTest extends TestCase
         $nested->directives->push(new Nested());
         $argumentSet->arguments['nested'] = $nested;
 
-        [$nestedArgs, $regularArgs] = ArgPartitioner::nestedArgResolvers($argumentSet, null);
+        [$nestedArgs, $regularArgs] = ArgPartitioner::postSaveArgResolvers($argumentSet, null);
 
         $this->assertSame(
             ['regular' => $regular],
