@@ -70,7 +70,10 @@ GRAPHQL;
     /**
      * Decodes a global id given as an argument.
      *
-     * @return string|array{0: string, 1: string}|null
+     * @return string|array{
+     *   0: string,
+     *   1: string,
+     * }|null
      */
     public function sanitize(mixed $argumentValue): string|array|null
     {

@@ -13,7 +13,10 @@ interface GlobalId
     /**
      * Split a global id into the type and the id it contains.
      *
-     * @return array{0: string, 1: string} A tuple of [$type, $id], e.g. ['User', '123']
+     * @return array{
+     *   0: string,
+     *   1: string,
+     * } A tuple of [$type, $id], e.g. ['User', '123']
      */
     public function decode(string $globalID): array;
 
