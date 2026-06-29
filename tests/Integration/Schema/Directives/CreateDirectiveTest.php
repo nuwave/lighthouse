@@ -584,4 +584,40 @@ final class CreateDirectiveTest extends DBTestCase
         }
         GRAPHQL);
     }
+
+    public function testPreSaveArgResolverIsCalledBeforeSave(): void
+    {
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Company {
+            id: ID!
+            name: String!
+        }
+
+        type Mutation {
+            createCompany(input: CreateCompanyInput! @spread): Company @create
+        }
+
+        input CreateCompanyInput {
+            name: String! @uppercase
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            createCompany(input: {
+                name: "foo"
+            }) {
+                id
+                name
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'createCompany' => [
+                    'id' => '1',
+                    'name' => 'FOO',
+                ],
+            ],
+        ]);
+    }
 }

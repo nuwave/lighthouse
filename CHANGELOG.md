@@ -11,7 +11,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
-- Support `@belongsTo` and `@hasOne` on `INPUT_FIELD_DEFINITION` for explicit nested mutation handling https://github.com/nuwave/lighthouse/pull/2777
+- Add `PreSaveArgResolver` interface for custom directives that resolve before `$model->save()` https://github.com/nuwave/lighthouse/pull/2777
 
 ## v6.67.0
 
