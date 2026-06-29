@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
+use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 use Nuwave\Lighthouse\Support\Contracts\PreSaveArgResolver;
 
@@ -36,14 +37,18 @@ class ResolveNested implements ArgResolver
             }
         }
 
+        if ($this->previous !== null) {
+            $root = ($this->previous)($root, $regularArgs);
+        }
+
         foreach ($preSaveArgs->arguments as $nested) {
             $resolver = $nested->resolver;
             assert($resolver !== null, 'Resolver must be set because we partitioned for it.');
             $resolver($root, $nested->value);
         }
 
-        if ($this->previous !== null) {
-            $root = ($this->previous)($root, $regularArgs);
+        if ($preSaveArgs->arguments !== [] && $root instanceof Model) {
+            $root->save();
         }
 
         foreach ($postSaveArgs->arguments as $nested) {

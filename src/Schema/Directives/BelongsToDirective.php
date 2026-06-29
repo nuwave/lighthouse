@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Nuwave\Lighthouse\Execution\Arguments\NestedBelongsTo;
 use Nuwave\Lighthouse\Execution\Arguments\ResolveNested;
 use Nuwave\Lighthouse\Support\Contracts\PreSaveArgResolver;
@@ -37,7 +38,10 @@ GRAPHQL;
         assert($root instanceof Model);
         $relationName = $this->directiveArgValue('relation') ?? $this->nodeName();
         $relation = $root->{$relationName}();
-        assert($relation instanceof BelongsTo);
+        assert(
+            $relation instanceof BelongsTo && ! $relation instanceof MorphTo,
+            "Use @morphTo for MorphTo relations, @belongsTo does not support them: {$relationName}.",
+        );
         (new ResolveNested(new NestedBelongsTo($relation)))($root, $value);
     }
 }
