@@ -22,6 +22,9 @@ interface SaveAwareArgResolver extends ArgResolver
      *
      * Only consulted when the root is a Model.
      * In non-Model contexts, this method is not called and the resolver executes normally.
+     *
+     * Implementations must base the decision on the model class and its relations,
+     * not on instance state — the model may not yet be hydrated when this is called.
      */
     public function runBeforeSave(Model $model): bool;
 }

@@ -75,7 +75,7 @@ class ArgPartitioner
     }
 
     /**
-     * Requires that resolvers have been attached via nestedArgResolvers() first.
+     * Requires that attachNestedArgResolver() has run on the arguments first.
      *
      * @return array{
      *   0: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet,
