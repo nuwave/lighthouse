@@ -3,19 +3,38 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Nuwave\Lighthouse\Execution\Arguments\ArgPartitioner;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Execution\Arguments\ResolveNested;
 use Nuwave\Lighthouse\Execution\TransactionalMutations;
-use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Support\Contracts\SaveAwareArgResolver;
 use Nuwave\Lighthouse\Support\Utils;
 
-abstract class ModelMutationDirective extends BaseDirective implements FieldResolver, ArgResolver
+abstract class ModelMutationDirective extends BaseDirective implements FieldResolver, SaveAwareArgResolver
 {
     public function __construct(
         protected TransactionalMutations $transactionalMutations,
     ) {}
+
+    protected function relationName(): string
+    {
+        return $this->directiveArgValue(
+            'relation',
+            $this->nodeName(),
+        );
+    }
+
+    public function runBeforeSave(Model $model): bool
+    {
+        return ArgPartitioner::methodReturnsRelation(
+            new \ReflectionClass($model),
+            $this->relationName(),
+            BelongsTo::class,
+        );
+    }
 
     /**
      * @param  Model  $model
@@ -25,13 +44,7 @@ abstract class ModelMutationDirective extends BaseDirective implements FieldReso
      */
     public function __invoke($model, $args): mixed
     {
-        $relationName = $this->directiveArgValue(
-            'relation',
-            // Use the name of the argument if no explicit relation name is given
-            $this->nodeName(),
-        );
-
-        $relation = $model->{$relationName}();
+        $relation = $model->{$this->relationName()}();
         assert($relation instanceof Relation);
 
         $related = $relation->make(); // @phpstan-ignore method.notFound (Relation delegates to Builder)
