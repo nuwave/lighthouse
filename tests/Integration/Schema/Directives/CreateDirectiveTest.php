@@ -811,4 +811,61 @@ final class CreateDirectiveTest extends DBTestCase
             ],
         ]);
     }
+
+    public function testGeocodePreSaveArgResolverInsideNest(): void
+    {
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type User {
+            id: ID!
+            name: String!
+            latitude: Float
+            longitude: Float
+        }
+
+        type Mutation {
+            createUser(input: CreateUserInput! @spread): User @create
+        }
+
+        input CreateUserInput {
+            name: String!
+            nested: NestedInput @nest
+        }
+
+        input NestedInput {
+            location: LocationInput @geocode
+        }
+
+        input LocationInput {
+            lat: Float!
+            lng: Float!
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            createUser(input: {
+                name: "Nested Geo User"
+                nested: {
+                    location: {
+                        lat: 48.1351
+                        lng: 11.5820
+                    }
+                }
+            }) {
+                id
+                name
+                latitude
+                longitude
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'createUser' => [
+                    'name' => 'Nested Geo User',
+                    'latitude' => 48.1351,
+                    'longitude' => 11.582,
+                ],
+            ],
+        ]);
+    }
 }

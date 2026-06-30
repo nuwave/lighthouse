@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Execution\Arguments\ResolveNested;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
@@ -30,7 +31,15 @@ GRAPHQL;
         $resolveNested = new ResolveNested();
 
         return Utils::mapEach(
-            static fn (ArgumentSet $argumentSet): mixed => $resolveNested($root, $argumentSet),
+            static function (ArgumentSet $argumentSet) use ($resolveNested, $root): mixed {
+                $result = $resolveNested($root, $argumentSet);
+
+                if ($root instanceof Model && $root->isDirty()) {
+                    $root->save();
+                }
+
+                return $result;
+            },
             $args,
         );
     }

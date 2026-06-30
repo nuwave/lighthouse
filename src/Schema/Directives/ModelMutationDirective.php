@@ -65,7 +65,10 @@ abstract class ModelMutationDirective extends BaseDirective implements FieldReso
      */
     protected function executeMutation(Model $model, ArgumentSet|array $args, ?Relation $parentRelation = null): Model|array
     {
-        $update = new ResolveNested($this->makeExecutionFunction($parentRelation));
+        $update = new ResolveNested(
+            $this->makeExecutionFunction($parentRelation),
+            [ArgPartitioner::class, 'nestedArgResolversWithoutPreSave'],
+        );
 
         return Utils::mapEach(
             static fn (ArgumentSet $argumentSet): mixed => $update($model->newInstance(), $argumentSet),

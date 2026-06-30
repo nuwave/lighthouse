@@ -149,7 +149,7 @@ final class ArgPartitionerTest extends TestCase
         $saveAware->directives->push(new SaveAwareNested());
         $argumentSet->arguments['saveAware'] = $saveAware;
 
-        [$nestedArgs, $regularArgs] = ArgPartitioner::nestedArgResolvers($argumentSet, new User());
+        [$nestedArgs, $regularArgs] = ArgPartitioner::nestedArgResolversWithoutPreSave($argumentSet, new User());
 
         $this->assertSame(
             ['regular' => $regular, 'saveAware' => $saveAware],
