@@ -588,27 +588,27 @@ final class CreateDirectiveTest extends DBTestCase
     public function testUpsertBelongsToBeforeSave(): void
     {
         $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
-        type Task {
+        type Post {
             id: ID!
-            name: String!
-            user: User @belongsTo
+            title: String!
+            task: Task @belongsTo
         }
 
-        type User {
+        type Task {
             id: ID!
             name: String!
         }
 
         type Mutation {
-            createTask(input: CreateTaskInput! @spread): Task @create
+            createPost(input: CreatePostInput! @spread): Post @create
         }
 
-        input CreateTaskInput {
-            name: String!
-            user: CreateUserInput @upsert
+        input CreatePostInput {
+            title: String!
+            task: UpsertTaskInput @upsert
         }
 
-        input CreateUserInput {
+        input UpsertTaskInput {
             id: ID
             name: String!
         }
@@ -616,15 +616,15 @@ final class CreateDirectiveTest extends DBTestCase
 
         $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
-            createTask(input: {
-                name: "My task"
-                user: {
-                    name: "New User"
+            createPost(input: {
+                title: "My post"
+                task: {
+                    name: "New Task"
                 }
             }) {
                 id
-                name
-                user {
+                title
+                task {
                     id
                     name
                 }
@@ -632,11 +632,11 @@ final class CreateDirectiveTest extends DBTestCase
         }
         GRAPHQL)->assertJson([
             'data' => [
-                'createTask' => [
-                    'name' => 'My task',
-                    'user' => [
+                'createPost' => [
+                    'title' => 'My post',
+                    'task' => [
                         'id' => '1',
-                        'name' => 'New User',
+                        'name' => 'New Task',
                     ],
                 ],
             ],
@@ -644,6 +644,72 @@ final class CreateDirectiveTest extends DBTestCase
     }
 
     public function testUpsertBelongsToTakesPrecedenceOverImplicitRelation(): void
+    {
+        $task = new Task();
+        $task->name = 'Original name';
+        $task->save();
+
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Post {
+            id: ID!
+            title: String!
+            task: Task @belongsTo
+        }
+
+        type Task {
+            id: ID!
+            name: String!
+        }
+
+        type Mutation {
+            createPost(input: CreatePostInput! @spread): Post @create
+        }
+
+        input CreatePostInput {
+            title: String!
+            task: UpsertTaskInput @upsert
+        }
+
+        input UpsertTaskInput {
+            id: ID
+            name: String!
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+        mutation {
+            createPost(input: {
+                title: "My post"
+                task: {
+                    id: "{$task->id}"
+                    name: "Updated via directive"
+                }
+            }) {
+                id
+                title
+                task {
+                    id
+                    name
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'createPost' => [
+                    'title' => 'My post',
+                    'task' => [
+                        'id' => (string) $task->id,
+                        'name' => 'Updated via directive',
+                    ],
+                ],
+            ],
+        ]);
+
+        $task->refresh();
+        $this->assertSame('Updated via directive', $task->name);
+    }
+
+    public function testUpsertBelongsToWithNullValue(): void
     {
         $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Task {
@@ -676,14 +742,12 @@ final class CreateDirectiveTest extends DBTestCase
         mutation {
             createTask(input: {
                 name: "My task"
-                user: {
-                    name: "Created via directive"
-                }
+                user: null
             }) {
                 id
                 name
                 user {
-                    name
+                    id
                 }
             }
         }
@@ -691,9 +755,7 @@ final class CreateDirectiveTest extends DBTestCase
             'data' => [
                 'createTask' => [
                     'name' => 'My task',
-                    'user' => [
-                        'name' => 'Created via directive',
-                    ],
+                    'user' => null,
                 ],
             ],
         ]);

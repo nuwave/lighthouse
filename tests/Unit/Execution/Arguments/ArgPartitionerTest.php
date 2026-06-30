@@ -7,6 +7,7 @@ use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\Arguments\ArgPartitioner;
 use Nuwave\Lighthouse\Execution\Arguments\Argument;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
+use Nuwave\Lighthouse\Execution\Arguments\ResolveNested;
 use Tests\TestCase;
 use Tests\Unit\Execution\Arguments\Fixtures\Nested;
 use Tests\Unit\Execution\Arguments\Fixtures\SaveAwareNested;
@@ -160,5 +161,47 @@ final class ArgPartitionerTest extends TestCase
             [],
             $nestedArgs->arguments,
         );
+    }
+
+    public function testSaveAwareArgResolverExecutesWithNonModelRoot(): void
+    {
+        $argumentSet = new ArgumentSet();
+
+        $saveAwareResolver = new SaveAwareNested();
+
+        $saveAware = new Argument();
+        $saveAware->value = new ArgumentSet();
+        $saveAware->directives->push($saveAwareResolver);
+        $argumentSet->arguments['saveAware'] = $saveAware;
+
+        $nonModelRoot = new \stdClass();
+        $resolveNested = new ResolveNested();
+        $resolveNested($nonModelRoot, $argumentSet);
+
+        $this->assertTrue($saveAwareResolver->wasCalled, 'SaveAwareArgResolver should execute when root is not a Model');
+        $this->assertSame($nonModelRoot, $saveAwareResolver->receivedRoot);
+    }
+
+    public function testPreSaveNestedArgResolversIncludesNullValues(): void
+    {
+        $argumentSet = new ArgumentSet();
+
+        $saveAwareResolver = new SaveAwareNested();
+
+        $nullArg = new Argument();
+        $nullArg->value = null;
+        $nullArg->resolver = $saveAwareResolver;
+        $argumentSet->arguments['nullField'] = $nullArg;
+
+        $nonNullArg = new Argument();
+        $nonNullArg->value = new ArgumentSet();
+        $nonNullArg->resolver = $saveAwareResolver;
+        $argumentSet->arguments['nonNullField'] = $nonNullArg;
+
+        [$preSave, $remaining] = ArgPartitioner::preSaveNestedArgResolvers($argumentSet, new User());
+
+        $this->assertArrayHasKey('nullField', $preSave->arguments, 'Null-valued args should not be filtered from pre-save set');
+        $this->assertArrayHasKey('nonNullField', $preSave->arguments);
+        $this->assertSame([], $remaining->arguments);
     }
 }

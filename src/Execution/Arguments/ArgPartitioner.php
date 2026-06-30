@@ -19,9 +19,7 @@ class ArgPartitioner
     /**
      * Partition the arguments into nested (post-save) and regular.
      *
-     * Resolvers implementing SaveAwareArgResolver that return true from
-     * runBeforeSave() are excluded from the nested set when the root is a Model,
-     * allowing SaveModel to handle them before persisting.
+     * Resolvers implementing SaveAwareArgResolver that return true from runBeforeSave() are excluded from the nested set when the root is a Model, allowing SaveModel to handle them before persisting.
      *
      * @return array{
      *   0: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet,
@@ -46,20 +44,13 @@ class ArgPartitioner
                     return false;
                 }
 
-                if ($resolver instanceof SaveAwareArgResolver
-                    && $root instanceof Model
-                    && $resolver->runBeforeSave($root)
-                ) {
-                    return false;
-                }
-
-                return true;
+                return ! ($resolver instanceof SaveAwareArgResolver && $root instanceof Model && $resolver->runBeforeSave($root));
             },
         );
     }
 
     /**
-     * Partition arguments into those with a pre-save resolver and the rest.
+     * Requires that resolvers have been attached via nestedArgResolvers() first.
      *
      * @return array{
      *   0: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet,

@@ -8,7 +8,15 @@ use Nuwave\Lighthouse\Support\Contracts\SaveAwareArgResolver;
 
 final class SaveAwareNested extends BaseDirective implements SaveAwareArgResolver
 {
-    public function __invoke(mixed $root, $args): void {}
+    public bool $wasCalled = false;
+
+    public mixed $receivedRoot = null;
+
+    public function __invoke(mixed $root, $args): void
+    {
+        $this->wasCalled = true;
+        $this->receivedRoot = $root;
+    }
 
     public function runBeforeSave(Model $model): bool
     {

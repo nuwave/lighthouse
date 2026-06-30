@@ -38,12 +38,16 @@ abstract class ModelMutationDirective extends BaseDirective implements FieldReso
 
     /**
      * @param  Model  $model
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>  $args
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>|null  $args
      *
-     * @return \Illuminate\Database\Eloquent\Model|array<\Illuminate\Database\Eloquent\Model>
+     * @return \Illuminate\Database\Eloquent\Model|array<\Illuminate\Database\Eloquent\Model>|null
      */
     public function __invoke($model, $args): mixed
     {
+        if ($args === null) {
+            return null;
+        }
+
         $relation = $model->{$this->relationName()}();
         assert($relation instanceof Relation);
 

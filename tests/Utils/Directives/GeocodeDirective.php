@@ -28,7 +28,7 @@ final class GeocodeDirective extends BaseDirective implements SaveAwareArgResolv
     public function __invoke($model, $args): void
     {
         $address = $args->toArray();
-        $model->setAttribute('latitude', $address['lat'] ?? 0.0);
-        $model->setAttribute('longitude', $address['lng'] ?? 0.0);
+        $model->setAttribute('latitude', $address['lat']);
+        $model->setAttribute('longitude', $address['lng']);
     }
 }

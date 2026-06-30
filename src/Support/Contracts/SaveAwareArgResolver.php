@@ -21,8 +21,7 @@ interface SaveAwareArgResolver extends ArgResolver
      * for any ArgResolver that does not implement this interface).
      *
      * Only consulted when the root is a Model inside SaveModel's orchestration.
-     * In non-Model contexts (e.g. @nest), this method is not called and the
-     * resolver runs in the default post-save position.
+     * In non-Model contexts (e.g. @nest), this method is not called and the resolver runs in the default post-save position.
      */
     public function runBeforeSave(Model $model): bool;
 }
