@@ -11,7 +11,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
-- Add `PreSaveArgResolver` interface for custom directives that resolve before `$model->save()` https://github.com/nuwave/lighthouse/pull/2777
+- Add `SaveAwareArgResolver` interface for directives that need control over pre/post-save timing in mutations https://github.com/nuwave/lighthouse/pull/2777
 
 ## v6.67.0
 
