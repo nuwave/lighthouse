@@ -27,6 +27,7 @@ abstract class ModelMutationDirective extends BaseDirective implements FieldReso
         );
     }
 
+    /** Includes MorphTo (a BelongsTo subclass) — explicit directives shadow implicit relation detection. */
     public function runBeforeSave(Model $model): bool
     {
         return ArgPartitioner::methodReturnsRelation(
