@@ -23,7 +23,7 @@ final class GeocodeDirective extends BaseDirective implements SaveAwareArgResolv
 
     /**
      * @param  Model  $model
-     * @param  ArgumentSet  $args
+     * @param  ArgumentSet|null  $args
      */
     public function __invoke($model, $args): void
     {
