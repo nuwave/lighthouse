@@ -2,8 +2,8 @@
 
 ## Problem
 
-`@upsert` (and `@create`/`@update`) on `INPUT_FIELD_DEFINITION` always runs post-save.
-When the field targets a BelongsTo relation, it needs to run before the parent saves so the FK is available.
+`@upsert`, `@create` and `@update` on `INPUT_FIELD_DEFINITION` always run post-save.
+When the field targets a BelongsTo relation, they need to run before the parent saves so the FK is available.
 Custom directives that set model attributes from complex input (e.g. geocoding) also need pre-save timing without being relation-bound.
 
 ## Constraints
@@ -21,7 +21,10 @@ namespace Nuwave\Lighthouse\Support\Contracts;
 
 use Illuminate\Database\Eloquent\Model;
 
-/** @api */
+/**
+ * PHPDoc TBD describes when this interface may be needed
+ * @api 
+ */
 interface SaveAwareArgResolver extends ArgResolver
 {
     /** PHPDoc TBD — describes when the orchestrator calls this and what true/false means. */
@@ -30,7 +33,7 @@ interface SaveAwareArgResolver extends ArgResolver
 ```
 
 - Extends `ArgResolver` -- a specialization, not a replacement.
-- `@api` -- stability guarantee, consumers can implement this.
+- `@api` -- stability guarantee, consumers can implement this. `ArgResolver` also gets `@api`
 - Receives the Model so the decision can be contextual (relation type introspection).
 - Replaces `PreSaveArgResolver` (branch-only, never shipped).
 
@@ -56,7 +59,7 @@ public function runBeforeSave(Model $model): bool
 }
 ```
 
-BelongsTo/MorphTo returns true (pre-save), everything else returns false (post-save).
+BelongsTo (MorphTo extends from it) returns true (pre-save), everything else returns false (post-save).
 
 ### Custom directives (e.g. @geocode test fixture)
 
@@ -77,6 +80,7 @@ Extended to exclude `SaveAwareArgResolver` resolvers where `runBeforeSave()` ret
 Only checks when root is a Model -- non-Model contexts skip the check entirely:
 
 ```php
+/** PHPDoc TBD clarify the implicit post-save default (explicit for SaveAware) */
 public static function nestedArgResolvers(ArgumentSet $argumentSet, mixed $root): array
 {
     // ... attach resolvers (unchanged) ...
@@ -88,11 +92,14 @@ public static function nestedArgResolvers(ArgumentSet $argumentSet, mixed $root)
             if ($resolver === null) {
                 return false;
             }
+
             if ($resolver instanceof SaveAwareArgResolver
                 && $root instanceof Model
-                && $resolver->runBeforeSave($root)) {
+                && $resolver->runBeforeSave($root)
+            ) {
                 return false;
             }
+
             return true;
         },
     );
@@ -104,7 +111,7 @@ public static function nestedArgResolvers(ArgumentSet $argumentSet, mixed $root)
 Extracts pre-save resolvers and runs them before `$model->save()`:
 
 ```php
-[$preSave, $remaining] = ArgPartitioner::preSaveArgResolvers($remaining, $model);
+[$preSave, $remaining] = ArgPartitioner::preSaveNestedArgResolvers($remaining, $model);
 
 // ... fill model, resolve implicit BelongsTo/MorphTo ...
 

@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
-use Nuwave\Lighthouse\Support\Contracts\PreSaveArgResolver;
 
 class SaveModel implements ArgResolver
 {
@@ -24,11 +23,9 @@ class SaveModel implements ArgResolver
      */
     public function __invoke($model, $args): Model
     {
-        [$preSave, $remaining] = ArgPartitioner::preSaveArgResolvers($args);
-
         // Extract $morphTo first, as MorphTo extends BelongsTo
         [$morphTo, $remaining] = ArgPartitioner::relationMethods(
-            $remaining,
+            $args,
             $model,
             MorphTo::class,
         );
@@ -60,12 +57,6 @@ class SaveModel implements ArgResolver
             assert($morphTo instanceof MorphTo);
             $morphToResolver = new ResolveNested(new NestedMorphTo($morphTo));
             $morphToResolver($model, $nestedOperations->value);
-        }
-
-        foreach ($preSave->arguments as $nested) {
-            $resolver = $nested->resolver;
-            assert($resolver instanceof PreSaveArgResolver, 'Resolver must be a PreSaveArgResolver because we partitioned for it.');
-            $resolver($model, $nested->value);
         }
 
         if ($this->parentRelation instanceof HasOneOrMany) {

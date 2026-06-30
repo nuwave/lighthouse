@@ -16,7 +16,7 @@ class ResolveNested implements ArgResolver
     public function __construct(?callable $previous = null, ?callable $argPartitioner = null)
     {
         $this->previous = $previous;
-        $this->argPartitioner = $argPartitioner ?? [ArgPartitioner::class, 'postSaveArgResolvers'];
+        $this->argPartitioner = $argPartitioner ?? [ArgPartitioner::class, 'nestedArgResolvers'];
     }
 
     /** @param  ArgumentSet  $args */
@@ -30,9 +30,8 @@ class ResolveNested implements ArgResolver
         }
 
         foreach ($nestedArgs->arguments as $nested) {
-            $resolver = $nested->resolver;
-            assert($resolver !== null, 'Resolver must be set because we partitioned for it.');
-            $resolver($root, $nested->value);
+            // @phpstan-ignore-next-line we know the resolver is there because we partitioned for it
+            ($nested->resolver)($root, $nested->value);
         }
 
         return $root;

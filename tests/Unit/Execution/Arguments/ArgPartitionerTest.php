@@ -9,7 +9,6 @@ use Nuwave\Lighthouse\Execution\Arguments\Argument;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Tests\TestCase;
 use Tests\Unit\Execution\Arguments\Fixtures\Nested;
-use Tests\Unit\Execution\Arguments\Fixtures\PreNested;
 use Tests\Utils\Models\User;
 use Tests\Utils\Models\WithoutRelationClassImport;
 
@@ -26,7 +25,7 @@ final class ArgPartitionerTest extends TestCase
         $nested->directives->push(new Nested());
         $argumentSet->arguments['nested'] = $nested;
 
-        [$nestedArgs, $regularArgs] = ArgPartitioner::postSaveArgResolvers($argumentSet, null);
+        [$nestedArgs, $regularArgs] = ArgPartitioner::nestedArgResolvers($argumentSet, null);
 
         $this->assertSame(
             ['regular' => $regular],
@@ -36,41 +35,6 @@ final class ArgPartitionerTest extends TestCase
         $this->assertSame(
             ['nested' => $nested],
             $nestedArgs->arguments,
-        );
-    }
-
-    public function testPartitionPreSaveArgResolvers(): void
-    {
-        $argumentSet = new ArgumentSet();
-
-        $regular = new Argument();
-        $argumentSet->arguments['regular'] = $regular;
-
-        $postSave = new Argument();
-        $postSave->directives->push(new Nested());
-        $argumentSet->arguments['postSave'] = $postSave;
-
-        $preSave = new Argument();
-        $preSave->directives->push(new PreNested());
-        $argumentSet->arguments['preSave'] = $preSave;
-
-        [$postSaveArgs, $regularArgs] = ArgPartitioner::postSaveArgResolvers($argumentSet, null);
-
-        $this->assertSame(
-            ['postSave' => $postSave],
-            $postSaveArgs->arguments,
-        );
-
-        [$preSaveArgs, $rest] = ArgPartitioner::preSaveArgResolvers($regularArgs);
-
-        $this->assertSame(
-            ['preSave' => $preSave],
-            $preSaveArgs->arguments,
-        );
-
-        $this->assertSame(
-            ['regular' => $regular],
-            $rest->arguments,
         );
     }
 
