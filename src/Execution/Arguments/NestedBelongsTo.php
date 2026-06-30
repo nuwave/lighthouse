@@ -71,7 +71,7 @@ class NestedBelongsTo implements ArgResolver
             && $args->arguments['delete']->value
         ) {
             $relation->dissociate();
-            $relation->delete();
+            $relation->first()?->delete();
         }
     }
 }
