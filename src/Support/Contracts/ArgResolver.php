@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Support\Contracts;
 
+/** @api */
 interface ArgResolver
 {
     /**
