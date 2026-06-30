@@ -9,6 +9,7 @@ use Nuwave\Lighthouse\Execution\Arguments\Argument;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Tests\TestCase;
 use Tests\Unit\Execution\Arguments\Fixtures\Nested;
+use Tests\Unit\Execution\Arguments\Fixtures\SaveAwareNested;
 use Tests\Utils\Models\User;
 use Tests\Utils\Models\WithoutRelationClassImport;
 
@@ -108,6 +109,56 @@ final class ArgPartitionerTest extends TestCase
             $argumentSet,
             new WithoutRelationClassImport(),
             HasMany::class,
+        );
+    }
+
+    public function testSaveAwareArgResolverWithNonModelRoot(): void
+    {
+        $argumentSet = new ArgumentSet();
+
+        $regular = new Argument();
+        $argumentSet->arguments['regular'] = $regular;
+
+        $saveAware = new Argument();
+        $saveAware->directives->push(new SaveAwareNested());
+        $argumentSet->arguments['saveAware'] = $saveAware;
+
+        [$nestedArgs, $regularArgs] = ArgPartitioner::nestedArgResolvers($argumentSet, null);
+
+        $this->assertSame(
+            ['regular' => $regular],
+            $regularArgs->arguments,
+        );
+
+        $this->assertSame(
+            ['saveAware' => $saveAware],
+            $nestedArgs->arguments,
+            'SaveAwareArgResolver should be in nested (post-save) set when root is not a Model',
+        );
+    }
+
+    public function testSaveAwareArgResolverWithModelRoot(): void
+    {
+        $argumentSet = new ArgumentSet();
+
+        $regular = new Argument();
+        $argumentSet->arguments['regular'] = $regular;
+
+        $saveAware = new Argument();
+        $saveAware->directives->push(new SaveAwareNested());
+        $argumentSet->arguments['saveAware'] = $saveAware;
+
+        [$nestedArgs, $regularArgs] = ArgPartitioner::nestedArgResolvers($argumentSet, new User());
+
+        $this->assertSame(
+            ['regular' => $regular, 'saveAware' => $saveAware],
+            $regularArgs->arguments,
+            'SaveAwareArgResolver with runBeforeSave=true should be excluded from nested set when root is Model',
+        );
+
+        $this->assertSame(
+            [],
+            $nestedArgs->arguments,
         );
     }
 }
