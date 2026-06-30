@@ -11,14 +11,22 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
+use Nuwave\Lighthouse\Support\Contracts\SaveAwareArgResolver;
 use Nuwave\Lighthouse\Support\Utils;
 
 class ArgPartitioner
 {
     /**
-     * Partition the arguments into nested and regular.
+     * Partition the arguments into nested (post-save) and regular.
      *
-     * @return array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>
+     * Resolvers implementing SaveAwareArgResolver that return true from
+     * runBeforeSave() are excluded from the nested set when the root is a Model,
+     * allowing SaveModel to handle them before persisting.
+     *
+     * @return array{
+     *   0: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet,
+     *   1: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet,
+     * }
      */
     public static function nestedArgResolvers(ArgumentSet $argumentSet, mixed $root): array
     {
@@ -32,7 +40,38 @@ class ArgPartitioner
 
         return static::partition(
             $argumentSet,
-            static fn (string $name, Argument $argument): bool => isset($argument->resolver),
+            static function (string $name, Argument $argument) use ($root): bool {
+                $resolver = $argument->resolver;
+                if ($resolver === null) {
+                    return false;
+                }
+
+                if ($resolver instanceof SaveAwareArgResolver
+                    && $root instanceof Model
+                    && $resolver->runBeforeSave($root)
+                ) {
+                    return false;
+                }
+
+                return true;
+            },
+        );
+    }
+
+    /**
+     * Partition arguments into those with a pre-save resolver and the rest.
+     *
+     * @return array{
+     *   0: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet,
+     *   1: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet,
+     * }
+     */
+    public static function preSaveNestedArgResolvers(ArgumentSet $argumentSet, Model $model): array
+    {
+        return static::partition(
+            $argumentSet,
+            static fn (string $name, Argument $argument): bool => $argument->resolver instanceof SaveAwareArgResolver
+                && $argument->resolver->runBeforeSave($model),
         );
     }
 
