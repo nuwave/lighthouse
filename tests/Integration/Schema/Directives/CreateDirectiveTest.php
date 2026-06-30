@@ -584,4 +584,118 @@ final class CreateDirectiveTest extends DBTestCase
         }
         GRAPHQL);
     }
+
+    public function testUpsertBelongsToBeforeSave(): void
+    {
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Task {
+            id: ID!
+            name: String!
+            user: User @belongsTo
+        }
+
+        type User {
+            id: ID!
+            name: String!
+        }
+
+        type Mutation {
+            createTask(input: CreateTaskInput! @spread): Task @create
+        }
+
+        input CreateTaskInput {
+            name: String!
+            user: CreateUserInput @upsert
+        }
+
+        input CreateUserInput {
+            id: ID
+            name: String!
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            createTask(input: {
+                name: "My task"
+                user: {
+                    name: "New User"
+                }
+            }) {
+                id
+                name
+                user {
+                    id
+                    name
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'createTask' => [
+                    'name' => 'My task',
+                    'user' => [
+                        'id' => '1',
+                        'name' => 'New User',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testUpsertBelongsToTakesPrecedenceOverImplicitRelation(): void
+    {
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Task {
+            id: ID!
+            name: String!
+            user: User @belongsTo
+        }
+
+        type User {
+            id: ID!
+            name: String!
+        }
+
+        type Mutation {
+            createTask(input: CreateTaskInput! @spread): Task @create
+        }
+
+        input CreateTaskInput {
+            name: String!
+            user: CreateUserInput @upsert
+        }
+
+        input CreateUserInput {
+            id: ID
+            name: String!
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            createTask(input: {
+                name: "My task"
+                user: {
+                    name: "Created via directive"
+                }
+            }) {
+                id
+                name
+                user {
+                    name
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'createTask' => [
+                    'name' => 'My task',
+                    'user' => [
+                        'name' => 'Created via directive',
+                    ],
+                ],
+            ],
+        ]);
+    }
 }
