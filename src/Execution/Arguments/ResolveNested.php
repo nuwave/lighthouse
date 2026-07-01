@@ -33,8 +33,9 @@ class ResolveNested implements ArgResolver
 
         foreach ($nestedArgs->arguments as $nested) {
             if ($nested->resolver instanceof NestDirective) {
+                $nestResolver = new self(null, $this->argPartitioner);
                 Utils::mapEach(
-                    fn (ArgumentSet $argumentSet): mixed => $this($root, $argumentSet),
+                    fn (ArgumentSet $argumentSet): mixed => $nestResolver($root, $argumentSet),
                     $nested->value,
                 );
             } else {

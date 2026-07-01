@@ -4,6 +4,7 @@ namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
+use Tests\Utils\Models\User;
 
 final class NestDirectiveTest extends DBTestCase
 {
@@ -209,6 +210,142 @@ final class NestDirectiveTest extends DBTestCase
                     'tasks' => [
                         ['name' => 'Post-save task'],
                     ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testNestDoesNotSaveParentModelMultipleTimes(): void
+    {
+        $savingCount = 0;
+        User::saving(function () use (&$savingCount): void {
+            ++$savingCount;
+        });
+
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Mutation {
+            createUser(input: CreateUserInput! @spread): User @create
+        }
+
+        input CreateUserInput {
+            name: String!
+            nested: NestedUserInput @nest
+        }
+
+        input NestedUserInput {
+            newTask: CreateTaskInput @create(relation: "tasks")
+        }
+
+        input CreateTaskInput {
+            name: String!
+        }
+
+        type User {
+            id: ID!
+            name: String!
+            tasks: [Task!]! @hasMany
+        }
+
+        type Task {
+            id: ID!
+            name: String!
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            createUser(input: {
+                name: "Save Once"
+                nested: {
+                    newTask: {
+                        name: "Post-save task"
+                    }
+                }
+            }) {
+                id
+                name
+                tasks {
+                    name
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'createUser' => [
+                    'name' => 'Save Once',
+                    'tasks' => [
+                        ['name' => 'Post-save task'],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertSame(1, $savingCount);
+    }
+
+    public function testSiblingNestBlocksWithSameChildName(): void
+    {
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Mutation {
+            createUser(input: CreateUserInput! @spread): User @create
+        }
+
+        input CreateUserInput {
+            name: String!
+            alpha: AlphaInput @nest
+            beta: BetaInput @nest
+        }
+
+        input AlphaInput {
+            location: LocationInput @geocode
+        }
+
+        input BetaInput {
+            location: LocationInput @geocode
+        }
+
+        input LocationInput {
+            lat: Float!
+            lng: Float!
+        }
+
+        type User {
+            id: ID!
+            name: String!
+            latitude: Float
+            longitude: Float
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            createUser(input: {
+                name: "Sibling Nest"
+                alpha: {
+                    location: {
+                        lat: 48.0
+                        lng: 11.0
+                    }
+                }
+                beta: {
+                    location: {
+                        lat: 52.0
+                        lng: 13.0
+                    }
+                }
+            }) {
+                id
+                name
+                latitude
+                longitude
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'createUser' => [
+                    'name' => 'Sibling Nest',
+                    'latitude' => 52.0,
+                    'longitude' => 13.0,
                 ],
             ],
         ]);

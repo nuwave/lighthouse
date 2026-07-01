@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Model;
  * Implement this on ArgResolver directives that need to control whether they
  * run before or after the parent model is saved during mutation execution.
  *
+ * When `runBeforeSave()` returns true, `__invoke()` receives null as `$value`
+ * if the client sends null for a nullable input field. Guard accordingly.
+ *
  * @api
  */
 interface SaveAwareArgResolver extends ArgResolver

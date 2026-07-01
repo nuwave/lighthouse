@@ -66,17 +66,26 @@ class ArgPartitioner
             $argumentSet,
             static function (string $name, Argument $argument) use ($root, $model): bool {
                 $resolver = $argument->resolver;
-                if ($resolver === null || $model === null) {
-                    return $resolver !== null;
+                if ($resolver === null) {
+                    return false;
+                }
+
+                if ($model === null) {
+                    return true;
                 }
 
                 assert($root instanceof Model);
 
-                return ! ($resolver instanceof SaveAwareArgResolver && $resolver->runBeforeSave($root));
+                if ($resolver instanceof SaveAwareArgResolver) {
+                    return ! $resolver->runBeforeSave($root);
+                }
+
+                return true;
             },
         );
 
-        if ($root instanceof Model) {
+        if ($model !== null) {
+            assert($root instanceof Model);
             static::liftPreSaveResolversFromNest($nested, $regular, $root, $model);
         }
 
@@ -84,12 +93,12 @@ class ArgPartitioner
     }
 
     /**
-     * Traverse through @nest arguments and lift pre-save resolvers to the regular set
+     * Recursively traverse @nest arguments and lift pre-save resolvers to the regular set
      * so they reach SaveModel and execute before $model->save().
      *
-     * @param  \ReflectionClass<\Illuminate\Database\Eloquent\Model>|null  $model
+     * @param  \ReflectionClass<\Illuminate\Database\Eloquent\Model>  $model
      */
-    protected static function liftPreSaveResolversFromNest(ArgumentSet $nested, ArgumentSet $regular, Model $root, ?\ReflectionClass $model): void
+    protected static function liftPreSaveResolversFromNest(ArgumentSet $nested, ArgumentSet $regular, Model $root, \ReflectionClass $model): void
     {
         foreach ($nested->arguments as $argument) {
             if (! ($argument->resolver instanceof NestDirective)) {
@@ -103,12 +112,14 @@ class ArgPartitioner
 
             foreach ($nestValue->arguments as $childName => $childArgument) {
                 static::attachNestedArgResolver($childName, $childArgument, $model);
-            }
 
-            foreach ($nestValue->arguments as $childName => $childArgument) {
                 if ($childArgument->resolver instanceof SaveAwareArgResolver && $childArgument->resolver->runBeforeSave($root)) {
                     $regular->arguments[$childName] = $childArgument;
                     unset($nestValue->arguments[$childName]);
+                } elseif ($childArgument->resolver instanceof NestDirective) {
+                    $childNested = new ArgumentSet();
+                    $childNested->arguments[$childName] = $childArgument;
+                    static::liftPreSaveResolversFromNest($childNested, $regular, $root, $model);
                 }
             }
         }
