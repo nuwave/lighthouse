@@ -34,18 +34,20 @@ class ResolveNested implements ArgResolver
             $resolver = $nested->resolver;
             assert($resolver !== null, 'we know the resolver is there because we partitioned for it');
 
+            $value = $nested->value;
             if ($resolver instanceof NestDirective) {
-                if ($nested->value === null) {
+                if ($value === null) {
                     continue;
                 }
 
-                assert($nested->value instanceof ArgumentSet, 'NestDirective validates that @nest is used on non-list input object types.');
+                assert($value instanceof ArgumentSet, 'NestDirective validates that @nest is used on non-list input object types.');
+
                 $nestResolver = new self(null, $this->argPartitioner);
-                $nestResolver($root, $nested->value);
+                $nestResolver($root, $value);
                 continue;
             }
 
-            $resolver($root, $nested->value);
+            $resolver($root, $value);
         }
 
         return $root;
