@@ -92,12 +92,12 @@ class ArgPartitioner
     protected static function liftPreSaveResolversFromNest(ArgumentSet $nested, ArgumentSet $regular, Model $root, ?\ReflectionClass $model): void
     {
         foreach ($nested->arguments as $argument) {
-            if (! ($argument->resolver instanceof NestDirective)) {
+            if (! $argument->resolver instanceof NestDirective) {
                 continue;
             }
 
             $nestValue = $argument->value;
-            if (! ($nestValue instanceof ArgumentSet)) {
+            if (! $nestValue instanceof ArgumentSet) {
                 continue;
             }
 
