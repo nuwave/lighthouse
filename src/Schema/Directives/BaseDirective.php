@@ -223,22 +223,19 @@ abstract class BaseDirective implements Directive
             throw new DefinitionException("Directive '{$this->name()}' must have an argument '{$argumentName}' in the form 'ClassName@methodName' or 'ClassName'");
         }
 
-        /**
-         * @var array{
+        /** @var array{
          *   0: string,
          *   1?: string,
-         * } $argumentParts
-         */
+         * } $argumentParts */
         if (empty($argumentParts[1])) {
             $argumentParts[1] = '__invoke';
         }
 
-        /**
-         * @var array{
+        /** @var array{
          *   0: string,
          *   1: string,
-         * } $argumentParts
-         */
+         * } $argumentParts */
+
         return $argumentParts;
     }
 

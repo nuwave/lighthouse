@@ -29,12 +29,10 @@ class Base64GlobalId implements GlobalId
             throw new GlobalIdException("Unexpectedly found more then 2 segments when decoding global id: {$globalID}.");
         }
 
-        /**
-         * @var array{
+        /** @var array{
          *   0: string,
          *   1: string,
-         * } $parts
-         */
+         * } $parts */
         return $parts;
     }
 
