@@ -113,10 +113,15 @@ class ArgPartitioner
             foreach ($nestValue->arguments as $childName => $childArgument) {
                 static::attachNestedArgResolver($childName, $childArgument, $model);
 
-                if ($childArgument->resolver instanceof SaveAwareArgResolver && $childArgument->resolver->runBeforeSave($root)) {
+                $resolver = $childArgument->resolver;
+
+                if (self::shouldRunBeforeSave($resolver, $root)) {
                     $regular->arguments[$childName] = $childArgument;
                     unset($nestValue->arguments[$childName]);
-                } elseif ($childArgument->resolver instanceof NestDirective) {
+                    continue;
+                }
+
+                if ($resolver instanceof NestDirective) {
                     $childNested = new ArgumentSet();
                     $childNested->arguments[$childName] = $childArgument;
                     static::liftPreSaveResolversFromNest($childNested, $regular, $root, $model);
@@ -137,8 +142,7 @@ class ArgPartitioner
     {
         return static::partition(
             $argumentSet,
-            static fn (string $name, Argument $argument): bool => $argument->resolver instanceof SaveAwareArgResolver
-                && $argument->resolver->runBeforeSave($model),
+            static fn (string $name, Argument $argument): bool => self::shouldRunBeforeSave($argument->resolver, $model),
         );
     }
 
@@ -300,5 +304,11 @@ class ArgPartitioner
         }
 
         return is_a($returnType->getName(), $relationClass, true);
+    }
+
+    public static function shouldRunBeforeSave(?ArgResolver $resolver, Model $model): bool
+    {
+        return $resolver instanceof SaveAwareArgResolver
+            && $resolver->runBeforeSave($model);
     }
 }

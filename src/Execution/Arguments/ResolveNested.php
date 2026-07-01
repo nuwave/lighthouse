@@ -32,16 +32,19 @@ class ResolveNested implements ArgResolver
         }
 
         foreach ($nestedArgs->arguments as $nested) {
-            if ($nested->resolver instanceof NestDirective) {
+            $resolver = $nested->resolver;
+            assert($resolver !== null, 'we know the resolver is there because we partitioned for it');
+
+            if ($resolver instanceof NestDirective) {
                 $nestResolver = new self(null, $this->argPartitioner);
                 Utils::mapEach(
                     fn (ArgumentSet $argumentSet): mixed => $nestResolver($root, $argumentSet),
                     $nested->value,
                 );
-            } else {
-                // @phpstan-ignore-next-line we know the resolver is there because we partitioned for it
-                ($nested->resolver)($root, $nested->value);
+                continue;
             }
+
+            $resolver($root, $nested->value);
         }
 
         return $root;
