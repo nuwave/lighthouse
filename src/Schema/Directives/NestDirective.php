@@ -2,11 +2,11 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
-use Nuwave\Lighthouse\Execution\Arguments\ResolveNested;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
-use Nuwave\Lighthouse\Support\Utils;
 
+/**
+ * Marker for nested input grouping — resolution is handled by ResolveNested.
+ */
 class NestDirective extends BaseDirective implements ArgResolver
 {
     public static function definition(): string
@@ -20,18 +20,9 @@ directive @nest on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 GRAPHQL;
     }
 
-    /**
-     * Delegate to nested arg resolvers.
-     *
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>  $args  the slice of arguments that belongs to this nested resolver
-     */
-    public function __invoke(mixed $root, $args): mixed
+    /** Handled by ResolveNested — direct invocation is not supported. */
+    public function __invoke(mixed $root, mixed $value): never
     {
-        $resolveNested = new ResolveNested();
-
-        return Utils::mapEach(
-            static fn (ArgumentSet $argumentSet): mixed => $resolveNested($root, $argumentSet),
-            $args,
-        );
+        throw new \LogicException('NestDirective must not be invoked directly, use ResolveNested.');
     }
 }

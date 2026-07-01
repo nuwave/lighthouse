@@ -2,7 +2,9 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
+use Nuwave\Lighthouse\Schema\Directives\NestDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
+use Nuwave\Lighthouse\Support\Utils;
 
 class ResolveNested implements ArgResolver
 {
@@ -30,8 +32,15 @@ class ResolveNested implements ArgResolver
         }
 
         foreach ($nestedArgs->arguments as $nested) {
-            // @phpstan-ignore-next-line we know the resolver is there because we partitioned for it
-            ($nested->resolver)($root, $nested->value);
+            if ($nested->resolver instanceof NestDirective) {
+                Utils::mapEach(
+                    fn (ArgumentSet $argumentSet): mixed => $this($root, $argumentSet),
+                    $nested->value,
+                );
+            } else {
+                // @phpstan-ignore-next-line we know the resolver is there because we partitioned for it
+                ($nested->resolver)($root, $nested->value);
+            }
         }
 
         return $root;
