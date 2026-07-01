@@ -765,6 +765,8 @@ final class CreateDirectiveTest extends DBTestCase
                 ],
             ],
         ]);
+
+        $this->assertDatabaseCount('users', 0);
     }
 
     public function testCustomDirectiveSetsModelAttributesBeforeSave(): void

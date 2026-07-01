@@ -138,6 +138,31 @@ final class ArgPartitionerTest extends TestCase
         );
     }
 
+    public function testSaveAwareArgResolverWithNonModelRootInWithoutPreSave(): void
+    {
+        $argumentSet = new ArgumentSet();
+
+        $regular = new Argument();
+        $argumentSet->arguments['regular'] = $regular;
+
+        $saveAware = new Argument();
+        $saveAware->directives->push(new SaveAwareNested());
+        $argumentSet->arguments['saveAware'] = $saveAware;
+
+        [$nestedArgs, $regularArgs] = ArgPartitioner::nestedArgResolversWithoutPreSave($argumentSet, null);
+
+        $this->assertSame(
+            ['regular' => $regular],
+            $regularArgs->arguments,
+        );
+
+        $this->assertSame(
+            ['saveAware' => $saveAware],
+            $nestedArgs->arguments,
+            'SaveAwareArgResolver should be in nested set when root is not a Model',
+        );
+    }
+
     public function testSaveAwareArgResolverWithModelRoot(): void
     {
         $argumentSet = new ArgumentSet();
