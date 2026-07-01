@@ -106,9 +106,11 @@ class ArgPartitioner
             }
 
             $nestValue = $argument->value;
-            if (! $nestValue instanceof ArgumentSet) {
+            if ($nestValue === null) {
                 continue;
             }
+
+            assert($nestValue instanceof ArgumentSet, 'NestDirective validates that @nest is used on non-list input object types.');
 
             foreach ($nestValue->arguments as $childName => $childArgument) {
                 static::attachNestedArgResolver($childName, $childArgument, $model);

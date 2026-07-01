@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Execution\Arguments;
 
 use Nuwave\Lighthouse\Schema\Directives\NestDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
-use Nuwave\Lighthouse\Support\Utils;
 
 class ResolveNested implements ArgResolver
 {
@@ -36,11 +35,13 @@ class ResolveNested implements ArgResolver
             assert($resolver !== null, 'we know the resolver is there because we partitioned for it');
 
             if ($resolver instanceof NestDirective) {
+                if ($nested->value === null) {
+                    continue;
+                }
+
+                assert($nested->value instanceof ArgumentSet, 'NestDirective validates that @nest is used on non-list input object types.');
                 $nestResolver = new self(null, $this->argPartitioner);
-                Utils::mapEach(
-                    fn (ArgumentSet $argumentSet): mixed => $nestResolver($root, $argumentSet),
-                    $nested->value,
-                );
+                $nestResolver($root, $nested->value);
                 continue;
             }
 

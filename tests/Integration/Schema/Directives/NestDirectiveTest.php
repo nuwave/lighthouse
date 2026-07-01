@@ -351,6 +351,60 @@ final class NestDirectiveTest extends DBTestCase
         ]);
     }
 
+    public function testNullableNestWithNullValue(): void
+    {
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Mutation {
+            createUser(input: CreateUserInput! @spread): User @create
+        }
+
+        input CreateUserInput {
+            name: String!
+            nested: NestedUserInput @nest
+        }
+
+        input NestedUserInput {
+            newTask: CreateTaskInput @create(relation: "tasks")
+        }
+
+        input CreateTaskInput {
+            name: String!
+        }
+
+        type User {
+            id: ID!
+            name: String!
+            tasks: [Task!]! @hasMany
+        }
+
+        type Task {
+            id: ID!
+            name: String!
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            createUser(input: {
+                name: "No Nest"
+                nested: null
+            }) {
+                name
+                tasks {
+                    name
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'createUser' => [
+                    'name' => 'No Nest',
+                    'tasks' => [],
+                ],
+            ],
+        ]);
+    }
+
     public function testDoubleNestedNest(): void
     {
         $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
