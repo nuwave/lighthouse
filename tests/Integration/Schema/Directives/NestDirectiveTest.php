@@ -218,7 +218,7 @@ final class NestDirectiveTest extends DBTestCase
     public function testNestDoesNotSaveParentModelMultipleTimes(): void
     {
         $savingCount = 0;
-        User::saving(function () use (&$savingCount): void {
+        User::saving(static function () use (&$savingCount): void {
             ++$savingCount;
         });
 
