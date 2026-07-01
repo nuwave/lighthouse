@@ -585,6 +585,7 @@ final class CreateDirectiveTest extends DBTestCase
         GRAPHQL);
     }
 
+    /** Proves before-save ordering: posts.task_id is NOT NULL, so saving without the FK set would throw. */
     public function testUpsertBelongsToBeforeSave(): void
     {
         $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
@@ -676,13 +677,15 @@ final class CreateDirectiveTest extends DBTestCase
         }
         GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
-        mutation {
+        $updatedName = 'Updated via directive';
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($id: ID!, $name: String!) {
             createPost(input: {
                 title: "My post"
                 task: {
-                    id: "{$task->id}"
-                    name: "Updated via directive"
+                    id: $id
+                    name: $name
                 }
             }) {
                 id
@@ -693,20 +696,23 @@ final class CreateDirectiveTest extends DBTestCase
                 }
             }
         }
-        GRAPHQL)->assertJson([
+        GRAPHQL, [
+            'id' => $task->id,
+            'name' => $updatedName,
+        ])->assertJson([
             'data' => [
                 'createPost' => [
                     'title' => 'My post',
                     'task' => [
                         'id' => (string) $task->id,
-                        'name' => 'Updated via directive',
+                        'name' => $updatedName,
                     ],
                 ],
             ],
         ]);
 
         $task->refresh();
-        $this->assertSame('Updated via directive', $task->name);
+        $this->assertSame($updatedName, $task->name);
     }
 
     public function testUpsertBelongsToWithNullValue(): void
@@ -761,7 +767,7 @@ final class CreateDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testGeocodePreSaveArgResolver(): void
+    public function testCustomDirectiveSetsModelAttributesBeforeSave(): void
     {
         $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
@@ -812,7 +818,7 @@ final class CreateDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testGeocodePreSaveArgResolverInsideNest(): void
+    public function testCustomDirectiveSetsModelAttributesBeforeSaveInsideNest(): void
     {
         $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
