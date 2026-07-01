@@ -306,7 +306,7 @@ class ArgPartitioner
         return is_a($returnType->getName(), $relationClass, true);
     }
 
-    public static function shouldRunBeforeSave(?ArgResolver $resolver, Model $model): bool
+    protected static function shouldRunBeforeSave(?ArgResolver $resolver, Model $model): bool
     {
         return $resolver instanceof SaveAwareArgResolver
             && $resolver->runBeforeSave($model);
