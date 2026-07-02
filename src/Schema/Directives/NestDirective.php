@@ -9,6 +9,7 @@ use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ListTypeNode;
 use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\Printer;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
@@ -33,7 +34,7 @@ GRAPHQL;
     }
 
     /** Handled by ResolveNested — direct invocation is not supported. */
-    public function __invoke(mixed $root, mixed $value): never
+    public function __invoke(mixed $root, mixed $value): void
     {
         throw new \LogicException('NestDirective must not be invoked directly, use ResolveNested.');
     }
@@ -70,7 +71,7 @@ GRAPHQL;
             : $definition->type;
 
         if ($type instanceof ListTypeNode) {
-            $printedType = \GraphQL\Language\Printer::doPrint($definition->type);
+            $printedType = Printer::doPrint($definition->type);
 
             throw new DefinitionException("The @nest directive must be used on input object types, got {$printedType} on {$location}.");
         }
@@ -79,7 +80,7 @@ GRAPHQL;
         $typeDefinition = $documentAST->types[$typeName] ?? null;
 
         if (! $typeDefinition instanceof InputObjectTypeDefinitionNode) {
-            $printedType = \GraphQL\Language\Printer::doPrint($definition->type);
+            $printedType = Printer::doPrint($definition->type);
 
             throw new DefinitionException("The @nest directive must be used on input object types, got {$printedType} on {$location}.");
         }
