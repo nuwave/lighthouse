@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Add `SaveAwareArgResolver` interface for directives that need control over pre/post-save timing in mutations https://github.com/nuwave/lighthouse/pull/2777
+
 ## v6.67.0
 
 ### Changed

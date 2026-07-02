@@ -3,35 +3,53 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Nuwave\Lighthouse\Execution\Arguments\ArgPartitioner;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Execution\Arguments\ResolveNested;
 use Nuwave\Lighthouse\Execution\TransactionalMutations;
-use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Support\Contracts\SaveAwareArgResolver;
 use Nuwave\Lighthouse\Support\Utils;
 
-abstract class ModelMutationDirective extends BaseDirective implements FieldResolver, ArgResolver
+abstract class ModelMutationDirective extends BaseDirective implements FieldResolver, SaveAwareArgResolver
 {
     public function __construct(
         protected TransactionalMutations $transactionalMutations,
     ) {}
 
+    protected function relationName(): string
+    {
+        return $this->directiveArgValue(
+            'relation',
+            $this->nodeName(),
+        );
+    }
+
+    public function runBeforeSave(Model $model): bool
+    {
+        return ArgPartitioner::methodReturnsRelation(
+            new \ReflectionClass($model),
+            $this->relationName(),
+            // Includes MorphTo (a BelongsTo subclass) — explicit directives shadow implicit relation detection.
+            BelongsTo::class,
+        );
+    }
+
     /**
      * @param  Model  $model
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>  $args
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>|null  $args
      *
-     * @return \Illuminate\Database\Eloquent\Model|array<\Illuminate\Database\Eloquent\Model>
+     * @return \Illuminate\Database\Eloquent\Model|array<\Illuminate\Database\Eloquent\Model>|null
      */
     public function __invoke($model, $args): mixed
     {
-        $relationName = $this->directiveArgValue(
-            'relation',
-            // Use the name of the argument if no explicit relation name is given
-            $this->nodeName(),
-        );
+        if ($args === null) {
+            return null;
+        }
 
-        $relation = $model->{$relationName}();
+        $relation = $model->{$this->relationName()}();
         assert($relation instanceof Relation);
 
         $related = $relation->make(); // @phpstan-ignore method.notFound (Relation delegates to Builder)
@@ -47,7 +65,10 @@ abstract class ModelMutationDirective extends BaseDirective implements FieldReso
      */
     protected function executeMutation(Model $model, ArgumentSet|array $args, ?Relation $parentRelation = null): Model|array
     {
-        $update = new ResolveNested($this->makeExecutionFunction($parentRelation));
+        $update = new ResolveNested(
+            $this->makeExecutionFunction($parentRelation),
+            [ArgPartitioner::class, 'nestedArgResolversWithoutPreSave'],
+        );
 
         return Utils::mapEach(
             static fn (ArgumentSet $argumentSet): mixed => $update($model->newInstance(), $argumentSet),
