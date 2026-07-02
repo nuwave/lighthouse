@@ -201,3 +201,50 @@ input DateRange {
 An [`Nuwave\Lighthouse\Support\Contracts\ArgResolver`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ArgResolver.php) directive allows you to compose resolvers for complex nested inputs, similar to the way that field resolvers are composed together.
 
 For an in-depth explanation of the concept of composing arg resolvers, read the [explanation of arg resolvers](../concepts/arg-resolvers.md).
+
+## SaveAwareArgResolver
+
+A [`Nuwave\Lighthouse\Support\Contracts\SaveAwareArgResolver`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/SaveAwareArgResolver.php) extends `ArgResolver` and allows control over whether the resolver runs before or after the parent model is saved.
+
+This is useful when your directive needs to set attributes or foreign keys on the model before it is persisted.
+For example, a directive that resolves a BelongsTo relationship must associate the related model before the parent is saved, since the foreign key column may have a NOT NULL constraint.
+
+```php
+use Illuminate\Database\Eloquent\Model;
+use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Support\Contracts\SaveAwareArgResolver;
+
+final class GeocodeDirective extends BaseDirective implements SaveAwareArgResolver
+{
+    public static function definition(): string
+    {
+        return /** @lang GraphQL */ <<<'GRAPHQL'
+        directive @geocode on INPUT_FIELD_DEFINITION
+        GRAPHQL;
+    }
+
+    public function runBeforeSave(Model $model): bool
+    {
+        return true;
+    }
+
+    /** @param  ArgumentSet|null  $args */
+    public function __invoke($model, $args): void
+    {
+        if ($args === null) {
+            return;
+        }
+
+        $address = $args->toArray();
+        $model->setAttribute('latitude', $address['lat']);
+        $model->setAttribute('longitude', $address['lng']);
+    }
+}
+```
+
+When `runBeforeSave()` returns `true`, the resolver is invoked before `$model->save()`, allowing it to set attributes on the model.
+When it returns `false`, the resolver runs after the model is saved — the same timing as any `ArgResolver` that does not implement this interface.
+
+Note that `__invoke()` receives `null` as `$args` if the client sends `null` for a nullable input field.
+Guard accordingly.

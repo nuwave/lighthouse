@@ -2,6 +2,9 @@
   "$schema": "https://lnai.sh/schemas/settings.schema.json",
   "permissions": {
     "allow": [
+      "Bash(docker compose run --rm php vendor/bin/phpstan:*)",
+      "Bash(docker compose run --rm php vendor/bin/phpunit:*)",
+      "Bash(docker compose run --rm php vendor/bin/php-cs-fixer:*)",
       "Bash(docker compose up:*)",
       "Bash(make setup)",
       "Bash(make it)",

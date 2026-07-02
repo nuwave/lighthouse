@@ -103,7 +103,7 @@ final class CanRootDirectiveTest extends CanDirectiveTestBase
         $user->name = UserPolicy::ADMIN;
         $this->be($user);
 
-        $return = new class() {
+        $return = new class {
             public string $name = 'foo';
         };
         $this->mockResolver(static fn (): object => $return);
