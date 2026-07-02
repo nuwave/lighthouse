@@ -27,13 +27,7 @@ class ArgPartitioner
      */
     public static function nestedArgResolvers(ArgumentSet $argumentSet, mixed $root): array
     {
-        $model = $root instanceof Model
-            ? new \ReflectionClass($root)
-            : null;
-
-        foreach ($argumentSet->arguments as $name => $argument) {
-            static::attachNestedArgResolver($name, $argument, $model);
-        }
+        static::prepareArgResolvers($argumentSet, $root);
 
         return static::partition(
             $argumentSet,
@@ -54,13 +48,7 @@ class ArgPartitioner
      */
     public static function nestedArgResolversWithoutPreSave(ArgumentSet $argumentSet, mixed $root): array
     {
-        $model = $root instanceof Model
-            ? new \ReflectionClass($root)
-            : null;
-
-        foreach ($argumentSet->arguments as $name => $argument) {
-            static::attachNestedArgResolver($name, $argument, $model);
-        }
+        $model = static::prepareArgResolvers($argumentSet, $root);
 
         [$nested, $regular] = static::partition(
             $argumentSet,
@@ -191,6 +179,20 @@ class ArgPartitioner
         );
 
         return [$nonNullRelations, $remaining];
+    }
+
+    /** @return \ReflectionClass<\Illuminate\Database\Eloquent\Model>|null */
+    protected static function prepareArgResolvers(ArgumentSet $argumentSet, mixed $root): ?\ReflectionClass
+    {
+        $model = $root instanceof Model
+            ? new \ReflectionClass($root)
+            : null;
+
+        foreach ($argumentSet->arguments as $name => $argument) {
+            static::attachNestedArgResolver($name, $argument, $model);
+        }
+
+        return $model;
     }
 
     /**
