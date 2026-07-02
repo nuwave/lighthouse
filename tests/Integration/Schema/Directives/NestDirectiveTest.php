@@ -283,7 +283,7 @@ final class NestDirectiveTest extends DBTestCase
         $this->assertSame(1, $savingCount);
     }
 
-    public function testSiblingNestBlocksWithSameChildName(): void
+    public function testSiblingNestBlocksWithSameChildNameLastWins(): void
     {
         $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Mutation {
@@ -482,6 +482,347 @@ final class NestDirectiveTest extends DBTestCase
                     'longitude' => 13.405,
                     'tasks' => [
                         ['name' => 'Deeply nested task'],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /** Multiple @create(relation: "tasks") children inside one @nest block — all resolve after parent save. */
+    public function testNestWithMultipleHasManyChildren(): void
+    {
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Mutation {
+            createUser(input: CreateUserInput! @spread): User @create
+        }
+
+        input CreateUserInput {
+            name: String!
+            operations: TaskOperationsInput @nest
+        }
+
+        input TaskOperationsInput {
+            firstTask: CreateTaskInput @create(relation: "tasks")
+            secondTask: CreateTaskInput @create(relation: "tasks")
+        }
+
+        input CreateTaskInput {
+            name: String!
+        }
+
+        type User {
+            id: ID!
+            name: String!
+            tasks: [Task!]! @hasMany
+        }
+
+        type Task {
+            id: ID!
+            name: String!
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            createUser(input: {
+                name: "Multi-child"
+                operations: {
+                    firstTask: {
+                        name: "First task"
+                    }
+                    secondTask: {
+                        name: "Second task"
+                    }
+                }
+            }) {
+                id
+                name
+                tasks {
+                    name
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'createUser' => [
+                    'name' => 'Multi-child',
+                    'tasks' => [
+                        ['name' => 'First task'],
+                        ['name' => 'Second task'],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /** @update + @nest should still work — covers the argPartitioner change in ModelMutationDirective. */
+    public function testUpdateWithNest(): void
+    {
+        $user = new User();
+        $user->name = 'Original';
+        $user->save();
+
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Mutation {
+            updateUser(input: UpdateUserInput! @spread): User @update
+        }
+
+        input UpdateUserInput {
+            id: ID!
+            nested: NestedUpdateInput @nest
+        }
+
+        input NestedUpdateInput {
+            newTask: CreateTaskInput @create(relation: "tasks")
+        }
+
+        input CreateTaskInput {
+            name: String!
+        }
+
+        type User {
+            id: ID!
+            name: String!
+            tasks: [Task!]! @hasMany
+        }
+
+        type Task {
+            id: ID!
+            name: String!
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($id: ID!) {
+            updateUser(input: {
+                id: $id
+                nested: {
+                    newTask: {
+                        name: "Added via update+nest"
+                    }
+                }
+            }) {
+                id
+                name
+                tasks {
+                    name
+                }
+            }
+        }
+        GRAPHQL, [
+            'id' => $user->id,
+        ])->assertJson([
+            'data' => [
+                'updateUser' => [
+                    'id' => (string) $user->id,
+                    'name' => 'Original',
+                    'tasks' => [
+                        ['name' => 'Added via update+nest'],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /** Implicit BelongsTo detection still works alongside @nest children. */
+    public function testImplicitBelongsToCoexistsWithNest(): void
+    {
+        $task = new Task();
+        $task->name = 'Existing';
+        $task->save();
+
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Mutation {
+            createUser(input: CreateUserInput! @spread): User @create
+        }
+
+        input CreateUserInput {
+            name: String!
+            tasks: TaskOps @nest
+        }
+
+        input TaskOps {
+            newTask: CreateTaskInput @create(relation: "tasks")
+        }
+
+        input CreateTaskInput {
+            name: String!
+        }
+
+        type User {
+            id: ID!
+            name: String!
+            tasks: [Task!]! @hasMany
+        }
+
+        type Task {
+            id: ID!
+            name: String!
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            createUser(input: {
+                name: "Has tasks via nest"
+                tasks: {
+                    newTask: {
+                        name: "Nested task"
+                    }
+                }
+            }) {
+                name
+                tasks {
+                    name
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'createUser' => [
+                    'name' => 'Has tasks via nest',
+                    'tasks' => [
+                        ['name' => 'Nested task'],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /** @nest argument name matches a relation name on the model — must not confuse partitioner. */
+    public function testNestArgumentNamedLikeRelation(): void
+    {
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Mutation {
+            createUser(input: CreateUserInput! @spread): User @create
+        }
+
+        input CreateUserInput {
+            name: String!
+            tasks: TaskNestInput @nest
+        }
+
+        input TaskNestInput {
+            newTask: CreateTaskInput @create(relation: "tasks")
+        }
+
+        input CreateTaskInput {
+            name: String!
+        }
+
+        type User {
+            id: ID!
+            name: String!
+            tasks: [Task!]! @hasMany
+        }
+
+        type Task {
+            id: ID!
+            name: String!
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            createUser(input: {
+                name: "Ambiguous name"
+                tasks: {
+                    newTask: {
+                        name: "Created through nest"
+                    }
+                }
+            }) {
+                name
+                tasks {
+                    name
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'createUser' => [
+                    'name' => 'Ambiguous name',
+                    'tasks' => [
+                        ['name' => 'Created through nest'],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /** @upsert inside @nest for an existing HasMany child — proves existing behavior isn't broken. */
+    public function testNestWithHasManyUpsertExistingChild(): void
+    {
+        $user = new User();
+        $user->name = 'Parent';
+        $user->save();
+
+        $task = new Task();
+        $task->name = 'Original name';
+        $task->user()->associate($user);
+        $task->save();
+
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Mutation {
+            updateUser(input: UpdateUserInput! @spread): User @update
+        }
+
+        input UpdateUserInput {
+            id: ID!
+            nested: NestedInput @nest
+        }
+
+        input NestedInput {
+            tasks: UpsertTaskInput @upsert(relation: "tasks")
+        }
+
+        input UpsertTaskInput {
+            id: ID
+            name: String!
+        }
+
+        type User {
+            id: ID!
+            name: String!
+            tasks: [Task!]! @hasMany
+        }
+
+        type Task {
+            id: ID!
+            name: String!
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($userId: ID!, $taskId: ID!) {
+            updateUser(input: {
+                id: $userId
+                nested: {
+                    tasks: {
+                        id: $taskId
+                        name: "Updated name"
+                    }
+                }
+            }) {
+                id
+                tasks {
+                    id
+                    name
+                }
+            }
+        }
+        GRAPHQL, [
+            'userId' => $user->id,
+            'taskId' => $task->id,
+        ])->assertJson([
+            'data' => [
+                'updateUser' => [
+                    'id' => (string) $user->id,
+                    'tasks' => [
+                        [
+                            'id' => (string) $task->id,
+                            'name' => 'Updated name',
+                        ],
                     ],
                 ],
             ],
