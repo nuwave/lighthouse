@@ -16,7 +16,6 @@
  * Verified: executed with PHP 8.4 against src/lighthouse.php on 2026-07-07; prints
  * the config keys (route, schema_cache, query_cache, batchload_relations, ...).
  */
-
 $path = $argv[1] ?? 'src/lighthouse.php';
 if (! is_file($path)) {
     fwrite(STDERR, "File not found: {$path}\n");
@@ -25,7 +24,7 @@ if (! is_file($path)) {
 
 $tokens = token_get_all(file_get_contents($path));
 $keys = [];
-for ($i = 0, $n = count($tokens); $i < $n; $i++) {
+for ($i = 0, $n = count($tokens); $i < $n; ++$i) {
     $tok = $tokens[$i];
     if (! is_array($tok) || $tok[0] !== T_CONSTANT_ENCAPSED_STRING) {
         continue;
@@ -33,7 +32,7 @@ for ($i = 0, $n = count($tokens); $i < $n; $i++) {
     // Look ahead past whitespace for a `=>` double arrow.
     $j = $i + 1;
     while ($j < $n && is_array($tokens[$j]) && $tokens[$j][0] === T_WHITESPACE) {
-        $j++;
+        ++$j;
     }
     if ($j < $n && is_array($tokens[$j]) && $tokens[$j][0] === T_DOUBLE_ARROW) {
         $keys[] = trim($tok[1], "'\"");
