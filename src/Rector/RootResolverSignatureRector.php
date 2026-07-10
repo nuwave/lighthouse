@@ -163,10 +163,14 @@ CODE_SAMPLE,
 
     protected function isMissingRootParam(ClassMethod $method): bool
     {
+        if (count($method->params) !== 1) {
+            return false;
+        }
+
         $firstParam = $method->params[0];
 
-        return $firstParam->type instanceof Identifier
-            && $firstParam->type->name === 'array';
+        return $firstParam->type === null
+            || ($firstParam->type instanceof Identifier && $firstParam->type->name === 'array');
     }
 
     protected function prependRootParam(ClassMethod $method): void
