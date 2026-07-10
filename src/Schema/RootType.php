@@ -21,4 +21,17 @@ class RootType
             ],
         );
     }
+
+    /** @return array<int, string> */
+    public static function namespaces(string $rootType): array
+    {
+        $key = match ($rootType) {
+            self::QUERY => 'queries',
+            self::MUTATION => 'mutations',
+            self::SUBSCRIPTION => 'subscriptions',
+            default => throw new \InvalidArgumentException("Invalid root type: {$rootType}."),
+        };
+
+        return (array) config("lighthouse.namespaces.{$key}");
+    }
 }

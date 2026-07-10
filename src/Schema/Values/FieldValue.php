@@ -81,9 +81,9 @@ class FieldValue
         $parentName = $this->getParentName();
 
         return match ($parentName) {
-            RootType::QUERY => (array) config('lighthouse.namespaces.queries'),
-            RootType::MUTATION => (array) config('lighthouse.namespaces.mutations'),
-            RootType::SUBSCRIPTION => (array) config('lighthouse.namespaces.subscriptions'),
+            RootType::QUERY,
+            RootType::MUTATION,
+            RootType::SUBSCRIPTION => RootType::namespaces($parentName),
             default => array_map(
                 static fn (string $typesNamespace): string => "{$typesNamespace}\\{$parentName}",
                 (array) config('lighthouse.namespaces.types'),
