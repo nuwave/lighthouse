@@ -104,13 +104,11 @@ CODE_SAMPLE,
         if ($this->isMissingRootParam($invokeMethod)) {
             $this->prependRootParam($invokeMethod);
             $changed = true;
-        }
-
-        if ($this->fixParamType($invokeMethod, 0, $this->rootTypeIdentifier())) {
+        } elseif ($this->fixParamType($invokeMethod, 0, $this->rootTypeIdentifier())) {
             $changed = true;
         }
 
-        if ($this->ensureMinParams($invokeMethod, 2)) {
+        if ($this->ensureArgsParam($invokeMethod)) {
             $changed = true;
         }
 
@@ -118,12 +116,16 @@ CODE_SAMPLE,
             $changed = true;
         }
 
-        if (isset($invokeMethod->params[2]) && $this->fixContextParam($invokeMethod)) {
-            $changed = true;
+        if (isset($invokeMethod->params[2])) {
+            if ($this->fixObjectParam($invokeMethod, 2, \Nuwave\Lighthouse\Support\Contracts\GraphQLContext::class)) {
+                $changed = true;
+            }
         }
 
-        if (isset($invokeMethod->params[3]) && $this->fixResolveInfoParam($invokeMethod)) {
-            $changed = true;
+        if (isset($invokeMethod->params[3])) {
+            if ($this->fixObjectParam($invokeMethod, 3, \Nuwave\Lighthouse\Execution\ResolveInfo::class)) {
+                $changed = true;
+            }
         }
 
         if ($this->normalizeNames($invokeMethod)) {
@@ -228,59 +230,32 @@ CODE_SAMPLE,
         return true;
     }
 
-    protected function ensureMinParams(ClassMethod $method, int $minCount): bool
+    protected function ensureArgsParam(ClassMethod $method): bool
     {
-        if (count($method->params) >= $minCount) {
+        if (count($method->params) >= 2) {
             return false;
         }
 
-        while (count($method->params) < $minCount) {
-            $index = count($method->params);
-            $method->params[] = match ($index) {
-                1 => new Param(new Variable('args'), null, new Identifier('array')),
-                default => throw new \LogicException("Unexpected param index: {$index}."),
-            };
-        }
+        $method->params[] = new Param(new Variable('args'), null, new Identifier('array'));
 
         return true;
     }
 
-    protected function fixContextParam(ClassMethod $method): bool
+    protected function fixObjectParam(ClassMethod $method, int $index, string $expectedClass): bool
     {
-        $param = $method->params[2];
+        $param = $method->params[$index];
         $currentType = $param->type;
 
         if ($currentType instanceof FullyQualified || $currentType instanceof Node\Name) {
-            $typeName = $currentType->toString();
-            $objectType = new ObjectType($typeName);
-            $contextType = new ObjectType(\Nuwave\Lighthouse\Support\Contracts\GraphQLContext::class);
+            $objectType = new ObjectType($currentType->toString());
+            $expectedType = new ObjectType($expectedClass);
 
-            if ($contextType->isSuperTypeOf($objectType)->yes()) {
+            if ($expectedType->isSuperTypeOf($objectType)->yes()) {
                 return false;
             }
         }
 
-        $param->type = new FullyQualified(\Nuwave\Lighthouse\Support\Contracts\GraphQLContext::class);
-
-        return true;
-    }
-
-    protected function fixResolveInfoParam(ClassMethod $method): bool
-    {
-        $param = $method->params[3];
-        $currentType = $param->type;
-
-        if ($currentType instanceof FullyQualified || $currentType instanceof Node\Name) {
-            $typeName = $currentType->toString();
-            $objectType = new ObjectType($typeName);
-            $resolveInfoType = new ObjectType(\Nuwave\Lighthouse\Execution\ResolveInfo::class);
-
-            if ($resolveInfoType->isSuperTypeOf($objectType)->yes()) {
-                return false;
-            }
-        }
-
-        $param->type = new FullyQualified(\Nuwave\Lighthouse\Execution\ResolveInfo::class);
+        $param->type = new FullyQualified($expectedClass);
 
         return true;
     }
