@@ -37,12 +37,15 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class MyQuery
 {
-    public function __invoke(null $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
+    public function __invoke(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
     {
         // ...
     }
 }
 ```
+
+On PHP 8.2+, you can use the more precise `null` type instead of `mixed`.
+The Rector rule below automatically picks the correct type for your PHP version.
 
 ### Rector rule
 
