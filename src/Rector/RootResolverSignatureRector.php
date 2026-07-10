@@ -153,13 +153,23 @@ CODE_SAMPLE,
         return false;
     }
 
-    /** @return list<string> */
+    /**
+     * Subscriptions are excluded — their resolver convention differs (they use subscriber classes, not __invoke).
+     *
+     * @return non-empty-list<string>
+     */
     protected function resolverNamespaces(): array
     {
-        return [
+        $namespaces = [
             ...RootType::namespaces(RootType::QUERY),
             ...RootType::namespaces(RootType::MUTATION),
         ];
+
+        if ($namespaces === []) {
+            throw new \RuntimeException('Lighthouse resolver namespaces are empty. Ensure your Rector config includes bootstrapFiles with the Larastan bootstrap and Lighthouse config loaded.');
+        }
+
+        return $namespaces;
     }
 
     protected function isDirectChildOfNamespace(string $fqcn, string $namespace): bool
