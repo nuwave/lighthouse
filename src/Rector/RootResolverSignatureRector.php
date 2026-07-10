@@ -22,10 +22,10 @@ use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 class RootResolverSignatureRector extends AbstractRector implements ConfigurableRectorInterface
 {
     /** @var array<int, string|null> */
-    private array $paramNames = [];
+    protected array $paramNames = [];
 
     public function __construct(
-        private PhpVersionProvider $phpVersionProvider,
+        protected PhpVersionProvider $phpVersionProvider,
     ) {}
 
     public function getRuleDefinition(): RuleDefinition
@@ -130,7 +130,7 @@ CODE_SAMPLE,
         return $node;
     }
 
-    private function isRootResolver(Class_ $node): bool
+    protected function isRootResolver(Class_ $node): bool
     {
         $fqcn = $node->namespacedName?->toString();
         if ($fqcn === null) {
@@ -147,7 +147,7 @@ CODE_SAMPLE,
     }
 
     /** @return list<string> */
-    private function resolverNamespaces(): array
+    protected function resolverNamespaces(): array
     {
         return [
             ...RootType::namespaces(RootType::QUERY),
@@ -155,13 +155,13 @@ CODE_SAMPLE,
         ];
     }
 
-    private function isDirectChildOfNamespace(string $fqcn, string $namespace): bool
+    protected function isDirectChildOfNamespace(string $fqcn, string $namespace): bool
     {
         return str_starts_with($fqcn, $namespace . '\\')
             && ! str_contains(substr($fqcn, strlen($namespace) + 1), '\\');
     }
 
-    private function isMissingRootParam(ClassMethod $method): bool
+    protected function isMissingRootParam(ClassMethod $method): bool
     {
         $firstParam = $method->params[0];
 
@@ -169,7 +169,7 @@ CODE_SAMPLE,
             && $firstParam->type->name === 'array';
     }
 
-    private function prependRootParam(ClassMethod $method): void
+    protected function prependRootParam(ClassMethod $method): void
     {
         $rootParam = new Param(
             new Variable('root'),
@@ -180,7 +180,7 @@ CODE_SAMPLE,
         array_unshift($method->params, $rootParam);
     }
 
-    private function rootTypeIdentifier(): Identifier
+    protected function rootTypeIdentifier(): Identifier
     {
         if ($this->phpVersionProvider->isAtLeastPhpVersion(PhpVersion::PHP_82)) {
             return new Identifier('null');
@@ -189,7 +189,7 @@ CODE_SAMPLE,
         return new Identifier('mixed');
     }
 
-    private function fixParamType(ClassMethod $method, int $index, Identifier $expectedType): bool
+    protected function fixParamType(ClassMethod $method, int $index, Identifier $expectedType): bool
     {
         if (! isset($method->params[$index])) {
             return false;
@@ -207,7 +207,7 @@ CODE_SAMPLE,
         return true;
     }
 
-    private function ensureMinParams(ClassMethod $method, int $minCount): bool
+    protected function ensureMinParams(ClassMethod $method, int $minCount): bool
     {
         if (count($method->params) >= $minCount) {
             return false;
@@ -224,7 +224,7 @@ CODE_SAMPLE,
         return true;
     }
 
-    private function fixContextParam(ClassMethod $method): bool
+    protected function fixContextParam(ClassMethod $method): bool
     {
         $param = $method->params[2];
         $currentType = $param->type;
@@ -244,7 +244,7 @@ CODE_SAMPLE,
         return true;
     }
 
-    private function fixResolveInfoParam(ClassMethod $method): bool
+    protected function fixResolveInfoParam(ClassMethod $method): bool
     {
         $param = $method->params[3];
         $currentType = $param->type;
@@ -254,7 +254,7 @@ CODE_SAMPLE,
             $objectType = new ObjectType($typeName);
             $resolveInfoType = new ObjectType(\Nuwave\Lighthouse\Execution\ResolveInfo::class);
 
-            if ($resolveInfoType->isSuperTypeOf($objectType)->yes() || $objectType->equals($resolveInfoType)) {
+            if ($resolveInfoType->isSuperTypeOf($objectType)->yes()) {
                 return false;
             }
         }
@@ -264,7 +264,7 @@ CODE_SAMPLE,
         return true;
     }
 
-    private function normalizeNames(ClassMethod $method): bool
+    protected function normalizeNames(ClassMethod $method): bool
     {
         if ($this->paramNames === []) {
             return false;
