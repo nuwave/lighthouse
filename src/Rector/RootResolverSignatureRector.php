@@ -21,11 +21,6 @@ use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 
 class RootResolverSignatureRector extends AbstractRector implements ConfigurableRectorInterface
 {
-    private const DEFAULT_NAMESPACES = [
-        'App\\GraphQL\\Queries',
-        'App\\GraphQL\\Mutations',
-    ];
-
     /** @var array<int, string|null> */
     private array $paramNames = [];
 
@@ -154,20 +149,10 @@ CODE_SAMPLE,
     /** @return list<string> */
     private function resolverNamespaces(): array
     {
-        try {
-            $namespaces = [
-                ...RootType::namespaces(RootType::QUERY),
-                ...RootType::namespaces(RootType::MUTATION),
-            ];
-        } catch (\Throwable) {
-            return self::DEFAULT_NAMESPACES;
-        }
-
-        if ($namespaces === []) {
-            return self::DEFAULT_NAMESPACES;
-        }
-
-        return $namespaces;
+        return [
+            ...RootType::namespaces(RootType::QUERY),
+            ...RootType::namespaces(RootType::MUTATION),
+        ];
     }
 
     private function isDirectChildOfNamespace(string $fqcn, string $namespace): bool

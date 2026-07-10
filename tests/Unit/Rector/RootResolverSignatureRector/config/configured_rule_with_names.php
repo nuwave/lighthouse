@@ -8,6 +8,7 @@ return static function (RectorConfig $rectorConfig): void {
         'paramNames' => ['_', 'args', 'context', 'resolveInfo'],
     ]);
     $rectorConfig->bootstrapFiles([
+        __DIR__ . '/../bootstrap.php',
         __DIR__ . '/../Source/CustomContext.php',
     ]);
 };
