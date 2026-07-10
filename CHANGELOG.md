@@ -11,7 +11,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Added
 
-- Add `RootResolverSignatureRector` rule to auto-fix root resolver `__invoke` signatures https://github.com/nuwave/lighthouse/pull/TODO
+- Add `RootResolverSignatureRector` rule to auto-fix root resolver `__invoke` signatures https://github.com/nuwave/lighthouse/pull/2779
 
 ## v6.68.0
 
