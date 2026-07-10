@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Rector\RootResolverSignatureRector;
 
-use Iterator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Rector\Testing\PHPUnit\AbstractRectorTestCase;
 
@@ -14,7 +13,7 @@ final class RootResolverSignatureRectorWithNamesTest extends AbstractRectorTestC
         $this->doTestFile($filePath);
     }
 
-    public static function provideData(): Iterator
+    public static function provideData(): \Iterator
     {
         return self::yieldFilesFromDirectory(__DIR__ . '/FixtureWithNames');
     }

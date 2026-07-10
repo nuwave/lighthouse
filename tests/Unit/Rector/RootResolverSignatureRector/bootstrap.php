@@ -1,5 +1,7 @@
 <?php declare(strict_types=1);
 
+use function Safe\define;
+
 if (defined('LIGHTHOUSE_RECTOR_BOOTSTRAP_LOADED')) {
     return;
 }

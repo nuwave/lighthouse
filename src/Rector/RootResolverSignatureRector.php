@@ -116,16 +116,12 @@ CODE_SAMPLE,
             $changed = true;
         }
 
-        if (isset($invokeMethod->params[2])) {
-            if ($this->fixObjectParam($invokeMethod, 2, \Nuwave\Lighthouse\Support\Contracts\GraphQLContext::class)) {
-                $changed = true;
-            }
+        if (isset($invokeMethod->params[2]) && $this->fixObjectParam($invokeMethod, 2, \Nuwave\Lighthouse\Support\Contracts\GraphQLContext::class)) {
+            $changed = true;
         }
 
-        if (isset($invokeMethod->params[3])) {
-            if ($this->fixObjectParam($invokeMethod, 3, \Nuwave\Lighthouse\Execution\ResolveInfo::class)) {
-                $changed = true;
-            }
+        if (isset($invokeMethod->params[3]) && $this->fixObjectParam($invokeMethod, 3, \Nuwave\Lighthouse\Execution\ResolveInfo::class)) {
+            $changed = true;
         }
 
         if ($this->normalizeNames($invokeMethod)) {
