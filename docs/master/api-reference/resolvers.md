@@ -26,8 +26,7 @@ The return value of this must fit the return type defined for the corresponding 
 
 Root resolvers are classes with an `__invoke` method that sit directly in the configured
 `lighthouse.namespaces.queries` or `lighthouse.namespaces.mutations` namespaces.
-Lighthouse calls them with positional arguments `($root, $args, $context, $resolveInfo)`,
-where `$root` is always `null` for root types.
+Lighthouse calls them with positional arguments `($root, $args, $context, $resolveInfo)` where `$root` is always `null` for root types.
 
 Omitting `$root` causes Lighthouse's positional `null` to bind to `$args`, producing TypeErrors at runtime.
 The canonical signature for a root resolver is:
@@ -66,7 +65,8 @@ return static function (RectorConfig $rectorConfig): void {
 
 The rule fixes:
 
-- Missing `$root` parameter (detected when the first param is typed `array`)
+- Missing `$root` parameter (detected when there is a single param typed `array` or untyped)
+- Missing `$args` parameter when only `$root` is present
 - Wrong type on the `$root` parameter (must be `null` on PHP 8.2+, `mixed` on earlier versions)
 - Wrong type on `$args` (must be `array`)
 - Wrong type on `$context` if present (must implement `GraphQLContext`)
