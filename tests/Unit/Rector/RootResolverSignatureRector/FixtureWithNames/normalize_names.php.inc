@@ -6,7 +6,9 @@ class Users
 {
     public function __invoke(null $root, array $arguments)
     {
-        return [];
+        $filtered = $arguments['filter'] ?? null;
+
+        return $root ?? $filtered;
     }
 }
 -----
@@ -18,6 +20,8 @@ class Users
 {
     public function __invoke(null $_, array $args)
     {
-        return [];
+        $filtered = $args['filter'] ?? null;
+
+        return $_ ?? $filtered;
     }
 }

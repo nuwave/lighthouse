@@ -13,6 +13,7 @@ use PhpParser\Node\Stmt\ClassMethod;
 use PHPStan\Type\ObjectType;
 use Rector\Contract\Rector\ConfigurableRectorInterface;
 use Rector\Exception\Configuration\InvalidConfigurationException;
+use Rector\Naming\VariableRenamer;
 use Rector\Php\PhpVersionProvider;
 use Rector\Rector\AbstractRector;
 use Rector\ValueObject\PhpVersion;
@@ -26,6 +27,7 @@ class RootResolverSignatureRector extends AbstractRector implements Configurable
 
     public function __construct(
         protected PhpVersionProvider $phpVersionProvider,
+        protected VariableRenamer $variableRenamer,
     ) {}
 
     public function getRuleDefinition(): RuleDefinition
@@ -278,11 +280,13 @@ CODE_SAMPLE,
                 continue;
             }
 
-            if ($param->var->name === $name) {
+            $oldName = $param->var->name;
+            if (! is_string($oldName) || $oldName === $name) {
                 continue;
             }
 
             $param->var = new Variable($name);
+            $this->variableRenamer->renameVariableInFunctionLike($method, $oldName, $name);
             $changed = true;
         }
 
