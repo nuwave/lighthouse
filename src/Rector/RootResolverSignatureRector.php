@@ -68,9 +68,16 @@ CODE_SAMPLE,
     public function configure(array $configuration): void
     {
         $paramNames = $configuration['paramNames'] ?? [];
+        assert(is_array($paramNames), 'paramNames must be an array.');
 
         if (count($paramNames) > 4) {
             throw new InvalidConfigurationException('paramNames must have at most 4 elements.');
+        }
+
+        foreach ($paramNames as $name) {
+            if ($name !== null && ! is_string($name)) {
+                throw new InvalidConfigurationException('Each paramNames element must be a string or null.');
+            }
         }
 
         $this->paramNames = $paramNames;
