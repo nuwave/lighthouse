@@ -1,0 +1,314 @@
+<?php declare(strict_types=1);
+
+namespace Nuwave\Lighthouse\Rector;
+
+use Nuwave\Lighthouse\Schema\RootType;
+use PhpParser\Node;
+use PhpParser\Node\Expr\Variable;
+use PhpParser\Node\Identifier;
+use PhpParser\Node\Name\FullyQualified;
+use PhpParser\Node\Param;
+use PhpParser\Node\Stmt\Class_;
+use PhpParser\Node\Stmt\ClassMethod;
+use PHPStan\Type\ObjectType;
+use Rector\Contract\Rector\ConfigurableRectorInterface;
+use Rector\Exception\Configuration\InvalidConfigurationException;
+use Rector\Php\PhpVersionProvider;
+use Rector\Rector\AbstractRector;
+use Rector\ValueObject\PhpVersion;
+use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
+use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
+
+class RootResolverSignatureRector extends AbstractRector implements ConfigurableRectorInterface
+{
+    private const DEFAULT_NAMESPACES = [
+        'App\\GraphQL\\Queries',
+        'App\\GraphQL\\Mutations',
+    ];
+
+    /** @var array<int, string|null> */
+    private array $paramNames = [];
+
+    public function __construct(
+        private PhpVersionProvider $phpVersionProvider,
+    ) {}
+
+    public function getRuleDefinition(): RuleDefinition
+    {
+        return new RuleDefinition('Fix root resolver __invoke signatures to match Lighthouse calling convention', [
+            new CodeSample(
+                <<<'CODE_SAMPLE'
+namespace App\GraphQL\Queries;
+
+class Users
+{
+    public function __invoke(array $args)
+    {
+        return [];
+    }
+}
+CODE_SAMPLE,
+                <<<'CODE_SAMPLE'
+namespace App\GraphQL\Queries;
+
+class Users
+{
+    public function __invoke(null $root, array $args)
+    {
+        return [];
+    }
+}
+CODE_SAMPLE,
+            ),
+        ]);
+    }
+
+    /** @return array<class-string<Node>> */
+    public function getNodeTypes(): array
+    {
+        return [Class_::class];
+    }
+
+    /** @param  array<string, mixed>  $configuration */
+    public function configure(array $configuration): void
+    {
+        $paramNames = $configuration['paramNames'] ?? [];
+
+        if (count($paramNames) > 4) {
+            throw new InvalidConfigurationException('paramNames must have at most 4 elements.');
+        }
+
+        $this->paramNames = $paramNames;
+    }
+
+    /** @param  Class_  $node */
+    public function refactor(Node $node): ?Node
+    {
+        if (! $this->isRootResolver($node)) {
+            return null;
+        }
+
+        $invokeMethod = $node->getMethod('__invoke');
+        if (! $invokeMethod instanceof ClassMethod) {
+            return null;
+        }
+
+        if ($invokeMethod->params === []) {
+            return null;
+        }
+
+        $changed = false;
+
+        if ($this->isMissingRootParam($invokeMethod)) {
+            $this->prependRootParam($invokeMethod);
+            $changed = true;
+        }
+
+        if ($this->fixParamType($invokeMethod, 0, $this->rootTypeIdentifier())) {
+            $changed = true;
+        }
+
+        if ($this->ensureMinParams($invokeMethod, 2)) {
+            $changed = true;
+        }
+
+        if ($this->fixParamType($invokeMethod, 1, new Identifier('array'))) {
+            $changed = true;
+        }
+
+        if (isset($invokeMethod->params[2]) && $this->fixContextParam($invokeMethod)) {
+            $changed = true;
+        }
+
+        if (isset($invokeMethod->params[3]) && $this->fixResolveInfoParam($invokeMethod)) {
+            $changed = true;
+        }
+
+        if ($this->normalizeNames($invokeMethod)) {
+            $changed = true;
+        }
+
+        if (! $changed) {
+            return null;
+        }
+
+        return $node;
+    }
+
+    private function isRootResolver(Class_ $node): bool
+    {
+        $fqcn = $node->namespacedName?->toString();
+        if ($fqcn === null) {
+            return false;
+        }
+
+        foreach ($this->resolverNamespaces() as $namespace) {
+            if ($this->isDirectChildOfNamespace($fqcn, $namespace)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /** @return list<string> */
+    private function resolverNamespaces(): array
+    {
+        try {
+            $namespaces = [
+                ...RootType::namespaces(RootType::QUERY),
+                ...RootType::namespaces(RootType::MUTATION),
+            ];
+        } catch (\Throwable) {
+            return self::DEFAULT_NAMESPACES;
+        }
+
+        if ($namespaces === []) {
+            return self::DEFAULT_NAMESPACES;
+        }
+
+        return $namespaces;
+    }
+
+    private function isDirectChildOfNamespace(string $fqcn, string $namespace): bool
+    {
+        return str_starts_with($fqcn, $namespace . '\\')
+            && ! str_contains(substr($fqcn, strlen($namespace) + 1), '\\');
+    }
+
+    private function isMissingRootParam(ClassMethod $method): bool
+    {
+        $firstParam = $method->params[0];
+
+        return $firstParam->type instanceof Identifier
+            && $firstParam->type->name === 'array';
+    }
+
+    private function prependRootParam(ClassMethod $method): void
+    {
+        $rootParam = new Param(
+            new Variable('root'),
+            null,
+            $this->rootTypeIdentifier(),
+        );
+
+        array_unshift($method->params, $rootParam);
+    }
+
+    private function rootTypeIdentifier(): Identifier
+    {
+        if ($this->phpVersionProvider->isAtLeastPhpVersion(PhpVersion::PHP_82)) {
+            return new Identifier('null');
+        }
+
+        return new Identifier('mixed');
+    }
+
+    private function fixParamType(ClassMethod $method, int $index, Identifier $expectedType): bool
+    {
+        if (! isset($method->params[$index])) {
+            return false;
+        }
+
+        $param = $method->params[$index];
+        $currentType = $param->type;
+
+        if ($currentType instanceof Identifier && $currentType->name === $expectedType->name) {
+            return false;
+        }
+
+        $param->type = $expectedType;
+
+        return true;
+    }
+
+    private function ensureMinParams(ClassMethod $method, int $minCount): bool
+    {
+        if (count($method->params) >= $minCount) {
+            return false;
+        }
+
+        while (count($method->params) < $minCount) {
+            $index = count($method->params);
+            $method->params[] = match ($index) {
+                1 => new Param(new Variable('args'), null, new Identifier('array')),
+                default => throw new \LogicException("Unexpected param index: {$index}."),
+            };
+        }
+
+        return true;
+    }
+
+    private function fixContextParam(ClassMethod $method): bool
+    {
+        $param = $method->params[2];
+        $currentType = $param->type;
+
+        if ($currentType instanceof FullyQualified || $currentType instanceof Node\Name) {
+            $typeName = $currentType->toString();
+            $objectType = new ObjectType($typeName);
+            $contextType = new ObjectType(\Nuwave\Lighthouse\Support\Contracts\GraphQLContext::class);
+
+            if ($contextType->isSuperTypeOf($objectType)->yes()) {
+                return false;
+            }
+        }
+
+        $param->type = new FullyQualified(\Nuwave\Lighthouse\Support\Contracts\GraphQLContext::class);
+
+        return true;
+    }
+
+    private function fixResolveInfoParam(ClassMethod $method): bool
+    {
+        $param = $method->params[3];
+        $currentType = $param->type;
+
+        if ($currentType instanceof FullyQualified || $currentType instanceof Node\Name) {
+            $typeName = $currentType->toString();
+            $objectType = new ObjectType($typeName);
+            $resolveInfoType = new ObjectType(\Nuwave\Lighthouse\Execution\ResolveInfo::class);
+
+            if ($resolveInfoType->isSuperTypeOf($objectType)->yes() || $objectType->equals($resolveInfoType)) {
+                return false;
+            }
+        }
+
+        $param->type = new FullyQualified(\Nuwave\Lighthouse\Execution\ResolveInfo::class);
+
+        return true;
+    }
+
+    private function normalizeNames(ClassMethod $method): bool
+    {
+        if ($this->paramNames === []) {
+            return false;
+        }
+
+        $changed = false;
+
+        foreach ($this->paramNames as $index => $name) {
+            if ($name === null) {
+                continue;
+            }
+
+            if (! isset($method->params[$index])) {
+                continue;
+            }
+
+            $param = $method->params[$index];
+            if (! $param->var instanceof Variable) {
+                continue;
+            }
+
+            if ($param->var->name === $name) {
+                continue;
+            }
+
+            $param->var = new Variable($name);
+            $changed = true;
+        }
+
+        return $changed;
+    }
+}
