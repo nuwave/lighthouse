@@ -7,6 +7,7 @@
 .vscode
 phpunit.xml
 .gitpod.yml
+docs/superpowers
 
 # Generated files
 .phpunit.result.cache
