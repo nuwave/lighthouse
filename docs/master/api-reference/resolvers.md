@@ -22,6 +22,74 @@ function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolv
 
 The return value of this must fit the return type defined for the corresponding field from the schema.
 
+## Root resolvers
+
+Root resolvers are classes with an `__invoke` method that sit directly in the configured
+`lighthouse.namespaces.queries` or `lighthouse.namespaces.mutations` namespaces.
+Lighthouse calls them with positional arguments `($root, $args, $context, $resolveInfo)`,
+where `$root` is always `null` for root types.
+
+Omitting `$root` causes Lighthouse's positional `null` to bind to `$args`, producing TypeErrors at runtime.
+The canonical signature for a root resolver is:
+
+```php
+use Nuwave\Lighthouse\Execution\ResolveInfo;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+
+class MyQuery
+{
+    public function __invoke(null $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
+    {
+        // ...
+    }
+}
+```
+
+### Rector rule
+
+Lighthouse ships a Rector rule that enforces correct `__invoke` signatures on root resolvers.
+Enable it in your `rector.php`:
+
+```php
+use Nuwave\Lighthouse\Rector\RootResolverSignatureRector;
+use Rector\Config\RectorConfig;
+
+return static function (RectorConfig $rectorConfig): void {
+    $rectorConfig->rule(RootResolverSignatureRector::class);
+
+    // Required: Larastan bootstrap makes config() available
+    $rectorConfig->bootstrapFiles([
+        __DIR__ . '/vendor/larastan/larastan/bootstrap.php',
+    ]);
+};
+```
+
+The rule fixes:
+
+- Missing `$root` parameter (detected when the first param is typed `array`)
+- Wrong type on the `$root` parameter (must be `null` on PHP 8.2+, `mixed` on earlier versions)
+- Wrong type on `$args` (must be `array`)
+- Wrong type on `$context` if present (must implement `GraphQLContext`)
+- Wrong type on `$resolveInfo` if present (must be or extend `ResolveInfo`)
+
+#### Name normalization
+
+Optionally configure preferred parameter names:
+
+```php
+$rectorConfig->ruleWithConfiguration(RootResolverSignatureRector::class, [
+    'paramNames' => ['_', 'args', 'context', 'resolveInfo'],
+]);
+```
+
+Use `null` at any position to skip renaming that parameter:
+
+```php
+$rectorConfig->ruleWithConfiguration(RootResolverSignatureRector::class, [
+    'paramNames' => [null, null, 'context', 'resolveInfo'],
+]);
+```
+
 ## Complexity function signature
 
 The complexity function is used to calculate a query complexity score for a field.
