@@ -7,6 +7,7 @@ use Rector\Testing\PHPUnit\AbstractRectorTestCase;
 
 final class RootResolverSignatureRectorWithNamesTest extends AbstractRectorTestCase
 {
+    /** @dataProvider provideData */
     #[DataProvider('provideData')]
     public function test(string $filePath): void
     {

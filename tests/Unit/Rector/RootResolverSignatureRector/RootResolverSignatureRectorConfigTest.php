@@ -9,7 +9,11 @@ use Rector\Testing\PHPUnit\AbstractRectorTestCase;
 
 final class RootResolverSignatureRectorConfigTest extends AbstractRectorTestCase
 {
-    /** @param  array<string, mixed>  $configuration */
+    /**
+     * @dataProvider invalidConfigurations
+     *
+     * @param  array<string, mixed>  $configuration
+     */
     #[DataProvider('invalidConfigurations')]
     public function testRejectsInvalidConfiguration(array $configuration): void
     {
