@@ -22,7 +22,7 @@ class RootType
         );
     }
 
-    /** @return non-empty-array<array-key, string> */
+    /** @return non-empty-array<string> */
     public static function namespaces(string $rootType): array
     {
         $key = match ($rootType) {
