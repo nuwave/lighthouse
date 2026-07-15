@@ -19,8 +19,17 @@ final class RootResolverSignatureRectorConfigTest extends AbstractRectorTestCase
     {
         $rector = $this->make(RootResolverSignatureRector::class);
 
-        $this->expectException(InvalidConfigurationException::class);
-        $rector->configure($configuration);
+        // Idiomatically the following, triggers as risky with "Test code or tested code did not remove its own exception handlers",
+        // likely due to how AbstractRectorTestCase is set up.
+        // $this->expectException(InvalidConfigurationException::class);
+        $exception = null;
+        try {
+            $rector->configure($configuration);
+        } catch (\Throwable $throwable) {
+            $exception = $throwable;
+        }
+
+        $this->assertInstanceOf(InvalidConfigurationException::class, $exception);
     }
 
     /** @return iterable<string, array{array<string, mixed>}> */
