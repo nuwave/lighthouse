@@ -34,7 +34,7 @@ class RootResolverSignatureRector extends AbstractRector implements Configurable
     {
         return new RuleDefinition('Fix root resolver __invoke signatures to match Lighthouse calling convention', [
             new CodeSample(
-                <<<'CODE_SAMPLE'
+                badCode: <<<'CODE_SAMPLE'
 namespace App\GraphQL\Queries;
 
 class Users
@@ -45,12 +45,12 @@ class Users
     }
 }
 CODE_SAMPLE,
-                <<<'CODE_SAMPLE'
+                goodCode: <<<'CODE_SAMPLE'
 namespace App\GraphQL\Queries;
 
 class Users
 {
-    public function __invoke(null $root, array $args)
+    public function __invoke(mixed $root, array $args)
     {
         return [];
     }
@@ -120,11 +120,15 @@ CODE_SAMPLE,
             $changed = true;
         }
 
-        if (isset($invokeMethod->params[2]) && $this->fixObjectParam($invokeMethod, 2, \Nuwave\Lighthouse\Support\Contracts\GraphQLContext::class)) {
+        if (isset($invokeMethod->params[2])
+            && $this->fixObjectParam($invokeMethod, 2, \Nuwave\Lighthouse\Support\Contracts\GraphQLContext::class)
+        ) {
             $changed = true;
         }
 
-        if (isset($invokeMethod->params[3]) && $this->fixObjectParam($invokeMethod, 3, \Nuwave\Lighthouse\Execution\ResolveInfo::class)) {
+        if (isset($invokeMethod->params[3])
+            && $this->fixObjectParam($invokeMethod, 3, \Nuwave\Lighthouse\Execution\ResolveInfo::class)
+        ) {
             $changed = true;
         }
 
@@ -176,18 +180,17 @@ CODE_SAMPLE,
             return false;
         }
 
-        $firstParam = $method->params[0];
+        $type = $method->params[0]->type;
 
-        return $firstParam->type === null
-            || ($firstParam->type instanceof Identifier && $firstParam->type->name === 'array');
+        return $type === null
+            || ($type instanceof Identifier && $type->name === 'array');
     }
 
     protected function prependRootParam(ClassMethod $method): void
     {
         $rootParam = new Param(
-            new Variable('root'),
-            null,
-            $this->rootTypeIdentifier(),
+            var: new Variable('root'),
+            type: $this->rootTypeIdentifier(),
         );
 
         array_unshift($method->params, $rootParam);
@@ -211,7 +214,9 @@ CODE_SAMPLE,
         $param = $method->params[$index];
         $currentType = $param->type;
 
-        if ($currentType instanceof Identifier && $currentType->name === $expectedType->name) {
+        if ($currentType instanceof Identifier
+            && $currentType->name === $expectedType->name
+        ) {
             return false;
         }
 
@@ -226,7 +231,7 @@ CODE_SAMPLE,
             return false;
         }
 
-        $method->params[] = new Param(new Variable('args'), null, new Identifier('array'));
+        $method->params[] = new Param(var: new Variable('args'), type: new Identifier('array'));
 
         return true;
     }
@@ -236,7 +241,9 @@ CODE_SAMPLE,
         $param = $method->params[$index];
         $currentType = $param->type;
 
-        if ($currentType instanceof FullyQualified || $currentType instanceof Node\Name) {
+        if ($currentType instanceof FullyQualified
+            || $currentType instanceof Node\Name
+        ) {
             $objectType = new ObjectType($currentType->toString());
             $expectedType = new ObjectType($expectedClass);
 
@@ -268,11 +275,12 @@ CODE_SAMPLE,
             }
 
             $param = $method->params[$index];
-            if (! $param->var instanceof Variable) {
+            $variable = $param->var;
+            if (! $variable instanceof Variable) {
                 continue;
             }
 
-            $oldName = $param->var->name;
+            $oldName = $variable->name;
             if (! is_string($oldName) || $oldName === $name) {
                 continue;
             }

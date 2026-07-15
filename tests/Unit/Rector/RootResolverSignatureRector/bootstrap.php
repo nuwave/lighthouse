@@ -10,4 +10,4 @@ define('LIGHTHOUSE_RECTOR_BOOTSTRAP_LOADED', true);
 
 require_once __DIR__ . '/../../../../vendor/larastan/larastan/bootstrap.php';
 
-app()->make('config')->set('lighthouse', require __DIR__ . '/../../../../src/lighthouse.php');
+config()->set('lighthouse', require __DIR__ . '/../../../../src/lighthouse.php');

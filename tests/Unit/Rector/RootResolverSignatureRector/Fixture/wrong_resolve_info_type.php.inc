@@ -2,12 +2,12 @@
 
 namespace App\GraphQL\Queries;
 
-use GraphQL\Type\Definition\ResolveInfo as BaseResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class Users
 {
-    public function __invoke(null $root, array $args, GraphQLContext $context, BaseResolveInfo $resolveInfo)
+    public function __invoke(null $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
     {
         return [];
     }
@@ -17,7 +17,7 @@ class Users
 
 namespace App\GraphQL\Queries;
 
-use GraphQL\Type\Definition\ResolveInfo as BaseResolveInfo;
+use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class Users

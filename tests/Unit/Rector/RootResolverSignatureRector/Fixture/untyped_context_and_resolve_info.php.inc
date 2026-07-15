@@ -2,9 +2,6 @@
 
 namespace App\GraphQL\Queries;
 
-use Nuwave\Lighthouse\Execution\ResolveInfo;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-
 class Users
 {
     public function __invoke(null $root, array $args, $context, $resolveInfo)
@@ -17,8 +14,8 @@ class Users
 
 namespace App\GraphQL\Queries;
 
-use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 
 class Users
 {
