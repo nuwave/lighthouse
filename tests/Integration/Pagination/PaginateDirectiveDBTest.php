@@ -1051,4 +1051,211 @@ GRAPHQL;
             ],
         ])->assertJsonCount(2, 'data.users.data');
     }
+
+    public function testPaginateWithoutFirst(): void
+    {
+        factory(User::class, 3)->create();
+
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type User {
+            id: ID!
+        }
+
+        type Query {
+            users: [User!]! @paginate
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            users {
+                paginatorInfo {
+                    count
+                    total
+                }
+                data {
+                    id
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'users' => [
+                    'paginatorInfo' => [
+                        'count' => 3,
+                        'total' => 3,
+                    ],
+                ],
+            ],
+        ])->assertJsonCount(3, 'data.users.data');
+    }
+
+    public function testPaginateWithFirstNull(): void
+    {
+        factory(User::class, 3)->create();
+
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type User {
+            id: ID!
+        }
+
+        type Query {
+            users: [User!]! @paginate
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            users(first: null) {
+                paginatorInfo {
+                    count
+                    total
+                }
+                data {
+                    id
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'users' => [
+                    'paginatorInfo' => [
+                        'count' => 3,
+                        'total' => 3,
+                    ],
+                ],
+            ],
+        ])->assertJsonCount(3, 'data.users.data');
+    }
+
+    public function testConnectionWithoutFirst(): void
+    {
+        factory(User::class, 3)->create();
+
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type User {
+            id: ID!
+        }
+
+        type Query {
+            users: [User!]! @paginate(type: CONNECTION)
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            users {
+                pageInfo {
+                    count
+                    total
+                    hasNextPage
+                }
+                edges {
+                    node {
+                        id
+                    }
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'users' => [
+                    'pageInfo' => [
+                        'count' => 3,
+                        'total' => 3,
+                        'hasNextPage' => false,
+                    ],
+                ],
+            ],
+        ])->assertJsonCount(3, 'data.users.edges');
+    }
+
+    public function testNestedConnectionWithoutFirst(): void
+    {
+        $user = factory(User::class)->create();
+        $posts = factory(Post::class, 3)->make();
+        $user->posts()->saveMany($posts);
+
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Post {
+            id: ID!
+        }
+
+        type User {
+            id: ID!
+            posts: [Post!]! @hasMany(type: CONNECTION)
+        }
+
+        type Query {
+            user(id: ID! @eq): User @find
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+        {
+            user(id: {$user->id}) {
+                posts {
+                    pageInfo {
+                        count
+                        total
+                    }
+                    edges {
+                        node {
+                            id
+                        }
+                    }
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'user' => [
+                    'posts' => [
+                        'pageInfo' => [
+                            'count' => 3,
+                            'total' => 3,
+                        ],
+                    ],
+                ],
+            ],
+        ])->assertJsonCount(3, 'data.user.posts.edges');
+    }
+
+    public function testPaginateSimpleWithoutFirst(): void
+    {
+        factory(User::class, 3)->create();
+
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type User {
+            id: ID!
+        }
+
+        type Query {
+            users: [User!]! @paginate(type: SIMPLE)
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            users {
+                paginatorInfo {
+                    count
+                    hasMorePages
+                }
+                data {
+                    id
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'users' => [
+                    'paginatorInfo' => [
+                        'count' => 3,
+                        'hasMorePages' => false,
+                    ],
+                ],
+            ],
+        ])->assertJsonCount(3, 'data.users.data');
+    }
 }
