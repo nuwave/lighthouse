@@ -2,7 +2,9 @@
 
 namespace Nuwave\Lighthouse\Rector;
 
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\RootType;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Identifier;
@@ -121,13 +123,13 @@ CODE_SAMPLE,
         }
 
         if (isset($invokeMethod->params[2])
-            && $this->fixObjectParam($invokeMethod, 2, \Nuwave\Lighthouse\Support\Contracts\GraphQLContext::class)
+            && $this->fixObjectParam($invokeMethod, 2, GraphQLContext::class)
         ) {
             $changed = true;
         }
 
         if (isset($invokeMethod->params[3])
-            && $this->fixObjectParam($invokeMethod, 3, \Nuwave\Lighthouse\Execution\ResolveInfo::class)
+            && $this->fixObjectParam($invokeMethod, 3, ResolveInfo::class)
         ) {
             $changed = true;
         }
