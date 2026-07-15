@@ -20,7 +20,6 @@ return static function (RectorConfig $rectorConfig): void {
         PHPUnitSetList::PHPUNIT_90,
         PHPUnitSetList::PHPUNIT_CODE_QUALITY,
     ]);
-    $rectorConfig->rule(Rector\CodingStyle\Rector\Closure\StaticClosureRector::class);
     $rectorConfig->skip([
         __DIR__ . '/src/Tracing/FederatedTracing/Proto', // Generated code
         __DIR__ . '/tests/database/migrations', // Does not fit autoloader standards
@@ -28,14 +27,8 @@ return static function (RectorConfig $rectorConfig): void {
         __DIR__ . '/tests/Unit/Schema/Directives/MethodDirectiveTest.php', // System error: "Undefined array key 0"
         Rector\CodeQuality\Rector\Isset_\IssetOnPropertyObjectToPropertyExistsRector::class, // isset() is nice when moving towards typed properties
         Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector::class, // Unnecessarily complex with PHPStan
-        Rector\CodeQuality\Rector\Concat\JoinStringConcatRector::class => [
-            __DIR__ . '/tests/Integration/OrderBy/OrderByDirectiveTest.php', // Improves clarity
-        ],
         Rector\Php71\Rector\FuncCall\RemoveExtraParametersRector::class => [
             __DIR__ . '/src/Testing/TestResponseMixin.php', // mixins are weird
-        ],
-        Rector\CodingStyle\Rector\Closure\StaticClosureRector::class => [
-            __DIR__ . '/src/Testing/TestResponseMixin.php', // Cannot bind an instance to a static closure
         ],
         Rector\CodingStyle\Rector\ClassMethod\MakeInheritedMethodVisibilitySameAsParentRector::class => [
             __DIR__ . '/tests/Unit/Execution/ResolveInfoTest.php', // Makes method public on purpose
