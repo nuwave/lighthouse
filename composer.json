@@ -43,6 +43,7 @@
         "webonyx/graphql-php": "^15"
     },
     "require-dev": {
+        "composer-runtime-api": "^2",
         "algolia/algoliasearch-client-php": "^3",
         "bensampo/laravel-enum": "^5 || ^6",
         "ergebnis/composer-normalize": "^2.2.2",
