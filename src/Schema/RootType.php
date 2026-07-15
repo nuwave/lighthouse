@@ -22,7 +22,7 @@ class RootType
         );
     }
 
-    /** @return array<int, string> */
+    /** @return non-empty-array<int, string> */
     public static function namespaces(string $rootType): array
     {
         $key = match ($rootType) {
@@ -32,6 +32,18 @@ class RootType
             default => throw new \InvalidArgumentException("Invalid root type: {$rootType}."),
         };
 
-        return (array) config("lighthouse.namespaces.{$key}");
+        $namespaces = (array) config("lighthouse.namespaces.{$key}");
+
+        foreach ($namespaces as $namespace) {
+            if (! is_string($namespace)) {
+                throw new \RuntimeException("Non-string value configured for lighthouse.namespaces.{$key}.");
+            }
+        }
+
+        if ($namespaces === []) {
+            throw new \RuntimeException("No namespaces configured for lighthouse.namespaces.{$key}.");
+        }
+
+        return $namespaces;
     }
 }
