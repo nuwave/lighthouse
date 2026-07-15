@@ -63,7 +63,7 @@ final class CanResolvedDirectiveTest extends CanDirectiveTestBase
 
         $this->schema = $this->getSchema('ability: "view"');
 
-        $this->query()->assertJson([
+        $this->doQuery()->assertJson([
             'data' => [
                 'user' => [
                     'name' => 'foo',
@@ -89,7 +89,7 @@ final class CanResolvedDirectiveTest extends CanDirectiveTestBase
 
         $this->schema = $this->getSchema('ability: "customObject"');
 
-        $this->query()->assertJson([
+        $this->doQuery()->assertJson([
             'data' => [
                 'user' => [
                     'name' => 'foo',
