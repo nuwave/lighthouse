@@ -4,10 +4,10 @@ namespace Tests\Unit\Rector\RootResolverSignatureRector;
 
 use Nuwave\Lighthouse\Rector\RootResolverSignatureRector;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 use Rector\Exception\Configuration\InvalidConfigurationException;
-use Rector\Testing\PHPUnit\AbstractRectorTestCase;
 
-final class RootResolverSignatureRectorConfigTest extends AbstractRectorTestCase
+final class RootResolverSignatureRectorConfigTest extends TestCase
 {
     /**
      * @dataProvider invalidConfigurations
@@ -17,19 +17,11 @@ final class RootResolverSignatureRectorConfigTest extends AbstractRectorTestCase
     #[DataProvider('invalidConfigurations')]
     public function testRejectsInvalidConfiguration(array $configuration): void
     {
-        $rector = $this->make(RootResolverSignatureRector::class);
+        $rector = (new \ReflectionClass(RootResolverSignatureRector::class))
+            ->newInstanceWithoutConstructor();
 
-        // Idiomatically the following, triggers as risky with "Test code or tested code did not remove its own exception handlers",
-        // likely due to how AbstractRectorTestCase is set up.
-        // $this->expectException(InvalidConfigurationException::class);
-        $exception = null;
-        try {
-            $rector->configure($configuration);
-        } catch (\Throwable $throwable) {
-            $exception = $throwable;
-        }
-
-        $this->assertInstanceOf(InvalidConfigurationException::class, $exception);
+        $this->expectException(InvalidConfigurationException::class);
+        $rector->configure($configuration);
     }
 
     /** @return iterable<string, array{array<string, mixed>}> */
@@ -39,10 +31,5 @@ final class RootResolverSignatureRectorConfigTest extends AbstractRectorTestCase
         yield 'non-string element' => [['paramNames' => [42]]];
         yield 'array element' => [['paramNames' => [[]]]];
         yield 'boolean element' => [['paramNames' => [true]]];
-    }
-
-    public function provideConfigFilePath(): string
-    {
-        return __DIR__ . '/config/configured_rule.php';
     }
 }
