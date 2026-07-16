@@ -16,7 +16,7 @@ namespace App\GraphQL\Queries;
 
 class Users
 {
-    public function __invoke(null $root, array $args)
+    public function __invoke(null $root)
     {
         return [];
     }

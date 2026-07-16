@@ -13,7 +13,7 @@ final class RootTypeTest extends TestCase
 
         $namespaces = RootType::namespaces(RootType::QUERY);
 
-        self::assertSame(['App\\GraphQL\\Queries'], $namespaces);
+        $this->assertSame(['App\\GraphQL\\Queries'], $namespaces);
     }
 
     public function testNamespacesReturnsConfiguredMutationNamespaces(): void
@@ -22,7 +22,7 @@ final class RootTypeTest extends TestCase
 
         $namespaces = RootType::namespaces(RootType::MUTATION);
 
-        self::assertSame(['App\\GraphQL\\Mutations', 'App\\Custom\\Mutations'], $namespaces);
+        $this->assertSame(['App\\GraphQL\\Mutations', 'App\\Custom\\Mutations'], $namespaces);
     }
 
     public function testNamespacesThrowsForInvalidRootType(): void
@@ -66,6 +66,6 @@ final class RootTypeTest extends TestCase
 
         $namespaces = RootType::namespaces(RootType::QUERY);
 
-        self::assertSame(['App\\GraphQL\\Queries'], $namespaces);
+        $this->assertSame(['App\\GraphQL\\Queries'], $namespaces);
     }
 }

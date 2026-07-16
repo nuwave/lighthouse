@@ -107,14 +107,15 @@ CODE_SAMPLE,
 
         $changed = false;
 
-        if ($this->isMissingRootParam($invokeMethod)) {
+        $rootWasPrepended = $this->isMissingRootParam($invokeMethod);
+        if ($rootWasPrepended) {
             $this->prependRootParam($invokeMethod);
             $changed = true;
         } elseif ($this->fixParamType($invokeMethod, 0, $this->rootTypeIdentifier())) {
             $changed = true;
         }
 
-        if ($this->ensureArgsParam($invokeMethod)) {
+        if ($rootWasPrepended && $this->ensureArgsParam($invokeMethod)) {
             $changed = true;
         }
 
