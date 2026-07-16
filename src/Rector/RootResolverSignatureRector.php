@@ -22,11 +22,6 @@ use Rector\ValueObject\PhpVersion;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 
-/**
- * Assumes all classes with `__invoke` found under the configured resolver paths are root resolvers.
- * Non-root-resolver classes (e.g. nested field resolvers receiving a parent model as first argument)
- * should either be moved out of those directories or added to the Rector skip list.
- */
 class RootResolverSignatureRector extends AbstractRector implements ConfigurableRectorInterface
 {
     /** @var array<int, string|null> */

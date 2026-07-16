@@ -17,10 +17,14 @@ Add the rule to your `rector.php` configuration:
 use Nuwave\Lighthouse\Rector\RootResolverSignatureRector;
 use Rector\Config\RectorConfig;
 
-return RectorConfig::configure()
-    ->withRules([
-        RootResolverSignatureRector::class,
+return static function (RectorConfig $rectorConfig): void {
+    $rectorConfig->rule(RootResolverSignatureRector::class);
+
+    // Required: Larastan bootstrap makes config() available
+    $rectorConfig->bootstrapFiles([
+        __DIR__ . '/vendor/larastan/larastan/bootstrap.php',
     ]);
+};
 ```
 
 ### What it does
@@ -59,20 +63,21 @@ public function __invoke(): mixed {}
 
 ### Configuration
 
-You can customize the expected parameter names:
+Optionally configure preferred parameter names:
 
 ```php
-use Nuwave\Lighthouse\Rector\RootResolverSignatureRector;
-use Rector\Config\RectorConfig;
-
-return RectorConfig::configure()
-    ->withConfiguredRule(RootResolverSignatureRector::class, [
-        'paramNames' => ['_', 'args', 'context', 'resolveInfo'],
-    ]);
+$rectorConfig->ruleWithConfiguration(RootResolverSignatureRector::class, [
+    'paramNames' => ['_', 'args', 'context', 'resolveInfo'],
+]);
 ```
 
-The `paramNames` array maps parameter positions (0-indexed) to expected names.
-Use `null` to skip renaming a specific position.
+Use `null` at any position to skip renaming that parameter:
+
+```php
+$rectorConfig->ruleWithConfiguration(RootResolverSignatureRector::class, [
+    'paramNames' => [null, null, 'context', 'resolveInfo'],
+]);
+```
 
 ### Known Limitation
 

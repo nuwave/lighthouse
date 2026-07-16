@@ -49,49 +49,8 @@ The Rector rule below automatically picks the correct type for your PHP version.
 
 ### Rector rule
 
-Lighthouse ships a Rector rule that enforces correct `__invoke` signatures on root resolvers.
-Enable it in your `rector.php`:
-
-```php
-use Nuwave\Lighthouse\Rector\RootResolverSignatureRector;
-use Rector\Config\RectorConfig;
-
-return static function (RectorConfig $rectorConfig): void {
-    $rectorConfig->rule(RootResolverSignatureRector::class);
-
-    // Required: Larastan bootstrap makes config() available
-    $rectorConfig->bootstrapFiles([
-        __DIR__ . '/vendor/larastan/larastan/bootstrap.php',
-    ]);
-};
-```
-
-The rule fixes:
-
-- Missing `$root` parameter (detected when the single param is typed `array`, assumed to be `$args`)
-- Useless single root parameters (any single param that is not typed `array` is stripped entirely)
-- Wrong type on the `$root` parameter (must be `null` on PHP 8.2+, `mixed` on earlier versions)
-- Wrong type on `$args` (must be `array`)
-- Wrong type on `$context` if present (must implement `GraphQLContext`)
-- Wrong type on `$resolveInfo` if present (must be or extend `ResolveInfo`)
-
-#### Name normalization
-
-Optionally configure preferred parameter names:
-
-```php
-$rectorConfig->ruleWithConfiguration(RootResolverSignatureRector::class, [
-    'paramNames' => ['_', 'args', 'context', 'resolveInfo'],
-]);
-```
-
-Use `null` at any position to skip renaming that parameter:
-
-```php
-$rectorConfig->ruleWithConfiguration(RootResolverSignatureRector::class, [
-    'paramNames' => [null, null, 'context', 'resolveInfo'],
-]);
-```
+Lighthouse ships `RootResolverSignatureRector` to automatically fix root resolver signatures.
+See [Automated Code Refactoring with Rector](../testing/rector.md) for setup and full documentation.
 
 ## Complexity function signature
 

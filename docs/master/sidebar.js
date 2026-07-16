@@ -30,7 +30,7 @@ module.exports = [
   },
   {
     title: "Testing",
-    children: ["testing/phpunit", "testing/phpstan", "testing/extensions", "testing/rector"],
+    children: ["testing/phpunit", "testing/phpstan", "testing/rector", "testing/extensions"],
   },
   {
     title: "Subscriptions",
