@@ -4,7 +4,7 @@ namespace App\GraphQL\Queries;
 
 class Users
 {
-    public function __invoke(string $root)
+    public function __invoke(mixed $root)
     {
         return [];
     }

@@ -105,6 +105,12 @@ CODE_SAMPLE,
             return null;
         }
 
+        if ($this->isUselessSingleRootParam($invokeMethod)) {
+            $invokeMethod->params = [];
+
+            return $node;
+        }
+
         $changed = false;
 
         $rootWasPrepended = $this->isMissingRootParam($invokeMethod);
@@ -185,8 +191,22 @@ CODE_SAMPLE,
 
         $type = $method->params[0]->type;
 
-        return $type === null
-            || ($type instanceof Identifier && $type->name === 'array');
+        return $type instanceof Identifier && $type->name === 'array';
+    }
+
+    protected function isUselessSingleRootParam(ClassMethod $method): bool
+    {
+        if (count($method->params) !== 1) {
+            return false;
+        }
+
+        $type = $method->params[0]->type;
+
+        if ($type instanceof Identifier && $type->name === 'array') {
+            return false;
+        }
+
+        return true;
     }
 
     protected function prependRootParam(ClassMethod $method): void
