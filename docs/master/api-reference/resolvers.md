@@ -68,8 +68,8 @@ return static function (RectorConfig $rectorConfig): void {
 
 The rule fixes:
 
-- Missing `$root` parameter (detected when there is a single param typed `array` or untyped)
-- Missing `$args` parameter when only `$root` is present
+- Missing `$root` parameter (detected when the single param is typed `array`, assumed to be `$args`)
+- Useless single root parameters (any single param that is not typed `array` is stripped entirely)
 - Wrong type on the `$root` parameter (must be `null` on PHP 8.2+, `mixed` on earlier versions)
 - Wrong type on `$args` (must be `array`)
 - Wrong type on `$context` if present (must implement `GraphQLContext`)
