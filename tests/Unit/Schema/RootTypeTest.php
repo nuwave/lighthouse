@@ -68,4 +68,13 @@ final class RootTypeTest extends TestCase
 
         $this->assertSame(['App\\GraphQL\\Queries'], $namespaces);
     }
+
+    public function testNamespacesReindexesAssociativeArray(): void
+    {
+        config()->set('lighthouse.namespaces.queries', ['custom' => 'App\\GraphQL\\Queries']);
+
+        $namespaces = RootType::namespaces(RootType::QUERY);
+
+        $this->assertSame(['App\\GraphQL\\Queries'], $namespaces);
+    }
 }

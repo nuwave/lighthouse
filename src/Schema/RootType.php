@@ -44,6 +44,6 @@ class RootType
             throw new \RuntimeException("No namespaces configured for lighthouse.namespaces.{$key}.");
         }
 
-        return $namespaces;
+        return array_values($namespaces);
     }
 }
