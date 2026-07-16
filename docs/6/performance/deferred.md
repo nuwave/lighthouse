@@ -13,7 +13,7 @@ Register the service provider `Nuwave\Lighthouse\Defer\DeferServiceProvider`, se
 
 ## Configuration
 
-Consider the configuration options under `defer` in your `config/lighthouse.php` to prevent deferred queries from running to long.
+Consider the configuration options under `defer` in your `config/lighthouse.php` to prevent deferred queries from running too long.
 
 <br />
 
