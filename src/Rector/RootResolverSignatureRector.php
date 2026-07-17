@@ -114,15 +114,10 @@ CODE_SAMPLE,
 
         $changed = false;
 
-        $rootWasPrepended = $this->isMissingRootParam($invokeMethod);
-        if ($rootWasPrepended) {
+        if ($this->isMissingRootParam($invokeMethod)) {
             $this->prependRootParam($invokeMethod);
             $changed = true;
         } elseif ($this->fixParamType($invokeMethod, 0, $this->rootTypeIdentifier())) {
-            $changed = true;
-        }
-
-        if ($rootWasPrepended && $this->ensureArgsParam($invokeMethod)) {
             $changed = true;
         }
 
@@ -253,17 +248,6 @@ CODE_SAMPLE,
         }
 
         $param->type = $expectedType;
-
-        return true;
-    }
-
-    protected function ensureArgsParam(ClassMethod $method): bool
-    {
-        if (count($method->params) >= 2) {
-            return false;
-        }
-
-        $method->params[] = new Param(var: new Variable('args'), type: new Identifier('array'));
 
         return true;
     }
