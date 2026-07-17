@@ -87,7 +87,7 @@ CODE_SAMPLE,
             }
         }
 
-        $this->paramNames = $paramNames;
+        $this->paramNames = array_values($paramNames);
     }
 
     /** @param  Class_  $node */
