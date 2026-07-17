@@ -9,6 +9,7 @@ use PhpParser\Node;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Name\FullyQualified;
+use PhpParser\Node\NullableType;
 use PhpParser\Node\Param;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
@@ -191,6 +192,10 @@ CODE_SAMPLE,
 
         $type = $method->params[0]->type;
 
+        if ($type instanceof NullableType) {
+            $type = $type->type;
+        }
+
         return $type instanceof Identifier && $type->name === 'array';
     }
 
@@ -201,6 +206,10 @@ CODE_SAMPLE,
         }
 
         $type = $method->params[0]->type;
+
+        if ($type instanceof NullableType) {
+            $type = $type->type;
+        }
 
         if ($type instanceof Identifier && $type->name === 'array') {
             return false;
