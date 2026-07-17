@@ -29,6 +29,9 @@ return static function (RectorConfig $rectorConfig): void {
 
 ### What it does
 
+> The examples below use `null $root` (PHP 8.2+).
+> On PHP 8.0/8.1, the rule produces `mixed $root` instead.
+
 **Adds the missing `$root` parameter** when only `array $args` is present:
 
 ```php
