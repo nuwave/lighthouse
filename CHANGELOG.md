@@ -13,6 +13,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Keep lazy type loading lazy on `webonyx/graphql-php >= 15.31.0` by passing scalar overrides explicitly when `SchemaConfig::setScalarOverrides` is available https://github.com/nuwave/lighthouse/pull/2772
 
+## v6.69.0
+
+### Added
+
+- Add `RootResolverSignatureRector` rule to auto-fix root resolver `__invoke` signatures https://github.com/nuwave/lighthouse/pull/2779
+
 ## v6.68.0
 
 ### Added
