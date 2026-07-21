@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Allow injecting into every element of a list using an asterisk `*` wildcard path segment in `@inject` https://github.com/nuwave/lighthouse/pull/2280
+
 ## v6.69.0
 
 ### Added
