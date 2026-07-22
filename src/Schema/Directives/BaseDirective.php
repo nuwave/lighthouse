@@ -204,7 +204,10 @@ abstract class BaseDirective implements Directive
      *
      * This validates that exactly two non-empty parts are given, not that the method exists.
      *
-     * @return array{0: string, 1: string} Contains two entries: [string $className, string $methodName]
+     * @return array{
+     *   0: string,
+     *   1: string,
+     * } Contains two entries: [string $className, string $methodName]
      */
     protected function getMethodArgumentParts(string $argumentName): array
     {
@@ -220,12 +223,18 @@ abstract class BaseDirective implements Directive
             throw new DefinitionException("Directive '{$this->name()}' must have an argument '{$argumentName}' in the form 'ClassName@methodName' or 'ClassName'");
         }
 
-        /** @var array{0: string, 1?: string} $argumentParts */
+        /** @var array{
+         *   0: string,
+         *   1?: string,
+         * } $argumentParts */
         if (empty($argumentParts[1])) {
             $argumentParts[1] = '__invoke';
         }
 
-        /** @var array{0: string, 1: string} $argumentParts */
+        /** @var array{
+         *   0: string,
+         *   1: string,
+         * } $argumentParts */
 
         return $argumentParts;
     }

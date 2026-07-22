@@ -584,4 +584,296 @@ final class CreateDirectiveTest extends DBTestCase
         }
         GRAPHQL);
     }
+
+    /** Proves before-save ordering: posts.task_id is NOT NULL, so saving without the FK set would throw. */
+    public function testUpsertBelongsToBeforeSave(): void
+    {
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Post {
+            id: ID!
+            title: String!
+            task: Task @belongsTo
+        }
+
+        type Task {
+            id: ID!
+            name: String!
+        }
+
+        type Mutation {
+            createPost(input: CreatePostInput! @spread): Post @create
+        }
+
+        input CreatePostInput {
+            title: String!
+            task: UpsertTaskInput @upsert
+        }
+
+        input UpsertTaskInput {
+            id: ID
+            name: String!
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            createPost(input: {
+                title: "My post"
+                task: {
+                    name: "New Task"
+                }
+            }) {
+                id
+                title
+                task {
+                    id
+                    name
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'createPost' => [
+                    'title' => 'My post',
+                    'task' => [
+                        'id' => '1',
+                        'name' => 'New Task',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testUpsertBelongsToTakesPrecedenceOverImplicitRelation(): void
+    {
+        $task = new Task();
+        $task->name = 'Original name';
+        $task->save();
+
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Post {
+            id: ID!
+            title: String!
+            task: Task @belongsTo
+        }
+
+        type Task {
+            id: ID!
+            name: String!
+        }
+
+        type Mutation {
+            createPost(input: CreatePostInput! @spread): Post @create
+        }
+
+        input CreatePostInput {
+            title: String!
+            task: UpsertTaskInput @upsert
+        }
+
+        input UpsertTaskInput {
+            id: ID
+            name: String!
+        }
+        GRAPHQL;
+
+        $updatedName = 'Updated via directive';
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($id: ID!, $name: String!) {
+            createPost(input: {
+                title: "My post"
+                task: {
+                    id: $id
+                    name: $name
+                }
+            }) {
+                id
+                title
+                task {
+                    id
+                    name
+                }
+            }
+        }
+        GRAPHQL, [
+            'id' => $task->id,
+            'name' => $updatedName,
+        ])->assertJson([
+            'data' => [
+                'createPost' => [
+                    'title' => 'My post',
+                    'task' => [
+                        'id' => (string) $task->id,
+                        'name' => $updatedName,
+                    ],
+                ],
+            ],
+        ]);
+
+        $task->refresh();
+        $this->assertSame($updatedName, $task->name);
+    }
+
+    public function testUpsertBelongsToWithNullValue(): void
+    {
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Task {
+            id: ID!
+            name: String!
+            user: User @belongsTo
+        }
+
+        type User {
+            id: ID!
+            name: String!
+        }
+
+        type Mutation {
+            createTask(input: CreateTaskInput! @spread): Task @create
+        }
+
+        input CreateTaskInput {
+            name: String!
+            user: CreateUserInput @upsert
+        }
+
+        input CreateUserInput {
+            id: ID
+            name: String!
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            createTask(input: {
+                name: "My task"
+                user: null
+            }) {
+                id
+                name
+                user {
+                    id
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'createTask' => [
+                    'name' => 'My task',
+                    'user' => null,
+                ],
+            ],
+        ]);
+
+        $this->assertDatabaseCount('users', 0);
+    }
+
+    public function testCustomDirectiveSetsModelAttributesBeforeSave(): void
+    {
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type User {
+            id: ID!
+            name: String!
+            latitude: Float
+            longitude: Float
+        }
+
+        type Mutation {
+            createUser(input: CreateUserInput! @spread): User @create
+        }
+
+        input CreateUserInput {
+            name: String!
+            location: LocationInput @geocode
+        }
+
+        input LocationInput {
+            lat: Float!
+            lng: Float!
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            createUser(input: {
+                name: "Geo User"
+                location: {
+                    lat: 48.1351
+                    lng: 11.5820
+                }
+            }) {
+                id
+                name
+                latitude
+                longitude
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'createUser' => [
+                    'name' => 'Geo User',
+                    'latitude' => 48.1351,
+                    'longitude' => 11.582,
+                ],
+            ],
+        ]);
+    }
+
+    public function testCustomDirectiveSetsModelAttributesBeforeSaveInsideNest(): void
+    {
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type User {
+            id: ID!
+            name: String!
+            latitude: Float
+            longitude: Float
+        }
+
+        type Mutation {
+            createUser(input: CreateUserInput! @spread): User @create
+        }
+
+        input CreateUserInput {
+            name: String!
+            nested: NestedInput @nest
+        }
+
+        input NestedInput {
+            location: LocationInput @geocode
+        }
+
+        input LocationInput {
+            lat: Float!
+            lng: Float!
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            createUser(input: {
+                name: "Nested Geo User"
+                nested: {
+                    location: {
+                        lat: 48.1351
+                        lng: 11.5820
+                    }
+                }
+            }) {
+                id
+                name
+                latitude
+                longitude
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'createUser' => [
+                    'name' => 'Nested Geo User',
+                    'latitude' => 48.1351,
+                    'longitude' => 11.582,
+                ],
+            ],
+        ]);
+    }
 }

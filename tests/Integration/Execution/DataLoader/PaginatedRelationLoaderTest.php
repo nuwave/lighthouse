@@ -37,19 +37,19 @@ final class PaginatedRelationLoaderTest extends DBTestCase
         ))->load($users);
 
         $firstUser = $users[0];
-        \PHPUnit\Framework\Assert::assertInstanceOf(User::class, $firstUser);
+        $this->assertInstanceOf(User::class, $firstUser);
         $tasksPaginator = $firstUser->tasks;
-        \PHPUnit\Framework\Assert::assertInstanceOf(LengthAwarePaginator::class, $tasksPaginator);
+        $this->assertInstanceOf(LengthAwarePaginator::class, $tasksPaginator);
         $this->assertCount($pageSize, $tasksPaginator);
         $firstTask = $tasksPaginator[0];
-        \PHPUnit\Framework\Assert::assertInstanceOf(Task::class, $firstTask);
+        $this->assertInstanceOf(Task::class, $firstTask);
         $this->assertEquals($firstUser->getKey(), $firstTask->user_id);
 
         $secondUser = $users[1];
-        \PHPUnit\Framework\Assert::assertInstanceOf(User::class, $secondUser);
+        $this->assertInstanceOf(User::class, $secondUser);
         $this->assertCount(2, $secondUser->tasks);
         $secondTask = $secondUser->tasks[0];
-        \PHPUnit\Framework\Assert::assertInstanceOf(Task::class, $secondTask);
+        $this->assertInstanceOf(Task::class, $secondTask);
         $this->assertEquals($secondUser->getKey(), $secondTask->user_id);
     }
 
@@ -78,11 +78,11 @@ final class PaginatedRelationLoaderTest extends DBTestCase
         ))->load($users);
 
         $firstUser = $users[0];
-        \PHPUnit\Framework\Assert::assertInstanceOf(User::class, $firstUser);
+        $this->assertInstanceOf(User::class, $firstUser);
         $this->assertSame($firstTasksCount, $firstUser->getAttributes()['tasks_count'] ?? null);
 
         $secondUser = $users[1];
-        \PHPUnit\Framework\Assert::assertInstanceOf(User::class, $secondUser);
+        $this->assertInstanceOf(User::class, $secondUser);
         $this->assertSame($secondTasksCount, $secondUser->getAttributes()['tasks_count'] ?? null);
     }
 
@@ -113,7 +113,7 @@ final class PaginatedRelationLoaderTest extends DBTestCase
         ))->load($users);
 
         $firstUser = $users[0];
-        \PHPUnit\Framework\Assert::assertInstanceOf(User::class, $firstUser);
+        $this->assertInstanceOf(User::class, $firstUser);
 
         $this->assertTrue($firstUser->relationLoaded('tasks'));
         $this->assertTrue($firstUser->relationLoaded('posts'));
@@ -154,12 +154,12 @@ final class PaginatedRelationLoaderTest extends DBTestCase
         ))->load($users);
 
         $firstUser = $users[0];
-        \PHPUnit\Framework\Assert::assertInstanceOf(User::class, $firstUser);
+        $this->assertInstanceOf(User::class, $firstUser);
         $this->assertTrue($firstUser->relationLoaded('tasks'));
         $this->assertCount($tasksUser1, $firstUser->tasks);
 
         $secondUser = $users[1];
-        \PHPUnit\Framework\Assert::assertInstanceOf(User::class, $secondUser);
+        $this->assertInstanceOf(User::class, $secondUser);
         $this->assertTrue($secondUser->relationLoaded('tasks'));
         $this->assertCount($tasksUser2, $secondUser->tasks);
     }
@@ -185,7 +185,7 @@ final class PaginatedRelationLoaderTest extends DBTestCase
         ))->load($tasks);
 
         $firstTask = $tasks[0];
-        \PHPUnit\Framework\Assert::assertInstanceOf(Task::class, $firstTask);
+        $this->assertInstanceOf(Task::class, $firstTask);
         $this->assertCount($first, $firstTask->tags);
     }
 
