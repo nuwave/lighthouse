@@ -206,11 +206,11 @@ CODE_SAMPLE,
             $type = $type->type;
         }
 
-        if ($type instanceof Identifier && $type->name === 'array') {
-            return false;
+        if (! $type instanceof Identifier) {
+            return true;
         }
 
-        return true;
+        return $type->name !== 'array';
     }
 
     protected function prependRootParam(ClassMethod $method): void
