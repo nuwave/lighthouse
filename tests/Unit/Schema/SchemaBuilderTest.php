@@ -240,22 +240,44 @@ final class SchemaBuilderTest extends TestCase
         $this->assertNotNull($scalarOverrides);
         $this->assertCount(1, $scalarOverrides);
 
-        $stringOverride = reset($scalarOverrides);
+        $stringOverride = $scalarOverrides[Type::STRING];
+        $this->assertInstanceOf(Email::class, $stringOverride);
+        $this->assertSame(Type::STRING, $stringOverride->name);
+    }
+
+    public function testRegistersProgrammaticallyOverwrittenBuiltInScalarsAsScalarOverrides(): void
+    {
+        $typeRegistry = $this->app->make(TypeRegistry::class);
+        $typeRegistry->overwrite(new Email(['name' => Type::STRING]));
+
+        $schema = $this->buildSchemaWithPlaceholderQuery('');
+
+        $config = $schema->getConfig();
+        if (! method_exists($config, 'getScalarOverrides')) {
+            $this->markTestSkipped('Requires a version of webonyx/graphql-php that supports SchemaConfig::setScalarOverrides.');
+        }
+
+        $scalarOverrides = $config->getScalarOverrides();
+        $this->assertNotNull($scalarOverrides);
+        $this->assertCount(1, $scalarOverrides);
+
+        $stringOverride = $scalarOverrides[Type::STRING];
         $this->assertInstanceOf(Email::class, $stringOverride);
         $this->assertSame(Type::STRING, $stringOverride->name);
     }
 
     public function testBuiltInScalarLookupDoesNotResolveAllTypes(): void
     {
-        if (! method_exists(SchemaConfig::class, 'setScalarOverrides')) {
-            $this->markTestSkipped('Requires a version of webonyx/graphql-php that supports SchemaConfig::setScalarOverrides.');
-        }
-
         $schema = $this->buildSchemaWithPlaceholderQuery(/** @lang GraphQL */ '
         type Foo {
             bar: Int
         }
         ');
+
+        $config = $schema->getConfig();
+        if (! method_exists($config, 'getScalarOverrides')) {
+            $this->markTestSkipped('Requires a version of webonyx/graphql-php that supports SchemaConfig::setScalarOverrides.');
+        }
 
         $booleanType = $schema->getType(Type::BOOLEAN);
         $this->assertInstanceOf(ScalarType::class, $booleanType);
