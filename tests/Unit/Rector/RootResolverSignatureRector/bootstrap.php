@@ -22,6 +22,7 @@ for ($i = 0; $i < 10; ++$i) {
         restore_error_handler();
         break;
     }
+
     restore_error_handler();
     restore_error_handler();
 }
@@ -31,6 +32,7 @@ for ($i = 0; $i < 10; ++$i) {
         restore_exception_handler();
         break;
     }
+
     restore_exception_handler();
     restore_exception_handler();
 }
