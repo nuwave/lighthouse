@@ -74,7 +74,7 @@ class SchemaBuilder
         // from discovering them by resolving the lazy types callable, which would eagerly
         // build every type in the schema, see https://github.com/nuwave/lighthouse/issues/2771.
         // TODO remove this check when the minimum version of webonyx/graphql-php includes the method
-        if (method_exists($config, 'setScalarOverrides')) {
+        if (method_exists($config, 'setScalarOverrides')) { // @phpstan-ignore function.alreadyNarrowedType (backward compatibility with webonyx/graphql-php < 15.31)
             $config->setScalarOverrides($this->typeRegistry->scalarOverrides());
         }
 

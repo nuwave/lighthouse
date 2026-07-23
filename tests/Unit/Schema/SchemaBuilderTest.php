@@ -218,7 +218,7 @@ final class SchemaBuilderTest extends TestCase
         $schema = $this->buildSchemaWithPlaceholderQuery('');
 
         $config = $schema->getConfig();
-        if (! method_exists($config, 'getScalarOverrides')) {
+        if (! method_exists($config, 'getScalarOverrides')) { // @phpstan-ignore function.alreadyNarrowedType (backward compatibility with webonyx/graphql-php < 15.31)
             $this->markTestSkipped('Requires a version of webonyx/graphql-php that supports SchemaConfig::setScalarOverrides.');
         }
 
@@ -232,7 +232,7 @@ final class SchemaBuilderTest extends TestCase
         ');
 
         $config = $schema->getConfig();
-        if (! method_exists($config, 'getScalarOverrides')) {
+        if (! method_exists($config, 'getScalarOverrides')) { // @phpstan-ignore function.alreadyNarrowedType (backward compatibility with webonyx/graphql-php < 15.31)
             $this->markTestSkipped('Requires a version of webonyx/graphql-php that supports SchemaConfig::setScalarOverrides.');
         }
 
@@ -253,7 +253,7 @@ final class SchemaBuilderTest extends TestCase
         $schema = $this->buildSchemaWithPlaceholderQuery('');
 
         $config = $schema->getConfig();
-        if (! method_exists($config, 'getScalarOverrides')) {
+        if (! method_exists($config, 'getScalarOverrides')) { // @phpstan-ignore function.alreadyNarrowedType (backward compatibility with webonyx/graphql-php < 15.31)
             $this->markTestSkipped('Requires a version of webonyx/graphql-php that supports SchemaConfig::setScalarOverrides.');
         }
 
@@ -275,7 +275,7 @@ final class SchemaBuilderTest extends TestCase
         ');
 
         $config = $schema->getConfig();
-        if (! method_exists($config, 'getScalarOverrides')) {
+        if (! method_exists($config, 'getScalarOverrides')) { // @phpstan-ignore function.alreadyNarrowedType (backward compatibility with webonyx/graphql-php < 15.31)
             $this->markTestSkipped('Requires a version of webonyx/graphql-php that supports SchemaConfig::setScalarOverrides.');
         }
 
