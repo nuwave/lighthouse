@@ -9,6 +9,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.69.1
+
 ### Fixed
 
 - Keep lazy type loading lazy on `webonyx/graphql-php >= 15.31.0` by passing scalar overrides explicitly when `SchemaConfig::setScalarOverrides` is available https://github.com/nuwave/lighthouse/pull/2772
