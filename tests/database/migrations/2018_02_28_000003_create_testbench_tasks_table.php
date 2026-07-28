@@ -16,6 +16,8 @@ final class CreateTestbenchTasksTable extends Migration
                 ->comment('The purpose of this property is to collide with a native model method name');
             $table->unsignedBigInteger('difficulty')->nullable();
             $table->unsignedBigInteger('user_id')->nullable();
+            $table->double('latitude')->nullable();
+            $table->double('longitude')->nullable();
             $table->timestamp('completed_at')->nullable();
             $table->timestamps();
             $table->softDeletes();

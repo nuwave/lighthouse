@@ -876,4 +876,277 @@ final class CreateDirectiveTest extends DBTestCase
             ],
         ]);
     }
+
+    public function testCustomDirectiveSetsModelAttributesBeforeSaveInsideNestedHasMany(): void
+    {
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Task {
+            id: ID!
+            name: String!
+            latitude: Float
+            longitude: Float
+        }
+
+        type User {
+            id: ID!
+            name: String!
+            tasks: [Task!]! @hasMany
+        }
+
+        type Mutation {
+            createUser(input: CreateUserInput! @spread): User @create
+        }
+
+        input CreateUserInput {
+            name: String!
+            tasks: CreateTaskRelation
+        }
+
+        input CreateTaskRelation {
+            create: [CreateTaskInput!]
+        }
+
+        input CreateTaskInput {
+            name: String!
+            location: LocationInput @geocode
+        }
+
+        input LocationInput {
+            lat: Float!
+            lng: Float!
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            createUser(input: {
+                name: "Geo Parent"
+                tasks: {
+                    create: [{
+                        name: "Geo Task"
+                        location: {
+                            lat: 48.1351
+                            lng: 11.5820
+                        }
+                    }]
+                }
+            }) {
+                id
+                name
+                tasks {
+                    id
+                    name
+                    latitude
+                    longitude
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'createUser' => [
+                    'name' => 'Geo Parent',
+                    'tasks' => [
+                        [
+                            'name' => 'Geo Task',
+                            'latitude' => 48.1351,
+                            'longitude' => 11.582,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testCustomDirectiveSetsModelAttributesBeforeSaveInsideNestInsideNestedHasMany(): void
+    {
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Task {
+            id: ID!
+            name: String!
+            latitude: Float
+            longitude: Float
+        }
+
+        type User {
+            id: ID!
+            name: String!
+            tasks: [Task!]! @hasMany
+        }
+
+        type Mutation {
+            createUser(input: CreateUserInput! @spread): User @create
+        }
+
+        input CreateUserInput {
+            name: String!
+            tasks: CreateTaskRelation
+        }
+
+        input CreateTaskRelation {
+            create: [CreateTaskInput!]
+        }
+
+        input CreateTaskInput {
+            name: String!
+            nested: TaskNestedInput @nest
+        }
+
+        input TaskNestedInput {
+            location: LocationInput @geocode
+        }
+
+        input LocationInput {
+            lat: Float!
+            lng: Float!
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            createUser(input: {
+                name: "Geo Nest Parent"
+                tasks: {
+                    create: [{
+                        name: "Geo Nest Task"
+                        nested: {
+                            location: {
+                                lat: 48.1351
+                                lng: 11.5820
+                            }
+                        }
+                    }]
+                }
+            }) {
+                id
+                name
+                tasks {
+                    id
+                    name
+                    latitude
+                    longitude
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'createUser' => [
+                    'name' => 'Geo Nest Parent',
+                    'tasks' => [
+                        [
+                            'name' => 'Geo Nest Task',
+                            'latitude' => 48.1351,
+                            'longitude' => 11.582,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testCustomDirectiveSetsModelAttributesBeforeSaveInsideDeeplyNestedRelation(): void
+    {
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Post {
+            id: ID!
+            title: String!
+            latitude: Float
+            longitude: Float
+        }
+
+        type Task {
+            id: ID!
+            name: String!
+            post: Post @hasOne
+        }
+
+        type User {
+            id: ID!
+            name: String!
+            tasks: [Task!]! @hasMany
+        }
+
+        type Mutation {
+            createUser(input: CreateUserInput! @spread): User @create
+        }
+
+        input CreateUserInput {
+            name: String!
+            tasks: CreateTaskRelation
+        }
+
+        input CreateTaskRelation {
+            create: [CreateTaskInput!]
+        }
+
+        input CreateTaskInput {
+            name: String!
+            post: CreatePostRelation
+        }
+
+        input CreatePostRelation {
+            create: CreatePostInput
+        }
+
+        input CreatePostInput {
+            title: String!
+            location: LocationInput @geocode
+        }
+
+        input LocationInput {
+            lat: Float!
+            lng: Float!
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            createUser(input: {
+                name: "Geo Deep Parent"
+                tasks: {
+                    create: [{
+                        name: "Geo Deep Task"
+                        post: {
+                            create: {
+                                title: "Geo Deep Post"
+                                location: {
+                                    lat: 48.1351
+                                    lng: 11.5820
+                                }
+                            }
+                        }
+                    }]
+                }
+            }) {
+                id
+                name
+                tasks {
+                    id
+                    name
+                    post {
+                        id
+                        title
+                        latitude
+                        longitude
+                    }
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'createUser' => [
+                    'name' => 'Geo Deep Parent',
+                    'tasks' => [
+                        [
+                            'name' => 'Geo Deep Task',
+                            'post' => [
+                                'title' => 'Geo Deep Post',
+                                'latitude' => 48.1351,
+                                'longitude' => 11.582,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
 }

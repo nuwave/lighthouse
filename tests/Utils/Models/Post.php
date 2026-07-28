@@ -21,6 +21,8 @@ use Laravel\Scout\Searchable;
  * Attributes
  * @property string $title
  * @property string|null $body
+ * @property float|null $latitude
+ * @property float|null $longitude
  *
  * Timestamps
  * @property \Illuminate\Support\Carbon $created_at

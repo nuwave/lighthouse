@@ -15,6 +15,8 @@ final class CreateTestbenchPostsTable extends Migration
             $table->unsignedBigInteger('task_id');
             $table->unsignedBigInteger('user_id')->nullable();
             $table->unsignedBigInteger('parent_id')->nullable();
+            $table->double('latitude')->nullable();
+            $table->double('longitude')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

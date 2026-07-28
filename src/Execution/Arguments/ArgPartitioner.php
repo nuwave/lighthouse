@@ -20,33 +20,15 @@ class ArgPartitioner
     /**
      * Partition the arguments into nested and regular.
      *
+     * SaveAwareArgResolvers where runBeforeSave() returns true stay in the regular set
+     * so they reach SaveModel for execution before $model->save().
+     *
      * @return array{
      *   0: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet,
      *   1: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet,
      * }
      */
     public static function nestedArgResolvers(ArgumentSet $argumentSet, mixed $root): array
-    {
-        static::prepareArgResolvers($argumentSet, $root);
-
-        return static::partition(
-            $argumentSet,
-            static fn (string $name, Argument $argument): bool => isset($argument->resolver),
-        );
-    }
-
-    /**
-     * Like nestedArgResolvers(), but excludes SaveAwareArgResolvers that run before save.
-     *
-     * Used by SaveModel's ResolveNested wrapper so pre-save resolvers stay in the
-     * regular set and reach SaveModel for execution before $model->save().
-     *
-     * @return array{
-     *   0: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet,
-     *   1: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet,
-     * }
-     */
-    public static function nestedArgResolversWithoutPreSave(ArgumentSet $argumentSet, mixed $root): array
     {
         $model = static::prepareArgResolvers($argumentSet, $root);
 
