@@ -1149,4 +1149,100 @@ final class CreateDirectiveTest extends DBTestCase
             ],
         ]);
     }
+
+    /**
+     * Lifting pre-save resolvers out of `@nest` keys them by their bare field name,
+     * so a `@nest` child silently replaces a sibling of the same name rather than erroring.
+     * Documents the status quo, not a guarantee - such a schema is ambiguous by design.
+     */
+    public function testNestChildOverwritesSiblingWithSameNameInsideNestedHasMany(): void
+    {
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Task {
+            id: ID!
+            name: String!
+            latitude: Float
+            longitude: Float
+        }
+
+        type User {
+            id: ID!
+            name: String!
+            tasks: [Task!]! @hasMany
+        }
+
+        type Mutation {
+            createUser(input: CreateUserInput! @spread): User @create
+        }
+
+        input CreateUserInput {
+            name: String!
+            tasks: CreateTaskRelation
+        }
+
+        input CreateTaskRelation {
+            create: [CreateTaskInput!]
+        }
+
+        input CreateTaskInput {
+            name: String!
+            location: LocationInput @geocode
+            nested: TaskNestedInput @nest
+        }
+
+        input TaskNestedInput {
+            location: LocationInput @geocode
+        }
+
+        input LocationInput {
+            lat: Float!
+            lng: Float!
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            createUser(input: {
+                name: "Geo Collision Parent"
+                tasks: {
+                    create: [{
+                        name: "Geo Collision Task"
+                        location: {
+                            lat: 1.0
+                            lng: 2.0
+                        }
+                        nested: {
+                            location: {
+                                lat: 48.1351
+                                lng: 11.5820
+                            }
+                        }
+                    }]
+                }
+            }) {
+                id
+                name
+                tasks {
+                    id
+                    name
+                    latitude
+                    longitude
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'createUser' => [
+                    'name' => 'Geo Collision Parent',
+                    'tasks' => [
+                        [
+                            'name' => 'Geo Collision Task',
+                            'latitude' => 48.1351,
+                            'longitude' => 11.582,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
 }
