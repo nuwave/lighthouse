@@ -423,4 +423,94 @@ final class UpdateDirectiveTest extends DBTestCase
             ],
         ]);
     }
+
+    public function testCustomDirectiveSetsModelAttributesBeforeSaveInsideNestedHasMany(): void
+    {
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
+
+        $task = factory(Task::class)->make();
+        $this->assertInstanceOf(Task::class, $task);
+        $task->user()->associate($user);
+        $task->save();
+
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Task {
+            id: ID!
+            name: String!
+            latitude: Float
+            longitude: Float
+        }
+
+        type User {
+            id: ID!
+            name: String!
+            tasks: [Task!]! @hasMany
+        }
+
+        type Mutation {
+            updateUser(input: UpdateUserInput! @spread): User @update
+        }
+
+        input UpdateUserInput {
+            id: ID!
+            name: String
+            tasks: UpdateTaskRelation
+        }
+
+        input UpdateTaskRelation {
+            update: [UpdateTaskInput!]
+        }
+
+        input UpdateTaskInput {
+            id: ID!
+            name: String
+            location: LocationInput @geocode
+        }
+
+        input LocationInput {
+            lat: Float!
+            lng: Float!
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+        mutation {
+            updateUser(input: {
+                id: {$user->id}
+                name: "Geo Update Parent"
+                tasks: {
+                    update: [{
+                        id: {$task->id}
+                        name: "Geo Update Task"
+                        location: {
+                            lat: 48.1351
+                            lng: 11.5820
+                        }
+                    }]
+                }
+            }) {
+                name
+                tasks {
+                    name
+                    latitude
+                    longitude
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'updateUser' => [
+                    'name' => 'Geo Update Parent',
+                    'tasks' => [
+                        [
+                            'name' => 'Geo Update Task',
+                            'latitude' => 48.1351,
+                            'longitude' => 11.582,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
 }

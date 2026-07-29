@@ -550,6 +550,110 @@ GRAPHQL;
         $this->assertSame('baz', User::firstOrFail()->name);
     }
 
+    public function testCustomDirectiveSetsModelAttributesBeforeSaveInsideNestedHasMany(): void
+    {
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
+
+        $task = factory(Task::class)->make();
+        $this->assertInstanceOf(Task::class, $task);
+        $task->user()->associate($user);
+        $task->save();
+
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Task {
+            id: ID!
+            name: String!
+            latitude: Float
+            longitude: Float
+        }
+
+        type User {
+            id: ID!
+            name: String!
+            tasks: [Task!]! @hasMany
+        }
+
+        type Mutation {
+            updateUser(input: UpdateUserInput! @spread): User @update
+        }
+
+        input UpdateUserInput {
+            id: ID!
+            name: String
+            tasks: UpsertTaskRelation
+        }
+
+        input UpsertTaskRelation {
+            upsert: [UpsertTaskInput!]
+        }
+
+        input UpsertTaskInput {
+            id: ID
+            name: String
+            location: LocationInput @geocode
+        }
+
+        input LocationInput {
+            lat: Float!
+            lng: Float!
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+        mutation {
+            updateUser(input: {
+                id: {$user->id}
+                name: "Geo Upsert Parent"
+                tasks: {
+                    upsert: [
+                        {
+                            id: {$task->id}
+                            name: "Geo Upserted Task"
+                            location: {
+                                lat: 48.1351
+                                lng: 11.5820
+                            }
+                        }
+                        {
+                            name: "Geo Inserted Task"
+                            location: {
+                                lat: 52.5200
+                                lng: 13.4050
+                            }
+                        }
+                    ]
+                }
+            }) {
+                name
+                tasks {
+                    name
+                    latitude
+                    longitude
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'updateUser' => [
+                    'name' => 'Geo Upsert Parent',
+                    'tasks' => [
+                        [
+                            'name' => 'Geo Upserted Task',
+                            'latitude' => 48.1351,
+                            'longitude' => 11.582,
+                        ],
+                        [
+                            'name' => 'Geo Inserted Task',
+                            'latitude' => 52.52,
+                            'longitude' => 13.405,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
     public static function resolveType(): Type
     {
         $typeRegistry = Container::getInstance()->make(TypeRegistry::class);
