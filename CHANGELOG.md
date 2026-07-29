@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+
+- Honour `SaveAwareArgResolver::runBeforeSave()` in nested mutations instead of only at the top level https://github.com/nuwave/lighthouse/pull/2784
+
 ## v6.69.1
 
 ### Fixed
