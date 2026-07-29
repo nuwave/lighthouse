@@ -261,7 +261,7 @@ trait MakesGraphQLRequests
 
     protected function refreshSchemaCacheIfNecessary(): void
     {
-        if (in_array(RefreshesSchemaCache::class, class_uses_recursive(static::class), true)) {
+        if (in_array(RefreshesSchemaCache::class, class_uses_recursive(static::class), strict: true)) {
             $this->refreshSchemaCache(); // @phpstan-ignore method.notFound (present in RefreshesSchemaCache)
         }
     }

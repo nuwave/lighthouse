@@ -351,6 +351,82 @@ final class NestDirectiveTest extends DBTestCase
         ]);
     }
 
+    /** Same-named children of sibling `@nest` blocks that write different columns must both run. */
+    public function testSiblingNestBlocksWithSameChildNameBothRun(): void
+    {
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Mutation {
+            createUser(input: CreateUserInput! @spread): User @create
+        }
+
+        input CreateUserInput {
+            name: String!
+            alpha: AlphaInput @nest
+            beta: BetaInput @nest
+        }
+
+        input AlphaInput {
+            detail: LocationInput @geocode
+        }
+
+        input BetaInput {
+            detail: EmailAddressInput @emailAddress
+        }
+
+        input LocationInput {
+            lat: Float!
+            lng: Float!
+        }
+
+        input EmailAddressInput {
+            local: String!
+            domain: String!
+        }
+
+        type User {
+            id: ID!
+            name: String!
+            email: String
+            latitude: Float
+            longitude: Float
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            createUser(input: {
+                name: "Sibling Nest"
+                alpha: {
+                    detail: {
+                        lat: 48.0
+                        lng: 11.0
+                    }
+                }
+                beta: {
+                    detail: {
+                        local: "sibling"
+                        domain: "example.com"
+                    }
+                }
+            }) {
+                name
+                email
+                latitude
+                longitude
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'createUser' => [
+                    'name' => 'Sibling Nest',
+                    'email' => 'sibling@example.com',
+                    'latitude' => 48.0,
+                    'longitude' => 11.0,
+                ],
+            ],
+        ]);
+    }
+
     public function testNullableNestWithNullValue(): void
     {
         $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
