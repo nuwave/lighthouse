@@ -513,4 +513,78 @@ final class UpdateDirectiveTest extends DBTestCase
             ],
         ]);
     }
+
+    /** A `@nest` child named `id` must not clobber the primary key that identifies the row to update. */
+    public function testNestChildNamedIdDoesNotClobberPrimaryKey(): void
+    {
+        $decoy = new Task();
+        $decoy->name = 'Decoy';
+        $decoy->save();
+
+        $task = new Task();
+        $task->name = 'Target';
+        $task->save();
+
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Task {
+            id: ID!
+            name: String!
+            latitude: Float
+            longitude: Float
+        }
+
+        type Mutation {
+            updateTask(input: UpdateTaskInput! @spread): Task @update
+        }
+
+        input UpdateTaskInput {
+            id: ID!
+            name: String
+            nested: TaskNestedInput @nest
+        }
+
+        input TaskNestedInput {
+            id: LocationInput @geocode
+        }
+
+        input LocationInput {
+            lat: Float!
+            lng: Float!
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($id: ID!) {
+            updateTask(input: {
+                id: $id
+                name: "Renamed target"
+                nested: {
+                    id: {
+                        lat: 48.1351
+                        lng: 11.5820
+                    }
+                }
+            }) {
+                id
+                name
+                latitude
+                longitude
+            }
+        }
+        GRAPHQL, [
+            'id' => $task->id,
+        ])->assertJson([
+            'data' => [
+                'updateTask' => [
+                    'id' => (string) $task->id,
+                    'name' => 'Renamed target',
+                    'latitude' => 48.1351,
+                    'longitude' => 11.582,
+                ],
+            ],
+        ]);
+
+        $decoy->refresh();
+        $this->assertSame('Decoy', $decoy->name);
+    }
 }

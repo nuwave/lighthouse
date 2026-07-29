@@ -5,10 +5,11 @@ namespace Nuwave\Lighthouse\Execution\Arguments;
 use GraphQL\Error\Error;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
+use Nuwave\Lighthouse\Support\Contracts\PreSaveArgumentsAware;
 
 use function Safe\array_flip;
 
-class UpsertModel implements ArgResolver
+class UpsertModel implements ArgResolver, PreSaveArgumentsAware
 {
     public const MISSING_IDENTIFYING_COLUMNS_FOR_UPSERT = 'All configured identifying columns must be present and non-null for upsert.';
 
@@ -22,6 +23,24 @@ class UpsertModel implements ArgResolver
         protected ?array $identifyingColumns = null,
     ) {
         $this->previous = $previous;
+    }
+
+    public function withPreSaveArguments(array $arguments): ?static
+    {
+        $previous = $this->previous;
+        if (! $previous instanceof PreSaveArgumentsAware) {
+            return null;
+        }
+
+        $previousWithPreSave = $previous->withPreSaveArguments($arguments);
+        if ($previousWithPreSave === null) {
+            return null;
+        }
+
+        $clone = clone $this;
+        $clone->previous = $previousWithPreSave;
+
+        return $clone;
     }
 
     /**

@@ -1151,11 +1151,10 @@ final class CreateDirectiveTest extends DBTestCase
     }
 
     /**
-     * Lifting pre-save resolvers out of `@nest` keys them by their bare field name,
-     * so a `@nest` child silently replaces a sibling of the same name rather than erroring.
-     * Documents the status quo, not a guarantee - such a schema is ambiguous by design.
+     * The plain sibling `location` and the same-named `@nest` child both run, in that order.
+     * Both write the same columns, so the last write wins.
      */
-    public function testNestChildOverwritesSiblingWithSameNameInsideNestedHasMany(): void
+    public function testNestChildAndSiblingWithSameNameBothRunInsideNestedHasMany(): void
     {
         $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Task {
@@ -1241,6 +1240,68 @@ final class CreateDirectiveTest extends DBTestCase
                             'longitude' => 11.582,
                         ],
                     ],
+                ],
+            ],
+        ]);
+    }
+
+    /** A `@nest` child named like a plain sibling writes different columns, so both values must persist. */
+    public function testNestChildNamedLikePlainSiblingKeepsBoth(): void
+    {
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Task {
+            id: ID!
+            name: String!
+            difficulty: Int
+            latitude: Float
+            longitude: Float
+        }
+
+        type Mutation {
+            createTask(input: CreateTaskInput! @spread): Task @create
+        }
+
+        input CreateTaskInput {
+            name: String!
+            difficulty: Int
+            nested: TaskNestedInput @nest
+        }
+
+        input TaskNestedInput {
+            difficulty: LocationInput @geocode
+        }
+
+        input LocationInput {
+            lat: Float!
+            lng: Float!
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            createTask(input: {
+                name: "Colliding Names"
+                difficulty: 3
+                nested: {
+                    difficulty: {
+                        lat: 48.1351
+                        lng: 11.5820
+                    }
+                }
+            }) {
+                name
+                difficulty
+                latitude
+                longitude
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'createTask' => [
+                    'name' => 'Colliding Names',
+                    'difficulty' => 3,
+                    'latitude' => 48.1351,
+                    'longitude' => 11.582,
                 ],
             ],
         ]);

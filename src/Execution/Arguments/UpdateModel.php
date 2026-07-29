@@ -5,8 +5,9 @@ namespace Nuwave\Lighthouse\Execution\Arguments;
 use GraphQL\Error\Error;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
+use Nuwave\Lighthouse\Support\Contracts\PreSaveArgumentsAware;
 
-class UpdateModel implements ArgResolver
+class UpdateModel implements ArgResolver, PreSaveArgumentsAware
 {
     public const MISSING_PRIMARY_KEY_FOR_UPDATE = 'Missing primary key for update.';
 
@@ -17,6 +18,24 @@ class UpdateModel implements ArgResolver
     public function __construct(callable $previous)
     {
         $this->previous = $previous;
+    }
+
+    public function withPreSaveArguments(array $arguments): ?static
+    {
+        $previous = $this->previous;
+        if (! $previous instanceof PreSaveArgumentsAware) {
+            return null;
+        }
+
+        $previousWithPreSave = $previous->withPreSaveArguments($arguments);
+        if ($previousWithPreSave === null) {
+            return null;
+        }
+
+        $clone = clone $this;
+        $clone->previous = $previousWithPreSave;
+
+        return $clone;
     }
 
     /**

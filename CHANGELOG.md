@@ -12,6 +12,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 ### Fixed
 
 - Honour `SaveAwareArgResolver::runBeforeSave()` in nested mutations instead of only at the top level https://github.com/nuwave/lighthouse/pull/2784
+- Run all pre-save arg resolvers lifted out of `@nest` instead of silently discarding those whose field name collides with a sibling https://github.com/nuwave/lighthouse/pull/2784
 
 ## v6.69.1
 
