@@ -31,15 +31,17 @@ class ResolveNested implements ArgResolver
         $previous = $this->previous;
         $liftedPreSave = [];
 
-        if ($root instanceof Model && $previous instanceof PreSaveArgumentsAware) {
-            $liftable = ArgPartitioner::liftPreSaveResolversFromNest($nestedArgs, $root);
+        if ($root instanceof Model
+            && $previous instanceof PreSaveArgumentsAware
+        ) {
+            $liftableArguments = ArgPartitioner::liftPreSaveResolversFromNest($nestedArgs, $root);
 
-            if ($liftable !== []) {
-                $withPreSave = $previous->withPreSaveArguments($liftable);
+            if ($liftableArguments !== []) {
+                $previousWithPreSave = $previous->withPreSaveArguments($liftableArguments);
 
-                if ($withPreSave !== null) {
-                    $previous = $withPreSave;
-                    $liftedPreSave = $liftable;
+                if ($previousWithPreSave !== null) {
+                    $previous = $previousWithPreSave;
+                    $liftedPreSave = $liftableArguments;
                 }
             }
         }
@@ -62,7 +64,7 @@ class ResolveNested implements ArgResolver
                 continue;
             }
 
-            if (in_array($nested, $alreadyRun, true)) {
+            if (in_array($nested, $alreadyRun, strict: true)) {
                 continue;
             }
 
