@@ -74,7 +74,10 @@ class SaveModel implements ArgResolver, PreSaveArgumentsAware
             $morphToResolver($model, $nestedOperations->value);
         }
 
-        foreach ([...array_values($preSave->arguments), ...$this->preSaveArguments] as $preSaveArgument) {
+        foreach ([
+            ...array_values($preSave->arguments),
+            ...$this->preSaveArguments,
+        ] as $preSaveArgument) {
             $resolver = $preSaveArgument->resolver;
             assert($resolver instanceof SaveAwareArgResolver, 'Resolver must be a SaveAwareArgResolver because we partitioned for it.');
             $resolver($model, $preSaveArgument->value);

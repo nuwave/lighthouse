@@ -198,6 +198,8 @@ class ArgPartitioner
     public static function liftPreSaveResolversFromNest(ArgumentSet $nested, Model $root): array
     {
         $model = new \ReflectionClass($root);
+
+        /** @var list<\Nuwave\Lighthouse\Execution\Arguments\Argument> */
         $lifted = [];
 
         foreach ($nested->arguments as $argument) {
@@ -205,31 +207,43 @@ class ArgPartitioner
                 continue;
             }
 
-            $nestValue = $argument->value;
-            if ($nestValue === null) {
+            array_push($lifted, ...static::liftPreSaveResolversFromNestArgument($argument, $root, $model));
+        }
+
+        return $lifted;
+    }
+
+    /**
+     * Collect the pre-save resolvers within a single @nest argument.
+     *
+     * @param  \ReflectionClass<\Illuminate\Database\Eloquent\Model>  $model
+     *
+     * @return list<\Nuwave\Lighthouse\Execution\Arguments\Argument>
+     */
+    protected static function liftPreSaveResolversFromNestArgument(Argument $nest, Model $root, \ReflectionClass $model): array
+    {
+        $nestValue = $nest->value;
+        if ($nestValue === null) {
+            return [];
+        }
+
+        assert($nestValue instanceof ArgumentSet, 'NestDirective validates that @nest is used on non-list input object types.');
+
+        /** @var list<\Nuwave\Lighthouse\Execution\Arguments\Argument> */
+        $lifted = [];
+
+        foreach ($nestValue->arguments as $childName => $childArgument) {
+            static::attachNestedArgResolver($childName, $childArgument, $model);
+
+            $resolver = $childArgument->resolver;
+
+            if (self::shouldRunBeforeSave($resolver, $root)) {
+                $lifted[] = $childArgument;
                 continue;
             }
 
-            assert($nestValue instanceof ArgumentSet, 'NestDirective validates that @nest is used on non-list input object types.');
-
-            foreach ($nestValue->arguments as $childName => $childArgument) {
-                static::attachNestedArgResolver($childName, $childArgument, $model);
-
-                $resolver = $childArgument->resolver;
-
-                if (self::shouldRunBeforeSave($resolver, $root)) {
-                    $lifted[] = $childArgument;
-                    continue;
-                }
-
-                if ($resolver instanceof NestDirective) {
-                    $childNested = new ArgumentSet();
-                    $childNested->arguments[$childName] = $childArgument;
-
-                    foreach (static::liftPreSaveResolversFromNest($childNested, $root) as $deeplyNested) {
-                        $lifted[] = $deeplyNested;
-                    }
-                }
+            if ($resolver instanceof NestDirective) {
+                array_push($lifted, ...static::liftPreSaveResolversFromNestArgument($childArgument, $root, $model));
             }
         }
 
