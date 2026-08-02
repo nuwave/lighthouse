@@ -80,8 +80,24 @@ class QueryCache
     protected function fromStoreOrParse(string $hash, \Closure $parse): DocumentNode
     {
         $store = $this->makeCacheStore();
+        $key = "lighthouse:query:{$hash}";
 
-        return $store->remember(key: "lighthouse:query:{$hash}", ttl: $this->ttl, callback: $parse);
+        // The AST is cached as an array rather than as a DocumentNode instance.
+        // Cache stores serialize objects, and applications may restrict which classes
+        // unserialize() accepts, which would turn the AST into __PHP_Incomplete_Class.
+        // Anything else found under this key predates that and is simply reparsed.
+        $astArray = $store->get(key: $key);
+        if (is_array($astArray)) {
+            $astInstance = AST::fromArray($astArray);
+            assert($astInstance instanceof DocumentNode, 'The cached AST array is expected to convert to a DocumentNode.');
+
+            return $astInstance;
+        }
+
+        $query = $parse();
+        $store->put(key: $key, value: $query->toArray(), ttl: $this->ttl);
+
+        return $query;
     }
 
     /** @param  \Closure(): DocumentNode  $parse */
