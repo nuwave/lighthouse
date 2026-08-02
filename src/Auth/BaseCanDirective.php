@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Auth;
 
+use GraphQL\Executor\Promise\Adapter\SyncPromise;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
@@ -103,24 +104,36 @@ GRAPHQL;
             try {
                 $resolved = $this->authorizeRequest($root, $args, $context, $resolveInfo, $trackedResolver, $authorizeModel);
                 if ($hasResolved) {
-                    return $resolved;
+                    // A batch loaded relation resolves to a promise, so authorization runs when
+                    // that promise is fulfilled, which is after this try-catch has been left.
+                    // Handle its failure the same way to keep `action` meaningful either way.
+                    return $resolved instanceof SyncPromise
+                        ? $resolved->then(null, fn (\Throwable $throwable): mixed => $this->handleAuthorizationFailure($throwable))
+                        : $resolved;
                 }
             } catch (\Throwable $throwable) {
-                $action = $this->directiveArgValue('action');
-                if ($action === 'EXCEPTION_NOT_AUTHORIZED') {
-                    throw new AuthorizationException(AuthorizationException::MESSAGE, $throwable->getCode(), $throwable);
-                }
-
-                if ($action === 'RETURN_VALUE') {
-                    return $this->directiveArgValue('returnValue');
-                }
-
-                throw $throwable;
+                return $this->handleAuthorizationFailure($throwable);
             }
 
             // Try to resolve the field outside the authorization try-catch block to avoid catching resolver exceptions.
             return $resolver($root, $args, $context, $resolveInfo);
         });
+    }
+
+    /** Apply the configured `action` to an authorization failure. */
+    protected function handleAuthorizationFailure(\Throwable $throwable): mixed
+    {
+        $action = $this->directiveArgValue('action');
+
+        if ($action === 'EXCEPTION_NOT_AUTHORIZED') {
+            throw new AuthorizationException(AuthorizationException::MESSAGE, $throwable->getCode(), $throwable);
+        }
+
+        if ($action === 'RETURN_VALUE') {
+            return $this->directiveArgValue('returnValue');
+        }
+
+        throw $throwable;
     }
 
     /**
