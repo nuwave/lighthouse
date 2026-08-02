@@ -54,6 +54,39 @@ final class QueryCacheTest extends TestCase
         $event->assertDispatchedTimes(KeyWritten::class, 1);
     }
 
+    public function testStoreModeWithRestrictedSerializableClasses(): void
+    {
+        $config = $this->app->make(ConfigRepository::class);
+        $config->set('lighthouse.query_cache.enable', true);
+        $config->set('lighthouse.validation_cache.enable', false);
+
+        // Laravel 13 lets applications restrict which classes may be unserialized from the cache.
+        // Any store that serializes values then calls unserialize() with `allowed_classes`,
+        // turning every disallowed object back into __PHP_Incomplete_Class.
+        $config->set('cache.stores.array.serialize', true);
+        $config->set('cache.serializable_classes', []);
+
+        $query = /** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            foo
+        }
+        GRAPHQL;
+
+        // Populates the query cache.
+        $this->graphQL($query)->assertExactJson([
+            'data' => [
+                'foo' => Foo::THE_ANSWER,
+            ],
+        ]);
+
+        // Reads the cached query back out of the store.
+        $this->graphQL($query)->assertExactJson([
+            'data' => [
+                'foo' => Foo::THE_ANSWER,
+            ],
+        ]);
+    }
+
     public function testDifferentQueriesHasDifferentKeys(): void
     {
         $config = $this->app->make(ConfigRepository::class);
