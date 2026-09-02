@@ -33,13 +33,16 @@ class DirectiveLocator
     /**
      * A map from short directive names to full class names.
      *
+     * Takes precedence over the namespaces, `null` marks a directive as disabled.
+     *
      * E.g.
      * [
      *   'create' => 'Nuwave\Lighthouse\Schema\Directives\CreateDirective',
      *   'custom' => 'App\GraphQL\Directives\CustomDirective',
+     *   'field' => null,
      * ]
      *
-     * @var array<string, class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>>
+     * @var array<string, class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>|null>
      */
     protected array $resolvedClassnames = [];
 
@@ -77,7 +80,7 @@ class DirectiveLocator
      */
     public function classes(): array
     {
-        $directives = [];
+        $directives = $this->resolvedClassnames;
 
         foreach ($this->namespaces() as $directiveNamespace) {
             /** @var array<class-string> $classesInNamespace */
@@ -93,12 +96,15 @@ class DirectiveLocator
                     continue;
                 }
 
-                // Only add the first directive that was found
-                $directives[self::directiveName($class)] ??= $class;
+                // Only add the first directive that was found, keeping disabled ones out
+                $directiveName = self::directiveName($class);
+                if (! array_key_exists($directiveName, $directives)) {
+                    $directives[$directiveName] = $class;
+                }
             }
         }
 
-        return $directives;
+        return array_filter($directives);
     }
 
     /**
@@ -133,7 +139,12 @@ class DirectiveLocator
     public function resolve(string $directiveName): string
     {
         if (array_key_exists($directiveName, $this->resolvedClassnames)) {
-            return $this->resolvedClassnames[$directiveName];
+            $resolvedClassname = $this->resolvedClassnames[$directiveName];
+            if ($resolvedClassname === null) {
+                throw self::noDirectiveFound($directiveName);
+            }
+
+            return $resolvedClassname;
         }
 
         foreach ($this->namespaces() as $directiveNamespace) {
@@ -152,7 +163,12 @@ class DirectiveLocator
             }
         }
 
-        throw new DirectiveException("No directive found for `{$directiveName}`");
+        throw self::noDirectiveFound($directiveName);
+    }
+
+    protected static function noDirectiveFound(string $directiveName): DirectiveException
+    {
+        return new DirectiveException("No directive found for `{$directiveName}`");
     }
 
     /** Returns the expected class name for a directive name. */
@@ -171,12 +187,22 @@ class DirectiveLocator
         );
     }
 
-    /** @param  class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>  $directiveClass */
-    public function setResolved(string $directiveName, string $directiveClass): self
+    /** @param  class-string<\Nuwave\Lighthouse\Support\Contracts\Directive>|null  $directiveClass */
+    public function setResolved(string $directiveName, ?string $directiveClass): self
     {
         $this->resolvedClassnames[$directiveName] = $directiveClass;
 
         return $this;
+    }
+
+    /**
+     * Make a directive unavailable, as if it did not exist.
+     *
+     * Its definition is left out of the schema and using it fails validation.
+     */
+    public function disable(string $directiveName): self
+    {
+        return $this->setResolved($directiveName, null);
     }
 
     /**
