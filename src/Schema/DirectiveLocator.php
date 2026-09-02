@@ -79,8 +79,6 @@ class DirectiveLocator
      */
     public function classes(): array
     {
-        $directives = $this->resolvedClassnames;
-
         foreach ($this->namespaces() as $directiveNamespace) {
             /** @var array<class-string> $classesInNamespace */
             $classesInNamespace = ClassFinder::getClassesInNamespace($directiveNamespace);
@@ -96,11 +94,11 @@ class DirectiveLocator
                 }
 
                 // Only add the first directive that was found
-                $directives[self::directiveName($class)] ??= $class;
+                $this->resolvedClassnames[self::directiveName($class)] ??= $class;
             }
         }
 
-        return $directives;
+        return $this->resolvedClassnames;
     }
 
     /**

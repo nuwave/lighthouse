@@ -11,7 +11,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Changed
 
-- Let classes passed to `DirectiveLocator::setResolved()` take precedence in `DirectiveLocator::classes()` and thus `DirectiveLocator::definitions()` https://github.com/nuwave/lighthouse/pull/2787
+- Classes passed to `DirectiveLocator::setResolved()` take precedence in `DirectiveLocator::classes()` and `DirectiveLocator::definitions()` https://github.com/nuwave/lighthouse/pull/2787
 
 ## v6.69.2
 
