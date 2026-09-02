@@ -85,23 +85,6 @@ final class DirectiveLocatorTest extends TestCase
         $this->assertSame(ComplexityDirective::class, $this->directiveLocator->classes()['field']);
     }
 
-    public function testThrowsIfDirectiveIsDisabled(): void
-    {
-        $this->directiveLocator->disable('field');
-
-        $this->expectException(DirectiveException::class);
-        $this->expectExceptionMessage('No directive found for `field`');
-
-        $this->directiveLocator->create('field');
-    }
-
-    public function testOmitsDefinitionOfDisabledDirective(): void
-    {
-        $this->directiveLocator->disable('field');
-
-        $this->assertArrayNotHasKey('field', $this->directiveLocator->classes());
-    }
-
     public function testThrowsIfDirectiveNameCanNotBeResolved(): void
     {
         $this->expectException(DirectiveException::class);

@@ -104,7 +104,7 @@ When Lighthouse encounters a directive within the schema, it starts looking for 
 This means that our directive is already registered, just by matter of defining it in the default namespace.
 Will take precedence over potential other directives with the same name.
 
-## Override Or Disable Directives
+## Override A Single Directive
 
 Namespace precedence is coarse: it applies to all directives of a namespace at once.
 To control a single directive name, bind its class explicitly in a service provider:
@@ -122,12 +122,6 @@ class GraphQLServiceProvider extends ServiceProvider
     {
         // Use the built-in directive, even though a plugin defines its own @paginate
         $directiveLocator->setResolved('paginate', PaginateDirective::class);
-
-        // Forbid @field, e.g. to enforce that resolvers live in the configured namespaces
-        $directiveLocator->disable('field');
     }
 }
 ```
-
-A disabled directive behaves as if it did not exist: its definition is left out of the schema
-and using it fails schema validation with an unknown directive error.
