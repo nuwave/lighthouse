@@ -9,6 +9,14 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Add `DirectiveLocator::disable()` to make a directive unavailable, leaving its definition out of the schema https://github.com/nuwave/lighthouse/pull/2787
+
+### Changed
+
+- Let classes passed to `DirectiveLocator::setResolved()` take precedence in `DirectiveLocator::classes()` and thus `DirectiveLocator::definitions()` https://github.com/nuwave/lighthouse/pull/2787
+
 ## v6.69.2
 
 ### Fixed
