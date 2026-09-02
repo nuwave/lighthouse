@@ -6,12 +6,12 @@ use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\DirectiveLocator;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Schema\Directives\ComplexityDirective;
 use Nuwave\Lighthouse\Schema\Directives\FieldDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Utils;
+use Tests\Integration\Events\FieldDirective as AlternateFieldDirective;
 use Tests\TestCase;
 
 final class DirectiveLocatorTest extends TestCase
@@ -80,9 +80,9 @@ final class DirectiveLocatorTest extends TestCase
 
     public function testResolvesExplicitlySetClassInsteadOfScannedNamespaces(): void
     {
-        $this->directiveLocator->setResolved('field', ComplexityDirective::class);
+        $this->directiveLocator->setResolved('field', AlternateFieldDirective::class);
 
-        $this->assertSame(ComplexityDirective::class, $this->directiveLocator->classes()['field']);
+        $this->assertSame(AlternateFieldDirective::class, $this->directiveLocator->classes()['field']);
     }
 
     public function testThrowsIfDirectiveNameCanNotBeResolved(): void
