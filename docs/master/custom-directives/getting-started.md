@@ -103,25 +103,3 @@ When Lighthouse encounters a directive within the schema, it starts looking for 
 
 This means that our directive is already registered, just by matter of defining it in the default namespace.
 Will take precedence over potential other directives with the same name.
-
-## Override A Single Directive
-
-Namespace precedence is coarse: it applies to all directives of a namespace at once.
-To control a single directive name, bind its class explicitly in a service provider:
-
-```php
-namespace App\Providers;
-
-use Illuminate\Support\ServiceProvider;
-use Nuwave\Lighthouse\Schema\DirectiveLocator;
-use Nuwave\Lighthouse\Schema\Directives\PaginateDirective;
-
-class GraphQLServiceProvider extends ServiceProvider
-{
-    public function boot(DirectiveLocator $directiveLocator): void
-    {
-        // Use the built-in directive, even though a plugin defines its own @paginate
-        $directiveLocator->setResolved('paginate', PaginateDirective::class);
-    }
-}
-```
