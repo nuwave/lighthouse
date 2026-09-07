@@ -32,9 +32,13 @@ abstract class DBTestCase extends TestCase
 
         // Ensure we start from a clean slate each time
         // We cannot use transactions, as they do not reset autoincrement
-        $databaseName = env('LIGHTHOUSE_TEST_DB_DATABASE') ?? 'lighthouse';
+        $databaseName = env('LIGHTHOUSE_TEST_DB_DATABASE') ?? 'test';
         $columnName = "Tables_in_{$databaseName}";
-        foreach (DB::select('SHOW TABLES') as $table) {
+        $tablesQuery = match ($this->databaseDriver()) {
+            'mysql' => 'SHOW TABLES',
+            'sqlite' => "SELECT name as '{$columnName}' FROM sqlite_master WHERE type = 'table';",
+        };
+        foreach (DB::select($tablesQuery) as $table) {
             DB::table($table->{$columnName})->truncate();
         }
 
@@ -47,22 +51,46 @@ abstract class DBTestCase extends TestCase
 
         $config = $app->make(ConfigRepository::class);
         $config->set('database.default', self::DEFAULT_CONNECTION);
-        $config->set('database.connections.' . self::DEFAULT_CONNECTION, $this->mysqlOptions());
-        $config->set('database.connections.' . self::ALTERNATE_CONNECTION, $this->mysqlOptions());
+
+        $databaseOptions = $this->databaseOptions();
+        $config->set('database.connections.' . self::DEFAULT_CONNECTION, $databaseOptions);
+        $config->set('database.connections.' . self::ALTERNATE_CONNECTION, $databaseOptions);
+    }
+
+    /** @return 'mysql'|'sqlite' */
+    protected function databaseDriver(): string
+    {
+        $driver = env('LIGHTHOUSE_TEST_DB_DRIVER', 'mysql');
+
+        return match ($driver) {
+            'mysql', 'sqlite' => $driver,
+            default => throw new \Exception("LIGHTHOUSE_TEST_DB_DRIVER must be mysql or sqlite, got: {$driver}."),
+        };
     }
 
     /** @return array<string, mixed> */
-    protected function mysqlOptions(): array
+    protected function databaseOptions(): array
     {
-        return [
-            'driver' => 'mysql',
-            'database' => env('LIGHTHOUSE_TEST_DB_DATABASE', 'test'),
-            'username' => env('LIGHTHOUSE_TEST_DB_USERNAME', 'root'),
-            'password' => env('LIGHTHOUSE_TEST_DB_PASSWORD', ''),
-            'host' => env('LIGHTHOUSE_TEST_DB_HOST', 'mysql'),
-            'port' => env('LIGHTHOUSE_TEST_DB_PORT', '3306'),
-            'unix_socket' => env('LIGHTHOUSE_TEST_DB_UNIX_SOCKET', null),
-        ];
+        return match ($this->databaseDriver()) {
+            'mysql' => [
+                'driver' => 'mysql',
+                'database' => env('LIGHTHOUSE_TEST_DB_DATABASE', 'test'),
+                'username' => env('LIGHTHOUSE_TEST_DB_USERNAME', 'root'),
+                'password' => env('LIGHTHOUSE_TEST_DB_PASSWORD', ''),
+                'host' => env('LIGHTHOUSE_TEST_DB_HOST', 'mysql'),
+                'port' => env('LIGHTHOUSE_TEST_DB_PORT', '3306'),
+                'unix_socket' => env('LIGHTHOUSE_TEST_DB_UNIX_SOCKET', null),
+            ],
+            'sqlite' => [
+                'driver' => 'sqlite',
+                'database' => env('LIGHTHOUSE_TEST_DB_DATABASE', 'test.sqlite'),
+                'username' => env('LIGHTHOUSE_TEST_DB_USERNAME', ''),
+                'password' => env('LIGHTHOUSE_TEST_DB_PASSWORD', ''),
+                'host' => env('LIGHTHOUSE_TEST_DB_HOST', ''),
+                'port' => env('LIGHTHOUSE_TEST_DB_PORT', ''),
+                'unix_socket' => env('LIGHTHOUSE_TEST_DB_UNIX_SOCKET', null),
+            ],
+        };
     }
 
     protected function countQueries(?int &$count): void
