@@ -28,10 +28,10 @@ final class WithDirectiveTest extends DBTestCase
         GRAPHQL;
 
         $user = factory(User::class)->create();
-        $this->assertInstanceOf(User::class, $user);
+        assert($user instanceof User);
 
         foreach (factory(Task::class, 3)->make() as $task) {
-            $this->assertInstanceOf(Task::class, $task);
+            assert($task instanceof Task);
             $task->user()->associate($user);
             $task->save();
         }
@@ -60,7 +60,7 @@ final class WithDirectiveTest extends DBTestCase
     {
         $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
-            users: User @first
+            user: User @first
         }
 
         type User {
@@ -71,15 +71,15 @@ final class WithDirectiveTest extends DBTestCase
         GRAPHQL;
 
         $user = factory(User::class)->create();
-        $this->assertInstanceOf(User::class, $user);
+        assert($user instanceof User);
 
         foreach (factory(Post::class, 2)->make() as $post) {
-            $this->assertInstanceOf(Post::class, $post);
+            assert($post instanceof Post);
             $post->user()->associate($user);
             $post->save();
 
             $comment = factory(Comment::class)->make();
-            $this->assertInstanceOf(Comment::class, $comment);
+            assert($comment instanceof Comment);
             $comment->user()->associate($user);
             $comment->post()->associate($post);
             $comment->save();
@@ -92,13 +92,13 @@ final class WithDirectiveTest extends DBTestCase
 
         $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
-            users {
+            user {
                 postsCommentsLoaded
             }
         }
         GRAPHQL)->assertJson([
             'data' => [
-                'users' => [
+                'user' => [
                     'postsCommentsLoaded' => true,
                 ],
             ],
@@ -135,15 +135,15 @@ final class WithDirectiveTest extends DBTestCase
         GRAPHQL;
 
         $user = factory(User::class)->create();
-        $this->assertInstanceOf(User::class, $user);
+        assert($user instanceof User);
 
         $post1 = factory(Post::class)->make();
-        $this->assertInstanceOf(Post::class, $post1);
+        assert($post1 instanceof Post);
         $post1->user()->associate($user);
         $post1->save();
 
         $activity1 = factory(Activity::class)->make();
-        $this->assertInstanceOf(Activity::class, $activity1);
+        assert($activity1 instanceof Activity);
         $activity1->user()->associate($user);
         $activity1->content()->associate($post1);
         $activity1->save();
@@ -154,12 +154,12 @@ final class WithDirectiveTest extends DBTestCase
             );
 
         $post2 = factory(Post::class)->make();
-        $this->assertInstanceOf(Post::class, $post2);
+        assert($post2 instanceof Post);
         $post2->user()->associate($user);
         $post2->save();
 
         $activity2 = factory(Activity::class)->make();
-        $this->assertInstanceOf(Activity::class, $activity2);
+        assert($activity2 instanceof Activity);
         $activity2->user()->associate($user);
         $activity2->content()->associate($post2);
         $activity2->save();
@@ -172,7 +172,7 @@ final class WithDirectiveTest extends DBTestCase
         $task = $post1->task;
 
         $activity3 = factory(Activity::class)->make();
-        $this->assertInstanceOf(Activity::class, $activity3);
+        assert($activity3 instanceof Activity);
         $activity3->user()->associate($user);
         $activity3->content()->associate($task);
         $activity3->save();
@@ -247,8 +247,7 @@ final class WithDirectiveTest extends DBTestCase
     {
         $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
-            users: User
-                @first
+            user: User @first
         }
 
         type User {
@@ -260,21 +259,21 @@ final class WithDirectiveTest extends DBTestCase
         GRAPHQL;
 
         $user = factory(User::class)->create();
-        $this->assertInstanceOf(User::class, $user);
+        assert($user instanceof User);
 
         foreach (factory(Task::class, 3)->make() as $task) {
-            $this->assertInstanceOf(Task::class, $task);
+            assert($task instanceof Task);
             $task->user()->associate($user);
             $task->save();
         }
 
         foreach (factory(Post::class, 2)->make() as $post) {
-            $this->assertInstanceOf(Post::class, $post);
+            assert($post instanceof Post);
             $post->user()->associate($user);
             $post->save();
 
             $comment = factory(Comment::class)->make();
-            $this->assertInstanceOf(Comment::class, $comment);
+            assert($comment instanceof Comment);
             $comment->user()->associate($user);
             $comment->post()->associate($post);
             $comment->save();
@@ -287,13 +286,13 @@ final class WithDirectiveTest extends DBTestCase
 
         $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
-            users {
+            user {
                 tasksAndPostsCommentsLoaded
             }
         }
         GRAPHQL)->assertJson([
             'data' => [
-                'users' => [
+                'user' => [
                     'tasksAndPostsCommentsLoaded' => true,
                 ],
             ],
@@ -302,15 +301,9 @@ final class WithDirectiveTest extends DBTestCase
 
     public function testEagerLoadsMultipleNestedRelationsAtOnce(): void
     {
-        $eloquentCollection = \Illuminate\Database\Eloquent\Collection::class;
-        $simpleModelsLoader = \Nuwave\Lighthouse\Execution\ModelsLoader\SimpleModelsLoader::class;
-        $this->markTestSkipped("Not working due to the current naive usage of {$eloquentCollection}::load() in {$simpleModelsLoader}::load().");
-
-        // @phpstan-ignore-next-line unreachable due to markTestSkipped
         $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
-            users: User
-                @first
+            user: User @first
         }
 
         type User {
@@ -322,33 +315,33 @@ final class WithDirectiveTest extends DBTestCase
         GRAPHQL;
 
         $user = factory(User::class)->create();
-        $this->assertInstanceOf(User::class, $user);
+        assert($user instanceof User);
 
         $taskA = factory(Task::class)->make();
-        $this->assertInstanceOf(Task::class, $taskA);
+        assert($taskA instanceof Task);
         $taskA->user()->associate($user);
         $taskA->save();
 
         $taskB = factory(Task::class)->make();
-        $this->assertInstanceOf(Task::class, $taskB);
+        assert($taskB instanceof Task);
         $taskB->user()->associate($user);
         $taskB->save();
 
         $postA = factory(Post::class)->make();
-        $this->assertInstanceOf(Post::class, $postA);
+        assert($postA instanceof Post);
         $postA->user()->associate($user);
         $postA->task()->associate($taskA);
         $postA->save();
 
         $postB = factory(Post::class)->make();
-        $this->assertInstanceOf(Post::class, $postB);
+        assert($postB instanceof Post);
         $postB->user()->associate($user);
         $postB->task()->associate($taskB);
         $postB->save();
 
         foreach ([$postA, $postB] as $post) {
             $comment = factory(Comment::class)->make();
-            $this->assertInstanceOf(Comment::class, $comment);
+            assert($comment instanceof Comment);
             $comment->user()->associate($user);
             $comment->post()->associate($post);
             $comment->save();
@@ -361,13 +354,13 @@ final class WithDirectiveTest extends DBTestCase
 
         $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
-            users {
+            user {
                 postTasksAndPostsCommentsLoaded
             }
         }
         GRAPHQL)->assertJson([
             'data' => [
-                'users' => [
+                'user' => [
                     'postTasksAndPostsCommentsLoaded' => true,
                 ],
             ],
