@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+
+- Use `serialize` instead of `json_encode` to avoid UTF-8 encoding errors https://github.com/nuwave/lighthouse/issues/2789
+
 ## v6.72.0
 
 ### Changed
