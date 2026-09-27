@@ -14,10 +14,6 @@ return static function (RectorConfig $rectorConfig): void {
         SetList::PHP_73,
         SetList::PHP_74,
         SetList::PHP_80,
-        PHPUnitSetList::PHPUNIT_60,
-        PHPUnitSetList::PHPUNIT_70,
-        PHPUnitSetList::PHPUNIT_80,
-        PHPUnitSetList::PHPUNIT_90,
         PHPUnitSetList::PHPUNIT_CODE_QUALITY,
     ]);
     $rectorConfig->skip([
