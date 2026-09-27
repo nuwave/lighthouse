@@ -9,6 +9,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.71.0
+
 ### Deprecated
 
 - Deprecate `_ide_helper.php` and generating `_lighthouse_ide_helper.php`, Larastan recognizes the `TestResponse` mixin methods without them https://github.com/nuwave/lighthouse/pull/2791
