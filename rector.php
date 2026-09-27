@@ -34,6 +34,9 @@ return static function (RectorConfig $rectorConfig): void {
             __DIR__ . '/tests/Unit/Execution/ResolveInfoTest.php', // Makes method public on purpose
             __DIR__ . '/benchmarks/BenchmarkTestCase.php', // exposes protected methods
         ],
+        Rector\CodeQuality\Rector\Catch_\ThrowWithPreviousExceptionRector::class => [
+            __DIR__ . '/src/Schema/Types/Scalars/DateScalar.php', // previous exception makes GraphQL\Error\Error not client-safe
+        ],
         Rector\CodingStyle\Rector\Encapsed\EncapsedStringsToSprintfRector::class, // unreadable, slow, error prone
         Rector\PHPUnit\CodeQuality\Rector\Class_\NarrowUnusedSetUpDefinedPropertyRector::class, // falsely removes $this->schema assignments in some tests
         Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertEmptyNullableObjectToAssertInstanceofRector::class, // Makes assertions more brittle
