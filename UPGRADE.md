@@ -64,6 +64,12 @@ The Artisan command `lighthouse:clear-cache` was renamed to `lighthouse:clear-sc
 +php artisan lighthouse:clear-schema-cache
 ```
 
+### `_lighthouse_ide_helper.php` is no longer generated
+
+`php artisan lighthouse:ide-helper` no longer writes `_lighthouse_ide_helper.php`, and Lighthouse no longer ships `_ide_helper.php`.
+Delete `_lighthouse_ide_helper.php` and remove `vendor/nuwave/lighthouse/_ide_helper.php` from `stubFiles` in your `phpstan.neon`.
+[Larastan](https://github.com/larastan/larastan) recognizes the `TestResponse` mixin methods without them.
+
 ## v5 to v6
 
 ### `messages` on `@rules` and `@rulesForArray`
