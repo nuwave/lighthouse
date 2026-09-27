@@ -90,7 +90,7 @@ GRAPHQL;
         // If the relation name is not set explicitly, we assume the argument
         // name follows a convention and contains the relation name
         if (is_null($relationName)) {
-            $relationName = lcfirst(
+            return lcfirst(
                 Str::after($this->nodeName(), 'has'),
             );
         }
