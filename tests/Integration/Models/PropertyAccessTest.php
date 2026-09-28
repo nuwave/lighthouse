@@ -3,6 +3,7 @@
 namespace Tests\Integration\Models;
 
 use Tests\DBTestCase;
+use Tests\Utils\Models\Role;
 use Tests\Utils\Models\User;
 
 final class PropertyAccessTest extends DBTestCase
@@ -173,10 +174,114 @@ final class PropertyAccessTest extends DBTestCase
         ])->assertJson([
             'data' => [
                 'user' => [
-                    'exists' => true,
+                    'exists' => null,
                 ],
             ],
         ]);
+    }
+
+    public function testHidesEloquentFrameworkProperty(): void
+    {
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
+
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type User {
+            id: ID!
+            wasRecentlyCreated: Boolean
+        }
+
+        type Query {
+            user(id: ID! @eq): User @find
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        query ($id: ID!) {
+            user(id: $id) {
+                wasRecentlyCreated
+            }
+        }
+        GRAPHQL, [
+            'id' => $user->id,
+        ])->assertJson([
+            'data' => [
+                'user' => [
+                    'wasRecentlyCreated' => null,
+                ],
+            ],
+        ]);
+    }
+
+    public function testHidesRedeclaredEloquentFrameworkProperty(): void
+    {
+        $role = factory(Role::class)->create();
+        $this->assertInstanceOf(Role::class, $role);
+
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Role {
+            id: ID!
+            timestamps: Boolean
+        }
+
+        type Query {
+            role(id: ID! @eq): Role @find
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        query ($id: ID!) {
+            role(id: $id) {
+                timestamps
+            }
+        }
+        GRAPHQL, [
+            'id' => $role->id,
+        ])->assertJson([
+            'data' => [
+                'role' => [
+                    'timestamps' => null,
+                ],
+            ],
+        ]);
+    }
+
+    /** @see https://github.com/webonyx/graphql-php/issues/759 */
+    public function testNullAccessorIsOnlyCalledOnce(): void
+    {
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
+
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type User {
+            id: ID!
+            null_accessor: String
+        }
+
+        type Query {
+            user(id: ID! @eq): User @find
+        }
+        GRAPHQL;
+
+        User::$nullAccessorCalls = 0;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        query ($id: ID!) {
+            user(id: $id) {
+                null_accessor
+            }
+        }
+        GRAPHQL, [
+            'id' => $user->id,
+        ])->assertJson([
+            'data' => [
+                'user' => [
+                    'null_accessor' => null,
+                ],
+            ],
+        ]);
+
+        $this->assertSame(1, User::$nullAccessorCalls);
     }
 
     /** @see https://github.com/nuwave/lighthouse/issues/1671 */

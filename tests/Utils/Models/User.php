@@ -43,6 +43,7 @@ use Tests\Utils\Models\User\UserBuilder;
  * @property-read string|null $company_name
  * @property-read string $laravel_function_property @see \Tests\Integration\Models\PropertyAccessTest
  * @property-read int $expensive_property @see \Tests\Integration\Models\PropertyAccessTest
+ * @property-read null $null_accessor @see \Tests\Integration\Models\PropertyAccessTest
  *
  * Relations
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\AlternateConnection> $alternateConnections
@@ -78,6 +79,9 @@ final class User extends Authenticatable
 
     /** @see \Tests\Integration\Models\PropertyAccessTest */
     public string $php_property = self::PHP_PROPERTY_VALUE;
+
+    /** @see \Tests\Integration\Models\PropertyAccessTest */
+    public static int $nullAccessorCalls = 0;
 
     public function newEloquentBuilder($query): UserBuilder
     {
@@ -209,6 +213,14 @@ final class User extends Authenticatable
     public function getIncrementingAttribute(): string
     {
         return self::INCREMENTING_ATTRIBUTE_VALUE;
+    }
+
+    /** @see \Tests\Integration\Models\PropertyAccessTest */
+    public function getNullAccessorAttribute(): ?string // @phpstan-ignore return.unusedType
+    {
+        ++self::$nullAccessorCalls;
+
+        return null;
     }
 
     /** @see \Tests\Integration\Models\PropertyAccessTest */

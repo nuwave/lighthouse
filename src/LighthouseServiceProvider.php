@@ -172,7 +172,7 @@ class LighthouseServiceProvider extends ServiceProvider
 
         if ($root instanceof Model) {
             $property = $root->getAttribute($fieldName);
-            if ($property === null && property_exists($root, $fieldName)) {
+            if ($property === null && static::isApplicationProperty($root, $fieldName)) {
                 $property = $root->{$fieldName};
             }
         } else {
@@ -182,6 +182,20 @@ class LighthouseServiceProvider extends ServiceProvider
         return $property instanceof \Closure
             ? $property($root, $args, $context, $resolveInfo)
             : $property;
+    }
+
+    /** Excludes framework properties such as $exists, also when a model redeclares them. */
+    protected static function isApplicationProperty(Model $model, string $name): bool
+    {
+        if (! property_exists($model, $name) || property_exists(Model::class, $name)) {
+            return false;
+        }
+
+        $property = new \ReflectionProperty($model, $name);
+
+        return $property->isPublic()
+            && ! $property->isStatic()
+            && ! str_starts_with($property->getDeclaringClass()->getName(), 'Illuminate\\');
     }
 
     protected function loadRoutesFrom($path): void

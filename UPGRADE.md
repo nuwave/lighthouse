@@ -14,10 +14,12 @@ Compare your `lighthouse.php` against the latest [default configuration](src/lig
 The default field resolver was changed from `GraphQL\Executor\Executor::defaultFieldResolver()` to `Nuwave\Lighthouse\LighthouseServiceProvider::defaultFieldResolver()`.
 The new default fields resolver is expected to be mostly compatible with the previous one, but introduces some behavior changes when resolving models:
 
-| Scenario                    | Previous behavior                                                         | New behavior                                                    |
-|-----------------------------|---------------------------------------------------------------------------|-----------------------------------------------------------------|
-| Accessing a magic attribute | Call `isset()` first, then get the value, resulting in duplicate accesses | Attempt to get the value directly, resulting in a single access |
-| Accessing a PHP property    | Call `isset()` first which goes into `__isset` and returns `null`         | Attempt to get the value directly, returning the property value |
+| Scenario                    | Previous behavior                                                         | New behavior                                                                  |
+|-----------------------------|---------------------------------------------------------------------------|-------------------------------------------------------------------------------|
+| Accessing a magic attribute | Call `isset()` first, then get the value, resulting in duplicate accesses | Attempt to get the value directly, resulting in a single access               |
+| Accessing a PHP property    | Call `isset()` first which goes into `__isset` and returns `null`         | Return the value of the public property when the attribute is `null`          |
+
+Eloquent's own properties such as `exists`, `incrementing` or `timestamps` still resolve to `null`, also when a model redeclares them.
 
 ### Leverage automatic test trait setup
 
