@@ -171,7 +171,7 @@ final class PropertyAccessTest extends DBTestCase
         }
         GRAPHQL, [
             'id' => $user->id,
-        ])->assertJson([
+        ])->assertExactJson([
             'data' => [
                 'user' => [
                     'exists' => null,
@@ -204,7 +204,7 @@ final class PropertyAccessTest extends DBTestCase
         }
         GRAPHQL, [
             'id' => $user->id,
-        ])->assertJson([
+        ])->assertExactJson([
             'data' => [
                 'user' => [
                     'wasRecentlyCreated' => null,
@@ -237,7 +237,7 @@ final class PropertyAccessTest extends DBTestCase
         }
         GRAPHQL, [
             'id' => $role->id,
-        ])->assertJson([
+        ])->assertExactJson([
             'data' => [
                 'role' => [
                     'timestamps' => null,
@@ -273,7 +273,7 @@ final class PropertyAccessTest extends DBTestCase
         }
         GRAPHQL, [
             'id' => $user->id,
-        ])->assertJson([
+        ])->assertExactJson([
             'data' => [
                 'user' => [
                     'null_accessor' => null,
