@@ -94,7 +94,6 @@ class PaginatedModelsLoader implements ModelsLoader
                      * this purpose.
                      */
                     fn ($v) => is_string($v) && ! mb_check_encoding($v, 'UTF-8')
-                        // @phpstan-ignore theCodingMachineSafe.function (Safe\mb_convert_encoding is not available in thecodingmachine/safe ^1)
                         ? mb_convert_encoding($v, 'UTF-8', 'ISO-8859-1')
                         : $v,
                     $relatedModel->getRawOriginal(),

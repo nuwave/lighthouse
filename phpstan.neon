@@ -92,6 +92,7 @@ parameters:
 
   # Unavailable in thecodingmachine/safe:1
   - '#Function (hrtime) is unsafe to use\. It can return FALSE instead of throwing an exception\.#'
+  - '#Function (mb_convert_encoding) is unsafe to use\. It can return FALSE instead of throwing an exception\.#'
 
   # Unavailable in thecodingmachine/safe:2
   - '#Function (sort|substr|ksort) is unsafe to use\. It can return FALSE instead of throwing an exception\.#'
