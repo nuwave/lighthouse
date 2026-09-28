@@ -4,7 +4,9 @@ namespace Nuwave\Lighthouse\Support\Contracts;
 
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 
-/** @phpstan-import-type ComplexityFn from \GraphQL\Type\Definition\FieldDefinition */
+/**
+ * @phpstan-import-type ComplexityFn from \GraphQL\Type\Definition\FieldDefinition
+ */
 interface ComplexityResolverDirective extends Directive
 {
     /**

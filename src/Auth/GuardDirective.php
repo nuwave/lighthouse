@@ -17,7 +17,9 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator;
 use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
 
-/** @see \Illuminate\Auth\Middleware\Authenticate */
+/**
+ * @see \Illuminate\Auth\Middleware\Authenticate
+ */
 class GuardDirective extends BaseDirective implements FieldMiddleware, TypeManipulator, TypeExtensionManipulator
 {
     public function __construct(

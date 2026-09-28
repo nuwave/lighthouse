@@ -45,7 +45,7 @@ abstract class DateScalar extends ScalarType
         try {
             return $this->parse($value);
         } catch (\Exception $exception) {
-            throw Error::createLocatedError($exception, $valueNode);
+            throw new Error($exception->getMessage(), $valueNode);
         }
     }
 

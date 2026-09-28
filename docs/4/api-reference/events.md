@@ -1,7 +1,6 @@
 # Events
 
-This reference lists the events that Lighthouse dispatches during a request in order
-of execution.
+This reference lists the events that Lighthouse dispatches during a request in order of execution.
 
 All events reside in the namespace `\Nuwave\Lighthouse\Events`.
 

@@ -1,7 +1,6 @@
 # Schema caching
 
-As your schema grows larger, the construction of the schema from raw `.graphql` files
-becomes more and more costly.
+As your schema grows larger, the construction of the schema from raw `.graphql` files becomes more and more costly.
 
 Make sure to enable schema caching when shipping Lighthouse to production.
 

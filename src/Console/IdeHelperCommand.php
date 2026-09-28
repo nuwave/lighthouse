@@ -151,8 +151,9 @@ GRAPHQL;
 
     /**
      * Users may register types programmatically, e.g. in service providers.
-     * In order to allow referencing those in the schema, it is useful to print
-     * those types to a helper schema, excluding types the user defined in the schema.
+     * It is useful to print those types to a helper schema.
+     * This allows referencing them in the schema.
+     * This excludes types the user defined in the schema.
      */
     public function programmaticTypes(SchemaSourceProvider $schemaSourceProvider, ASTCache $astCache, SchemaBuilder $schemaBuilder): void
     {
@@ -200,6 +201,7 @@ GRAPHQL;
         return base_path() . '/programmatic-types.graphql';
     }
 
+    /** @deprecated TODO remove with v7 */
     public function phpIdeHelper(): void
     {
         $filePath = static::phpIdeHelperPath();
@@ -210,6 +212,7 @@ GRAPHQL;
         $this->info("Wrote PHP definitions to {$filePath}.");
     }
 
+    /** @deprecated TODO remove with v7 */
     public static function phpIdeHelperPath(): string
     {
         return base_path() . '/_lighthouse_ide_helper.php';

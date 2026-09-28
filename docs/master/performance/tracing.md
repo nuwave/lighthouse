@@ -4,8 +4,7 @@ Tracing offers field-level performance monitoring for your GraphQL server.
 
 ## Setup
 
-Register the service provider `Nuwave\Lighthouse\Tracing\TracingServiceProvider`,
-see [registering providers in Laravel](https://laravel.com/docs/providers#registering-providers).
+Register the service provider `Nuwave\Lighthouse\Tracing\TracingServiceProvider`, see [registering providers in Laravel](https://laravel.com/docs/providers#registering-providers).
 
 ## Drivers
 

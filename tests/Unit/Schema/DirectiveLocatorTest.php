@@ -11,6 +11,7 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Utils;
+use Tests\Integration\Events\FieldDirective as AlternateFieldDirective;
 use Tests\TestCase;
 
 final class DirectiveLocatorTest extends TestCase
@@ -56,7 +57,7 @@ final class DirectiveLocatorTest extends TestCase
                     foo: String @foo
         GRAPHQL);
 
-        $directive = new class() implements FieldMiddleware {
+        $directive = new class implements FieldMiddleware {
             public static function definition(): string
             {
                 return /** @lang GraphQL */ <<<'GRAPHQL'
@@ -75,6 +76,13 @@ final class DirectiveLocatorTest extends TestCase
             ->first();
 
         $this->assertNotInstanceOf(BaseDirective::class, $directive);
+    }
+
+    public function testResolvesExplicitlySetClassInsteadOfScannedNamespaces(): void
+    {
+        $this->directiveLocator->setResolved('field', AlternateFieldDirective::class);
+
+        $this->assertSame(AlternateFieldDirective::class, $this->directiveLocator->classes()['field']);
     }
 
     public function testThrowsIfDirectiveNameCanNotBeResolved(): void

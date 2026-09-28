@@ -2,7 +2,7 @@
 home: true
 title: Lighthouse - A framework for serving GraphQL from Laravel
 heroImage: /logo.svg
-actionText: Get Started  →
+actionText: Get Started →
 actionLink: /latest/getting-started/installation
 features:
   - title: 📜 SDL First

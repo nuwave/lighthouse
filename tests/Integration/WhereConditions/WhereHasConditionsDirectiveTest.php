@@ -92,7 +92,7 @@ final class WhereHasConditionsDirectiveTest extends DBTestCase
     {
         $userWithoutCompany = factory(User::class)->make();
         $this->assertInstanceOf(User::class, $userWithoutCompany);
-        $userWithoutCompany->company_id = null;
+        $userWithoutCompany->company()->dissociate();
         $userWithoutCompany->save();
 
         factory(User::class)->create();

@@ -1,12 +1,10 @@
 # Validation
 
-Lighthouse allows you to use [Laravel's validation](https://laravel.com/docs/validation)
-for your queries and mutations.
+Lighthouse allows you to use [Laravel's validation](https://laravel.com/docs/validation) for your queries and mutations.
 
 ## Single Arguments
 
-The simplest way to leverage the built-in validation rules is to use the
-[@rules](../api-reference/directives.md#rules) directive.
+The simplest way to leverage the built-in validation rules is to use the [@rules](../api-reference/directives.md#rules) directive.
 
 ```graphql
 type Mutation {
@@ -14,8 +12,8 @@ type Mutation {
 }
 ```
 
-In the case of a validation error, Lighthouse will abort execution and return the validation messages
-as part of the response.
+If validation fails, Lighthouse aborts execution.
+It returns the validation messages as part of the response.
 
 ```graphql
 mutation {
@@ -96,11 +94,10 @@ input CreatePostInput {
 }
 ```
 
-Using the [`unique`](https://laravel.com/docs/validation#rule-unique)
-validation rule can be a bit tricky.
+Using the [`unique`](https://laravel.com/docs/validation#rule-unique) validation rule can be a bit tricky.
 
-If the argument is nested within an input object, the argument path will not
-match the column name, so you have to specify the column name explicitly.
+If the argument is nested within an input object, the argument path will not match the column name.
+So you have to specify the column name explicitly.
 
 ```graphql
 input CreateUserInput {
@@ -110,8 +107,7 @@ input CreateUserInput {
 
 ## Validating Arrays
 
-When you are passing in an array as an argument to a field, you might
-want to apply some validation on the array itself, using [@rulesForArray](../api-reference/directives.md#rulesforarray)
+When you are passing in an array as an argument to a field, you might want to apply some validation on the array itself, using [@rulesForArray](../api-reference/directives.md#rulesforarray)
 
 ```graphql
 type Mutation {
@@ -122,8 +118,7 @@ type Mutation {
 }
 ```
 
-You can also combine this with [@rules](../api-reference/directives.md#rules) to validate
-both size and contents of an argument array.
+You can also combine this with [@rules](../api-reference/directives.md#rules) to validate both size and contents of an argument array.
 For example, you might require a list of at least 3 valid emails to be passed.
 
 ```graphql
@@ -136,9 +131,9 @@ type Mutation {
 
 ## Validator Classes
 
-In cases where your validation becomes too complex and demanding, you want to have the power of PHP to perform
-complex validation. For example, accessing existing data in the database or validating the combination of input
-values cannot be achieved with the examples above. This is where validator classes come into play.
+In cases where your validation becomes too complex and demanding, you want to have the power of PHP to perform complex validation.
+For example, accessing existing data in the database or validating the combination of input values cannot be achieved with the examples above.
+This is where validator classes come into play.
 
 Validator classes can be reused on field definitions or input types within your schema.
 Use the [@validator](../api-reference/directives.md#validator) directive:
@@ -150,15 +145,15 @@ input UpdateUserInput @validator {
 }
 ```
 
-We need to back that with a validator class. Lighthouse uses a simple naming convention for validator classes,
-use the name of the input type and append `Validator`:
+We need to back that with a validator class.
+Lighthouse uses a simple naming convention for validator classes, use the name of the input type and append `Validator`:
 
 ```shell
 php artisan lighthouse:validator UpdateUserInputValidator
 ```
 
-The resulting class will be placed in your configured validator namespace. Let's go ahead
-and define the validation rules for the input:
+The resulting class will be placed in your configured validator namespace.
+Let's go ahead and define the validation rules for the input:
 
 ```php
 namespace App\GraphQL\Validators;
@@ -183,8 +178,8 @@ final class UpdateUserInputValidator extends Validator
 }
 ```
 
-Note that this gives you access to all kinds of programmatic validation rules that Laravel
-provides. This can give you additional flexibility when you need it.
+Note that this gives you access to all kinds of programmatic validation rules that Laravel provides.
+This can give you additional flexibility when you need it.
 
 ### Custom Validator Messages
 
@@ -220,13 +215,13 @@ type Mutation {
 }
 ```
 
-In that case, Lighthouse will look for a validator class in a sub-namespace matching the parent type, in this case
-that would be `Mutation`, so the default FQCN would be `App\GraphQL\Validators\Mutation\UpdateUserValidator`.
+In that case, Lighthouse will look for a validator class in a sub-namespace matching the parent type, in this case that would be `Mutation`.
+The default FQCN would be `App\GraphQL\Validators\Mutation\UpdateUserValidator`.
 
 ### Validator For Nested Inputs
 
-Use multiple validators for complex inputs that include nested input objects. This ensures
-they do not grow too complex and can be composed freely.
+Use multiple validators for complex inputs that include nested input objects.
+This ensures they do not grow too complex and can be composed freely.
 
 ## Caveats
 
@@ -252,8 +247,8 @@ input FooInput {
 }
 ```
 
-The following mutation would pass validation, because `notBar` references the `bar` field of `FooInput`
-and thus its value `1` is compared to the value `2` - which is different:
+The following mutation would pass validation.
+`notBar` references the `bar` field of `FooInput` and thus its value `1` is compared to the value `2`, which is different:
 
 ```graphql
 mutation {
@@ -263,8 +258,8 @@ mutation {
 
 ### Custom Rules With References
 
-When creating custom validation rules with references, you need to tell Lighthouse
-which parameters are references, so it can add the full argument path:
+When creating custom validation rules with references, you need to tell Lighthouse which parameters are references.
+So it can add the full argument path:
 
 ```graphql
 input FooInput {
@@ -273,8 +268,7 @@ input FooInput {
 }
 ```
 
-In this example, `equal_field` is a custom rule that checks if the argument
-is the same as the one referenced by the parameter.
+In this example, `equal_field` is a custom rule that checks if the argument is the same as the one referenced by the parameter.
 
 The parameters to `with_reference` are:
 
@@ -288,8 +282,7 @@ Lighthouse will call this method with the argument path leading up to the valida
 
 ### Comparisons
 
-If you need to validate the size of an integer, you need to add the
-`integer` validation rule before:
+If you need to validate the size of an integer, you need to add the `integer` validation rule before:
 
 ```graphql
 type Mutation {
@@ -298,8 +291,7 @@ type Mutation {
 ```
 
 Rules that reference other fields work strictly function as such.
-For example, it is not possible to use `gt` to compare against a literal value,
-use `min` instead:
+For example, it is not possible to use `gt` to compare against a literal value, use `min` instead:
 
 ```graphql
 type Mutation {
@@ -315,8 +307,7 @@ type Mutation {
 By default, Lighthouse enables all default query validation rules from `webonyx/graphql-php`.
 This covers fundamental checks, e.g. queried fields match the schema, variables have values of the correct type.
 
-If you want to add custom rules or change which ones are used, you can bind a custom implementation
-of the interface `Nuwave\Lighthouse\Support\Contracts\ProvidesCacheableValidationRules` through a service provider.
+If you want to add custom rules or change which ones are used, you can bind a custom implementation of the interface `Nuwave\Lighthouse\Support\Contracts\ProvidesCacheableValidationRules` through a service provider.
 
 ```php
 use Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules;

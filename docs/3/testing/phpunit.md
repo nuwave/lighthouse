@@ -4,8 +4,8 @@ Lighthouse makes it easy to add automated tests through PHPUnit.
 
 ## Setup
 
-Lighthouse offers some useful test helpers that make it easy to call your API
-from within a PHPUnit test. Just add the `MakesGraphQLRequests` trait to your test class.
+Lighthouse offers some useful test helpers that make it easy to call your API from within a PHPUnit test.
+Just add the `MakesGraphQLRequests` trait to your test class.
 
 ```diff
 <?php
@@ -66,11 +66,9 @@ public function testCreatePost(): void
 
 ## Assertions
 
-Now that we know how to query our server in tests, we need to make sure the
-returned results match our expectations.
+Now that we know how to query our server in tests, we need to make sure the returned results match our expectations.
 
-The returned `TestResponse` conveniently offers assertions that work quite
-well quite with the JSON data returned by GraphQL.
+The returned `TestResponse` conveniently offers assertions that work quite well with the JSON data returned by GraphQL.
 
 The `assertJson` method asserts that the response is a superset of the given JSON.
 
@@ -133,8 +131,7 @@ public function testOrdersUsersByName(): void
 
 Lighthouse allows you to [upload files](../digging-deeper/file-uploads.md) through GraphQL.
 
-Since multipart form requests are tricky to construct, you can just use the `multipartGraphQL`
-helper method.
+Since multipart form requests are tricky to construct, you can just use the `multipartGraphQL` helper method.
 
 ```php
 $this->multipartGraphQL(

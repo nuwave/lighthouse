@@ -1,8 +1,7 @@
 # Caching
 
-If some fields in your schema are expensive or slow to compute, it can be
-beneficial to cache their result. Use the [@cache](../api-reference/directives.md#cache)
-directive to instruct Lighthouse to cache the result of a resolver.
+If some fields in your schema are expensive or slow to compute, it can be beneficial to cache their result.
+Use the [@cache](../api-reference/directives.md#cache) directive to instruct Lighthouse to cache the result of a resolver.
 
 The cache is created on the first request and is cached forever by default.
 Use this for values that seldom change and take long to fetch/compute.
@@ -32,8 +31,7 @@ type Query {
 
 ## Clear cache
 
-To enable this feature, you need to use a cache store that supports [cache tags](https://laravel.com/docs/cache#cache-tags)
-and enable cache tags in `config/lighthouse.php`:
+To enable this feature, you need to use a cache store that supports [cache tags](https://laravel.com/docs/cache#cache-tags) and enable cache tags in `config/lighthouse.php`:
 
 ```php
     'cache' => [
@@ -44,9 +42,9 @@ and enable cache tags in `config/lighthouse.php`:
     ],
 ```
 
-Now, you can place the [@clearCache](../api-reference/directives.md#clearcache) directive on
-mutation fields. When they are queried, they will invalidate all cache entries associated with
-a calculated tag. Depending on the effect of the mutation, you can clear different tags.
+Now, you can place the [@clearCache](../api-reference/directives.md#clearcache) directive on mutation fields.
+When they are queried, they will invalidate all cache entries associated with a calculated tag.
+Depending on the effect of the mutation, you can clear different tags.
 
 Update the cache associated with a given type without a specific ID:
 
@@ -90,8 +88,7 @@ If your mutation affects multiple levels of cache, you can apply this directive 
 ## Cache key
 
 When generating a cached result for a resolver, Lighthouse produces a unique key for each type.
-By default, Lighthouse will look for a field of type `ID` on the parent to generate the key
-for a field with [@cache](../api-reference/directives.md#cache).
+By default, Lighthouse will look for a field of type `ID` on the parent to generate the key for a field with [@cache](../api-reference/directives.md#cache).
 
 This directive allows to use a different field (i.e., an external API id):
 
@@ -104,15 +101,13 @@ type GithubProfile {
 
 ## Implementing your own cache key generator
 
-In one of your application service providers, bind the [`Nuwave\Lighthouse\Cache\CacheKeyAndTags.php`](https://github.com/nuwave/lighthouse/blob/master/src/Cache/CacheKeyAndTags.php)
-interface to your cache key generator class:
+In one of your application service providers, bind the [`Nuwave\Lighthouse\Cache\CacheKeyAndTags.php`](https://github.com/nuwave/lighthouse/blob/master/src/Cache/CacheKeyAndTags.php) interface to your cache key generator class:
 
 ```php
 $this->app->bind(CacheKeyAndTags::class, YourOwnCacheKeyGenerator::class);
 ```
 
-You can extend [`Nuwave\Lighthouse\Cache\CacheKeyAndTagsGenerator.php`](https://github.com/nuwave/lighthouse/blob/master/src/Cache/CacheKeyAndTagsGenerator.php)
-to override certain methods, or implement the interface from scratch.
+You can extend [`Nuwave\Lighthouse\Cache\CacheKeyAndTagsGenerator.php`](https://github.com/nuwave/lighthouse/blob/master/src/Cache/CacheKeyAndTagsGenerator.php) to override certain methods, or implement the interface from scratch.
 
 ## HTTP Cache-Control header
 
@@ -126,9 +121,7 @@ Add the service provider to your `config/app.php`:
 ],
 ```
 
-You can change the [`Cache-Control` header](https://developer.mozilla.org/de/docs/Web/HTTP/Headers/Cache-Control) of your response
-regardless of [@cache](../api-reference/directives.md#cache)
-by adding the [@cacheControl](../api-reference/directives.md#cachecontrol) directive to a field.
+You can change the [`Cache-Control` header](https://developer.mozilla.org/de/docs/Web/HTTP/Headers/Cache-Control) of your response regardless of [@cache](../api-reference/directives.md#cache) by adding the [@cacheControl](../api-reference/directives.md#cachecontrol) directive to a field.
 
 The final header settings are calculated based on these rules:
 

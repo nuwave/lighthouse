@@ -16,8 +16,9 @@ class Subscriber
     /**
      * A unique key for the subscriber's channel.
      *
-     * This has to be unique for each subscriber, because each of them can send a different
-     * query and must receive a response that is specifically tailored towards that.
+     * This has to be unique for each subscriber.
+     * Each of them can send a different query.
+     * Each must receive a response tailored to that query.
      */
     public string $channel;
 
@@ -102,6 +103,7 @@ class Subscriber
         $this->topic = $data['topic'];
 
         $documentNode = AST::fromArray(
+            // @phpstan-ignore theCodingMachineSafe.function (Safe\unserialize is not available in thecodingmachine/safe ^1 and ^2)
             unserialize($data['query']),
         );
         assert($documentNode instanceof DocumentNode, 'We know the type since it is set during construction and serialized.');

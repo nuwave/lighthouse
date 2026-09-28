@@ -29,7 +29,9 @@ use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Utils;
 
-/** @deprecated TODO remove with v7 */
+/**
+ * @deprecated TODO remove with v7
+ */
 class CanDirective extends BaseDirective implements FieldMiddleware, FieldManipulator
 {
     public function __construct(

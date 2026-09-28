@@ -34,8 +34,7 @@ type Query {
 ## Mutations
 
 There is another special type called `Mutation`.
-It works similar to the `Query` type, but it exposes operations that are
-allowed to change data on the server.
+It works similar to the `Query` type, but it exposes operations that are allowed to change data on the server.
 
 ```graphql
 type Mutation {

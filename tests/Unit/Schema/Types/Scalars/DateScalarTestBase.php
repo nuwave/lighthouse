@@ -107,6 +107,25 @@ abstract class DateScalarTestBase extends TestCase
         );
     }
 
+    public function testThrowsClientSafeErrorIfParseLiteralInvalidDate(): void
+    {
+        $error = null;
+
+        try {
+            $this->scalarInstance()->parseLiteral(
+                new StringValueNode(['value' => 'rolf']),
+            );
+        } catch (Error $caught) {
+            $error = $caught;
+        }
+
+        $this->assertInstanceOf(Error::class, $error);
+        $this->assertTrue(
+            $error->isClientSafe(),
+            'A malformed date literal is client misuse, so it must not be reported as a server error.',
+        );
+    }
+
     public function testSerializesCarbonInstance(): void
     {
         $now = IlluminateCarbon::now();

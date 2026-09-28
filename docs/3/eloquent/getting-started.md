@@ -26,8 +26,7 @@ type Query {
 }
 ```
 
-The [@all](../api-reference/directives.md#all) directive will assume the name of your model to be the same as
-the return type of the Field you are trying to resolve and automatically uses Eloquent to resolve the field.
+The [@all](../api-reference/directives.md#all) directive will assume the name of your model to be the same as the return type of the Field you are trying to resolve and automatically uses Eloquent to resolve the field.
 
 The following query:
 
@@ -55,8 +54,7 @@ Will return the following result:
 
 ## Pagination
 
-You can leverage the [`@paginate`](../api-reference/directives.md#paginate) directive to
-query a large list of models in chunks.
+You can leverage the [`@paginate`](../api-reference/directives.md#paginate) directive to query a large list of models in chunks.
 
 ```graphql
 type Query {
@@ -96,8 +94,7 @@ And can be queried like this:
 
 ## Adding query constraints
 
-Lighthouse provides built-in directives to enhance your queries by giving
-additional query capabilities to the client.
+Lighthouse provides built-in directives to enhance your queries by giving additional query capabilities to the client.
 
 The following field definition allows you to fetch a single User by ID.
 
@@ -195,8 +192,7 @@ mutation {
 }
 ```
 
-Be aware that while a create operation will always return a result, provided you pass valid data, the update
-may fail to find the model you provided and return `null`:
+Be aware that while a create operation will always return a result, provided you pass valid data, the update may fail to find the model you provided and return `null`:
 
 ```json
 {
@@ -208,7 +204,8 @@ may fail to find the model you provided and return `null`:
 
 ## Delete
 
-Deleting models is a breeze using the [@delete](../api-reference/directives.md#delete) directive. Dangerously easy.
+Deleting models is a breeze using the [@delete](../api-reference/directives.md#delete) directive.
+Dangerously easy.
 
 ```graphql
 type Mutation {
@@ -226,7 +223,8 @@ mutation {
 }
 ```
 
-This mutation will return the deleted object, so you will have a last chance to look at the data. Use it wisely.
+This mutation will return the deleted object, so you will have a last chance to look at the data.
+Use it wisely.
 
 ```json
 {

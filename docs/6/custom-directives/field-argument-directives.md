@@ -4,11 +4,10 @@ Field argument directives can be applied to field arguments (see [Field Argument
 
 ## ArgManipulator
 
-An [`Nuwave\Lighthouse\Support\Contracts\ArgManipulator`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ArgManipulator.php)
-directive can be used to manipulate the schema AST of a field argument or its parents.
+An [`Nuwave\Lighthouse\Support\Contracts\ArgManipulator`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ArgManipulator.php) directive can be used to manipulate the schema AST of a field argument or its parents.
 
-For example, you might want to add a directive that automagically derives the arguments
-for a field based on an object type. A skeleton for this directive might look something like this:
+For example, you might want to add a directive that automagically derives the arguments for a field based on an object type.
+A skeleton for this directive might look something like this:
 
 ```php
 namespace App\GraphQL\Directives;

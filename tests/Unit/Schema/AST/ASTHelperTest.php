@@ -256,7 +256,7 @@ final class ASTHelperTest extends TestCase
     {
         $astBuilder = $this->app->make(ASTBuilder::class);
 
-        $directive = new class() extends BaseDirective implements FieldManipulator {
+        $directive = new class extends BaseDirective implements FieldManipulator {
             public static function definition(): string
             {
                 return /** @lang GraphQL */ <<<'GRAPHQL'
@@ -276,7 +276,7 @@ final class ASTHelperTest extends TestCase
         $directiveLocator = $this->app->make(DirectiveLocator::class);
         $directiveLocator->setResolved('foo', $directive::class);
 
-        $dynamicDirective = new class() extends BaseDirective implements FieldManipulator {
+        $dynamicDirective = new class extends BaseDirective implements FieldManipulator {
             public static function definition(): string
             {
                 return /** @lang GraphQL */ <<<'GRAPHQL'
@@ -319,7 +319,7 @@ final class ASTHelperTest extends TestCase
 
     public function testDynamicallyAddedArgManipulatorDirective(): void
     {
-        $directive = new class() extends BaseDirective implements ArgManipulator {
+        $directive = new class extends BaseDirective implements ArgManipulator {
             public static function definition(): string
             {
                 return /** @lang GraphQL */ <<<'GRAPHQL'
@@ -340,7 +340,7 @@ final class ASTHelperTest extends TestCase
         $directiveLocator = $this->app->make(DirectiveLocator::class);
         $directiveLocator->setResolved('foo', $directive::class);
 
-        $dynamicDirective = new class() extends BaseDirective implements ArgManipulator {
+        $dynamicDirective = new class extends BaseDirective implements ArgManipulator {
             public static function definition(): string
             {
                 return /** @lang GraphQL */ <<<'GRAPHQL'
@@ -388,7 +388,7 @@ final class ASTHelperTest extends TestCase
 
     public function testDynamicallyAddedInputFieldManipulatorDirective(): void
     {
-        $directive = new class() extends BaseDirective implements InputFieldManipulator {
+        $directive = new class extends BaseDirective implements InputFieldManipulator {
             public static function definition(): string
             {
                 return /** @lang GraphQL */ <<<'GRAPHQL'
@@ -408,7 +408,7 @@ final class ASTHelperTest extends TestCase
         $directiveLocator = $this->app->make(DirectiveLocator::class);
         $directiveLocator->setResolved('foo', $directive::class);
 
-        $dynamicDirective = new class() extends BaseDirective implements InputFieldManipulator {
+        $dynamicDirective = new class extends BaseDirective implements InputFieldManipulator {
             public static function definition(): string
             {
                 return /** @lang GraphQL */ <<<'GRAPHQL'

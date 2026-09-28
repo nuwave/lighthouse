@@ -1,3 +1,5 @@
+name: lighthouse
+
 services:
   php:
     build:
@@ -11,7 +13,7 @@ services:
       - label:disable
     depends_on:
       - mysql
-    tty: true
+      - redis
 
   mysql:
     # TODO switch to MySQL 8 https://github.com/nuwave/lighthouse/issues/1784
@@ -39,7 +41,6 @@ services:
       - NODE_OPTIONS="--max-old-space-size=8192"
     ports:
       - 8081:8080
-    tty: true
 
   node-tools:
     build:
@@ -48,4 +49,3 @@ services:
     volumes:
       - ./:/workdir
     working_dir: /workdir
-    tty: true
