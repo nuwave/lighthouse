@@ -11,7 +11,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Fixed
 
-- Only resolve validation rules from `@rules` and `@rulesForArray` as classes when they contain a namespace separator, so built-in rules like `url` or `image` are not shadowed by global classes or facade aliases https://github.com/nuwave/lighthouse/pull/2792
+- Only resolve validation rules from `@rules` and `@rulesForArray` as classes when they contain a namespace separator, so built-in rules like `url` or `image` are not shadowed by global classes or facade aliases. Custom rule classes in the global namespace must now be referenced with a leading backslash, e.g. `"\\MyRule"` https://github.com/nuwave/lighthouse/pull/2792
 
 ## v6.71.0
 
