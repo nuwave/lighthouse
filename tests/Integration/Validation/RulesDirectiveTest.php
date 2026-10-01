@@ -232,7 +232,7 @@ final class RulesDirectiveTest extends TestCase
         // which matches the built-in rule case-insensitively once loaded.
         // The container then resolves its `url` binding, the UrlGenerator.
         if (! class_exists('Url')) {
-            class_alias((new class() {})::class, 'Url');
+            class_alias((new class {})::class, 'Url');
         }
 
         $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'

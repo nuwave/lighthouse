@@ -60,7 +60,7 @@ final class RulesForArrayDirectiveTest extends TestCase
         // Like a facade alias such as `URL` or intervention/image's `Image`,
         // which matches the built-in rule case-insensitively once loaded.
         if (! class_exists('Filled')) {
-            class_alias((new class() {})::class, 'Filled');
+            class_alias((new class {})::class, 'Filled');
         }
 
         $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
