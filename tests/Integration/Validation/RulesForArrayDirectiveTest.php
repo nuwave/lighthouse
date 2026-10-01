@@ -5,6 +5,8 @@ namespace Tests\Integration\Validation;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
 
+use function Safe\class_alias;
+
 final class RulesForArrayDirectiveTest extends TestCase
 {
     public function testValidatesListSize(): void

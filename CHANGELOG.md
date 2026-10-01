@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+
+- Only resolve validation rules from `@rules` and `@rulesForArray` as classes when they contain a namespace separator, so built-in rules like `url` or `image` are not shadowed by global classes or facade aliases https://github.com/nuwave/lighthouse/pull/2792
+
 ## v6.71.0
 
 ### Deprecated

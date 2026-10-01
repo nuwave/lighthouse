@@ -10,6 +10,8 @@ use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
 use Tests\Utils\Rules\FooBarRule;
 
+use function Safe\class_alias;
+
 final class RulesDirectiveTest extends TestCase
 {
     protected function getEnvironmentSetUp($app): void
