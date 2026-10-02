@@ -24,6 +24,7 @@ use Tests\Utils\Models\User\UserBuilder;
  * @property string|null $email
  * @property \Illuminate\Support\Carbon|null $email_verified_at
  * @property string|null $password
+ * @property array<string, mixed>|null $preferences
  * @property Carbon|null $date_of_birth
  * @property string|null $remember_token
  * @property float|null $latitude
