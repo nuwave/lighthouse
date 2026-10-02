@@ -72,14 +72,23 @@ enum SQLOperator {
     "Whether a value is not in the JSON."
     JSON_DOESNT_CONTAIN @enum(value: "JsonDoesntContain")
 
-    "Whether a value overlaps the JSON."
-    JSON_OVERLAPS @enum(value: "JsonOverlaps")
+    "Whether a value is equals to the length of JSON array."
+    JSON_LENGTH_EQ @enum(value: "JsonLengthEq")
 
-    "Whether a value does not overlaps the JSON."
-    JSON_DOESNT_OVERLAP @enum(value: "JsonDoesntOverlap")
+    "Whether a value is not equals to the length of JSON array."
+    JSON_LENGTH_NEQ @enum(value: "JsonLengthNeq")
 
-    "Whether a value can be compared to the length of JSON array."
-    JSON_LENGTH @enum(value: "JsonLength")
+    "Whether a value is less than the length of JSON array."
+    JSON_LENGTH_LT @enum(value: "JsonLengthLt")
+
+    "Whether a value is greater than the length of JSON array."
+    JSON_LENGTH_GT @enum(value: "JsonLengthGt")
+
+    "Whether a value is less than or equals to the length of JSON array."
+    JSON_LENGTH_LTE @enum(value: "JsonLengthLte")
+
+    "Whether a value is greater than or equals to the length of JSON array."
+    JSON_LENGTH_GTE @enum(value: "JsonLengthGte")
 }
 GRAPHQL;
     }
@@ -107,6 +116,19 @@ GRAPHQL;
         // Some operators require calling Laravel's conditions in different ways
         $operator = $whereConditions['operator'];
         $arity = $this->operatorArity($operator);
+
+        if (str_starts_with($operator, 'JsonLength')) {
+            $operator = match($operator) {
+                'JsonLengthEq' => '=',
+                'JsonLengthNeq' => '!=',
+                'JsonLengthLt' => '<',
+                'JsonLengthGt' => '>',
+                'JsonLengthLte' => '<=',
+                'JsonLengthGte' => '>=',
+            };
+
+            $method = 'whereJsonLength';
+        }
 
         if ($arity === 3) {
             // Usually, the operator is passed as the second argument to the condition
@@ -140,7 +162,7 @@ GRAPHQL;
             return 1;
         }
 
-        if (in_array($operator, ['In', 'NotIn', 'Between', 'NotBetween', 'JsonContains', 'JsonDoesntContain', 'JsonOverlaps', 'JsonDoesntOverlap'], strict: true)) {
+        if (in_array($operator, ['In', 'NotIn', 'Between', 'NotBetween', 'JsonContains', 'JsonDoesntContain'], strict: true)) {
             return 2;
         }
 
