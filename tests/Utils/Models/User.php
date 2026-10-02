@@ -72,6 +72,7 @@ final class User extends Authenticatable
 
     // @phpstan-ignore-next-line iterable type missing in Laravel 9.0.0
     protected $casts = [
+        'preferences' => 'array',
         'email_verified_at' => 'datetime',
         'date_of_birth' => 'date',
     ];

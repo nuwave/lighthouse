@@ -22,6 +22,12 @@ final class WhereConditionsDirectiveTest extends DBTestCase
         id: ID!
         name: String
         email: String
+        preferences: UserPreferences
+    }
+
+    type UserPreferences {
+        theme: String
+        languages: [String!]
     }
 
     type Post {
