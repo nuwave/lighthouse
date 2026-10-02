@@ -117,10 +117,6 @@ GRAPHQL;
         $operator = $whereConditions['operator'];
         $arity = $this->operatorArity($operator);
 
-        if (str_starts_with($operator, 'JsonLength')) {
-            $method = 'whereJsonLength';
-        }
-
         if ($arity === 3) {
             // Usually, the operator is passed as the second argument to the condition
             // method, e.g. ->where('some_col', '=', $value)
@@ -133,6 +129,10 @@ GRAPHQL;
                 'JsonLengthGte' => '>=',
                 default => $operator,
             };
+
+            if (str_starts_with($operator, 'JsonLength')) {
+                $method .= 'JsonLength';
+            }
         } else {
             // We use the fact that the operators are named after Laravel's condition
             // methods, so we can simply append the name, e.g. whereNull, whereNotBetween
