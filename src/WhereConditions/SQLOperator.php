@@ -59,6 +59,27 @@ enum SQLOperator {
 
     "Whether a value is not null (`IS NOT NULL`)"
     IS_NOT_NULL @enum(value: "NotNull")
+
+    "Whether a value is a key in the JSON."
+    JSON_CONTAINS_KEY @enum(value: "JsonContainsKey")
+
+    "Whether a value is not a key in the JSON."
+    JSON_DOESNT_CONTAIN_KEY @enum(value: "JsonDoesntContainKey")
+
+    "Whether a value is in the JSON."
+    JSON_CONTAINS @enum(value: "JsonContains")
+
+    "Whether a value is not in the JSON."
+    JSON_DOESNT_CONTAIN @enum(value: "JsonDoesntContain")
+
+    "Whether a value overlaps the JSON."
+    JSON_OVERLAPS @enum(value: "JsonOverlaps")
+
+    "Whether a value does not overlaps the JSON."
+    JSON_DOESNT_OVERLAP @enum(value: "JsonDoesntOverlap")
+
+    "Whether a value can be compared to the length of JSON array."
+    JSON_LENGTH @enum(value: "JsonLength")
 }
 GRAPHQL;
     }
@@ -115,11 +136,11 @@ GRAPHQL;
 
     protected function operatorArity(string $operator): int
     {
-        if (in_array($operator, ['Null', 'NotNull'], strict: true)) {
+        if (in_array($operator, ['Null', 'NotNull', 'JsonContainsKey', 'JsonDoesntContainKey'], strict: true)) {
             return 1;
         }
 
-        if (in_array($operator, ['In', 'NotIn', 'Between', 'NotBetween'], strict: true)) {
+        if (in_array($operator, ['In', 'NotIn', 'Between', 'NotBetween', 'JsonContains', 'JsonDoesntContain', 'JsonOverlaps', 'JsonDoesntOverlap'], strict: true)) {
             return 2;
         }
 
