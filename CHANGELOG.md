@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Fixed
+
+- Pass the value to result handlers such as `@globalId` when the field resolves to a chained promise, such as with `@with` https://github.com/nuwave/lighthouse/pull/2794
+
 ## v6.71.0
 
 ### Deprecated
