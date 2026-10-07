@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Support Laravel JSON SQL Operators in Where Conditions
+
 ## v6.71.0
 
 ### Deprecated

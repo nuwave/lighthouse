@@ -59,6 +59,36 @@ enum SQLOperator {
 
     "Whether a value is not null (`IS NOT NULL`)"
     IS_NOT_NULL @enum(value: "NotNull")
+
+    "Whether a value is a key in the JSON."
+    JSON_CONTAINS_KEY @enum(value: "JsonContainsKey")
+
+    "Whether a value is not a key in the JSON."
+    JSON_DOESNT_CONTAIN_KEY @enum(value: "JsonDoesntContainKey")
+
+    "Whether a value is in the JSON."
+    JSON_CONTAINS @enum(value: "JsonContains")
+
+    "Whether a value is not in the JSON."
+    JSON_DOESNT_CONTAIN @enum(value: "JsonDoesntContain")
+
+    "Whether a value is equals to the length of JSON array."
+    JSON_LENGTH_EQ @enum(value: "JsonLengthEq")
+
+    "Whether a value is not equals to the length of JSON array."
+    JSON_LENGTH_NEQ @enum(value: "JsonLengthNeq")
+
+    "Whether a value is less than the length of JSON array."
+    JSON_LENGTH_LT @enum(value: "JsonLengthLt")
+
+    "Whether a value is greater than the length of JSON array."
+    JSON_LENGTH_GT @enum(value: "JsonLengthGt")
+
+    "Whether a value is less than or equals to the length of JSON array."
+    JSON_LENGTH_LTE @enum(value: "JsonLengthLte")
+
+    "Whether a value is greater than or equals to the length of JSON array."
+    JSON_LENGTH_GTE @enum(value: "JsonLengthGte")
 }
 GRAPHQL;
     }
@@ -90,7 +120,19 @@ GRAPHQL;
         if ($arity === 3) {
             // Usually, the operator is passed as the second argument to the condition
             // method, e.g. ->where('some_col', '=', $value)
-            $args[] = $operator;
+            $args[] = match($operator) {
+                'JsonLengthEq' => '=',
+                'JsonLengthNeq' => '!=',
+                'JsonLengthLt' => '<',
+                'JsonLengthGt' => '>',
+                'JsonLengthLte' => '<=',
+                'JsonLengthGte' => '>=',
+                default => $operator,
+            };
+
+            if (str_starts_with($operator, 'JsonLength')) {
+                $method .= 'JsonLength';
+            }
         } else {
             // We use the fact that the operators are named after Laravel's condition
             // methods, so we can simply append the name, e.g. whereNull, whereNotBetween
@@ -115,11 +157,11 @@ GRAPHQL;
 
     protected function operatorArity(string $operator): int
     {
-        if (in_array($operator, ['Null', 'NotNull'], strict: true)) {
+        if (in_array($operator, ['Null', 'NotNull', 'JsonContainsKey', 'JsonDoesntContainKey'], strict: true)) {
             return 1;
         }
 
-        if (in_array($operator, ['In', 'NotIn', 'Between', 'NotBetween'], strict: true)) {
+        if (in_array($operator, ['In', 'NotIn', 'Between', 'NotBetween', 'JsonContains', 'JsonDoesntContain'], strict: true)) {
             return 2;
         }
 

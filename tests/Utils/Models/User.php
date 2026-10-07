@@ -24,6 +24,7 @@ use Tests\Utils\Models\User\UserBuilder;
  * @property string|null $email
  * @property \Illuminate\Support\Carbon|null $email_verified_at
  * @property string|null $password
+ * @property array<string, mixed>|null $preferences
  * @property Carbon|null $date_of_birth
  * @property string|null $remember_token
  * @property float|null $latitude
@@ -72,6 +73,7 @@ final class User extends Authenticatable
 
     // @phpstan-ignore-next-line iterable type missing in Laravel 9.0.0
     protected $casts = [
+        'preferences' => 'array',
         'email_verified_at' => 'datetime',
         'date_of_birth' => 'date',
     ];
