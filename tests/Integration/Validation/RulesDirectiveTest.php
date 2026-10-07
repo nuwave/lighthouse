@@ -10,6 +10,8 @@ use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
 use Tests\Utils\Rules\FooBarRule;
 
+use function Safe\class_alias;
+
 final class RulesDirectiveTest extends TestCase
 {
     protected function getEnvironmentSetUp($app): void
@@ -224,6 +226,44 @@ final class RulesDirectiveTest extends TestCase
             ->assertGraphQLValidationError('input.name', 'The name field is required.')
             ->assertGraphQLValidationError('input.type.name', 'The name field is required.')
             ->assertGraphQLValidationError('input.type.type', 'The input.type.type field is required.');
+    }
+
+    public function testBuiltInRuleNotShadowedByGlobalClassWithMatchingName(): void
+    {
+        // Like a facade alias such as `URL` or intervention/image's `Image`,
+        // which matches the built-in rule case-insensitively once loaded.
+        // The container then resolves its `url` binding, the UrlGenerator.
+        if (! class_exists('Url')) {
+            class_alias((new class {})::class, 'Url');
+        }
+
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Query {
+            foo(
+                bar: String @rules(apply: ["url"])
+            ): Int
+        }
+        GRAPHQL;
+
+        $this
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+            {
+                foo(bar: "https://lighthouse-php.com")
+            }
+            GRAPHQL)
+            ->assertExactJson([
+                'data' => [
+                    'foo' => Foo::THE_ANSWER,
+                ],
+            ]);
+
+        $this
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+            {
+                foo(bar: "not a url")
+            }
+            GRAPHQL)
+            ->assertGraphQLValidationKeys(['bar']);
     }
 
     public function testUsesCustomRuleClass(): void

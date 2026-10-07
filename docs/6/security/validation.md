@@ -83,6 +83,9 @@ Reference custom validation rules by their fully qualified class name.
 @rules(apply: ["App\\Rules\\MyCustomRule"])
 ```
 
+Rules without a namespace separator are treated as built-in rules.
+Reference custom rules in the global namespace with a leading backslash, e.g. `"\\MyCustomRule"`.
+
 ## Validating Input Objects
 
 Rules can be defined upon Input Object Values.
