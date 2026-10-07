@@ -59,7 +59,7 @@ GRAPHQL;
         $rules = parent::rules();
 
         if (! in_array('array', $rules)) {
-            $rules = Arr::prepend($rules, 'array');
+            return Arr::prepend($rules, 'array');
         }
 
         return $rules;

@@ -13,6 +13,24 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Apply the `action` of `@canResolved` and friends when the field resolves to a promise, such as a batch loaded relation https://github.com/nuwave/lighthouse/pull/2786
 
+## v6.71.0
+
+### Deprecated
+
+- Deprecate `_ide_helper.php` and generating `_lighthouse_ide_helper.php`, Larastan recognizes the `TestResponse` mixin methods without them https://github.com/nuwave/lighthouse/pull/2791
+
+## v6.70.1
+
+### Fixed
+
+- Throw client-safe errors for malformed date literals instead of reporting them as server errors https://github.com/nuwave/lighthouse/pull/2788
+
+## v6.70.0
+
+### Changed
+
+- Classes passed to `DirectiveLocator::setResolved()` take precedence in `DirectiveLocator::classes()` and `DirectiveLocator::definitions()` https://github.com/nuwave/lighthouse/pull/2787
+
 ## v6.69.2
 
 ### Fixed
