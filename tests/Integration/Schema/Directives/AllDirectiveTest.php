@@ -9,6 +9,7 @@ use Laravel\Scout\Builder as ScoutBuilder;
 use Tests\DBTestCase;
 use Tests\TestsScoutEngine;
 use Tests\Utils\Models\Post;
+use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
 final class AllDirectiveTest extends DBTestCase
@@ -91,11 +92,13 @@ final class AllDirectiveTest extends DBTestCase
 
     public function testGetAllAsNestedField(): void
     {
+        $task = factory(Task::class)->create();
+
         factory(Post::class, 2)
             ->create()
-            ->each(static function (Post $post): void {
+            ->each(static function (Post $post) use ($task): void {
                 // Do not create those, as they would create more users.
-                $post->task_id = 1;
+                $post->task()->associate($task);
                 $post->save();
             });
 

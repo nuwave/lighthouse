@@ -8,6 +8,7 @@ use Nuwave\Lighthouse\Schema\TypeRegistry;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
+use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
 final class UnionTest extends DBTestCase
@@ -16,11 +17,14 @@ final class UnionTest extends DBTestCase
     #[DataProvider('withAndWithoutCustomTypeResolver')]
     public function testResolveUnionTypes(string $schema, string $query): void
     {
-        // This creates a user with it
-        factory(Post::class)->create(
-            // Prevent creating more users through nested factory
-            ['task_id' => 1],
-        );
+        // This creates a user with it.
+        $task = factory(Task::class)->create();
+        $post = new Post();
+        $post->title = 'foo';
+        $post->body = 'bar';
+        $post->user()->associate(factory(User::class)->create());
+        $post->task()->associate($task);
+        $post->save();
 
         $this->schema = $schema;
 
@@ -40,11 +44,14 @@ final class UnionTest extends DBTestCase
 
     public function testConsidersRenamedModels(): void
     {
-        // This creates a user with it
-        factory(Post::class)->create(
-            // Prevent creating more users through nested factory
-            ['task_id' => 1],
-        );
+        // This creates a user with it.
+        $task = factory(Task::class)->create();
+        $post = new Post();
+        $post->title = 'foo';
+        $post->body = 'bar';
+        $post->user()->associate(factory(User::class)->create());
+        $post->task()->associate($task);
+        $post->save();
 
         $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         union Stuff = Foo | Post
@@ -102,11 +109,14 @@ GRAPHQL . "\n",
 
     public function testThrowsOnAmbiguousSchemaMapping(): void
     {
-        // This creates a user with it
-        factory(Post::class)->create(
-            // Prevent creating more users through nested factory
-            ['task_id' => 1],
-        );
+        // This creates a user with it.
+        $task = factory(Task::class)->create();
+        $post = new Post();
+        $post->title = 'foo';
+        $post->body = 'bar';
+        $post->user()->associate(factory(User::class)->create());
+        $post->task()->associate($task);
+        $post->save();
 
         $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         union Nameable = Foo | Post
@@ -143,11 +153,14 @@ GRAPHQL;
 
     public function testThrowsOnNonOverlappingSchemaMapping(): void
     {
-        // This creates a user with it
-        factory(Post::class)->create(
-            // Prevent creating more users through nested factory
-            ['task_id' => 1],
-        );
+        // This creates a user with it.
+        $task = factory(Task::class)->create();
+        $post = new Post();
+        $post->title = 'foo';
+        $post->body = 'bar';
+        $post->user()->associate(factory(User::class)->create());
+        $post->task()->associate($task);
+        $post->save();
 
         $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         union Stuff = Post

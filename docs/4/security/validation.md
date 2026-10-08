@@ -1,12 +1,10 @@
 # Validation
 
-Lighthouse allows you to use [Laravel's validation](https://laravel.com/docs/validation) for your
-queries and mutations.
+Lighthouse allows you to use [Laravel's validation](https://laravel.com/docs/validation) for your queries and mutations.
 
 ## Single Arguments
 
-The simplest way to leverage the built-in validation rules is to use the
-[@rules](../api-reference/directives.md#rules) directive.
+The simplest way to leverage the built-in validation rules is to use the [@rules](../api-reference/directives.md#rules) directive.
 
 ```graphql
 type Mutation {
@@ -14,8 +12,7 @@ type Mutation {
 }
 ```
 
-In the case of a validation error, Lighthouse will abort execution and return the validation messages
-as part of the response.
+In the case of a validation error, Lighthouse will abort execution and return the validation messages as part of the response.
 
 ```graphql
 mutation {
@@ -76,11 +73,9 @@ input CreatePostInput {
 }
 ```
 
-Using the [`unique`](https://laravel.com/docs/validation#rule-unique)
-validation rule can be a bit tricky.
+Using the [`unique`](https://laravel.com/docs/validation#rule-unique) validation rule can be a bit tricky.
 
-If the argument is nested within an input object, the argument path will not
-match the column name, so you have to specify the column name explicitly.
+If the argument is nested within an input object, the argument path will not match the column name, so you have to specify the column name explicitly.
 
 ```graphql
 input CreateUserInput {
@@ -90,8 +85,7 @@ input CreateUserInput {
 
 ## Validating Arrays
 
-When you are passing in an array as an argument to a field, you might
-want to apply some validation on the array itself, using [@rulesForArray](../api-reference/directives.md#rulesforarray)
+When you are passing in an array as an argument to a field, you might want to apply some validation on the array itself, using [@rulesForArray](../api-reference/directives.md#rulesforarray)
 
 ```graphql
 type Mutation {
@@ -102,8 +96,7 @@ type Mutation {
 }
 ```
 
-You can also combine this with [@rules](../api-reference/directives.md#rules) to validate
-both the size and the contents of an argument array.
+You can also combine this with [@rules](../api-reference/directives.md#rules) to validate both the size and the contents of an argument array.
 For example, you might require a list of at least 3 valid emails to be passed.
 
 ```graphql
@@ -116,12 +109,11 @@ type Mutation {
 
 ## Validate Fields
 
-In some cases, validation rules are more complex and need to use entirely custom logic
-or take multiple arguments into account.
+In some cases, validation rules are more complex and need to use entirely custom logic or take multiple arguments into account.
 
-To create a reusable validator that can be applied to fields, extend the base validation
-directive `\Nuwave\Lighthouse\Schema\Directives\ValidationDirective`. Your custom directive
-class should be located in one of the configured default directive namespaces, e.g. `App\GraphQL\Directives`.
+To create a reusable validator that can be applied to fields, extend the base validation directive `\Nuwave\Lighthouse\Schema\Directives\ValidationDirective`.
+Your custom directive class should be located in one of the configured default directive namespaces, e.g.
+`App\GraphQL\Directives`.
 
 ```php
 <?php
@@ -173,8 +165,7 @@ You can customize the messages for the given rules by implementing the `messages
 By default, Lighthouse enables all default query validation rules from `webonyx/graphql-php`.
 This covers fundamental checks, e.g. queried fields match the schema, variables have values of the correct type.
 
-If you want to add custom rules or change which ones are used, you can bind a custom implementation
-of the interface `\Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules` through a service provider.
+If you want to add custom rules or change which ones are used, you can bind a custom implementation of the interface `\Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules` through a service provider.
 
 ```php
 use Nuwave\Lighthouse\Support\Contracts\ProvidesValidationRules;

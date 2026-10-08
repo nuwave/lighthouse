@@ -24,8 +24,8 @@ type Query {
 #import user.graphql
 ```
 
-Imports always begin on a separate line with `#import`, followed by the relative path
-to the imported file. The contents of `user.graphql` are pasted in the final schema.
+Imports always begin on a separate line with `#import`, followed by the relative path to the imported file.
+The contents of `user.graphql` are pasted in the final schema.
 
 ```graphql
 type Query {
@@ -79,8 +79,7 @@ type Query {
 }
 ```
 
-**Attention**: A valid `Query` type definition with at least one field
-must be present in the root schema.
+**Attention**: A valid `Query` type definition with at least one field must be present in the root schema.
 This is because `extend type` needs the original type to get merged into.
 
 You can provide an empty `Query` type (without curly braces) in the root schema:
@@ -91,8 +90,7 @@ type Query
 #import post.graphql
 ```
 
-The same applies for mutations: if you want to use them, you can define
-an empty `Mutation` type (without curly braces) within your root schema:
+The same applies for mutations: if you want to use them, you can define an empty `Mutation` type (without curly braces) within your root schema:
 
 ```graphql
 type Query
@@ -102,8 +100,8 @@ type Mutation
 #import post.graphql
 ```
 
-Now you want to add a few queries to actually fetch posts. You could add them to the main `Query` type
-in your main file, but that spreads the definition apart, and could also grow quite large over time.
+Now you want to add a few queries to actually fetch posts.
+You could add them to the main `Query` type in your main file, but that spreads the definition apart, and could also grow quite large over time.
 
 Another way would be to extend the `Query` type and colocate the type definition with its Queries in `post.graphql`.
 

@@ -34,11 +34,11 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
         return function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($modelClass, $scopes, $expectsList): EloquentCollection|Model|null {
             $builder = $modelClass::query();
 
-            if (! $resolveInfo->wouldEnhanceBuilder($builder, $scopes, $root, $args, $context)) {
+            if (! $resolveInfo->wouldEnhanceBuilder($builder, $scopes, $root, $args, $context, $resolveInfo)) {
                 throw self::wouldModifyAll();
             }
 
-            $builder = $resolveInfo->enhanceBuilder($builder, $scopes, $root, $args, $context);
+            $builder = $resolveInfo->enhanceBuilder($builder, $scopes, $root, $args, $context, $resolveInfo);
             assert($builder instanceof EloquentBuilder);
 
             $modelOrModels = $this->enhanceBuilder($builder)->get();

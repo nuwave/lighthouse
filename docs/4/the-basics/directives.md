@@ -1,16 +1,14 @@
 # Directives
 
-Assuming you read through the previous chapters, you should be familiar with the basics
-of schema definition by now.
+Assuming you read through the previous chapters, you should be familiar with the basics of schema definition by now.
 
-You might have seen some funky extra bits in the schema definitions such as [@paginate](../api-reference/directives.md#paginate),
-[@rules](../api-reference/directives.md#rules) or [@hasMany](../api-reference/directives.md#hasmany).
+You might have seen some funky extra bits in the schema definitions such as [@paginate](../api-reference/directives.md#paginate), [@rules](../api-reference/directives.md#rules) or [@hasMany](../api-reference/directives.md#hasmany).
 Those are called _directives_ and are the primary way to add functionality to your GraphQL schema.
 
 ## Definition
 
-Directives always begin with an `@` symbol, followed by a unique name. They may be used
-at specified parts of the GraphQL schema.
+Directives always begin with an `@` symbol, followed by a unique name.
+They may be used at specified parts of the GraphQL schema.
 
 This example directive `@upperCase` may be used on field definitions to UPPERCASE the result.
 
@@ -22,8 +20,8 @@ type Query {
 }
 ```
 
-Directives may also define arguments to enable a more flexible use, and they can
-be used in multiple places, depending on the [specified directive location](https://facebook.github.io/graphql/June2018/#DirectiveLocation).
+Directives may also define arguments to enable a more flexible use.
+They can be used in multiple places, depending on the [specified directive location](https://facebook.github.io/graphql/June2018/#DirectiveLocation).
 
 ```graphql
 directive @append(text: String) on FIELD_DEFINITION | ARGUMENT_DEFINITION
@@ -36,11 +34,9 @@ type Query {
 
 ## Usage
 
-Lighthouse provides a plethora of built-in schema directives that are ready to
-be consumed and can simply be used from within the schema.
+Lighthouse provides a plethora of built-in schema directives that are ready to be consumed and can simply be used from within the schema.
 
-The following example is quite dense, but it should give you an idea of what
-directives are capable of.
+The following example is quite dense, but it should give you an idea of what directives are capable of.
 
 ```graphql
 type Query {
@@ -60,8 +56,6 @@ type Query {
 }
 ```
 
-Explore the docs to find out more or look into the [directives API reference](../api-reference/directives.md)
-for a complete list of all available directives.
+Explore the docs to find out more or look into the [directives API reference](../api-reference/directives.md) for a complete list of all available directives.
 
-Implementing your own directives is a great way to add reusable functionality to your schema,
-learn how you can [implement your own directives](../custom-directives/getting-started.md).
+Implementing your own directives is a great way to add reusable functionality to your schema, learn how you can [implement your own directives](../custom-directives/getting-started.md).

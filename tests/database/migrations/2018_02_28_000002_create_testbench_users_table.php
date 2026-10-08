@@ -23,6 +23,8 @@ final class CreateTestbenchUsersTable extends Migration
             $table->unsignedBigInteger('team_id')->nullable();
             $table->unsignedBigInteger('person_id')->nullable();
             $table->string('person_type')->nullable();
+            $table->double('latitude')->nullable();
+            $table->double('longitude')->nullable();
         });
     }
 

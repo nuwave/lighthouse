@@ -38,6 +38,7 @@ final class AsyncDirectiveTest extends DBTestCase
         foreach ($jobs as $job) {
             $this->assertInstanceOf(AsyncMutation::class, $job);
 
+            // @phpstan-ignore theCodingMachineSafe.function (Safe\unserialize is not available in thecodingmachine/safe ^1 and ^2)
             $jobCycledThroughSerialization = unserialize(serialize($job));
             $this->assertInstanceOf(AsyncMutation::class, $jobCycledThroughSerialization);
             Container::getInstance()->call([$jobCycledThroughSerialization, 'handle']);
@@ -71,6 +72,7 @@ final class AsyncDirectiveTest extends DBTestCase
             $this->assertInstanceOf(AsyncMutation::class, $job);
             $this->assertSame('custom', $job->queue);
 
+            // @phpstan-ignore theCodingMachineSafe.function (Safe\unserialize is not available in thecodingmachine/safe ^1 and ^2)
             $jobCycledThroughSerialization = unserialize(serialize($job));
             $this->assertInstanceOf(AsyncMutation::class, $jobCycledThroughSerialization);
             Container::getInstance()->call([$jobCycledThroughSerialization, 'handle']);

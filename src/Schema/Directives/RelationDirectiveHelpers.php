@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace Nuwave\Lighthouse\Schema\Directives\Traits;
+namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Illuminate\Contracts\Database\Query\Builder;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
@@ -24,20 +25,33 @@ trait RelationDirectiveHelpers
         return $this->directiveArgValue('relation', $this->nodeName());
     }
 
-    /** @param  array<string, mixed>  $args */
+    /**
+     * @param  array<string, mixed>  $args
+     *
+     * @return \Closure(\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>, mixed=): void
+     */
     protected function makeBuilderDecorator(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): \Closure
     {
-        return function (Builder $builder) use ($root, $args, $context, $resolveInfo): void {
+        return function (object $builder, mixed $specificRoot = null) use ($root, $args, $context, $resolveInfo): void {
             if ($builder instanceof Relation) {
                 $builder = $builder->getQuery();
             }
 
+            assert($builder instanceof QueryBuilder || $builder instanceof EloquentBuilder);
+
             $resolveInfo->enhanceBuilder(
                 $builder,
                 $this->scopes(),
-                $root,
+                /**
+                 * Sometimes overridden to use a different model than the usual root.
+                 *
+                 * @see \Nuwave\Lighthouse\Execution\ModelsLoader\PaginatedModelsLoader::loadRelatedModels
+                 * @see \Tests\Integration\Schema\Directives\BuilderDirectiveTest::testCallsCustomBuilderMethodOnFieldWithSpecificModel
+                 */
+                $specificRoot ?? $root,
                 $args,
                 $context,
+                $resolveInfo,
             );
         };
     }

@@ -3,8 +3,9 @@
 namespace Nuwave\Lighthouse\Auth;
 
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
-use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective;
@@ -37,7 +38,7 @@ directive @whereAuth(
 GRAPHQL;
     }
 
-    public function handleFieldBuilder(Builder $builder, mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Builder
+    public function handleFieldBuilder(QueryBuilder|EloquentBuilder|Relation $builder, mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): QueryBuilder|EloquentBuilder|Relation
     {
         assert($builder instanceof EloquentBuilder);
 

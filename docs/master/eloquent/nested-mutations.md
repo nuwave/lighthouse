@@ -1,12 +1,11 @@
 # Nested Mutations
 
-Lighthouse allows you to create, update or delete models and their associated relationships,
-all in one single mutation. This is enabled by the [nested arg resolvers mechanism](../concepts/arg-resolvers.md).
+Lighthouse allows you to create, update or delete models and their associated relationships, all in one single mutation.
+This is enabled by the [nested arg resolvers mechanism](../concepts/arg-resolvers.md).
 
 ## Return Types Required
 
-You have to define return types on your relationship methods so that Lighthouse
-can detect them.
+You have to define return types on your relationship methods so that Lighthouse can detect them.
 
 ```php
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -28,20 +27,17 @@ final class Post extends Model
 ## Partial Failure
 
 By default, all mutations are wrapped in a database transaction.
-If any of the nested operations fail, the whole mutation is aborted
-and no changes are written to the database.
+If any of the nested operations fail, the whole mutation is aborted and no changes are written to the database.
 
 You can change this setting [in the configuration](../getting-started/configuration.md).
 
 ## Polymorphic Relation Limitations
 
-Because the GraphQL Specification does not support polymorphic Input types (yet),
-the available functionality is limited.
+Because the GraphQL Specification does not support polymorphic Input types (yet), the available functionality is limited.
 
-It is not possible to have an argument that can contain different types, which
-would be necessary to pass the attributes the different related models might have.
-For now, we can only support cases where the input type does not change across related
-models, e.g. connecting through an ID, disconnecting or deleting the relation.
+It is not possible to have an argument that can contain different types.
+Would be necessary to pass the attributes the different related models might have.
+For now, we can only support cases where the input type does not change across related models, e.g. connecting through an ID, disconnecting or deleting the relation.
 
 See [this issue](https://github.com/nuwave/lighthouse/issues/900) for further discussion.
 
@@ -50,8 +46,7 @@ See [this issue](https://github.com/nuwave/lighthouse/issues/900) for further di
 Lighthouse has no mechanism for fine-grained permissions of nested mutation operations.
 Field directives such as the [@can\* family of directives](../api-reference/directives.md#can-family-of-directives) apply to the whole field.
 
-Make sure that fields with nested mutations are only available to users who are allowed
-to execute all reachable nested mutations.
+Make sure that fields with nested mutations are only available to users who are allowed to execute all reachable nested mutations.
 
 ## BelongsTo
 
@@ -63,8 +58,7 @@ type Mutation {
 }
 ```
 
-The mutation takes a single argument `input` that contains data about
-the Post you want to create.
+The mutation takes a single argument `input` that contains data about the Post you want to create.
 
 ```graphql
 input CreatePostInput {
@@ -73,8 +67,7 @@ input CreatePostInput {
 }
 ```
 
-The first argument `title` is a value of the `Post` itself and corresponds
-to a column in the database.
+The first argument `title` is a value of the `Post` itself and corresponds to a column in the database.
 
 The second argument `author` is named just like the relationship method that is defined on the `Post` model.
 A nested `BelongsTo` relationship exposes the following operations:
@@ -135,8 +128,7 @@ Lighthouse will create a new `Post` and associate an `User` with it.
 }
 ```
 
-If the related model does not exist yet, you can also
-create a new one.
+If the related model does not exist yet, you can also create a new one.
 
 ```graphql
 mutation {
@@ -165,8 +157,8 @@ mutation {
 ```
 
 When issuing an update, you can also allow the user to remove a relation.
-Both `disconnect` and `delete` remove the association to the author,
-but `delete` also removes the author model itself.
+Both `disconnect` and `delete` remove the association to the author.
+`delete` also removes the author model itself.
 
 ```graphql
 type Mutation {
@@ -190,8 +182,7 @@ input UpdateUserBelongsTo {
 ```
 
 You must pass a truthy value to `disconnect` and `delete` for them to actually run.
-This structure was chosen as it is consistent with updating `BelongsToMany` relationships
-and allows the query string to be mostly static, taking a variable value to control its behavior.
+This structure was chosen as it is consistent with updating `BelongsToMany` relationships and allows the query string to be mostly static, taking a variable value to control its behavior.
 
 ```graphql
 mutation UpdatePost($disconnectAuthor: Boolean) {
@@ -210,8 +201,8 @@ mutation UpdatePost($disconnectAuthor: Boolean) {
 }
 ```
 
-The `author` relationship will only be disconnected if the value of the variable
-`$disconnectAuthor` is `true`, if `false` or `null` are passed, it will not change.
+The `author` relationship is disconnected only when `$disconnectAuthor` is `true`.
+If `false` or `null` is passed, it will not change.
 
 ```json
 {
@@ -260,9 +251,7 @@ mutation UpdatePost($disconnectAuthor: Boolean) {
 
 ## MorphTo
 
-The basic structure of this nested mutation type is similar to [BelongsTo](#belongsto),
-the main difference being that the `connect` operation requires an input type with both
-the `id` and `type` of the related model.
+The basic structure of this nested mutation type is similar to [BelongsTo](#belongsto), the main difference being that the `connect` operation requires an input type with both the `id` and `type` of the related model.
 
 ```graphql
 type Task {
@@ -367,8 +356,8 @@ type Mutation {
 }
 ```
 
-This mutation takes a single argument `input` that contains values
-of the `User` itself and its associated `Phone` model.
+This mutation takes a single `input` argument.
+It contains values of the `User` and its associated `Phone` model.
 
 ```graphql
 input UpdateUserInput {
@@ -434,8 +423,8 @@ type Mutation {
 }
 ```
 
-This mutation takes a single argument `input` that contains values
-of the `User` itself and its associated `Post` models.
+This mutation takes a single `input` argument.
+It contains values of the `User` and its associated `Post` models.
 
 ```graphql
 input CreateUserInput {
@@ -444,8 +433,7 @@ input CreateUserInput {
 }
 ```
 
-Now, we can expose an operation that allows us to directly create new posts
-right when we create the `User`.
+Now, we can expose an operation that allows us to directly create new posts right when we create the `User`.
 
 ```graphql
 input CreatePostsHasMany {
@@ -561,8 +549,7 @@ mutation {
 }
 ```
 
-The behavior for `upsert` is a mix between updating and creating,
-it will produce the needed action regardless of whether the model exists or not.
+The behavior for `upsert` is a mix between updating and creating, it will produce the needed action regardless of whether the model exists or not.
 
 ## MorphMany
 
@@ -570,8 +557,7 @@ Works exactly like [Has Many](#hasmany).
 
 ## BelongsToMany
 
-A belongs to many relation allows you to create new related models as well
-as attaching existing ones.
+A belongs to many relation allows you to create new related models as well as attaching existing ones.
 
 ```graphql
 type Mutation {
@@ -648,8 +634,7 @@ Lighthouse will detect the relationship and attach, update or create it.
 }
 ```
 
-It is also possible to use the `sync` operation to ensure only the given IDs
-will be contained within the relation.
+It is also possible to use the `sync` operation to ensure only the given IDs will be contained within the relation.
 
 ```graphql
 mutation {
@@ -680,8 +665,8 @@ input UpdateAuthorBelongsToMany {
 ### Storing Pivot Data
 
 It is common that many-to-many relations store some extra data in pivot tables.
-Suppose we want to track what movies a user has seen. In addition to connecting
-the two entities, we want to store how well they liked it:
+Suppose we want to track what movies a user has seen.
+In addition to connecting the two entities, we want to store how well they liked it:
 
 ```graphql
 type User {
@@ -700,13 +685,11 @@ type UserMoviePivot {
 }
 ```
 
-Laravel's `sync()`, `syncWithoutDetach()` or `connect()` methods allow you to pass
-an array where the keys are IDs of related models and the values are pivot data.
+Laravel's `sync()`, `syncWithoutDetach()` or `connect()` methods allow you to pass an array where the keys are IDs of related models and the values are pivot data.
 
 Lighthouse exposes this capability through the nested operations on many-to-many relations.
 Instead of passing just a list of IDs, you can define an `input` type that also contains pivot data.
-It must contain a field called `id` to contain the ID of the related model,
-all other fields will be inserted into the pivot table.
+It must contain a field called `id` to contain the ID of the related model, all other fields will be inserted into the pivot table.
 
 ```graphql
 type Mutation {

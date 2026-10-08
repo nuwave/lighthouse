@@ -26,8 +26,7 @@ type Query {
 }
 ```
 
-The [@all](../api-reference/directives.md#all) directive will assume the name of your model to be the same as
-the return type of the Field you are trying to resolve and automatically uses Eloquent to resolve the field.
+The [@all](../api-reference/directives.md#all) directive will assume the name of your model to be the same as the return type of the Field you are trying to resolve and automatically uses Eloquent to resolve the field.
 
 The following query:
 
@@ -55,8 +54,7 @@ Will return the following result:
 
 ## Pagination
 
-You can leverage the [@paginate](../api-reference/directives.md#paginate) directive to
-query a large list of models in chunks.
+You can leverage the [@paginate](../api-reference/directives.md#paginate) directive to query a large list of models in chunks.
 
 ```graphql
 type Query {
@@ -96,8 +94,7 @@ And can be queried like this:
 
 ## Adding Query Constraints
 
-Lighthouse provides built-in directives to enhance your queries by giving
-additional query capabilities to the client.
+Lighthouse provides built-in directives to enhance your queries by giving additional query capabilities to the client.
 
 The following field definition allows you to fetch a single User by ID.
 
@@ -131,8 +128,7 @@ And, if a result is found, receive a result like this:
 
 ## Local Scopes
 
-[Local scopes](https://laravel.com/docs/eloquent#local-scopes) are commonly used in Eloquent models
-to specify reusable query constraints.
+[Local scopes](https://laravel.com/docs/eloquent#local-scopes) are commonly used in Eloquent models to specify reusable query constraints.
 
 ```php
 use Illuminate\Database\Eloquent\Builder;
@@ -147,8 +143,7 @@ class User extends Model
 }
 ```
 
-Directives that query models, such as [@all](../api-reference/directives.md#all)
-or [@first](../api-reference/directives.md#first), allow you to re-use those scopes:
+Directives that query models, such as [@all](../api-reference/directives.md#all) or [@first](../api-reference/directives.md#first), allow you to re-use those scopes:
 
 ```graphql
 type Query {
@@ -240,8 +235,7 @@ The update may fail to find the model you provided and return `null`:
 
 ## Upsert
 
-Use the [@upsert](../api-reference/directives.md#upsert) directive to update a model with
-a given `id` or create it if it does not exist.
+Use the [@upsert](../api-reference/directives.md#upsert) directive to update a model with a given `id` or create it if it does not exist.
 
 ```graphql
 type Mutation {
@@ -276,7 +270,8 @@ mutation {
 
 ## Delete
 
-Deleting models is a breeze using the [@delete](../api-reference/directives.md#delete) directive. Dangerously easy.
+Deleting models is a breeze using the [@delete](../api-reference/directives.md#delete) directive.
+Dangerously easy.
 
 ```graphql
 type Mutation {
@@ -294,7 +289,8 @@ mutation {
 }
 ```
 
-This mutation will return the deleted object, so you will have a last chance to look at the data. Use it wisely.
+This mutation will return the deleted object, so you will have a last chance to look at the data.
+Use it wisely.
 
 ```json
 {

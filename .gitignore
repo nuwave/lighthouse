@@ -7,6 +7,7 @@
 .vscode
 phpunit.xml
 .gitpod.yml
+docs/superpowers
 
 # Generated files
 .phpunit.result.cache
@@ -20,11 +21,9 @@ composer.phar
 composer.lock
 vendor
 
-# lnai
-.ai/.lnai-manifest.json
-
 # lnai-generated
+.ai/.lnai-manifest.json
 .claude/CLAUDE.md
 .claude/settings.json
-AGENTS.md
+/AGENTS.md
 # end lnai-generated

@@ -80,7 +80,7 @@ GRAPHQL;
         $relationIsBelongsToLike = $relation instanceof BelongsTo;
 
         if ($relationIsHasOneLike || $relationIsBelongsToLike) {
-            assert($relation instanceof HasOne || $relation instanceof MorphOne || $relation instanceof BelongsTo);
+            assert($relation instanceof HasOne || $relation instanceof MorphOne || $relation instanceof BelongsTo); // @phpstan-ignore instanceof.alwaysTrue, booleanOr.alwaysTrue
             // Only delete if the given value is truthy, since
             // the client might use a variable and always pass the argument.
             // Deleting when `false` is given seems wrong.

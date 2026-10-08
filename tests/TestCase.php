@@ -185,8 +185,8 @@ abstract class TestCase extends TestbenchTestCase
     /**
      * Rethrow all errors that are not handled by GraphQL.
      *
-     * This makes debugging the tests much simpler as Exceptions
-     * are fully dumped to the console when making requests.
+     * This makes test debugging much simpler.
+     * Exceptions are fully dumped to the console when making requests.
      */
     protected function resolveApplicationExceptionHandler($app): void
     {

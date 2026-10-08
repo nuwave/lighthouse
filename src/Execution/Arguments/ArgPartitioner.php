@@ -10,7 +10,9 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Schema\Directives\NestDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
+use Nuwave\Lighthouse\Support\Contracts\SaveAwareArgResolver;
 use Nuwave\Lighthouse\Support\Utils;
 
 class ArgPartitioner
@@ -18,21 +20,54 @@ class ArgPartitioner
     /**
      * Partition the arguments into nested and regular.
      *
-     * @return array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>
+     * SaveAwareArgResolvers where runBeforeSave() returns true stay in the regular set
+     * so they reach SaveModel for execution before $model->save().
+     *
+     * @return array{
+     *   0: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet,
+     *   1: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet,
+     * }
      */
     public static function nestedArgResolvers(ArgumentSet $argumentSet, mixed $root): array
     {
-        $model = $root instanceof Model
-            ? new \ReflectionClass($root)
-            : null;
-
-        foreach ($argumentSet->arguments as $name => $argument) {
-            static::attachNestedArgResolver($name, $argument, $model);
-        }
+        $model = static::prepareArgResolvers($argumentSet, $root);
 
         return static::partition(
             $argumentSet,
-            static fn (string $name, Argument $argument): bool => isset($argument->resolver),
+            static function (string $name, Argument $argument) use ($root, $model): bool {
+                $resolver = $argument->resolver;
+                if ($resolver === null) {
+                    return false;
+                }
+
+                if ($model === null) {
+                    return true;
+                }
+
+                assert($root instanceof Model);
+
+                if ($resolver instanceof SaveAwareArgResolver) {
+                    return ! $resolver->runBeforeSave($root);
+                }
+
+                return true;
+            },
+        );
+    }
+
+    /**
+     * Requires that attachNestedArgResolver() has run on the arguments first.
+     *
+     * @return array{
+     *   0: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet,
+     *   1: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet,
+     * }
+     */
+    public static function preSaveNestedArgResolvers(ArgumentSet $argumentSet, Model $model): array
+    {
+        return static::partition(
+            $argumentSet,
+            static fn (string $name, Argument $argument): bool => self::shouldRunBeforeSave($argument->resolver, $model),
         );
     }
 
@@ -47,8 +82,7 @@ class ArgPartitioner
      *    ['foo' => 'Bar'],
      * ]
      *
-     * and the model has a method "comments" that returns a HasMany relationship,
-     * the result will be:
+     * and the model has a method "comments" that returns a HasMany relationship, the result will be:
      * [
      *   [
      *    'comments' =>
@@ -83,58 +117,10 @@ class ArgPartitioner
     }
 
     /**
-     * Attach a nested argument resolver to an argument.
-     *
-     * @param  \ReflectionClass<\Illuminate\Database\Eloquent\Model>|null  $model
-     */
-    protected static function attachNestedArgResolver(string $name, Argument &$argument, ?\ReflectionClass $model): void
-    {
-        $resolverDirective = $argument->directives->first(
-            Utils::instanceofMatcher(ArgResolver::class),
-        );
-        assert($resolverDirective instanceof ArgResolver || $resolverDirective === null);
-
-        if ($resolverDirective !== null) {
-            $argument->resolver = $resolverDirective;
-
-            return;
-        }
-
-        if (isset($model)) {
-            $isRelation = static fn (string $relationClass): bool => static::methodReturnsRelation($model, $name, $relationClass);
-
-            if (
-                $isRelation(HasOne::class)
-                || $isRelation(MorphOne::class)
-            ) {
-                $argument->resolver = new ResolveNested(new NestedOneToOne($name));
-
-                return;
-            }
-
-            if (
-                $isRelation(HasMany::class)
-                || $isRelation(MorphMany::class)
-            ) {
-                $argument->resolver = new ResolveNested(new NestedOneToMany($name));
-
-                return;
-            }
-
-            if (
-                $isRelation(BelongsToMany::class)
-                || $isRelation(MorphToMany::class)
-            ) {
-                $argument->resolver = new ResolveNested(new NestedManyToMany($name));
-            }
-        }
-    }
-
-    /**
      * Partition arguments based on a predicate.
      *
-     * The predicate will be called for each argument within the ArgumentSet
-     * with the following parameters:
+     * The predicate is called for each argument within the ArgumentSet.
+     * It receives the following parameters:
      * 1. The name of the argument
      * 2. The argument itself
      *
@@ -195,5 +181,140 @@ class ArgPartitioner
         }
 
         return is_a($returnType->getName(), $relationClass, true);
+    }
+
+    /**
+     * Recursively collect the pre-save resolvers within @nest arguments,
+     * so they can run before $root->save() instead of after it.
+     *
+     * The result is an ordered list rather than a name-keyed set:
+     * field names are unique per input type, not across a whole input tree.
+     *
+     * Leaves the given arguments untouched, as they may be shared with cached
+     * or spread ArgumentSets that the caller still owns.
+     *
+     * @return list<\Nuwave\Lighthouse\Execution\Arguments\Argument>
+     */
+    public static function liftPreSaveResolversFromNest(ArgumentSet $nested, Model $root): array
+    {
+        $model = new \ReflectionClass($root);
+
+        /** @var list<\Nuwave\Lighthouse\Execution\Arguments\Argument> */
+        $lifted = [];
+
+        foreach ($nested->arguments as $argument) {
+            if (! $argument->resolver instanceof NestDirective) {
+                continue;
+            }
+
+            array_push($lifted, ...static::liftPreSaveResolversFromNestArgument($argument, $root, $model));
+        }
+
+        return $lifted;
+    }
+
+    /**
+     * Collect the pre-save resolvers within a single @nest argument.
+     *
+     * @param  \ReflectionClass<\Illuminate\Database\Eloquent\Model>  $model
+     *
+     * @return list<\Nuwave\Lighthouse\Execution\Arguments\Argument>
+     */
+    protected static function liftPreSaveResolversFromNestArgument(Argument $nest, Model $root, \ReflectionClass $model): array
+    {
+        $nestValue = $nest->value;
+        if ($nestValue === null) {
+            return [];
+        }
+
+        assert($nestValue instanceof ArgumentSet, 'NestDirective validates that @nest is used on non-list input object types.');
+
+        /** @var list<\Nuwave\Lighthouse\Execution\Arguments\Argument> */
+        $lifted = [];
+
+        foreach ($nestValue->arguments as $childName => $childArgument) {
+            static::attachNestedArgResolver($childName, $childArgument, $model);
+
+            $resolver = $childArgument->resolver;
+
+            if (self::shouldRunBeforeSave($resolver, $root)) {
+                $lifted[] = $childArgument;
+                continue;
+            }
+
+            if ($resolver instanceof NestDirective) {
+                array_push($lifted, ...static::liftPreSaveResolversFromNestArgument($childArgument, $root, $model));
+            }
+        }
+
+        return $lifted;
+    }
+
+    /** @return \ReflectionClass<\Illuminate\Database\Eloquent\Model>|null */
+    protected static function prepareArgResolvers(ArgumentSet $argumentSet, mixed $root): ?\ReflectionClass
+    {
+        $model = $root instanceof Model
+            ? new \ReflectionClass($root)
+            : null;
+
+        foreach ($argumentSet->arguments as $name => $argument) {
+            static::attachNestedArgResolver($name, $argument, $model);
+        }
+
+        return $model;
+    }
+
+    protected static function shouldRunBeforeSave(?ArgResolver $resolver, Model $model): bool
+    {
+        return $resolver instanceof SaveAwareArgResolver
+            && $resolver->runBeforeSave($model);
+    }
+
+    /**
+     * Attach a nested argument resolver to an argument.
+     *
+     * @param  \ReflectionClass<\Illuminate\Database\Eloquent\Model>|null  $model
+     */
+    protected static function attachNestedArgResolver(string $name, Argument &$argument, ?\ReflectionClass $model): void
+    {
+        $resolverDirective = $argument->directives->first(
+            Utils::instanceofMatcher(ArgResolver::class),
+        );
+        assert($resolverDirective instanceof ArgResolver || $resolverDirective === null);
+
+        if ($resolverDirective !== null) {
+            $argument->resolver = $resolverDirective;
+
+            return;
+        }
+
+        if (isset($model)) {
+            $isRelation = static fn (string $relationClass): bool => static::methodReturnsRelation($model, $name, $relationClass);
+
+            if (
+                $isRelation(HasOne::class)
+                || $isRelation(MorphOne::class)
+            ) {
+                $argument->resolver = new ResolveNested(new NestedOneToOne($name));
+
+                return;
+            }
+
+            if (
+                $isRelation(HasMany::class)
+                || $isRelation(MorphMany::class)
+            ) {
+                $argument->resolver = new ResolveNested(new NestedOneToMany($name));
+
+                return;
+            }
+
+            if (
+                $isRelation(BelongsToMany::class)
+                || $isRelation(MorphToMany::class)
+            ) {
+                $argument->resolver = new ResolveNested(new NestedManyToMany($name));
+            }
+        }
     }
 }

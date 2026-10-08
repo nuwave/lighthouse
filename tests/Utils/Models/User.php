@@ -26,6 +26,8 @@ use Tests\Utils\Models\User\UserBuilder;
  * @property string|null $password
  * @property Carbon|null $date_of_birth
  * @property string|null $remember_token
+ * @property float|null $latitude
+ * @property float|null $longitude
  *
  * Timestamps
  * @property \Illuminate\Support\Carbon $created_at

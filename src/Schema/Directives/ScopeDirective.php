@@ -2,7 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Illuminate\Contracts\Database\Query\Builder;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
@@ -27,7 +29,7 @@ directive @scope(
 GRAPHQL;
     }
 
-    public function handleBuilder(Builder $builder, $value): Builder
+    public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, $value): QueryBuilder|EloquentBuilder|Relation
     {
         $scope = $this->directiveArgValue('name', $this->nodeName());
 

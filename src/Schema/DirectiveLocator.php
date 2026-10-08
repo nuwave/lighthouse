@@ -21,8 +21,8 @@ class DirectiveLocator
     /**
      * The paths used for locating directive classes.
      *
-     * Should be tried in the order they are contained in this array,
-     * going from the most significant to least significant.
+     * Should be tried in the order they are contained in this array.
+     * Go from the most significant to the least significant.
      *
      * Lazily initialized.
      *
@@ -32,6 +32,8 @@ class DirectiveLocator
 
     /**
      * A map from short directive names to full class names.
+     *
+     * Takes precedence over the namespaces.
      *
      * E.g.
      * [
@@ -77,8 +79,6 @@ class DirectiveLocator
      */
     public function classes(): array
     {
-        $directives = [];
-
         foreach ($this->namespaces() as $directiveNamespace) {
             /** @var array<class-string> $classesInNamespace */
             $classesInNamespace = ClassFinder::getClassesInNamespace($directiveNamespace);
@@ -94,11 +94,11 @@ class DirectiveLocator
                 }
 
                 // Only add the first directive that was found
-                $directives[self::directiveName($class)] ??= $class;
+                $this->resolvedClassnames[self::directiveName($class)] ??= $class;
             }
         }
 
-        return $directives;
+        return $this->resolvedClassnames;
     }
 
     /**

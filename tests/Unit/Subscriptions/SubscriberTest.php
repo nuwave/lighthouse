@@ -45,6 +45,7 @@ final class SubscriberTest extends TestCase
 
         $channel = $subscriber->channel;
 
+        // @phpstan-ignore theCodingMachineSafe.function (Safe\unserialize is not available in thecodingmachine/safe ^1 and ^2)
         $serialized = unserialize(serialize($subscriber));
 
         $this->assertInstanceOf(Subscriber::class, $serialized);

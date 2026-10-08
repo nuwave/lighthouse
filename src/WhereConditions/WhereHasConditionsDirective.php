@@ -2,8 +2,9 @@
 
 namespace Nuwave\Lighthouse\WhereConditions;
 
-use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Str;
 
 class WhereHasConditionsDirective extends WhereConditionsBaseDirective
@@ -56,7 +57,7 @@ GRAPHQL;
     }
 
     /** @param  array<string, mixed>|null  $value  The client given conditions */
-    public function handleBuilder(Builder $builder, $value): Builder
+    public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, $value): QueryBuilder|EloquentBuilder|Relation
     {
         if ($value === null) {
             return $builder;
@@ -89,7 +90,7 @@ GRAPHQL;
         // If the relation name is not set explicitly, we assume the argument
         // name follows a convention and contains the relation name
         if (is_null($relationName)) {
-            $relationName = lcfirst(
+            return lcfirst(
                 Str::after($this->nodeName(), 'has'),
             );
         }

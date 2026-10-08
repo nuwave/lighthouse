@@ -23,9 +23,9 @@ make bench          # Run PHPBench benchmarks
 ### Running a Single Test
 
 ```bash
-docker compose exec php vendor/bin/phpunit --filter=TestClassName
-docker compose exec php vendor/bin/phpunit --filter=testMethodName
-docker compose exec php vendor/bin/phpunit tests/Unit/Path/To/TestFile.php
+docker compose run --rm php vendor/bin/phpunit --filter=TestClassName
+docker compose run --rm php vendor/bin/phpunit --filter=testMethodName
+docker compose run --rm php vendor/bin/phpunit tests/Unit/Path/To/TestFile.php
 ```
 
 ## Architecture
@@ -45,7 +45,8 @@ docker compose exec php vendor/bin/phpunit tests/Unit/Path/To/TestFile.php
 
 ### Directive System
 
-Directives are the core extension mechanism. Located in `src/Schema/Directives/`.
+Directives are the core extension mechanism.
+Located in `src/Schema/Directives/`.
 
 - `BaseDirective` - Abstract base class for all directives, provides common utilities
 - Directive interfaces in `src/Support/Contracts/` define capabilities:
@@ -76,6 +77,38 @@ Multiple service providers for optional features (auto-discovered via composer.j
 
 Tests use `Tests\Utils\` namespace for test fixtures (Models, Queries, Mutations, etc.).
 
+### Test data setup
+
+Use relations over direct access to foreign keys.
+
+```php
+$user = factory(User::class)->create();
+
+// Right
+$post = factory(Post::class)->make();
+$post->user()->associate($user);
+$post->save();
+
+// Wrong
+$post = factory(Post::class)->create([
+    'user_id' => $user->id,
+]);
+```
+
+Use properties over arrays to fill fields.
+
+```php
+// Right
+$user = new User();
+$user->name = 'Sepp';
+$user->save();
+
+// Wrong
+$user = User::create([
+    'name' => 'Sepp',
+]);
+```
+
 ### GraphQL string style in tests
 
 - Always annotate GraphQL literals with `/** @lang GraphQL */`.
@@ -92,6 +125,8 @@ Tests use `Tests\Utils\` namespace for test fixtures (Models, Queries, Mutations
 - Never use `final` in `src/`, always in `tests/`
 - Full namespace in PHPDoc (`@var \Full\Namespace\Class`), imports in code
 - Code elements with `@api` have stability guarantees between major versions
+- Use [Semantic Line Breaks](https://sembr.org) for prose in markdown and multiline comments
+- Default to one sentence per line and avoid comma/clause-only line breaks
 
 ## Pull Requests
 
@@ -99,11 +134,11 @@ Follow the [PR template](.github/PULL_REQUEST_TEMPLATE.md):
 - Link related issues
 - Add or update tests
 - Document user-facing changes in `/docs`
-- Update `CHANGELOG.md`
+- Update `CHANGELOG.md` for non-docs-only changes
 
 ### Changelog
 
-Add entries to the `## Unreleased` section in [CHANGELOG.md](/CHANGELOG.md).
+Add entries to the `## Unreleased` section in [CHANGELOG.md](/CHANGELOG.md) for non-docs-only changes.
 Use categories: `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`.
 End each entry with a full PR URL: `https://github.com/nuwave/lighthouse/pull/<number>`.
 

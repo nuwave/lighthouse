@@ -42,6 +42,7 @@ GRAPHQL;
                     $root,
                     $args,
                     $context,
+                    $resolveInfo,
                 )
                 ->get();
 

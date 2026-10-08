@@ -75,7 +75,7 @@ final class AutomaticPersistedQueriesTest extends TestCase
     public function testEnabledWithHybridStore(): void
     {
         $filesystem = Storage::fake();
-        $this->assertInstanceOf(FilesystemAdapter::class, $filesystem);
+        $this->assertInstanceOf(FilesystemAdapter::class, $filesystem); // @phpstan-ignore method.alreadyNarrowedType (aids IDE)
 
         $config = $this->app->make(ConfigRepository::class);
         $config->set('lighthouse.query_cache.enable', true);

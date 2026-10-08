@@ -3,8 +3,7 @@
 Not every user in your application may be allowed to see all data or do any action.
 You can control what they can do by enforcing authorization rules.
 
-Before you can apply authorization, make sure you cover [authentication](authentication.md) first - it's
-a prerequisite to have your users logged in before checking what they can do.
+Before you can apply authorization, make sure you cover [authentication](authentication.md) first - it's a prerequisite to have your users logged in before checking what they can do.
 
 ## Use the Viewer pattern
 
@@ -56,8 +55,7 @@ Now, authenticated users can query for items that belong to them and are natural
 ## Restrict fields through policies
 
 Lighthouse allows you to restrict field operations to a certain group of users.
-Use the [@can\* family of directives](../api-reference/directives.md#can-family-of-directives)
-to leverage [Laravel Policies](https://laravel.com/docs/authorization) for authorization.
+Use the [@can\* family of directives](../api-reference/directives.md#can-family-of-directives) to leverage [Laravel Policies](https://laravel.com/docs/authorization) for authorization.
 
 Starting from Laravel 5.7, [authorization of guest users](https://laravel.com/docs/authorization#guest-users) is supported.
 Because of this, Lighthouse does **not** validate that the user is authenticated before passing it along to the policy.
@@ -87,8 +85,7 @@ final class PostPolicy
 
 ### Protect mutations using database queries
 
-You can also protect specific models by using the [@canFind](../api-reference/directives.md#canfind)
-or [@canQuery](../api-reference/directives.md#canquery) directive.
+You can also protect specific models by using the [@canFind](../api-reference/directives.md#canfind) or [@canQuery](../api-reference/directives.md#canquery) directive.
 They will query the database and check the specified policy against the result.
 
 ```graphql
@@ -186,8 +183,7 @@ final class PostPolicy
 }
 ```
 
-You can pass along the client given input data as arguments to the policy checks
-with the `injectArgs` argument:
+You can pass along the client given input data as arguments to the policy checks with the `injectArgs` argument:
 
 ```graphql
 type Mutation {
@@ -207,8 +203,7 @@ final class PostPolicy
 }
 ```
 
-When you combine both ways of passing arguments, the policy will be passed the `injectArgs` as
-the second parameter and the static `args` as the third parameter:
+When you combine both ways of passing arguments, the policy will be passed the `injectArgs` as the second parameter and the static `args` as the third parameter:
 
 ```php
 final class PostPolicy
@@ -240,15 +235,12 @@ The `banned` field would return false for all users who are not authorized to ac
 
 ## Custom field restrictions
 
-For applications with role management, it is common to hide some model attributes from a
-certain group of users. At the moment, Laravel and Lighthouse offer no canonical solution
-for this.
+For applications with role management, it is common to hide some model attributes from a certain group of users.
+At the moment, Laravel and Lighthouse offer no canonical solution for this.
 
-A great way to implement something that fits your use case is to create
-[a custom `FieldMiddleware` directive](../custom-directives/field-directives.md#fieldmiddleware).
+A great way to implement something that fits your use case is to create [a custom `FieldMiddleware` directive](../custom-directives/field-directives.md#fieldmiddleware).
 Field middleware allows you to intercept field access and conditionally hide them.
-You can hide a field by returning `null` instead of calling the final resolver, or maybe even
-abort execution by throwing an error.
+You can hide a field by returning `null` instead of calling the final resolver, or maybe even abort execution by throwing an error.
 
 The following directive `@canAccess` is an example implementation, make sure to adapt it to your needs.
 It assumes a simple role system where a `User` has a single attribute `$role`.

@@ -5,7 +5,9 @@ namespace Nuwave\Lighthouse\Pagination;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
-/** @extends \Illuminate\Pagination\LengthAwarePaginator<array-key, mixed> */
+/**
+ * @extends \Illuminate\Pagination\LengthAwarePaginator<array-key, mixed>
+ */
 class ZeroPerPageLengthAwarePaginator extends LengthAwarePaginator
 {
     public function __construct(int $total, int $page)

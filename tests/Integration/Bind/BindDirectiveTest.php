@@ -884,7 +884,8 @@ final class BindDirectiveTest extends DBTestCase
 
     public function testCallableClassBindingOnFieldArgument(): void
     {
-        $user = factory(User::class)->make(['id' => 1]);
+        $user = factory(User::class)->make();
+        $user->id = 1;
         $this->instance(SpyCallableClassBinding::class, new SpyCallableClassBinding($user));
 
         $this->mockResolver(fn (mixed $root, array $args): User => $args['user']);
@@ -1030,7 +1031,8 @@ final class BindDirectiveTest extends DBTestCase
 
     public function testCallableClassBindingOnInputField(): void
     {
-        $user = factory(User::class)->make(['id' => 1]);
+        $user = factory(User::class)->make();
+        $user->id = 1;
         $this->instance(SpyCallableClassBinding::class, new SpyCallableClassBinding($user));
 
         $this->mockResolver(fn (mixed $root, array $args): User => $args['input']['user']);

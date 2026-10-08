@@ -492,48 +492,72 @@ final class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testHasMixed(): void
     {
-        factory(User::class, 9)
+        $users = factory(User::class, 9)
             ->create()
             ->each(static function (User $user): void {
                 $posts = factory(Post::class, 2)->create();
                 $user->posts()->saveMany($posts);
             });
 
+        $commentAuthorA = $users->get(0);
+        $this->assertInstanceOf(User::class, $commentAuthorA);
+        $commentAuthorB = $users->get(1);
+        $this->assertInstanceOf(User::class, $commentAuthorB);
+
+        $secondUser = $users->get(1);
+        $this->assertInstanceOf(User::class, $secondUser);
+        $secondUserFirstPost = $secondUser->posts()->orderBy('id')->firstOrFail();
+        $fourthUser = $users->get(3);
+        $this->assertInstanceOf(User::class, $fourthUser);
+        $fourthUserFirstPost = $fourthUser->posts()->orderBy('id')->firstOrFail();
+        $fifthUser = $users->get(4);
+        $this->assertInstanceOf(User::class, $fifthUser);
+        $fifthUserFirstPost = $fifthUser->posts()->orderBy('id')->firstOrFail();
+        $sixthUser = $users->get(5);
+        $this->assertInstanceOf(User::class, $sixthUser);
+        $sixthUserFirstPost = $sixthUser->posts()->orderBy('id')->firstOrFail();
+        $seventhUser = $users->get(6);
+        $this->assertInstanceOf(User::class, $seventhUser);
+        $seventhUserSecondPost = $seventhUser->posts()->orderBy('id')->skip(1)->firstOrFail();
+        $eighthUser = $users->get(7);
+        $this->assertInstanceOf(User::class, $eighthUser);
+        $eighthUserFirstPost = $eighthUser->posts()->orderBy('id')->firstOrFail();
+
         $commentOne = new Comment();
-        $commentOne->post_id = 3;
-        $commentOne->user_id = 1;
+        $commentOne->post()->associate($secondUserFirstPost);
+        $commentOne->user()->associate($commentAuthorA);
         $commentOne->comment = 'none';
         $commentOne->save();
 
         $commentTwo = new Comment();
-        $commentTwo->post_id = 7;
-        $commentTwo->user_id = 2;
+        $commentTwo->post()->associate($fourthUserFirstPost);
+        $commentTwo->user()->associate($commentAuthorB);
         $commentTwo->comment = 'test';
         $commentTwo->save();
 
         for ($i = 0; $i < 5; ++$i) {
             $commentBatch = new Comment();
-            $commentBatch->post_id = 9;
-            $commentBatch->user_id = 2;
+            $commentBatch->post()->associate($fifthUserFirstPost);
+            $commentBatch->user()->associate($commentAuthorB);
             $commentBatch->comment = 'test';
             $commentBatch->save();
         }
 
         $commentThree = new Comment();
-        $commentThree->post_id = 11;
-        $commentThree->user_id = 1;
+        $commentThree->post()->associate($sixthUserFirstPost);
+        $commentThree->user()->associate($commentAuthorA);
         $commentThree->comment = 'test';
         $commentThree->save();
 
         $commentFour = new Comment();
-        $commentFour->post_id = 14;
-        $commentFour->user_id = 2;
+        $commentFour->post()->associate($seventhUserSecondPost);
+        $commentFour->user()->associate($commentAuthorB);
         $commentFour->comment = 'none';
         $commentFour->save();
 
         $commentFive = new Comment();
-        $commentFive->post_id = 15;
-        $commentFive->user_id = 2;
+        $commentFive->post()->associate($eighthUserFirstPost);
+        $commentFive->user()->associate($commentAuthorB);
         $commentFive->comment = 'none';
         $commentFive->save();
 
@@ -570,7 +594,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
             'data' => [
                 'users' => [
                     [
-                        'id' => '5',
+                        'id' => (string) $fifthUser->getKey(),
                     ],
                 ],
             ],
@@ -579,22 +603,31 @@ final class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testHasRelation(): void
     {
-        factory(User::class, 5)
+        $users = factory(User::class, 5)
             ->create()
             ->each(static function (User $user): void {
                 $posts = factory(Post::class, 2)->create();
                 $user->posts()->saveMany($posts);
             });
 
+        $commentAuthor = $users->get(0);
+        $this->assertInstanceOf(User::class, $commentAuthor);
+        $secondUser = $users->get(1);
+        $this->assertInstanceOf(User::class, $secondUser);
+        $secondUserFirstPost = $secondUser->posts()->orderBy('id')->firstOrFail();
+        $fourthUser = $users->get(3);
+        $this->assertInstanceOf(User::class, $fourthUser);
+        $fourthUserFirstPost = $fourthUser->posts()->orderBy('id')->firstOrFail();
+
         $commentOne = new Comment();
-        $commentOne->user_id = 1;
-        $commentOne->post_id = 3;
+        $commentOne->user()->associate($commentAuthor);
+        $commentOne->post()->associate($secondUserFirstPost);
         $commentOne->comment = 'none';
         $commentOne->save();
 
         $commentTwo = new Comment();
-        $commentTwo->user_id = 1;
-        $commentTwo->post_id = 7;
+        $commentTwo->user()->associate($commentAuthor);
+        $commentTwo->post()->associate($fourthUserFirstPost);
         $commentTwo->comment = 'none';
         $commentTwo->save();
 
@@ -614,10 +647,10 @@ final class WhereConditionsDirectiveTest extends DBTestCase
             'data' => [
                 'users' => [
                     [
-                        'id' => '2',
+                        'id' => (string) $secondUser->getKey(),
                     ],
                     [
-                        'id' => '4',
+                        'id' => (string) $fourthUser->getKey(),
                     ],
                 ],
             ],
@@ -626,25 +659,34 @@ final class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testHasAmount(): void
     {
-        factory(User::class, 5)
+        $users = factory(User::class, 5)
             ->create()
             ->each(static function (User $user): void {
                 $posts = factory(Post::class, 2)->create();
                 $user->posts()->saveMany($posts);
             });
 
+        $commentAuthor = $users->get(0);
+        $this->assertInstanceOf(User::class, $commentAuthor);
+        $secondUser = $users->get(1);
+        $this->assertInstanceOf(User::class, $secondUser);
+        $secondUserFirstPost = $secondUser->posts()->orderBy('id')->firstOrFail();
+        $fourthUser = $users->get(3);
+        $this->assertInstanceOf(User::class, $fourthUser);
+        $fourthUserFirstPost = $fourthUser->posts()->orderBy('id')->firstOrFail();
+
         for ($i = 0; $i < 5; ++$i) {
             $commentBatchOne = new Comment();
-            $commentBatchOne->user_id = 1;
-            $commentBatchOne->post_id = 3;
+            $commentBatchOne->user()->associate($commentAuthor);
+            $commentBatchOne->post()->associate($secondUserFirstPost);
             $commentBatchOne->comment = 'none';
             $commentBatchOne->save();
         }
 
         for ($i = 0; $i < 2; ++$i) {
             $commentBatchTwo = new Comment();
-            $commentBatchTwo->user_id = 1;
-            $commentBatchTwo->post_id = 7;
+            $commentBatchTwo->user()->associate($commentAuthor);
+            $commentBatchTwo->post()->associate($fourthUserFirstPost);
             $commentBatchTwo->comment = 'none';
             $commentBatchTwo->save();
         }
@@ -666,7 +708,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
             'data' => [
                 'users' => [
                     [
-                        'id' => '2',
+                        'id' => (string) $secondUser->getKey(),
                     ],
                 ],
             ],
@@ -675,25 +717,34 @@ final class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testHasOperator(): void
     {
-        factory(User::class, 5)
+        $users = factory(User::class, 5)
             ->create()
             ->each(static function (User $user): void {
                 $posts = factory(Post::class, 2)->create();
                 $user->posts()->saveMany($posts);
             });
 
+        $commentAuthor = $users->get(0);
+        $this->assertInstanceOf(User::class, $commentAuthor);
+        $secondUser = $users->get(1);
+        $this->assertInstanceOf(User::class, $secondUser);
+        $secondUserFirstPost = $secondUser->posts()->orderBy('id')->firstOrFail();
+        $fourthUser = $users->get(3);
+        $this->assertInstanceOf(User::class, $fourthUser);
+        $fourthUserFirstPost = $fourthUser->posts()->orderBy('id')->firstOrFail();
+
         for ($i = 0; $i < 5; ++$i) {
             $commentBatchOne = new Comment();
-            $commentBatchOne->user_id = 1;
-            $commentBatchOne->post_id = 3;
+            $commentBatchOne->user()->associate($commentAuthor);
+            $commentBatchOne->post()->associate($secondUserFirstPost);
             $commentBatchOne->comment = 'none';
             $commentBatchOne->save();
         }
 
         for ($i = 0; $i < 6; ++$i) {
             $commentBatchTwo = new Comment();
-            $commentBatchTwo->user_id = 1;
-            $commentBatchTwo->post_id = 7;
+            $commentBatchTwo->user()->associate($commentAuthor);
+            $commentBatchTwo->post()->associate($fourthUserFirstPost);
             $commentBatchTwo->comment = 'none';
             $commentBatchTwo->save();
         }
@@ -716,7 +767,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
             'data' => [
                 'users' => [
                     [
-                        'id' => '2',
+                        'id' => (string) $secondUser->getKey(),
                     ],
                 ],
             ],
@@ -725,22 +776,31 @@ final class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testHasCondition(): void
     {
-        factory(User::class, 5)
+        $users = factory(User::class, 5)
             ->create()
             ->each(static function (User $user): void {
                 $posts = factory(Post::class, 2)->create();
                 $user->posts()->saveMany($posts);
             });
 
+        $commentAuthor = $users->get(0);
+        $this->assertInstanceOf(User::class, $commentAuthor);
+        $secondUser = $users->get(1);
+        $this->assertInstanceOf(User::class, $secondUser);
+        $secondUserFirstPost = $secondUser->posts()->orderBy('id')->firstOrFail();
+        $fourthUser = $users->get(3);
+        $this->assertInstanceOf(User::class, $fourthUser);
+        $fourthUserFirstPost = $fourthUser->posts()->orderBy('id')->firstOrFail();
+
         $commentOne = new Comment();
-        $commentOne->user_id = 1;
-        $commentOne->post_id = 3;
+        $commentOne->user()->associate($commentAuthor);
+        $commentOne->post()->associate($secondUserFirstPost);
         $commentOne->comment = 'test';
         $commentOne->save();
 
         $commentTwo = new Comment();
-        $commentTwo->user_id = 1;
-        $commentTwo->post_id = 7;
+        $commentTwo->user()->associate($commentAuthor);
+        $commentTwo->post()->associate($fourthUserFirstPost);
         $commentTwo->comment = 'none';
         $commentTwo->save();
 
@@ -764,7 +824,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
             'data' => [
                 'users' => [
                     [
-                        'id' => '2',
+                        'id' => (string) $secondUser->getKey(),
                     ],
                 ],
             ],
@@ -773,22 +833,31 @@ final class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testHasRecursive(): void
     {
-        factory(User::class, 7)
+        $users = factory(User::class, 7)
             ->create()
             ->each(static function (User $user): void {
                 $posts = factory(Post::class, 2)->create();
                 $user->posts()->saveMany($posts);
             });
 
+        $commentAuthor = $users->get(0);
+        $this->assertInstanceOf(User::class, $commentAuthor);
+        $fourthUser = $users->get(3);
+        $this->assertInstanceOf(User::class, $fourthUser);
+        $fourthUserFirstPost = $fourthUser->posts()->orderBy('id')->firstOrFail();
+        $sixthUser = $users->get(5);
+        $this->assertInstanceOf(User::class, $sixthUser);
+        $sixthUserFirstPost = $sixthUser->posts()->orderBy('id')->firstOrFail();
+
         $commentOne = new Comment();
-        $commentOne->user_id = 1;
-        $commentOne->post_id = 7;
+        $commentOne->user()->associate($commentAuthor);
+        $commentOne->post()->associate($fourthUserFirstPost);
         $commentOne->comment = 'none';
         $commentOne->save();
 
         $commentTwo = new Comment();
-        $commentTwo->user_id = 1;
-        $commentTwo->post_id = 11;
+        $commentTwo->user()->associate($commentAuthor);
+        $commentTwo->post()->associate($sixthUserFirstPost);
         $commentTwo->comment = 'none';
         $commentTwo->save();
 
@@ -813,7 +882,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
             'data' => [
                 'users' => [
                     [
-                        'id' => '4',
+                        'id' => (string) $fourthUser->getKey(),
                     ],
                 ],
             ],
@@ -822,28 +891,37 @@ final class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testHasNested(): void
     {
-        factory(User::class, 5)
+        $users = factory(User::class, 5)
             ->create()
             ->each(static function (User $user): void {
                 $posts = factory(Post::class, 2)->create();
                 $user->posts()->saveMany($posts);
             });
 
+        $thirdUser = $users->get(2);
+        $this->assertInstanceOf(User::class, $thirdUser);
+        $secondUser = $users->get(1);
+        $this->assertInstanceOf(User::class, $secondUser);
+        $secondUserFirstPost = $secondUser->posts()->orderBy('id')->firstOrFail();
+        $fourthUser = $users->get(3);
+        $this->assertInstanceOf(User::class, $fourthUser);
+        $fourthUserFirstPost = $fourthUser->posts()->orderBy('id')->firstOrFail();
+
         $commentOne = new Comment();
-        $commentOne->user_id = 3;
-        $commentOne->post_id = 3;
+        $commentOne->user()->associate($thirdUser);
+        $commentOne->post()->associate($secondUserFirstPost);
         $commentOne->comment = 'none';
         $commentOne->save();
 
         $commentTwo = new Comment();
-        $commentTwo->user_id = 2;
-        $commentTwo->post_id = 7;
+        $commentTwo->user()->associate($secondUser);
+        $commentTwo->post()->associate($fourthUserFirstPost);
         $commentTwo->comment = 'none';
         $commentTwo->save();
 
         $task = new Task();
         $task->name = 'test';
-        $task->user_id = 2;
+        $task->user()->associate($secondUser);
         $task->save();
 
         $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
@@ -872,7 +950,7 @@ final class WhereConditionsDirectiveTest extends DBTestCase
             'data' => [
                 'users' => [
                     [
-                        'id' => '4',
+                        'id' => (string) $fourthUser->getKey(),
                     ],
                 ],
             ],
