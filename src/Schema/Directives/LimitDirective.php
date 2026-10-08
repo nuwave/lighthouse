@@ -7,9 +7,7 @@ use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\Type;
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
-use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Contracts\Database\Query\Builder;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
@@ -109,7 +107,7 @@ GRAPHQL;
         });
     }
 
-    public function handleBuilder(Relation|EloquentBuilder|QueryBuilder $builder, mixed $value): QueryBuilder|EloquentBuilder|Relation
+    public function handleBuilder(Builder $builder, mixed $value): Builder
     {
         if (! $this->shouldApplyToQueryBuilders()) {
             return $builder;

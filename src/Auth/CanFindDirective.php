@@ -107,7 +107,6 @@ GRAPHQL;
                 $root,
                 $args,
                 $context,
-                $resolveInfo,
                 Utils::instanceofMatcher(TrashedDirective::class),
             );
             assert($enhancedBuilder instanceof EloquentBuilder);

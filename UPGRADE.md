@@ -70,6 +70,34 @@ The Artisan command `lighthouse:clear-cache` was renamed to `lighthouse:clear-sc
 Delete `_lighthouse_ide_helper.php` and remove `vendor/nuwave/lighthouse/_ide_helper.php` from `stubFiles` in your `phpstan.neon`.
 [Larastan](https://github.com/larastan/larastan) recognizes the `TestResponse` mixin methods without them.
 
+### Use `Illuminate\Contracts\Database\Query\Builder` in builder directives
+
+`ArgBuilderDirective::handleBuilder()` and `FieldBuilderDirective::handleFieldBuilder()` now type the builder
+with the common interface `Illuminate\Contracts\Database\Query\Builder` instead of a union of concrete classes.
+Custom directives that implement them must adopt the new signature.
+
+```diff
+-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+-use Illuminate\Database\Eloquent\Relations\Relation;
+-use Illuminate\Database\Query\Builder as QueryBuilder;
++use Illuminate\Contracts\Database\Query\Builder;
+
+final class MyDirective extends BaseDirective implements ArgBuilderDirective
+{
+-    public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, mixed $value): QueryBuilder|EloquentBuilder|Relation
++    public function handleBuilder(Builder $builder, mixed $value): Builder
+}
+```
+
+### Do not pass `ResolveInfo` to `ResolveInfo::enhanceBuilder()`
+
+`ResolveInfo::enhanceBuilder()` and `ResolveInfo::wouldEnhanceBuilder()` no longer accept a `ResolveInfo` argument, they use the instance they are called on.
+
+```diff
+-$resolveInfo->enhanceBuilder($builder, $scopes, $root, $args, $context, $resolveInfo, $directiveFilter);
++$resolveInfo->enhanceBuilder($builder, $scopes, $root, $args, $context, $directiveFilter);
+```
+
 ## v5 to v6
 
 ### `messages` on `@rules` and `@rulesForArray`

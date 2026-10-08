@@ -3,9 +3,7 @@
 namespace Nuwave\Lighthouse\Execution;
 
 use GraphQL\Type\Definition\ResolveInfo as BaseResolveInfo;
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
-use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Laravel\Scout\Builder as ScoutBuilder;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
@@ -37,33 +35,29 @@ class ResolveInfo extends BaseResolveInfo
     /**
      * Apply ArgBuilderDirectives and scopes to the builder.
      *
-     * @template TModel of \Illuminate\Database\Eloquent\Model
-     *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<TModel>|\Illuminate\Database\Eloquent\Relations\Relation<TModel>|\Laravel\Scout\Builder  $builder
      * @param  array<string>  $scopes
      * @param  array<string, mixed>  $args
      * @param  (callable(\Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective|\Nuwave\Lighthouse\Scout\ScoutBuilderDirective): bool)|null  $directiveFilter
-     *
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<TModel>|\Illuminate\Database\Eloquent\Relations\Relation<TModel>|\Laravel\Scout\Builder
      */
     public function enhanceBuilder(
-        QueryBuilder|EloquentBuilder|Relation|ScoutBuilder $builder,
+        Builder|ScoutBuilder $builder,
         array $scopes,
         mixed $root,
         array $args,
         GraphQLContext $context,
-        ResolveInfo $resolveInfo,
         ?callable $directiveFilter = null,
-    ): QueryBuilder|EloquentBuilder|Relation|ScoutBuilder {
-        $argumentSet = $resolveInfo->argumentSet;
+    ): Builder|ScoutBuilder {
+        $argumentSet = $this->argumentSet;
 
         $scoutEnhancer = new ScoutEnhancer($argumentSet, $builder);
         if ($scoutEnhancer->canEnhanceBuilder()) {
             return $scoutEnhancer->enhanceBuilder($directiveFilter);
         }
 
+        assert($builder instanceof Builder, 'Scout builders are handled by the ScoutEnhancer.');
+
         self::applyArgBuilderDirectives($argumentSet, $builder, $directiveFilter);
-        self::applyFieldBuilderDirectives($builder, $root, $args, $context, $resolveInfo);
+        self::applyFieldBuilderDirectives($builder, $root, $args, $context, $this);
 
         foreach ($scopes as $scope) {
             $builder->{$scope}($args);
@@ -75,37 +69,34 @@ class ResolveInfo extends BaseResolveInfo
     /**
      * Would the builder be enhanced in any way?
      *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>|\Laravel\Scout\Builder  $builder
      * @param  array<string>  $scopes
      * @param  array<string, mixed>  $args
      * @param  (callable(\Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective): bool)|null  $directiveFilter
      */
     public function wouldEnhanceBuilder(
-        QueryBuilder|EloquentBuilder|Relation|ScoutBuilder $builder,
+        Builder|ScoutBuilder $builder,
         array $scopes,
         mixed $root,
         array $args,
         GraphQLContext $context,
-        ResolveInfo $resolveInfo,
         ?callable $directiveFilter = null,
     ): bool {
-        $argumentSet = $resolveInfo->argumentSet;
+        $argumentSet = $this->argumentSet;
 
         return (new ScoutEnhancer($argumentSet, $builder))->wouldEnhanceBuilder()
             || self::wouldApplyArgBuilderDirectives($argumentSet, $builder, $directiveFilter)
-            || self::wouldApplyFieldBuilderDirectives($resolveInfo)
+            || self::wouldApplyFieldBuilderDirectives($this)
             || $scopes !== [];
     }
 
     /**
      * Recursively apply the ArgBuilderDirectives onto the builder.
      *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>  $builder
      * @param  (callable(\Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective): bool)|null  $directiveFilter
      */
     protected static function applyArgBuilderDirectives(
         ArgumentSet $argumentSet,
-        QueryBuilder|EloquentBuilder|Relation &$builder,
+        Builder &$builder,
         ?callable $directiveFilter = null,
     ): void {
         foreach ($argumentSet->arguments as $argument) {
@@ -137,12 +128,11 @@ class ResolveInfo extends BaseResolveInfo
     /**
      * Would there be any ArgBuilderDirectives to apply to the builder?
      *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>  $builder
      * @param  (callable(\Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective): bool)|null  $directiveFilter
      */
     protected static function wouldApplyArgBuilderDirectives(
         ArgumentSet $argumentSet,
-        QueryBuilder|EloquentBuilder|Relation &$builder,
+        Builder|ScoutBuilder &$builder,
         ?callable $directiveFilter = null,
     ): bool {
         foreach ($argumentSet->arguments as $argument) {
@@ -182,10 +172,9 @@ class ResolveInfo extends BaseResolveInfo
     /**
      * Apply the FieldBuilderDirectives onto the builder.
      *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>  $builder
      * @param  array<string, mixed>  $args
      */
-    protected static function applyFieldBuilderDirectives(QueryBuilder|EloquentBuilder|Relation &$builder, mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): void
+    protected static function applyFieldBuilderDirectives(Builder &$builder, mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): void
     {
         foreach (self::fieldBuilderDirectives($resolveInfo) as $fieldBuilderDirective) {
             $builder = $fieldBuilderDirective->handleFieldBuilder($builder, $root, $args, $context, $resolveInfo);
