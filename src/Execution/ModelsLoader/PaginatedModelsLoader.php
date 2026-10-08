@@ -86,7 +86,17 @@ class PaginatedModelsLoader implements ModelsLoader
         return $relatedModels->unique(
             // Compare all attributes because there might not be a unique primary key
             // or there could be differing pivot attributes.
-            static fn (Model $relatedModel): string => json_encode($relatedModel->getRawOriginal()),
+            static fn (Model $relatedModel): string => json_encode(
+                array_map(
+                    /**
+                     * Ensure all strings are UTF-8 for json_encode. The exact values don't really matter here,
+                     * just any differences between them, so the byte-by-byte encoding conversion is safe for
+                     * this purpose.
+                     */
+                    fn ($v) => is_string($v) ? mb_convert_encoding($v, 'UTF-8', 'ISO-8859-1') : $v,
+                    $relatedModel->getRawOriginal(),
+                ),
+            ),
         );
     }
 

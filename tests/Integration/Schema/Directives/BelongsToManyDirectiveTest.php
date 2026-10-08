@@ -492,6 +492,67 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         ]);
     }
 
+    public function testQueryPaginatedBelongsToManyWithDuplicatesUtf8Collision(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Query {
+            users: [User]! @all
+        }
+
+        type User {
+            id: ID!
+            roles: [Role!]! @belongsToMany(type: SIMPLE)
+        }
+
+        type Role {
+            id: ID!
+        }
+        GRAPHQL;
+
+        $role1 = factory(Role::class)->create([
+            'bytes' => "\xE9",
+        ]);
+        $role2 = factory(Role::class)->create([
+            'bytes' => "\xC3\xA9",
+        ]);
+
+        $users = factory(User::class, 2)->create();
+        foreach ($users as $user) {
+            $this->assertInstanceOf(User::class, $user);
+            $user->roles()->attach($role1);
+            $user->roles()->attach($role2);
+        }
+
+        $roleIDs = [
+            ['id' => (string) $role1->id],
+            ['id' => (string) $role2->id],
+        ];
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            users {
+                id
+                roles(first: 2) {
+                    data {
+                        id
+                    }
+                }
+            }
+        }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'users' => $users
+                    ->map(static fn (User $user): array => [
+                        'id' => (string) $user->id,
+                        'roles' => [
+                            'data' => $roleIDs,
+                        ],
+                    ])
+                    ->all(),
+            ],
+        ]);
+    }
+
     public function testQueryBelongsToManyNestedRelationships(): void
     {
         $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'

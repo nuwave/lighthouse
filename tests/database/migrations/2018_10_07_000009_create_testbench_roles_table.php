@@ -11,6 +11,7 @@ final class CreateTestbenchRolesTable extends Migration
         Schema::create('roles', function (Blueprint $table): void {
             $table->id();
             $table->string('name');
+            $table->binary('bytes')->nullable();
             $table->unsignedBigInteger('acl_id')->nullable();
         });
     }
