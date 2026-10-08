@@ -48,6 +48,20 @@ class PaginatedModelsLoader implements ModelsLoader
      */
     protected function loadRelatedModels(EloquentCollection $parents): EloquentCollection
     {
+        if ($this->paginationArgs->first === null) {
+            $relation = $this->relationInstance($parents);
+            $relation->addEagerConstraints($parents->all());
+
+            ($this->decorateBuilder)($relation);
+
+            if ($relation instanceof BelongsToMany || $relation instanceof HasManyThrough) {
+                $select = Utils::callProtected($relation, 'shouldSelect', ['*']);
+                $relation->addSelect($select);
+            }
+
+            return $relation->get();
+        }
+
         $relations = $parents->toBase()
             ->map(function (Model $model) use ($parents): Relation {
                 $relation = $this->relationInstance($parents);
@@ -184,9 +198,13 @@ class PaginatedModelsLoader implements ModelsLoader
         foreach ($parents as $model) {
             $total = CountModelsLoader::extractCount($model, $this->relation);
 
-            $paginator = $first === 0
-                ? new ZeroPerPageLengthAwarePaginator($total, $page)
-                : new LengthAwarePaginator($model->getRelation($this->relation), $total, $first, $page);
+            if ($first === null) {
+                $paginator = new LengthAwarePaginator($model->getRelation($this->relation), $total, max(1, $total), $page);
+            } elseif ($first === 0) {
+                $paginator = new ZeroPerPageLengthAwarePaginator($total, $page);
+            } else {
+                $paginator = new LengthAwarePaginator($model->getRelation($this->relation), $total, $first, $page);
+            }
 
             $model->setRelation($this->relation, $paginator);
         }

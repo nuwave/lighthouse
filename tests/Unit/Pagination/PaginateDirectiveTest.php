@@ -170,7 +170,7 @@ final class PaginateDirectiveTest extends TestCase
 type Query {
   users(
     "Limits number of fetched items."
-    first: Int!
+    first: Int
 
     "The offset from which items are returned."
     page: Int
@@ -209,7 +209,7 @@ GRAPHQL,
 type Query {
   users(
     "Limits number of fetched items."
-    first: Int!
+    first: Int
 
     "The offset from which items are returned."
     page: Int
@@ -248,7 +248,7 @@ GRAPHQL,
 type Query {
   users(
     "Limits number of fetched items."
-    first: Int!
+    first: Int
 
     "A cursor after which elements are returned."
     after: String
@@ -545,16 +545,16 @@ GRAPHQL,
     {
         config(['lighthouse.pagination.default_count' => 2]);
 
-        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type User {
             id: ID!
             name: String!
         }
 
         type Query {
-            users: [User!]! @paginate(defaultCount: null)
+            users: [User!]! @paginate(defaultCount: null, resolver: "{$this->qualifyTestResolver('returnPaginatedDataInsteadOfBuilder')}")
         }
-        GRAPHQL;
+GRAPHQL;
 
         $this
             ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
@@ -566,7 +566,16 @@ GRAPHQL,
                 }
             }
             GRAPHQL)
-            ->assertGraphQLErrorMessage('Field "users" argument "first" of type "Int!" is required but not provided.');
+            ->assertJson([
+                'data' => [
+                    'users' => [
+                        'data' => [
+                            ['id' => 1],
+                            ['id' => 2],
+                        ],
+                    ],
+                ],
+            ]);
     }
 
     public function testThrowsWhenPaginationWithNegativeCountIsRequested(): void
@@ -644,17 +653,17 @@ GRAPHQL,
         $this->assertCount(1, $ast->directives);
     }
 
-    public function testDisallowFirstNull(): void
+    public function testAllowFirstNull(): void
     {
-        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type User {
             id: ID!
         }
 
         type Query {
-            users: [User!]! @paginate(defaultCount: 2)
+            users: [User!]! @paginate(defaultCount: 2, resolver: "{$this->qualifyTestResolver('returnPaginatedDataInsteadOfBuilder')}")
         }
-        GRAPHQL;
+GRAPHQL;
 
         $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
@@ -664,7 +673,16 @@ GRAPHQL,
                 }
             }
         }
-        GRAPHQL)->assertGraphQLErrorMessage('Expected value of type "Int!", found null.');
+        GRAPHQL)->assertJson([
+            'data' => [
+                'users' => [
+                    'data' => [
+                        ['id' => 1],
+                        ['id' => 2],
+                    ],
+                ],
+            ],
+        ]);
     }
 
     public function testQueriesFirst0SimplePaginator(): void
@@ -697,12 +715,14 @@ GRAPHQL,
     }
 
     /**
-     * @param  array{first: int}  $args
+     * @param  array{first?: int|null}  $args
      *
      * @return \Illuminate\Pagination\LengthAwarePaginator<int, array{id: int}>
      */
     public static function returnPaginatedDataInsteadOfBuilder(mixed $root, array $args): LengthAwarePaginator
     {
+        $first = $args['first'] ?? 2;
+
         return new LengthAwarePaginator([ // @phpstan-ignore return.type (pagination generics changed between Laravel versions)
             [
                 'id' => 1,
@@ -710,7 +730,7 @@ GRAPHQL,
             [
                 'id' => 2,
             ],
-        ], 2, $args['first']);
+        ], 2, $first ?: 2);
     }
 
     public function testPaginatorResolver(): void

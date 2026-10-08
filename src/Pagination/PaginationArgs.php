@@ -3,10 +3,12 @@
 namespace Nuwave\Lighthouse\Pagination;
 
 use GraphQL\Error\Error;
-use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Contracts\Pagination\Paginator as PaginatorContract;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
 use Laravel\Scout\Builder as ScoutBuilder;
 use Nuwave\Lighthouse\Cache\CacheDirective;
@@ -17,7 +19,7 @@ class PaginationArgs
 {
     public function __construct(
         public int $page,
-        public int $first,
+        public ?int $first,
         public PaginationType $type,
     ) {}
 
@@ -28,7 +30,7 @@ class PaginationArgs
      */
     public static function extractArgs(array $args, ResolveInfo $resolveInfo, PaginationType $proposedPaginationType, ?int $paginateMaxCount): self
     {
-        $first = $args['first'];
+        $first = $args['first'] ?? null;
 
         $page = $proposedPaginationType->isConnection()
             ? self::calculateCurrentPage(
@@ -38,13 +40,14 @@ class PaginationArgs
             // Handles cases "paginate" and "simple", which both take the same args.
             : Arr::get($args, 'page') ?? 1;
 
-        if ($first < 0) {
+        if ($first !== null && $first < 0) {
             throw new Error(self::requestedLessThanZeroItems($first));
         }
 
         // Make sure the maximum pagination count is not exceeded
         if (
-            $paginateMaxCount !== null
+            $first !== null
+            && $paginateMaxCount !== null
             && $first > $paginateMaxCount
         ) {
             throw new Error(self::requestedTooManyItems($paginateMaxCount, $first));
@@ -66,7 +69,7 @@ class PaginationArgs
     }
 
     /** Calculate the current page to inform the user about the pagination state. */
-    protected static function calculateCurrentPage(int $first, int $after, int $defaultPage = 1): int
+    protected static function calculateCurrentPage(?int $first, int $after, int $defaultPage = 1): int
     {
         return $first && $after
             ? (int) floor(($first + $after) / $first)
@@ -108,8 +111,18 @@ class PaginationArgs
      *
      * @return \Illuminate\Contracts\Pagination\Paginator<array-key, TModel>
      */
-    public function applyToBuilder(QueryBuilder|ScoutBuilder|EloquentBuilder|Relation $builder): Paginator
+    public function applyToBuilder(QueryBuilder|ScoutBuilder|EloquentBuilder|Relation $builder): PaginatorContract
     {
+        if ($this->first === null) {
+            $results = $builder->get();
+            $count = $results->count();
+
+            // @phpstan-ignore return.type (generic type does not matter)
+            return $this->type->isSimple()
+                ? new Paginator($results, max(1, $count), $this->page)
+                : new LengthAwarePaginator($results, $count, max(1, $count), $this->page);
+        }
+
         if ($this->first === 0) {
             if ($this->type->isSimple()) {
                 return new ZeroPerPagePaginator($this->page); // @phpstan-ignore return.type (generic type does not matter)
