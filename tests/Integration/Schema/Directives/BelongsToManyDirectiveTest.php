@@ -515,17 +515,18 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         $role2 = factory(Role::class)->create([
             'bytes' => "\xC3\xA9",
         ]);
-        $roles = collect([$role1, $role2]);
 
         $users = factory(User::class, 2)->create();
         foreach ($users as $user) {
             $this->assertInstanceOf(User::class, $user);
-            $user->roles()->attach($roles);
+            $user->roles()->attach($role1);
+            $user->roles()->attach($role2);
         }
 
-        $roleIDs = $roles
-            ->map(static fn (Role $role): array => ['id' => (string) $role->id])
-            ->all();
+        $roleIDs = [
+            ['id' => (string) $role1->id],
+            ['id' => (string) $role2->id],
+        ];
 
         $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
