@@ -116,6 +116,25 @@ final class BelongsToTest extends DBTestCase
         ]);
     }
 
+    public function testConnectNonExisting(): void
+    {
+        $this
+            ->graphQL(/** @lang GraphQL */ '
+            mutation {
+                createTask(input: {
+                    name: "foo"
+                    user: {
+                        connect: 1
+                    }
+                }) {
+                    id
+                }
+            }
+            ')
+            ->dump()
+            ->assertGraphQLErrorMessage('Can not connect non-existing User 1');
+    }
+
     public function testBelongsToExplicitNullHasNoEffect(): void
     {
         $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
