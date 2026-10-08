@@ -21,13 +21,16 @@ use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Federation\Directives\ComposeDirectiveDirective;
 use Nuwave\Lighthouse\Federation\Directives\ExtendsDirective;
 use Nuwave\Lighthouse\Federation\Directives\ExternalDirective;
+use Nuwave\Lighthouse\Federation\Directives\AuthenticatedDirective;
 use Nuwave\Lighthouse\Federation\Directives\InaccessibleDirective;
 use Nuwave\Lighthouse\Federation\Directives\InterfaceObjectDirective;
 use Nuwave\Lighthouse\Federation\Directives\KeyDirective;
 use Nuwave\Lighthouse\Federation\Directives\LinkDirective;
 use Nuwave\Lighthouse\Federation\Directives\OverrideDirective;
+use Nuwave\Lighthouse\Federation\Directives\PolicyDirective;
 use Nuwave\Lighthouse\Federation\Directives\ProvidesDirective;
 use Nuwave\Lighthouse\Federation\Directives\RequiresDirective;
+use Nuwave\Lighthouse\Federation\Directives\RequiresScopesDirective;
 use Nuwave\Lighthouse\Federation\Directives\ShareableDirective;
 use Nuwave\Lighthouse\Federation\Directives\TagDirective;
 use Nuwave\Lighthouse\Schema\RootType;
@@ -59,6 +62,9 @@ class FederationPrinter
         TagDirective::NAME,
         LinkDirective::NAME,
         ComposeDirectiveDirective::NAME,
+        AuthenticatedDirective::NAME,
+        RequiresScopesDirective::NAME,
+        PolicyDirective::NAME,
     ];
 
     public static function print(Schema $schema): string
