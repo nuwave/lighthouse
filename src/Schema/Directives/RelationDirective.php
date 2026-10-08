@@ -96,9 +96,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
 
             $decorateBuilder($relation);
 
-            return $paginationArgs !== null
-                ? $paginationArgs->applyToBuilder($relation)
-                : $relation->getResults();
+            return $paginationArgs?->applyToBuilder($relation) ?? $relation->getResults();
         };
     }
 

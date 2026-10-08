@@ -2,9 +2,8 @@
 
 namespace Tests\Unit\Execution;
 
+use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
-use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Database\Query\Builder as QueryBuilder;
 use Nuwave\Lighthouse\Execution\Arguments\Argument;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
@@ -23,7 +22,7 @@ final class ResolveInfoTest extends TestCase
                 return '';
             }
 
-            public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, mixed $value): QueryBuilder|EloquentBuilder|Relation
+            public function handleBuilder(Builder $builder, mixed $value): Builder
             {
                 return $builder->where('one', $value);
             }
@@ -34,7 +33,7 @@ final class ResolveInfoTest extends TestCase
                 return '';
             }
 
-            public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, mixed $value): QueryBuilder|EloquentBuilder|Relation
+            public function handleBuilder(Builder $builder, mixed $value): Builder
             {
                 return $builder->where('two', $value);
             }
@@ -45,7 +44,7 @@ final class ResolveInfoTest extends TestCase
                 return '';
             }
 
-            public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, mixed $value): QueryBuilder|EloquentBuilder|Relation
+            public function handleBuilder(Builder $builder, mixed $value): Builder
             {
                 return $builder->where('nested', $value);
             }
@@ -56,7 +55,7 @@ final class ResolveInfoTest extends TestCase
                 return '';
             }
 
-            public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, mixed $value): QueryBuilder|EloquentBuilder|Relation
+            public function handleBuilder(Builder $builder, mixed $value): Builder
             {
                 return $builder->where('ignored', $value);
             }
@@ -104,7 +103,7 @@ final class ResolveInfoTest extends TestCase
 
             public static function applyArgBuilderDirectives(
                 ArgumentSet $argumentSet,
-                Relation|EloquentBuilder|QueryBuilder &$builder,
+                Builder &$builder,
                 ?callable $directiveFilter = null,
             ): void {
                 parent::applyArgBuilderDirectives(
@@ -120,6 +119,7 @@ final class ResolveInfoTest extends TestCase
             $builder,
             static fn (ArgBuilderDirective $directive): bool => $directive !== $directiveIgnored,
         );
+        $this->assertInstanceOf(EloquentBuilder::class, $builder);
 
         $this->assertSame([
             [

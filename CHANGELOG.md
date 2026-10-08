@@ -9,6 +9,12 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Changed
+
+- Use `Illuminate\Contracts\Database\Query\Builder` in the signatures of `ArgBuilderDirective::handleBuilder()` and `FieldBuilderDirective::handleFieldBuilder()` https://github.com/nuwave/lighthouse/pull/2389
+- Remove `ResolveInfo` parameter from `ResolveInfo::enhanceBuilder()` and `ResolveInfo::wouldEnhanceBuilder()` https://github.com/nuwave/lighthouse/pull/2389
+- Allow the `builder` argument of `@aggregate` to return a `Relation` https://github.com/nuwave/lighthouse/pull/2389
+
 ## v6.71.0
 
 ### Deprecated
