@@ -93,9 +93,7 @@ class PaginatedModelsLoader implements ModelsLoader
                      * just any differences between them, so the byte-by-byte encoding conversion is safe for
                      * this purpose.
                      */
-                    fn ($v) => is_string($v) && ! mb_check_encoding($v, 'UTF-8')
-                        ? mb_convert_encoding($v, 'UTF-8', 'ISO-8859-1')
-                        : $v,
+                    fn ($v) => is_string($v) ? mb_convert_encoding($v, 'UTF-8', 'ISO-8859-1') : $v,
                     $relatedModel->getRawOriginal(),
                 ),
             ),
