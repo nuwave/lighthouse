@@ -90,7 +90,7 @@ GRAPHQL;
                     $relation->getParent()->save();
                 }
 
-                $relation->delete();
+                $relation->first()?->delete();
             }
         } else {
             $related = $relation->make(); // @phpstan-ignore method.notFound (Relation delegates to Builder)
