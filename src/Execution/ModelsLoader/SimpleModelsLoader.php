@@ -14,7 +14,7 @@ class SimpleModelsLoader implements ModelsLoader
 
     public function load(EloquentCollection $parents): void
     {
-        $parents->load([$this->relation => $this->decorateBuilder]);
+        $parents->loadMissing([$this->relation => $this->decorateBuilder]);
     }
 
     public function extract(Model $model): mixed
