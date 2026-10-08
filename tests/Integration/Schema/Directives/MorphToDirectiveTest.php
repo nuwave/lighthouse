@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Carbon\Carbon;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Image;
 use Tests\Utils\Models\Post;
@@ -120,6 +121,163 @@ final class MorphToDirectiveTest extends DBTestCase
                     'customImageable' => [
                         'id' => $task->id,
                         'name' => $task->name,
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testResolveMorphToWithScopes(): void
+    {
+        $user = factory(User::class)->create();
+        assert($user instanceof User);
+
+        $task = factory(Task::class)->make();
+        assert($task instanceof Task);
+        $task->user()->associate($user);
+        $task->save();
+
+        $image = factory(Image::class)->make();
+        assert($image instanceof Image);
+        $image->imageable()->associate($task);
+        $image->save();
+
+        $post = factory(Post::class)->make();
+        assert($post instanceof Post);
+        $post->user()->associate($user->id);
+        $post->save();
+
+        $postImage = factory(Image::class)->make();
+        assert($postImage instanceof Image);
+        $postImage->imageable()->associate($post);
+        $postImage->save();
+
+        $this->schema = /** @lang GraphQL */ '
+        interface Imageable {
+            id: ID!
+        }
+
+        type Task implements Imageable {
+            id: ID!
+            name: String!
+        }
+
+        type Post implements Imageable {
+            id: ID!
+            title: String!
+        }
+
+        type Image {
+            id: ID!
+            imageable: Imageable @morphTo(scopes: [
+                { model: "Task", scopes: ["completed"] }
+            ])
+        }
+
+        type Query {
+            image (
+                id: ID! @eq
+            ): Image @find
+        }
+        ';
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($taskImage: ID!, $postImage: ID!){
+            taskImage: image(id: $taskImage) {
+                id
+                imageable {
+                    ... on Task {
+                        id
+                        name
+                    }
+                    ... on Post {
+                        id
+                        title
+                    }
+                }
+            }
+            postImage: image(id: $postImage) {
+                id
+                imageable {
+                    ... on Task {
+                        id
+                        name
+                    }
+                    ... on Post {
+                        id
+                        title
+                    }
+                }
+            }
+        }
+        ', [
+            'taskImage' => $image->id,
+            'postImage' => $postImage->id,
+        ])->assertJson([
+            'data' => [
+                'taskImage' => [
+                    'id' => $image->id,
+                    'imageable' => null,
+                ],
+                'postImage' => [
+                    'id' => $postImage->id,
+                    'imageable' => [
+                        'id' => $post->id,
+                        'title' => $post->title,
+                    ],
+                ],
+            ],
+        ]);
+
+        $task->completed_at = Carbon::now();
+        $task->save();
+
+        $this->graphQL(/** @lang GraphQL */ '
+        query ($taskImage: ID!, $postImage: ID!){
+            taskImage: image(id: $taskImage) {
+                id
+                imageable {
+                    ... on Task {
+                        id
+                        name
+                    }
+                    ... on Post {
+                        id
+                        title
+                    }
+                }
+            }
+            postImage: image(id: $postImage) {
+                id
+                imageable {
+                    ... on Task {
+                        id
+                        name
+                    }
+                    ... on Post {
+                        id
+                        title
+                    }
+                }
+            }
+        }
+        ', [
+            'taskImage' => $image->id,
+            'postImage' => $postImage->id,
+        ])->assertJson([
+            'data' => [
+                'taskImage' => [
+                    'id' => $image->id,
+                    'imageable' => [
+                        'id' => $task->id,
+                        'name' => $task->name,
+                    ],
+                ],
+                'postImage' => [
+                    'id' => $postImage->id,
+                    'imageable' => [
+                        'id' => $post->id,
+                        'title' => $post->title,
                     ],
                 ],
             ],
