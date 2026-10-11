@@ -175,6 +175,35 @@ final class FederationSchemaTest extends TestCase
         $this->assertStringContainsString('type SimplePaginatorInfo @shareable {', $sdl);
     }
 
+    public function testServiceQueryShouldReturnSchemaDefinitionForCustomRootTypeNames(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        schema {
+            query: RootQuery
+            mutation: RootMutation
+        }
+
+        type RootQuery {
+            foo: Int!
+        }
+
+        type RootMutation {
+            foo: Int!
+        }
+
+        type Foo @key(fields: "id") {
+            id: ID!
+        }
+        GRAPHQL;
+
+        $this->assertStringContainsString(/** @lang GraphQL */ <<<'GRAPHQL'
+        schema {
+          query: RootQuery
+          mutation: RootMutation
+        }
+        GRAPHQL, $this->_serviceSdl());
+    }
+
     private function _serviceSdl(): string
     {
         $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
