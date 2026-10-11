@@ -1,189 +1,63 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Values;
 
-use Closure;
+use GraphQL\Deferred;
 use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\StringValueNode;
-use GraphQL\Type\Definition\Type;
-use Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter;
+use GraphQL\Type\Definition\ResolveInfo as BaseResolveInfo;
+use Illuminate\Container\Container;
+use Nuwave\Lighthouse\Execution\Arguments\ArgumentSetFactory;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
+use Nuwave\Lighthouse\Execution\Utils\FieldPath;
 use Nuwave\Lighthouse\Schema\RootType;
-use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
-use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
+/**
+ * @phpstan-import-type FieldResolver from \GraphQL\Executor\Executor as FieldResolverFn
+ *
+ * @phpstan-type Resolver callable(mixed, array<string, mixed>, \Nuwave\Lighthouse\Support\Contracts\GraphQLContext, \Nuwave\Lighthouse\Execution\ResolveInfo): mixed
+ * @phpstan-type ResolverWrapper callable(Resolver): Resolver
+ * @phpstan-type ArgumentSetTransformer callable(\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet, \GraphQL\Type\Definition\ResolveInfo): \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet
+ */
 class FieldValue
 {
     /**
-     * An instance of the type that this field returns.
-     *
-     * @var \GraphQL\Type\Definition\Type|null
+     * @var array<
+     *   string,
+     *   array{
+     *     0: array<string, mixed>,
+     *     1: \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet,
+     *   }
+     * >
      */
-    protected $returnType;
+    protected static array $transformedResolveArgs = [];
 
     /**
-     * The underlying AST definition of the Field.
+     * Ordered list of callbacks to transform the incoming argument set.
      *
-     * @var \GraphQL\Language\AST\FieldDefinitionNode
+     * @var array<int, ArgumentSetTransformer>
      */
-    protected $field;
+    protected array $argumentSetTransformers = [];
 
-    /**
-     * The parent type of the field.
-     *
-     * @var \Nuwave\Lighthouse\Schema\Values\TypeValue
-     */
-    protected $parent;
+    /** @var array<int, ResolverWrapper> */
+    protected array $resolverWrappers = [];
 
-    /**
-     * The actual field resolver.
-     *
-     * @var callable|null
-     */
-    protected $resolver;
+    public function __construct(
+        /** The parent type of the field. */
+        protected TypeValue $parent,
+        /** The underlying AST definition of the field. */
+        protected FieldDefinitionNode $field,
+    ) {}
 
-    /**
-     * Text describing by this field is deprecated.
-     *
-     * @var string|null
-     */
-    protected $deprecationReason = null;
-
-    /**
-     * A closure that determines the complexity of executing the field.
-     *
-     * @var \Closure|null
-     */
-    protected $complexity;
-
-    public function __construct(TypeValue $parent, FieldDefinitionNode $field)
+    public static function clear(): void
     {
-        $this->parent = $parent;
-        $this->field = $field;
+        self::$transformedResolveArgs = [];
     }
 
-    /**
-     * Overwrite the current/default resolver.
-     *
-     * @return $this
-     */
-    public function setResolver(callable $resolver): self
-    {
-        $this->resolver = $resolver;
-
-        return $this;
-    }
-
-    /**
-     * Use the default resolver.
-     *
-     * @return $this
-     */
-    public function useDefaultResolver(): self
-    {
-        $this->resolver = $this->getParentName() === RootType::SUBSCRIPTION
-            ? app(ProvidesSubscriptionResolver::class)->provideSubscriptionResolver($this)
-            : app(ProvidesResolver::class)->provideResolver($this);
-
-        return $this;
-    }
-
-    /**
-     * Define a closure that is used to determine the complexity of the field.
-     *
-     * @return $this
-     */
-    public function setComplexity(Closure $complexity): self
-    {
-        $this->complexity = $complexity;
-
-        return $this;
-    }
-
-    /**
-     * Set deprecation reason for field.
-     *
-     * @return $this
-     */
-    public function setDeprecationReason(string $deprecationReason): self
-    {
-        $this->deprecationReason = $deprecationReason;
-
-        return $this;
-    }
-
-    /**
-     * Get an instance of the return type of the field.
-     */
-    public function getReturnType(): Type
-    {
-        if (! isset($this->returnType)) {
-            /** @var \Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter $typeNodeConverter */
-            $typeNodeConverter = app(ExecutableTypeNodeConverter::class);
-            $this->returnType = $typeNodeConverter->convert($this->field->type);
-        }
-
-        return $this->returnType;
-    }
-
-    /**
-     * @return \Nuwave\Lighthouse\Schema\Values\TypeValue
-     */
-    public function getParent(): TypeValue
-    {
-        return $this->parent;
-    }
-
-    public function getParentName(): string
-    {
-        return $this->getParent()->getTypeDefinitionName();
-    }
-
-    /**
-     * Get the underlying AST definition for the field.
-     */
+    /** Get the underlying AST definition for the field. */
     public function getField(): FieldDefinitionNode
     {
         return $this->field;
-    }
-
-    /**
-     * Get field resolver.
-     */
-    public function getResolver(): callable
-    {
-        return $this->resolver; // @phpstan-ignore-line This must only be called after setResolver() was called
-    }
-
-    /**
-     * Return the namespaces configured for the parent type.
-     *
-     * @return string[]
-     */
-    public function defaultNamespacesForParent(): array
-    {
-        switch ($this->getParentName()) {
-            case RootType::QUERY:
-                return (array) config('lighthouse.namespaces.queries');
-            case RootType::MUTATION:
-                return (array) config('lighthouse.namespaces.mutations');
-            case RootType::SUBSCRIPTION:
-                return (array) config('lighthouse.namespaces.subscriptions');
-            default:
-               return [];
-        }
-    }
-
-    public function getDescription(): ?StringValueNode
-    {
-        return $this->field->description;
-    }
-
-    /**
-     * Get current complexity.
-     */
-    public function getComplexity(): ?Closure
-    {
-        return $this->complexity;
     }
 
     public function getFieldName(): string
@@ -191,16 +65,126 @@ class FieldValue
         return $this->field->name->value;
     }
 
-    public function getDeprecationReason(): ?string
+    public function getParent(): TypeValue
     {
-        return $this->deprecationReason;
+        return $this->parent;
+    }
+
+    public function getParentName(): string
+    {
+        return $this->parent->getTypeDefinitionName();
+    }
+
+    /** @return array<int, string> */
+    public function parentNamespaces(): array
+    {
+        $parentName = $this->getParentName();
+
+        return match ($parentName) {
+            RootType::QUERY,
+            RootType::MUTATION,
+            RootType::SUBSCRIPTION => RootType::namespaces($parentName),
+            default => array_map(
+                static fn (string $typesNamespace): string => "{$typesNamespace}\\{$parentName}",
+                (array) config('lighthouse.namespaces.types'),
+            ),
+        };
     }
 
     /**
-     * Is the parent of this field one of the root types?
+     * Wrap the previous resolver with another resolver.
+     *
+     * @param  callable(Resolver): Resolver  $resolverWrapper
      */
-    public function parentIsRootType(): bool
+    public function wrapResolver(callable $resolverWrapper): void
     {
-        return RootType::isRootType($this->getParentName());
+        $this->resolverWrappers[] = $resolverWrapper;
+    }
+
+    /**
+     * Register a function that will receive the final result and resolver arguments.
+     *
+     * For example, the following handler tries to double the result.
+     * This is somewhat nonsensical, but shows the range of what you can do.
+     *
+     * function ($result, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
+     *     if (is_numeric($result)) {
+     *         // A common use-case is to transform the result
+     *         $result = $result * 2;
+     *     }
+     *
+     *     // You can also filter results conditionally
+     *     if ($result === 42) {
+     *          return null;
+     *     }
+     *
+     *     // You can also run side effects
+     *     Log::debug("Doubled to {$result}.");
+     *
+     *     // Don't forget to return something
+     *     return $result;
+     * }
+     *
+     * @param  Resolver  $handle
+     */
+    public function resultHandler(callable $handle): void
+    {
+        $this->wrapResolver(static fn (callable $resolver): \Closure => static function (mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $handle): mixed {
+            $resolved = $resolver($root, $args, $context, $resolveInfo);
+            if ($resolved instanceof Deferred) {
+                return $resolved->then(static fn (mixed $result): mixed => $handle($result, $args, $context, $resolveInfo));
+            }
+
+            return $handle($resolved, $args, $context, $resolveInfo);
+        });
+    }
+
+    /**
+     * @param  ArgumentSetTransformer  $argumentSetTransformer
+     *
+     * @return $this
+     */
+    public function addArgumentSetTransformer(callable $argumentSetTransformer): self
+    {
+        $this->argumentSetTransformers[] = $argumentSetTransformer;
+
+        return $this;
+    }
+
+    /**
+     * Apply wrappers and transformation to the innermost resolver function.
+     *
+     * @param  Resolver  $resolver
+     *
+     * @return FieldResolverFn
+     */
+    public function finishResolver(callable $resolver): callable
+    {
+        // We expect the wrapped resolvers to run in order, but nesting them causes the last
+        // applied wrapper to be run first. Thus, we reverse the wrappers before applying them.
+        foreach (array_reverse($this->resolverWrappers) as $wrapper) {
+            $resolver = $wrapper($resolver);
+        }
+
+        return function (mixed $root, array $baseArgs, GraphQLContext $context, BaseResolveInfo $baseResolveInfo) use ($resolver): mixed {
+            $path = FieldPath::withoutLists($baseResolveInfo->path);
+
+            if (! isset(self::$transformedResolveArgs[$path])) {
+                $argumentSetFactory = Container::getInstance()->make(ArgumentSetFactory::class);
+
+                $argumentSet = $argumentSetFactory->fromResolveInfo($baseArgs, $baseResolveInfo);
+                foreach ($this->argumentSetTransformers as $transform) {
+                    $argumentSet = $transform($argumentSet, $baseResolveInfo);
+                }
+
+                $args = $argumentSet->toArray();
+
+                self::$transformedResolveArgs[$path] = [$args, $argumentSet];
+            } else {
+                [$args, $argumentSet] = self::$transformedResolveArgs[$path];
+            }
+
+            return ($resolver)($root, $args, $context, new ResolveInfo($baseResolveInfo, $argumentSet));
+        };
     }
 }

@@ -10,40 +10,29 @@ type Subscription {
 
 The quickest way to define such a field is through the `artisan` generator command:
 
-    php artisan lighthouse:subscription PostUpdated
+```shell
+php artisan lighthouse:subscription PostUpdated
+```
 
-Lighthouse will look for a class with the capitalized name of the field that
-is defined within the default subscription namespace.
-For example, the field `postUpdated` should have a corresponding class at
-`App\GraphQL\Subscriptions\PostUpdated`.
+Lighthouse will look for a class matching the capitalized name of the field within the default subscription namespace.
+For example, the field `postUpdated` should have a corresponding class at `App\GraphQL\Subscriptions\PostUpdated`.
 
-All subscription field classes **must** implement the abstract class
-`Nuwave\Lighthouse\Schema\Types\GraphQLSubscription` and implement two methods:
-`authorize` and `filter`.
+All subscription field classes **must** implement the abstract class `Nuwave\Lighthouse\Schema\Types\GraphQLSubscription` and implement the two methods `authorize` and `filter`.
 
 ```php
-<?php
-
 namespace App\GraphQL\Subscriptions;
 
-use App\User;
-use App\Post;
+use App\Models\User;
+use App\Models\Post;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class PostUpdated extends GraphQLSubscription
+final class PostUpdated extends GraphQLSubscription
 {
-    /**
-     * Check if subscriber is allowed to listen to the subscription.
-     *
-     * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
-     */
     public function authorize(Subscriber $subscriber, Request $request): bool
     {
         $user = $subscriber->context->user;
@@ -53,13 +42,9 @@ class PostUpdated extends GraphQLSubscription
     }
 
     /**
-     * Filter which subscribers should receive the subscription.
-     *
-     * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
-     * @param  mixed  $root
-     * @return bool
+     * @param  \App\Models\Post  $root
      */
-    public function filter(Subscriber $subscriber, $root): bool
+    public function filter(Subscriber $subscriber, mixed $root): bool
     {
         $user = $subscriber->context->user;
 
@@ -68,30 +53,16 @@ class PostUpdated extends GraphQLSubscription
         return $root->updated_by !== $user->id;
     }
 
-    /**
-     * Encode topic name.
-     *
-     * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
-     * @param  string  $fieldName
-     * @return string
-     */
     public function encodeTopic(Subscriber $subscriber, string $fieldName): string
     {
-        // Optionally create a unique topic name based on the
-        // `author` argument.
-        $args = $subscriber->args;
-
-        return Str::snake($fieldName).':'.$args['author'];
+        // Create a unique topic name based on the `author` argument
+        return Str::snake($fieldName).':'.$subscriber->args['author'];
     }
 
     /**
-     * Decode topic name.
-     *
-     * @param  string  $fieldName
-     * @param  \App\Post  $root
-     * @return string
+     * @param  \App\Models\Post  $root
      */
-    public function decodeTopic(string $fieldName, $root): string
+    public function decodeTopic(string $fieldName, mixed $root): string
     {
         // Decode the topic name if the `encodeTopic` has been overwritten.
         $author_id = $root->author_id;
@@ -100,15 +71,9 @@ class PostUpdated extends GraphQLSubscription
     }
 
     /**
-     * Resolve the subscription.
-     *
-     * @param  \App\Post  $root
-     * @param  mixed[]  $args
-     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
-     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
-     * @return mixed
+     * @param  \App\Models\Post  $root
      */
-    public function resolve($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Post
+    public function resolve(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Post
     {
         // Optionally manipulate the `$root` item before it gets broadcasted to
         // subscribed client(s).
@@ -119,6 +84,4 @@ class PostUpdated extends GraphQLSubscription
 }
 ```
 
-If the default namespaces are not working with your application structure
-or you want to be more explicit, you can use the [@subscription](../api-reference/directives.md#subscription)
-directive to point to a different class.
+If the default namespaces are not working with your application structure or you want to be more explicit, you can use the [@subscription](../api-reference/directives.md#subscription) directive to point to a different class.

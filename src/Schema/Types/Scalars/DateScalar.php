@@ -1,37 +1,30 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Types\Scalars;
 
-use Carbon\Carbon;
-use Exception;
 use GraphQL\Error\Error;
 use GraphQL\Error\InvariantViolation;
+use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Type\Definition\ScalarType;
-use GraphQL\Utils\Utils;
+use Illuminate\Support\Carbon as IlluminateCarbon;
 
 abstract class DateScalar extends ScalarType
 {
     /**
-     * Serialize an internal value, ensuring it is a valid date string.
+     * Serialize an internal value, ensuring it is a valid date object or string.
      *
-     * @param  \Carbon\Carbon|string  $value
+     * @param  \DateTimeInterface|string  $value
      */
     public function serialize($value): string
     {
-        if (! $value instanceof Carbon) {
-            $value = $this->tryParsingDate($value, InvariantViolation::class);
-        }
+        $carbonValue = $this->tryParsingDate($value, InvariantViolation::class);
 
-        return $this->format($value);
+        return $this->format($carbonValue);
     }
 
-    /**
-     * Parse a externally provided variable value into a Carbon instance.
-     *
-     * @param  string  $value
-     */
-    public function parseValue($value): Carbon
+    /** Parse an externally provided variable value into a Carbon instance. */
+    public function parseValue(mixed $value): IlluminateCarbon
     {
         return $this->tryParsingDate($value, Error::class);
     }
@@ -39,51 +32,59 @@ abstract class DateScalar extends ScalarType
     /**
      * Parse a literal provided as part of a GraphQL query string into a Carbon instance.
      *
-     * @param  \GraphQL\Language\AST\Node  $valueNode
-     * @param  mixed[]|null  $variables
-     *
-     * @throws \GraphQL\Error\Error
+     * @param  array<string, mixed>|null  $variables
      */
-    public function parseLiteral($valueNode, ?array $variables = null): Carbon
+    public function parseLiteral(Node $valueNode, ?array $variables = null): IlluminateCarbon
     {
         if (! $valueNode instanceof StringValueNode) {
-            throw new Error(
-                "Query error: Can only parse strings, got {$valueNode->kind}",
-                $valueNode
-            );
+            throw new Error("Query error: Can only parse strings, got {$valueNode->kind}.", $valueNode);
         }
 
-        return $this->tryParsingDate($valueNode->value, Error::class);
+        $value = $valueNode->value;
+
+        try {
+            return $this->parse($value);
+        } catch (\Exception $exception) {
+            throw new Error($exception->getMessage(), $valueNode);
+        }
     }
 
     /**
      * Try to parse the given value into a Carbon instance, throw if it does not work.
      *
-     * @param  string  $value
+     * @param  mixed  $value  Any value that might be a Date
      * @param  class-string<\Exception>  $exceptionClass
-     *
-     * @throws \GraphQL\Error\InvariantViolation|\GraphQL\Error\Error
      */
-    protected function tryParsingDate($value, string $exceptionClass): Carbon
+    protected function tryParsingDate(mixed $value, string $exceptionClass): IlluminateCarbon
     {
         try {
+            if (is_object($value)) {
+                if ($value instanceof IlluminateCarbon) {
+                    return $value;
+                }
+
+                if ($value instanceof \DateTimeInterface) {
+                    return IlluminateCarbon::instance($value);
+                }
+            }
+
+            if (! is_string($value)) {
+                throw new $exceptionClass('Query error: Can only parse strings.');
+            }
+
             return $this->parse($value);
-        } catch (Exception $e) {
-            throw new $exceptionClass(
-                Utils::printSafeJson($e->getMessage())
-            );
+        } catch (\Exception $exception) {
+            throw new $exceptionClass($exception->getMessage());
         }
     }
 
-    /**
-     * Serialize the Carbon instance.
-     */
-    abstract protected function format(Carbon $carbon): string;
+    /** Serialize the Carbon instance. */
+    abstract protected function format(IlluminateCarbon $carbon): string;
 
     /**
      * Try turning a client value into a Carbon instance.
      *
-     * @param  mixed  $value A possibly faulty client value.
+     * @param  string  $value a possibly faulty client value
      */
-    abstract protected function parse($value): Carbon;
+    abstract protected function parse(string $value): IlluminateCarbon;
 }

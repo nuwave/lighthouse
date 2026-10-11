@@ -1,14 +1,13 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Schema\Directives;
 
-use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
-class WhereJsonContainsDirectiveDBTest extends DBTestCase
+final class WhereJsonContainsDirectiveDBTest extends DBTestCase
 {
-    protected $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ <<<'GRAPHQL'
     type Query {
         users(foo: String! @whereJsonContains(key: "name->nested")): [User!]! @all
     }
@@ -16,38 +15,32 @@ class WhereJsonContainsDirectiveDBTest extends DBTestCase
     type User {
         name: String
     }
-    ';
+    GRAPHQL;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        if (AppVersion::below(5.6)) {
-            $this->markTestSkipped('Laravel supports whereJsonContains from version 5.6.');
-        }
-    }
-
-    public function testCanApplyWhereJsonContainsFilter(): void
+    public function testApplyWhereJsonContainsFilter(): void
     {
         $nestedBar = \Safe\json_encode([
             'nested' => 'bar',
         ]);
-        factory(User::class)->create([
-            'name' => $nestedBar,
-        ]);
-        factory(User::class)->create([
-            'name' => \Safe\json_encode([
-                'nested' => 'baz',
-            ]),
-        ]);
+        $userWithBar = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $userWithBar);
+        $userWithBar->name = $nestedBar;
+        $userWithBar->save();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $userWithBaz = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $userWithBaz);
+        $userWithBaz->name = \Safe\json_encode([
+            'nested' => 'baz',
+        ]);
+        $userWithBaz->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(foo: "bar") {
                 name
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Console;
 
@@ -6,14 +6,14 @@ use Illuminate\Support\Facades\Storage;
 use Nuwave\Lighthouse\Console\PrintSchemaCommand;
 use Tests\TestCase;
 
-class PrintSchemaCommandTest extends TestCase
+final class PrintSchemaCommandTest extends TestCase
 {
     public function testPrintsSchemaAsGraphQLSDL(): void
     {
         $tester = $this->commandTester(new PrintSchemaCommand());
         $tester->execute([]);
 
-        $this->assertContains($this->schema, $tester->getDisplay());
+        $this->assertStringContainsString($this->schema, $tester->getDisplay());
     }
 
     public function testPrintsSchemaAsJSON(): void
@@ -24,7 +24,7 @@ class PrintSchemaCommandTest extends TestCase
         $json = $tester->getDisplay();
 
         $this->assertJson($json);
-        $this->assertContains('"name":"foo"', $json, 'Should contain the introspection result for the schema.');
+        $this->assertStringContainsString('"name":"foo"', $json, 'Should contain the introspection result for the schema.');
     }
 
     public function testWritesSchema(): void
@@ -33,9 +33,9 @@ class PrintSchemaCommandTest extends TestCase
         $tester = $this->commandTester(new PrintSchemaCommand());
         $tester->execute(['--write' => true]);
 
-        $this->assertContains(
-            $this->schema,
-            Storage::get(PrintSchemaCommand::GRAPHQL_FILENAME)
-        );
+        $printed = Storage::get(PrintSchemaCommand::GRAPHQL_FILENAME);
+
+        $this->assertIsString($printed);
+        $this->assertStringContainsString($this->schema, $printed);
     }
 }

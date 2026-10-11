@@ -1,6 +1,0 @@
-preset: laravel
-enabled:
-  - no_superfluous_phpdoc_tags
-finder:
-  not-name:
-  - "_ide_helper.php"

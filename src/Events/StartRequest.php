@@ -1,37 +1,26 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Events;
 
-use Carbon\Carbon;
-use Nuwave\Lighthouse\Execution\GraphQLRequest;
+use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 /**
  * Fires right after a request reaches the GraphQLController.
  *
- * Can be used for logging or for measuring and monitoring
- * the time a request takes to resolve.
+ * Can be used for logging or for measuring and monitoring the time a request takes to resolve.
  *
- * @see \Nuwave\Lighthouse\Support\Http\Controllers\GraphQLController
+ * @see \Nuwave\Lighthouse\Http\GraphQLController
  */
 class StartRequest
 {
-    /**
-     * GraphQL request instance.
-     *
-     * @var \Nuwave\Lighthouse\Execution\GraphQLRequest
-     */
-    public $request;
+    /** The point in time when the request started. */
+    public Carbon $moment;
 
-    /**
-     * The point in time when the request started.
-     *
-     * @var \Carbon\Carbon
-     */
-    public $moment;
-
-    public function __construct(GraphQLRequest $request)
-    {
-        $this->request = $request;
+    public function __construct(
+        /** The request sent from the client. */
+        public Request $request,
+    ) {
         $this->moment = Carbon::now();
     }
 }

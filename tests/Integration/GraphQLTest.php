@@ -1,29 +1,29 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration;
 
-use GraphQL\Error\Error;
 use Tests\TestCase;
 use Tests\Utils\Queries\Bar;
 use Tests\Utils\Queries\Foo;
 
-class GraphQLTest extends TestCase
+final class GraphQLTest extends TestCase
 {
-    protected $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ <<<'GRAPHQL'
     type Query {
         foo: Int
         bar: String
     }
-    ';
+    GRAPHQL;
 
     public function testResolvesQueryViaPostRequest(): void
     {
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 foo
             }
-            ')
+            GRAPHQL)
+            ->assertGraphQLErrorFree()
             ->assertExactJson([
                 'data' => [
                     'foo' => Foo::THE_ANSWER,
@@ -36,15 +36,15 @@ class GraphQLTest extends TestCase
         $this
             ->getJson(
                 'graphql?'
-                .http_build_query(
+                . http_build_query(
                     [
-                        'query' => /** @lang GraphQL */ '
+                        'query' => /** @lang GraphQL */ <<<'GRAPHQL'
                         {
                             foo
                         }
-                        ',
-                    ]
-                )
+                        GRAPHQL,
+                    ],
+                ),
             )
             ->assertExactJson([
                 'data' => [
@@ -55,135 +55,42 @@ class GraphQLTest extends TestCase
 
     public function testResolvesNamedOperation(): void
     {
-        $this->postGraphQL([
-            'query' => /** @lang GraphQL */ '
-                query Foo {
-                    foo
-                }
-                query Bar {
-                    bar
-                }
-            ',
-            'operationName' => 'Bar',
-        ])->assertExactJson([
-            'data' => [
-                'bar' => Bar::RESULT,
-            ],
-        ]);
-    }
-
-    public function testRejectsEmptyRequest(): void
-    {
-        $this->postGraphQL([])
-             ->assertStatus(200)
-             ->assertJson([
-                 [
-                     'errors' => [
-                         [
-                             'message' => 'Syntax Error: Unexpected <EOF>',
-                             'extensions' => [
-                                 'category' => 'graphql',
-                             ],
-                         ],
-                     ],
-                 ],
-             ]);
-    }
-
-    public function testRejectsEmptyQuery(): void
-    {
-        $this->graphQL(/** @lang GraphQL */ '')
-             ->assertStatus(200)
-             ->assertJson([
-                 'errors' => [
-                     [
-                         'message' => 'Syntax Error: Unexpected <EOF>',
-                         'extensions' => [
-                             'category' => 'graphql',
-                         ],
-                     ],
-                 ],
-             ]);
-    }
-
-    public function testRejectsInvalidQuery(): void
-    {
-        $result = $this
-            ->graphQL(/** @lang GraphQL */ '
-            {
-                nonExistingField
-            }
-            ');
-
-        // TODO remove as we stop supporting Laravel 5.5/PHPUnit 6
-        $assertContains = method_exists($this, 'assertStringContainsString')
-            ? 'assertStringContainsString'
-            : 'assertContains';
-
-        $this->{$assertContains}(
-            'nonExistingField',
-            $result->jsonGet('errors.0.message')
-        );
-    }
-
-    public function testHandlesErrorInResolver(): void
-    {
-        $message = 'foo';
-        $this->mockResolver()
-            ->willThrowException(new Error($message));
-
-        $this->schema = /** @lang GraphQL */ '
-        type Query {
-            foo: ID @mock
-        }
-        ';
-
         $this
-            ->graphQL(/** @lang GraphQL */ '
-            {
-                foo
-            }
-            ')
-            ->assertJson([
-                'data' => [
-                    'foo' => null,
-                ],
-                'errors' => [
-                    [
-                        'message' => $message,
-                    ],
-                ],
+            ->postGraphQL([
+                'query' => /** @lang GraphQL */ <<<'GRAPHQL'
+                    query Foo {
+                        foo
+                    }
+                    query Bar {
+                        bar
+                    }
+                GRAPHQL,
+                'operationName' => 'Bar',
             ])
-            ->assertStatus(200);
+            ->assertExactJson([
+                'data' => [
+                    'bar' => Bar::RESULT,
+                ],
+            ]);
     }
 
-    public function testIgnoresInvalidJSONVariables(): void
-    {
-        $result = $this->postGraphQL([
-            'query' => /** @lang GraphQL */ '{}',
-            'variables' => /** @lang JSON */ '{}',
-        ]);
-
-        $result->assertStatus(200);
-    }
-
-    public function testCanResolveBatchedQueries(): void
+    public function testResolveBatchedQueries(): void
     {
         $this
             ->postGraphQL([
                 [
-                    'query' => /** @lang GraphQL */ '
+                    'query' => /** @lang GraphQL */ <<<'GRAPHQL'
                         {
                             foo
                         }
-                        ',
+                    GRAPHQL,
                 ],
                 [
-                    'query' => /** @lang GraphQL */ '
+                    'query' => /** @lang GraphQL */ <<<'GRAPHQL'
                         {
                             bar
                         }
-                        ',
+                    GRAPHQL,
                 ],
             ])
             ->assertExactJson([

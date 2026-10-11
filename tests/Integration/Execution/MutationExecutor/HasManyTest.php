@@ -1,15 +1,17 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Execution\MutationExecutor;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\DBTestCase;
+use Tests\Utils\Models\CustomPrimaryKey;
 use Tests\Utils\Models\Role;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class HasManyTest extends DBTestCase
+final class HasManyTest extends DBTestCase
 {
-    protected $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ <<<'GRAPHQL'
     type Task {
         id: ID!
         name: String!
@@ -35,6 +37,7 @@ class HasManyTest extends DBTestCase
     input CreateTaskRelation {
         create: [CreateTaskInput!]
         upsert: [UpsertTaskInput!]
+        connect: [ID!]
     }
 
     input CreateTaskInput {
@@ -52,6 +55,8 @@ class HasManyTest extends DBTestCase
         update: [UpdateTaskInput!]
         upsert: [UpsertTaskInput!]
         delete: [ID!]
+        connect: [ID!]
+        disconnect: [ID!]
     }
 
     input UpdateTaskInput {
@@ -70,17 +75,19 @@ class HasManyTest extends DBTestCase
         update: [UpdateTaskInput!]
         upsert: [UpsertTaskInput!]
         delete: [ID!]
+        connect: [ID!]
+        disconnect: [ID!]
     }
 
     input UpsertTaskInput {
         id: ID
         name: String
     }
-    '.self::PLACEHOLDER_QUERY;
+    GRAPHQL . self::PLACEHOLDER_QUERY;
 
-    public function testCanCreateWithNewHasMany(): void
+    public function testCreateWithNewHasMany(): void
     {
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createUser(input: {
                 name: "foo"
@@ -100,7 +107,7 @@ class HasManyTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'createUser' => [
                     'id' => '1',
@@ -116,11 +123,60 @@ class HasManyTest extends DBTestCase
         ]);
     }
 
+    public function testCreateWithConnectHasMany(): void
+    {
+        $task1 = factory(Task::class)->create();
+        $this->assertInstanceOf(Task::class, $task1);
+
+        $task2 = factory(Task::class)->create();
+        $this->assertInstanceOf(Task::class, $task2);
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+            mutation ($input: CreateUserInput!) {
+                createUser(input: $input) {
+                    name
+                    tasks {
+                        id
+                        name
+                    }
+                }
+            }
+        GRAPHQL,
+            [
+                'input' => [
+                    'name' => 'foo',
+                    'tasks' => [
+                        'connect' => [
+                            $task1->id,
+                            $task2->id,
+                        ],
+                    ],
+                ],
+            ],
+        )->assertJson([
+            'data' => [
+                'createUser' => [
+                    'name' => 'foo',
+                    'tasks' => [
+                        [
+                            'id' => (string) $task1->id,
+                            'name' => $task1->name,
+                        ],
+                        [
+                            'id' => (string) $task2->id,
+                            'name' => $task2->name,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
     public function testAllowsNullOperations(): void
     {
         factory(User::class)->create();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             updateUser(input: {
                 id: 1
@@ -138,7 +194,7 @@ class HasManyTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'updateUser' => [
                     'name' => 'foo',
@@ -148,9 +204,9 @@ class HasManyTest extends DBTestCase
         ]);
     }
 
-    public function testCanUpsertWithNewHasMany(): void
+    public function testUpsertWithNewHasMany(): void
     {
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createUser(input: {
                 name: "foo"
@@ -169,7 +225,7 @@ class HasManyTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'createUser' => [
                     'id' => '1',
@@ -205,8 +261,7 @@ class HasManyTest extends DBTestCase
                 }
             }
         }
-GRAPHQL
-        )->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'upsertUser' => [
                     'id' => '1',
@@ -222,9 +277,9 @@ GRAPHQL
         ]);
     }
 
-    public function testCanCreateUsingUpsertWithNewHasMany(): void
+    public function testCreateUsingUpsertWithNewHasMany(): void
     {
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             upsertUser(input: {
                 id: 1
@@ -244,7 +299,7 @@ GRAPHQL
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'upsertUser' => [
                     'id' => '1',
@@ -260,27 +315,22 @@ GRAPHQL
         ]);
     }
 
-    /**
-     * @return array<array<string, string>>
-     */
-    public function existingModelMutations(): array
+    /** @return iterable<array{string}> */
+    public static function existingModelMutations(): iterable
     {
-        return [
-            ['Update action' => 'update'],
-            ['Upsert action' => 'upsert'],
-        ];
+        yield 'Update action' => ['update'];
+        yield 'Upsert action' => ['upsert'];
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
-    public function testCanCreateHasMany(string $action): void
+    /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
+    public function testCreateHasMany(string $action): void
     {
         factory(User::class)->create();
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            ${action}User(input: {
+            {$action}User(input: {
                 id: 1
                 name: "foo"
                 tasks: {
@@ -297,10 +347,9 @@ GRAPHQL
                 }
             }
         }
-GRAPHQL
-        )->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
-                "${action}User" => [
+                "{$action}User" => [
                     'id' => '1',
                     'name' => 'foo',
                     'tasks' => [
@@ -314,21 +363,21 @@ GRAPHQL
         ]);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
-    public function testCanUpdateHasMany(string $action): void
+    /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
+    public function testUpdateHasMany(string $action): void
     {
-        factory(User::class)
-            ->create()
-            ->tasks()
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
+
+        $user->tasks()
             ->save(
-                factory(Task::class)->create()
+                factory(Task::class)->create(),
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            ${action}User(input: {
+            {$action}User(input: {
                 id: 1
                 name: "foo"
                 tasks: {
@@ -346,11 +395,10 @@ GRAPHQL
                 }
             }
         }
-GRAPHQL
-        )->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
-                "${action}User" => [
-                    'id' => '1',
+                "{$action}User" => [
+                    'id' => "{$user->id}",
                     'name' => 'foo',
                     'tasks' => [
                         [
@@ -363,21 +411,21 @@ GRAPHQL
         ]);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
-    public function testCanUpsertHasMany(string $action): void
+    /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
+    public function testUpsertHasMany(string $action): void
     {
-        factory(User::class)
-            ->create()
-            ->tasks()
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
+
+        $user->tasks()
             ->save(
-                factory(Task::class)->create()
+                factory(Task::class)->create(),
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            ${action}User(input: {
+            {$action}User(input: {
                 id: 1
                 name: "foo"
                 tasks: {
@@ -395,11 +443,11 @@ GRAPHQL
                 }
             }
         }
-GRAPHQL
+        GRAPHQL,
         )->assertJson([
             'data' => [
-                "${action}User" => [
-                    'id' => '1',
+                "{$action}User" => [
+                    'id' => "{$user->id}",
                     'name' => 'foo',
                     'tasks' => [
                         [
@@ -412,21 +460,21 @@ GRAPHQL
         ]);
     }
 
-    /**
-     * @dataProvider existingModelMutations
-     */
-    public function testCanDeleteHasMany(string $action): void
+    /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
+    public function testDeleteHasMany(string $action): void
     {
-        factory(User::class)
-            ->create()
-            ->tasks()
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
+
+        $user->tasks()
             ->save(
-                factory(Task::class)->create()
+                factory(Task::class)->create(),
             );
 
         $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         mutation {
-            ${action}User(input: {
+            {$action}User(input: {
                 id: 1
                 name: "foo"
                 tasks: {
@@ -441,11 +489,11 @@ GRAPHQL
                 }
             }
         }
-GRAPHQL
+        GRAPHQL,
         )->assertJson([
             'data' => [
-                "${action}User" => [
-                    'id' => '1',
+                "{$action}User" => [
+                    'id' => "{$user->id}",
                     'name' => 'foo',
                     'tasks' => [],
                 ],
@@ -453,9 +501,125 @@ GRAPHQL
         ]);
     }
 
+    /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
+    public function testConnectHasMany(string $action): void
+    {
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
+
+        $task1 = factory(Task::class)->create();
+        $this->assertInstanceOf(Task::class, $task1);
+
+        $task2 = factory(Task::class)->create();
+        $this->assertInstanceOf(Task::class, $task2);
+
+        $actionInputName = ucfirst($action);
+
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+            mutation (\$input: {$actionInputName}UserInput!) {
+                {$action}User(input: \$input) {
+                    id
+                    name
+                    tasks {
+                        id
+                        name
+                    }
+                }
+            }
+        GRAPHQL,
+            [
+                'input' => [
+                    'id' => $user->id,
+                    'name' => 'foo',
+                    'tasks' => [
+                        'connect' => [
+                            $task1->id,
+                            $task2->id,
+                        ],
+                    ],
+                ],
+            ],
+        )->assertJson([
+            'data' => [
+                "{$action}User" => [
+                    'id' => "{$user->id}",
+                    'name' => 'foo',
+                    'tasks' => [
+                        [
+                            'id' => "{$task1->id}",
+                            'name' => $task1->name,
+                        ],
+                        [
+                            'id' => "{$task2->id}",
+                            'name' => $task2->name,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /** @dataProvider existingModelMutations */
+    #[DataProvider('existingModelMutations')]
+    public function testDisconnectHasMany(string $action): void
+    {
+        $user = factory(User::class)->create();
+
+        $taskDisconnect = factory(Task::class)->make();
+        $this->assertInstanceOf(Task::class, $taskDisconnect);
+        $taskDisconnect->user()->associate($user);
+        $taskDisconnect->save();
+
+        $taskKeep = factory(Task::class)->make();
+        $this->assertInstanceOf(Task::class, $taskKeep);
+        $taskKeep->user()->associate($user);
+        $taskKeep->save();
+
+        $actionInputName = ucfirst($action);
+
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
+            mutation (\$input: {$actionInputName}UserInput!) {
+                {$action}User(input: \$input) {
+                    id
+                    name
+                    tasks {
+                        id
+                        name
+                    }
+                }
+            }
+        GRAPHQL, [
+            'input' => [
+                'id' => $user->id,
+                'name' => 'foo',
+                'tasks' => [
+                    'disconnect' => [
+                        $taskDisconnect->id,
+                    ],
+                ],
+            ],
+        ])->assertJson([
+            'data' => [
+                "{$action}User" => [
+                    'id' => "{$user->id}",
+                    'name' => 'foo',
+                    'tasks' => [
+                        [
+                            'id' => "{$taskKeep->id}",
+                            'name' => $taskKeep->name,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertNull($taskDisconnect->refresh()->user);
+    }
+
     public function testUpsertAcrossPivotTableOverrideExistingModel(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
             name: String!
@@ -490,10 +654,10 @@ GRAPHQL
         input UpsertRoleUsersRelation {
             sync: [ID!]
         }
-        '.self::PLACEHOLDER_QUERY;
+        GRAPHQL . self::PLACEHOLDER_QUERY;
 
         // Create the first User with a Role.
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             upsertUser(input: {
                 name: "foo"
@@ -511,7 +675,7 @@ GRAPHQL
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'upsertUser' => [
                     'id' => '1',
@@ -527,13 +691,13 @@ GRAPHQL
         ]);
 
         // The first User has the first Role.
-        $role = Role::firstOrFail();
-        $this->assertEquals([1], $role->users()->pluck('users.id')->toArray());
+        $role = Role::query()->firstOrFail();
+        $this->assertSame([1], $role->users()->pluck('users.id')->toArray());
 
         // Create another User.
         factory(User::class)->create();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             upsertUser(input: {
                 id: "1"
@@ -556,7 +720,7 @@ GRAPHQL
                 }
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'upsertUser' => [
                     'id' => '1',
@@ -566,6 +730,162 @@ GRAPHQL
             ],
         ]);
 
-        $this->assertEquals([2], $role->users()->pluck('users.id')->toArray());
+        $this->assertSame([2], $role->users()->pluck('users.id')->toArray());
+    }
+
+    public function testConnectModelWithCustomKey(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Query {
+            user: User @first
+        }
+
+        type CustomPrimaryKey {
+            custom_primary_key_id: ID!
+            users: [User!] @belongsTo
+        }
+
+        type User {
+            id: ID!
+            name: String
+            customPrimaryKeys: [CustomPrimaryKey!] @hasMany
+        }
+
+        type Mutation {
+            createUser(input: CreateUserInput! @spread): User @create
+            updateUser(input: UpdateUserInput! @spread): User @update
+        }
+
+        input CreateUserInput {
+            name: String
+            customPrimaryKeys: UpdateCustomPrimaryKeyHasMany
+        }
+
+        input UpdateUserInput {
+            id: ID!
+            name: String
+            customPrimaryKeys: UpdateCustomPrimaryKeyHasMany
+        }
+
+        input UpdateCustomPrimaryKeyHasMany {
+            connect: [ID!]
+            disconnect: [ID!]
+        }
+        GRAPHQL;
+
+        factory(CustomPrimaryKey::class, 3)->create();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+            mutation {
+                createUser(input: {
+                    name: "foo"
+                    customPrimaryKeys: {
+                        connect: [1, 2, 3]
+                    }
+                }) {
+                    id
+                    name
+                    customPrimaryKeys {
+                        custom_primary_key_id
+                    }
+                }
+            }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'createUser' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'customPrimaryKeys' => [
+                        [
+                            'custom_primary_key_id' => '1',
+                        ],
+                        [
+                            'custom_primary_key_id' => '2',
+                        ],
+                        [
+                            'custom_primary_key_id' => '3',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+            mutation {
+                updateUser(input: {
+                    id: "1"
+                    name: "bar"
+                    customPrimaryKeys: {
+                        disconnect: [1, 2]
+                    }
+                }) {
+                    id
+                    name
+                    customPrimaryKeys {
+                        custom_primary_key_id
+                    }
+                }
+            }
+        GRAPHQL)->assertJson([
+            'data' => [
+                'updateUser' => [
+                    'id' => '1',
+                    'name' => 'bar',
+                    'customPrimaryKeys' => [
+                        [
+                            'custom_primary_key_id' => '3',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testUpdateNestedHasMany(): void
+    {
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
+
+        $task = factory(Task::class)->create();
+        $this->assertInstanceOf(Task::class, $task);
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+            mutation ($input: UpdateUserInput!) {
+                updateUser(input: $input) {
+                    id
+                    name
+                    tasks {
+                        id
+                        name
+                    }
+                }
+            }
+        GRAPHQL, [
+            'input' => [
+                'id' => $user->id,
+                'name' => 'foo',
+                'tasks' => [
+                    'update' => [
+                        [
+                            'id' => $task->id,
+                            'name' => 'bar',
+                        ],
+                    ],
+                ],
+            ],
+        ])->assertJson([
+            'data' => [
+                'updateUser' => [
+                    'id' => $user->id,
+                    'name' => 'foo',
+                    'tasks' => [
+                        [
+                            'id' => $task->id,
+                            'name' => 'bar',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
     }
 }

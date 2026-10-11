@@ -1,0 +1,24 @@
+<?php declare(strict_types=1);
+
+namespace DummyNamespace;
+
+use Tests\TestCase;
+
+final class DummyClass extends TestCase
+{
+    public function test_dummyField(): void
+    {
+        // TODO set up test data
+
+        $this->graphQL(/** @lang GraphQL */ '
+            dummyOperationPrefix{
+                dummyField
+            }
+        ')->assertJson([
+            'data' => [
+                // TODO specify expected result
+                'dummyField' => null,
+            ],
+        ]);
+    }
+}

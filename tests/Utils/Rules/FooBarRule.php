@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Utils\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
 
-class FooBarRule implements Rule
+final class FooBarRule implements Rule
 {
     public const MESSAGE = 'This rule was triggered.';
 
@@ -12,16 +12,14 @@ class FooBarRule implements Rule
      * Determine if the validation rule passes.
      *
      * @param  string  $attribute
-     * @param  mixed  $value The user-given value
+     * @param  mixed  $value  the user-given value
      */
     public function passes($attribute, $value): bool
     {
         return false;
     }
 
-    /**
-     * Get the validation error message.
-     */
+    /** Get the validation error message. */
     public function message(): string
     {
         return self::MESSAGE;

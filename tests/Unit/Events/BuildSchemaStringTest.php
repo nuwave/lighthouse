@@ -1,59 +1,54 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Events;
 
+use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Nuwave\Lighthouse\Events\BuildSchemaString;
 use Tests\TestCase;
 
-class BuildSchemaStringTest extends TestCase
+final class BuildSchemaStringTest extends TestCase
 {
     public function testInjectsSourceSchemaIntoEvent(): void
     {
-        app('events')->listen(
-            BuildSchemaString::class,
-            function (BuildSchemaString $buildSchemaString): void {
-                $this->assertSame(self::PLACEHOLDER_QUERY, $buildSchemaString->userSchema);
-            }
-        );
+        $dispatcher = $this->app->make(EventsDispatcher::class);
+        $dispatcher->listen(BuildSchemaString::class, function (BuildSchemaString $buildSchemaString): void {
+            $this->assertSame(self::PLACEHOLDER_QUERY, $buildSchemaString->userSchema);
+        });
 
         $this->buildSchema(self::PLACEHOLDER_QUERY);
     }
 
-    public function testCanAddAdditionalSchemaThroughEvent(): void
+    public function testAddAdditionalSchemaThroughEvent(): void
     {
-        app('events')->listen(
-            BuildSchemaString::class,
-            function (BuildSchemaString $buildSchemaString): string {
-                return "
-                extend type Query {
-                    sayHello: String @field(resolver: \"{$this->qualifyTestResolver('resolveSayHello')}\")
-                }
-                ";
+        $dispatcher = $this->app->make(EventsDispatcher::class);
+        $dispatcher->listen(BuildSchemaString::class, fn (): string => "
+            extend type Query {
+                sayHello: String @field(resolver: \"{$this->qualifyTestResolver('resolveSayHello')}\")
             }
-        );
+        ");
 
-        $this->schema = "
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type Query {
-            foo: String @field(resolver: \"{$this->qualifyTestResolver('resolveFoo')}\")
+            foo: String @field(resolver: "{$this->qualifyTestResolver('resolveFoo')}")
         }
-        ";
+        GRAPHQL;
 
-        $queryForBaseSchema = '
+        $queryForBaseSchema = /** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ';
+        GRAPHQL;
         $this->graphQL($queryForBaseSchema)->assertJson([
             'data' => [
                 'foo' => 'foo',
             ],
         ]);
 
-        $queryForAdditionalSchema = '
+        $queryForAdditionalSchema = /** @lang GraphQL */ <<<'GRAPHQL'
         {
             sayHello
         }
-        ';
+        GRAPHQL;
         $this->graphQL($queryForAdditionalSchema)->assertJson([
             'data' => [
                 'sayHello' => 'hello',
@@ -61,12 +56,12 @@ class BuildSchemaStringTest extends TestCase
         ]);
     }
 
-    public function resolveSayHello(): string
+    public static function resolveSayHello(): string
     {
         return 'hello';
     }
 
-    public function resolveFoo(): string
+    public static function resolveFoo(): string
     {
         return 'foo';
     }

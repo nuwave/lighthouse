@@ -1,14 +1,17 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Support\Traits;
 
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
-use Illuminate\Support\Str;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\AST\PartialParser;
+use Nuwave\Lighthouse\Support\Utils;
 
 /**
  * Directives may want to constrain database columns to an enum.
@@ -17,18 +20,14 @@ use Nuwave\Lighthouse\Schema\AST\PartialParser;
  */
 trait GeneratesColumnsEnum
 {
-    /**
-     * Check whether the directive constrains allowed columns.
-     */
+    /** Check whether the directive constrains allowed columns. */
     protected function hasAllowedColumns(): bool
     {
         $hasColumns = ! is_null($this->directiveArgValue('columns'));
         $hasColumnsEnum = ! is_null($this->directiveArgValue('columnsEnum'));
 
         if ($hasColumns && $hasColumnsEnum) {
-            throw new DefinitionException(
-                'The @'.$this->name().' directive can only have one of the following arguments: `columns`, `columnsEnum`.'
-            );
+            throw new DefinitionException("The @{$this->name()} directive can only have one of the following arguments: `columns`, `columnsEnum`.");
         }
 
         return $hasColumns || $hasColumnsEnum;
@@ -37,77 +36,66 @@ trait GeneratesColumnsEnum
     /**
      * Generate the enumeration type for the list of allowed columns.
      *
-     * @return string The name of the used enum.
+     * @return string the name of the used enum
      */
     protected function generateColumnsEnum(
         DocumentAST &$documentAST,
         InputValueDefinitionNode &$argDefinition,
-        FieldDefinitionNode &$parentField
+        FieldDefinitionNode &$parentField,
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
     ): string {
         $columnsEnum = $this->directiveArgValue('columnsEnum');
-
         if (! is_null($columnsEnum)) {
             return $columnsEnum;
         }
 
-        $allowedColumnsEnumName = static::allowedColumnsEnumName($argDefinition, $parentField);
+        $allowedColumnsEnumName = ASTHelper::qualifiedArgType($argDefinition, $parentField, $parentType) . 'Column';
 
         $documentAST
             ->setTypeDefinition(
                 static::createAllowedColumnsEnum(
                     $argDefinition,
                     $parentField,
+                    $parentType,
                     $this->directiveArgValue('columns'),
-                    $allowedColumnsEnumName
-                )
+                    $allowedColumnsEnumName,
+                ),
             );
 
         return $allowedColumnsEnumName;
     }
 
     /**
-     * Create the name for the Enum that holds the allowed columns.
-     *
-     * @example FieldNameArgNameColumn
-     */
-    protected function allowedColumnsEnumName(
-        InputValueDefinitionNode &$argDefinition,
-        FieldDefinitionNode &$parentField
-    ): string {
-        return Str::studly($parentField->name->value)
-            .Str::studly($argDefinition->name->value)
-            .'Column';
-    }
-
-    /**
      * Create the Enum that holds the allowed columns.
      *
-     * @param  string[]  $allowedColumns
+     * @param  array<mixed, string>  $allowedColumns
      */
     protected function createAllowedColumnsEnum(
         InputValueDefinitionNode &$argDefinition,
         FieldDefinitionNode &$parentField,
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
         array $allowedColumns,
-        string $allowedColumnsEnumName
+        string $allowedColumnsEnumName,
     ): EnumTypeDefinitionNode {
         $enumValues = array_map(
-            function (string $columnName): string {
-                return
-                    strtoupper(
-                        Str::snake($columnName)
-                    )
-                    .' @enum(value: "'.$columnName.'")';
+            static function (string $columnName): string {
+                $enumName = Utils::toEnumValueName($columnName);
+
+                return /** @lang GraphQL */ <<<GRAPHQL
+{$enumName} @enum(value: "{$columnName}")
+GRAPHQL;
             },
-            $allowedColumns
+            $allowedColumns,
         );
 
-        $enumDefinition = "\"Allowed column names for the `{$argDefinition->name->value}` argument on the query `{$parentField->name->value}`.\"\n"
-            ."enum $allowedColumnsEnumName {\n";
-        foreach ($enumValues as $enumValue) {
-            $enumDefinition .= "$enumValue\n";
-        }
-        $enumDefinition .= '}';
+        $enumValuesString = implode("\n", $enumValues);
 
-        return PartialParser::enumTypeDefinition($enumDefinition);
+        return Parser::enumTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
+"Allowed column names for {$parentType->name->value}.{$parentField->name->value}.{$argDefinition->name->value}."
+enum {$allowedColumnsEnumName} {
+    {$enumValuesString}
+}
+GRAPHQL
+        );
     }
 }

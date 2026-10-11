@@ -1,41 +1,59 @@
 # Error Handling
 
-Most of the error handling in Lighthouse is pretty closely based upon **webonyx/graphql-php**,
-so you can find a lot of valuable information [in their documentation](http://webonyx.github.io/graphql-php/error-handling/).
+Most of the error handling in Lighthouse is pretty closely based upon **webonyx/graphql-php**.
+You can find a lot of valuable information [in their documentation](https://webonyx.github.io/graphql-php/error-handling).
 
 ## User-friendly Errors
 
-In a production setting, error messages should not be shown to the user by default
-to prevent information leaking. In some cases however, you may want to display an
-explicit error message to the user.
+In a production setting, error messages should not be shown to the user by default to prevent information leaking.
+In some cases however, you may want to display an explicit error message to the user.
 
-**webonyx/graphql-php** offers the [`GraphQL\Error\ClientAware`](https://github.com/webonyx/graphql-php/blob/master/src/Error/ClientAware.php) interface, that can
-be implemented by Exceptions to control how they are rendered to the client.
+**webonyx/graphql-php** offers the [`GraphQL\Error\ClientAware`](https://github.com/webonyx/graphql-php/blob/master/src/Error/ClientAware.php) interface.
+Can be implemented by Exceptions to control how they are rendered to the client.
 
-Head over their [Error Handling docs](http://webonyx.github.io/graphql-php/error-handling/) to learn more.
+Head over their [Error Handling docs](https://webonyx.github.io/graphql-php/error-handling) to learn more.
+
+## Error Reporting
+
+Lighthouse will catch exceptions thrown during the execution of a query and return them as part of the response.
+
+The error handler `Nuwave\Lighthouse\Execution\ReportingErrorHandler` is included in the default configuration and reports non-client-safe errors through the default Laravel exception handler.
+
+Client-safe errors are assumed to be something that:
+
+- a client can understand and handle
+- were caused by client misuse, e.g. wrong syntax, authentication, validation
+
+Thus, they are typically not actionable for server developers.
+
+However, you can choose to report client-safe errors by replacing `Nuwave\Lighthouse\Execution\ReportingErrorHandler` with `Nuwave\Lighthouse\Execution\AlwaysReportingErrorHandler` in the `lighthouse.php` config:
+
+```diff
+'error_handlers' => [
+-    Nuwave\Lighthouse\Execution\ReportingErrorHandler::class,
++    Nuwave\Lighthouse\Execution\AlwaysReportingErrorHandler::class,
+],
+```
+
+`Nuwave\Lighthouse\Execution\AlwaysReportingErrorHandler` reports all errors through the default Laravel exception handler, regardless of client-safety.
 
 ## Additional Error Information
 
-The interface [`\Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions`](https://github.com/nuwave/lighthouse/blob/master/src/Exceptions/RendersErrorsExtensions.php)
-may be extended to add more information then just an error message to the rendered error output.
+The interface [`GraphQL\Error\ProvidesExtensions`](https://github.com/webonyx/graphql-php/blob/master/src/Error/ProvidesExtensions.php) may be implemented to add more information than just an error message to the rendered error output.
 
-Let's say you want to have a custom exception type that contains information about
-the reason why the exception was thrown.
+This custom exception contains information about the reason the exception was thrown:
 
 ```php
-<?php
-
 namespace App\Exceptions;
 
 use Exception;
-use Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions;
+use GraphQL\Error\ClientAware;
+use GraphQL\Error\ProvidesExtensions;
 
-class CustomException extends Exception implements RendersErrorsExtensions
+final class CustomException extends Exception implements ClientAware, ProvidesExtensions
 {
-    /**
-    * @var @string
-    */
-    private $reason;
+    /** @var @string */
+    protected $reason;
 
     public function __construct(string $message, string $reason)
     {
@@ -46,9 +64,6 @@ class CustomException extends Exception implements RendersErrorsExtensions
 
     /**
      * Returns true when exception message is safe to be displayed to a client.
-     *
-     * @api
-     * @return bool
      */
     public function isClientSafe(): bool
     {
@@ -56,25 +71,11 @@ class CustomException extends Exception implements RendersErrorsExtensions
     }
 
     /**
-     * Returns string describing a category of the error.
+     * Data to include within the "extensions" key of the formatted error.
      *
-     * Value "graphql" is reserved for errors produced by query parsing or validation, do not use it.
-     *
-     * @api
-     * @return string
+     * @return array<string, mixed>
      */
-    public function getCategory(): string
-    {
-        return 'custom';
-    }
-
-    /**
-     * Return the content that is put in the "extensions" part
-     * of the returned error.
-     *
-     * @return array
-     */
-    public function extensionsContent(): array
+    public function getExtensions(): array
     {
         return [
             'some' => 'additional information',
@@ -84,21 +85,18 @@ class CustomException extends Exception implements RendersErrorsExtensions
 }
 ```
 
-Now you can just throw that Exception somewhere in your code, for example your resolver,
-and it will display additional error output.
+Now you can throw that Exception somewhere in your code, for example in your resolver, and it will display additional error output.
 
 ```php
-<?php
-
 namespace App\GraphQL\Queries;
 
 use App\Exceptions\CustomException;
-use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class SomeField
+final class SomeField
 {
-    public function __invoke($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): string
+    public function __invoke(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): string
     {
         if ($this->errorConditionIsMet()) {
             throw new CustomException(
@@ -121,7 +119,6 @@ A query that produces an error will render like this:
     {
       "message": "This is the error message",
       "extensions": {
-        "category": "custom",
         "some": "additional information",
         "reason": "The reason why this error was thrown, is rendered in the extension output."
       }
@@ -132,42 +129,61 @@ A query that produces an error will render like this:
 
 ## Registering Error Handlers
 
-Error handlers receive the Errors that occur during GraphQL execution.
+Error handlers receive the errors that occur during GraphQL execution.
 They can be used to log, filter or format the errors.
 
 Add them to your `lighthouse.php` config file, for example:
 
 ```php
 'error_handlers' => [
-    \Nuwave\Lighthouse\Execution\ExtensionErrorHandler::class,
-    \App\GraphQL\MyErrorHandler::class,
+    \App\GraphQL\CountErrorHandler::class,
+    ...
 ],
 ```
 
-An error handler class must implement [`\Nuwave\Lighthouse\Execution\ErrorHandler`](https://github.com/nuwave/lighthouse/blob/master/src/Execution/ErrorHandler.php)
+An error handler class must implement [`Nuwave\Lighthouse\Execution\ErrorHandler`](https://github.com/nuwave/lighthouse/blob/master/src/Execution/ErrorHandler.php)
 
 ```php
-<?php
-
 namespace App\GraphQL;
 
-use Closure;
 use GraphQL\Error\Error;
 use Nuwave\Lighthouse\Execution\ErrorHandler;
 
-class ExtensionErrorHandler implements ErrorHandler
+final class CountErrorHandler implements ErrorHandler
 {
-    public static function handle(Error $error, Closure $next): array
+    public function __invoke(?Error $error, \Closure $next): ?array
     {
-        // TODO do something with $error
+        // You can discard errors by returning null
+        if ($this->shouldBeDiscarded($error)) {
+            return null;
+        }
 
+        // Error handlers are instantiated once per query
+        $this->errorCount++;
+
+        // Keep the pipeline going, last step formats the error into an array
         return $next($error);
     }
 }
 ```
 
-## Collecting Errors
+## Partial Errors
 
-As a GraphQL query may return a partial result, you may not always want to abort
-execution immediately after an error occurred. You can use the [`\Nuwave\Lighthouse\Execution\ErrorBuffer`](https://github.com/nuwave/lighthouse/blob/master/src/Execution/ErrorBuffer.php)
-when you want to collect multiple errors before returning a result.
+As a GraphQL query may return a partial result, you may not always want to abort execution immediately after an error occurred.
+
+Use the [`ErrorPool`](https://github.com/nuwave/lighthouse/blob/master/src/Execution/ErrorPool.php) when you want to collect multiple errors before returning a result.
+
+```php
+try {
+    // Something that might fail but still allows for a partial result
+} catch (\Throwable $error) {
+    $errorPool = app(\Nuwave\Lighthouse\Execution\ErrorPool::class);
+    $errorPool->record($error);
+}
+
+return $result;
+```
+
+## Testing Errors
+
+See [PHPUnit - Testing Errors](../testing/phpunit.md#testing-errors).

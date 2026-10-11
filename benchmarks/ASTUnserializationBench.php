@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Benchmarks;
 
@@ -8,65 +8,62 @@ use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 /**
  * @BeforeMethods({"prepareSchema"})
  */
-class ASTUnserializationBench
+final class ASTUnserializationBench
 {
-    public const SCHEMA = /** @lang GraphQL */ <<<'SCHEMA'
-type Query {
-  query1: String
-  query2: String
-}
+    public const SCHEMA = /** @lang GraphQL */ <<<'GRAPHQL'
+    type Query {
+      query1: String
+      query2: String
+    }
 
-type Mutation {
-  mutation1: Int
-  mutation2: Int
-}
+    type Mutation {
+      mutation1: Int
+      mutation2: Int
+    }
 
-type Foo {
-  foo1: Boolean
-  foo2: Boolean
-}
-SCHEMA;
+    type Foo {
+      foo1: Boolean
+      foo2: Boolean
+    }
+    GRAPHQL;
 
-    /**
-     * @var string
-     */
-    private $documentNode;
+    private string $documentNode;
 
-    /**
-     * @var string
-     */
-    private $documentAST;
+    private string $documentAST;
 
     public function prepareSchema(): void
     {
         $this->documentNode = serialize(
             Parser::parse(
                 self::SCHEMA,
-                // Ignore location since it only bloats the AST
-                ['noLocation' => true]
-            )
+                ['noLocation' => true], // Ignore location since it only bloats the AST
+            ),
         );
 
         $this->documentAST = serialize(
-            DocumentAST::fromSource(self::SCHEMA)
+            DocumentAST::fromSource(self::SCHEMA),
         );
     }
 
     /**
      * @Revs(100)
+     *
      * @Iterations(10)
      */
     public function benchUnserializeDocumentNode(): void
     {
+        // @phpstan-ignore theCodingMachineSafe.function (Safe\unserialize is not available in thecodingmachine/safe ^1 and ^2)
         unserialize($this->documentNode);
     }
 
     /**
      * @Revs(100)
+     *
      * @Iterations(10)
      */
     public function benchUnserializeDocumentAST(): void
     {
+        // @phpstan-ignore theCodingMachineSafe.function (Safe\unserialize is not available in thecodingmachine/safe ^1 and ^2)
         unserialize($this->documentAST);
     }
 }

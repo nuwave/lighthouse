@@ -1,7 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Support;
 
+use Illuminate\Container\Container;
 use Illuminate\Support\Str;
 
 class AppVersion
@@ -23,7 +24,14 @@ class AppVersion
 
     protected static function version(): string
     {
-        return app()->version();
+        /**
+         * Not using assert() as only one of those classes will actually be installed.
+         *
+         * @var \Illuminate\Foundation\Application|\Laravel\Lumen\Application $container
+         */
+        $container = Container::getInstance();
+
+        return $container->version();
     }
 
     protected static function versionNumber(): float

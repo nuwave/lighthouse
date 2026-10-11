@@ -1,125 +1,53 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Schema\Factories;
 
-use Closure;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Schema\AST\PartialParser;
-use Nuwave\Lighthouse\Schema\Directives\FieldDirective;
+use GraphQL\Language\DirectiveLocation;
+use GraphQL\Language\Parser;
+use GraphQL\Type\Definition\Type;
+use Nuwave\Lighthouse\Schema\AST\FallbackTypeNodeConverter;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
-use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-use ReflectionProperty;
+use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\TestCase;
 
-class DirectiveFactoryTest extends TestCase
+final class DirectiveFactoryTest extends TestCase
 {
-    /**
-     * @var \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory
-     */
-    protected $directiveFactory;
+    protected DirectiveFactory $directiveFactory;
 
-    public function getEnvironmentSetUp($app): void
+    protected function setUp(): void
     {
-        $this->directiveFactory = $app->make(DirectiveFactory::class);
+        parent::setUp();
 
-        parent::getEnvironmentSetUp($app);
-    }
-
-    public function testRegistersLighthouseDirectives(): void
-    {
-        $this->assertInstanceOf(
-            FieldDirective::class,
-            $this->directiveFactory->create('field')
+        $typeRegistry = $this->app->make(TypeRegistry::class);
+        $this->directiveFactory = new DirectiveFactory(
+            new FallbackTypeNodeConverter($typeRegistry),
         );
     }
 
-    public function testHydratesBaseDirectives(): void
+    public function testConvertDirectiveFromNodeToExecutable(): void
     {
-        $fieldDefinition = PartialParser::fieldDefinition(/** @lang GraphQL */ '
-            foo: String @field
-        ');
+        $node = Parser::directiveDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
+        "foo description"
+        directive @foo(
+            """
+            baz
+            description
+            """
+            baz: Int
+        ) repeatable on OBJECT
+        GRAPHQL);
+        $executable = $this->directiveFactory->handle($node);
 
-        /** @var \Nuwave\Lighthouse\Schema\Directives\FieldDirective $fieldDirective */
-        $fieldDirective = $this
-            ->directiveFactory
-            ->createAssociatedDirectives($fieldDefinition)
-            ->first();
+        $this->assertSame('foo description', $executable->description);
+        $this->assertTrue($executable->isRepeatable);
+        $this->assertSame([DirectiveLocation::OBJECT], $executable->locations);
+        $this->assertSame($node, $executable->astNode);
+        $this->assertSame('foo', $executable->name);
 
-        $definitionNode = new ReflectionProperty($fieldDirective, 'definitionNode');
-        $definitionNode->setAccessible(true);
-
-        $this->assertSame(
-            $fieldDefinition,
-            $definitionNode->getValue($fieldDirective)
-        );
-    }
-
-    public function testSkipsHydrationForNonBaseDirectives(): void
-    {
-        $fieldDefinition = PartialParser::fieldDefinition(/** @lang GraphQL */ '
-            foo: String @foo
-        ');
-
-        $directive = new class implements FieldMiddleware {
-            public function name(): string
-            {
-                return 'foo';
-            }
-
-            public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
-            {
-                return $fieldValue;
-            }
-        };
-
-        $this->directiveFactory->setResolved('foo', get_class($directive));
-
-        $directive = $this
-            ->directiveFactory
-            ->createAssociatedDirectives($fieldDefinition)
-            ->first();
-
-        $this->assertObjectNotHasAttribute('definitionNode', $directive);
-    }
-
-    public function testThrowsIfDirectiveNameCanNotBeResolved(): void
-    {
-        $this->expectException(DirectiveException::class);
-
-        $this->directiveFactory->create('bar');
-    }
-
-    public function testCanCreateSingleDirective(): void
-    {
-        $fieldDefinition = PartialParser::fieldDefinition(/** @lang GraphQL */ '
-            foo: [Foo!]! @hasMany
-        ');
-
-        $resolver = $this->directiveFactory->createSingleDirectiveOfType($fieldDefinition, FieldResolver::class);
-        $this->assertInstanceOf(FieldResolver::class, $resolver);
-    }
-
-    public function testThrowsExceptionWhenMultipleFieldResolverDirectives(): void
-    {
-        $this->expectException(DirectiveException::class);
-        $this->expectExceptionMessage("Node bar can only have one directive of type Nuwave\Lighthouse\Support\Contracts\FieldResolver but found [@hasMany, @belongsTo].");
-
-        $fieldDefinition = PartialParser::fieldDefinition(/** @lang GraphQL */ '
-            bar: [Bar!]! @hasMany @belongsTo
-        ');
-
-        $this->directiveFactory->createSingleDirectiveOfType($fieldDefinition, FieldResolver::class);
-    }
-
-    public function testCanCreateMultipleDirectives(): void
-    {
-        $fieldDefinition = PartialParser::fieldDefinition(/** @lang GraphQL */ '
-            bar: String @can(if: ["viewBar"]) @event
-        ');
-
-        $middleware = $this->directiveFactory->createAssociatedDirectivesOfType($fieldDefinition, FieldMiddleware::class);
-        $this->assertCount(2, $middleware);
+        $this->assertCount(1, $executable->args);
+        $arg = $executable->args[0];
+        $this->assertSame('baz', $arg->name);
+        $this->assertSame("baz\ndescription", $arg->description);
+        $this->assertSame(Type::int(), $arg->getType());
     }
 }

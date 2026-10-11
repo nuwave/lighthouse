@@ -1,93 +1,121 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Schema\AST;
 
-use GraphQL\Language\AST\DirectiveDefinitionNode;
-use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use Nuwave\Lighthouse\Exceptions\ParseException;
+use GraphQL\Language\Parser;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Exceptions\SchemaSyntaxErrorException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\RootType;
 use Tests\TestCase;
+use Tests\Utils\Models\User;
 
-class DocumentASTTest extends TestCase
+final class DocumentASTTest extends TestCase
 {
     public function testParsesSimpleSchema(): void
     {
-        $documentAST = DocumentAST::fromSource(/** @lang GraphQL */ '
+        $schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: Int
         }
-        ');
+        GRAPHQL;
+        // calculated as hash('sha256', $schema)
+        $schemaHash = '774433c158904b98b4f69eddee3424679b99a70736960a189b7d7b5923695bac';
+        $documentAST = DocumentAST::fromSource($schema);
 
         $this->assertInstanceOf(
             ObjectTypeDefinitionNode::class,
-            $documentAST->types[RootType::QUERY]
+            $documentAST->types[RootType::QUERY],
         );
+
+        $this->assertSame($schemaHash, $documentAST->hash);
     }
 
     public function testThrowsOnInvalidSchema(): void
     {
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessageRegExp('/^Syntax Error/');
+        $this->expectException(SchemaSyntaxErrorException::class);
+        $this->expectExceptionMessage('Syntax Error: Expected Name, found !, near: ');
 
-        DocumentAST::fromSource('foo');
+        DocumentAST::fromSource(/** @lang GraphQL */ <<<'GRAPHQL'
+        type Mutation {
+            bar: Int
+        }
+
+        type Query {
+            foo: Int!!
+        }
+
+        type Foo {
+            bar: ID
+        }
+        GRAPHQL);
+    }
+
+    public function testThrowsOnUnknownModelClasses(): void
+    {
+        $this->expectException(DefinitionException::class);
+        $this->expectExceptionMessage('Failed to find a model class Unknown in namespaces [Tests\Utils\Models, Tests\Utils\ModelsSecondary] referenced in @model on type Query.');
+
+        DocumentAST::fromSource(/** @lang GraphQL */ <<<'GRAPHQL'
+        type Query @model(class: "Unknown") {
+            foo: Int!
+        }
+        GRAPHQL);
     }
 
     public function testOverwritesDefinitionWithSameName(): void
     {
-        $documentAST = DocumentAST::fromSource(/** @lang GraphQL */ '
+        $documentAST = DocumentAST::fromSource(/** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: Int
         }
-        ');
+        GRAPHQL);
 
-        $overwrite = PartialParser::objectTypeDefinition(/** @lang GraphQL */ '
+        $overwrite = Parser::objectTypeDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             bar: Int
         }
-        ');
+        GRAPHQL);
 
         $documentAST->types[$overwrite->name->value] = $overwrite;
 
         $this->assertSame(
             $overwrite,
-            $documentAST->types[RootType::QUERY]
+            $documentAST->types[RootType::QUERY],
         );
     }
 
-    public function testCanBeSerialized(): void
+    public function testBeSerialized(): void
     {
-        $documentAST = DocumentAST::fromSource(/** @lang GraphQL */ '
-        type Query {
+        $documentAST = DocumentAST::fromSource(/** @lang GraphQL */ <<<'GRAPHQL'
+        extend schema @link(url: "https://specs.apollo.dev/federation/v2.3", import: ["@key"])
+
+        type Query @model(class: "User") {
             foo: Int
         }
 
         directive @foo on FIELD
-        ');
+        GRAPHQL);
 
-        /** @var \Nuwave\Lighthouse\Schema\AST\DocumentAST $reserialized */
+        // @phpstan-ignore theCodingMachineSafe.function (Safe\unserialize is not available in thecodingmachine/safe ^1 and ^2)
         $reserialized = unserialize(
-            serialize($documentAST)
+            serialize($documentAST),
         );
+        $this->assertInstanceOf(DocumentAST::class, $reserialized);
 
-        /** @var \GraphQL\Language\AST\ObjectTypeDefinitionNode $queryType */
         $queryType = $reserialized->types[RootType::QUERY];
-        $this->assertInstanceOf(
-            ObjectTypeDefinitionNode::class,
-            $queryType
-        );
+        $this->assertInstanceOf(ObjectTypeDefinitionNode::class, $queryType);
 
-        $this->assertInstanceOf(
-            FieldDefinitionNode::class,
-            // @phpstan-ignore-next-line can not be null
-            $queryType->fields[0]
-        );
+        $this->assertArrayHasKey('foo', $reserialized->directives);
 
-        $this->assertInstanceOf(
-            DirectiveDefinitionNode::class,
-            $reserialized->directives['foo']
-        );
+        $this->assertSame(['Query'], $reserialized->classNameToObjectTypeNames[User::class]);
+
+        $this->assertArrayHasKey(0, $reserialized->schemaExtensions);
+
+        $schemaExtension = $reserialized->schemaExtensions[0];
+        $this->assertArrayHasKey(0, $schemaExtension->directives); // @phpstan-ignore method.impossibleType (NodeList not understood by earlier deps)
+
+        $this->assertSame($documentAST->hash, $reserialized->hash);
     }
 }

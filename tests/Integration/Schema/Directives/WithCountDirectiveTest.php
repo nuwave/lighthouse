@@ -1,28 +1,17 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Schema\Directives;
 
-use Illuminate\Support\Facades\DB;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Support\AppVersion;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class WithCountDirectiveTest extends DBTestCase
+final class WithCountDirectiveTest extends DBTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        if (AppVersion::below(5.7)) {
-            $this->markTestSkipped('Version less than 5.7 do not support loadCount().');
-        }
-    }
-
     public function testEagerLoadsRelationCount(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             users: [User!] @all
         }
@@ -32,48 +21,45 @@ class WithCountDirectiveTest extends DBTestCase
                 @withCount(relation: "tasks")
                 @method
         }
-        ';
+        GRAPHQL;
 
         factory(User::class, 3)->create()
-            ->each(function ($user) {
-                factory(Task::class, 3)->create([
-                    'user_id' => $user->getKey(),
-                ]);
+            ->each(static function (User $user): void {
+                $tasks = factory(Task::class, 3)->make();
+                $tasks->each(static function (Task $task) use ($user): void {
+                    $task->user()->associate($user);
+                    $task->save();
+                });
             });
 
-        $queries = 0;
-        DB::listen(function () use (&$queries): void {
-            $queries++;
-        });
-
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            users {
-                tasksCountLoaded
+        $this->assertQueryCountMatches(2, function (): void {
+            $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+            {
+                users {
+                    tasksCountLoaded
+                }
             }
-        }
-        ')->assertExactJson([
-            'data' => [
-                'users' => [
-                    [
-                        'tasksCountLoaded' => true,
-                    ],
-                    [
-                        'tasksCountLoaded' => true,
-                    ],
-                    [
-                        'tasksCountLoaded' => true,
+            GRAPHQL)->assertExactJson([
+                'data' => [
+                    'users' => [
+                        [
+                            'tasksCountLoaded' => true,
+                        ],
+                        [
+                            'tasksCountLoaded' => true,
+                        ],
+                        [
+                            'tasksCountLoaded' => true,
+                        ],
                     ],
                 ],
-            ],
-        ]);
-
-        $this->assertSame(2, $queries);
+            ]);
+        });
     }
 
-    public function testItFailsToEagerLoadRelationCountWithoutRelation(): void
+    public function testFailsToEagerLoadRelationCountWithoutRelation(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             users: [User!] @all
         }
@@ -81,17 +67,17 @@ class WithCountDirectiveTest extends DBTestCase
         type User {
             name: String! @withCount
         }
-        ';
+        GRAPHQL;
 
         factory(User::class)->create();
 
         $this->expectException(DefinitionException::class);
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users {
                 name
             }
         }
-        ');
+        GRAPHQL);
     }
 }

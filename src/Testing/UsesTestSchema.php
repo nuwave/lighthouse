@@ -1,29 +1,26 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Testing;
 
+use Illuminate\Container\Container;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 
 trait UsesTestSchema
 {
-    /**
-     * The schema that Lighthouse will use.
-     *
-     * @var string
-     */
-    protected $schema;
+    /** The schema that Lighthouse will use. */
+    protected string $schema;
 
     protected function setUpTestSchema(): void
     {
-        app()->bind(
+        Container::getInstance()->bind(
             SchemaSourceProvider::class,
             function (): TestSchemaProvider {
-                if (! is_string($this->schema)) {
+                if (! isset($this->schema)) {
                     throw new \Exception('Missing test schema, provide one by setting $this->schema.');
                 }
 
                 return new TestSchemaProvider($this->schema);
-            }
+            },
         );
     }
 }

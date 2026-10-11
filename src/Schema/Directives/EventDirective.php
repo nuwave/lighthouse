@@ -1,63 +1,47 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Closure;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
-class EventDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
+class EventDirective extends BaseDirective implements FieldMiddleware
 {
-    /**
-     * @var \Illuminate\Contracts\Events\Dispatcher
-     */
-    protected $eventsDispatcher;
-
-    public function __construct(EventsDispatcher $eventsDispatcher)
-    {
-        $this->eventsDispatcher = $eventsDispatcher;
-    }
+    public function __construct(
+        protected EventsDispatcher $eventsDispatcher,
+    ) {}
 
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Fire an event after a mutation has taken place.
-It requires the `dispatch` argument that should be
-the class name of the event you want to fire.
+Dispatch an event after the resolution of a field.
+
+The event constructor will be called with a single argument:
+the resolved value of the field.
 """
 directive @event(
   """
   Specify the fully qualified class name (FQCN) of the event to dispatch.
   """
   dispatch: String!
-) on FIELD_DEFINITION
-SDL;
+) repeatable on FIELD_DEFINITION
+GRAPHQL;
     }
 
-    /**
-     * Resolve the field directive.
-     */
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue): void
     {
-        $eventBaseName = $this->directiveArgValue('dispatch');
-        $eventClassName = $this->namespaceClassName($eventBaseName);
-        $previousResolver = $fieldValue->getResolver();
-
-        return $next(
-            $fieldValue->setResolver(
-                function () use ($previousResolver, $eventClassName) {
-                    $result = $previousResolver(...func_get_args());
-
-                    $this->eventsDispatcher->dispatch(
-                        new $eventClassName($result)
-                    );
-
-                    return $result;
-                }
-            )
+        $eventClassName = $this->namespaceClassName(
+            $this->directiveArgValue('dispatch'),
         );
+
+        $fieldValue->resultHandler(function ($result) use ($eventClassName) {
+            $this->eventsDispatcher->dispatch(
+                new $eventClassName($result),
+            );
+
+            return $result;
+        });
     }
 }

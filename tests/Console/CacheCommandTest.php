@@ -1,30 +1,40 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Console;
 
-use Illuminate\Contracts\Cache\Repository as CacheRepository;
-use Illuminate\Contracts\Config\Repository as ConfigRepository;
+use Illuminate\Filesystem\Filesystem;
 use Nuwave\Lighthouse\Console\CacheCommand;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Tests\TestCase;
+use Tests\TestsSchemaCache;
 
-class CacheCommandTest extends TestCase
+final class CacheCommandTest extends TestCase
 {
-    public function testItCachesGraphQLAST(): void
+    use TestsSchemaCache;
+
+    protected function setUp(): void
     {
-        $config = app(ConfigRepository::class);
-        $config->set('lighthouse.cache.ttl', 60);
+        parent::setUp();
 
-        $key = $config->get('lighthouse.cache.key');
+        $this->setUpSchemaCache();
+    }
 
-        $cache = app(CacheRepository::class);
-        $this->assertFalse(
-            $cache->has($key)
-        );
+    protected function tearDown(): void
+    {
+        $this->tearDownSchemaCache();
 
-        $this->commandTester(new CacheCommand)->execute([]);
+        parent::tearDown();
+    }
 
-        $this->assertTrue(
-            $cache->has($key)
-        );
+    public function testCache(): void
+    {
+        $filesystem = $this->app->make(Filesystem::class);
+        $path = $this->schemaCachePath();
+        $this->assertFalse($filesystem->exists($path));
+
+        $this->commandTester(new CacheCommand())->execute([]);
+
+        $this->assertTrue($filesystem->exists($path));
+        DocumentAST::fromArray(require $path);
     }
 }

@@ -1,11 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Utils\Policies;
 
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class TaskPolicy
+final class TaskPolicy
 {
     public const ADMIN = 'admin';
 
@@ -16,6 +16,11 @@ class TaskPolicy
 
     public function delete(User $user, Task $task): bool
     {
-        return $user->id === $task->user->id;
+        $taskUser = $task->user;
+        if ($taskUser === null) {
+            return false;
+        }
+
+        return $user->id === $taskUser->id;
     }
 }

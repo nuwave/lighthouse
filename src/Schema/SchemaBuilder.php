@@ -1,84 +1,98 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema;
 
 use GraphQL\GraphQL;
+use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
-use Nuwave\Lighthouse\ClientDirectives\ClientDirectiveFactory;
+use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\AST\ExecutableTypeNodeConverter;
+use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 
 class SchemaBuilder
 {
-    /**
-     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
-     */
-    protected $typeRegistry;
-
-    /**
-     * @var \Nuwave\Lighthouse\ClientDirectives\ClientDirectiveFactory
-     */
-    protected $clientDirectiveFactory;
+    protected Schema $schema;
 
     public function __construct(
-        TypeRegistry $typeRegistry,
-        ClientDirectiveFactory $clientDirectiveFactory
-    ) {
-        $this->typeRegistry = $typeRegistry;
-        $this->clientDirectiveFactory = $clientDirectiveFactory;
+        protected TypeRegistry $typeRegistry,
+        protected ASTBuilder $astBuilder,
+    ) {}
+
+    public function schema(): Schema
+    {
+        return $this->schema ??= $this->build(
+            $this->astBuilder->documentAST(),
+        );
     }
 
-    /**
-     * Build an executable schema from AST.
-     */
-    public function build(DocumentAST $documentAST): Schema
+    public function schemaHash(): string
+    {
+        return $this->astBuilder->documentAST()->hash;
+    }
+
+    /** Build an executable schema from an AST. */
+    protected function build(DocumentAST $documentAST): Schema
     {
         $config = SchemaConfig::create();
 
         $this->typeRegistry->setDocumentAST($documentAST);
 
         // Always set Query since it is required
-        /** @var \GraphQL\Type\Definition\ObjectType $query */
         $query = $this->typeRegistry->get(RootType::QUERY);
+        assert($query instanceof ObjectType);
         $config->setQuery($query);
 
         // Mutation and Subscription are optional, so only add them
         // if they are present in the schema
         if (isset($documentAST->types[RootType::MUTATION])) {
-            /** @var \GraphQL\Type\Definition\ObjectType $mutation */
             $mutation = $this->typeRegistry->get(RootType::MUTATION);
+            assert($mutation instanceof ObjectType);
             $config->setMutation($mutation);
         }
 
         if (isset($documentAST->types[RootType::SUBSCRIPTION])) {
-            /** @var \GraphQL\Type\Definition\ObjectType $subscription */
             $subscription = $this->typeRegistry->get(RootType::SUBSCRIPTION);
-            // Eager-load the subscription fields to ensure they are registered
-            $subscription->getFields();
-
+            assert($subscription instanceof ObjectType);
             $config->setSubscription($subscription);
         }
 
         // Use lazy type loading to prevent unnecessary work
         $config->setTypeLoader(
-            [$this->typeRegistry, 'get']
+            fn (string $name): ?Type => $this->typeRegistry->search($name),
         );
 
-        // This is just used for introspection, it is required
-        // to be able to retrieve all the types in the schema
+        // Enables introspection to list all types in the schema
         $config->setTypes(
-            [$this->typeRegistry, 'possibleTypes']
+            /** @return array<string, \GraphQL\Type\Definition\Type> */
+            fn (): array => $this->typeRegistry->possibleTypes(),
         );
 
-        // There is no way to resolve client directives lazily,
-        // so we convert them eagerly
-        $clientDirectives = [];
-        foreach ($documentAST->directives as $directiveDefinition) {
-            $clientDirectives [] = $this->clientDirectiveFactory->handle($directiveDefinition);
+        // Passing scalar overrides explicitly prevents the first lookup of a built-in scalar
+        // from discovering them by resolving the lazy types callable, which would eagerly
+        // build every type in the schema, see https://github.com/nuwave/lighthouse/issues/2771.
+        // TODO remove this check when the minimum version of webonyx/graphql-php includes the method
+        if (method_exists($config, 'setScalarOverrides')) { // @phpstan-ignore function.alreadyNarrowedType (backward compatibility with webonyx/graphql-php < 15.31)
+            $config->setScalarOverrides($this->typeRegistry->scalarOverrides());
         }
-        $config->setDirectives(
-            array_merge(GraphQL::getStandardDirectives(), $clientDirectives)
+
+        // There is no way to resolve directives lazily, so we convert them eagerly
+        $directiveFactory = new DirectiveFactory(
+            new ExecutableTypeNodeConverter($this->typeRegistry),
         );
+
+        $directives = [];
+        foreach ($documentAST->directives as $directiveDefinition) {
+            $directives[] = $directiveFactory->handle($directiveDefinition);
+        }
+
+        $config->setDirectives(
+            array_merge(GraphQL::getStandardDirectives(), $directives),
+        );
+
+        $config->setExtensionASTNodes($documentAST->schemaExtensions);
 
         return new Schema($config);
     }

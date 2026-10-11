@@ -1,17 +1,23 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\WhereConditions;
 
+use Carbon\Carbon;
+use GraphQL\Type\TypeKind;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Nuwave\Lighthouse\WhereConditions\SQLOperator;
-use Nuwave\Lighthouse\WhereConditions\WhereConditionsDirective;
+use Nuwave\Lighthouse\WhereConditions\WhereConditionsHandler;
 use Nuwave\Lighthouse\WhereConditions\WhereConditionsServiceProvider;
 use Tests\DBTestCase;
+use Tests\Utils\Models\Comment;
+use Tests\Utils\Models\Location;
 use Tests\Utils\Models\Post;
+use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class WhereConditionsDirectiveTest extends DBTestCase
+final class WhereConditionsDirectiveTest extends DBTestCase
 {
-    protected $schema = /** @lang GraphQL */ '
+    protected string $schema = /** @lang GraphQL */ <<<'GRAPHQL'
     type User {
         id: ID!
         name: String
@@ -40,21 +46,131 @@ class WhereConditionsDirectiveTest extends DBTestCase
         ID @enum(value: "id")
         NAME @enum(value: "name")
     }
-    ';
+    GRAPHQL;
 
     protected function getPackageProviders($app): array
     {
         return array_merge(
             parent::getPackageProviders($app),
-            [WhereConditionsServiceProvider::class]
+            [WhereConditionsServiceProvider::class],
         );
+    }
+
+    public function testBetweenWithMultipleVariables(): void
+    {
+        $user1 = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user1);
+        $user1->date_of_birth = Carbon::createStrict(2000, 1, 1);
+        $user1->save();
+
+        $user2 = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user2);
+        $user2->date_of_birth = Carbon::createStrict(1995, 1, 1);
+        $user2->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        query ($dobMin: Mixed, $dobMax: Mixed) {
+            users(
+                where: {
+                    column: "date_of_birth",
+                    operator: BETWEEN,
+                    value: [$dobMin, $dobMax]
+                }
+            ) {
+                id
+            }
+        }
+        GRAPHQL, [
+            'dobMin' => '1990-01-01',
+            'dobMax' => '1999-01-01',
+        ])->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => "{$user2->id}",
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testBetweenWithOneVariable(): void
+    {
+        $user1 = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user1);
+        $user1->date_of_birth = Carbon::createStrict(2000, 1, 1);
+        $user1->save();
+
+        $user2 = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user2);
+        $user2->date_of_birth = Carbon::createStrict(1995, 1, 1);
+        $user2->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        query ($dates: Mixed) {
+            users(
+                where: {
+                    column: "date_of_birth",
+                    operator: BETWEEN,
+                    value: $dates
+                }
+            ) {
+                id
+            }
+        }
+        GRAPHQL, [
+            'dates' => ['1990-01-01', '1999-01-01'],
+        ])->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => "{$user2->id}",
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testBetweenWithLiteralValues(): void
+    {
+        $user1 = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user1);
+        $user1->date_of_birth = Carbon::createStrict(2000, 1, 1);
+        $user1->save();
+
+        $user2 = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user2);
+        $user2->date_of_birth = Carbon::createStrict(1995, 1, 1);
+        $user2->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+            query {
+                users(
+                    where: {
+                        column: "date_of_birth",
+                        operator: BETWEEN,
+                        value: ["1990-01-01", "1999-01-01"]
+                    }
+                ) {
+                    id
+                }
+            }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => "{$user2->id}",
+                    ],
+                ],
+            ],
+        ]);
     }
 
     public function testDefaultsToWhereEqual(): void
     {
         factory(User::class, 2)->create();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 where: {
@@ -65,14 +181,14 @@ class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertJsonCount(1, 'data.users');
+        GRAPHQL)->assertJsonCount(1, 'data.users');
     }
 
     public function testOverwritesTheOperator(): void
     {
         factory(User::class, 3)->create();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 where: {
@@ -84,14 +200,49 @@ class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertJsonCount(2, 'data.users');
+        GRAPHQL)->assertJsonCount(2, 'data.users');
+    }
+
+    public function testOperatorNotLike(): void
+    {
+        $user1 = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $user1);
+        $user1->name = 'foo';
+        $user1->save();
+
+        $user2 = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $user2);
+        $user2->name = 'bar';
+        $user2->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            users(
+                where: {
+                    column: "name"
+                    operator: NOT_LIKE
+                    value: "ba%"
+                }
+            ) {
+                id
+            }
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => "{$user1->id}",
+                    ],
+                ],
+            ],
+        ]);
     }
 
     public function testOperatorIn(): void
     {
         factory(User::class, 5)->create();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 where: {
@@ -103,7 +254,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [
@@ -119,14 +270,17 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testOperatorIsNull(): void
     {
-        factory(Post::class)->create([
-            'body' => null,
-        ]);
-        factory(Post::class)->create([
-            'body' => 'foobar',
-        ]);
+        $postWithoutBody = factory(Post::class)->make();
+        $this->assertInstanceOf(Post::class, $postWithoutBody);
+        $postWithoutBody->body = null;
+        $postWithoutBody->save();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $postWithBody = factory(Post::class)->make();
+        $this->assertInstanceOf(Post::class, $postWithBody);
+        $postWithBody->body = 'foobar';
+        $postWithBody->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             posts(
                 where: {
@@ -137,7 +291,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'posts' => [
                     [
@@ -150,14 +304,17 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testOperatorNotNull(): void
     {
-        factory(Post::class)->create([
-            'body' => null,
-        ]);
-        factory(Post::class)->create([
-            'body' => 'foobar',
-        ]);
+        $postWithoutBody = factory(Post::class)->make();
+        $this->assertInstanceOf(Post::class, $postWithoutBody);
+        $postWithoutBody->body = null;
+        $postWithoutBody->save();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $postWithBody = factory(Post::class)->make();
+        $this->assertInstanceOf(Post::class, $postWithBody);
+        $postWithBody->body = 'foobar';
+        $postWithBody->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             posts(
                 where: {
@@ -168,7 +325,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'posts' => [
                     [
@@ -183,7 +340,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
     {
         factory(User::class, 5)->create();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 where: {
@@ -195,7 +352,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [
@@ -213,7 +370,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
     {
         factory(User::class, 3)->create();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 where: {
@@ -234,14 +391,14 @@ class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertJsonCount(1, 'data.users');
+        GRAPHQL)->assertJsonCount(1, 'data.users');
     }
 
     public function testAddsNestedOr(): void
     {
         factory(User::class, 5)->create();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 where: {
@@ -269,7 +426,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [
@@ -290,7 +447,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
     {
         factory(User::class, 5)->create();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 where: {
@@ -319,7 +476,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [
@@ -333,15 +490,482 @@ class WhereConditionsDirectiveTest extends DBTestCase
         ]);
     }
 
+    public function testHasMixed(): void
+    {
+        $users = factory(User::class, 9)
+            ->create()
+            ->each(static function (User $user): void {
+                $posts = factory(Post::class, 2)->create();
+                $user->posts()->saveMany($posts);
+            });
+
+        $commentAuthorA = $users->get(0);
+        $this->assertInstanceOf(User::class, $commentAuthorA);
+        $commentAuthorB = $users->get(1);
+        $this->assertInstanceOf(User::class, $commentAuthorB);
+
+        $secondUser = $users->get(1);
+        $this->assertInstanceOf(User::class, $secondUser);
+        $secondUserFirstPost = $secondUser->posts()->orderBy('id')->firstOrFail();
+        $fourthUser = $users->get(3);
+        $this->assertInstanceOf(User::class, $fourthUser);
+        $fourthUserFirstPost = $fourthUser->posts()->orderBy('id')->firstOrFail();
+        $fifthUser = $users->get(4);
+        $this->assertInstanceOf(User::class, $fifthUser);
+        $fifthUserFirstPost = $fifthUser->posts()->orderBy('id')->firstOrFail();
+        $sixthUser = $users->get(5);
+        $this->assertInstanceOf(User::class, $sixthUser);
+        $sixthUserFirstPost = $sixthUser->posts()->orderBy('id')->firstOrFail();
+        $seventhUser = $users->get(6);
+        $this->assertInstanceOf(User::class, $seventhUser);
+        $seventhUserSecondPost = $seventhUser->posts()->orderBy('id')->skip(1)->firstOrFail();
+        $eighthUser = $users->get(7);
+        $this->assertInstanceOf(User::class, $eighthUser);
+        $eighthUserFirstPost = $eighthUser->posts()->orderBy('id')->firstOrFail();
+
+        $commentOne = new Comment();
+        $commentOne->post()->associate($secondUserFirstPost);
+        $commentOne->user()->associate($commentAuthorA);
+        $commentOne->comment = 'none';
+        $commentOne->save();
+
+        $commentTwo = new Comment();
+        $commentTwo->post()->associate($fourthUserFirstPost);
+        $commentTwo->user()->associate($commentAuthorB);
+        $commentTwo->comment = 'test';
+        $commentTwo->save();
+
+        for ($i = 0; $i < 5; ++$i) {
+            $commentBatch = new Comment();
+            $commentBatch->post()->associate($fifthUserFirstPost);
+            $commentBatch->user()->associate($commentAuthorB);
+            $commentBatch->comment = 'test';
+            $commentBatch->save();
+        }
+
+        $commentThree = new Comment();
+        $commentThree->post()->associate($sixthUserFirstPost);
+        $commentThree->user()->associate($commentAuthorA);
+        $commentThree->comment = 'test';
+        $commentThree->save();
+
+        $commentFour = new Comment();
+        $commentFour->post()->associate($seventhUserSecondPost);
+        $commentFour->user()->associate($commentAuthorB);
+        $commentFour->comment = 'none';
+        $commentFour->save();
+
+        $commentFive = new Comment();
+        $commentFive->post()->associate($eighthUserFirstPost);
+        $commentFive->user()->associate($commentAuthorB);
+        $commentFive->comment = 'none';
+        $commentFive->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            users(
+                where: {
+                    column: "id"
+                    operator: LT
+                    value: 8
+                    AND: [{
+                        column: "id"
+                        operator: GT
+                        value: 2
+                        HAS: {
+                            relation: "posts.comments"
+                            operator: GT
+                            amount: 4
+                            condition: {
+                               column: "comment",
+                               value: "test"
+                               HAS: {
+                                    relation: "user.posts.comments"
+                               }
+                            }
+                        }
+                    }]
+                }
+            ) {
+                id
+            }
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => (string) $fifthUser->getKey(),
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testHasRelation(): void
+    {
+        $users = factory(User::class, 5)
+            ->create()
+            ->each(static function (User $user): void {
+                $posts = factory(Post::class, 2)->create();
+                $user->posts()->saveMany($posts);
+            });
+
+        $commentAuthor = $users->get(0);
+        $this->assertInstanceOf(User::class, $commentAuthor);
+        $secondUser = $users->get(1);
+        $this->assertInstanceOf(User::class, $secondUser);
+        $secondUserFirstPost = $secondUser->posts()->orderBy('id')->firstOrFail();
+        $fourthUser = $users->get(3);
+        $this->assertInstanceOf(User::class, $fourthUser);
+        $fourthUserFirstPost = $fourthUser->posts()->orderBy('id')->firstOrFail();
+
+        $commentOne = new Comment();
+        $commentOne->user()->associate($commentAuthor);
+        $commentOne->post()->associate($secondUserFirstPost);
+        $commentOne->comment = 'none';
+        $commentOne->save();
+
+        $commentTwo = new Comment();
+        $commentTwo->user()->associate($commentAuthor);
+        $commentTwo->post()->associate($fourthUserFirstPost);
+        $commentTwo->comment = 'none';
+        $commentTwo->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            users(
+                where: {
+                    HAS: {
+                        relation: "posts.comments"
+                    }
+                }
+            ) {
+                id
+            }
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => (string) $secondUser->getKey(),
+                    ],
+                    [
+                        'id' => (string) $fourthUser->getKey(),
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testHasAmount(): void
+    {
+        $users = factory(User::class, 5)
+            ->create()
+            ->each(static function (User $user): void {
+                $posts = factory(Post::class, 2)->create();
+                $user->posts()->saveMany($posts);
+            });
+
+        $commentAuthor = $users->get(0);
+        $this->assertInstanceOf(User::class, $commentAuthor);
+        $secondUser = $users->get(1);
+        $this->assertInstanceOf(User::class, $secondUser);
+        $secondUserFirstPost = $secondUser->posts()->orderBy('id')->firstOrFail();
+        $fourthUser = $users->get(3);
+        $this->assertInstanceOf(User::class, $fourthUser);
+        $fourthUserFirstPost = $fourthUser->posts()->orderBy('id')->firstOrFail();
+
+        for ($i = 0; $i < 5; ++$i) {
+            $commentBatchOne = new Comment();
+            $commentBatchOne->user()->associate($commentAuthor);
+            $commentBatchOne->post()->associate($secondUserFirstPost);
+            $commentBatchOne->comment = 'none';
+            $commentBatchOne->save();
+        }
+
+        for ($i = 0; $i < 2; ++$i) {
+            $commentBatchTwo = new Comment();
+            $commentBatchTwo->user()->associate($commentAuthor);
+            $commentBatchTwo->post()->associate($fourthUserFirstPost);
+            $commentBatchTwo->comment = 'none';
+            $commentBatchTwo->save();
+        }
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            users(
+                where: {
+                    HAS: {
+                        relation: "posts.comments"
+                        amount: 3
+                    }
+                }
+            ) {
+                id
+            }
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => (string) $secondUser->getKey(),
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testHasOperator(): void
+    {
+        $users = factory(User::class, 5)
+            ->create()
+            ->each(static function (User $user): void {
+                $posts = factory(Post::class, 2)->create();
+                $user->posts()->saveMany($posts);
+            });
+
+        $commentAuthor = $users->get(0);
+        $this->assertInstanceOf(User::class, $commentAuthor);
+        $secondUser = $users->get(1);
+        $this->assertInstanceOf(User::class, $secondUser);
+        $secondUserFirstPost = $secondUser->posts()->orderBy('id')->firstOrFail();
+        $fourthUser = $users->get(3);
+        $this->assertInstanceOf(User::class, $fourthUser);
+        $fourthUserFirstPost = $fourthUser->posts()->orderBy('id')->firstOrFail();
+
+        for ($i = 0; $i < 5; ++$i) {
+            $commentBatchOne = new Comment();
+            $commentBatchOne->user()->associate($commentAuthor);
+            $commentBatchOne->post()->associate($secondUserFirstPost);
+            $commentBatchOne->comment = 'none';
+            $commentBatchOne->save();
+        }
+
+        for ($i = 0; $i < 6; ++$i) {
+            $commentBatchTwo = new Comment();
+            $commentBatchTwo->user()->associate($commentAuthor);
+            $commentBatchTwo->post()->associate($fourthUserFirstPost);
+            $commentBatchTwo->comment = 'none';
+            $commentBatchTwo->save();
+        }
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            users(
+                where: {
+                    HAS: {
+                        relation: "posts.comments"
+                        amount: 5
+                        operator: EQ
+                    }
+                }
+            ) {
+                id
+            }
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => (string) $secondUser->getKey(),
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testHasCondition(): void
+    {
+        $users = factory(User::class, 5)
+            ->create()
+            ->each(static function (User $user): void {
+                $posts = factory(Post::class, 2)->create();
+                $user->posts()->saveMany($posts);
+            });
+
+        $commentAuthor = $users->get(0);
+        $this->assertInstanceOf(User::class, $commentAuthor);
+        $secondUser = $users->get(1);
+        $this->assertInstanceOf(User::class, $secondUser);
+        $secondUserFirstPost = $secondUser->posts()->orderBy('id')->firstOrFail();
+        $fourthUser = $users->get(3);
+        $this->assertInstanceOf(User::class, $fourthUser);
+        $fourthUserFirstPost = $fourthUser->posts()->orderBy('id')->firstOrFail();
+
+        $commentOne = new Comment();
+        $commentOne->user()->associate($commentAuthor);
+        $commentOne->post()->associate($secondUserFirstPost);
+        $commentOne->comment = 'test';
+        $commentOne->save();
+
+        $commentTwo = new Comment();
+        $commentTwo->user()->associate($commentAuthor);
+        $commentTwo->post()->associate($fourthUserFirstPost);
+        $commentTwo->comment = 'none';
+        $commentTwo->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            users(
+                where: {
+                    HAS: {
+                        relation: "posts.comments"
+                        condition: {
+                           column: "comment",
+                           value: "test"
+                        }
+                    }
+                }
+            ) {
+                id
+            }
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => (string) $secondUser->getKey(),
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testHasRecursive(): void
+    {
+        $users = factory(User::class, 7)
+            ->create()
+            ->each(static function (User $user): void {
+                $posts = factory(Post::class, 2)->create();
+                $user->posts()->saveMany($posts);
+            });
+
+        $commentAuthor = $users->get(0);
+        $this->assertInstanceOf(User::class, $commentAuthor);
+        $fourthUser = $users->get(3);
+        $this->assertInstanceOf(User::class, $fourthUser);
+        $fourthUserFirstPost = $fourthUser->posts()->orderBy('id')->firstOrFail();
+        $sixthUser = $users->get(5);
+        $this->assertInstanceOf(User::class, $sixthUser);
+        $sixthUserFirstPost = $sixthUser->posts()->orderBy('id')->firstOrFail();
+
+        $commentOne = new Comment();
+        $commentOne->user()->associate($commentAuthor);
+        $commentOne->post()->associate($fourthUserFirstPost);
+        $commentOne->comment = 'none';
+        $commentOne->save();
+
+        $commentTwo = new Comment();
+        $commentTwo->user()->associate($commentAuthor);
+        $commentTwo->post()->associate($sixthUserFirstPost);
+        $commentTwo->comment = 'none';
+        $commentTwo->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            users(
+                where: {
+                    column: "id"
+                    operator: LT
+                    value: 6
+                    AND: [{
+                        HAS: {
+                            relation: "posts.comments"
+                        }
+                    }]
+                }
+            ) {
+                id
+            }
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => (string) $fourthUser->getKey(),
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testHasNested(): void
+    {
+        $users = factory(User::class, 5)
+            ->create()
+            ->each(static function (User $user): void {
+                $posts = factory(Post::class, 2)->create();
+                $user->posts()->saveMany($posts);
+            });
+
+        $thirdUser = $users->get(2);
+        $this->assertInstanceOf(User::class, $thirdUser);
+        $secondUser = $users->get(1);
+        $this->assertInstanceOf(User::class, $secondUser);
+        $secondUserFirstPost = $secondUser->posts()->orderBy('id')->firstOrFail();
+        $fourthUser = $users->get(3);
+        $this->assertInstanceOf(User::class, $fourthUser);
+        $fourthUserFirstPost = $fourthUser->posts()->orderBy('id')->firstOrFail();
+
+        $commentOne = new Comment();
+        $commentOne->user()->associate($thirdUser);
+        $commentOne->post()->associate($secondUserFirstPost);
+        $commentOne->comment = 'none';
+        $commentOne->save();
+
+        $commentTwo = new Comment();
+        $commentTwo->user()->associate($secondUser);
+        $commentTwo->post()->associate($fourthUserFirstPost);
+        $commentTwo->comment = 'none';
+        $commentTwo->save();
+
+        $task = new Task();
+        $task->name = 'test';
+        $task->user()->associate($secondUser);
+        $task->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            users(
+                where: {
+                    HAS: {
+                        relation: "posts.comments"
+                        condition: {
+                           HAS: {
+                               relation: "user.posts.comments"
+                               condition: {
+                                   HAS: {
+                                       relation: "post.user.tasks"
+                                   }
+                               }
+                           }
+                        }
+                    }
+                }
+            ) {
+                id
+            }
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => (string) $fourthUser->getKey(),
+                    ],
+                ],
+            ],
+        ]);
+    }
+
     public function testRejectsInvalidColumnName(): void
     {
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 where: {
                     AND: [
                         {
-                            column: "Robert\'); DROP TABLE Students;--"
+                            column: "Robert'); DROP TABLE Students;--"
                             value: "https://xkcd.com/327/"
                         }
                     ]
@@ -350,52 +974,19 @@ class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertJsonFragment([
-            'message' => WhereConditionsDirective::invalidColumnName("Robert'); DROP TABLE Students;--"),
-        ]);
+        GRAPHQL)->assertGraphQLErrorMessage(WhereConditionsHandler::invalidColumnName("Robert'); DROP TABLE Students;--"));
     }
 
-    public function testQueriesEmptyStrings(): void
+    public function testQueryForNull(): void
     {
         factory(User::class, 3)->create();
 
-        $userNamedEmptyString = factory(User::class)->create([
-            'name' => '',
-        ]);
+        $userNamedNull = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $userNamedNull);
+        $userNamedNull->name = null;
+        $userNamedNull->save();
 
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            users(
-                where: {
-                    column: "name"
-                    value: ""
-                }
-            ) {
-                id
-                name
-            }
-        }
-        ')->assertJson([
-            'data' => [
-                'users' => [
-                    [
-                        'id' => $userNamedEmptyString->id,
-                        'name' => $userNamedEmptyString->name,
-                    ],
-                ],
-            ],
-        ]);
-    }
-
-    public function testCanQueryForNull(): void
-    {
-        factory(User::class, 3)->create();
-
-        $userNamedNull = factory(User::class)->create([
-            'name' => null,
-        ]);
-
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 where: {
@@ -407,7 +998,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'users' => [
                     [
@@ -421,7 +1012,7 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testRequiresAValueForAColumn(): void
     {
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 where: {
@@ -431,79 +1022,76 @@ class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertJsonFragment([
-            'message' => SQLOperator::missingValueForColumn('no_value'),
-        ]);
+        GRAPHQL)->assertGraphQLError(SQLOperator::missingValueForColumn('no_value'));
     }
 
     public function testOnlyAllowsWhitelistedColumns(): void
     {
-        factory(User::class)->create();
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
 
-        $this->graphQL(/** @lang GraphQL */ '
-        {
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        query ($id: Mixed!) {
             whitelistedColumns(
                 where: {
                     column: ID
-                    value: 1
+                    value: $id
                 }
             ) {
                 id
             }
         }
-        ')->assertJson([
+        GRAPHQL, [
+            'id' => $user->id,
+        ])->assertExactJson([
             'data' => [
                 'whitelistedColumns' => [
                     [
-                        'id' => 1,
+                        'id' => "{$user->id}",
                     ],
                 ],
             ],
         ]);
 
-        $expectedEnumName = 'WhitelistedColumnsWhereColumn';
+        $expectedEnumName = 'QueryWhitelistedColumnsWhereColumn';
         $enum = $this->introspectType($expectedEnumName);
 
-        $this->assertNotNull($enum);
-        /** @var array<string, mixed> $enum */
-        $this->assertArraySubset(
-            [
-                'kind' => 'ENUM',
-                'name' => $expectedEnumName,
-                'description' => 'Allowed column names for the `where` argument on the query `whitelistedColumns`.',
-                'enumValues' => [
-                    [
-                        'name' => 'ID',
-                    ],
-                    [
-                        'name' => 'CAMEL_CASE',
-                    ],
-                ],
-            ],
-            $enum
-        );
+        $this->assertIsArray($enum);
+        $this->assertSame(TypeKind::ENUM, $enum['kind']);
+        $this->assertSame($expectedEnumName, $enum['name']);
+        $this->assertSame('Allowed column names for Query.whitelistedColumns.where.', $enum['description']);
+
+        $enumValues = $enum['enumValues'];
+        $this->assertCount(2, $enumValues);
+
+        [$idValue, $camelCaseValue] = $enumValues;
+        $this->assertSame('ID', $idValue['name']);
+        $this->assertSame('CAMEL_CASE', $camelCaseValue['name']);
     }
 
-    public function testCanUseColumnEnumsArg(): void
+    public function testUseColumnEnumsArg(): void
     {
-        factory(User::class)->create();
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
 
-        $this->graphQL(/** @lang GraphQL */ '
-        {
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        query ($id: Mixed!) {
             enumColumns(
                 where: {
                     column: ID
-                    value: 1
+                    value: $id
                 }
             ) {
                 id
             }
         }
-        ')->assertJson([
+        GRAPHQL, [
+            'id' => $user->id,
+        ])->assertExactJson([
             'data' => [
                 'enumColumns' => [
                     [
-                        'id' => 1,
+                        'id' => "{$user->id}",
                     ],
                 ],
             ],
@@ -512,9 +1100,10 @@ class WhereConditionsDirectiveTest extends DBTestCase
 
     public function testIgnoreNullCondition(): void
     {
-        factory(User::class)->create();
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             users(
                 where: null
@@ -522,14 +1111,276 @@ class WhereConditionsDirectiveTest extends DBTestCase
                 id
             }
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'users' => [
                     [
-                        'id' => '1',
+                        'id' => "{$user->id}",
                     ],
                 ],
             ],
         ]);
+    }
+
+    public function testWhereConditionOnJSONColumn(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        type Location {
+            id: Int!
+        }
+
+        type Query {
+            locations(where: _ @whereConditions): [Location!]! @all
+        }
+        GRAPHQL;
+
+        $location = factory(Location::class)->make();
+        $this->assertInstanceOf(Location::class, $location);
+        $location->extra = [
+            'value' => 'exampleValue',
+        ];
+        $location->save();
+
+        factory(Location::class)->create();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            locations(
+                where: {
+                    column: "extra->value",
+                    value: "exampleValue"
+                }
+            ) {
+                id
+            }
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'locations' => [
+                    [
+                        'id' => $location->id,
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testHandler(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<GRAPHQL
+        type User {
+            id: ID!
+        }
+
+        type Query {
+            users(where: _ @whereConditions(
+                columns: ["name"],
+                handler: "{$this->qualifyTestResolver('valueTwiceHandler')}")
+            ): [User!]! @all
+        }
+        GRAPHQL;
+
+        $user1 = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $user1);
+        $user1->name = 'foo';
+        $user1->save();
+
+        $user2 = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $user2);
+        $user2->name = 'foofoo';
+        $user2->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            users(
+                where: {
+                    column: NAME,
+                    value: "foo"
+                }
+            ) {
+                id
+            }
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => "{$user2->id}",
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testWhereHasConditionsColumnDefaultsToString(): void
+    {
+        $user1 = factory(User::class)->create();
+
+        $post1 = factory(Post::class)->make();
+        $post1->title = 'Miss';
+        $post1->user()->associate($user1);
+        $post1->save();
+
+        $user2 = factory(User::class)->create();
+
+        $post2 = factory(Post::class)->make();
+        $post2->title = 'Hit';
+        $post2->user()->associate($user2);
+        $post2->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            enumColumns(
+                where: {
+                    HAS: {
+                        relation: "posts"
+                        condition: {
+                            column: "title"
+                            value: "Hit"
+                        }
+                    }
+                }
+            ) {
+                id
+            }
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'enumColumns' => [
+                    [
+                        'id' => "{$user2->id}",
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testWhereHasConditionsWithNestedHas(): void
+    {
+        $user1 = factory(User::class)->create();
+
+        $post1 = factory(Post::class)->make();
+        $post1->user()->associate($user1);
+        $post1->save();
+
+        $comment1 = factory(Comment::class)->make();
+        $comment1->comment = 'Miss';
+        $comment1->user()->associate($user1);
+        $comment1->post()->associate($post1);
+        $comment1->save();
+
+        $user2 = factory(User::class)->create();
+
+        $post2 = factory(Post::class)->make();
+        $post2->user()->associate($user2);
+        $post2->save();
+
+        $comment2 = factory(Comment::class)->make();
+        $comment2->comment = 'Hit';
+        $comment2->user()->associate($user2);
+        $comment2->post()->associate($post2);
+        $comment2->save();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            enumColumns(
+                where: {
+                    HAS: {
+                        relation: "posts"
+                        condition: {
+                            HAS: {
+                                relation: "comments"
+                                condition: {
+                                    column: "comment"
+                                    value: "Hit"
+                                }
+                            }
+                        }
+                    }
+                }
+            ) {
+                id
+            }
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'enumColumns' => [
+                    [
+                        'id' => "{$user2->id}",
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testWhereHasConditionsWithAndOr(): void
+    {
+        $user1 = factory(User::class)->create();
+
+        $post1 = factory(Post::class)->make();
+        $post1->title = 'First';
+        $post1->body = 'Alpha';
+        $post1->user()->associate($user1);
+        $post1->save();
+
+        $user2 = factory(User::class)->create();
+
+        $post2 = factory(Post::class)->make();
+        $post2->title = 'Second';
+        $post2->body = 'Beta';
+        $post2->user()->associate($user2);
+        $post2->save();
+
+        $user3 = factory(User::class)->create();
+
+        $post3 = factory(Post::class)->make();
+        $post3->title = 'Third';
+        $post3->body = 'Alpha';
+        $post3->user()->associate($user3);
+        $post3->save();
+
+        // Find users with posts where (title = 'First' OR title = 'Second') AND body = 'Alpha'
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            enumColumns(
+                where: {
+                    HAS: {
+                        relation: "posts"
+                        condition: {
+                            AND: [
+                                {
+                                    OR: [
+                                        { column: "title", value: "First" }
+                                        { column: "title", value: "Second" }
+                                    ]
+                                }
+                                { column: "body", value: "Alpha" }
+                            ]
+                        }
+                    }
+                }
+            ) {
+                id
+            }
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'enumColumns' => [
+                    [
+                        'id' => "{$user1->id}",
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @param  \Illuminate\Database\Eloquent\Builder<\Tests\Utils\Models\User>  $builder
+     * @param  array<string, mixed>  $conditions
+     */
+    public static function valueTwiceHandler(EloquentBuilder $builder, array $conditions): void
+    {
+        $value = $conditions['value'];
+        $builder->where($conditions['column'], $value . $value);
     }
 }

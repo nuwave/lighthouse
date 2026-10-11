@@ -1,15 +1,15 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Nuwave\Lighthouse\Execution\Arguments\SaveModel;
 
-class CreateDirective extends MutationExecutorDirective
+class CreateDirective extends OneModelMutationDirective
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Create a new Eloquent model with the given arguments.
 """
@@ -27,7 +27,7 @@ directive @create(
   """
   relation: String
 ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
     protected function makeExecutionFunction(?Relation $parentRelation = null): callable

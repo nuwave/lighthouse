@@ -1,49 +1,31 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
-use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
 class NestedOneToMany implements ArgResolver
 {
-    /**
-     * @var string
-     */
-    private $relationName;
-
-    public function __construct(string $relationName)
-    {
-        $this->relationName = $relationName;
-    }
+    public function __construct(
+        protected string $relationName,
+    ) {}
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  ArgumentSet  $args
      */
-    public function __invoke($parent, $args): void
+    public function __invoke($model, $args): void
     {
-        /** @var \Illuminate\Database\Eloquent\Relations\HasMany|\Illuminate\Database\Eloquent\Relations\MorphMany $relation */
-        $relation = $parent->{$this->relationName}();
+        $relation = $model->{$this->relationName}();
+        assert($relation instanceof HasMany || $relation instanceof MorphMany);
 
-        static::createUpdateUpsert($args, $relation);
-
-        if ($args->has('delete')) {
-            $relation->getRelated()::destroy(
-                $args->arguments['delete']->toPlain()
-            );
-        }
-    }
-
-    /**
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
-     */
-    public static function createUpdateUpsert(ArgumentSet $args, Relation $relation): void
-    {
         if ($args->has('create')) {
             $saveModel = new ResolveNested(new SaveModel($relation));
 
             foreach ($args->arguments['create']->value as $childArgs) {
+                // @phpstan-ignore-next-line Relation&Builder mixin not recognized
                 $saveModel($relation->make(), $childArgs);
             }
         }
@@ -52,6 +34,7 @@ class NestedOneToMany implements ArgResolver
             $updateModel = new ResolveNested(new UpdateModel(new SaveModel($relation)));
 
             foreach ($args->arguments['update']->value as $childArgs) {
+                // @phpstan-ignore-next-line Relation&Builder mixin not recognized
                 $updateModel($relation->make(), $childArgs);
             }
         }
@@ -60,8 +43,40 @@ class NestedOneToMany implements ArgResolver
             $upsertModel = new ResolveNested(new UpsertModel(new SaveModel($relation)));
 
             foreach ($args->arguments['upsert']->value as $childArgs) {
+                // @phpstan-ignore-next-line Relation&Builder mixin not recognized
                 $upsertModel($relation->make(), $childArgs);
             }
+        }
+
+        if ($args->has('connect')) {
+            $children = $relation
+                ->make()
+                ->whereIn(
+                    $relation->make()->getKeyName(),
+                    $args->arguments['connect']->value,
+                )
+                ->get();
+            $relation->saveMany($children);
+        }
+
+        if ($args->has('disconnect')) {
+            $children = $relation
+                ->make()
+                ->whereIn(
+                    $relation->make()->getKeyName(),
+                    $args->arguments['disconnect']->value,
+                )
+                ->get();
+            foreach ($children as $child) {
+                $child->setAttribute($relation->getForeignKeyName(), null);
+                $child->save();
+            }
+        }
+
+        if ($args->has('delete')) {
+            $relation->getRelated()::destroy(
+                $args->arguments['delete']->toPlain(),
+            );
         }
     }
 }

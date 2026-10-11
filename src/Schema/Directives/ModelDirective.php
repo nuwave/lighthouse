@@ -1,18 +1,39 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-class ModelDirective extends NodeDirective
+use GraphQL\Language\AST\Node;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+
+class ModelDirective extends BaseDirective
 {
+    public const NAME = 'model';
+
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Enable fetching an Eloquent model by its global id through the `node` query.
+Map a model class to an object type.
 
-@deprecated(reason: "Use @node instead. This directive will be repurposed and do what @modelClass does now in v5.")
+This can be used when the name of the model differs from the name of the type.
 """
-directive @model on OBJECT
-SDL;
+directive @model(
+  """
+  The class name of the corresponding model.
+  """
+  class: String!
+) on OBJECT
+GRAPHQL;
+    }
+
+    /** Attempt to get the model class name from this directive. */
+    public static function modelClass(Node $node): ?string
+    {
+        $modelDirective = ASTHelper::directiveDefinition($node, self::NAME);
+        if ($modelDirective !== null) {
+            return ASTHelper::directiveArgValue($modelDirective, 'class');
+        }
+
+        return null;
     }
 }

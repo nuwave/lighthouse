@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Utils\Models;
 
@@ -7,22 +7,32 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
+ * Primary key.
+ *
  * @property int $id
- * @property int|null $acl_id
+ *
+ * Attributes
  * @property string $name
+ *
+ * Foreign keys
+ * @property int|null $acl_id
+ *
+ * Relations
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Tests\Utils\Models\User> $users
+ * @property-read \Tests\Utils\Models\ACL|null $acl
  */
-class Role extends Model
+final class Role extends Model
 {
-    /** @var bool */
     public $timestamps = false;
 
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Tests\Utils\Models\User, $this, \Illuminate\Database\Eloquent\Relations\Pivot> */
     public function users(): BelongsToMany
     {
-        return $this
-            ->belongsToMany(User::class)
-            ->withPivot(['meta']);
+        return $this->belongsToMany(User::class)
+            ->withPivot('meta');
     }
 
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Tests\Utils\Models\ACL, $this> */
     public function acl(): BelongsTo
     {
         return $this->belongsTo(ACL::class);

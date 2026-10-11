@@ -1,21 +1,15 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Utils\Mutations;
 
-use Exception;
 use Illuminate\Http\UploadedFile;
 
-class Upload
+final class Upload
 {
-    /**
-     * Return a value for the field.
-     *
-     * @param  mixed[]  $args
-     *
-     * @throws Exception
-     */
-    public function resolve($root, array $args): bool
+    /** @param  array<string, mixed>  $args */
+    public function __invoke(mixed $root, array $args): bool
     {
-        return $args['file'] instanceof UploadedFile;
+        return isset($args['file'])
+            && $args['file'] instanceof UploadedFile;
     }
 }

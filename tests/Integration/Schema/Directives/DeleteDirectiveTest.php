@@ -1,39 +1,44 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Schema\Directives;
 
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Schema\Directives\ModifyModelExistenceDirective;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class DeleteDirectiveTest extends DBTestCase
+final class DeleteDirectiveTest extends DBTestCase
 {
     public function testDeletesUserAndReturnsIt(): void
     {
-        factory(User::class)->create();
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
 
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
         }
 
         type Mutation {
-            deleteUser(id: ID!): User @delete
+            deleteUser(id: ID! @whereKey): User @delete
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL('
-        mutation {
-            deleteUser(id: 1) {
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($id: ID!) {
+            deleteUser(id: $id) {
                 id
             }
         }
-        ')->assertJson([
+        GRAPHQL, [
+            'id' => $user->id,
+        ])->assertJson([
             'data' => [
                 'deleteUser' => [
-                    'id' => 1,
+                    'id' => "{$user->id}",
                 ],
             ],
         ]);
@@ -41,134 +46,311 @@ class DeleteDirectiveTest extends DBTestCase
         $this->assertCount(0, User::all());
     }
 
-    public function testDeletesMultipleUsersAndReturnsThem(): void
+    public function testDeleteNotFound(): void
     {
-        factory(User::class, 2)->create();
-
-        $this->schema .= '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
-            name: String
         }
 
         type Mutation {
-            deleteUsers(id: [ID!]!): [User!]! @delete
+            deleteUser(id: ID! @whereKey): User @delete
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
-            deleteUsers(id: [1, 2]) {
-                name
+            deleteUser(id: "non-existing") {
+                id
             }
         }
-        ')->assertJsonCount(2, 'data.deleteUsers');
+        GRAPHQL)->assertJson([
+            'data' => [
+                'deleteUser' => null,
+            ],
+        ]);
+    }
+
+    public function testDeletesMultipleUsersByIDAndReturnsThem(): void
+    {
+        $users = factory(User::class, 2)->create();
+        $this->assertInstanceOf(EloquentCollection::class, $users);
+
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type User {
+            id: ID!
+        }
+
+        type Mutation {
+            deleteUsers(ids: [ID!]! @whereKey): [User!]! @delete
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($ids: [ID!]!) {
+            deleteUsers(ids: $ids) {
+                id
+            }
+        }
+        GRAPHQL, [
+            'ids' => $users->pluck('id'),
+        ])->assertJsonCount(2, 'data.deleteUsers');
 
         $this->assertCount(0, User::all());
     }
 
-    public function testRejectsDefinitionWithNullableArgument(): void
+    public function testDeleteByNonPrimaryKey(): void
     {
-        $this->expectException(DefinitionException::class);
+        $foo = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $foo);
+        $foo->name = 'foo';
+        $foo->save();
 
-        $this->buildSchema(/** @lang GraphQL */ '
+        $bar = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $bar);
+        $bar->name = 'bar';
+        $bar->save();
+
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type User {
             id: ID!
-            name: String
         }
 
-        type Query {
+        type Mutation {
+            deleteUsers(name: String! @eq): [User!]! @delete
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($name: String!) {
+            deleteUsers(name: $name) {
+                id
+            }
+        }
+        GRAPHQL, [
+            'name' => $foo->name,
+        ])->assertJson([
+            'data' => [
+                'deleteUsers' => [
+                    [
+                        'id' => $foo->id,
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertCount(1, User::all());
+    }
+
+    public function testDeleteWithScopes(): void
+    {
+        $named = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $named);
+        $named->name = 'foo';
+        $named->save();
+
+        $unnamed = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $unnamed);
+        $unnamed->name = null;
+        $unnamed->save();
+
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type User {
+            id: ID!
+        }
+
+        type Mutation {
+            deleteUser(id: ID! @whereKey): User @delete(scopes: ["named"])
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($id: ID!) {
+            deleteUser(id: $id) {
+                id
+            }
+        }
+        GRAPHQL, [
+            'id' => $named->id,
+        ])->assertJson([
+            'data' => [
+                'deleteUser' => [
+                    'id' => $named->id,
+                ],
+            ],
+        ]);
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($id: ID!) {
+            deleteUser(id: $id) {
+                id
+            }
+        }
+        GRAPHQL, [
+            'id' => $unnamed->id,
+        ])->assertJson([
+            'data' => [
+                'deleteUser' => null,
+            ],
+        ]);
+    }
+
+    public function testDeletesMultipleNonExisting(): void
+    {
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type User {
+            id: ID!
+        }
+
+        type Mutation {
+            deleteUsers(ids: [ID!]! @whereKey): [User!]! @delete
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            deleteUsers(ids: ["non-existing"]) {
+                id
+            }
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'deleteUsers' => [],
+            ],
+        ]);
+    }
+
+    public function testDeletesMultipleEmptyInput(): void
+    {
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type User {
+            id: ID!
+        }
+
+        type Mutation {
+            deleteUsers(ids: [ID!]! @whereKey): [User!]! @delete
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            deleteUsers(ids: []) {
+                id
+            }
+        }
+        GRAPHQL)->assertExactJson([
+            'data' => [
+                'deleteUsers' => [],
+            ],
+        ]);
+    }
+
+    public function testDeleteRequiresAtLeastOneArgument(): void
+    {
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type User {
+            id: ID!
+        }
+
+        type Mutation {
+            deleteUser(id: ID @whereKey, email: String @eq): User @delete
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            deleteUser {
+                id
+            }
+        }
+        GRAPHQL)->assertGraphQLError(ModifyModelExistenceDirective::wouldModifyAll());
+    }
+
+    public function testDoesNotAcceptArgumentWithoutArgBuilderDirective(): void
+    {
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type User {
+            id: ID!
+        }
+
+        type Mutation {
             deleteUser(id: ID): User @delete
         }
-        ');
-    }
+        GRAPHQL;
 
-    public function testRejectsDefinitionWithNoArgument(): void
-    {
-        $this->expectException(DefinitionException::class);
-
-        $this->buildSchema(/** @lang GraphQL */ '
-        type User {
-            id: ID!
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            deleteUser(id: 1) {
+                id
+            }
         }
-
-        type Query {
-            deleteUser: User @delete
-        }
-        ');
-    }
-
-    public function testRejectsDefinitionWithMultipleArguments(): void
-    {
-        $this->expectException(DefinitionException::class);
-
-        $this->buildSchema(/** @lang GraphQL */ '
-        type User {
-            id: ID!
-        }
-
-        type Query {
-            deleteUser(foo: String, bar: Int): User @delete
-        }
-        ');
+        GRAPHQL)->assertGraphQLError(ModifyModelExistenceDirective::wouldModifyAll());
     }
 
     public function testRequiresRelationWhenUsingAsArgResolver(): void
     {
         $this->expectException(DefinitionException::class);
 
-        $this->buildSchema(/** @lang GraphQL */ '
-        type Query {
+        $this->buildSchema(/** @lang GraphQL */ <<<'GRAPHQL'
+        type Mutation {
             updateUser(deleteTasks: Tasks @delete): User @update
         }
 
         type User {
             id: ID!
         }
-        ');
+        GRAPHQL . self::PLACEHOLDER_QUERY);
     }
 
     public function testUseNestedArgResolverDelete(): void
     {
-        factory(User::class)->create();
-        factory(Task::class, 2)->create([
-            'user_id' => 1,
-        ]);
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
 
-        $this->schema = /** @lang GraphQL */ '
-        type Query {
+        $tasks = factory(Task::class, 2)->make();
+        foreach ($tasks as $task) {
+            $this->assertInstanceOf(Task::class, $task);
+            $task->user()->associate($user);
+            $task->save();
+        }
+
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Mutation {
             updateUser(
-                id: Int
-                deleteTasks: [Int!]! @delete(relation: "tasks")
+                id: ID
+                deleteTasks: [ID!]! @delete(relation: "tasks")
             ): User @update
         }
 
         type User {
-            id: Int!
+            id: ID!
             tasks: [Task!]!
         }
 
         type Task {
-            id: Int
+            id: ID!
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            updateUser(id: 1, deleteTasks: [2]) {
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($id: ID!, $deleteTasks: [ID!]!) {
+            updateUser(id: $id, deleteTasks: $deleteTasks) {
                 id
                 tasks {
                     id
                 }
             }
         }
-        ')->assertExactJson([
+        GRAPHQL, [
+            'id' => $user->id,
+            'deleteTasks' => [$tasks[1]->id],
+        ])->assertExactJson([
             'data' => [
                 'updateUser' => [
-                    'id' => 1,
+                    'id' => "{$user->id}",
                     'tasks' => [
                         [
-                            'id' => 1,
+                            'id' => "{$tasks[0]->id}",
                         ],
                     ],
                 ],
@@ -178,116 +360,154 @@ class DeleteDirectiveTest extends DBTestCase
 
     public function testDeleteHasOneThroughNestedArgResolver(): void
     {
-        /** @var \Tests\Utils\Models\Task $task */
         $task = factory(Task::class)->create();
-        $task->post()->save(
-            factory(Post::class)->make()
-        );
+        $this->assertInstanceOf(Task::class, $task);
 
-        $this->schema = /** @lang GraphQL */ '
-        type Query {
+        $post = factory(Post::class)->make();
+        $this->assertInstanceOf(Post::class, $post);
+        $post->task()->associate($task);
+        $post->save();
+
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Mutation {
             updateTask(
-                id: Int
+                id: ID
                 deletePost: Boolean @delete(relation: "post")
             ): Task @update
         }
 
         type Task {
-            id: Int!
+            id: ID!
             post: Post
         }
 
         type Post {
-            id: Int!
+            id: ID!
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            updateTask(id: 1, deletePost: false) {
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($id: ID!) {
+            updateTask(id: $id, deletePost: false) {
                 id
                 post {
                     id
                 }
             }
         }
-        ')->assertExactJson([
+        GRAPHQL, [
+            'id' => $task->id,
+        ])->assertExactJson([
             'data' => [
                 'updateTask' => [
-                    'id' => 1,
+                    'id' => "{$task->id}",
                     'post' => [
-                        'id' => 1,
+                        'id' => "{$post->id}",
                     ],
                 ],
             ],
         ]);
 
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            updateTask(id: 1, deletePost: true) {
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($id: ID!) {
+            updateTask(id: $id, deletePost: true) {
                 id
                 post {
                     id
                 }
             }
         }
-        ')->assertExactJson([
+        GRAPHQL, [
+            'id' => $task->id,
+        ])->assertExactJson([
             'data' => [
                 'updateTask' => [
-                    'id' => 1,
+                    'id' => "{$task->id}",
                     'post' => null,
                 ],
             ],
         ]);
 
-        $this->assertNull(Post::find(1));
+        $this->assertNull(Post::find($post->id));
     }
 
     public function testDeleteBelongsToThroughNestedArgResolver(): void
     {
-        factory(User::class)->create();
-        $task = factory(Task::class)->create([
-            'user_id' => 1,
-        ]);
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
 
-        $this->schema = /** @lang GraphQL */ '
-        type Query {
+        $task = factory(Task::class)->make();
+        $this->assertInstanceOf(Task::class, $task);
+        $task->user()->associate($user);
+        $task->save();
+
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type Mutation {
             updateTask(
-                id: Int
+                id: ID!
                 deleteUser: Boolean @delete(relation: "user")
-            ): Task @update
+            ): Task! @update
         }
 
         type Task {
-            id: Int!
+            id: ID!
             user: User
         }
 
         type User {
-            id: Int!
+            id: ID!
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
-        {
-            updateTask(id: 1, deleteUser: true) {
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($id: ID!) {
+            updateTask(id: $id, deleteUser: true) {
                 id
                 user {
                     id
                 }
             }
         }
-        ')->assertExactJson([
+        GRAPHQL, [
+            'id' => $task->id,
+        ])->assertExactJson([
             'data' => [
                 'updateTask' => [
-                    'id' => 1,
+                    'id' => "{$task->id}",
                     'user' => null,
                 ],
             ],
         ]);
 
-        $this->assertNull(
-            $task->refresh()->user_id
-        );
+        $this->assertNull($task->refresh()->user_id);
+        $this->assertNull(User::find($user->id));
+    }
+
+    public function testDeletingReturnsFalseTriggersException(): void
+    {
+        User::deleting(static fn (): bool => false);
+
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
+
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
+        type User {
+            id: ID!
+        }
+
+        type Mutation {
+            deleteUser(id: ID! @whereKey): User @delete
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation ($id: ID!) {
+            deleteUser(id: $id) {
+                id
+            }
+        }
+        GRAPHQL, [
+            'id' => $user->id,
+        ])->assertGraphQLError(ModifyModelExistenceDirective::couldNotModify($user));
     }
 }

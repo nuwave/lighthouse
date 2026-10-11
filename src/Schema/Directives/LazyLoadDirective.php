@@ -1,59 +1,53 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Closure;
-use GraphQL\Deferred;
-use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Database\Eloquent\Collection;
+use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Pagination\AbstractPaginator;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
+use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class LazyLoadDirective extends BaseDirective implements DefinedDirective, FieldMiddleware
+class LazyLoadDirective extends BaseDirective implements FieldMiddleware, FieldManipulator
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Perform a [lazy eager load](https://laravel.com/docs/eloquent-relationships#lazy-eager-loading)
 on the relations of a list of models.
 """
 directive @lazyLoad(
-    """
-    The names of the relationship methods to load.
-    """
-    relations: [String!]!
-) on FIELD_DEFINITION
-SDL;
+  """
+  The names of the relationship methods to load.
+  """
+  relations: [String!]!
+) repeatable on FIELD_DEFINITION
+GRAPHQL;
     }
 
-    /**
-     * Resolve the field directive.
-     */
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue): void
     {
-        $relations = $this->directiveArgValue('relations', []);
-        $resolver = $fieldValue->getResolver();
+        $relations = $this->directiveArgValue('relations');
 
-        return $next(
-            $fieldValue->setResolver(
-                function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $relations) {
-                    /** @var \GraphQL\Deferred|\Illuminate\Database\Eloquent\Model $result */
-                    $result = $resolver($root, $args, $context, $resolveInfo);
+        $fieldValue->resultHandler(static function (EloquentCollection|AbstractPaginator $items) use ($relations): EloquentCollection|AbstractPaginator {
+            // @phpstan-ignore-next-line AbstractPaginator forwards calls to EloquentCollection
+            $items->load($relations);
 
-                    $result instanceof Deferred
-                        ? $result->then(function (Collection &$items) use ($relations): Collection {
-                            $items->load($relations);
+            return $items;
+        });
+    }
 
-                            return $items;
-                        })
-                        : $result->load($relations);
-
-                    return $result;
-                }
-            )
-        );
+    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType): void
+    {
+        $relations = $this->directiveArgValue('relations');
+        if (! is_array($relations) || $relations === []) {
+            throw new DefinitionException("Must specify non-empty list of relations in `@{$this->name()}` directive on `{$parentType->name->value}.{$fieldDefinition->name->value}`.");
+        }
     }
 }

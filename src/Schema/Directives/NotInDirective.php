@@ -1,39 +1,39 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class NotInDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
+class NotInDirective extends BaseDirective implements ArgBuilderDirective
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
-Filter a column by an array using a `whereNotIn` clause.
+Use the client given value to add a NOT IN conditional to a database query.
 """
 directive @notIn(
   """
-  Specify the name of the column.
-  Only required if it differs from the name of the argument.
+  Specify the database column to compare.
+  Only required if database column has a different name than the attribute in your schema.
   """
   key: String
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-SDL;
+) repeatable on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+GRAPHQL;
     }
 
-    /**
-     * Apply a simple "WHERE NOT IN $values" clause.
-     *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
-     */
-    public function handleBuilder($builder, $values)
+    public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, $value): QueryBuilder|EloquentBuilder|Relation
     {
+        if ($value === null) {
+            return $builder;
+        }
+
         return $builder->whereNotIn(
             $this->directiveArgValue('key', $this->nodeName()),
-            $values
+            $value,
         );
     }
 }

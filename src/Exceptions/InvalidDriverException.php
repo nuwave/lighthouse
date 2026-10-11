@@ -1,10 +1,5 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Exceptions;
 
-use Exception;
-
-class InvalidDriverException extends Exception
-{
-    //
-}
+class InvalidDriverException extends \Exception {}

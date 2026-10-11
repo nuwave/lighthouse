@@ -1,21 +1,16 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use GraphQL\Type\Definition\ResolveInfo;
+use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class MethodDirective extends BaseDirective implements FieldResolver, DefinedDirective
+class MethodDirective extends BaseDirective implements FieldResolver
 {
-    /** @var \GraphQL\Language\AST\FieldDefinitionNode */
-    protected $definitionNode;
-
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Resolve a field by calling a method on the parent object.
 
@@ -28,43 +23,23 @@ directive @method(
   Defaults to the name of the field if not given.
   """
   name: String
-
-  """
-  Pass the field arguments to the method, using the argument definition
-  order from the schema to sort them before passing them along.
-
-  @deprecated This behaviour will default to true in v5 and this setting will be removed.
-  """
-  passOrdered: Boolean = false
 ) on FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
-    /**
-     * Resolve the field directive.
-     */
-    public function resolveField(FieldValue $fieldValue): FieldValue
+    public function resolveField(FieldValue $fieldValue): callable
     {
-        return $fieldValue->setResolver(
-            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
-                /** @var string $method */
-                $method = $this->directiveArgValue(
-                    'name',
-                    $this->nodeName()
-                );
+        return function (mixed $root, array $args) {
+            $method = $this->directiveArgValue('name', $this->nodeName());
+            assert(is_string($method));
 
-                // TODO always do this in v5
-                if ($this->directiveArgValue('passOrdered')) {
-                    $orderedArgs = [];
-                    foreach ($this->definitionNode->arguments as $argDefinition) {
-                        $orderedArgs [] = $args[$argDefinition->name->value] ?? null;
-                    }
-
-                    return $root->{$method}(...$orderedArgs);
-                }
-
-                return $root->{$method}($root, $args, $context, $resolveInfo);
+            $orderedArgs = [];
+            assert($this->definitionNode instanceof FieldDefinitionNode);
+            foreach ($this->definitionNode->arguments as $argDefinition) {
+                $orderedArgs[] = $args[$argDefinition->name->value] ?? null;
             }
-        );
+
+            return $root->{$method}(...$orderedArgs);
+        };
     }
 }

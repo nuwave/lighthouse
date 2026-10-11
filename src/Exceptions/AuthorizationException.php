@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Exceptions;
 
@@ -7,30 +7,15 @@ use Illuminate\Auth\Access\AuthorizationException as IlluminateAuthorizationExce
 
 class AuthorizationException extends IlluminateAuthorizationException implements ClientAware
 {
-    /**
-     * @var string
-     */
-    public const CATEGORY = 'authorization';
+    public const MESSAGE = 'This action is unauthorized.';
 
-    /**
-     * Returns true when exception message is safe to be displayed to a client.
-     *
-     * @api
-     */
     public function isClientSafe(): bool
     {
         return true;
     }
 
-    /**
-     * Returns string describing a category of the error.
-     *
-     * Value "graphql" is reserved for errors produced by query parsing or validation, do not use it.
-     *
-     * @api
-     */
-    public function getCategory(): string
+    public static function fromLaravel(IlluminateAuthorizationException $laravelException): self
     {
-        return self::CATEGORY;
+        return new static($laravelException->getMessage(), $laravelException->getCode());
     }
 }

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Schema\Directives;
 
@@ -8,89 +8,181 @@ use Tests\Utils\Models\Tag;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class ScopeDirectiveTest extends DBTestCase
+final class ScopeDirectiveTest extends DBTestCase
 {
-    public function testCanApplyDirective(): void
+    public function testExplicitName(): void
     {
-        /** @var User $user */
-        $user = factory(User::class)->create();
+        factory(Task::class)->times(2)->create();
 
-        $user->tasks()->saveMany(
-            factory(Task::class)->times(2)->create()
-        );
-
-        /** @var Task $taskWithTag */
         $taskWithTag = factory(Task::class)->create();
-        $taskWithTag->tags()->save(
-            factory(Tag::class)->create(['name' => 'Lighthouse'])
-        );
-        $user->tasks()->save($taskWithTag);
+        $this->assertInstanceOf(Task::class, $taskWithTag);
 
-        $this->be($user);
+        $tag = factory(Tag::class)->create();
+        $this->assertInstanceOf(Tag::class, $tag);
 
-        $this->schema = /** @lang GraphQL */ '
-        type User {
-            tasks(tags: [String!] @scope(name: "whereTags")): [Task!]! @hasMany
+        $taskWithTag->tags()->attach($tag);
+
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Query {
+            tasks(tags: [String!] @scope(name: "whereTags")): [Task!]! @all
         }
 
         type Task {
             id: ID!
-            name: String!
-            tags: [Tag!]!
         }
+        GRAPHQL;
 
-        type Tag {
-            id: ID!
-            name: String!
-        }
-
-        type Query {
-            user: User @auth
-        }
-        ';
-
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
-            user {
-                tasks(tags: ["Lighthouse"]) {
-                    id
-                }
+            tasks {
+                id
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJsonCount(3, 'data.tasks');
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        query ($tags: [String!]!) {
+            tasks(tags: $tags) {
+                id
+            }
+        }
+        GRAPHQL, [
+            'tags' => [$tag->name],
+        ])->assertExactJson([
             'data' => [
-                'user' => [
-                    'tasks' => [
-                        [
-                            'id' => $taskWithTag->getKey(),
-                        ],
+                'tasks' => [
+                    [
+                        'id' => "{$taskWithTag->id}",
                     ],
                 ],
             ],
         ]);
     }
 
-    public function testCanThrowExceptionOnInvalidScope(): void
+    public function testDefaultsScopeToEqualArgumentName(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        factory(Task::class)->times(2)->create();
+
+        $taskWithTag = factory(Task::class)->create();
+        $this->assertInstanceOf(Task::class, $taskWithTag);
+
+        $tag = factory(Tag::class)->create();
+        $this->assertInstanceOf(Tag::class, $tag);
+
+        $taskWithTag->tags()->save($tag);
+
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Query {
+            tasks(whereTags: [String!] @scope): [Task!]! @all
+        }
+
+        type Task {
+            id: ID!
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        query ($whereTags: [String!]!) {
+            tasks(whereTags: $whereTags) {
+                id
+            }
+        }
+        GRAPHQL, [
+            'whereTags' => [$tag->name],
+        ])->assertExactJson([
+            'data' => [
+                'tasks' => [
+                    [
+                        'id' => "{$taskWithTag->id}",
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testWorksWithCustomQueryBuilders(): void
+    {
+        $named = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $named);
+        $named->name = 'foo';
+        $named->save();
+
+        $unnamed = factory(User::class)->make();
+        $this->assertInstanceOf(User::class, $unnamed);
+        $unnamed->name = null;
+        $unnamed->save();
+
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Query {
+            users(named: Boolean @scope): [User!]! @all
+        }
+
+        type User {
+            id: ID!
+        }
+        GRAPHQL;
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        query ($named: Boolean) {
+            users(named: $named) {
+                id
+            }
+        }
+        GRAPHQL, [
+            'named' => true,
+        ])->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => "{$named->id}",
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        query {
+            users {
+                id
+            }
+        }
+        GRAPHQL, [
+            'named' => false,
+        ])->assertSimilarJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => "{$named->id}",
+                    ],
+                    [
+                        'id' => "{$unnamed->id}",
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testThrowExceptionOnInvalidScope(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             tasks(
                 name: String @scope(name: "nonExistantScope")
             ): [Task!]! @all
         }
-        
+
         type Task {
             id: ID
         }
-        ';
+        GRAPHQL;
 
         $this->expectException(DefinitionException::class);
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             tasks(name: "Lighthouse rocks") {
                 id
             }
         }
-        ');
+        GRAPHQL);
     }
 }

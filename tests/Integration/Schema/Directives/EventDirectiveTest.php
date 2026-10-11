@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Schema\Directives;
 
@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Event;
 use Tests\DBTestCase;
 use Tests\Integration\Schema\Directives\Fixtures\CompanyWasCreatedEvent;
 
-class EventDirectiveTest extends DBTestCase
+final class EventDirectiveTest extends DBTestCase
 {
     public function testDispatchesAnEvent(): void
     {
@@ -14,7 +14,7 @@ class EventDirectiveTest extends DBTestCase
             CompanyWasCreatedEvent::class,
         ]);
 
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Company {
             id: ID!
             name: String!
@@ -22,18 +22,18 @@ class EventDirectiveTest extends DBTestCase
 
         type Mutation {
             createCompany(name: String): Company @create
-                @event(dispatch: "Tests\\\\Integration\\\\Schema\\\\Directives\\\\Fixtures\\\\CompanyWasCreatedEvent")
+                @event(dispatch: "Tests\\Integration\\Schema\\Directives\\Fixtures\\CompanyWasCreatedEvent")
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createCompany(name: "foo") {
                 id
                 name
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'createCompany' => [
                     'id' => '1',
@@ -42,9 +42,7 @@ class EventDirectiveTest extends DBTestCase
             ],
         ]);
 
-        Event::assertDispatched(CompanyWasCreatedEvent::class, function ($event): bool {
-            return $event->company->id === 1
-                && $event->company->name === 'foo';
-        });
+        Event::assertDispatched(CompanyWasCreatedEvent::class, static fn ($event): bool => $event->company->id === 1
+            && $event->company->name === 'foo');
     }
 }

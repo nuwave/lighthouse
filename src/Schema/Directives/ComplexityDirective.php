@@ -1,19 +1,16 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Closure;
-use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
-use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\ComplexityResolverDirective;
 use Nuwave\Lighthouse\Support\Utils;
 
-class ComplexityDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
+class ComplexityDirective extends BaseDirective implements ComplexityResolverDirective
 {
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /** @lang GraphQL */ <<<'GRAPHQL'
 """
 Customize the calculation of a fields complexity score before execution.
 """
@@ -23,40 +20,40 @@ directive @complexity(
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
   If you pass only a class name, the method name defaults to `__invoke`.
   """
-  resolver: String
+  resolver: String!
 ) on FIELD_DEFINITION
-SDL;
+GRAPHQL;
     }
 
-    /**
-     * Resolve the field directive.
-     */
-    public function handleField(FieldValue $fieldFieldValue, Closure $next): FieldValue
+    public function complexityResolver(FieldValue $fieldValue): callable
     {
-        if ($this->directiveHasArgument('resolver')) {
-            [$className, $methodName] = $this->getMethodArgumentParts('resolver');
+        $resolver = $this->directiveArgValue('resolver');
+        assert(is_string($resolver));
 
-            $namespacedClassName = $this->namespaceClassName(
-                $className,
-                $fieldFieldValue->defaultNamespacesForParent()
-            );
+        [$className, $methodName] = $this->getMethodArgumentParts('resolver');
 
-            $resolver = Utils::constructResolver($namespacedClassName, $methodName);
-        } else {
-            $resolver = function (int $childrenComplexity, array $args): int {
-                /** @var int $complexity */
-                $complexity = Arr::get(
-                    $args,
-                    'first',
-                    Arr::get($args, config('lighthouse.pagination_amount_argument'), 1)
-                );
-
-                return $childrenComplexity * $complexity;
-            };
-        }
-
-        return $next(
-            $fieldFieldValue->setComplexity($resolver)
+        $namespacedClassName = $this->namespaceClassName(
+            $className,
+            $fieldValue->parentNamespaces(),
         );
+
+        return Utils::constructResolver($namespacedClassName, $methodName);
+    }
+
+    /** @param  array<string, mixed>  $args */
+    public static function defaultComplexityResolver(int $childrenComplexity, array $args): int
+    {
+        /** Assuming pagination, @see PaginationManipulator::countArgument(). */
+        $first = $args['first'] ?? null;
+
+        $expectedNumberOfChildren = is_int($first)
+            ? $first
+            : 1;
+
+        return
+            // Default complexity for this field itself
+            1
+            // Scale children complexity by the expected number of results
+            + $childrenComplexity * $expectedNumberOfChildren;
     }
 }

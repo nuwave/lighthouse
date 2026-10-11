@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Testing;
 
@@ -6,14 +6,9 @@ use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 
 class TestSchemaProvider implements SchemaSourceProvider
 {
-    /**
-     * @var string
-     */
-    protected $schema = '';
+    protected string $schema = '';
 
-    /**
-     * @param  string  $schema  May be changed after instantiation, so it is passed as a reference
-     */
+    /** @param  string  $schema  May be changed after instantiation, so it is passed as a reference */
     public function __construct(string &$schema)
     {
         $this->schema = &$schema;
@@ -22,15 +17,5 @@ class TestSchemaProvider implements SchemaSourceProvider
     public function getSchemaString(): string
     {
         return $this->schema;
-    }
-
-    /**
-     * Set schema root path.
-     *
-     * @return $this
-     */
-    public function setRootPath(string $path)
-    {
-        return $this;
     }
 }

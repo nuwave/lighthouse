@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Console;
 
@@ -17,6 +17,6 @@ class ScalarCommand extends LighthouseGeneratorCommand
 
     protected function getStub(): string
     {
-        return __DIR__.'/stubs/scalar.stub';
+        return __DIR__ . '/stubs/scalar.stub';
     }
 }

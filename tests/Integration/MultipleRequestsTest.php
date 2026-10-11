@@ -1,38 +1,36 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration;
 
 use Tests\TestCase;
 
-class MultipleRequestsTest extends TestCase
+final class MultipleRequestsTest extends TestCase
 {
-    public function testCanFireMultipleRequestsInOneTest(): void
+    public function testFireMultipleRequestsInOneTest(): void
     {
-        $this->mockResolver(function ($root, array $args): string {
-            return $args['this'];
-        });
+        $this->mockResolver(static fn ($_, array $args): string => $args['this']);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             return(this: String!): String @mock
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             return(this: "foo")
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'return' => 'foo',
             ],
         ]);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             return(this: "bar")
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'return' => 'bar',
             ],

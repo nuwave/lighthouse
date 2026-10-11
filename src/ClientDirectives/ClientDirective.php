@@ -1,42 +1,34 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\ClientDirectives;
 
 use GraphQL\Executor\Values;
 use GraphQL\Type\Definition\Directive;
-use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Container\Container;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\GraphQL;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
+use Nuwave\Lighthouse\Schema\SchemaBuilder;
 
 /**
- * Provides information about where client directives
- * were placed in the query and what arguments were given to them.
+ * Provides information about where client directives were placed in the query.
+ * It also provides the arguments given to them.
  *
- * TODO implement accessors for other locations http://spec.graphql.org/draft/#ExecutableDirectiveLocation
+ * TODO implement accessors for other locations https://spec.graphql.org/draft/#ExecutableDirectiveLocation
  */
 class ClientDirective
 {
-    /**
-     * @var string
-     */
-    protected $name;
+    protected Directive $definition;
 
-    /**
-     * @var \GraphQL\Type\Definition\Directive|null
-     */
-    private $definition;
-
-    public function __construct(string $name)
-    {
-        $this->name = $name;
-    }
+    public function __construct(
+        protected string $name,
+    ) {}
 
     /**
      * Get the given values for a client directive.
      *
      * This returns an array of the given arguments for all field nodes.
-     * The number of items in the returned result will always be equivalent
-     * to the number of field nodes, each having one of the following values:
+     * The number of items in the returned result is always equivalent to the number of field nodes.
+     * Each entry has one of the following values:
      * - When a field node does not have the directive on it: null
      * - When the directive is present but has no arguments: []
      * - When the directive is present with arguments: an associative array
@@ -49,34 +41,22 @@ class ClientDirective
 
         $arguments = [];
         foreach ($resolveInfo->fieldNodes as $fieldNode) {
-            $arguments [] = Values::getDirectiveValues($directive, $fieldNode, $resolveInfo->variableValues);
+            $arguments[] = Values::getDirectiveValues($directive, $fieldNode, $resolveInfo->variableValues);
         }
 
         return $arguments;
     }
 
-    /**
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
-     */
     protected function definition(): Directive
     {
-        if ($this->definition) {
-            return $this->definition;
+        if (! isset($this->definition)) {
+            $schemaBuilder = Container::getInstance()->make(SchemaBuilder::class);
+            $schema = $schemaBuilder->schema();
+
+            return $this->definition = $schema->getDirective($this->name)
+                ?? throw new DefinitionException("Missing a schema definition for the client directive {$this->name}.");
         }
 
-        /** @var \Nuwave\Lighthouse\GraphQL $graphQL */
-        $graphQL = app(GraphQL::class);
-        $schema = $graphQL->prepSchema();
-
-        /**
-         * TODO remove once graphql-php is accurate.
-         * @var \GraphQL\Type\Definition\Directive|null $definition
-         */
-        $definition = $schema->getDirective($this->name);
-        if ($definition === null) {
-            throw new DefinitionException("Missing a schema definition for the client directive $this->name");
-        }
-
-        return $this->definition = $definition;
+        return $this->definition;
     }
 }
