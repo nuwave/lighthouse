@@ -184,6 +184,7 @@ class DocumentAST implements Arrayable
             }
         }
 
+        // Strict per spec, even for federation subgraphs that would get their query type added later
         if (! isset($rootTypes[RootType::QUERY])) {
             throw new DefinitionException('The schema definition must define the root query type.');
         }
