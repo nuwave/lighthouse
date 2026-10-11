@@ -69,7 +69,7 @@ class FederationPrinter
         }
 
         $originalQueryType = $schema->getQueryType();
-        assert($originalQueryType instanceof ObjectType);
+        assert($originalQueryType instanceof ObjectType, 'federation always adds fields to the query type');
         unset($types[$originalQueryType->name]);
 
         $queryFieldsWithoutFederation = array_filter(
@@ -85,9 +85,19 @@ class FederationPrinter
             : null;
         $config->setQuery($newQueryType);
 
-        $config->setMutation($schema->getMutationType());
+        $mutationType = $schema->getMutationType();
+        if ($mutationType !== null) {
+            unset($types[$mutationType->name]);
+        }
 
-        $config->setSubscription($schema->getSubscriptionType());
+        $config->setMutation($mutationType);
+
+        $subscriptionType = $schema->getSubscriptionType();
+        if ($subscriptionType !== null) {
+            unset($types[$subscriptionType->name]);
+        }
+
+        $config->setSubscription($subscriptionType);
 
         $config->setTypes($types);
 
