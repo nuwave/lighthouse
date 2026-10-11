@@ -15,7 +15,7 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Deprecated
 
-- Deprecate `RootType::isRootType()`, use `DocumentAST::isRootType()` which knows custom root type names https://github.com/nuwave/lighthouse/pull/2077
+- Deprecate `RootType::isRootType()`, use `DocumentAST::isRootType()` https://github.com/nuwave/lighthouse/pull/2077
 
 ## v6.71.1
 
