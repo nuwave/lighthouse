@@ -144,4 +144,25 @@ final class RootTypesTest extends TestCase
         }
         ');
     }
+
+    public function testAddsNodeFieldToCustomQueryRoot(): void
+    {
+        $schema = $this->buildSchema(/** @lang GraphQL */ <<<'GRAPHQL'
+        schema {
+            query: RootQuery
+        }
+
+        type RootQuery {
+            foo: Int
+        }
+
+        type User @node(resolver: "Tests\\Integration\\GlobalId\\NodeDirectiveDBTest@resolveNode") {
+            name: String!
+        }
+        GRAPHQL);
+
+        $queryType = $schema->getQueryType();
+        $this->assertNotNull($queryType);
+        $this->assertTrue($queryType->hasField('node'));
+    }
 }
