@@ -168,7 +168,11 @@ class DocumentAST implements Arrayable
                 $instance->directives[$definition->name->value] = $definition;
             } elseif ($definition instanceof SchemaDefinitionNode) {
                 if (count($definition->directives) > 0) {
-                    throw new DefinitionException('Directives on the schema definition are not supported, use `extend schema` instead.');
+                    throw new DefinitionException('Directives on the schema definition are not supported. Use `extend schema` instead.');
+                }
+
+                if (isset($schemaDefinition)) {
+                    throw new DefinitionException('The schema must not have more than one schema definition.');
                 }
 
                 $schemaDefinition = $definition;
@@ -179,18 +183,32 @@ class DocumentAST implements Arrayable
             }
         }
 
-        $rootTypes = isset($schemaDefinition)
-            ? []
-            : $instance->rootTypes;
-        foreach (array_filter([$schemaDefinition ?? null, ...$instance->schemaExtensions]) as $schema) {
-            foreach ($schema->operationTypes as $operationType) {
-                $rootTypes[ucfirst($operationType->operation)] = $operationType->type->name->value;
+        $schemaNodes = array_filter([$schemaDefinition ?? null, ...$instance->schemaExtensions]);
+        $explicitRootTypes = [];
+        foreach ($schemaNodes as $schemaNode) {
+            foreach ($schemaNode->operationTypes as $operationType) {
+                $defaultName = ucfirst($operationType->operation);
+                if (isset($explicitRootTypes[$defaultName])) {
+                    throw new DefinitionException("The root type for {$operationType->operation} must not be defined more than once.");
+                }
+
+                $explicitRootTypes[$defaultName] = $operationType->type->name->value;
             }
         }
 
+        $rootTypes = isset($schemaDefinition)
+            ? $explicitRootTypes
+            : array_merge($instance->rootTypes, $explicitRootTypes);
+
         // Strict per spec, even for federation subgraphs that would get their query type added later
         if (! isset($rootTypes[RootType::QUERY])) {
-            throw new DefinitionException('The schema definition must define the root query type.');
+            throw new DefinitionException('The schema definition must define the query root type.');
+        }
+
+        $duplicateRootTypes = array_diff_key($rootTypes, array_unique($rootTypes));
+        if ($duplicateRootTypes !== []) {
+            $duplicates = implode(', ', array_unique($duplicateRootTypes));
+            throw new DefinitionException("The root types must all be different, found duplicates: {$duplicates}.");
         }
 
         $instance->rootTypes = $rootTypes;

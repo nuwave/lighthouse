@@ -163,7 +163,7 @@ final class DocumentASTTest extends TestCase
 
     public function testThrowsOnSchemaDefinitionWithoutQuery(): void
     {
-        $this->expectExceptionObject(new DefinitionException('The schema definition must define the root query type.'));
+        $this->expectExceptionObject(new DefinitionException('The schema definition must define the query root type.'));
 
         DocumentAST::fromSource(/** @lang GraphQL */ <<<'GRAPHQL'
         schema {
@@ -178,7 +178,7 @@ final class DocumentASTTest extends TestCase
 
     public function testThrowsOnSchemaDefinitionWithDirectives(): void
     {
-        $this->expectExceptionObject(new DefinitionException('Directives on the schema definition are not supported, use `extend schema` instead.'));
+        $this->expectExceptionObject(new DefinitionException('Directives on the schema definition are not supported. Use `extend schema` instead.'));
 
         DocumentAST::fromSource(/** @lang GraphQL */ <<<'GRAPHQL'
         schema @link(url: "https://specs.apollo.dev/federation/v2.3") {
@@ -186,6 +186,60 @@ final class DocumentASTTest extends TestCase
         }
 
         type Query {
+            foo: Int
+        }
+        GRAPHQL);
+    }
+
+    public function testThrowsOnMultipleSchemaDefinitions(): void
+    {
+        $this->expectExceptionObject(new DefinitionException('The schema must not have more than one schema definition.'));
+
+        DocumentAST::fromSource(/** @lang GraphQL */ <<<'GRAPHQL'
+        schema {
+            query: Query
+        }
+
+        schema {
+            query: Query
+        }
+
+        type Query {
+            foo: Int
+        }
+        GRAPHQL);
+    }
+
+    public function testThrowsOnSchemaExtensionRedefiningRootType(): void
+    {
+        $this->expectExceptionObject(new DefinitionException('The root type for query must not be defined more than once.'));
+
+        DocumentAST::fromSource(/** @lang GraphQL */ <<<'GRAPHQL'
+        schema {
+            query: Query
+        }
+
+        extend schema {
+            query: RootQuery
+        }
+
+        type Query {
+            foo: Int
+        }
+        GRAPHQL);
+    }
+
+    public function testThrowsOnTypeUsedForMultipleRootTypes(): void
+    {
+        $this->expectExceptionObject(new DefinitionException('The root types must all be different, found duplicates: Root.'));
+
+        DocumentAST::fromSource(/** @lang GraphQL */ <<<'GRAPHQL'
+        schema {
+            query: Root
+            mutation: Root
+        }
+
+        type Root {
             foo: Int
         }
         GRAPHQL);
