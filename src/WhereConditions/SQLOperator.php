@@ -60,10 +60,10 @@ enum SQLOperator {
     "Whether a value is not null (`IS NOT NULL`)"
     IS_NOT_NULL @enum(value: "NotNull")
 
-    "Whether a value is a key in the JSON."
+    "Whether the JSON path given in `column` exists, e.g. `preferences->theme`."
     JSON_CONTAINS_KEY @enum(value: "JsonContainsKey")
 
-    "Whether a value is not a key in the JSON."
+    "Whether the JSON path given in `column` does not exist."
     JSON_DOESNT_CONTAIN_KEY @enum(value: "JsonDoesntContainKey")
 
     "Whether a value is in the JSON."
@@ -72,22 +72,22 @@ enum SQLOperator {
     "Whether a value is not in the JSON."
     JSON_DOESNT_CONTAIN @enum(value: "JsonDoesntContain")
 
-    "Whether a value is equals to the length of JSON array."
+    "Whether the length of the JSON array is equals to the value."
     JSON_LENGTH_EQ @enum(value: "JsonLengthEq")
 
-    "Whether a value is not equals to the length of JSON array."
+    "Whether the length of the JSON array is not equals to the value."
     JSON_LENGTH_NEQ @enum(value: "JsonLengthNeq")
 
-    "Whether a value is less than the length of JSON array."
+    "Whether the length of the JSON array is less than the value."
     JSON_LENGTH_LT @enum(value: "JsonLengthLt")
 
-    "Whether a value is greater than the length of JSON array."
+    "Whether the length of the JSON array is greater than the value."
     JSON_LENGTH_GT @enum(value: "JsonLengthGt")
 
-    "Whether a value is less than or equals to the length of JSON array."
+    "Whether the length of the JSON array is less than or equals to the value."
     JSON_LENGTH_LTE @enum(value: "JsonLengthLte")
 
-    "Whether a value is greater than or equals to the length of JSON array."
+    "Whether the length of the JSON array is greater than or equals to the value."
     JSON_LENGTH_GTE @enum(value: "JsonLengthGte")
 }
 GRAPHQL;
