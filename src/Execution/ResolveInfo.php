@@ -55,7 +55,7 @@ class ResolveInfo extends BaseResolveInfo
         assert($builder instanceof Builder, 'Scout builders are handled by the ScoutEnhancer.');
 
         self::applyArgBuilderDirectives($this->argumentSet, $builder, $directiveFilter);
-        self::applyFieldBuilderDirectives($builder, $root, $args, $context, $this);
+        $this->applyFieldBuilderDirectives($builder, $root, $args, $context);
 
         foreach ($scopes as $scope) {
             $builder->{$scope}($args);
@@ -81,7 +81,7 @@ class ResolveInfo extends BaseResolveInfo
     ): bool {
         return (new ScoutEnhancer($this->argumentSet, $builder))->wouldEnhanceBuilder()
             || self::wouldApplyArgBuilderDirectives($this->argumentSet, $directiveFilter)
-            || self::wouldApplyFieldBuilderDirectives($this)
+            || $this->wouldApplyFieldBuilderDirectives()
             || $scopes !== [];
     }
 
@@ -169,25 +169,25 @@ class ResolveInfo extends BaseResolveInfo
      *
      * @param  array<string, mixed>  $args
      */
-    protected static function applyFieldBuilderDirectives(Builder &$builder, mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): void
+    protected function applyFieldBuilderDirectives(Builder &$builder, mixed $root, array $args, GraphQLContext $context): void
     {
-        foreach (self::fieldBuilderDirectives($resolveInfo) as $fieldBuilderDirective) {
-            $builder = $fieldBuilderDirective->handleFieldBuilder($builder, $root, $args, $context, $resolveInfo);
+        foreach ($this->fieldBuilderDirectives() as $fieldBuilderDirective) {
+            $builder = $fieldBuilderDirective->handleFieldBuilder($builder, $root, $args, $context, $this);
         }
     }
 
     /** Would there be any FieldBuilderDirectives to apply to the builder? */
-    protected static function wouldApplyFieldBuilderDirectives(ResolveInfo $resolveInfo): bool
+    protected function wouldApplyFieldBuilderDirectives(): bool
     {
-        return self::fieldBuilderDirectives($resolveInfo)
+        return $this->fieldBuilderDirectives()
             ->isNotEmpty();
     }
 
     /** @return Collection<int, \Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective> */
-    protected static function fieldBuilderDirectives(ResolveInfo $resolveInfo): Collection
+    protected function fieldBuilderDirectives(): Collection
     {
         // @phpstan-ignore-next-line filter is not understood
-        return $resolveInfo->argumentSet
+        return $this->argumentSet
             ->directives
             ->filter(Utils::instanceofMatcher(FieldBuilderDirective::class));
     }
