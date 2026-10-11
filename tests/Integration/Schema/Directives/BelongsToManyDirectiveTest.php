@@ -4,6 +4,7 @@ namespace Tests\Integration\Schema\Directives;
 
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Role;
 use Tests\Utils\Models\User;
@@ -438,7 +439,9 @@ final class BelongsToManyDirectiveTest extends DBTestCase
         ])->assertJsonCount(2, 'data.user.roles.edges');
     }
 
-    public function testQueryPaginatedBelongsToManyWithDuplicates(): void
+    /** @dataProvider firstValues */
+    #[DataProvider('firstValues')]
+    public function testQueryPaginatedBelongsToManyWithDuplicates(?int $first): void
     {
         $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
@@ -447,7 +450,7 @@ final class BelongsToManyDirectiveTest extends DBTestCase
 
         type User {
             id: ID!
-            roles: [Role!]! @belongsToMany(type: SIMPLE)
+            roles: [Role!]! @belongsToMany(type: SIMPLE, allowUnlimited: true)
         }
 
         type Role {
@@ -468,17 +471,19 @@ final class BelongsToManyDirectiveTest extends DBTestCase
             ->all();
 
         $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
-        {
+        query ($first: Int) {
             users {
                 id
-                roles(first: 2) {
+                roles(first: $first) {
                     data {
                         id
                     }
                 }
             }
         }
-        GRAPHQL)->assertJson([
+        GRAPHQL, [
+            'first' => $first,
+        ])->assertJson([
             'data' => [
                 'users' => $users
                     ->map(static fn (User $user): array => [
@@ -490,6 +495,13 @@ final class BelongsToManyDirectiveTest extends DBTestCase
                     ->all(),
             ],
         ]);
+    }
+
+    /** @return iterable<string, array{int|null}> */
+    public static function firstValues(): iterable
+    {
+        yield 'limited' => [2];
+        yield 'unlimited' => [null];
     }
 
     public function testQueryBelongsToManyNestedRelationships(): void

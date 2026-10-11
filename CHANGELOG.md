@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Added
+
+- Add option `allowUnlimited` to `@paginate` and paginated relation directives and configuration option `pagination.allow_unlimited` to fetch all items with `first: null` https://github.com/nuwave/lighthouse/pull/2781
+
 ## v6.72.0
 
 ### Changed

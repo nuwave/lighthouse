@@ -336,6 +336,51 @@ final class RelationBatchLoaderTest extends DBTestCase
         });
     }
 
+    public function testSplitsEagerLoadsOfPaginatedRelationsWithoutArguments(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Task {
+            id: ID
+        }
+
+        type User {
+            tasks: [Task!]! @hasMany
+            tasksPaginated: [Task!]! @hasMany(relation: "tasks", type: PAGINATOR, allowUnlimited: true)
+        }
+
+        type Query {
+            users: [User!]! @all
+        }
+        GRAPHQL;
+
+        $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
+
+        $tasks = factory(Task::class, 3)->make();
+        $user->tasks()->saveMany($tasks);
+
+        $this->assertQueryCountMatches(3, function (): void {
+            $this
+                ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+                {
+                    users {
+                        tasks {
+                            id
+                        }
+                        tasksPaginated {
+                            data {
+                                id
+                            }
+                        }
+                    }
+                }
+                GRAPHQL)
+                ->assertGraphQLErrorFree()
+                ->assertJsonCount(3, 'data.users.0.tasks')
+                ->assertJsonCount(3, 'data.users.0.tasksPaginated.data');
+        });
+    }
+
     public function testTwoBatchLoadedQueriesWithDifferentResults(): void
     {
         $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'

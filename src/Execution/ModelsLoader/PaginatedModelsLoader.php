@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
 use Nuwave\Lighthouse\Pagination\ZeroPerPageLengthAwarePaginator;
 use Nuwave\Lighthouse\Support\Utils;
@@ -21,11 +22,16 @@ class PaginatedModelsLoader implements ModelsLoader
         protected string $relation,
         protected \Closure $decorateBuilder,
         protected PaginationArgs $paginationArgs,
+        /** Can $decorateBuilder constrain the query differently depending on the given parent model? */
+        protected bool $decorationDependsOnParent = true,
     ) {}
 
     public function load(EloquentCollection $parents): void
     {
-        $parents->loadCount([$this->relation => $this->decorateBuilder]);
+        // When all items are requested, counting the loaded models is sufficient
+        if ($this->paginationArgs->first !== null) {
+            $parents->loadCount([$this->relation => $this->decorateBuilder]);
+        }
 
         $relation = $this->relationInstance($parents);
         $relatedModels = $this->loadRelatedModels($parents);
@@ -48,23 +54,35 @@ class PaginatedModelsLoader implements ModelsLoader
      */
     protected function loadRelatedModels(EloquentCollection $parents): EloquentCollection
     {
-        $relations = $parents->toBase()
-            ->map(function (Model $model) use ($parents): Relation {
+        $first = $this->paginationArgs->first;
+
+        $parentGroups = $first === null
+            ? $this->groupParentsByConstraints($parents)
+            // Each parent is limited separately
+            : $parents->toBase()->map(static fn (Model $model): array => [$model]);
+
+        $relations = $parentGroups
+            ->map(function (array $models) use ($parents, $parentGroups, $first): Relation {
                 $relation = $this->relationInstance($parents);
 
-                $relation->addEagerConstraints([$model]);
+                $relation->addEagerConstraints($models);
 
-                ($this->decorateBuilder)($relation, $model);
+                ($this->decorateBuilder)($relation, $models[0]);
 
                 if ($relation instanceof BelongsToMany || $relation instanceof HasManyThrough) {
                     $select = Utils::callProtected($relation, 'shouldSelect', ['*']);
                     $relation->addSelect($select);
                 }
 
-                $relation->initRelation([$model], $this->relation);
+                $relation->initRelation($models, $this->relation);
 
+                if ($first === null && $parentGroups->count() === 1) {
+                    return $relation;
+                }
+
+                // Unlimited queries combined with UNION ALL below still need a limit, otherwise MySQL ignores their ORDER BY
                 // @phpstan-ignore-next-line Builder mixin is not understood
-                return $relation->forPage($this->paginationArgs->page, $this->paginationArgs->first);
+                return $relation->forPage($this->paginationArgs->page, $first ?? PHP_INT_MAX);
             });
 
         // Merge all the relation queries into a single query with UNION ALL.
@@ -88,6 +106,42 @@ class PaginatedModelsLoader implements ModelsLoader
             // or there could be differing pivot attributes.
             static fn (Model $relatedModel): string => json_encode($relatedModel->getRawOriginal()),
         );
+    }
+
+    /**
+     * Group parents whose related models can be loaded with the same constraints.
+     *
+     * Builder directives may constrain the query differently for each parent.
+     * Usually they do not, which allows loading the related models of all parents in a single query.
+     *
+     * @see \Tests\Integration\Schema\Directives\BuilderDirectiveTest::testCallsCustomBuilderMethodOnFieldWithSpecificModel
+     *
+     * @param  \Illuminate\Database\Eloquent\Collection<array-key, \Illuminate\Database\Eloquent\Model>  $parents
+     *
+     * @return \Illuminate\Support\Collection<int, list<\Illuminate\Database\Eloquent\Model>>
+     */
+    protected function groupParentsByConstraints(EloquentCollection $parents): Collection
+    {
+        if (! $this->decorationDependsOnParent) {
+            return new Collection([array_values($parents->all())]);
+        }
+
+        /** @var array<string, list<\Illuminate\Database\Eloquent\Model>> $groups */
+        $groups = [];
+
+        foreach ($parents as $model) {
+            $relation = $this->relationInstance($parents);
+            ($this->decorateBuilder)($relation, $model);
+
+            $query = $relation->getQuery()->toBase();
+
+            // Compare bindings as they are executed, e.g. dates that only differ in microseconds may be formatted equally
+            $bindings = $query->getConnection()->prepareBindings($query->getBindings());
+
+            $groups[serialize([$query->toSql(), $bindings])][] = $model;
+        }
+
+        return new Collection(array_values($groups));
     }
 
     /**
@@ -182,11 +236,19 @@ class PaginatedModelsLoader implements ModelsLoader
         $page = $this->paginationArgs->page;
 
         foreach ($parents as $model) {
-            $total = CountModelsLoader::extractCount($model, $this->relation);
+            if ($first === null) {
+                $relatedModels = $model->getRelation($this->relation);
+                assert($relatedModels instanceof EloquentCollection);
 
-            $paginator = $first === 0
-                ? new ZeroPerPageLengthAwarePaginator($total, $page)
-                : new LengthAwarePaginator($model->getRelation($this->relation), $total, $first, $page);
+                $total = $relatedModels->count();
+                $paginator = new LengthAwarePaginator($relatedModels, $total, max(1, $total), $page);
+            } else {
+                $total = CountModelsLoader::extractCount($model, $this->relation);
+
+                $paginator = $first === 0
+                    ? new ZeroPerPageLengthAwarePaginator($total, $page)
+                    : new LengthAwarePaginator($model->getRelation($this->relation), $total, $first, $page);
+            }
 
             $model->setRelation($this->relation, $paginator);
         }

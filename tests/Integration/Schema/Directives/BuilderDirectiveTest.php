@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
@@ -156,7 +157,9 @@ final class BuilderDirectiveTest extends DBTestCase
         GRAPHQL)->assertJsonCount(2, 'data.users');
     }
 
-    public function testCallsCustomBuilderMethodOnFieldWithSpecificModel(): void
+    /** @dataProvider firstValues */
+    #[DataProvider('firstValues')]
+    public function testCallsCustomBuilderMethodOnFieldWithSpecificModel(?int $first): void
     {
         $this->schema = /** @lang GraphQL */ <<<GRAPHQL
         type Query {
@@ -165,7 +168,7 @@ final class BuilderDirectiveTest extends DBTestCase
 
         type User {
             id: ID
-            tasks: [Task!]! @hasMany(type: SIMPLE) @builder(method: "{$this->qualifyTestResolver('specificModel')}")
+            tasks: [Task!]! @hasMany(type: SIMPLE, allowUnlimited: true) @builder(method: "{$this->qualifyTestResolver('specificModel')}")
         }
 
         type Task {
@@ -195,19 +198,28 @@ final class BuilderDirectiveTest extends DBTestCase
         }
 
         $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
-        {
+        query ($first: Int) {
             users {
                 id
-                tasks(first: 10) {
+                tasks(first: $first) {
                     data {
                         id
                     }
                 }
             }
         }
-        GRAPHQL)
+        GRAPHQL, [
+            'first' => $first,
+        ])
             ->assertJsonCount(1, 'data.users.0.tasks.data')
             ->assertJsonCount(1, 'data.users.1.tasks.data');
+    }
+
+    /** @return iterable<string, array{int|null}> */
+    public static function firstValues(): iterable
+    {
+        yield 'limited' => [10];
+        yield 'unlimited' => [null];
     }
 
     /**

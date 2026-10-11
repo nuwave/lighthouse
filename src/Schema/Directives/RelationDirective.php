@@ -23,8 +23,10 @@ use Nuwave\Lighthouse\Pagination\PaginationType;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\FieldBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Support\Utils;
 
 abstract class RelationDirective extends BaseDirective implements FieldResolver
 {
@@ -82,12 +84,23 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
                 // Batch loading joins across both models, thus only works if they are on the same connection
                 && $this->isSameConnection($relation)
             ) {
+                $pathToField = $paginationArgs !== null && $args === []
+                    // Unlike qualifyPath() without args, do not combine paginated relations with other fields
+                    ? [...$resolveInfo->path, $this->relation(), ...$this->scopes()]
+                    : $this->qualifyPath($args, $resolveInfo);
+
                 $relationBatchLoader = BatchLoaderRegistry::instance(
-                    $this->qualifyPath($args, $resolveInfo),
+                    $pathToField,
                     static fn (): RelationBatchLoader => new RelationBatchLoader(
                         $paginationArgs === null
                             ? new SimpleModelsLoader($relationName, $decorateBuilder)
-                            : new PaginatedModelsLoader($relationName, $decorateBuilder, $paginationArgs),
+                            : new PaginatedModelsLoader(
+                                $relationName,
+                                $decorateBuilder,
+                                $paginationArgs,
+                                // Only field builder directives receive the parent model, see ResolveInfo::enhanceBuilder()
+                                $resolveInfo->argumentSet->directives->contains(Utils::instanceofMatcher(FieldBuilderDirective::class)),
+                            ),
                     ),
                 );
 
@@ -134,6 +147,7 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
             $this->paginationDefaultCount(),
             $this->paginationMaxCount(),
             $this->edgeType($documentAST),
+            $this->paginationAllowUnlimited(),
         );
     }
 
@@ -178,6 +192,13 @@ abstract class RelationDirective extends BaseDirective implements FieldResolver
     protected function paginationDefaultCount(): ?int
     {
         return $this->directiveArgValue('defaultCount', $this->lighthouseConfig['pagination']['default_count']);
+    }
+
+    protected function paginationAllowUnlimited(): bool
+    {
+        return $this->directiveArgValue('allowUnlimited')
+            ?? $this->lighthouseConfig['pagination']['allow_unlimited']
+            ?? false;
     }
 
     /** @param  \Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model>  $relation */

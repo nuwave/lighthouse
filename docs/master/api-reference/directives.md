@@ -303,6 +303,13 @@ directive @belongsToMany(
   maxCount: Int
 
   """
+  Allow clients to fetch all items at once by passing `first: null`.
+  Overrules the `pagination.allow_unlimited` setting from `lighthouse.php`.
+  Requires `maxCount` to be `null`.
+  """
+  allowUnlimited: Boolean
+
+  """
   Specify a custom type that implements the Edge interface
   to extend edge object.
   Only applies when using Relay style "connection" pagination.
@@ -1827,6 +1834,13 @@ directive @hasMany(
   maxCount: Int
 
   """
+  Allow clients to fetch all items at once by passing `first: null`.
+  Overrules the `pagination.allow_unlimited` setting from `lighthouse.php`.
+  Requires `maxCount` to be `null`.
+  """
+  allowUnlimited: Boolean
+
+  """
   Specify a custom type that implements the Edge interface
   to extend edge object.
   Only applies when using Relay style "connection" pagination.
@@ -1916,6 +1930,13 @@ directive @hasManyThrough(
   Setting this to `null` means the count is unrestricted.
   """
   maxCount: Int
+
+  """
+  Allow clients to fetch all items at once by passing `first: null`.
+  Overrules the `pagination.allow_unlimited` setting from `lighthouse.php`.
+  Requires `maxCount` to be `null`.
+  """
+  allowUnlimited: Boolean
 
   """
   Specify a custom type that implements the Edge interface
@@ -2397,6 +2418,13 @@ directive @morphMany(
   maxCount: Int
 
   """
+  Allow clients to fetch all items at once by passing `first: null`.
+  Overrules the `pagination.allow_unlimited` setting from `lighthouse.php`.
+  Requires `maxCount` to be `null`.
+  """
+  allowUnlimited: Boolean
+
+  """
   Specify a custom type that implements the Edge interface
   to extend edge object.
   Only applies when using Relay style "connection" pagination.
@@ -2534,6 +2562,13 @@ directive @morphToMany(
   Setting this to `null` means the count is unrestricted.
   """
   maxCount: Int
+
+  """
+  Allow clients to fetch all items at once by passing `first: null`.
+  Overrules the `pagination.allow_unlimited` setting from `lighthouse.php`.
+  Requires `maxCount` to be `null`.
+  """
+  allowUnlimited: Boolean
 
   """
   Specify a custom type that implements the Edge interface
@@ -2935,6 +2970,13 @@ directive @paginate(
   maxCount: Int
 
   """
+  Allow clients to fetch all items at once by passing `first: null`.
+  Overrules the `pagination.allow_unlimited` setting from `lighthouse.php`.
+  Requires `maxCount` to be `null`.
+  """
+  allowUnlimited: Boolean
+
+  """
   Reference a function to customize the complexity score calculation.
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
   If you pass only a class name, the method name defaults to `__invoke`.
@@ -3201,6 +3243,43 @@ type Query {
   posts: [Post!]! @paginate(maxCount: 10)
 }
 ```
+
+### Allow unlimited count
+
+Clients may sometimes need all items of a paginated list.
+Instead of having them request an arbitrarily large count, you can allow them to fetch all items at once:
+
+```graphql
+type Query {
+  posts: [Post!]! @paginate(allowUnlimited: true)
+}
+```
+
+This makes the `first` argument nullable.
+Clients fetch all items by passing `first: null`, or by omitting `first` if there is no default count:
+
+```graphql
+{
+  posts(first: null) {
+    data {
+      id
+      title
+    }
+  }
+}
+```
+
+All items are returned on a single page, so `page` and `after` are ignored.
+This also works for paginated relationships, such as [@hasMany](#hasmany).
+When combined with [@search](#search), the search engine may limit the number of results.
+Functions referenced by the `resolver` argument must handle `first` being `null` or absent.
+To allow unlimited results for all paginated fields, set `pagination.allow_unlimited` in your configuration.
+
+Unlimited results can not be combined with a maximum count.
+If you configured `pagination.max_count`, set `maxCount: null` on fields that allow unlimited results.
+
+> Fetching all items may be expensive, and query complexity analysis counts unlimited results as a single item.
+> Only allow unlimited results for lists that are known to stay reasonably small.
 
 ### Overwrite model
 
