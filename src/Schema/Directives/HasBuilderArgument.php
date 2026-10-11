@@ -33,7 +33,7 @@ trait HasBuilderArgument
         $builder = $this->getResolverFromArgument('builder')($root, $args, $context, $resolveInfo);
         assert(
             $builder instanceof Builder || $builder instanceof ScoutBuilder,
-            "The method referenced by the builder argument of the @{$this->name()} directive on {$this->nodeName()} must return a Builder or Relation.",
+            "The method referenced by the builder argument of the @{$this->name()} directive on {$this->nodeName()} must return a Builder, Relation or Scout Builder.",
         );
 
         return $builder;
