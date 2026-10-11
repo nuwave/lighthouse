@@ -80,7 +80,7 @@ class ResolveInfo extends BaseResolveInfo
         ?callable $directiveFilter = null,
     ): bool {
         return (new ScoutEnhancer($this->argumentSet, $builder))->wouldEnhanceBuilder()
-            || self::wouldApplyArgBuilderDirectives($this->argumentSet, $builder, $directiveFilter)
+            || self::wouldApplyArgBuilderDirectives($this->argumentSet, $directiveFilter)
             || self::wouldApplyFieldBuilderDirectives($this)
             || $scopes !== [];
     }
@@ -128,7 +128,6 @@ class ResolveInfo extends BaseResolveInfo
      */
     protected static function wouldApplyArgBuilderDirectives(
         ArgumentSet $argumentSet,
-        Builder|ScoutBuilder &$builder,
         ?callable $directiveFilter = null,
     ): bool {
         foreach ($argumentSet->arguments as $argument) {
@@ -147,13 +146,13 @@ class ResolveInfo extends BaseResolveInfo
 
             $valueOrValues = $argument->value;
             if ($valueOrValues instanceof ArgumentSet) {
-                return self::wouldApplyArgBuilderDirectives($valueOrValues, $builder, $directiveFilter);
+                return self::wouldApplyArgBuilderDirectives($valueOrValues, $directiveFilter);
             }
 
             if (is_array($valueOrValues)) {
                 foreach ($valueOrValues as $value) {
                     if ($value instanceof ArgumentSet) {
-                        $wouldApply = self::wouldApplyArgBuilderDirectives($value, $builder, $directiveFilter);
+                        $wouldApply = self::wouldApplyArgBuilderDirectives($value, $directiveFilter);
                         if ($wouldApply) {
                             return true;
                         }
