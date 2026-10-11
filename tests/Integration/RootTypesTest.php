@@ -121,4 +121,27 @@ final class RootTypesTest extends TestCase
         }
         ');
     }
+
+    public function testThrowsOnUndefinedCustomRootType(): void
+    {
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        schema {
+            query: Query
+            mutation: RootMutation
+        }
+
+        type Query {
+            foo: Int
+        }
+        GRAPHQL;
+
+        $this->expectException(DefinitionException::class);
+        $this->expectExceptionMessage('RootMutation');
+
+        $this->graphQL(/** @lang GraphQL */ '
+        {
+            foo
+        }
+        ');
+    }
 }

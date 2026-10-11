@@ -46,16 +46,16 @@ class SchemaBuilder
         $config->setQuery($query);
 
         // Mutation and Subscription are optional, so only add them
-        // if they are present in the schema
+        // if they are present in the schema or named in the schema definition
         $mutationTypeName = $documentAST->rootTypes[RootType::MUTATION] ?? null;
-        if ($mutationTypeName !== null && isset($documentAST->types[$mutationTypeName])) {
+        if ($mutationTypeName !== null && ($mutationTypeName !== RootType::MUTATION || isset($documentAST->types[$mutationTypeName]))) {
             $mutation = $this->typeRegistry->get($mutationTypeName);
             assert($mutation instanceof ObjectType);
             $config->setMutation($mutation);
         }
 
         $subscriptionTypeName = $documentAST->rootTypes[RootType::SUBSCRIPTION] ?? null;
-        if ($subscriptionTypeName !== null && isset($documentAST->types[$subscriptionTypeName])) {
+        if ($subscriptionTypeName !== null && ($subscriptionTypeName !== RootType::SUBSCRIPTION || isset($documentAST->types[$subscriptionTypeName]))) {
             $subscription = $this->typeRegistry->get($subscriptionTypeName);
             assert($subscription instanceof ObjectType);
             $config->setSubscription($subscription);
