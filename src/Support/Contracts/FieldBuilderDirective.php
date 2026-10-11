@@ -10,8 +10,6 @@ interface FieldBuilderDirective extends Directive
     /**
      * Add additional constraints to the builder.
      *
-     * TODO try adding a generic type parameter for the type of model when PHPStan handles it better
-     *
      * @param  \Illuminate\Contracts\Database\Query\Builder  $builder  the builder used to resolve the field
      * @param  array<string, mixed>  $args  the arguments that were passed into the field
      *

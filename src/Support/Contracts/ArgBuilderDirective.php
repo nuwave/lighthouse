@@ -9,8 +9,6 @@ interface ArgBuilderDirective extends Directive
     /**
      * Add additional constraints to the builder based on the given argument value.
      *
-     * TODO try adding a generic type parameter for the type of model when PHPStan handles it better
-     *
      * @param  \Illuminate\Contracts\Database\Query\Builder  $builder  the builder used to resolve the field
      * @param  mixed  $value  the client given value of the argument
      *
