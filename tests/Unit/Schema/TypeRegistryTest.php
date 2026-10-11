@@ -28,6 +28,20 @@ final class TypeRegistryTest extends TestCase
         $this->typeRegistry->setDocumentAST($astBuilder->documentAST());
     }
 
+    public function testHandlesObjectTypeFieldsWithoutDocumentAST(): void
+    {
+        $typeRegistry = $this->app->build(TypeRegistry::class);
+
+        $objectType = $typeRegistry->handle(Parser::objectTypeDefinition(/** @lang GraphQL */ <<<'GRAPHQL'
+        type User {
+            name: String
+        }
+        GRAPHQL));
+        $this->assertInstanceOf(ObjectType::class, $objectType);
+
+        $this->assertSame(['name'], array_keys($objectType->getFields()));
+    }
+
     public function testSetsEnumValueThroughDirective(): void
     {
         $enumNode = Parser::enumTypeDefinition(/** @lang GraphQL */ <<<'GRAPHQL'

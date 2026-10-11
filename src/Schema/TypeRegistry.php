@@ -407,7 +407,7 @@ class TypeRegistry
     {
         return function () use ($typeDefinition): array {
             $fieldFactory = $this->fieldFactory();
-            $typeValue = new TypeValue($typeDefinition, $this->documentAST);
+            $typeValue = new TypeValue($typeDefinition, $this->documentAST ?? null);
             $fields = [];
 
             foreach ($typeDefinition->fields as $fieldDefinition) {
