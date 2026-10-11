@@ -72,6 +72,8 @@ final class QueryCacheTest extends TestCase
         }
         GRAPHQL;
 
+        $event = Event::fake();
+
         // Populates the query cache.
         $this->graphQL($query)->assertExactJson([
             'data' => [
@@ -85,6 +87,8 @@ final class QueryCacheTest extends TestCase
                 'foo' => Foo::THE_ANSWER,
             ],
         ]);
+
+        $event->assertDispatchedTimes(KeyWritten::class, 1);
     }
 
     public function testDifferentQueriesHasDifferentKeys(): void
