@@ -8,9 +8,12 @@ final class VoidDirectiveTest extends TestCase
 {
     public function testVoid(): void
     {
+        $this->mockResolverExpects($this->once())
+            ->willReturn(null);
+
         $this->schema = /** @lang GraphQL */ '
         type Query {
-            foo: _ @void
+            foo: _ @mock @void
         }
         ';
 
