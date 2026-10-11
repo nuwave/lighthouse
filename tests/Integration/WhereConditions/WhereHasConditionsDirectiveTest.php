@@ -240,7 +240,7 @@ final class WhereHasConditionsDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function testWhereHasBelongsToManyWithNestedAnd(): void
+    public function testWhereHasBelongsToManyWithNestedAndOr(): void
     {
         factory(User::class)->create();
 
@@ -257,6 +257,12 @@ final class WhereHasConditionsDirectiveTest extends DBTestCase
             users(
                 hasRoles: {
                     AND: [
+                        {
+                            column: "id",
+                            value: $id
+                        }
+                    ]
+                    OR: [
                         {
                             column: "id",
                             value: $id
