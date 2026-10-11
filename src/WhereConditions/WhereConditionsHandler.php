@@ -118,7 +118,7 @@ class WhereConditionsHandler
     }
 
     /**
-     * If the condition references a column, prefix it with the table name.
+     * Prefix unqualified columns of the condition and its nested AND/OR conditions with the table name.
      *
      * This is important for queries that can otherwise be ambiguous.
      * For example, ambiguity happens when multiple tables include a column named "id".
