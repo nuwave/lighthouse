@@ -72,8 +72,7 @@ Delete `_lighthouse_ide_helper.php` and remove `vendor/nuwave/lighthouse/_ide_he
 
 ### Use `Illuminate\Contracts\Database\Query\Builder` in builder directives
 
-`ArgBuilderDirective::handleBuilder()` and `FieldBuilderDirective::handleFieldBuilder()` now type the builder
-with the common interface `Illuminate\Contracts\Database\Query\Builder` instead of a union of concrete classes.
+`ArgBuilderDirective::handleBuilder()` and `FieldBuilderDirective::handleFieldBuilder()` now type the builder with the common interface `Illuminate\Contracts\Database\Query\Builder` instead of a union of concrete classes.
 Custom directives that implement them, and subclasses of built-in directives that override them, must adopt the new signature.
 The same applies to overrides of `WhereConditionsBaseDirective::handle()` and the protected builder methods of `ResolveInfo`.
 The interface does not relate to a model, so `ResolveInfo::enhanceBuilder()` and `PaginationArgs::applyToBuilder()` are no longer generic over it.
@@ -95,9 +94,10 @@ final class MyDirective extends BaseDirective implements ArgBuilderDirective, Fi
 }
 ```
 
-### Do not pass `ResolveInfo` to `ResolveInfo::enhanceBuilder()`
+### Do not pass `ResolveInfo` to `ResolveInfo::enhanceBuilder()` and `ResolveInfo::wouldEnhanceBuilder()`
 
-`ResolveInfo::enhanceBuilder()` and `ResolveInfo::wouldEnhanceBuilder()` no longer accept a `ResolveInfo` argument, they use the instance they are called on.
+`ResolveInfo::enhanceBuilder()` and `ResolveInfo::wouldEnhanceBuilder()` no longer accept a `ResolveInfo` argument.
+They use the instance they are called on.
 
 ```diff
 -$resolveInfo->enhanceBuilder($builder, $scopes, $root, $args, $context, $resolveInfo, $directiveFilter);
