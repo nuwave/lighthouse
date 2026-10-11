@@ -225,15 +225,11 @@ class TypeRegistry
         foreach ($this->documentAST->types as $typeDefinition) {
             $name = $typeDefinition->getName()->value;
 
-            if (! isset($this->types[$name])) {
-                $this->types[$name] = $this->handle($typeDefinition);
-            }
+            $this->types[$name] ??= $this->handle($typeDefinition);
         }
 
         foreach ($this->lazyTypes as $name => $lazyType) {
-            if (! isset($this->types[$name])) {
-                $this->types[$name] = $lazyType();
-            }
+            $this->types[$name] ??= $lazyType();
         }
 
         return array_filter($this->types);

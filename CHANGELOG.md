@@ -11,7 +11,31 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ### Fixed
 
-- Cache the query AST as an array in `query_cache.mode: store`, so restricting `cache.serializable_classes` no longer makes the cached AST come back as `__PHP_Incomplete_Class` https://github.com/nuwave/lighthouse/pull/2785
+- Cache the query AST as an array in `query_cache.mode: store`, so it no longer requires allowing AST classes in `cache.serializable_classes` https://github.com/nuwave/lighthouse/pull/2785
+
+## v6.71.1
+
+### Fixed
+
+- Stop resolving built-in `@rules` like `url` to global classes, reference global rule classes as `"\\MyRule"` https://github.com/nuwave/lighthouse/pull/2792
+
+## v6.71.0
+
+### Deprecated
+
+- Deprecate `_ide_helper.php` and generating `_lighthouse_ide_helper.php`, Larastan recognizes the `TestResponse` mixin methods without them https://github.com/nuwave/lighthouse/pull/2791
+
+## v6.70.1
+
+### Fixed
+
+- Throw client-safe errors for malformed date literals instead of reporting them as server errors https://github.com/nuwave/lighthouse/pull/2788
+
+## v6.70.0
+
+### Changed
+
+- Classes passed to `DirectiveLocator::setResolved()` take precedence in `DirectiveLocator::classes()` and `DirectiveLocator::definitions()` https://github.com/nuwave/lighthouse/pull/2787
 
 ## v6.69.2
 

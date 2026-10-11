@@ -14,10 +14,6 @@ return static function (RectorConfig $rectorConfig): void {
         SetList::PHP_73,
         SetList::PHP_74,
         SetList::PHP_80,
-        PHPUnitSetList::PHPUNIT_60,
-        PHPUnitSetList::PHPUNIT_70,
-        PHPUnitSetList::PHPUNIT_80,
-        PHPUnitSetList::PHPUNIT_90,
         PHPUnitSetList::PHPUNIT_CODE_QUALITY,
     ]);
     $rectorConfig->skip([
@@ -33,6 +29,9 @@ return static function (RectorConfig $rectorConfig): void {
         Rector\CodingStyle\Rector\ClassMethod\MakeInheritedMethodVisibilitySameAsParentRector::class => [
             __DIR__ . '/tests/Unit/Execution/ResolveInfoTest.php', // Makes method public on purpose
             __DIR__ . '/benchmarks/BenchmarkTestCase.php', // exposes protected methods
+        ],
+        Rector\CodeQuality\Rector\Catch_\ThrowWithPreviousExceptionRector::class => [
+            __DIR__ . '/src/Schema/Types/Scalars/DateScalar.php', // previous exception makes GraphQL\Error\Error not client-safe
         ],
         Rector\CodingStyle\Rector\Encapsed\EncapsedStringsToSprintfRector::class, // unreadable, slow, error prone
         Rector\PHPUnit\CodeQuality\Rector\Class_\NarrowUnusedSetUpDefinedPropertyRector::class, // falsely removes $this->schema assignments in some tests
