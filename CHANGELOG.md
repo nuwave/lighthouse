@@ -9,6 +9,8 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+## v6.72.0
+
 ### Changed
 
 - Omit `locations` from errors of queries served from `query_cache.mode: store`, as opcache and hybrid modes already do https://github.com/nuwave/lighthouse/pull/2785
