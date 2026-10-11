@@ -9,6 +9,10 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 ## Unreleased
 
+### Changed
+
+- Omit `locations` from errors of queries served from `query_cache.mode: store`, as opcache and hybrid modes already do https://github.com/nuwave/lighthouse/pull/2785
+
 ### Fixed
 
 - Cache the query AST as an array in `query_cache.mode: store`, so it no longer requires allowing AST classes in `cache.serializable_classes` https://github.com/nuwave/lighthouse/pull/2785
