@@ -1,84 +1,64 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Schema\Directives;
 
-use Tests\DBTestCase;
+use Tests\TestCase;
 
-class TrimDirectiveTest extends DBTestCase
+final class TrimDirectiveTest extends TestCase
 {
     public function testTrimsStringArgument(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
-        type Company {
-            id: ID!
-            name: String!
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Query {
+            foo(bar: String! @trim): String! @mock
         }
+        GRAPHQL;
 
-        type Mutation {
-            createCompany(name: String @trim): Company @create
-        }
-        ';
+        $this->mockResolver(static fn ($_, array $args): string => $args['bar']);
 
-        $this->graphQL(/** @lang GraphQL */ '
-        mutation {
-            createCompany(name: "    foo     ") {
-                id
-                name
-            }
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            foo(bar: "    foo     ")
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
-                'createCompany' => [
-                    'id' => '1',
-                    'name' => 'foo',
-                ],
+                'foo' => 'foo',
             ],
         ]);
     }
 
     public function testTrimsInputArgument(): void
     {
-        $this->schema .= /** @lang GraphQL */ '
-        input CompanyInput {
-            name: String!
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        input FooInput {
+            bar: String!
         }
 
-        type Company {
-            id: ID!
-            name: String!
+        type Query {
+            foo(input: FooInput! @trim @spread): String! @mock
         }
+        GRAPHQL;
 
-        type Mutation {
-            createCompany(input: CompanyInput @trim @spread): Company @create
-        }
-        ';
+        $this->mockResolver(static fn ($_, array $args): string => $args['bar']);
 
-        $this->graphQL(/** @lang GraphQL */ '
-        mutation {
-            createCompany(input: {
-                name: "    foo     "
-            }) {
-                id
-                name
-            }
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
+            foo(input: {
+                bar: "    foo     "
+            })
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
-                'createCompany' => [
-                    'id' => '1',
-                    'name' => 'foo',
-                ],
+                'foo' => 'foo',
             ],
         ]);
     }
 
     public function testTrimsAllFieldInputs(): void
     {
-        $this->mockResolver(static function ($root, array $args): array {
-            return $args;
-        });
+        $this->mockResolver(static fn ($_, array $args): array => $args);
 
-        $this->schema .= /** @lang GraphQL */ '
+        $this->schema .= /** @lang GraphQL */ <<<'GRAPHQL'
         type Foo {
             foo: String!
             bar: [String!]!
@@ -91,13 +71,13 @@ class TrimDirectiveTest extends DBTestCase
             baz: Int!
         }
 
-        type Mutation {
-            foo(input: FooInput @spread): Foo @trim @mock
+        type Query {
+            foo(input: FooInput! @spread): Foo! @trim @mock
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
-        mutation {
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
             foo(input: {
                 foo: " foo "
                 bar: [" bar "]
@@ -108,7 +88,7 @@ class TrimDirectiveTest extends DBTestCase
                 baz
             }
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'foo' => [
                     'foo' => 'foo',

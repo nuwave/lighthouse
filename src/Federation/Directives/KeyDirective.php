@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Federation\Directives;
 
@@ -11,9 +11,7 @@ class KeyDirective extends BaseDirective
 {
     public const NAME = 'key';
 
-    /**
-     * @see https://www.apollographql.com/docs/apollo-server/federation/federation-spec/#schema-modifications-glossary
-     */
+    /** @see https://www.apollographql.com/docs/apollo-server/federation/federation-spec/#schema-modifications-glossary */
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'GRAPHQL'
@@ -34,7 +32,7 @@ GRAPHQL;
     {
         $fields = $this->directiveArgValue('fields');
         if (! is_string($fields)) {
-            throw new DefinitionException('Argument `fields` on the `@key` directive is required.');
+            throw new DefinitionException("Argument `fields` on the `@{$this->name()}` directive is required.");
         }
 
         // Grammatically, a field set is a selection set minus the braces.

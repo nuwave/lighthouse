@@ -1,30 +1,31 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Subscriptions\Storage;
 
 use Illuminate\Support\Facades\Redis;
+use Illuminate\Testing\TestResponse;
 use Nuwave\Lighthouse\Subscriptions\Storage\RedisStorageManager;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
+use Tests\EnablesSubscriptionServiceProvider;
 use Tests\TestCase;
 use Tests\TestsRedis;
-use Tests\TestsSubscriptions;
 
-class RedisStorageManagerTest extends TestCase
+final class RedisStorageManagerTest extends TestCase
 {
     use TestsRedis;
-    use TestsSubscriptions;
+    use EnablesSubscriptionServiceProvider;
 
-    protected $schema = /** @lang GraphQL */ '
-    type Task {
-        id: ID!
-        name: String!
-    }
-
-    type Subscription {
-        taskUpdated(id: ID!): Task
-        taskCreated: Task
-    }
-    ' . self::PLACEHOLDER_QUERY;
+    protected string $schema = /** @lang GraphQL */ <<<'GRAPHQL'
+        type Task {
+            id: ID!
+            name: String!
+        }
+    
+        type Subscription {
+            taskUpdated(id: ID!): Task
+            taskCreated: Task
+        }
+    GRAPHQL . self::PLACEHOLDER_QUERY;
 
     public function testSubscriptionStoredWithPrefix(): void
     {
@@ -35,7 +36,7 @@ class RedisStorageManagerTest extends TestCase
         $this->assertStringStartsWith('private-lighthouse-', $channel);
 
         // internally when using the redis driver to access the keys there seems to be no prefix
-        $this->assertRedisHas('graphql.subscriber.' . $channel);
+        $this->assertRedisHas("graphql.subscriber.{$channel}");
         $this->assertRedisHas('graphql.topic.TASK_UPDATED');
 
         // but in reality redis stores with a prefix
@@ -47,18 +48,18 @@ class RedisStorageManagerTest extends TestCase
 
     public function testDeleteSubscriber(): void
     {
-        /** @var \Nuwave\Lighthouse\Subscriptions\Storage\RedisStorageManager $storage */
+        /** @var RedisStorageManager $storage */
         $storage = $this->app->make(RedisStorageManager::class);
 
         $response = $this->querySubscription();
         $channel = $response->json('extensions.lighthouse_subscriptions.channel');
 
         // when it's the only subscriber to a topic, the topic gets deleted with the subscriber
-        $this->assertRedisHas('graphql.subscriber.' . $channel);
+        $this->assertRedisHas("graphql.subscriber.{$channel}");
         $this->assertRedisHas('graphql.topic.TASK_UPDATED');
 
         $storage->deleteSubscriber($channel);
-        $this->assertRedisMissing('graphql.subscriber.' . $channel);
+        $this->assertRedisMissing("graphql.subscriber.{$channel}");
         $this->assertRedisMissing('graphql.topic.TASK_UPDATED');
 
         // when there are multiple subscribers, the topic stays as long as there are subscribers
@@ -77,7 +78,6 @@ class RedisStorageManagerTest extends TestCase
 
     public function testSubscribersByTopic(): void
     {
-        /** @var RedisStorageManager $storage */
         $storage = $this->app->make(RedisStorageManager::class);
 
         $this->querySubscription();
@@ -97,18 +97,31 @@ class RedisStorageManagerTest extends TestCase
         $this->assertContainsOnlyInstancesOf(Subscriber::class, $createdSubscribers);
     }
 
-    /**
-     * @return \Illuminate\Testing\TestResponse
-     */
-    protected function querySubscription(string $topic = /** @lang GraphQL */ 'taskUpdated(id: 123)')
+    public function testSocketIDStoredOnSubscribe(): void
     {
-        return $this->graphQL(/** @lang GraphQL */ "
+        $storage = $this->app->make(RedisStorageManager::class);
+
+        $this->querySubscription('taskCreated', [
+            'X-Socket-ID' => '1234.1234',
+        ]);
+
+        $createdSubscriber = $storage->subscribersByTopic('TASK_CREATED')->first();
+        $this->assertNotNull($createdSubscriber);
+        $this->assertSame('1234.1234', $createdSubscriber->socket_id);
+    }
+
+    /** @param  array<string, mixed>  $headers */
+    private function querySubscription(string $topic = /** @lang GraphQL */ <<<'GRAPHQL'
+    taskUpdated(id: 123)
+    GRAPHQL, array $headers = []): TestResponse
+    {
+        return $this->graphQL(/** @lang GraphQL */ query: "
         subscription {
             {$topic} {
                 id
                 name
             }
         }
-        ");
+        ", headers: $headers);
     }
 }

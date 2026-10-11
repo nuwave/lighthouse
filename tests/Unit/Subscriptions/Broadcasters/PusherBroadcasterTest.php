@@ -1,17 +1,18 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Subscriptions\Broadcasters;
 
 use Illuminate\Config\Repository as ConfigRepository;
-use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
+use Nuwave\Lighthouse\Subscriptions\BroadcastDriverManager;
+use Nuwave\Lighthouse\Subscriptions\Broadcasters\PusherBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Psr\Log\LoggerInterface;
+use Tests\EnablesSubscriptionServiceProvider;
 use Tests\TestCase;
-use Tests\TestsSubscriptions;
 
-class PusherBroadcasterTest extends TestCase
+final class PusherBroadcasterTest extends TestCase
 {
-    use TestsSubscriptions;
+    use EnablesSubscriptionServiceProvider;
 
     public function testPusherUsesLoggerInterface(): void
     {
@@ -22,19 +23,15 @@ class PusherBroadcasterTest extends TestCase
             ->expects($this->atLeast(1))
             ->method('log');
 
-        $this->app->bind(LoggerInterface::class, static function () use ($logger): LoggerInterface {
-            return $logger;
-        });
+        $this->app->bind(LoggerInterface::class, static fn (): LoggerInterface => $logger);
 
         $config = $this->app->make(ConfigRepository::class);
         $config->set('broadcasting.connections.pusher.log', true);
 
-        $subscriber = $this->createMock(Subscriber::class);
+        $subscriber = $this->createStub(Subscriber::class);
         $subscriber->channel = 'test-123';
 
-        $broadcastManager = $this->app->make(BroadcastManager::class);
-        $pusherBroadcaster = $broadcastManager->driver('pusher');
-        $pusherBroadcaster->broadcast($subscriber, 'foo');
+        $this->broadcast($subscriber);
     }
 
     public function testPusherNeverUsesLoggerInterface(): void
@@ -45,18 +42,25 @@ class PusherBroadcasterTest extends TestCase
             ->expects($this->never())
             ->method('log');
 
-        $this->app->bind(LoggerInterface::class, static function () use ($logger): LoggerInterface {
-            return $logger;
-        });
+        $this->app->bind(LoggerInterface::class, static fn (): LoggerInterface => $logger);
 
         $config = $this->app->make(ConfigRepository::class);
         $config->set('broadcasting.connections.pusher.log', false);
 
-        $subscriber = $this->createMock(Subscriber::class);
+        $subscriber = $this->createStub(Subscriber::class);
         $subscriber->channel = 'test-123';
 
-        $broadcastManager = $this->app->make(BroadcastManager::class);
-        $pusherBroadcaster = $broadcastManager->driver('pusher');
+        $this->broadcast($subscriber);
+    }
+
+    /** @param  \Nuwave\Lighthouse\Subscriptions\Subscriber&\PHPUnit\Framework\MockObject\Stub  $subscriber */
+    private function broadcast(object $subscriber): void
+    {
+        $broadcastDriverManager = $this->app->make(BroadcastDriverManager::class);
+
+        $pusherBroadcaster = $broadcastDriverManager->driver('pusher');
+        $this->assertInstanceOf(PusherBroadcaster::class, $pusherBroadcaster);
+
         $pusherBroadcaster->broadcast($subscriber, 'foo');
     }
 }

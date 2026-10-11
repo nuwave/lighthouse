@@ -1,37 +1,14 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema;
-
-use Illuminate\Support\Str;
 
 class RootType
 {
     public const QUERY = 'Query';
+
     public const MUTATION = 'Mutation';
+
     public const SUBSCRIPTION = 'Subscription';
-
-    public static function Query(): string
-    {
-        return self::getType(static::QUERY);
-    }
-
-    public static function Mutation(): string
-    {
-        return self::getType(static::MUTATION);
-    }
-
-    public static function Subscription(): string
-    {
-        return self::getType(static::SUBSCRIPTION);
-    }
-
-    private static function getType(string $typeName): string
-    {
-        return config(
-            'lighthouse.root_types.' . Str::lower($typeName),
-            $typeName
-        );
-    }
 
     public static function isRootType(string $typeName): bool
     {
@@ -41,19 +18,32 @@ class RootType
                 static::QUERY,
                 static::MUTATION,
                 static::SUBSCRIPTION,
-            ]
+            ],
         );
     }
 
-    /**
-     * @return array<int, string>
-     */
-    public static function defaultNamespaces(string $typeName): array
+    /** @return non-empty-array<string> */
+    public static function namespaces(string $rootType): array
     {
-        if (!static::isRootType($typeName)) {
-            return [];
+        $key = match ($rootType) {
+            self::QUERY => 'queries',
+            self::MUTATION => 'mutations',
+            self::SUBSCRIPTION => 'subscriptions',
+            default => throw new \InvalidArgumentException("Invalid root type: {$rootType}."),
+        };
+
+        $namespaces = (array) config("lighthouse.namespaces.{$key}");
+
+        foreach ($namespaces as $namespace) {
+            if (! is_string($namespace)) {
+                throw new \RuntimeException("Non-string value configured for lighthouse.namespaces.{$key}.");
+            }
         }
 
-        return (array) config('lighthouse.namespaces.' . Str::plural(Str::lower($typeName)));
+        if ($namespaces === []) {
+            throw new \RuntimeException("No namespaces configured for lighthouse.namespaces.{$key}.");
+        }
+
+        return array_values($namespaces);
     }
 }

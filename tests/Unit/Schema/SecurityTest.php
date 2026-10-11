@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Schema;
 
@@ -7,13 +7,13 @@ use GraphQL\Validator\Rules\QueryComplexity;
 use GraphQL\Validator\Rules\QueryDepth;
 use Tests\TestCase;
 
-class SecurityTest extends TestCase
+final class SecurityTest extends TestCase
 {
     public function testSetMaxComplexityThroughConfig(): void
     {
         config(['lighthouse.security.max_query_complexity' => 1]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             user: User @first
         }
@@ -21,7 +21,7 @@ class SecurityTest extends TestCase
         type User {
             name: String
         }
-        ';
+        GRAPHQL;
 
         $this->assertMaxQueryComplexityIs1();
     }
@@ -30,7 +30,7 @@ class SecurityTest extends TestCase
     {
         config(['lighthouse.security.max_query_depth' => 1]);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             user: User @first
         }
@@ -39,37 +39,34 @@ class SecurityTest extends TestCase
             name: String
             user: User
         }
-        ';
+        GRAPHQL;
 
         $this->assertMaxQueryDepthIs1();
     }
 
     public function testDisableIntrospectionThroughConfig(): void
     {
-        config(['lighthouse.security.disable_introspection' => true]);
+        config(['lighthouse.security.disable_introspection' => DisableIntrospection::ENABLED]);
 
         $this->assertIntrospectionIsDisabled();
     }
 
-    protected function assertMaxQueryComplexityIs1(): void
+    private function assertMaxQueryComplexityIs1(): void
     {
-        $result = $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 name
             }
         }
-        ');
-
-        $this->assertSame(
+        GRAPHQL)->assertGraphQLErrorMessage(
             QueryComplexity::maxQueryComplexityErrorMessage(1, 2),
-            $result->json('errors.0.message')
         );
     }
 
-    protected function assertMaxQueryDepthIs1(): void
+    private function assertMaxQueryDepthIs1(): void
     {
-        $result = $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             user {
                 user {
@@ -79,17 +76,14 @@ class SecurityTest extends TestCase
                 }
             }
         }
-        ');
-
-        $this->assertSame(
+        GRAPHQL)->assertGraphQLErrorMessage(
             QueryDepth::maxQueryDepthErrorMessage(1, 2),
-            $result->json('errors.0.message')
         );
     }
 
-    protected function assertIntrospectionIsDisabled(): void
+    private function assertIntrospectionIsDisabled(): void
     {
-        $result = $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             __schema {
                 queryType {
@@ -97,11 +91,8 @@ class SecurityTest extends TestCase
                 }
             }
         }
-        ');
-
-        $this->assertSame(
+        GRAPHQL)->assertGraphQLErrorMessage(
             DisableIntrospection::introspectionDisabledMessage(),
-            $result->json('errors.0.message')
         );
     }
 }

@@ -1,27 +1,21 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\GlobalId;
 
-use Closure;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgSanitizerDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
-use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 
 class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgSanitizerDirective, ArgDirective
 {
-    /**
-     * @var \Nuwave\Lighthouse\Support\Contracts\GlobalId
-     */
-    protected $globalId;
+    public const NAME = 'globalId';
 
-    public function __construct(GlobalId $globalId)
-    {
-        $this->globalId = $globalId;
-    }
+    public function __construct(
+        protected GlobalId $globalId,
+    ) {}
 
     public static function definition(): string
     {
@@ -62,48 +56,39 @@ enum GlobalIdDecode {
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue): void
     {
         $type = $fieldValue->getParentName();
 
-        $fieldValue->resultHandler(function ($result) use ($type) {
-            if (null === $result) {
-                return null;
-            }
-
-            return $this->globalId->encode($type, $result);
-        });
-
-        return $next($fieldValue);
+        $fieldValue->resultHandler(
+            fn ($result): ?string => $result === null
+                ? null
+                : $this->globalId->encode($type, $result),
+        );
     }
 
     /**
      * Decodes a global id given as an argument.
      *
-     * @param  string|null  $argumentValue
-     *
-     * @return string|array{0: string, 1: string}|null
+     * @return string|array{
+     *   0: string,
+     *   1: string,
+     * }|null
      */
-    public function sanitize($argumentValue)
+    public function sanitize(mixed $argumentValue): string|array|null
     {
-        if (null === $argumentValue) {
+        if ($argumentValue === null) {
             return null;
         }
 
         $decode = $this->directiveArgValue('decode');
-        if (null !== $decode) {
-            switch ($decode) {
-                case 'TYPE':
-                    return $this->globalId->decodeType($argumentValue);
-                case 'ID':
-                    return $this->globalId->decodeID($argumentValue);
-                case 'ARRAY':
-                    return $this->globalId->decode($argumentValue);
-                default:
-                    throw new DefinitionException(
-                        "The decode argument of the @globalId directive can only be TYPE, ARRAY or ID, got {$decode}"
-                    );
-            }
+        if ($decode !== null) {
+            return match ($decode) {
+                'TYPE' => $this->globalId->decodeType($argumentValue),
+                'ID' => $this->globalId->decodeID($argumentValue),
+                'ARRAY' => $this->globalId->decode($argumentValue),
+                default => throw new DefinitionException("The decode argument of the @{$this->name()} directive can only be TYPE, ARRAY or ID, got {$decode}."),
+            };
         }
 
         return $this->globalId->decode($argumentValue);

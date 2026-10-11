@@ -1,123 +1,119 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Execution\DataLoader;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Nuwave\Lighthouse\Execution\ModelsLoader\PaginatedModelsLoader;
 use Nuwave\Lighthouse\Pagination\PaginationArgs;
+use Nuwave\Lighthouse\Pagination\PaginationType;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Tag;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class PaginatedRelationLoaderTest extends DBTestCase
+final class PaginatedRelationLoaderTest extends DBTestCase
 {
     public function testLoadRelationshipsWithLimitsOnCollection(): void
     {
-        /** @var \Tests\Utils\Models\User $user1 */
         $user1 = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user1);
         $user1->tasks()->saveMany(
-            factory(Task::class, 5)->make()
+            factory(Task::class, 5)->make(),
         );
 
-        /** @var \Tests\Utils\Models\User $user2 */
         $user2 = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user2);
         $user2->tasks()->saveMany(
-            factory(Task::class, 2)->make()
+            factory(Task::class, 2)->make(),
         );
 
         $pageSize = 3;
         $users = User::all();
         (new PaginatedModelsLoader(
             'tasks',
-            static function () {
-            },
-            $this->makePaginationArgs($pageSize)
+            static function (): void {},
+            $this->makePaginationArgs($pageSize),
         ))->load($users);
 
-        /** @var \Tests\Utils\Models\User $firstUser */
         $firstUser = $users[0];
-        /** @var \Illuminate\Pagination\LengthAwarePaginator<\Tests\Utils\Models\Task> $tasksPaginator */
+        $this->assertInstanceOf(User::class, $firstUser);
         $tasksPaginator = $firstUser->tasks;
         $this->assertInstanceOf(LengthAwarePaginator::class, $tasksPaginator);
         $this->assertCount($pageSize, $tasksPaginator);
-        /** @var \Tests\Utils\Models\Task $firstTask */
         $firstTask = $tasksPaginator[0];
+        $this->assertInstanceOf(Task::class, $firstTask);
         $this->assertEquals($firstUser->getKey(), $firstTask->user_id);
 
-        /** @var \Tests\Utils\Models\User $secondUser */
         $secondUser = $users[1];
+        $this->assertInstanceOf(User::class, $secondUser);
         $this->assertCount(2, $secondUser->tasks);
-        /** @var \Tests\Utils\Models\Task $secondTask */
         $secondTask = $secondUser->tasks[0];
+        $this->assertInstanceOf(Task::class, $secondTask);
         $this->assertEquals($secondUser->getKey(), $secondTask->user_id);
     }
 
     public function testLoadCountOnCollection(): void
     {
-        /** @var \Tests\Utils\Models\User $user1 */
         $user1 = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user1);
         $firstTasksCount = 1;
         $user1->tasks()->saveMany(
-            factory(Task::class, $firstTasksCount)->make()
+            factory(Task::class, $firstTasksCount)->make(),
         );
 
-        /** @var \Tests\Utils\Models\User $user2 */
         $user2 = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user2);
         $secondTasksCount = 3;
         $user2->tasks()->saveMany(
-            factory(Task::class, $secondTasksCount)->make()
+            factory(Task::class, $secondTasksCount)->make(),
         );
 
         $users = User::all();
 
         (new PaginatedModelsLoader(
             'tasks',
-            static function () {
-            },
-            $this->makePaginationArgs(10)
+            static function (): void {},
+            $this->makePaginationArgs(10),
         ))->load($users);
 
-        /** @var \Tests\Utils\Models\User $firstUser */
         $firstUser = $users[0];
+        $this->assertInstanceOf(User::class, $firstUser);
         $this->assertSame($firstTasksCount, $firstUser->getAttributes()['tasks_count'] ?? null);
 
-        /** @var \Tests\Utils\Models\User $secondUser */
         $secondUser = $users[1];
+        $this->assertInstanceOf(User::class, $secondUser);
         $this->assertSame($secondTasksCount, $secondUser->getAttributes()['tasks_count'] ?? null);
     }
 
     public function testLoadsMultipleRelations(): void
     {
-        /** @var \Tests\Utils\Models\User $user */
         $user = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user);
 
         $user->tasks()->saveMany(
-            factory(Task::class, 2)->make()
+            factory(Task::class, 2)->make(),
         );
         $user->posts()->saveMany(
-            factory(Post::class, 3)->make()
+            factory(Post::class, 3)->make(),
         );
 
         $users = User::all();
 
         (new PaginatedModelsLoader(
             'tasks',
-            static function () {
-            },
-            $this->makePaginationArgs(4)
+            static function (): void {},
+            $this->makePaginationArgs(4),
         ))->load($users);
 
         (new PaginatedModelsLoader(
             'posts',
-            static function () {
-            },
-            $this->makePaginationArgs(4)
+            static function (): void {},
+            $this->makePaginationArgs(4),
         ))->load($users);
 
-        /** @var \Tests\Utils\Models\User $firstUser */
         $firstUser = $users[0];
+        $this->assertInstanceOf(User::class, $firstUser);
 
         $this->assertTrue($firstUser->relationLoaded('tasks'));
         $this->assertTrue($firstUser->relationLoaded('posts'));
@@ -125,24 +121,24 @@ class PaginatedRelationLoaderTest extends DBTestCase
 
     public function testHandleSoftDeletes(): void
     {
-        /** @var \Tests\Utils\Models\User $user1 */
         $user1 = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user1);
 
         $tasksUser1 = 3;
         $user1->tasks()->saveMany(
-            factory(Task::class, $tasksUser1)->make()
+            factory(Task::class, $tasksUser1)->make(),
         );
 
         $softDeletedTaskUser1 = factory(Task::class)->make();
         $user1->tasks()->save($softDeletedTaskUser1);
         $softDeletedTaskUser1->delete();
 
-        /** @var \Tests\Utils\Models\User $user2 */
         $user2 = factory(User::class)->create();
+        $this->assertInstanceOf(User::class, $user2);
 
         $tasksUser2 = 4;
         $user2->tasks()->saveMany(
-            factory(Task::class, $tasksUser2)->make()
+            factory(Task::class, $tasksUser2)->make(),
         );
 
         $softDeletedTaskUser2 = factory(Task::class)->make();
@@ -153,29 +149,29 @@ class PaginatedRelationLoaderTest extends DBTestCase
 
         (new PaginatedModelsLoader(
             'tasks',
-            static function () {
-            },
-            $this->makePaginationArgs(4)
+            static function (): void {},
+            $this->makePaginationArgs(4),
         ))->load($users);
 
-        /** @var \Tests\Utils\Models\User $firstUser */
         $firstUser = $users[0];
+        $this->assertInstanceOf(User::class, $firstUser);
         $this->assertTrue($firstUser->relationLoaded('tasks'));
         $this->assertCount($tasksUser1, $firstUser->tasks);
 
-        /** @var \Tests\Utils\Models\User $secondUser */
         $secondUser = $users[1];
+        $this->assertInstanceOf(User::class, $secondUser);
         $this->assertTrue($secondUser->relationLoaded('tasks'));
         $this->assertCount($tasksUser2, $secondUser->tasks);
     }
 
     public function testGetsPolymorphicRelationship(): void
     {
-        /** @var Task $task */
         $task = factory(Task::class)->create();
-        $task->tags()->saveMany(
-            factory(Tag::class, 3)->make()
-        );
+        $this->assertInstanceOf(Task::class, $task);
+
+        foreach (factory(Tag::class, 3)->make() as $tag) {
+            $task->tags()->save($tag);
+        }
 
         $this->assertCount(3, $task->tags);
 
@@ -184,19 +180,18 @@ class PaginatedRelationLoaderTest extends DBTestCase
 
         (new PaginatedModelsLoader(
             'tags',
-            static function () {
-            },
-            $this->makePaginationArgs($first)
+            static function (): void {},
+            $this->makePaginationArgs($first),
         ))->load($tasks);
 
-        /** @var \Tests\Utils\Models\Task $firstTask */
         $firstTask = $tasks[0];
+        $this->assertInstanceOf(Task::class, $firstTask);
         $this->assertCount($first, $firstTask->tags);
     }
 
-    protected function makePaginationArgs(int $first): PaginationArgs
+    private function makePaginationArgs(int $first): PaginationArgs
     {
-        $paginatorArgs = new PaginationArgs();
+        $paginatorArgs = new PaginationArgs(1, $first, new PaginationType('SIMPLE'));
         $paginatorArgs->first = $first;
 
         return $paginatorArgs;

@@ -1,48 +1,41 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
 use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Type\Definition\Directive;
-use GraphQL\Type\Definition\FieldArgument;
+use GraphQL\Type\Definition\InputType;
+use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\TypeNodeConverter;
 
 class DirectiveFactory
 {
-    /**
-     * @var \Nuwave\Lighthouse\Schema\AST\TypeNodeConverter
-     */
-    protected $typeNodeConverter;
+    public function __construct(
+        protected TypeNodeConverter $typeNodeConverter,
+    ) {}
 
-    public function __construct(TypeNodeConverter $typeNodeConverter)
-    {
-        $this->typeNodeConverter = $typeNodeConverter;
-    }
-
-    /**
-     * Transform node to type.
-     */
+    /** Transform node to type. */
     public function handle(DirectiveDefinitionNode $directive): Directive
     {
         $arguments = [];
         foreach ($directive->arguments as $argument) {
-            /** @var \GraphQL\Type\Definition\Type&\GraphQL\Type\Definition\InputType $argumentType */
             $argumentType = $this->typeNodeConverter->convert($argument->type);
+            assert($argumentType instanceof Type && $argumentType instanceof InputType);
 
-            $fieldArgumentConfig = [
+            $argumentConfig = [
                 'name' => $argument->name->value,
-                'description' => $argument->description->value ?? null,
+                'description' => $argument->description?->value,
                 'type' => $argumentType,
             ];
 
-            if ($defaultValue = $argument->defaultValue) {
-                $fieldArgumentConfig += [
+            if (($defaultValue = $argument->defaultValue) !== null) {
+                $argumentConfig += [
                     'defaultValue' => ASTHelper::defaultValueForArgument($defaultValue, $argumentType),
                 ];
             }
 
-            $arguments[] = new FieldArgument($fieldArgumentConfig);
+            $arguments[] = $argumentConfig;
         }
 
         $locations = [];
@@ -53,7 +46,7 @@ class DirectiveFactory
 
         return new Directive([
             'name' => $directive->name->value,
-            'description' => $directive->description->value ?? null,
+            'description' => $directive->description?->value,
             'locations' => $locations,
             'args' => $arguments,
             'isRepeatable' => $directive->repeatable,

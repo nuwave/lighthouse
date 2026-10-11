@@ -5,6 +5,9 @@
 - [joselfonseca/lighthouse-graphql-passport-auth](https://github.com/joselfonseca/lighthouse-graphql-passport-auth)
 - [daniel-de-wit/lighthouse-sanctum](https://github.com/daniel-de-wit/lighthouse-sanctum)
 - [thekonz/lighthouse-redis-broadcaster](https://github.com/thekonz/lighthouse-redis-broadcaster)
+- [brightalley/lighthouse-apollo](https://github.com/brightalley/lighthouse-apollo)
+- [roboroads/lighthouse-settings](https://github.com/Roboroads/lighthouse-settings)
+- [lastdragon-ru/lara-asp-graphql](https://github.com/LastDragon-ru/php-packages/tree/main/packages/lara-asp-graphql "Strictly typed Searching and Sorting")
 
 ## Tutorials
 
@@ -23,7 +26,8 @@
 
 ## Recommended Packages
 
-- [mll-lab/laravel-graphql-playground](https://github.com/mll-lab/laravel-graphql-playground)
+- [mll-lab/laravel-graphiql](https://github.com/mll-lab/laravel-graphiql)
+- [mll-lab/laravel-graphql-voyager](https://github.com/mll-lab/laravel-graphql-voyager)
 - [mll-lab/graphql-php-scalars](https://github.com/mll-lab/graphql-php-scalars)
 - [marvinrabe/laravel-graphql-test](https://github.com/marvinrabe/laravel-graphql-test)
 

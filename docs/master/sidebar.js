@@ -14,6 +14,7 @@ module.exports = [
       "the-basics/types",
       "the-basics/fields",
       "the-basics/directives",
+      "the-basics/best-practices",
     ],
   },
   {
@@ -29,7 +30,12 @@ module.exports = [
   },
   {
     title: "Testing",
-    children: ["testing/phpunit", "testing/phpstan", "testing/extensions"],
+    children: [
+      "testing/phpunit",
+      "testing/phpstan",
+      "testing/rector",
+      "testing/extensions",
+    ],
   },
   {
     title: "Subscriptions",
@@ -46,6 +52,8 @@ module.exports = [
     children: [
       ["federation/getting-started", "Getting Started"],
       "federation/entities",
+      "federation/entity-representations",
+      "federation/reference-resolvers",
     ],
   },
   {
@@ -59,6 +67,7 @@ module.exports = [
       "digging-deeper/file-uploads",
       "digging-deeper/client-directives",
       "digging-deeper/deprecation",
+      "digging-deeper/feature-toggles",
       "digging-deeper/extending-lighthouse",
     ],
   },
@@ -68,7 +77,9 @@ module.exports = [
       ["custom-directives/getting-started", "Getting Started"],
       "custom-directives/type-directives",
       "custom-directives/field-directives",
-      "custom-directives/argument-directives",
+      "custom-directives/input-value-directives",
+      "custom-directives/field-argument-directives",
+      "custom-directives/input-field-directives",
     ],
   },
   {

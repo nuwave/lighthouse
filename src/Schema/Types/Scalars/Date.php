@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Types\Scalars;
 
@@ -11,7 +11,7 @@ class Date extends DateScalar
         return $carbon->toDateString();
     }
 
-    protected function parse($value): Carbon
+    protected function parse(string $value): Carbon
     {
         // @phpstan-ignore-next-line We know the format to be good, so this can never return `false`
         return Carbon::createFromFormat('Y-m-d', $value)->startOfDay();

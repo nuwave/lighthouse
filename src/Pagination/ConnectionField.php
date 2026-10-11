@@ -1,71 +1,80 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Pagination;
 
-use GraphQL\Type\Definition\ResolveInfo;
+use GraphQL\Type\Definition\InterfaceType;
+use GraphQL\Type\Definition\NonNull;
+use GraphQL\Type\Definition\ObjectType;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Execution\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class ConnectionField
 {
     /**
-     * Resolve page info for connection.
+     * @param  \Illuminate\Contracts\Pagination\LengthAwarePaginator<*, *>  $paginator
      *
-     * @return array<string, mixed>
+     * @return array{
+     *     hasNextPage: bool,
+     *     hasPreviousPage: bool,
+     *     startCursor: string|null,
+     *     endCursor: string|null,
+     *     total: int,
+     *     count: int,
+     *     currentPage: int,
+     *     lastPage: int,
+     * }
      */
     public function pageInfoResolver(LengthAwarePaginator $paginator): array
     {
         /** @var int|null $firstItem Laravel type-hints are inaccurate here */
         $firstItem = $paginator->firstItem();
+
         /** @var int|null $lastItem Laravel type-hints are inaccurate here */
         $lastItem = $paginator->lastItem();
 
         return [
             'hasNextPage' => $paginator->hasMorePages(),
             'hasPreviousPage' => $paginator->currentPage() > 1,
-            'startCursor' => null !== $firstItem
+            'startCursor' => $firstItem !== null
                 ? Cursor::encode($firstItem)
                 : null,
-            'endCursor' => null !== $lastItem
+            'endCursor' => $lastItem !== null
                 ? Cursor::encode($lastItem)
                 : null,
             'total' => $paginator->total(),
-            'count' => $paginator->count(),
+            'count' => count($paginator->items()),
             'currentPage' => $paginator->currentPage(),
             'lastPage' => $paginator->lastPage(),
         ];
     }
 
     /**
-     * Resolve edges for connection.
-     *
-     * @param  \Illuminate\Pagination\LengthAwarePaginator<mixed>  $paginator
+     * @param  \Illuminate\Contracts\Pagination\Paginator<*, *>  $paginator
      * @param  array<string, mixed>  $args
+     *
+     * @return Collection<int, array<string, mixed>>
      */
-    public function edgeResolver(LengthAwarePaginator $paginator, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Collection
+    public function edgeResolver(Paginator $paginator, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Collection
     {
         // We know those types because we manipulated them during PaginationManipulator
-        /** @var \GraphQL\Type\Definition\NonNull $nonNullList */
         $nonNullList = $resolveInfo->returnType;
-        /** @var \GraphQL\Type\Definition\ObjectType|\GraphQL\Type\Definition\InterfaceType $objectLikeType */
-        $objectLikeType = $nonNullList->getWrappedType(true);
+        assert($nonNullList instanceof NonNull);
+
+        $objectLikeType = $nonNullList->getInnermostType();
+        assert($objectLikeType instanceof ObjectType || $objectLikeType instanceof InterfaceType);
 
         $returnTypeFields = $objectLikeType->getFields();
 
         /** @var int|null $firstItem Laravel type-hints are inaccurate here */
         $firstItem = $paginator->firstItem();
 
-        /**
-         * The return type `static` refers to the wrong class because it is a proxied method call.
-         *
-         * @var \Illuminate\Support\Collection<mixed> $values
-         */
-        $values = $paginator->values();
+        $values = new Collection(array_values($paginator->items()));
 
-        return $values->map(function ($item, int $index) use ($returnTypeFields, $firstItem): array {
+        return $values->map(static function ($item, int $index) use ($returnTypeFields, $firstItem): array {
             $data = [];
-
             foreach ($returnTypeFields as $field) {
                 switch ($field->name) {
                     case 'cursor':
@@ -74,6 +83,10 @@ class ConnectionField
 
                     case 'node':
                         $data['node'] = $item;
+                        break;
+
+                    case 'pivot':
+                        $data['pivot'] = $item->pivot;
                         break;
 
                     default:

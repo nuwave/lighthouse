@@ -2,10 +2,8 @@
 
 **Experimental: not enabled by default, not guaranteed to be stable.**
 
-Adding query conditions ad-hoc can be cumbersome and limiting when you require
-manifold ways to filter query results.
-Lighthouse's `WhereConditions` extension can give advanced query capabilities to clients
-and allow them to apply complex, dynamic WHERE conditions to queries.
+Adding query conditions ad-hoc can be cumbersome and limiting when you require manifold ways to filter query results.
+Lighthouse's `WhereConditions` extension can give advanced query capabilities to clients and allow them to apply complex, dynamic WHERE conditions to queries.
 
 ## Setup
 
@@ -19,12 +17,11 @@ Add the service provider to your `config/app.php`:
 
 Install the dependency [mll-lab/graphql-php-scalars](https://github.com/mll-lab/graphql-php-scalars):
 
-    composer require mll-lab/graphql-php-scalars:^4
+    composer require mll-lab/graphql-php-scalars
 
 ## Usage
 
-You can use this feature through a set of schema directives that enhance fields
-with advanced filter capabilities.
+You can use this feature through a set of schema directives that enhance fields with advanced filter capabilities.
 
 ### @whereConditions
 
@@ -36,14 +33,14 @@ directive @whereConditions(
   """
   Restrict the allowed column names to a well-defined list.
   This improves introspection capabilities and security.
-  Mutually exclusive with the `columnsEnum` argument.
+  Mutually exclusive with `columnsEnum`.
   """
   columns: [String!]
 
   """
   Use an existing enumeration type to restrict the allowed columns to a predefined list.
-  This allowes you to re-use the same enum for multiple fields.
-  Mutually exclusive with the `columns` argument.
+  This allows you to re-use the same enum for multiple fields.
+  Mutually exclusive with `columns`.
   """
   columnsEnum: String
 
@@ -61,6 +58,9 @@ directive @whereConditions(
   handler: String = "\\Nuwave\\Lighthouse\\WhereConditions\\WhereConditionsHandler"
 ) on ARGUMENT_DEFINITION
 ```
+
+> This directive only works if the field resolver passes its builder through a call to `$resolveInfo->enhanceBuilder()`.
+> Built-in field resolver directives that query the database do this, such as [@all](../api-reference/directives.md#all) or [@hasMany](../api-reference/directives.md#hasmany).
 
 You can apply this directive on any field that performs an Eloquent query:
 
@@ -80,8 +80,8 @@ type Person {
 }
 ```
 
-Lighthouse automatically generates definitions for an `Enum` type and an `Input` type
-that are restricted to the defined columns, so you do not have to specify them by hand.
+Lighthouse automatically generates definitions for an `Enum` type and an `Input` type that are restricted to the defined columns.
+You do not have to specify them by hand.
 The blank type named `_` will be changed to the actual type.
 Here are the types that will be included in the compiled schema:
 
@@ -131,8 +131,8 @@ input QueryPeopleWhereWhereConditionsRelation {
 }
 ```
 
-Alternatively to the `columns` argument, you can also use `columnsEnum` in case you
-want to re-use a list of allowed columns. Here's how your schema could look like:
+Alternatively to the `columns` argument, you can also use `columnsEnum` in case you want to re-use a list of allowed columns.
+Here's how your schema could look like:
 
 ```graphql
 type Query {
@@ -158,8 +158,7 @@ Instead of creating enums for the allowed columns, it will simply use the existi
 
 It is recommended to either use the `columns` or the `columnsEnum` argument.
 When you don't define any allowed columns, clients can specify arbitrary column names as a `String`.
-This approach should by taken with care, as it carries
-potential performance and security risks and offers little type safety.
+This approach should by taken with care, as it carries potential performance and security risks and offers little type safety.
 
 A simple query for a person who is exactly 42 years old would look like this:
 
@@ -171,8 +170,7 @@ A simple query for a person who is exactly 42 years old would look like this:
 }
 ```
 
-Note that the operator defaults to `EQ` (`=`) if not given, so you could
-also omit it from the previous example and get the same result.
+Note that the operator defaults to `EQ` (`=`) if not given, so you could also omit it from the previous example and get the same result.
 
 The following query gets actors over age 37 who either have red hair or are at least 150cm:
 
@@ -197,8 +195,8 @@ The following query gets actors over age 37 who either have red hair or are at l
 }
 ```
 
-Some operators require passing lists of values - or no value at all. The following
-query gets people that have no hair and blue-ish eyes:
+Some operators require passing lists of values - or no value at all.
+The following query gets people that have no hair and blue-ish eyes:
 
 ```graphql
 {
@@ -246,14 +244,14 @@ directive @whereHasConditions(
   """
   Restrict the allowed column names to a well-defined list.
   This improves introspection capabilities and security.
-  Mutually exclusive with the `columnsEnum` argument.
+  Mutually exclusive with `columnsEnum`.
   """
   columns: [String!]
 
   """
   Use an existing enumeration type to restrict the allowed columns to a predefined list.
-  This allowes you to re-use the same enum for multiple fields.
-  Mutually exclusive with the `columns` argument.
+  This allows you to re-use the same enum for multiple fields.
+  Mutually exclusive with `columns`.
   """
   columnsEnum: String
 
@@ -261,8 +259,8 @@ directive @whereHasConditions(
   Reference a method that applies the client given conditions to the query builder.
 
   Expected signature: `(
-  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder,
-  array<string, mixed> $whereConditions
+      \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder,
+      array<string, mixed> $whereConditions
   ): void`
 
   Consists of two parts: a class name and a method name, separated by an `@` symbol.
@@ -272,8 +270,7 @@ directive @whereHasConditions(
 ) on ARGUMENT_DEFINITION
 ```
 
-This directive works very similar to [@whereConditions](#whereconditions), except that
-the conditions are applied to a relation sub query:
+This directive works very similar to [@whereConditions](#whereconditions), except that the conditions are applied to a relation sub query:
 
 ```graphql
 type Query {
@@ -316,8 +313,7 @@ enum QueryPeopleHasRoleColumn {
 }
 ```
 
-A simple query for a person who has an access level of at least 5, through one of
-their roles, looks like this:
+A simple query for a person who has an access level of at least 5, through one of their roles, looks like this:
 
 ```graphql
 {
@@ -352,10 +348,10 @@ This query would retrieve all persons, no matter if they have a role or not:
 ## Custom operator
 
 If Lighthouse's default `SQLOperator` does not fit your use case, you can register a custom operator class.
-This may be necessary if your database uses different SQL operators then Lighthouse's default,
-or you want to extend/restrict the allowed operators.
+This may be necessary if your database uses different SQL operators then Lighthouse's default, or you want to extend/restrict the allowed operators.
 
-First create a class that implements `\Nuwave\Lighthouse\WhereConditions\Operator`. For example:
+First create a class that implements `\Nuwave\Lighthouse\WhereConditions\Operator`.
+For example:
 
 ```php
 namespace App\GraphQL;
@@ -407,9 +403,8 @@ Make sure to add it after Lighthouse's `\Nuwave\Lighthouse\WhereConditions\Where
 
 ## Custom handler
 
-If you want to take advantage of the schema generation that [@whereConditions](#whereconditions)
-and [@whereHasConditions](#wherehasconditions) provide, but customize the application of arguments
-to the query builder, you can provide a custom handler.
+If you want to take advantage of the schema generation that [@whereConditions](#whereconditions) and [@whereHasConditions](#wherehasconditions) provide.
+Customize the application of arguments to the query builder, you can provide a custom handler.
 
 ```graphql
 type Query {
@@ -419,8 +414,7 @@ type Query {
 }
 ```
 
-When a client passes `where`, your handler will be called with the query builder and
-the passed conditions:
+When a client passes `where`, your handler will be called with the query builder and the passed conditions:
 
 ```php
 namespace App;

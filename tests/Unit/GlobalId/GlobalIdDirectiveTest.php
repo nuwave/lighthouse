@@ -1,20 +1,18 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\GlobalId;
 
+use Nuwave\Lighthouse\GlobalId\GlobalId;
 use Nuwave\Lighthouse\Schema\RootType;
-use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
 
-class GlobalIdDirectiveTest extends TestCase
+final class GlobalIdDirectiveTest extends TestCase
 {
-    /**
-     * @var \Nuwave\Lighthouse\GlobalId\GlobalId
-     */
+    /** @var GlobalId */
     protected $globalId;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -23,50 +21,48 @@ class GlobalIdDirectiveTest extends TestCase
 
     public function testDecodesGlobalId(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: String! @globalId
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
-                'foo' => $this->globalId->encode(RootType::Query(), Foo::THE_ANSWER),
+                'foo' => $this->globalId->encode(RootType::QUERY, Foo::THE_ANSWER),
             ],
         ]);
     }
 
     public function testNullableArgument(): void
     {
-        $this->mockResolver(function ($root, array $args): ?string {
-            return $args['bar'] ?? null;
-        });
+        $this->mockResolver(static fn ($_, array $args): ?string => $args['bar'] ?? null);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(bar: String @globalId): String @mock
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'foo' => null,
             ],
         ]);
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo(bar: null)
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'foo' => null,
             ],
@@ -77,17 +73,17 @@ class GlobalIdDirectiveTest extends TestCase
     {
         $this->mockResolver();
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: String @mock @globalId
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'foo' => null,
             ],
@@ -96,16 +92,9 @@ class GlobalIdDirectiveTest extends TestCase
 
     public function testDecodesGlobalIdOnInput(): void
     {
-        $this->mockResolver(
-            /**
-             * @param  array<string, mixed>  $args
-             */
-            static function ($root, array $args): array {
-                return $args['input']['bar'];
-            }
-        );
+        $this->mockResolver(static fn ($_, array $args): array => $args['input']['bar']);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(input: FooInput!): [String!]! @mock
         }
@@ -113,18 +102,18 @@ class GlobalIdDirectiveTest extends TestCase
         input FooInput {
             bar: String! @globalId
         }
-        ';
+        GRAPHQL;
 
         $globalId = $this->globalId->encode('foo', 'bar');
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($bar: String!) {
                 foo(input: {
                     bar: $bar
                 })
             }
-            ', [
+            GRAPHQL, [
                 'bar' => $globalId,
             ])
             ->assertJson([
@@ -136,16 +125,9 @@ class GlobalIdDirectiveTest extends TestCase
 
     public function testDecodesGlobalIdInDifferentWays(): void
     {
-        $this->mockResolver(
-            /**
-             * @param  array<string, mixed>  $args
-             */
-            static function ($root, array $args): array {
-                return $args;
-            }
-        );
+        $this->mockResolver(static fn ($_, array $args): array => $args);
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo(
                 type: ID! @globalId(decode: TYPE)
@@ -159,23 +141,23 @@ class GlobalIdDirectiveTest extends TestCase
             id: ID!
             array: [String!]!
         }
-        ';
+        GRAPHQL;
 
         $globalId = $this->globalId->encode('Foo', 'bar');
 
-        $this->graphQL(/** @lang GraphQL */ "
+        $this->graphQL(/** @lang GraphQL */ <<<GRAPHQL
         {
             foo(
-                type: \"{$globalId}\"
-                id: \"{$globalId}\"
-                array: \"{$globalId}\"
+                type: "{$globalId}"
+                id: "{$globalId}"
+                array: "{$globalId}"
             ) {
                 id
                 type
                 array
             }
         }
-        ")->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'foo' => [
                     'type' => 'Foo',

@@ -1,7 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Scout;
 
+use GraphQL\Utils\Utils;
 use Laravel\Scout\Builder as ScoutBuilder;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -26,11 +27,10 @@ GRAPHQL;
     public function search(ScoutBuilder $builder): void
     {
         $within = $this->directiveArgValue('within');
-        if (null !== $within) {
+        if ($within !== null) {
             if (! is_string($within)) {
-                throw new DefinitionException(
-                    "Expected the value of the `within` argument of @{$this->name()} on {$this->nodeName()} to be a string, got: " . \Safe\json_encode($within)
-                );
+                $notString = Utils::printSafeJson($within);
+                throw new DefinitionException("Expected the value of the `within` argument of @{$this->name()} on {$this->nodeName()} to be a string, got: {$notString}.");
             }
 
             $builder->within($within);

@@ -1,31 +1,37 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Subscriptions;
 
 use Illuminate\Auth\SessionGuard;
+use Illuminate\Contracts\Auth\Factory as AuthFactory;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\Arr;
-use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
+use Illuminate\Testing\TestResponse;
+use Mockery\MockInterface;
+use Nuwave\Lighthouse\Subscriptions\BroadcastDriverManager;
+use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\Storage\CacheStorageManager;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
-use Tests\DBTestCase;
-use Tests\TestsSubscriptions;
+use Nuwave\Lighthouse\Testing\TestsSubscriptions;
+use Tests\EnablesSubscriptionServiceProvider;
+use Tests\TestCase;
+use Tests\TestsRedis;
 use Tests\Utils\Models\User;
 
-/**
- * TODO extends TestCase when depending on Laravel 5.8+.
- */
-class SubscriptionTest extends DBTestCase
+final class SubscriptionTest extends TestCase
 {
+    use EnablesSubscriptionServiceProvider;
     use TestsSubscriptions;
+    use TestsRedis;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
+        $this->setUpTestsSubscriptions();
+
         $this->mockResolverExpects($this->any())
-            ->willReturnCallback(function ($root, array $args): array {
-                return $args;
-            });
+            ->willReturnCallback(static fn (mixed $root, array $args): array => $args);
 
         $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Post {
@@ -46,17 +52,20 @@ class SubscriptionTest extends DBTestCase
         type Query {
             foo: String
         }
-GRAPHQL;
+        GRAPHQL;
     }
 
     public function testSendsSubscriptionChannelInResponse(): void
     {
         $response = $this->subscribe();
-        $subscriber = app(CacheStorageManager::class)->subscribersByTopic('ON_POST_CREATED')->first();
+
+        $cache = $this->app->make(CacheStorageManager::class);
+
+        $subscriber = $cache->subscribersByTopic('ON_POST_CREATED')->first();
 
         $this->assertInstanceOf(Subscriber::class, $subscriber);
         $response->assertExactJson(
-            $this->buildResponse('onPostCreated', $subscriber->channel)
+            $this->buildResponse('onPostCreated', $subscriber->channel),
         );
     }
 
@@ -64,48 +73,59 @@ GRAPHQL;
     {
         $response = $this->postGraphQL([
             [
-                'query' => /** @lang GraphQL */ '
+                'query' => /** @lang GraphQL */ <<<'GRAPHQL'
                     subscription OnPostCreated1 {
                         onPostCreated {
                             title
                         }
                     }
-                    ',
+                    GRAPHQL,
             ],
             [
-                'query' => /** @lang GraphQL */ '
+                'query' => /** @lang GraphQL */ <<<'GRAPHQL'
                     subscription OnPostCreated2 {
                         onPostCreated {
                             title
                         }
                     }
-                    ',
+                    GRAPHQL,
             ],
         ]);
 
-        $subscribers = app(CacheStorageManager::class)->subscribersByTopic('ON_POST_CREATED');
+        $cache = $this->app->make(CacheStorageManager::class);
+
+        $subscribers = $cache->subscribersByTopic('ON_POST_CREATED');
         $this->assertCount(2, $subscribers);
 
+        $subscriber1 = $subscribers[0];
+        $this->assertInstanceOf(Subscriber::class, $subscriber1);
+
+        $subscriber2 = $subscribers[1];
+        $this->assertInstanceOf(Subscriber::class, $subscriber2);
+
         $response->assertExactJson([
-            $this->buildResponse('onPostCreated', $subscribers[0]->channel),
-            $this->buildResponse('onPostCreated', $subscribers[1]->channel),
+            $this->buildResponse('onPostCreated', $subscriber1->channel),
+            $this->buildResponse('onPostCreated', $subscriber2->channel),
         ]);
     }
 
     public function testBroadcastSubscriptions(): void
     {
         $this->subscribe();
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createPost(title: "Foobar") {
                 title
             }
         }
-        ');
+        GRAPHQL)->assertGraphQLErrorFree();
 
-        /** @var \Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster $log */
-        $log = app(BroadcastManager::class)->driver();
-        $broadcasts = $log->broadcasts();
+        $broadcastDriverManager = $this->app->make(BroadcastDriverManager::class);
+
+        $logDriver = $broadcastDriverManager->driver();
+        $this->assertInstanceOf(LogBroadcaster::class, $logDriver);
+
+        $broadcasts = $logDriver->broadcasts();
 
         $this->assertNotNull($broadcasts);
         /** @var array<mixed> $broadcasts */
@@ -118,20 +138,20 @@ GRAPHQL;
 
     public function testWithFieldAlias(): void
     {
-        $response = $this->graphQL(/** @lang GraphQL */ '
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         subscription {
             alias: onPostCreated {
                 title
             }
         }
-        ');
+        GRAPHQL)->assertGraphQLErrorFree();
 
-        /** @var \Nuwave\Lighthouse\Subscriptions\Storage\CacheStorageManager $cache */
         $cache = $this->app->make(CacheStorageManager::class);
 
         $subscriber = $cache
             ->subscribersByTopic('ON_POST_CREATED')
             ->first();
+        $this->assertNotNull($subscriber);
 
         $response->assertExactJson([
             'data' => [
@@ -139,11 +159,7 @@ GRAPHQL;
             ],
             'extensions' => [
                 'lighthouse_subscriptions' => [
-                    'version' => 1,
                     'channel' => $subscriber->channel,
-                    'channels' => [
-                        'onPostCreated' => $subscriber->channel,
-                    ],
                 ],
             ],
         ]);
@@ -151,26 +167,21 @@ GRAPHQL;
 
     public function testWithoutExcludeEmpty(): void
     {
-        /** @var \Illuminate\Contracts\Config\Repository $config */
-        $config = $this->app->make('config');
+        $config = $this->app->make(ConfigRepository::class);
         $config->set('lighthouse.subscriptions.exclude_empty', false);
-        $config->set('lighthouse.subscriptions.version', 2);
 
         $this->subscribe();
 
-        $response = $this->graphQL(/** @lang GraphQL */ '
-        query foo {
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
             foo
         }
-        ');
-
-        $response->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'foo' => '42',
             ],
             'extensions' => [
                 'lighthouse_subscriptions' => [
-                    'version' => 2,
                     'channel' => null,
                 ],
             ],
@@ -179,20 +190,16 @@ GRAPHQL;
 
     public function testWithExcludeEmpty(): void
     {
-        /** @var \Illuminate\Contracts\Config\Repository $config */
-        $config = $this->app->make('config');
+        $config = $this->app->make(ConfigRepository::class);
         $config->set('lighthouse.subscriptions.exclude_empty', true);
-        $config->set('lighthouse.subscriptions.version', 2);
 
         $this->subscribe();
 
-        $response = $this->graphQL(/** @lang GraphQL */ '
-        query foo {
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        {
             foo
         }
-        ');
-
-        $response->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'foo' => '42',
             ],
@@ -202,28 +209,32 @@ GRAPHQL;
     public function testWithGuard(): void
     {
         $this->be(new User());
-        $this->graphQL(/** @lang GraphQL */ '
-            subscription OnPostCreated {
-                onPostCreated {
-                    body
-                }
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        subscription OnPostCreated {
+            onPostCreated {
+                body
             }
-        ');
+        }
+        GRAPHQL)->assertGraphQLErrorFree();
 
-        /** @var SessionGuard $sessionGuard */
-        $sessionGuard = $this->app->make('auth')->guard();
+        $authFactory = $this->app->make(AuthFactory::class);
+        $sessionGuard = $authFactory->guard();
+        $this->assertInstanceOf(SessionGuard::class, $sessionGuard);
         $sessionGuard->logout();
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         mutation {
             createPost(title: "foo", body: "bar") {
                 title
             }
         }
-        ');
+        GRAPHQL)->assertGraphQLErrorFree();
 
-        /** @var \Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster $log */
-        $log = app(BroadcastManager::class)->driver();
+        $broadcastDriverManager = $this->app->make(BroadcastDriverManager::class);
+
+        $log = $broadcastDriverManager->driver();
+        $this->assertInstanceOf(LogBroadcaster::class, $log);
+
         $broadcasts = $log->broadcasts();
 
         $this->assertIsArray($broadcasts);
@@ -235,22 +246,101 @@ GRAPHQL;
                     'body' => 'bar',
                 ],
             ],
-            Arr::first($broadcasts)['data'] ?? null
+            Arr::first($broadcasts)['data'] ?? null,
         );
     }
 
-    /**
-     * @return \Illuminate\Testing\TestResponse
-     */
-    protected function subscribe()
+    public function testGraphQLSubscriptionAuthorized(): void
     {
-        return $this->graphQL(/** @lang GraphQL */ '
-            subscription OnPostCreated {
-                onPostCreated {
-                    title
-                }
+        $response = $this->subscribe();
+        $response->assertGraphQLSubscriptionAuthorized($this);
+    }
+
+    public function testGraphQLSubscriptionNotAuthorized(): void
+    {
+        $user = new User();
+        $user->name = 'fail_the_authorize_of_subscription';
+        $this->be($user);
+
+        $response = $this->subscribe();
+        $response->assertGraphQLSubscriptionNotAuthorized($this);
+    }
+
+    public function testGraphQLBroadcastedEvents(): void
+    {
+        $response = $this->subscribe();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            createPost(title: "foo", body: "bar") {
+                title
             }
-        ');
+        }
+        GRAPHQL)->assertGraphQLErrorFree();
+
+        $response->assertGraphQLBroadcasted([
+            ['title' => 'foo'],
+        ]);
+    }
+
+    public function testGraphQLBroadcastedEventsTwice(): void
+    {
+        $response = $this->subscribe();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            createPost(title: "foo", body: "bar") {
+                title
+            }
+        }
+        GRAPHQL)->assertGraphQLErrorFree();
+
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        mutation {
+            createPost(title: "baz", body: "boom") {
+                title
+            }
+        }
+        GRAPHQL)->assertGraphQLErrorFree();
+
+        $response->assertGraphQLBroadcasted([
+            ['title' => 'foo'],
+            ['title' => 'baz'],
+        ]);
+    }
+
+    public function testGraphQLNotBroadcastedEventsViaSpy(): void
+    {
+        $response = $this->subscribe();
+
+        $mock = $response->graphQLSubscriptionMock();
+        $this->assertInstanceOf(MockInterface::class, $mock); // @phpstan-ignore method.alreadyNarrowedType (aids IDE)
+        $mock->shouldNotHaveReceived('broadcast');
+    }
+
+    public function testGraphQLNotBroadcasted(): void
+    {
+        $response = $this->subscribe();
+
+        $response->assertGraphQLNotBroadcasted();
+    }
+
+    public function testGraphQLChannelName(): void
+    {
+        $response = $this->subscribe();
+
+        $this->assertSame($response->graphQLSubscriptionChannelName(), $response->json('extensions.lighthouse_subscriptions.channel'));
+    }
+
+    private function subscribe(): TestResponse
+    {
+        return $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        subscription OnPostCreated {
+            onPostCreated {
+                title
+            }
+        }
+        GRAPHQL);
     }
 
     /**
@@ -258,7 +348,7 @@ GRAPHQL;
      *
      * @return array<string, array<string, mixed>>
      */
-    protected function buildResponse(string $channelName, string $channel): array
+    private function buildResponse(string $channelName, string $channel): array
     {
         return [
             'data' => [
@@ -266,11 +356,7 @@ GRAPHQL;
             ],
             'extensions' => [
                 'lighthouse_subscriptions' => [
-                    'version' => 1,
                     'channel' => $channel,
-                    'channels' => [
-                        $channelName => $channel,
-                    ],
                 ],
             ],
         ];

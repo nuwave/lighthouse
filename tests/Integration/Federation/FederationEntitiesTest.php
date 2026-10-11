@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration\Federation;
 
@@ -9,19 +9,19 @@ use Nuwave\Lighthouse\Federation\FederationServiceProvider;
 use Nuwave\Lighthouse\Federation\Types\Any;
 use Tests\TestCase;
 
-class FederationEntitiesTest extends TestCase
+final class FederationEntitiesTest extends TestCase
 {
     protected function getPackageProviders($app): array
     {
         return array_merge(
             parent::getPackageProviders($app),
-            [FederationServiceProvider::class]
+            [FederationServiceProvider::class],
         );
     }
 
     public function testCallsEntityResolverClass(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Foo @key(fields: "id") {
           id: ID! @external
           foo: String!
@@ -30,24 +30,24 @@ class FederationEntitiesTest extends TestCase
         type Query {
           foo: Int!
         }
-        ';
+        GRAPHQL;
 
         $foo = [
             '__typename' => 'Foo',
             'id' => '42',
         ];
 
-        $this->graphQL(/** @lang GraphQL */ '
-        query ($_representations: [_Any!]!) {
-            _entities(representations: $_representations) {
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        query ($representations: [_Any!]!) {
+            _entities(representations: $representations) {
                 __typename
                 ... on Foo {
                     id
                 }
             }
         }
-        ', [
-            '_representations' => [
+        GRAPHQL, [
+            'representations' => [
                 $foo,
             ],
         ])->assertExactJson([
@@ -61,7 +61,7 @@ class FederationEntitiesTest extends TestCase
 
     public function testCallsBatchedEntityResolverClass(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type BatchedFoo @key(fields: "id") {
           id: ID! @external
           foo: String!
@@ -70,7 +70,7 @@ class FederationEntitiesTest extends TestCase
         type Query {
           foo: Int!
         }
-        ';
+        GRAPHQL;
 
         $foo1 = [
             '__typename' => 'BatchedFoo',
@@ -82,17 +82,17 @@ class FederationEntitiesTest extends TestCase
             'id' => '69',
         ];
 
-        $this->graphQL(/** @lang GraphQL */ '
-        query ($_representations: [_Any!]!) {
-            _entities(representations: $_representations) {
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        query ($representations: [_Any!]!) {
+            _entities(representations: $representations) {
                 __typename
                 ... on BatchedFoo {
                     id
                 }
             }
         }
-        ', [
-            '_representations' => [
+        GRAPHQL, [
+            'representations' => [
                 $foo1,
                 $foo2,
             ],
@@ -106,12 +106,10 @@ class FederationEntitiesTest extends TestCase
         ]);
     }
 
-    public function testMaintainsOrderBetweenOfRepresentationsInResult(): void
+    /** https://github.com/apollographql/apollo-federation-subgraph-compatibility/issues/70. */
+    public function testMaintainsOrderOfRepresentationsInResult(): void
     {
-        $this->markTestSkipped('Not necessarily required: https://github.com/apollographql/apollo-federation-subgraph-compatibility/issues/70');
-
-        // @phpstan-ignore-next-line of course unreachable
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Foo @key(fields: "id") {
           id: ID! @external
           foo: String!
@@ -125,7 +123,7 @@ class FederationEntitiesTest extends TestCase
         type Query {
           foo: Int!
         }
-        ';
+        GRAPHQL;
 
         $foo1 = [
             '__typename' => 'BatchedFoo',
@@ -142,9 +140,9 @@ class FederationEntitiesTest extends TestCase
             'id' => '9001',
         ];
 
-        $this->graphQL(/** @lang GraphQL */ '
-        query ($_representations: [_Any!]!) {
-            _entities(representations: $_representations) {
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
+        query ($representations: [_Any!]!) {
+            _entities(representations: $representations) {
                 __typename
                 ... on Foo {
                     id
@@ -154,8 +152,8 @@ class FederationEntitiesTest extends TestCase
                 }
             }
         }
-        ', [
-            '_representations' => [
+        GRAPHQL, [
+            'representations' => [
                 $foo1,
                 $foo2,
                 $foo3,
@@ -173,14 +171,14 @@ class FederationEntitiesTest extends TestCase
 
     public function testThrowsWhenTypeIsUnknown(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Foo @key(fields: "id") {
           id: ID! @external
           foo: String!
         }
-        ' . self::PLACEHOLDER_QUERY;
+        GRAPHQL . self::PLACEHOLDER_QUERY;
 
-        $response = $this->graphQL(/** @lang GraphQL */ '
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             _entities(
                 representations: [
@@ -192,24 +190,24 @@ class FederationEntitiesTest extends TestCase
                 }
             }
         }
-        ');
+        GRAPHQL);
 
         $this->assertStringContainsString(
             EntityResolverProvider::unknownTypename('Unknown'),
-            $response->json('errors.0.message')
+            (string) $response->json('errors.0.message'),
         );
     }
 
     public function testThrowsWhenRepresentationIsNotArray(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Foo @key(fields: "id") {
           id: ID! @external
           foo: String!
         }
-        ' . self::PLACEHOLDER_QUERY;
+        GRAPHQL . self::PLACEHOLDER_QUERY;
 
-        $response = $this->graphQL(/** @lang GraphQL */ '
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             _entities(
                 representations: [
@@ -221,24 +219,24 @@ class FederationEntitiesTest extends TestCase
                 }
             }
         }
-        ');
+        GRAPHQL);
 
         $this->assertStringContainsString(
             Any::isNotArray(),
-            $response->json('errors.0.message')
+            (string) $response->json('errors.0.message'),
         );
     }
 
     public function testThrowsWhenTypeIsNotString(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Foo @key(fields: "id") {
           id: ID! @external
           foo: String!
         }
-        ' . self::PLACEHOLDER_QUERY;
+        GRAPHQL . self::PLACEHOLDER_QUERY;
 
-        $response = $this->graphQL(/** @lang GraphQL */ '
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             _entities(
                 representations: [
@@ -250,27 +248,27 @@ class FederationEntitiesTest extends TestCase
                 }
             }
         }
-        ');
+        GRAPHQL);
 
         $this->assertStringContainsString(
             Any::typenameIsNotString(),
-            $response->json('errors.0.message')
+            (string) $response->json('errors.0.message'),
         );
     }
 
     public function testThrowsWhenTypeIsInvalidName(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Foo @key(fields: "id") {
           id: ID! @external
           foo: String!
         }
-        ' . self::PLACEHOLDER_QUERY;
+        GRAPHQL . self::PLACEHOLDER_QUERY;
 
         $isValidNameError = Utils::isValidNameError('1');
         $this->assertInstanceOf(Error::class, $isValidNameError);
 
-        $response = $this->graphQL(/** @lang GraphQL */ '
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             _entities(
                 representations: [
@@ -282,24 +280,24 @@ class FederationEntitiesTest extends TestCase
                 }
             }
         }
-        ');
+        GRAPHQL);
 
         $this->assertStringContainsString(
             Any::typenameIsInvalidName($isValidNameError),
-            $response->json('errors.0.message')
+            (string) $response->json('errors.0.message'),
         );
     }
 
     public function testThrowsWhenNoKeySelectionIsSatisfied(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Foo @key(fields: "id") {
           id: ID! @external
           foo: String!
         }
-        ' . self::PLACEHOLDER_QUERY;
+        GRAPHQL . self::PLACEHOLDER_QUERY;
 
-        $response = $this->graphQL(/** @lang GraphQL */ '
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             _entities(
                 representations: [
@@ -311,24 +309,24 @@ class FederationEntitiesTest extends TestCase
                 }
             }
         }
-        ');
+        GRAPHQL);
 
         $this->assertStringContainsString(
             'Representation does not satisfy any set of uniquely identifying keys',
-            $response->json('errors.0.message')
+            (string) $response->json('errors.0.message'),
         );
     }
 
     public function testThrowsWhenMissingResolver(): void
     {
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type MissingResolver @key(fields: "id") {
           id: ID! @external
           foo: String!
         }
-        ' . self::PLACEHOLDER_QUERY;
+        GRAPHQL . self::PLACEHOLDER_QUERY;
 
-        $response = $this->graphQL(/** @lang GraphQL */ '
+        $response = $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             _entities(
                 representations: [
@@ -343,11 +341,11 @@ class FederationEntitiesTest extends TestCase
                 }
             }
         }
-        ');
+        GRAPHQL);
 
         $this->assertStringContainsString(
             EntityResolverProvider::missingResolver('MissingResolver'),
-            $response->json('errors.0.message')
+            (string) $response->json('errors.0.message'),
         );
     }
 }

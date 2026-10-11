@@ -1,12 +1,12 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Closure;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Pagination\AbstractPaginator;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -31,33 +31,23 @@ directive @lazyLoad(
 GRAPHQL;
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue): void
     {
         $relations = $this->directiveArgValue('relations');
 
-        $fieldValue->resultHandler(
-            /**
-             * @param  Collection|LengthAwarePaginator  $items
-             *
-             * @return Collection|LengthAwarePaginator
-             */
-            static function ($items) use ($relations) {
-                $items->load($relations);
+        $fieldValue->resultHandler(static function (EloquentCollection|AbstractPaginator $items) use ($relations): EloquentCollection|AbstractPaginator {
+            // @phpstan-ignore-next-line AbstractPaginator forwards calls to EloquentCollection
+            $items->load($relations);
 
-                return $items;
-            }
-        );
-
-        return $next($fieldValue);
+            return $items;
+        });
     }
 
-    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType)
+    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType): void
     {
         $relations = $this->directiveArgValue('relations');
-        if (! is_array($relations) || 0 === count($relations)) {
-            throw new DefinitionException(
-                "Must specify non-empty list of relations in `@{$this->name()}` directive on `{$parentType->name->value}.{$fieldDefinition->name->value}`."
-            );
+        if (! is_array($relations) || $relations === []) {
+            throw new DefinitionException("Must specify non-empty list of relations in `@{$this->name()}` directive on `{$parentType->name->value}.{$fieldDefinition->name->value}`.");
         }
     }
 }

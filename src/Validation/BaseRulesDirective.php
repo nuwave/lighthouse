@@ -1,10 +1,13 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Validation;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Utils\Utils;
+use Illuminate\Container\Container;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -20,9 +23,11 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
         // Custom rules may be referenced through their fully qualified class name.
         // The Laravel validator expects a class instance to be passed, so we
         // resolve any given rule where a corresponding class exists.
+        // Requiring a namespace separator keeps built-in rules such as `url` or `image`
+        // from matching global classes or facade aliases, as class names are case-insensitive.
         foreach ($rules as $key => $rule) {
-            if (class_exists($rule)) {
-                $rules[$key] = app($rule);
+            if (str_contains($rule, '\\') && class_exists($rule)) {
+                $rules[$key] = Container::getInstance()->make($rule);
             }
         }
 
@@ -32,7 +37,7 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
     public function messages(): array
     {
         $messages = $this->directiveArgValue('messages');
-        if (null === $messages) {
+        if ($messages === null) {
             return [];
         }
 
@@ -64,8 +69,8 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
         DocumentAST &$documentAST,
         InputValueDefinitionNode &$argDefinition,
         FieldDefinitionNode &$parentField,
-        ObjectTypeDefinitionNode &$parentType
-    ) {
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
+    ): void {
         $this->validateRulesArg();
         $this->validateMessageArg();
     }
@@ -78,7 +83,7 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
             $this->invalidApplyArgument($rules);
         }
 
-        if (0 === count($rules)) {
+        if ($rules === []) {
             $this->invalidApplyArgument($rules);
         }
 
@@ -92,7 +97,7 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
     protected function validateMessageArg(): void
     {
         $messages = $this->directiveArgValue('messages');
-        if (null === $messages) {
+        if ($messages === null) {
             return;
         }
 
@@ -130,28 +135,24 @@ abstract class BaseRulesDirective extends BaseDirective implements ArgumentValid
     }
 
     /**
-     * @param  mixed  $messages  Whatever faulty value was given for messages
+     * @param  mixed  $messages  whatever faulty value was given for messages
      *
-     * @throws DefinitionException
+     * @return never
      */
-    protected function invalidMessageArgument($messages): void
+    protected function invalidMessageArgument(mixed $messages): void
     {
-        $encoded = \Safe\json_encode($messages);
-        throw new DefinitionException(
-            "The `messages` argument of @`{$this->name()}` on `{$this->nodeName()} must be a list of input values with the string keys `rule` and `message`, got: {$encoded}"
-        );
+        $notListOfInputValues = Utils::printSafeJson($messages);
+        throw new DefinitionException("The `messages` argument of @`{$this->name()}` on `{$this->nodeName()} must be a list of input values with the string keys `rule` and `message`, got: {$notListOfInputValues}.");
     }
 
     /**
-     * @param  mixed  $apply  Any invalid value
+     * @param  mixed  $apply  any invalid value
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
+     * @return never
      */
-    protected function invalidApplyArgument($apply): void
+    protected function invalidApplyArgument(mixed $apply): void
     {
-        $encoded = \Safe\json_encode($apply);
-        throw new DefinitionException(
-            "The `apply` argument of @`{$this->name()}` on `{$this->nodeName()}` has to be a list of strings, got: {$encoded}"
-        );
+        $notListOfStrings = Utils::printSafeJson($apply);
+        throw new DefinitionException("The `apply` argument of @`{$this->name()}` on `{$this->nodeName()}` has to be a list of strings, got: {$notListOfStrings}.");
     }
 }

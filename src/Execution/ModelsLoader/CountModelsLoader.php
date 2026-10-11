@@ -1,34 +1,22 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Execution\ModelsLoader;
 
-use Closure;
+use GraphQL\Utils\Utils;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 class CountModelsLoader implements ModelsLoader
 {
-    /**
-     * @var string
-     */
-    protected $relation;
-
-    /**
-     * @var \Closure
-     */
-    protected $decorateBuilder;
-
-    public function __construct(string $relation, Closure $decorateBuilder)
-    {
-        $this->relation = $relation;
-        $this->decorateBuilder = $decorateBuilder;
-    }
+    public function __construct(
+        protected string $relation,
+        protected \Closure $decorateBuilder,
+    ) {}
 
     public function load(EloquentCollection $parents): void
     {
-        self::loadCount($parents, [$this->relation => $this->decorateBuilder]);
+        $parents->loadCount([$this->relation => $this->decorateBuilder]);
     }
 
     public function extract(Model $model): int
@@ -43,58 +31,14 @@ class CountModelsLoader implements ModelsLoader
          *
          * @see \Illuminate\Database\Eloquent\Concerns\QueriesRelationships::withCount()
          */
-        $countAttributeName = Str::snake("${relationName}_count");
+        $countAttributeName = Str::snake("{$relationName}_count");
 
-        /**
-         * We just assert this is an int and let PHP run into a type error if not.
-         *
-         * @var int $count
-         */
         $count = $model->getAttribute($countAttributeName);
-
-        return $count;
-    }
-
-    /**
-     * Reload the models to get the `{relation}_count` attributes of models set.
-     *
-     * @deprecated Laravel 5.7 has native ->loadCount() on EloquentCollection
-     * @see \Illuminate\Database\Eloquent\Collection::loadCount()
-     *
-     * @param  array<string, \Closure>  $relations
-     */
-    public static function loadCount(EloquentCollection $parents, array $relations): void
-    {
-        $firstParent = $parents->first();
-        if (! $firstParent) {
-            return;
+        if (! is_numeric($count)) {
+            $nonNumericCount = Utils::printSafe($count);
+            throw new \Exception("Expected numeric count, got: {$nonNumericCount}.");
         }
 
-        $models = $firstParent->newModelQuery()
-            ->whereKey($parents->modelKeys())
-            ->select($firstParent->getKeyName())
-            ->withCount($relations)
-            ->get()
-            ->keyBy($firstParent->getKeyName());
-
-        $firstModel = $models->first();
-        assert($firstModel instanceof Model);
-        $attributes = Arr::except(
-            array_keys($firstModel->getAttributes()),
-            $firstModel->getKeyName()
-        );
-
-        foreach ($parents as $parent) {
-            $model = $models->get($parent->getKey());
-            assert($model instanceof Model);
-
-            $extraAttributes = Arr::only($model->getAttributes(), $attributes);
-
-            $parent->forceFill($extraAttributes);
-
-            foreach ($attributes as $attribute) {
-                $parent->syncOriginalAttribute($attribute);
-            }
-        }
+        return (int) $count;
     }
 }

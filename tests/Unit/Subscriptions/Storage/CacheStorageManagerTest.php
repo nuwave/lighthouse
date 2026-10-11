@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Subscriptions\Storage;
 
@@ -6,60 +6,61 @@ use GraphQL\Language\Parser;
 use GraphQL\Utils\AST;
 use Nuwave\Lighthouse\Subscriptions\Storage\CacheStorageManager;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
+use Tests\EnablesSubscriptionServiceProvider;
 use Tests\TestCase;
-use Tests\TestsSubscriptions;
 
-class CacheStorageManagerTest extends TestCase
+final class CacheStorageManagerTest extends TestCase
 {
-    use TestsSubscriptions;
+    use EnablesSubscriptionServiceProvider;
 
-    /**
-     * @var \Nuwave\Lighthouse\Subscriptions\Storage\CacheStorageManager
-     */
-    protected $storage;
+    protected CacheStorageManager $storage;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->storage = app(CacheStorageManager::class);
+        $this->storage = $this->app->make(CacheStorageManager::class);
     }
 
-    /**
-     * Construct a dummy subscriber for testing.
-     */
-    protected function subscriber(string $queryString): Subscriber
+    /** Construct a dummy subscriber for testing. */
+    private function subscriber(string $queryString): Subscriber
     {
-        /** @var \Nuwave\Lighthouse\Subscriptions\Subscriber $subscriber */
         $subscriber = $this->createMock(Subscriber::class);
-
         $subscriber->channel = Subscriber::uniqueChannelName();
-        $subscriber->query = Parser::parse($queryString);
+        $subscriber->query = Parser::parse($queryString, ['noLocation' => true]);
 
         return $subscriber;
     }
 
     public function testStoreAndRetrieveByChannel(): void
     {
-        $subscriber = $this->subscriber(/** @lang GraphQL */ '{ me }');
+        $subscriber = $this->subscriber(/** @lang GraphQL */ <<<'GRAPHQL'
+        { me }
+        GRAPHQL);
         $this->storage->storeSubscriber($subscriber, 'foo');
 
         $this->assertSubscriberIsSame(
             $subscriber,
-            $this->storage->subscriberByChannel($subscriber->channel)
+            $this->storage->subscriberByChannel($subscriber->channel),
         );
     }
 
     public function testStoreAndRetrieveByTopics(): void
     {
         $fooTopic = 'foo';
-        $fooSubscriber1 = $this->subscriber(/** @lang GraphQL */ '{ me }');
-        $fooSubscriber2 = $this->subscriber(/** @lang GraphQL */ '{ viewer }');
+        $fooSubscriber1 = $this->subscriber(/** @lang GraphQL */ <<<'GRAPHQL'
+        { me }
+        GRAPHQL);
+        $fooSubscriber2 = $this->subscriber(/** @lang GraphQL */ <<<'GRAPHQL'
+        { viewer }
+        GRAPHQL);
         $this->storage->storeSubscriber($fooSubscriber1, $fooTopic);
         $this->storage->storeSubscriber($fooSubscriber2, $fooTopic);
 
         $barTopic = 'bar';
-        $barSubscriber = $this->subscriber(/** @lang GraphQL */ '{ bar }');
+        $barSubscriber = $this->subscriber(/** @lang GraphQL */ <<<'GRAPHQL'
+        { bar }
+        GRAPHQL);
         $this->storage->storeSubscriber($barSubscriber, $barTopic);
 
         $fooSubscribers = $this->storage->subscribersByTopic($fooTopic);
@@ -71,8 +72,12 @@ class CacheStorageManagerTest extends TestCase
 
     public function testDeleteSubscribersInCache(): void
     {
-        $subscriber1 = $this->subscriber(/** @lang GraphQL */ '{ me }');
-        $subscriber2 = $this->subscriber(/** @lang GraphQL */ '{ viewer }');
+        $subscriber1 = $this->subscriber(/** @lang GraphQL */ <<<'GRAPHQL'
+        { me }
+        GRAPHQL);
+        $subscriber2 = $this->subscriber(/** @lang GraphQL */ <<<'GRAPHQL'
+        { viewer }
+        GRAPHQL);
 
         $topic = 'foo';
         $this->storage->storeSubscriber($subscriber1, $topic);
@@ -90,13 +95,12 @@ class CacheStorageManagerTest extends TestCase
         $this->assertCount(0, $this->storage->subscribersByTopic($topic));
     }
 
-    protected function assertSubscriberIsSame(Subscriber $expected, ?Subscriber $actual): void
+    private function assertSubscriberIsSame(Subscriber $expected, ?Subscriber $actual): void
     {
         $this->assertNotNull($actual);
-        /** @var \Nuwave\Lighthouse\Subscriptions\Subscriber $actual */
         $this->assertSame(
             AST::toArray($expected->query),
-            AST::toArray($actual->query)
+            AST::toArray($actual->query),
         );
     }
 }

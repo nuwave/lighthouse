@@ -1,12 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration;
 
-use Exception;
 use Tests\TestCase;
 use Tests\Utils\NullErrorHandler;
 
-class ErrorHandlersTest extends TestCase
+final class ErrorHandlersTest extends TestCase
 {
     public function testErrorHandlerReturningNull(): void
     {
@@ -15,20 +14,20 @@ class ErrorHandlersTest extends TestCase
         ]]);
 
         $this->mockResolver(static function (): void {
-            throw new Exception();
+            throw new \Exception();
         });
 
-        $this->schema = /** @lang GraphQL */ '
+        $this->schema = /** @lang GraphQL */ <<<'GRAPHQL'
         type Query {
             foo: ID @mock
         }
-        ';
+        GRAPHQL;
 
-        $this->graphQL(/** @lang GraphQL */ '
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ')->assertExactJson([
+        GRAPHQL)->assertExactJson([
             'data' => [
                 'foo' => null,
             ],

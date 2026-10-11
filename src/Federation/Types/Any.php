@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Federation\Types;
 
@@ -6,6 +6,7 @@ use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Utils\AST;
 use GraphQL\Utils\Utils;
+use Illuminate\Container\Container;
 use Nuwave\Lighthouse\Federation\EntityResolverProvider;
 
 /**
@@ -13,9 +14,9 @@ use Nuwave\Lighthouse\Federation\EntityResolverProvider;
  */
 class Any extends ScalarType
 {
-    public $name = '_Any';
+    public string $name = '_Any';
 
-    public $description = /** @lang Markdown */ <<<'DESCRIPTION'
+    public ?string $description = /** @lang Markdown */ <<<'DESCRIPTION'
 Representation of entities from external services for the root `_entities` field.
 DESCRIPTION;
 
@@ -39,9 +40,7 @@ DESCRIPTION;
         return $value;
     }
 
-    /**
-     * @return array{__typename: string}
-     */
+    /** @return array{__typename: string} */
     public function parseValue($value): array
     {
         // We do as much validation as possible here, before entering resolvers
@@ -60,8 +59,7 @@ DESCRIPTION;
             throw new Error(self::typenameIsInvalidName($isValidNameError));
         }
 
-        /** @var \Nuwave\Lighthouse\Federation\EntityResolverProvider $entityResolverProvider */
-        $entityResolverProvider = app(EntityResolverProvider::class);
+        $entityResolverProvider = Container::getInstance()->make(EntityResolverProvider::class);
 
         // Representations must contain at least the fields defined in the fieldset of a @key directive on the base type.
         $definition = $entityResolverProvider->typeDefinition($typename);
@@ -75,13 +73,11 @@ DESCRIPTION;
         return $value;
     }
 
-    /**
-     * @return array{__typename: string}
-     */
+    /** @return array{__typename: string} */
     public function parseLiteral($valueNode, ?array $variables = null): array
     {
         return $this->parseValue(
-            AST::valueFromASTUntyped($valueNode)
+            AST::valueFromASTUntyped($valueNode),
         );
     }
 }

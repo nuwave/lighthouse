@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Console;
 
@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Storage;
 use Nuwave\Lighthouse\Console\PrintSchemaCommand;
 use Tests\TestCase;
 
-class PrintSchemaCommandTest extends TestCase
+final class PrintSchemaCommandTest extends TestCase
 {
     public function testPrintsSchemaAsGraphQLSDL(): void
     {

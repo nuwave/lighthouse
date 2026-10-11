@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Utils\Subscriptions;
 
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 
-class DummySubscriber extends Subscriber
+final class DummySubscriber extends Subscriber
 {
     public function __construct(string $channel, string $topic)
     {

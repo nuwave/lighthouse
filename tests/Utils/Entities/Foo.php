@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Utils\Entities;
 
-class Foo
+final class Foo
 {
     /**
      * @param  array<string, mixed>  $representation

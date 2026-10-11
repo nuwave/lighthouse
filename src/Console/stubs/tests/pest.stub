@@ -1,0 +1,18 @@
+<?php declare(strict_types=1);
+
+use Tests\TestCase;
+
+test('dummyField', function (): void  {
+    // TODO set up test data
+
+    graphQL(/** @lang GraphQL */ '
+        dummyOperationPrefix{
+            dummyField
+        }
+    ')->assertJson([
+        'data' => [
+            // TODO specify expected result
+            'dummyField' => null,
+        ],
+    ]);
+});

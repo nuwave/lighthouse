@@ -1,11 +1,14 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Support;
 
-use Closure;
+use Illuminate\Container\Container;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use ReflectionClass;
-use ReflectionException;
+
+use function Safe\preg_match;
+use function Safe\preg_replace;
 
 class Utils
 {
@@ -23,15 +26,17 @@ class Utils
     public static function namespaceClassname(string $classCandidate, array $namespacesToTry, callable $determineMatch): ?string
     {
         if ($determineMatch($classCandidate)) {
-            /** @var class-string $classCandidate */
+            assert(class_exists($classCandidate));
+
             return $classCandidate;
         }
 
         foreach ($namespacesToTry as $namespace) {
-            $className = $namespace . '\\' . $classCandidate;
+            $className = "{$namespace}\\{$classCandidate}";
 
             if ($determineMatch($className)) {
-                /** @var class-string $className */
+                assert(class_exists($className));
+
                 return $className;
             }
         }
@@ -44,53 +49,57 @@ class Utils
      *
      * @param  class-string  $className  this class is resolved through the container
      * @param  string  $methodName  the method that gets passed the arguments of the closure
-     *
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
-    public static function constructResolver(string $className, string $methodName): Closure
+    public static function constructResolver(string $className, string $methodName): \Closure
     {
         if (! method_exists($className, $methodName)) {
-            throw new DefinitionException("Method '{$methodName}' does not exist on class '{$className}'");
+            throw new DefinitionException("Method '{$methodName}' does not exist on class '{$className}'.");
         }
 
-        return Closure::fromCallable(
-            // @phpstan-ignore-next-line this works
-            [app($className), $methodName]
-        );
+        $resolver = Container::getInstance()->make($className);
+        assert(is_object($resolver));
+
+        return \Closure::fromCallable([$resolver, $methodName]);
     }
 
     /**
      * Get the value of a protected member variable of an object.
      *
-     * Returns a default value in case of error.
-     *
      * @param  mixed  $object  object with protected member
      * @param  string  $memberName  name of object's protected member
-     * @param  mixed|null  $default  default value to return in case of access error
-     *
-     * @return mixed value of object's protected member
      */
-    public static function accessProtected($object, string $memberName, $default = null)
+    public static function accessProtected(mixed $object, string $memberName): mixed
     {
-        try {
-            $reflection = new ReflectionClass($object);
-            $property = $reflection->getProperty($memberName);
-            $property->setAccessible(true);
+        $property = new \ReflectionProperty($object, $memberName);
+        $property->setAccessible(true);
 
-            return $property->getValue($object);
-        } catch (ReflectionException $ex) {
-            return $default;
-        }
+        return $property->getValue($object);
     }
 
     /**
-     * Apply a callback to a value or each value in an array.
+     * Call a protected method of an object.
      *
+     * @param  mixed  $object  object with protected method
+     * @param  string  $methodName  name of object's protected method
+     * @param  array<mixed>  ...$args  zero or more parameters to be passed to the method
+     */
+    public static function callProtected(mixed $object, string $methodName, array ...$args): mixed
+    {
+        $property = new \ReflectionMethod($object, $methodName);
+        $property->setAccessible(true);
+
+        return $property->invoke($object, ...$args);
+    }
+
+    /**
+     * Map a value or each value in an array.
+     *
+     * @param  callable(mixed): mixed  $callback
      * @param  mixed|array<mixed>  $valueOrValues
      *
      * @return mixed|array<mixed>
      */
-    public static function applyEach(Closure $callback, $valueOrValues)
+    public static function mapEach(callable $callback, mixed $valueOrValues): mixed
     {
         if (is_array($valueOrValues)) {
             return array_map($callback, $valueOrValues);
@@ -100,15 +109,54 @@ class Utils
     }
 
     /**
+     * Map a value or each value in an array.
+     *
+     * @param  callable(mixed): mixed  $callback
+     * @param  mixed|array<mixed>  $valueOrValues
+     *
+     * @return mixed|array<mixed>
+     */
+    public static function mapEachRecursive(callable $callback, mixed $valueOrValues): mixed
+    {
+        if (is_array($valueOrValues)) {
+            return array_map(
+                static fn ($value): mixed => static::mapEachRecursive($callback, $value),
+                $valueOrValues,
+            );
+        }
+
+        return $callback($valueOrValues);
+    }
+
+    /**
+     * Apply a callback to a value or each value in an iterable.
+     *
+     * @param  callable(mixed): mixed  $callback
+     * @param  mixed|iterable<mixed>  $valueOrValues
+     */
+    public static function applyEach(callable $callback, mixed $valueOrValues): void
+    {
+        if (is_iterable($valueOrValues)) {
+            foreach ($valueOrValues as $value) {
+                $callback($value);
+            }
+
+            return;
+        }
+
+        $callback($valueOrValues);
+    }
+
+    /**
      * Determine if a class uses a trait.
      *
      * @param  object|class-string  $class
      */
-    public static function classUsesTrait($class, string $trait): bool
+    public static function classUsesTrait(object|string $class, string $trait): bool
     {
         return in_array(
             $trait,
-            class_uses_recursive($class)
+            class_uses_recursive($class),
         );
     }
 
@@ -117,12 +165,58 @@ class Utils
      *
      * @param  class-string  $classLike
      *
-     * @return Closure(mixed): bool
+     * @return \Closure(mixed): bool
      */
-    public static function instanceofMatcher(string $classLike): Closure
+    public static function instanceofMatcher(string $classLike): \Closure
     {
-        return function ($object) use ($classLike): bool {
-            return $object instanceof $classLike;
-        };
+        return static fn (mixed $object): bool => $object instanceof $classLike;
+    }
+
+    /**
+     * Convert the given name to an UPPER_CASE name for an enum value.
+     *
+     * Ensures compliance with https://spec.graphql.org/draft/#sec-Names.
+     *
+     * @see \Illuminate\Support\Str::slug().
+     */
+    public static function toEnumValueName(string $name): string
+    {
+        // Remove UTF-8 special characters
+        $name = Str::ascii($name);
+        // Preserve words separated by camelCase
+        $name = Str::snake($name);
+        // ALL_CAPS
+        $name = strtoupper($name);
+        // Preserve separator on specific characters like $ for MariaDB and . for MongoDB
+        $name = preg_replace('/[$.]/', '_', $name);
+        // Remove all characters that are not the separator, letters, numbers, or whitespace
+        $name = preg_replace('![^_\pL\pN\s]+!u', '', $name);
+        // Replace all separator characters and whitespace by a single separator
+        $name = preg_replace('![_\s]+!u', '_', $name);
+        // Remove leading or trailing separators
+        $name = trim($name, '_');
+
+        // GraphQL names can only start with a letter or underscore
+        return preg_match('/^[a-zA-Z_]/', $name)
+            ? $name
+            : "_{$name}";
+    }
+
+    /**
+     * Write the contents to a file atomically.
+     *
+     * This is done by writing to a temporary file first and then renaming it.
+     *
+     * It circumvents the following issues:
+     * - large files not being written completely before being read
+     * - partial writes from other processes while we expect to read what we wrote
+     */
+    public static function atomicPut(Filesystem $filesystem, string $path, string $contents): void
+    {
+        $randomSuffix = bin2hex(random_bytes(6));
+        $tempPath = "{$path}.{$randomSuffix}";
+
+        $filesystem->put(path: $tempPath, contents: $contents);
+        $filesystem->move(path: $tempPath, target: $path);
     }
 }

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Events;
 
@@ -7,24 +7,24 @@ use Nuwave\Lighthouse\Events\ManipulateResult;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
 
-class ManipulateResultTest extends TestCase
+final class ManipulateResultTest extends TestCase
 {
     public function testManipulateTheResult(): void
     {
         Event::listen(
             ManipulateResult::class,
-            function (ManipulateResult $manipulateResult): void {
+            static function (ManipulateResult $manipulateResult): void {
                 $manipulateResult->result->data = [
                     'foo' => Foo::THE_ANSWER + 1,
                 ];
-            }
+            },
         );
 
-        $this->graphQL('
+        $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
         {
             foo
         }
-        ')->assertJson([
+        GRAPHQL)->assertJson([
             'data' => [
                 'foo' => Foo::THE_ANSWER + 1,
             ],

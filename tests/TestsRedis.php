@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests;
 
@@ -10,7 +10,7 @@ trait TestsRedis
 {
     protected function tearDown(): void
     {
-        Redis::flushall();
+        Redis::flushdb();
 
         parent::tearDown();
     }
@@ -19,9 +19,7 @@ trait TestsRedis
     {
         parent::getEnvironmentSetUp($app);
 
-        /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = $app->make(ConfigRepository::class);
-
         $config->set('database.redis.default', [
             'url' => env('LIGHTHOUSE_TEST_REDIS_URL'),
             'host' => env('LIGHTHOUSE_TEST_REDIS_HOST', 'redis'),
@@ -29,13 +27,10 @@ trait TestsRedis
             'port' => env('LIGHTHOUSE_TEST_REDIS_PORT', '6379'),
             'database' => env('LIGHTHOUSE_TEST_REDIS_DB', '0'),
         ]);
-
         $config->set('database.redis.options', [
             'prefix' => 'lighthouse-test-',
         ]);
-
         $config->set('lighthouse.subscriptions', [
-            'version' => 1,
             'storage' => 'redis',
             'broadcaster' => 'echo',
             'broadcasters' => [

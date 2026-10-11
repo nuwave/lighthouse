@@ -1,7 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Subscriptions\Broadcasters;
 
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -13,26 +14,13 @@ use Pusher\Pusher;
 
 class PusherBroadcaster implements Broadcaster
 {
-    /**
-     * @var \Pusher\Pusher
-     */
-    protected $pusher;
+    protected StoresSubscriptions $storage;
 
-    /**
-     * @var \Illuminate\Contracts\Debug\ExceptionHandler
-     */
-    protected $exceptionHandler;
-
-    /**
-     * @var \Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions
-     */
-    protected $storage;
-
-    public function __construct(Pusher $pusher, ExceptionHandler $exceptionHandler)
-    {
-        $this->pusher = $pusher;
-        $this->exceptionHandler = $exceptionHandler;
-        $this->storage = app(StoresSubscriptions::class);
+    public function __construct(
+        protected Pusher $pusher,
+        protected ExceptionHandler $exceptionHandler,
+    ) {
+        $this->storage = Container::getInstance()->make(StoresSubscriptions::class);
     }
 
     public function authorized(Request $request): JsonResponse
@@ -41,7 +29,7 @@ class PusherBroadcaster implements Broadcaster
         $socketId = $request->input('socket_id');
         $data = \Safe\json_decode(
             $this->pusher->socket_auth($channel, $socketId),
-            true
+            true,
         );
 
         return new JsonResponse($data, 200);
@@ -57,7 +45,7 @@ class PusherBroadcaster implements Broadcaster
     public function hook(Request $request): JsonResponse
     {
         foreach ($request->input('events', []) as $event) {
-            if ('channel_vacated' === $event['name']) {
+            if ($event['name'] === 'channel_vacated') {
                 $this->storage->deleteSubscriber($event['channel']);
             }
         }
@@ -65,7 +53,7 @@ class PusherBroadcaster implements Broadcaster
         return new JsonResponse(['message' => 'okay']);
     }
 
-    public function broadcast(Subscriber $subscriber, $data): void
+    public function broadcast(Subscriber $subscriber, mixed $data): void
     {
         try {
             $this->pusher->trigger(
@@ -74,10 +62,10 @@ class PusherBroadcaster implements Broadcaster
                 [
                     'more' => true,
                     'result' => $data,
-                ]
+                ],
             );
-        } catch (ApiErrorException $e) {
-            $this->exceptionHandler->report($e);
+        } catch (ApiErrorException $apiErrorException) {
+            $this->exceptionHandler->report($apiErrorException);
         }
     }
 }

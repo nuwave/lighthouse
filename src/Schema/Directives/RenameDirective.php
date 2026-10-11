@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
@@ -25,32 +25,17 @@ directive @rename(
 GRAPHQL;
     }
 
-    public function resolveField(FieldValue $fieldValue): FieldValue
+    public function resolveField(FieldValue $fieldValue): callable
     {
         $attribute = $this->attributeArgValue();
 
-        return $fieldValue->setResolver(
-            function ($rootValue) use ($attribute) {
-                return data_get($rootValue, $attribute);
-            }
-        );
+        return static fn (mixed $root): mixed => data_get($root, $attribute);
     }
 
-    /**
-     * Retrieves the attribute argument for the directive.
-     *
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
-     */
+    /** Retrieves the attribute argument for the directive. */
     public function attributeArgValue(): string
     {
-        $attribute = $this->directiveArgValue('attribute');
-
-        if (! $attribute) {
-            throw new DefinitionException(
-                "The @{$this->name()} directive requires an `attribute` argument."
-            );
-        }
-
-        return $attribute;
+        return $this->directiveArgValue('attribute')
+            ?: throw new DefinitionException("The @{$this->name()} directive requires an `attribute` argument.");
     }
 }

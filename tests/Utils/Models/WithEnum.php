@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Utils\Models;
 
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Tests\Utils\LaravelEnums\AOrB;
 
@@ -17,29 +17,23 @@ use Tests\Utils\LaravelEnums\AOrB;
  *
  * Scopes
  *
- * @method static \Illuminate\Database\Eloquent\Builder&static byType(AOrB $aOrB)
- * @method static \Illuminate\Database\Eloquent\Builder&static byTypeInternal(string $aOrB) TODO remove in v6
+ * @method static \Illuminate\Database\Eloquent\Builder<self> byType(AOrB $aOrB)
  */
-class WithEnum extends Model
+final class WithEnum extends Model
 {
     public $timestamps = false;
 
-    /**
-     * @var array<string, class-string<\BenSampo\Enum\Enum>>
-     */
-    protected $enumCasts = [
+    // @phpstan-ignore-next-line iterable type missing in Laravel 9.0.0
+    protected $casts = [
         'type' => AOrB::class,
     ];
 
-    public function scopeByType(Builder $builder, AOrB $aOrB): Builder
-    {
-        return $builder->where('type', $aOrB);
-    }
-
     /**
-     * TODO remove in v6.
+     * @param  \Illuminate\Database\Eloquent\Builder<self>  $builder
+     *
+     * @return \Illuminate\Database\Eloquent\Builder<self>
      */
-    public function scopeByTypeInternal(Builder $builder, string $aOrB): Builder
+    public function scopeByType(EloquentBuilder $builder, AOrB $aOrB): EloquentBuilder
     {
         return $builder->where('type', $aOrB);
     }

@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTestbenchProductsTable extends Migration
+final class CreateTestbenchProductsTable extends Migration
 {
     public function up(): void
     {
@@ -12,11 +12,8 @@ class CreateTestbenchProductsTable extends Migration
             // Composite primary key
             $table->string('barcode');
             $table->string('uuid');
-
             $table->string('name');
-
-            $table->unsignedInteger('color_id');
-
+            $table->unsignedBigInteger('color_id');
             $table->timestamps();
         });
     }

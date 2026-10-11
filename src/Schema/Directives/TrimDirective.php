@@ -1,15 +1,12 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Closure;
-use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgSanitizerDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Utils;
 
 class TrimDirective extends BaseDirective implements ArgSanitizerDirective, ArgDirective, FieldMiddleware
@@ -28,39 +25,20 @@ directive @trim on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION | FIELD_DEFINITI
 GRAPHQL;
     }
 
-    /**
-     * Remove whitespace from the beginning and end of a given input.
-     */
-    public function sanitize($argumentValue)
+    /** Remove whitespace from the beginning and end of a given input. */
+    public function sanitize(mixed $argumentValue): mixed
     {
-        return Utils::applyEach(
-            function ($value) {
-                return $value instanceof ArgumentSet
-                    ? $this->transformArgumentSet($value)
-                    : $this->transformLeaf($value);
-            },
-            $argumentValue
+        return Utils::mapEach(
+            fn (mixed $value): mixed => $value instanceof ArgumentSet
+                ? $this->transformArgumentSet($value)
+                : $this->transformLeaf($value),
+            $argumentValue,
         );
     }
 
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue): void
     {
-        $resolver = $fieldValue->getResolver();
-
-        return $next(
-            $fieldValue->setResolver(
-                function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
-                    $resolveInfo->argumentSet = $this->transformArgumentSet($resolveInfo->argumentSet);
-
-                    return $resolver(
-                        $root,
-                        $resolveInfo->argumentSet->toArray(),
-                        $context,
-                        $resolveInfo
-                    );
-                }
-            )
-        );
+        $fieldValue->addArgumentSetTransformer(fn (ArgumentSet $argumentSet): ArgumentSet => $this->transformArgumentSet($argumentSet));
     }
 
     protected function transformArgumentSet(ArgumentSet $argumentSet): ArgumentSet
@@ -77,7 +55,7 @@ GRAPHQL;
      *
      * @return mixed The transformed value
      */
-    protected function transformLeaf($value)
+    protected function transformLeaf(mixed $value): mixed
     {
         if (is_string($value)) {
             return trim($value);

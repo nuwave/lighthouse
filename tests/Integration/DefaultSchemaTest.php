@@ -1,18 +1,19 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration;
 
+use Illuminate\Testing\TestResponse;
 use Nuwave\Lighthouse\Console\ValidateSchemaCommand;
 use Nuwave\Lighthouse\LighthouseServiceProvider;
 use Nuwave\Lighthouse\Pagination\PaginationServiceProvider;
-use Nuwave\Lighthouse\Support\AppVersion;
+use Nuwave\Lighthouse\Testing\TestingServiceProvider;
 use Nuwave\Lighthouse\Validation\ValidationServiceProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
-class DefaultSchemaTest extends DBTestCase
+final class DefaultSchemaTest extends DBTestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -30,8 +31,9 @@ class DefaultSchemaTest extends DBTestCase
     {
         return [
             LighthouseServiceProvider::class,
-            ValidationServiceProvider::class,
             PaginationServiceProvider::class,
+            TestingServiceProvider::class,
+            ValidationServiceProvider::class,
         ];
     }
 
@@ -45,50 +47,42 @@ class DefaultSchemaTest extends DBTestCase
 
     public function testFindRequiresExactlyOneArgument(): void
     {
-        if (AppVersion::below(8.0)) {
-            $this->markTestSkipped('Missing validation rule prohibits');
-        }
-
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 user {
                     id
                 }
             }
-            ')
+            GRAPHQL)
             ->assertGraphQLValidationError('email', 'The email field is required when id is not present.')
             ->assertGraphQLValidationError('id', 'The id field is required when email is not present.');
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 user(id: 1, email: "foo@bar.baz") {
                     id
                 }
             }
-            ')
+            GRAPHQL)
             ->assertGraphQLValidationError('email', 'The email field prohibits id from being present.')
             ->assertGraphQLValidationError('id', 'The id field prohibits email from being present.');
     }
 
     public function testFindById(): void
     {
-        if (AppVersion::below(8.0)) {
-            $this->markTestSkipped('Missing validation rule prohibits');
-        }
-
         factory(User::class)->create();
         $user = factory(User::class)->create();
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($id: ID!) {
                 user(id: $id) {
                     id
                 }
             }
-            ', [
+            GRAPHQL, [
                 'id' => $user->id,
             ])
             ->assertExactJson([
@@ -103,7 +97,7 @@ class DefaultSchemaTest extends DBTestCase
     public function testEmptyUsers(): void
     {
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 users {
                     data {
@@ -111,7 +105,7 @@ class DefaultSchemaTest extends DBTestCase
                     }
                 }
             }
-            ')
+            GRAPHQL)
             ->assertExactJson([
                 'data' => [
                     'users' => [
@@ -127,7 +121,7 @@ class DefaultSchemaTest extends DBTestCase
         factory(User::class)->times($amount)->create();
 
         $this
-            ->graphQL(/** @lang GraphQL */ '
+            ->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             {
                 users {
                     data {
@@ -135,7 +129,7 @@ class DefaultSchemaTest extends DBTestCase
                     }
                 }
             }
-            ')
+            GRAPHQL)
             ->assertJsonCount(2, 'data.users.data');
     }
 
@@ -160,12 +154,9 @@ class DefaultSchemaTest extends DBTestCase
             ->assertJsonCount(0, 'data.users.data');
     }
 
-    /**
-     * @return \Illuminate\Testing\TestResponse
-     */
-    protected function usersByName(string $name)
+    private function usersByName(string $name): TestResponse
     {
-        return $this->graphQL(/** @lang GraphQL */ '
+        return $this->graphQL(/** @lang GraphQL */ <<<'GRAPHQL'
             query ($name: String!) {
                 users(name: $name) {
                     data {
@@ -173,10 +164,10 @@ class DefaultSchemaTest extends DBTestCase
                     }
                 }
             }
-            ',
+        GRAPHQL,
             [
                 'name' => $name,
-            ]
+            ],
         );
     }
 }

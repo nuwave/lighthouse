@@ -1,16 +1,17 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Support\Traits;
 
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
-use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Support\Utils;
 
 /**
  * Directives may want to constrain database columns to an enum.
@@ -19,18 +20,14 @@ use Nuwave\Lighthouse\Schema\AST\DocumentAST;
  */
 trait GeneratesColumnsEnum
 {
-    /**
-     * Check whether the directive constrains allowed columns.
-     */
+    /** Check whether the directive constrains allowed columns. */
     protected function hasAllowedColumns(): bool
     {
         $hasColumns = ! is_null($this->directiveArgValue('columns'));
         $hasColumnsEnum = ! is_null($this->directiveArgValue('columnsEnum'));
 
         if ($hasColumns && $hasColumnsEnum) {
-            throw new DefinitionException(
-                'The @' . $this->name() . ' directive can only have one of the following arguments: `columns`, `columnsEnum`.'
-            );
+            throw new DefinitionException("The @{$this->name()} directive can only have one of the following arguments: `columns`, `columnsEnum`.");
         }
 
         return $hasColumns || $hasColumnsEnum;
@@ -45,10 +42,9 @@ trait GeneratesColumnsEnum
         DocumentAST &$documentAST,
         InputValueDefinitionNode &$argDefinition,
         FieldDefinitionNode &$parentField,
-        ObjectTypeDefinitionNode &$parentType
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
     ): string {
         $columnsEnum = $this->directiveArgValue('columnsEnum');
-
         if (! is_null($columnsEnum)) {
             return $columnsEnum;
         }
@@ -62,8 +58,8 @@ trait GeneratesColumnsEnum
                     $parentField,
                     $parentType,
                     $this->directiveArgValue('columns'),
-                    $allowedColumnsEnumName
-                )
+                    $allowedColumnsEnumName,
+                ),
             );
 
         return $allowedColumnsEnumName;
@@ -77,26 +73,26 @@ trait GeneratesColumnsEnum
     protected function createAllowedColumnsEnum(
         InputValueDefinitionNode &$argDefinition,
         FieldDefinitionNode &$parentField,
-        ObjectTypeDefinitionNode &$parentType,
+        ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode &$parentType,
         array $allowedColumns,
-        string $allowedColumnsEnumName
+        string $allowedColumnsEnumName,
     ): EnumTypeDefinitionNode {
         $enumValues = array_map(
-            function (string $columnName): string {
-                return
-                    strtoupper(
-                        Str::snake($columnName)
-                    )
-                    . ' @enum(value: "' . $columnName . '")';
+            static function (string $columnName): string {
+                $enumName = Utils::toEnumValueName($columnName);
+
+                return /** @lang GraphQL */ <<<GRAPHQL
+{$enumName} @enum(value: "{$columnName}")
+GRAPHQL;
             },
-            $allowedColumns
+            $allowedColumns,
         );
 
         $enumValuesString = implode("\n", $enumValues);
 
         return Parser::enumTypeDefinition(/** @lang GraphQL */ <<<GRAPHQL
 "Allowed column names for {$parentType->name->value}.{$parentField->name->value}.{$argDefinition->name->value}."
-enum $allowedColumnsEnumName {
+enum {$allowedColumnsEnumName} {
     {$enumValuesString}
 }
 GRAPHQL

@@ -1,9 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\WhereConditions;
 
-use Exception;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Str;
 
 class WhereHasConditionsDirective extends WhereConditionsBaseDirective
@@ -28,14 +29,14 @@ directive @whereHasConditions(
     """
     Restrict the allowed column names to a well-defined list.
     This improves introspection capabilities and security.
-    Mutually exclusive with the `columnsEnum` argument.
+    Mutually exclusive with `columnsEnum`.
     """
     columns: [String!]
 
     """
     Use an existing enumeration type to restrict the allowed columns to a predefined list.
-    This allowes you to re-use the same enum for multiple fields.
-    Mutually exclusive with the `columns` argument.
+    This allows you to re-use the same enum for multiple fields.
+    Mutually exclusive with `columns`.
     """
     columnsEnum: String
 
@@ -55,17 +56,15 @@ directive @whereHasConditions(
 GRAPHQL;
     }
 
-    /**
-     * @param  array<string, mixed>|null  $value  The client given conditions
-     */
-    public function handleBuilder($builder, $value): object
+    /** @param  array<string, mixed>|null  $value  The client given conditions */
+    public function handleBuilder(QueryBuilder|EloquentBuilder|Relation $builder, $value): QueryBuilder|EloquentBuilder|Relation
     {
-        if (null === $value) {
+        if ($value === null) {
             return $builder;
         }
 
         if (! $builder instanceof EloquentBuilder) {
-            throw new Exception('Can not get model from builder of class: ' . get_class($builder));
+            throw new \Exception('Can not get model from builder of class: ' . $builder::class);
         }
 
         $this->handle(
@@ -77,15 +76,13 @@ GRAPHQL;
                     'operator' => '>=',
                     'condition' => $value,
                 ],
-            ]
+            ],
         );
 
         return $builder;
     }
 
-    /**
-     * Get the name of the Eloquent relationship that is used for the query.
-     */
+    /** Get the name of the Eloquent relationship that is used for the query. */
     protected function relationName(): string
     {
         $relationName = $this->directiveArgValue('relation');
@@ -93,8 +90,8 @@ GRAPHQL;
         // If the relation name is not set explicitly, we assume the argument
         // name follows a convention and contains the relation name
         if (is_null($relationName)) {
-            $relationName = lcfirst(
-                Str::after($this->nodeName(), 'has')
+            return lcfirst(
+                Str::after($this->nodeName(), 'has'),
             );
         }
 

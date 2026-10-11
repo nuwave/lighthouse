@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Pagination;
 
@@ -10,51 +10,45 @@ use Nuwave\Lighthouse\Exceptions\DefinitionException;
 class PaginationType
 {
     public const PAGINATOR = 'PAGINATOR';
+
     public const SIMPLE = 'SIMPLE';
+
     public const CONNECTION = 'CONNECTION';
 
-    /**
-     * @var string One of the constant values in this class
-     */
-    protected $type;
+    /** One of the constant values in this class. */
+    protected string $type;
 
-    /**
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
-     */
     public function __construct(string $paginationType)
     {
-        // TODO remove lowercase and alternate options in v6
-        switch (strtolower($paginationType)) {
-            case 'default':
-            case 'paginator':
-                $this->type = self::PAGINATOR;
-                break;
-            case 'connection':
-            case 'relay':
-                $this->type = self::CONNECTION;
-                break;
-            case 'simple':
-                $this->type = self::SIMPLE;
-                break;
-            default:
-                throw new DefinitionException(
-                    "Found invalid pagination type: {$paginationType}"
-                );
-        }
+        $this->type = match ($paginationType) {
+            self::PAGINATOR => self::PAGINATOR,
+            self::SIMPLE => self::SIMPLE,
+            self::CONNECTION => self::CONNECTION,
+            default => throw new DefinitionException("Found invalid pagination type: {$paginationType}"),
+        };
     }
 
     public function isPaginator(): bool
     {
-        return self::PAGINATOR === $this->type;
-    }
-
-    public function isConnection(): bool
-    {
-        return self::CONNECTION === $this->type;
+        return $this->type === self::PAGINATOR;
     }
 
     public function isSimple(): bool
     {
-        return self::SIMPLE === $this->type;
+        return $this->type === self::SIMPLE;
+    }
+
+    public function isConnection(): bool
+    {
+        return $this->type === self::CONNECTION;
+    }
+
+    public function infoFieldName(): string
+    {
+        return match ($this->type) {
+            self::PAGINATOR, self::SIMPLE => 'paginatorInfo',
+            self::CONNECTION => 'pageInfo',
+            default => throw new \Exception("infoFieldName is not implemented for pagination type: {$this->type}."),
+        };
     }
 }

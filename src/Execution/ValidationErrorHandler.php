@@ -1,8 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Execution;
 
-use Closure;
 use GraphQL\Error\Error;
 use Illuminate\Validation\ValidationException as LaravelValidationException;
 use Nuwave\Lighthouse\Exceptions\ValidationException;
@@ -12,9 +11,9 @@ use Nuwave\Lighthouse\Exceptions\ValidationException;
  */
 class ValidationErrorHandler implements ErrorHandler
 {
-    public function __invoke(?Error $error, Closure $next): ?array
+    public function __invoke(?Error $error, \Closure $next): ?array
     {
-        if (null === $error) {
+        if ($error === null) {
             return $next(null);
         }
 
@@ -22,12 +21,11 @@ class ValidationErrorHandler implements ErrorHandler
         if ($underlyingException instanceof LaravelValidationException) {
             return $next(new Error(
                 $error->getMessage(),
-                // @phpstan-ignore-next-line graphql-php and phpstan disagree with themselves
                 $error->getNodes(),
                 $error->getSource(),
                 $error->getPositions(),
                 $error->getPath(),
-                ValidationException::fromLaravel($underlyingException)
+                ValidationException::fromLaravel($underlyingException),
             ));
         }
 

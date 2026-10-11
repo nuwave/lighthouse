@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Tests\Integration;
 
@@ -6,27 +6,25 @@ use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
 
-class FileUploadTest extends TestCase
+final class FileUploadTest extends TestCase
 {
-    protected $schema = /** @lang GraphQL */ '
-    scalar Upload @scalar(class: "Nuwave\\\\Lighthouse\\\\Schema\\\\Types\\\\Scalars\\\\Upload")
+    protected string $schema = /** @lang GraphQL */ <<<'GRAPHQL'
+    scalar Upload @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Upload")
 
     type Mutation {
-        upload(file: Upload!): Boolean
+        upload(file: Upload): Boolean
     }
-    ' . self::PLACEHOLDER_QUERY;
+    GRAPHQL . self::PLACEHOLDER_QUERY;
 
-    /**
-     * https://github.com/jaydenseric/graphql-multipart-request-spec#single-file.
-     */
+    /** https://github.com/jaydenseric/graphql-multipart-request-spec#single-file. */
     public function testResolvesUploadViaMultipartRequest(): void
     {
         $operations = [
-            'query' => /** @lang GraphQL */ '
+            'query' => /** @lang GraphQL */ <<<'GRAPHQL'
                 mutation ($file: Upload!) {
                     upload(file: $file)
                 }
-            ',
+            GRAPHQL,
             'variables' => [
                 'file' => null,
             ],
@@ -49,18 +47,42 @@ class FileUploadTest extends TestCase
             ]);
     }
 
-    /**
-     * https://github.com/jaydenseric/graphql-multipart-request-spec#batching.
-     */
+    public function testUploadNull(): void
+    {
+        $operations = [
+            'query' => /** @lang GraphQL */ <<<'GRAPHQL'
+                mutation ($file: Upload) {
+                    upload(file: $file)
+                }
+            GRAPHQL,
+            'variables' => [
+                'file' => null,
+            ],
+        ];
+
+        $map = [];
+
+        $file = [];
+
+        $this
+            ->multipartGraphQL($operations, $map, $file)
+            ->assertJson([
+                'data' => [
+                    'upload' => null,
+                ],
+            ]);
+    }
+
+    /** https://github.com/jaydenseric/graphql-multipart-request-spec#batching. */
     public function testResolvesUploadViaBatchedMultipartRequest(): void
     {
         $operations = [
-            'query' => /** @lang GraphQL */ '
+            'query' => /** @lang GraphQL */ <<<'GRAPHQL'
                 mutation ($file1: Upload!, $file2: Upload!) {
                     first: upload(file: $file1)
                     second: upload(file: $file2)
                 }
-            ',
+            GRAPHQL,
             'variables' => [
                 'file1' => null,
                 'file2' => null,
