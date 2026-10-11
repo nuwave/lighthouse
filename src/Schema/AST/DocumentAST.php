@@ -167,6 +167,10 @@ class DocumentAST implements Arrayable
             } elseif ($definition instanceof DirectiveDefinitionNode) {
                 $instance->directives[$definition->name->value] = $definition;
             } elseif ($definition instanceof SchemaDefinitionNode) {
+                if (count($definition->directives) > 0) {
+                    throw new DefinitionException('Directives on the schema definition are not supported, use `extend schema` instead.');
+                }
+
                 $schemaDefinition = $definition;
             } elseif ($definition instanceof SchemaExtensionNode) {
                 $instance->schemaExtensions[] = $definition;

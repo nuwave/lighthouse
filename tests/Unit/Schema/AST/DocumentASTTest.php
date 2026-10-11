@@ -176,6 +176,21 @@ final class DocumentASTTest extends TestCase
         GRAPHQL);
     }
 
+    public function testThrowsOnSchemaDefinitionWithDirectives(): void
+    {
+        $this->expectExceptionObject(new DefinitionException('Directives on the schema definition are not supported, use `extend schema` instead.'));
+
+        DocumentAST::fromSource(/** @lang GraphQL */ <<<'GRAPHQL'
+        schema @link(url: "https://specs.apollo.dev/federation/v2.3") {
+            query: Query
+        }
+
+        type Query {
+            foo: Int
+        }
+        GRAPHQL);
+    }
+
     public function testSerializesRootTypes(): void
     {
         $documentAST = DocumentAST::fromSource(/** @lang GraphQL */ <<<'GRAPHQL'
