@@ -22,6 +22,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $name
  * @property int|null $difficulty
  * @property string|null $guard
+ * @property float|null $latitude
+ * @property float|null $longitude
  * @property \Illuminate\Support\Carbon $completed_at
  *
  * Timestamps

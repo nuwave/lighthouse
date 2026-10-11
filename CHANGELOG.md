@@ -13,6 +13,43 @@ You can find and compare releases at the [GitHub release page](https://github.co
 
 - Allow injecting into every element of a list using an asterisk `*` wildcard path segment in `@inject` https://github.com/nuwave/lighthouse/pull/2280
 
+## v6.71.1
+
+### Fixed
+
+- Stop resolving built-in `@rules` like `url` to global classes, reference global rule classes as `"\\MyRule"` https://github.com/nuwave/lighthouse/pull/2792
+
+## v6.71.0
+
+### Deprecated
+
+- Deprecate `_ide_helper.php` and generating `_lighthouse_ide_helper.php`, Larastan recognizes the `TestResponse` mixin methods without them https://github.com/nuwave/lighthouse/pull/2791
+
+## v6.70.1
+
+### Fixed
+
+- Throw client-safe errors for malformed date literals instead of reporting them as server errors https://github.com/nuwave/lighthouse/pull/2788
+
+## v6.70.0
+
+### Changed
+
+- Classes passed to `DirectiveLocator::setResolved()` take precedence in `DirectiveLocator::classes()` and `DirectiveLocator::definitions()` https://github.com/nuwave/lighthouse/pull/2787
+
+## v6.69.2
+
+### Fixed
+
+- Honour `SaveAwareArgResolver::runBeforeSave()` in nested mutations instead of only at the top level https://github.com/nuwave/lighthouse/pull/2784
+- Run all pre-save arg resolvers lifted out of `@nest` instead of silently discarding those whose field name collides with a sibling https://github.com/nuwave/lighthouse/pull/2784
+
+## v6.69.1
+
+### Fixed
+
+- Keep lazy type loading lazy on `webonyx/graphql-php >= 15.31.0` by passing scalar overrides explicitly when `SchemaConfig::setScalarOverrides` is available https://github.com/nuwave/lighthouse/pull/2772
+
 ## v6.69.0
 
 ### Added

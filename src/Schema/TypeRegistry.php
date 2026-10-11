@@ -225,18 +225,40 @@ class TypeRegistry
         foreach ($this->documentAST->types as $typeDefinition) {
             $name = $typeDefinition->getName()->value;
 
-            if (! isset($this->types[$name])) {
-                $this->types[$name] = $this->handle($typeDefinition);
-            }
+            $this->types[$name] ??= $this->handle($typeDefinition);
         }
 
         foreach ($this->lazyTypes as $name => $lazyType) {
-            if (! isset($this->types[$name])) {
-                $this->types[$name] = $lazyType();
-            }
+            $this->types[$name] ??= $lazyType();
         }
 
         return array_filter($this->types);
+    }
+
+    /**
+     * Built-in scalar types that are overridden in this schema.
+     *
+     * A scalar override is a type named after a built-in scalar such as `String`,
+     * defined in the schema or registered programmatically.
+     *
+     * @return array<int, \GraphQL\Type\Definition\ScalarType>
+     */
+    public function scalarOverrides(): array
+    {
+        $overrides = [];
+        foreach (Type::BUILT_IN_SCALAR_NAMES as $name) {
+            if (
+                isset($this->types[$name])
+                || isset($this->documentAST->types[$name])
+                || isset($this->lazyTypes[$name])
+            ) {
+                $override = $this->get($name);
+                assert($override instanceof ScalarType);
+                $overrides[] = $override;
+            }
+        }
+
+        return $overrides;
     }
 
     /**
